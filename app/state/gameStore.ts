@@ -172,7 +172,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import {
   canScrap,
@@ -953,6 +953,10 @@ const STAMINA_COSTS = {
 // app session.
 const WELCOME_BACK_MIN_MS = 60_000;
 let lastWelcomeBackAt: number | null = null;
+// OTA-350 — throttle the Arbiter's "consider stealth" nudge so it's an
+// occasional suggestion in fitting moments, not a per-scene nag.
+const STEALTH_HINT_MIN_MS = 120_000;
+let lastStealthHintAt: number | null = null;
 
 // OTA 228 — Arbiter low-HP warning latch. Fires the moment HP
 // transitions from ≥5% to <5% of max; clears the latch the moment
@@ -4630,6 +4634,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'arbiter',
           `The Arbiter's voice drops. "This one's beyond you for now — there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill."`,
         );
+      } else {
+        // OTA-350 — "consider stealth" nudge. When a fight looks dangerous (but
+        // not flee-level) AND the player actually has stealth to lean on —
+        // either trained STE or stealth gear worn — the Arbiter suggests
+        // approaching unseen / striking from silence. Throttled (STEALTH_HINT_MIN_MS)
+        // so it's situational advice, not a nag. Sits in the `else` so a
+        // flee-level threat shows the flee line instead (one nudge per scene).
+        const steTotal = effectiveStats(player).stealth;
+        const steGear = aggregateEquippedStatBonuses(player).stealth ?? 0;
+        const threatening = toughest >= hpMax * 1.15 || enemies.length >= 2;
+        const now = Date.now();
+        if (
+          threatening
+          && (steTotal >= 4 || steGear > 0)
+          && (!lastStealthHintAt || now - lastStealthHintAt > STEALTH_HINT_MIN_MS)
+        ) {
+          lastStealthHintAt = now;
+          const line = steGear > 0
+            ? `The Arbiter lowers their voice. "You're carrying shadow with you — use it. Tap APPROACH, flip 'use stealth', and you can be on them before they know it. A clean opening strike, or slip past entirely."`
+            : `The Arbiter lowers their voice. "You move quiet when you choose to. Tap APPROACH, flip 'use stealth', and take them on your terms — strike unseen, or thread past without a fight."`;
+          get().appendLog('arbiter', line);
+        }
       }
     }
     // Track hub-room visits separately from the procedural visitedRooms
@@ -20579,6 +20605,21 @@ function applyEnemyCounter(
               get().appendLog(
                 'reward',
                 `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`,
+              );
+            }
+          }
+          // OTA-350 — using stealth gear in combat trains STEALTH. A clean
+          // parry/dodge while wearing stealth gear (cloak, footwraps, a quiet
+          // blade) is the gear earning its keep — moving unseen under fire.
+          // Gated on equipped stealth > 0 so it only fires when gear is worn.
+          const liveSte = get().player;
+          if (liveSte && (aggregateEquippedStatBonuses(liveSte).stealth ?? 0) > 0) {
+            const trS = trainStat(liveSte, 'stealth', true);
+            set((s) => (s.player ? { player: trS.player } : s));
+            if (trS.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ The shadows move with you. +1 STE (now ${trS.leveled.to}).`,
               );
             }
           }

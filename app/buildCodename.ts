@@ -185,6 +185,11 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-350 — stealth mechanics + Arbiter: 3 titles grant +Stealth (Shadow
+  // Diver / Wayfarer / Etherbound Survivor); using stealth gear in combat
+  // (clean parry/dodge while geared) trains STE; the Arbiter suggests stealth
+  // in fitting encounters (throttled).
+  '2026-06-08-350': 'Dogwood Anvil',
   // OTA-349 — stealth gear pass: stealth statBonus on fitting weapons (daggers/
   // bow/throwing knife) + light armor (cloaks/boots); equipment applies weapon +
   // fused-item stealth; fusion inherits stealth from stealthy inputs; inferred-

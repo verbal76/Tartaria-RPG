@@ -151,8 +151,9 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'etherbound_survivor',
+    // OTA-350 — a survivor of the wastes has learned to keep to cover. (perk below)
     earned: (_pl, p) => p.stormsSurvived >= 1,
-    perk: (a) => { a.envHazardSaveBonus += 2; },
+    perk: (a) => { a.envHazardSaveBonus += 2; a.stealthBonus += 1; },
   },
   {
     id: 'survivor_of_aetherstone',
@@ -220,7 +221,8 @@ export const WIRED_TITLES: TitleDef[] = [
   {
     id: 'wayfarer_of_the_lost_paths',
     earned: (_pl, p) => p.labyrinthCleanRuns >= 1,
-    perk: (a) => { a.pathfinder = true; },
+    // OTA-350 — one who reads the unseen paths also moves along them unseen.
+    perk: (a) => { a.pathfinder = true; a.stealthBonus += 1; },
   },
   {
     id: 'guild_broker',
@@ -255,7 +257,7 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   bane_of_sentinels: 'Passive: +1d6 damage against mechanical foes (automatons, sentinels, drones).',
   seeker_of_lost_relics: 'Passive: +2 to Investigate checks.',
   relic_trader: 'Passive: relics sell for more (≈+10%).',
-  etherbound_survivor: 'Passive: shrugs off some damage from falls and elemental/environmental hits.',
+  etherbound_survivor: 'Passive: shrugs off some damage from falls and elemental/environmental hits; +1 Stealth (you\'ve learned to keep to cover).',
   survivor_of_aetherstone: 'Passive: halves corruption gained from Etheric weather.',
   scion_of_the_giants: 'Passive: +2 to social (diplomacy) checks.',
   etheric_explorer: 'Passive: +1 to social (diplomacy) checks.',
@@ -272,7 +274,7 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   protector_of_the_forgotten: 'Passive: +1 AC while in ruins / constructed places (stacks with Warden).',
   warden_of_the_old_world: 'Passive: +1 AC while in ruins / constructed places (stacks with Protector).',
   speaker_of_forgotten_tongues: 'Passive: +2 when investigating relics & Tartarian machines.',
-  wayfarer_of_the_lost_paths: 'Passive: cardinal travel costs less stamina (2 → 1.5).',
+  wayfarer_of_the_lost_paths: 'Passive: cardinal travel costs less stamina (2 → 1.5); +1 Stealth (you move the lost paths unseen).',
 };
 
 /** Every wired title whose requirement the player currently meets. */

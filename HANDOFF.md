@@ -37,14 +37,18 @@
 >   (Paper-texture ceiling 20%→50%). Plus a test-only verification that the real
 >   dog death/abandon WRITE survives a cold reload. Pushed `789eabf..2bd41c6`;
 >   `eas-update.yml` publishes to Android + iOS. **338 is closed.**
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 2 so far:**
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 3 so far:**
 >   - **OTA-348 "Walnut Anvil"** — Stealth as a first-class attribute (race-rolled
 >     STE: Giant 0 … Reclaimer 1d12); governs stealth/steal checks (off DEX),
 >     trains up, and equipped stealth gear (Salvager's Trench Coat) now feeds it.
 >   - **OTA-349 "Yew Anvil"** — stealth gear pass: stealth on fitting weapons +
 >     light armor; equipment applies weapon/fused stealth; fusion + inferred-stats
 >     + tag-backfill all understand stealth.
->   Holding toward ≥5 before the user triggers the push (per §P3a).
+>   - **OTA-350 "Dogwood Anvil"** — stealth mechanics + Arbiter: 3 titles grant
+>     +Stealth; stealth gear used in combat trains STE; the Arbiter suggests
+>     stealth in fitting encounters.
+>   The full **stealth expansion (348→350)** is staged. Holding toward ≥5 before
+>   the user triggers the push (per §P3a).
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -195,7 +199,16 @@ checkout, not a special rollback tool.)
    tag-backfill propagates the new tags to held items. Tests:
    `stealthGearAndFusion` (7). tsc clean.
 
-*(2 OTAs staged toward the next batch. ≥5 before the next push, per §P3a — unless
+3. **OTA-350 "Dogwood Anvil" — stealth mechanics + Arbiter.** Closes the stealth
+   expansion: (1) three titles grant +1 Stealth (Shadow Diver / Wayfarer of the
+   Lost Paths / Etherbound Survivor); (2) using stealth gear in combat (a clean
+   parry/dodge while geared) trains STE — the other two sources (stealth
+   approaches + vendor steals) already trained it since 348; (3) the Arbiter
+   suggests stealth in threatening-but-survivable encounters when the player has
+   STE/gear, nudging APPROACH → "use stealth" (throttled). Tests: `stealthTitles`
+   (5). tsc clean.
+
+*(3 OTAs staged toward the next batch. ≥5 before the next push, per §P3a — unless
 the user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues

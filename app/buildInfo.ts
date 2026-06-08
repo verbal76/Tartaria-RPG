@@ -12708,4 +12708,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // UniqueItemStats.statBonus. (4) The inferred-stats engine grants stealth for
 // shadow/silent/muffled/etc. names (weapons, armor, accessories). (5) Catalog
 // tag-backfill propagates the new `stealth` tags to held instances. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-349';
+// OTA-350 (Dogwood Anvil) — stealth mechanics + Arbiter. (1) Three thematically-
+// fitting titles now grant +Stealth: Shadow Diver (existing), Wayfarer of the
+// Lost Paths, Etherbound Survivor — flowing into the stealth check via
+// titleSkillBonus. (2) Using stealth gear in combat trains STE: a clean
+// parry/dodge while wearing equipped stealth gear also trains Stealth (gated on
+// equipped stealth > 0). (Stealth approaches + successful vendor steals already
+// train STE since OTA-348.) (3) The Arbiter now proactively suggests stealth in
+// fitting spots — a threatening (not flee-level) encounter when the player has
+// trained STE or stealth gear — nudging APPROACH → "use stealth"; throttled so
+// it's situational advice, not a nag. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-350';
