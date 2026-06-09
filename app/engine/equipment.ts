@@ -172,15 +172,16 @@ export function resolveEquippedItem(
   if (!eq) return null;
   const name = eq[slot];
   if (!name) return null;
+  const inventory = player.inventory ?? [];
   const idKey = SLOT_ID_KEY[slot];
   const wantedId = eq[idKey];
   if (wantedId) {
-    const byId = player.inventory.find((i) => i.id === wantedId && i.quantity > 0);
+    const byId = inventory.find((i) => i.id === wantedId && i.quantity > 0);
     if (byId) return byId;
   }
   // Legacy save (no id stored) — first-by-name. Same behaviour as before
   // the refactor, so saves without ids still equip correctly.
-  return player.inventory.find(
+  return inventory.find(
     (i) => i.name.toLowerCase() === name.toLowerCase() && i.quantity > 0,
   ) ?? null;
 }
@@ -279,6 +280,14 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   for (const slot of ARMOR_SLOTS) {
     const name = eq[slot];
     if (!name) continue;
+    // Per-instance rolled perks (stampDurability) take precedence over the
+    // catalog so two copies of the same piece grant different bonuses. They
+    // carry attribute stats only (never hp — that stays catalog/hpMax-baked).
+    const inst = resolveEquippedItem(player, slot);
+    if (inst?.instanceStats?.statBonuses) {
+      for (const b of inst.instanceStats.statBonuses) add(b.stat, b.amount);
+      continue;
+    }
     const piece = findArmorByName(name);
     if (!piece) continue;
     // arb-fix — apply EVERY stat bonus on a piece, not just the primary
@@ -297,6 +306,11 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   for (const slot of ['main', 'off'] as const) {
     const name = eq[slot];
     if (!name) continue;
+    const inst = resolveEquippedItem(player, slot);
+    if (inst?.instanceStats?.statBonuses) {
+      for (const b of inst.instanceStats.statBonuses) add(b.stat, b.amount);
+      continue;
+    }
     const wpn = findWeaponByName(name);
     if (!wpn) continue;
     for (const b of wpn.statBonuses ?? []) add(b.stat, b.amount);

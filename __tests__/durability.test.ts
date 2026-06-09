@@ -71,3 +71,36 @@ describe('durability', () => {
     expect(next[0]!.durability!.current).toBe(30);
   });
 });
+
+describe('durability — per-instance variation (inverse tradeoff)', () => {
+  const fresh = (): InventoryItem => ({
+    id: 'w', name: 'Rusted Blade', kind: 'weapon', quantity: 1, tags: [],
+  });
+  const perkTotal = (i: InventoryItem): number =>
+    (i.instanceStats?.acBonus ?? 0)
+    + (i.instanceStats?.statBonuses ?? []).reduce((s, b) => s + b.amount, 0);
+
+  afterEach(() => jest.restoreAllMocks());
+
+  it('a fragile roll (temper 0) has LOW durability but a BIG perk budget', () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0); // temper 0 = fragile
+    const fragile = stampDurability(fresh());
+    jest.spyOn(Math, 'random').mockReturnValue(0.999); // temper ~1 = sturdy
+    const sturdy = stampDurability(fresh());
+
+    // Inverse relationship: the fragile copy is weaker-bodied, stronger-perked.
+    expect(fragile.durability!.max).toBeLessThan(sturdy.durability!.max);
+    expect(perkTotal(fragile)).toBeGreaterThan(perkTotal(sturdy));
+    // Both still carry a rolled perk loadout, and the primary channel survives.
+    expect(perkTotal(fragile)).toBeGreaterThanOrEqual(1);
+    expect(perkTotal(sturdy)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('never re-rolls an item that already has durability (idempotent)', () => {
+    const already: InventoryItem = {
+      id: 'w', name: 'Rusted Blade', kind: 'weapon', quantity: 1, tags: [],
+      durability: { current: 7, max: 7 },
+    };
+    expect(stampDurability(already)).toBe(already);
+  });
+});

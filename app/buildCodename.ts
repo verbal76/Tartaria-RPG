@@ -275,6 +275,11 @@ const CODENAMES: Record<string, string> = {
   // title catch-all to before submitPlayerAction's player snapshot so stale
   // writebacks stop clobbering the earnedTitles append (was re-announcing every
   // action + dropping the passive perk).
+  // OTA-380 — per-instance gear variety: stampDurability rolls a `temper` that
+  // scales durability up while scaling the perk budget down (inverse tradeoff);
+  // perks stored on InventoryItem.instanceStats, read before the catalog by the
+  // stat/AC aggregators. Two copies of the same item now differ.
+  '2026-06-09-380': 'Pawpaw Anvil',
   '2026-06-09-379': 'Mesquite Anvil',
   '2026-06-09-378': 'Chinquapin Anvil',
   '2026-06-09-377': 'Serviceberry Anvil',

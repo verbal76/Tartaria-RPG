@@ -10,13 +10,14 @@ import { useGameStore } from '../state/gameStore';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
-import { effectiveStatsBreakdown, type StatBreakdown } from '../engine/equipment';
+import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
 import { TITLE_PASSIVE_PERK } from '../engine/titles';
-import { getItemPreview } from '../components/itemPreview';
+import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { findHuntById } from '../engine/hunts';
@@ -246,7 +247,10 @@ export function CharacterScreen() {
                   </View>
                 );
               }
-              const preview = getItemPreview(name);
+              // Prefer the equipped INSTANCE so per-instance rolled durability
+              // and perks show (mirrored off-hand resolves the main 2H weapon).
+              const inst = resolveEquippedItem(player, (isMirrored ? 'main' : slot) as EquipSlot);
+              const preview = inst ? getItemPreviewForInstance(inst) : getItemPreview(name);
               return (
                 <View key={slot} style={styles.slotRow}>
                   <Text style={styles.slotLabel}>{SLOT_LABEL[slot]}</Text>

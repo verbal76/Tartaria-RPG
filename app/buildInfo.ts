@@ -13030,4 +13030,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nearly every turn and titlePerkModifiers (e.g. +2 diplomacy) saw it only
 // intermittently. Moved the catch-all to BEFORE the snapshot so the title folds
 // into it and all writebacks preserve it. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-379';
+// OTA-380 (Pawpaw Anvil) — per-instance gear variety. Every copy of a catalog
+// weapon/armor used to clone the same durability + perks ("buying the cooler
+// name"). stampDurability now rolls a per-instance `temper` (0=fragile…1=sturdy):
+// durability scales 0.4×–1.8× of base while the perk budget scales INVERSELY
+// (fragile = more/stronger perks, sturdy = fewer/weaker), keyed by rarity and
+// distributed over the piece's catalog perk channels (AC + attribute stats;
+// weapons seed from their scaling stat). Perks live on a new
+// InventoryItem.instanceStats, read before the catalog by
+// aggregateEquippedStatBonuses (attributes) + aggregateArmor (AC); HP stays
+// catalog-driven (hpMax baking). Legacy saves fall back to catalog. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-380';

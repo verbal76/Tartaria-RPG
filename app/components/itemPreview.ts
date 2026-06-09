@@ -38,6 +38,8 @@ export type ItemPreview = {
 export function getItemPreviewForInstance(item: {
   name: string;
   uniqueStats?: import('../engine/types').UniqueItemStats;
+  durability?: { current: number; max: number };
+  instanceStats?: { acBonus?: number; statBonuses?: { stat: string; amount: number }[] };
   description?: string;
   rarity?: string;
 }): ItemPreview {
@@ -62,7 +64,41 @@ export function getItemPreviewForInstance(item: {
       stats,
     };
   }
-  return getItemPreview(item.name);
+
+  const base = getItemPreview(item.name);
+  // No per-instance roll → plain catalog preview (legacy saves, non-gear).
+  if (!item.instanceStats && !item.durability) return base;
+
+  const isAcLine = (s: string) => /^AC \+\d+$/.test(s);
+  const isStatLine = (s: string) => /^[A-Za-z]{3} \+\d+$/.test(s); // "DEX +1", "STE +2"
+  const isDurLine = (s: string) => s.startsWith('Durability:');
+  const catalogDur = base.stats.find(isDurLine);
+
+  let stats: string[];
+  if (item.instanceStats) {
+    // Swap the catalog AC + attribute-perk lines for this instance's rolled
+    // values; keep everything else (Damage / Scales / Resists / Tags) intact.
+    const rebuilt: string[] = [];
+    if (item.instanceStats.acBonus !== undefined) rebuilt.push(`AC +${item.instanceStats.acBonus}`);
+    for (const s of base.stats) {
+      if (isAcLine(s) || isStatLine(s) || isDurLine(s)) continue;
+      rebuilt.push(s);
+    }
+    for (const b of item.instanceStats.statBonuses ?? []) {
+      rebuilt.push(`${b.stat.toUpperCase().slice(0, 3)} +${b.amount}`);
+    }
+    stats = rebuilt;
+  } else {
+    stats = base.stats.filter((s) => !isDurLine(s));
+  }
+
+  // Re-append durability: the live instance value when known, else the catalog line.
+  const durLine = item.durability
+    ? `Durability: ${item.durability.current}/${item.durability.max}`
+    : catalogDur;
+  if (durLine) stats.push(durLine);
+
+  return { ...base, stats };
 }
 
 // Resolve an item name to a previewable summary. Used by the buy / equip /

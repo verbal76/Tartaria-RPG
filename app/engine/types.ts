@@ -414,6 +414,23 @@ export interface InventoryItem {
    *  one-of-a-kind for this save and will not appear in any vendor /
    *  loot / catalog lookup elsewhere. */
   uniqueStats?: UniqueItemStats;
+  /** Per-instance rolled variation for AUTHORED (non-fused) gear. Stamped
+   *  once at item creation (stampDurability) so two copies of the same
+   *  catalog weapon/armor differ: durability and perks vary with an inverse
+   *  tradeoff — a sturdier roll carries fewer/weaker perks, a fragile roll
+   *  carries more/stronger ones. The equip/aggregate/preview resolvers read
+   *  these BEFORE the catalog. Absent on legacy saves and on non-gear →
+   *  catalog fallback (behaviour unchanged). HP perks stay catalog-driven
+   *  (baked into hpMax on equip via gearHpBonus), so instanceStats never
+   *  carries an `hp` entry. `uniqueStats` (fused items) takes precedence. */
+  instanceStats?: {
+    /** Overrides the armor catalog acBonus for THIS instance (armor only). */
+    acBonus?: number;
+    /** Overrides the catalog attribute statBonuses for THIS instance.
+     *  Base stats only (strength/dexterity/intelligence/wisdom/charisma/
+     *  stealth) — never `hp`. */
+    statBonuses?: { stat: string; amount: number }[];
+  };
   /** OTA-360 — weapon-coating applied to THIS weapon instance. A
    *  consumable coating (poison / acid / corruption) painted onto a
    *  bladed or ranged weapon. Permanent for the weapon's life: it

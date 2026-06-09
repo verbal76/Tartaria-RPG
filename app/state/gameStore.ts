@@ -175,7 +175,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import {
   canScrap,
@@ -20775,7 +20775,11 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     }
     const piece = findArmorByName(name);
     if (!piece) continue;
-    acBonus += piece.acBonus;
+    // Per-instance rolled AC (stampDurability) takes precedence over the
+    // catalog acBonus so two copies of the same piece differ. Resistances
+    // still come from the catalog (not part of the instance roll).
+    const inst = resolveEquippedItem(player, slot);
+    acBonus += inst?.instanceStats?.acBonus ?? piece.acBonus;
     for (const r of piece.resistances) resistances.push(r);
   }
   return { acBonus, resistances };
