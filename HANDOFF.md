@@ -136,7 +136,18 @@
 >     location, return) — checked before the 25 TC cost. The cryptic line led a
 >     player to read the later TC step as the blocker. Irma's + the foreman's lines
 >     now say to leave the outpost and see the world first. Copy only.
->   (Batch now 6, ≥5 — ready when the **user** triggers the push.)
+>   - **OTA-391 "Hophornbeam Anvil"** — combat narration shows the coated weapon
+>     name. Attack lines used the base parsed noun, so a coated weapon read as its
+>     old name mid-fight; new `coatedWeaponNoun` helper prefers `coatedDisplayName`.
+>     Pairs with OTA-389. Display only.
+>   (Batch now 7, ≥5 — ready when the **user** triggers the push.)
+>
+> **RESOLVED (fusion gate — keep as-is):** considered relaxing the Crucible gate so
+> it unlocks the moment the player is out in the wilds (roadside vendor / first wilds
+> scene), but the current rule is already looser than remembered — `macroVisitSeq ≥ 1`
+> unlocks on reaching ANY other named macro-location (incl. another outpost like the
+> Dynasty Border Post, not a far "City"), and wild crucibles already bypass via
+> `fusionPending`. User chose to keep it; OTA-390 makes the requirement legible.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

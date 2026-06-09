@@ -6552,7 +6552,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
           }
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
-          get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
+          get().appendLog('world', attackOpener(targetEnemy.name, coatedWeaponNoun(get().player, parsed.resolvedNoun)));
         } else {
           // No enemy — the player might have meant "kick the rubble"
           // / "smash the wall" / "punch the ground" as a clumsy way
@@ -12844,7 +12844,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: true,
     });
-    const weaponName = combatParse.resolvedNoun ?? null;
+    const weaponName = coatedWeaponNoun(player, combatParse.resolvedNoun ?? null);
 
     if (initiative) {
       get().appendLog('world', initiative.success
@@ -24237,6 +24237,26 @@ function tryFireRubblePuppy(
     `The Arbiter looks at the pup, then at you. "Some debts the world settles itself. What kind of dog is that?"`,
   );
   return true;
+}
+
+// OTA-391 — combat narration shows the COATED weapon name. The attack lines
+// took the parsed noun (the base "rusty shortbow"), so a coated weapon read as
+// its old name mid-fight even though inventory + the apply line called it
+// "Acid-Etched Rusty Shortbow". Resolve the wielded instance and prefer its
+// coated display name; fall back to the parsed noun for bare/uncoated swings.
+function coatedWeaponNoun(
+  player: PlayerCharacter | null | undefined,
+  resolvedNoun: string | null | undefined,
+): string | null {
+  if (!resolvedNoun) return resolvedNoun ?? null;
+  const eq = player?.equipped ?? {};
+  const inst = (player?.inventory ?? []).find(
+    (i) => i.coating
+      && i.name.toLowerCase() === resolvedNoun.toLowerCase()
+      && (i.id === eq.mainId || i.id === eq.offId),
+  );
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return inst ? (require('../engine/weaponCoating').coatedDisplayName(inst) as string) : resolvedNoun;
 }
 
 function weaponPhrase(weapon: string | null): string {

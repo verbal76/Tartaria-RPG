@@ -13109,4 +13109,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the later TC step as the blocker and chased coins instead of leaving the
 // outpost. Both lines now spell it out: "Leave the outpost and see something of
 // the world first — travel out to a named place and come back." JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-390';
+// OTA-391 (Hophornbeam Anvil) — combat narration shows the COATED weapon name.
+// The attack lines (opener / hit / miss / kill / knockout) used the parsed noun
+// (the base "rusty shortbow"), so a coated weapon read as its OLD name mid-fight
+// even though inventory + the apply line called it "Acid-Etched Rusty Shortbow".
+// New coatedWeaponNoun helper resolves the wielded instance and prefers its
+// coatedDisplayName; bare/uncoated swings fall back to the parsed noun. Pairs
+// with OTA-389 (repair). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-391';

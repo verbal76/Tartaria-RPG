@@ -309,6 +309,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-390 — clearer Crucible "first-timer" refusal: the fusion gate needs you to
   // venture out to a named location and return (before the TC cost); Irma's + the
   // foreman's cryptic line now say plainly to leave the outpost and see the world.
+  // OTA-391 — combat narration shows the coated weapon name: the attack lines used
+  // the base parsed noun, so a coated weapon read as its old name mid-fight; new
+  // coatedWeaponNoun helper prefers coatedDisplayName (pairs with the OTA-389 repair fix).
+  '2026-06-09-391': 'Hophornbeam Anvil',
   '2026-06-09-390': 'Witchhazel Anvil',
   '2026-06-09-389': 'Bristlecone Anvil',
   '2026-06-09-388': 'Hackmatack Anvil',
