@@ -97,6 +97,29 @@
       ]
     },
     {
+      "result": "Incendiary Paste",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Aether Crystal", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Searing Paste",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Smoldering Paste",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Aether Residue", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

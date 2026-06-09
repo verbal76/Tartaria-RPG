@@ -448,7 +448,7 @@ export interface InventoryItem {
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */
 export interface WeaponCoating {
   /** Coating family — drives the on-hit enemy status that lands. */
-  kind: 'poison' | 'acid' | 'corruption' | 'electrical';
+  kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
   /** Damage dice rolled on a landing hit ("1d4"). */
   dice: string;
   /** Display adjective used by coatedDisplayName ("Corrupted"). */

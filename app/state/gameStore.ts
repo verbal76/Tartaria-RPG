@@ -439,7 +439,7 @@ interface CurrentScene {
    *  status list; ticks each combat round. Empty array when no
    *  status is active. Initialized empty by beginScene. */
   enemyStatuses?: Array<Array<{
-    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat';
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
@@ -6376,7 +6376,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   || st.kind === 'poison_coat'
                   || st.kind === 'acid_coat'
                   || st.kind === 'corruption_coat'
-                  || st.kind === 'electrical_coat';
+                  || st.kind === 'electrical_coat'
+                  || st.kind === 'burn_coat';
                 if (isDot && st.turnsRemaining > 0) {
                   const dmg = st.dmgPerTurn;
                   const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
@@ -6390,7 +6391,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         ? `${enemyName} blackens — corruption eats ${dmg}.`
                         : st.kind === 'electrical_coat'
                           ? `${enemyName} convulses — arcing current bites ${dmg}.`
-                          : `${enemyName} convulses — infection bleeds ${dmg}.`;
+                          : st.kind === 'burn_coat'
+                            ? `${enemyName} blisters — clinging fire sears ${dmg}.`
+                            : `${enemyName} convulses — infection bleeds ${dmg}.`;
                   get().appendLog(
                     'combat',
                     `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
@@ -12972,7 +12975,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // also seeds an ongoing DOT (applied below, only if the enemy
       // survives the blow). The instance is resolved off the equipped
       // slot id for the hand that swung.
-      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical'; rolled: number; label: string; source: string } | null = null;
+      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; label: string; source: string } | null = null;
       if (!barehand) {
         const coatSlotId = usedOffHandForDmg
           ? (player.equipped?.offId ?? null)
@@ -12981,12 +12984,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const coating = coatInst?.coating;
         if (coating) {
           const rawRolled = Math.max(1, rollFromNotation(coating.dice));
-          // OTA-386 — an etheric (electrical) coating delivers ELECTRICAL-typed
-          // bonus damage, so its proc earns the weakness multiplier against
-          // electrical-weak foes (Constructs / Automations) even when the base
-          // weapon isn't electrical. Other coatings deal flat typeless bonus dmg.
-          const rolled = coating.kind === 'electrical'
-            ? Math.max(1, applyDamageTypeModifier(rawRolled, 'electrical', enemy.type).damage)
+          // OTA-386/387 — ELEMENTAL coatings (electrical, burn) deliver their own
+          // damage-typed bonus, so the proc earns the enemy's weakness to that
+          // type — both the macro type map AND the enemy's own resist:/vulnerable:
+          // traits — even when the base weapon isn't that type. Poison/acid/
+          // corruption deal flat typeless bonus damage (their bite is the DOT).
+          const isElemental = coating.kind === 'electrical' || coating.kind === 'burn';
+          const rolled = isElemental
+            ? Math.max(
+                1,
+                Math.round(
+                  applyDamageTypeModifier(rawRolled, coating.kind, enemy.type).damage
+                  * traitDamageMultiplier(enemy.traits, coating.kind).multiplier,
+                ),
+              )
             : rawRolled;
           coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
           dmg += rolled;

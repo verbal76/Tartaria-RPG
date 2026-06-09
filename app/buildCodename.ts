@@ -297,7 +297,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-386 — etheric (electrical) weapon coatings: aether-dust pastes that arc
   // electrical damage (weakness-aware vs constructs/automatons); flavored variants
   // (Galvanic +1 STE, Resonant +1 CHA) also grant a passive stat bonus when held.
-  '2026-06-09-386': 'Manzanita Anvil',
+  // OTA-387 — burn weapon coatings (parallel family): aether-dust pastes run hot
+  // that sear burn damage (weakness-aware, now via type map AND traits); variants
+  // Incendiary, Searing (+1 STR), Smoldering (+1 INT).
+  '2026-06-09-387': 'Madrone Anvil',
   '2026-06-09-385': 'Sweetbay Anvil',
   '2026-06-09-384': 'Basswood Anvil',
   '2026-06-09-383': 'Yaupon Anvil',

@@ -92,7 +92,7 @@ export type ItemEffect =
       // (InventoryItem.coating) and consumes one unit. poison =
       // pure DOT, acid = DOT + armor shred, corruption = DOT +
       // corruption stacks. dice rolls on a landing hit.
-      coating?: { kind: 'poison' | 'acid' | 'corruption' | 'electrical'; dice: string; label: string; statBonus?: { stat: string; amount: number } };
+      coating?: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; dice: string; label: string; statBonus?: { stat: string; amount: number } };
     }
   | { kind: 'gate'; unlocks: GateKind }
   | {

@@ -118,6 +118,11 @@
 >     (previously only the 21 electrical WEAPONS could). 3 variants (Aether Dust +
 >     Speckled Egg base): Static Paste, Galvanic (+1 STE), Resonant (+1 CHA) — the
 >     flavored ones grant a passive stat bonus via new `WeaponCoating.statBonus`.
+>   - **OTA-387 "Madrone Anvil"** — burn weapon coatings (parallel family). New
+>     `burn` coating kind: aether-dust paste run hot that sears burn damage; the
+>     elemental proc now runs through type map AND `vulnerable:`/`resist:` traits
+>     (electrical inherits the fix). 3 variants (Aether Dust + Aether Crystal base):
+>     Incendiary, Searing (+1 STR), Smoldering (+1 INT).
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

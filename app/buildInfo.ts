@@ -13082,4 +13082,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Egg base): Static Paste, Galvanic Paste (+1 stealth), Resonant Paste (+1 CHA);
 // the flavored ones grant a passive stat bonus while the coated weapon is held
 // (new WeaponCoating.statBonus, read by aggregateEquippedStatBonuses). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-386';
+// OTA-387 (Madrone Anvil) — burn weapon coatings, parallel to the etheric family
+// (the Iron Spider et al. are burn-weak but only the 45 burn WEAPONS could
+// exploit it). New `burn` coating kind: an aether-dust paste run hot that sears
+// burn damage; its proc now runs through BOTH the type map AND the enemy's
+// resist:/vulnerable: traits (generalized the OTA-386 elemental path, so
+// electrical benefits too). Three variants (Aether Dust + Aether Crystal base):
+// Incendiary Paste, Searing Paste (+1 STR), Smoldering Paste (+1 INT). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-387';
