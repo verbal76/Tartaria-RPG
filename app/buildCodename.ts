@@ -279,6 +279,10 @@ const CODENAMES: Record<string, string> = {
   // scales durability up while scaling the perk budget down (inverse tradeoff);
   // perks stored on InventoryItem.instanceStats, read before the catalog by the
   // stat/AC aggregators. Two copies of the same item now differ.
+  // OTA-381 — "Buy & Equip" at vendors: a second buy-modal button that wears the
+  // ware immediately; single-slot gear auto-equips, a weapon prompts main vs off
+  // hand. Reuses validSlotsForItem + equipItem.
+  '2026-06-09-381': 'Boxelder Anvil',
   '2026-06-09-380': 'Pawpaw Anvil',
   '2026-06-09-379': 'Mesquite Anvil',
   '2026-06-09-378': 'Chinquapin Anvil',

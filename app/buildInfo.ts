@@ -13040,4 +13040,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // InventoryItem.instanceStats, read before the catalog by
 // aggregateEquippedStatBonuses (attributes) + aggregateArmor (AC); HP stays
 // catalog-driven (hpMax baking). Legacy saves fall back to catalog. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-380';
+// OTA-381 (Boxelder Anvil) — "Buy & Equip" at vendors. Buying only added to the
+// pack; the player then had to open the inventory to wear it. The vendor buy
+// modal now offers a second "Buy & Equip" button for equippable wares: single-
+// slot gear (armor/accessory) equips immediately, a weapon (main OR off hand)
+// opens a hand-choice prompt. Reuses validSlotsForItem + equipItem (which already
+// handles two-handed displacement + HP/durability baking). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-381';

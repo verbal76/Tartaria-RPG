@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
+import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
@@ -36,6 +38,7 @@ export function VendorScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const setScreen = useGameStore((s) => s.setScreen);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
+  const equipItem = useGameStore((s) => s.equipItem);
   const sellToVendor = useGameStore((s) => s.sellToVendor);
   const stealFromVendor = useGameStore((s) => s.stealFromVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
@@ -60,6 +63,9 @@ export function VendorScreen() {
   const [sellQty, setSellQty] = useState(1);
   // arb92 — buy in quantity (food/material traders stock multiples).
   const [buyQty, setBuyQty] = useState(1);
+  // "Buy & Equip" hand-choice prompt. Set after buying a weapon (which can go
+  // in either hand) so the player picks main vs off before it's equipped.
+  const [pendingEquip, setPendingEquip] = useState<{ itemName: string; slots: EquipSlot[] } | null>(null);
 
   const vendor = scene?.vendor ?? null;
 
@@ -151,6 +157,31 @@ export function VendorScreen() {
     : 0;
   const buyMax = Math.max(1, Math.min(pendingBuyStock, Math.max(1, pendingBuyAfford)));
   const buyRepsClamped = Math.max(1, Math.min(buyQty, buyMax));
+  // Equip slots an unbought ware would offer — used to decide whether to show
+  // the "Buy & Equip" button. A name-only stub is enough: validSlotsForItem
+  // resolves weapons/armor/accessories by catalog name + name-regex fallback.
+  const equipSlotsForName = (itemName: string): EquipSlot[] =>
+    validSlotsForItem({ id: '', name: itemName, kind: 'misc', quantity: 1, tags: [] } as InventoryItem);
+  const pendingBuyEquipSlots: EquipSlot[] = pending?.mode === 'buy' ? equipSlotsForName(pending.itemName) : [];
+
+  // Buy one and equip it immediately. A single valid slot (armor / accessory)
+  // equips straight away; a weapon (main OR off hand) opens the hand-choice
+  // prompt. We read the freshly-bought instance from the live store so the
+  // slot decision reflects the real item (tags/kind), then equip by name —
+  // equipItem already handles two-handed displacement + HP/durability baking.
+  const doBuyEquip = () => {
+    if (pending?.mode !== 'buy') return;
+    const name = pending.itemName;
+    buyFromVendor(name, 1);
+    setPending(null);
+    const bought = useGameStore.getState().player?.inventory.find((i) => i.name === name);
+    const slots = bought ? validSlotsForItem(bought) : equipSlotsForName(name);
+    if (slots.length === 1) {
+      equipItem(name, slots[0]!);
+    } else if (slots.length > 1) {
+      setPendingEquip({ itemName: name, slots });
+    }
+  };
   const doBuy = (override?: number) => {
     if (pending?.mode !== 'buy') return;
     const n = Math.max(1, Math.min(override ?? buyQty, buyMax));
@@ -673,10 +704,31 @@ export function VendorScreen() {
                         ...(buyMax > 1
                           ? [{ label: `Buy All (${buyMax})`, onPress: () => doBuy(buyMax), tone: 'primary' as const }]
                           : []),
+                        // Buy one and wear it now (weapons prompt for which hand).
+                        ...(pendingBuyEquipSlots.length > 0
+                          ? [{ label: 'Buy & Equip', onPress: doBuyEquip, tone: 'primary' as const }]
+                          : []),
                       ]
                     : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
         }
         onRequestClose={cancel}
+      />
+
+      {/* Buy & Equip — hand choice for weapons (main vs off). Single-slot gear
+          equips without this prompt. */}
+      <BrandedModal
+        visible={pendingEquip !== null}
+        title={`Equip ${pendingEquip?.itemName ?? ''}`}
+        contextLine="Which hand?"
+        buttons={[
+          { label: 'Not now', onPress: () => setPendingEquip(null), tone: 'neutral' as const },
+          ...(pendingEquip?.slots ?? []).map((s) => ({
+            label: SLOT_LABEL[s],
+            onPress: () => { equipItem(pendingEquip!.itemName, s); setPendingEquip(null); },
+            tone: 'primary' as const,
+          })),
+        ]}
+        onRequestClose={() => setPendingEquip(null)}
       />
     </View>
   );
