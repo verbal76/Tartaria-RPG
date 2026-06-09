@@ -29,9 +29,17 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-381 "Boxelder Anvil"** — the gear-variety +
->   UX-polish batch (377→381), pushed through `6c17eb5`; `eas-update.yml` publishes
->   to Android + iOS. Per-OTA detail in `docs/build-codenames.md`.
+> - **LIVE (pushed 2026-06-09) = OTA-395 "Inkberry Anvil"** — the big polish +
+>   **SAVE-LOSS ROOT-CAUSE** batch (385→395), pushed through `ec326c4`;
+>   `eas-update.yml` publishes to Android + iOS. Headline: 395 bounds the slot blob
+>   under AsyncStorage's ~2MB readback window (the real fix for the "staged save
+>   did not verify" failures), 394 adds a manual SAVE button that reports the real
+>   result. Also: water-bottle drink/refill + "drink" verb (393), etheric/burn
+>   weapon coatings (386/387), coated-name consistency (389/391), rope-not-a-tool
+>   (385), clearer MAIN QUEST + Crucible copy (388/390), climb middle-tier label
+>   (392). Per-OTA detail in `docs/build-codenames.md`.
+> - **PRIOR LIVE (pushed 2026-06-09) = OTA-384 "Basswood Anvil"** — stall sale-price
+>   variation (382→384 incl. enemy panel + Viper Venom recipes), pushed `f26de09`.
 >   - **377 Serviceberry** — title-footer clarity ("2148" = the in-world year).
 >   - **378 Chinquapin** — Tired/Exhausted "(99r)" no longer leaks to the compact HUD
 >     (stamina-gated sentinel; `formatEffectSummary` now hides the fake count).
@@ -89,7 +97,9 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
+> - **STAGED — none.** Everything through OTA-395 is pushed/LIVE (see above).
+>   Next change starts a fresh batch.
+> - **(shipped, was staged) earlier-batch detail kept for reference:**
 >   - **OTA-382 "Loblolly Anvil"** — enemy panel fits the top-right column
 >     (portrait) instead of a full-screen landscape card that scrolled left/right
 >     (`EnemyPanel` now measures its container via `onLayout`, single enemy drops
