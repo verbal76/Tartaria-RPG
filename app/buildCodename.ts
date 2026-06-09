@@ -319,6 +319,9 @@ const CODENAMES: Record<string, string> = {
   // Empty Water Bottle left to refill); a shared leaveEmptyWaterBottle helper now
   // runs on every consume path. Plus a shared consumeVerb so the button/narration
   // say "drink" (not "eat") for the bottle.
+  // OTA-394 — manual SAVE button (Session tab) alongside SAVE & EXIT; persist()
+  // returns a boolean so the button reports a real "✓ SAVED" / "✗ SAVE FAILED".
+  '2026-06-09-394': 'Sourgum Anvil',
   '2026-06-09-393': 'Chokecherry Anvil',
   '2026-06-09-392': 'Silverbell Anvil',
   '2026-06-09-391': 'Hophornbeam Anvil',

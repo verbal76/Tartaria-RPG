@@ -2330,7 +2330,11 @@ interface GameStore {
    *  ignored for 'scratch' / 'speak'. */
   selectCallDogOption: (option: 'scratch' | 'treat' | 'speak', treatItemName?: string) => void;
 
-  persist: () => Promise<void>;
+  /** Write the active slot. Resolves `true` when the atomic save landed and
+   *  verified, `false` when it was skipped (no slot / no player) or the write
+   *  failed (truncated / storage full). Most callers fire-and-forget; the
+   *  manual SAVE button awaits the result to report success honestly. */
+  persist: () => Promise<boolean>;
 }
 
 // OTA 199-200 — log fully uncapped per playtester directive:
@@ -19200,13 +19204,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   async persist() {
     const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId, wastelandStepsSinceEncounter } = get();
-    if (!activeSlotId) return; // No active slot — nothing to write to.
+    if (!activeSlotId) return false; // No active slot — nothing to write to.
     // CRITICAL: refuse to overwrite a save with player=null. This guards
     // against transient states (mid-load, mid-death-cleanup, mid-OTA-
     // reload) where activeSlotId is still set but player has been
     // cleared. Writing player=null silently here was a major source of
     // "save file is missing the character record" errors across updates.
-    if (!player) return;
+    if (!player) return false;
     // OTA-368 — structural integrity guard. Beyond player=null, refuse to
     // overwrite a slot when the in-memory player is missing its core
     // identity (name / raceId / stats) — a sign of a half-constructed or
@@ -19219,7 +19223,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'debug',
         `persist: skipped — player record missing core identity (name=${player.name ? '✓' : '∅'}, raceId=${player.raceId ? '✓' : '∅'}, stats=${player.stats ? '✓' : '∅'}); slot ${activeSlotId} left intact`,
       );
-      return;
+      return false;
     }
     // 2026-05-25 OTA-046 — stamp the player's lastSessionEndedAt at
     // every persist so a slot-load round trip can compute "real-time
@@ -19254,6 +19258,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // means the atomic save isn't landing — exactly what a log review needs.
     const saveErr = getLastSaveWriteError();
     if (saveErr) get().appendLog('debug', `persist: slot ${activeSlotId} FAILED — ${saveErr}`);
+    return !saveErr;
   },
 }));
 

@@ -13132,4 +13132,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inventory button hardcoded "Use (eat)" for all consumables; new shared
 // consumeVerb helper labels drinks "Use (drink)", kits "Use (apply)", food
 // "Use (eat)" — used by the button, the narration, and the debug snapshot. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-393';
+// OTA-394 (Sourgum Anvil) — manual SAVE button on the settings Session tab, next
+// to SAVE & EXIT TO TITLE, so the player can checkpoint without leaving the run.
+// It reports the REAL write result: persist() now returns a boolean (false on
+// skip/failed write — it already checks getLastSaveWriteError, which saveSlot
+// clears on success), and the button flashes "✓ SAVED" or a red "✗ SAVE FAILED"
+// so a silent save failure (storage full / oversized slot) is finally loud.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-394';

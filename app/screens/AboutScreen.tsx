@@ -100,6 +100,9 @@ export function AboutScreen() {
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
+  // Manual SAVE button feedback. 'saving' while the write runs, then a 'saved'
+  // / 'failed' flash reflecting whether the atomic write actually landed.
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
   // OTA-203 — dedicated COPY INVENTORY button. Separate from the log
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
@@ -119,6 +122,21 @@ export function AboutScreen() {
     | null
   >(null);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
+  const persist = useGameStore((s) => s.persist);
+
+  // Save in place (stay on the screen). Reports the real result — important
+  // because a save can silently fail (storage full / oversized slot blob).
+  const handleSave = async () => {
+    setSaveState('saving');
+    let ok = false;
+    try {
+      ok = await persist();
+    } catch {
+      ok = false;
+    }
+    setSaveState(ok ? 'saved' : 'failed');
+    setTimeout(() => setSaveState('idle'), 3000);
+  };
   async function handleCopyLog() {
     try {
       await flushLogWrites();
@@ -603,6 +621,23 @@ export function AboutScreen() {
             sharing, or wipe the log so the next paste-back contains only
             fresh activity.
           </Text>
+
+          {/* SAVE in place — keep playing. Separate from SAVE & EXIT so the
+              player can checkpoint without leaving the run. Reports the real
+              write result (a save can silently fail when storage is full). */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnPrimary, saveState === 'failed' && styles.sessionBtnDanger]}
+            onPress={() => { void handleSave(); }}
+            activeOpacity={0.7}
+            disabled={saveState === 'saving'}
+          >
+            <Text style={styles.sessionBtnPrimaryText}>
+              {saveState === 'saving' ? 'SAVING…'
+                : saveState === 'saved' ? '✓ SAVED'
+                : saveState === 'failed' ? '✗ SAVE FAILED'
+                : 'SAVE'}
+            </Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.sessionBtn, styles.sessionBtnPrimary]}
@@ -1273,6 +1308,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: 3,
+  },
+  // Failed-save flash on the SAVE button — red so a silent save failure is loud
+  // (bright enough that the dark primary text still reads on it).
+  sessionBtnDanger: {
+    backgroundColor: '#e07a5f',
+    borderColor: '#e07a5f',
   },
   sessionBtnSecondary: {
     backgroundColor: '#1a1714',
