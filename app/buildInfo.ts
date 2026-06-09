@@ -13122,4 +13122,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "tier 2/4", which the narration rendered as "You reach the tier 2/4 of the …"
 // — a broken-looking line. 3-tier climbs never hit it. Middle tiers now read
 // "next hold". JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-392';
+// OTA-393 (Chokecherry Anvil) — Water Bottle: don't destroy it, and say "drink".
+// (1) DRINK-DESTROYS-BOTTLE BUG: the Water Bottle (healHP + restoreStamina) went
+// through the `use`/use_relic STRUCTURED-effect path, which consumed it without
+// leaving an Empty Water Bottle — the OTA-004 empty-bottle logic only lived in the
+// `eat` handler. So "use Water Bottle" left the player with nothing to refill.
+// New shared leaveEmptyWaterBottle helper applied on EVERY consume path → drinking
+// always yields an Empty Water Bottle (full→empty, fillable). (2) VERB: the
+// inventory button hardcoded "Use (eat)" for all consumables; new shared
+// consumeVerb helper labels drinks "Use (drink)", kits "Use (apply)", food
+// "Use (eat)" — used by the button, the narration, and the debug snapshot. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-393';

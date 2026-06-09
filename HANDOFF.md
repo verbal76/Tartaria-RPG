@@ -144,7 +144,13 @@
 >     tier on a 4+ tier climb leaked the raw "tier 2/4" into narration ("You reach
 >     the tier 2/4 of the …"); middle tiers now read "next hold". 3-tier climbs
 >     unaffected. Display only.
->   (Batch now 8, ≥5 — ready when the **user** triggers the push.)
+>   - **OTA-393 "Chokecherry Anvil"** — Water Bottle: (1) drinking via the `use`
+>     path destroyed it (the OTA-004 empty-bottle logic only lived in the `eat`
+>     handler; the Water Bottle's structured effect routes through the `use_relic`
+>     path) — shared `leaveEmptyWaterBottle` now runs on every consume path so you
+>     always get a refillable Empty Water Bottle. (2) shared `consumeVerb` so the
+>     button/narration say "drink" not "eat" for drinks.
+>   (Batch now 9, ≥5 — ready when the **user** triggers the push.)
 >
 > **OPEN / CRITICAL — save persistence still failing on LIVE (OTA-384):** player
 > logs show `persist: slot … FAILED — staged save did not verify (truncated or

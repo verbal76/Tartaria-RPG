@@ -315,6 +315,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-392 — climb middle-tier label fix: a true middle tier on a 4+ tier climb
   // leaked the raw "tier 2/4" into narration ("You reach the tier 2/4 of the …");
   // middle tiers now read "next hold".
+  // OTA-393 — Water Bottle fixes: drinking via the `use` path destroyed it (no
+  // Empty Water Bottle left to refill); a shared leaveEmptyWaterBottle helper now
+  // runs on every consume path. Plus a shared consumeVerb so the button/narration
+  // say "drink" (not "eat") for the bottle.
+  '2026-06-09-393': 'Chokecherry Anvil',
   '2026-06-09-392': 'Silverbell Anvil',
   '2026-06-09-391': 'Hophornbeam Anvil',
   '2026-06-09-390': 'Witchhazel Anvil',

@@ -19,6 +19,7 @@ import { getItemPreview, getItemPreviewForInstance } from '../components/itemPre
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { consumeVerb } from '../engine/consumeVerb';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -478,7 +479,7 @@ export function InventoryScreen() {
     const useIsRealAction = isConsumable || hasEffect || offEligible;
     if (useIsRealAction) {
       buttons.push({
-        label: isConsumable ? 'Use (eat)' : (offEligible ? 'Use (off hand)' : 'Use'),
+        label: isConsumable ? `Use (${consumeVerb(pending.item)})` : (offEligible ? 'Use (off hand)' : 'Use'),
         onPress: doUse,
         tone: 'primary',
       });

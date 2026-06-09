@@ -177,6 +177,8 @@ import {
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
+import { leaveEmptyWaterBottle } from '../engine/waterBottle';
+import { consumeVerb } from '../engine/consumeVerb';
 import {
   canScrap,
   scrapOutputFor,
@@ -8414,9 +8416,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // fired. Cheap deliverable until the buff system
                 // lands.
               }
-              const newInventory = p.inventory
-                .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
-                .filter((i) => i.quantity > 0);
+              const newInventory = leaveEmptyWaterBottle(
+                p.inventory
+                  .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
+                  .filter((i) => i.quantity > 0),
+                used.name,
+              );
               p = { ...p, inventory: newInventory };
               set({ player: advanceTime(p, 0.25) });
               get().appendLog('world', `You use one ${used.name}. ${messages.join(', ')}.`);
@@ -8534,30 +8539,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const stamGain = fx
             ? Math.min(Math.max(0, stamRoom), fx.restoreStamina ?? 0)
             : 0;
-          let newInventory = player.inventory
-            .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
-            .filter((i) => i.quantity > 0);
-          // OTA 004 — drinking a Water Bottle leaves an Empty Water
-          // Bottle behind so the player can refill it. Merge into an
-          // existing empty-bottle stack if one exists.
-          if (consumable.name === 'Water Bottle') {
-            const existingEmpty = newInventory.findIndex((i) => i.name === 'Empty Water Bottle');
-            if (existingEmpty >= 0) {
-              newInventory[existingEmpty] = {
-                ...newInventory[existingEmpty]!,
-                quantity: newInventory[existingEmpty]!.quantity + 1,
-              };
-            } else {
-              newInventory.push({
-                id: `empty_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                name: 'Empty Water Bottle',
-                kind: 'misc',
-                rarity: 'Common',
-                quantity: 1,
-                tags: ['container', 'water'],
-              });
-            }
-          }
+          // OTA 004 / OTA-393 — drinking a Water Bottle leaves an Empty Water
+          // Bottle behind so the player can refill it (shared helper, applied on
+          // every consume path so the `use` path can't destroy it either).
+          let newInventory = leaveEmptyWaterBottle(
+            player.inventory
+              .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
+              .filter((i) => i.quantity > 0),
+            consumable.name,
+          );
           // OTA 003 — register the food buff if the catalog declares one.
           // remainingRounds = buffDuration; label encodes the food name +
           // stat so the "Wild Carrot (+1 WIS) fades." line is readable.
@@ -8631,12 +8621,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // also catch Water Bottle / Bottle / Canteen / Skin / etc.
           // so the player doesn't see "You eat the Water Bottle" (a
           // real playtest log line that read like a bug).
-          const isMedical = /first aid|bandage|medkit|salve|tonic|poultice|stim/i.test(consumable.name);
-          const isPotion = /vial|potion|flask|elixir|brew/i.test(consumable.name);
-          const isDrink = (consumable.tags ?? []).includes('drink')
-            || (consumable.tags ?? []).includes('water')
-            || /\b(bottle|canteen|skin|cup|draught|broth|tea|infusion|gourd|jug)\b/i.test(consumable.name);
-          const verb = isMedical ? 'apply' : (isPotion || isDrink) ? 'drink' : 'eat';
+          const verb = consumeVerb(consumable);
           get().appendLog('world', `You ${verb} the ${consumable.name}. ${tail}${buffLine}`);
           // Heal may push us back over the 5% latch threshold.
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
