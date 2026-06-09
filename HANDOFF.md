@@ -29,16 +29,23 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-368 "Locust Anvil"** — boot/save-durability
->   pair (367→368), pushed through `a11d215`; `eas-update.yml` publishes to
->   Android + iOS.
->   - **367 Oak** — OTA updates apply AUTOMATICALLY at the FRONT of boot (before
->     mind/voice). Fixes the manual-tap requirement AND the mid-load reload race
->     that crashed to home + could persist `player=null` over the slot.
->   - **368 Locust** — save durability: 90s + on-background autosave; `persist()`
->     refuses to overwrite a slot with a player missing core identity;
->     `backfillPlayer` (the on-load save-upgrade step) wrapped to never throw.
->     Closes the save-corruption-across-OTA vectors with 367.
+> - **LIVE (pushed 2026-06-09) = OTA-372 "Buckthorn Anvil"** — the OTA-reliability
+>   + content batch (369→372), pushed through `4f53281`; `eas-update.yml`
+>   publishes to Android + iOS.
+>   - **369 Catalpa** — big-jump-tolerant OTA download (240s budget + 3× resume-
+>     retry via EAS's asset cache; new `fetchTimeoutMs` opt). Fixes the iPad that
+>     "kept failing then finally updated" climbing from Clay Anvil (308).
+>   - **370 Ironwood** — Disease Sample is now a crafting material (still a
+>     throwable): Plague Tonic (premium 1d6 corruption coating), Plague Vial
+>     (premium 1d6 poison coating), Inoculant Draught (corruption cure you drink).
+>   - **371 Hornbeam** — rag-based first-aid ladder (RE1-style): Field Dressing
+>     (+10) → First Aid Kit (+25, re-based onto the rag) → Trauma Kit (+45).
+>   - **372 Buckthorn** — a failed flee is no longer free: losing the escape roll
+>     hands every living enemy an automatic attack of opportunity.
+>   Full per-OTA detail in `docs/build-codenames.md`.
+> - **PRIOR LIVE = OTA-368 "Locust Anvil"** — boot/save-durability pair (367→368),
+>   pushed through `a11d215`. 367 Oak = OTA auto-apply at front of boot; 368 Locust
+>   = autosave + persist integrity guard + never-throw save-upgrade step.
 > - **PRIOR LIVE = OTA-366 "Pine Anvil"** — the weapons batch (360→366), pushed
 >   through `7ab730c`. Seven OTAs:
 >   - **360 Chestnut** — weapon coatings phase 1 (data + apply + inventory UI).
@@ -56,26 +63,7 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
->   - **OTA-369 "Catalpa Anvil"** — big-jump-tolerant OTA download. A device far
->     behind must pull every asset added since (tens of MB); the old 60s fetch
->     timeout failed on iPad WiFi. Now the download budget is **240s** + **auto-
->     retry up to 3×** that resumes via EAS's asset cache (new `fetchTimeoutMs`
->     opt). Pairs with 367 so a far-behind iOS device catches up on next launch.
->   - **OTA-370 "Ironwood Anvil"** — Disease Sample becomes a crafting material
->     (still a throwable): **Plague Tonic** (premium 1d6 corruption coating),
->     **Plague Vial** (premium 1d6 poison coating), and **Inoculant Draught** (a
->     corruption cure you drink, reduceCorruption 22). Data-only; rides the
->     spec-driven coating machinery.
->   - **OTA-371 "Hornbeam Anvil"** — rag-based first-aid ladder (RE1-style): Field
->     Dressing (+10) → First Aid Kit (+25, re-based onto the rag) → Trauma Kit
->     (+45), all built on a rag (Patched Cloth), each tier adding an ingredient.
->     Data-only.
->   - **OTA-372 "Buckthorn Anvil"** — a failed flee is no longer free: losing the
->     escape (flee) roll hands every living enemy an automatic attack of
->     opportunity (`runEnemyGroupCounters`). Successful flee still breaks contact
->     cleanly.
->   (Batch at **4** staged; the **user** triggers the push.)
+> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
