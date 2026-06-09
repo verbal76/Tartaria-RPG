@@ -13150,4 +13150,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // budget (~1.4 MB): sheds regenerable lore tables oldest-first, then drops the
 // oldest rooms (never one holding dropped items). In-memory/session state is
 // untouched; a normal-size save is byte-for-byte unchanged. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-395';
+// OTA-396 (Serviceash Anvil) — save-loss fix, take 2 (395 didn't land). 395's
+// trim engaged on a CHARACTER budget (1.4M) but the save failed UNDER it, so the
+// trim never ran — the real limit is BYTES, and the narration's multi-byte glyphs
+// (— ' ✦) make the byte size bigger than the char count. Now: (1) tighter budget
+// (800K chars); (2) PROGRESSIVE shedding — regenerable lore tables → oldest rooms
+// → old narrative memos → the saved live scene (load falls back to beginScene) —
+// until it fits; (3) on a FAILED persist, log a per-part BYTE breakdown
+// (saveSizeBreakdown) so the next log names the oversized component instead of us
+// guessing. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-396';

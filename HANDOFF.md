@@ -29,7 +29,15 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-395 "Inkberry Anvil"** — the big polish +
+> - **LIVE (pushed 2026-06-09) = OTA-396 "Serviceash Anvil"** — save-loss fix TAKE 2.
+>   OTA-395's trim engaged on a CHAR budget but the save still failed UNDER it (byte
+>   vs char — multi-byte narration glyphs). Now: tighter budget (800K chars) +
+>   PROGRESSIVE shedding (lore tables → oldest rooms → memos → saved scene) + a
+>   per-part BYTE breakdown logged on a FAILED persist (`saveSizeBreakdown`) so the
+>   next failure log NAMES the oversized component. Pushed solo as a save hotfix.
+>   ⚠️ STILL UNCONFIRMED on-device — watch the next log for `persist: trimmed to fit`
+>   + no FAILED, OR a `persist sizes(KB):` breakdown if it still fails.
+> - **PRIOR LIVE (pushed 2026-06-09) = OTA-395 "Inkberry Anvil"** — the big polish +
 >   **SAVE-LOSS ROOT-CAUSE** batch (385→395), pushed through `ec326c4`;
 >   `eas-update.yml` publishes to Android + iOS. Headline: 395 bounds the slot blob
 >   under AsyncStorage's ~2MB readback window (the real fix for the "staged save

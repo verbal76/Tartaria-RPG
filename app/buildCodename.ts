@@ -326,6 +326,10 @@ const CODENAMES: Record<string, string> = {
   // roomInvestigationTables), so the staged save failed to verify. trimSaveState-
   // ToFit bounds the saved blob when over budget (sheds lore tables, then oldest
   // rooms); in-memory untouched, normal saves unchanged.
+  // OTA-396 — save-loss fix take 2: 395's trim engaged on a char budget but the
+  // save failed under it (byte vs char). Tighter budget + progressive shedding
+  // (tables → rooms → memos → scene) + a per-part byte breakdown logged on failure.
+  '2026-06-09-396': 'Serviceash Anvil',
   '2026-06-09-395': 'Inkberry Anvil',
   '2026-06-09-394': 'Sourgum Anvil',
   '2026-06-09-393': 'Chokecherry Anvil',
