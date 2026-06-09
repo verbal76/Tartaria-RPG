@@ -131,7 +131,12 @@
 >     shows the coated name), but the repair-confirmation lines logged the base
 >     name — so a repair looked like it reverted "Acid-Etched Rusty Shortbow" to
 >     "Rusty Shortbow". Both repair paths now log `coatedDisplayName`. Display only.
->   (Batch now ≥5 — ready when the **user** triggers the push.)
+>   - **OTA-390 "Witchhazel Anvil"** — clearer Crucible "first-timer" refusal. The
+>     fusion gate needs `macroVisitSeq ≥ 1` (leave the spawn outpost, reach a named
+>     location, return) — checked before the 25 TC cost. The cryptic line led a
+>     player to read the later TC step as the blocker. Irma's + the foreman's lines
+>     now say to leave the outpost and see the world first. Copy only.
+>   (Batch now 6, ≥5 — ready when the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

@@ -306,6 +306,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-389 — repair keeps a coated weapon's name: the coating survives a repair,
   // but the repair-confirmation lines logged the base name; both the Arbiter
   // repair handler and the vendor mend now use coatedDisplayName.
+  // OTA-390 — clearer Crucible "first-timer" refusal: the fusion gate needs you to
+  // venture out to a named location and return (before the TC cost); Irma's + the
+  // foreman's cryptic line now say plainly to leave the outpost and see the world.
+  '2026-06-09-390': 'Witchhazel Anvil',
   '2026-06-09-389': 'Bristlecone Anvil',
   '2026-06-09-388': 'Hackmatack Anvil',
   '2026-06-09-385': 'Sweetbay Anvil',

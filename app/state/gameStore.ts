@@ -14560,7 +14560,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if ((player.macroVisitSeq ?? 0) < 1) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} waves you off. "The Crucible's not for first-timers. Get some road under you, then come back."`,
+        `${scene.vendor.name} waves you off. "The Crucible's not for first-timers. Leave the outpost and see something of the world first — travel out to a named place and come back. Then I'll fire it and forge you something new."`,
       );
       return;
     }
@@ -18195,7 +18195,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'arbiter',
         !!player.hubRoomId && !hasLeftOutpost
-          ? `The foreman shakes his head. "The Crucible's not for first-timers. Walk the road, see the country, then come back — I'll fire it for you then."`
+          ? `The foreman shakes his head. "The Crucible's not for first-timers. Leave the outpost and see something of the world first — travel out to a named place and come back, then I'll fire it for you."`
           : `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
       );
       return;

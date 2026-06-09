@@ -13102,4 +13102,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // just coated an "Acid-Etched Rusty Shortbow" thought the repair reverted it.
 // Both the Arbiter repair handler and the vendor mend now log coatedDisplayName.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-389';
+// OTA-390 (Witchhazel Anvil) — clearer Crucible "first-timer" refusal. The fusion
+// gate requires venturing out to a named macro-location and returning
+// (macroVisitSeq ≥ 1), checked BEFORE the 25 TC cost — but Irma's / the foreman's
+// line ("get some road under you / walk the road") was cryptic, so a player read
+// the later TC step as the blocker and chased coins instead of leaving the
+// outpost. Both lines now spell it out: "Leave the outpost and see something of
+// the world first — travel out to a named place and come back." JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-390';
