@@ -77,7 +77,11 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
+> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
+>   - **OTA-377 "Serviceberry Anvil"** — title-footer clarity: the "2148" after the
+>     version is the in-world YEAR (Tartaria's Present Day), not a build number;
+>     relabelled the title footer "v3.4.11 / 2148" → "v3.4.11 · Year 2148".
+>   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

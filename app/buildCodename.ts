@@ -266,6 +266,9 @@ const CODENAMES: Record<string, string> = {
   // or (more limited) hpRegen, summed + capped across the 6 armor slots, on top
   // of its other bonuses; 93 pieces marked across all slots/rarities, faction
   // pieces grant a little more. + DISPLAY_VERSION 3.0.0 → 3.4.11 (cosmetic).
+  // OTA-377 — title-footer clarity: the "2148" after the version is the in-world
+  // YEAR (Tartaria's Present Day), not a build number; relabelled "· Year 2148".
+  '2026-06-09-377': 'Serviceberry Anvil',
   '2026-06-09-376': 'Sourwood Anvil',
   '2026-06-09-375': 'Sweetgum Anvil',
   '2026-06-09-374': 'Hackberry Anvil',

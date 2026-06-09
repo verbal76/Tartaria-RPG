@@ -1124,7 +1124,10 @@ export function TitleScreen() {
             the dev for repro — including a corrupt save that can never
             be loaded (and so can never be reached by COPY SAVE). */}
         <CopyCrashedSaveLine />
-        <Text style={[styles.footer, { color: mutedColor }]}>v{APP_VERSION}  /  2148</Text>
+        {/* OTA-377 — the trailing "2148" is the in-world year (Tartaria's
+            "Present Day" — see data/events/timeline.json), not a build
+            number. Labelled "Year 2148" so it no longer reads like one. */}
+        <Text style={[styles.footer, { color: mutedColor }]}>v{APP_VERSION}  ·  Year 2148</Text>
       </View>
 
       <BugReportModal

@@ -13009,4 +13009,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // little more. (2) DISPLAY_VERSION 3.0.0 → 3.4.11 (cosmetic title/About version;
 // decoupled from runtimeVersion per OTA-251, so OTA delivery is unaffected).
 // __tests__/armorRegen.test.ts (8) + armorRegenApply.test.ts (1). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-376';
+// OTA-377 (Serviceberry Anvil) — title-footer clarity. The "2148" after the
+// version is the in-world YEAR (Tartaria's "Present Day" — see timeline.json),
+// not a build number. Relabelled the title-screen footer "v3.4.11 / 2148" →
+// "v3.4.11 · Year 2148" so it no longer reads like a build counter. One-line
+// copy change (TitleScreen.tsx); the 2148 lives only on the title footer.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-377';
