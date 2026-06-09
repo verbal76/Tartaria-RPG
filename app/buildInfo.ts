@@ -12943,4 +12943,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Blue Cap; Plague Vial = Disease Sample + Violet Cap; Inoculant Draught =
 // Disease Sample + Aether Dust + Orange Sporecap. __tests__/weaponCoating.test.ts
 // (+4). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-370';
+// OTA-371 (Hornbeam Anvil) — rag-based first-aid ladder (RE1-style). The First
+// Aid Kit already existed + was craftable; the player wanted a "any rag + extra
+// ingredients = stronger kit" tier system. A rag (Patched Cloth) is now the base
+// of every tier; each step adds an ingredient and heals more: Field Dressing
+// (rag + red cap → +10 HP, cure bleed) → First Aid Kit (rag + spider-silk binding
+// + Aetheric salve/aether residue → +25 HP, +10 stam, cure bleed; recipe re-based
+// onto the rag) → Trauma Kit (rag + silk + salve + red cap → +45 HP, +15 stam,
+// cure bleed). Two new Common/Rare consumables + their recipes; one recipe per
+// result. Data-only (heal/cureBleed flow through the existing consumable effect
+// path). __tests__/firstAidLadder.test.ts (5). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-371';

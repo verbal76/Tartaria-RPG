@@ -67,6 +67,10 @@
 >     **Plague Vial** (premium 1d6 poison coating), and **Inoculant Draught** (a
 >     corruption cure you drink, reduceCorruption 22). Data-only; rides the
 >     spec-driven coating machinery.
+>   - **OTA-371 "Hornbeam Anvil"** — rag-based first-aid ladder (RE1-style): Field
+>     Dressing (+10) → First Aid Kit (+25, re-based onto the rag) → Trauma Kit
+>     (+45), all built on a rag (Patched Cloth), each tier adding an ingredient.
+>     Data-only.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

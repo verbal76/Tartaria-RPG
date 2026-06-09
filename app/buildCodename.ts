@@ -246,6 +246,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-370 — Disease Sample becomes a crafting material (still a throwable):
   // Plague Tonic (premium 1d6 corruption coating), Plague Vial (premium 1d6
   // poison coating), and Inoculant Draught (a corruption cure you drink).
+  // OTA-371 — rag-based first-aid ladder (RE1-style): Field Dressing → First Aid
+  // Kit → Trauma Kit, all built on a rag (Patched Cloth), each tier adding an
+  // ingredient for more healing.
+  '2026-06-09-371': 'Hornbeam Anvil',
   '2026-06-09-370': 'Ironwood Anvil',
   '2026-06-08-369': 'Catalpa Anvil',
   '2026-06-08-368': 'Locust Anvil',

@@ -163,16 +163,27 @@
       ]
     },
     {
+      "result": "Field Dressing",
+      "ingredients": [
+        { "name": "Patched Cloth", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
       "result": "First Aid Kit",
       "ingredients": [
-        {
-          "name": "Spider Silk",
-          "quantity": 2
-        },
-        {
-          "name": "Aether Residue",
-          "quantity": 1
-        }
+        { "name": "Patched Cloth", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 },
+        { "name": "Aether Residue", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Trauma Kit",
+      "ingredients": [
+        { "name": "Patched Cloth", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 },
+        { "name": "Aether Residue", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 1 }
       ]
     },
     {
