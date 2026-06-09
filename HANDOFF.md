@@ -63,7 +63,15 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
+> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
+>   - **OTA-373 "Sumac Anvil"** — SAVE-LOSS FIX. Device log showed
+>     `persist: ... FAILED — staged save did not verify (truncated)` on every
+>     action. Cause: `MAX_LOG_IN_MEMORY` was Infinity and persist() embeds the log
+>     in the slot blob, which grew past AsyncStorage's ~2 MB readback window → the
+>     atomic verify failed → progress stopped saving (no corruption; live+.bak
+>     intact). Capped the log at 500. Self-heals next persist. COPY LOG unaffected
+>     (reads the dedicated on-disk key).
+>   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

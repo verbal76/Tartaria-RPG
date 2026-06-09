@@ -252,6 +252,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-372 — a failed flee is no longer free: losing the escape (flee) roll
   // hands every living enemy an automatic attack of opportunity
   // (runEnemyGroupCounters). A successful flee still breaks contact cleanly.
+  // OTA-373 — SAVE-LOSS FIX: cap the game log at 500 (was Infinity). The
+  // unbounded log was embedded in the slot save blob, which grew past
+  // AsyncStorage's ~2 MB readback window so the atomic save's verify failed and
+  // progress stopped persisting. COPY LOG (dedicated on-disk key) unaffected.
+  '2026-06-09-373': 'Sumac Anvil',
   '2026-06-09-372': 'Buckthorn Anvil',
   '2026-06-09-371': 'Hornbeam Anvil',
   '2026-06-09-370': 'Ironwood Anvil',

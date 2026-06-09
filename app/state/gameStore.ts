@@ -2347,13 +2347,20 @@ interface GameStore {
 // constant is kept so a future "cap at N" experiment can flip it
 // without re-wiring every call site.
 //
-// Hard ceiling (informational): AsyncStorage's per-key Android
-// default is ~6 MB. At ~116 bytes per persisted line, that's
-// ~52,000 lines — well past any realistic single-session need.
-// If we ever ship a build for marathon sessions, bump
-// AsyncStorage_db_size_in_MB in android/gradle.properties (native
-// build required, not OTA).
-const MAX_LOG_IN_MEMORY = Number.POSITIVE_INFINITY;
+// OTA-373 — CAPPED (was Number.POSITIVE_INFINITY). The unbounded log was
+// the cause of a real save-loss bug: persist() embeds gameLog.slice(
+// -MAX_LOG_IN_MEMORY) inside the SLOT SAVE BLOB, so with no cap the blob
+// grew with the session until it crossed AsyncStorage's ~2 MB readback
+// window (Android CursorWindow) — at which point the atomic save's
+// verify step read back a TRUNCATED copy, `staged !== payload`, and
+// EVERY persist failed ("staged save did not verify (truncated)").
+// Progress stopped saving on long-played characters (the live + .bak
+// stayed intact, so no corruption — but no new writes landed either).
+// 500 entries bounds the slot blob to ~150 KB of log, far under the
+// limit, while still giving generous on-screen scrollback. The FULL
+// history is unaffected for diagnostics: COPY LOG reads the dedicated
+// on-disk log key (readFullLog), not this in-memory buffer.
+const MAX_LOG_IN_MEMORY = 500;
 
 // arb-fix — which equip slot currently holds a given inventory-item id. Used
 // by the equipped-faction-catalyst fusion prompt to know which slot to free.

@@ -12961,4 +12961,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enemies being present. A SUCCESSFUL flee still breaks contact cleanly (clears
 // the enemies, no counter). One-line fix at the escape skill-check FAIL arm in
 // concludeRolls. __tests__/fleeFailCounter.test.ts (2). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-372';
+// OTA-373 (Sumac Anvil) — SAVE-LOSS FIX: cap the game log. A device log showed
+// `persist: ... FAILED — staged save did not verify (truncated or storage full)`
+// firing on every action — saves stopped landing. Cause: MAX_LOG_IN_MEMORY was
+// Number.POSITIVE_INFINITY, and persist() embeds gameLog.slice(-MAX) INSIDE the
+// slot save blob, so the blob grew with the session until it crossed
+// AsyncStorage's ~2 MB Android readback window (CursorWindow). The atomic save's
+// verify step then read back a TRUNCATED copy, staged !== payload, and every
+// persist was rejected — the live + .bak stayed intact (no corruption) but no
+// new progress was written. Capped MAX_LOG_IN_MEMORY at 500 (was Infinity): the
+// slot blob's log is now bounded to ~150 KB, far under the limit, while the
+// on-screen scrollback stays generous and the FULL history is untouched for
+// diagnostics (COPY LOG reads the dedicated on-disk log key, not this buffer).
+// Self-heals on the next persist after install. __tests__/logCapPersist.test.ts
+// (1). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-373';
