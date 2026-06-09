@@ -307,6 +307,10 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     const name = eq[slot];
     if (!name) continue;
     const inst = resolveEquippedItem(player, slot);
+    // OTA-386 — an etheric coating painted on this weapon grants a passive stat
+    // bonus (+1 stealth / charisma / …) while it's wielded, on top of whatever
+    // the weapon itself grants. Applies independent of the catalog/instance perks.
+    if (inst?.coating?.statBonus) add(inst.coating.statBonus.stat, inst.coating.statBonus.amount);
     if (inst?.instanceStats?.statBonuses) {
       for (const b of inst.instanceStats.statBonuses) add(b.stat, b.amount);
       continue;

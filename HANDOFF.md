@@ -112,6 +112,12 @@
 >     inventory, not the pouch), so `isPouchEligible` now refuses rope-tagged items
 >     (Reclaimer's / Climbing Rope). Scanners (fire only when equipped/pouched)
 >     still qualify.
+>   - **OTA-386 "Manzanita Anvil"** — etheric (electrical) weapon coatings. New
+>     `electrical` coating kind: an aether-dust paste that arcs electrical damage,
+>     proc runs through the weakness map so it lands 1.5× on constructs/automatons
+>     (previously only the 21 electrical WEAPONS could). 3 variants (Aether Dust +
+>     Speckled Egg base): Static Paste, Galvanic (+1 STE), Resonant (+1 CHA) — the
+>     flavored ones grant a passive stat bonus via new `WeaponCoating.statBonus`.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

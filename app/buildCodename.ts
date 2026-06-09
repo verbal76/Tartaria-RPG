@@ -294,6 +294,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-385 — rope is no longer a tool-pouch item: it works from the pack (the
   // climb_steep gate checks inventory, not the pouch), so isPouchEligible now
   // refuses rope-tagged items (Reclaimer's / Climbing Rope). Scanners still qualify.
+  // OTA-386 — etheric (electrical) weapon coatings: aether-dust pastes that arc
+  // electrical damage (weakness-aware vs constructs/automatons); flavored variants
+  // (Galvanic +1 STE, Resonant +1 CHA) also grant a passive stat bonus when held.
+  '2026-06-09-386': 'Manzanita Anvil',
   '2026-06-09-385': 'Sweetbay Anvil',
   '2026-06-09-384': 'Basswood Anvil',
   '2026-06-09-383': 'Yaupon Anvil',

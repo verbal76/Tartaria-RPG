@@ -448,11 +448,16 @@ export interface InventoryItem {
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */
 export interface WeaponCoating {
   /** Coating family — drives the on-hit enemy status that lands. */
-  kind: 'poison' | 'acid' | 'corruption';
+  kind: 'poison' | 'acid' | 'corruption' | 'electrical';
   /** Damage dice rolled on a landing hit ("1d4"). */
   dice: string;
   /** Display adjective used by coatedDisplayName ("Corrupted"). */
   label: string;
+  /** OTA-386 — an etheric (electrical) coating can also grant a passive stat
+   *  bonus while the coated weapon is wielded (the "flavored" paste variants:
+   *  +1 stealth, +1 charisma, …). Read by aggregateEquippedStatBonuses. Base
+   *  stats only. */
+  statBonus?: { stat: string; amount: number };
 }
 
 /** OTA-195 — fused item identity. Stamped on the InventoryItem

@@ -56,6 +56,8 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
       return 'burns and eats the target\'s armor (damage over time + armor shred)';
     case 'corruption':
       return 'pushes corruption into the target (damage over time + sickening stacks)';
+    case 'electrical':
+      return 'arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)';
   }
 }
 
@@ -87,8 +89,8 @@ export const CORRUPTION_STACK_BONUS = 1;
 /** The enemyStatuses `kind` string a coating lands as a DOT. */
 export function coatingStatusKind(
   kind: WeaponCoating['kind'],
-): 'poison_coat' | 'acid_coat' | 'corruption_coat' {
-  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat';
+): 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' {
+  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat';
 }
 
 // ─── OTA-363 — occasional coated-weapon loot ───────────────────────
@@ -106,6 +108,9 @@ const LOOT_COATING_LABELS: Record<WeaponCoating['kind'], string> = {
   poison: 'Poisoned',
   acid: 'Acid-Etched',
   corruption: 'Corrupted',
+  // Electrical/etheric coatings are craft-only (not in the loot `kinds` roll
+  // below), but the label map stays exhaustive over the union.
+  electrical: 'Charged',
 };
 
 /** Roll whether a looted weapon arrives pre-coated. Returns the coating

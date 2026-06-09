@@ -74,6 +74,29 @@
       ]
     },
     {
+      "result": "Static Paste",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Speckled Egg", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Galvanic Paste",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Speckled Egg", "quantity": 1 },
+        { "name": "Aether Residue", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Resonant Paste",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Speckled Egg", "quantity": 1 },
+        { "name": "Aether Crystal", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

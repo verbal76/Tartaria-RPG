@@ -13074,4 +13074,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // just by sitting in the pack (the gate checks inventory, not the pouch), so a
 // rope in a tool slot is wasted. isPouchEligible now refuses rope-tagged items
 // (scanners, which only fire when equipped/pouched, still qualify). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-385';
+// OTA-386 (Manzanita Anvil) — etheric (electrical) weapon coatings. Adds an
+// `electrical` coating kind: an aether-dust paste painted on a blade/point that
+// arcs ELECTRICAL damage on hit — and the proc runs through the weakness map, so
+// it lands 1.5× on constructs/automatons (previously only the 21 electrical
+// WEAPONS could exploit that). Three craftable variants (Aether Dust + Speckled
+// Egg base): Static Paste, Galvanic Paste (+1 stealth), Resonant Paste (+1 CHA);
+// the flavored ones grant a passive stat bonus while the coated weapon is held
+// (new WeaponCoating.statBonus, read by aggregateEquippedStatBonuses). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-386';
