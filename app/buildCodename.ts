@@ -288,6 +288,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-383 — Viper Venom becomes a real material feeding two poison recipes: a
   // weapon coating (Viper Venom Vial, 1d6) and a poison cure (Antivenom, new
   // curePoison effect that strips the poisoned status).
+  // OTA-384 — stall sale-price variation: tc-less items (armor, materials) were
+  // pinned to a ~5 TC rarity floor; buildStallVendor now grounds price in the
+  // item's worth (armor: AC/stat/durability) + a wider rarity band & spread.
+  '2026-06-09-384': 'Basswood Anvil',
   '2026-06-09-383': 'Yaupon Anvil',
   '2026-06-09-382': 'Loblolly Anvil',
   '2026-06-09-380': 'Pawpaw Anvil',

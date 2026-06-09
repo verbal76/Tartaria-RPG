@@ -102,6 +102,11 @@
 >     crafting material feeding two poison recipes: **Viper Venom Vial** (a 1d6
 >     poison weapon coating) and **Antivenom** (a poison cure — new `curePoison`
 >     consumable effect strips the `poisoned` status, +5 HP). Mirrors `cureBleed`.
+>   - **OTA-384 "Basswood Anvil"** — stall sale-price variation. Armor + materials
+>     carry no authored `tc`, so they floored at ~5 TC. `buildStallVendor` now
+>     grounds a tc-less item's price in its worth (armor: AC / stat bonuses /
+>     durability / resistances) on a wider rarity band + spread. Weapons (authored
+>     `tc`), hub vendors, roadside, and faction gear are untouched.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

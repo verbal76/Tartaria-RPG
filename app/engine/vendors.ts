@@ -168,7 +168,16 @@ export function pickRoadsideTrader(): VendorInstance {
 // matching catalog every time the player steps up to it, so the stock
 // changes each visit. Prices come from the item's own tc / tcBuy when it
 // has one, else a rarity-based default with a little spread.
-interface StallCatalogItem { name: string; rarity?: string; tc?: number; tcBuy?: number; tags?: string[] }
+interface StallCatalogItem {
+  name: string; rarity?: string; tc?: number; tcBuy?: number; tags?: string[];
+  // Armor value inputs (present on armor.json rows) — used to ground the price
+  // of a piece that carries no authored tc in its actual worth.
+  acBonus?: number;
+  statBonus?: { stat: string; amount: number };
+  statBonuses?: { stat: string; amount: number }[];
+  baseDurability?: number;
+  resistances?: string[];
+}
 
 function stallCatalog(category: StallCategory): StallCatalogItem[] {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -186,10 +195,29 @@ function stallCatalog(category: StallCategory): StallCatalogItem[] {
 
 function rarityPrice(rarity?: string): number {
   const r = (rarity ?? 'Common').toLowerCase();
-  if (r === 'legendary') return 120 + Math.floor(Math.random() * 130);
-  if (r === 'rare') return 40 + Math.floor(Math.random() * 40);
-  if (r === 'uncommon') return 15 + Math.floor(Math.random() * 16);
-  return 5 + Math.floor(Math.random() * 8);
+  if (r === 'legendary') return 140 + Math.floor(Math.random() * 160); // 140-299
+  if (r === 'rare') return 50 + Math.floor(Math.random() * 60);        // 50-109
+  if (r === 'uncommon') return 18 + Math.floor(Math.random() * 28);    // 18-45
+  return 6 + Math.floor(Math.random() * 20);                           // 6-25
+}
+
+// Estimate a stall price for an item that carries no authored tc/tcBuy. Grounds
+// the price in the item's actual worth so two pieces of the same rarity differ:
+// armor folds in AC, stat bonuses, durability and resistances on top of the
+// rarity base. Without this, every tc-less Common piece collapsed onto the
+// narrow rarity floor (~5 TC) and the shelf looked flat.
+function estimatedStallValue(it: StallCatalogItem, category: StallCategory): number {
+  const base = rarityPrice(it.rarity);
+  if (category === 'armor') {
+    const bonuses = it.statBonuses ?? (it.statBonus ? [it.statBonus] : []);
+    const bonusTotal = bonuses.reduce((s, b) => s + (b.amount ?? 0), 0);
+    return base
+      + (it.acBonus ?? 0) * 9
+      + bonusTotal * 6
+      + Math.floor((it.baseDurability ?? 0) / 3)
+      + (it.resistances?.length ?? 0) * 8;
+  }
+  return base;
 }
 
 export function buildStallVendor(category: StallCategory, stallName: string): VendorInstance {
@@ -197,8 +225,10 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
   const n = Math.min(items.length, 3 + Math.floor(Math.random() * 4)); // 3-6
   const shuffled = [...items].sort(() => Math.random() - 0.5).slice(0, n);
   const offers: VendorOffer[] = shuffled.map((it) => {
-    const base = it.tc ?? it.tcBuy ?? rarityPrice(it.rarity);
-    const price = Math.max(2, Math.round(base * (0.85 + Math.random() * 0.3)));
+    const base = it.tc ?? it.tcBuy ?? estimatedStallValue(it, category);
+    // Wider per-offer haggling spread (±~22%) on top of the value-based base so
+    // even two of the same item vary a little visit to visit.
+    const price = Math.max(2, Math.round(base * (0.8 + Math.random() * 0.45)));
     return { itemName: it.name, price, quantity: rollOfferQuantity(it.name) };
   });
   return {

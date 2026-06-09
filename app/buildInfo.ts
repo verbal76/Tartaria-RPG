@@ -13062,4 +13062,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a poison CURE (Viper Venom + Orange Sporecap) that strips the poisoned status
 // (+5 HP). New `curePoison` consumable effect mirrors `cureBleed` in the
 // use-item handler. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-383';
+// OTA-384 (Basswood Anvil) — stall sale-price variation. Armor (279 rows) and
+// materials carry no authored `tc`, so they fell to a narrow rarity floor and
+// Common pieces collapsed onto ~5 TC — the shelf looked flat. buildStallVendor
+// now grounds a tc-less item's price in its worth (armor folds in AC / stat
+// bonuses / durability / resistances) on top of a widened rarity band + a wider
+// haggling spread, so two same-rarity pieces differ. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-384';
