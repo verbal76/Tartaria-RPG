@@ -113,6 +113,15 @@ export function isPouchEligible(
   if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) {
     return { eligible: false, reason: "you wear that — it's not a tool" };
   }
+  // OTA-385 — rope is carried gear, not a pouch tool. A rope grants its climb
+  // capability (the `climb_steep` gate) just by sitting in your pack — the gate
+  // checks the inventory, not the pouch — so a rope in a tool slot is wasted.
+  // (Scanners differ: they only fire when equipped / pouched, so THEY belong
+  // there.) Reclaimer's Rope / Climbing Rope are kind:relic + tagged `tool`, so
+  // itemIsTool would otherwise wave them in; gate them out here explicitly.
+  if (tags.includes('rope')) {
+    return { eligible: false, reason: "that's just rope — it works from your pack, no tool slot needed" };
+  }
   // Single source of truth (shared with the inventory TOOLS category).
   if (itemIsTool(item)) {
     return { eligible: true };

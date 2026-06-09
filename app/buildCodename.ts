@@ -291,6 +291,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-384 — stall sale-price variation: tc-less items (armor, materials) were
   // pinned to a ~5 TC rarity floor; buildStallVendor now grounds price in the
   // item's worth (armor: AC/stat/durability) + a wider rarity band & spread.
+  // OTA-385 — rope is no longer a tool-pouch item: it works from the pack (the
+  // climb_steep gate checks inventory, not the pouch), so isPouchEligible now
+  // refuses rope-tagged items (Reclaimer's / Climbing Rope). Scanners still qualify.
+  '2026-06-09-385': 'Sweetbay Anvil',
   '2026-06-09-384': 'Basswood Anvil',
   '2026-06-09-383': 'Yaupon Anvil',
   '2026-06-09-382': 'Loblolly Anvil',

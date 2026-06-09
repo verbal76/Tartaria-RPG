@@ -107,6 +107,11 @@
 >     grounds a tc-less item's price in its worth (armor: AC / stat bonuses /
 >     durability / resistances) on a wider rarity band + spread. Weapons (authored
 >     `tc`), hub vendors, roadside, and faction gear are untouched.
+>   - **OTA-385 "Sweetbay Anvil"** — rope is no longer a tool-pouch item. A rope
+>     grants its climb capability from the pack (the `climb_steep` gate checks
+>     inventory, not the pouch), so `isPouchEligible` now refuses rope-tagged items
+>     (Reclaimer's / Climbing Rope). Scanners (fire only when equipped/pouched)
+>     still qualify.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

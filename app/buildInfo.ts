@@ -13068,4 +13068,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // now grounds a tc-less item's price in its worth (armor folds in AC / stat
 // bonuses / durability / resistances) on top of a widened rarity band + a wider
 // haggling spread, so two same-rarity pieces differ. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-384';
+// OTA-385 (Sweetbay Anvil) — rope is no longer a tool-pouch item. Reclaimer's
+// Rope / Climbing Rope are kind:relic + tagged `tool`, so the pouch predicate
+// waved them in — but a rope grants its climb capability (the climb_steep gate)
+// just by sitting in the pack (the gate checks inventory, not the pouch), so a
+// rope in a tool slot is wasted. isPouchEligible now refuses rope-tagged items
+// (scanners, which only fire when equipped/pouched, still qualify). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-385';
