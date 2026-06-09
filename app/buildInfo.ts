@@ -13015,4 +13015,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "v3.4.11 · Year 2148" so it no longer reads like a build counter. One-line
 // copy change (TitleScreen.tsx); the 2148 lives only on the title footer.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-377';
+// OTA-378 (Chinquapin Anvil) — Tired/Exhausted "(99r)" no longer leaks to the
+// compact stats HUD. These statuses are stamina-gated (clear the moment stamina
+// recovers above 25%) and stamped with a sentinel remainingRounds:99 so the
+// round-timer never expires them; the full Character screen already hid the fake
+// count (OTA-357 → "until you rest"), but the compact formatEffectSummary was
+// missed. Now it drops the count for stamina-gated statuses (shows just "Tired")
+// and keeps "(Nr)" for genuinely timed effects. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-378';

@@ -268,6 +268,10 @@ const CODENAMES: Record<string, string> = {
   // pieces grant a little more. + DISPLAY_VERSION 3.0.0 → 3.4.11 (cosmetic).
   // OTA-377 — title-footer clarity: the "2148" after the version is the in-world
   // YEAR (Tartaria's Present Day), not a build number; relabelled "· Year 2148".
+  // OTA-378 — Tired/Exhausted "(99r)" no longer leaks to the compact HUD: these
+  // stamina-gated statuses use a sentinel remainingRounds:99 (they clear when
+  // stamina recovers), so formatEffectSummary now hides the fake count for them.
+  '2026-06-09-378': 'Chinquapin Anvil',
   '2026-06-09-377': 'Serviceberry Anvil',
   '2026-06-09-376': 'Sourwood Anvil',
   '2026-06-09-375': 'Sweetgum Anvil',

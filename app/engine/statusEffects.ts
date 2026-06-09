@@ -241,6 +241,14 @@ export function aethericVulnerabilityMultiplier(current: readonly StatusEffect[]
 export function formatEffectSummary(effects: readonly StatusEffect[] | undefined): string {
   if (!effects || effects.length === 0) return '';
   return effects
-    .map((e) => `${e.label ?? e.kind} (${e.remainingRounds}r)`)
+    .map((e) =>
+      // Tired / Exhausted are stamina-gated — they clear the moment stamina
+      // recovers, not on a round timer. Their `remainingRounds` is a sentinel
+      // (99), so showing "(99r)" is meaningless bookkeeping that leaks to the
+      // HUD. The full Character screen already hides it (OTA-357); match here.
+      STAMINA_GATED_STATUSES.has(e.kind)
+        ? (e.label ?? e.kind)
+        : `${e.label ?? e.kind} (${e.remainingRounds}r)`,
+    )
     .join(', ');
 }
