@@ -1,6 +1,6 @@
 {
   "gear": [
-    { "name": "Trail Rations", "kind": "consumable", "rarity": "Common", "tags": ["food"], "description": "Hardtack and salted mud-meat. Eating mends the body — food is how you heal out here." },
+    { "name": "Trail Rations", "kind": "consumable", "rarity": "Common", "tags": ["food"], "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 3 }, "description": "Hardtack and salted mud-meat. Eating mends the body and puts a little wind back in your lungs — +6 HP, +3 stamina. Food is how you heal out here, and how you catch your second breath in a fight." },
 
     { "name": "Wild Onion",       "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","vegetable"], "description": "Pulled from the silt by its papery tops. Sharp, watery, fills a corner of the gut.",
       "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1 } },
@@ -40,8 +40,8 @@
       "effect": { "kind": "consumable", "healHP": 1, "revealScene": true } },
 
     { "name": "Empty Water Bottle", "kind": "misc",       "rarity": "Common",   "tags": ["container","water"],          "description": "A glass-and-cork bottle, scoured clean. Type 'fill bottle' near a puddle, lake, waterfall, or crevice-pool to draw water." },
-    { "name": "Water Bottle",       "kind": "consumable", "rarity": "Common",   "tags": ["drink","water","container"],   "description": "A full bottle of water — clean enough, cold enough. Drink to take the edge off thirst and the day. Leaves an empty bottle behind.",
-      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 3 } },
+    { "name": "Water Bottle",       "kind": "consumable", "rarity": "Common",   "tags": ["drink","water","container"],   "description": "A full bottle of water — clean enough, cold enough. A few hard pulls get your wind right back when your lungs are burning: +10 stamina, +2 HP. The cheap, refillable way to recover stamina mid-fight — top it up free at any puddle, lake, or crevice-pool. Leaves an empty bottle behind.",
+      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 10 } },
 
     { "name": "Forager's Stew",       "kind": "consumable", "rarity": "Uncommon", "tags": ["food","cooked","stew"],     "description": "Onion and carrot simmered over Firewood with a bottle's worth of water. Hot, simple, restores you.",
       "effect": { "kind": "consumable", "healHP": 8, "restoreStamina": 4, "buffStat": "wisdom", "buffBonus": 1, "buffDuration": 6 } },
