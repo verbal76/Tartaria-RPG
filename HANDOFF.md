@@ -153,7 +153,15 @@
 >   - **OTA-394 "Sourgum Anvil"** — manual SAVE button on the settings Session tab
 >     (next to SAVE & EXIT). `persist()` now returns a boolean so the button reports
 >     a real "✓ SAVED" / red "✗ SAVE FAILED" — surfacing the silent save failures.
->   (Batch now 10, ≥5 — ready when the **user** triggers the push.)
+>   - **OTA-395 "Inkberry Anvil" — SAVE-LOSS ROOT CAUSE FIX.** The slot blob crossed
+>     AsyncStorage's ~2MB readback window (unbounded `worldMemory.visitedRooms` +
+>     heavy regenerable `roomInvestigationTable`s), so the staged save failed to
+>     verify and progress silently stopped saving (OTA-373 capped only the log).
+>     `trimSaveStateToFit` bounds the saved blob when over budget (sheds lore
+>     tables oldest-first, then oldest rooms; keeps dropped-item rooms); in-memory
+>     untouched, normal saves byte-for-byte unchanged.
+>   (Batch now 11, ≥5. Pushing the save fixes (394+395) FIRST per the user, then
+>   the rest — see the §P3a push log when done.)
 >
 > **OPEN / CRITICAL — save persistence still failing on LIVE (OTA-384):** player
 > logs show `persist: slot … FAILED — staged save did not verify (truncated or

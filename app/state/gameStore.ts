@@ -64,6 +64,7 @@ import {
   getLastSaveWriteError,
   type SlotSummary,
 } from '../engine/saveSystem';
+import { trimSaveStateToFit } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
@@ -19235,23 +19236,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stampNow = Date.now();
     const playerForSave: PlayerCharacter = { ...player, lastSessionEndedAt: stampNow };
     set((s) => (s.player ? { player: { ...s.player, lastSessionEndedAt: stampNow } } : s));
-    await saveSlot(activeSlotId, {
-      version: 1,
-      savedAt: stampNow,
-      player: playerForSave,
-      worldMemory,
-      gameLog: gameLog.slice(-MAX_LOG_IN_MEMORY),
-      currentScreen,
-      // Snapshot the live scene so resume picks up exactly where the player
-      // left off — no fresh Arbiter narration, no re-rolled weather /
-      // enemies / vendor. The player should be the next actor on resume,
-      // not the AI. Skipped only when currentScene is null (player on the
-      // title screen, mid-load, etc.).
-      currentScene: currentScene ?? undefined,
-      // 2026-05-25 — persist the wasteland encounter step counter so
-      // a save-load round trip can't reset it (cheese).
-      wastelandStepsSinceEncounter,
-    });
+    // OTA-395 — slot-blob size guard. The unbounded grower is
+    // worldMemory.visitedRooms (each room carries a heavy, regenerable
+    // roomInvestigationTable). Left alone the blob crosses AsyncStorage's
+    // ~2 MB readback window, the staged save fails to verify, and progress
+    // silently stops saving. trimSaveStateToFit sheds the cheapest-to-lose data
+    // (regenerable lore tables, then the oldest rooms) ONLY when over budget, so
+    // a normal-size save is byte-for-byte unchanged. In-memory state is untouched.
+    const { state: stateToSave, trimmed, bytesBefore, bytesAfter, tablesStripped, roomsDropped } =
+      trimSaveStateToFit({
+        version: 1,
+        savedAt: stampNow,
+        player: playerForSave,
+        worldMemory,
+        gameLog: gameLog.slice(-MAX_LOG_IN_MEMORY),
+        currentScreen,
+        // Snapshot the live scene so resume picks up exactly where the player
+        // left off — no fresh Arbiter narration, no re-rolled weather /
+        // enemies / vendor. Skipped only when currentScene is null (title /
+        // mid-load).
+        currentScene: currentScene ?? undefined,
+        // 2026-05-25 — persist the wasteland encounter step counter so a
+        // save-load round trip can't reset it (cheese).
+        wastelandStepsSinceEncounter,
+      });
+    if (trimmed) {
+      get().appendLog(
+        'debug',
+        `persist: slot blob trimmed to fit (${bytesBefore} → ${bytesAfter} bytes; stripped ${tablesStripped} room tables, dropped ${roomsDropped} old rooms) — over the ~2MB save window`,
+      );
+    }
+    await saveSlot(activeSlotId, stateToSave);
     // OTA-354 — persist health on-device, FAILURE-ONLY (persist fires every
     // action, so we don't spam "ok"). saveSlot is atomic (OTA-344) and never
     // throws; it records getLastSaveWriteError() on a failed write. A line here

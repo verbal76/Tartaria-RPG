@@ -13139,4 +13139,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // clears on success), and the button flashes "✓ SAVED" or a red "✗ SAVE FAILED"
 // so a silent save failure (storage full / oversized slot) is finally loud.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-394';
+// OTA-395 (Inkberry Anvil) — SAVE-LOSS ROOT CAUSE. The "staged save did not
+// verify (truncated or storage full)" failures: AsyncStorage reads a value back
+// through a ~2 MB SQLite cursor window, so a slot blob over that comes back
+// TRUNCATED and the verify (`staged !== payload`) fails → progress silently
+// stops saving. OTA-373 capped the game log, but the real unbounded grower is
+// worldMemory.visitedRooms — every entered room is recorded with a heavy,
+// regenerable roomInvestigationTable (lore text per ambient noun). New
+// trimSaveStateToFit (engine/saveTrim.ts) bounds the SAVED blob ONLY when over
+// budget (~1.4 MB): sheds regenerable lore tables oldest-first, then drops the
+// oldest rooms (never one holding dropped items). In-memory/session state is
+// untouched; a normal-size save is byte-for-byte unchanged. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-395';

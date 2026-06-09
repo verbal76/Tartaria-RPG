@@ -321,6 +321,12 @@ const CODENAMES: Record<string, string> = {
   // say "drink" (not "eat") for the bottle.
   // OTA-394 — manual SAVE button (Session tab) alongside SAVE & EXIT; persist()
   // returns a boolean so the button reports a real "✓ SAVED" / "✗ SAVE FAILED".
+  // OTA-395 — SAVE-LOSS ROOT CAUSE: the slot blob crossed AsyncStorage's ~2MB
+  // readback window (unbounded worldMemory.visitedRooms + heavy regenerable
+  // roomInvestigationTables), so the staged save failed to verify. trimSaveState-
+  // ToFit bounds the saved blob when over budget (sheds lore tables, then oldest
+  // rooms); in-memory untouched, normal saves unchanged.
+  '2026-06-09-395': 'Inkberry Anvil',
   '2026-06-09-394': 'Sourgum Anvil',
   '2026-06-09-393': 'Chokecherry Anvil',
   '2026-06-09-392': 'Silverbell Anvil',
