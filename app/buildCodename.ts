@@ -300,7 +300,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-387 — burn weapon coatings (parallel family): aether-dust pastes run hot
   // that sear burn damage (weakness-aware, now via type map AND traits); variants
   // Incendiary, Searing (+1 STR), Smoldering (+1 INT).
-  '2026-06-09-387': 'Madrone Anvil',
+  // OTA-388 — clearer MAIN QUEST chip subtitle: it's the only entry to Contracts
+  // (main storyline + side quests + collectibles); relabelled "tap to open — Main
+  // Storyline · Contracts · Collectibles".
+  '2026-06-09-388': 'Hackmatack Anvil',
   '2026-06-09-385': 'Sweetbay Anvil',
   '2026-06-09-384': 'Basswood Anvil',
   '2026-06-09-383': 'Yaupon Anvil',

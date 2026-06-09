@@ -13089,4 +13089,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resist:/vulnerable: traits (generalized the OTA-386 elemental path, so
 // electrical benefits too). Three variants (Aether Dust + Aether Crystal base):
 // Incendiary Paste, Searing Paste (+1 STR), Smoldering Paste (+1 INT). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-387';
+// OTA-388 (Hackmatack Anvil) — clearer label on the home-screen MAIN QUEST chip.
+// It's the ONLY entry to the Contracts screen (main storyline + side quests +
+// collectibles), but its subtitle ("tap for all contracts + collectibles") didn't
+// announce the main storyline. Relabelled to "tap to open — Main Storyline ·
+// Contracts · Collectibles ↗" so the single access point reads plainly. One-line
+// copy change (ExplorationScreen.tsx). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-388';

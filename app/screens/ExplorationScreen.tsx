@@ -590,7 +590,7 @@ export function ExplorationScreen() {
                   {mainLine}
                 </Text>
                 <Text style={styles.objectiveChipSubtitle}>
-                  tap for all contracts + collectibles ↗
+                  tap to open — Main Storyline · Contracts · Collectibles ↗
                 </Text>
               </View>
               {atUnrecovered && (

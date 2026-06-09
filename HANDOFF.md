@@ -123,7 +123,10 @@
 >     elemental proc now runs through type map AND `vulnerable:`/`resist:` traits
 >     (electrical inherits the fix). 3 variants (Aether Dust + Aether Crystal base):
 >     Incendiary, Searing (+1 STR), Smoldering (+1 INT).
->   (Batch building toward ≥5; the **user** triggers the push.)
+>   - **OTA-388 "Hackmatack Anvil"** — clearer MAIN QUEST chip subtitle. It's the
+>     only entry to Contracts (main storyline + side quests + collectibles), so the
+>     subtitle now reads "tap to open — Main Storyline · Contracts · Collectibles ↗".
+>   (Batch building toward ≥5 — 4 staged so far; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
