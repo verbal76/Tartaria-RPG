@@ -62,6 +62,11 @@
 >     timeout failed on iPad WiFi. Now the download budget is **240s** + **auto-
 >     retry up to 3×** that resumes via EAS's asset cache (new `fetchTimeoutMs`
 >     opt). Pairs with 367 so a far-behind iOS device catches up on next launch.
+>   - **OTA-370 "Ironwood Anvil"** — Disease Sample becomes a crafting material
+>     (still a throwable): **Plague Tonic** (premium 1d6 corruption coating),
+>     **Plague Vial** (premium 1d6 poison coating), and **Inoculant Draught** (a
+>     corruption cure you drink, reduceCorruption 22). Data-only; rides the
+>     spec-driven coating machinery.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

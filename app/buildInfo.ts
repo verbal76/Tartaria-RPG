@@ -12931,4 +12931,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // noUpdate); a persistent network failure across all attempts surfaces as
 // errored and boot falls through to load on the current bundle.
 // __tests__/checkAndApplyOTA.test.ts (+3). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-369';
+// OTA-370 (Ironwood Anvil) — Disease Sample is now a crafting material (it stays
+// a throwable too). Three new Rare consumables crafted from it: Plague Tonic (a
+// PREMIUM corruption weapon-coating, 1d6 + the sickening-stacks effect, label
+// "Plagued"); Plague Vial (a PREMIUM poison coating, 1d6 pure DOT, label
+// "Festering"); and Inoculant Draught (a corruption CURE you drink —
+// reduceCorruption 22 — "like cures like": a killed sample inoculates the blood).
+// All flow through the existing coating machinery (apply / combat / display /
+// loot) with no engine changes since coatings are spec-driven. One recipe per
+// result (no duplicate-result rows). Recipes: Plague Tonic = Disease Sample +
+// Blue Cap; Plague Vial = Disease Sample + Violet Cap; Inoculant Draught =
+// Disease Sample + Aether Dust + Orange Sporecap. __tests__/weaponCoating.test.ts
+// (+4). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-370';

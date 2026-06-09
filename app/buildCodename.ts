@@ -243,6 +243,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-369 — big-jump-tolerant OTA download: bundle fetch budget 60s → 240s
   // (new fetchTimeoutMs opt) + auto-retry up to 3× that RESUMES via EAS's asset
   // cache, so a device far behind catches up instead of timing out / "failing".
+  // OTA-370 — Disease Sample becomes a crafting material (still a throwable):
+  // Plague Tonic (premium 1d6 corruption coating), Plague Vial (premium 1d6
+  // poison coating), and Inoculant Draught (a corruption cure you drink).
+  '2026-06-09-370': 'Ironwood Anvil',
   '2026-06-08-369': 'Catalpa Anvil',
   '2026-06-08-368': 'Locust Anvil',
   '2026-06-08-367': 'Oak Anvil',

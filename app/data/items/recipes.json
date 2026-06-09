@@ -38,6 +38,28 @@
       ]
     },
     {
+      "result": "Plague Tonic",
+      "ingredients": [
+        { "name": "Disease Sample", "quantity": 1 },
+        { "name": "Blue Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Plague Vial",
+      "ingredients": [
+        { "name": "Disease Sample", "quantity": 1 },
+        { "name": "Violet Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Inoculant Draught",
+      "ingredients": [
+        { "name": "Disease Sample", "quantity": 1 },
+        { "name": "Aether Dust", "quantity": 1 },
+        { "name": "Orange Sporecap", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

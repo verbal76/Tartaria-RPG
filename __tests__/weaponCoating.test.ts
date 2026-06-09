@@ -157,3 +157,42 @@ describe('coating consumables carry a coating effect spec', () => {
     }
   });
 });
+
+describe('Disease Sample crafted items (OTA-370)', () => {
+  it('Plague Tonic is a premium 1d6 corruption coating', () => {
+    const fx = resolveItemEffect('Plague Tonic', [findGearByName]);
+    expect(fx?.kind).toBe('consumable');
+    if (fx?.kind === 'consumable') {
+      expect(fx.coating?.kind).toBe('corruption');
+      expect(fx.coating?.dice).toBe('1d6');
+      expect(fx.coating?.label).toBe('Plagued');
+    }
+  });
+
+  it('Plague Vial is a premium 1d6 poison coating', () => {
+    const fx = resolveItemEffect('Plague Vial', [findGearByName]);
+    expect(fx?.kind).toBe('consumable');
+    if (fx?.kind === 'consumable') {
+      expect(fx.coating?.kind).toBe('poison');
+      expect(fx.coating?.dice).toBe('1d6');
+      expect(fx.coating?.label).toBe('Festering');
+    }
+  });
+
+  it('Inoculant Draught is a corruption cure (reduceCorruption)', () => {
+    const fx = resolveItemEffect('Inoculant Draught', [findGearByName]);
+    expect(fx?.kind).toBe('consumable');
+    if (fx?.kind === 'consumable') {
+      expect(fx.reduceCorruption).toBeGreaterThan(0);
+      expect(fx.coating).toBeUndefined(); // it's drunk, not painted on
+    }
+  });
+
+  it('all three are crafted from Disease Sample (no duplicate-result recipes)', () => {
+    for (const name of ['Plague Tonic', 'Plague Vial', 'Inoculant Draught']) {
+      const matches = RECIPES.filter((r) => r.result === name);
+      expect(matches).toHaveLength(1); // one recipe per result (convention held)
+      expect(matches[0]!.ingredients.some((i) => i.name === 'Disease Sample')).toBe(true);
+    }
+  });
+});
