@@ -63,7 +63,10 @@ export function climbTierLabel(tier: number, total: number): string {
   if (tier === total) return 'top';
   if (tier === 1) return 'first hold';
   if (tier === total - 1) return 'last stretch';
-  return `tier ${tier}/${total}`;
+  // Middle tiers (only exist on 4+ tier climbs) — a natural "still ascending"
+  // phrase. Previously this returned the raw "tier 2/4", which the narration
+  // rendered as "You reach the tier 2/4 of the …" (a broken-looking template).
+  return 'next hold';
 }
 
 // OTA 046 — extract the cleared-state lookup the climb verb has done

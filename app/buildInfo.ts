@@ -13116,4 +13116,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New coatedWeaponNoun helper resolves the wielded instance and prefers its
 // coatedDisplayName; bare/uncoated swings fall back to the parsed noun. Pairs
 // with OTA-389 (repair). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-391';
+// OTA-392 (Silverbell Anvil) — climb middle-tier label fix. climbTierLabel only
+// named tier 1 ("first hold"), total-1 ("last stretch"), and total ("top"); a
+// true MIDDLE tier (only exists on 4+ tier climbs) fell through to the raw
+// "tier 2/4", which the narration rendered as "You reach the tier 2/4 of the …"
+// — a broken-looking line. 3-tier climbs never hit it. Middle tiers now read
+// "next hold". JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-392';

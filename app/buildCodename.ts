@@ -312,6 +312,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-391 — combat narration shows the coated weapon name: the attack lines used
   // the base parsed noun, so a coated weapon read as its old name mid-fight; new
   // coatedWeaponNoun helper prefers coatedDisplayName (pairs with the OTA-389 repair fix).
+  // OTA-392 — climb middle-tier label fix: a true middle tier on a 4+ tier climb
+  // leaked the raw "tier 2/4" into narration ("You reach the tier 2/4 of the …");
+  // middle tiers now read "next hold".
+  '2026-06-09-392': 'Silverbell Anvil',
   '2026-06-09-391': 'Hophornbeam Anvil',
   '2026-06-09-390': 'Witchhazel Anvil',
   '2026-06-09-389': 'Bristlecone Anvil',

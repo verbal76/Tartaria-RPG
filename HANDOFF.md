@@ -140,7 +140,22 @@
 >     name. Attack lines used the base parsed noun, so a coated weapon read as its
 >     old name mid-fight; new `coatedWeaponNoun` helper prefers `coatedDisplayName`.
 >     Pairs with OTA-389. Display only.
->   (Batch now 7, ≥5 — ready when the **user** triggers the push.)
+>   - **OTA-392 "Silverbell Anvil"** — climb middle-tier label fix. A true middle
+>     tier on a 4+ tier climb leaked the raw "tier 2/4" into narration ("You reach
+>     the tier 2/4 of the …"); middle tiers now read "next hold". 3-tier climbs
+>     unaffected. Display only.
+>   (Batch now 8, ≥5 — ready when the **user** triggers the push.)
+>
+> **OPEN / CRITICAL — save persistence still failing on LIVE (OTA-384):** player
+> logs show `persist: slot … FAILED — staged save did not verify (truncated or
+> storage full)` on nearly every action, AFTER the OTA-373 log cap (500) that was
+> meant to fix exactly this. So the slot blob is still oversizing the AsyncStorage
+> readback window OR the device is low on storage. Progress isn't being written
+> (live + .bak preserved, no corruption, but no new saves). NEXT: audit what else
+> rides in the slot save blob besides the now-capped gameLog (inventory, worldMemory
+> visitedRooms map, dog/quest state, statusEffects), add a blob-size guard + trim
+> the biggest offender. The "Save-load health: clean" line only tracks LOAD crashes,
+> not these write failures — don't be reassured by it.
 >
 > **RESOLVED (fusion gate — keep as-is):** considered relaxing the Crucible gate so
 > it unlocks the moment the player is out in the wilds (roadside vendor / first wilds

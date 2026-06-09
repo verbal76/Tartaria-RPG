@@ -16,7 +16,14 @@ describe('climb height table', () => {
     expect(climbTierLabel(4, 4)).toBe('top');
     expect(climbTierLabel(1, 4)).toBe('first hold');
     expect(climbTierLabel(3, 4)).toBe('last stretch');
-    expect(climbTierLabel(2, 4)).toMatch(/tier 2\/4/);
+    // OTA-392 — a true middle tier (only on 4+ tier climbs) gets a natural
+    // label, not the raw "tier 2/4" that used to leak into narration.
+    expect(climbTierLabel(2, 4)).toBe('next hold');
+    expect(climbTierLabel(2, 4)).not.toMatch(/tier \d/);
+    // 3-tier climbs are unaffected (every tier still hits a named case).
+    expect(climbTierLabel(1, 3)).toBe('first hold');
+    expect(climbTierLabel(2, 3)).toBe('last stretch');
+    expect(climbTierLabel(3, 3)).toBe('top');
   });
 
   it('rollClimbTopLoot returns null on low rolls, an item on high rolls', () => {
