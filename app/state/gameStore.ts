@@ -2369,6 +2369,13 @@ interface GameStore {
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
 
+// OTA-397 — save-size telemetry. persist() logs the per-part byte breakdown on
+// failure, on a trim, AND every Nth persist as a heartbeat, so the slot blob's
+// size is VISIBLE in the log as it grows (instead of only surfacing once it's
+// already too big to save). Module-level so it counts across persist calls.
+const PERSIST_SIZE_SAMPLE_EVERY = 10;
+let persistSizeSampleCounter = 0;
+
 // arb-fix — which equip slot currently holds a given inventory-item id. Used
 // by the equipped-faction-catalyst fusion prompt to know which slot to free.
 // Returns null when the id isn't worn (ring2/ring3 fall through — rare for a
@@ -19270,7 +19277,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const saveErr = getLastSaveWriteError();
     if (saveErr) {
       get().appendLog('debug', `persist: slot ${activeSlotId} FAILED — ${saveErr}`);
-      // OTA-396 — name the oversized part(s) so we stop guessing what's big.
+    }
+    // OTA-396/397 — per-part byte breakdown so we never guess what's oversized.
+    // Logged on a FAILED write, on a trim, AND as a periodic heartbeat so the
+    // blob size is visible as it climbs toward the limit, not just at the cliff.
+    persistSizeSampleCounter += 1;
+    if (saveErr || trim.trimmed || persistSizeSampleCounter % PERSIST_SIZE_SAMPLE_EVERY === 0) {
       get().appendLog('debug', saveSizeBreakdown(builtState));
     }
     return !saveErr;

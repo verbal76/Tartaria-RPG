@@ -13159,4 +13159,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // until it fits; (3) on a FAILED persist, log a per-part BYTE breakdown
 // (saveSizeBreakdown) so the next log names the oversized component instead of us
 // guessing. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-396';
+// OTA-397 (Catkin Anvil) — save-size telemetry. persist() now logs the per-part
+// byte breakdown (saveSizeBreakdown: total / player / worldMemory[rooms, events,
+// memos, npcs, defeated, …] / log / scene) on a FAILED write, on a trim, AND as a
+// periodic heartbeat (every 10th persist) — so the slot blob's size is VISIBLE in
+// the log as it grows toward the limit, instead of only surfacing once it's
+// already too big. Measure, don't guess. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-397';

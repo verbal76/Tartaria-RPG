@@ -29,7 +29,12 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-396 "Serviceash Anvil"** — save-loss fix TAKE 2.
+> - **LIVE (pushed 2026-06-09) = OTA-397 "Catkin Anvil"** — save-size telemetry:
+>   `persist()` logs the per-part byte breakdown (`saveSizeBreakdown`) on failure,
+>   on a trim, AND every 10th persist as a heartbeat — so the blob size is visible
+>   in the log as it grows (measure, don't guess). Watch the log for the
+>   `persist sizes(KB): …` line to see which component is climbing.
+> - **PRIOR LIVE (pushed 2026-06-09) = OTA-396 "Serviceash Anvil"** — save-loss fix TAKE 2.
 >   OTA-395's trim engaged on a CHAR budget but the save still failed UNDER it (byte
 >   vs char — multi-byte narration glyphs). Now: tighter budget (800K chars) +
 >   PROGRESSIVE shedding (lore tables → oldest rooms → memos → saved scene) + a
