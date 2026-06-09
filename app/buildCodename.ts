@@ -256,6 +256,14 @@ const CODENAMES: Record<string, string> = {
   // unbounded log was embedded in the slot save blob, which grew past
   // AsyncStorage's ~2 MB readback window so the atomic save's verify failed and
   // progress stopped persisting. COPY LOG (dedicated on-disk key) unaffected.
+  // OTA-374 — accessible stamina items (the exhaustion fix; no combat pause —
+  // there are none in a fight): Trail Rations now restore stamina (+3), Water
+  // Bottle sip 3 → 10, and every character starts with a Water Bottle.
+  // OTA-375 — water sources to refill the Water Bottle: ~55% of outdoor tiles
+  // surface a water source (rain pool / puddle / spring / pond …) in look-around,
+  // seeded per room key, recognised by the 'fill bottle' handler.
+  '2026-06-09-375': 'Sweetgum Anvil',
+  '2026-06-09-374': 'Hackberry Anvil',
   '2026-06-09-373': 'Sumac Anvil',
   '2026-06-09-372': 'Buckthorn Anvil',
   '2026-06-09-371': 'Hornbeam Anvil',

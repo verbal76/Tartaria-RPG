@@ -4019,7 +4019,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const gearConsumed = roomConsumedSet(get().worldMemory, candidateKey);
     const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey)
       .filter((n: string) => !isConsumedNoun(gearConsumed, n));
-    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
+    // OTA-375 — water sources for refilling the Water Bottle. Outdoor
+    // tiles get a stable, per-room water source surfaced in look-around so
+    // 'fill bottle' has somewhere to draw. Seeded off the room key (stable
+    // per tile — not farmable by leave-and-return), so it reads as a real
+    // feature of the place, not a re-roll. Hub interiors + arid tiles stay
+    // dry. The fill handler matches these nouns (puddle / pool / crevice /
+    // seep / basin / spring).
+    const waterSourceNouns: string[] = (() => {
+      if (get().player?.hubRoomId) return []; // indoor outpost rooms
+      const locTags = (location.tags ?? []).map((t) => String(t).toLowerCase());
+      if (locTags.some((t) => /desert|arid|dune|scorched|ash[- ]?waste|drought/.test(t))) return [];
+      let h = 0;
+      for (let i = 0; i < candidateKey.length; i++) h = (h * 31 + candidateKey.charCodeAt(i)) >>> 0;
+      if (h % 100 >= 55) return []; // ~55% of eligible outdoor tiles have water
+      // Every noun here must be recognised by the fill-bottle handler's
+      // WATER_SOURCE_NOUNS (pool / puddle / crevice / spring / pond) or
+      // contain the word "water".
+      const pool = ['rain pool', 'crevice-pool', 'puddle', 'shallow pool', 'standing water', 'cold spring', 'still pond'];
+      return [pool[h % pool.length]!];
+    })();
+    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
@@ -4047,6 +4067,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the capped selection rather than competing inside it).
     if (sceneGearNouns.length > 0) {
       displayedAmbientNouns = Array.from(new Set([...sceneGearNouns, ...displayedAmbientNouns]));
+    }
+    // OTA-375 — make sure the water source actually shows in look-around
+    // (it's a refill point the player needs to SEE), not just live in the
+    // uncapped ambient pool the fill handler reads.
+    if (waterSourceNouns.length > 0) {
+      displayedAmbientNouns = Array.from(new Set([...waterSourceNouns, ...displayedAmbientNouns]));
     }
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been

@@ -12975,4 +12975,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // diagnostics (COPY LOG reads the dedicated on-disk log key, not this buffer).
 // Self-heals on the next persist after install. __tests__/logCapPersist.test.ts
 // (1). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-373';
+// OTA-374 (Hackberry Anvil) — accessible stamina items (the exhaustion fix).
+// Player: "you can't rest in a fight, so if you're out of stamina all you can do
+// is flee?" — and "we need a stamina item; have the Water Bottle restore 10, have
+// each player start with one." The fix is items, not a combat pause (there are no
+// pauses in a fight). Stamina-restoring consumables already abound and are
+// drinkable mid-fight (Blue Cap Draught +8, Trauma/First Aid Kits +15/+10, the
+// stews +4–6, …) — but the STARTER ration was HP-only and nothing advertised the
+// stamina. Now: Trail Rations restore stamina too (effect { healHP 6,
+// restoreStamina 3 } — was the 2d6 HP-only fallback); the Water Bottle is a STRONG
+// sip (restoreStamina 3 → 10), the cheap FREE-refillable option; EVERY character
+// STARTS WITH a Water Bottle (buildStarterInventory); descriptions rewritten to
+// say plainly they put your wind back. __tests__/staminaItems.test.ts (3) +
+// starterInventory.test.ts (1). JS-only → OTA.
+// OTA-375 (Sweetgum Anvil) — water sources to refill the Water Bottle. With the
+// bottle now the go-to stamina item, the player needs places to top it up. About
+// 55% of OUTDOOR tiles (not hub interiors, not arid/desert/ash tiles) now surface
+// a water source in look-around — rain pool / crevice-pool / puddle / shallow
+// pool / standing water / cold spring / still pond — seeded off the room key so
+// it's stable per tile (a real feature of the place, not a farmable re-roll) and
+// shows in the look-around chips (prepended to displayedAmbientNouns, like spawned
+// gear). Every generated noun is recognised by the existing 'fill bottle' handler.
+// __tests__/waterSources.test.ts (7). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-375';

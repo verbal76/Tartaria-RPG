@@ -70,7 +70,16 @@
 >     in the slot blob, which grew past AsyncStorage's ~2 MB readback window → the
 >     atomic verify failed → progress stopped saving (no corruption; live+.bak
 >     intact). Capped the log at 500. Self-heals next persist. COPY LOG unaffected
->     (reads the dedicated on-disk key).
+>     (reads the dedicated on-disk key). **CRITICAL — recommend pushing promptly.**
+>   - **OTA-374 "Hackberry Anvil"** — accessible stamina items (the exhaustion
+>     fix; the answer is items, NOT a combat pause — there are no pauses in a
+>     fight). Trail Rations now restore stamina (+3), Water Bottle sip 3→**10**, and
+>     **every character starts with a Water Bottle**. (Most food/drink already
+>     restores stamina & is drinkable mid-fight.) *A "combat breather" idea was
+>     prototyped and withdrawn at the player's call.*
+>   - **OTA-375 "Sweetgum Anvil"** — water sources to refill the Water Bottle:
+>     ~55% of outdoor tiles surface a water source (rain pool / puddle / spring /
+>     pond …) in look-around, seeded per room key, recognised by `fill bottle`.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
