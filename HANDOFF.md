@@ -29,9 +29,23 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-372 "Buckthorn Anvil"** — the OTA-reliability
->   + content batch (369→372), pushed through `4f53281`; `eas-update.yml`
+> - **LIVE (pushed 2026-06-09) = OTA-376 "Sourwood Anvil"** — the save-loss +
+>   stamina/exhaustion batch (373→376), pushed through `b6a02dc`; `eas-update.yml`
 >   publishes to Android + iOS.
+>   - **373 Sumac** — SAVE-LOSS FIX: capped the unbounded game log (it had grown
+>     the slot blob past AsyncStorage's ~2 MB readback window → atomic-save verify
+>     failed → progress stopped saving). Self-heals next persist.
+>   - **374 Hackberry** — accessible stamina items: Trail Rations +3 stamina,
+>     Water Bottle +10, every character starts with a Water Bottle.
+>   - **375 Sweetgum** — water sources: ~55% of outdoor tiles surface a refill
+>     point in look-around (seeded per tile, `fill bottle`-able).
+>   - **376 Sourwood** — armor regen (mild per-action staminaRegen / limited
+>     hpRegen on 93 pieces, capped 3/2, faction grants more) + `DISPLAY_VERSION`
+>     3.0.0 → 3.4.11.
+>   (A "combat breather" was prototyped as 374 "Boxwood" and withdrawn —
+>   no pauses in a fight; the answer is items + water + armor regen.)
+> - **PRIOR LIVE = OTA-372 "Buckthorn Anvil"** — the OTA-reliability + content
+>   batch (369→372), pushed through `4f53281`.
 >   - **369 Catalpa** — big-jump-tolerant OTA download (240s budget + 3× resume-
 >     retry via EAS's asset cache; new `fetchTimeoutMs` opt). Fixes the iPad that
 >     "kept failing then finally updated" climbing from Clay Anvil (308).
@@ -63,29 +77,7 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
->   - **OTA-373 "Sumac Anvil"** — SAVE-LOSS FIX. Device log showed
->     `persist: ... FAILED — staged save did not verify (truncated)` on every
->     action. Cause: `MAX_LOG_IN_MEMORY` was Infinity and persist() embeds the log
->     in the slot blob, which grew past AsyncStorage's ~2 MB readback window → the
->     atomic verify failed → progress stopped saving (no corruption; live+.bak
->     intact). Capped the log at 500. Self-heals next persist. COPY LOG unaffected
->     (reads the dedicated on-disk key). **CRITICAL — recommend pushing promptly.**
->   - **OTA-374 "Hackberry Anvil"** — accessible stamina items (the exhaustion
->     fix; the answer is items, NOT a combat pause — there are no pauses in a
->     fight). Trail Rations now restore stamina (+3), Water Bottle sip 3→**10**, and
->     **every character starts with a Water Bottle**. (Most food/drink already
->     restores stamina & is drinkable mid-fight.) *A "combat breather" idea was
->     prototyped and withdrawn at the player's call.*
->   - **OTA-375 "Sweetgum Anvil"** — water sources to refill the Water Bottle:
->     ~55% of outdoor tiles surface a water source (rain pool / puddle / spring /
->     pond …) in look-around, seeded per room key, recognised by `fill bottle`.
->   - **OTA-376 "Sourwood Anvil"** — armor regen: worn armor can carry a mild
->     per-action `staminaRegen` or (limited) `hpRegen`, summed + capped (3/2)
->     across the 6 armor slots, on top of its other bonuses; 93 pieces marked
->     across all slots/rarities, faction pieces grant a little more. Also flipped
->     `DISPLAY_VERSION` 3.0.0 → 3.4.11 (cosmetic title/About version).
->   (Batch building toward ≥5; the **user** triggers the push.)
+> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
