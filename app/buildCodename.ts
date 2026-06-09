@@ -303,6 +303,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-388 — clearer MAIN QUEST chip subtitle: it's the only entry to Contracts
   // (main storyline + side quests + collectibles); relabelled "tap to open — Main
   // Storyline · Contracts · Collectibles".
+  // OTA-389 — repair keeps a coated weapon's name: the coating survives a repair,
+  // but the repair-confirmation lines logged the base name; both the Arbiter
+  // repair handler and the vendor mend now use coatedDisplayName.
+  '2026-06-09-389': 'Bristlecone Anvil',
   '2026-06-09-388': 'Hackmatack Anvil',
   '2026-06-09-385': 'Sweetbay Anvil',
   '2026-06-09-384': 'Basswood Anvil',

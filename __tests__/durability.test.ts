@@ -70,6 +70,20 @@ describe('durability', () => {
     const next = repairItem(inv, 'a');
     expect(next[0]!.durability!.current).toBe(30);
   });
+
+  it('repairItem preserves a weapon coating — the coating survives a repair', () => {
+    const inv: InventoryItem[] = [
+      {
+        id: 'a', name: 'Rusty Shortbow', kind: 'weapon', quantity: 1, tags: [],
+        durability: { current: 2, max: 30 },
+        coating: { kind: 'acid', dice: '1d4', label: 'Acid-Etched' },
+      },
+    ];
+    const next = repairItem(inv, 'a');
+    expect(next[0]!.durability!.current).toBe(30);
+    // The instance (and its coating) is kept, so the coated name holds too.
+    expect(next[0]!.coating).toEqual({ kind: 'acid', dice: '1d4', label: 'Acid-Etched' });
+  });
 });
 
 describe('durability — per-instance variation (inverse tradeoff)', () => {

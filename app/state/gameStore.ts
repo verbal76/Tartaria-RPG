@@ -14646,9 +14646,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) =>
       s.player ? { player: { ...s.player, tc: s.player.tc - cost, inventory: newInventory } } : s,
     );
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mendDisplay = require('../engine/weaponCoating').coatedDisplayName(item) as string;
     get().appendLog(
       'reward',
-      `${scene.vendor.name} mends your ${item.name}. ${cost} TC. (durability restored)`,
+      `${scene.vendor.name} mends your ${mendDisplay}. ${cost} TC. (durability restored)`,
     );
     // arb45 — Architect's Eye: a completed mend counts as restoring ancient work.
     recordTitleProgress(get, set, { repairsCompleted: 1 });
@@ -18709,13 +18711,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing to repair — this one doesn't wear."`);
       return;
     }
+    // Use the coated display name in every line so a repaired coated weapon
+    // reads as itself ("Acid-Etched Rusty Shortbow") — the coating survives the
+    // repair (the instance is restored in place), so the name must too.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const display = require('../engine/weaponCoating').coatedDisplayName(item) as string;
     if (item.durability.current >= item.durability.max) {
-      get().appendLog('arbiter', `The Arbiter looks the ${item.name} over. "Already whole. Don't waste materials."`);
+      get().appendLog('arbiter', `The Arbiter looks the ${display} over. "Already whole. Don't waste materials."`);
       return;
     }
     const cost = repairCostMaterials(item);
     if (cost.length === 0) {
-      get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "No recipe to mend this one. Sell it on or scrap for parts."`);
+      get().appendLog('arbiter', `The Arbiter taps the ${display}. "No recipe to mend this one. Sell it on or scrap for parts."`);
       return;
     }
     // OTA-205 — substitution-aware shortage check. Previously the
@@ -18732,7 +18739,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const shortages = missing.map((m) => `${m.name} ${m.quantity} short`);
       get().appendLog(
         'arbiter',
-        `The Arbiter eyes the ${item.name}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
+        `The Arbiter eyes the ${display}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
       );
       return;
     }
@@ -18762,7 +18769,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return { player: { ...s.player, inventory: newInventory } };
     });
     const costSummary = cost.map((c) => c.quantity > 1 ? `${c.name} x${c.quantity}` : c.name).join(', ');
-    get().appendLog('world', `You repair the ${item.name}. Back to full. (spent: ${costSummary})`);
+    get().appendLog('world', `You repair the ${display}. Back to full. (spent: ${costSummary})`);
     void get().persist();
   },
 

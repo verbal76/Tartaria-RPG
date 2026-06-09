@@ -126,7 +126,12 @@
 >   - **OTA-388 "Hackmatack Anvil"** — clearer MAIN QUEST chip subtitle. It's the
 >     only entry to Contracts (main storyline + side quests + collectibles), so the
 >     subtitle now reads "tap to open — Main Storyline · Contracts · Collectibles ↗".
->   (Batch building toward ≥5 — 4 staged so far; the **user** triggers the push.)
+>   - **OTA-389 "Bristlecone Anvil"** — repair keeps a coated weapon's name. The
+>     coating survives a repair (instance restored in place; inventory row already
+>     shows the coated name), but the repair-confirmation lines logged the base
+>     name — so a repair looked like it reverted "Acid-Etched Rusty Shortbow" to
+>     "Rusty Shortbow". Both repair paths now log `coatedDisplayName`. Display only.
+>   (Batch now ≥5 — ready when the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

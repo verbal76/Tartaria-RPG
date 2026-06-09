@@ -13095,4 +13095,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // announce the main storyline. Relabelled to "tap to open — Main Storyline ·
 // Contracts · Collectibles ↗" so the single access point reads plainly. One-line
 // copy change (ExplorationScreen.tsx). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-388';
+// OTA-389 (Bristlecone Anvil) — repair keeps a coated weapon's NAME. A coating
+// survives a repair (the instance is restored in place, coating intact + the
+// inventory row already shows the coated name), but both repair-confirmation
+// lines logged the BASE name ("You repair the Rusty Shortbow"), so a player who
+// just coated an "Acid-Etched Rusty Shortbow" thought the repair reverted it.
+// Both the Arbiter repair handler and the vendor mend now log coatedDisplayName.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-389';
