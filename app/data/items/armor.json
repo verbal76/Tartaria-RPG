@@ -127,7 +127,8 @@
         "helmet",
         "mud_dwellers"
       ],
-      "description": "Aether-Seeker's Hood. Rare head armor from the Mud Dwellers tradition."
+      "description": "Aether-Seeker's Hood. Rare head armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Crown of the Deep",
@@ -191,7 +192,8 @@
         "helmet",
         "tartarian_giants"
       ],
-      "description": "Aetheric Helm of Command. Common head armor from the Tartarian Giants tradition."
+      "description": "Aetheric Helm of Command. Common head armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Titan's Forehead Guard",
@@ -259,7 +261,8 @@
         "helmet",
         "tartarian_giants"
       ],
-      "description": "Architect's Crown. Uncommon head armor from the Tartarian Giants tradition."
+      "description": "Architect's Crown. Uncommon head armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Helm of the Great Architect",
@@ -331,7 +334,8 @@
         "helmet",
         "tartarian_giants"
       ],
-      "description": "Aetheric Crown of the Giants. Legendary head armor from the Tartarian Giants tradition."
+      "description": "Aetheric Crown of the Giants. Legendary head armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Reclaimer's Salvage Cap",
@@ -587,7 +591,8 @@
         "helmet",
         "architectural_sentinels"
       ],
-      "description": "Architect's Sight Enhancer. Uncommon head armor from the Architectural Sentinels tradition."
+      "description": "Architect's Sight Enhancer. Uncommon head armor from the Architectural Sentinels tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric Analyzer Helm",
@@ -867,7 +872,8 @@
         "helmet",
         "aetherborn"
       ],
-      "description": "Aetheric Helm of Insight. Common head armor from the Aetherborn tradition."
+      "description": "Aetheric Helm of Insight. Common head armor from the Aetherborn tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Arcane Observer's Circlet",
@@ -931,7 +937,8 @@
         "helmet",
         "aetherborn"
       ],
-      "description": "Aether-Seeker's Cap. Uncommon head armor from the Aetherborn tradition."
+      "description": "Aether-Seeker's Cap. Uncommon head armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Crown of the Aether Lords",
@@ -999,7 +1006,8 @@
         "helmet",
         "aetherborn"
       ],
-      "description": "Arcane King's Diadem. Legendary head armor from the Aetherborn tradition."
+      "description": "Arcane King's Diadem. Legendary head armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Memory Weaver's Hood",
@@ -1328,7 +1336,8 @@
         "face",
         "mud_dwellers"
       ],
-      "description": "Crown Mask of the Mud King. Legendary head armor from the Mud Dwellers tradition."
+      "description": "Crown Mask of the Mud King. Legendary head armor from the Mud Dwellers tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Titan's Guard Mask",
@@ -1801,7 +1810,8 @@
         "face",
         "architectural_sentinels"
       ],
-      "description": "Aether Mask of the Sentinel. Rare head armor from the Architectural Sentinels tradition."
+      "description": "Aether Mask of the Sentinel. Rare head armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Guardian Mask of the Architects",
@@ -2047,7 +2057,8 @@
         "face",
         "aetherborn"
       ],
-      "description": "Aetherbound Mask. Common head armor from the Aetherborn tradition."
+      "description": "Aetherbound Mask. Common head armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Seer's Veil of the Aether",
@@ -2145,7 +2156,8 @@
         "face",
         "aetherborn"
       ],
-      "description": "Aether-Warrior's Veil. Rare head armor from the Aetherborn tradition."
+      "description": "Aether-Warrior's Veil. Rare head armor from the Aetherborn tradition.",
+      "hpRegen": 1
     },
     {
       "name": "King's Mask of the Aetherborn",
@@ -2470,7 +2482,8 @@
         "chest",
         "mud_dwellers"
       ],
-      "description": "Aether-Woven Mud Plate. Rare chest armor from the Mud Dwellers tradition."
+      "description": "Aether-Woven Mud Plate. Rare chest armor from the Mud Dwellers tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Armor of the Mud King",
@@ -2508,7 +2521,8 @@
         "chest",
         "mud_dwellers"
       ],
-      "description": "Armor of the Mud King. Legendary chest armor from the Mud Dwellers tradition."
+      "description": "Armor of the Mud King. Legendary chest armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Aetheric Chainmail",
@@ -2538,7 +2552,8 @@
         "chest",
         "tartarian_giants"
       ],
-      "description": "Aetheric Chainmail. Common chest armor from the Tartarian Giants tradition."
+      "description": "Aetheric Chainmail. Common chest armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Hardened Titan's Chestplate",
@@ -2606,7 +2621,8 @@
         "chest",
         "tartarian_giants"
       ],
-      "description": "Architect's Warplate. Uncommon chest armor from the Tartarian Giants tradition."
+      "description": "Architect's Warplate. Uncommon chest armor from the Tartarian Giants tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aether-Fused Battle Armor",
@@ -2640,7 +2656,8 @@
         "chest",
         "tartarian_giants"
       ],
-      "description": "Aether-Fused Battle Armor. Rare chest armor from the Tartarian Giants tradition."
+      "description": "Aether-Fused Battle Armor. Rare chest armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Crown Defender's Plate",
@@ -2938,7 +2955,8 @@
         "chest",
         "architectural_sentinels"
       ],
-      "description": "Aether-Reinforced Armor. Uncommon chest armor from the Architectural Sentinels tradition."
+      "description": "Aether-Reinforced Armor. Uncommon chest armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Sentinel's Warplate",
@@ -3014,7 +3032,8 @@
         "chest",
         "architectural_sentinels"
       ],
-      "description": "Aetheric Bulwark of the Sentinel. Legendary chest armor from the Architectural Sentinels tradition."
+      "description": "Aetheric Bulwark of the Sentinel. Legendary chest armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Rough-Hewn Chestplate",
@@ -3222,7 +3241,8 @@
         "chest",
         "aetherborn"
       ],
-      "description": "Aetheric Warplate. Common chest armor from the Aetherborn tradition."
+      "description": "Aetheric Warplate. Common chest armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Arcane Guardian's Chestpiece",
@@ -3252,7 +3272,8 @@
         "chest",
         "aetherborn"
       ],
-      "description": "Arcane Guardian's Chestpiece. Common chest armor from the Aetherborn tradition."
+      "description": "Arcane Guardian's Chestpiece. Common chest armor from the Aetherborn tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aether-Woven Battlecoat",
@@ -3286,7 +3307,8 @@
         "chest",
         "aetherborn"
       ],
-      "description": "Aether-Woven Battlecoat. Uncommon chest armor from the Aetherborn tradition."
+      "description": "Aether-Woven Battlecoat. Uncommon chest armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "King's Aether Warplate",
@@ -3619,7 +3641,8 @@
         "mud_dwellers",
         "stealth"
       ],
-      "description": "Aether-Warden's Legguards. Uncommon legs armor from the Mud Dwellers tradition."
+      "description": "Aether-Warden's Legguards. Uncommon legs armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Aether-Wrapped Mud Greaves",
@@ -3653,7 +3676,8 @@
         "legs",
         "mud_dwellers"
       ],
-      "description": "Aether-Wrapped Mud Greaves. Rare legs armor from the Mud Dwellers tradition."
+      "description": "Aether-Wrapped Mud Greaves. Rare legs armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Legplates of the Mud King",
@@ -3721,7 +3745,8 @@
         "legs",
         "tartarian_giants"
       ],
-      "description": "Aetheric Scout Greaves. Common legs armor from the Tartarian Giants tradition."
+      "description": "Aetheric Scout Greaves. Common legs armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Titan's Trail Leggings",
@@ -3827,7 +3852,8 @@
         "legs",
         "tartarian_giants"
       ],
-      "description": "Architect's Aether Legplates. Rare legs armor from the Tartarian Giants tradition."
+      "description": "Architect's Aether Legplates. Rare legs armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Legplates of the Crown Titan",
@@ -3993,7 +4019,8 @@
         "legs",
         "reclaimers"
       ],
-      "description": "Explorer's Aetheric Legplates. Rare legs armor from the Reclaimers tradition."
+      "description": "Explorer's Aetheric Legplates. Rare legs armor from the Reclaimers tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Forgotten Wanderer's Greaves",
@@ -4027,7 +4054,8 @@
         "legs",
         "reclaimers"
       ],
-      "description": "Forgotten Wanderer's Greaves. Legendary legs armor from the Reclaimers tradition."
+      "description": "Forgotten Wanderer's Greaves. Legendary legs armor from the Reclaimers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Sentinel's Mobile Greaves",
@@ -4121,7 +4149,8 @@
         "legs",
         "architectural_sentinels"
       ],
-      "description": "Aetheric Reinforced Greaves. Uncommon legs armor from the Architectural Sentinels tradition."
+      "description": "Aetheric Reinforced Greaves. Uncommon legs armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Sentinel's Agile Legplates",
@@ -4194,7 +4223,8 @@
         "legs",
         "architectural_sentinels"
       ],
-      "description": "Greaves of the Sentinel King. Legendary legs armor from the Architectural Sentinels tradition."
+      "description": "Greaves of the Sentinel King. Legendary legs armor from the Architectural Sentinels tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Stone-Stride Greaves",
@@ -4406,7 +4436,8 @@
         "legs",
         "aetherborn"
       ],
-      "description": "Aether-Runner Greaves. Common legs armor from the Aetherborn tradition."
+      "description": "Aether-Runner Greaves. Common legs armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Arcane Sprinter's Legplates",
@@ -4436,7 +4467,8 @@
         "legs",
         "aetherborn"
       ],
-      "description": "Arcane Sprinter's Legplates. Common legs armor from the Aetherborn tradition."
+      "description": "Arcane Sprinter's Legplates. Common legs armor from the Aetherborn tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric Runner's Legplates",
@@ -4470,7 +4502,8 @@
         "legs",
         "aetherborn"
       ],
-      "description": "Aetheric Runner's Legplates. Uncommon legs armor from the Aetherborn tradition."
+      "description": "Aetheric Runner's Legplates. Uncommon legs armor from the Aetherborn tradition.",
+      "hpRegen": 1
     },
     {
       "name": "King's Legplates of Speed",
@@ -4538,7 +4571,8 @@
         "legs",
         "aetherborn"
       ],
-      "description": "Greaves of the Aetherborn King. Legendary legs armor from the Aetherborn tradition."
+      "description": "Greaves of the Aetherborn King. Legendary legs armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Forgotten Leggings",
@@ -4797,7 +4831,8 @@
         "mud_dwellers",
         "stealth"
       ],
-      "description": "Aether-Warden's Cape. Uncommon cloak armor from the Mud Dwellers tradition."
+      "description": "Aether-Warden's Cape. Uncommon cloak armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Ceremonial Robes",
@@ -4831,7 +4866,8 @@
         "ceremonial",
         "true_tartarians"
       ],
-      "description": "Ceremonial Robes. Woven for True Tartarian rites — burial processions, oath-takings, the Mud Monarch Purifier sermons. Soft silk-mud blend; offers little stopping power but speaks the right language to anyone who recognises the cut."
+      "description": "Ceremonial Robes. Woven for True Tartarian rites — burial processions, oath-takings, the Mud Monarch Purifier sermons. Soft silk-mud blend; offers little stopping power but speaks the right language to anyone who recognises the cut.",
+      "staminaRegen": 2
     },
     {
       "name": "Mud-glass Scales",
@@ -4863,7 +4899,8 @@
         "mud_glass",
         "true_tartarians"
       ],
-      "description": "Mud-glass Scales. Overlapping shards of fired Aetheric silica, lashed onto a leather backing. Deflects an arrow point as readily as a fist — the silica shatters loudly on a real hit, which has saved more True Tartarians than the armour itself."
+      "description": "Mud-glass Scales. Overlapping shards of fired Aetheric silica, lashed onto a leather backing. Deflects an arrow point as readily as a fist — the silica shatters loudly on a real hit, which has saved more True Tartarians than the armour itself.",
+      "staminaRegen": 2
     },
     {
       "name": "Runic Mantle",
@@ -4897,7 +4934,8 @@
         "forgotten_order",
         "rare"
       ],
-      "description": "Runic Mantle. The Forgotten Order's reward for unsealing the Red Tower's first vault. Hand-inked Tartarian glyphs cover the inside lining — they pull warmth from the Aether and turn aside the more obvious wards. The Order's mark is stitched at the collar in iron thread."
+      "description": "Runic Mantle. The Forgotten Order's reward for unsealing the Red Tower's first vault. Hand-inked Tartarian glyphs cover the inside lining — they pull warmth from the Aether and turn aside the more obvious wards. The Order's mark is stitched at the collar in iron thread.",
+      "hpRegen": 2
     },
     {
       "name": "Shaman's Mantle of Secrets",
@@ -4975,7 +5013,8 @@
         "mud_dwellers",
         "stealth"
       ],
-      "description": "Cloak of the Mud King. Legendary cloak armor from the Mud Dwellers tradition."
+      "description": "Cloak of the Mud King. Legendary cloak armor from the Mud Dwellers tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Titan's Vest",
@@ -5039,7 +5078,8 @@
         "outer",
         "tartarian_giants"
       ],
-      "description": "Architect's Field Jacket. Common cloak armor from the Tartarian Giants tradition."
+      "description": "Architect's Field Jacket. Common cloak armor from the Tartarian Giants tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric Titan's Overcoat",
@@ -5077,7 +5117,8 @@
         "outer",
         "tartarian_giants"
       ],
-      "description": "Aetheric Titan's Overcoat. Uncommon cloak armor from the Tartarian Giants tradition."
+      "description": "Aetheric Titan's Overcoat. Uncommon cloak armor from the Tartarian Giants tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Titan King's War Vest",
@@ -5288,7 +5329,8 @@
         "reclaimers",
         "stealth"
       ],
-      "description": "Cloak of the Forgotten Seeker. Rare cloak armor from the Reclaimers tradition."
+      "description": "Cloak of the Forgotten Seeker. Rare cloak armor from the Reclaimers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Relic Hunter's Mantle",
@@ -5416,7 +5458,8 @@
         "outer",
         "architectural_sentinels"
       ],
-      "description": "Aetheric Guard Cloak. Uncommon cloak armor from the Architectural Sentinels tradition."
+      "description": "Aetheric Guard Cloak. Uncommon cloak armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Cloak of the Sentinel King",
@@ -5454,7 +5497,8 @@
         "outer",
         "architectural_sentinels"
       ],
-      "description": "Cloak of the Sentinel King. Rare cloak armor from the Architectural Sentinels tradition."
+      "description": "Cloak of the Sentinel King. Rare cloak armor from the Architectural Sentinels tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aether-Reinforced Cloak",
@@ -5488,7 +5532,8 @@
         "outer",
         "architectural_sentinels"
       ],
-      "description": "Aether-Reinforced Cloak. Legendary cloak armor from the Architectural Sentinels tradition."
+      "description": "Aether-Reinforced Cloak. Legendary cloak armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Stonebreaker's Cloak",
@@ -5688,7 +5733,8 @@
         "outer",
         "aetherborn"
       ],
-      "description": "Aether-Weaver's Mantle. Common cloak armor from the Aetherborn tradition."
+      "description": "Aether-Weaver's Mantle. Common cloak armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Aether-Walker's Cape",
@@ -5718,7 +5764,8 @@
         "outer",
         "aetherborn"
       ],
-      "description": "Aether-Walker's Cape. Common cloak armor from the Aetherborn tradition."
+      "description": "Aether-Walker's Cape. Common cloak armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Arcane Cloak of the Aetherborn",
@@ -5786,7 +5833,8 @@
         "outer",
         "aetherborn"
       ],
-      "description": "Cloak of the Aether King. Rare cloak armor from the Aetherborn tradition."
+      "description": "Cloak of the Aether King. Rare cloak armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Mantle of the Aether Lords",
@@ -5989,7 +6037,8 @@
         "unknowing_masses",
         "stealth"
       ],
-      "description": "Cloak of the Forgotten Heir. Legendary cloak armor from the Unknowing Masses tradition."
+      "description": "Cloak of the Forgotten Heir. Legendary cloak armor from the Unknowing Masses tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Mud-Lurker Boots",
@@ -6123,7 +6172,8 @@
         "feet",
         "mud_dwellers"
       ],
-      "description": "Aether-Walker's Mud Boots. Rare feet armor from the Mud Dwellers tradition."
+      "description": "Aether-Walker's Mud Boots. Rare feet armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Boots of the Mud King",
@@ -6161,7 +6211,8 @@
         "feet",
         "mud_dwellers"
       ],
-      "description": "Boots of the Mud King. Legendary feet armor from the Mud Dwellers tradition."
+      "description": "Boots of the Mud King. Legendary feet armor from the Mud Dwellers tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric Strider Boots",
@@ -6191,7 +6242,8 @@
         "feet",
         "tartarian_giants"
       ],
-      "description": "Aetheric Strider Boots. Common feet armor from the Tartarian Giants tradition."
+      "description": "Aetheric Strider Boots. Common feet armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Titan's Swiftstep Boots",
@@ -6259,7 +6311,8 @@
         "feet",
         "tartarian_giants"
       ],
-      "description": "Aether-Walker's Boots. Uncommon feet armor from the Tartarian Giants tradition."
+      "description": "Aether-Walker's Boots. Uncommon feet armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Greaves of the Titan's Path",
@@ -6297,7 +6350,8 @@
         "feet",
         "tartarian_giants"
       ],
-      "description": "Greaves of the Titan's Path. Rare feet armor from the Tartarian Giants tradition."
+      "description": "Greaves of the Titan's Path. Rare feet armor from the Tartarian Giants tradition.",
+      "hpRegen": 1
     },
     {
       "name": "King's Greaves of Speed",
@@ -6469,7 +6523,8 @@
         "feet",
         "reclaimers"
       ],
-      "description": "Explorer's Aetheric Greaves. Rare feet armor from the Reclaimers tradition."
+      "description": "Explorer's Aetheric Greaves. Rare feet armor from the Reclaimers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Boots of the Forgotten Seeker",
@@ -6503,7 +6558,8 @@
         "feet",
         "reclaimers"
       ],
-      "description": "Boots of the Forgotten Seeker. Legendary feet armor from the Reclaimers tradition."
+      "description": "Boots of the Forgotten Seeker. Legendary feet armor from the Reclaimers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Sentinel's Greaves",
@@ -6597,7 +6653,8 @@
         "feet",
         "architectural_sentinels"
       ],
-      "description": "Aetheric Swiftstep Greaves. Uncommon feet armor from the Architectural Sentinels tradition."
+      "description": "Aetheric Swiftstep Greaves. Uncommon feet armor from the Architectural Sentinels tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Sentinel's Reinforced Greaves",
@@ -6885,7 +6942,8 @@
         "feet",
         "aetherborn"
       ],
-      "description": "Aether-Runner Boots. Common feet armor from the Aetherborn tradition."
+      "description": "Aether-Runner Boots. Common feet armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Arcane Sprinter's Boots",
@@ -6915,7 +6973,8 @@
         "feet",
         "aetherborn"
       ],
-      "description": "Arcane Sprinter's Boots. Common feet armor from the Aetherborn tradition."
+      "description": "Arcane Sprinter's Boots. Common feet armor from the Aetherborn tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric Runner's Boots",
@@ -6949,7 +7008,8 @@
         "feet",
         "aetherborn"
       ],
-      "description": "Aetheric Runner's Boots. Uncommon feet armor from the Aetherborn tradition."
+      "description": "Aetheric Runner's Boots. Uncommon feet armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "King's Speed Boots",
@@ -7185,7 +7245,8 @@
         "feet",
         "unknowing_masses"
       ],
-      "description": "Boots of the Forgotten King. Legendary feet armor from the Unknowing Masses tradition."
+      "description": "Boots of the Forgotten King. Legendary feet armor from the Unknowing Masses tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Mud-Claw Gloves",
@@ -7313,7 +7374,8 @@
         "hands",
         "mud_dwellers"
       ],
-      "description": "Aether-Warden's Gloves. Rare hands armor from the Mud Dwellers tradition."
+      "description": "Aether-Warden's Gloves. Rare hands armor from the Mud Dwellers tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Gauntlets of the Mud King",
@@ -7449,7 +7511,8 @@
         "hands",
         "tartarian_giants"
       ],
-      "description": "Architect's Guard Gauntlets. Uncommon hands armor from the Tartarian Giants tradition."
+      "description": "Architect's Guard Gauntlets. Uncommon hands armor from the Tartarian Giants tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric King's Gauntlets",
@@ -7483,7 +7546,8 @@
         "hands",
         "tartarian_giants"
       ],
-      "description": "Aetheric King's Gauntlets. Rare hands armor from the Tartarian Giants tradition."
+      "description": "Aetheric King's Gauntlets. Rare hands armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Gauntlets of the Giant Lord",
@@ -7521,7 +7585,8 @@
         "hands",
         "tartarian_giants"
       ],
-      "description": "Gauntlets of the Giant Lord. Legendary hands armor from the Tartarian Giants tradition."
+      "description": "Gauntlets of the Giant Lord. Legendary hands armor from the Tartarian Giants tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Reclaimer's Gloves",
@@ -7649,7 +7714,8 @@
         "hands",
         "reclaimers"
       ],
-      "description": "Explorer's Aetheric Grip. Rare hands armor from the Reclaimers tradition."
+      "description": "Explorer's Aetheric Grip. Rare hands armor from the Reclaimers tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Gauntlets of the Relic Seeker",
@@ -7747,7 +7813,8 @@
         "hands",
         "architectural_sentinels"
       ],
-      "description": "Architect's Aether Gloves. Common hands armor from the Architectural Sentinels tradition."
+      "description": "Architect's Aether Gloves. Common hands armor from the Architectural Sentinels tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aether-Grip Gauntlets",
@@ -7781,7 +7848,8 @@
         "hands",
         "architectural_sentinels"
       ],
-      "description": "Aether-Grip Gauntlets. Uncommon hands armor from the Architectural Sentinels tradition."
+      "description": "Aether-Grip Gauntlets. Uncommon hands armor from the Architectural Sentinels tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Sentinel's Guard Gauntlets",
@@ -8065,7 +8133,8 @@
         "hands",
         "aetherborn"
       ],
-      "description": "Aetheric Gauntlets. Common hands armor from the Aetherborn tradition."
+      "description": "Aetheric Gauntlets. Common hands armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Arcane Weaver's Grip",
@@ -8095,7 +8164,8 @@
         "hands",
         "aetherborn"
       ],
-      "description": "Arcane Weaver's Grip. Common hands armor from the Aetherborn tradition."
+      "description": "Arcane Weaver's Grip. Common hands armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Aetherborn Gauntlets of Grace",
@@ -8129,7 +8199,8 @@
         "hands",
         "aetherborn"
       ],
-      "description": "Aetherborn Gauntlets of Grace. Uncommon hands armor from the Aetherborn tradition."
+      "description": "Aetherborn Gauntlets of Grace. Uncommon hands armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "King's Aether Gauntlets",
@@ -8197,7 +8268,8 @@
         "hands",
         "aetherborn"
       ],
-      "description": "Gauntlets of the Aether Lord. Legendary hands armor from the Aetherborn tradition."
+      "description": "Gauntlets of the Aether Lord. Legendary hands armor from the Aetherborn tradition.",
+      "staminaRegen": 1
     },
     {
       "name": "Lost Seeker's Gloves",
@@ -8359,7 +8431,8 @@
         "hands",
         "unknowing_masses"
       ],
-      "description": "Gauntlets of the Lost King. Legendary hands armor from the Unknowing Masses tradition."
+      "description": "Gauntlets of the Lost King. Legendary hands armor from the Unknowing Masses tradition.",
+      "hpRegen": 1
     },
     {
       "name": "Aetheric Vest",
@@ -8702,7 +8775,8 @@
         "boss",
         "legendary"
       ],
-      "description": "Behemoth Plate. Hammered from the fused ribs of an Aetheric Behemoth. Heavy as a door, and shrugs off a falling beam the same way."
+      "description": "Behemoth Plate. Hammered from the fused ribs of an Aetheric Behemoth. Heavy as a door, and shrugs off a falling beam the same way.",
+      "hpRegen": 1
     },
     {
       "name": "Sludge-Forged Vest",
@@ -8754,7 +8828,8 @@
         "aether",
         "crafted"
       ],
-      "description": "Aether-Wing Cloak. Spider silk stretched over the membrane of an Aether-Wing moth. Catches gusts that aren't quite there; the wearer moves a half-beat lighter."
+      "description": "Aether-Wing Cloak. Spider silk stretched over the membrane of an Aether-Wing moth. Catches gusts that aren't quite there; the wearer moves a half-beat lighter.",
+      "staminaRegen": 1
     },
     {
       "name": "Mudstone Bulwark",
@@ -8835,7 +8910,8 @@
       "description": "Faction-issue chest armor of the mud monarchs. Bears their colors.",
       "statBonuses": [],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "staminaRegen": 2
     },
     {
       "name": "Heir's Dynastic Plate",
@@ -8853,7 +8929,8 @@
       "description": "Faction-issue chest armor of the eternal dynasty. Bears their colors.",
       "statBonuses": [],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "hpRegen": 2
     },
     {
       "name": "Reclaimer's Scrapplate",
@@ -8871,7 +8948,8 @@
       "description": "Faction-issue chest armor of the reclaimers guild. Bears their colors.",
       "statBonuses": [],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "staminaRegen": 2
     },
     {
       "name": "Order Vellum Mantle",
@@ -8898,7 +8976,8 @@
         }
       ],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "hpRegen": 2
     },
     {
       "name": "Ancestor Bone Vest",
@@ -8916,7 +8995,8 @@
       "description": "Faction-issue chest armor of the true tartarians. Bears their colors.",
       "statBonuses": [],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "hpRegen": 2
     },
     {
       "name": "Builder's Shoring Plate",
@@ -8943,7 +9023,8 @@
         "amount": 20
       },
       "tcBuy": 45,
-      "tcSell": 18
+      "tcSell": 18,
+      "hpRegen": 2
     },
     {
       "name": "Tomb-Warden Plate",
@@ -8970,7 +9051,8 @@
         "amount": 20
       },
       "tcBuy": 45,
-      "tcSell": 18
+      "tcSell": 18,
+      "staminaRegen": 2
     },
     {
       "name": "Architect's Shadow Coat",
@@ -8997,7 +9079,8 @@
         }
       ],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "staminaRegen": 2
     },
     {
       "name": "Revivalist Field Jacket",
@@ -9015,7 +9098,8 @@
       "description": "Faction-issue chest armor of the tartarian revivalists. Bears their colors.",
       "statBonuses": [],
       "tcBuy": 40,
-      "tcSell": 16
+      "tcSell": 16,
+      "staminaRegen": 2
     },
     {
       "name": "Echoing Steps Boots",
@@ -9047,7 +9131,8 @@
         "common"
       ],
       "description": "Boots tuned for silent movement in ruins. Reduces noise when walking on debris.",
-      "abilityReq": "Dexterity Level 2"
+      "abilityReq": "Dexterity Level 2",
+      "hpRegen": 2
     },
     {
       "name": "Golem Leather Gloves",
@@ -9083,7 +9168,8 @@
         "common"
       ],
       "description": "Handling Aetheric stones and crystals. Provides resistance to Aetheric shocks.",
-      "abilityReq": "Strength Level 3"
+      "abilityReq": "Strength Level 3",
+      "staminaRegen": 2
     },
     {
       "name": "Mud-Sealer Gauntlets",
@@ -9115,7 +9201,8 @@
         "common"
       ],
       "description": "Gauntlets for shaping mud and clay. Enhances mud-shaping and solidification.",
-      "abilityReq": "Strength Level 2"
+      "abilityReq": "Strength Level 2",
+      "staminaRegen": 2
     },
     {
       "name": "Heat-Shield Gloves",
@@ -9147,7 +9234,8 @@
         "uncommon"
       ],
       "description": "Resistant to high temperatures and Aetheric burns.",
-      "abilityReq": "Dexterity Level 6"
+      "abilityReq": "Dexterity Level 6",
+      "staminaRegen": 2
     },
     {
       "name": "Aetheric Mask",
@@ -9184,7 +9272,8 @@
       "effect": {
         "kind": "gate",
         "unlocks": "breathe_toxic"
-      }
+      },
+      "staminaRegen": 2
     },
     {
       "name": "Aether-Breath Mask",
@@ -9223,7 +9312,8 @@
       "effect": {
         "kind": "gate",
         "unlocks": "breathe_toxic"
-      }
+      },
+      "hpRegen": 2
     },
     {
       "name": "Aetheric Cloak",
@@ -9256,7 +9346,8 @@
         "rare"
       ],
       "description": "Provides stealth in Aetheric storms.",
-      "abilityReq": "Dexterity Level 9"
+      "abilityReq": "Dexterity Level 9",
+      "staminaRegen": 2
     },
     {
       "name": "Anti-Aetheric Cloak",
@@ -9289,7 +9380,8 @@
         "rare"
       ],
       "description": "Blocks detection from Aetheric sensors.",
-      "abilityReq": "Intelligence Level 9"
+      "abilityReq": "Intelligence Level 9",
+      "staminaRegen": 2
     },
     {
       "name": "Stealth Hood",
@@ -9322,7 +9414,8 @@
         "uncommon"
       ],
       "description": "Reduces visibility in fog and Aetheric disturbances.",
-      "abilityReq": "Dexterity Level 6"
+      "abilityReq": "Dexterity Level 6",
+      "staminaRegen": 2
     }
   ]
 }

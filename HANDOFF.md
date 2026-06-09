@@ -80,6 +80,11 @@
 >   - **OTA-375 "Sweetgum Anvil"** — water sources to refill the Water Bottle:
 >     ~55% of outdoor tiles surface a water source (rain pool / puddle / spring /
 >     pond …) in look-around, seeded per room key, recognised by `fill bottle`.
+>   - **OTA-376 "Sourwood Anvil"** — armor regen: worn armor can carry a mild
+>     per-action `staminaRegen` or (limited) `hpRegen`, summed + capped (3/2)
+>     across the 6 armor slots, on top of its other bonuses; 93 pieces marked
+>     across all slots/rarities, faction pieces grant a little more. Also flipped
+>     `DISPLAY_VERSION` 3.0.0 → 3.4.11 (cosmetic title/About version).
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

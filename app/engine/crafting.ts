@@ -75,6 +75,15 @@ export interface CatalogArmor {
   // functional `effect` (e.g. the Aether masks' `gate: breathe_toxic`), read
   // via the EFFECT_RESOLVERS chain (which now includes findArmorByName).
   effect?: ItemEffect;
+  // OTA-376 — passive per-action regeneration granted while this piece is
+  // worn, summed across all equipped armor by aggregateEquippedRegen and
+  // applied each player action (one "round"). A piece carries AT MOST ONE
+  // of these (never both). Mild by design: per-piece values are small and
+  // the aggregate is capped (STAMINA_REGEN_CAP / HP_REGEN_CAP) so even a
+  // full regen build is noticeable, not OP. Faction pieces grant a little
+  // more. Additive on top of the piece's AC / stat bonuses.
+  staminaRegen?: number;
+  hpRegen?: number;
 }
 
 export interface CatalogGear {

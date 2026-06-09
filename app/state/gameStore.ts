@@ -175,7 +175,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import {
   canScrap,
@@ -5683,6 +5683,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           withCompanion ? { stormsSurvived: 1, stormsSurvivedWithCompanion: 1 } : { stormsSurvived: 1 },
           { maxCorruption: survivor?.corruption ?? 0 },
         );
+      }
+    }
+    // OTA-376 — passive armor regen. Worn armor carrying staminaRegen /
+    // hpRegen trickles a little back each action (one "round"), summed +
+    // capped by aggregateEquippedRegen. Silent (it's a passive — no
+    // per-action log spam); only fills when there's room. tickPlayerStamina-
+    // Statuses re-syncs tired/exhausted as stamina rises. On top of the
+    // pieces' AC / stat bonuses.
+    {
+      const live = get().player;
+      if (live && !live.dead) {
+        const regen = aggregateEquippedRegen(live);
+        const stamGain = Math.min(regen.stamina, Math.max(0, (live.staminaMax ?? 0) - live.stamina));
+        const hpGain = Math.min(regen.hp, Math.max(0, (live.hpMax ?? 0) - live.hp));
+        if (stamGain > 0 || hpGain > 0) {
+          set((s) => s.player
+            ? { player: tickPlayerStaminaStatuses({ ...s.player, stamina: s.player.stamina + stamGain, hp: s.player.hp + hpGain }) }
+            : s);
+        }
       }
     }
     // arb45 — periodic catch-all so the DERIVED titles (Golem Whisperer,

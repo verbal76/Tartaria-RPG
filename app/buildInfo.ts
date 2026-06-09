@@ -10612,7 +10612,7 @@
 //     DISPLAY_VERSION and the two are synced again.
 //
 // Bump this for marketing-visible version changes.
-export const DISPLAY_VERSION = '3.0.0';
+export const DISPLAY_VERSION = '3.4.11';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -12997,4 +12997,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shows in the look-around chips (prepended to displayedAmbientNouns, like spawned
 // gear). Every generated noun is recognised by the existing 'fill bottle' handler.
 // __tests__/waterSources.test.ts (7). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-375';
+// OTA-376 (Sourwood Anvil) — armor regen + version flip. (1) ARMOR REGEN: worn
+// armor can now carry a mild passive PER-ACTION regen (new CatalogArmor
+// staminaRegen / hpRegen), summed across all 6 equipped armor slots by
+// aggregateEquippedRegen and applied each player action (one "round"), ON TOP of
+// the piece's AC / stat bonuses. A piece carries AT MOST ONE (never both stamina
+// AND hp). Mild + bounded: per-piece 1 (faction pieces 2), aggregate clamped at
+// STAMINA_REGEN_CAP 3 / HP_REGEN_CAP 2 so even a full regen build is noticeable,
+// not OP; HP regen is the more limited trickle. Marked 93 pieces (62 stamina + 31
+// hp) — a few per body slot across ALL rarity tiers, faction pieces granting a
+// little more. (2) DISPLAY_VERSION 3.0.0 → 3.4.11 (cosmetic title/About version;
+// decoupled from runtimeVersion per OTA-251, so OTA delivery is unaffected).
+// __tests__/armorRegen.test.ts (8) + armorRegenApply.test.ts (1). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-376';

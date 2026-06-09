@@ -262,6 +262,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-375 — water sources to refill the Water Bottle: ~55% of outdoor tiles
   // surface a water source (rain pool / puddle / spring / pond …) in look-around,
   // seeded per room key, recognised by the 'fill bottle' handler.
+  // OTA-376 — armor regen: worn armor can carry a mild per-action staminaRegen
+  // or (more limited) hpRegen, summed + capped across the 6 armor slots, on top
+  // of its other bonuses; 93 pieces marked across all slots/rarities, faction
+  // pieces grant a little more. + DISPLAY_VERSION 3.0.0 → 3.4.11 (cosmetic).
+  '2026-06-09-376': 'Sourwood Anvil',
   '2026-06-09-375': 'Sweetgum Anvil',
   '2026-06-09-374': 'Hackberry Anvil',
   '2026-06-09-373': 'Sumac Anvil',

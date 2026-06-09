@@ -326,6 +326,37 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   return bonus;
 }
 
+// OTA-376 — per-action regen caps. Sum across worn armor, then clamp so a
+// fully-stacked regen build stays "noticeable, not OP": in combat each
+// basic action costs ~1 stamina, so a capped +2 stamina/action sustains
+// light fighting without making exhaustion impossible (heavier / multiple
+// actions still drain). HP regen is deliberately tighter — a slow trickle,
+// not a tank's fountain.
+export const STAMINA_REGEN_CAP = 3;
+export const HP_REGEN_CAP = 2;
+
+/** OTA-376 — sum the passive per-action regen from every equipped ARMOR
+ *  piece (head / chest / legs / feet / hands / cloak), clamped to the caps.
+ *  Returns whole-number amounts to add to the player's stamina / HP on each
+ *  action. Weapons / amulets / rings don't carry regen. */
+export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: number; hp: number } {
+  const eq = player.equipped ?? {};
+  let stamina = 0;
+  let hp = 0;
+  for (const slot of ARMOR_SLOTS) {
+    const name = eq[slot];
+    if (!name) continue;
+    const piece = findArmorByName(name);
+    if (!piece) continue;
+    stamina += Math.max(0, piece.staminaRegen ?? 0);
+    hp += Math.max(0, piece.hpRegen ?? 0);
+  }
+  return {
+    stamina: Math.min(STAMINA_REGEN_CAP, stamina),
+    hp: Math.min(HP_REGEN_CAP, hp),
+  };
+}
+
 // arb-fix — total max-HP bonus from a single equipped armor piece, read from
 // its `statBonuses` array (the `hp` entry, which is a SECONDARY bonus so it's
 // not picked up by aggregateEquippedStatBonuses' primary-only `statBonus`).
