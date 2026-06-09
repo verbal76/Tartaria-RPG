@@ -5519,6 +5519,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // discarded when the model finally returns.
     if (get().isGenerating) get().cancelGeneration();
 
+    // arb45 — periodic catch-all so the DERIVED titles (Golem Whisperer,
+    // Scion of the Giants, Etheric Explorer, Aetherborn Awakened) award during
+    // normal play without per-site wiring. MUST run BEFORE the `player`
+    // snapshot below: the action body writes the player back through dozens of
+    // `set({ player: <derived from this snapshot> })` calls, so an earnedTitles
+    // append made mid-action (the old call site) was clobbered every action —
+    // re-announcing the title forever and dropping its passive perk. Awarding
+    // here folds the new title into the snapshot so every writeback preserves it.
+    awardNewTitles(get, set);
+
     const player = get().player;
     if (!player) return;
     if (player.hp <= 0) {
@@ -5704,10 +5714,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    // arb45 — periodic catch-all so the DERIVED titles (Golem Whisperer,
-    // Scion of the Giants, Etheric Explorer, Aetherborn Awakened) award
-    // during normal play without per-site wiring.
-    awardNewTitles(get, set);
+    // (arb45 derived-title catch-all moved up — see the call just before the
+    // `player` snapshot near the top of submitPlayerAction. Running it here,
+    // after the action body's player writebacks, clobbered the earnedTitles
+    // append every action.)
 
     // If the scene was lost (e.g. slot restore on an older save before this
     // fix) auto-recover before bailing — silent no-ops on submit are the

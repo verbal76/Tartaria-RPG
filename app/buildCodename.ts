@@ -271,6 +271,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-378 — Tired/Exhausted "(99r)" no longer leaks to the compact HUD: these
   // stamina-gated statuses use a sentinel remainingRounds:99 (they clear when
   // stamina recovers), so formatEffectSummary now hides the fake count for them.
+  // OTA-379 — derived titles award once + their passive applies: moved the
+  // title catch-all to before submitPlayerAction's player snapshot so stale
+  // writebacks stop clobbering the earnedTitles append (was re-announcing every
+  // action + dropping the passive perk).
+  '2026-06-09-379': 'Mesquite Anvil',
   '2026-06-09-378': 'Chinquapin Anvil',
   '2026-06-09-377': 'Serviceberry Anvil',
   '2026-06-09-376': 'Sourwood Anvil',

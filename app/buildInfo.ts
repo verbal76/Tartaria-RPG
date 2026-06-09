@@ -13022,4 +13022,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // count (OTA-357 → "until you rest"), but the compact formatEffectSummary was
 // missed. Now it drops the count for stamina-gated statuses (shows just "Tired")
 // and keeps "(Nr)" for genuinely timed effects. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-378';
+// OTA-379 (Mesquite Anvil) — derived Arbiter titles now award ONCE and their
+// passive actually applies. The periodic catch-all that grants derived titles
+// (Scion of the Giants, etc.) ran AFTER submitPlayerAction snapshots `player`,
+// so the action body's player writeback — built from the pre-award snapshot —
+// discarded the earnedTitles append every action: the title re-announced on
+// nearly every turn and titlePerkModifiers (e.g. +2 diplomacy) saw it only
+// intermittently. Moved the catch-all to BEFORE the snapshot so the title folds
+// into it and all writebacks preserve it. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-379';
