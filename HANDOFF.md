@@ -29,7 +29,19 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-376 "Sourwood Anvil"** — the save-loss +
+> - **LIVE (pushed 2026-06-09) = OTA-381 "Boxelder Anvil"** — the gear-variety +
+>   UX-polish batch (377→381), pushed through `6c17eb5`; `eas-update.yml` publishes
+>   to Android + iOS. Per-OTA detail in `docs/build-codenames.md`.
+>   - **377 Serviceberry** — title-footer clarity ("2148" = the in-world year).
+>   - **378 Chinquapin** — Tired/Exhausted "(99r)" no longer leaks to the compact HUD
+>     (stamina-gated sentinel; `formatEffectSummary` now hides the fake count).
+>   - **379 Mesquite** — derived titles award ONCE + their passive applies (moved the
+>     title catch-all before `submitPlayerAction`'s player snapshot).
+>   - **380 Pawpaw** — per-instance gear variety: `stampDurability` rolls a `temper`
+>     (durability ↑ / perk budget ↓, inverse), perks on `InventoryItem.instanceStats`.
+>   - **381 Boxelder** — "Buy & Equip" at vendors (single-slot auto-equips, a weapon
+>     prompts main vs off hand).
+> - **PRIOR LIVE (pushed 2026-06-09) = OTA-376 "Sourwood Anvil"** — the save-loss +
 >   stamina/exhaustion batch (373→376), pushed through `b6a02dc`; `eas-update.yml`
 >   publishes to Android + iOS.
 >   - **373 Sumac** — SAVE-LOSS FIX: capped the unbounded game log (it had grown
@@ -78,29 +90,15 @@
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
 > - **STAGED (committed on `HaL2001`, NOT yet pushed):**
->   - **OTA-377 "Serviceberry Anvil"** — title-footer clarity: the "2148" after the
->     version is the in-world YEAR (Tartaria's Present Day), not a build number;
->     relabelled the title footer "v3.4.11 / 2148" → "v3.4.11 · Year 2148".
->   - **OTA-378 "Chinquapin Anvil"** — Tired/Exhausted "(99r)" no longer leaks to
->     the compact HUD. These are stamina-gated (clear when stamina recovers >25%),
->     stamped with a sentinel `remainingRounds:99`; the full Character screen
->     already hid it (OTA-357), the compact `formatEffectSummary` was missed. Now
->     drops the count for stamina-gated statuses, keeps "(Nr)" for timed ones.
->   - **OTA-379 "Mesquite Anvil"** — derived titles award ONCE + their passive
->     actually applies. The title catch-all ran AFTER `submitPlayerAction`'s
->     `player` snapshot, so the action body's stale writeback clobbered the
->     `earnedTitles` append every action (re-announce spam + intermittent perk,
->     e.g. Scion's +2 diplomacy). Moved the catch-all BEFORE the snapshot.
->   - **OTA-380 "Pawpaw Anvil"** — per-instance gear variety. `stampDurability`
->     rolls a `temper` (0=fragile…1=sturdy): durability 0.4×–1.8× of base, perk
->     budget scales INVERSELY (rarity-keyed), distributed over the piece's catalog
->     perk channels (AC + attribute stats; weapons seed from their scaling stat).
->     Perks live on new `InventoryItem.instanceStats`, read before the catalog by
->     the stat/AC aggregators; HP stays catalog-driven. Legacy saves fall back.
->   - **OTA-381 "Boxelder Anvil"** — "Buy & Equip" at vendors: a second buy-modal
->     button that wears the ware now — single-slot gear auto-equips, a weapon
->     prompts main vs off hand. Reuses `validSlotsForItem` + `equipItem`.
->   (Batch now ≥5 — ready when the **user** triggers the push.)
+>   - **OTA-382 "Loblolly Anvil"** — enemy panel fits the top-right column
+>     (portrait) instead of a full-screen landscape card that scrolled left/right
+>     (`EnemyPanel` now measures its container via `onLayout`, single enemy drops
+>     the pager, stats stack two-up). A card taller than the corner **scrolls
+>     vertically** inside it (capped to the measured stats-panel height) instead of
+>     growing the row. Now also lists the enemy's **RESIST / WEAK**
+>     damage types — macro `TYPE_RESISTANCE_MAP` + per-enemy `resist:`/`vulnerable:`
+>     traits, via new `enemyTypeDefenses` (crafting) + `traitDefenses` (enemyTraits).
+>   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

@@ -659,6 +659,17 @@ const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> 
 
 export type DamageMatch = 'normal' | 'weak' | 'resist';
 
+/** Macro type-resistance for an enemy type (the `TYPE_RESISTANCE_MAP` row).
+ *  Returns the resisted + weak-to damage-type lists, or empty arrays when the
+ *  type has no entry. Used by the EnemyPanel to surface defenses to the player. */
+export function enemyTypeDefenses(
+  enemyType: string | null | undefined,
+): { resist: string[]; weak: string[] } {
+  const map = enemyType ? TYPE_RESISTANCE_MAP[enemyType] : undefined;
+  return { resist: map?.resist ?? [], weak: map?.weak ?? [] };
+}
+
+
 export function applyDamageTypeModifier(
   rawDamage: number,
   weaponDamageType: string | null | undefined,

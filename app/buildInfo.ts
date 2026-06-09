@@ -13046,4 +13046,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // slot gear (armor/accessory) equips immediately, a weapon (main OR off hand)
 // opens a hand-choice prompt. Reuses validSlotsForItem + equipItem (which already
 // handles two-handed displacement + HP/durability baking). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-381';
+// OTA-382 (Loblolly Anvil) — enemy panel fits the top-right column. It was sized
+// to the full screen width (Dimensions) while living in the ~flex-1 right column,
+// so a single enemy's card overflowed into a left/right-scrolling "landscape"
+// strip. EnemyPanel now measures its own container via onLayout and sizes cards
+// to it (portrait); a single enemy drops the pager entirely and the stats stack
+// two-up. If a card is taller than the corner it scrolls VERTICALLY inside it
+// (like the exploration feed) instead of growing the row — capped to the
+// measured left stats-panel height. Also surfaces the enemy's RESIST / WEAK
+// damage types — macro TYPE_RESISTANCE_MAP (enemyTypeDefenses) + per-enemy
+// resist:/vulnerable: traits (traitDefenses). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-382';

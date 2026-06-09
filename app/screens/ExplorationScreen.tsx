@@ -104,6 +104,9 @@ export function ExplorationScreen() {
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
   const setActiveEnemyIdx = useGameStore((s) => s.setActiveEnemyIdx);
 
+  // Measured height of the left stats panel — the enemy panel caps to this so a
+  // tall enemy card scrolls within the top-right corner instead of growing the row.
+  const [statsColH, setStatsColH] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
   // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
@@ -445,6 +448,10 @@ export function ExplorationScreen() {
           <TouchableOpacity
             onPress={() => setScreen('character')}
             activeOpacity={0.75}
+            onLayout={(e) => {
+              const h = e.nativeEvent.layout.height;
+              if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
+            }}
           >
             <StatsPanel player={player} />
           </TouchableOpacity>
@@ -455,6 +462,7 @@ export function ExplorationScreen() {
               enemies={enemyViews}
               activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
+              maxHeight={statsColH}
             />
           ) : (
             <CrestPlaceholder />

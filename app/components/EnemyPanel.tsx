@@ -1,17 +1,20 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
+  ScrollView,
   Dimensions,
   TouchableOpacity,
+  type LayoutChangeEvent,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
   type ListRenderItem,
 } from 'react-native';
 import type { Enemy } from '../engine/types';
-import { describeTrait, traitACBonus } from '../engine/enemyTraits';
+import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
+import { enemyTypeDefenses } from '../engine/crafting';
 
 export interface EnemyView {
   enemy: Enemy;
@@ -26,70 +29,115 @@ interface Props {
   enemies: EnemyView[];
   activeIndex: number;
   onSelectActive: (i: number) => void;
+  /** Height of the top-right corner the panel sits in (≈ the left stats panel,
+   *  measured by ExplorationScreen). The card scrolls vertically past this so a
+   *  tall enemy never grows the row — it stays in the corner like the feed. */
+  maxHeight?: number;
 }
 
-const SCREEN_W = Dimensions.get('window').width;
-const HORIZONTAL_PADDING = 8 + 2; // ExplorationScreen padding + 1 card edge
-const CARD_WIDTH = SCREEN_W - HORIZONTAL_PADDING * 2;
-// 2026-05-27 OTA-081 — HP bar inner width in pixels.
-// Pre-OTA-081 the fill width was a percent string ("47%")
-// which React Native's view diff sometimes refused to re-
-// lay-out when only the value changed within the same View
-// instance — playtester saw the HP number tick down ("HP 5/12")
-// while the bar visually stayed full. Numeric pixel widths
-// always trigger a fresh layout. Card padding is 8 each side
-// + 1px border each side = 18 of horizontal chrome.
-const HP_BAR_WIDTH = CARD_WIDTH - 18;
+// OTA-382 — fallback width only. The panel lives in the top-right column
+// (ExplorationScreen `rightCol`, ~flex 1 of the top row), NOT the full screen.
+// The real width is measured via onLayout below; this estimate (~42% of the
+// screen) just sizes the first frame before the measurement lands so cards
+// don't flash at zero width.
+const FALLBACK_W = Math.round(Dimensions.get('window').width * 0.42);
+// Fallback height cap before ExplorationScreen reports the real corner height
+// (matches the top row's minHeight). Keeps the panel from growing the row on the
+// first frame; the measured stats-panel height takes over once it lands.
+const FALLBACK_H = 165;
+// Card chrome eaten by padding (8×2) + border (1×2) = 18px.
+const CARD_CHROME = 18;
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** Combine the macro type-resistance map with the enemy's per-instance
+ *  resist:/vulnerable: traits into the damage types it resists / is weak to. */
+function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } {
+  const type = enemyTypeDefenses(enemy.type);
+  const trait = traitDefenses(enemy.traits);
+  const uniq = (a: string[]) => Array.from(new Set(a));
+  return {
+    resists: uniq([...type.resist, ...trait.resists]),
+    weaknesses: uniq([...type.weak, ...trait.weaknesses]),
+  };
+}
+
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: Props) {
+  // Measure the column we actually live in so cards fit the top-right corner
+  // (portrait), instead of being sized to the full screen width and spilling
+  // out into a left/right-scrolling "landscape" strip.
+  const [panelW, setPanelW] = useState(0);
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
+    const w = e.nativeEvent.layout.width;
+    if (w > 0 && Math.abs(w - panelW) > 0.5) setPanelW(w);
+  }, [panelW]);
+
+  const cardWidth = panelW > 0 ? panelW : FALLBACK_W;
+  const hpBarWidth = Math.max(0, cardWidth - CARD_CHROME);
+  // Cap the card to the corner height; taller content scrolls vertically (like
+  // the exploration feed) rather than growing the top row. Leave a little room
+  // below for the paging dots when more than one enemy is staged.
+  const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
+
+  // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
+  const scrollWrap = (card: React.ReactNode) => (
+    <ScrollView
+      style={{ maxHeight: capH }}
+      showsVerticalScrollIndicator
+      nestedScrollEnabled
+    >
+      {card}
+    </ScrollView>
+  );
+
   const onMomentumEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const x = e.nativeEvent.contentOffset.x;
-      const idx = Math.round(x / CARD_WIDTH);
+      const idx = Math.round(x / cardWidth);
       if (idx !== activeIndex && idx >= 0 && idx < enemies.length) {
         onSelectActive(idx);
       }
     },
-    [activeIndex, enemies.length, onSelectActive],
+    [activeIndex, enemies.length, onSelectActive, cardWidth],
   );
-
-  if (enemies.length === 0) return null;
 
   // Tap on the panel cycles to the next enemy when more than one is staged.
   // This is in addition to horizontal swipe paging.
-  const cycleNext = () => {
+  const cycleNext = useCallback(() => {
     if (enemies.length <= 1) return;
     onSelectActive((activeIndex + 1) % enemies.length);
-  };
+  }, [enemies.length, activeIndex, onSelectActive]);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
     <TouchableOpacity activeOpacity={enemies.length > 1 ? 0.7 : 1} onPress={cycleNext}>
-      <EnemyCard view={item} />
+      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
     </TouchableOpacity>
   );
 
+  // onLayout must stay mounted even when empty so the measurement is ready the
+  // instant combat starts; render the (empty) wrap and bail on the list.
   return (
-    <View style={styles.wrap}>
-      <FlatList
-        data={enemies}
-        // OTA 197 — extraData forces FlatList to re-render the
-        // visible cells when a value not present in `data` itself
-        // changes. Without this, FlatList's PureComponent cell
-        // virtualization treats items at the same index as "same"
-        // even when the EnemyView object identity changed — so the
-        // HP bar didn't reflect damage. Joining the per-enemy
-        // currentHp values into a single key is the most explicit
-        // signal: any HP change forces a fresh render pass.
-        extraData={enemies.map((v) => `${v.currentHp}/${v.enemy.hp}`).join('|')}
-        keyExtractor={(_, i) => String(i)}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={onMomentumEnd}
-        renderItem={renderItem}
-        snapToInterval={CARD_WIDTH}
-        decelerationRate="fast"
-      />
+    <View style={styles.wrap} onLayout={onLayout}>
+      {enemies.length === 0 ? null : enemies.length === 1 ? (
+        // Single enemy: no pager (nothing to scroll horizontally), just the card —
+        // capped to the corner height and vertically scrollable when it's tall.
+        scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)
+      ) : (
+        <FlatList
+          data={enemies}
+          // OTA 197 — extraData forces FlatList to re-render the visible cells
+          // when a value not present in `data` changes (HP ticking down).
+          extraData={`${cardWidth}|${enemies.map((v) => `${v.currentHp}/${v.enemy.hp}`).join('|')}`}
+          keyExtractor={(_, i) => String(i)}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onMomentumEnd}
+          renderItem={renderItem}
+          snapToInterval={cardWidth}
+          decelerationRate="fast"
+        />
+      )}
       {enemies.length > 1 && (
         <View style={styles.dots}>
           {enemies.map((_, i) => (
@@ -102,7 +150,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
   );
 }
 
-function EnemyCard({ view }: { view: EnemyView }) {
+function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth: number; hpBarWidth: number }) {
   const apNum = parseInt(view.enemy.abilityPoint, 10);
   const baseAc = Math.max(5, Math.min(18, 5 + (Number.isFinite(apNum) ? apNum : 0)));
   const ac = Math.max(1, baseAc + traitACBonus(view.enemy.traits));
@@ -114,47 +162,60 @@ function EnemyCard({ view }: { view: EnemyView }) {
   // anyone staged in the scene is in arm's reach. Once positioning is
   // added this becomes view.inRange.
   const inRange = view.inRange ?? true;
+  const defenses = defensesFor(view.enemy);
 
   return (
-    <View style={[styles.card, { width: CARD_WIDTH }]}>
+    <View style={[styles.card, { width: cardWidth }]}>
       <View style={styles.head}>
         <Text style={styles.name} numberOfLines={1}>
           {view.enemy.name}
         </Text>
-        <View style={styles.headRight}>
-          <Text style={[styles.range, inRange ? styles.rangeIn : styles.rangeOut]}>
-            {view.rangeLabel
-              ? `${view.rangeLabel.toUpperCase()}${inRange ? '' : ' · OUT'}`
-              : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
-          </Text>
-          <Text style={styles.rarity}>{view.enemy.rarity}</Text>
-        </View>
+        <Text style={styles.rarity}>{view.enemy.rarity}</Text>
       </View>
-      <Text style={styles.subline} numberOfLines={1}>
-        {view.enemy.type}
-      </Text>
-      <View style={[styles.hpBarBg, { width: HP_BAR_WIDTH }]}>
-        {/* OTA-081 — numeric pixel width (was percent string).
-            RN sometimes skipped the layout pass when only the
-            percent value changed, leaving the bar visually
-            stuck at full while the HP number under it ticked
-            down. Pixel widths always trigger fresh layout. */}
+      <View style={styles.subhead}>
+        <Text style={styles.subline} numberOfLines={1}>
+          {view.enemy.type}
+        </Text>
+        <Text style={[styles.range, inRange ? styles.rangeIn : styles.rangeOut]}>
+          {view.rangeLabel
+            ? `${view.rangeLabel.toUpperCase()}${inRange ? '' : ' · OUT'}`
+            : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
+        </Text>
+      </View>
+      <View style={[styles.hpBarBg, { width: hpBarWidth }]}>
+        {/* OTA-081 — numeric pixel width (was percent string): RN sometimes
+            skipped the layout pass when only the percent changed, leaving the
+            bar stuck full while the HP number ticked down. */}
         <View
           style={[
             styles.hpBarFill,
-            {
-              width: Math.max(0, Math.round(HP_BAR_WIDTH * hpPct)),
-              backgroundColor: hpColor,
-            },
+            { width: Math.max(0, Math.round(hpBarWidth * hpPct)), backgroundColor: hpColor },
           ]}
         />
       </View>
-      <View style={styles.statRow}>
+      {/* Portrait stat grid: two rows of two so it fits the narrow column. */}
+      <View style={styles.statGrid}>
         <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
         <Stat label="AC" value={String(ac)} />
         <Stat label="ATK" value={atkLabel} />
         <Stat label="DMG" value={String(view.enemy.damage)} />
       </View>
+      {(defenses.resists.length > 0 || defenses.weaknesses.length > 0) && (
+        <View style={styles.defs}>
+          {defenses.resists.length > 0 && (
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defResist}>RESIST </Text>
+              <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
+            </Text>
+          )}
+          {defenses.weaknesses.length > 0 && (
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defWeak}>WEAK </Text>
+              <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
+            </Text>
+          )}
+        </View>
+      )}
       {view.enemy.traits && view.enemy.traits.length > 0 && (
         <View style={styles.traitRow}>
           {view.enemy.traits.map((t) => (
@@ -178,7 +239,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: {},
+  wrap: { width: '100%' },
   card: {
     backgroundColor: '#13110f',
     borderColor: '#5a2a26',
@@ -186,25 +247,23 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
   },
-  // v2.4.1 (OTA 048) — paddingRight reserved space for the gear icon
-  // that ExplorationScreen overlaid in the top-right corner.
-  // OTA-174 — gear icon moved to bottom-right; top-right is now free
-  // so the enemy name + range tag can use the full row width. Reserve
-  // is gone. Playtester repro for the original crowding ("The
-  // settings button is covering some of the enemies name.") no longer
-  // applies once the gear is at the bottom.
   head: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
   },
-  headRight: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
-  rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
-  range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1 },
+  rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  subhead: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 4,
+  },
+  range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1, marginLeft: 6 },
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
   rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
-  subline: { color: '#7a705c', fontSize: 11, marginBottom: 4 },
+  subline: { color: '#7a705c', fontSize: 11, flexShrink: 1 },
   hpBarBg: {
     height: 6,
     backgroundColor: '#1a1714',
@@ -214,10 +273,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   hpBarFill: { height: '100%' },
-  statRow: { flexDirection: 'row', gap: 6, marginTop: 4 },
-  stat: { flex: 1 },
+  // Two-up grid (HP / AC then ATK / DMG) so the stats stack portrait-style in
+  // the narrow column rather than spreading into a wide single row.
+  statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
+  stat: { width: '50%', paddingVertical: 1 },
   statLabel: { color: '#7a705c', fontSize: 9, letterSpacing: 1 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  defs: { marginTop: 4, gap: 1 },
+  defLine: { fontSize: 10, letterSpacing: 0.5 },
+  defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
+  defWeak: { color: '#e07a5f', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
+  defVal: { color: '#c9b89a', fontSize: 10 },
   traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   traitBadge: {
     color: '#c9a86a',

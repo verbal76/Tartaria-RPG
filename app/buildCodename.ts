@@ -282,7 +282,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-381 — "Buy & Equip" at vendors: a second buy-modal button that wears the
   // ware immediately; single-slot gear auto-equips, a weapon prompts main vs off
   // hand. Reuses validSlotsForItem + equipItem.
-  '2026-06-09-381': 'Boxelder Anvil',
+  // OTA-382 — enemy panel fits the top-right column (portrait, onLayout-measured)
+  // instead of a full-screen landscape card that scrolled left/right; now lists
+  // the enemy's RESIST / WEAK damage types (type map + resist:/vulnerable: traits).
+  '2026-06-09-382': 'Loblolly Anvil',
   '2026-06-09-380': 'Pawpaw Anvil',
   '2026-06-09-379': 'Mesquite Anvil',
   '2026-06-09-378': 'Chinquapin Anvil',

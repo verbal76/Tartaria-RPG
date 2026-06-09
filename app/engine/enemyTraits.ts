@@ -45,6 +45,23 @@ export function traitAttackBonus(traits: readonly string[] | undefined): number 
   return bonus;
 }
 
+/** Per-enemy `resist:<type>` / `vulnerable:<type>` traits collapsed into the
+ *  damage types this enemy resists / is weak to. Layered on top of the macro
+ *  type-resistance map by the EnemyPanel so the player sees the full picture. */
+export function traitDefenses(
+  traits: readonly string[] | undefined,
+): { resists: string[]; weaknesses: string[] } {
+  const resists: string[] = [];
+  const weaknesses: string[] = [];
+  for (const t of traits ?? []) {
+    const [key, arg] = t.split(':');
+    if (!arg) continue;
+    if (key === 'resist') resists.push(arg.toLowerCase());
+    else if (key === 'vulnerable') weaknesses.push(arg.toLowerCase());
+  }
+  return { resists, weaknesses };
+}
+
 /** Damage-side resistance / vulnerability traits. Returns the multiplier
  *  applied to incoming damage of the given type. Stacks multiplicatively
  *  with other modifiers. */

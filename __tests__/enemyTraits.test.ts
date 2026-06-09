@@ -6,9 +6,11 @@ import {
   traitRegen,
   traitAmbushBonus,
   traitDodgeChance,
+  traitDefenses,
   describeTrait,
   describeTraits,
 } from '../app/engine/enemyTraits';
+import { enemyTypeDefenses } from '../app/engine/crafting';
 
 // Enemies were previously homogenized — `attack` and `abilityPoint` defaulted
 // when the data file used string-prefixed values. The new `traits` array lets
@@ -121,5 +123,26 @@ describe('describeTrait / describeTraits', () => {
   it('joins with bullet separator', () => {
     expect(describeTraits(['armored', 'quick'])).toBe('Armored · Quick');
     expect(describeTraits([])).toBe('');
+  });
+});
+
+describe('resist/weakness surfacing (EnemyPanel)', () => {
+  it('traitDefenses collapses resist:/vulnerable: traits', () => {
+    expect(traitDefenses(['resist:slashing', 'vulnerable:burn', 'armored'])).toEqual({
+      resists: ['slashing'],
+      weaknesses: ['burn'],
+    });
+    expect(traitDefenses(undefined)).toEqual({ resists: [], weaknesses: [] });
+  });
+
+  it('enemyTypeDefenses returns the macro type-resistance row', () => {
+    // Construct: resists slashing/piercing, weak to bludgeoning/electrical.
+    expect(enemyTypeDefenses('Construct')).toEqual({
+      resist: ['slashing', 'piercing'],
+      weak: ['bludgeoning', 'electrical'],
+    });
+    // Unknown / missing type → empty (no crash).
+    expect(enemyTypeDefenses('Nonexistent Type')).toEqual({ resist: [], weak: [] });
+    expect(enemyTypeDefenses(undefined)).toEqual({ resist: [], weak: [] });
   });
 });
