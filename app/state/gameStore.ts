@@ -12639,8 +12639,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : ' The way out is blocked for now — try a different direction, or rest before pushing through.';
             get().appendLog(
               'world',
-              `The way is longer than you remembered. You circle back, breathing hard.${hint}`,
+              inCombat
+                ? `You break to run — and turning your back hands them the opening.${hint}`
+                : `The way is longer than you remembered. You circle back, breathing hard.${hint}`,
             );
+            // OTA-372 — a FAILED flee is not free. Turning to run exposes you,
+            // so every still-living enemy in the scene gets an automatic
+            // attack of opportunity (the same group-counter a missed attack
+            // provokes). Only when enemies are present. runEnemyGroupCounters
+            // self-guards against a dead player mid-volley.
+            if (inCombat) {
+              runEnemyGroupCounters(get, set, player);
+            }
             break;
           }
           case 'investigate': {

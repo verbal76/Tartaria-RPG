@@ -12953,4 +12953,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cure bleed). Two new Common/Rare consumables + their recipes; one recipe per
 // result. Data-only (heal/cureBleed flow through the existing consumable effect
 // path). __tests__/firstAidLadder.test.ts (5). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-371';
+// OTA-372 (Buckthorn Anvil) — a failed flee is no longer free. Combat flee
+// ('flee'/'retreat') is a DEX escape skill check; on a FAIL it used to just log
+// "you circle back" and the enemy got nothing. Now turning your back to run
+// hands every still-living enemy an automatic attack of opportunity — the same
+// runEnemyGroupCounters the engine already fires after a missed attack — gated on
+// enemies being present. A SUCCESSFUL flee still breaks contact cleanly (clears
+// the enemies, no counter). One-line fix at the escape skill-check FAIL arm in
+// concludeRolls. __tests__/fleeFailCounter.test.ts (2). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-372';

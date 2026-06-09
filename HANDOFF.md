@@ -71,7 +71,11 @@
 >     Dressing (+10) → First Aid Kit (+25, re-based onto the rag) → Trauma Kit
 >     (+45), all built on a rag (Patched Cloth), each tier adding an ingredient.
 >     Data-only.
->   (Batch building toward ≥5; the **user** triggers the push.)
+>   - **OTA-372 "Buckthorn Anvil"** — a failed flee is no longer free: losing the
+>     escape (flee) roll hands every living enemy an automatic attack of
+>     opportunity (`runEnemyGroupCounters`). Successful flee still breaks contact
+>     cleanly.
+>   (Batch at **4** staged; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

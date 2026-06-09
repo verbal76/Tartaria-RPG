@@ -249,6 +249,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-371 — rag-based first-aid ladder (RE1-style): Field Dressing → First Aid
   // Kit → Trauma Kit, all built on a rag (Patched Cloth), each tier adding an
   // ingredient for more healing.
+  // OTA-372 — a failed flee is no longer free: losing the escape (flee) roll
+  // hands every living enemy an automatic attack of opportunity
+  // (runEnemyGroupCounters). A successful flee still breaks contact cleanly.
+  '2026-06-09-372': 'Buckthorn Anvil',
   '2026-06-09-371': 'Hornbeam Anvil',
   '2026-06-09-370': 'Ironwood Anvil',
   '2026-06-08-369': 'Catalpa Anvil',
