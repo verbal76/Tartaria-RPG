@@ -60,6 +60,20 @@
       ]
     },
     {
+      "result": "Viper Venom Vial",
+      "ingredients": [
+        { "name": "Viper Venom", "quantity": 1 },
+        { "name": "Violet Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Antivenom",
+      "ingredients": [
+        { "name": "Viper Venom", "quantity": 1 },
+        { "name": "Orange Sporecap", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

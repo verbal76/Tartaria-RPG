@@ -77,6 +77,9 @@ export type ItemEffect =
       // First Aid Kit promises this in its description; opens the
       // door to other patch/salve items declaring the same flag.
       cureBleed?: boolean;
+      // OTA-383 — strip the poisoned status on consumption. Antivenom
+      // (rendered from viper venom) promises this; mirrors cureBleed.
+      curePoison?: boolean;
       // OTA-120 Phase 4 — dog treat flag. When true, the item gives
       // +40 loyalty when fed to the dog (vs +20 for regular food)
       // and surfaces as [treat] in the inventory. The player can

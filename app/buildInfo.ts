@@ -13056,4 +13056,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // measured left stats-panel height. Also surfaces the enemy's RESIST / WEAK
 // damage types — macro TYPE_RESISTANCE_MAP (enemyTypeDefenses) + per-enemy
 // resist:/vulnerable: traits (traitDefenses). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-382';
+// OTA-383 (Yaupon Anvil) — Viper Venom (Mud Viper drop) becomes a real crafting
+// material feeding two poison recipes: (1) Viper Venom Vial — a poison WEAPON
+// COATING (1d6 "Envenomed", Viper Venom + Violet Cap Mushroom); (2) Antivenom —
+// a poison CURE (Viper Venom + Orange Sporecap) that strips the poisoned status
+// (+5 HP). New `curePoison` consumable effect mirrors `cureBleed` in the
+// use-item handler. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-383';

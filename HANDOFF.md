@@ -98,6 +98,10 @@
 >     growing the row. Now also lists the enemy's **RESIST / WEAK**
 >     damage types — macro `TYPE_RESISTANCE_MAP` + per-enemy `resist:`/`vulnerable:`
 >     traits, via new `enemyTypeDefenses` (crafting) + `traitDefenses` (enemyTraits).
+>   - **OTA-383 "Yaupon Anvil"** — Viper Venom (Mud Viper drop) becomes a real
+>     crafting material feeding two poison recipes: **Viper Venom Vial** (a 1d6
+>     poison weapon coating) and **Antivenom** (a poison cure — new `curePoison`
+>     consumable effect strips the `poisoned` status, +5 HP). Mirrors `cureBleed`.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

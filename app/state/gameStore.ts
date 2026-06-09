@@ -8517,6 +8517,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 buffBonus?: number;
                 buffDuration?: number;
                 cureBleed?: boolean;
+                curePoison?: boolean;
               }
             : null;
           const hpRoom = player.hpMax - player.hp;
@@ -8566,6 +8567,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               bleedCured = true;
             }
           }
+          // OTA-383 — curePoison strips the poisoned status (Antivenom). Mirrors
+          // cureBleed so an envenomed player has a drink-able answer mid-fight.
+          let poisonCured = false;
+          if (fx && fx.curePoison) {
+            const hadPoison = newStatusEffects.some((e) => e.kind === 'poisoned');
+            if (hadPoison) {
+              newStatusEffects = newStatusEffects.filter((e) => e.kind !== 'poisoned');
+              poisonCured = true;
+            }
+          }
           if (fx && fx.buffStat && fx.buffBonus && fx.buffDuration && fx.buffBonus > 0 && fx.buffDuration > 0) {
             const buff: StatusEffect = {
               kind: 'food_buff',
@@ -8601,6 +8612,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (heal > 0) tailParts.push(`+${heal} HP`);
           if (stamGain > 0) tailParts.push(`+${stamGain} stamina`);
           if (bleedCured) tailParts.push('bleeding stopped');
+          if (poisonCured) tailParts.push('poison neutralized');
           const tail = tailParts.length > 0
             ? `${tailParts.join(', ')}.`
             : (fx ? 'You were already topped up — the bite holds nothing back.' : 'You were already at full strength — the ration steadies you, nothing more.');
