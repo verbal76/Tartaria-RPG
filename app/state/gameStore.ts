@@ -61,6 +61,7 @@ import {
   addResurrectionGems,
   ensureFirstInstallSeed,
   grantDevGemOnce,
+  grantTestSupplyGiftOnce,
   getLastSaveWriteError,
   consumeSaveReclaimedFlag,
   type SlotSummary,
@@ -3243,6 +3244,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
               `✦ A Resurrection Gem is set aside for ${player.name} — the buried world keeps its own. (${res.gems} held)`,
             );
           }
+        });
+      }
+      // OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
+      // A standing crash-test kit so the dog-fungus repro (and general testing)
+      // doesn't burn the player's own consumables. Idempotent per slot via
+      // grantTestSupplyGiftOnce — resuming the same save never restacks it. No
+      // effect for any other name.
+      if (player.name.trim().toLowerCase() === 'verbal') {
+        void grantTestSupplyGiftOnce(`${slotId}:verbal`).then((res) => {
+          if (!res.granted) return;
+          const gift: Array<{ name: string; qty: number }> = [
+            { name: 'First Aid Kit', qty: 10 },
+            { name: 'Trail Rations', qty: 20 },
+            { name: 'Smoke-Cured Jerky Strip', qty: 20 },
+            { name: 'Bioluminescent Fungus', qty: 20 },
+            { name: 'Water Bottle', qty: 1 },
+          ];
+          set((s) => {
+            if (!s.player) return s;
+            let inv = s.player.inventory;
+            for (const { name, qty } of gift) {
+              const look = lookupCraftedItem(name);
+              inv = grantItem(inv, {
+                id: `verbalgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
+                name,
+                kind: look.kind,
+                rarity: look.rarity,
+                quantity: qty,
+                tags: [...look.tags, 'gift'],
+              }).inventory;
+            }
+            return { player: { ...s.player, inventory: inv } };
+          });
+          get().appendLog(
+            'reward',
+            `✦ A crash-test kit lands in ${player.name}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`,
+          );
+          void get().persist();
         });
       }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation

@@ -69,6 +69,11 @@ export interface GlobalStash {
   // a dev character (Verbal / Sasmooch). Idempotent so a load doesn't
   // re-grant on every resume.
   devGemGrantedSlots?: string[];
+  // OTA-461 — one-time test-supply gift for the dev character "Verbal".
+  // Slot keys that have already received the playtest kit (first aid /
+  // rations / dog jerky / fungus / water). Idempotent per slot so a
+  // resume never restacks it.
+  testGiftGrantedSlots?: string[];
 }
 
 export async function loadGlobalStash(): Promise<GlobalStash> {
@@ -81,9 +86,10 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       endingBadges: parsed.endingBadges ?? [],
       installSeeded: parsed.installSeeded ?? false,
       devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
+      testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
     };
   } catch {
-    return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [] };
+    return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };
   }
 }
 
@@ -130,6 +136,19 @@ export async function grantDevGemOnce(slotKey: string): Promise<{ granted: boole
   stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
   await saveGlobalStash(stash);
   return { granted: true, gems: stash.resurrectionGems };
+}
+
+/** OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
+ *  Records the slot key so the kit is granted exactly once per slot (a
+ *  resume never restacks it). The caller does the actual inventory push;
+ *  this only gates the once-per-slot bookkeeping. */
+export async function grantTestSupplyGiftOnce(slotKey: string): Promise<{ granted: boolean }> {
+  const stash = await loadGlobalStash();
+  const already = stash.testGiftGrantedSlots ?? [];
+  if (already.includes(slotKey)) return { granted: false };
+  stash.testGiftGrantedSlots = [...already, slotKey];
+  await saveGlobalStash(stash);
+  return { granted: true };
 }
 
 /** v2.4.1 (OTA 043) — record a completed (faction, ending) combo.

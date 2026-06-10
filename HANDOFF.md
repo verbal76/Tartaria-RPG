@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-461 "Barium Flash" — [dev] one-time playtest-supply gift for "Verbal"** *(element #56)*. Loading a
+  save named Verbal (case-insensitive) drops 10 First Aid Kit / 20 Trail Rations / 20 Smoke-Cured Jerky
+  Strip / 20 Bioluminescent Fungus / 1 Water Bottle into the pack so crash-testing doesn't burn the
+  player's own consumables. Idempotent per slot (`grantTestSupplyGiftOnce` → global-stash
+  `testGiftGrantedSlots`, mirrors `grantDevGemOnce`). `saveSystem.ts`, `gameStore.ts` (in loadSlotIntoGame).
 - **OTA-460 "Cesium Getter" — [crash mitigation, cont.] make the AI re-enable testable** *(element #55)*.
   On-device, OTA-459 showed a contradiction: ML health "clean/not disabled, count 0" yet boot still read
   `qwen:skipped` — the batch fix couldn't be exercised, and restart didn't clear it. Upgraded the reset

@@ -13740,4 +13740,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // boot-time 'skipped'. The button label tracks live load progress (STARTING/LOADING %/✓ LOADED/✗ FAILED)
 // and surfaces the load error, so the player can confirm Qwen is actually up before testing the fungus
 // crash. The force-loaded context uses the OTA-459 shrunken batch (512/128). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-460';
+// OTA-461 (Barium Flash) — [dev] one-time playtest-supply gift for the character "Verbal". So the
+// dog-fungus crash repro (and general testing) doesn't burn the player's own consumables, loading a
+// save whose character is named "Verbal" (case-insensitive, trimmed) drops a standing crash-test kit
+// into the pack: 10 First Aid Kit, 20 Trail Rations, 20 Smoke-Cured Jerky Strip (dog treat), 20
+// Bioluminescent Fungus, 1 Water Bottle. Idempotent per slot via the global-stash testGiftGrantedSlots
+// (mirrors grantDevGemOnce) — resuming the same save never restacks it. All five are uncapped
+// consumables, so nothing is clipped. No effect for any other name. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-461';

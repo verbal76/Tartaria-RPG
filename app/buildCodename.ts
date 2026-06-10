@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-461 — [dev] one-time playtest-supply gift for the character "Verbal" (10 First Aid Kit, 20 Trail
+  // Rations, 20 Smoke-Cured Jerky Strip, 20 Bioluminescent Fungus, 1 Water Bottle) so crash-testing
+  // doesn't burn the player's own consumables. Idempotent per slot (testGiftGrantedSlots). Element #56: Barium.
+  '2026-06-10-461': 'Barium Flash',
   // OTA-460 — [crash mitigation, cont.] make the AI re-enable actually testable: the device showed
   // "clean/not disabled" yet boot still read qwen:skipped, so the OTA-459 batch fix couldn't be exercised.
   // Upgraded the reset button to "RESET AI NARRATION & RELOAD" — clears breadcrumbs AND force-loads Qwen
