@@ -13640,11 +13640,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       .find(({ rec, def }) => {
         if (!def) return false;
         // Boss enemy names are tagged " (hunted)" by scaleHuntBoss.
-        // OTA 011 — was `rec.stage > 0`, which blocked completion
-        // when a hunt-target was killed on stage 0 (the spawn beat).
-        // Hunts now complete whenever the tagged boss dies,
-        // regardless of which stage the player happened to be in.
-        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage >= 0;
+        // OTA-426 — [audit fix #8] only the FINAL boss stage's kill completes the
+        // hunt. Several hunts (bog_dragon, mud_titan, sludge_behemoth, iron_titan,
+        // mud_siren_queen, servants_doubter) carry a MID-hunt `boss` stage that
+        // also spawns the (final) scaled target via scaleHuntBoss; killing it there
+        // used to stamp the hunt complete (the old `stage >= 0`) and skip the back
+        // half. advanceHunt spawns the boss AND increments the stage, so once the
+        // record has advanced PAST the last boss stage we're at the real apex.
+        // (OTA-011's `>= 0` only ever needed to clear stage-0 single-boss hunts —
+        // for those lastBoss is 0 and stage lands at 1, so they still complete.)
+        let lastBoss = -1;
+        for (let i = 0; i < def.stages.length; i++) {
+          if (def.stages[i]?.checkKind === 'boss') lastBoss = i;
+        }
+        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage > lastBoss;
       });
     if (matchingHunt && matchingHunt.def) {
       set((s) =>

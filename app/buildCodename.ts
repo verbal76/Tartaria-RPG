@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-426 — [audit #8] multi-boss hunts complete only at the LAST boss stage, not a mid
+  // boss — killing the mid boss no longer skips the apex fight + reward. Element #21: Scandium.
+  '2026-06-10-426': 'Scandium Fluorination',
   // OTA-425 — [audit #7] companion (golem/dog) kills splice all 6 per-enemy arrays, so
   // DOT/shred/corruption/KO no longer land on the wrong surviving foe. Element #20: Calcium.
   '2026-06-10-425': 'Calcium Slaking',

@@ -13434,4 +13434,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // other four out of alignment, and a coating DOT / acid AC-shred / corruption stack / KO
 // flag then applied to the WRONG surviving foe. Both paths now splice all six (mirroring
 // resolveEnemyDefeat's dropAt). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-425';
+// OTA-426 (Scandium Fluorination) — [audit fix #8] multi-boss hunts no longer complete
+// at a MID boss stage. Several hunts (e.g. hunt_bog_dragon: 7 stages, checkKind:'boss'
+// at indices [3, 6]) have more than one 'boss' stage, and advanceHunt spawns the scaled
+// target "<name> (hunted)" at EACH boss stage. The completion match in resolveEnemyDefeat
+// only checked `rec.stage >= 0`, so killing the mid-hunt boss stamped the whole hunt
+// complete and skipped the apex fight + final reward. Completion is now gated on the LAST
+// boss stage: it scans def.stages for the highest 'boss' index (lastBoss) and only
+// completes when `rec.stage > lastBoss`. Single-boss hunts are unaffected (their lone
+// boss IS the last). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-426';

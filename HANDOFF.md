@@ -367,6 +367,12 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-426 "Scandium Fluorination" — [audit fix #8] multi-boss hunts complete only at the
+  LAST boss** *(element #21)*. Hunts with >1 `checkKind:'boss'` stage (e.g. `hunt_bog_dragon`,
+  boss at [3,6]) spawn `"<name> (hunted)"` at each; the completion match gated only on
+  `rec.stage >= 0`, so killing the mid boss stamped the hunt done and skipped the apex.
+  Now scans `def.stages` for the highest boss index and completes only when
+  `rec.stage > lastBoss`. `gameStore.ts`. Covered by `__tests__/huntMultiBossCompletion.test.ts`.
 - **OTA-425 "Calcium Slaking" — [audit fix #7] companion kills splice all 6 per-enemy
   arrays** *(element #20)*. golem-kill + dog-bite-kill spliced only enemies+hps+ambush →
   DOT/shred/corruption/KO landed on the wrong surviving foe. Now mirror
