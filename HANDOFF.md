@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-435 "Zinc Galvanizing" — [audit fix #24] Cores X/9 badge on the play HUD** *(element #30)*.
+  New `CoresProgressBadge` in `StatsPanel.tsx` shows "◆ N/9 CORES" during the revelation→cores→
+  descent arc (display-only, reads `mainQuest.coresRecovered.length`) — no more tabbing to
+  Contracts to check progress.
 - **OTA-434 "Copper Cementation" — [audit fix #18] unique inventory instance ids** *(element #29)*.
   `${prefix}_${Date.now()}` ids collided on same-ms grants, breaking equip/repair/wear/temper
   keyed on instance id (OTA-427/431). New `freshInstanceId` appends a monotonic per-process

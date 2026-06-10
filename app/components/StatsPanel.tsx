@@ -63,6 +63,22 @@ const aetherBadgeStyle = StyleSheet.create({
   badge: { color: '#b88ce0', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
 });
 
+// OTA-435 — Cores progress at a glance. The main-quest count (X/9 Cores) lived
+// only in the Contracts screen and inside the exploration objective chip's prose
+// hint; the play HUD had no discrete indicator next to HP/STA/TC. This badge
+// surfaces it once the player knows the Cores matter (revelation → cores →
+// descent) and hides before the hook and after they leave for the Nexus.
+function CoresProgressBadge({ player }: Props) {
+  const mq = player.mainQuest;
+  if (!mq) return null;
+  if (mq.phase !== 'revelation' && mq.phase !== 'cores' && mq.phase !== 'descent') return null;
+  const n = mq.coresRecovered?.length ?? 0;
+  return <Text style={coresBadgeStyle.badge}>◆ {n}/9 CORES</Text>;
+}
+const coresBadgeStyle = StyleSheet.create({
+  badge: { color: '#d8b46a', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
+});
+
 interface Props { player: PlayerCharacter; }
 
 export function StatsPanel({ player }: Props) {
@@ -148,6 +164,7 @@ export function StatsPanel({ player }: Props) {
       </View>
       <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
+      <CoresProgressBadge player={player} />
       <View style={styles.row}>
         <Stat label="STR" value={formatStat(player.stats.strength, eff.strength)} />
         <Stat label="DEX" value={formatStat(player.stats.dexterity, eff.dexterity)} />

@@ -13510,4 +13510,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // A module-level monotonic counter (freshInstanceId) now appends a per-process sequence so each
 // id is unique regardless of clock resolution; applied to the craft / scout-recover / loot-roll
 // / faction-leg / vendor-buy / encounter-loot / climb-drop / disc grant paths. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-434';
+// OTA-435 (Zinc Galvanizing) — [audit fix #24] Cores progress on the play HUD. The main-quest
+// count (X/9 Cores) lived only on the Contracts screen and buried inside the exploration
+// objective chip's prose hint; the StatsPanel HUD had no discrete indicator beside HP/STA/AC/TC.
+// A new CoresProgressBadge surfaces "◆ N/9 CORES" once the player knows the Cores matter
+// (phases revelation → cores → descent) and stays hidden before the hook and after they leave
+// for the Nexus. Display-only, reads player.mainQuest.coresRecovered.length. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-435';

@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-435 — [audit #24] a Cores X/9 badge on the play HUD (StatsPanel), shown during the
+  // revelation→cores→descent arc — no more tabbing to Contracts to check progress. Element #30: Zinc.
+  '2026-06-10-435': 'Zinc Galvanizing',
   // OTA-434 — [audit #18] inventory item ids get a monotonic suffix, so two same-ms grants no
   // longer share an id and break equip/repair/wear/temper keyed on instance id. Element #29: Copper.
   '2026-06-10-434': 'Copper Cementation',
