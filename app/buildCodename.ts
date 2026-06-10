@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-472 — [UX] splash "too big" fix: OTA-471's full-width + aspectRatio image still overran the screen
+  // height (cropping golem + dog). Switched to a full-screen absoluteFill + resizeMode "contain" so the
+  // WHOLE composition scales to fit, never cropped, with a thin dark letterbox. Element #67: Holmium.
+  '2026-06-10-472': 'Holmium Quench',
   // OTA-471 — [UX] splash render fix: OTA-470's splash sat inside the AppShell's safe-area padding (green
   // margins) AND its UI scale transform, distorting the aspectRatio so the art rendered oversized + cropped
   // to the top (golem/dog below the fold). Moved it to a new <SplashOverlay/> at the AppShell ROOT —

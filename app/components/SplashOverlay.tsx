@@ -38,15 +38,14 @@ export function SplashOverlay() {
 
   return (
     <View style={styles.overlay} pointerEvents="auto">
-      {/* Full-WIDTH, top-anchored: no side-crop (the title stays intact), the
-          image's natural height sits at the top, and the leftover dark space
-          pools at the bottom under the loading bar. This works edge-to-edge here
-          because the overlay is at the AppShell root — outside the UI scale
-          transform that distorted the earlier in-screen version. */}
+      {/* "contain" guarantees the WHOLE composition fits the screen (scaled down,
+          never cropped) — title, wanderer, dog and golem all in frame. The image
+          is wider-aspect than a tall phone, so it fits to width and leaves a thin
+          dark letterbox top/bottom that blends with the dark overlay + dark art. */}
       <Image
         source={require('../../assets/splash-art.jpg')}
-        style={styles.image}
-        resizeMode="cover"
+        style={StyleSheet.absoluteFill}
+        resizeMode="contain"
       />
       <View style={styles.barWrap}>
         <View style={styles.barTrack}>
@@ -62,7 +61,6 @@ export function SplashOverlay() {
 
 const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#0b0a09', zIndex: 1000, elevation: 1000 },
-  image: { width: '100%', aspectRatio: 941 / 1672 },
   barWrap: { position: 'absolute', left: 28, right: 28, bottom: 56, alignItems: 'center' },
   barTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },

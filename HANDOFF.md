@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-471 "Dysprosium Reduction" — splash moved to a
->   full-bleed root overlay (fixes the green margins + zoom/top-crop). 470 taller splash art;
->   467 golem stats; 466 golem repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→471**
->   playtest batch (Tellurium Refining → Dysprosium Reduction, elements 52–66) is published
+> - **LIVE (pushed 2026-06-10) = OTA-472 "Holmium Quench" — splash now "contain"-fit
+>   (whole image scales to fit, no crop). 471 full-bleed root overlay; 467 golem stats;
+>   466 golem repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→472**
+>   playtest batch (Tellurium Refining → Holmium Quench, elements 52–67) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,12 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 / 466 / 467 / 468 / 469 / 470 / 471 committed below (post-batch follow-ups).**
+**OTA-465 / 466 / 467 / 468 / 469 / 470 / 471 / 472 committed below (post-batch follow-ups).**
 
+- **OTA-472 "Holmium Quench" — [UX] splash "too big" fix** *(element #67)*. OTA-471's full-width +
+  aspectRatio image still overran the screen height (cropping golem + dog). Switched `SplashOverlay` to a
+  full-screen `absoluteFill` + `resizeMode="contain"` so the whole composition scales to fit, never
+  cropped, with a thin dark letterbox. `components/SplashOverlay.tsx`.
 - **OTA-471 "Dysprosium Reduction" — [UX] splash render fix (full-bleed + no zoom)** *(element #66)*. The
   splash sat inside the AppShell safe-area padding (green margins) + UI scale transform, distorting the
   aspectRatio so it rendered oversized/top-cropped. Moved it to a new `<SplashOverlay/>` at the AppShell

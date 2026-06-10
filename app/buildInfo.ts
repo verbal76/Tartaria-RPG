@@ -13842,4 +13842,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // at the bottom for the loading bar. The overlay self-manages its once-per-launch timer + Kokoro
 // subscription. TitleScreen's splash early-return + state + styles are removed (it keeps only the compact
 // on-menu download bar). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-471';
+// OTA-472 (Holmium Quench) — [UX] splash "too big" fix. OTA-471's full-width + aspectRatio image still
+// rendered oversized (the art's height overran the screen, cropping the golem + dog below the fold).
+// Switched the SplashOverlay image to a full-screen StyleSheet.absoluteFill with resizeMode "contain",
+// which deterministically scales the WHOLE composition to fit (never crops) — title, wanderer, dog and
+// golem all in frame — with a thin dark letterbox top/bottom that blends with the dark overlay + art.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-472';
