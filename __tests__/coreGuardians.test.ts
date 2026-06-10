@@ -137,6 +137,32 @@ describe('Core Guardians', () => {
       const ap5 = parseInt(String(g5!.abilityPoint).match(/\d+/)?.[0] ?? '0', 10);
       expect(ap5).toBeGreaterThan(ap1);
     });
+
+    // OTA-448 — the first Guardian should be a straightforward (not easy) win
+    // for a kitted player; later Guardians ramp monotonically harder.
+    it('eases the first Guardian and ramps AC monotonically through tier 9', () => {
+      const acWithBoss = (g: { abilityPoint?: unknown }) => {
+        const ap = parseInt(String(g.abilityPoint).match(/\d+/)?.[0] ?? '0', 10);
+        return Math.max(5, Math.min(18, 5 + ap)) + 6; // mirror enemyAC + boss +6
+      };
+      const caps = LOST_CAPITAL_LOCATIONS;
+      const acs: number[] = [];
+      for (let tier = 1; tier <= 9; tier++) {
+        const p = makePlayer({
+          hpMax: 32,
+          mainQuest: { phase: 'cores', coresRecovered: caps.slice(0, tier - 1) },
+        });
+        acs.push(acWithBoss(spawnGuardianForCapital(p, 'asgardar')!));
+      }
+      // First Guardian is hittable: AC 14 (was 17).
+      expect(acs[0]).toBe(14);
+      // Monotonic non-decreasing ramp.
+      for (let i = 1; i < acs.length; i++) {
+        expect(acs[i]).toBeGreaterThanOrEqual(acs[i - 1]!);
+      }
+      // Late game keeps its hardness.
+      expect(acs[8]).toBe(22);
+    });
   });
 
   describe('detection helpers', () => {

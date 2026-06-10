@@ -13617,4 +13617,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Blade tagged metal/mud/blade) scrapped without it — the mud-tag path was effectively dead. Mudstone
 // is now its own condition keyed on `mud`/`mudstone`, independent of stone (an iron spear with no mud
 // tag still yields none). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-447';
+// OTA-448 (Technetium Eluting) — [playability] the FIRST Core Guardian is now a straightforward
+// (not easy) win for a player who arrives kitted — decent gear + a dog + a golem — then each later
+// Guardian ramps harder. Pre-OTA the AC curve started at +0 (AC 17 with the boss +6), a ~45% hit
+// wall at the very first gate; the AC bonus is re-smoothed DOWN for the early tiers (T1 −3 → AC 14,
+// monotonic +1/tier) while T7–T9 keep their original hardness (AC 20/21/22). Early hpMult eased a
+// touch (T1 1.5→1.4 … T6 2.5→2.4) so the kitted fight closes before the player is overwhelmed; T7–T9
+// HP, all damage dice, counters, and trait layering are unchanged. The Guardians still have teeth and
+// the late game stays demanding — only the entry wall is lowered to match the intended "by now you
+// have gear + a dog + a golem" power level. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-448';

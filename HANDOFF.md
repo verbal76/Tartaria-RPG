@@ -367,6 +367,9 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-448 "Technetium Eluting" — [playability] first Guardian straightforward win** *(element #43)*.
+  AC curve re-smoothed down for early tiers (T1 AC 17→14, monotonic +1/tier); T7–T9 hardness kept.
+  Early hpMult eased a touch. `coreGuardians.ts`. Covered by `__tests__/coreGuardians.test.ts`.
 - **OTA-447 "Molybdenum Sintering" — [playability] Mud-Golem fuel gaps** *(element #42)*. Validation-sim
   follow-up: Mudstone now low-weight forageable (was kill/scrap-only); scrap mud-tag path (dead inside
   the stone branch) yields Mudstone again as its own condition. `areaSearch.ts`, `scrapEngine.ts`.

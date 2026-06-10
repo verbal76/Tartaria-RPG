@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-448 — [playability] first Core Guardian eased to a straightforward (not easy) win for a
+  // kitted player (AC 17→14, T1 hp eased); AC ramps monotonically, T7–T9 hardness preserved. Element #43: Technetium.
+  '2026-06-10-448': 'Technetium Eluting',
   // OTA-447 — [playability] close two Mud-Golem fuel gaps a sim found: Mudstone now low-weight
   // forageable, and the scrap mud-tag path (dead inside the stone branch) yields Mudstone again. Element #42: Molybdenum.
   '2026-06-10-447': 'Molybdenum Sintering',

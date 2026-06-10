@@ -73,16 +73,25 @@ interface TierProfile {
   extraTraits: string[];
 }
 
+// OTA-448 — [playability] the FIRST Guardian should be a straightforward (not
+// easy) win for a player who arrives kitted — decent gear, a dog, and a golem —
+// then ramp steadily so each later Guardian is harder than the last. Pre-OTA the
+// AC curve started at +0 (AC 17 with the boss +6), which a freshly-arrived
+// player can only hit ~45% of the time; the fight was a Rare-difficulty wall at
+// the very first gate. The AC bonus is now re-smoothed DOWN for the early tiers
+// (T1 −3 → AC 14, monotonic +1/tier) while T7–T9 keep their original hardness
+// (+3/+4/+5). HP, damage, and the trait layering are unchanged, so the fight
+// still has teeth and the late-game stays demanding.
 const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
-  1: { hpMult: 1.5, acBonus: 0, damage: '1d8+3',  counters: 2, extraTraits: [] },
-  2: { hpMult: 1.7, acBonus: 1, damage: '1d8+4',  counters: 2, extraTraits: ['armored'] },
-  3: { hpMult: 1.9, acBonus: 1, damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
-  4: { hpMult: 2.1, acBonus: 2, damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
-  5: { hpMult: 2.3, acBonus: 2, damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
-  6: { hpMult: 2.5, acBonus: 3, damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
-  7: { hpMult: 2.7, acBonus: 3, damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  8: { hpMult: 2.9, acBonus: 4, damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
-  9: { hpMult: 3.1, acBonus: 5, damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
+  1: { hpMult: 1.4, acBonus: -3, damage: '1d8+3',  counters: 2, extraTraits: [] },
+  2: { hpMult: 1.6, acBonus: -2, damage: '1d8+4',  counters: 2, extraTraits: ['armored'] },
+  3: { hpMult: 1.8, acBonus: -1, damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
+  4: { hpMult: 2.0, acBonus: 0,  damage: '1d10+4', counters: 2, extraTraits: ['armored', 'quick'] },
+  5: { hpMult: 2.2, acBonus: 1,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
+  6: { hpMult: 2.4, acBonus: 2,  damage: '1d10+5', counters: 2, extraTraits: ['armored', 'quick', 'regenerate'] },
+  7: { hpMult: 2.7, acBonus: 3,  damage: '2d6+4',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  8: { hpMult: 2.9, acBonus: 4,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder'] },
+  9: { hpMult: 3.1, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
 };
 
 /** Returns the live-fight Enemy for the Guardian at this Capital,
