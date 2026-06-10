@@ -337,6 +337,10 @@ const CODENAMES: Record<string, string> = {
   // appends every log line to an unbounded on-disk COPY-LOG key that grew to fill
   // AsyncStorage's ~6MB DB, after which every write (incl. the tiny save) fails.
   // capDiskLog bounds it to ~400KB; self-heals on the next write.
+  // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
+  // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
+  // (already has the label) but the proc line still prepended proc.label.
+  '2026-06-09-399': 'Shagbark Anvil',
   '2026-06-09-398': 'Sumacberry Anvil',
   '2026-06-09-397': 'Catkin Anvil',
   '2026-06-09-396': 'Serviceash Anvil',

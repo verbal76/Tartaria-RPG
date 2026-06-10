@@ -13273,7 +13273,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : '';
           get().appendLog(
             'combat',
-            `${proc.label} ${weaponName ?? 'weapon'} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
+            `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
             { combatOutcome: 'player_dmg' },
           );
         }

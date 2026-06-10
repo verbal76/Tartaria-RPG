@@ -13174,4 +13174,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the tiny save. New diskLogCap.capDiskLog bounds that key to its most-recent
 // ~400 KB (trimmed to a line boundary). Self-healing: the first log write after
 // this ships shrinks a bloated log, frees the space, and saves start landing.
-export const OTA_BUILD_ID = '2026-06-09-398';
+// OTA-399 (Shagbark Anvil) — fix doubled coating label in the on-hit line. OTA-391
+// made combat narration use the COATED weapon name (coatedDisplayName, which already
+// includes the label), but the coating-proc line still prepended proc.label — so an
+// acid-coated bow read "Acid-Etched Acid-Etched Rusty Shortbow". Drop the redundant
+// prefix; the coated name carries the label. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-399';
