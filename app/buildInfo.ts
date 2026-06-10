@@ -13317,4 +13317,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (summonCoreGuardian → not_at_capital off-anchor). The capital vendor already clears
 // on every cardinal step (stepDirection sets scene.vendor = null), so it disappears on
 // exit too. A city is ONE tile, so a single cardinal step exits it. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-412';
+// OTA-413 (Oxygen Combustion) — two crash-hardening measures from a Carbon-Pyrolysis
+// (411) crash report. (1) PROACTIVE room-lore prune: visitedRooms's
+// roomInvestigationTable is the dominant save grower (a playtest hit rooms=156 KB,
+// firing the save self-heal). It re-seeds on demand and isn't anti-farm state, so
+// persist() now drops it from every room EXCEPT the current one on EVERY save —
+// keeping the blob small instead of creeping toward the 800K trim / the self-heal.
+// In-memory untouched; pruned rooms re-seed on re-entry. (2) VOICE (TTS) crash
+// breadcrumb: the coating itself succeeded in the log, so the crash was native — and
+// the diagnostic couldn't tell Qwen from voice. Mirroring the OTA-351 Qwen completion
+// guard, the bundled neural TTS now writes a labeled breadcrumb before each utterance
+// and clears it after; if it survives to the next boot, the diagnostic's new
+// "Voice (TTS) guard" line NAMES voice as what died (detection-only; no auto-disable
+// yet). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-413';

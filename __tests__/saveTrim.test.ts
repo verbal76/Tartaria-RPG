@@ -1,4 +1,4 @@
-import { trimSaveStateToFit, utf8ByteLength, saveSizeBreakdown } from '../app/engine/saveTrim';
+import { trimSaveStateToFit, utf8ByteLength, saveSizeBreakdown, pruneRegenerableRoomTables } from '../app/engine/saveTrim';
 import type { SaveState, VisitedRoom, WorldMemory } from '../app/engine/types';
 
 // OTA-395/396 — the slot-blob size guard that fixes the save-loss root cause.
@@ -75,6 +75,39 @@ describe('trimSaveStateToFit', () => {
     expect((r.state.worldMemory.chainMemos ?? []).length).toBeLessThanOrEqual(40);
     expect(r.sceneDropped).toBe(true);
     expect(r.state.currentScene).toBeUndefined();
+  });
+});
+
+describe('OTA-413 — pruneRegenerableRoomTables (proactive)', () => {
+  it('strips investigation tables from every room except the kept one', () => {
+    const s = makeState({
+      visitedRooms: { home: room(3), a: room(1), b: room(2) },
+    });
+    const before = JSON.stringify(s).length;
+    const { state, stripped } = pruneRegenerableRoomTables(s, 'home');
+    expect(stripped).toBe(2); // a + b stripped, home kept
+    const rooms = state.worldMemory.visitedRooms!;
+    expect(rooms.home.roomInvestigationTable).toBeDefined(); // current room kept
+    expect(rooms.a.roomInvestigationTable).toBeUndefined();
+    expect(rooms.b.roomInvestigationTable).toBeUndefined();
+    // The lightweight per-room memory (anti-farm) survives the prune.
+    expect(rooms.a.searchedAmbientNouns).toEqual(['kettle']);
+    // And the blob actually got smaller.
+    expect(JSON.stringify(state).length).toBeLessThan(before);
+  });
+
+  it('keeps everything when keepRoomKey matches no room (still safe) — strips all', () => {
+    const s = makeState({ visitedRooms: { a: room(1), b: room(2) } });
+    const { state, stripped } = pruneRegenerableRoomTables(s, null);
+    expect(stripped).toBe(2);
+    expect(state.worldMemory.visitedRooms!.a.roomInvestigationTable).toBeUndefined();
+  });
+
+  it('is a no-op when no room has a table', () => {
+    const s = makeState({ visitedRooms: { a: room(1, false), b: room(2, false) } });
+    const { state, stripped } = pruneRegenerableRoomTables(s, 'a');
+    expect(stripped).toBe(0);
+    expect(state).toBe(s); // same reference — nothing changed
   });
 });
 

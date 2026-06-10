@@ -367,6 +367,19 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-413 "Oxygen Combustion" — proactive room-lore prune + voice (TTS) crash
+  breadcrumb** *(element #8)*. From a 411 crash report (crashed after applying a searing
+  paste — but the coating JS *succeeded*, so it was a native crash). **(1)**
+  `roomInvestigationTable` is the dominant save grower (report hit `rooms=156 KB`,
+  firing the self-heal); it re-seeds on demand and isn't anti-farm state, so `persist()`
+  now drops it from every room except the current one on every save (`saveTrim`
+  `pruneRegenerableRoomTables`). In-memory untouched; pruned rooms re-seed on re-entry.
+  **(2)** The diagnostic couldn't tell Qwen from voice; mirroring the OTA-351 Qwen
+  guard, the bundled TTS now writes a labeled breadcrumb before each utterance
+  (`mlHealth.markTTSStart/markTTSDone`, `PiperTTSManager.drain`), so a native voice
+  death is NAMED on the next boot via the new "Voice (TTS) guard" diagnostic line
+  (detection-only, no auto-disable yet). `saveTrim.ts`, `gameStore.ts`, `mlHealth.ts`,
+  `PiperTTSManager.ts`; `saveTrim.test.ts` (+3).
 - **OTA-412 "Nitrogen Fixation" — SUMMON chip only shows while on the capital tile**
   *(element #7)*. Player: "when I leave the capital city, the summon button should go
   away — I should only be able to summon the Core Guardian while I'm in the city." The

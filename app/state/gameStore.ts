@@ -65,7 +65,7 @@ import {
   consumeSaveReclaimedFlag,
   type SlotSummary,
 } from '../engine/saveSystem';
-import { trimSaveStateToFit, saveSizeBreakdown } from '../engine/saveTrim';
+import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
@@ -19339,7 +19339,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // round trip can't reset it (cheese).
       wastelandStepsSinceEncounter,
     };
-    const trim = trimSaveStateToFit(builtState);
+    // OTA-413 — PROACTIVELY drop regenerable per-room lore tables from every room
+    // except the one the player is standing in, on EVERY save. visitedRooms's
+    // roomInvestigationTable is the dominant grower (a playtest hit rooms=156 KB);
+    // it re-seeds on demand and isn't anti-farm state, so pruning it keeps the
+    // blob small instead of letting it creep toward the 800K trim / the save
+    // self-heal. The current room's table is kept so an immediate resume reads the
+    // same text. In-memory state is untouched (this only shapes the saved copy).
+    const currentRoomKey = currentScene
+      ? makeRoomKey(playerForSave.currentLocationId, currentScene.microMicroId, playerForSave.mapX, playerForSave.mapY, playerForSave.hubRoomId)
+      : null;
+    const pruned = pruneRegenerableRoomTables(builtState, currentRoomKey);
+    const trim = trimSaveStateToFit(pruned.state);
     if (trim.trimmed) {
       get().appendLog(
         'debug',
@@ -19368,7 +19379,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // blob size is visible as it climbs toward the limit, not just at the cliff.
     persistSizeSampleCounter += 1;
     if (saveErr || trim.trimmed || persistSizeSampleCounter % PERSIST_SIZE_SAMPLE_EVERY === 0) {
-      get().appendLog('debug', saveSizeBreakdown(builtState));
+      // OTA-413 — report the ACTUALLY-SAVED (pruned + trimmed) blob, not the raw
+      // in-memory builtState, so the heartbeat reflects what landed on disk.
+      get().appendLog('debug', saveSizeBreakdown(trim.state));
     }
     return !saveErr;
   },

@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-413 — proactive room-lore prune (bound the save blob) + voice (TTS) crash
+  // breadcrumb (name voice vs Qwen on the next native crash). Element #8: Oxygen.
+  '2026-06-10-413': 'Oxygen Combustion',
   // OTA-412 — SUMMON chip only shows while stationed on the capital anchor tile
   // (not after stepping off into the wilderness). Element #7: Nitrogen.
   '2026-06-10-412': 'Nitrogen Fixation',

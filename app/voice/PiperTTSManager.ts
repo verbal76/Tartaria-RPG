@@ -638,6 +638,14 @@ async function drain(): Promise<void> {
     void drain();
     return;
   }
+  // OTA-413 — voice crash breadcrumb. Flush a marker (naming the voice) before the
+  // native synth + playback, so a SIGSEGV mid-utterance is detected AND named on the
+  // next boot (the diagnostic's "Voice (TTS) guard" line), instead of being
+  // indistinguishable from a Qwen crash. Cleared in the finally whether the
+  // utterance succeeds or a JS error is caught (both mean the process survived).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ml = require('../diagnostics/mlHealth') as typeof import('../diagnostics/mlHealth');
+  await ml.markTTSStart(`kokoro:${targetVoice}`);
   try {
     const settings = getVoiceSettings();
     // Use the prefetched samples if drain's previous iteration already
@@ -708,6 +716,9 @@ async function drain(): Promise<void> {
     recordKokoroError('unknown', currentlySpeaking?.voiceId ?? 'unknown', err, diskFreeMB);
     setKokoroState({ phase: 'error', message: `[speak] ${msg}`.slice(0, 240) });
   } finally {
+    // OTA-413 — the process survived this utterance (success or JS-caught error),
+    // so clear the voice crash breadcrumb; only a native SIGSEGV leaves it behind.
+    void ml.markTTSDone();
     currentlySpeaking = null;
     void drain();
   }

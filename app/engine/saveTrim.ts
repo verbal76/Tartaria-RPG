@@ -127,6 +127,38 @@ export function trimSaveStateToFit(state: SaveState, maxChars = SAFE_BLOB_CHARS)
   return result();
 }
 
+/** OTA-413 — PROACTIVE room-lore prune. The single biggest grower in a long save
+ *  is `visitedRooms[*].roomInvestigationTable` — generated lore text per ambient
+ *  noun, regenerated on demand (gameStore seeds it when missing) and NOT part of
+ *  the anti-farm "already searched" state (that's `searchedAmbientNouns`). So we
+ *  can drop it from every room EXCEPT the one the player is standing in, on EVERY
+ *  save, keeping the blob small instead of waiting for the 800K trim to fire (and
+ *  the save self-heal to clear storage). Re-entering a pruned room re-seeds its
+ *  table. `keepRoomKey` keeps the current room's table so an immediate resume +
+ *  re-investigate reads the same text. Returns the pruned state + how many tables
+ *  were dropped. */
+export function pruneRegenerableRoomTables(
+  state: SaveState,
+  keepRoomKey: string | null,
+): { state: SaveState; stripped: number } {
+  const wm = state.worldMemory;
+  const rooms = wm?.visitedRooms;
+  if (!rooms) return { state, stripped: 0 };
+  let stripped = 0;
+  const next: Record<string, VisitedRoom> = {};
+  for (const [k, r] of Object.entries(rooms)) {
+    if (k !== keepRoomKey && r && r.roomInvestigationTable) {
+      const { roomInvestigationTable: _drop, ...rest } = r;
+      next[k] = rest;
+      stripped++;
+    } else {
+      next[k] = r;
+    }
+  }
+  if (stripped === 0) return { state, stripped: 0 };
+  return { state: { ...state, worldMemory: { ...wm, visitedRooms: next } }, stripped };
+}
+
 /** Per-part byte breakdown for a failure log — names exactly what's oversized. */
 export function saveSizeBreakdown(state: SaveState): string {
   const kb = (o: unknown) => Math.round(utf8ByteLength(JSON.stringify(o ?? null)) / 1024);

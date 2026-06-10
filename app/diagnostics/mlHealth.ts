@@ -64,6 +64,18 @@ const KEY_QWEN_CRASH_COUNT = 'tartaria.ml.qwenCompletionCrashCount';
 const KEY_QWEN_DISABLED = 'tartaria.ml.qwenDisabledByCrash';
 const MAX_QWEN_COMPLETION_CRASHES = 3; // completions recover, so a touch more tolerant than init (2)
 
+// OTA-413 — VOICE (TTS) crash breadcrumb. Same trick as the Qwen completion guard,
+// scoped to the bundled neural TTS (executorch Kokoro/Piper): the native synth +
+// playback can SIGSEGV mid-utterance AFTER a clean voice init, so the init guards
+// never fire and the process just dies. We write a breadcrumb (with a label naming
+// the voice) before each utterance and clear it after; if it survives to the next
+// boot, a voice op crashed the process — and we now KNOW it was voice, not Qwen.
+// Detection-only for now (counts + surfaces in the diagnostic so the next native
+// crash NAMES what died); no auto-disable yet — wire that once a tester's report
+// confirms voice is the culprit.
+const KEY_TTS_IN_PROGRESS = 'tartaria.ml.ttsInProgress';
+const KEY_TTS_CRASH_COUNT = 'tartaria.ml.ttsCrashCount';
+
 interface MLHealthState {
   lastAttemptAt: string | null;
   lastSuccessAt: string | null;
@@ -76,6 +88,12 @@ interface MLHealthState {
   qwenCompletionCrashCount: number;
   qwenDisabledByCrash: boolean;
   detectedQwenCompletionCrashThisBoot: boolean;
+  // OTA-413 — voice (TTS) crash breadcrumb. Detection-only.
+  ttsCrashCount: number;
+  detectedTtsCrashThisBoot: boolean;
+  /** The breadcrumb label (voice id) that was in-flight when the process died
+   *  last session, if a TTS crash was detected this boot. */
+  lastTtsOpBeforeCrash: string | null;
 }
 
 let cached: MLHealthState | null = null;
@@ -96,8 +114,10 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let completionInProgress: string | null = null;
   let qwenCrashCountStr: string | null = null;
   let qwenDisabledStr: string | null = null;
+  let ttsInProgress: string | null = null;
+  let ttsCrashCountStr: string | null = null;
   try {
-    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr] = await Promise.all([
+    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr] = await Promise.all([
       AsyncStorage.getItem(KEY_ATTEMPTED),
       AsyncStorage.getItem(KEY_SUCCEEDED),
       AsyncStorage.getItem(KEY_CRASH_COUNT),
@@ -105,6 +125,8 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       AsyncStorage.getItem(KEY_COMPLETION_IN_PROGRESS),
       AsyncStorage.getItem(KEY_QWEN_CRASH_COUNT),
       AsyncStorage.getItem(KEY_QWEN_DISABLED),
+      AsyncStorage.getItem(KEY_TTS_IN_PROGRESS),
+      AsyncStorage.getItem(KEY_TTS_CRASH_COUNT),
     ]);
   } catch {
     // AsyncStorage failed — defensive default to "all clean, attempt ML."
@@ -155,6 +177,24 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     }
   }
 
+  // OTA-413 — voice (TTS) completion-crash detection. If the TTS breadcrumb
+  // survived to this boot, a voice utterance crashed the process last session.
+  let ttsCrashCount = Number.parseInt(ttsCrashCountStr ?? '0', 10);
+  if (!Number.isFinite(ttsCrashCount) || ttsCrashCount < 0) ttsCrashCount = 0;
+  let detectedTtsCrashThisBoot = false;
+  let lastTtsOpBeforeCrash: string | null = null;
+  if (ttsInProgress) {
+    detectedTtsCrashThisBoot = true;
+    ttsCrashCount += 1;
+    // The breadcrumb is `{"label":<voice>,"at":<iso>}`; surface the label.
+    try { lastTtsOpBeforeCrash = (JSON.parse(ttsInProgress) as { label?: string }).label ?? ttsInProgress; }
+    catch { lastTtsOpBeforeCrash = ttsInProgress; }
+    try {
+      await AsyncStorage.setItem(KEY_TTS_CRASH_COUNT, String(ttsCrashCount));
+      await AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS);
+    } catch { /* re-detected next launch if the write fails */ }
+  }
+
   cached = {
     lastAttemptAt: attempted,
     lastSuccessAt: succeeded,
@@ -164,6 +204,9 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     qwenCompletionCrashCount,
     qwenDisabledByCrash,
     detectedQwenCompletionCrashThisBoot,
+    ttsCrashCount,
+    detectedTtsCrashThisBoot,
+    lastTtsOpBeforeCrash,
   };
   return cached;
 }
@@ -195,6 +238,25 @@ export async function markQwenCompletionDone(): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS);
   } catch { /* ignore — re-detected only if a crash also occurs, which it didn't */ }
+}
+
+/** OTA-413 — call BEFORE each bundled-TTS utterance (neural synth + playback).
+ *  AWAITED so the breadcrumb is durably flushed before the native call; a SIGSEGV
+ *  mid-utterance then leaves it for the next boot to detect + NAME (the label is
+ *  the voice id). Best-effort. */
+export async function markTTSStart(label: string): Promise<void> {
+  try {
+    await AsyncStorage.setItem(KEY_TTS_IN_PROGRESS, JSON.stringify({ label, at: new Date().toISOString() }));
+  } catch { /* best effort — lose detection for this one utterance */ }
+}
+
+/** OTA-413 — call AFTER a TTS utterance finishes (success OR a JS-caught error —
+ *  either way the process survived, so it wasn't a native crash). Clears the
+ *  breadcrumb so a clean utterance is never counted. */
+export async function markTTSDone(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS);
+  } catch { /* ignore */ }
 }
 
 /**
@@ -251,6 +313,9 @@ export async function resetMLHealth(): Promise<void> {
       AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT),
       AsyncStorage.removeItem(KEY_QWEN_DISABLED),
       AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS),
+      // OTA-413 — also clear the voice (TTS) crash breadcrumb + count.
+      AsyncStorage.removeItem(KEY_TTS_CRASH_COUNT),
+      AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS),
     ]);
   } catch {
     // ignore
@@ -260,6 +325,9 @@ export async function resetMLHealth(): Promise<void> {
     cached.disabledByCrash = false;
     cached.qwenCompletionCrashCount = 0;
     cached.qwenDisabledByCrash = false;
+    cached.ttsCrashCount = 0;
+    cached.detectedTtsCrashThisBoot = false;
+    cached.lastTtsOpBeforeCrash = null;
   }
 }
 
@@ -299,6 +367,17 @@ export function mlHealthSummary(): string {
   } else {
     qwenStatus = `clean (no completion crashes)`;
   }
+  // OTA-413 — voice (TTS) crash line. Names voice as the culprit when a TTS
+  // breadcrumb survived a crash, so a native death during narration is no longer
+  // ambiguous with the Qwen path.
+  let ttsStatus: string;
+  if (state.detectedTtsCrashThisBoot) {
+    ttsStatus = `⚠ VOICE CRASH detected on previous launch (${state.ttsCrashCount} total)${state.lastTtsOpBeforeCrash ? ` — last voice: ${state.lastTtsOpBeforeCrash}` : ''}`;
+  } else if (state.ttsCrashCount > 0) {
+    ttsStatus = `${state.ttsCrashCount} voice crash(es) this install`;
+  } else {
+    ttsStatus = `clean (no voice crashes)`;
+  }
   return [
     `ML runtime health`,
     `  Status: ${status}`,
@@ -307,5 +386,6 @@ export function mlHealthSummary(): string {
     `  Last init success: ${state.lastSuccessAt ?? 'never'}`,
     `  Crashes-before-disable threshold: ${MAX_CRASHES_BEFORE_DISABLE}`,
     `  Qwen completion guard: ${qwenStatus}`,
+    `  Voice (TTS) guard: ${ttsStatus}`,
   ].join('\n');
 }
