@@ -13418,4 +13418,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (no conjuring metal from wood); real metal weapons still do. (2) Scrap Metal re-raritied
 // Uncommon → Common (sell 14 → ~5), matching the scrap engine's stated "one scrap ≈ one
 // common dig" design. The loop is now strictly no-better-than digging. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-423';
+// OTA-424 (Potassium Saponification) — [audit fix #6] bought gear no longer eaten as a
+// crafting/repair substitute. Bought weapons/armor are stored kind:'misc' (so they
+// stack), and isSubstitutable gated only on kind==='misc' — so an unequipped bought
+// sword (with a metal tag) was silently consumed to make, e.g., an Acid Flask, no
+// warning. isSubstitutable now also refuses any misc item whose name resolves to a real
+// weapon/armor catalog entry (findWeaponByName/findArmorByName) or that carries a coating.
+// Looted gear was already safe (stored with its real kind); raw materials never resolve
+// to a weapon/armor name, so legit substitution is unaffected. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-424';

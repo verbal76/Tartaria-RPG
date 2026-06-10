@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-424 — [audit #6] bought weapons/armor (stored kind:'misc') no longer eaten as a
+  // craft/repair substitute; isSubstitutable excludes name-resolved gear. Element #19: Potassium.
+  '2026-06-10-424': 'Potassium Saponification',
   // OTA-423 — [audit #5] close the craft→scrap TC/material pump (improvised weapons give
   // no Scrap Metal; Scrap Metal re-raritied Uncommon→Common). Element #18: Argon.
   '2026-06-10-423': 'Argon Welding',

@@ -321,6 +321,15 @@ function isSubstitutable(item: InventoryItem): boolean {
   if (item.kind !== 'misc') return false;
   if (item.stolen) return false;
   if (item.reservedForFusion) return false;
+  // OTA-424 — [audit fix #6] BOUGHT weapons/armor are stored kind:'misc' (so they
+  // stack), but they are NOT raw material. If the item's name resolves to a real
+  // weapon/armor catalog entry — or it carries a coating (a real weapon) — never
+  // auto-consume it as a craft/repair substitute. Pre-fix, an unequipped bought
+  // sword silently vanished into an Acid Flask. (Looted gear is already safe — it's
+  // stored with its real weapon/armor kind, which the kind!=='misc' guard catches;
+  // raw materials never resolve to a weapon/armor name.)
+  if (item.coating) return false;
+  if (findWeaponByName(item.name) || findArmorByName(item.name)) return false;
   return true;
 }
 

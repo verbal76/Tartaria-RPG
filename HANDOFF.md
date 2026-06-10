@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-424 "Potassium Saponification" — [audit fix #6] bought gear not eaten as
+  substitute** *(element #19)*. `isSubstitutable` now excludes misc items whose name
+  resolves to a real weapon/armor (`findWeaponByName`/`findArmorByName`) or that carry a
+  coating. `crafting.ts`. *(crossSystemRegressionStress "immediate-reload" test is a
+  PRE-EXISTING seeded flake — fails on the clean tree too, not this change.)*
 - **OTA-423 "Argon Welding" — [audit fix #5] close the craft→scrap pump** *(element
   #18)*. Improvised weapons no longer yield Scrap Metal (no metal-from-wood); Scrap Metal
   re-raritied Uncommon→Common (14→~5 TC). Loop now ≤ digging. `scrapEngine.ts`,
