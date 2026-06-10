@@ -807,7 +807,7 @@ export function TitleScreen() {
         <Image
           source={require('../../assets/splash-art.jpg')}
           style={styles.splashImage}
-          resizeMode="contain"
+          resizeMode="cover"
         />
         <View style={styles.splashBarWrap}>
           <View style={styles.splashBarTrack}>
@@ -1338,8 +1338,12 @@ export function TitleScreen() {
 
 const styles = StyleSheet.create({
   // OTA-468 — opening splash art + thin loading bar.
+  // OTA-470 — full-width, top-anchored splash art. The OTA-469 cover-image is a
+  // tall 941×1672 (close to a phone's aspect), so it fills the screen WIDTH with
+  // no side-crop (the title stays intact at the top) and leaves a small dark strip
+  // at the bottom for the loading bar — far less empty space than centered contain.
   splashContainer: { flex: 1, backgroundColor: '#0b0a09' },
-  splashImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
+  splashImage: { width: '100%', aspectRatio: 941 / 1672 },
   splashBarWrap: { position: 'absolute', left: 28, right: 28, bottom: 44, alignItems: 'center' },
   splashBarTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
   splashBarFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },

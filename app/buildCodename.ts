@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-470 — [UX] taller splash art + full-width top-anchored layout. Swapped in a phone-shaped 941×1672
+  // image; it now fills the full width (no side-crop, title intact), anchored top, with only a small dark
+  // strip at the bottom for the loading bar — far less empty space than OTA-469's centered contain. Element #65: Terbium.
+  '2026-06-10-470': 'Terbium Anneal',
   // OTA-469 — [UX] splash-art fit fix: OTA-468's "cover" cropped the sides on tall phones (cut off the
   // TARTARIA REALMS title); switched to "contain" so the whole image shows, letterboxed on the dark bg. Element #64: Gadolinium.
   '2026-06-10-469': 'Gadolinium Doping',

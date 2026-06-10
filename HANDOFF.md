@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-469 "Gadolinium Doping" — splash-art fit fix
->   (contain, no crop). 468 opening splash + loading bar; 467 golem stats; 466 golem
->   repair+naming; 465 whisper set-course; 464 reverted the 463 voice auto-disable.** The whole **OTA-457→469**
->   playtest batch (Tellurium Refining → Gadolinium Doping, elements 52–64) is published
+> - **LIVE (pushed 2026-06-10) = OTA-470 "Terbium Anneal" — taller phone-shaped splash
+>   art, full-width top-anchored (no crop, minimal letterbox). 468 opening splash + bar;
+>   467 golem stats; 466 golem repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→470**
+>   playtest batch (Tellurium Refining → Terbium Anneal, elements 52–65) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,12 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 / 466 / 467 / 468 / 469 committed below (post-batch follow-ups).**
+**OTA-465 / 466 / 467 / 468 / 469 / 470 committed below (post-batch follow-ups).**
 
+- **OTA-470 "Terbium Anneal" — [UX] taller splash art + full-width top-anchored layout** *(element #65)*.
+  Swapped in a phone-shaped 941×1672 image; fills full width (no side-crop, title intact), anchored top,
+  small dark strip at bottom for the bar. `splashImage` = `width:100% + aspectRatio 941/1672`. 308KB JPEG.
+  `TitleScreen.tsx`, `assets/splash-art.jpg`.
 - **OTA-469 "Gadolinium Doping" — [UX] splash-art fit fix** *(element #64)*. OTA-468's `cover` cropped the
   sides on tall phones (cut off the TARTARIA REALMS title); switched to `contain` so the whole image shows,
   letterboxed on the dark bg. `TitleScreen.tsx`. One-liner.

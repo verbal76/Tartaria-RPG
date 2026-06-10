@@ -13827,4 +13827,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "cover" filled the height and cropped the SIDES — slicing the "TARTARIA REALMS" title off the left edge.
 // Switched to resizeMode "contain" so the whole composition (title included) shows, letterboxed against
 // the dark splash background (#0b0a09, which blends with the moody art). One-line change. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-469';
+// OTA-470 (Terbium Anneal) — [UX] taller splash art + full-width top-anchored layout. Swapped the cover
+// image for a phone-shaped 941×1672 piece (aspect 0.56, close to the screen's 0.45) and changed the
+// layout: the art now fills the full WIDTH with no side-crop (title stays intact at top), anchored to the
+// top, leaving only a small dark strip at the bottom for the loading bar — far less empty space than
+// OTA-469's centered contain. splashImage is width:100% + aspectRatio 941/1672. Asset re-encoded to a
+// 308KB JPEG. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-470';
