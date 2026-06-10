@@ -45,50 +45,84 @@ export function canScrap(item: InventoryItem): boolean {
       'Scrap Metal', 'Stick', 'Small Rock', 'Big Rock', 'Patched Cloth',
       'Spider Silk', 'Aether Crystal', 'Aetheric Shard', 'Aether Residue',
       'Mud Fragment', 'Aether Mud',
+      // OTA-443 — the higher-tier mats scrap now produces are stock too, so a
+      // player can't scrap them back into a loop (Golem Core → Scrap Metal …).
+      'Golem Core', 'Mudstone', 'Aether Dust',
     ]);
     return !rawNames.has(item.name);
   }
   return false;
 }
 
+/** OTA-443 — scrap output scales with the scrapped item's rarity. A
+ *  better piece breaks down into MORE (and, on the secondary channels,
+ *  BETTER) stock — so clearing tougher gear actually feeds crafting +
+ *  golem-summoning, the bottleneck a playtester hit running from the
+ *  start to the first city. Common=+0 … Legendary=+3 on the primary
+ *  material. Sell value is unaffected (the commons stay Common); the
+ *  better mats only ever come from gear worth MORE than they sell for,
+ *  and crafting the higher-tier scrappables costs more of those mats
+ *  than scrapping returns — so the OTA-423 money pump stays closed. */
+function rarityScrapBonus(rarity: InventoryItem['rarity']): number {
+  switch (rarity) {
+    case 'Legendary': return 3;
+    case 'Rare': return 2;
+    case 'Uncommon': return 1;
+    default: return 0;
+  }
+}
+
 /** Derive the scrap output for an item. Tag-driven so any new item
  *  added to the catalog with sensible tags scraps cleanly without
- *  needing a manual mapping. */
+ *  needing a manual mapping. OTA-443 — yields 2–3+ REPRESENTATIVE
+ *  materials geared to crafting / repair / golem fuel, scaled by rarity. */
 export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   const tags = new Set((item.tags ?? []).map((t) => t.toLowerCase()));
   const grants: Array<{ name: string; quantity: number }> = [];
-  // Metal content → Scrap Metal. Bolt-casters / blades / armor plates
-  // all carry it.
-  // OTA-423 — [audit fix #5] an IMPROVISED weapon (a stick Club, a Stone Spear)
-  // carries no metal, so it must NOT yield Scrap Metal — that conjured metal from
-  // wood and, with Scrap Metal mispriced Uncommon, let a 1-Stick Club scrap for
-  // MORE than it cost: an infinite craft→scrap→sell TC pump. Real metal weapons
-  // (blade/metal/iron/plate, or a non-improvised weapon) still give it.
+  const rb = rarityScrapBonus(item.rarity);
+  const half = Math.floor(rb / 2);
+  // Metal content → Scrap Metal (the bulk), and on a Rare+ metal piece a
+  // GOLEM CORE — the Iron-Golem bottleneck — since a high-grade metal
+  // construct plausibly carries one. Representative: only metal gear.
+  // OTA-423 — an IMPROVISED weapon (a stick Club, a Stone Spear) carries no
+  // metal, so it must NOT yield Scrap Metal (that conjured metal from wood and,
+  // with Scrap Metal once mispriced Uncommon, let a 1-Stick Club scrap for more
+  // than it cost). Real metal weapons (blade/metal/iron/plate, or a
+  // non-improvised weapon) still give it.
   if (tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade')
       || (item.kind === 'weapon' && !tags.has('improvised'))) {
-    grants.push({ name: 'Scrap Metal', quantity: 1 });
+    grants.push({ name: 'Scrap Metal', quantity: 2 + rb });
+    if (rb >= 2) grants.push({ name: 'Golem Core', quantity: 1 });
   }
-  // Wooden handle / haft → Stick.
-  if (tags.has('wood') || tags.has('haft') || item.kind === 'weapon') {
-    grants.push({ name: 'Stick', quantity: 1 });
-  }
-  // Stone / mud heads → Small Rock.
-  if (tags.has('stone') || tags.has('mudstone') || tags.has('improvised')) {
-    grants.push({ name: 'Small Rock', quantity: 1 });
-  }
-  // Cloth / fiber → Patched Cloth.
-  if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || item.kind === 'armor') {
-    grants.push({ name: 'Patched Cloth', quantity: 1 });
-  }
-  // Aether content → Aetheric Shard. Relics + Aether-tagged gear.
+  // Aether content → Aetheric Shard + Aether Crystal (golem fuel), plus
+  // Aether Dust (the most-demanded recipe staple, otherwise unforageable) on
+  // Uncommon+ pieces. Relics + Aether-tagged gear.
   if (tags.has('aether') || tags.has('crystal') || item.kind === 'relic') {
-    grants.push({ name: 'Aetheric Shard', quantity: 1 });
+    grants.push({ name: 'Aetheric Shard', quantity: 2 + half });
+    grants.push({ name: 'Aether Crystal', quantity: 1 });
+    if (rb >= 1) grants.push({ name: 'Aether Dust', quantity: 1 });
+  }
+  // Stone / mud heads → Small Rock, and MUDSTONE (Mud-Golem fuel) from
+  // actually-muddy gear. Representative: only stone/mud pieces.
+  if (tags.has('stone') || tags.has('mudstone') || tags.has('improvised')) {
+    grants.push({ name: 'Small Rock', quantity: 2 + half });
+    if (tags.has('mud') || tags.has('mudstone')) grants.push({ name: 'Mudstone', quantity: 1 });
+  }
+  // Cloth / fiber → Patched Cloth, and SPIDER SILK (a 7-recipe fiber) from
+  // organic gear.
+  if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || item.kind === 'armor') {
+    grants.push({ name: 'Patched Cloth', quantity: 2 + half });
+    if (tags.has('organic')) grants.push({ name: 'Spider Silk', quantity: 1 });
+  }
+  // Wooden handle / haft → Stick (secondary on weapons; capped at 60 anyway).
+  if (tags.has('wood') || tags.has('haft') || item.kind === 'weapon') {
+    grants.push({ name: 'Stick', quantity: 1 + half });
   }
   // Fallback — every scrap should give SOMETHING, otherwise the
   // player wasted the click. A bare misc gives a Stick + Small Rock.
   if (grants.length === 0) {
-    grants.push({ name: 'Stick', quantity: 1 });
-    grants.push({ name: 'Small Rock', quantity: 1 });
+    grants.push({ name: 'Stick', quantity: 1 + half });
+    grants.push({ name: 'Small Rock', quantity: 2 + half });
   }
   // De-dupe — if both "weapon" and "metal" tags pushed Scrap Metal,
   // collapse to a single grant rather than 2.

@@ -367,6 +367,13 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-443 "Strontium Pyrotechny" — [playability] scrap overhaul** *(element #38)*. `scrapOutputFor`
+  yields 2–3+ representative, rarity-scaled mats geared to crafting/golem fuel (metal→Scrap Metal
+  +Golem Core on Rare+, aether→Aetheric Shard+Aether Crystal+Aether Dust, mud→Mudstone, organic→
+  Spider Silk). OTA-423 pump stays closed (commons cheap; better mats cost more to craft than scrap
+  returns). `scrapEngine.ts`. Covered by `__tests__/scrapEngine.test.ts`. **Part of the playability
+  pass** (start→first-city felt under-supplied): pairs with OTA-444 drop weights, 445 fusion tier,
+  446 early gear.
 - **OTA-442 "Rubidium Photoemission" — [audit fix #22] Capitals no longer samey** *(element #37)*.
   Each of the 9 Lost Capitals plays a distinct one-time arrival signature on first entry
   (`capitalArrivalSignature` + `worldMemory.capitalArrivalSeen`). `mainQuest.ts`, `gameStore.ts`.

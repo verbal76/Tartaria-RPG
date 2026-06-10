@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-443 — [playability] scrap overhaul: 2–3+ representative, rarity-scaled mats geared to
+  // crafting/golem fuel (metal→Scrap Metal+Golem Core, aether→Crystal+Dust, mud→Mudstone). Element #38: Strontium.
+  '2026-06-10-443': 'Strontium Pyrotechny',
   // OTA-442 — [audit #22] each of the 9 Lost Capitals plays a distinct one-time arrival signature
   // on first entry, so the set no longer feels samey while exploring. Element #37: Rubidium.
   '2026-06-10-442': 'Rubidium Photoemission',

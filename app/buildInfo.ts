@@ -13572,4 +13572,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // river that keeps pace with you; Iskan-Veil's maze of false doors that won't hold still in your
 // head; …). Fires once per Capital per character (worldMemory.capitalArrivalSeen), printed before
 // the gate hint so the place lands first. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-442';
+// OTA-443 (Strontium Pyrotechny) — [playability] scrap overhaul. Scrapping a weapon/armor gave one
+// or two bottom-tier mats, so a playtester who cleared the start area + walked to the first city
+// could barely craft or summon a golem. scrapOutputFor now yields 2–3+ REPRESENTATIVE materials
+// scaled by the scrapped item's rarity (Common +0 … Legendary +3 on the primary), and routes
+// crafting/golem-fuel mats by family: metal gear → Scrap Metal (+ a GOLEM CORE on Rare+, the
+// Iron-Golem bottleneck); aether gear → Aetheric Shard + Aether Crystal (+ Aether Dust, the
+// otherwise-unforageable recipe staple, on Uncommon+); mud/stone gear → Small Rock + MUDSTONE
+// (Mud-Golem fuel); organic gear → Patched Cloth + Spider Silk. An iron spear NEVER yields a
+// mudshard. The OTA-423 money pump stays closed: the bulk commons keep their low sell value, and
+// the better mats only come from gear worth more than they sell for (and the higher-tier
+// scrappables cost more of those mats to craft than scrapping returns). New mats are added to the
+// no-re-scrap guard. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-443';

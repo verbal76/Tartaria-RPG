@@ -76,3 +76,68 @@ describe('scrapOutputFor — every scrap yields at least one material', () => {
     expect(scrapEntries.length).toBe(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// OTA-443 — richer, rarity-scaled, representative, golem-geared scrap output
+// ---------------------------------------------------------------------------
+
+function mkR(name: string, kind: InventoryItem['kind'], rarity: InventoryItem['rarity'], tags: string[] = []): InventoryItem {
+  return { id: `t_${name}`, name, kind, rarity, quantity: 1, tags };
+}
+const qty = (out: { grants: { name: string; quantity: number }[] }, name: string) =>
+  out.grants.find((g) => g.name === name)?.quantity ?? 0;
+
+describe('OTA-443 — scrap yields more, scaled by rarity, geared to crafting', () => {
+  it('a Common metal weapon gives 2 Scrap Metal + a Stick (>=2 items)', () => {
+    const out = scrapOutputFor(mkR('Iron Spear', 'weapon', 'Common', ['metal', 'blade', 'weapon']));
+    expect(qty(out, 'Scrap Metal')).toBe(2);
+    expect(qty(out, 'Stick')).toBe(1);
+  });
+
+  it('higher rarity yields strictly more of the primary material', () => {
+    const common = scrapOutputFor(mkR('Blade', 'weapon', 'Common', ['metal', 'blade']));
+    const rare = scrapOutputFor(mkR('Blade', 'weapon', 'Rare', ['metal', 'blade']));
+    const legendary = scrapOutputFor(mkR('Blade', 'weapon', 'Legendary', ['metal', 'blade']));
+    expect(qty(rare, 'Scrap Metal')).toBeGreaterThan(qty(common, 'Scrap Metal'));
+    expect(qty(legendary, 'Scrap Metal')).toBeGreaterThan(qty(rare, 'Scrap Metal'));
+  });
+
+  it('a Rare+ metal piece yields a Golem Core (Iron-Golem fuel)', () => {
+    const rare = scrapOutputFor(mkR('Iron Cuirass', 'armor', 'Rare', ['metal', 'plate', 'armor']));
+    expect(qty(rare, 'Golem Core')).toBe(1);
+    // A Common metal piece does NOT.
+    const common = scrapOutputFor(mkR('Iron Cuirass', 'armor', 'Common', ['metal', 'plate', 'armor']));
+    expect(qty(common, 'Golem Core')).toBe(0);
+  });
+
+  it('aether gear yields Aether Crystal (golem fuel) + Aether Dust on Uncommon+', () => {
+    const out = scrapOutputFor(mkR('Aether Relic', 'relic', 'Rare', ['aether', 'crystal']));
+    expect(qty(out, 'Aetheric Shard')).toBeGreaterThanOrEqual(2);
+    expect(qty(out, 'Aether Crystal')).toBe(1);
+    expect(qty(out, 'Aether Dust')).toBe(1);
+  });
+
+  it('mud/stone gear yields Mudstone (Mud-Golem fuel)', () => {
+    const out = scrapOutputFor(mkR('Mudstone Maul', 'weapon', 'Uncommon', ['stone', 'mud', 'weapon']));
+    expect(qty(out, 'Mudstone')).toBe(1);
+  });
+
+  it('stays REPRESENTATIVE — an iron spear never yields mud or aether mats', () => {
+    const out = scrapOutputFor(mkR('Iron Spear', 'weapon', 'Rare', ['metal', 'blade', 'weapon']));
+    const names = out.grants.map((g) => g.name);
+    expect(names).not.toContain('Mudstone');
+    expect(names).not.toContain('Aether Crystal');
+    expect(names).not.toContain('Aetheric Shard');
+  });
+
+  it('preserves the OTA-423 guard — improvised weapons give no Scrap Metal', () => {
+    const out = scrapOutputFor(mkR('Stick Club', 'weapon', 'Common', ['wood', 'improvised', 'weapon']));
+    expect(qty(out, 'Scrap Metal')).toBe(0);
+  });
+
+  it('the new higher-tier mats cannot be re-scrapped (no loop)', () => {
+    expect(canScrap(mkR('Golem Core', 'misc', 'Rare', ['construct', 'aether']))).toBe(false);
+    expect(canScrap(mkR('Mudstone', 'misc', 'Rare', ['mud', 'stone']))).toBe(false);
+    expect(canScrap(mkR('Aether Dust', 'misc', 'Common', ['aether', 'dust']))).toBe(false);
+  });
+});
