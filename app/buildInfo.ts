@@ -13547,4 +13547,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // listing exactly what will be stripped; confirm re-dispatches the craft via a one-shot
 // craftSubConfirmedFor latch, cancel leaves the pack untouched. Recipes that use only exact-named
 // ingredients are unaffected. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-439';
+// OTA-440 (Bromine Debromination) — [audit fix #25] proactive save-size warning. The save blob
+// silently auto-trims at 100% of SAFE_BLOB_CHARS (800k) — shedding regenerable lore, old rooms,
+// then the scene — so the player never knew their save was bloating until things started
+// vanishing from the saved copy. persist() now surfaces a single in-feed 'system' heads-up the
+// first time the PRE-trim blob crosses 70% of the budget, advising the player to scrap/sell junk.
+// Light hysteresis (re-arms under 55%) lets a genuine later regrowth warn again. Session-scoped
+// flag (module-level, not persisted). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-440';

@@ -65,7 +65,7 @@ import {
   consumeSaveReclaimedFlag,
   type SlotSummary,
 } from '../engine/saveSystem';
-import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables } from '../engine/saveTrim';
+import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
@@ -2432,6 +2432,16 @@ const MAX_LOG_IN_MEMORY = 500;
 // already too big to save). Module-level so it counts across persist calls.
 const PERSIST_SIZE_SAMPLE_EVERY = 10;
 let persistSizeSampleCounter = 0;
+
+// OTA-440 — [audit #25] proactive save-size warning. trimSaveStateToFit only
+// acts at 100% of SAFE_BLOB_CHARS (and silently sheds data); the player never
+// learns their save is bloating until items start vanishing from the saved
+// copy. We surface a single in-feed heads-up the first time the pre-trim blob
+// crosses WARN fraction of the budget, with light hysteresis (re-arm once it
+// falls back under CLEAR) so a genuine later regrowth can warn again.
+const SAVE_SIZE_WARN_FRACTION = 0.70;
+const SAVE_SIZE_CLEAR_FRACTION = 0.55;
+let saveSizeWarnedThisSession = false;
 
 // arb-fix — which equip slot currently holds a given inventory-item id. Used
 // by the equipped-faction-catalyst fusion prompt to know which slot to free.
@@ -19574,6 +19584,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'debug',
         `persist: trimmed to fit (${trim.charsBefore}→${trim.charsAfter} chars; -${trim.tablesStripped} room tables, -${trim.roomsDropped} rooms${trim.memosCapped ? ', capped memos' : ''}${trim.sceneDropped ? ', dropped scene' : ''})`,
       );
+    }
+    // OTA-440 — [audit #25] proactive save-size heads-up. Warn once when the
+    // pre-trim blob crosses 70% of the budget, BEFORE the silent trim begins
+    // shedding rooms/scene at 100%. Re-arm if it falls back under 55%.
+    {
+      const pct = trim.charsBefore / SAFE_BLOB_CHARS;
+      if (pct >= SAVE_SIZE_WARN_FRACTION && !saveSizeWarnedThisSession) {
+        saveSizeWarnedThisSession = true;
+        get().appendLog(
+          'system',
+          `⚠ This character's save is getting large (${Math.round(pct * 100)}% of the safe size). The game auto-trims regenerable lore + old rooms to keep saving reliably, but consider scrapping or selling junk you don't need to keep your pack lean.`,
+        );
+      } else if (pct < SAVE_SIZE_CLEAR_FRACTION) {
+        saveSizeWarnedThisSession = false;
+      }
     }
     await saveSlot(activeSlotId, trim.state);
     // OTA-354 — persist health on-device, FAILURE-ONLY. saveSlot is atomic and

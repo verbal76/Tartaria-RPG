@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-440 "Bromine Debromination" — [audit fix #25] proactive save-size warning** *(element #35)*.
+  `persist()` surfaces a one-time in-feed heads-up when the pre-trim blob crosses 70% of
+  `SAFE_BLOB_CHARS`, before the silent auto-trim sheds rooms/scene; module-level session flag,
+  re-arms under 55%. `gameStore.ts`. Covered by `__tests__/saveSizeWarning.test.ts`.
 - **OTA-439 "Selenium Rectifying" — [audit fix #23] confirm before consuming craft substitutes**
   *(element #34)*. New `craftSubstitutionPrompt` modal (mirrors fusion-catalyst prompt) lists what
   will be stripped; `confirmCraftSubstitution` re-dispatches via one-shot `craftSubConfirmedFor`,

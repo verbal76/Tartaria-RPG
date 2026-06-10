@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-440 — [audit #25] one-time in-feed warning when the save blob crosses 70% of budget,
+  // before the silent auto-trim starts shedding rooms/scene. Element #35: Bromine.
+  '2026-06-10-440': 'Bromine Debromination',
   // OTA-439 — [audit #23] a craft that would consume material substitutes now asks first (modal),
   // instead of silently stripping a synthesized piece standing in for a named ingredient. Element #34: Selenium.
   '2026-06-10-439': 'Selenium Rectifying',
