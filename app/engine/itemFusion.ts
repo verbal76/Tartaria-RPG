@@ -225,7 +225,7 @@ function buildPrompt(
         '- acBonus 1–6 only. Higher only when the input pack is rich (5+ tags).',
         '- ONE resistance max, and only if a thematic tag (aether → aetheric, organic → poison) is present.',
         '- "special" is a single short clause; the engine does not parse it mechanically (yet).',
-        '- "rarity" should be "Legendary" only when the input pack spans 5+ material tags; otherwise "Rare".',
+        '- "rarity" should be "Legendary" when the input pack spans 4+ material tags; otherwise "Rare". A fused piece is always a premium, above-rare reward.',
         '- Optionally add "stealthBonus": 1–2 ONLY when the inputs include stealthy / silent / shadow / muffled gear (e.g. a shiv, cloak, footwraps) — it grants +Stealth while equipped. Omit otherwise.',
       ].join('\n'),
     },
@@ -420,8 +420,12 @@ export function synthesizeFusionDeterministic(
         : dominantTag === 'aether'
           ? 'weapon'
           : 'armor';
-  // Rarity scales with diversity. ≥5 tags = Legendary, else Rare.
-  const rarity: 'Rare' | 'Legendary' = tagProfile.length >= 5 ? 'Legendary' : 'Rare';
+  // OTA-445 — [playability] fusion is an INVESTMENT (collect + reserve 3+ inferred
+  // pieces + fire the Crucible), so the payoff should out-class anything you'd
+  // just find. Legendary now lands at 4+ tags (was 5+); the 3-tag floor is still
+  // Rare but its stats below are bumped ABOVE a same-rarity catalog piece. So a
+  // fused item is reliably "a level above rare."
+  const rarity: 'Rare' | 'Legendary' = tagProfile.length >= 4 ? 'Legendary' : 'Rare';
   // Name from a theme word + suffix. Deterministic via the input hash
   // so the same input set always produces the same name.
   const themePool: Record<string, string[]> = {
@@ -450,32 +454,40 @@ export function synthesizeFusionDeterministic(
   const themeIdx = Math.abs(hash) % theme.length;
   const suffixIdx = (hash >>> 4) % suffix.length;
   const name = `${theme[themeIdx]!} ${suffix[suffixIdx]!}`;
-  // Stats — deterministic, clamped.
+  // Stats — deterministic, clamped. OTA-445 — durability + power bumped so a
+  // fused piece beats a same-rarity catalog item (a catalog Rare weapon is 2d8;
+  // pre-OTA a fused Rare was a weak 1d8). Legendary fused = 2d8, Rare fused = 2d6.
   const baseStats: UniqueItemStats = {
     kind,
     rarity,
-    durability: { current: 30, max: 30 },
+    durability: rarity === 'Legendary' ? { current: 45, max: 45 } : { current: 35, max: 35 },
   };
+  const scale: UniqueItemStats['scalesWith'] =
+    dominantTag === 'aether' ? 'intelligence'
+    : dominantTag === 'metal' ? 'strength'
+    : 'dexterity';
   if (kind === 'weapon') {
-    // 1d6 / 1d8 / 2d6 by rarity. damageType + scaling stat by dominant tag.
-    const dice = rarity === 'Legendary' ? '2d6' : '1d8';
+    // OTA-445 — Legendary 2d8 / Rare 2d6 (was 2d6 / 1d8). damageType + scaling
+    // stat by dominant tag.
+    const dice = rarity === 'Legendary' ? '2d8' : '2d6';
     const dmgType: UniqueItemStats['damageType'] =
       dominantTag === 'aether' ? 'aetheric'
       : dominantTag === 'metal' ? 'slashing'
       : 'bludgeoning';
-    const scale: UniqueItemStats['scalesWith'] =
-      dominantTag === 'aether' ? 'intelligence'
-      : dominantTag === 'metal' ? 'strength'
-      : 'dexterity';
     baseStats.damageDice = dice;
     baseStats.damageType = dmgType;
     baseStats.scalesWith = scale;
   } else {
-    baseStats.acBonus = rarity === 'Legendary' ? 4 : 2;
+    // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
+    baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
     if (kind === 'armor') {
       baseStats.armorSlot = dominantTag === 'cloth' ? 'chest' : 'head';
     }
   }
+  // OTA-445 — a fused piece always carries a real perk: +2 (Legendary) / +1
+  // (Rare) to its scaling stat. A stealthy input set overrides this with the
+  // stealth bonus below (preserving the OTA-349 stealth-fusion path).
+  baseStats.statBonus = { stat: scale, amount: rarity === 'Legendary' ? 2 : 1 };
   // Resistance from dominant tag.
   const resistance =
     dominantTag === 'aether' ? 'aetheric'

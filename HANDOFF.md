@@ -367,6 +367,9 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-445 "Zirconium Crystal-Bar" — [playability] fusion output above-rare** *(element #40)*.
+  Legendary at 4+ tags (was 5+); fused weapons 2d6/2d8, armor AC+3/+5, durability 35/45, + a
+  guaranteed scaling-stat perk. `itemFusion.ts`. Covered by `__tests__/fusionDeterministicFallback.test.ts`.
 - **OTA-444 "Yttrium Garnet-Growth" — [playability] crafting-material drop weights** *(element #39)*.
   Aether Dust now forageable (@4, was 0); Aether Mud 6→8, Aether Crystal 4→7, Aetheric Shard 2→4;
   Mudstone added to Mud Boar + Mud Tortoise loot. Food/rocks untouched. `areaSearch.ts`,

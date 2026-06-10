@@ -91,19 +91,38 @@ describe('OTA-221 — deterministic fusion fallback', () => {
     }
   });
 
-  it('rarity is Legendary when 5+ tags are present', () => {
-    const r = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal', 'organic']);
-    expect(r.stats.rarity).toBe('Legendary');
+  // OTA-445 — fusion is an investment, so the payoff is above-rare. Legendary
+  // now lands at 4+ tags (was 5+); exactly 3 tags is the Rare floor.
+  it('rarity is Legendary when 4+ tags are present', () => {
+    const r4 = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal']);
+    expect(r4.stats.rarity).toBe('Legendary');
+    const r5 = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal', 'organic']);
+    expect(r5.stats.rarity).toBe('Legendary');
   });
 
-  it('rarity is Rare for 3-4 tags', () => {
+  it('rarity is Rare for exactly 3 tags', () => {
     const r = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised']);
     expect(r.stats.rarity).toBe('Rare');
   });
 
-  it('always sets durability to 30/30', () => {
-    const r = synthesizeFusionDeterministic(inputs, tagProfile);
-    expect(r.stats.durability).toEqual({ current: 30, max: 30 });
+  // OTA-445 — every fused piece carries a real perk and above-rare power.
+  it('fused gear is above-rare: a real perk + premium stats', () => {
+    const r = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal']);
+    expect(r.stats.statBonus).toBeDefined();
+    expect(r.stats.statBonus!.amount).toBeGreaterThanOrEqual(1);
+    if (r.stats.kind === 'weapon') {
+      // 2d6 (Rare) or 2d8 (Legendary) — never the old weak 1d8.
+      expect(r.stats.damageDice).toMatch(/^2d[68]$/);
+    } else {
+      expect(r.stats.acBonus).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('durability scales with rarity (35 Rare / 45 Legendary)', () => {
+    const rare = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised']);
+    expect(rare.stats.durability).toEqual({ current: 35, max: 35 });
+    const legendary = synthesizeFusionDeterministic(inputs, ['aether', 'cloth', 'improvised', 'metal']);
+    expect(legendary.stats.durability).toEqual({ current: 45, max: 45 });
   });
 
   it('description mentions the Crucible', () => {

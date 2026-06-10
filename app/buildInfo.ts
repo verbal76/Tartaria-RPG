@@ -13592,4 +13592,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // of two COMMON mud enemies (Mud Boar, Mud Tortoise). Food, mushrooms, and the (capped) rock/stick
 // weights are untouched, so discoveries + cooking are unaffected — only the material niche grows.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-444';
+// OTA-445 (Zirconium Crystal-Bar) — [playability] fusion output is now genuinely ABOVE-RARE. Fusing
+// is an investment (collect + reserve 3+ inferred pieces + fire the Crucible), but a fused Rare
+// weapon was a weak 1d8 — below a same-rarity catalog Rare (2d8). Now: Legendary lands at 4+ tags
+// (was 5+); fused weapons are 2d8 (Legendary) / 2d6 (Rare, up from 1d8); fused armor is AC +5/+3
+// (up from +4/+2); durability 45/35 (up from a flat 30); and EVERY fused piece carries a real perk
+// (+2/+1 to its scaling stat, unless a stealthy input set keeps the OTA-349 stealth bonus). The
+// Qwen synth prompt is updated to match. So the Crucible reliably pays out a premium, above-rare
+// reward. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-445';
