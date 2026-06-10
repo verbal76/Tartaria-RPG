@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-433 "Nickel Carbonyl" — [audit fix #19] golem retaliation scales with enemy damage**
+  *(element #28)*. Enemy swings vs a golem rolled a flat 1d6+1 regardless of tier, so a golem
+  immortally tanked bosses. Now rolls the enemy's real `enemy.damage` notation (fallback flat).
+  `gameStore.ts`. Covered by `__tests__/golemCompanion.test.ts`.
 - **OTA-432 "Cobalt Roasting" — [audit fix #15] word-boundary hook-noun matching** *(element #27)*.
   `matchHookNoun`/`matchAnyHookNoun` did raw substring (`t.includes(n) || n.includes(t)`), so a
   tiny fragment matched a longer noun and fired the wrong hook. Single-word nouns now match on

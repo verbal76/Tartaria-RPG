@@ -201,4 +201,37 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().player!.golem!.kind).toBe('aether_golem');
     });
   });
+
+  // OTA-433 — enemy retaliation against the golem rolls the enemy's REAL
+  // damage notation, not a flat 1d6+1 (max 7). A high-tier foe now hits the
+  // golem far harder than the old cap, so a summoned golem can't immortally
+  // tank a boss.
+  describe('OTA-433 — retaliation scales with enemy damage', () => {
+    it('a heavy-damage enemy deals more than the old flat 1d6+1 cap to the golem', async () => {
+      const store = await bootstrap();
+      // Beefy golem so it survives the hit and we can measure the loss.
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hp: 10000, hpMax: 10000 };
+      // A Core-Guardian-tier foe: huge damage notation + high ability point so
+      // its retaliation always lands (atk + AP >> golem AC 11), and enough HP
+      // that the golem's own swing can't kill it (which would skip retaliation).
+      const enemy = {
+        name: 'Apex Guardian', damage: '10d10', abilityPoint: 'Strength 40',
+        hp: 100000, type: 'construct', loot: [], rarity: 'Legendary', traits: [],
+      };
+      const scene = store.getState().currentScene!;
+      store.setState({
+        player: { ...store.getState().player!, golem },
+        currentScene: {
+          ...scene, enemies: [enemy as never], enemyHps: [100000], activeEnemyIdx: 0,
+          range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
+        },
+      });
+
+      await store.getState().submitPlayerAction('golem attack');
+
+      const after = store.getState().player!.golem!;
+      // 10d10 is at least 10 — comfortably above the old flat cap of 7.
+      expect(after.hp).toBeLessThanOrEqual(10000 - 8);
+    });
+  });
 });

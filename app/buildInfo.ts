@@ -13495,4 +13495,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "stone" → "stonework" still helps); multi-word nouns keep phrase containment; an exact target
 // always matches. Verified against the full hook/investigate/search suite (105 tests).
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-432';
+// OTA-433 (Nickel Carbonyl) — [audit fix #19] golem combat: an enemy's retaliation against a
+// summoned golem now rolls the enemy's REAL damage notation (the same `enemy.damage` the player
+// takes, gameStore ~21327) instead of a flat 1d6+1. Pre-OTA every foe — Mud Boar or Core
+// Guardian — chipped the golem for the same 1–7, so a golem was an immortal tank that
+// trivialized boss fights (summon a golem, send it in, the boss could never out-damage its HP).
+// A tier-appropriate roll makes the golem a real but expendable shield; falls back to the old
+// flat value only when the foe has no parseable damage. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-433';

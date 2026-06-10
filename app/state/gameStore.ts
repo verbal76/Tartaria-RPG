@@ -23167,7 +23167,13 @@ function handleGolemCommand(
   const golemAc = 11; // simple flat AC for golems
   const enemyHit = (enemyAtkRoll + enemyAtkBonus) >= golemAc;
   if (enemyHit) {
-    const enemyDmg = rollDie(6) + 1;
+    // OTA-433 — roll the enemy's REAL damage notation against the golem, the
+    // same `enemy.damage` the player takes (gameStore ~21327), instead of a flat
+    // 1d6+1. Pre-OTA every foe — Mud Boar or Core Guardian — chipped the golem
+    // for the same 1–7, so a summoned golem was an immortal tank that trivialized
+    // boss fights. A tier-appropriate roll makes the golem a real but expendable
+    // shield. Falls back to the old flat value if the foe has no parseable damage.
+    const enemyDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
     const newGolemHp = Math.max(0, golem.hp - enemyDmg);
     get().appendLog(
       'combat',
