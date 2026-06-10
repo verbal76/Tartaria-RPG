@@ -367,6 +367,9 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-452 "Silver Cupellation" — [playability] early-tile roadside-trader boost** *(element #47)*.
+  Roadside vendor spawn 0.50 → 0.25 decay over the first ~24 tiles (`recentTileHistory.length`), in
+  beginScene's vendor gate. `gameStore.ts`. (Formula verified; beginScene covered by integration suites.)
 - **OTA-451 "Palladium Sponge" — [playability] Mission Board in every Outpost** *(element #46)*.
   `currentScene.missionBoard {faction}` set by beginScene in `outpost_central` (vendor-free shared
   room); tappable chip → `readMissionBoard()` lists postings; accept/turn-in generalized to treat the

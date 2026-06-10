@@ -13653,4 +13653,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // postings + accept instructions in the feed. acceptFactionQuest / turnInFactionQuest now treat the
 // board as a quest SOURCE (no vendor required) — accept, gather, and turn in all work right at the
 // board. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-451';
+// OTA-452 (Silver Cupellation) — [playability] early-tile roadside-trader boost. The cadence report's
+// "go looking for work" dead zone is also fed by the wandering-vendor spawn (a flat 25% on outdoor
+// non-capital tiles). A new character now gets a BOOSTED roadside chance (0.50) that decays linearly
+// back to the 0.25 baseline over their first ~24 tiles (keyed off recentTileHistory.length), so the
+// opening reliably puts trade + quest contact in front of a player who sets out to find work — then
+// settles to baseline so the world isn't permanently flooded. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-452';

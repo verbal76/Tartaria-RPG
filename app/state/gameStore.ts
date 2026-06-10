@@ -3951,6 +3951,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const atCoreCapital = !opts?.isOpening && !hasEnemies && !hubRoom
       && !!player?.currentLocationId
       && (require('../engine/mainQuest').LOST_CAPITAL_LOCATIONS as readonly string[]).includes(player.currentLocationId);
+    // OTA-452 — warm up the early "go looking for a trader" loop. A new
+    // character sees a BOOSTED roadside-trader chance (0.50) that decays
+    // linearly back to the 0.25 baseline over their first ~24 tiles
+    // (recentTileHistory window). So the opening reliably puts trade + quest
+    // contact in front of a player who sets out specifically to find work,
+    // without permanently flooding the world with vendors.
+    const tilesSeen = player?.recentTileHistory?.length ?? 0;
+    const roadsideRate = tilesSeen >= 24 ? 0.25 : 0.5 - (0.25 * tilesSeen) / 24;
     const vendor: VendorInstance | null = ((): VendorInstance | null => {
       let base: VendorInstance | null = opts?.isOpening
         ? null
@@ -3958,9 +3966,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? (defeatedSet.has(hubRoom.anchorNpc)
               ? null
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
-          // OTA-411 — a capital never falls to the 25% roadside roll; it always
+          // OTA-411 — a capital never falls to the roadside roll; it always
           // gets a NAMED vendor below. Only NON-capital outdoor tiles roll roadside.
-          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < 0.25 ? pickRoadsideTrader() : null);
+          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? pickRoadsideTrader() : null);
       // OTA-410/411 — capital named-vendor greeting. RNG-rolled which non-defeated
       // VENDORS entry arrives, re-rolled each arrival (intended). Always fires at a
       // capital (the roadside roll above is suppressed there), so a capital begin-

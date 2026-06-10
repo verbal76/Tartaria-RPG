@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-452 — [playability] early-tile roadside-trader boost: 0.50 spawn decaying to the 0.25 baseline
+  // over a new character's first ~24 tiles, warming the opening's trade/quest contact. Element #47: Silver.
+  '2026-06-10-452': 'Silver Cupellation',
   // OTA-451 — [playability] a Mission Board in every Outpost's central square (vendor-free room) posts
   // the faction's contracts; tappable chip + readMissionBoard; accept/turn-in work at the board. Element #46: Palladium.
   '2026-06-10-451': 'Palladium Sponge',
