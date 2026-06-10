@@ -2180,19 +2180,19 @@ interface GameStore {
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
-  turnInFactionQuest: (titleOrId: string) => void;
+  turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
   acceptHunt: (titleOrId: string) => void;
   advanceHunt: (huntId: string) => void;
-  turnInHunt: (titleOrId: string) => void;
+  turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
-  turnInMystery: (titleOrId: string) => void;
+  turnInMystery: (titleOrId: string, remote?: boolean) => void;
   acceptStoryline: (titleOrId: string) => void;
   advanceStoryline: (storylineId: string) => void;
-  turnInStoryline: (titleOrId: string) => void;
+  turnInStoryline: (titleOrId: string, remote?: boolean) => void;
   /** OTA 020 — Contracts-screen one-tap completion. Skips the
    *  vendor-proximity gate the normal turn-in handlers enforce
    *  (the player tapped the card on purpose, they don't need to
@@ -11989,17 +11989,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const lower = target.toLowerCase();
+        // OTA-456 — "send word <quest>" / "courier <quest>" is a REMOTE turn-in:
+        // it works from anywhere for a 15% TC cut on DEED quests (hunts /
+        // mysteries / storylines / faction quests without a fetch). FETCH quests
+        // refuse it (you carry the goods — deliver in person). Detected off the
+        // raw verb the player used.
+        const remote = /\b(send word|courier|send a runner)\b/i.test(trimmed);
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
         const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
         const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path/.test(lower);
         if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
-          get().turnInStoryline(target);
+          get().turnInStoryline(target, remote);
         } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
-          get().turnInMystery(target);
+          get().turnInMystery(target, remote);
         } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
-          get().turnInHunt(target);
+          get().turnInHunt(target, remote);
         } else {
-          get().turnInFactionQuest(target);
+          get().turnInFactionQuest(target, remote);
         }
         break;
       }
@@ -15113,15 +15119,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInFactionQuest(titleOrId) {
+  turnInFactionQuest(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
     // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
+    // OTA-456 — or REMOTELY by courier ("send word <quest>") from anywhere, for a
+    // 15% TC cut (full rep). Travel to claim in full stays the optimal play.
     const turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
     const turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
-    if (!turnFaction || !turnSourceName) {
+    if (!remote && (!turnFaction || !turnSourceName)) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
       // back to listing the factions they owe across all active quests.
@@ -15130,7 +15138,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = namedHint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — to turn it in."`,
+          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — to turn it in for full pay. Or 'send word ${namedHint.contractTitle.toLowerCase()}' to courier it now for a smaller cut."`,
         );
         return;
       }
@@ -15158,7 +15166,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : `a vendor from one of: ${lines.join('; ')}`;
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "Find ${list} to turn that contract in."`,
+          `The Arbiter waves. "Find ${list} to turn that contract in for full pay — or 'send word <name>' to courier it now for a smaller cut."`,
         );
       } else {
         get().appendLog(
@@ -15168,6 +15176,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
+    // OTA-456 — the agent name shown in the flow. Remote turn-ins have no vendor
+    // present, so a "runner" stands in.
+    const sourceLabel = turnSourceName ?? 'A runner';
     const active = player.activeFactionQuestIds ?? [];
     // Direct id, then fuzzy title across active list.
     const direct = findFactionQuestById(titleOrId);
@@ -15178,14 +15189,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!candidate || !active.includes(candidate.id)) {
       get().appendLog(
         'arbiter',
-        `${turnSourceName} doesn't list that one on your active slate.`,
+        `${sourceLabel} doesn't list that one on your active slate.`,
       );
       return;
     }
-    if (candidate.factionId !== turnFaction) {
+    // OTA-456 — a courier always carries it to the RIGHT faction, so the
+    // wrong-faction refusal only applies when turning in at a vendor/board.
+    if (!remote && candidate.factionId !== turnFaction) {
       get().appendLog(
         'arbiter',
-        `${turnSourceName} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}.`,
+        `${sourceLabel} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}.`,
+      );
+      return;
+    }
+    // OTA-456 — HYBRID remote rule. A FETCH quest is a physical delivery: you
+    // carry the goods, so it can't be couriered by word of mouth — it must be
+    // handed over in person (board or any same-faction agent). Deed quests
+    // (kill / travel / stage) CAN be sent word remotely below.
+    if (remote && candidate.fetch) {
+      const fLabel = FACTIONS.find((f) => f.id === candidate.factionId)?.name ?? candidate.factionId.replace(/_/g, ' ');
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "${candidate.title} is a delivery — ${candidate.fetch.quantity}× ${candidate.fetch.itemName} doesn't travel by word of mouth. Carry it to the board or any ${fLabel} agent yourself."`,
       );
       return;
     }
@@ -15199,7 +15224,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (currentStage < candidate.stages.length) {
         get().appendLog(
           'arbiter',
-          `${turnSourceName}: "${candidate.title}" isn't done — you're on step ${currentStage + 1} of ${candidate.stages.length}. Come back when the work's behind you.`,
+          `${sourceLabel}: "${candidate.title}" isn't done — you're on step ${currentStage + 1} of ${candidate.stages.length}. Come back when the work's behind you.`,
         );
         return;
       }
@@ -15215,7 +15240,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (have < quantity) {
         get().appendLog(
           'arbiter',
-          `${turnSourceName} checks the slate: "${candidate.title}" needs ${quantity}× ${itemName} — you've brought ${have}. Come back when you've got the rest.`,
+          `${sourceLabel} checks the slate: "${candidate.title}" needs ${quantity}× ${itemName} — you've brought ${have}. Come back when you've got the rest.`,
         );
         return;
       }
@@ -15230,14 +15255,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((i) => (i.quantity ?? 1) > 0);
       set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
     }
-    // Pay out reward + record completion.
+    // Pay out reward + record completion. OTA-456 — a remote "send word" turn-in
+    // pays a runner to carry the report, so it takes a 15% TC cut (full rep);
+    // turning in face-to-face pays in full.
+    const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.85)) : candidate.reward.tc;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.reward.rep);
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
-              tc: s.player.tc + candidate.reward.tc,
+              tc: s.player.tc + payTc,
               factionStanding: repResult.standing,
               activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => id !== candidate.id),
               activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== candidate.id),
@@ -15246,9 +15274,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    const fLabel = candidate.factionId.replace(/_/g, ' ');
     get().appendLog(
       'reward',
-      `✦ Faction contract complete — ${candidate.title}. +${candidate.reward.tc} TC, +${candidate.reward.rep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+      remote
+        ? `✦ Sent word — ${candidate.title} closed by courier. +${payTc} TC (runner's cut taken), +${candidate.reward.rep} rep with ${fLabel}.`
+        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${candidate.reward.rep} rep with ${fLabel}.`,
     );
     logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
@@ -15508,15 +15539,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInHunt(titleOrId) {
+  turnInHunt(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need someone to pay you. Find a vendor."`);
+    // OTA-456 — a HUNT is a deed (the trophy is the proof), so it can be sent
+    // word remotely for a 15% TC cut; in person pays in full.
+    if (!remote && !scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need someone to pay you. Find a vendor — or 'send word <name>' to courier the trophy in for a smaller cut."`);
       return;
     }
+    const sourceLabel = scene?.vendor?.name ?? 'A runner';
     const active = player.activeHunts ?? [];
     const direct = findHuntById(titleOrId);
     const candidate = direct ?? fuzzyFindHunt(
@@ -15524,25 +15558,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       active.map((r) => findHuntById(r.id)).filter((h): h is NonNullable<typeof h> => !!h),
     );
     if (!candidate) {
-      get().appendLog('arbiter', `${scene.vendor.name} squints. "That hunt is not on your slate."`);
+      get().appendLog('arbiter', `${sourceLabel} squints. "That hunt is not on your slate."`);
       return;
     }
     const record = active.find((h) => h.id === candidate.id);
     if (!record) {
-      get().appendLog('arbiter', `${scene.vendor.name} squints. "That hunt is not on your slate."`);
+      get().appendLog('arbiter', `${sourceLabel} squints. "That hunt is not on your slate."`);
       return;
     }
     if (record.stage < candidate.stages.length) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} reads your face. "The trophy is the proof. You don't have it yet."`,
+        `${sourceLabel} reads your face. "The trophy is the proof. You don't have it yet."`,
       );
       return;
     }
-    if (candidate.factionId && candidate.factionId !== scene.vendor.faction) {
+    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
       );
       return;
     }
@@ -15585,12 +15619,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
-              tc: s.player.tc + candidate.rewardTc,
+              tc: s.player.tc + payTc,
               inventory: newInventory,
               factionStanding: repResult.standing,
               activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== candidate.id),
@@ -15601,7 +15636,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     get().appendLog(
       'reward',
-      `✦ Hunt complete — ${candidate.title}. +${candidate.rewardTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
+      remote
+        ? `✦ Sent word — Hunt closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken)${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy carried back.`
+        : `✦ Hunt complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
     applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -15773,15 +15810,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInMystery(titleOrId) {
+  turnInMystery(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor."`);
+    // OTA-456 — a mystery is a deed (the artifact is the proof), so it can be
+    // sent word remotely for a 15% TC cut; in person pays in full.
+    if (!remote && !scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor — or 'send word <name>' to courier it in for a smaller cut."`);
       return;
     }
+    const sourceLabel = scene?.vendor?.name ?? 'A runner';
     const active = player.activeMysteries ?? [];
     const direct = findMysteryById(titleOrId);
     const candidate = direct ?? fuzzyFindMystery(
@@ -15789,25 +15829,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       active.map((r) => findMysteryById(r.id)).filter((m): m is NonNullable<typeof m> => !!m),
     );
     if (!candidate) {
-      get().appendLog('arbiter', `${scene.vendor.name} squints. "That mystery is not on your slate."`);
+      get().appendLog('arbiter', `${sourceLabel} squints. "That mystery is not on your slate."`);
       return;
     }
     const record = active.find((m) => m.id === candidate.id);
     if (!record) {
-      get().appendLog('arbiter', `${scene.vendor.name} squints. "That mystery is not on your slate."`);
+      get().appendLog('arbiter', `${sourceLabel} squints. "That mystery is not on your slate."`);
       return;
     }
     if (record.stage < candidate.stages.length) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} reads your face. "The artifact is the proof. You don't have it yet."`,
+        `${sourceLabel} reads your face. "The artifact is the proof. You don't have it yet."`,
       );
       return;
     }
-    if (candidate.factionId && candidate.factionId !== scene.vendor.faction) {
+    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that."`,
+        `${sourceLabel} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that."`,
       );
       return;
     }
@@ -15845,12 +15885,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
-              tc: s.player.tc + candidate.rewardTc,
+              tc: s.player.tc + payTc,
               inventory: newInventory,
               factionStanding: repResult.standing,
               activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== candidate.id),
@@ -15861,7 +15902,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     get().appendLog(
       'reward',
-      `✦ Mystery complete — ${candidate.title}. +${candidate.rewardTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
+      remote
+        ? `✦ Sent word — Mystery closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken)${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`
+        : `✦ Mystery complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -15996,15 +16039,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  turnInStoryline(titleOrId) {
+  turnInStoryline(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent."`);
+    // OTA-456 — a storyline is a deed arc, so it can be sent word remotely for a
+    // 15% TC cut; in person pays in full.
+    if (!remote && !scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent — or 'send word <name>' to courier it in for a smaller cut."`);
       return;
     }
+    const sourceLabel = scene?.vendor?.name ?? 'A runner';
     const active = player.activeStorylines ?? [];
     const direct = findStorylineById(titleOrId);
     const candidate = direct ?? fuzzyFindStoryline(
@@ -16012,18 +16058,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       active.map((r) => findStorylineById(r.id)).filter((s): s is NonNullable<typeof s> => !!s),
     );
     if (!candidate) {
-      get().appendLog('arbiter', `${scene.vendor.name} squints. "Not on your slate."`);
+      get().appendLog('arbiter', `${sourceLabel} squints. "Not on your slate."`);
       return;
     }
     const record = active.find((s) => s.id === candidate.id);
     if (!record) {
-      get().appendLog('arbiter', `${scene.vendor.name} squints. "Not on your slate."`);
+      get().appendLog('arbiter', `${sourceLabel} squints. "Not on your slate."`);
       return;
     }
     if (record.stage < candidate.stages.length) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} reads your face. "Storyline isn't finished. Come back."`,
+        `${sourceLabel} reads your face. "Storyline isn't finished. Come back."`,
       );
       return;
     }
@@ -16031,10 +16077,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // storyline ever ships with factionId=null (none currently do,
     // but schema allows it) the old bare !== check would reject
     // every vendor; the && short-circuits that.
-    if (candidate.factionId && candidate.factionId !== scene.vendor.faction) {
+    if (!remote && candidate.factionId && candidate.factionId !== scene?.vendor?.faction) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+        `${sourceLabel} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
       );
       return;
     }
@@ -16049,13 +16095,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           tags: storyRewardLookup.tags,
         })]
       : [...player.inventory];
+    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
-              tc: s.player.tc + candidate.rewardTc,
+              tc: s.player.tc + payTc,
               inventory: newInventory,
               factionStanding: repResult.standing,
               activeStorylines: (s.player.activeStorylines ?? []).filter((rec) => rec.id !== candidate.id),
@@ -16066,7 +16113,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     get().appendLog(
       'reward',
-      `✦ Storyline complete — ${candidate.title}. +${candidate.rewardTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+      remote
+        ? `✦ Sent word — Storyline closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken), +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`
+        : `✦ Storyline complete — ${candidate.title}. +${payTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
     applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');

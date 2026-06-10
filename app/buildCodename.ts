@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-456 — [playability] hybrid remote turn-in: deed quests (hunts/mysteries/storylines/non-fetch
+  // faction quests) can "send word" from anywhere for a 15% TC cut; FETCH quests must deliver in person. Element #51: Antimony.
+  '2026-06-10-456': 'Antimony Liquation',
   // OTA-455 — [playability] first-steps flee grace: a brand-new character's failed escape is fudged to
   // a bare win-by-one for the first 3 steps (with a "barely escaped" Arbiter line), so no green-player
   // death-trap on step one; the flee stays a real roll after that. Element #50: Tin.

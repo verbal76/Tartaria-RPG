@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-456 "Antimony Liquation" — [playability] hybrid remote turn-in** *(element #51)*. Deed quests
+  (hunts/mysteries/storylines/non-fetch faction quests) can "send word"/"courier" from anywhere for a
+  15% TC cut (full rep); FETCH quests refuse it (deliver in person). All 4 turn-in handlers take a
+  `remote` flag; parser routes the verbs. `gameStore.ts`, `parser.ts`. Covered by `starterFetchQuests.test.ts`.
 - **OTA-455 "Tin Cry" — [playability] first-steps flee grace** *(element #50)*. A brand-new character's
   FAILED escape is fudged to a bare win-by-one for the first 3 wasteland steps (`fleeGraceApplies`,
   `recentTileHistory ≤ 3`) with a "barely escaped" Arbiter line — no green-player death-trap on step

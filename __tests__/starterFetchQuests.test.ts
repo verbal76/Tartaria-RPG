@@ -108,4 +108,34 @@ describe('OTA-450 — starter fetch quests', () => {
     expect(p.completedFactionQuestIds).toContain('fq_reclaimers_starter');
     expect(p.tc).toBe(tcBefore + 35);
   });
+
+  it('OTA-456 — a FETCH quest CANNOT be couriered (must deliver in person)', async () => {
+    const factionId = 'reclaimers_guild';
+    const store = await boot('Hauler', factionId);
+    // No vendor, no board — out in the field with the goods in hand.
+    store.setState((s) => ({
+      currentScene: { ...s.currentScene!, vendor: null, missionBoard: null },
+      player: { ...s.player!, inventory: [
+        ...s.player!.inventory,
+        { id: 'sm', name: 'Scrap Metal', kind: 'misc', quantity: 5, tags: ['metal'] },
+      ] },
+    }));
+    // Accept needs a source; give a board just to accept, then strip it.
+    store.setState((s) => ({ currentScene: { ...s.currentScene!, missionBoard: { faction: factionId } } }));
+    store.getState().acceptFactionQuest('Scrap Run');
+    store.setState((s) => ({ currentScene: { ...s.currentScene!, missionBoard: null } }));
+
+    const tcBefore = store.getState().player!.tc;
+    // Try to courier it remotely — refused; it's a delivery.
+    store.getState().turnInFactionQuest('Scrap Run', true);
+
+    const p = store.getState().player!;
+    expect(p.activeFactionQuestIds).toContain('fq_reclaimers_starter'); // still active
+    expect(p.completedFactionQuestIds ?? []).not.toContain('fq_reclaimers_starter');
+    expect(p.tc).toBe(tcBefore);                                        // no reward
+    const sm = p.inventory.filter((i) => i.name === 'Scrap Metal').reduce((n, i) => n + i.quantity, 0);
+    expect(sm).toBe(5);                                                 // items NOT consumed
+    const log = store.getState().gameLog.map((l) => l.text).join('\n');
+    expect(log).toMatch(/delivery|by word of mouth|in person|yourself/i);
+  });
 });

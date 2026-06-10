@@ -171,7 +171,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // active anyway, but the synonym kept dragging unrelated lines into
   // the accept path.
   accept: ['accept', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'aye'],
-  turn_in: ['turn in', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
+  turn_in: ['turn in', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in', 'send word', 'courier', 'send a runner'],
   dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow', 'tunnel', 'mine', 'spade', 'pry'],
   // OTA 004 — Phase 3 water bottles. Most fills are typed as
   // "fill bottle" / "fill the bottle from puddle" etc.; the handler

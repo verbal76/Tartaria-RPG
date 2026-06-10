@@ -13684,4 +13684,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // taken severe damage… get yourself some gear before you press your luck again."). After 3 steps the
 // roll stands on its own and a failed flee provokes the OTA-372 attack of opportunity as before.
 // Logic in combatRules.fleeGraceApplies. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-455';
+// OTA-456 (Antimony Liquation) — [playability] HYBRID remote turn-in ("send word" / "courier
+// <quest>"). A FETCH quest is a physical delivery — it must be handed over IN PERSON (board or any
+// same-faction agent); couriering it is refused ("doesn't travel by word of mouth"). A DEED quest
+// (kill / objective — hunts, mysteries, storylines, and faction quests WITHOUT a fetch) can be sent
+// word from ANYWHERE for full rep + a 15% TC cut (a runner carries the report/trophy); turning in
+// face-to-face still pays in full, so travel stays the optimal play. All four turn-in handlers take
+// an optional `remote` flag; the parser routes "send word"/"courier"/"send a runner" through turn_in
+// with remote=true. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-456';
