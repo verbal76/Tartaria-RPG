@@ -1125,13 +1125,25 @@ function acceptKeyword(title: string): string {
 // guard then refuses to write it back if it's missing core identity)
 // instead of failing the load to .bak / a slot-load error.
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
+  let out: PlayerCharacter;
   try {
-    return backfillPlayerInner(p);
+    out = backfillPlayerInner(p);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
-    return p;
+    out = p;
   }
+  // OTA-416 — a LIVE character can never legitimately sit at hp<=0 (that IS
+  // death; death is gated by the `dead` flag, not by hp). If a save loads
+  // alive-but-zeroed — e.g. a crash interrupted the death sequence before
+  // `dead=true` committed, or a bad mid-combat write — restore HP + stamina so
+  // the player never resumes / resurrects at 0 HP. Can't mask a real death
+  // (those carry dead=true and are gated out of the load paths entirely).
+  if (!out.dead && (out.hp ?? 0) <= 0) {
+    const safeMax = out.hpMax && out.hpMax > 0 ? out.hpMax : 1;
+    out = { ...out, hp: safeMax, stamina: out.staminaMax ?? out.stamina ?? 0 };
+  }
+  return out;
 }
 
 function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
@@ -3016,7 +3028,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // may not), drop the player back into it exactly as it was — no
       // Arbiter rehash, no fresh weather roll, no re-spawned enemies.
       // Resume is player-first: they take the next action.
-      const restoredScene = (saved.currentScene ?? null) as CurrentScene | null;
+      let restoredScene = (saved.currentScene ?? null) as CurrentScene | null;
+      // OTA-416 — interrupted-death recovery. A crash DURING the death sequence
+      // (hp zeroed, but `dead=true` not yet committed) loads an "alive" character
+      // at 0 HP. backfillPlayer's guard already restored their HP; here we ALSO
+      // drop the scene they died in — e.g. an active Core Guardian fight — so they
+      // don't resume one tick from re-death, and we narrate it below as the
+      // revival it is rather than a casual "welcome back" (the mismatch the
+      // player flagged: a killing blow, then "Welcome back" in the same fight).
+      // (`dead === true` is already returned out above, so an alive 0-HP save
+      // here is the interrupted-death state.)
+      const wasInterruptedDeath = (saved.player.hp ?? 0) <= 0;
+      if (wasInterruptedDeath) restoredScene = null;
       // Refresh ambientNouns from the canonical source. Prefer the
       // authored location.interactables list when present; fall back
       // to extractAmbientNouns(description) otherwise. Older saves
@@ -3179,6 +3202,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {
         get().beginScene();
+        // OTA-416 — narrate the interrupted-death case as a revival, not silence.
+        if (wasInterruptedDeath) {
+          const here = get().currentScene?.location?.name ?? 'Tartaria';
+          get().appendLog(
+            'reward',
+            `✦ You claw back from the brink — the Aetherstone hauls the breath back into you. Restored, you stand again in ${here}.`,
+            { skipDedup: true },
+          );
+        }
       } else {
         // Drop a small "back to the world" cue so the player can orient
         // without a fresh narration block dominating the feed. Just the
@@ -3224,7 +3256,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // loadSlotIntoGame calls within the same app session but
       // resets on JS reload (cold start gets a fresh hello).
       const now = Date.now();
-      if (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS) {
+      // OTA-416 — skip the casual "welcome back" on an interrupted-death revival;
+      // the revival line above already greeted the player, and "welcome back"
+      // reads wrong right after a death.
+      if (!wasInterruptedDeath && (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS)) {
         // OTA-184 — ~1/3 of welcomes use the player's name instead
         // of "friend" so the Arbiter occasionally sounds personal.
         const addr = arbiterAddress(get().player, 'friend');

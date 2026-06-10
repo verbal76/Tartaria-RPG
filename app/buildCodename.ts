@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-416 — never revive at 0 HP: backfillPlayer restores HP on an alive-but-
+  // zeroed load (interrupted-death from a crash) + resume drops the lost combat
+  // scene and narrates a revival. Element #11: Sodium.
+  '2026-06-10-416': 'Sodium Amalgamation',
   // OTA-415 — move the save self-heal recovery line off the player-facing feed to
   // the debug channel (was dev-speak in the world feed). Element #10: Neon.
   '2026-06-10-415': 'Neon Liquefaction',

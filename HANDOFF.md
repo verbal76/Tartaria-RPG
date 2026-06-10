@@ -367,6 +367,16 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-416 "Sodium Amalgamation" — never revive at 0 HP** *(element #11)*. Player
+  (screenshot): "I was revived with 0 hit points" + the feed showed a killing blow then
+  "Welcome back" in the same fight. A crash DURING death persisted `hp=0` with `dead`
+  uncommitted; the resume loaded the alive-0-HP character back into the Core Guardian
+  fight. **(1)** `backfillPlayer` restores HP on any alive-but-`hp<=0` load (impossible
+  state — death is gated by the `dead` flag, not hp). **(2)** `loadSlotIntoGame` drops
+  the stale combat scene (fresh `beginScene`) + narrates a revival instead of "Welcome
+  back". `gameStore.ts`; `interruptedDeathRevive.test.ts` (1). *(The "mismatched plot
+  hooks" the player mentioned = this death→welcome-back narrative mismatch; if they meant
+  a separate hook issue, ask for specifics.)*
 - **OTA-415 "Neon Liquefaction" — save self-heal line no longer player-facing**
   *(element #10)*. Player (screenshot): "that event shouldn't be player facing." OTA-406's
   *"Storage was full from an old diagnostic log…"* was on the `system` channel (shows in

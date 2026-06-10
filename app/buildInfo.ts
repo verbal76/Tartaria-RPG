@@ -13347,4 +13347,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // channel, which renders in the world feed — dev-speak that breaks immersion. Moved to
 // the 'debug' channel (HIDDEN_CHANNELS in AdventureFeed → never shown in the feed, only
 // in the exported diagnostic log). The save still self-heals silently. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-415';
+// OTA-416 (Sodium Amalgamation) — never revive at 0 HP (interrupted-death recovery).
+// Player (screenshot): "I was revived with 0 hit points" — and flagged the feed showing
+// a killing blow then a casual "Welcome back" in the same fight. A crash DURING the
+// death sequence (the app died ~5s after "You fall") persisted hp=0 with `dead=true`
+// not yet committed; the resume loaded that "alive" 0-HP character straight back into
+// the Core Guardian fight. Fixes: (1) backfillPlayer now guards every load path — an
+// alive character with hp<=0 is an impossible state (death is gated by the `dead` flag,
+// not hp), so HP + stamina are restored. (2) loadSlotIntoGame detects the alive-but-
+// 0-HP save, DROPS the stale combat scene (fresh beginScene — no resuming the fight you
+// just lost) and narrates a revival ("✦ You claw back from the brink…") instead of the
+// mismatched "Welcome back". JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-416';
