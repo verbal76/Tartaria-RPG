@@ -13531,4 +13531,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // recordNothingSearch) gives NOTHING_SEARCH_CAP=2 grace retries, then consumes the noun (adds it
 // to searchedAmbientNouns) so the next search hits the hard "already searched" guard. Applied to
 // the primary `search <noun>` forage path. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-437';
+// OTA-438 (Arsenic Sublimation) — [audit fix #21] close the wild-tile encounter farm. Wasteland
+// encounters rolled on `wastelandStepsSinceEncounter` alone, with no per-tile memory — so
+// oscillating between two adjacent tiles (each step ticking past the 1–2 step threshold) farmed
+// unlimited encounters and their loot/TC without ever covering new ground. The roll is now gated
+// on tile NOVELTY: an encounter only fires on a tile NOT in the 50-wide recentTileHistory window
+// (reusing the OTA-057/138 novelty infra). `wasteSteps` still accrues on revisits, so genuine
+// forward travel pays out the banked danger. The intended wild-tile loot RE-ROLL ("theme-park
+// density") is untouched — only the repeatable encounter spawn is gated. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-438';

@@ -17086,7 +17086,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? { player: { ...s.player, pendingDirectionalFind: undefined } }
           : s);
       }
-      const enc = pickWastelandEncounter(liveSceneForEncounter.location, {
+      // OTA-438 — [audit #21] only roll a wasteland encounter on a NOVEL tile
+      // (one not in the 50-tile recentTileHistory window). Pre-OTA the roll
+      // depended only on `wasteSteps`, so oscillating between two adjacent tiles
+      // (each step ticking wasteSteps past the 1–2 threshold) farmed unlimited
+      // encounters — and their loot/TC — without ever covering new ground. The
+      // intended wild-tile loot RE-ROLL (theme-park density) is untouched; only
+      // the repeatable encounter spawn is gated. `wasteSteps` still accrues on
+      // revisits, so resuming genuine forward travel pays out the banked danger.
+      const enc = tileIsNovel ? pickWastelandEncounter(liveSceneForEncounter.location, {
         stepsSinceLastEncounter: wasteSteps,
         threshold: baseThreshold,
         rollChance: effectiveRollChance,
@@ -17098,7 +17106,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-218 — combat-starvation bias. 3+ peaceful steps → 2×
         // skirmish/mini_dungeon weight. 5+ → 4×.
         stepsSinceCombat: get().stepsSinceCombat,
-      });
+      }) : null;
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
         // OTA-217 — visually elevate fusion_bench encounters so the

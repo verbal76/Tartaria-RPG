@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-438 — [audit #21] wasteland encounters only roll on a NOVEL tile, so oscillating between
+  // two tiles can't farm encounters/loot; intended wild-tile loot re-roll is untouched. Element #33: Arsenic.
+  '2026-06-10-438': 'Arsenic Sublimation',
   // OTA-437 — [audit #17] bound the "nothing" forage re-roll: 2 grace retries per noun, then
   // it's consumed — foraging is a gamble again, not a guaranteed payout via infinite retries. Element #32: Germanium.
   '2026-06-10-437': 'Germanium Zone-Leveling',

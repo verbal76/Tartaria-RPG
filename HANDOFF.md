@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-438 "Arsenic Sublimation" — [audit fix #21] close the wild-tile encounter farm** *(element #33)*.
+  Wasteland encounters now only roll on a NOVEL tile (not in the 50-wide `recentTileHistory`), so
+  oscillating between two tiles can't farm encounters; `wasteSteps` still accrues so forward
+  travel stays dangerous. Intended wild-tile loot re-roll untouched. `gameStore.ts`. (Path covered
+  by movementStress; the dedicated assertion would need a heavy RNG harness.)
 - **OTA-437 "Germanium Zone-Leveling" — [audit fix #17] bound the null forage re-roll** *(element #32)*.
   New `VisitedRoom.searchNothingCounts` + `recordNothingSearch` (cap 2) consumes a noun after 2
   null rolls, so foraging is a gamble again instead of a guaranteed-payout retry loop. Applied to
