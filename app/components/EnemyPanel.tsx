@@ -176,9 +176,14 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
 }
 
 function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth: number; hpBarWidth: number }) {
-  const apNum = parseInt(view.enemy.abilityPoint, 10);
-  const baseAc = Math.max(5, Math.min(18, 5 + (Number.isFinite(apNum) ? apNum : 0)));
-  const ac = Math.max(1, baseAc + traitACBonus(view.enemy.traits));
+  // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
+  // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
+  // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
+  // 8 like combat, and bosses get the same +6 wall.
+  const apMatch = String(view.enemy.abilityPoint ?? '').match(/\d+/);
+  const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
+  const baseAc = isNaN(apNum) ? 8 : Math.max(5, Math.min(18, 5 + apNum));
+  const ac = Math.max(1, baseAc + traitACBonus(view.enemy.traits) + (view.enemy.boss ? 6 : 0));
   const attackNum = parseInt(String(view.enemy.attack), 10);
   const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));

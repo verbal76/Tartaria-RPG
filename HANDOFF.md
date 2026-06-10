@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-419 "Silicon Doping" — [audit fix #1] enemy AC un-flattened** *(element #14)*.
+  `enemyAC` did `parseInt(enemy.abilityPoint)` but `abilityPoint` is `"Strength 4"` →
+  NaN → every enemy AC 8 / boss 14, killing stat + Core-Guardian-tier AC scaling.
+  Both `combatRules.enemyAC` and `EnemyPanel`'s display AC now use `/\d+/` (panel also
+  adds the boss +6 it dropped). `combatRules.ts`, `EnemyPanel.tsx`.
 - **OTA-418 "Aluminum Anodizing" — 15 interior hooks** *(element #13)*. Player: "we
   need 15 more inside hooks." OTA-417's indoor gate left interior investigation empty;
   this adds a full INTERIOR pool (floorboard / compartment / portrait / bricked doorway

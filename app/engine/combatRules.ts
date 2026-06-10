@@ -327,7 +327,14 @@ function attackStatFor(
 }
 
 function enemyAC(enemy: Enemy): number {
-  const ap = parseInt(String(enemy.abilityPoint), 10);
+  // OTA-419 — `abilityPoint` is stored as "Strength 4" / "Dexterity 6" etc., so
+  // parseInt() returned NaN and EVERY enemy collapsed to the AC-8 fallback (bosses
+  // 14) — flattening all stat-based AND Core-Guardian-tier AC scaling (a T1 and a
+  // T9 Guardian had identical AC). The thrown-attack / counter paths were fixed
+  // long ago via gameStore's parseEnemyAP; this one was missed. Pull the first
+  // number out of the string, same as parseEnemyAP.
+  const apMatch = String(enemy.abilityPoint ?? '').match(/\d+/);
+  const ap = apMatch ? parseInt(apMatch[0], 10) : NaN;
   const base = isNaN(ap) ? 8 : Math.max(5, Math.min(18, 5 + ap));
   // Boss tier: +6 over the standard scaling so even a power character
   // (STR 14 + 1d8 weapon) can't auto-hit. Combined with double counters

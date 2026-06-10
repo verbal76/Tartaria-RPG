@@ -13379,4 +13379,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // excludes interior kinds and pickRandomIndoorHookKind() draws only them, so neither
 // lands in the wrong context. All 7 random-plant sites now plant the context-appropriate
 // pool — indoors give interior leads, outdoors give outdoor sightings. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-418';
+// OTA-419 (Silicon Doping) — [audit fix #1] enemy AC was universally flattened. The
+// AC calc did parseInt(enemy.abilityPoint), but abilityPoint is stored as "Strength 4"
+// → NaN → EVERY enemy fell back to AC 8 (bosses 14), killing all stat-based AND Core-
+// Guardian-tier AC scaling (a T1 and a T9 Guardian had identical AC). The
+// thrown-attack / counter paths were fixed long ago (parseEnemyAP); enemyAC +
+// EnemyPanel's display AC were missed. Both now pull the number out of the string via
+// /\d+/ (the panel also now adds the boss +6 it was dropping). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-419';
