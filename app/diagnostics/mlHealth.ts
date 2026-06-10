@@ -62,7 +62,14 @@ const MAX_CRASHES_BEFORE_DISABLE = 2;
 const KEY_COMPLETION_IN_PROGRESS = 'tartaria.ml.qwenCompletionInProgress';
 const KEY_QWEN_CRASH_COUNT = 'tartaria.ml.qwenCompletionCrashCount';
 const KEY_QWEN_DISABLED = 'tartaria.ml.qwenDisabledByCrash';
-const MAX_QWEN_COMPLETION_CRASHES = 3; // completions recover, so a touch more tolerant than init (2)
+// OTA-457 — lowered 3→1. On the Pixel 10 Pro XL / Tensor G5 an SVE-kernel SIGSEGV
+// during token generation drops the WHOLE app to the home screen mid-action (a
+// tester fed the dog and the game vanished). That's a hard, user-visible failure,
+// not a recoverable hiccup — one occurrence is enough signal to self-protect and
+// fall back to template narration. OTA-414 auto-retry re-enables Qwen on its own
+// once the device strings together enough clean cold boots, so a one-off blip on a
+// healthy device costs nothing; affected devices stop losing their game.
+const MAX_QWEN_COMPLETION_CRASHES = 1;
 
 // OTA-413 — VOICE (TTS) crash breadcrumb. Same trick as the Qwen completion guard,
 // scoped to the bundled neural TTS (executorch Kokoro/Piper): the native synth +

@@ -13692,4 +13692,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // face-to-face still pays in full, so travel stays the optimal play. All four turn-in handlers take
 // an optional `remote` flag; the parser routes "send word"/"courier"/"send a runner" through turn_in
 // with remote=true. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-456';
+// OTA-457 (Tellurium Refining) — [crash] a tester fed the dog bioluminescent fungus and the game
+// dropped to the home screen. Root cause: a Qwen COMPLETION-crash (SVE-kernel SIGSEGV during token
+// generation) on the Pixel 10 Pro XL / Tensor G5 — the same device the OTA-351 guard already names.
+// The fungus was incidental; ANY Qwen-narrated action can trip the native crash on this device, and
+// it drops the WHOLE app to the home screen mid-action — a hard, user-visible failure, not a
+// recoverable hiccup. The completion-crash self-protect threshold was 3 (lose your game three times
+// before Qwen disables); it's lowered to 1 so a single app-drop flips the Arbiter to template
+// narration (fully playable) instead of letting the device keep losing the game. OTA-414 auto-retry
+// still re-enables Qwen on its own once the device strings together enough clean cold boots, so a
+// one-off blip on a healthy device costs nothing. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-457';

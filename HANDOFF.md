@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-457 "Tellurium Refining" — [crash] feed-the-dog game-drop** *(element #52)*. A tester fed the
+  dog bioluminescent fungus and the game dropped to the home screen — a Qwen completion SIGSEGV on the
+  Pixel 10 Pro XL / Tensor G5 (the device the OTA-351 guard names). The fungus was incidental; any
+  Qwen-narrated action can trip it. Lowered `MAX_QWEN_COMPLETION_CRASHES` 3→1 so one app-drop flips the
+  Arbiter to template narration (OTA-414 auto-retry self-heals on healthy devices). `diagnostics/mlHealth.ts`.
 - **OTA-456 "Antimony Liquation" — [playability] hybrid remote turn-in** *(element #51)*. Deed quests
   (hunts/mysteries/storylines/non-fetch faction quests) can "send word"/"courier" from anywhere for a
   15% TC cut (full rep); FETCH quests refuse it (deliver in person). All 4 turn-in handlers take a
