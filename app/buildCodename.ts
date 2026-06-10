@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-464 — [regression fix] REVERT the OTA-463 voice auto-disable. Its breadcrumb detection couldn't
+  // tell a real Kokoro crash from a benign app termination (OTA reload mid-utterance / backgrounding), so
+  // it false-tripped on reload churn and dropped a healthy Kokoro to the system voice. Bundled neural
+  // voice is always used again; voice crashes stay detection-only; stale disable flags self-heal. Element #59: Praseodymium.
+  '2026-06-10-464': 'Praseodymium Calcination',
   // OTA-463 — [CRASH — the real one] a tester's diagnostic named the culprit: "Voice (TTS) guard: ⚠ VOICE
   // CRASH … last voice: kokoro:am_michael". The bundled NEURAL TTS (Kokoro) was dropping the app mid-
   // narration, not Qwen. Wired the voice auto-disable (1 crash → fall back to the system device voice via

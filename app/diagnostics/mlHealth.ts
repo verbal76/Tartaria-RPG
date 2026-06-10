@@ -77,17 +77,18 @@ const MAX_QWEN_COMPLETION_CRASHES = 1;
 // never fire and the process just dies. We write a breadcrumb (with a label naming
 // the voice) before each utterance and clear it after; if it survives to the next
 // boot, a voice op crashed the process — and we now KNOW it was voice, not Qwen.
-// OTA-463 — AUTO-DISABLE wired. A tester's diagnostic confirmed it: "Voice (TTS)
-// guard: ⚠ VOICE CRASH detected on previous launch (3 total) — last voice:
-// kokoro:am_michael" on a Pixel 10 Pro XL. The bundled Kokoro synth was the thing
-// dropping the whole app to the home screen mid-narration (not Qwen). Like the
-// Qwen completion guard, ONE confirmed crash is enough signal — we disable the
-// bundled neural voice and fall back to the system device voice (expo-speech),
-// which doesn't SIGSEGV. The Arbiter keeps narrating, just in the device voice.
+// OTA-463 wired an auto-disable here; OTA-464 REVERTED it. The breadcrumb-survives
+// detection can't distinguish a real Kokoro SIGSEGV from a benign app termination
+// (an OTA reload mid-utterance, OS backgrounding, or the user swiping the app away
+// all leave the same breadcrumb), so a threshold of 1 false-tripped on the OTA-reload
+// churn of a testing session and dropped a perfectly healthy Kokoro to the system
+// voice — which the user explicitly does not want. We keep COUNTING + NAMING voice
+// crashes for the diagnostic (genuinely useful triage signal), but never auto-disable.
+// KEY_TTS_DISABLED is retained only so loadMLHealth can self-heal (clear) a flag left
+// on a device by OTA-463.
 const KEY_TTS_IN_PROGRESS = 'tartaria.ml.ttsInProgress';
 const KEY_TTS_CRASH_COUNT = 'tartaria.ml.ttsCrashCount';
 const KEY_TTS_DISABLED = 'tartaria.ml.ttsDisabledByCrash';
-const MAX_TTS_CRASHES_BEFORE_DISABLE = 1;
 
 // OTA-414 — AUTO-RETRY with backoff for the Qwen completion guard. The disable is
 // no longer permanent: once it trips, Qwen gets another attempt after a cooldown
@@ -293,7 +294,17 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   if (!Number.isFinite(ttsCrashCount) || ttsCrashCount < 0) ttsCrashCount = 0;
   let detectedTtsCrashThisBoot = false;
   let lastTtsOpBeforeCrash: string | null = null;
-  let ttsDisabledByCrash = ttsDisabledStr === 'true';
+  // OTA-464 — voice auto-disable REVERTED to detection-only (was OTA-463). The
+  // breadcrumb can't distinguish a real Kokoro SIGSEGV from a benign app
+  // termination (OTA reload mid-utterance, backgrounding, swipe-away), so a
+  // threshold of 1 false-tripped on reload churn and forced a healthy Kokoro to
+  // the system voice. We keep COUNTING + naming for the diagnostic, but never
+  // disable. ttsDisabledByCrash is pinned false, and any stale disable flag a
+  // device picked up under OTA-463 is cleared here so Kokoro self-heals on load.
+  const ttsDisabledByCrash = false;
+  if (ttsDisabledStr === 'true') {
+    try { await AsyncStorage.removeItem(KEY_TTS_DISABLED); } catch { /* ignore */ }
+  }
   if (ttsInProgress) {
     detectedTtsCrashThisBoot = true;
     ttsCrashCount += 1;
@@ -304,12 +315,6 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       await AsyncStorage.setItem(KEY_TTS_CRASH_COUNT, String(ttsCrashCount));
       await AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS);
     } catch { /* re-detected next launch if the write fails */ }
-    // OTA-463 — disable the bundled neural voice after a confirmed crash; the
-    // Arbiter falls back to the system device voice (expo-speech), which is safe.
-    if (ttsCrashCount >= MAX_TTS_CRASHES_BEFORE_DISABLE) {
-      ttsDisabledByCrash = true;
-      try { await AsyncStorage.setItem(KEY_TTS_DISABLED, 'true'); } catch { /* ignore */ }
-    }
   }
 
   cached = {
@@ -344,13 +349,14 @@ export function shouldAttemptQwen(): boolean {
 }
 
 /**
- * OTA-463 — should we use the bundled NEURAL voice (Kokoro/Piper) this session?
- * False once the voice crash-guard has tripped — the Arbiter then narrates with
- * the system device voice (expo-speech), which doesn't SIGSEGV. Independent of
- * Qwen / the classifier (different native lib).
+ * OTA-464 — ALWAYS true. The OTA-463 voice auto-disable was reverted (its
+ * breadcrumb detection false-tripped on OTA-reload churn and dropped a healthy
+ * Kokoro to the system voice). The bundled neural voice is no longer gated on a
+ * crash counter; this is kept as a stable hook returning true. Voice crashes are
+ * still counted + named in the diagnostic, just never acted on.
  */
 export function shouldAttemptBundledTTS(): boolean {
-  return !(cached?.ttsDisabledByCrash ?? false);
+  return true;
 }
 
 /** OTA-351 — call BEFORE each Qwen completion. AWAITED so the breadcrumb is
@@ -516,9 +522,7 @@ export function mlHealthSummary(): string {
   // breadcrumb survived a crash, so a native death during narration is no longer
   // ambiguous with the Qwen path.
   let ttsStatus: string;
-  if (state.ttsDisabledByCrash) {
-    ttsStatus = `auto-disabled after ${state.ttsCrashCount} voice crash(es) — using system device voice${state.lastTtsOpBeforeCrash ? ` (last bundled voice: ${state.lastTtsOpBeforeCrash})` : ''}`;
-  } else if (state.detectedTtsCrashThisBoot) {
+  if (state.detectedTtsCrashThisBoot) {
     ttsStatus = `⚠ VOICE CRASH detected on previous launch (${state.ttsCrashCount} total)${state.lastTtsOpBeforeCrash ? ` — last voice: ${state.lastTtsOpBeforeCrash}` : ''}`;
   } else if (state.ttsCrashCount > 0) {
     ttsStatus = `${state.ttsCrashCount} voice crash(es) this install`;

@@ -1,10 +1,11 @@
-// OTA-463 — voice (TTS) crash guard auto-disable. A native SIGSEGV inside the
-// bundled neural TTS (Kokoro) leaves the "tts in progress" breadcrumb behind; the
-// next boot counts it, and after MAX_TTS_CRASHES_BEFORE_DISABLE (1) the bundled
-// voice is disabled — the Arbiter falls back to the system device voice
-// (expo-speech), which doesn't crash. A tester's Pixel 10 Pro XL diagnostic
-// ("last voice: kokoro:am_michael", 3 crashes) confirmed voice was the culprit
-// that the OTA-413 detection-only guard was waiting on.
+// OTA-464 — the voice (TTS) crash guard is DETECTION-ONLY. OTA-463 briefly wired an
+// auto-disable (1 crash → fall back to the system device voice), but the
+// breadcrumb-survives detection can't tell a real Kokoro SIGSEGV from a benign app
+// termination (OTA reload mid-utterance, backgrounding, swipe-away), so it
+// false-tripped on reload churn and forced a healthy Kokoro to the system voice.
+// Reverted: voice crashes are counted + named for the diagnostic, but the bundled
+// neural voice is NEVER auto-disabled — shouldAttemptBundledTTS() is always true,
+// and any stale disable flag from OTA-463 self-heals on load.
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -25,42 +26,30 @@ async function setup(seed: Record<string, string> = {}) {
   return { AS, m };
 }
 
-describe('OTA-463 — voice (TTS) crash guard', () => {
-  it('a clean run (no breadcrumb) keeps the bundled voice enabled', async () => {
+describe('OTA-464 — voice (TTS) guard is detection-only (no auto-disable)', () => {
+  it('a clean run keeps the bundled voice enabled', async () => {
     const { m } = await setup();
     expect(m.shouldAttemptBundledTTS()).toBe(true);
   });
 
-  it('a surviving voice breadcrumb disables the bundled voice on next boot (threshold 1)', async () => {
+  it('a surviving voice breadcrumb is COUNTED + NAMED but does NOT disable Kokoro', async () => {
     const { AS, m } = await setup({
       [KEY_TTS_IN_PROGRESS]: JSON.stringify({ label: 'kokoro:am_michael', at: new Date().toISOString() }),
     });
-    expect(m.shouldAttemptBundledTTS()).toBe(false);
-    expect(await AS.getItem(KEY_TTS_IN_PROGRESS)).toBeNull(); // breadcrumb consumed
+    // Still counted for diagnostics...
     expect(await AS.getItem(KEY_TTS_COUNT)).toBe('1');
-    expect(await AS.getItem(KEY_TTS_DISABLED)).toBe('true');
-    // The summary names the device-voice fallback + the last bundled voice.
-    expect(m.mlHealthSummary()).toMatch(/auto-disabled.*system device voice/i);
+    expect(await AS.getItem(KEY_TTS_IN_PROGRESS)).toBeNull(); // breadcrumb consumed
     expect(m.mlHealthSummary()).toMatch(/am_michael/);
-  });
-
-  it('stays disabled across a later clean boot (persisted flag, no breadcrumb)', async () => {
-    const { m } = await setup({ [KEY_TTS_DISABLED]: 'true', [KEY_TTS_COUNT]: '1' });
-    expect(m.shouldAttemptBundledTTS()).toBe(false);
-  });
-
-  it('resetMLHealth re-enables the bundled voice', async () => {
-    const { m } = await setup({ [KEY_TTS_DISABLED]: 'true', [KEY_TTS_COUNT]: '1' });
-    expect(m.shouldAttemptBundledTTS()).toBe(false);
-    await m.resetMLHealth();
+    // ...but Kokoro stays ON and no disable flag is written.
     expect(m.shouldAttemptBundledTTS()).toBe(true);
+    expect(await AS.getItem(KEY_TTS_DISABLED)).toBeNull();
+    // And the summary must NOT claim a fallback to the system voice.
+    expect(m.mlHealthSummary()).not.toMatch(/system device voice/i);
   });
 
-  it('the voice guard is independent of Qwen (Qwen stays enabled)', async () => {
-    const { m } = await setup({
-      [KEY_TTS_IN_PROGRESS]: JSON.stringify({ label: 'kokoro:am_michael', at: new Date().toISOString() }),
-    });
-    expect(m.shouldAttemptBundledTTS()).toBe(false);
-    expect(m.shouldAttemptQwen()).toBe(true);
+  it('self-heals: a stale OTA-463 disable flag is cleared on load and Kokoro returns', async () => {
+    const { AS, m } = await setup({ [KEY_TTS_DISABLED]: 'true', [KEY_TTS_COUNT]: '1' });
+    expect(m.shouldAttemptBundledTTS()).toBe(true);
+    expect(await AS.getItem(KEY_TTS_DISABLED)).toBeNull(); // cleared on load
   });
 });

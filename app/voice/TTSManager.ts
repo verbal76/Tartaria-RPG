@@ -21,7 +21,6 @@ import {
   disposeStickyArbiterVoice,
   getKokoroState,
 } from './PiperTTSManager';
-import { shouldAttemptBundledTTS } from '../diagnostics/mlHealth';
 
 interface QueuedUtterance {
   /** Monotonic id so callers can debounce / dedupe if needed. */
@@ -140,10 +139,13 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
     // was aborted), fall through to the system engine below so the
     // Arbiter still narrates with the device voice. While it's still
     // downloading/loading/ready we use the bundled path as normal.
-    // OTA-463 — if the bundled neural voice has crash-disabled itself (a
-    // confirmed native SIGSEGV mid-utterance dropped the app on a prior launch),
-    // fall through to the system device voice instead of re-running the crasher.
-    if (getKokoroState().phase !== 'error' && shouldAttemptBundledTTS()) {
+    // OTA-464 — REVERTED the OTA-463 voice auto-disable. The breadcrumb-survives
+    // detection can't tell a real Kokoro SIGSEGV from a benign app termination
+    // (OTA reload mid-utterance, OS backgrounding, user swipe-away), so a threshold
+    // of 1 false-tripped on reload churn and dropped a perfectly healthy Kokoro to
+    // the system voice. The bundled neural voice is now ALWAYS used (unless its
+    // model genuinely failed to install — the original error-state fallthrough).
+    if (getKokoroState().phase !== 'error') {
       // arb68 diagnostic — record which engine actually voiced this line so
       // COPY VOICE INFO can confirm the route. The title-line clip behaves
       // identically across Kokoro-playback OTAs, which only makes sense if the

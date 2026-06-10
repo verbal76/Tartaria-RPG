@@ -32,9 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-463 "Cerium Polish" — VOICE (TTS) crash
->   auto-disable, the real fix for the app-drop-to-home.** The whole **OTA-457→463**
->   playtest batch (Tellurium Refining → Cerium Polish, elements 52–58) is published
+> - **LIVE (pushed 2026-06-10) = OTA-464 "Praseodymium Calcination" — REVERT of the
+>   463 voice auto-disable; Kokoro is always used again (463 false-tripped on reload
+>   churn and forced the system voice).** The whole **OTA-457→464**
+>   playtest batch (Tellurium Refining → Praseodymium Calcination, elements 52–59) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -380,7 +381,17 @@ checkout, not a special rollback tool.)
 The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
-**SHIPPED 2026-06-10 — Playtest batch (OTA-457→463), live on all channels:**
+**SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels:**
+
+- **OTA-464 "Praseodymium Calcination" — [regression fix] REVERT the OTA-463 voice auto-disable** *(element #59)*.
+  OTA-463 was wrong: the breadcrumb-survives detection can't tell a real Kokoro SIGSEGV from a benign app
+  termination (OTA reload mid-utterance — this session reloaded constantly — / backgrounding / swipe-away),
+  so the "3 voice crashes" were false positives and threshold=1 dropped a healthy Kokoro to the system
+  voice (user: "I only want to hear kokoro"). Bundled neural voice always used again; voice crashes stay
+  detection-only (counted + named, never acted on); `shouldAttemptBundledTTS()` → true; `loadMLHealth`
+  self-heals any stale `KEY_TTS_DISABLED` from a 463 device. Qwen completion guard (OTA-457) untouched.
+  `mlHealth.ts`, `TTSManager.ts`. Covered by `ttsCrashGuard.test.ts`. **The original "drop to home" was
+  most likely the Qwen completion crash (guarded by 457) and/or reload-churn — NOT Kokoro.**
 
 - **OTA-463 "Cerium Polish" — [CRASH — the real one] wire the VOICE (TTS) auto-disable** *(element #58)*.
   A tester's diagnostic named it: "Voice (TTS) guard: ⚠ VOICE CRASH … last voice: kokoro:am_michael". The

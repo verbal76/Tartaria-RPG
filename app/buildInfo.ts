@@ -13769,4 +13769,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fallthrough in TTSManager.speak — Android's built-in TTS doesn't SIGSEGV. New shouldAttemptBundledTTS()
 // gate + KEY_TTS_DISABLED; resetMLHealth clears it; the diagnostic now reads "auto-disabled … using
 // system device voice". Covered by ttsCrashGuard.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-463';
+// OTA-464 (Praseodymium Calcination) — [regression fix] REVERT the OTA-463 voice auto-disable. It was
+// wrong: the breadcrumb-survives detection can't distinguish a real Kokoro SIGSEGV from a BENIGN app
+// termination — an OTA reload mid-utterance (and this session reloaded constantly: 457→458→…→463), OS
+// backgrounding, or a swipe-away all leave the identical "tts in progress" breadcrumb. So the "3 voice
+// crashes" were false positives from reload churn, not real crashes; with the threshold at 1, a single
+// false trip dropped a perfectly healthy Kokoro to the system device voice — which the user explicitly
+// does NOT want ("I only want to hear kokoro"). The bundled neural voice is ALWAYS used again now (the
+// only fallthrough left is the original model-failed-to-install error state). Voice crashes are still
+// COUNTED + NAMED in the diagnostic (useful triage), just never acted on; shouldAttemptBundledTTS()
+// returns true; loadMLHealth self-heals (clears) any KEY_TTS_DISABLED an OTA-463 device picked up, so
+// Kokoro returns on first load with no reset needed. The Qwen completion guard (OTA-457) is untouched.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-464';
