@@ -332,6 +332,12 @@ const CODENAMES: Record<string, string> = {
   // OTA-397 — save-size telemetry: persist() logs the per-part byte breakdown on
   // failure, on a trim, AND every 10th persist as a heartbeat, so the blob size is
   // visible as it grows (measure, don't guess).
+  // OTA-398 — THE ACTUAL save-loss fix. 397's telemetry showed the save blob at
+  // ~123KB (never a size issue); the real cause is "storage full" — appendLogToDisk
+  // appends every log line to an unbounded on-disk COPY-LOG key that grew to fill
+  // AsyncStorage's ~6MB DB, after which every write (incl. the tiny save) fails.
+  // capDiskLog bounds it to ~400KB; self-heals on the next write.
+  '2026-06-09-398': 'Sumacberry Anvil',
   '2026-06-09-397': 'Catkin Anvil',
   '2026-06-09-396': 'Serviceash Anvil',
   '2026-06-09-395': 'Inkberry Anvil',

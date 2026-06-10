@@ -13165,4 +13165,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // periodic heartbeat (every 10th persist) — so the slot blob's size is VISIBLE in
 // the log as it grows toward the limit, instead of only surfacing once it's
 // already too big. Measure, don't guess. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-397';
+// OTA-398 (Sumacberry Anvil) — THE ACTUAL SAVE-LOSS FIX. OTA-397's telemetry put
+// the save blob at ~123 KB — so it was NEVER a blob-size problem (all the 385/395/
+// 396 trim work treated a non-issue; it stays as harmless dormant insurance). The
+// real cause is "storage full": appendLogToDisk APPENDS every log line to the
+// slot's on-disk COPY-LOG key and never trims it, so on a long-played character it
+// grew to fill AsyncStorage's ~6 MB DB — after which EVERY write fails, including
+// the tiny save. New diskLogCap.capDiskLog bounds that key to its most-recent
+// ~400 KB (trimmed to a line boundary). Self-healing: the first log write after
+// this ships shrinks a bloated log, frees the space, and saves start landing.
+export const OTA_BUILD_ID = '2026-06-09-398';

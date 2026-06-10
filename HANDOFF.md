@@ -29,7 +29,15 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-397 "Catkin Anvil"** — save-size telemetry:
+> - **LIVE (pushed 2026-06-09) = OTA-398 "Sumacberry Anvil" — THE ACTUAL SAVE-LOSS
+>   FIX.** 397's telemetry showed the save blob at ~123KB → never a size issue (the
+>   385/395/396 blob-trim treated a non-problem; harmless dormant insurance). Real
+>   cause = "storage full": `appendLogToDisk` appended every log line to an
+>   UNBOUNDED on-disk COPY-LOG key that filled AsyncStorage's ~6MB DB, after which
+>   every write (incl. the tiny save) failed. `capDiskLog` (engine/diskLogCap.ts)
+>   bounds it to ~400KB; self-heals on the next log write. CONFIRM on-device: next
+>   log should show no `persist … FAILED`.
+> - **PRIOR LIVE (pushed 2026-06-09) = OTA-397 "Catkin Anvil"** — save-size telemetry:
 >   `persist()` logs the per-part byte breakdown (`saveSizeBreakdown`) on failure,
 >   on a trim, AND every 10th persist as a heartbeat — so the blob size is visible
 >   in the log as it grows (measure, don't guess). Watch the log for the

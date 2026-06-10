@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { SaveState } from './types';
+import { capDiskLog } from './diskLogCap';
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
 // own log; an index file lists summaries for the title screen.
@@ -360,7 +361,7 @@ export function appendLogToDisk(line: string): Promise<void> {
     try {
       const key = slotLogKey(activeSlotId);
       const existing = (await AsyncStorage.getItem(key)) ?? '';
-      await AsyncStorage.setItem(key, existing + line + '\n');
+      await AsyncStorage.setItem(key, capDiskLog(existing + line + '\n'));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.warn('appendLogToDisk failed', e);
