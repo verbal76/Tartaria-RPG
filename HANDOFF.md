@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-467 "Samarium Anneal" — golems now GAIN STATS
->   (POWER/RESILIENCE) through combat like the dog, shown on the Character screen. 466
->   added golem repair + naming; 465 whisper set-course; 464 reverted the 463 voice auto-disable.** The whole **OTA-457→467**
->   playtest batch (Tellurium Refining → Samarium Anneal, elements 52–62) is published
+> - **LIVE (pushed 2026-06-10) = OTA-468 "Europium Phosphor" — opening splash art +
+>   thin loading bar (retired the verbose MIND/VOICE banner). 467 golem stats; 466 golem
+>   repair+naming; 465 whisper set-course; 464 reverted the 463 voice auto-disable.** The whole **OTA-457→468**
+>   playtest batch (Tellurium Refining → Europium Phosphor, elements 52–63) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,7 +382,13 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 / 466 / 467 committed below (post-batch follow-ups).**
+**OTA-465 / 466 / 467 / 468 committed below (post-batch follow-ups).**
+
+- **OTA-468 "Europium Phosphor" — [UX] opening splash art + thin loading bar** *(element #63)*. Title opens
+  on the cover art (wanderer + dog + crystal golem) for ~2s while the voice warms, then reveals the menu;
+  once per app launch (module guard), min 2s / cap 6s, dismisses when voice settles. Retired the verbose
+  MIND/VOICE banner for a single thin progress bar (splash bottom + compact menu bar). New asset
+  `assets/splash-art.jpg` (2.7MB PNG → 218KB JPEG). `TitleScreen.tsx`. (No test — pure UI; tsc clean.)
 
 - **OTA-467 "Samarium Anneal" — [feature] golems gain stats through combat (mirrors the dog)** *(element #62)*.
   Incentive to repair + keep a golem vs re-summon a base one. Two trainable Companion stats (optional,

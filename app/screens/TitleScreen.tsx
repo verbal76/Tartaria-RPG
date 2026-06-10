@@ -88,6 +88,12 @@ function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
   }
 }
 
+// OTA-468 — the opening splash shows once per app LAUNCH (cold boot), not every
+// time the title screen re-mounts (e.g. save & exit back to title). Module-scoped
+// so it survives component remounts within the same JS process; resets on a fresh
+// process / OTA reload.
+let splashShownThisLaunch = false;
+
 export function TitleScreen() {
   // The title screen renders directly on the player's tuned background (the
   // container is transparent), so the muted secondary text washed out when a
@@ -164,29 +170,37 @@ export function TitleScreen() {
   const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
+  // OTA-468 — opening splash art. Hold the cover image for a beat while the voice
+  // warms, then reveal the menu. Dismiss once the minimum time has elapsed AND the
+  // voice has settled (ready / error / idle / disabled), with a hard cap so a slow
+  // first-install download doesn't sit on the splash. A thin bar at the bottom
+  // replaces the old verbose MIND/VOICE banner.
+  const [splashMinElapsed, setSplashMinElapsed] = useState(false);
+  const [splashCapReached, setSplashCapReached] = useState(false);
+  const [splashSkipped] = useState(() => splashShownThisLaunch);
+  useEffect(() => {
+    if (splashShownThisLaunch) return;
+    const a = setTimeout(() => setSplashMinElapsed(true), 2000);
+    const b = setTimeout(() => setSplashCapReached(true), 6000);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, []);
+  const voiceSettled =
+    kokoroPhase.phase === 'ready' || kokoroPhase.phase === 'error' || kokoroPhase.phase === 'idle';
+  const showSplash = !splashSkipped && !(splashCapReached || (splashMinElapsed && voiceSettled));
+  useEffect(() => {
+    if (!showSplash) splashShownThisLaunch = true;
+  }, [showSplash]);
+  // Bottom-bar fill: voice-weighted so it reads ~full at the moment we dismiss.
+  const splashProgress =
+    voiceSettled ? 1
+    : kokoroPhase.phase === 'downloading' ? Math.max(0.08, Math.min(0.95, kokoroPhase.fraction))
+    : kokoroPhase.phase === 'loading' ? 0.92
+    : 0.12;
   const modelsLoading =
     qwenStatus === 'downloading' || qwenStatus === 'loading'
     || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
-  // Live per-engine readiness for the loading banner. Both percentages are
-  // the REAL native download fractions (Qwen GGUF + Kokoro model), not a
-  // timer. The compile/warm-up step has no native progress, so it honestly
-  // reads "finishing…" instead of freezing a stale % or snapping to green.
-  const qwenLabel =
-    qwenStatus === 'downloading' ? `${Math.round(qwenFraction * 100)}%`
-    : qwenStatus === 'loading' ? 'finishing…'
-    : qwenStatus === 'ready' ? 'ready ✓'
-    : 'starting…';
-  const kokoroLabel =
-    kokoroPhase.phase === 'downloading' ? `${Math.round(kokoroPhase.fraction * 100)}%`
-    : kokoroPhase.phase === 'loading' ? 'finishing…'
-    : kokoroPhase.phase === 'ready' ? 'ready ✓'
-    // Voice failed → the Arbiter still narrates; the system voice speaks.
-    // Read it honestly here so the NARRATION row can keep loading without
-    // the VOICE row falsely showing "starting…" forever.
-    : kokoroPhase.phase === 'error' ? 'system voice'
-    : 'starting…';
-  const qwenDone = qwenStatus === 'ready';
-  const kokoroDone = kokoroPhase.phase === 'ready';
+  // OTA-468 — the verbose per-engine MIND/VOICE labels were retired with the old
+  // loading banner; the splash + compact bar now carry progress as a single fill.
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -784,6 +798,29 @@ export function TitleScreen() {
     </SwipeableRow>
   );
 
+  // OTA-468 — splash takeover. While showing, ONLY the cover art + a thin loading
+  // bar render; model loading continues in App.tsx's boot effects regardless. All
+  // hooks above have already run, so this conditional return is safe.
+  if (showSplash) {
+    return (
+      <View style={styles.splashContainer}>
+        <Image
+          source={require('../../assets/splash-art.jpg')}
+          style={styles.splashImage}
+          resizeMode="cover"
+        />
+        <View style={styles.splashBarWrap}>
+          <View style={styles.splashBarTrack}>
+            <View style={[styles.splashBarFill, { width: `${Math.round(splashProgress * 100)}%` }]} />
+          </View>
+          <Text style={styles.splashBarLabel}>
+            {voiceSettled ? 'Entering the buried world…' : 'Waking the Arbiter — keep the app open'}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Image
@@ -811,35 +848,29 @@ export function TitleScreen() {
           model files, breaking subsequent launches until uninstall+
           reinstall. This banner makes the danger explicit so testers
           don't accidentally interrupt the setup. */}
-      {modelsLoading && (
-        <View style={styles.modelLoadingBanner}>
-          <Text style={styles.modelLoadingBannerTitle}>
-            ⚙  WAKING THE ARBITER — THIS IS NORMAL
-          </Text>
-          <Text style={styles.modelLoadingBannerBody}>
-            The Arbiter's mind and voice are loading for the first time — the
-            longest part. They download once, then Tartaria Realms runs fully
-            offline. A normal one-time setup, not an error.
-          </Text>
-          <View style={styles.modelLoadingRows}>
-            <View style={styles.modelLoadingRow}>
-              <Text style={styles.modelLoadingRowLabel}>MIND</Text>
-              <Text style={[styles.modelLoadingRowValue, qwenDone && styles.modelLoadingRowValueDone]}>
-                {qwenLabel}
-              </Text>
+      {/* OTA-468 — compact loading bar (replaced the verbose MIND/VOICE banner).
+          The splash covers the typical load window; if a first-install download
+          is still running after the splash, this thin bar carries the progress +
+          a short keep-open hint instead of the old wall of text. */}
+      {modelsLoading && (() => {
+        const q = qwenStatus === 'ready' ? 1
+          : qwenStatus === 'downloading' ? qwenFraction
+          : qwenStatus === 'loading' ? 0.92 : 0.1;
+        const k = (kokoroPhase.phase === 'ready' || kokoroPhase.phase === 'error') ? 1
+          : kokoroPhase.phase === 'downloading' ? kokoroPhase.fraction
+          : kokoroPhase.phase === 'loading' ? 0.92 : 0.1;
+        const pct = Math.round(((q + k) / 2) * 100);
+        return (
+          <View style={styles.compactLoadWrap}>
+            <View style={styles.splashBarTrack}>
+              <View style={[styles.splashBarFill, { width: `${pct}%` }]} />
             </View>
-            <View style={styles.modelLoadingRow}>
-              <Text style={styles.modelLoadingRowLabel}>VOICE</Text>
-              <Text style={[styles.modelLoadingRowValue, kokoroDone && styles.modelLoadingRowValueDone]}>
-                {kokoroLabel}
-              </Text>
-            </View>
+            <Text style={styles.compactLoadLabel}>
+              Preparing the Arbiter ({pct}%) — first-time setup, keep the app open
+            </Text>
           </View>
-          <Text style={styles.modelLoadingBannerBody}>
-            Please keep the app open until both read “ready”.
-          </Text>
-        </View>
-      )}
+        );
+      })()}
 
       {/* OTA-271 — Play Store stale-APK nag. Render conditions:
           (1) Android only — Play Store doesn't exist on iOS;
@@ -1306,6 +1337,16 @@ export function TitleScreen() {
 }
 
 const styles = StyleSheet.create({
+  // OTA-468 — opening splash art + thin loading bar.
+  splashContainer: { flex: 1, backgroundColor: '#0b0a09' },
+  splashImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
+  splashBarWrap: { position: 'absolute', left: 28, right: 28, bottom: 44, alignItems: 'center' },
+  splashBarTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
+  splashBarFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },
+  splashBarLabel: { marginTop: 10, color: '#e6dcc2', fontSize: 11, letterSpacing: 1.5, textShadowColor: 'rgba(0,0,0,0.9)', textShadowRadius: 4 },
+  // OTA-468 — compact on-menu loading bar (replaced the verbose banner).
+  compactLoadWrap: { width: '100%', marginVertical: 10, alignItems: 'center' },
+  compactLoadLabel: { marginTop: 6, color: '#9a8f78', fontSize: 10, letterSpacing: 1, textAlign: 'center' },
   // OTA-275 — width cap for tablets. Phones (<600pt wide) render
   // unchanged. iPad portrait (744-1024pt) + landscape (1024-1366pt)
   // get the layout centered at 600pt instead of edge-to-edge buttons.

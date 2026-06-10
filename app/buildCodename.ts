@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-468 — [UX] opening SPLASH ART + thin loading bar. Title opens on the cover image (wanderer + dog +
+  // crystal golem) for ~2s while the voice warms, then reveals the menu (once per launch, hard-capped 6s).
+  // The verbose MIND/VOICE banner is retired for a single thin progress bar (splash bottom + compact menu
+  // bar). New asset assets/splash-art.jpg (218KB JPEG). Element #63: Europium.
+  '2026-06-10-468': 'Europium Phosphor',
   // OTA-467 — [feature] GOLEMS gain stats through combat, mirroring the dog — incentive to repair + keep
   // one alive vs re-summon a base one. POWER (trains on a landed strike → +to-hit/+damage) and RESILIENCE
   // (trains on surviving a hit → soaks retaliation) use the dog's exact progression curve. Character screen

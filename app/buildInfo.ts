@@ -13814,4 +13814,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // split). makeCompanion seeds {power:0, resilience:0}. The Character screen gets a GOLEM panel under the
 // dog's — HP + POW/RES with the same fractional progress bars — so a veteran golem reads as stronger than
 // a fresh summon. Covered by golemCompanion.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-467';
+// OTA-468 (Europium Phosphor) — [UX] OPENING SPLASH ART + thin loading bar. The title screen now opens on
+// the cover art (wanderer + dog + crystal golem) for a beat while the voice warms, then reveals the menu.
+// Shows once per app LAUNCH (module-scoped guard; not on every save-&-exit re-mount), min 2s, dismisses
+// once the min elapsed AND the voice settled (ready/error/idle), hard-capped at 6s so a slow first-install
+// download doesn't sit on it. Boot continues in App.tsx regardless (the splash is a conditional render
+// after all hooks). The verbose "WAKING THE ARBITER — MIND/VOICE" banner is RETIRED in favour of a single
+// thin progress bar: a bottom bar on the splash (voice-weighted fill + "keep the app open" hint) and a
+// compact combined-progress bar on the menu if a first-install download is still running. New asset
+// assets/splash-art.jpg (re-encoded 2.7MB PNG -> 218KB JPEG @900px to keep the OTA lean). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-468';
