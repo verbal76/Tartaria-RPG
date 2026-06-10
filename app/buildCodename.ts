@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-446 — [playability] richer found-gear: Uncommon gear weights up + two low-weight Rare drops
+  // in the investigate pool, so a lucky wanderer can actually upgrade toward the Guardians. Element #41: Niobium.
+  '2026-06-10-446': 'Niobium Anodizing',
   // OTA-445 — [playability] fusion output is above-rare: Legendary at 4+ tags, fused weapons 2d6/2d8,
   // armor AC+3/+5, durability 35/45, + a guaranteed scaling-stat perk. Element #40: Zirconium.
   '2026-06-10-445': 'Zirconium Crystal-Bar',

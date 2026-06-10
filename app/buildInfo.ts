@@ -13600,4 +13600,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (+2/+1 to its scaling stat, unless a stealthy input set keeps the OTA-349 stealth bonus). The
 // Qwen synth prompt is updated to match. So the Crucible reliably pays out a premium, above-rare
 // reward. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-445';
+// OTA-446 (Niobium Anodizing) — [playability] richer found-gear so WANDERING upgrades you. A
+// playtester cleared the start area + reached the first city "still pretty average" — the
+// investigate RARE_FINDS pool yielded only 1–2 Uncommon pieces over the journey. Uncommon gear
+// weights bumped (weapons 3→4 / 2→3, armor 2→3), and two low-weight RARE pieces added (Sentinel
+// Cleaver 2d8 weapon, Aether-Seeker's Hood AC+3 helm) so a LUCKY wanderer can find a real upgrade —
+// the "if you're lucky you can make it through" curve the design wants. Materials still dominate
+// the pool; nothing is handed out. Together with OTA-443/444 (scrap + material drops) and OTA-445
+// (above-rare fusion), the wander-and-upgrade loop toward the 9 Guardians is now actually reachable
+// for an average-but-lucky player. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-446';

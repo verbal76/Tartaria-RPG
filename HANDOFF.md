@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-446 "Niobium Anodizing" — [playability] richer found-gear** *(element #41)*. Uncommon gear
+  weights up + two low-weight Rare drops (Sentinel Cleaver, Aether-Seeker's Hood) in the investigate
+  pool, so a lucky wanderer can upgrade toward the Guardians. `areaSearch.ts`. Covered by
+  `__tests__/areaSearch.test.ts`. **Completes the playability pass (OTA-443→446).**
 - **OTA-445 "Zirconium Crystal-Bar" — [playability] fusion output above-rare** *(element #40)*.
   Legendary at 4+ tags (was 5+); fused weapons 2d6/2d8, armor AC+3/+5, durability 35/45, + a
   guaranteed scaling-stat perk. `itemFusion.ts`. Covered by `__tests__/fusionDeterministicFallback.test.ts`.

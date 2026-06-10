@@ -99,16 +99,24 @@ const RARE_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Mud Essence', rarity: 'Uncommon', weight: 5 },
   { name: 'Drone Core', rarity: 'Uncommon', weight: 4 },
   { name: 'Energy Fragment', rarity: 'Uncommon', weight: 4 },
+  // OTA-446 — [playability] richer found-gear so WANDERING actually upgrades you.
+  // A playtester cleared the start area + walked to the first city and arrived
+  // "still pretty average" — the investigate pool yielded only 1–2 Uncommon
+  // pieces. Uncommon gear weights bumped (3→4 / 2→3), and two low-weight RARE
+  // pieces added so a LUCKY wanderer can find a real upgrade (the "if you're
+  // lucky, you can make it" curve). Materials still dominate the pool.
   // rare gear — weapons
-  { name: 'Mud-Rend Blade', rarity: 'Uncommon', weight: 3 },
-  { name: 'Aetheric Crystal Blade', rarity: 'Uncommon', weight: 2 },
-  { name: 'Storm Rod', rarity: 'Uncommon', weight: 2 },
-  { name: 'Bone Crossbow', rarity: 'Uncommon', weight: 2 },
+  { name: 'Mud-Rend Blade', rarity: 'Uncommon', weight: 4 },
+  { name: 'Aetheric Crystal Blade', rarity: 'Uncommon', weight: 3 },
+  { name: 'Storm Rod', rarity: 'Uncommon', weight: 3 },
+  { name: 'Bone Crossbow', rarity: 'Uncommon', weight: 3 },
+  { name: 'Sentinel Cleaver', rarity: 'Rare', weight: 1 },
   // rare gear — armor
-  { name: "Salvager's Intuition Band", rarity: 'Uncommon', weight: 2 },
-  { name: "Aether-Seeker's Cap", rarity: 'Uncommon', weight: 2 },
-  { name: "Architect's Sight Enhancer", rarity: 'Uncommon', weight: 2 },
-  { name: "Spirit-Caller's Helm", rarity: 'Uncommon', weight: 2 },
+  { name: "Salvager's Intuition Band", rarity: 'Uncommon', weight: 3 },
+  { name: "Aether-Seeker's Cap", rarity: 'Uncommon', weight: 3 },
+  { name: "Architect's Sight Enhancer", rarity: 'Uncommon', weight: 3 },
+  { name: "Spirit-Caller's Helm", rarity: 'Uncommon', weight: 3 },
+  { name: "Aether-Seeker's Hood", rarity: 'Rare', weight: 1 },
 ];
 
 const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [

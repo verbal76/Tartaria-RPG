@@ -104,3 +104,22 @@ describe('OTA-444 — golem/recipe material availability', () => {
     expect(tortoise?.loot).toContain('Mudstone');
   });
 });
+
+describe('OTA-446 — wandering can yield real gear upgrades', () => {
+  it('investigate can surface Rare gear (the lucky upgrade)', () => {
+    const names = new Set<string>();
+    let sawRare = false;
+    for (let i = 0; i < 12000; i++) {
+      const o = rollAreaSearch('the rubble', { intent: 'investigate' });
+      if (o.kind === 'material') {
+        names.add(o.itemName);
+        if (o.rarity === 'Rare') sawRare = true;
+      }
+    }
+    // The two new Rare drops are reachable.
+    expect(sawRare).toBe(true);
+    expect(names.has('Sentinel Cleaver') || names.has("Aether-Seeker's Hood")).toBe(true);
+    // Uncommon gear still shows up too.
+    expect(names.has('Mud-Rend Blade')).toBe(true);
+  });
+});
