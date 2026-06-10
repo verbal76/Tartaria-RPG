@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-410 — a core/lost capital always greets the player with a NAMED vendor
+  // (RNG-rolled) on arrival, when the SUMMON chip draws. Element #5: Boron.
+  '2026-06-10-410': 'Boron Crystallization',
   // OTA-409 — raise roadside-trader spawn during travel (0.08 → 0.20); spawn path
   // verified healthy, just throttled. Element #4: Beryllium.
   '2026-06-10-409': 'Beryllium Reduction',

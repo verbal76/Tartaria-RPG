@@ -3821,13 +3821,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (random + unnamed; can't be in defeatedEnemies meaningfully).
     const defeatedSet = new Set(get().worldMemory.defeatedEnemies ?? []);
     const vendor: VendorInstance | null = ((): VendorInstance | null => {
-      const base: VendorInstance | null = opts?.isOpening
+      let base: VendorInstance | null = opts?.isOpening
         ? null
         : hubRoom && hubRoom.anchorNpc
           ? (defeatedSet.has(hubRoom.anchorNpc)
               ? null
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
           : (!hasEnemies && !hubRoom && Math.random() < 0.25 ? pickRoadsideTrader() : null);
+      // OTA-410 — a core/lost capital ALWAYS greets the arriving player with a
+      // NAMED vendor (RNG-rolled which one), unless one already took the slot
+      // (a hub anchor) or the scene is hostile / the opening scene. Player ask:
+      // "I hit a core capital and wasn't greeted with a Vendor — as soon as the
+      // summon button is drawn, a vendor should appear; RNG roll which named
+      // vendor arrives." The SUMMON (Core Guardian) chip surfaces at exactly
+      // these LOST_CAPITAL_LOCATIONS, so the vendor lands the moment that button
+      // is drawn. A random non-defeated VENDORS entry is chosen each arrival
+      // (re-roll on re-entry is intended). Filtered against defeatedEnemies so a
+      // vendor the player killed doesn't walk back in.
+      if (!base && !opts?.isOpening && !hasEnemies && player?.currentLocationId) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const capList: readonly string[] = require('../engine/mainQuest').LOST_CAPITAL_LOCATIONS;
+        if (capList.includes(player.currentLocationId)) {
+          const candidates = VENDORS.filter((v) => !defeatedSet.has(v.name));
+          if (candidates.length > 0) {
+            const pickName = candidates[Math.floor(Math.random() * candidates.length)]!.name;
+            base = findVendorByName(pickName) ?? null;
+          }
+        }
+      }
       // arb104 — the outpost Armory stocks the player's OWN faction's named
       // armor + weapons (Irma carries faction-issue gear in your outpost).
       if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {

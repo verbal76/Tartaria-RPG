@@ -367,6 +367,14 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-410 "Boron Crystallization" — a core capital always greets you with a named
+  vendor (RNG-rolled)** *(element #5)*. Player: "I hit a core capital and wasn't greeted
+  with a Vendor — as soon as the summon button is drawn, a vendor should appear; RNG
+  roll which named vendor arrives." The SUMMON (Core Guardian) chip draws at exactly the
+  `LOST_CAPITAL_LOCATIONS`, so `beginScene` now — when a capital scene has no vendor yet
+  (no hub anchor), not hostile/opening — picks a random non-defeated `VENDORS` entry via
+  `findVendorByName`. Re-rolls on re-entry (intended); defeated vendors filtered; the
+  existing non-anchor arrival line + banner surface it. `gameStore.ts`.
 - **OTA-409 "Beryllium Reduction" — raise roadside-trader spawn during travel**
   *(element #4)*. Player: "I haven't seen any vendors at all, named or random … check
   we didn't break it and if it's working raise the rate during travel." **Verified

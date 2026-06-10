@@ -13283,4 +13283,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rate had just been throttled — 0.15 originally, halved to 0.08 at OTA-302's branch
 // promotion (the comment still wrongly said 15%). Bumped to 0.20, so a traveler
 // reliably runs into a trader every ~5 steps. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-409';
+// OTA-410 (Boron Crystallization) — a core/lost capital always greets the arriving
+// player with a NAMED vendor (RNG-rolled which one). Player: "I hit a core capital
+// and wasn't greeted with a Vendor — as soon as the summon button is drawn, a vendor
+// should appear; RNG roll which named vendor arrives." The SUMMON (Core Guardian) chip
+// draws at exactly the LOST_CAPITAL_LOCATIONS, so beginScene now, when a capital scene
+// has no vendor yet (no hub anchor) and isn't hostile/opening, picks a random
+// non-defeated VENDORS entry via findVendorByName — landing a named vendor the moment
+// the summon button is drawn. Re-rolls on re-entry (intended); defeated vendors are
+// filtered out. The existing non-anchor arrival narration + banner surface it. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-410';
