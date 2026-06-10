@@ -343,6 +343,23 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-404 "Possumhaw Anvil" — OTA updates auto-apply (no tap).** Player ask: "why
+  are some updates still tap to apply, they should be automatic right?" Boot-**front**
+  (OTA-367) already auto-applies an update found at cold boot, but one landing
+  **after** boot was caught by the TitleScreen `fetchOnly` check and only offered a
+  "tap to apply" banner (OTA-234 reverted immediate mid-boot `reloadAsync` — it
+  crashed while native modules were **mid-init**). The banner **tap** runs the full
+  **safe teardown** first. So the TitleScreen now **auto-fires that same safe path**
+  once **Qwen** (heaviest, last to settle) reaches `ready`/`failed`/`skipped` —
+  every module past init, teardown has real handles — after a short beat. If Qwen
+  never settles, the banner + manual tap stay (pure enhancement). Loading a slot
+  unmounts + cancels. Banner copy flips to "APPLYING AUTOMATICALLY…".
+  `TitleScreen.tsx`.
+  > **Decision note for the user:** I gated auto-apply on Qwen being *settled*
+  > (not an immediate reload) specifically to avoid resurrecting the OTA-234
+  > mid-init crash. If you'd rather it apply *the instant* an update is detected
+  > (faster, but reintroduces that crash risk on slow devices), say so and I'll
+  > drop the gate.
 - **OTA-403 "Devilwood Anvil" — manual weapon-coating damage roll.** Player ask:
   "make the dice roll manual … I never get a roll for the acid damage." The
   coating's bonus dice were rolled **internally** in `concludeRolls`

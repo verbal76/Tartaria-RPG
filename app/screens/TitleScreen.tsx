@@ -310,6 +310,54 @@ export function TitleScreen() {
     });
     return () => { cancelled = true; };
   }, []);
+
+  // OTA-404 — run the staged-update apply (the full safe teardown +
+  // reloadAsync sequence). Shared by the banner tap AND the auto-apply
+  // effect below so both go through one path. skipFetch: the bundle is
+  // already on disk from the boot fetchOnly pass.
+  const applyPendingOTA = useCallback(() => {
+    setApplyingOTA('Preparing…');
+    void checkAndApplyOTA({
+      skipFetch: true,
+      onStatus: (s) => setApplyingOTA(s),
+      onError: (msg) => {
+        setApplyingOTA(null);
+        // Leave pendingOTAUpdate set — the banner stays visible so the
+        // player (or the auto-apply effect) can retry. Pre-OTA-047 the
+        // flag was cleared here, which hid the banner and forced a full
+        // app relaunch to recover.
+        useGameStore.setState({ slotLoadError: `Update failed: ${msg}\n\nTap UPDATE READY again to retry, or restart the app.` });
+      },
+    });
+  }, []);
+
+  // OTA-404 — AUTOMATIC apply. The player asked "why are some updates
+  // still tap to apply, they should be automatic right?" They are now:
+  // once a staged update is pending AND the heaviest native module
+  // (Qwen / llama.rn) has reached a SETTLED state — 'ready', 'failed',
+  // or 'skipped' — we fire the same safe teardown+reload the banner tap
+  // did, after a short visible beat, with no tap required.
+  //
+  // Why gate on a settled Qwen status instead of applying immediately:
+  // OTA-234's crash was reloadAsync firing while the native modules
+  // (executorch Kokoro, llama.rn Qwen, ONNX MiniLM, expo-av) were still
+  // MID-init — teardown can't release a handle that isn't registered
+  // yet. Waiting for Qwen (the last + heaviest to settle) to finish
+  // means every module is past init, so the teardown has real handles
+  // to release and the reload is the same clean-state apply the tap
+  // performed. If Qwen never settles (still 'loading'/'downloading'),
+  // we leave the banner up and the manual tap still works — auto-apply
+  // is a pure enhancement, never a regression. Loading a slot / New
+  // Expedition unmounts this screen and cancels the pending apply.
+  const qwenSettled = qwenStatus === 'ready' || qwenStatus === 'failed' || qwenStatus === 'skipped';
+  useEffect(() => {
+    if (!pendingOTAUpdate || applyingOTA !== null || !qwenSettled) return;
+    // Short beat so the "applying automatically…" banner is visible
+    // before the screen flash-reloads, and to let any final settle tick
+    // land on the native side.
+    const timer = setTimeout(() => { applyPendingOTA(); }, 1800);
+    return () => clearTimeout(timer);
+  }, [pendingOTAUpdate, applyingOTA, qwenSettled, applyPendingOTA]);
   // v2.4.1 (OTA 023) — chunked copy for dead-character logs. Long
   // sessions easily exceed 25 KB and most chat clients silently
   // truncate larger pastes. Mirror LogScreen's chunking so the
@@ -901,34 +949,22 @@ export function TitleScreen() {
           style={styles.updateBanner}
           activeOpacity={0.8}
           disabled={applyingOTA !== null}
-          onPress={() => {
-            setApplyingOTA('Preparing…');
-            // OTA 047 — skipFetch: bundle is already on disk from
-            // the boot fetchOnly pass. Re-fetching here was throwing
-            // ERR_UPDATES_FETCH on transient network hiccups even
-            // with a perfectly good staged update sitting locally.
-            void checkAndApplyOTA({
-              skipFetch: true,
-              onStatus: (s) => setApplyingOTA(s),
-              onError: (msg) => {
-                setApplyingOTA(null);
-                // Leave pendingOTAUpdate set — the banner stays
-                // visible so the player can tap again to retry.
-                // Pre-OTA-047 the flag was cleared here, which
-                // hid the banner and forced a full app relaunch
-                // to recover.
-                useGameStore.setState({ slotLoadError: `Update failed: ${msg}\n\nTap UPDATE READY again to retry, or restart the app.` });
-              },
-            });
-          }}
+          // OTA-404 — the auto-apply effect above fires this same path on
+          // its own once Qwen settles; the tap is now just a "skip the
+          // wait, apply right now" shortcut.
+          onPress={applyPendingOTA}
         >
           <Text style={styles.updateBannerTitle}>
-            {applyingOTA ? `APPLYING UPDATE — ${applyingOTA.toUpperCase()}` : 'UPDATE READY — TAP TO APPLY'}
+            {applyingOTA
+              ? `APPLYING UPDATE — ${applyingOTA.toUpperCase()}`
+              : qwenSettled ? 'UPDATE READY — APPLYING AUTOMATICALLY…' : 'UPDATE READY — TAP TO APPLY'}
           </Text>
           <Text style={styles.updateBannerBody}>
             {applyingOTA
               ? 'Tearing down audio + AI handles before the reload. One moment.'
-              : 'A new build is downloaded and waiting. Tap to restart and apply.'}
+              : qwenSettled
+                ? 'A new build is downloaded. Restarting to apply automatically — or tap to apply now.'
+                : 'A new build is downloaded and waiting. Tap to restart and apply.'}
           </Text>
         </TouchableOpacity>
       )}

@@ -13214,4 +13214,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the player's rolled total and only falls back to an internal roll for legacy
 // paths. The DiceRoller renders it generically (no target → bonus-damage card).
 // The elemental type/trait modifier still applies to the rolled total. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-403';
+// OTA-404 (Possumhaw Anvil) — OTA updates auto-apply (no tap). Player ask: "why are
+// some updates still tap to apply, they should be automatic right?" The boot-FRONT
+// check (OTA-367) already auto-applies an update found at cold boot, but an update
+// that lands AFTER boot is caught by the TitleScreen's fetchOnly check and only
+// offered a "tap to apply" banner (OTA-234 reverted immediate mid-boot reloadAsync
+// because it crashed the process while native modules — Kokoro / Qwen / MiniLM /
+// expo-av — were still MID-init). The banner tap, though, runs the FULL safe
+// teardown before reloadAsync. So: the TitleScreen now AUTO-fires that same safe
+// path once the heaviest native module (Qwen / llama.rn) reaches a SETTLED status
+// ('ready' | 'failed' | 'skipped') — meaning every module is past init and teardown
+// has real handles to release — after a short visible beat. If Qwen never settles
+// the banner stays and the manual tap still works (pure enhancement). Loading a
+// slot / New Expedition unmounts the screen and cancels the pending apply. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-404';
