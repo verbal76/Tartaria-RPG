@@ -7,6 +7,8 @@ import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
+import { startingLocationForFaction } from '../engine/character';
+import { getLocationById } from '../engine/encounter';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain } from '../engine/whispers';
 import {
@@ -850,6 +852,31 @@ export function ContractsScreen() {
                         </Text>
                       </View>
                     )}
+                    {open && def.factionId && (() => {
+                      // OTA-458 — route-to-turn-in. Players kept losing the agent
+                      // they need to hand a faction quest to. The home outpost holds
+                      // the mission board + same-faction vendors, so it's always a
+                      // valid turn-in point. Reuses the existing pendingRoute confirm
+                      // modal (hub-aware travel).
+                      const dest = startingLocationForFaction(def.factionId);
+                      const destName = getLocationById(dest).name;
+                      const here = player?.currentLocationId === dest;
+                      if (here) {
+                        return (
+                          <Text style={styles.routeHereNote}>
+                            ▸ You're at {destName} — turn in at the mission board or a same-faction agent.
+                          </Text>
+                        );
+                      }
+                      return (
+                        <Pressable
+                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          onPress={() => setPendingRoute({ id: dest, name: destName })}
+                        >
+                          <Text style={styles.routeBtnText}>▸ ROUTE TO TURN-IN ({destName})</Text>
+                        </Pressable>
+                      );
+                    })()}
                     {open && readyToTurnIn && (
                       <Pressable
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
@@ -1340,6 +1367,20 @@ const styles = StyleSheet.create({
   },
   completeBtnPressed: { opacity: 0.7 },
   completeBtnText: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
+  // OTA-458 — ROUTE TO TURN-IN button. Outlined parchment-blue, distinct from
+  // the filled-green COMPLETE and the warning-red ABANDON; sits above both.
+  routeBtn: {
+    marginTop: 10,
+    backgroundColor: 'transparent',
+    borderColor: '#6f93c4',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 9,
+    alignItems: 'center',
+  },
+  routeBtnPressed: { opacity: 0.7 },
+  routeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  routeHereNote: { marginTop: 10, color: '#9ec96a', fontSize: 11, fontStyle: 'italic' },
   // 2026-05-26 OTA-054 — ABANDON button. Ghost/outlined style with
   // a warning border, distinct from the filled-amber COMPLETE.
   abandonBtn: {

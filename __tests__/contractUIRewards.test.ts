@@ -47,6 +47,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { findMysteryById } from '../app/engine/mysteries';
 import { findStorylineById } from '../app/engine/factionStorylines';
+import { FACTION_QUESTS } from '../app/engine/factionQuests';
 
 describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
   beforeAll(() => {
@@ -115,5 +116,63 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
     expect(afterCount).toBe(beforeCount + 1);
     expect(after.activeStorylines?.some((s) => s.id === story.id)).toBe(false);
     expect((after.completedStorylineIds ?? []).includes(story.id)).toBe(true);
+  });
+
+  // OTA-458 — the Contracts-screen COMPLETE button must respect the OTA-450 fetch
+  // gate. A starter fetch quest has no stages, so it slipped past the stage gate and
+  // paid out for free; now the UI path verifies the items are held and consumes them.
+  it('faction_quest (fetch): UI complete refuses without the items, then succeeds and consumes them', async () => {
+    const fetchQuest = FACTION_QUESTS.find((q) => q.fetch)!;
+    expect(fetchQuest.fetch).toBeTruthy();
+    const { itemName, quantity } = fetchQuest.fetch!;
+
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Gatherer', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+
+    const p0 = store.getState().player!;
+    // Active quest on the slate, but NO fetch items in the pack.
+    store.setState({
+      player: {
+        ...p0,
+        inventory: p0.inventory.filter((i) => i.name.toLowerCase() !== itemName.toLowerCase()),
+        activeFactionQuests: [{ id: fetchQuest.id, stage: 0, postedByFaction: fetchQuest.factionId, acceptedAt: Date.now() }],
+        activeFactionQuestIds: [fetchQuest.id],
+      },
+    });
+
+    // Empty-handed: refused, quest stays active, no completion.
+    store.getState().completeContractFromUI('faction_quest', fetchQuest.id);
+    let after = store.getState().player!;
+    expect((after.activeFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(true);
+    expect((after.completedFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(false);
+
+    // Now hold exactly the required items.
+    const p1 = store.getState().player!;
+    store.setState({
+      player: {
+        ...p1,
+        inventory: [
+          ...p1.inventory.filter((i) => i.name.toLowerCase() !== itemName.toLowerCase()),
+          { id: 'fetch_stack', name: itemName, kind: 'material', rarity: 'Common', quantity, tags: [] } as never,
+        ],
+      },
+    });
+    const tcBefore = store.getState().player!.tc;
+
+    store.getState().completeContractFromUI('faction_quest', fetchQuest.id);
+    after = store.getState().player!;
+
+    // Completed, reward paid, and the fetch items consumed.
+    expect((after.completedFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(true);
+    expect((after.activeFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(false);
+    expect(after.tc).toBe(tcBefore + fetchQuest.reward.tc);
+    const held = after.inventory
+      .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
+      .reduce((n, i) => n + (i.quantity ?? 1), 0);
+    expect(held).toBe(0);
   });
 });

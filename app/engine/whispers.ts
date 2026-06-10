@@ -117,7 +117,13 @@ export function findReadyFetchWhisper(
 ): WhisperRecord | null {
   if (!whispers) return null;
   for (const w of whispers) {
-    if (w.stage !== 'fetch_in_progress') continue;
+    // OTA-458 — also re-trigger on 'fetch_active'. Pre-fix, a Silt-Thief kill could
+    // be silently clobbered (see resolveEnemyDefeat): the whisper stayed stuck at
+    // 'fetch_active' with the thief already gone, an unrecoverable dead end. Now
+    // returning to the thief tile while still 'fetch_active' re-spawns the encounter
+    // (fireYulkaFetch guards against a double-spawn if one is already live), so a
+    // player stranded by the old bug can walk back and finish the chain.
+    if (w.stage !== 'fetch_in_progress' && w.stage !== 'fetch_active') continue;
     const tx = w.ctx?.thiefMapX as number | undefined;
     const ty = w.ctx?.thiefMapY as number | undefined;
     if (tx === playerMapX && ty === playerMapY) return w;
@@ -170,7 +176,10 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
       case 'fetch_in_progress':
         return `Travel east of Yulka's tile. The thief is 2-3 tiles over.`;
       case 'fetch_active':
-        return `Defeat the Silt Thief and recover the Aetheric Discs.`;
+        // OTA-458 — include the location hint. If a player was stranded here by the
+        // old disc-clobber bug (thief gone, stage stuck), returning to the thief
+        // tile east of Yulka re-spawns the encounter so they can finish.
+        return `Defeat the Silt Thief and recover the Aetheric Discs — east of Yulka's tile (2-3 over). If the thief isn't there, step back onto that tile to draw them out again.`;
       case 'fetch_returned':
         return `Return to Yulka's tile with the recovered Discs. She owes you 5.`;
       case 'ambush_armed':

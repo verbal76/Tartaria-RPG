@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-458 — [bug/UX] quest turn-in correctness + findability: Silt-Thief disc grant no longer
+  // clobbered by the loot set() (functional set in resolveEnemyDefeat) + stuck-whisper recovery; the
+  // Contracts COMPLETE button now respects the fetch gate (verify + consume); faction-quest cards gain
+  // a ROUTE TO TURN-IN button to the faction home outpost. Element #53: Iodine.
+  '2026-06-10-458': 'Iodine Sublimation',
   // OTA-457 — [crash] feed-the-dog game-drop was a Qwen completion SIGSEGV on the Pixel 10 Pro XL /
   // Tensor G5; lowered the completion-crash self-protect threshold 3→1 so one app-drop flips the Arbiter
   // to template narration (OTA-414 auto-retry self-heals). Element #52: Tellurium.

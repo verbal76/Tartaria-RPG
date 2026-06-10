@@ -367,6 +367,16 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-458 "Iodine Sublimation" — [bug/UX] quest turn-in correctness + findability** *(element #53)*.
+  Three fixes from one playtest report. (1) **Silt-Thief discs**: `resolveEnemyDefeat`'s monolithic loot
+  `set()` rebuilt `player` from a STALE snapshot, clobbering the early disc grant — discs wiped, whisper
+  reverted `fetch_returned`→`fetch_active` (dead end). Made it a functional `set` reading live state;
+  added stuck-player recovery (re-spawn on returning to thief tile at `fetch_active`, `fireYulkaFetch`
+  double-spawn guard, location hint in the stage desc). (2) **UI fetch gate**: `completeContractFromUI`
+  skipped the OTA-450 fetch gate — fetch quests completed FREE from the Contracts screen; now verifies +
+  consumes the items. (3) **Route to turn-in**: faction-quest cards get a "▸ ROUTE TO TURN-IN" button to
+  the faction home outpost. `gameStore.ts`, `whispers.ts`, `ContractsScreen.tsx`. Covered by
+  `whisperYulka.test.ts` (disc-grant regression) + `contractUIRewards.test.ts` (UI fetch gate).
 - **OTA-457 "Tellurium Refining" — [crash] feed-the-dog game-drop** *(element #52)*. A tester fed the
   dog bioluminescent fungus and the game dropped to the home screen — a Qwen completion SIGSEGV on the
   Pixel 10 Pro XL / Tensor G5 (the device the OTA-351 guard names). The fungus was incidental; any

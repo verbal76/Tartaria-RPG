@@ -229,4 +229,56 @@ describe('Yulka chain — full state-machine drive', () => {
     expect(after.tc).toBe(0);
     expect(after.inventory.find((i) => i.name === 'Aetheric Disc')).toBeUndefined();
   });
+
+  // OTA-458 regression — killing the Silt Thief grants the Stolen Aetheric Discs
+  // and advances the whisper to 'fetch_returned'. Pre-fix, resolveEnemyDefeat's
+  // disc grant ran an early set() that was then CLOBBERED by the monolithic loot
+  // set() (built from a stale player snapshot): the discs were wiped and the stage
+  // reverted to 'fetch_active' — "defeated the silt thief but didn't get the discs."
+  it("killing the Silt Thief grants the Stolen Discs and advances the whisper (not clobbered by loot)", async () => {
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'YulkaKiller', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+    const p0 = store.getState().player!;
+    const scene = store.getState().currentScene!;
+    // Whisper armed at fetch_active (thief spawned), and a 1-HP Silt Thief as the
+    // active enemy with real loot so the monolithic loot set() definitely fires.
+    const thief = {
+      name: 'Silt Thief', damage: '1d6', abilityPoint: 'Strength 0',
+      hp: 1, type: 'humanoid', loot: ['Scrap Metal'], rarity: 'Common', traits: [],
+    };
+    store.setState({
+      player: {
+        ...p0,
+        activeWhispers: [{
+          id: 'yulka_discs',
+          stage: 'fetch_active',
+          plantedAtHour: 0,
+          expiresAtHour: 48,
+          targetMapX: p0.mapX ?? 0,
+          targetMapY: p0.mapY ?? 0,
+          targetLocationId: p0.currentLocationId,
+          ctx: { thiefMapX: 5, thiefMapY: 5 },
+        }],
+      },
+      currentScene: {
+        ...scene, enemies: [thief as never], enemyHps: [1], activeEnemyIdx: 0,
+        range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
+      },
+    });
+
+    store.getState().resolveEnemyDefeat();
+
+    const after = store.getState().player!;
+    // The stolen discs survived the loot set().
+    const stolen = after.inventory.find((i) => i.name === 'Stolen Aetheric Discs');
+    expect(stolen).toBeDefined();
+    expect(stolen!.quantity).toBe(12);
+    // And the whisper advanced to the return stage (was reverting to fetch_active).
+    const w = (after.activeWhispers ?? []).find((x) => x.id === 'yulka_discs');
+    expect(w?.stage).toBe('fetch_returned');
+  });
 });

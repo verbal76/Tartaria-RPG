@@ -13702,4 +13702,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // narration (fully playable) instead of letting the device keep losing the game. OTA-414 auto-retry
 // still re-enables Qwen on its own once the device strings together enough clean cold boots, so a
 // one-off blip on a healthy device costs nothing. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-457';
+// OTA-458 (Iodine Sublimation) — [bug/UX] quest turn-in correctness + findability, three fixes from
+// one playtest report. (1) SILT-THIEF DISCS: a player "defeated the silt thief but didn't get the
+// discs." resolveEnemyDefeat granted the Stolen Aetheric Discs in an early set(), then the monolithic
+// loot set() — rebuilt from a STALE player snapshot captured at the top of the function — clobbered it,
+// wiping the discs AND reverting the whisper from 'fetch_returned' back to 'fetch_active' (an
+// unrecoverable dead end). That loot set() is now functional (reads live s.player / s.worldMemory), so
+// the disc grant survives. As recovery for anyone already stranded by the old bug, returning to the
+// thief tile while stuck at 'fetch_active' re-spawns the encounter (findReadyFetchWhisper now matches
+// it; fireYulkaFetch guards a double-spawn), and the stage hint names the location. (2) UI FETCH GATE:
+// the Contracts-screen COMPLETE button skipped the OTA-450 fetch gate — a starter fetch quest (no
+// stages) paid out for FREE; completeContractFromUI now verifies the items are held and consumes them.
+// (3) ROUTE TO TURN-IN: faction-quest cards gain a "▸ ROUTE TO TURN-IN" button that sets course for the
+// faction home outpost (board + same-faction agents), so players stop losing the agent they owe.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-458';

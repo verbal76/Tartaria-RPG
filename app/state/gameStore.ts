@@ -13942,48 +13942,59 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // stacks, ambush flags) so they don't drift onto the wrong enemy.
     const dropAt = <T>(arr: T[] | undefined): T[] | undefined =>
       arr ? arr.filter((_, i) => i !== activeIdx) : undefined;
-    set({
-      currentScene: {
-        ...currentScene,
-        enemies: remainingEnemies,
-        enemyHps: remainingHps,
-        enemyStatuses: dropAt(currentScene.enemyStatuses),
-        enemyKnockedOut: dropAt(currentScene.enemyKnockedOut),
-        enemyArmorShred: dropAt(currentScene.enemyArmorShred),
-        enemyCorruptionStacks: dropAt(currentScene.enemyCorruptionStacks),
-        enemyAmbushUsed: dropAt(currentScene.enemyAmbushUsed),
-        activeEnemyIdx: nextActiveIdx,
-        range: stillFighting ? currentScene.range : null,
-        hooks: currentScene.hooks ?? [],
-      },
-      worldMemory: recordEnemyDefeat(worldMemory, enemy.name),
-      player: {
-        ...player,
-        hp: newHp,
-        hpMax: newHpMax,
-        inventory: lootDrops.reduce(
-          (inv, lootName, i) => {
-            const lootLookup = lookupCraftedItem(lootName);
-            // OTA-363 — a dropped coatable weapon occasionally arrives
-            // pre-coated. Coated weapons mint as a distinct instance
-            // (grantItem refuses to merge them) with a full durability
-            // block so they read + wear like a real found weapon.
-            const lootCoat = lootLookup.kind === 'weapon' ? rollLootCoating(lootName) : null;
-            const baseDur = lootCoat ? (findWeaponByName(lootName)?.baseDurability ?? 10) : undefined;
-            return mergeOrPushItem(inv, {
-              id: `loot_${Date.now()}_${i}`,
-              name: lootName,
-              kind: lootLookup.kind,
-              rarity: lootLookup.rarity,
-              quantity: 1,
-              tags: [...lootLookup.tags, 'loot'],
-              ...(lootCoat ? { coating: lootCoat, durability: { current: baseDur!, max: baseDur! } } : {}),
-            });
-          },
-          player.inventory,
-        ),
-        milestones: { ...prevMs, enemiesDefeated: newKills },
-      },
+    // OTA-458 — functional set. This used to be a plain set({ player: { ...player } })
+    // built from the `player` snapshot captured at the TOP of resolveEnemyDefeat
+    // (before the Silt-Thief disc grant ran its own earlier set). That stale spread
+    // CLOBBERED the disc grant — the stolen Aetheric Discs were added then wiped, and
+    // the yulka_discs whisper reverted from 'fetch_returned' back to 'fetch_active'
+    // (the player "defeated the silt thief but didn't get the discs"). Reading from
+    // the live state (s.player / s.worldMemory) preserves any earlier mutation —
+    // discs, whisper advance — and starts the loot reduce from the current inventory.
+    set((s) => {
+      const base = s.player ?? player;
+      return {
+        currentScene: {
+          ...currentScene,
+          enemies: remainingEnemies,
+          enemyHps: remainingHps,
+          enemyStatuses: dropAt(currentScene.enemyStatuses),
+          enemyKnockedOut: dropAt(currentScene.enemyKnockedOut),
+          enemyArmorShred: dropAt(currentScene.enemyArmorShred),
+          enemyCorruptionStacks: dropAt(currentScene.enemyCorruptionStacks),
+          enemyAmbushUsed: dropAt(currentScene.enemyAmbushUsed),
+          activeEnemyIdx: nextActiveIdx,
+          range: stillFighting ? currentScene.range : null,
+          hooks: currentScene.hooks ?? [],
+        },
+        worldMemory: recordEnemyDefeat(s.worldMemory ?? worldMemory, enemy.name),
+        player: {
+          ...base,
+          hp: newHp,
+          hpMax: newHpMax,
+          inventory: lootDrops.reduce(
+            (inv, lootName, i) => {
+              const lootLookup = lookupCraftedItem(lootName);
+              // OTA-363 — a dropped coatable weapon occasionally arrives
+              // pre-coated. Coated weapons mint as a distinct instance
+              // (grantItem refuses to merge them) with a full durability
+              // block so they read + wear like a real found weapon.
+              const lootCoat = lootLookup.kind === 'weapon' ? rollLootCoating(lootName) : null;
+              const baseDur = lootCoat ? (findWeaponByName(lootName)?.baseDurability ?? 10) : undefined;
+              return mergeOrPushItem(inv, {
+                id: `loot_${Date.now()}_${i}`,
+                name: lootName,
+                kind: lootLookup.kind,
+                rarity: lootLookup.rarity,
+                quantity: 1,
+                tags: [...lootLookup.tags, 'loot'],
+                ...(lootCoat ? { coating: lootCoat, durability: { current: baseDur!, max: baseDur! } } : {}),
+              });
+            },
+            base.inventory,
+          ),
+          milestones: { ...prevMs, enemiesDefeated: newKills },
+        },
+      };
     });
     // arb45 — Bane of Sentinels: count Architectural Sentinel / mechanical
     // kills toward the title (5 needed).
@@ -16321,11 +16332,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return;
         }
       }
+      // OTA-458 — fetch gate (was missing on the UI path). The OTA-450 starter
+      // quests are fetch deliveries with NO stages, so they slipped straight past
+      // the stage gate above and the Contracts-screen COMPLETE button paid out the
+      // reward WITHOUT verifying or consuming the items — a free turn-in. Mirror
+      // the vendor turn-in: require the items in pack, then consume them.
+      let fetchConsumed: InventoryItem[] | null = null;
+      if (def.fetch) {
+        const { itemName, quantity } = def.fetch;
+        const have = player.inventory
+          .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
+          .reduce((n, i) => n + (i.quantity ?? 1), 0);
+        if (have < quantity) {
+          get().appendLog('arbiter', `The Arbiter checks the slate. "${def.title} needs ${quantity}× ${itemName} — you're carrying ${have}. Gather the rest, then claim it."`);
+          return;
+        }
+        let toRemove = quantity;
+        fetchConsumed = player.inventory
+          .map((i) => {
+            if (toRemove <= 0 || i.name.toLowerCase() !== itemName.toLowerCase()) return i;
+            const take = Math.min(toRemove, i.quantity ?? 1);
+            toRemove -= take;
+            return { ...i, quantity: (i.quantity ?? 1) - take };
+          })
+          .filter((i) => (i.quantity ?? 1) > 0);
+      }
       const repResult = applyRepChange(player.factionStanding, def.factionId, def.reward.rep);
       set((s) => (s.player ? {
         player: {
           ...s.player,
           tc: s.player.tc + def.reward.tc,
+          inventory: fetchConsumed ?? s.player.inventory,
           factionStanding: repResult.standing,
           activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== def.id),
           activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== def.id),
@@ -20728,6 +20765,13 @@ function fireYulkaFetch(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   whisper: WhisperRecord,
 ): void {
+  // OTA-458 — double-spawn guard. findReadyFetchWhisper now also re-fires on
+  // 'fetch_active' (recovery for players stranded by the old disc-clobber bug), so
+  // don't stack a second thief if one is already live in the scene.
+  const scnNow = get().currentScene;
+  if (scnNow && scnNow.enemies.some((e, i) => e.name === 'Silt Thief' && (scnNow.enemyHps[i] ?? 0) > 0)) {
+    return;
+  }
   // Spawn the Silt Thief into the current scene with stolen-Discs
   // on death drop. Done via the standard enemy-spawn pattern.
   const proto = spawnChainEnemy('Silt Thief');
