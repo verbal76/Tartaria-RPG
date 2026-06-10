@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-421 — [audit #3] rotating save temp key: concurrent same-slot saves no longer
+  // false-trip the self-heal (copy-log wipe + phantom persist FAILED). Element #16: Sulfur.
+  '2026-06-10-421': 'Sulfur Vulcanization',
   // OTA-420 — [audit #2] typed enemy damage ("2D6 Psychic") no longer collapses to 1d6;
   // dice parser ignores the trailing type word. Element #15: Phosphorus.
   '2026-06-10-420': 'Phosphorus Oxidation',

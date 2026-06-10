@@ -259,16 +259,29 @@ export function consumeSaveReclaimedFlag(): boolean {
 // contrast, RELIABLY frees space (a DELETE doesn't need new pages). So when a
 // save can't stage, we sacrifice the debug copy-log — never the player's actual
 // progress — to get the save to land, and self-heal a DB the old bug had bricked.
-async function emergencyReclaimDiskSpace(slotId: string): Promise<void> {
+async function emergencyReclaimDiskSpace(slotId: string, currentTmpKey?: string): Promise<void> {
   try { await AsyncStorage.removeItem(slotLogKey(slotId)); } catch { /* ignore */ }
-  // Drop any stale temp key from a prior interrupted write, too.
+  // Drop THIS write's temp + any legacy single-temp leftover from a prior crash.
+  if (currentTmpKey) { try { await AsyncStorage.removeItem(currentTmpKey); } catch { /* ignore */ } }
   try { await AsyncStorage.removeItem(slotSaveTmpKey(slotId)); } catch { /* ignore */ }
 }
+
+// OTA-421 — [audit fix #3] bounded rotating temp-key counter. The old single
+// `${slot}.tmp` key meant two concurrent saves to the SAME slot collided: save A
+// staged payloadA, save B overwrote the tmp with payloadB, then A's verify read
+// payloadB ≠ payloadA → A wrongly concluded "storage full" → emergency-purged the
+// copy-log AND logged a phantom `persist FAILED`. Because `void persist()` fires
+// back-to-back during fast play, ORDINARY rapid play tripped this. Rotating the
+// temp key over a small window (`& 7` = 8 keys) means concurrent writes never share
+// one, so each verifies its own bytes — while orphaned temps (from a crash
+// mid-stage) stay bounded to ≤8/slot and get reused as the counter cycles. The
+// counter resets per process launch, so cross-launch orphans are reused too.
+let saveTmpCounter = 0;
 
 export async function saveSlot(slotId: string, state: SaveState): Promise<void> {
   const toSave: SaveState = { ...state, savedAt: Date.now(), version: 1 };
   const payload = JSON.stringify(toSave);
-  const tmpKey = slotSaveTmpKey(slotId);
+  const tmpKey = `${slotSaveKey(slotId)}.tmp.${(saveTmpCounter++) & 7}`;
   const bakKey = slotSaveBakKey(slotId);
   const liveKey = slotSaveKey(slotId);
 
@@ -294,7 +307,7 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
     //      regenerable copy-log and retry ONCE; that frees space a stuffed DB
     //      wouldn't give an overwrite, so a save can finally land.
     if (!(await tryStage())) {
-      await emergencyReclaimDiskSpace(slotId);
+      await emergencyReclaimDiskSpace(slotId, tmpKey);
       if (!(await tryStage())) {
         throw new Error('staged save did not verify (truncated or storage full)');
       }
@@ -364,7 +377,9 @@ export async function deleteSlot(slotId: string): Promise<void> {
   // character leaves no recoverable bytes behind.
   await AsyncStorage.multiRemove([
     slotSaveKey(slotId),
-    slotSaveTmpKey(slotId),
+    slotSaveTmpKey(slotId), // legacy single-temp
+    // OTA-421 — the rotating temp keys (`.tmp.0`..`.tmp.7`) too.
+    ...Array.from({ length: 8 }, (_, i) => `${slotSaveKey(slotId)}.tmp.${i}`),
     slotSaveBakKey(slotId),
     slotLogKey(slotId),
   ]);

@@ -367,6 +367,14 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-421 "Sulfur Vulcanization" — [audit fix #3] rotating save temp key** *(element
+  #16)*. Single `${slot}.tmp` → concurrent same-slot saves collided → one save's verify
+  read another's bytes → false "storage full" → copy-log wiped + phantom `persist
+  FAILED`. Temp key now rotates `& 7` (8 keys); orphans bounded, cleared on delete.
+  `saveSystem.ts`; `atomicSaveWrites.test.ts` (+2). *(NOTE: the index-race half of the
+  audit finding — concurrent saves to DIFFERENT slots dropping index entries — is NOT
+  addressed by this; it'd need full persist serialization. Rare since one slot is
+  active. Logged for later.)*
 - **OTA-420 "Phosphorus Oxidation" — [audit fix #2] typed enemy damage no longer 1d6**
   *(element #15)*. 14 enemies store damage with a type word ("2D6 Psychic"); the
   anchored `^…$` in `parseDiceNotation` failed them → 0 → 1d6 fallback. Parser now

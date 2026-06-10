@@ -148,6 +148,42 @@ describe('OTA-406 — storage-full self-heal: purge the copy-log + retry', () =>
   });
 });
 
+describe('OTA-421 — concurrent same-slot saves do not false-trip the self-heal', () => {
+  const logKey2 = (slot: string) => `tartaria.gamelog.${slot}.v2`;
+
+  it('three concurrent saves to one slot keep the copy-log + report no error', async () => {
+    await AsyncStorage.setItem(logKey2(SLOT), 'x'.repeat(500)); // the diagnostic copy-log
+    clearLastSaveWriteError();
+    consumeSaveReclaimedFlag(); // clear any leftover flag
+
+    // Pre-OTA-421 these collided on the single `${slot}.tmp` key: one save's
+    // verify read another's bytes → false "storage full" → copy-log wiped +
+    // phantom persist FAILED. The rotating temp key gives each its own.
+    await Promise.all([
+      saveSlot(SLOT, mkState('A')),
+      saveSlot(SLOT, mkState('B')),
+      saveSlot(SLOT, mkState('C')),
+    ]);
+
+    // The copy-log survived (no spurious emergency purge)…
+    expect(await AsyncStorage.getItem(logKey2(SLOT))).not.toBeNull();
+    // …no phantom failure or self-heal was recorded…
+    expect(getLastSaveWriteError()).toBeNull();
+    expect(consumeSaveReclaimedFlag()).toBe(false);
+    // …and a valid save landed (last writer wins).
+    const loaded = await loadSlot(SLOT);
+    expect(['A', 'B', 'C']).toContain(loaded?.player?.name);
+  });
+
+  it('deleteSlot clears the rotating temp keys too', async () => {
+    await saveSlot(SLOT, mkState('A'));
+    // Force a rotating temp to exist by simulating an interrupted stage.
+    await AsyncStorage.setItem(`${slotSaveKey(SLOT)}.tmp.3`, 'leftover');
+    await deleteSlot(SLOT);
+    expect(await AsyncStorage.getItem(`${slotSaveKey(SLOT)}.tmp.3`)).toBeNull();
+  });
+});
+
 describe('deleteSlot — clears every atomic key', () => {
   it('removes live, temp, and backup keys', async () => {
     await saveSlot(SLOT, mkState('Aldric'));

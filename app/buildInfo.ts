@@ -13392,4 +13392,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "2d6psychic") → rollFromNotation returned 0 → the hardest hitters silently fell back
 // to 1d6. The parser now matches the FIRST NdM(±N) token anywhere and ignores
 // leading/trailing type text; clean notations parse identically. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-420';
+// OTA-421 (Sulfur Vulcanization) — [audit fix #3] saves no longer false-trip the
+// self-heal during fast play. saveSlot staged to a single `${slot}.tmp` key, so two
+// concurrent same-slot saves collided: A staged payloadA, B overwrote with payloadB,
+// A's verify read payloadB ≠ payloadA → A wrongly concluded "storage full" →
+// emergency-purged the diagnostic copy-log AND logged a phantom `persist FAILED`. Since
+// `void persist()` fires back-to-back during ordinary rapid play, this tripped often.
+// The temp key now rotates over a bounded window (`& 7` = 8 keys) so concurrent writes
+// never share one; orphaned temps stay ≤8/slot (reused as the counter cycles, and
+// cleared on deleteSlot). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-421';
