@@ -13246,4 +13246,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // applies on the next app open (expo ON_LOAD → boot-front, before native starts),
 // so the banner is now an OPTIONAL "apply now" and there is no risky mid-session
 // auto-reload. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-405';
+// OTA-406 (Hydrogen Electrolysis) — bulletproof save self-heal for "storage full".
+// Telemetry from a Tanbark-Anvil (405) device proved capDiskLog (398) ISN'T enough:
+// saves still FAIL at a tiny ~159-182 KB blob with "truncated or storage full" —
+// i.e. AsyncStorage's ~6 MB SQLite DB is already STUFFED (by the pre-398 unbounded
+// copy-log), and capDiskLog only self-heals if an overwrite-with-smaller setItem can
+// still squeeze in, which a full DB refuses. New fix: when saveSlot can't stage the
+// save, it emergency-PURGES the regenerable on-disk copy-log via removeItem (a DELETE
+// reliably frees pages where an overwrite stalls) and retries the stage ONCE — so the
+// player's actual progress lands even on a bricked DB, sacrificing only the debug log.
+// persist() surfaces a one-time "storage was full — cleared it, saving again" line.
+// (saveSystem.ts emergencyReclaimDiskSpace + consumeSaveReclaimedFlag; gameStore
+// persist wiring; atomicSaveWrites.test.ts +1.) JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-406';

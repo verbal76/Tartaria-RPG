@@ -367,6 +367,18 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-406 "Hydrogen Electrolysis" — bulletproof "storage full" save self-heal**
+  *(first periodic-table codename — element #1)*. A **Tanbark-Anvil (405)** device's
+  log proved capDiskLog (398) isn't enough: saves STILL fail at a tiny ~159-182 KB
+  blob with "truncated or storage full" → AsyncStorage's ~6 MB DB is already stuffed
+  (the pre-398 unbounded copy-log), and capDiskLog only self-heals if an
+  overwrite-with-smaller `setItem` can squeeze in, which a full DB refuses. Fix: when
+  `saveSlot` can't stage, it emergency-PURGES the regenerable on-disk copy-log via
+  `removeItem` (a DELETE frees pages where an overwrite stalls) and retries ONCE — the
+  player's progress lands even on a bricked DB, sacrificing only the debug log.
+  `persist()` surfaces a one-time recovery line. `saveSystem.ts`
+  (`emergencyReclaimDiskSpace` + `consumeSaveReclaimedFlag`), `gameStore.ts`;
+  `atomicSaveWrites.test.ts` (+1).
 - **OTA-405 "Tanbark Anvil" — boot gate (Gate A + Gate B) + revert 404's
   mid-session auto-apply.** Player direction: "keep gate A … give me the best
   version of gate b so it doesn't affect load times too much or cause ai crashes

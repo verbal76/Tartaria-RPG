@@ -62,6 +62,7 @@ import {
   ensureFirstInstallSeed,
   grantDevGemOnce,
   getLastSaveWriteError,
+  consumeSaveReclaimedFlag,
   type SlotSummary,
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown } from '../engine/saveTrim';
@@ -19304,6 +19305,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const saveErr = getLastSaveWriteError();
     if (saveErr) {
       get().appendLog('debug', `persist: slot ${activeSlotId} FAILED — ${saveErr}`);
+    }
+    // OTA-406 — if saveSlot had to emergency-purge the on-disk copy-log to land
+    // the save (a DB the pre-398 unbounded log had stuffed full), tell the
+    // player their progress was rescued — this is the recovery from the silent
+    // "storage full" save-loss, and it self-heals on the spot.
+    if (consumeSaveReclaimedFlag()) {
+      get().appendLog(
+        'system',
+        'Storage was full from an old diagnostic log — cleared it and your save went through. Progress is saving again.',
+      );
     }
     // OTA-396/397 — per-part byte breakdown so we never guess what's oversized.
     // Logged on a FAILED write, on a trim, AND as a periodic heartbeat so the

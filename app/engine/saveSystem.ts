@@ -240,6 +240,31 @@ export function clearLastSaveWriteError(): void {
   lastSaveWriteError = null;
 }
 
+// OTA-406 — set true for one persist cycle when saveSlot had to emergency-purge
+// the on-disk copy-log to free space before a save could land. persist() reads +
+// clears it so the world feed can tell the player their progress was rescued.
+let lastSaveReclaimedSpace = false;
+export function consumeSaveReclaimedFlag(): boolean {
+  const v = lastSaveReclaimedSpace;
+  lastSaveReclaimedSpace = false;
+  return v;
+}
+
+// OTA-406 — emergency storage reclaim. The on-disk COPY-LOG (slotLogKey) is the
+// largest REGENERABLE key we own: on a pre-OTA-398 build it grew unbounded and
+// can fill AsyncStorage's ~6 MB SQLite DB, after which EVERY setItem — including
+// the tiny slot save — fails with "storage full" and the player silently stops
+// saving. capDiskLog (398) only self-heals if an overwrite-with-smaller setItem
+// can still squeeze in, which a fully-stuffed DB may refuse. A removeItem, by
+// contrast, RELIABLY frees space (a DELETE doesn't need new pages). So when a
+// save can't stage, we sacrifice the debug copy-log — never the player's actual
+// progress — to get the save to land, and self-heal a DB the old bug had bricked.
+async function emergencyReclaimDiskSpace(slotId: string): Promise<void> {
+  try { await AsyncStorage.removeItem(slotLogKey(slotId)); } catch { /* ignore */ }
+  // Drop any stale temp key from a prior interrupted write, too.
+  try { await AsyncStorage.removeItem(slotSaveTmpKey(slotId)); } catch { /* ignore */ }
+}
+
 export async function saveSlot(slotId: string, state: SaveState): Promise<void> {
   const toSave: SaveState = { ...state, savedAt: Date.now(), version: 1 };
   const payload = JSON.stringify(toSave);
@@ -247,17 +272,33 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
   const bakKey = slotSaveBakKey(slotId);
   const liveKey = slotSaveKey(slotId);
 
+  // Stage the payload to the temp key and verify it round-trips byte-for-byte
+  // (catches a truncated / quota-capped write BEFORE we touch the live slot).
+  // setItem can THROW on a full DB, so guard it — a thrown write is a failed
+  // stage, same as a mismatched readback.
+  const tryStage = async (): Promise<boolean> => {
+    try {
+      await AsyncStorage.setItem(tmpKey, payload);
+      const staged = await AsyncStorage.getItem(tmpKey);
+      return staged === payload;
+    } catch {
+      return false;
+    }
+  };
+
   // OTA-344 — atomic write: temp → verify → snapshot last-good → swap → cleanup.
   // Never throws (see lastSaveWriteError note above): on any failure the live
   // save and the .bak are left exactly as they were.
   try {
-    // 1. Stage to a temp key.
-    await AsyncStorage.setItem(tmpKey, payload);
-    // 2. Verify the staged copy round-trips byte-for-byte — catches a truncated
-    //    / quota-capped write BEFORE we touch the live slot.
-    const staged = await AsyncStorage.getItem(tmpKey);
-    if (staged !== payload) {
-      throw new Error('staged save did not verify (truncated or storage full)');
+    // 1-2. Stage + verify. OTA-406 — if it fails (storage full), reclaim the
+    //      regenerable copy-log and retry ONCE; that frees space a stuffed DB
+    //      wouldn't give an overwrite, so a save can finally land.
+    if (!(await tryStage())) {
+      await emergencyReclaimDiskSpace(slotId);
+      if (!(await tryStage())) {
+        throw new Error('staged save did not verify (truncated or storage full)');
+      }
+      lastSaveReclaimedSpace = true;
     }
     // 3. Snapshot the current live save → backup (last-good), but ONLY if it
     //    parses — never promote already-corrupt bytes to the backup.

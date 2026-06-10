@@ -5,6 +5,7 @@ import {
   deleteSlot,
   getLastSaveWriteError,
   clearLastSaveWriteError,
+  consumeSaveReclaimedFlag,
   slotSaveKey,
 } from '../app/engine/saveSystem';
 import type { SaveState } from '../app/engine/types';
@@ -89,9 +90,12 @@ describe('atomic saveSlot — failure leaves the live save intact, never throws'
     await saveSlot(SLOT, mkState('Aldric')); // good live save exists
     clearLastSaveWriteError();
 
-    // Make the verify read-back return the WRONG bytes once (simulates a
-    // truncated/quota-capped staged write).
-    (AsyncStorage.getItem as jest.Mock).mockImplementationOnce(() => Promise.resolve('garbage-not-the-payload'));
+    // Make the verify read-back return the WRONG bytes on BOTH stage attempts
+    // (the initial stage AND the OTA-406 post-reclaim retry) — a persistent
+    // truncated/quota-capped staged write, so the save genuinely can't land.
+    (AsyncStorage.getItem as jest.Mock)
+      .mockImplementationOnce(() => Promise.resolve('garbage-not-the-payload'))
+      .mockImplementationOnce(() => Promise.resolve('garbage-not-the-payload'));
 
     await expect(saveSlot(SLOT, mkState('Verbal'))).resolves.toBeUndefined(); // never throws
     expect(getLastSaveWriteError()).toMatch(/verify/i);
@@ -101,10 +105,46 @@ describe('atomic saveSlot — failure leaves the live save intact, never throws'
     expect(loaded?.player?.name).toBe('Aldric');
   });
 
-  it('a rejecting setItem is swallowed (no unhandled rejection from persist)', async () => {
-    (AsyncStorage.setItem as jest.Mock).mockImplementationOnce(() => Promise.reject(new Error('quota')));
+  it('a PERSISTENTLY rejecting setItem is swallowed (no unhandled rejection from persist)', async () => {
+    // Both stage attempts reject — the initial stage AND the post-reclaim retry
+    // (OTA-406) — so the save can never land. saveSlot must still resolve
+    // (never throw) and record the error. Two one-shot rejections cover both
+    // setItem stage calls, then the default mock impl is preserved for the
+    // next test.
+    (AsyncStorage.setItem as jest.Mock)
+      .mockImplementationOnce(() => Promise.reject(new Error('quota')))
+      .mockImplementationOnce(() => Promise.reject(new Error('quota')));
     await expect(saveSlot(SLOT, mkState('Verbal'))).resolves.toBeUndefined();
-    expect(getLastSaveWriteError()).toMatch(/quota/i);
+    expect(getLastSaveWriteError()).toMatch(/verify|quota/i);
+  });
+});
+
+describe('OTA-406 — storage-full self-heal: purge the copy-log + retry', () => {
+  const logKey = (slot: string) => `tartaria.gamelog.${slot}.v2`;
+
+  it('frees space by removing the on-disk copy-log, then the save lands', async () => {
+    // The pre-398 unbounded copy-log that stuffed the DB.
+    await AsyncStorage.setItem(logKey(SLOT), 'x'.repeat(5000));
+    clearLastSaveWriteError();
+    consumeSaveReclaimedFlag(); // clear any leftover flag from a prior test
+
+    // The FIRST setItem (staging to the temp key) rejects as if the DB were
+    // full; every subsequent setItem uses the default mock (stores normally) —
+    // mirroring the removeItem having freed enough space for the retry.
+    (AsyncStorage.setItem as jest.Mock).mockImplementationOnce(() =>
+      Promise.reject(new Error('database or disk is full')),
+    );
+
+    await saveSlot(SLOT, mkState('Rescued'));
+
+    // The regenerable copy-log was purged to reclaim space…
+    expect(await AsyncStorage.getItem(logKey(SLOT))).toBeNull();
+    // …and the player's save actually landed despite the first full-DB failure.
+    const loaded = await loadSlot(SLOT);
+    expect(loaded?.player?.name).toBe('Rescued');
+    expect(getLastSaveWriteError()).toBeNull();
+    // The recovery flag is raised so persist() can tell the player.
+    expect(consumeSaveReclaimedFlag()).toBe(true);
   });
 });
 
