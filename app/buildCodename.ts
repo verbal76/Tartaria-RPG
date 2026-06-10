@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-423 — [audit #5] close the craft→scrap TC/material pump (improvised weapons give
+  // no Scrap Metal; Scrap Metal re-raritied Uncommon→Common). Element #18: Argon.
+  '2026-06-10-423': 'Argon Welding',
   // OTA-422 — [audit #4] author vendors for the 4 vendorless factions so their faction
   // quests are reachable (audit reachability 8→0). Element #17: Chlorine.
   '2026-06-10-422': 'Chlorine Bleaching',

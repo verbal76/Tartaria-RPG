@@ -13410,4 +13410,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Cartographer / Foreman Drest Holloway / Sister Yune Ashfall) with valid catalog
 // offers; they surface via the same pickRandomVendor path (incl. the capital RNG) the
 // other 5 use. Audit reachability failures: 8 → 0. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-422';
+// OTA-423 (Argon Welding) — [audit fix #5] close the craft→scrap money/material pump.
+// A 1-Stick Club (improvised, no metal) scrapped to Scrap Metal + Stick + Small Rock —
+// returning the input PLUS extras, and Scrap Metal was mispriced Uncommon (sells 14 TC),
+// so craft→scrap→sell was an unbounded TC pump (crafting/scrapping cost no TC/time/
+// stamina). Two surgical fixes: (1) an improvised weapon no longer yields Scrap Metal
+// (no conjuring metal from wood); real metal weapons still do. (2) Scrap Metal re-raritied
+// Uncommon → Common (sell 14 → ~5), matching the scrap engine's stated "one scrap ≈ one
+// common dig" design. The loop is now strictly no-better-than digging. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-423';

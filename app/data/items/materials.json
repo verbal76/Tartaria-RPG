@@ -12,7 +12,7 @@
     { "name": "Mud Essence", "rarity": "Uncommon", "tags": ["mud", "aether"], "description": "Concentrated Aetheric mud distilled from a creature's core." },
     { "name": "Drone Core", "rarity": "Uncommon", "tags": ["automation", "aether"], "description": "A small Aetherstone-powered logic core from a salvaged automaton." },
     { "name": "Energy Fragment", "rarity": "Uncommon", "tags": ["aether", "energy"], "description": "A still-charged splinter of pre-flood circuitry." },
-    { "name": "Scrap Metal", "rarity": "Uncommon", "tags": ["metal"], "description": "Mixed metals from rusted Tartarian constructions. Reforges into weapon stock." },
+    { "name": "Scrap Metal", "rarity": "Common", "tags": ["metal"], "description": "Mixed metals from rusted Tartarian constructions. Reforges into weapon stock." },
     { "name": "Aetheric Cloth", "rarity": "Rare", "tags": ["fiber", "aether"], "description": "Cloth woven with Aetheric thread. Resists most energy types." },
     { "name": "Aetheric Pelt", "rarity": "Rare", "tags": ["organic", "aether"], "description": "Hide from an Aetheric mutation. Cured properly it sheds nearly all damage." },
     { "name": "Golem Core", "rarity": "Rare", "tags": ["construct", "aether"], "description": "The Aetherstone heart of a Mud Golem. Beats faintly for hours after extraction." },

@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-423 "Argon Welding" — [audit fix #5] close the craft→scrap pump** *(element
+  #18)*. Improvised weapons no longer yield Scrap Metal (no metal-from-wood); Scrap Metal
+  re-raritied Uncommon→Common (14→~5 TC). Loop now ≤ digging. `scrapEngine.ts`,
+  `materials.json`.
 - **OTA-422 "Chlorine Bleaching" — [audit fix #4] 4 missing faction vendors authored**
   *(element #17)*. eternal_dynasty / conspiracy_architects / stone_builders /
   tartarian_revivalists had no vendor → their faction quests were 0% reachable. Added 4

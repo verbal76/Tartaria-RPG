@@ -59,7 +59,13 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   const grants: Array<{ name: string; quantity: number }> = [];
   // Metal content → Scrap Metal. Bolt-casters / blades / armor plates
   // all carry it.
-  if (tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade') || item.kind === 'weapon') {
+  // OTA-423 — [audit fix #5] an IMPROVISED weapon (a stick Club, a Stone Spear)
+  // carries no metal, so it must NOT yield Scrap Metal — that conjured metal from
+  // wood and, with Scrap Metal mispriced Uncommon, let a 1-Stick Club scrap for
+  // MORE than it cost: an infinite craft→scrap→sell TC pump. Real metal weapons
+  // (blade/metal/iron/plate, or a non-improvised weapon) still give it.
+  if (tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade')
+      || (item.kind === 'weapon' && !tags.has('improvised'))) {
     grants.push({ name: 'Scrap Metal', quantity: 1 });
   }
   // Wooden handle / haft → Stick.
