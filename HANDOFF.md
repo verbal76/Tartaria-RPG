@@ -343,7 +343,34 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
-- **OTA-404 "Possumhaw Anvil" — OTA updates auto-apply (no tap).** Player ask: "why
+- **OTA-405 "Tanbark Anvil" — boot gate (Gate A + Gate B) + revert 404's
+  mid-session auto-apply.** Player direction: "keep gate A … give me the best
+  version of gate b so it doesn't affect load times too much or cause ai crashes
+  because we are playing mid load." Two gates hold character load/create on the
+  TitleScreen:
+  - **Gate A** — locked until the boot-front OTA check resolves to "staying on this
+    bundle this launch" (new `otaBootResolved` store flag, set by `App.tsx`; **8s
+    boot-side safety cap** so a hung `hydrate()` can't brick entry). Prevents loading
+    a save onto a bundle about to `reloadAsync` (OTA-234 window).
+  - **Gate B** — locked until the **classifier** (MiniLM / `cognitiveStatus`) hits a
+    terminal state (`ready`/`failed`/`skipped`) **or** a **5s cap**. Gated on the
+    small/fast/gameplay-**required** classifier, *not* the heavy mind (Qwen) or voice
+    (Kokoro). **Why this is the best Gate B:** I verified at the code level that both
+    AI call sites are already hard-gated on real readiness — `narrateViaArbiter` bails
+    to templates unless `qwen.isReady()` (`gameStore.ts:24472`), cognitive enrichment
+    runs only `if cognitiveStatus==='ready'` (`gameStore.ts:12068`), OOM-killed
+    contexts are caught by `isDormant()`+`forceReinitialize` (OTA-222), and native-init
+    crashes are gated by mlHealth (OTA-272/351). So **playing mid-load can't crash from
+    *calling* a half-loaded model** — it uses templates/silence. Waiting for the heavy
+    mind/voice would only add a long per-launch wait for no crash benefit; gating on the
+    fast classifier covers the only AI the game needs at turn one and keeps the hold to
+    ~1-3s (0s on a disabled device, which now reports `cognitiveStatus: 'skipped'`).
+  - **Reverts OTA-404's mid-session auto-reload.** A staged bundle already applies on
+    the next app open (expo `ON_LOAD` → boot-front, before native starts), so the banner
+    is now an optional "apply now"; no mid-session `reloadAsync` (the OTA-234 risk class).
+  - `App.tsx`, `screens/TitleScreen.tsx`, `state/gameStore.ts`.
+- **OTA-404 "Possumhaw Anvil" — OTA updates auto-apply (no tap).** *(Superseded by
+  OTA-405.)* Player ask: "why
   are some updates still tap to apply, they should be automatic right?" Boot-**front**
   (OTA-367) already auto-applies an update found at cold boot, but one landing
   **after** boot was caught by the TitleScreen `fetchOnly` check and only offered a

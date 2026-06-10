@@ -151,6 +151,17 @@ export function TitleScreen() {
   // OTA-apply during the danger window.
   const qwenStatus = useGameStore((s) => s.qwenStatus);
   const qwenFraction = useGameStore((s) => s.qwenFraction);
+  // OTA-405 — GATE A + GATE B inputs. otaBootResolved (Gate A): the boot OTA
+  // check has resolved to "staying on this bundle," so loading a save can't be
+  // caught by an imminent reloadAsync. cognitiveStatus (Gate B): the MiniLM
+  // classifier — the small, fast model the gameplay actually needs from turn
+  // one for target resolution. We gate on the CLASSIFIER, not the heavy mind
+  // (Qwen) or voice (Kokoro): those keep warming in the background and the
+  // engine's dispatch guards (qwen.isReady() / cognitiveStatus==='ready')
+  // make playing through their warm-up crash-safe, so waiting on them would
+  // only hurt load times for no safety gain.
+  const otaBootResolved = useGameStore((s) => s.otaBootResolved);
+  const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
   const modelsLoading =
@@ -196,6 +207,11 @@ export function TitleScreen() {
   const [lastTappedSlot, setLastTappedSlot] = useState<SlotSummary | null>(null);
 
   const onSlotTap = (slot: SlotSummary) => {
+    // OTA-405 — boot gate (A+B). Don't load a save until the boot OTA check
+    // has resolved (no imminent reload) and the classifier has settled (or the
+    // cap elapsed). The slot rows render dimmed + show the warm-up hint while
+    // this is closed; this is the defensive guard if a tap slips through.
+    if (!bootGateOpen) return;
     if (slot.dead) {
       if (resurrectionGems > 0) {
         setPendingAction({ kind: 'resurrect', slot });
@@ -311,10 +327,19 @@ export function TitleScreen() {
     return () => { cancelled = true; };
   }, []);
 
-  // OTA-404 — run the staged-update apply (the full safe teardown +
-  // reloadAsync sequence). Shared by the banner tap AND the auto-apply
-  // effect below so both go through one path. skipFetch: the bundle is
-  // already on disk from the boot fetchOnly pass.
+  // OTA-405 — OPTIONAL "apply now" for a staged update (full safe teardown
+  // + reloadAsync). A downloaded-but-unapplied bundle ALREADY applies on its
+  // own the next time the app is opened (expo-updates `checkAutomatically:
+  // ON_LOAD` loads the newest fetched bundle at the next launch, where the
+  // boot-front sequence applies it BEFORE any native module starts — the
+  // clean path). So this tap is just a "skip the wait, apply right now"
+  // shortcut, not a requirement.
+  //
+  // OTA-405 SUPERSEDES OTA-404's automatic mid-session reload: that auto-fire
+  // was reverted. Reloading mid-session — even gated on a settled Qwen — is
+  // the exact risk class OTA-234 hit (teardown racing native handles), and it
+  // buys nothing now that the next-launch apply is automatic and lands through
+  // the safe boot-front path. We keep ONLY the user-initiated tap.
   const applyPendingOTA = useCallback(() => {
     setApplyingOTA('Preparing…');
     void checkAndApplyOTA({
@@ -323,41 +348,42 @@ export function TitleScreen() {
       onError: (msg) => {
         setApplyingOTA(null);
         // Leave pendingOTAUpdate set — the banner stays visible so the
-        // player (or the auto-apply effect) can retry. Pre-OTA-047 the
-        // flag was cleared here, which hid the banner and forced a full
-        // app relaunch to recover.
-        useGameStore.setState({ slotLoadError: `Update failed: ${msg}\n\nTap UPDATE READY again to retry, or restart the app.` });
+        // player can tap again to retry. Pre-OTA-047 the flag was cleared
+        // here, which hid the banner and forced a full app relaunch.
+        useGameStore.setState({ slotLoadError: `Update failed: ${msg}\n\nTap APPLY NOW again to retry, or just restart the app.` });
       },
     });
   }, []);
 
-  // OTA-404 — AUTOMATIC apply. The player asked "why are some updates
-  // still tap to apply, they should be automatic right?" They are now:
-  // once a staged update is pending AND the heaviest native module
-  // (Qwen / llama.rn) has reached a SETTLED state — 'ready', 'failed',
-  // or 'skipped' — we fire the same safe teardown+reload the banner tap
-  // did, after a short visible beat, with no tap required.
-  //
-  // Why gate on a settled Qwen status instead of applying immediately:
-  // OTA-234's crash was reloadAsync firing while the native modules
-  // (executorch Kokoro, llama.rn Qwen, ONNX MiniLM, expo-av) were still
-  // MID-init — teardown can't release a handle that isn't registered
-  // yet. Waiting for Qwen (the last + heaviest to settle) to finish
-  // means every module is past init, so the teardown has real handles
-  // to release and the reload is the same clean-state apply the tap
-  // performed. If Qwen never settles (still 'loading'/'downloading'),
-  // we leave the banner up and the manual tap still works — auto-apply
-  // is a pure enhancement, never a regression. Loading a slot / New
-  // Expedition unmounts this screen and cancels the pending apply.
-  const qwenSettled = qwenStatus === 'ready' || qwenStatus === 'failed' || qwenStatus === 'skipped';
+  // OTA-405 — GATE B readiness cap. The character-entry gate (below) holds
+  // load/create until the classifier (MiniLM) reaches a TERMINAL state OR
+  // this cap elapses, whichever is first. The cap guarantees a slow /
+  // offline / weird-status device is never locked out for more than a few
+  // seconds — the heavy generative model + voice are NEVER waited on (they
+  // load in the background and the engine's dispatch guards make playing
+  // through their warm-up crash-safe).
+  const [bootGateCapReached, setBootGateCapReached] = useState(false);
   useEffect(() => {
-    if (!pendingOTAUpdate || applyingOTA !== null || !qwenSettled) return;
-    // Short beat so the "applying automatically…" banner is visible
-    // before the screen flash-reloads, and to let any final settle tick
-    // land on the native side.
-    const timer = setTimeout(() => { applyPendingOTA(); }, 1800);
-    return () => clearTimeout(timer);
-  }, [pendingOTAUpdate, applyingOTA, qwenSettled, applyPendingOTA]);
+    const t = setTimeout(() => setBootGateCapReached(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // OTA-405 — the combined boot gate. Character load / create is held until:
+  //   GATE A — the boot OTA check has resolved (otaBootResolved), AND
+  //   GATE B — the classifier has reached a TERMINAL state ('ready' / 'failed'
+  //            / 'skipped'), OR the safety cap elapsed.
+  // 'idle' / 'downloading' / a mid-load BootStage all keep it closed, so a
+  // player can't act before the classifier has even tried to come up — but the
+  // cap guarantees release within a few seconds no matter what (slow / offline
+  // / unexpected status), and a DISABLED device reports 'skipped' immediately
+  // (App.tsx OTA-405) so it never waits at all.
+  const classifierSettled =
+    cognitiveStatus === 'ready' || cognitiveStatus === 'failed' || cognitiveStatus === 'skipped';
+  const bootGateOpen = otaBootResolved && (classifierSettled || bootGateCapReached);
+  // What's still pending, for the locked-state hint copy.
+  const bootGateReason = !otaBootResolved
+    ? 'Checking for updates…'
+    : 'Waking the Arbiter…';
   // v2.4.1 (OTA 023) — chunked copy for dead-character logs. Long
   // sessions easily exceed 25 KB and most chat clients silently
   // truncate larger pastes. Mirror LogScreen's chunking so the
@@ -656,9 +682,10 @@ export function TitleScreen() {
   const renderItem = ({ item }: { item: SlotSummary }) => (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
       <TouchableOpacity
-        style={[styles.slot, item.dead && styles.slotDead]}
+        style={[styles.slot, item.dead && styles.slotDead, !bootGateOpen && styles.btnDisabled]}
         onPress={() => onSlotTap(item)}
         activeOpacity={0.7}
+        disabled={!bootGateOpen}
       >
         <View style={styles.slotHead}>
           <View style={styles.slotNameRow}>
@@ -949,22 +976,22 @@ export function TitleScreen() {
           style={styles.updateBanner}
           activeOpacity={0.8}
           disabled={applyingOTA !== null}
-          // OTA-404 — the auto-apply effect above fires this same path on
-          // its own once Qwen settles; the tap is now just a "skip the
-          // wait, apply right now" shortcut.
+          // OTA-405 — the staged bundle applies AUTOMATICALLY the next time
+          // the app is opened (expo ON_LOAD → boot-front apply, before any
+          // native module starts). So this tap is optional: "apply now"
+          // instead of waiting for the next launch. No mid-session auto-reload
+          // (that was OTA-404, reverted — it's the OTA-234 risk class).
           onPress={applyPendingOTA}
         >
           <Text style={styles.updateBannerTitle}>
             {applyingOTA
               ? `APPLYING UPDATE — ${applyingOTA.toUpperCase()}`
-              : qwenSettled ? 'UPDATE READY — APPLYING AUTOMATICALLY…' : 'UPDATE READY — TAP TO APPLY'}
+              : 'UPDATE DOWNLOADED — APPLIES ON NEXT OPEN'}
           </Text>
           <Text style={styles.updateBannerBody}>
             {applyingOTA
               ? 'Tearing down audio + AI handles before the reload. One moment.'
-              : qwenSettled
-                ? 'A new build is downloaded. Restarting to apply automatically — or tap to apply now.'
-                : 'A new build is downloaded and waiting. Tap to restart and apply.'}
+              : 'A new build is ready. It applies automatically the next time you open the app — or tap to apply it now.'}
           </Text>
         </TouchableOpacity>
       )}
@@ -984,16 +1011,25 @@ export function TitleScreen() {
           </Text>
         }
         ListHeaderComponent={
-          slots.length > 0 ? <Text style={[styles.listLabel, { color: mutedColor }]}>YOUR TARTARIANS  ·  swipe left to delete</Text> : null
+          slots.length > 0
+            ? <Text style={[styles.listLabel, { color: mutedColor }]}>
+                {bootGateOpen
+                  ? 'YOUR TARTARIANS  ·  swipe left to delete'
+                  : `⟳ ${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
+              </Text>
+            : null
         }
         ListFooterComponent={
           <View style={styles.footerActions}>
             <TouchableOpacity
-              style={styles.primaryBtn}
+              style={[styles.primaryBtn, !bootGateOpen && styles.btnDisabled]}
               onPress={() => setScreen('character_creation')}
               activeOpacity={0.7}
+              disabled={!bootGateOpen}
             >
-              <Text style={styles.primaryBtnText}>New Tartarian</Text>
+              <Text style={styles.primaryBtnText}>
+                {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
+              </Text>
             </TouchableOpacity>
             {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
                 Removed in v2.4.1 (OTA 051) on the theory that the auto-

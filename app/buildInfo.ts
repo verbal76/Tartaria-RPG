@@ -13227,4 +13227,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // has real handles to release — after a short visible beat. If Qwen never settles
 // the banner stays and the manual tap still works (pure enhancement). Loading a
 // slot / New Expedition unmounts the screen and cancels the pending apply. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-404';
+// OTA-405 (Tanbark Anvil) — boot gate (Gate A + Gate B) + revert 404's mid-session
+// auto-apply. Two gates now hold character load/create on the TitleScreen:
+//   GATE A — until the boot-front OTA check has RESOLVED to "staying on this
+//     bundle this launch" (new store flag otaBootResolved, set by App.tsx after
+//     the check; an 8s boot-side safety cap force-opens it so a hung hydrate can
+//     never brick entry). Stops a player loading a save onto a bundle a heartbeat
+//     from reloadAsync (the OTA-234 corruption window).
+//   GATE B — until the CLASSIFIER (MiniLM / cognitive) reaches a terminal state
+//     ('ready'/'failed'/'skipped') OR a 5s cap. We gate on the small, fast,
+//     gameplay-REQUIRED classifier — NOT the heavy mind (Qwen) or voice (Kokoro),
+//     which keep warming in the background; the engine's dispatch guards
+//     (qwen.isReady() / cognitiveStatus==='ready') already make playing through
+//     their warm-up crash-safe, so waiting on them would only cost load time.
+//     A disabled device now reports cognitiveStatus 'skipped' (App.tsx) so it
+//     opens instantly. Dimmed slots + "Waking the Arbiter…" copy explain the hold.
+// Also REVERTS OTA-404's automatic mid-session reload: a staged bundle already
+// applies on the next app open (expo ON_LOAD → boot-front, before native starts),
+// so the banner is now an OPTIONAL "apply now" and there is no risky mid-session
+// auto-reload. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-405';

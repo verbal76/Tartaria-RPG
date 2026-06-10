@@ -1942,6 +1942,16 @@ interface GameStore {
    *  tap; that path tears down cleanly before reloadAsync. */
   pendingOTAUpdate: boolean;
   clearPendingOTAUpdate: () => void;
+  /** OTA-405 — GATE A: false until the boot-front OTA check (App.tsx,
+   *  OTA-367) has RESOLVED to "we're staying on this bundle this launch"
+   *  (no update / disabled / errored / fetched-pending). It is never set
+   *  true on the 'applied' path because that path reloads. The
+   *  TitleScreen keeps character load/create LOCKED until this is true,
+   *  so a player can't load a save onto a bundle that's a heartbeat away
+   *  from reloadAsync (the OTA-234 corruption window). Defaults false and
+   *  is force-resolved by a boot-side safety cap so a hung check never
+   *  locks the player out. */
+  otaBootResolved: boolean;
   /** Add a collectable story-fragment id to the player's set. Silent
    *  no-op if the fragment is unknown OR already owned. Safe to call
    *  from any loot path. Logs a reward line on first acquisition.
@@ -2436,6 +2446,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   justUpdatedFromBuild: null,
   pendingOtaAppliedFrom: null,
   pendingOTAUpdate: false,
+  otaBootResolved: false,
   pendingInputDraft: null,
   inputModalOpen: false,
   cognitiveModelInfo: null,

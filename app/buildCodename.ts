@@ -340,8 +340,12 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-405 — boot gate (Gate A: OTA resolved; Gate B: classifier settled/capped)
+  // locks character entry; reverts 404's mid-session auto-apply (next-open apply).
+  '2026-06-10-405': 'Tanbark Anvil',
   // OTA-404 — OTA updates auto-apply: TitleScreen fires the safe teardown+reload
   // once Qwen settles, instead of waiting for a "tap to apply" banner tap.
+  // (SUPERSEDED by OTA-405 — the mid-session auto-reload was reverted.)
   '2026-06-10-404': 'Possumhaw Anvil',
   // OTA-403 — manual weapon-coating damage roll (4th 'coating' RollStep), hit-gated;
   // was auto-rolled inside concludeRolls before ("I never get a roll for the acid").

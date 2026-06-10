@@ -202,6 +202,18 @@ export default function App() {
     // arb78 — load the player's saved background settings (notifies the
     // AppShell's useDisplaySettings hook once storage resolves).
     void loadDisplaySettings();
+    // OTA-405 — GATE A safety cap. otaBootResolved opens the character-entry
+    // gate; it's normally set the moment the boot OTA check resolves below.
+    // But if hydrate() rejects (or any boot step throws before that line),
+    // the gate would stay locked forever and brick the player out of their
+    // own saves. This timer force-opens it after 8s no matter what — longer
+    // than the OTA check's own 5s budget, so the normal path always wins the
+    // race and this only fires on a genuinely stuck boot.
+    const otaGateSafetyCap = setTimeout(() => {
+      if (!useGameStore.getState().otaBootResolved) {
+        useGameStore.setState({ otaBootResolved: true });
+      }
+    }, 8000);
     setStage('hydrate:start');
     void hydrate()
       .then(async () => {
@@ -224,6 +236,8 @@ export default function App() {
           if (otaResult === 'applied') {
             // reloadAsync fired — the JS bridge is restarting onto the new
             // bundle. Do NOT boot the native models; this context is dead.
+            // Leave otaBootResolved FALSE — the reload starts a fresh boot
+            // that will resolve the gate on the new bundle.
             return;
           }
           setStage('ota:done');
@@ -231,6 +245,12 @@ export default function App() {
           // eslint-disable-next-line no-console
           console.warn('boot-front OTA check failed (proceeding to load):', otaErr);
         }
+        // OTA-405 — GATE A: the boot OTA check is done and we are staying on
+        // THIS bundle this launch (the 'applied' path returned above). Open
+        // the character-entry gate so the TitleScreen can let the player
+        // load / create. Until now it was locked so nobody could load a save
+        // onto a bundle about to reloadAsync (the OTA-234 corruption window).
+        useGameStore.setState({ otaBootResolved: true });
         // OTA-272 — ML init now gated by mlHealth crash counter. On
         // certain ARMv8.2 Android devices (Snapdragon 865 family —
         // Galaxy S20, Pixel 5, OnePlus 8) the native ML libs crash
@@ -252,6 +272,13 @@ export default function App() {
             );
             setStage('cognitive:skipped');
             setStage('qwen:skipped');
+            // OTA-405 — reflect the DISABLED state in the store status (not
+            // just the boot-stage global), so the TitleScreen's Gate B sees a
+            // terminal state and opens character entry IMMEDIATELY instead of
+            // waiting out its safety cap. On a disabled device there is no
+            // classifier to wait for — the game runs on deterministic
+            // fallback — so a wait here would be pure dead time.
+            useGameStore.setState({ cognitiveStatus: 'skipped', qwenStatus: 'skipped' });
             return;
           }
           if (health.detectedCrashThisBoot) {
@@ -386,6 +413,7 @@ export default function App() {
         } catch { /* ignore */ }
       });
     return () => {
+      clearTimeout(otaGateSafetyCap);
       stopAudioController();
       stopTTSController();
       void disposeAudio();
