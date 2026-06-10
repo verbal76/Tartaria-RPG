@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-437 "Germanium Zone-Leveling" — [audit fix #17] bound the null forage re-roll** *(element #32)*.
+  New `VisitedRoom.searchNothingCounts` + `recordNothingSearch` (cap 2) consumes a noun after 2
+  null rolls, so foraging is a gamble again instead of a guaranteed-payout retry loop. Applied to
+  the primary `search <noun>` path. `worldMemory.ts`, `types.ts`, `gameStore.ts`. Covered by
+  `__tests__/nothingSearchCap.test.ts`.
 - **OTA-436 "Gallium Zone-Refining" — [audit fix #20] gem economy tightened** *(element #31)*.
   Organic per-kill drop halved (0.5%→0.25%, Sentinel 1.25%→0.625%) and pity interval doubled
   (50→100 kills, `PITY_KILL_INTERVAL`); boss-guaranteed drop + install seed untouched.

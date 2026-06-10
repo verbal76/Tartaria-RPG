@@ -13523,4 +13523,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nerfs: the organic rate is halved (0.5%→0.25%, Sentinel 1.25%→0.625%, in raceMechanics), and
 // the pity interval doubled (50→100 kills, named PITY_KILL_INTERVAL). The boss-kill drop — the
 // signature "earned" gem — and the install seed are untouched. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-436';
+// OTA-437 (Germanium Zone-Leveling) — [audit fix #17] bound the "nothing" forage re-roll.
+// Successful area-searches (material/TC/hook) consume the noun, but a NULL roll deliberately
+// left it searchable (so one unlucky roll didn't waste it). Unbounded, that let a player retry
+// through every "nothing" until each noun guaranteed a payout — foraging stopped being a gamble.
+// A new per-room/per-noun counter (VisitedRoom.searchNothingCounts + worldMemory's
+// recordNothingSearch) gives NOTHING_SEARCH_CAP=2 grace retries, then consumes the noun (adds it
+// to searchedAmbientNouns) so the next search hits the hard "already searched" guard. Applied to
+// the primary `search <noun>` forage path. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-437';

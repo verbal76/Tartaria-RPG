@@ -29,7 +29,7 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -8406,6 +8406,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
+          else if (outcome.kind === 'nothing') {
+            // OTA-437 — [audit #17] bound the null-search grace. A "nothing" roll
+            // deliberately doesn't consume the noun (one unlucky roll shouldn't
+            // waste it), but unbounded that let a player retry through every null
+            // until each noun guaranteed a payout — foraging stopped being a
+            // gamble. Record this empty roll; after NOTHING_SEARCH_CAP nulls the
+            // noun is consumed (added to searchedAmbientNouns), so the next
+            // search hits the hard "already searched" guard at the top.
+            const { memory, exhausted } = recordNothingSearch(get().worldMemory, searchRoomKey, loweredTarget);
+            set({ worldMemory: memory });
+            if (exhausted) {
+              get().appendLog('world', `You've combed the ${loweredTarget} for everything it holds — there's nothing more here.`);
+            }
+          }
           break;
         }
         // 4.5) NPC hard-match — fires BEFORE MiniLM so "search tarek"

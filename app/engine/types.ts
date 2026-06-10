@@ -1358,6 +1358,14 @@ export interface VisitedRoom {
    *  searched, nothing more to do" line instead of looping the
    *  player on the same prop. */
   searchedAmbientNouns?: string[];
+  /** OTA-437 — per-noun count of consecutive "nothing" area-search rolls in
+   *  this room. A null search deliberately does NOT consume the noun (so one
+   *  unlucky roll doesn't waste it), but leaving it unbounded let a player
+   *  retry through every "nothing" until each noun guaranteed a payout —
+   *  removing the gamble. Once a noun's count reaches NOTHING_SEARCH_CAP it is
+   *  added to searchedAmbientNouns (consumed), so a search is a real risk again
+   *  after a couple of grace retries. */
+  searchNothingCounts?: Record<string, number>;
   /** 2026-05-25 [POLISH-3] — ambient nouns whose investigate
    *  outcome was pure flavor (no item / no XP / no hook produced).
    *  Kept SEPARATE from searchedAmbientNouns so other verbs
