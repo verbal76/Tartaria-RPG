@@ -11,6 +11,9 @@ import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/
 // Splash art native dimensions (assets/splash-art.jpg).
 const SPLASH_W = 941;
 const SPLASH_H = 1672;
+// OTA-474 — top-left-anchored splash scale (fraction of screen width). Full-width
+// read "too big", 2/3 read "too far" — 0.85 splits the difference. Easy to tune.
+const SPLASH_SCALE = 0.85;
 
 // Module-scoped so it survives remounts within the same JS process; resets on a
 // fresh process / OTA reload.
@@ -40,11 +43,10 @@ export function SplashOverlay() {
     : kokoro.phase === 'loading' ? 0.92
     : 0.12;
 
-  // OTA-473 — top-left anchored, scaled to 2/3 of full-width (drop 1/3 off the
-  // right and, proportionally, 1/3 off the bottom). Explicit pixel dimensions from
-  // the screen width — deterministic, no aspectRatio guesswork.
+  // OTA-473/474 — top-left anchored, scaled to SPLASH_SCALE of full-width. Explicit
+  // pixel dimensions from the screen width — deterministic, no aspectRatio guesswork.
   const screenW = Dimensions.get('window').width;
-  const imgW = Math.round((screenW * 2) / 3);
+  const imgW = Math.round(screenW * SPLASH_SCALE);
   const imgH = Math.round((imgW * SPLASH_H) / SPLASH_W);
 
   return (

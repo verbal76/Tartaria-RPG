@@ -13853,4 +13853,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dropped off the right and, proportionally, off the bottom) — pinned to the top-left corner (top:0,
 // left:0), over the dark full-screen overlay. Explicit Dimensions-derived pixels, no aspectRatio
 // guesswork. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-473';
+// OTA-474 (Thulium Roasting) — [UX] splash scale tune. OTA-473's 2/3 read "too far" (too small) and the
+// earlier full-width read "too big", so the top-left-anchored scale is set to 0.85 of screen width (a
+// named SPLASH_SCALE constant for easy further tuning). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-474';

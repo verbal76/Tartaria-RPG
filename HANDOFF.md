@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-473 "Erbium Implant" — splash top-left anchored,
->   scaled to 2/3 (per request). 471 full-bleed root overlay; 467 golem stats; 466 golem
->   repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→473**
->   playtest batch (Tellurium Refining → Erbium Implant, elements 52–68) is published
+> - **LIVE (pushed 2026-06-10) = OTA-474 "Thulium Roasting" — splash top-left anchored,
+>   scale tuned to 0.85. 471 full-bleed root overlay; 467 golem stats; 466 golem
+>   repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→474**
+>   playtest batch (Tellurium Refining → Thulium Roasting, elements 52–69) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,10 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 / 466 / 467 / 468 / 469 / 470 / 471 / 472 / 473 committed below (post-batch follow-ups).**
+**OTA-465 / 466 / 467 / 468 / 469 / 470 / 471 / 472 / 473 / 474 committed below (post-batch follow-ups).**
 
+- **OTA-474 "Thulium Roasting" — [UX] splash scale tune (0.85)** *(element #69)*. 2/3 was too small, full too
+  big → top-left-anchored `SPLASH_SCALE = 0.85`. `components/SplashOverlay.tsx`.
 - **OTA-473 "Erbium Implant" — [UX] splash sizing: top-left anchored, 2/3 scale** *(element #68)*. Image
   renders at explicit pixels — width = 2/3 screen width, height proportional — pinned top:0/left:0 over the
   dark overlay (drop 1/3 off right + bottom). `components/SplashOverlay.tsx`.

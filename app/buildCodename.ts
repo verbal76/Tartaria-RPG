@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-474 — [UX] splash scale tune: 2/3 was "too far" (small), full was "too big" → top-left-anchored
+  // scale set to 0.85 of screen width (named SPLASH_SCALE constant). Element #69: Thulium.
+  '2026-06-10-474': 'Thulium Roasting',
   // OTA-473 — [UX] splash sizing per request: TOP-LEFT anchored, scaled to 2/3 (drop 1/3 off the right +
   // proportionally off the bottom). Explicit Dimensions-derived pixel width/height pinned at top:0/left:0
   // over the dark overlay — deterministic, no aspectRatio guesswork. Element #68: Erbium.
