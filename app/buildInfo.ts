@@ -13502,4 +13502,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // trivialized boss fights (summon a golem, send it in, the boss could never out-damage its HP).
 // A tier-appropriate roll makes the golem a real but expendable shield; falls back to the old
 // flat value only when the foe has no parseable damage. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-433';
+// OTA-434 (Copper Cementation) — [audit fix #18] unique inventory instance ids. Many grant
+// sites minted item ids as `${prefix}_${Date.now()}`, so two items granted in the SAME
+// millisecond (craft+craft, a multi-item loot drop, buy-then-buy) collided on one id. Duplicate
+// ids break every per-instance operation keyed on id — equip-by-id, repair-by-id (OTA-431),
+// durability wear, and per-instance temper stats (OTA-427) — silently acting on the wrong copy.
+// A module-level monotonic counter (freshInstanceId) now appends a per-process sequence so each
+// id is unique regardless of clock resolution; applied to the craft / scout-recover / loot-roll
+// / faction-leg / vendor-buy / encounter-loot / climb-drop / disc grant paths. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-434';

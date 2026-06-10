@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-434 — [audit #18] inventory item ids get a monotonic suffix, so two same-ms grants no
+  // longer share an id and break equip/repair/wear/temper keyed on instance id. Element #29: Copper.
+  '2026-06-10-434': 'Copper Cementation',
   // OTA-433 — [audit #19] enemy retaliation vs a golem rolls the enemy's real damage notation,
   // not a flat 1d6+1 — golems no longer immortally tank bosses. Element #28: Nickel.
   '2026-06-10-433': 'Nickel Carbonyl',

@@ -335,6 +335,18 @@ const allLocations = locationsData as Location[];
  *  unchanged, so the odds a room shows the player something still hold. */
 const AMBIENT_DISPLAY_CAP = 5;
 
+// OTA-434 — unique inventory instance ids. Many grant sites minted ids as
+// `${prefix}_${Date.now()}`, so two items granted in the SAME millisecond (craft
+// + craft, a multi-item loot drop, buy-then-buy) collided on one id. Duplicate
+// ids break every per-instance operation that keys on id — equip-by-id,
+// repair-by-id (OTA-431), durability wear, and per-instance temper stats
+// (OTA-427) — silently acting on the wrong copy. This monotonic counter makes
+// each id unique regardless of clock resolution.
+let _itemInstanceSeq = 0;
+function freshInstanceId(prefix: string): string {
+  return `${prefix}_${Date.now()}_${(_itemInstanceSeq++).toString(36)}`;
+}
+
 // arb89 — dev character names that get the Resurrection-Gem perk: a gem
 // granted up front on load (grantDevGemOnce) AND another on every death.
 // Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
@@ -763,7 +775,7 @@ function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: s
     let have = countOf(req.itemName);
     if (req.recoverOnScout && have < req.quantity) {
       const res = grantItem(player.inventory, {
-        id: `${req.itemName.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${Date.now()}`,
+        id: freshInstanceId(req.itemName.toLowerCase().replace(/[^a-z0-9]+/g, '_')),
         name: req.itemName, kind: 'misc', quantity: req.quantity, tags: ['quest', 'challenge'],
         description: 'A cryptic device for deciphering Tartarian runes.',
       });
@@ -10814,7 +10826,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (drop) {
               const dropLookup = lookupCraftedItem(drop.name);
               const grant: InventoryItem = stampDurability({
-                id: `climb_top_${Date.now()}`,
+                id: freshInstanceId('climb_top'),
                 name: drop.name,
                 kind: dropLookup.kind,
                 rarity: drop.rarity,
@@ -11833,7 +11845,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const grantResult = grantItem(player.inventory, {
-          id: `${rolled.entry.name}_${Date.now()}`,
+          id: freshInstanceId(rolled.entry.name),
           name: rolled.entry.name,
           kind: rolled.entry.kind,
           quantity: rolled.quantity,
@@ -12125,7 +12137,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const remaining = consumeIngredients(player.inventory, recipe);
         const catEntry = lookupCraftedItem(recipe.result);
         const crafted: InventoryItem = stampDurability({
-          id: `crafted_${Date.now()}`,
+          id: freshInstanceId('crafted'),
           name: recipe.result,
           kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
           rarity: catEntry.rarity,
@@ -13596,7 +13608,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const leg = broker.isBrokerSourceTile(mission, locationId);
         if (leg && !pl.inventory.some((i) => i.name === leg.itemName)) {
           const res = grantItem(pl.inventory, {
-            id: `${leg.itemId}_${Date.now()}`, name: leg.itemName, kind: 'misc',
+            id: freshInstanceId(leg.itemId), name: leg.itemName, kind: 'misc',
             quantity: 1, tags: ['quest', 'coveted', 'broker'],
             description: 'A coveted relic — a faction will broker an alliance for it.',
           });
@@ -14252,7 +14264,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const affordableCount = Math.floor(player.tc / effectivePrice);
     const buyCount = Math.max(1, Math.min(requested, affordableCount));
     const newItem: InventoryItem = stampDurability({
-      id: `bought_${Date.now()}`,
+      id: freshInstanceId('bought'),
       name: offer.itemName,
       kind,
       rarity: cat?.rarity,
@@ -17097,7 +17109,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().grantCollectableFragment(fragId);
             } else {
               const grantResult = grantItem(livePlayer.inventory, {
-                id: `${enc.loot.name}_${Date.now()}`,
+                id: freshInstanceId(enc.loot.name),
                 name: enc.loot.name,
                 kind: enc.loot.kind,
                 quantity: enc.loot.quantity,
@@ -20395,7 +20407,7 @@ function handleYulkaBuy(
         ...s.player,
         tc: s.player.tc - 50,
         inventory: mergeOrPushItem(s.player.inventory, {
-          id: `disc_buy_${Date.now()}`,
+          id: freshInstanceId('disc_buy'),
           name: 'Aetheric Disc',
           kind: 'misc' as const,
           rarity: 'Uncommon' as const,
@@ -20508,7 +20520,7 @@ function fireYulkaReturn(
       .map((i) => (i.id === stolen.id ? { ...i, quantity: 0 } : i))
       .filter((i) => i.quantity > 0)
       .concat([{
-        id: `disc_reward_${Date.now()}`,
+        id: freshInstanceId('disc_reward'),
         name: 'Aetheric Disc',
         kind: 'misc' as const,
         rarity: 'Uncommon' as const,
