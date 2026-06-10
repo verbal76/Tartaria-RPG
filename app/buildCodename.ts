@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-478 — [feature] GOLEM ARMAMENTS pt.1: the golem can WIELD a crafted melee weapon (4 kind-matched
+  // Rare weapons; arm/disarm verb + "Arm <golem>" button; wielded dice replace innate + durability wear;
+  // shown on the Character screen). Coatings + Core-4 unlock follow. (OTA-477 was a test-only commit, no
+  // build.) Element #73: Tantalum.
+  '2026-06-10-478': 'Tantalum Forging',
   // OTA-476 — [UX] splash scale nudge 0.92 → 0.97 ("just a touch more"), top-left anchored. Element #71: Lutetium.
   '2026-06-10-476': 'Lutetium Smelting',
   // OTA-475 — [UX] splash scale nudge 0.85 → 0.92 ("getting there"), top-left anchored. Element #70: Ytterbium.

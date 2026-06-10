@@ -118,6 +118,35 @@ export function getGolemDefinition(kind: GolemKind): GolemDefinition {
   return GOLEM_DEFINITIONS[kind];
 }
 
+// ----- OTA-478: golem armaments -----------------------------------------------
+//
+// Craftable melee weapons, one per golem kind. The kind is encoded on the
+// weapon's catalog tags as `golem:<kind>` plus a `golem_weapon` marker. These
+// pure helpers read tags so the caller (which resolves the catalog) avoids an
+// import cycle with crafting.ts.
+
+/** True if a weapon (by its tags) is a golem armament. */
+export function isGolemWeapon(weaponTags: readonly string[] | undefined): boolean {
+  return (weaponTags ?? []).includes('golem_weapon');
+}
+
+/** The golem kind a golem-weapon is built for (from its `golem:<kind>` tag), or
+ *  null if it's not a golem weapon / the kind is unknown. */
+export function golemWeaponKind(weaponTags: readonly string[] | undefined): GolemKind | null {
+  const tag = (weaponTags ?? []).find((t) => t.startsWith('golem:'));
+  if (!tag) return null;
+  const kind = tag.slice('golem:'.length);
+  return (kind in GOLEM_DEFINITIONS) ? (kind as GolemKind) : null;
+}
+
+/** Friendly per-kind weapon name, for messages/UI. */
+export const GOLEM_WEAPON_NAME: Record<GolemKind, string> = {
+  mud_golem: 'Mire Maul',
+  iron_golem: 'Sentinel Greatcleaver',
+  aether_golem: 'Aetheric Lance',
+  crystal_golem: 'Shard Glaive',
+};
+
 /** Parse player input like "summon iron golem" / "summon mud" /
  *  "summon golem" → GolemKind. Defaults to mud_golem when only
  *  "golem" is named (backward-compat with the pre-existing

@@ -392,4 +392,51 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect((after.statProgress?.power ?? 0)).toBeGreaterThan(0);
     });
   });
+
+  // OTA-478 — golem armaments (wielding a crafted weapon).
+  describe('OTA-478 — golem wields a kind-matched weapon', () => {
+    it('arm golem rejects a wrong-kind weapon, accepts the matching one (pack <-> golem)', async () => {
+      const store = await bootstrap([
+        { id: 'w1', name: 'Sentinel Greatcleaver', kind: 'weapon', rarity: 'Rare', quantity: 1, tags: ['weapon', 'golem_weapon', 'golem:iron_golem'] } as never,
+      ]);
+      const p0 = store.getState().player!;
+      // A MUD golem can't wield the iron weapon.
+      store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) } });
+      store.getState().submitPlayerAction('arm golem with Sentinel Greatcleaver');
+      expect(store.getState().player!.golem!.weapon ?? null).toBeNull();
+      expect(store.getState().player!.inventory.some((i) => i.name === 'Sentinel Greatcleaver')).toBe(true);
+
+      // An IRON golem can: weapon leaves the pack, lands on the golem with durability.
+      store.setState((s) => (s.player ? { player: { ...s.player, golem: makeCompanion(GOLEM_DEFINITIONS.iron_golem) } } : s));
+      store.getState().submitPlayerAction('arm golem with Sentinel Greatcleaver');
+      const g = store.getState().player!.golem!;
+      expect(g.weapon?.name).toBe('Sentinel Greatcleaver');
+      expect(g.weapon?.durability?.current).toBeGreaterThan(0);
+      expect(store.getState().player!.inventory.some((i) => i.name === 'Sentinel Greatcleaver')).toBe(false);
+
+      // Disarm returns it to the pack.
+      store.getState().submitPlayerAction('disarm golem');
+      expect(store.getState().player!.golem!.weapon ?? null).toBeNull();
+      expect(store.getState().player!.inventory.some((i) => i.name === 'Sentinel Greatcleaver')).toBe(true);
+    });
+
+    it('a wielded weapon raises golem damage and wears down on strikes', async () => {
+      const store = await bootstrap();
+      const p0 = store.getState().player!;
+      const weapon = { id: 'gw', name: 'Shard Glaive', kind: 'weapon' as const, rarity: 'Rare' as const, quantity: 1, tags: ['weapon', 'golem_weapon', 'golem:crystal_golem'], durability: { current: 3, max: 45 } };
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.crystal_golem), hp: 200, hpMax: 200, hitBonus: 40, weapon: weapon as never };
+      const scene = store.getState().currentScene!;
+      store.setState({
+        player: { ...p0, golem },
+        currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
+      });
+      // 3 strikes: weapon (durability 3) wears to 0 and shatters → golem.weapon cleared.
+      for (let i = 0; i < 3; i++) await store.getState().submitPlayerAction('golem attack');
+      const g = store.getState().player!.golem!;
+      expect(g.weapon ?? null).toBeNull();
+      const log = store.getState().gameLog.map((l) => l.text).join('\n');
+      expect(log).toMatch(/swings the Shard Glaive/);
+      expect(log).toMatch(/shatters in .* grip/);
+    });
+  });
 });

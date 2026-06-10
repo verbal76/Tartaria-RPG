@@ -378,6 +378,17 @@ export function CharacterScreen() {
                     </View>
                   </View>
                 ))}
+                {/* OTA-478 — wielded golem weapon (+ coating, when present). */}
+                <View style={styles.slotRow}>
+                  <Text style={styles.slotLabel}>Arm</Text>
+                  <View style={styles.slotBody}>
+                    <Text style={golem.weapon ? styles.slotName : styles.slotEmpty}>
+                      {golem.weapon
+                        ? `${golem.weapon.coating ? `${golem.weapon.coating.label ?? golem.weapon.coating.kind} ` : ''}${golem.weapon.name}${golem.weapon.durability ? ` (${golem.weapon.durability.current}/${golem.weapon.durability.max})` : ''}`
+                        : '—'}
+                    </Text>
+                  </View>
+                </View>
                 <Text style={styles.subline}>Repair by feeding it the parts it's made of.</Text>
               </View>
             </>

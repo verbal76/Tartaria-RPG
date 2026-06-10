@@ -20,7 +20,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { isGolemRepairPart } from '../engine/golems';
+import { isGolemRepairPart, isGolemWeapon, golemWeaponKind } from '../engine/golems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -549,6 +549,21 @@ export function InventoryScreen() {
           },
           tone: 'primary',
         });
+      }
+      // OTA-478 — ARM GOLEM. If this is a golem armament matching the active
+      // golem's kind, offer a one-tap arm (routes through `arm golem with <w>`).
+      if (golemActive) {
+        const cat = findWeaponByName(pending.item.name);
+        if (cat && isGolemWeapon(cat.tags) && golemWeaponKind(cat.tags) === golem.kind) {
+          buttons.push({
+            label: `Arm ${golem.name}`,
+            onPress: () => {
+              useGameStore.getState().submitPlayerAction(`arm golem with ${pending.item.name}`);
+              closeModal();
+            },
+            tone: 'primary',
+          });
+        }
       }
     }
     // OTA-360 — COAT A WEAPON. Weapon-coating consumables (Poison

@@ -1118,6 +1118,11 @@ export interface Companion {
    *  before this OTA (absent → treated as 0). A kept-alive golem grows these. */
   stats?: { power: number; resilience: number };
   statProgress?: { power: number; resilience: number };
+  /** OTA-478 "Golem Armaments" — a melee weapon the golem wields (one craftable
+   *  type per golem kind). Its dice replace the innate attackDie; a coated weapon
+   *  lets the golem apply the coating on hit. Carries its own coating + durability
+   *  like any weapon instance. Absent → the golem fights with its innate attack. */
+  weapon?: InventoryItem | null;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest';

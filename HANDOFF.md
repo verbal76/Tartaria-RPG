@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-476 "Lutetium Smelting" — splash top-left anchored,
->   scale 0.97. 471 full-bleed root overlay; 467 golem stats; 466 golem
->   repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→476**
->   playtest batch (Tellurium Refining → Lutetium Smelting, elements 52–71) is published
+> - **LIVE (pushed 2026-06-10) = OTA-478 "Tantalum Forging" — Golem Armaments pt.1: golems
+>   wield crafted weapons (kind-matched, durability, Character-screen display). 467 golem stats;
+>   466 golem repair+naming; 471 full-bleed splash; 464 reverted 463 voice auto-disable.** The whole **OTA-457→478**
+>   playtest batch (Tellurium Refining → Tantalum Forging, elements 52–73; 477 was test-only) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,7 +382,16 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 … 476 committed below (post-batch follow-ups).**
+**OTA-465 … 476, 478 committed below (post-batch follow-ups).**
+
+- **OTA-478 "Tantalum Forging" — [feature] Golem Armaments pt.1 (wielding)** *(element #73)*. Golem can wield
+  a crafted melee weapon: 4 kind-matched Rare weapons (`golem_weapon`+`golem:<kind>` tags, 2d8–2d10, dur 45);
+  `Companion.weapon` + `arm/disarm golem` verbs + "Arm <golem>" inv button (kind-matched); combat uses the
+  weapon's dice (replaces innate) + durability wear → shatter; shown on Character screen. **NEXT: coatings
+  carry-through (golem applies coating on hit), armor-shred scaling, Core-4 forge-quest unlock + 4 craft
+  recipes.** Part of "help the player late game" (golem becomes the armor-breaker once coated). *(OTA-477 =
+  test-only commit, no build.)* `weapons.json`, `types.ts`, `golems.ts`, `gameStore.ts`, `InventoryScreen.tsx`,
+  `CharacterScreen.tsx`. Covered by `golemCompanion.test.ts`.
 
 - **Test-only (no OTA bump) — `golemStressSweep.test.ts`**: bounded stress sweep validating OTA-466
   (repair) + OTA-467 (combat stat growth). 300-strike fight asserts golem HP stays finite + in [0,hpMax]

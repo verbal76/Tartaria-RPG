@@ -2239,6 +2239,11 @@ interface GameStore {
   setWhisperCourse: (mapX: number, mapY: number, label: string) => void;
   continueWhisperCourse: () => void;
   stopWhisperCourse: () => void;
+  /** OTA-478 "Golem Armaments" — arm the active golem with a crafted golem weapon
+   *  matching its kind (the weapon moves from pack to golem.weapon); disarmGolem
+   *  returns it to the pack. */
+  armGolem: (weaponName: string) => void;
+  disarmGolem: () => void;
   /** 2026-05-25 OTA-035 — when a player issues `travel to <city>` from
    *  inside an outpost, this field holds the pending destination until
    *  they confirm or cancel via the BrandedModal. The screen layer
@@ -6124,6 +6129,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (tryGolemApplyVerb(get, set, trimmed)) {
       void get().persist();
       return;
+    }
+    // OTA-478 — `arm golem with <weapon>` / `give golem <weapon>` / `disarm golem`.
+    {
+      const gl = trimmed.toLowerCase();
+      if (/^(disarm|unarm)\s+(the\s+)?golem\b/i.test(gl)) {
+        get().appendLog('player', trimmed);
+        get().disarmGolem();
+        void get().persist();
+        return;
+      }
+      const armMatch = /^(?:arm|give|equip)\s+(?:the\s+)?golem(?:\s+with)?\s+(.+)$/i.exec(trimmed);
+      if (armMatch) {
+        get().appendLog('player', trimmed);
+        get().armGolem(armMatch[1]!.trim());
+        void get().persist();
+        return;
+      }
     }
     // OTA-120 Phase 5 — `call dog` / `call <name>` opens the
     // CallDogModal. Intercepted before the diplomacy verb-pool can
@@ -16480,6 +16502,67 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // OTA-478 — arm the active golem with a crafted golem weapon of its kind.
+  armGolem(weaponName) {
+    const player = get().player;
+    if (!player) return;
+    const golem = player.golem;
+    if (!golem || golem.hp <= 0) {
+      get().appendLog('arbiter', `"No golem at your side to arm," the Arbiter says. "Summon one first."`);
+      return;
+    }
+    const lower = weaponName.toLowerCase().trim();
+    const item = player.inventory.find((i) =>
+      i.quantity > 0 && (i.name.toLowerCase() === lower || i.name.toLowerCase().includes(lower)),
+    );
+    if (!item) {
+      get().appendLog('arbiter', `"No '${weaponName}' in your pack," the Arbiter says.`);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isGolemWeapon, golemWeaponKind, GOLEM_WEAPON_NAME } = require('../engine/golems');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findWeaponByName: fwbn } = require('../engine/crafting');
+    const cat = fwbn(item.name);
+    if (!cat || !isGolemWeapon(cat.tags)) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament."`);
+      return;
+    }
+    const forKind = golemWeaponKind(cat.tags);
+    if (forKind !== golem.kind) {
+      const want = GOLEM_WEAPON_NAME[golem.kind] ?? 'its own armament';
+      get().appendLog('arbiter', `The Arbiter eyes the fit. "The ${item.name} is built for a ${String(forKind).replace(/_/g, ' ')}, not your ${golem.kind.replace(/_/g, ' ')}. ${golem.name} needs the ${want}."`);
+      return;
+    }
+    // Stamp durability + take one instance out of the pack; return any current
+    // weapon to the pack first.
+    const armed = stampDurability({ ...item, quantity: 1 });
+    set((s) => {
+      if (!s.player || !s.player.golem) return s;
+      let inv = s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => (i.quantity ?? 0) > 0);
+      if (s.player.golem.weapon) inv = grantItem(inv, s.player.golem.weapon).inventory;
+      return { player: { ...s.player, inventory: inv, golem: { ...s.player.golem, weapon: armed } } };
+    });
+    get().appendLog('world', `${golem.name} takes up the ${item.name}. It settles into the construct's grip like it was cast for it.`);
+    void get().persist();
+  },
+
+  disarmGolem() {
+    const player = get().player;
+    if (!player || !player.golem || !player.golem.weapon) {
+      get().appendLog('arbiter', `"Your golem carries nothing to take back," the Arbiter says.`);
+      return;
+    }
+    const wName = player.golem.weapon.name;
+    set((s) => (s.player && s.player.golem && s.player.golem.weapon
+      ? { player: { ...s.player, inventory: grantItem(s.player.inventory, s.player.golem.weapon).inventory, golem: { ...s.player.golem, weapon: null } } }
+      : s));
+    get().appendLog('world', `You take the ${wName} back from ${player.golem.name}. It returns to its bare-fisted stance.`);
+    void get().persist();
+  },
+
   discardLead(id) {
     const player = get().player;
     if (!player) return;
@@ -23597,8 +23680,15 @@ function handleGolemCommand(
     const tp = trainGolemStat(workingGolem, 'power', true);
     workingGolem = tp.golem;
     if (tp.leveled) get().appendLog('reward', `✦ ${workingGolem.name}'s Power rises to ${tp.leveled.to}.`);
-    // Roll damage from attackDie like "1d8" + attackMod + half POWER.
-    const dieMatch = /^(\d+)d(\d+)$/.exec(golem.attackDie);
+    // OTA-478 — a WIELDED golem weapon's dice REPLACE the innate attackDie (it
+    // swings the weapon, not its fists); Power still adds half to damage.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findWeaponByName: fwbnGolem } = require('../engine/crafting');
+    const wieldedName = workingGolem.weapon?.name ?? null;
+    const wieldedCat = wieldedName ? fwbnGolem(wieldedName) : null;
+    const dmgDice: string = wieldedCat?.damageDice ?? golem.attackDie;
+    const dmgType: string = wieldedCat?.damageType ?? golem.damageType;
+    const dieMatch = /^(\d+)d(\d+)$/.exec(dmgDice);
     let dmg = 0;
     if (dieMatch) {
       const n = parseInt(dieMatch[1]!, 10);
@@ -23609,8 +23699,20 @@ function handleGolemCommand(
     const newEnemyHp = Math.max(0, targetHp - dmg);
     get().appendLog(
       'combat',
-      `${golem.name} lands ${dmg} ${golem.damageType} damage on ${target.name}. (${newEnemyHp} HP left)`,
+      `${golem.name}${wieldedName ? ` swings the ${wieldedName} —` : ' lands'} ${dmg} ${dmgType} damage on ${target.name}. (${newEnemyHp} HP left)`,
     );
+    // OTA-478 — wear the wielded weapon on each connecting strike; it breaks like
+    // any weapon and the golem reverts to its innate attack.
+    if (workingGolem.weapon?.durability) {
+      const dur = workingGolem.weapon.durability;
+      const newCur = dur.current - 1;
+      if (newCur <= 0) {
+        get().appendLog('world', `The ${workingGolem.weapon.name} shatters in ${golem.name}'s grip — back to bare fists.`);
+        workingGolem = { ...workingGolem, weapon: null };
+      } else {
+        workingGolem = { ...workingGolem, weapon: { ...workingGolem.weapon, durability: { ...dur, current: newCur } } };
+      }
+    }
     if (newEnemyHp <= 0) {
       // OTA-449 — route the COMPANION killing blow through resolveEnemyDefeat,
       // the SAME path a player kill uses, so loot / TC / Core-Guardian Core +

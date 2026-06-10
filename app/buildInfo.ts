@@ -13860,4 +13860,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // anchored. One-number SPLASH_SCALE tweak. JS-only → OTA.
 // OTA-476 (Lutetium Smelting) — [UX] splash scale nudge 0.92 → 0.97 ("just a touch more"), top-left
 // anchored. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-476';
+// OTA-478 (Tantalum Forging) — [feature] GOLEM ARMAMENTS, part 1 of the "help the player late game" set:
+// the golem can now WIELD a melee weapon. Four catalog weapons, one per golem kind (Mire Maul / Sentinel
+// Greatcleaver / Aetheric Lance / Shard Glaive; Rare, 2d8–2d10, baseDurability 45), tagged
+// `golem_weapon` + `golem:<kind>`. New Companion.weapon instance + arm/disarm: `arm golem with <weapon>`
+// / `give golem <weapon>` / `disarm golem` (kind-MATCHED — a Crystal weapon refuses on an Iron golem),
+// plus an "Arm <golem>" inventory button next to "Repair". In combat the wielded weapon's dice REPLACE
+// the innate attackDie (Power still adds half), and it WEARS down per connecting strike — shattering like
+// any weapon and reverting the golem to bare fists. Shown on the Character-screen golem panel. Coatings
+// carry-through + the Core-4 forge-quest unlock land in the follow-up OTAs. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-478';
