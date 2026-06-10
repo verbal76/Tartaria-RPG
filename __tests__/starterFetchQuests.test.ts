@@ -76,4 +76,36 @@ describe('OTA-450 — starter fetch quests', () => {
     const sm = p.inventory.filter((i) => i.name === 'Scrap Metal').reduce((n, i) => n + i.quantity, 0);
     expect(sm).toBe(2);
   });
+
+  it('OTA-451 — the mission board (no vendor) accepts + turns in faction quests', async () => {
+    const factionId = 'reclaimers_guild';
+    const store = await boot('Boarder', factionId);
+    // A board in the scene, NO vendor.
+    store.setState((s) => ({
+      currentScene: { ...s.currentScene!, vendor: null, missionBoard: { faction: factionId } },
+    }));
+
+    // Reading the board posts the open contracts to the feed.
+    store.getState().readMissionBoard();
+    const log1 = store.getState().gameLog.map((l) => l.text).join('\n');
+    expect(log1).toMatch(/Mission Board/i);
+    expect(log1).toMatch(/Scrap Run/);
+
+    // Accept from the board (no vendor present).
+    store.getState().acceptFactionQuest('Scrap Run');
+    expect(store.getState().player!.activeFactionQuestIds).toContain('fq_reclaimers_starter');
+
+    // Gather + turn in at the board.
+    store.setState((s) => ({
+      player: { ...s.player!, inventory: [
+        ...s.player!.inventory,
+        { id: 'sm', name: 'Scrap Metal', kind: 'misc', quantity: 5, tags: ['metal'] },
+      ] },
+    }));
+    const tcBefore = store.getState().player!.tc;
+    store.getState().turnInFactionQuest('Scrap Run');
+    const p = store.getState().player!;
+    expect(p.completedFactionQuestIds).toContain('fq_reclaimers_starter');
+    expect(p.tc).toBe(tcBefore + 35);
+  });
 });

@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-451 — [playability] a Mission Board in every Outpost's central square (vendor-free room) posts
+  // the faction's contracts; tappable chip + readMissionBoard; accept/turn-in work at the board. Element #46: Palladium.
+  '2026-06-10-451': 'Palladium Sponge',
   // OTA-450 — [playability] nine rep-0 per-faction STARTER fetch quests (gather N forageable commons →
   // reward), a real early quest on-ramp; new `fetch` requirement consumed on turn-in. Element #45: Rhodium.
   '2026-06-10-450': 'Rhodium Refining',

@@ -400,6 +400,12 @@ interface CurrentScene {
   /** Index of the enemy the player is currently targeting. */
   activeEnemyIdx: number;
   vendor: VendorInstance | null;
+  /** OTA-451 — a public MISSION BOARD standing in this room (the vendor-free
+   *  central square of every faction Outpost). Carries the faction whose
+   *  contracts it posts so a new player has an immediate quest on-ramp; the UI
+   *  renders a tappable "Mission Board" chip and acceptFactionQuest /
+   *  turnInFactionQuest treat it as a quest source (no vendor required). */
+  missionBoard?: { faction: string } | null;
   /** arb36 — id of an enterable structure standing on the player's current
    *  WILD tile (deterministic via buildingForTile), or null. Surfaces the
    *  ENTER affordance + narration so buildings are discovered organically
@@ -2175,6 +2181,9 @@ interface GameStore {
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string) => void;
+  /** OTA-451 — read the outpost Mission Board: list the player faction's open
+   *  postings in the feed with accept instructions. Fired by the board chip. */
+  readMissionBoard: () => void;
   acceptHunt: (titleOrId: string) => void;
   advanceHunt: (huntId: string) => void;
   turnInHunt: (titleOrId: string) => void;
@@ -4341,9 +4350,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       !hasEnemies && !hubRoom && !onAnchorTile
         ? buildingForTile(location.id, bX, bY)
         : null;
+    // OTA-451 — a Mission Board stands in the central square of every faction
+    // Outpost (outpost_central — the one shared room with no vendor anchor). It
+    // posts the player's own faction's contracts (the rep-0 starters + anything
+    // they qualify for), giving a brand-new character an immediate quest on-ramp
+    // without having to stumble onto a wandering trader.
+    const missionBoard: { faction: string } | null =
+      hubRoom?.id === 'outpost_central' && player?.factionId
+        ? { faction: player.factionId }
+        : null;
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      missionBoard,
       sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
       // OTA-361 — knockout flags, one per enemy, all false at scene start.
@@ -14951,7 +14970,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
       return;
     }
-    if (!scene?.vendor || !scene.vendor.faction) {
+    // OTA-451 — a contract can be picked up from a same-faction VENDOR or from
+    // the OUTPOST MISSION BOARD. Resolve the quest faction + a display source
+    // name from whichever is present.
+    const acceptFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
+    const acceptSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'the mission board' : null);
+    if (!acceptFaction || !acceptSourceName) {
       // Resolve the named contract to its faction so we can tell the
       // player WHICH vendor archetype to seek, not just "a faction
       // agent." Falls back to the generic line if the input doesn't
@@ -14979,8 +15003,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Direct id match first, then fuzzy title within this faction's pool.
     const direct = findFactionQuestById(titleOrId);
     const pool = availableFactionQuests(
-      scene.vendor.faction,
-      getStanding(player.factionStanding, scene.vendor.faction),
+      acceptFaction,
+      getStanding(player.factionStanding, acceptFaction),
       player.activeFactionQuestIds ?? [],
       player.completedFactionQuestIds ?? [],
     );
@@ -14990,12 +15014,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'arbiter',
         titles
-          ? `${scene.vendor.name} looks you over. "Not that one. Currently on offer: ${titles}."`
-          : `${scene.vendor.name} shakes their head. "Nothing on offer for you right now."`,
+          ? `${acceptSourceName} — currently on offer: ${titles}.`
+          : `${acceptSourceName} has nothing on offer for you right now.`,
       );
       return;
     }
-    const factionId = scene.vendor.faction;
+    const factionId = acceptFaction;
     const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
       && (player.completedFactionQuestIds?.length ?? 0) === 0;
     set((s) =>
@@ -15065,7 +15089,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    if (!scene?.vendor || !scene.vendor.faction) {
+    // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
+    const turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
+    const turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
+    if (!turnFaction || !turnSourceName) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
       // back to listing the factions they owe across all active quests.
@@ -15122,14 +15149,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!candidate || !active.includes(candidate.id)) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} squints. "That one isn't on your active slate."`,
+        `${turnSourceName} doesn't list that one on your active slate.`,
       );
       return;
     }
-    if (candidate.factionId !== scene.vendor.faction) {
+    if (candidate.factionId !== turnFaction) {
       get().appendLog(
         'arbiter',
-        `${scene.vendor.name} shakes their head. "Wrong faction. Take that to ${candidate.factionId.replace(/_/g, ' ')}."`,
+        `${turnSourceName} won't take it — wrong faction. Bring it to ${candidate.factionId.replace(/_/g, ' ')}.`,
       );
       return;
     }
@@ -15143,7 +15170,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (currentStage < candidate.stages.length) {
         get().appendLog(
           'arbiter',
-          `${scene.vendor.name} eyes you carefully. "${candidate.title} isn't done. You're on step ${currentStage + 1} of ${candidate.stages.length}. Come back when the work's behind you."`,
+          `${turnSourceName}: "${candidate.title}" isn't done — you're on step ${currentStage + 1} of ${candidate.stages.length}. Come back when the work's behind you.`,
         );
         return;
       }
@@ -15159,7 +15186,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (have < quantity) {
         get().appendLog(
           'arbiter',
-          `${scene.vendor.name} checks the slate. "${candidate.title} needs ${quantity}× ${itemName} — you've brought ${have}. Come back when you've got the rest."`,
+          `${turnSourceName} checks the slate: "${candidate.title}" needs ${quantity}× ${itemName} — you've brought ${have}. Come back when you've got the rest.`,
         );
         return;
       }
@@ -15196,6 +15223,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
+    void get().persist();
+  },
+
+  readMissionBoard() {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player) return;
+    const board = scene?.missionBoard;
+    if (!board) {
+      get().appendLog('arbiter', `The Arbiter glances around. "No board posted here."`);
+      return;
+    }
+    const factionLabel = FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ');
+    const pool = availableFactionQuests(
+      board.faction,
+      getStanding(player.factionStanding, board.faction),
+      player.activeFactionQuestIds ?? [],
+      player.completedFactionQuestIds ?? [],
+    );
+    if (pool.length === 0) {
+      get().appendLog('world', `The ${factionLabel} mission board is clear — nothing posted for you right now. Turn in your active work, then check back.`);
+      return;
+    }
+    get().appendLog('world', `▣ ${factionLabel} Mission Board — open postings:`);
+    for (const q of pool) {
+      get().appendLog('world', `• "${q.title}" — ${q.objective} (reward: ${q.reward.tc} TC, +${q.reward.rep} rep)`);
+    }
+    get().appendLog(
+      'arbiter',
+      `The Arbiter taps the board. "Type ACCEPT <name> to take one on — e.g. accept ${pool[0]!.title.toLowerCase()}. Bring the work back here, or to any ${factionLabel} agent, to turn it in."`,
+    );
     void get().persist();
   },
 

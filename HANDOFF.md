@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-451 "Palladium Sponge" — [playability] Mission Board in every Outpost** *(element #46)*.
+  `currentScene.missionBoard {faction}` set by beginScene in `outpost_central` (vendor-free shared
+  room); tappable chip → `readMissionBoard()` lists postings; accept/turn-in generalized to treat the
+  board as a quest source. `gameStore.ts`, `ExplorationScreen.tsx`. Covered by `starterFetchQuests.test.ts`.
 - **OTA-450 "Rhodium Refining" — [playability] per-faction starter fetch quests** *(element #45)*.
   Nine rep-0 quests (one/faction): gather N forageable commons → reward. New `fetch` field on
   `FactionQuestDef`, consumed at turn-in. `factionQuests.ts`, `faction-quests.json`, `gameStore.ts`.

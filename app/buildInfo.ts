@@ -13644,4 +13644,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // turn-in now verifies the player holds the items and CONSUMES them (no free narrative close). These
 // surface at any same-faction vendor today; OTA-451 posts them on a bounty board in every Outpost.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-450';
+// OTA-451 (Palladium Sponge) — [playability] a MISSION BOARD in every faction Outpost. It stands in
+// `outpost_central` — the one room shared by all nine outposts that has no vendor anchor — and posts
+// the player's own faction's contracts (the OTA-450 rep-0 starters + anything they qualify for), so a
+// brand-new character has an immediate quest on-ramp instead of waiting on a wandering trader. A new
+// `currentScene.missionBoard {faction}` is set by beginScene; the UI renders a tappable parchment
+// "⚑ MISSION BOARD" chip (mirroring the vendor banner) that fires readMissionBoard(), listing the open
+// postings + accept instructions in the feed. acceptFactionQuest / turnInFactionQuest now treat the
+// board as a quest SOURCE (no vendor required) — accept, gather, and turn in all work right at the
+// board. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-451';

@@ -653,6 +653,25 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
+      {/* OTA-451 — Mission Board chip. Stands in the vendor-free central square
+          of every faction Outpost; tapping reads the board's open postings into
+          the feed (the rep-0 starter quests + anything the player qualifies for)
+          so a brand-new character has an immediate quest on-ramp. */}
+      {currentScene?.missionBoard && (
+        <TouchableOpacity
+          style={styles.missionBoardBanner}
+          onPress={() => useGameStore.getState().readMissionBoard()}
+          activeOpacity={0.7}
+        >
+          <View style={styles.missionBoardStripe} />
+          <View style={styles.vendorBannerBody}>
+            <Text style={styles.missionBoardName}>⚑ MISSION BOARD</Text>
+            <Text style={styles.vendorBannerHint}>tap to read the postings</Text>
+          </View>
+          <Text style={styles.missionBoardArrow}>›</Text>
+        </TouchableOpacity>
+      )}
+
       {/* OTA-217 / OTA-220 — visible permit indicator for the OTA-195
           Fusing Crucible. Playtest log: after OTA-217's banner shipped,
           player tapped 'fuse' 5 times in a row not realizing they
@@ -1672,6 +1691,21 @@ const styles = StyleSheet.create({
   vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
   vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
+  // vendor's amber and the Crucible's purple.
+  missionBoardBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#13110f',
+    borderColor: '#8b7355',
+    borderWidth: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
+    minHeight: 44,
+  },
+  missionBoardStripe: { width: 4, backgroundColor: '#8b7355', alignSelf: 'stretch' },
+  missionBoardName: { color: '#b89a6a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  missionBoardArrow: { color: '#8b7355', fontSize: 22, paddingHorizontal: 12 },
   // OTA-217 — Crucible permit banner. Purple stripe to differentiate
   // from the vendor banner's amber, matching the OTA-199 Rare rarity
   // color so the visual signal reads "rare event, act now."
