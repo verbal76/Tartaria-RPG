@@ -6561,6 +6561,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s);
           }
         }
+        // OTA-429 — a DOT tick that drops the LAST living enemy must still end
+        // the fight. Pre-OTA, DOT kills were left at 0 HP for "the next attack
+        // to clean up" — but if the DOT kills the final enemy the player has
+        // nothing left to swing at, so the fight hung (range stayed set, no
+        // loot, no victory line). When EVERY enemy is now dead from the tick,
+        // sweep them all through resolveEnemyDefeat (loot + kill bookkeeping +
+        // combat-end, which persists) and bail out of the attack — there is no
+        // valid target. Mixed fights (at least one enemy still alive) keep the
+        // old behavior so mid-fight targeting isn't perturbed.
+        {
+          const swept = get().currentScene;
+          if (swept && swept.enemies.length > 0 && swept.enemyHps.every((h) => (h ?? 0) <= 0)) {
+            set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: 0 } } : s));
+            let guard = 0;
+            while (++guard <= 16) {
+              const sc = get().currentScene;
+              if (!sc || sc.enemies.length === 0) break;
+              get().resolveEnemyDefeat();
+            }
+            return;
+          }
+        }
         const targetEnemy = activeEnemy(currentScene);
         if (targetEnemy) {
           // OTA 205 — Phase 2 args migration. If the player named an

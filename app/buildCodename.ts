@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-429 — [audit #11] a DOT tick that kills the LAST enemy now ends the fight (loot +
+  // victory + range clear) instead of hanging with no target to swing at. Element #24: Chromium.
+  '2026-06-10-429': 'Chromium Sensitization',
   // OTA-428 — [audit #10] Resurrection-Gem revival: spend gem only after the save lands,
   // wake at backfilled hpMax, and wrap rehydrate in a load-crash breadcrumb. Element #23: Vanadium.
   '2026-06-10-428': 'Vanadium Aluminothermy',

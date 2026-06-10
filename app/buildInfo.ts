@@ -13461,4 +13461,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // revive flags the slot for Retry/Delete instead of an instant re-crash; cleared on clean
 // completion, and a JS-caught error surfaces slotLoadError without charging the gem.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-428';
+// OTA-429 (Chromium Sensitization) — [audit fix #11] a damage-over-time tick that kills the
+// LAST living enemy now ends the fight. DOT ticks (infection + weapon-coating poison/acid/
+// corruption/electrical/burn) run at the start of the attack round; pre-OTA a DOT kill was
+// left at 0 HP for "the next attack to clean up." But when the DOT drops the final enemy the
+// player has no target to swing at, so the fight hung — range stayed set, no loot, no victory
+// line, and the only escape was fleeing. After the tick, if EVERY enemy is dead the round
+// sweeps them all through resolveEnemyDefeat (loot + kill bookkeeping + combat-end, which
+// persists) and returns out of the attack. Mixed fights (≥1 enemy still alive) keep the old
+// behavior, so mid-fight targeting is unchanged. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-429';

@@ -367,6 +367,12 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-429 "Chromium Sensitization" — [audit fix #11] a DOT kill of the last enemy ends the
+  fight** *(element #24)*. DOT ticks at the start of the attack round used to leave a killed
+  enemy at 0 HP for the next attack to clear — but a DOT that drops the FINAL enemy left the
+  player with no target, hanging the fight (range set, no loot/victory). The tick now sweeps
+  an all-dead scene through `resolveEnemyDefeat` and ends combat; mixed fights unchanged.
+  `gameStore.ts`. Covered by `__tests__/dotKillEndsCombat.test.ts`.
 - **OTA-428 "Vanadium Aluminothermy" — [audit fix #10] Resurrection-Gem revival hardened**
   *(element #23)*. (a) spend the gem only after the revived save lands (no save → no spend);
   (b) wake at backfilled `hpMax` not the raw saved one; (c) wrap rehydrate in a
