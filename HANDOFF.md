@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-439 "Selenium Rectifying" — [audit fix #23] confirm before consuming craft substitutes**
+  *(element #34)*. New `craftSubstitutionPrompt` modal (mirrors fusion-catalyst prompt) lists what
+  will be stripped; `confirmCraftSubstitution` re-dispatches via one-shot `craftSubConfirmedFor`,
+  `cancelCraftSubstitution` keeps the pack. `gameStore.ts`, `ExplorationScreen.tsx`. Covered by
+  `__tests__/craftSubstitutionConfirm.test.ts`.
 - **OTA-438 "Arsenic Sublimation" — [audit fix #21] close the wild-tile encounter farm** *(element #33)*.
   Wasteland encounters now only roll on a NOVEL tile (not in the 50-wide `recentTileHistory`), so
   oscillating between two tiles can't farm encounters; `wasteSteps` still accrues so forward

@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-439 — [audit #23] a craft that would consume material substitutes now asks first (modal),
+  // instead of silently stripping a synthesized piece standing in for a named ingredient. Element #34: Selenium.
+  '2026-06-10-439': 'Selenium Rectifying',
   // OTA-438 — [audit #21] wasteland encounters only roll on a NOVEL tile, so oscillating between
   // two tiles can't farm encounters/loot; intended wild-tile loot re-roll is untouched. Element #33: Arsenic.
   '2026-06-10-438': 'Arsenic Sublimation',

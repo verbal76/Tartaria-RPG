@@ -2329,6 +2329,18 @@ interface GameStore {
   confirmEquippedCatalystFusion: () => void;
   /** Dismiss the equipped-catalyst prompt without fusing. */
   cancelFusionCatalystPrompt: () => void;
+  /** OTA-439 — [audit #23] when a craft would CONSUME material substitutes
+   *  (a misc/inferred item standing in for a named ingredient via its tags),
+   *  ask before stripping them instead of silently eating them. `subsList` is
+   *  the pre-formatted "2× Brass Sextant → Scrap Metal, …" summary. */
+  craftSubstitutionPrompt: { recipeResult: string; subsList: string } | null;
+  /** One-shot latch: set by confirmCraftSubstitution so the re-dispatched
+   *  craft skips the prompt and proceeds. Cleared the moment it's consumed. */
+  craftSubConfirmedFor: string | null;
+  /** Confirm: proceed with the craft, consuming the listed substitutes. */
+  confirmCraftSubstitution: () => void;
+  /** Dismiss the substitution prompt without crafting. */
+  cancelCraftSubstitution: () => void;
   /** OTA-211 — pick a stat for the Aether Dust +3 buff, apply it,
    *  consume the pending food + 1 Aether Dust, close the picker. */
   selectAetherStat: (stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma') => void;
@@ -2447,6 +2459,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingRolls: null,
   pendingHookContinue: null,
   fusionCatalystPrompt: null,
+  craftSubstitutionPrompt: null,
+  craftSubConfirmedFor: null,
   pendingTravelConfirm: null,
   hydrated: false,
   lowHpWarned: false,
@@ -12143,10 +12157,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `${s.quantity}× ${s.substitute} → ${s.ingredient}`
               : `${s.substitute} → ${s.ingredient}`,
           ).join(', ');
-          get().appendLog(
-            'arbiter',
-            `The Arbiter nods. "Stripped for parts: ${list}."`,
-          );
+          // OTA-439 — [audit #23] confirm before consuming substitutes. A craft
+          // that strips a misc/inferred item (standing in for a named ingredient
+          // via its material tag) used to eat it silently. Unless this is the
+          // confirmed re-dispatch, raise the prompt and bail — the player's
+          // synthesized pieces aren't burned without a yes.
+          if (get().craftSubConfirmedFor === recipe.result) {
+            set({ craftSubConfirmedFor: null });
+            get().appendLog('arbiter', `The Arbiter nods. "Stripped for parts: ${list}."`);
+          } else {
+            set({ craftSubstitutionPrompt: { recipeResult: recipe.result, subsList: list } });
+            break;
+          }
         }
         const remaining = consumeIngredients(player.inventory, recipe);
         const catEntry = lookupCraftedItem(recipe.result);
@@ -18638,6 +18660,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   cancelFusionCatalystPrompt() {
     set({ fusionCatalystPrompt: null });
+  },
+
+  // OTA-439 — [audit #23] confirm: latch the recipe so the re-dispatched craft
+  // skips the prompt and proceeds, then re-issue the craft.
+  confirmCraftSubstitution() {
+    const prompt = get().craftSubstitutionPrompt;
+    if (!prompt) return;
+    set({ craftSubstitutionPrompt: null, craftSubConfirmedFor: prompt.recipeResult });
+    get().submitPlayerAction(`craft ${prompt.recipeResult}`);
+  },
+  // Dismiss without crafting — the substitutes stay in the pack.
+  cancelCraftSubstitution() {
+    const prompt = get().craftSubstitutionPrompt;
+    set({ craftSubstitutionPrompt: null, craftSubConfirmedFor: null });
+    if (prompt) {
+      get().appendLog('arbiter', `The Arbiter sets the schematic down. "Left them be, then. Your pieces stay in your pack."`);
+    }
   },
 
   openRaceAbilityPicker() { set({ raceAbilityPickerOpen: true }); },

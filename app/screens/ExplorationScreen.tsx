@@ -72,6 +72,7 @@ export function ExplorationScreen() {
   const currentScene = useGameStore((s) => s.currentScene);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
+  const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
   // arb-fix — race-ability picker (activatable once/day race powers).
   const raceAbilityPickerOpen = useGameStore((s) => s.raceAbilityPickerOpen);
   // Tungsten Spire — current tutorial beat id (null when no tutorial). The
@@ -1422,6 +1423,30 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => useGameStore.getState().cancelFusionCatalystPrompt()}
+      />
+
+      {/* OTA-439 — [audit #23] confirm before a craft consumes material
+          substitutes (a misc/inferred piece standing in for a named ingredient
+          via its tag), so synthesized gear isn't silently stripped. */}
+      <BrandedModal
+        visible={craftSubstitutionPrompt !== null}
+        title="Strip these for parts?"
+        body={craftSubstitutionPrompt
+          ? `Crafting ${craftSubstitutionPrompt.recipeResult} will consume substitutes from your pack:\n\n${craftSubstitutionPrompt.subsList}\n\nThese stand in for the listed ingredients and will be used up. Proceed?`
+          : undefined}
+        buttons={[
+          {
+            label: 'Keep them',
+            onPress: () => useGameStore.getState().cancelCraftSubstitution(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Craft & strip',
+            onPress: () => useGameStore.getState().confirmCraftSubstitution(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => useGameStore.getState().cancelCraftSubstitution()}
       />
 
       {/* arb-fix — ✦ race-ability picker. Lists the once/day race powers the

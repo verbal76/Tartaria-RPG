@@ -13539,4 +13539,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (reusing the OTA-057/138 novelty infra). `wasteSteps` still accrues on revisits, so genuine
 // forward travel pays out the banked danger. The intended wild-tile loot RE-ROLL ("theme-park
 // density") is untouched — only the repeatable encounter spawn is gated. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-438';
+// OTA-439 (Selenium Rectifying) — [audit fix #23] confirm before a craft consumes material
+// SUBSTITUTES. A recipe can be satisfied by a misc/inferred piece whose material tag matches a
+// named ingredient (a synthesized "Brass Sextant" tagged ['metal'] standing in for Scrap Metal);
+// pre-OTA the craft ate it silently and only logged "Stripped for parts" after the fact. Crafting
+// now raises a confirm modal (craftSubstitutionPrompt, mirroring the fusion-catalyst prompt)
+// listing exactly what will be stripped; confirm re-dispatches the craft via a one-shot
+// craftSubConfirmedFor latch, cancel leaves the pack untouched. Recipes that use only exact-named
+// ingredients are unaffected. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-439';
