@@ -13276,4 +13276,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // route could miss them entirely. Bumped to 22% (~one every 4-5 tiles) — frequent
 // enough to actually encounter on a journey, still not a building on every screen.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-408';
+// OTA-409 (Beryllium Reduction) — raise roadside-trader spawn during travel. Player
+// crossed whole courses without meeting a single vendor (named OR random). VERIFIED
+// the spawn path is healthy (not broken): stepDirection rolls a roadside trader each
+// peaceful outdoor step and pickRoadsideTrader returns a full 3-6 offer stall. The
+// rate had just been throttled — 0.15 originally, halved to 0.08 at OTA-302's branch
+// promotion (the comment still wrongly said 15%). Bumped to 0.20, so a traveler
+// reliably runs into a trader every ~5 steps. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-409';

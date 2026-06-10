@@ -367,6 +367,15 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-409 "Beryllium Reduction" — raise roadside-trader spawn during travel**
+  *(element #4)*. Player: "I haven't seen any vendors at all, named or random … check
+  we didn't break it and if it's working raise the rate during travel." **Verified
+  healthy:** `stepDirection` rolls a roadside trader each peaceful outdoor step,
+  `pickRoadsideTrader` returns a full 3-6 offer stall. The rate was just throttled —
+  `0.15` originally, halved to `0.08` at OTA-302's branch promotion (comment still said
+  15%). Bumped to **`0.20`** (~one every ~5 travel steps). `gameStore.ts`. *(Named
+  hub vendors are a separate path — anchor NPCs in outposts/cities — and were
+  untouched/intact; this is the wilderness-travel trader.)*
 - **OTA-408 "Lithium Calcination" — more structures on planned routes** *(element
   #3)*. Player: "I have not run into any houses or sheds or any other structures in my
   travels … bump the random encounters of this up on planned routes." Buildings are

@@ -16574,10 +16574,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // handler stays inside the same macro scene, so beginScene never
     // re-rolls the vendor slot — a player who paces within one
     // location (e.g. the Outskirts wilderness) never encounters a
-    // roadside stall even with the 25% spawn rate. Roll here on
-    // every peaceful outdoor step: 15% chance, gated on no current
-    // vendor, no enemies, no hub-room. Stalls "materialize" as the
-    // player crests the next stretch of silt.
+    // roadside stall even with beginScene's 25% spawn rate. Roll here on
+    // every peaceful outdoor step, gated on no current vendor, no
+    // enemies, no hub-room. Stalls "materialize" as the player crests
+    // the next stretch of silt.
+    // OTA-409 — rate bumped 0.08 → 0.20. It was 0.15 originally, halved to
+    // 0.08 at OTA-302's branch promotion (the comment was never updated and
+    // still claimed 15%). Playtester crossed entire courses without meeting a
+    // single trader. At 20% the player reliably runs into one every ~5 travel
+    // steps — vendors actually show up on a journey now. The spawn path itself
+    // was verified healthy (pickRoadsideTrader returns a full 3-6 offer stall).
     {
       const liveScene = get().currentScene;
       const livePlayer = get().player;
@@ -16585,7 +16591,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.08) {
+      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.20) {
         const stall = pickRoadsideTrader();
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(

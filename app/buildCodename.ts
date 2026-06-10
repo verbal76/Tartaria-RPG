@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-409 — raise roadside-trader spawn during travel (0.08 → 0.20); spawn path
+  // verified healthy, just throttled. Element #4: Beryllium.
+  '2026-06-10-409': 'Beryllium Reduction',
   // OTA-408 — more enterable structures on planned routes (BUILDING_TILE_CHANCE
   // 12 → 22%). Element #3: Lithium.
   '2026-06-10-408': 'Lithium Calcination',
