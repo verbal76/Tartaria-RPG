@@ -649,9 +649,10 @@ export function InventoryScreen() {
   if (coatTarget) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { isCoatableWeapon, coatedDisplayName } = require('../engine/weaponCoating');
+      const { isCoatableItem, coatedDisplayName } = require('../engine/weaponCoating');
       const coatable = (player.inventory ?? []).filter(
-        (i: InventoryItem) => isCoatableWeapon(i.name),
+        // OTA-453 — instance-aware so FUSED weapons (catalog-absent) are listed.
+        (i: InventoryItem) => isCoatableItem(i),
       );
       if (coatable.length === 0) {
         coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.';

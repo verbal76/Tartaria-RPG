@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-453 "Cadmium Plating" — [bug] fused weapons can be coated** *(element #48)*. Coatability was
+  name-only (`isCoatableWeapon` → `findWeaponByName`), which misses catalog-absent fused weapons. New
+  `isCoatableItem(item)` reads `uniqueStats`; used by the inventory coat-picker + `applyCoating` guard.
+  `weaponCoating.ts`, `InventoryScreen.tsx`, `gameStore.ts`. Covered by `weaponCoating.test.ts`.
 - **OTA-452 "Silver Cupellation" — [playability] early-tile roadside-trader boost** *(element #47)*.
   Roadside vendor spawn 0.50 → 0.25 decay over the first ~24 tiles (`recentTileHistory.length`), in
   beginScene's vendor gate. `gameStore.ts`. (Formula verified; beginScene covered by integration suites.)

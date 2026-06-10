@@ -1,5 +1,5 @@
 import {
-  isCoatableWeapon, coatedDisplayName, coatingBlurb,
+  isCoatableWeapon, isCoatableItem, coatedDisplayName, coatingBlurb,
   coatingStatusKind, coatingDotPerTurn, rollLootCoating,
   COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, CORRUPTION_STACK_BONUS,
 } from '../app/engine/weaponCoating';
@@ -35,6 +35,22 @@ describe('isCoatableWeapon — only edges and points hold a coating', () => {
   it('a non-weapon name is not coatable', () => {
     expect(isCoatableWeapon('Scrap Metal')).toBe(false);
     expect(isCoatableWeapon('')).toBe(false);
+  });
+
+  // OTA-453 — fused weapons are catalog-absent (stats on the instance), so the
+  // name-only isCoatableWeapon always missed them and they never showed up under
+  // "coat weapon." isCoatableItem reads the instance and allows fused weapons.
+  it('a FUSED weapon (uniqueStats, catalog-absent name) IS coatable via isCoatableItem', () => {
+    const fused = { name: 'Resonant Spike', kind: 'weapon' as const, uniqueStats: { kind: 'weapon' } };
+    expect(isCoatableWeapon(fused.name)).toBe(false); // catalog miss (the bug)
+    expect(isCoatableItem(fused)).toBe(true);          // fixed
+  });
+  it('isCoatableItem does NOT coat fused armor', () => {
+    expect(isCoatableItem({ name: 'Woven Mantle', kind: 'armor', uniqueStats: { kind: 'armor' } })).toBe(false);
+  });
+  it('isCoatableItem keeps the damage-type gate for catalog weapons', () => {
+    expect(isCoatableItem({ name: 'Rusted Blade', kind: 'weapon' })).toBe(true);
+    expect(isCoatableItem({ name: 'Mud-fist Wraps', kind: 'weapon' })).toBe(false);
   });
 });
 

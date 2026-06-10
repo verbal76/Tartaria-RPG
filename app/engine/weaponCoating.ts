@@ -38,6 +38,18 @@ export function isCoatableWeapon(name: string): boolean {
   return w.damageType === 'piercing';
 }
 
+/** OTA-453 — instance-aware coatability. A FUSED weapon is unique and
+ *  catalog-absent — its stats live on the InventoryItem (`uniqueStats`), so
+ *  findWeaponByName (and therefore isCoatableWeapon) misses it entirely, and a
+ *  fused weapon never appeared under "coat weapon." A fused weapon is a bespoke
+ *  forged piece the player invested in; treat any fused WEAPON as coatable.
+ *  Catalog weapons keep the damage-type gate. Prefer this over isCoatableWeapon
+ *  wherever an actual InventoryItem is in hand. */
+export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniqueStats'>): boolean {
+  if (item.kind === 'weapon' && item.uniqueStats?.kind === 'weapon') return true;
+  return isCoatableWeapon(item.name);
+}
+
 /** The player-facing name for an item, prefixed with the coating
  *  adjective when one is applied ("Corrupted Battle Axe"). The
  *  underlying InventoryItem.name is never mutated. */

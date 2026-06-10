@@ -13659,4 +13659,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // back to the 0.25 baseline over their first ~24 tiles (keyed off recentTileHistory.length), so the
 // opening reliably puts trade + quest contact in front of a player who sets out to find work — then
 // settles to baseline so the world isn't permanently flooded. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-452';
+// OTA-453 (Cadmium Plating) — [bug] FUSED weapons can now be coated. A player forged a Legendary
+// "Resonant Spike" at the Crucible and it never appeared under "coat weapon." Cause: coatability was
+// gated by isCoatableWeapon(NAME), which resolves via findWeaponByName — but a fused weapon is
+// catalog-absent (its stats live on the InventoryItem.uniqueStats), so the lookup returned null and
+// EVERY fused weapon read as non-coatable. New instance-aware isCoatableItem(item): a fused weapon
+// (uniqueStats.kind === 'weapon') is a bespoke forged piece and is coatable; catalog weapons keep the
+// damage-type gate; fused ARMOR stays non-coatable. The inventory coat-picker filter and the
+// applyCoating guard both use it now. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-453';

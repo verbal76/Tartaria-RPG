@@ -18539,8 +18539,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isCoatableWeapon, coatedDisplayName } = require('../engine/weaponCoating');
-    if (!isCoatableWeapon(weapon.name)) {
+    const { isCoatableItem, coatedDisplayName } = require('../engine/weaponCoating');
+    // OTA-453 — instance-aware: a FUSED weapon is catalog-absent (its stats live
+    // on the instance), so the old name-only isCoatableWeapon always refused it.
+    if (!isCoatableItem(weapon)) {
       get().appendLog('world', `You can't coat the ${weapon.name} — a coating needs an edge or a point to carry it. Try a blade, an arrow-arm, or a bolt-caster.`);
       return;
     }
