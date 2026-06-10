@@ -5,8 +5,12 @@
 // Self-contained: owns its timer + Kokoro subscription, returns null when done.
 
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
+
+// Splash art native dimensions (assets/splash-art.jpg).
+const SPLASH_W = 941;
+const SPLASH_H = 1672;
 
 // Module-scoped so it survives remounts within the same JS process; resets on a
 // fresh process / OTA reload.
@@ -36,16 +40,19 @@ export function SplashOverlay() {
     : kokoro.phase === 'loading' ? 0.92
     : 0.12;
 
+  // OTA-473 — top-left anchored, scaled to 2/3 of full-width (drop 1/3 off the
+  // right and, proportionally, 1/3 off the bottom). Explicit pixel dimensions from
+  // the screen width — deterministic, no aspectRatio guesswork.
+  const screenW = Dimensions.get('window').width;
+  const imgW = Math.round((screenW * 2) / 3);
+  const imgH = Math.round((imgW * SPLASH_H) / SPLASH_W);
+
   return (
     <View style={styles.overlay} pointerEvents="auto">
-      {/* "contain" guarantees the WHOLE composition fits the screen (scaled down,
-          never cropped) — title, wanderer, dog and golem all in frame. The image
-          is wider-aspect than a tall phone, so it fits to width and leaves a thin
-          dark letterbox top/bottom that blends with the dark overlay + dark art. */}
       <Image
         source={require('../../assets/splash-art.jpg')}
-        style={StyleSheet.absoluteFill}
-        resizeMode="contain"
+        style={{ position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
+        resizeMode="cover"
       />
       <View style={styles.barWrap}>
         <View style={styles.barTrack}>

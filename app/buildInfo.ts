@@ -13848,4 +13848,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // which deterministically scales the WHOLE composition to fit (never crops) — title, wanderer, dog and
 // golem all in frame — with a thin dark letterbox top/bottom that blends with the dark overlay + art.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-472';
+// OTA-473 (Erbium Implant) — [UX] splash sizing per request: TOP-LEFT anchored, scaled to 2/3. The image
+// now renders at an explicit pixel size — width = 2/3 of the screen width, height proportional (so 1/3 is
+// dropped off the right and, proportionally, off the bottom) — pinned to the top-left corner (top:0,
+// left:0), over the dark full-screen overlay. Explicit Dimensions-derived pixels, no aspectRatio
+// guesswork. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-473';
