@@ -13856,4 +13856,6 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-474 (Thulium Roasting) — [UX] splash scale tune. OTA-473's 2/3 read "too far" (too small) and the
 // earlier full-width read "too big", so the top-left-anchored scale is set to 0.85 of screen width (a
 // named SPLASH_SCALE constant for easy further tuning). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-474';
+// OTA-475 (Ytterbium Reduction) — [UX] splash scale nudge 0.85 → 0.92 ("getting there"), top-left
+// anchored. One-number SPLASH_SCALE tweak. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-475';

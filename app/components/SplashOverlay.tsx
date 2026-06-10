@@ -11,9 +11,9 @@ import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/
 // Splash art native dimensions (assets/splash-art.jpg).
 const SPLASH_W = 941;
 const SPLASH_H = 1672;
-// OTA-474 — top-left-anchored splash scale (fraction of screen width). Full-width
-// read "too big", 2/3 read "too far" — 0.85 splits the difference. Easy to tune.
-const SPLASH_SCALE = 0.85;
+// OTA-474/475 — top-left-anchored splash scale (fraction of screen width). Full
+// read "too big", 2/3 "too far", 0.85 "getting there" → 0.92. Easy to tune.
+const SPLASH_SCALE = 0.92;
 
 // Module-scoped so it survives remounts within the same JS process; resets on a
 // fresh process / OTA reload.
