@@ -76,6 +76,19 @@ const MAX_QWEN_COMPLETION_CRASHES = 3; // completions recover, so a touch more t
 const KEY_TTS_IN_PROGRESS = 'tartaria.ml.ttsInProgress';
 const KEY_TTS_CRASH_COUNT = 'tartaria.ml.ttsCrashCount';
 
+// OTA-414 — AUTO-RETRY with backoff for the Qwen completion guard. The disable is
+// no longer permanent: once it trips, Qwen gets another attempt after a cooldown
+// measured in COLD BOOTS. If the retry session survives (no completion crash), Qwen
+// RECOVERS (re-enabled, crash count cleared). If it crashes again, the cooldown
+// doubles (capped) so a genuinely-incapable device retries less and less often
+// while a flaky-but-capable one heals on the first good run.
+const KEY_BOOT_COUNT = 'tartaria.ml.bootCount';
+const KEY_QWEN_RETRY_AT = 'tartaria.ml.qwenRetryAtBoot';
+const KEY_QWEN_RETRY_PENDING = 'tartaria.ml.qwenRetryPending';
+const KEY_QWEN_BACKOFF = 'tartaria.ml.qwenBackoffBoots';
+const QWEN_RETRY_BASE_BOOTS = 5;  // first cooldown after a disable
+const QWEN_RETRY_MAX_BOOTS = 40;  // cap — a bad device retries at most every 40 boots
+
 interface MLHealthState {
   lastAttemptAt: string | null;
   lastSuccessAt: string | null;
@@ -94,6 +107,14 @@ interface MLHealthState {
   /** The breadcrumb label (voice id) that was in-flight when the process died
    *  last session, if a TTS crash was detected this boot. */
   lastTtsOpBeforeCrash: string | null;
+  // OTA-414 — Qwen auto-retry/backoff state (for the diagnostic + UX).
+  /** This boot is a scheduled retry of a crash-disabled Qwen. */
+  qwenRetryingThisBoot: boolean;
+  /** A prior retry survived a full run; Qwen was re-enabled this boot. */
+  qwenRecoveredThisBoot: boolean;
+  /** Cold boots until the next Qwen retry while disabled, or null when enabled /
+   *  retrying this boot. */
+  qwenNextRetryInBoots: number | null;
 }
 
 let cached: MLHealthState | null = null;
@@ -116,8 +137,12 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let qwenDisabledStr: string | null = null;
   let ttsInProgress: string | null = null;
   let ttsCrashCountStr: string | null = null;
+  let bootCountStr: string | null = null;
+  let qwenRetryAtStr: string | null = null;
+  let qwenRetryPendingStr: string | null = null;
+  let qwenBackoffStr: string | null = null;
   try {
-    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr] = await Promise.all([
+    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr] = await Promise.all([
       AsyncStorage.getItem(KEY_ATTEMPTED),
       AsyncStorage.getItem(KEY_SUCCEEDED),
       AsyncStorage.getItem(KEY_CRASH_COUNT),
@@ -127,6 +152,10 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       AsyncStorage.getItem(KEY_QWEN_DISABLED),
       AsyncStorage.getItem(KEY_TTS_IN_PROGRESS),
       AsyncStorage.getItem(KEY_TTS_CRASH_COUNT),
+      AsyncStorage.getItem(KEY_BOOT_COUNT),
+      AsyncStorage.getItem(KEY_QWEN_RETRY_AT),
+      AsyncStorage.getItem(KEY_QWEN_RETRY_PENDING),
+      AsyncStorage.getItem(KEY_QWEN_BACKOFF),
     ]);
   } catch {
     // AsyncStorage failed — defensive default to "all clean, attempt ML."
@@ -177,6 +206,69 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     }
   }
 
+  // OTA-414 — AUTO-RETRY with backoff. Increment the monotonic boot counter, then
+  // drive the disable→retry→recover/relapse state machine (cooldown in cold boots).
+  let bootCount = Number.parseInt(bootCountStr ?? '0', 10);
+  if (!Number.isFinite(bootCount) || bootCount < 0) bootCount = 0;
+  bootCount += 1;
+  try { await AsyncStorage.setItem(KEY_BOOT_COUNT, String(bootCount)); } catch { /* ignore */ }
+
+  let qwenRetryingThisBoot = false;
+  let qwenRecoveredThisBoot = false;
+  let qwenNextRetryInBoots: number | null = null;
+  const retryWasPending = qwenRetryPendingStr === '1';
+  let backoff = Number.parseInt(qwenBackoffStr ?? '0', 10);
+  if (!Number.isFinite(backoff) || backoff < QWEN_RETRY_BASE_BOOTS) backoff = QWEN_RETRY_BASE_BOOTS;
+
+  if (qwenDisabledByCrash) {
+    if (retryWasPending && detectedQwenCompletionCrashThisBoot) {
+      // The retry session crashed → grow the backoff and push the next retry out.
+      backoff = Math.min(backoff * 2, QWEN_RETRY_MAX_BOOTS);
+      const retryAt = bootCount + backoff;
+      try {
+        await AsyncStorage.setItem(KEY_QWEN_BACKOFF, String(backoff));
+        await AsyncStorage.setItem(KEY_QWEN_RETRY_AT, String(retryAt));
+        await AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING);
+      } catch { /* ignore */ }
+      qwenNextRetryInBoots = retryAt - bootCount;
+    } else if (retryWasPending && !detectedQwenCompletionCrashThisBoot) {
+      // The retry session SURVIVED a full run → recover: re-enable Qwen + clear its
+      // crash count + cooldown. Keep the grown backoff so a future relapse stays
+      // cautious.
+      qwenDisabledByCrash = false;
+      qwenCompletionCrashCount = 0;
+      qwenRecoveredThisBoot = true;
+      try {
+        await AsyncStorage.removeItem(KEY_QWEN_DISABLED);
+        await AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT);
+        await AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING);
+        await AsyncStorage.removeItem(KEY_QWEN_RETRY_AT);
+      } catch { /* ignore */ }
+    } else {
+      // Not a retry boot — has the cooldown elapsed? Schedule one if missing.
+      let retryAt = Number.parseInt(qwenRetryAtStr ?? '0', 10);
+      if (!Number.isFinite(retryAt) || retryAt <= 0) {
+        retryAt = bootCount + backoff;
+        try {
+          await AsyncStorage.setItem(KEY_QWEN_RETRY_AT, String(retryAt));
+          await AsyncStorage.setItem(KEY_QWEN_BACKOFF, String(backoff));
+        } catch { /* ignore */ }
+      }
+      if (bootCount >= retryAt) {
+        // Cooldown elapsed → attempt Qwen THIS session. Mark the retry pending so
+        // next boot can judge whether it survived (recover) or crashed (relapse).
+        qwenDisabledByCrash = false;
+        qwenRetryingThisBoot = true;
+        try { await AsyncStorage.setItem(KEY_QWEN_RETRY_PENDING, '1'); } catch { /* ignore */ }
+      } else {
+        qwenNextRetryInBoots = retryAt - bootCount;
+      }
+    }
+  } else if (retryWasPending) {
+    // Defensive: a pending retry but Qwen isn't disabled — clear the flag.
+    try { await AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING); } catch { /* ignore */ }
+  }
+
   // OTA-413 — voice (TTS) completion-crash detection. If the TTS breadcrumb
   // survived to this boot, a voice utterance crashed the process last session.
   let ttsCrashCount = Number.parseInt(ttsCrashCountStr ?? '0', 10);
@@ -207,6 +299,9 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     ttsCrashCount,
     detectedTtsCrashThisBoot,
     lastTtsOpBeforeCrash,
+    qwenRetryingThisBoot,
+    qwenRecoveredThisBoot,
+    qwenNextRetryInBoots,
   };
   return cached;
 }
@@ -316,6 +411,10 @@ export async function resetMLHealth(): Promise<void> {
       // OTA-413 — also clear the voice (TTS) crash breadcrumb + count.
       AsyncStorage.removeItem(KEY_TTS_CRASH_COUNT),
       AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS),
+      // OTA-414 — clear the Qwen auto-retry/backoff schedule.
+      AsyncStorage.removeItem(KEY_QWEN_RETRY_AT),
+      AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING),
+      AsyncStorage.removeItem(KEY_QWEN_BACKOFF),
     ]);
   } catch {
     // ignore
@@ -328,6 +427,9 @@ export async function resetMLHealth(): Promise<void> {
     cached.ttsCrashCount = 0;
     cached.detectedTtsCrashThisBoot = false;
     cached.lastTtsOpBeforeCrash = null;
+    cached.qwenRetryingThisBoot = false;
+    cached.qwenRecoveredThisBoot = false;
+    cached.qwenNextRetryInBoots = null;
   }
 }
 
@@ -356,10 +458,15 @@ export function mlHealthSummary(): string {
   } else {
     status = `active (no crashes detected)`;
   }
-  // OTA-351 — Qwen completion-crash guard line (the SVE-on-Tensor-G5 class).
+  // OTA-351/414 — Qwen completion-crash guard line, now with auto-retry/backoff.
   let qwenStatus: string;
-  if (state.qwenDisabledByCrash) {
-    qwenStatus = `auto-disabled after ${state.qwenCompletionCrashCount} completion crashes (template narration in use)`;
+  if (state.qwenRecoveredThisBoot) {
+    qwenStatus = `RECOVERED — a retry survived a clean run; AI narration re-enabled`;
+  } else if (state.qwenRetryingThisBoot) {
+    qwenStatus = `retrying this boot (cooldown elapsed after ${state.qwenCompletionCrashCount} completion crashes)`;
+  } else if (state.qwenDisabledByCrash) {
+    qwenStatus = `auto-disabled after ${state.qwenCompletionCrashCount} completion crashes (template narration in use`
+      + (state.qwenNextRetryInBoots != null ? `; auto-retry in ${state.qwenNextRetryInBoots} boot${state.qwenNextRetryInBoots === 1 ? '' : 's'})` : ')');
   } else if (state.detectedQwenCompletionCrashThisBoot) {
     qwenStatus = `recovering — completion crash on previous launch (${state.qwenCompletionCrashCount}/${MAX_QWEN_COMPLETION_CRASHES} before auto-disable)`;
   } else if (state.qwenCompletionCrashCount > 0) {

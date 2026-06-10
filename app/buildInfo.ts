@@ -13330,4 +13330,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and clears it after; if it survives to the next boot, the diagnostic's new
 // "Voice (TTS) guard" line NAMES voice as what died (detection-only; no auto-disable
 // yet). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-413';
+// OTA-414 (Fluorine Etching) — Qwen can REFIRE after the crash-guard disables it.
+// Player: "can qwen refire on fail?" Pre-414 the completion guard disabled Qwen
+// PERMANENTLY after 3 crashes (the resetMLHealth re-enable was never wired to UI), so
+// a few transient crashes killed AI narration for the whole install. Now it auto-
+// retries with backoff: after a disable, Qwen re-attempts once a cooldown (measured
+// in COLD BOOTS, base 5) elapses; if that retry session survives a clean run it
+// RECOVERS (re-enabled, crash count cleared); if it crashes again the cooldown doubles
+// (capped at 40 boots) so a genuinely-incapable device retries less and less often
+// while a flaky-but-capable one heals on the first good run. State machine + new
+// breadcrumbs live in mlHealth; the diagnostic's Qwen line now shows retrying /
+// recovered / "auto-retry in N boots". JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-414';

@@ -367,6 +367,14 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-414 "Fluorine Etching" — Qwen auto-retry with backoff** *(element #9)*.
+  Player: "can qwen refire on fail?" Pre-414 the completion guard disabled Qwen
+  PERMANENTLY after 3 crashes (`resetMLHealth` was never wired to UI). Now it
+  auto-retries: after a disable Qwen re-attempts once a cooldown (cold boots, base 5)
+  elapses; a clean retry RECOVERS it (re-enabled, count cleared); a crashing retry
+  doubles the cooldown (cap 40 boots). State machine in `mlHealth.loadMLHealth`;
+  diagnostic Qwen line shows retrying / RECOVERED / "auto-retry in N boots".
+  `diagnostics/mlHealth.ts`; `mlHealthQwenRetry.test.ts` (4).
 - **OTA-413 "Oxygen Combustion" — proactive room-lore prune + voice (TTS) crash
   breadcrumb** *(element #8)*. From a 411 crash report (crashed after applying a searing
   paste — but the coating JS *succeeded*, so it was a native crash). **(1)**
