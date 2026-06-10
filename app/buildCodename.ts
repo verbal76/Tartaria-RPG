@@ -345,6 +345,12 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-460 — [crash mitigation, cont.] make the AI re-enable actually testable: the device showed
+  // "clean/not disabled" yet boot still read qwen:skipped, so the OTA-459 batch fix couldn't be exercised.
+  // Upgraded the reset button to "RESET AI NARRATION & RELOAD" — clears breadcrumbs AND force-loads Qwen
+  // in-session via bootQwen() (bypasses the boot skip gate; resets store status to 'idle' first), with a
+  // live load-progress label. Force-loaded context uses the OTA-459 shrunken batch. Element #55: Cesium.
+  '2026-06-10-460': 'Cesium Getter',
   // OTA-459 — [crash mitigation] root-cause attempt at the Tensor-G5 Qwen completion SIGSEGV: shrink the
   // llama.rn compute batch (n_batch 2048→512, n_ubatch 512→128) to shrink the faulting compute buffer, +
   // wire a "RESET AI NARRATION" button (resetMLHealth) so a self-disabled device can re-attempt Qwen and

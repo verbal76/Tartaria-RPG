@@ -367,6 +367,15 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-460 "Cesium Getter" — [crash mitigation, cont.] make the AI re-enable testable** *(element #55)*.
+  On-device, OTA-459 showed a contradiction: ML health "clean/not disabled, count 0" yet boot still read
+  `qwen:skipped` — the batch fix couldn't be exercised, and restart didn't clear it. Upgraded the reset
+  button to **"RESET AI NARRATION & RELOAD"**: clears breadcrumbs AND force-loads Qwen in-session via
+  `bootQwen()` (bypasses the boot skip gate — it just inits the llama.rn context; resets store qwenStatus
+  to 'idle' first so the early-return doesn't swallow it; no reloadAsync → no OTA-234 risk). Live
+  load-progress label + error surface. Force-loaded context uses the OTA-459 shrunken batch (512/128).
+  `AboutScreen.tsx`. **The boot-time skip-despite-clean-state anomaly is sidestepped, not root-caused — worth
+  a follow-up:** why does the 3s-deferred Qwen boot skip when `shouldAttemptQwen()` should be true?
 - **OTA-459 "Xenon Sputtering" — [crash mitigation] Tensor-G5 Qwen SIGSEGV root-cause attempt** *(element #54)*.
   OTA-457 only CATCHES the crash; this tries to PREVENT it. (1) `LlamaRuntime` init shrinks the compute
   batch (n_batch 2048→512, n_ubatch 512→128) — n_ubatch sizes the compute buffer the SVE kernel faults

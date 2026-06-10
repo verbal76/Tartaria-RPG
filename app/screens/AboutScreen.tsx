@@ -68,6 +68,7 @@ export function AboutScreen() {
   const qwenFraction = useGameStore((s) => s.qwenFraction);
   const qwenError = useGameStore((s) => s.qwenError);
   const qwenModelId = useGameStore((s) => s.qwenModelId);
+  const bootQwen = useGameStore((s) => s.bootQwen);
   const gameLogLength = useGameStore((s) => s.gameLog.length);
   const player = useGameStore((s) => s.player);
 
@@ -727,24 +728,39 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
-          {/* OTA-459 — RESET AI NARRATION. Clears the ML crash breadcrumbs so a
-              device that self-disabled Qwen re-attempts it on the next launch.
-              Takes effect after a full app restart (the disable is read once at
-              boot). Surfaces the current ML-health line so the player can see the
-              disabled state before/after. */}
+          {/* OTA-459/460 — RESET AI NARRATION & RELOAD. Clears the ML crash
+              breadcrumbs AND force-loads Qwen in-session, bypassing the boot-time
+              skip gate entirely (bootQwen doesn't consult shouldAttemptQwen, it just
+              initializes). The store's qwenStatus is reset to 'idle' first so
+              bootQwen's "already running" early-return doesn't swallow the call after
+              a boot-time 'skipped'. No app restart needed — watch the label go to
+              "✓ AI NARRATION LOADED". */}
           <TouchableOpacity
             style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-            onPress={() => { void resetMLHealth().then(() => { setAiReset(true); setTimeout(() => setAiReset(false), 4000); }); }}
+            onPress={() => {
+              setAiReset(true);
+              void resetMLHealth().then(() => {
+                useGameStore.setState({ qwenStatus: 'idle', qwenError: null });
+                void bootQwen();
+              });
+            }}
             activeOpacity={0.7}
           >
             <Text style={styles.sessionBtnSecondaryText}>
-              {aiReset ? '✓ AI RESET — RESTART THE APP' : 'RESET AI NARRATION'}
+              {!aiReset ? 'RESET AI NARRATION & RELOAD'
+                : qwenStatus === 'ready' ? '✓ AI NARRATION LOADED'
+                : qwenStatus === 'failed' ? '✗ AI LOAD FAILED — SEE BELOW'
+                : qwenStatus === 'downloading' ? `LOADING AI… ${Math.round(qwenFraction * 100)}%`
+                : qwenStatus === 'loading' ? 'LOADING AI…'
+                : 'STARTING AI…'}
             </Text>
           </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
             RESET AI NARRATION clears the crash counters that disable the Arbiter's
-            local AI after repeated native crashes, so the next launch tries it again.
-            Fully close and reopen the app for it to take effect. Current state:{'\n'}
+            local AI after repeated native crashes, then loads it right now (no restart
+            needed). Once it reads LOADED, trigger some Arbiter narration to test.
+            {qwenStatus === 'failed' && qwenError ? `\nLoad error: ${qwenError}` : ''}
+            {'\n'}Current state:{'\n'}
             {mlHealthSummary()}
           </Text>
           <Text style={styles.sessionFootnote}>

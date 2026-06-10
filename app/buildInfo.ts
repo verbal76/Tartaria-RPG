@@ -13728,4 +13728,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on the affected device). flash_attn (the attention-kernel swap, the other candidate lever) is plumbed
 // through init but left default-off; it's the next thing to verify on-device if the batch shrink alone
 // doesn't hold. Also corrects OTA-457's missed test update (qwenCompletionGuard threshold 3→1). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-459';
+// OTA-460 (Cesium Getter) — [crash mitigation, cont.] make the AI re-enable ACTUALLY testable. After
+// OTA-459 the device showed a contradiction: ML health "clean / not disabled, crash count 0" yet boot
+// still read `qwen:skipped` — so the batch-shrink fix couldn't be exercised, and a full restart didn't
+// clear it. The reset button (OTA-459) only cleared the crash breadcrumbs and relied on the NEXT boot to
+// re-attempt Qwen through shouldAttemptQwen()/the 3s-deferred boot path, which was still skipping. This
+// upgrades it to "RESET AI NARRATION & RELOAD": it clears the breadcrumbs AND force-loads Qwen IN-SESSION
+// via bootQwen() — which does NOT consult the skip gate, it just initializes the llama.rn context (the
+// same lazy load a healthy boot does 3s in, so no reloadAsync / no OTA-234 risk). The store qwenStatus is
+// reset to 'idle' first so bootQwen's "already running" early-return doesn't swallow the call after a
+// boot-time 'skipped'. The button label tracks live load progress (STARTING/LOADING %/✓ LOADED/✗ FAILED)
+// and surfaces the load error, so the player can confirm Qwen is actually up before testing the fungus
+// crash. The force-loaded context uses the OTA-459 shrunken batch (512/128). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-460';
