@@ -367,6 +367,12 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-422 "Chlorine Bleaching" — [audit fix #4] 4 missing faction vendors authored**
+  *(element #17)*. eternal_dynasty / conspiracy_architects / stone_builders /
+  tartarian_revivalists had no vendor → their faction quests were 0% reachable. Added 4
+  named vendors w/ valid offers; reachability 8→0. `app/data/npcs/vendors.json`.
+  *(questProgressionAudit still fails on the 6 hunt-boss + 3 travel turn-in issues —
+  those are separate menu items #8 / suspected-harness, not this fix.)*
 - **OTA-421 "Sulfur Vulcanization" — [audit fix #3] rotating save temp key** *(element
   #16)*. Single `${slot}.tmp` → concurrent same-slot saves collided → one save's verify
   read another's bytes → false "storage full" → copy-log wiped + phantom `persist

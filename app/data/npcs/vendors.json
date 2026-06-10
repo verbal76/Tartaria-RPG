@@ -559,6 +559,78 @@
       ],
       "gender": "neutral",
       "voiceId": "af_river"
+    },
+    {
+      "id": "dynasty_factor",
+      "name": "Magister Caul Veyre",
+      "title": "Dynastic Factor",
+      "faction": "eternal_dynasty",
+      "description": "A silver-templed factor of the line that does not end, in court-cut grey and old gold. Speaks as if every transaction were a small audience granted. Prices are firm; the Dynasty does not haggle with the brief-lived.",
+      "personality": "Imperious",
+      "offers": [
+        { "itemName": "Ceremonial Robes", "price": 70 },
+        { "itemName": "Runic Mantle", "price": 85 },
+        { "itemName": "Aetheric Locket", "price": 80 },
+        { "itemName": "Aetheric Compass", "price": 65 },
+        { "itemName": "First Aid Kit", "price": 32 },
+        { "itemName": "Trail Rations", "price": 9 }
+      ],
+      "gender": "male",
+      "voiceId": "bm_daniel"
+    },
+    {
+      "id": "architects_keeper",
+      "name": "The Cartographer",
+      "title": "Keeper of Quiet Plans",
+      "faction": "conspiracy_architects",
+      "description": "A hooded figure who never gives a name, only a nod. Deals in what other people would rather you didn't have — quiet boots, charms that swallow sound, maps of doors that aren't on any map. Speaks in implications and watches the exits.",
+      "personality": "Secretive",
+      "offers": [
+        { "itemName": "Aetheric Compass", "price": 60 },
+        { "itemName": "Whisperer's Charm", "price": 55 },
+        { "itemName": "Echoing Steps Boots", "price": 62 },
+        { "itemName": "Throwing Knife", "price": 16 },
+        { "itemName": "First Aid Kit", "price": 34 },
+        { "itemName": "Patched Cloth", "price": 20 }
+      ],
+      "gender": "neutral",
+      "voiceId": "af_heart"
+    },
+    {
+      "id": "builders_foreman",
+      "name": "Foreman Drest Holloway",
+      "title": "Master Mason",
+      "faction": "stone_builders",
+      "description": "Stone dust in every crease of him, a level and a plumb-line at his belt. Blunt, fair, and contemptuous of anything that won't hold weight. Sells gear built to outlast its owner and tells you so.",
+      "personality": "Blunt",
+      "offers": [
+        { "itemName": "Rough-Hewn Chestplate", "price": 60 },
+        { "itemName": "Tartarian Stoneband", "price": 45 },
+        { "itemName": "Sentinel's Chestplate", "price": 90 },
+        { "itemName": "Climbing Rope", "price": 12 },
+        { "itemName": "Rusted Blade", "price": 28 },
+        { "itemName": "Trail Rations", "price": 8 }
+      ],
+      "gender": "male",
+      "voiceId": "am_adam"
+    },
+    {
+      "id": "revivalists_quartermaster",
+      "name": "Sister Yune Ashfall",
+      "title": "Revival Quartermaster",
+      "faction": "tartarian_revivalists",
+      "description": "Fervent and bright-eyed, robes stitched with circuit-glyphs from a salvaged coil. She believes the buried world is only sleeping and sells the relics she swears will wake it — at a believer's discount, if you'll hear the creed first.",
+      "personality": "Fervent",
+      "offers": [
+        { "itemName": "Aetheric Crystal Blade", "price": 95 },
+        { "itemName": "Minor Aetheric Amulet", "price": 50 },
+        { "itemName": "Aetheric Vest", "price": 68 },
+        { "itemName": "Aetheric Torch", "price": 22 },
+        { "itemName": "First Aid Kit", "price": 32 },
+        { "itemName": "Patched Cloth", "price": 18 }
+      ],
+      "gender": "female",
+      "voiceId": "af_sarah"
     }
   ]
 }

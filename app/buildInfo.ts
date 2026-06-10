@@ -13401,4 +13401,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The temp key now rotates over a bounded window (`& 7` = 8 keys) so concurrent writes
 // never share one; orphaned temps stay ≤8/slot (reused as the counter cycles, and
 // cleared on deleteSlot). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-421';
+// OTA-422 (Chlorine Bleaching) — [audit fix #4] the 4 vendorless factions now have a
+// vendor. eternal_dynasty, conspiracy_architects, stone_builders, and
+// tartarian_revivalists had NO vendor anywhere, and faction quests/hunts/storylines can
+// only be accepted + turned in at a same-faction vendor — so ~44% of faction picks had
+// no mid-game contract loop at all (questProgressionAudit reported 8 reachability
+// failures). Authored 4 lore-fitting named vendors (Magister Caul Veyre / The
+// Cartographer / Foreman Drest Holloway / Sister Yune Ashfall) with valid catalog
+// offers; they surface via the same pickRandomVendor path (incl. the capital RNG) the
+// other 5 use. Audit reachability failures: 8 → 0. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-422';
