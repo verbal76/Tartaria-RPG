@@ -10,8 +10,15 @@ import {
 } from '../app/engine/factionQuests';
 
 describe('faction-quests.json schema', () => {
-  it('every quest has a stages array with at least 2 beats', () => {
+  it('every quest is either a staged quest (>=2 beats) or a fetch quest', () => {
     for (const q of FACTION_QUESTS) {
+      // OTA-450 — the generic per-faction STARTER quests carry no stages; the
+      // `fetch` requirement IS their objective (gather N, bring them back).
+      if (q.fetch) {
+        expect(q.fetch.itemName).toBeTruthy();
+        expect(q.fetch.quantity).toBeGreaterThan(0);
+        continue;
+      }
       expect(Array.isArray(q.stages)).toBe(true);
       expect(q.stages!.length).toBeGreaterThanOrEqual(2);
     }

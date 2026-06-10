@@ -15148,6 +15148,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
+    // OTA-450 — fetch gate. The generic per-faction starter quests require the
+    // player to actually HOLD the items; verify, then consume them on turn-in so
+    // it's a real "gather N, bring them back" loop (not a free narrative close).
+    if (candidate.fetch) {
+      const { itemName, quantity } = candidate.fetch;
+      const have = player.inventory
+        .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
+        .reduce((n, i) => n + (i.quantity ?? 1), 0);
+      if (have < quantity) {
+        get().appendLog(
+          'arbiter',
+          `${scene.vendor.name} checks the slate. "${candidate.title} needs ${quantity}× ${itemName} — you've brought ${have}. Come back when you've got the rest."`,
+        );
+        return;
+      }
+      let toRemove = quantity;
+      const consumed = player.inventory
+        .map((i) => {
+          if (toRemove <= 0 || i.name.toLowerCase() !== itemName.toLowerCase()) return i;
+          const take = Math.min(toRemove, i.quantity ?? 1);
+          toRemove -= take;
+          return { ...i, quantity: (i.quantity ?? 1) - take };
+        })
+        .filter((i) => (i.quantity ?? 1) > 0);
+      set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
+    }
     // Pay out reward + record completion.
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.reward.rep);
     set((s) =>

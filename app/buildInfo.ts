@@ -13636,4 +13636,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the intended Guardian kit IS a golem. Both companion-kill paths now point the active index at the
 // target and call resolveEnemyDefeat (a pure resolver — no recursion), so every grant fires no matter
 // who lands the last hit; rescue-captor completion routes through it too. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-449';
+// OTA-450 (Rhodium Refining) — [playability] generic per-faction STARTER fetch quests. The cadence
+// report flagged the "go looking for work" playstyle as the loop's dead zone — vendor/faction quests
+// are all gated behind a roadside-trader spawn + rep, so a new character has no quest on-ramp. Added
+// nine rep-0 starter quests (one per faction): a real "gather N of a forageable common → bring them
+// back for ~30–35 TC + 6 rep" loop. New optional `fetch {itemName, quantity}` on FactionQuestDef;
+// turn-in now verifies the player holds the items and CONSUMES them (no free narrative close). These
+// surface at any same-faction vendor today; OTA-451 posts them on a bounty board in every Outpost.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-450';

@@ -1,6 +1,96 @@
 {
   "quests": [
     {
+      "id": "fq_reclaimers_starter",
+      "factionId": "reclaimers_guild",
+      "title": "Scrap Run",
+      "description": "The board's standing bounty: the Guild always needs reforging stock. Bring in 5 Scrap Metal.",
+      "objective": "Gather 5 Scrap Metal, then turn the quest in at the board or any Reclaimers agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 35, "rep": 6 },
+      "fetch": { "itemName": "Scrap Metal", "quantity": 5 }
+    },
+    {
+      "id": "fq_order_starter",
+      "factionId": "forgotten_order",
+      "title": "Field Samples",
+      "description": "A standing request pinned to the board: the Order studies raw Aether. Bring 4 Aether Residue.",
+      "objective": "Gather 4 Aether Residue, then turn the quest in at the board or any Forgotten Order agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 35, "rep": 6 },
+      "fetch": { "itemName": "Aether Residue", "quantity": 4 }
+    },
+    {
+      "id": "fq_monarchs_starter",
+      "factionId": "mud_monarchs",
+      "title": "Tribute of Mud",
+      "description": "The board posts the Monarchs' due: the mud is theirs by right. Bring 5 Aether Mud as tribute.",
+      "objective": "Gather 5 Aether Mud, then turn the quest in at the board or any Mud Monarchs agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 35, "rep": 6 },
+      "fetch": { "itemName": "Aether Mud", "quantity": 5 }
+    },
+    {
+      "id": "fq_tartarians_starter",
+      "factionId": "true_tartarians",
+      "title": "Grave Goods",
+      "description": "A quiet notice on the board: the Entombed honor their dead with offerings. Bring 5 Mud Fragment.",
+      "objective": "Gather 5 Mud Fragment, then turn the quest in at the board or any True Tartarian agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 30, "rep": 6 },
+      "fetch": { "itemName": "Mud Fragment", "quantity": 5 }
+    },
+    {
+      "id": "fq_servants_starter",
+      "factionId": "servants_of_giants",
+      "title": "Kindling for the Vigil",
+      "description": "The board's standing call: the vigil fires must never die. Bring 6 Stick for the watch.",
+      "objective": "Gather 6 Stick, then turn the quest in at the board or any Servants of Giants agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 30, "rep": 6 },
+      "fetch": { "itemName": "Stick", "quantity": 6 }
+    },
+    {
+      "id": "fq_dynasty_starter",
+      "factionId": "eternal_dynasty",
+      "title": "The Dynasty's Banners",
+      "description": "A formal posting on the board: the empire is dressed in its colors. Bring 6 Patched Cloth for banners.",
+      "objective": "Gather 6 Patched Cloth, then turn the quest in at the board or any Eternal Dynasty agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 35, "rep": 6 },
+      "fetch": { "itemName": "Patched Cloth", "quantity": 6 }
+    },
+    {
+      "id": "fq_architects_starter",
+      "factionId": "conspiracy_architects",
+      "title": "Dead Drops",
+      "description": "An unsigned note on the board: mark the safe routes. Bring 5 Small Rock for the cairns.",
+      "objective": "Gather 5 Small Rock, then turn the quest in at the board or any Conspiracy Architects agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 30, "rep": 6 },
+      "fetch": { "itemName": "Small Rock", "quantity": 5 }
+    },
+    {
+      "id": "fq_builders_starter",
+      "factionId": "stone_builders",
+      "title": "Quarry Quota",
+      "description": "The board's work-order: the Builders rebuild in stone. Bring 4 Big Rock from the field.",
+      "objective": "Gather 4 Big Rock, then turn the quest in at the board or any Stone Builders agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 35, "rep": 6 },
+      "fetch": { "itemName": "Big Rock", "quantity": 4 }
+    },
+    {
+      "id": "fq_revivalists_starter",
+      "factionId": "tartarian_revivalists",
+      "title": "Shrouds for the Faithful",
+      "description": "A pilgrim's notice on the board: the relics must be wrapped and carried. Bring 4 Spider Silk.",
+      "objective": "Gather 4 Spider Silk, then turn the quest in at the board or any Tartarian Revivalists agent.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 35, "rep": 6 },
+      "fetch": { "itemName": "Spider Silk", "quantity": 4 }
+    },
+    {
       "id": "fq_order_relic",
       "factionId": "forgotten_order",
       "title": "Salvage the buried lens",

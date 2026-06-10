@@ -40,6 +40,12 @@ export interface FactionQuestDef {
    *  stages.length. When omitted (legacy data), the engine treats it as
    *  a single objective whose narration is the existing description. */
   stages?: FactionQuestStageDef[];
+  /** OTA-450 — a literal FETCH requirement. When present, turn-in is gated
+   *  on the player actually holding `quantity` of `itemName`, and those
+   *  items are consumed on turn-in. Used by the generic per-faction starter
+   *  quests (a real "gather N, bring them back" on-ramp). Quests with a
+   *  `fetch` requirement carry no stages — the fetch IS the objective. */
+  fetch?: { itemName: string; quantity: number };
 }
 
 /** A faction quest the player has accepted. Mirrors ActiveHunt /

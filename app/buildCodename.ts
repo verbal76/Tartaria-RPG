@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-450 — [playability] nine rep-0 per-faction STARTER fetch quests (gather N forageable commons →
+  // reward), a real early quest on-ramp; new `fetch` requirement consumed on turn-in. Element #45: Rhodium.
+  '2026-06-10-450': 'Rhodium Refining',
   // OTA-449 — [playability/bug] companion (golem/dog) killing blows route through resolveEnemyDefeat,
   // so loot/TC/Core-Guardian Core+gear+gem+quest-advance fire no matter who lands the last hit. Element #44: Ruthenium.
   '2026-06-10-449': 'Ruthenium Plating',

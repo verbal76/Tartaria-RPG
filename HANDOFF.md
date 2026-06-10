@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-450 "Rhodium Refining" — [playability] per-faction starter fetch quests** *(element #45)*.
+  Nine rep-0 quests (one/faction): gather N forageable commons → reward. New `fetch` field on
+  `FactionQuestDef`, consumed at turn-in. `factionQuests.ts`, `faction-quests.json`, `gameStore.ts`.
+  Covered by `__tests__/starterFetchQuests.test.ts`. OTA-451 surfaces them on the outpost board.
 - **OTA-449 "Ruthenium Plating" — [playability/bug] companion kills grant rewards** *(element #44)*.
   Golem + dog killing blows now route through `resolveEnemyDefeat` (were manual splice + return), so
   loot/TC/milestone — and Core-Guardian Core+gear+gem+quest-advance — fire no matter who lands the
