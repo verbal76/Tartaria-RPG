@@ -18,9 +18,14 @@
 // older OTA still shows a stable codename in their "OTA applied"
 // dialog and bug reports.
 //
-// Codename scheme: noun-noun pairs evocative of Tartaria but generic
-// enough to not be obvious as game-specific search hits. ~40
-// curated pairs in reserve; we burn them sequentially per OTA.
+// Codename scheme (from OTA-406): `<Element> <Chemical-Process>` — periodic
+// table by atomic number, one element per OTA, until all 118 are gone. Anchor:
+// element # = OTA-NNN − 405 (OTA-406 = #1 Hydrogen … OTA-523 = #118 Oganesson);
+// the process word is flavor. See HANDOFF.md §P "Codename scheme" +
+// docs/build-codenames.md. PRIOR scheme (through OTA-405): `<word> Anvil` tree
+// names (ended at OTA-405 Tanbark Anvil); before that, `<Gem> Vault` /
+// noun-noun pairs. Old entries are kept so an existing tester's "OTA applied"
+// dialog + bug reports still resolve to a stable codename.
 
 import { OTA_BUILD_ID } from './buildInfo';
 

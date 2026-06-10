@@ -13,6 +13,18 @@ bug reports.
 > after major build cycles per the OTA-265 workflow plan; the
 > mapping stays inside the private repo or your local notes.
 
+## Codename scheme
+
+**Current (from OTA-406):** `<Element> <Chemical-Process>` — march through the
+**periodic table by atomic number**, one element per OTA, until all 118 are gone.
+Anchor: **element # = `OTA-NNN − 405`** (OTA-406 = #1 Hydrogen … OTA-523 = #118
+Oganesson). The process word (Oxidation, Electrolysis, Calcination, …) is flavor —
+only the element advances in order. When Oganesson is reached, ask for the next
+scheme; don't wrap.
+
+**Prior (through OTA-405):** `<word> Anvil` (tree names) — ended at **OTA-405
+Tanbark Anvil**. Earlier still: `<Gem> Vault` on the retired `arbiters-line`.
+
 ## Current mapping
 
 | OTA build ID            | Codename       | Notes                                                      |

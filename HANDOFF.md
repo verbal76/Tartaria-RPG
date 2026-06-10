@@ -1,7 +1,9 @@
 # Tartaria Realms — Session Handoff
 
 > **READ FIRST — how we operate:** §P below is the single source of truth.
-> **ONE branch (`HaL2001`). ONE codename scheme (`<word> Anvil`). BATCH the
+> **ONE branch (`HaL2001`). ONE codename scheme — now `<Element> <Chemical-Process>`
+> (periodic table by atomic number; the old `<word> Anvil` tree scheme ENDED at
+> OTA-405 Tanbark). BATCH the
 > push (min 5), and the USER triggers it.** Everything is built, tested, and
 > committed on **`HaL2001`** — but pushing `HaL2001` is what publishes the OTA to
 > the player's phone, so we **accumulate ≥5 OTAs locally and only push when the
@@ -13,8 +15,9 @@
 > - **`HaL2001`** — the live working branch (work in a fresh `HaL2001` worktree;
 >   `npm ci` to get `node_modules` so `tsc` + `jest` run there). Pushing it fires
 >   `eas-update.yml` → **multi-channel publish to BOTH platforms**: `hal2001` +
->   `preview` (Android) and `ios-preview` (iOS). Codenames are **`<word> Anvil`**;
->   OTA ids are numeric **`YYYY-MM-DD-NNN`**. Its `app.json` carries the live
+>   `preview` (Android) and `ios-preview` (iOS). Codenames are now
+>   **`<Element> <Chemical-Process>`** (periodic table by atomic number — see §P
+>   "Codename scheme"); OTA ids are numeric **`YYYY-MM-DD-NNN`**. Its `app.json` carries the live
 >   channel/package/name (`hal2001` / `…hal2001` / "Tartaria Realms HAL") — never
 >   change those. **`HaL2001` is kept as the conduit specifically because it owns
 >   the signed store workflows** — the production AAB (Google Play console) and
@@ -236,8 +239,9 @@
 >
 > **⇒ THE RULE (do not drift):** a change is built + tested + committed + pushed
 > on **`HaL2001`**, and that push IS the ship — the OTA publishes to the phone.
-> One codename per change (the next **Anvil**), and it's the one the player sees
-> on their device. Never split a change across two branches or two codenames.
+> One codename per change (the next **`<Element> <Process>`** — see §P "Codename
+> scheme"), and it's the one the player sees on their device. Never split a change
+> across two branches or two codenames.
 
 ---
 
@@ -257,10 +261,29 @@ codenames for one change, you've reintroduced the bug.)
 |---|---|
 | Branch | **`HaL2001`** (the only one you commit to) |
 | Worktree | **`/tmp/hal2001-rollback`** (has `node_modules` via a symlink to `/tmp/arbiters-line/node_modules`, so `tsc` + `jest` run here) |
-| Codename | **`<word> Anvil`** (Tule, Rush, Cattail, Alder, Willow, …) |
+| Codename | **`<Element> <Chemical-Process>`** (periodic table — see "Codename scheme" below) |
 | OTA id | numeric **`YYYY-MM-DD-NNN`** |
 | `app.json` | channel `hal2001`, package `…tartarprim.hal2001`, name "Tartaria Realms HAL" — **never change these** |
 | Reaches the phone? | **YES** — see P2 |
+
+#### Codename scheme (current) — `<Element> <Chemical-Process>`
+Set by the user 2026-06-10: march through the **periodic table by atomic number**,
+one element per OTA, until **all 118 are gone**; pair each element with a
+**chemical/metallurgical process word** for flavor.
+
+- **Anchor (unambiguous):** element # = **`OTA-NNN − 405`**. So **OTA-406 = #1
+  Hydrogen**, OTA-407 = #2 Helium, OTA-408 = #3 Lithium, … OTA-523 = #118
+  Oganesson. (The `<word> Anvil` tree scheme ended at **OTA-405 Tanbark Anvil**.)
+- **NEXT UP: OTA-406 → `Hydrogen <process>`.**
+- **Process word:** any chemical process — Oxidation, Reduction, Electrolysis,
+  Distillation, Calcination, Sublimation, Crystallization, Pyrolysis, Hydrolysis,
+  Combustion, Catalysis, Fermentation, Neutralization, Precipitation,
+  Polymerization, Saponification, Nitration, Smelting, Annealing, Quenching,
+  Leaching, Sintering, Esterification, Hydrogenation, Cracking, … — pick a fresh
+  one each OTA (don't repeat the immediately prior one). Only the **element**
+  needs to advance in order; the process is flavor.
+- When the elements run out (after Oganesson / OTA-523), STOP and ask the user
+  for the next scheme — don't reuse or wrap.
 
 `arbiters-line` is a **retired, dead-channel scratch branch** — don't commit to
 it, don't mint Vault codenames. `main` / `claude/*` are base/parked.
@@ -286,11 +309,12 @@ run there):
    isolation and confirm it against a stash of your changes before calling it a
    regression.
 3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` → next numeric `YYYY-MM-DD-NNN`.
-4. Mint the next **Anvil** codename in `app/buildCodename.ts` + add a row to the
+4. Mint the next **`<Element> <Chemical-Process>`** codename (element # = OTA −
+   405; see "Codename scheme" above) in `app/buildCodename.ts` + add a row to the
    current-mapping table in `docs/build-codenames.md`.
 5. Update `HANDOFF.md` §0.B (Closed), the "Next Batch — staging list" (§0), and
    the header "Current state" in the SAME commit (per `CLAUDE.md`).
-6. Commit titled `<Anvil> — OTA-NNN — <desc>` to `HaL2001`. **Commit only — do
+6. Commit titled `OTA-NNN (<Element> <Process>) — <desc>` to `HaL2001`. **Commit only — do
    NOT push.** Add the OTA to the staging list and report "N/5 staged."
 
 ### P3a — Batching: accumulate ≥5, the USER triggers the push
