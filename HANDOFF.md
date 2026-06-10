@@ -367,6 +367,14 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-417 "Magnesium Sublimation" — outdoor wandering-leads never plant indoors**
+  *(element #12)*. Player: "investigate the candle and see a giant on a Ridgeline — how
+  did I do that with a candle in the house?" `HOOK_PLANTS` is all outdoor sightings, but
+  `plantHookByKind(pickRandomHookKind())` fired with no indoor/outdoor awareness. New
+  `indoorsForOutdoorHooks(get)` (`hubRoomId || activeBuildingId`) gates all 7 random-hook
+  plant sites (investigate-table ×3, salvage, first-investigate guarantee, look-around,
+  wander); indoors they give an interior beat / hidden-text + trinket instead.
+  `gameStore.ts`.
 - **OTA-416 "Sodium Amalgamation" — never revive at 0 HP** *(element #11)*. Player
   (screenshot): "I was revived with 0 hit points" + the feed showed a killing blow then
   "Welcome back" in the same fight. A crash DURING death persisted `hp=0` with `dead`

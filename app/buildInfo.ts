@@ -13358,4 +13358,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 0-HP save, DROPS the stale combat scene (fresh beginScene — no resuming the fight you
 // just lost) and narrates a revival ("✦ You claw back from the brink…") instead of the
 // mismatched "Welcome back". JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-416';
+// OTA-417 (Magnesium Sublimation) — outdoor wandering-lead hooks never plant indoors.
+// Player: "investigate the candle and see a giant on a Ridgeline — how did I do that
+// with a candle in the house?" The HOOK_PLANTS table is ALL outdoor sightings (smoke in
+// the distance, a giant on the ridge, a submerged steeple, …), but the random hook plant
+// fired with no indoor/outdoor awareness — so investigating a candle inside a house
+// surfaced "a figure too tall to be human watches you from the far ridge." New
+// indoorsForOutdoorHooks(get) guard (player.hubRoomId || activeBuildingId) gates ALL
+// seven random-hook plant sites — investigate-table (×3), salvage, first-investigate
+// guarantee, look-around, and wander. Indoors those paths give an interior beat / fall
+// through to hidden-text + trinket instead. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-417';
