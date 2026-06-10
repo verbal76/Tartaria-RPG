@@ -807,7 +807,7 @@ export function TitleScreen() {
         <Image
           source={require('../../assets/splash-art.jpg')}
           style={styles.splashImage}
-          resizeMode="cover"
+          resizeMode="contain"
         />
         <View style={styles.splashBarWrap}>
           <View style={styles.splashBarTrack}>

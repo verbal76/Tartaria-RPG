@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-469 — [UX] splash-art fit fix: OTA-468's "cover" cropped the sides on tall phones (cut off the
+  // TARTARIA REALMS title); switched to "contain" so the whole image shows, letterboxed on the dark bg. Element #64: Gadolinium.
+  '2026-06-10-469': 'Gadolinium Doping',
   // OTA-468 — [UX] opening SPLASH ART + thin loading bar. Title opens on the cover image (wanderer + dog +
   // crystal golem) for ~2s while the voice warms, then reveals the menu (once per launch, hard-capped 6s).
   // The verbose MIND/VOICE banner is retired for a single thin progress bar (splash bottom + compact menu

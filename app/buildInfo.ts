@@ -13823,4 +13823,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // thin progress bar: a bottom bar on the splash (voice-weighted fill + "keep the app open" hint) and a
 // compact combined-progress bar on the menu if a first-install download is still running. New asset
 // assets/splash-art.jpg (re-encoded 2.7MB PNG -> 218KB JPEG @900px to keep the OTA lean). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-468';
+// OTA-469 (Gadolinium Doping) — [UX] splash-art fit fix. On a tall/narrow phone OTA-468's resizeMode
+// "cover" filled the height and cropped the SIDES — slicing the "TARTARIA REALMS" title off the left edge.
+// Switched to resizeMode "contain" so the whole composition (title included) shows, letterboxed against
+// the dark splash background (#0b0a09, which blends with the moody art). One-line change. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-469';
