@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-459 — [crash mitigation] root-cause attempt at the Tensor-G5 Qwen completion SIGSEGV: shrink the
+  // llama.rn compute batch (n_batch 2048→512, n_ubatch 512→128) to shrink the faulting compute buffer, +
+  // wire a "RESET AI NARRATION" button (resetMLHealth) so a self-disabled device can re-attempt Qwen and
+  // test the fix. flash_attn plumbed but default-off (next on-device lever). Element #54: Xenon.
+  '2026-06-10-459': 'Xenon Sputtering',
   // OTA-458 — [bug/UX] quest turn-in correctness + findability: Silt-Thief disc grant no longer
   // clobbered by the loot set() (functional set in resolveEnemyDefeat) + stuck-whisper recovery; the
   // Contracts COMPLETE button now respects the fetch gate (verify + consume); faction-quest cards gain

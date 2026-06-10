@@ -13716,4 +13716,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (3) ROUTE TO TURN-IN: faction-quest cards gain a "▸ ROUTE TO TURN-IN" button that sets course for the
 // faction home outpost (board + same-faction agents), so players stop losing the agent they owe.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-458';
+// OTA-459 (Xenon Sputtering) — [crash mitigation] root-cause attempt at the Tensor-G5 Qwen completion
+// SIGSEGV (the OTA-457 safety net only CATCHES it). Two parts: (1) shrink the llama.rn compute batch —
+// n_batch 2048→512, n_ubatch 512→128. n_ubatch sizes the pre-allocated compute graph/buffer the SVE
+// kernel faults in during token generation, so a smaller physical batch shrinks the faulting region.
+// Cost is purely a hair more prompt-prefill latency (decode speed + output text unchanged) + lower peak
+// RAM, so it ships globally. (2) WIRE a "RESET AI NARRATION" button (About → session tab → resetMLHealth)
+// — previously the re-enable existed but was never wired to UI, so a device that self-disabled Qwen
+// after crashes could never re-attempt it short of the slow OTA-414 auto-retry. The button clears the
+// crash breadcrumbs so the next launch retries Qwen with the new batch config (needed to TEST this fix
+// on the affected device). flash_attn (the attention-kernel swap, the other candidate lever) is plumbed
+// through init but left default-off; it's the next thing to verify on-device if the batch shrink alone
+// doesn't hold. Also corrects OTA-457's missed test update (qwenCompletionGuard threshold 3→1). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-459';

@@ -55,6 +55,7 @@ import {
   type KokoroState,
 } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
+import { resetMLHealth, mlHealthSummary } from '../diagnostics/mlHealth';
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -72,6 +73,11 @@ export function AboutScreen() {
 
   const [copied, setCopied] = useState(false);
   const [voiceCopied, setVoiceCopied] = useState(false);
+  // OTA-459 — manual AI-narration re-enable. On devices where Qwen self-disabled
+  // after repeated native crashes (resetMLHealth was never wired to UI before),
+  // this clears the crash breadcrumbs so the next boot re-attempts Qwen — needed
+  // to TEST an inference-config fix on a previously-disabled device.
+  const [aiReset, setAiReset] = useState(false);
   const [kokoroCacheCleared, setKokoroCacheCleared] = useState(false);
   const [kokoroCache, setKokoroCache] = useState<ExecutorchCacheEntry[]>([]);
   // arb75 — in-game bug report (Settings/About). Loads slots so the report can
@@ -721,6 +727,26 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
+          {/* OTA-459 — RESET AI NARRATION. Clears the ML crash breadcrumbs so a
+              device that self-disabled Qwen re-attempts it on the next launch.
+              Takes effect after a full app restart (the disable is read once at
+              boot). Surfaces the current ML-health line so the player can see the
+              disabled state before/after. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            onPress={() => { void resetMLHealth().then(() => { setAiReset(true); setTimeout(() => setAiReset(false), 4000); }); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {aiReset ? '✓ AI RESET — RESTART THE APP' : 'RESET AI NARRATION'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.sessionFootnote}>
+            RESET AI NARRATION clears the crash counters that disable the Arbiter's
+            local AI after repeated native crashes, so the next launch tries it again.
+            Fully close and reopen the app for it to take effect. Current state:{'\n'}
+            {mlHealthSummary()}
+          </Text>
           <Text style={styles.sessionFootnote}>
             COPY LOG drops the full disk log on the clipboard. Long-press it in the
             in-game menu (or use the LOG screen) for the share + chunked-paste view.

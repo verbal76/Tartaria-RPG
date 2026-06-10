@@ -49,6 +49,9 @@ export interface LlamaModule {
     n_gpu_layers?: number;
     use_mlock?: boolean;
     n_threads?: number;
+    n_batch?: number;
+    n_ubatch?: number;
+    flash_attn?: boolean;
   }): Promise<LlamaContext>;
   releaseAllLlama(): Promise<void>;
 }
@@ -118,6 +121,12 @@ export interface LlamaInitOptions {
   contextSize?: number;
   /** Threads to use for inference. Mobile CPUs usually pick 4 well. */
   threads?: number;
+  /** OTA-459 — logical prompt batch (llama.cpp n_batch). Default 512. */
+  batch?: number;
+  /** OTA-459 — physical micro-batch (llama.cpp n_ubatch); sizes the compute
+   *  buffer. Smaller = smaller faulting region on crash-prone ARM kernels.
+   *  Default 128. */
+  ubatch?: number;
 }
 
 export interface LlamaGenerateOptions {
@@ -158,6 +167,15 @@ export class LlamaRuntime {
       n_gpu_layers: 0, // mobile CPU only — GPU offload is desktop territory
       n_threads: opts.threads ?? 4,
       use_mlock: false, // lets the OS swap weights out under memory pressure
+      // OTA-459 — shrink the compute batch. llama.cpp defaults (n_batch 2048 /
+      // n_ubatch 512) allocate a large compute graph/buffer; on newer ARM cores
+      // (Pixel 10 Pro XL / Tensor G5) the SVE-optimized kernels SIGSEGV a few
+      // tokens into generation. n_ubatch sizes that pre-allocated buffer, so a
+      // smaller physical batch shrinks the faulting region. Cost is purely a hair
+      // more prompt-prefill latency (decode speed + output text are unchanged);
+      // peak RAM drops too. Conservative values that keep prefill throughput sane.
+      n_batch: opts.batch ?? 512,
+      n_ubatch: opts.ubatch ?? 128,
     });
     this.modelPath = opts.modelPath;
   }

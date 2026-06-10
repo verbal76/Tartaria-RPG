@@ -367,6 +367,15 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-459 "Xenon Sputtering" — [crash mitigation] Tensor-G5 Qwen SIGSEGV root-cause attempt** *(element #54)*.
+  OTA-457 only CATCHES the crash; this tries to PREVENT it. (1) `LlamaRuntime` init shrinks the compute
+  batch (n_batch 2048→512, n_ubatch 512→128) — n_ubatch sizes the compute buffer the SVE kernel faults
+  in; smaller = smaller faulting region. Cost = trivial extra prefill latency + lower RAM, output
+  unchanged → ships globally. (2) Wired a **"RESET AI NARRATION"** button (About → session tab →
+  `resetMLHealth`) so a self-disabled device can re-attempt Qwen and TEST the fix (the re-enable was never
+  wired to UI before). `flash_attn` plumbed through init, default-off — next on-device lever if batch
+  alone fails. Fixed OTA-457's missed `qwenCompletionGuard` test (threshold 3→1). `LlamaRuntime.ts`,
+  `AboutScreen.tsx`. **Needs on-device verification on the Pixel 10 Pro XL.**
 - **OTA-458 "Iodine Sublimation" — [bug/UX] quest turn-in correctness + findability** *(element #53)*.
   Three fixes from one playtest report. (1) **Silt-Thief discs**: `resolveEnemyDefeat`'s monolithic loot
   `set()` rebuilt `player` from a STALE snapshot, clobbering the early disc grant — discs wiped, whisper
