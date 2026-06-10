@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-471 — [UX] splash render fix: OTA-470's splash sat inside the AppShell's safe-area padding (green
+  // margins) AND its UI scale transform, distorting the aspectRatio so the art rendered oversized + cropped
+  // to the top (golem/dog below the fold). Moved it to a new <SplashOverlay/> at the AppShell ROOT —
+  // full-bleed, no scale, full-width top-anchored so the whole image + title show. Element #66: Dysprosium.
+  '2026-06-10-471': 'Dysprosium Reduction',
   // OTA-470 — [UX] taller splash art + full-width top-anchored layout. Swapped in a phone-shaped 941×1672
   // image; it now fills the full width (no side-crop, title intact), anchored top, with only a small dark
   // strip at the bottom for the loading bar — far less empty space than OTA-469's centered contain. Element #65: Terbium.

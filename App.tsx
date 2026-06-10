@@ -16,6 +16,7 @@ import {
   markMLInitSucceeded,
 } from './app/diagnostics/mlHealth';
 import { TitleScreen } from './app/screens/TitleScreen';
+import { SplashOverlay } from './app/components/SplashOverlay';
 import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
 import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
@@ -720,6 +721,10 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'ending' && <EndingScreen />}
         </View>
       </View>
+      {/* OTA-471 — opening splash overlay at the ROOT (outside the safe-area
+          padding + scale transform), so it's full-bleed with no parchment
+          margins. Self-dismisses after ~2s on first launch. */}
+      <SplashOverlay />
     </View>
   );
 }

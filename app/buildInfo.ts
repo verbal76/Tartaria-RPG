@@ -13833,4 +13833,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // top, leaving only a small dark strip at the bottom for the loading bar — far less empty space than
 // OTA-469's centered contain. splashImage is width:100% + aspectRatio 941/1672. Asset re-encoded to a
 // 308KB JPEG. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-470';
+// OTA-471 (Dysprosium Reduction) — [UX] splash render fix — full-bleed + no zoom. OTA-470's splash sat
+// INSIDE the AppShell's safe-area padding (green margins) AND its UI scale transform, which distorted the
+// aspectRatio layout so the art rendered oversized and cropped to the TOP (golem + dog fell below the
+// fold). Moved the splash OUT into a new <SplashOverlay/> rendered at the AppShell ROOT (sibling of the
+// safe-area View) — truly edge-to-edge, no parchment margins, no scale transform. The image is full-WIDTH
+// + aspectRatio top-anchored, so the whole composition shows with the title intact and a small dark strip
+// at the bottom for the loading bar. The overlay self-manages its once-per-launch timer + Kokoro
+// subscription. TitleScreen's splash early-return + state + styles are removed (it keeps only the compact
+// on-menu download bar). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-471';

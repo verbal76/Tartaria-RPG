@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-470 "Terbium Anneal" — taller phone-shaped splash
->   art, full-width top-anchored (no crop, minimal letterbox). 468 opening splash + bar;
->   467 golem stats; 466 golem repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→470**
->   playtest batch (Tellurium Refining → Terbium Anneal, elements 52–65) is published
+> - **LIVE (pushed 2026-06-10) = OTA-471 "Dysprosium Reduction" — splash moved to a
+>   full-bleed root overlay (fixes the green margins + zoom/top-crop). 470 taller splash art;
+>   467 golem stats; 466 golem repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→471**
+>   playtest batch (Tellurium Refining → Dysprosium Reduction, elements 52–66) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,14 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 / 466 / 467 / 468 / 469 / 470 committed below (post-batch follow-ups).**
+**OTA-465 / 466 / 467 / 468 / 469 / 470 / 471 committed below (post-batch follow-ups).**
 
+- **OTA-471 "Dysprosium Reduction" — [UX] splash render fix (full-bleed + no zoom)** *(element #66)*. The
+  splash sat inside the AppShell safe-area padding (green margins) + UI scale transform, distorting the
+  aspectRatio so it rendered oversized/top-cropped. Moved it to a new `<SplashOverlay/>` at the AppShell
+  ROOT (sibling of the safe-area View) — edge-to-edge, no scale, full-width top-anchored (whole image +
+  title visible). TitleScreen's splash code removed (kept the compact menu bar). `App.tsx`,
+  `components/SplashOverlay.tsx`, `TitleScreen.tsx`.
 - **OTA-470 "Terbium Anneal" — [UX] taller splash art + full-width top-anchored layout** *(element #65)*.
   Swapped in a phone-shaped 941×1672 image; fills full width (no side-crop, title intact), anchored top,
   small dark strip at bottom for the bar. `splashImage` = `width:100% + aspectRatio 941/1672`. 308KB JPEG.

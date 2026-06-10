@@ -88,12 +88,6 @@ function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
   }
 }
 
-// OTA-468 — the opening splash shows once per app LAUNCH (cold boot), not every
-// time the title screen re-mounts (e.g. save & exit back to title). Module-scoped
-// so it survives component remounts within the same JS process; resets on a fresh
-// process / OTA reload.
-let splashShownThisLaunch = false;
-
 export function TitleScreen() {
   // The title screen renders directly on the player's tuned background (the
   // container is transparent), so the muted secondary text washed out when a
@@ -170,32 +164,9 @@ export function TitleScreen() {
   const cognitiveStatus = useGameStore((s) => s.cognitiveStatus);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
-  // OTA-468 — opening splash art. Hold the cover image for a beat while the voice
-  // warms, then reveal the menu. Dismiss once the minimum time has elapsed AND the
-  // voice has settled (ready / error / idle / disabled), with a hard cap so a slow
-  // first-install download doesn't sit on the splash. A thin bar at the bottom
-  // replaces the old verbose MIND/VOICE banner.
-  const [splashMinElapsed, setSplashMinElapsed] = useState(false);
-  const [splashCapReached, setSplashCapReached] = useState(false);
-  const [splashSkipped] = useState(() => splashShownThisLaunch);
-  useEffect(() => {
-    if (splashShownThisLaunch) return;
-    const a = setTimeout(() => setSplashMinElapsed(true), 2000);
-    const b = setTimeout(() => setSplashCapReached(true), 6000);
-    return () => { clearTimeout(a); clearTimeout(b); };
-  }, []);
-  const voiceSettled =
-    kokoroPhase.phase === 'ready' || kokoroPhase.phase === 'error' || kokoroPhase.phase === 'idle';
-  const showSplash = !splashSkipped && !(splashCapReached || (splashMinElapsed && voiceSettled));
-  useEffect(() => {
-    if (!showSplash) splashShownThisLaunch = true;
-  }, [showSplash]);
-  // Bottom-bar fill: voice-weighted so it reads ~full at the moment we dismiss.
-  const splashProgress =
-    voiceSettled ? 1
-    : kokoroPhase.phase === 'downloading' ? Math.max(0.08, Math.min(0.95, kokoroPhase.fraction))
-    : kokoroPhase.phase === 'loading' ? 0.92
-    : 0.12;
+  // OTA-471 — the opening splash now lives in <SplashOverlay/> at the AppShell
+  // root (full-bleed). The title screen just renders the menu + a compact loading
+  // bar (below) if a first-install download is still running.
   const modelsLoading =
     qwenStatus === 'downloading' || qwenStatus === 'loading'
     || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
@@ -798,29 +769,6 @@ export function TitleScreen() {
     </SwipeableRow>
   );
 
-  // OTA-468 — splash takeover. While showing, ONLY the cover art + a thin loading
-  // bar render; model loading continues in App.tsx's boot effects regardless. All
-  // hooks above have already run, so this conditional return is safe.
-  if (showSplash) {
-    return (
-      <View style={styles.splashContainer}>
-        <Image
-          source={require('../../assets/splash-art.jpg')}
-          style={styles.splashImage}
-          resizeMode="cover"
-        />
-        <View style={styles.splashBarWrap}>
-          <View style={styles.splashBarTrack}>
-            <View style={[styles.splashBarFill, { width: `${Math.round(splashProgress * 100)}%` }]} />
-          </View>
-          <Text style={styles.splashBarLabel}>
-            {voiceSettled ? 'Entering the buried world…' : 'Waking the Arbiter — keep the app open'}
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Image
@@ -1337,18 +1285,11 @@ export function TitleScreen() {
 }
 
 const styles = StyleSheet.create({
-  // OTA-468 — opening splash art + thin loading bar.
-  // OTA-470 — full-width, top-anchored splash art. The OTA-469 cover-image is a
-  // tall 941×1672 (close to a phone's aspect), so it fills the screen WIDTH with
-  // no side-crop (the title stays intact at the top) and leaves a small dark strip
-  // at the bottom for the loading bar — far less empty space than centered contain.
-  splashContainer: { flex: 1, backgroundColor: '#0b0a09' },
-  splashImage: { width: '100%', aspectRatio: 941 / 1672 },
-  splashBarWrap: { position: 'absolute', left: 28, right: 28, bottom: 44, alignItems: 'center' },
+  // OTA-468/471 — compact on-menu loading bar (replaced the verbose MIND/VOICE
+  // banner). The full opening splash now lives in <SplashOverlay/> at the AppShell
+  // root; only the thin track/fill are reused here for the menu's download bar.
   splashBarTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
   splashBarFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },
-  splashBarLabel: { marginTop: 10, color: '#e6dcc2', fontSize: 11, letterSpacing: 1.5, textShadowColor: 'rgba(0,0,0,0.9)', textShadowRadius: 4 },
-  // OTA-468 — compact on-menu loading bar (replaced the verbose banner).
   compactLoadWrap: { width: '100%', marginVertical: 10, alignItems: 'center' },
   compactLoadLabel: { marginTop: 6, color: '#9a8f78', fontSize: 10, letterSpacing: 1, textAlign: 'center' },
   // OTA-275 — width cap for tablets. Phones (<600pt wide) render
