@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-430 — [audit #13] main-quest hints: 'hook' lists all 9 Capitals (was 5), 'descent'
+  // points to the Mud Flood Nexus (the reached_nexus trigger) not the Endless Stair. Element #25: Manganese.
+  '2026-06-10-430': 'Manganese Nodulizing',
   // OTA-429 — [audit #11] a DOT tick that kills the LAST enemy now ends the fight (loot +
   // victory + range clear) instead of hanging with no target to swing at. Element #24: Chromium.
   '2026-06-10-429': 'Chromium Sensitization',

@@ -13470,4 +13470,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sweeps them all through resolveEnemyDefeat (loot + kill bookkeeping + combat-end, which
 // persists) and returns out of the attack. Mixed fights (≥1 enemy still alive) keep the old
 // behavior, so mid-fight targeting is unchanged. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-429';
+// OTA-430 (Manganese Nodulizing) — [audit fix #13] main-quest objective text corrected on two
+// fronts. (1) The 'hook' phase hint named only the original FIVE Lost Capitals (Asgardar…
+// Voronov); a player who cleared those five thought the hunt was over and never visited the
+// four added in OTA 052 (Karok-Sa / Yuldra-Tul / Ostragar / Iskan-Veil). It now lists all
+// nine, built from the canonical LOST_CAPITAL_NAMES map so it can't drift again. (2) The
+// 'descent' phase hint sent the player to the Endless Stair, but the quest advances on
+// reaching the Mud Flood Nexus (the `reached_nexus` trigger keys on locationId
+// 'mud_flood_nexus'); travelling to the Stair did nothing. The hint now names the Nexus as the
+// destination and keeps the Stair as path-flavor. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-430';

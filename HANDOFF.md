@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-430 "Manganese Nodulizing" — [audit fix #13] main-quest objective text** *(element #25)*.
+  (1) `hook` hint now lists all 9 Lost Capitals (was 5 — players missed Karok-Sa/Yuldra-Tul/
+  Ostragar/Iskan-Veil), built from `LOST_CAPITAL_NAMES`. (2) `descent` hint points to the Mud
+  Flood Nexus (the `reached_nexus` trigger location) not the Endless Stair (which did nothing).
+  `mainQuest.ts`. Covered by `__tests__/mainQuest.test.ts`.
 - **OTA-429 "Chromium Sensitization" — [audit fix #11] a DOT kill of the last enemy ends the
   fight** *(element #24)*. DOT ticks at the start of the attack round used to leave a killed
   enemy at 0 HP for the next attack to clear — but a DOT that drops the FINAL enemy left the

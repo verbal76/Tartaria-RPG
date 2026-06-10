@@ -601,13 +601,22 @@ export function phaseLabel(phase: MainQuestPhase): string {
 export function phaseHint(phase: MainQuestPhase, coresRecovered: number): string {
   switch (phase) {
     case 'hook':
-      return 'Visit a Lost Capital (Asgardar, Samarran, Nimari, Drakova, or Voronov) to learn what the Cores demand.';
+      // OTA-430 — list ALL nine Capitals, built from the canonical name map so
+      // it never drifts. The old hint named only the original five (Asgardar…
+      // Voronov), so a player who cleared those five thought the hunt was over
+      // and never visited Karok-Sa / Yuldra-Tul / Ostragar / Iskan-Veil.
+      return `Visit a Lost Capital (${LOST_CAPITAL_LOCATIONS.map((id) => LOST_CAPITAL_NAMES[id] ?? id).join(', ')}) to learn what the Cores demand.`;
     case 'revelation':
       return `Recover 1 of 9 Cores by visiting a Lost Capital. Each yields its Core to the right approach.`;
     case 'cores':
       return `${coresRecovered}/9 Cores recovered. Visit the remaining Lost Capitals.`;
     case 'descent':
-      return 'All 9 Cores in your pack. Travel to the Endless Stair and descend.';
+      // OTA-430 — the quest advances when the player reaches the Mud Flood
+      // Nexus (the `reached_nexus` trigger keys on locationId
+      // 'mud_flood_nexus'), NOT the Endless Stair. The old hint sent players to
+      // the Stair, where nothing happens. Name the Nexus as the destination and
+      // keep the Stair as the path-flavor it is.
+      return 'All 9 Cores in your pack. Travel to the Mud Flood Nexus — at the foot of the Endless Stair — and descend into it.';
     case 'nexus':
       return 'You are at the Mud Flood Nexus. Open the Contracts screen to make The Choice.';
     case 'choice':

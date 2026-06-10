@@ -142,6 +142,20 @@ describe('mainQuest phase machine', () => {
     it('phaseHint includes core count for cores phase', () => {
       expect(phaseHint('cores', 2)).toMatch(/2\/9/);
     });
+    // OTA-430 — the hook hint must name ALL nine Capitals (was only the first
+    // five), so a player who cleared five doesn't think the hunt is finished.
+    it('phaseHint hook names all nine Capitals', () => {
+      const hint = phaseHint('hook', 0);
+      for (const name of ['Asgardar', 'Samarran', 'Nimari', 'Drakova', 'Voronov',
+        'Karok-Sa', 'Yuldra-Tul', 'Ostragar', 'Iskan-Veil']) {
+        expect(hint).toContain(name);
+      }
+    });
+    // OTA-430 — the descent hint must point at the Mud Flood Nexus (the
+    // reached_nexus trigger location), not just the Endless Stair.
+    it('phaseHint descent names the Mud Flood Nexus', () => {
+      expect(phaseHint('descent', 9)).toMatch(/Mud Flood Nexus/);
+    });
     it('remainingCapitals excludes already-recovered', () => {
       const r = remainingCapitals({ phase: 'cores', coresRecovered: ['asgardar', 'samarran'] });
       expect(r).not.toContain('asgardar');
