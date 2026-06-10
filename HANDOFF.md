@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-442 "Rubidium Photoemission" — [audit fix #22] Capitals no longer samey** *(element #37)*.
+  Each of the 9 Lost Capitals plays a distinct one-time arrival signature on first entry
+  (`capitalArrivalSignature` + `worldMemory.capitalArrivalSeen`). `mainQuest.ts`, `gameStore.ts`.
+  Covered by `__tests__/mainQuest.test.ts`.
 - **OTA-441 "Krypton Fractionation" — [audit fix #26 pt1] bound inventory growth** *(element #36)*.
   Generous `ITEM_CAPS` for flood junk (Small Rock 60, Big Rock 40, Stick 60); meaningful items
   uncapped. Row-generating farms bounded by OTA-437/438. **Deferred:** the per-action O(n²)

@@ -13675,6 +13675,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const mq = require('../engine/mainQuest');
       if (mq.LOST_CAPITAL_LOCATIONS.includes(locationId)) {
         const playerNow = get().player;
+        // OTA-442 — [audit #22] play the Capital's one-time arrival signature
+        // FIRST (before the gate hint), so each of the nine reads as its own
+        // place instead of a generic ruin. Gated once per Capital per character.
+        const seen = get().worldMemory.capitalArrivalSeen ?? [];
+        if (!seen.includes(locationId)) {
+          const sig = mq.capitalArrivalSignature(locationId);
+          if (sig) {
+            get().appendLog('world', sig);
+            set((s) => ({
+              worldMemory: {
+                ...s.worldMemory,
+                capitalArrivalSeen: [...(s.worldMemory.capitalArrivalSeen ?? []), locationId],
+              },
+            }));
+          }
+        }
         const alreadyRecovered = playerNow?.mainQuest?.coresRecovered?.includes(locationId) ?? false;
         if (!alreadyRecovered) {
           const hint = mq.coreGateHint(playerNow?.factionId ?? '', locationId);

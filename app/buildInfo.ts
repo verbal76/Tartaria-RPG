@@ -13564,4 +13564,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bounded by OTA-437/438. NOTE: the per-action O(n²) immutable-clone (the other half of audit
 // #26) is a cross-cutting refactor across ~118 set() sites and is intentionally DEFERRED rather
 // than rushed; its practical save-bloat harm is already mitigated by OTA-440. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-441';
+// OTA-442 (Rubidium Photoemission) — [audit fix #22] the nine Lost Capitals no longer feel samey.
+// They carry distinct authored DESCRIPTIONS, but share generic exploration scene-composition, so
+// once you're walking them they read alike. Each Capital now plays a one-time ARRIVAL SIGNATURE
+// on first entry — a distinct sensory beat keyed to its identity (Asgardar's snapped Grand Spire
+// still humming; Yuldra-Tul's grudge-cold and Giant-shapes under the snow; Ostragar's wrong-way
+// river that keeps pace with you; Iskan-Veil's maze of false doors that won't hold still in your
+// head; …). Fires once per Capital per character (worldMemory.capitalArrivalSeen), printed before
+// the gate hint so the place lands first. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-442';

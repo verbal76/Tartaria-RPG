@@ -13,6 +13,7 @@ import {
   NEXUS_LOCATION_ID,
   phaseLabel,
   phaseHint,
+  capitalArrivalSignature,
   remainingCapitals,
   canRecoverCore,
   coreGateHint,
@@ -155,6 +156,17 @@ describe('mainQuest phase machine', () => {
     // reached_nexus trigger location), not just the Endless Stair.
     it('phaseHint descent names the Mud Flood Nexus', () => {
       expect(phaseHint('descent', 9)).toMatch(/Mud Flood Nexus/);
+    });
+    // OTA-442 — every Capital has its own arrival signature; all distinct.
+    it('all nine Capitals have a distinct arrival signature', () => {
+      const sigs = LOST_CAPITAL_LOCATIONS.map((id) => capitalArrivalSignature(id));
+      for (const s of sigs) expect(typeof s).toBe('string');
+      expect(new Set(sigs).size).toBe(LOST_CAPITAL_LOCATIONS.length);
+      // The signature is keyed to the place (Asgardar names its Spire).
+      expect(capitalArrivalSignature('asgardar')).toMatch(/Asgardar/);
+      expect(capitalArrivalSignature('yuldra_tul')).toMatch(/Yuldra-Tul/);
+      // Unknown ids return null.
+      expect(capitalArrivalSignature('not_a_capital')).toBeNull();
     });
     it('remainingCapitals excludes already-recovered', () => {
       const r = remainingCapitals({ phase: 'cores', coresRecovered: ['asgardar', 'samarran'] });

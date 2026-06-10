@@ -322,6 +322,38 @@ const LOST_CAPITAL_NAMES: Record<string, string> = {
   iskan_veil: 'Iskan-Veil',
 };
 
+// OTA-442 — [audit #22] one-time ARRIVAL SIGNATURE per Lost Capital. The nine
+// Capitals share generic exploration scene-composition, so they read the same
+// once you're walking them. A distinct sensory beat on FIRST entry — keyed off
+// each Capital's authored identity (its Spire / Tower / frost / river / sigils)
+// — stamps the place in the player's memory so the set never feels samey. Fires
+// once per Capital per character (gated by worldMemory.capitalArrivalSeen).
+const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
+  asgardar:
+    'Asgardar announces itself before you crest the rise: the Grand Spire of Etheria, snapped a third of the way up, still hums a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
+  samarran:
+    'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Etheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
+  nimari:
+    'Half of Nimari is under the silt; the half that isn\'t is red. The Red Tower throws a long rust-coloured shadow across drowned streets, and somewhere inside it a working Aetheric core pulses warm enough that the mud around your boots steams faintly.',
+  drakova:
+    'Drakova you reach by going down — a throat of hardened Aetherstone mud sealed over a city that never saw the sky again. Your lantern light dies three feet out. The dark here is old, and it is full, and it does not like being looked at.',
+  voronov:
+    'Voronov took the Mud Flood across the jaw. Whole districts lie tipped on their sides, rooftops for floors, and the wind through the canted streets makes a low mourning sound. Intact things glint in the wreckage — the city kept its treasures by burying its people on top of them.',
+  karok_sa:
+    'Karok-Sa is silent the way a held breath is silent. Every wall of the Forgotten Order\'s ritual seat is carved floor-to-vault with binding-sigils, and as you pass they seem to turn — not the stone, but the meaning — to keep facing you. The air tastes of chalk and old intent.',
+  yuldra_tul:
+    'Yuldra-Tul bites. Frost sheaths the gate-city to the Giants\' tombs in blue-white rime, and your breath freezes on your collar before it leaves your mouth. The mountain holds the cold like a grudge, and far up the pass, shapes too large to be men lie under the snow, waiting out the centuries.',
+  ostragar:
+    'Ostragar moves. The Eternal Dynasty\'s river city sits half-drowned in a slow brown current that runs the wrong way past your shins, threading between sunken colonnades. Something in the water keeps pace with you just under the surface, and the reeds bow as you pass, then straighten behind you.',
+  iskan_veil:
+    'Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northern light comes in flat and grey through windows that open onto walls. Twice you are sure you\'ve been here already. Twice you are wrong. Or right.',
+};
+
+/** OTA-442 — the one-time arrival signature for a Lost Capital, or null. */
+export function capitalArrivalSignature(capitalId: string): string | null {
+  return CAPITAL_ARRIVAL_SIGNATURES[capitalId] ?? null;
+}
+
 const DESCENT_LINE_BY_FACTION: Record<string, string> = {
   reclaimers_guild:
     'You stand at the head of the Endless Stair with all 9 Cores. The Reclaimers have never reached the bottom. You will be the first.',

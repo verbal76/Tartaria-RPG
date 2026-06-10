@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-442 — [audit #22] each of the 9 Lost Capitals plays a distinct one-time arrival signature
+  // on first entry, so the set no longer feels samey while exploring. Element #37: Rubidium.
+  '2026-06-10-442': 'Rubidium Photoemission',
   // OTA-441 — [audit #26 pt1] generous caps on flood-prone junk (Small/Big Rock, Stick) bound the
   // unbounded forage hoard; per-action O(n²) clone refactor deferred (see notes). Element #36: Krypton.
   '2026-06-10-441': 'Krypton Fractionation',

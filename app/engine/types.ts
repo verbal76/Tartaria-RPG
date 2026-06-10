@@ -1223,6 +1223,10 @@ export interface WorldMemory {
    *  for this place" line on every scene entry. One fire per
    *  location per character. */
   dangerWarnedLocations?: string[];
+  /** OTA-442 — Lost Capital ids whose one-time ARRIVAL SIGNATURE (a distinct
+   *  sensory beat that gives each Capital its own identity on first entry) has
+   *  already played. One fire per Capital per character. */
+  capitalArrivalSeen?: string[];
   memorableEvents?: MemorableEvent[];
   /** Active multi-scene hook chains — a hook resolution may queue a follow-up
    *  hook kind to plant in a future wander. plantedAtHour lets beginScene
