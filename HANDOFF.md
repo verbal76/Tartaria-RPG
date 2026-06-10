@@ -367,6 +367,12 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-427 "Titanium Sponging" — [audit fix #9] per-instance gear never stacks away its
+  rolled stats** *(element #22)*. `grantItem` merge key ignored `instanceStats`
+  (temper-rolled durability/perks) and `uniqueStats` (fused), so two same-name rolled copies
+  collapsed into one row and dropped the loser's stats. Merge now refuses any row carrying
+  either marker (mirrors the coating guard). `inventory.ts`. Covered by
+  `__tests__/inventoryStacking.test.ts`.
 - **OTA-426 "Scandium Fluorination" — [audit fix #8] multi-boss hunts complete only at the
   LAST boss** *(element #21)*. Hunts with >1 `checkKind:'boss'` stage (e.g. `hunt_bog_dragon`,
   boss at [3,6]) spawn `"<name> (hunted)"` at each; the completion match gated only on

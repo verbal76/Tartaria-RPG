@@ -13443,4 +13443,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // boss stage: it scans def.stages for the highest 'boss' index (lastBoss) and only
 // completes when `rec.stage > lastBoss`. Single-boss hunts are unaffected (their lone
 // boss IS the last). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-426';
+// OTA-427 (Titanium Sponging) — [audit fix #9] per-instance gear no longer stacks away its
+// rolled stats. A weapon/armor instance can carry its own temper-driven instanceStats
+// (low durability ↔ stronger perks) and fused gear carries uniqueStats. grantItem's merge
+// key only checked name+kind+coating+full-durability, so two same-name rolled copies (or a
+// rolled + a fused) collapsed into one row — silently dropping the loser's stats and
+// durability band. grantItem now also refuses to merge any row where existing or incoming
+// carries instanceStats OR uniqueStats (mirrors the OTA-363 coating guard). Plain catalog
+// copies (no per-instance markers) still stack normally. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-427';

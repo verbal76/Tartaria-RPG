@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-427 — [audit #9] per-instance gear (instanceStats / fused uniqueStats) never stacks,
+  // so a rolled copy no longer drops its temper-driven durability+perks. Element #22: Titanium.
+  '2026-06-10-427': 'Titanium Sponging',
   // OTA-426 — [audit #8] multi-boss hunts complete only at the LAST boss stage, not a mid
   // boss — killing the mid boss no longer skips the apex fight + reward. Element #21: Scandium.
   '2026-06-10-426': 'Scandium Fluorination',

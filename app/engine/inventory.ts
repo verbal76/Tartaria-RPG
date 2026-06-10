@@ -90,6 +90,13 @@ export function grantItem(
     // coated weapon (it would silently drop the coating on the incoming
     // item or fuse two differently-coated blades).
     if (existing.coating || newItem.coating) return false;
+    // OTA-427 — per-instance gear is unique. A rolled weapon/armor carries its
+    // own temper-driven instanceStats (and fused gear carries uniqueStats); two
+    // copies of the same name now have different durability bands + perk sets.
+    // Merging would collapse them into one row and silently drop the loser's
+    // rolled stats. Never stack a row that carries either marker.
+    if (existing.instanceStats || newItem.instanceStats) return false;
+    if (existing.uniqueStats || newItem.uniqueStats) return false;
     if (stackable) return true;
     return isFullyDurable(existing) && newItemFull;
   });

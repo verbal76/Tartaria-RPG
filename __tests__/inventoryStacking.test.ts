@@ -165,3 +165,44 @@ describe('mergeOrPushItem — edge cases', () => {
     expect(out[1]!.quantity).toBe(1);
   });
 });
+
+// ---------------------------------------------------------------------------
+// OTA-427 — per-instance gear (instanceStats / uniqueStats) never stacks
+// ---------------------------------------------------------------------------
+
+describe('mergeOrPushItem — per-instance gear stays separate', () => {
+  it('does NOT merge two same-name weapons that carry instanceStats', () => {
+    const a = makeItem({
+      name: 'Iron Axe', kind: 'weapon', durability: { current: 10, max: 10 },
+    });
+    a.instanceStats = { statBonuses: [{ stat: 'strength', amount: 4 }] };
+    const b = makeItem({
+      name: 'Iron Axe', kind: 'weapon', durability: { current: 50, max: 50 },
+    });
+    b.instanceStats = { statBonuses: [{ stat: 'strength', amount: 3 }] };
+    const out = mergeOrPushItem([a], b);
+    expect(out).toHaveLength(2);
+    expect(out[0]!.instanceStats?.statBonuses[0]!.amount).toBe(4);
+    expect(out[1]!.instanceStats?.statBonuses[0]!.amount).toBe(3);
+  });
+
+  it('does NOT merge fused gear (uniqueStats) into a plain copy', () => {
+    const plain = makeItem({
+      name: 'Steel Helm', kind: 'armor', durability: { current: 20, max: 20 },
+    });
+    const fused = makeItem({
+      name: 'Steel Helm', kind: 'armor', durability: { current: 20, max: 20 },
+    });
+    fused.uniqueStats = { statBonuses: [{ stat: 'constitution', amount: 2 }] } as never;
+    const out = mergeOrPushItem([plain], fused);
+    expect(out).toHaveLength(2);
+  });
+
+  it('still stacks plain (no-instanceStats) fully-durable copies', () => {
+    const a = makeItem({ name: 'Plain Dagger', kind: 'weapon', durability: { current: 12, max: 12 } });
+    const b = makeItem({ name: 'Plain Dagger', kind: 'weapon', durability: { current: 12, max: 12 } });
+    const out = mergeOrPushItem([a], b);
+    expect(out).toHaveLength(1);
+    expect(out[0]!.quantity).toBe(2);
+  });
+});
