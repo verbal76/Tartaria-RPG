@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { RECIPES, lookupCraftedItem, type Recipe } from '../engine/crafting';
+import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
@@ -18,20 +18,19 @@ const RECIPE_RARITY_RANK: Record<string, number> = {
 interface RecipeStatus {
   recipe: Recipe;
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
-  missing: { name: string; needed: number; have: number }[];
+  missing: { name: string; short: number }[];
   available: boolean;
 }
 
+// OTA-401 — substitute-aware availability. Pre-OTA this counted only
+// exact-name matches, so a recipe you could actually build using a
+// material substitute (e.g. Cloth Scrap standing in for Patched Cloth)
+// rendered as "Missing" / muted and never lit green. Now it routes
+// through the same `missingIngredientsList` the engine uses, so the
+// green "ready" styling matches what `craftRecipe` will actually accept.
 function evaluateRecipe(recipe: Recipe, inventory: { name: string; quantity: number }[]): RecipeStatus {
-  const missing: RecipeStatus['missing'] = [];
-  for (const ing of recipe.ingredients) {
-    const have = inventory
-      .filter((i) => i.name.toLowerCase() === ing.name.toLowerCase())
-      .reduce((sum, i) => sum + i.quantity, 0);
-    if (have < ing.quantity) {
-      missing.push({ name: ing.name, needed: ing.quantity, have });
-    }
-  }
+  const short = missingIngredientsList(recipe.ingredients, inventory as never);
+  const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
   const cat = lookupCraftedItem(recipe.result);
   return { recipe, kind: cat.kind, missing, available: missing.length === 0 };
 }
@@ -207,7 +206,7 @@ export function RecipesView({
                 <View style={[styles.recipeStripe, { backgroundColor: stripeColor }]} />
                 <View style={styles.recipeBody}>
                   <View style={styles.recipeHead}>
-                    <Text style={[styles.recipeName, !e.available && styles.recipeNameMuted]}>
+                    <Text style={[styles.recipeName, e.available && styles.recipeNameReady, !e.available && styles.recipeNameMuted]}>
                       {e.recipe.result}
                     </Text>
                     <Text style={[styles.recipeRarity, { color: rarityColor(cat.rarity) }]}>
@@ -228,7 +227,7 @@ export function RecipesView({
                     </>
                   ) : (
                     <Text style={styles.recipeMissing}>
-                      Missing: {e.missing.map((m) => `${m.needed - m.have}× ${m.name}`).join(', ')}
+                      Missing: {e.missing.map((m) => `${m.short}× ${m.name}`).join(', ')}
                     </Text>
                   )}
                 </View>
@@ -263,6 +262,7 @@ const styles = StyleSheet.create({
   recipeBody: { flex: 1, padding: 10 },
   recipeHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   recipeName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  recipeNameReady: { color: '#9ec96a' },
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },

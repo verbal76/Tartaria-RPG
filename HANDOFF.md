@@ -340,9 +340,22 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Empty** — the weapons batch (**OTA-360→366**) shipped 2026-06-08 (LIVE = Pine
-Anvil; see the header + `docs/build-codenames.md`). Next change starts a fresh
-batch.
+**Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
+the user's push command).
+
+- **OTA-401 "Spicebush Anvil" — green "ready" highlighting everywhere.** Player
+  ask: "on the atheric tab in crafting if you have the ingredients listed it should
+  be written in green, as a matter of fact it should do that for all crafting
+  recipes And for repairs." The CRAFT/RECIPES rows (`RecipesView.evaluateRecipe`)
+  and REPAIR rows (`CraftingScreen.evaluateRepair`) judged availability with an
+  exact-name ingredient check, so a recipe/repair makeable via a **material
+  substitute** (Cloth Scrap → Patched Cloth, …) rendered muted/"Missing" and never
+  lit green even though `craftRecipe`/`repairInventoryItem` would accept it. Both
+  now use the engine's substitute-aware `missingIngredientsList`, and the result
+  **name** goes green when ready (not just the stripe). The **Aetheric** tab lights
+  each fuel name green when in the pack (disciplines: each fuel judged
+  independently; golem variants: substitute-aware affordability). `RecipesView.tsx`,
+  `CraftingScreen.tsx`.
 
 <details><summary>Shipped batch notes (360→366) — retained for reference</summary>
 

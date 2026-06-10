@@ -13184,4 +13184,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 387 (Madrone) — so getBuildCodename fell back to the raw id for those builds.
 // Re-added them in order; player-facing codename + bug reports resolve correctly
 // again. Map-only; no behavior change. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-400';
+// OTA-401 (Spicebush Anvil) — green "ready" highlighting for craftable recipes
+// and affordable repairs, EVERYWHERE. The CRAFT/RECIPES rows and the REPAIR rows
+// used a NON-substitute-aware availability check (exact-name match only), so a
+// recipe/repair you could actually make using a material substitute (Cloth Scrap
+// → Patched Cloth, Bent Nails → Scrap Metal, …) rendered as "Missing"/muted and
+// never lit green — even though craftRecipe / repairInventoryItem WOULD accept it.
+// Both now route through the engine's substitute-aware missingIngredientsList, and
+// the result NAME goes green when ready (not just the stripe). The Aetheric tab
+// also lights each fuel name green when it's in the pack (disciplines: "any one";
+// golem variants: substitute-aware affordability). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-401';

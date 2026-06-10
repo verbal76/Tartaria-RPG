@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
+import { missingIngredientsList } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
@@ -114,19 +115,30 @@ const RECIPE_SORT_OPTIONS = [
 interface RepairStatus {
   item: InventoryItem;
   cost: { name: string; quantity: number }[];
-  missing: { name: string; needed: number; have: number }[];
+  missing: { name: string; short: number }[];
   available: boolean;
+}
+
+// OTA-401 — substitute-aware repair affordability. The engine's
+// repairInventoryItem (OTA-205) already accepts material substitutes
+// (Cloth Scrap → Patched Cloth, Bent Nails → Scrap Metal, …) via
+// missingIngredientsList, but this UI check still required exact-name
+// matches — so a repair you could actually afford rendered as "Missing"
+// and never lit green. Route it through the same engine helper so the
+// highlight matches what repairInventoryItem will accept.
+// OTA-401 — exact-name owned quantity. Used by the aetheric tab to
+// light fuel names green when they're in the pack.
+function ownedQty(inventory: InventoryItem[], name: string): number {
+  const lower = name.toLowerCase();
+  return inventory
+    .filter((i) => i.name.toLowerCase() === lower)
+    .reduce((s, i) => s + i.quantity, 0);
 }
 
 function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): RepairStatus {
   const cost = repairCostMaterials(item);
-  const missing: RepairStatus['missing'] = [];
-  for (const need of cost) {
-    const have = inventory
-      .filter((i) => i.name.toLowerCase() === need.name.toLowerCase())
-      .reduce((s, i) => s + i.quantity, 0);
-    if (have < need.quantity) missing.push({ name: need.name, needed: need.quantity, have });
-  }
+  const short = missingIngredientsList(cost, inventory);
+  const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
   return { item, cost, missing, available: cost.length > 0 && missing.length === 0 };
 }
 
@@ -425,9 +437,17 @@ export function CraftingScreen() {
                 >
                   <Text style={styles.aetherCardTitle}>{d.title}</Text>
                   <Text style={styles.aetherCardBody}>{d.body}</Text>
+                  {/* OTA-401 — light each fuel name green when it's in the
+                      pack so the player can see at a glance which discipline
+                      they can fire right now. "Any one" → each name is judged
+                      independently (need ≥1 of it). */}
                   <Text style={styles.aetherCardFuel}>
                     <Text style={styles.aetherCardFuelLabel}>Fuel (any one): </Text>
-                    {d.fuels.join(', ')}
+                    {d.fuels.map((f, i) => (
+                      <Text key={f} style={ownedQty(player.inventory, f) >= 1 ? styles.fuelHave : undefined}>
+                        {f}{i < d.fuels.length - 1 ? ', ' : ''}
+                      </Text>
+                    ))}
                   </Text>
                   {/* OTA-111 — per-golem stats + fuel recipe. Only
                       the summon card sets showGolemVariants. Each
@@ -441,6 +461,9 @@ export function CraftingScreen() {
                       <Text style={styles.golemVariantsHeader}>Golem variants — tap to stage that summon:</Text>
                       {GOLEM_VARIANTS.map((g) => {
                         const phrase = GOLEM_VARIANT_PHRASE[g.kind];
+                        // OTA-401 — affordable when every fuel line is in stock
+                        // (substitute-aware, mirroring the craft/repair drains).
+                        const golemAfford = missingIngredientsList(g.fuel, player.inventory).length === 0;
                         const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
                         const modSign = g.attackMod >= 0 ? '+' : '';
                         const hitTxt = g.hitBonus !== 0 ? `, +${g.hitBonus} hit` : '';
@@ -459,7 +482,7 @@ export function CraftingScreen() {
                             <Text style={styles.golemVariantBlurb}>{g.blurb}</Text>
                             <Text style={styles.golemVariantFuel}>
                               <Text style={styles.golemVariantFuelLabel}>Needs: </Text>
-                              {fuel}
+                              <Text style={golemAfford ? styles.fuelHave : undefined}>{fuel}</Text>
                             </Text>
                             <Text style={styles.golemVariantPhrase}>tap → "{phrase}"</Text>
                           </Pressable>
@@ -535,7 +558,7 @@ export function CraftingScreen() {
                     <View style={[styles.recipeStripe, { backgroundColor: stripeColor }]} />
                     <View style={styles.recipeBody}>
                       <View style={styles.recipeHead}>
-                        <Text style={[styles.recipeName, !r.available && styles.recipeNameMuted]}>
+                        <Text style={[styles.recipeName, r.available && styles.recipeNameReady, !r.available && styles.recipeNameMuted]}>
                           {r.item.name}
                         </Text>
                         <Text style={styles.durabilityChip}>
@@ -558,7 +581,7 @@ export function CraftingScreen() {
                         </>
                       ) : (
                         <Text style={styles.recipeMissing}>
-                          Missing: {r.missing.map((m) => `${m.needed - m.have}× ${m.name}`).join(', ')}
+                          Missing: {r.missing.map((m) => `${m.short}× ${m.name}`).join(', ')}
                         </Text>
                       )}
                     </View>
@@ -651,6 +674,7 @@ const styles = StyleSheet.create({
   recipeBody: { flex: 1, padding: 10 },
   recipeHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   recipeName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  recipeNameReady: { color: '#9ec96a' },
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   durabilityChip: { color: '#c9a86a', fontSize: 11, fontWeight: '700' },
@@ -679,6 +703,7 @@ const styles = StyleSheet.create({
   aetherCardBody: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 6 },
   aetherCardFuel: { color: '#7a705c', fontSize: 11, lineHeight: 15, marginBottom: 4 },
   aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
+  fuelHave: { color: '#9ec96a', fontWeight: '700' },
   aetherCardExamples: { color: '#7a705c', fontSize: 11, lineHeight: 15 },
   aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
   aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
