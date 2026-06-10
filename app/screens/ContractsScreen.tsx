@@ -219,8 +219,18 @@ export function ContractsScreen() {
         // post-revive when the Guardian had been wiped from the
         // scene. Tap the chip → store fires the same spawn pipeline
         // and bounces back to exploration.
+        // OTA-412 — only while STANDING ON the capital's anchor tile.
+        // currentLocationId lingers as the capital after a cardinal step into the
+        // wilderness; gating on it alone left the SUMMON chip live miles outside
+        // the city. Mirror isStationedAtNamedLocation (the summon action enforces
+        // the same — summonCoreGuardian → not_at_capital).
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
+        const stationedAtCapital = !player.travelTarget
+          && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
         const atCapitalForSummon =
-          (mq.phase === 'revelation' || mq.phase === 'cores')
+          stationedAtCapital
+          && (mq.phase === 'revelation' || mq.phase === 'cores')
           && LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
           && !mq.coresRecovered.includes(player.currentLocationId);
         return (

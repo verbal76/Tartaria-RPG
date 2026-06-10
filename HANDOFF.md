@@ -367,6 +367,16 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-412 "Nitrogen Fixation" — SUMMON chip only shows while on the capital tile**
+  *(element #7)*. Player: "when I leave the capital city, the summon button should go
+  away — I should only be able to summon the Core Guardian while I'm in the city." The
+  chip checked only `currentLocationId`, which lingers as the capital after a cardinal
+  step off the anchor → the button stayed drawn in the wilderness. Both the
+  ExplorationScreen MAIN QUEST chip and the ContractsScreen PRIMARY OBJECTIVE chip now
+  also require `isStationedAtNamedLocation` (not mid-journey; in a building OR on the
+  map-center anchor), matching what `summonCoreGuardian` already enforced. The capital
+  vendor already clears on every cardinal step (`stepDirection` → `scene.vendor = null`),
+  so it disappears on exit too. `ExplorationScreen.tsx`, `ContractsScreen.tsx`.
 - **OTA-411 "Carbon Pyrolysis" — capital vendor ALWAYS fires + pin the "core" noun**
   *(element #6)*. (1) "begin scene at capital should ALWAYS get a named vendor": OTA-410
   only fired when the slot was empty, so the 25% roadside roll could win first — a

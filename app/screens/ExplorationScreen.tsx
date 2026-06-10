@@ -576,7 +576,20 @@ export function ExplorationScreen() {
           mainLine = 'No active objective.';
         } else {
           const cores = mq.coresRecovered?.length ?? 0;
-          atUnrecovered = capitals.includes(player.currentLocationId)
+          // OTA-412 — the SUMMON chip must only show while the player is
+          // STANDING ON the capital's anchor tile. currentLocationId lingers as
+          // the capital after a cardinal step off into the wilderness, so gating
+          // on it alone left the chip drawn (and the "recover the core here" line)
+          // miles outside the city. Mirror isStationedAtNamedLocation: not
+          // mid-journey, and either inside a building or on the map-center anchor.
+          // The summon ACTION already enforces this (summonCoreGuardian →
+          // not_at_capital); this hides the button so the affordance matches.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
+          const stationedAtCapital = !player.travelTarget
+            && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
+          atUnrecovered = stationedAtCapital
+            && capitals.includes(player.currentLocationId)
             && !mq.coresRecovered.includes(player.currentLocationId)
             && (mq.phase === 'revelation' || mq.phase === 'cores');
           mainLine = atUnrecovered

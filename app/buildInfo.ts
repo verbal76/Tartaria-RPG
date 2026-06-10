@@ -13305,4 +13305,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // + the take/salvage chips. Interacting still routes through the Core gate (faction
 // gate verb summons the Guardian; any other verb gets the nudge) — pinning only makes
 // the objective discoverable, never bypasses the gate. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-411';
+// OTA-412 (Nitrogen Fixation) — SUMMON chip only shows while standing on the capital
+// tile. Player: "when I leave the capital city, the summon button should go away — I
+// should only be able to summon the Core Guardian while I'm in the city." The chip's
+// eligibility checked only currentLocationId, which LINGERS as the capital after a
+// cardinal step off the anchor into the wilderness — so the SUMMON button (and the
+// "recover the core here" line) stayed drawn miles outside the city. Both the
+// ExplorationScreen MAIN QUEST chip and the ContractsScreen PRIMARY OBJECTIVE chip now
+// also require isStationedAtNamedLocation (not mid-journey; inside a building OR on the
+// map-center anchor tile) — matching what the summon ACTION already enforces
+// (summonCoreGuardian → not_at_capital off-anchor). The capital vendor already clears
+// on every cardinal step (stepDirection sets scene.vendor = null), so it disappears on
+// exit too. A city is ONE tile, so a single cardinal step exits it. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-412';
