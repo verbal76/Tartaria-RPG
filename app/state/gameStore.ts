@@ -19365,13 +19365,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('debug', `persist: slot ${activeSlotId} FAILED — ${saveErr}`);
     }
     // OTA-406 — if saveSlot had to emergency-purge the on-disk copy-log to land
-    // the save (a DB the pre-398 unbounded log had stuffed full), tell the
-    // player their progress was rescued — this is the recovery from the silent
-    // "storage full" save-loss, and it self-heals on the spot.
+    // the save (a DB the pre-398 unbounded log had stuffed full), record that the
+    // self-heal fired. OTA-415 — this goes on the DEBUG channel (diagnostic log
+    // only), NOT a player-facing line: "storage was full / diagnostic log" is
+    // dev-speak that shouldn't surface in the world feed. The save was rescued
+    // silently; the log still captures that it happened for triage.
     if (consumeSaveReclaimedFlag()) {
       get().appendLog(
-        'system',
-        'Storage was full from an old diagnostic log — cleared it and your save went through. Progress is saving again.',
+        'debug',
+        'persist: emergency-purged the on-disk copy-log to free storage; save landed on retry (self-heal).',
       );
     }
     // OTA-396/397 — per-part byte breakdown so we never guess what's oversized.

@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-415 — move the save self-heal recovery line off the player-facing feed to
+  // the debug channel (was dev-speak in the world feed). Element #10: Neon.
+  '2026-06-10-415': 'Neon Liquefaction',
   // OTA-414 — Qwen auto-retry with backoff (refire after the crash-guard disables
   // it; recover on a clean run, grow the cooldown on a relapse). Element #9: Fluorine.
   '2026-06-10-414': 'Fluorine Etching',

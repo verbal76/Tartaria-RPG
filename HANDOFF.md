@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-415 "Neon Liquefaction" — save self-heal line no longer player-facing**
+  *(element #10)*. Player (screenshot): "that event shouldn't be player facing." OTA-406's
+  *"Storage was full from an old diagnostic log…"* was on the `system` channel (shows in
+  the world feed). Moved to `debug` (`AdventureFeed.HIDDEN_CHANNELS` → log-only). Save
+  still self-heals silently. `gameStore.ts`.
 - **OTA-414 "Fluorine Etching" — Qwen auto-retry with backoff** *(element #9)*.
   Player: "can qwen refire on fail?" Pre-414 the completion guard disabled Qwen
   PERMANENTLY after 3 crashes (`resetMLHealth` was never wired to UI). Now it

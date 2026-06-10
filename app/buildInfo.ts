@@ -13341,4 +13341,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // while a flaky-but-capable one heals on the first good run. State machine + new
 // breadcrumbs live in mlHealth; the diagnostic's Qwen line now shows retrying /
 // recovered / "auto-retry in N boots". JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-414';
+// OTA-415 (Neon Liquefaction) — the save self-heal recovery line is no longer
+// player-facing. Player (screenshot): "that event shouldn't be player facing." OTA-406
+// logged "Storage was full from an old diagnostic log — cleared it…" on the 'system'
+// channel, which renders in the world feed — dev-speak that breaks immersion. Moved to
+// the 'debug' channel (HIDDEN_CHANNELS in AdventureFeed → never shown in the feed, only
+// in the exported diagnostic log). The save still self-heals silently. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-415';
