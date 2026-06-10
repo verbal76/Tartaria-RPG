@@ -367,6 +367,16 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-418 "Aluminum Anodizing" — 15 interior hooks** *(element #13)*. Player: "we
+  need 15 more inside hooks." OTA-417's indoor gate left interior investigation empty;
+  this adds a full INTERIOR pool (floorboard / compartment / portrait / bricked doorway
+  / rug / ledger / drawing / clock / scratched door / warm chair / shelf / ceiling drip
+  / strongbox / aether tang / barefoot prints) — each a 2-beat chain (examine → payoff).
+  `HOOK_WEIGHTS` partitioned by `INDOOR_HOOK_KINDS`; `pickRandomHookKind` (outdoor)
+  excludes them, `pickRandomIndoorHookKind` draws only them. All 7 random-plant sites
+  now plant the context-appropriate pool. `hooks.ts`, `gameStore.ts`;
+  `indoorHooks.test.ts` (4). *(interactionStress seeded floor 8→7: RNG-stream drift from
+  one extra Math.random() on the indoor plant — not a variety regression.)*
 - **OTA-417 "Magnesium Sublimation" — outdoor wandering-leads never plant indoors**
   *(element #12)*. Player: "investigate the candle and see a giant on a Ridgeline — how
   did I do that with a candle in the house?" `HOOK_PLANTS` is all outdoor sightings, but

@@ -198,6 +198,7 @@ import {
   matchHookNoun,
   matchAnyHookNoun,
   pickRandomHookKind,
+  pickRandomIndoorHookKind,
   plantHookByKind,
 } from '../engine/hooks';
 import type { EquipSlot, PlayerEquipped } from '../engine/types';
@@ -6981,11 +6982,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // path above for the candle→giant-on-a-ridgeline non-sequitur.
               const indoors = !!get().player?.hubRoomId || !!get().activeBuildingId;
               const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
-              if (indoors) {
-                get().appendLog('world', 'Indoors, the buried world keeps its omens to itself — whatever it would point you toward waits out under the open sky.');
-                producedFb = true;
-              } else if (!activeUnresolved) {
-                const hook = plantHookByKind(pickRandomHookKind());
+              if (!activeUnresolved) {
+                // OTA-418 — indoors plant an INTERIOR lead, outdoors an outdoor sighting.
+                const hook = plantHookByKind(indoors ? pickRandomIndoorHookKind() : pickRandomHookKind());
                 set((s) => (s.currentScene
                   ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
                   : s));
@@ -7353,11 +7352,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // the non-sequitur the player reported. Indoors, give an interior beat.
               const indoors = !!get().player?.hubRoomId || !!get().activeBuildingId;
               const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
-              if (indoors) {
-                get().appendLog('world', 'Indoors, the buried world keeps its omens to itself — whatever it would point you toward waits out under the open sky.');
-                produced = true;
-              } else if (!activeUnresolved) {
-                const hook = plantHookByKind(pickRandomHookKind());
+              if (!activeUnresolved) {
+                // OTA-418 — indoors plant an INTERIOR lead, outdoors an outdoor sighting.
+                const hook = plantHookByKind(indoors ? pickRandomIndoorHookKind() : pickRandomHookKind());
                 set((s) => (s.currentScene
                   ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
                   : s));
@@ -8306,11 +8303,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // indoors (hub room / building interior). Candle→giant-on-a-ridgeline.
             const indoors = !!get().player?.hubRoomId || !!get().activeBuildingId;
             const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
-            if (indoors) {
-              get().appendLog('world', 'Indoors, the buried world keeps its omens to itself — whatever it would point you toward waits out under the open sky.');
-              producedInv = true;
-            } else if (!activeUnresolved) {
-              const hook = plantHookByKind(pickRandomHookKind());
+            if (!activeUnresolved) {
+              // OTA-418 — indoors plant an INTERIOR lead, outdoors an outdoor sighting.
+              const hook = plantHookByKind(indoors ? pickRandomIndoorHookKind() : pickRandomHookKind());
               set((s) => (s.currentScene
                 ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
                 : s));
@@ -22132,10 +22127,10 @@ function narrateAmbientFind(
   }
   // Hook plant — 40% baseline, 60% on curated salvageables. Skipped
   // when a hook is already active in this scene (don't pile up).
-  // OTA-417 — and never indoors (the wandering leads are outdoor sightings).
+  // OTA-418 — indoors plant an INTERIOR lead, outdoors an outdoor sighting.
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
-  if (!activeUnresolved && !indoorsForOutdoorHooks(get) && chance(curatedBoost ? 60 : 40)) {
-    const hook = plantHookByKind(pickRandomHookKind());
+  if (!activeUnresolved && chance(curatedBoost ? 60 : 40)) {
+    const hook = plantHookByKind(indoorsForOutdoorHooks(get) ? pickRandomIndoorHookKind() : pickRandomHookKind());
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     // 2026-05-25 OTA-041 — tie the hook plant to the noun the player
     // searched. Was bare hook.plantedLine, which read as a non-sequitur
@@ -22185,10 +22180,9 @@ function narrateAmbientFind(
   // firstInvestigateDone flag so subsequent investigates fall back
   // to the normal RNG rates.
   if (isFirstInvestigate && !producedSubstantive && roomKey) {
-    if (!activeUnresolved && !indoorsForOutdoorHooks(get)) {
-      // OTA-417 — outdoor wandering-lead only; indoors this falls through to the
-      // hidden-text / trinket guarantees below (both interior-appropriate).
-      const hook = plantHookByKind(pickRandomHookKind());
+    if (!activeUnresolved) {
+      // OTA-418 — indoors plant an INTERIOR lead, outdoors an outdoor sighting.
+      const hook = plantHookByKind(indoorsForOutdoorHooks(get) ? pickRandomIndoorHookKind() : pickRandomHookKind());
       set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
       get().appendLog(
         'world',
@@ -22522,9 +22516,9 @@ function narrateCasualLook(
   // 6. Optional hook plant — 30% chance, only if no hook is already active.
   // Kept separate from the description so the look-summary always reads
   // the same way regardless of whether a new lead drops.
-  // OTA-417 — and never indoors (the wandering leads are outdoor sightings).
-  if (unresolvedHooks.length === 0 && !indoorsForOutdoorHooks(get) && chance(30)) {
-    const hook = plantHookByKind(pickRandomHookKind());
+  // OTA-418 — indoors plant an INTERIOR lead, outdoors an outdoor sighting.
+  if (unresolvedHooks.length === 0 && chance(30)) {
+    const hook = plantHookByKind(indoorsForOutdoorHooks(get) ? pickRandomIndoorHookKind() : pickRandomHookKind());
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     get().appendLog('world', hook.plantedLine);
   }
@@ -22563,12 +22557,19 @@ function narrateWanderingJourney(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scene: CurrentScene,
 ): void {
-  // OTA-417 — wandering + its leads (WANDERING_LEADS) and the hooks they plant
-  // are all OUTDOOR; indoors (a hub room / building interior) there's nowhere to
-  // wander and no far-off omen to spot, so don't narrate an outdoor lead or plant
-  // an outdoor hook (the candle→giant-on-a-ridgeline class of mismatch).
+  // OTA-417/418 — the WANDERING_LEADS lead-ins are all OUTDOOR sightings; indoors
+  // (a hub room / building interior) we reframe "wandering" as moving room to room
+  // and plant an INTERIOR lead instead of an outdoor one (the candle→giant-on-a-
+  // ridgeline class of mismatch). Same don't-pile-up gate.
   if (indoorsForOutdoorHooks(get)) {
-    get().appendLog('world', 'You cast about, but there is nowhere to wander to in here — the leads are all out under the open sky.');
+    const activeIndoors = (scene.hooks ?? []).some((h) => !h.resolved);
+    if (activeIndoors) {
+      get().appendLog('world', 'You move from room to room, but there is already a thread here that wants finishing first.');
+      return;
+    }
+    const indoorHook = plantHookByKind(pickRandomIndoorHookKind());
+    set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), indoorHook] } } : s));
+    get().appendLog('world', `You move from room to room, looking closer. ${indoorHook.plantedLine}`);
     return;
   }
   const lead = rotatingPick(WANDERING_LEADS, 'wander.lead');

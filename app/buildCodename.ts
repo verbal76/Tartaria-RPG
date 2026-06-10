@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-418 — 15 INTERIOR hooks + indoor/outdoor partitioned pickers, so indoors
+  // surface interior leads instead of empty / outdoor sightings. Element #13: Aluminum.
+  '2026-06-10-418': 'Aluminum Anodizing',
   // OTA-417 — outdoor wandering-lead hooks never plant indoors (candle-in-a-house
   // no longer surfaces "a giant on the ridgeline"); gates all 7 plant sites. Element #12: Magnesium.
   '2026-06-10-417': 'Magnesium Sublimation',

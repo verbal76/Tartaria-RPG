@@ -32,7 +32,26 @@ export type HookKind =
   | 'black_market_lantern'
   | 'aether_grid_hum'
   | 'sealed_vault_door'
-  | 'preserved_corpse';
+  | 'preserved_corpse'
+  // OTA-418 — Tier-3: INTERIOR finds (indoors-only). Planted by the indoor
+  // hook pool when the player investigates / looks around inside a hub room or
+  // a building, so a candle in a house surfaces an interior lead (a loose
+  // floorboard, a bricked-up doorway) instead of an outdoor sighting.
+  | 'loose_floorboard'
+  | 'hidden_compartment'
+  | 'watching_portrait'
+  | 'bricked_doorway'
+  | 'bloodstain_rug'
+  | 'open_ledger'
+  | 'childs_drawing'
+  | 'stopped_clock'
+  | 'scratched_door'
+  | 'warm_chair'
+  | 'crooked_shelf'
+  | 'ceiling_drip'
+  | 'bolted_strongbox'
+  | 'aether_tang'
+  | 'barefoot_prints';
 
 export interface Hook {
   id: string;
@@ -148,6 +167,52 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
   ],
   preserved_corpse: [
     { line: 'A Tartarian body lies in the silt, the mud-glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.', nouns: ['body', 'corpse', 'robes', 'satchel', 'tartarian'] },
+  ],
+  // OTA-418 — INTERIOR finds. Each plants something you'd notice INSIDE a room.
+  loose_floorboard: [
+    { line: 'One floorboard sits proud of the rest, its nails backed half out — lifted and re-laid more than once.', nouns: ['floorboard', 'board', 'plank', 'floor', 'nails'] },
+  ],
+  hidden_compartment: [
+    { line: 'The wainscoting has a seam where there should be none — a panel, cut to the size of a hand.', nouns: ['panel', 'wainscoting', 'seam', 'wall', 'compartment'] },
+  ],
+  watching_portrait: [
+    { line: 'A portrait hangs crooked on the wall. The painted eyes have been scratched out — recently, the bare canvas beneath still pale.', nouns: ['portrait', 'painting', 'eyes', 'frame', 'canvas'] },
+  ],
+  bricked_doorway: [
+    { line: 'A doorway in the far wall has been bricked up, the mortar still pale. Whatever room it led to, someone wanted it shut.', nouns: ['doorway', 'bricks', 'brickwork', 'wall', 'mortar'] },
+  ],
+  bloodstain_rug: [
+    { line: 'A rug lies dead-centre on the floor — wrong for the room. The boards along its edge are dark with something old that soaked in.', nouns: ['rug', 'carpet', 'stain', 'boards', 'floor'] },
+  ],
+  open_ledger: [
+    { line: 'A ledger lies open on the table, a column of names half of them struck through. The ink on the last entry is not yet dry.', nouns: ['ledger', 'book', 'names', 'register', 'page'] },
+  ],
+  childs_drawing: [
+    { line: "A child's drawing is pinned to the wall — a tall figure, all angles, standing over small stick people. Crayon, but the proportions are exact.", nouns: ['drawing', 'picture', 'sketch', 'crayon', 'paper'] },
+  ],
+  stopped_clock: [
+    { line: 'A clock on the mantel has stopped — not wound down, stopped, hands frozen at a single minute as if the moment itself jammed.', nouns: ['clock', 'mantel', 'hands', 'timepiece', 'pendulum'] },
+  ],
+  scratched_door: [
+    { line: 'The inside of the door is raked with scratch marks — fingernails, low down, frantic. Someone was shut in here and did not want to be.', nouns: ['door', 'scratches', 'marks', 'gouges', 'wood'] },
+  ],
+  warm_chair: [
+    { line: 'The hearth is cold but swept clean, and a single chair faces it, angled as if someone just rose. The seat is still warm.', nouns: ['chair', 'hearth', 'seat', 'fireplace', 'stool'] },
+  ],
+  crooked_shelf: [
+    { line: "One shelf of books doesn't match the others — same spines, no dust, and they don't quite sit flush against the wall.", nouns: ['shelf', 'bookshelf', 'books', 'spines', 'shelves'] },
+  ],
+  ceiling_drip: [
+    { line: 'Water beads and falls from one spot in the ceiling, steady, though no storm has touched this place in years. Above is meant to be sealed.', nouns: ['ceiling', 'drip', 'water', 'leak', 'rafters'] },
+  ],
+  bolted_strongbox: [
+    { line: 'A strongbox sits bolted to the floor in the corner, its lock a Tartarian tumbler — dim, but not dead.', nouns: ['strongbox', 'box', 'lock', 'chest', 'tumbler'] },
+  ],
+  aether_tang: [
+    { line: 'The air in this room tastes of Aether — sharp, metallic, the way it does near a working core. Nothing here should hum, and yet.', nouns: ['air', 'aether', 'smell', 'hum', 'tang'] },
+  ],
+  barefoot_prints: [
+    { line: 'A set of footprints crosses the dust on the floor — small, bare — and they stop dead in the middle of the room. They do not come back.', nouns: ['footprints', 'prints', 'dust', 'tracks', 'steps'] },
   ],
 };
 
@@ -711,6 +776,68 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: true,
     },
   ],
+  // OTA-418 — INTERIOR chains. Two beats each: examine reveals more, then a
+  // modest interior payoff (a stash, a memo, a coin or scrap, a small heal).
+  loose_floorboard: [
+    { line: 'You work the board up. Beneath it, a shallow void packed with oilcloth — a hidden stash, undisturbed since whoever stowed it stopped coming back.', effects: [], done: false, addNouns: ['stash', 'void', 'oilcloth', 'cache', 'bundle'] },
+    { line: 'Inside the oilcloth: a fistful of old coin and a coil of salvageable wire.', arbiterLine: '"The buried world keeps its secrets under the floor as often as under the mud," the Arbiter says.', effects: [{ type: 'grant_tc', amount: 22 }, { type: 'grant_item', name: 'Scrap Metal' }], done: true },
+  ],
+  hidden_compartment: [
+    { line: 'You press the panel and it gives with a soft click, swinging back on a hidden hinge.', effects: [], done: false, addNouns: ['hinge', 'cavity', 'recess', 'hollow'] },
+    { line: 'Folded in the cavity: a strip of cured cloth and a few coins someone meant to come back for.', effects: [{ type: 'grant_item', name: 'Cloth Scrap' }, { type: 'grant_tc', amount: 14 }], done: true },
+  ],
+  watching_portrait: [
+    { line: 'You lift the portrait off its hook. The wall behind it is bare but for a single line of Tartarian script, scratched into the plaster by hand.', effects: [], done: false, addNouns: ['script', 'plaster', 'wall', 'writing'] },
+    { line: 'The script is a name and a warning: do not answer if it knocks from inside. You copy it into memory — it may matter later.', arbiterLine: '"Someone was afraid of this house," the Arbiter notes. "Or of what they kept in it."', effects: [{ type: 'memo', text: 'A scratched warning behind a portrait: "do not answer if it knocks from inside."' }], done: true },
+  ],
+  bricked_doorway: [
+    { line: 'You knock a few loose bricks free. The mortar is newer than the wall — and behind it, cold air moves. The sealed room still breathes.', effects: [], done: false, addNouns: ['bricks', 'gap', 'hole', 'opening', 'breach'] },
+    { line: 'You widen the gap and reach through. A storeroom, long shut — your hand closes on a coil of patched cloth and a heavy old coin.', effects: [{ type: 'grant_item', name: 'Patched Cloth' }, { type: 'grant_tc', amount: 26 }], done: true },
+  ],
+  bloodstain_rug: [
+    { line: 'You pull the rug back. The stain runs to a loose seam in the boards — and a small bundle wedged into the gap beneath, hidden in haste.', effects: [], done: false, addNouns: ['bundle', 'seam', 'gap', 'boards'] },
+    { line: 'Inside the bundle, wrapped against the damp: a salvage of metal and a handful of coin. Whoever bled here was trying to hide this first.', effects: [{ type: 'grant_item', name: 'Scrap Metal' }, { type: 'grant_tc', amount: 20 }], done: true },
+  ],
+  open_ledger: [
+    { line: 'You read down the ledger. The struck-through names share a column heading you recognise — a debt-list, and the unstruck names are still owed.', effects: [], done: false, addNouns: ['column', 'entry', 'debt', 'list'] },
+    { line: 'The last wet entry names a place you can find. You commit it to memory; a lead like this pays out later.', arbiterLine: '"Names and numbers," the Arbiter murmurs. "The most dangerous lore there is."', effects: [{ type: 'memo', text: 'A debt-ledger named an unsettled account — a lead worth following.' }], done: true },
+  ],
+  childs_drawing: [
+    { line: 'You take the drawing down. On the back, in the same crayon, a single shaky word: HOME — with an arrow, pointing down.', effects: [], done: false, addNouns: ['arrow', 'word', 'back', 'crayon'] },
+    { line: 'A child drew what they saw, and what they saw was true. The image stays with you — the buried world remembers its giants, even through a child.', effects: [{ type: 'memo', text: "A child's drawing of a giant figure, marked HOME with an arrow pointing down." }], done: true },
+  ],
+  stopped_clock: [
+    { line: 'You open the clock case. The mechanism is whole — no broken spring, no jam. It simply stopped, all at once, the way clocks do where the Aether ran wild.', effects: [], done: false, addNouns: ['case', 'mechanism', 'gears', 'spring'] },
+    { line: 'Tucked behind the face, a thin disc of Aether-glass, still faintly warm. You pry it loose.', effects: [{ type: 'grant_item', name: 'Aether Residue' }], done: true },
+  ],
+  scratched_door: [
+    { line: 'You crouch to the marks. Worn into the wood below them, almost smooth, is a knot you can press — a catch, hidden where a trapped hand would have found it last.', effects: [], done: false, addNouns: ['catch', 'knot', 'latch', 'mechanism'] },
+    { line: 'The catch releases a narrow drawer in the door frame. Inside: a few coins and a scrap of cloth, a prisoner\'s last cache.', effects: [{ type: 'grant_tc', amount: 16 }, { type: 'grant_item', name: 'Cloth Scrap' }], done: true },
+  ],
+  warm_chair: [
+    { line: 'You set a hand on the seat. Still warm — but the room is empty, the dust unbroken. Whatever rose from this chair left no tracks at all.', effects: [], done: false, addNouns: ['cushion', 'seat', 'armrest'] },
+    { line: 'Down the side of the cushion your fingers find what was left behind — a few coins, still warm from a body that is no longer here. You take them and do not look back.', arbiterLine: '"Don\'t wait for the host," the Arbiter says. "This one doesn\'t keep to the hours of the living."', effects: [{ type: 'grant_tc', amount: 18 }], done: true },
+  ],
+  crooked_shelf: [
+    { line: 'You pull at the mismatched shelf. It swings outward on a concealed pivot — behind it, a crawlspace, barely wide enough, breathing cold.', effects: [], done: false, addNouns: ['crawlspace', 'pivot', 'passage', 'opening'] },
+    { line: 'The crawlspace ends in a niche someone used as a strongroom — patched cloth, scrap, and coin, left when the house was abandoned.', effects: [{ type: 'grant_item', name: 'Patched Cloth' }, { type: 'grant_tc', amount: 24 }], done: true },
+  ],
+  ceiling_drip: [
+    { line: 'You climb to the wet spot. Above the boards, a void — and something resting in it that the water has been running off for years.', effects: [], done: false, addNouns: ['void', 'space', 'rafters', 'loft'] },
+    { line: 'You bring it down: a sealed Tartarian canister, its seam still good, salvage rattling inside.', effects: [{ type: 'grant_item', name: 'Scrap Metal' }, { type: 'grant_tc', amount: 15 }], done: true },
+  ],
+  bolted_strongbox: [
+    { line: 'You work the tumbler. It is old and stiff, but the glyphs warm under your hand, and on the third try the bolt draws back.', effects: [], done: false, addNouns: ['bolt', 'glyphs', 'lid', 'tumbler'] },
+    { line: 'The strongbox holds what a careful household saves for a bad year: coin, and metal worth more than coin.', effects: [{ type: 'grant_tc', amount: 34 }, { type: 'grant_item', name: 'Scrap Metal' }], done: true },
+  ],
+  aether_tang: [
+    { line: 'You follow the taste to its source — a hairline crack in the wall, and behind it a thread of Aether-glass laid into the house\'s bones, still live.', effects: [], done: false, addNouns: ['crack', 'thread', 'wall', 'vein'] },
+    { line: 'You ease a length of the glass free. It hums faintly in your palm before it dims — raw Aether residue, the good kind.', effects: [{ type: 'grant_item', name: 'Aether Residue' }, { type: 'heal', amount: 4 }], done: true },
+  ],
+  barefoot_prints: [
+    { line: 'You follow the prints to where they stop. The dust there is pressed flat in a circle — something stood here a long while, then was simply gone.', effects: [], done: false, addNouns: ['circle', 'mark', 'dust', 'spot'] },
+    { line: 'In the centre of the circle, set down as if placed, lies a small coin-purse. You take it. The house holds its breath; you let it.', arbiterLine: '"Take it and go," the Arbiter says, very quietly. "Some debts you do not want to be present to collect."', effects: [{ type: 'grant_tc', amount: 20 }], done: true },
+  ],
 };
 
 export function getHookOutcome(kind: HookKind, stage: number): HookOutcome | null {
@@ -780,16 +907,55 @@ const HOOK_WEIGHTS: Record<HookKind, number> = {
   aether_grid_hum: 6,
   sealed_vault_door: 3, // mostly chained
   preserved_corpse: 6,
+  // OTA-418 — interior weights (only ever drawn by the INDOOR picker below).
+  loose_floorboard: 8,
+  hidden_compartment: 7,
+  watching_portrait: 5,
+  bricked_doorway: 6,
+  bloodstain_rug: 5,
+  open_ledger: 6,
+  childs_drawing: 4,
+  stopped_clock: 5,
+  scratched_door: 5,
+  warm_chair: 4,
+  crooked_shelf: 6,
+  ceiling_drip: 6,
+  bolted_strongbox: 6,
+  aether_tang: 6,
+  barefoot_prints: 4,
 };
 
-export function pickRandomHookKind(): HookKind {
-  const total = Object.values(HOOK_WEIGHTS).reduce((a, b) => a + b, 0);
+// OTA-418 — the INTERIOR hook kinds. The two pickers below partition HOOK_WEIGHTS
+// so an indoor lead never lands outdoors and an outdoor sighting never lands
+// indoors (the candle-in-a-house → giant-on-a-ridgeline class of mismatch).
+export const INDOOR_HOOK_KINDS: ReadonlySet<HookKind> = new Set<HookKind>([
+  'loose_floorboard', 'hidden_compartment', 'watching_portrait', 'bricked_doorway',
+  'bloodstain_rug', 'open_ledger', 'childs_drawing', 'stopped_clock', 'scratched_door',
+  'warm_chair', 'crooked_shelf', 'ceiling_drip', 'bolted_strongbox', 'aether_tang',
+  'barefoot_prints',
+]);
+
+/** Weighted pick over a subset of HOOK_WEIGHTS (the kinds passing `include`). */
+function pickWeightedHookKind(include: (k: HookKind) => boolean, fallback: HookKind): HookKind {
+  const entries = (Object.entries(HOOK_WEIGHTS) as [HookKind, number][]).filter(([k]) => include(k));
+  const total = entries.reduce((a, [, w]) => a + w, 0);
+  if (total <= 0) return fallback;
   let roll = Math.random() * total;
-  for (const [kind, weight] of Object.entries(HOOK_WEIGHTS) as [HookKind, number][]) {
+  for (const [kind, weight] of entries) {
     roll -= weight;
     if (roll <= 0) return kind;
   }
-  return 'glint';
+  return fallback;
+}
+
+/** OUTDOOR random hook — excludes the interior kinds. */
+export function pickRandomHookKind(): HookKind {
+  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k), 'glint');
+}
+
+/** OTA-418 — INDOOR random hook — only the interior kinds. */
+export function pickRandomIndoorHookKind(): HookKind {
+  return pickWeightedHookKind((k) => INDOOR_HOOK_KINDS.has(k), 'loose_floorboard');
 }
 
 export function plantHookByKind(kind: HookKind, chainId?: string): Hook {

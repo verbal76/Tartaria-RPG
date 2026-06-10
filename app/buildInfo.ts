@@ -13368,4 +13368,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // seven random-hook plant sites — investigate-table (×3), salvage, first-investigate
 // guarantee, look-around, and wander. Indoors those paths give an interior beat / fall
 // through to hidden-text + trinket instead. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-417';
+// OTA-418 (Aluminum Anodizing) — 15 INTERIOR hooks. Player: "we need 15 more inside
+// hooks." OTA-417 gated outdoor wandering-leads from indoor scenes, which left indoor
+// investigation feeling empty. This adds a full INTERIOR hook pool (loose floorboard,
+// hidden compartment, watching portrait, bricked doorway, bloodstain rug, open ledger,
+// child's drawing, stopped clock, scratched door, warm chair, crooked shelf, ceiling
+// drip, bolted strongbox, aether tang, barefoot prints) — each a 2-beat chain (examine
+// → modest interior payoff: a stash, a coin/scrap, a memo, a small heal). HOOK_WEIGHTS
+// is partitioned by a new INDOOR_HOOK_KINDS set: pickRandomHookKind() (outdoor) now
+// excludes interior kinds and pickRandomIndoorHookKind() draws only them, so neither
+// lands in the wrong context. All 7 random-plant sites now plant the context-appropriate
+// pool — indoors give interior leads, outdoors give outdoor sightings. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-418';
