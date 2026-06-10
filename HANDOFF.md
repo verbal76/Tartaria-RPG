@@ -343,6 +343,16 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-402 "Fringetree Anvil" — enemy panel shows coating/DOT statuses + turns
+  left.** Player ask: "it should show in the enemy info area it is applied and for
+  how many turns of combat left it has." The scene already tracked per-enemy
+  statuses (`currentScene.enemyStatuses[i]`: `poison_coat`/`acid_coat`/
+  `corruption_coat`/`electrical_coat`/`burn_coat`/`infected`, each w/ `turnsRemaining`
+  + `dmgPerTurn`), but `EnemyPanel` never rendered them. `ExplorationScreen` now
+  threads `enemyStatuses[i]` into each `EnemyView`; `EnemyCard` draws one badge per
+  status ("POISON · 3t left · 5/turn") with a per-kind accent; FlatList `extraData`
+  carries the status signature so badges re-render as the DOT counts down.
+  `EnemyPanel.tsx`, `ExplorationScreen.tsx`.
 - **OTA-401 "Spicebush Anvil" — green "ready" highlighting everywhere.** Player
   ask: "on the atheric tab in crafting if you have the ingredients listed it should
   be written in green, as a matter of fact it should do that for all crafting

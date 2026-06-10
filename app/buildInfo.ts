@@ -13194,4 +13194,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the result NAME goes green when ready (not just the stripe). The Aetheric tab
 // also lights each fuel name green when it's in the pack (disciplines: "any one";
 // golem variants: substitute-aware affordability). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-401';
+// OTA-402 (Fringetree Anvil) — show active coating/DOT statuses + turns left on
+// the enemy panel. Player ask: "it should show in the enemy info area it is applied
+// and for how many turns of combat left it has." The scene already tracks per-enemy
+// statuses (currentScene.enemyStatuses[i]: poison_coat / acid_coat / corruption_coat
+// / electrical_coat / burn_coat / infected, each with turnsRemaining + dmgPerTurn),
+// but the EnemyPanel never surfaced them — so a player who coated a blade couldn't
+// confirm the DOT landed or see how long it ticks. ExplorationScreen now threads
+// enemyStatuses[i] into each EnemyView; EnemyCard renders one badge per status
+// ("POISON · 3t left · 5/turn") with a per-kind accent color. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-402';

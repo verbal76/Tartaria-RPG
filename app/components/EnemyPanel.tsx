@@ -16,6 +16,17 @@ import type { Enemy } from '../engine/types';
 import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
 import { enemyTypeDefenses } from '../engine/crafting';
 
+/** OTA-401 — a single active status (coating DOT / infection) on an
+ *  enemy, mirrored from `currentScene.enemyStatuses[i]`. Surfaced on the
+ *  panel so the player can see what's ticking and how many combat turns
+ *  it has left. */
+export interface EnemyStatusView {
+  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+  turnsRemaining: number;
+  dmgPerTurn: number;
+  sourceName: string;
+}
+
 export interface EnemyView {
   enemy: Enemy;
   currentHp: number;
@@ -23,7 +34,21 @@ export interface EnemyView {
   inRange?: boolean;
   /** Human-readable range label — "arm's reach", "close", "far". */
   rangeLabel?: string;
+  /** OTA-401 — active coating/DOT statuses on this enemy + turns left. */
+  statuses?: EnemyStatusView[];
 }
+
+// OTA-401 — short label + accent color per status kind. The coating
+// families mirror the on-hit log adjectives (Poisoned / Acid-Etched /
+// …); infection is the OTA-210 contagion DOT.
+const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: string }> = {
+  poison_coat: { label: 'POISON', color: '#9ec96a' },
+  acid_coat: { label: 'ACID', color: '#c9e06a' },
+  corruption_coat: { label: 'CORRUPTION', color: '#b88ce0' },
+  electrical_coat: { label: 'SHOCK', color: '#6ac9e0' },
+  burn_coat: { label: 'BURN', color: '#e0915f' },
+  infected: { label: 'INFECTED', color: '#c97a5f' },
+};
 
 interface Props {
   enemies: EnemyView[];
@@ -127,7 +152,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
           data={enemies}
           // OTA 197 — extraData forces FlatList to re-render the visible cells
           // when a value not present in `data` changes (HP ticking down).
-          extraData={`${cardWidth}|${enemies.map((v) => `${v.currentHp}/${v.enemy.hp}`).join('|')}`}
+          extraData={`${cardWidth}|${enemies.map((v) => `${v.currentHp}/${v.enemy.hp}/${(v.statuses ?? []).map((s) => `${s.kind}:${s.turnsRemaining}`).join(',')}`).join('|')}`}
           keyExtractor={(_, i) => String(i)}
           horizontal
           pagingEnabled
@@ -216,6 +241,24 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
           )}
         </View>
       )}
+      {/* OTA-401 — active coating/DOT statuses on this enemy + turns left.
+          One badge per status: "POISON · 3t · 4/turn". Lets the player
+          confirm a coating actually landed and track how long it ticks. */}
+      {view.statuses && view.statuses.length > 0 && (
+        <View style={styles.statusCol}>
+          {view.statuses.map((st, i) => {
+            const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#c9a86a' };
+            const turns = `${st.turnsRemaining}t left`;
+            const dmg = st.dmgPerTurn > 0 ? ` · ${st.dmgPerTurn}/turn` : '';
+            return (
+              <Text key={`${st.kind}-${i}`} style={[styles.statusBadge, { borderColor: meta.color }]} numberOfLines={1}>
+                <Text style={[styles.statusLabel, { color: meta.color }]}>{meta.label} </Text>
+                <Text style={styles.statusVal}>{turns}{dmg}</Text>
+              </Text>
+            );
+          })}
+        </View>
+      )}
       {view.enemy.traits && view.enemy.traits.length > 0 && (
         <View style={styles.traitRow}>
           {view.enemy.traits.map((t) => (
@@ -284,6 +327,17 @@ const styles = StyleSheet.create({
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   defWeak: { color: '#e07a5f', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   defVal: { color: '#c9b89a', fontSize: 10 },
+  statusCol: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  statusBadge: {
+    fontSize: 9,
+    letterSpacing: 0.5,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderWidth: 1,
+    borderRadius: 2,
+  },
+  statusLabel: { fontWeight: '700', fontSize: 9, letterSpacing: 1 },
+  statusVal: { color: '#c9b89a', fontSize: 9 },
   traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   traitBadge: {
     color: '#c9a86a',

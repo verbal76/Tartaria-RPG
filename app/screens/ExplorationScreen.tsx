@@ -390,9 +390,12 @@ export function ExplorationScreen() {
       currentHp: currentScene.enemyHps[i] ?? e.hp,
       rangeLabel,
       inRange: canHit,
+      // OTA-401 — surface active coating/DOT statuses + turns left on the panel.
+      statuses: currentScene.enemyStatuses?.[i] ?? [],
     }));
   }, [
     currentScene?.enemies, currentScene?.enemyHps, currentScene?.range,
+    currentScene?.enemyStatuses,
     player?.equipped?.main, player?.equipped?.weaponName, player?.stats?.intelligence,
     player?.inventory,
   ]);
