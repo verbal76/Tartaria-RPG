@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-465 "Neodymium Sinter" — tap-to-set-course for
->   whispers/leads (Yulka's discs are now routable from Contracts). 464 reverted the
->   463 voice auto-disable; Kokoro is always used again.** The whole **OTA-457→465**
->   playtest batch (Tellurium Refining → Neodymium Sinter, elements 52–60) is published
+> - **LIVE (pushed 2026-06-10) = OTA-466 "Promethium Decay" — golem repair (feed it
+>   the parts it's made of) + golem naming on summon. 465 added tap-to-set-course for
+>   whispers; 464 reverted the 463 voice auto-disable (Kokoro always used).** The whole **OTA-457→466**
+>   playtest batch (Tellurium Refining → Promethium Decay, elements 52–61) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,7 +382,15 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 committed below (post-batch follow-up).**
+**OTA-465 / 466 committed below (post-batch follow-ups).**
+
+- **OTA-466 "Promethium Decay" — [feature] golem repair + naming (mirrors the dog)** *(element #61)*. (1)
+  Repair a surviving golem by feeding it the PARTS it's made of (its summon fuel set). `golems.ts` helpers
+  `golemRepairParts`/`isGolemRepairPart`/`golemRepairHeal` (heal=round(hpMax/4)); `feed/repair golem <item>`
+  → `applyItemToGolem` (only constituent parts; consumes 1, caps at hpMax); inventory "Repair <golem>"
+  button. (2) On summon the Arbiter prompts and the next input names the golem ("skip" keeps the type),
+  via transient `pendingGolemNaming` (reset on new-game/load). `golems.ts`, `types.ts`, `gameStore.ts`,
+  `InventoryScreen.tsx`. Covered by `golemCompanion.test.ts`.
 
 - **OTA-465 "Neodymium Sinter" — [feature] tap-to-set-course for WHISPERS/leads** *(element #60)*. Finishes
   the OTA-458 route button (faction quests only). Whisper objectives live on map TILES (mapX/mapY), not

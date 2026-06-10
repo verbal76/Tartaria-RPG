@@ -273,4 +273,74 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(log).toMatch(/Sentinel Husk defeated\. You recover/);
     });
   });
+
+  // OTA-466 — repair a surviving golem by feeding it its own constituent parts,
+  // and name it on summon.
+  describe('OTA-466 — golem repair + naming', () => {
+    it('golemRepairParts / isGolemRepairPart / golemRepairHeal reflect the fuel set', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const g = require('../app/engine/golems');
+      expect(g.golemRepairParts('iron_golem').sort()).toEqual(['Golem Core', 'Scrap Metal'].sort());
+      expect(g.isGolemRepairPart('iron_golem', 'scrap metal')).toBe(true);
+      expect(g.isGolemRepairPart('iron_golem', 'Aether Mud')).toBe(false);
+      expect(g.golemRepairHeal('iron_golem')).toBe(6); // round(24/4)
+      expect(g.golemRepairHeal('mud_golem')).toBe(4);  // round(16/4)
+    });
+
+    it('feed golem <constituent part> repairs HP and consumes the part', async () => {
+      const store = await bootstrap([
+        { id: 'sm', name: 'Scrap Metal', kind: 'misc', rarity: 'Common', quantity: 2, tags: [] } as never,
+      ]);
+      const p0 = store.getState().player!;
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hp: 5 }; // hurt, hpMax 24
+      store.setState({ player: { ...p0, golem } });
+
+      store.getState().submitPlayerAction('feed golem scrap metal');
+
+      const after = store.getState().player!;
+      expect(after.golem!.hp).toBe(11); // 5 + 6
+      expect((after.inventory.find((i) => i.name === 'Scrap Metal')?.quantity) ?? 0).toBe(1);
+    });
+
+    it('feed golem with a NON-constituent item is refused and consumes nothing', async () => {
+      const store = await bootstrap([
+        { id: 'am', name: 'Aether Mud', kind: 'misc', rarity: 'Common', quantity: 1, tags: [] } as never,
+      ]);
+      const p0 = store.getState().player!;
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hp: 5 };
+      store.setState({ player: { ...p0, golem } });
+
+      store.getState().submitPlayerAction('feed golem aether mud');
+
+      const after = store.getState().player!;
+      expect(after.golem!.hp).toBe(5); // unchanged
+      expect((after.inventory.find((i) => i.name === 'Aether Mud')?.quantity) ?? 0).toBe(1); // not consumed
+      expect(store.getState().gameLog.map((l) => l.text).join('\n')).toMatch(/mends only from what it's made of/);
+    });
+
+    it('naming takeover: the input after a summon names the golem', async () => {
+      const store = await bootstrap();
+      const p0 = store.getState().player!;
+      // Simulate the post-summon state the summon path sets.
+      store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) }, pendingGolemNaming: true });
+
+      store.getState().submitPlayerAction('Clanker');
+
+      const after = store.getState();
+      expect(after.pendingGolemNaming).toBe(false);
+      expect(after.player!.golem!.name).toBe('Clanker');
+    });
+
+    it('naming takeover: "skip" keeps the type label', async () => {
+      const store = await bootstrap();
+      const p0 = store.getState().player!;
+      store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) }, pendingGolemNaming: true });
+
+      store.getState().submitPlayerAction('skip');
+
+      const after = store.getState();
+      expect(after.pendingGolemNaming).toBe(false);
+      expect(after.player!.golem!.name).toBe('Mud Golem');
+    });
+  });
 });

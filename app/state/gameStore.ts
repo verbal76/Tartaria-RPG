@@ -2244,6 +2244,10 @@ interface GameStore {
    *  they confirm or cancel via the BrandedModal. The screen layer
    *  listens for this and renders a Yes/No prompt. */
   pendingTravelConfirm: { locationId: string; locationName: string } | null;
+  /** OTA-466 — set true right after a golem is summoned: the next typed input
+   *  is captured as the golem's name (or 'skip' to keep the type label), like
+   *  the dog onboarding. Transient — not persisted. */
+  pendingGolemNaming: boolean;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -2489,6 +2493,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
   pendingTravelConfirm: null,
+  pendingGolemNaming: false,
   hydrated: false,
   lowHpWarned: false,
   weaponResistStreak: null,
@@ -3199,6 +3204,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
+        pendingGolemNaming: false,
         justUpdatedFromBuild: null,
         // OTA-100 — clear pendingOtaAppliedFrom in the same set
         // that fires the debug log below. One marker per
@@ -3528,6 +3534,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       pendingRolls: null,
       pendingHookContinue: null,
+      pendingGolemNaming: false,
       activeSlotId: slotId,
       // Tungsten Spire — reset tutorial-props ledger for the new
       // character. Old characters loaded via loadSlotIntoGame don't
@@ -6064,6 +6071,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
+    // OTA-466 — golem naming takeover. Set right after a summon: the next typed
+    // input names the golem (or "skip" keeps the type label). One input only.
+    if (get().pendingGolemNaming) {
+      get().appendLog('player', trimmed);
+      const golemNow = get().player?.golem;
+      if (!golemNow) {
+        // Golem vanished before naming (dismissed / died) — just clear the flag.
+        set({ pendingGolemNaming: false });
+      } else if (/^(skip|no|none|nope|leave it|no name|nvm|cancel|n)$/i.test(trimmed)) {
+        set({ pendingGolemNaming: false });
+        get().appendLog('arbiter', `"As you like," the Arbiter says. "It answers to its making, then — ${golemNow.name}."`);
+      } else {
+        const name = trimmed.slice(0, 16).trim() || golemNow.name;
+        set((s) => (s.player && s.player.golem
+          ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
+          : { pendingGolemNaming: false }));
+        get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
+        get().appendLog('arbiter', `The Arbiter nods. "${name}, then."`);
+      }
+      void get().persist();
+      return;
+    }
     const parsed = parseInput(trimmed, parseCtx);
     // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
     // the [player] echo so the player doesn't see two input lines
@@ -6086,6 +6115,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // parser dispatch so the rest/eat/use handlers don't try to
     // apply the consumable to the player.
     if (tryDogApplyVerb(get, set, trimmed)) {
+      void get().persist();
+      return;
+    }
+    // OTA-466 — `feed/repair golem <item>` intercept. Repairs the golem with its
+    // own constituent parts; short-circuits before the normal verb pipeline so
+    // the consumable doesn't get applied to the player.
+    if (tryGolemApplyVerb(get, set, trimmed)) {
       void get().persist();
       return;
     }
@@ -23444,10 +23480,16 @@ function runAethercraft(
       golem = { ...golem, hp: golem.hp + bonusHp, hpMax: golem.hpMax + bonusHp, attackDie: upsizeDie(golem.attackDie) };
       golemEdgeTag = ' Your mastery shapes it stronger than most.';
     }
-    set((s) => s.player ? { player: { ...s.player, golem } } : s);
+    set((s) => s.player ? { player: { ...s.player, golem }, pendingGolemNaming: true } : s);
     get().appendLog(
       'world',
       `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
+    );
+    // OTA-466 — like the dog, a thing you gave life gets a name. The next typed
+    // input is captured as the golem's name (or "skip" to keep the type label).
+    get().appendLog(
+      'arbiter',
+      `The Arbiter studies the standing shape. "You gave it life. You might as well give it a name." (Type a name, or "skip".)`,
     );
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;
@@ -24366,6 +24408,84 @@ function applyItemToDog(
           : `You ${verb} ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} eat{verbS}, slow and serious. (${tail})`, dog.sex.pronoun)}`,
   );
   return true;
+}
+
+/** OTA-466 — repair a golem by feeding it the parts it's MADE of. A surviving
+ *  golem holds its HP between fights (OTA-433); now the player can mend it with
+ *  its own constituent materials (Iron Golem ← Scrap Metal / Golem Core, etc.)
+ *  the same way they feed the dog. Only the golem's own fuel parts work; each
+ *  part restores golemRepairHeal HP. Returns true when handled. */
+function applyItemToGolem(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  itemName: string,
+): boolean {
+  const player = get().player;
+  if (!player) return false;
+  const golem = player.golem;
+  if (!golem || golem.hp <= 0) {
+    get().appendLog('arbiter', `"You have no golem at your side to mend," the Arbiter says. "Summon one first."`);
+    return false;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getGolemDefinition, isGolemRepairPart, golemRepairParts, golemRepairHeal } = require('../engine/golems');
+  const def = getGolemDefinition(golem.kind);
+  const lower = itemName.toLowerCase().trim();
+  const item = player.inventory.find((i) =>
+    i.quantity > 0 && (i.name.toLowerCase() === lower || i.name.toLowerCase().includes(lower)),
+  );
+  if (!item) {
+    get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
+    return false;
+  }
+  if (!isGolemRepairPart(golem.kind, item.name)) {
+    const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
+    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends only from what it's made of — ${parts}. The ${item.name} won't take."`);
+    return false;
+  }
+  if (golem.hp >= golem.hpMax) {
+    get().appendLog('world', `${golem.name} is already whole — no repair needed.`);
+    return false;
+  }
+  const heal = Math.min(golem.hpMax - golem.hp, golemRepairHeal(golem.kind) as number);
+  const newInventory = player.inventory
+    .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+    .filter((i) => i.quantity > 0);
+  const newHp = golem.hp + heal;
+  set((s) => (s.player && s.player.golem
+    ? { player: { ...s.player, inventory: newInventory, golem: { ...s.player.golem, hp: newHp } } }
+    : s));
+  get().appendLog(
+    'world',
+    `You work the ${item.name} into ${golem.name}'s frame. It fuses into the Aetherstone and the cracks seal over. (+${heal} HP, ${newHp}/${golem.hpMax})`,
+  );
+  return true;
+}
+
+/** OTA-466 — dispatcher for `feed/repair/mend golem <item>` /
+ *  `feed/repair <golem name> <item>` (optionally `... with <item>`). Mirrors
+ *  tryDogApplyVerb; routes to applyItemToGolem. Returns true when handled. */
+function tryGolemApplyVerb(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  rawInput: string,
+): boolean {
+  const golem = get().player?.golem;
+  if (!golem || golem.hp <= 0) return false;
+  const lower = rawInput.toLowerCase().trim();
+  const golemTokens = new Set<string>(['golem']);
+  if (golem.name) golemTokens.add(golem.name.toLowerCase());
+  const m = /^(?:feed|repair|mend|fix|fuel)\s+(\S+)\s+(.+)$/i.exec(lower);
+  if (m) {
+    const target = m[1]!.trim();
+    // Strip a leading "with " so "repair golem with scrap metal" resolves.
+    const item = m[2]!.trim().replace(/^with\s+/i, '').trim();
+    if (golemTokens.has(target)) {
+      applyItemToGolem(get, set, item);
+      return true;
+    }
+  }
+  return false;
 }
 
 /** Dispatcher for `feed dog <item>` / `heal dog <item>` / `use <item>

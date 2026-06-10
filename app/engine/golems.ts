@@ -147,6 +147,27 @@ export function makeCompanion(def: GolemDefinition): Companion {
   };
 }
 
+/** OTA-466 — the material names a golem is BUILT from (its summon fuel set).
+ *  A golem is repaired by feeding it these same parts. Returns the distinct
+ *  part names for the kind. */
+export function golemRepairParts(kind: GolemKind): string[] {
+  return Array.from(new Set(GOLEM_DEFINITIONS[kind].fuel.map((f) => f.name)));
+}
+
+/** OTA-466 — true if `itemName` is one of the parts this golem is made of
+ *  (case-insensitive). Only constituent parts can repair it. */
+export function isGolemRepairPart(kind: GolemKind, itemName: string): boolean {
+  const lower = itemName.toLowerCase().trim();
+  return golemRepairParts(kind).some((p) => p.toLowerCase() === lower);
+}
+
+/** OTA-466 — HP restored per constituent part fed to a golem. Scales with the
+ *  golem's size so a few of its own parts mend it: Mud 4, Iron/Aether 6,
+ *  Crystal 8 (~3–4 parts for a full repair from near-dead). */
+export function golemRepairHeal(kind: GolemKind): number {
+  return Math.max(3, Math.round(GOLEM_DEFINITIONS[kind].hpMax / 4));
+}
+
 /** Validate that the player's inventory holds the full fuel set.
  *  Returns the names of missing items (empty array when fully
  *  funded). Used by the summon handler before the skill check. */

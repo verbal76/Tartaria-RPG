@@ -20,6 +20,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
+import { isGolemRepairPart } from '../engine/golems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -532,6 +533,23 @@ export function InventoryScreen() {
         },
         tone: 'primary',
       });
+    }
+    // OTA-466 — REPAIR GOLEM. When a golem is active, hurt, and this item is one
+    // of the parts it's MADE of, offer a one-tap repair (routes through the same
+    // `feed golem <item>` engine path). Mirrors the dog feed affordance.
+    {
+      const golem = player?.golem;
+      const golemActive = !!golem && golem.hp > 0;
+      if (golemActive && golem.hp < golem.hpMax && isGolemRepairPart(golem.kind, pending.item.name)) {
+        buttons.push({
+          label: `Repair ${golem.name}`,
+          onPress: () => {
+            useGameStore.getState().submitPlayerAction(`feed golem ${pending.item.name}`);
+            closeModal();
+          },
+          tone: 'primary',
+        });
+      }
     }
     // OTA-360 — COAT A WEAPON. Weapon-coating consumables (Poison
     // Vial / Acid Flask / Corruption Tonic, tagged `weapon_coating`)

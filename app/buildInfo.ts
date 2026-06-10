@@ -13792,4 +13792,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spawn). A new whisperRouteTarget(whisper) picks the right tile for the current stage (Yulka's fire →
 // the thief's tile → back to Yulka), and the Contracts screen Whispers cards get a "▸ SET COURSE TO <X>"
 // button. Mutually exclusive with location travel. Covered by whisperYulka.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-465';
+// OTA-466 (Promethium Decay) — [feature] GOLEM repair + naming, mirroring the dog. (1) A golem that
+// survives combat holds its HP (OTA-433); now you mend it by feeding it the PARTS IT'S MADE OF — its own
+// summon fuel set (Iron Golem ← Scrap Metal / Golem Core; Mud ← Aether Mud / Mudstone / Aether Crystal).
+// New golems.ts helpers golemRepairParts / isGolemRepairPart / golemRepairHeal (heal = round(hpMax/4):
+// Mud 4, Iron/Aether 6, Crystal 8 — a few parts for a full repair). `feed/repair/mend golem <item>` (or
+// `feed <golem name> <item>`) routes through applyItemToGolem; only constituent parts work (others refused
+// with a hint listing what it eats), each consumes one part + restores HP capped at hpMax. The inventory
+// item modal gains a "Repair <golem>" button (parallel to "Feed <dog>") on constituent parts when a hurt
+// golem is active. (2) NAMING: on summon the Arbiter says "You gave it life. You might as well give it a
+// name." and the next typed input names the golem (or "skip" keeps the type label) — a one-input takeover
+// like the dog's, via the transient pendingGolemNaming flag (reset on new-game/load). Covered by
+// golemCompanion.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-466';

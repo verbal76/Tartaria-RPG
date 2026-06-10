@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-466 — [feature] GOLEM repair + naming, like the dog. Mend a surviving golem by feeding it the
+  // PARTS it's made of (its own summon fuel: Iron ← Scrap Metal/Golem Core, etc.) via `feed/repair golem
+  // <item>` + a "Repair <golem>" inventory button; only constituent parts work (heal = round(hpMax/4)). On
+  // summon the Arbiter prompts for a name and the next input names it ("skip" keeps the type). Element #61: Promethium.
+  '2026-06-10-466': 'Promethium Decay',
   // OTA-465 — [feature] tap-to-set-course for WHISPERS/leads (finishes the OTA-458 route button, which
   // only covered faction quests). Whisper objectives live on map TILES, not named locations, so the
   // location travel system couldn't reach them — players kept losing Yulka's discs. New intra-area
