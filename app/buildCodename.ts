@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-463 — [CRASH — the real one] a tester's diagnostic named the culprit: "Voice (TTS) guard: ⚠ VOICE
+  // CRASH … last voice: kokoro:am_michael". The bundled NEURAL TTS (Kokoro) was dropping the app mid-
+  // narration, not Qwen. Wired the voice auto-disable (1 crash → fall back to the system device voice via
+  // expo-speech, which doesn't SIGSEGV). New shouldAttemptBundledTTS() gate. Element #58: Cerium.
+  '2026-06-10-463': 'Cerium Polish',
   // OTA-462 — [bug] climb "already crested" fired mid-climb: the CLIMB UP (n/m) button reads live
   // elevatedOn while the verb recomputed progress from cumulative, substring-matched `climbed:` markers,
   // so a t3 marker from a different climb ("climbed:scaffold:t3") fuzzy-matched "broken scaffold" and read

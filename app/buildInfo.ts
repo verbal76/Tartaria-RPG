@@ -13757,4 +13757,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (elevatedOn noun matches the target), elevatedOn.tier/.totalTiers is authoritative — the verb advances
 // from there and the marker scan only governs a FRESH climb started from the ground. The two now always
 // agree. Covered by climbRopeMechanics.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-462';
+// OTA-463 (Cerium Polish) — [CRASH — the real one] wire the VOICE (TTS) auto-disable. A tester's
+// Pixel 10 Pro XL diagnostic finally named the culprit: "Voice (TTS) guard: ⚠ VOICE CRASH detected on
+// previous launch (3 total) — last voice: kokoro:am_michael." The thing dropping the whole app to the
+// home screen mid-narration was the bundled NEURAL TTS (Kokoro voice am_michael) SIGSEGV-ing during
+// synthesis — NOT Qwen (the fungus, and every other "narrated action", was incidental: it's the VOICE of
+// whatever line follows). The OTA-413 voice guard was detection-only "until a tester's report confirms
+// voice is the culprit" — this is that confirmation. Wired the auto-disable (mirrors the Qwen completion
+// guard): one confirmed voice crash disables the bundled neural voice (MAX_TTS_CRASHES_BEFORE_DISABLE=1)
+// and the Arbiter falls back to the SYSTEM device voice (expo-speech) via the existing kokoro-error
+// fallthrough in TTSManager.speak — Android's built-in TTS doesn't SIGSEGV. New shouldAttemptBundledTTS()
+// gate + KEY_TTS_DISABLED; resetMLHealth clears it; the diagnostic now reads "auto-disabled … using
+// system device voice". Covered by ttsCrashGuard.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-463';

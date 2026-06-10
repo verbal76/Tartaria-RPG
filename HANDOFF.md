@@ -367,6 +367,14 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-463 "Cerium Polish" — [CRASH — the real one] wire the VOICE (TTS) auto-disable** *(element #58)*.
+  A tester's diagnostic named it: "Voice (TTS) guard: ⚠ VOICE CRASH … last voice: kokoro:am_michael". The
+  bundled neural TTS (Kokoro) was dropping the app mid-narration — NOT Qwen (every "narrated action" crash
+  was the VOICE of the line, fungus incidental). The OTA-413 voice guard was detection-only awaiting this
+  confirmation. Wired auto-disable (1 crash → `shouldAttemptBundledTTS()` false → `TTSManager.speak` falls
+  through to the system device voice via expo-speech, no SIGSEGV). `mlHealth.ts`, `TTSManager.ts`. Covered
+  by `ttsCrashGuard.test.ts`. **This supersedes the OTA-457/459/460 Qwen-targeted crash work as the actual
+  fix** — those still help (Qwen also tripped once) but voice was the dominant crasher.
 - **OTA-462 "Lanthanum Exchange" — [bug] climb "already crested" fired mid-climb** *(element #57)*. The
   CLIMB UP (n/m) button (reads live `elevatedOn`) and the climb verb (recomputed from cumulative,
   substring-matched `climbed:` markers) desynced — a `t3` marker from a different climb fuzzy-matched
