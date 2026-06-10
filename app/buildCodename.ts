@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-408 — more enterable structures on planned routes (BUILDING_TILE_CHANCE
+  // 12 → 22%). Element #3: Lithium.
+  '2026-06-10-408': 'Lithium Calcination',
   // OTA-407 — coated weapon name on the combat quick-buttons + equipped summary
   // (resolved by equipped slot id, not ambiguous name). Element #2: Helium.
   '2026-06-10-407': 'Helium Distillation',

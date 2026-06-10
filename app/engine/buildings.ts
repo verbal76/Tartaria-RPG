@@ -265,8 +265,14 @@ export function buildingIds(): string[] {
 
 /** Out of 100 — how many wilderness tiles carry an enterable structure.
  *  Tuned for "stumble on one every several tiles of exploring" rather than
- *  a building on every screen. */
-export const BUILDING_TILE_CHANCE = 12;
+ *  a building on every screen.
+ *  OTA-408 — bumped 12 → 22. Playtester crossed a whole planned route without
+ *  running into a single house / shed / structure; at 12% a several-tile course
+ *  could miss them entirely. ~22% lands one roughly every 4-5 tiles — frequent
+ *  enough to actually encounter on a journey, still not every screen. Buildings
+ *  already surface per travel step (the approach line in beginScene), so a higher
+ *  rate is all that's needed for them to show up on a course. */
+export const BUILDING_TILE_CHANCE = 22;
 
 /** Deterministic "is there an enterable structure standing on this tile?"
  *  Pure function of (locationId, mapX, mapY): the SAME tile always yields

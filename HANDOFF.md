@@ -367,6 +367,12 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-408 "Lithium Calcination" — more structures on planned routes** *(element
+  #3)*. Player: "I have not run into any houses or sheds or any other structures in my
+  travels … bump the random encounters of this up on planned routes." Buildings are
+  deterministic per wild tile (`buildingForTile`) and already surface per travel step
+  (the approach line in `beginScene`), but at `BUILDING_TILE_CHANCE = 12%` a several-tile
+  course could miss them. Bumped to **22%** (~one every 4-5 tiles). `engine/buildings.ts`.
 - **OTA-407 "Helium Distillation" — coated weapon name on combat buttons + equipped
   summary** *(element #2)*. Player (with screenshots): "the weapon still has the wrong
   name." Combat narration was fixed (391/399), but the **"OFF: RUSTY SHORTBOW"**

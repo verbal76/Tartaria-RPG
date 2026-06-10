@@ -13269,4 +13269,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shortbow"); the attack ACTION still uses the base name + hand keyword so the parser
 // resolves the right instance. StatsPanel uses coatedDisplayName for the main/off
 // slots. shortWeaponLabel was dropping the coating adjective (last-2-tokens). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-407';
+// OTA-408 (Lithium Calcination) — more structures on planned routes. Player crossed a
+// whole course without running into a single house / shed / structure. Buildings are
+// deterministic per wild tile (buildingForTile) and already surface per travel step
+// (the approach line in beginScene), but at BUILDING_TILE_CHANCE = 12% a several-tile
+// route could miss them entirely. Bumped to 22% (~one every 4-5 tiles) — frequent
+// enough to actually encounter on a journey, still not a building on every screen.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-408';
