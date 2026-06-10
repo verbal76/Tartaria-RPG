@@ -23029,9 +23029,16 @@ function handleGolemCommand(
       get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
       set((s) => {
         if (!s.currentScene) return s;
+        // OTA-425 — [audit fix #7] splice ALL six per-enemy arrays in lockstep,
+        // not just enemies+hps+ambush. Missing enemyStatuses/armorShred/
+        // corruptionStacks/knockedOut meant a companion kill of a NON-last enemy
+        // shifted those out of alignment with enemies[] — a coating DOT, acid AC-
+        // shred, corruption stack, or KO flag then applied to the wrong surviving
+        // foe. Mirrors resolveEnemyDefeat's dropAt.
+        const dropAt = <T,>(arr: T[] | undefined): T[] | undefined =>
+          arr ? arr.filter((_, i) => i !== targetIdx) : arr;
         const remainingEnemies = s.currentScene.enemies.filter((_, i) => i !== targetIdx);
         const remainingHps = s.currentScene.enemyHps.filter((_, i) => i !== targetIdx);
-        const remainingAmbush = (s.currentScene.enemyAmbushUsed ?? []).filter((_, i) => i !== targetIdx);
         const nextActiveIdx = remainingEnemies.length > 0
           ? Math.min(s.currentScene.activeEnemyIdx, remainingEnemies.length - 1)
           : 0;
@@ -23040,7 +23047,11 @@ function handleGolemCommand(
             ...s.currentScene,
             enemies: remainingEnemies,
             enemyHps: remainingHps,
-            enemyAmbushUsed: remainingAmbush,
+            enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
+            enemyStatuses: dropAt(s.currentScene.enemyStatuses),
+            enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
+            enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
+            enemyKnockedOut: dropAt(s.currentScene.enemyKnockedOut),
             activeEnemyIdx: nextActiveIdx,
             range: remainingEnemies.length > 0 ? s.currentScene.range : null,
           },
@@ -23480,15 +23491,23 @@ function handleDogCombat(
         // submitPlayerAction.
         set((s) => {
           if (!s.currentScene) return s;
+          // OTA-425 — [audit fix #7] splice ALL six per-enemy arrays in lockstep
+          // (was only enemies+hps+ambush) so a dog-bite kill of a non-last enemy
+          // doesn't misalign enemyStatuses/armorShred/corruptionStacks/knockedOut.
+          const dropAt = <T,>(arr: T[] | undefined): T[] | undefined =>
+            arr ? arr.filter((_, i) => i !== targetIdx) : arr;
           const remaining = s.currentScene.enemies.filter((_, i) => i !== targetIdx);
           const remHps = s.currentScene.enemyHps.filter((_, i) => i !== targetIdx);
-          const remAmb = (s.currentScene.enemyAmbushUsed ?? []).filter((_, i) => i !== targetIdx);
           return {
             currentScene: {
               ...s.currentScene,
               enemies: remaining,
               enemyHps: remHps,
-              enemyAmbushUsed: remAmb,
+              enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
+              enemyStatuses: dropAt(s.currentScene.enemyStatuses),
+              enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
+              enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
+              enemyKnockedOut: dropAt(s.currentScene.enemyKnockedOut),
               activeEnemyIdx: Math.min(s.currentScene.activeEnemyIdx, Math.max(0, remaining.length - 1)),
               range: remaining.length > 0 ? s.currentScene.range : null,
             },

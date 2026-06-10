@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-425 "Calcium Slaking" — [audit fix #7] companion kills splice all 6 per-enemy
+  arrays** *(element #20)*. golem-kill + dog-bite-kill spliced only enemies+hps+ambush →
+  DOT/shred/corruption/KO landed on the wrong surviving foe. Now mirror
+  `resolveEnemyDefeat`'s dropAt over all six. `gameStore.ts`.
 - **OTA-424 "Potassium Saponification" — [audit fix #6] bought gear not eaten as
   substitute** *(element #19)*. `isSubstitutable` now excludes misc items whose name
   resolves to a real weapon/armor (`findWeaponByName`/`findArmorByName`) or that carry a

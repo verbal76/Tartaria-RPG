@@ -13426,4 +13426,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // weapon/armor catalog entry (findWeaponByName/findArmorByName) or that carries a coating.
 // Looted gear was already safe (stored with its real kind); raw materials never resolve
 // to a weapon/armor name, so legit substitution is unaffected. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-424';
+// OTA-425 (Calcium Slaking) — [audit fix #7] companion kills no longer desync the
+// per-enemy arrays. There are 6 index-parallel arrays (enemyHps, enemyStatuses,
+// enemyArmorShred, enemyCorruptionStacks, enemyKnockedOut, enemyAmbushUsed);
+// resolveEnemyDefeat + loot splice ALL six, but the golem-kill and dog-bite-kill paths
+// spliced only enemies+hps+ambush — so a companion killing a NON-last enemy shifted the
+// other four out of alignment, and a coating DOT / acid AC-shred / corruption stack / KO
+// flag then applied to the WRONG surviving foe. Both paths now splice all six (mirroring
+// resolveEnemyDefeat's dropAt). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-425';
