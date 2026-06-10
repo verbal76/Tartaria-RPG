@@ -14060,7 +14060,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //    (race "Immunity to Time": more likely to find the gem that cheats
     //    death, per resurrectionGemDropChance).
     // First-install seed is granted separately on hydrate (one-shot).
-    const pityHit = !enemy.boss && newKills > 0 && newKills % 50 === 0;
+    // OTA-436 — [audit #20] raise the pity interval from 50 → 100 non-boss kills.
+    // Combined with the boss-guaranteed drop and the (now halved) organic rate,
+    // a 50-kill pity gem made gems pile up faster than a careful player could
+    // ever spend them, draining death of its stakes. 100 keeps the safety net
+    // for grinders without flooding the stash.
+    const PITY_KILL_INTERVAL = 100;
+    const pityHit = !enemy.boss && newKills > 0 && newKills % PITY_KILL_INTERVAL === 0;
     const gemDropped = enemy.boss || pityHit
       || Math.random() < resurrectionGemDropChance(get().player?.raceId);
     if (gemDropped) {

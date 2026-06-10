@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-436 "Gallium Zone-Refining" — [audit fix #20] gem economy tightened** *(element #31)*.
+  Organic per-kill drop halved (0.5%→0.25%, Sentinel 1.25%→0.625%) and pity interval doubled
+  (50→100 kills, `PITY_KILL_INTERVAL`); boss-guaranteed drop + install seed untouched.
+  `raceMechanics.ts`, `gameStore.ts`. Covered by `__tests__/sentinelGemDrop.test.ts`.
 - **OTA-435 "Zinc Galvanizing" — [audit fix #24] Cores X/9 badge on the play HUD** *(element #30)*.
   New `CoresProgressBadge` in `StatsPanel.tsx` shows "◆ N/9 CORES" during the revelation→cores→
   descent arc (display-only, reads `mainQuest.coresRecovered.length`) — no more tabbing to

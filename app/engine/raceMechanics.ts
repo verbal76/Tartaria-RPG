@@ -203,11 +203,16 @@ export function raceSearchHookBonus(player: PlayerCharacter, scene: SceneContext
 
 // arb-fix — Sentinel "Immunity to Time": the one race that cheats death finds
 // more of the one thing that cheats death. Per-kill Resurrection Gem drop
-// chance is raised from the base 0.5% to 1.25% for Sentinels (still rare, and
-// install-wide). Other races keep the base rate.
-export const BASE_GEM_DROP_CHANCE = 0.005;
+// chance is raised over the base for Sentinels (still rare, and install-wide).
+// Other races keep the base rate.
+// OTA-436 — [audit #20] gem economy tightened. The base per-kill drop was 0.5%
+// and the Sentinel rate 1.25%; combined with the boss-guaranteed drop and a
+// 50-kill pity gem, a grinding character accumulated enough gems that death
+// stopped mattering. Halved to 0.25% / 0.625% so passive income roughly halves
+// while the boss-kill reward (the signature "earned" gem) is untouched.
+export const BASE_GEM_DROP_CHANCE = 0.0025;
 export function resurrectionGemDropChance(raceId: string | undefined): number {
-  if (raceId === 'architectural_sentinel') return 0.0125;
+  if (raceId === 'architectural_sentinel') return 0.00625;
   return BASE_GEM_DROP_CHANCE;
 }
 

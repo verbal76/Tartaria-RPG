@@ -17,4 +17,11 @@ describe('Sentinel Resurrection Gem drop boost', () => {
   it('the boost stays rare (well under 5% per kill)', () => {
     expect(resurrectionGemDropChance('architectural_sentinel')).toBeLessThan(0.05);
   });
+
+  // OTA-436 — [audit #20] gem economy tightened: base halved to 0.25%, Sentinel
+  // to ~0.625%, so passive gem income roughly halves and death keeps its stakes.
+  it('base + Sentinel rates are the tightened values', () => {
+    expect(BASE_GEM_DROP_CHANCE).toBe(0.0025);
+    expect(resurrectionGemDropChance('architectural_sentinel')).toBe(0.00625);
+  });
 });

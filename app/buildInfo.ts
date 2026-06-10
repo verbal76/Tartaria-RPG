@@ -13516,4 +13516,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // A new CoresProgressBadge surfaces "◆ N/9 CORES" once the player knows the Cores matter
 // (phases revelation → cores → descent) and stays hidden before the hook and after they leave
 // for the Nexus. Display-only, reads player.mainQuest.coresRecovered.length. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-435';
+// OTA-436 (Gallium Zone-Refining) — [audit fix #20] Resurrection-Gem economy tightened so death
+// keeps its stakes. Gems came from FOUR live sources stacking: a boss-guaranteed drop, a pity
+// gem every 50 non-boss kills, a 0.5% organic per-kill drop (1.25% for Sentinels), and the
+// one-shot install seed. A grinder accumulated gems faster than they could die. Two surgical
+// nerfs: the organic rate is halved (0.5%→0.25%, Sentinel 1.25%→0.625%, in raceMechanics), and
+// the pity interval doubled (50→100 kills, named PITY_KILL_INTERVAL). The boss-kill drop — the
+// signature "earned" gem — and the install seed are untouched. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-436';
