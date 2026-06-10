@@ -103,7 +103,7 @@ import { pickWastelandEncounter } from '../engine/wastelandEncounters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -12571,6 +12571,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ── SKILL CHECK ───────────────────────────────────────────────────────
     if (skill) {
       const { intent } = parseInput(actionText);
+      // OTA-455 — first-steps FLEE GRACE. Some characters spawn in a high-danger
+      // area, so we don't suppress the encounter — we keep the flee ROLL. But for
+      // the first 3 wasteland steps out of a starter outpost (recentTileHistory
+      // only reaches 1..3 that early, and never returns there once it grows), a
+      // brand-new player must never get trapped: a FAILED escape is nudged to a
+      // bare success — landed exactly on the DC, a win by one — and the Arbiter
+      // marks the near miss below. After 3 steps the roll stands on its own.
+      let fleeGraceSaved = false;
+      if (fleeGraceApplies(intent, !!skill.success, player.recentTileHistory?.length ?? 0)) {
+        skill.total = skill.target;
+        skill.success = true;
+        fleeGraceSaved = true;
+      }
       // OTA-352 — skill-check breakdown (the [debug] equivalent of the combat
       // "You — d20 → X + STR Y = Z vs AC W" line). Verifies the new stealth
       // check (and every other) fires with the right governing stat + DC.
@@ -12759,6 +12772,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set((s) => (s.currentScene
                 ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
                 : s));
+            }
+            // OTA-455 — the first-steps grace caught this one. Mark the near miss
+            // so the player feels the danger without being trapped by it.
+            if (fleeGraceSaved) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter lets out a slow breath. "You barely escaped that one. A stumble — a heartbeat's hesitation — and you'd have taken severe damage. The ground this close to where you started does not forgive twice. Get yourself some gear before you press your luck again."`,
+              );
             }
             break;
           }

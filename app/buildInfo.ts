@@ -13674,4 +13674,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // nine complete in a roughly comparable early-game window: Scrap Metal 5→3, Aether Mud 5→4, Patched
 // Cloth 6→4 (descriptions + objectives synced). The common-item fetches (Stick 6, Small/Big Rock,
 // Mud Fragment 5) are unchanged. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-454';
+// OTA-455 (Tin Cry) — [playability] first-steps FLEE GRACE. The cadence re-run flagged unlucky new
+// characters dying to a hard wasteland encounter on the first step out of the outpost. Rather than
+// suppress the encounter (some characters intentionally spawn in a high-danger area), the flee stays
+// a real DEX roll — but for the first 3 wasteland steps of a brand-new character (recentTileHistory
+// length ≤ 3, which it only reaches that early and never returns to) a FAILED escape is nudged to a
+// bare success (lands exactly on the DC — a win by one), so a green player can never be trapped at the
+// very start. The Arbiter marks the near miss ("You barely escaped that one… a stumble and you'd have
+// taken severe damage… get yourself some gear before you press your luck again."). After 3 steps the
+// roll stands on its own and a failed flee provokes the OTA-372 attack of opportunity as before.
+// Logic in combatRules.fleeGraceApplies. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-455';

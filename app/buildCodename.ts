@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-455 — [playability] first-steps flee grace: a brand-new character's failed escape is fudged to
+  // a bare win-by-one for the first 3 steps (with a "barely escaped" Arbiter line), so no green-player
+  // death-trap on step one; the flee stays a real roll after that. Element #50: Tin.
+  '2026-06-10-455': 'Tin Cry',
   // OTA-454 — [playability] balance starter-fetch quantities to item availability (Scrap Metal 5→3,
   // Aether Mud 5→4, Patched Cloth 6→4) so all nine complete in a comparable early window. Element #49: Indium.
   '2026-06-10-454': 'Indium Reflow',

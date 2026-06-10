@@ -567,6 +567,17 @@ export function parseDamageDice(notation: string): { sides: number; count: numbe
 // ─── Skill checks ────────────────────────────────────────────────────────────
 // Rulebook DC table: Easy 6 / Moderate 9 / Hard 12 / Very Hard 15
 
+/** OTA-455 — first-steps FLEE GRACE. True when a FAILED escape attempt should be
+ *  nudged to a bare success. Conditions: the 'escape' intent, the roll actually
+ *  failed, and the character is within their first 3 wasteland steps (the sliding
+ *  `recentTileHistory` window only reaches length 1..3 that early and, since it
+ *  grows monotonically to its cap, never returns to ≤3 — so this reliably means
+ *  "brand-new character"). The flee stays a real roll everywhere else. */
+export const FLEE_GRACE_STEPS = 3;
+export function fleeGraceApplies(intent: string, skillSucceeded: boolean, tilesSeen: number): boolean {
+  return intent === 'escape' && !skillSucceeded && tilesSeen <= FLEE_GRACE_STEPS;
+}
+
 const SKILL_DC: Record<string, number> = {
   stealth: 12,
   diplomacy: 15,

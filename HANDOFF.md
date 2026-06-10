@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-455 "Tin Cry" — [playability] first-steps flee grace** *(element #50)*. A brand-new character's
+  FAILED escape is fudged to a bare win-by-one for the first 3 wasteland steps (`fleeGraceApplies`,
+  `recentTileHistory ≤ 3`) with a "barely escaped" Arbiter line — no green-player death-trap on step
+  one; flee stays a real roll after. `combatRules.ts`, `gameStore.ts`. Covered by `fleeFailCounter.test.ts`.
 - **OTA-454 "Indium Reflow" — [playability] balance starter-fetch quantities** *(element #49)*. Cadence
   re-run found the starters weren't comparable (Scrap Metal Uncommon → 116 min vs Big Rock Common →
   22 min); trimmed Scrap Metal 5→3, Aether Mud 5→4, Patched Cloth 6→4. `faction-quests.json`.
