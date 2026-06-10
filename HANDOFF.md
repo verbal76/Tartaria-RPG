@@ -367,6 +367,12 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-462 "Lanthanum Exchange" — [bug] climb "already crested" fired mid-climb** *(element #57)*. The
+  CLIMB UP (n/m) button (reads live `elevatedOn`) and the climb verb (recomputed from cumulative,
+  substring-matched `climbed:` markers) desynced — a `t3` marker from a different climb fuzzy-matched
+  "broken scaffold" → verb refused as crested while the button showed (1/3). Fix: on an active climb,
+  `elevatedOn.tier/.totalTiers` is authoritative; the marker scan only governs a fresh ground climb.
+  `gameStore.ts`. Covered by `climbRopeMechanics.test.ts`.
 - **OTA-461 "Barium Flash" — [dev] one-time playtest-supply gift for "Verbal"** *(element #56)*. Loading a
   save named Verbal (case-insensitive) drops 10 First Aid Kit / 20 Trail Rations / 20 Smoke-Cured Jerky
   Strip / 20 Bioluminescent Fungus / 1 Water Bottle into the pack so crash-testing doesn't burn the

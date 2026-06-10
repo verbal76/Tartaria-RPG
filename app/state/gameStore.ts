@@ -10649,12 +10649,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const totalTiers: number = climbHeightFor(tgt);
         const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
         const climbMarks = climbRoom?.searchedAmbientNouns ?? [];
-        const maxCleared: number = maxClimbedTier(tgt, climbMarks);
+        // OTA-462 — when the player is CURRENTLY up on this climb, the live
+        // elevatedOn progress (the same source the "CLIMB UP (n/m)" button reads)
+        // is authoritative — NOT the persistent fuzzy marker scan. The climbed:
+        // markers are cumulative and never cleared, and maxClimbedTier matches by
+        // substring, so a t3 marker from a DIFFERENT already-crested climb in this
+        // room (e.g. "climbed:scaffold:t3") fuzzy-matched "broken scaffold" and
+        // reported it fully crested — firing "already crested" while the button
+        // still showed (1/3). On an active climb the two now agree; the marker scan
+        // only governs a fresh climb started from the ground.
+        const elev = currentScene.elevatedOn;
+        const onThisClimb = !!elev && (() => {
+          const a = elev.noun.toLowerCase();
+          const b = tgt.toLowerCase();
+          return a === b || a.includes(b) || b.includes(a);
+        })();
+        const effectiveTotalTiers = onThisClimb && elev ? elev.totalTiers : totalTiers;
+        const maxCleared: number = onThisClimb && elev ? elev.tier : maxClimbedTier(tgt, climbMarks);
         const currentTier = maxCleared + 1;
-        if (currentTier > totalTiers) {
+        if (currentTier > effectiveTotalTiers) {
           get().appendLog(
             'world',
-            `You've already crested the ${tgt} here. The view from the top hasn't changed since the last time you stood up there.`,
+            onThisClimb
+              ? `You're already at the top of the ${tgt}. Nothing higher to reach — climb down when you're ready.`
+              : `You've already crested the ${tgt} here. The view from the top hasn't changed since the last time you stood up there.`,
           );
           break;
         }

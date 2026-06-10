@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-462 — [bug] climb "already crested" fired mid-climb: the CLIMB UP (n/m) button reads live
+  // elevatedOn while the verb recomputed progress from cumulative, substring-matched `climbed:` markers,
+  // so a t3 marker from a different climb ("climbed:scaffold:t3") fuzzy-matched "broken scaffold" and read
+  // as fully crested. Fix: on an active climb, elevatedOn.tier/.totalTiers is authoritative. Element #57: Lanthanum.
+  '2026-06-10-462': 'Lanthanum Exchange',
   // OTA-461 — [dev] one-time playtest-supply gift for the character "Verbal" (10 First Aid Kit, 20 Trail
   // Rations, 20 Smoke-Cured Jerky Strip, 20 Bioluminescent Fungus, 1 Water Bottle) so crash-testing
   // doesn't burn the player's own consumables. Idempotent per slot (testGiftGrantedSlots). Element #56: Barium.

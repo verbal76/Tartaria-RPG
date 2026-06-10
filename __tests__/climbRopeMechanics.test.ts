@@ -213,4 +213,43 @@ describe('OTA 23-007 — climb mechanics', () => {
       expect(after.hp).toBe(10);
     });
   });
+
+  // OTA-462 — when the player is actively elevated on a climb, the live
+  // elevatedOn progress is authoritative, not the fuzzy persistent marker scan.
+  // Repro: a t3 marker from a DIFFERENT crested climb ("climbed:scaffold:t3")
+  // fuzzy-matched "broken scaffold" → maxClimbedTier said fully crested → "already
+  // crested" fired while the button still showed (1/3). On an active climb, climbing
+  // up must advance the tier, not refuse.
+  describe('OTA-462 — active climb trusts elevatedOn over fuzzy markers', () => {
+    it('climbing up from tier 1/3 advances to tier 2 despite a fuzzy-matching cleared marker', async () => {
+      const store = await setupClimber('Climbing Rope', { stamina: 10, staminaMax: 10 });
+      const p = store.getState().player!;
+      const { makeRoomKey } = require('../app/state/gameStore');
+      const roomKey = makeRoomKey(p.currentLocationId, store.getState().currentScene?.microMicroId, p.mapX, p.mapY, p.hubRoomId);
+      store.setState({
+        currentScene: {
+          ...store.getState().currentScene!,
+          ambientNouns: ['broken scaffold'],
+          // Player is up on the broken scaffold at tier 1 of 3.
+          elevatedOn: { noun: 'broken scaffold', tier: 1, totalTiers: 3 },
+        },
+        worldMemory: {
+          ...store.getState().worldMemory,
+          visitedRooms: {
+            ...(store.getState().worldMemory.visitedRooms ?? {}),
+            // A t3 marker from a different climb that fuzzy-matches "broken scaffold".
+            [roomKey]: { firstVisitAt: 1, lastVisitAt: 1, visitCount: 1, searchedAmbientNouns: ['climbed:scaffold:t3'] },
+          },
+        },
+      });
+
+      store.getState().submitPlayerAction('climb broken scaffold');
+
+      const after = store.getState();
+      const logs = after.gameLog.map((e) => e.text).join('\n');
+      // Must NOT refuse with "already crested" — and must advance the elevation.
+      expect(logs).not.toMatch(/already crested/i);
+      expect(after.currentScene?.elevatedOn?.tier).toBe(2);
+    });
+  });
 });

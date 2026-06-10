@@ -13747,4 +13747,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Bioluminescent Fungus, 1 Water Bottle. Idempotent per slot via the global-stash testGiftGrantedSlots
 // (mirrors grantDevGemOnce) — resuming the same save never restacks it. All five are uncapped
 // consumables, so nothing is clipped. No effect for any other name. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-461';
+// OTA-462 (Lanthanum Exchange) — [bug] climb "already crested" fired mid-climb (button showed CLIMB UP
+// (1/3) while the verb refused as if topped out). Two independent climb-progress sources had desynced:
+// the CLIMB UP (n/m) button reads the live currentScene.elevatedOn, while the verb recomputed progress
+// from the persistent `climbed:<noun>:tN` markers via maxClimbedTier — which are CUMULATIVE, never
+// cleared, and matched by SUBSTRING. So a t3 marker from a different already-crested climb in the same
+// room (e.g. "climbed:scaffold:t3") fuzzy-matched "broken scaffold" and reported it fully crested, while
+// the player was actually only one tier up. Fix: when the player is currently elevated on this climb
+// (elevatedOn noun matches the target), elevatedOn.tier/.totalTiers is authoritative — the verb advances
+// from there and the marker scan only governs a FRESH climb started from the ground. The two now always
+// agree. Covered by climbRopeMechanics.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-462';
