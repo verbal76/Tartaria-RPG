@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-420 "Phosphorus Oxidation" — [audit fix #2] typed enemy damage no longer 1d6**
+  *(element #15)*. 14 enemies store damage with a type word ("2D6 Psychic"); the
+  anchored `^…$` in `parseDiceNotation` failed them → 0 → 1d6 fallback. Parser now
+  matches the first `NdM(±N)` token anywhere; clean inputs identical. `engine/rng.ts`.
 - **OTA-419 "Silicon Doping" — [audit fix #1] enemy AC un-flattened** *(element #14)*.
   `enemyAC` did `parseInt(enemy.abilityPoint)` but `abilityPoint` is `"Strength 4"` →
   NaN → every enemy AC 8 / boss 14, killing stat + Core-Guardian-tier AC scaling.

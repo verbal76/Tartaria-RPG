@@ -10,7 +10,15 @@ export function rollDice(count: number, sides: number): number {
 
 export function parseDiceNotation(notation: string): { count: number; sides: number; bonus: number } | null {
   const cleaned = notation.replace(/\s+/g, '').toLowerCase();
-  const match = /^(\d+)d(\d+)([+-]\d+)?$/.exec(cleaned);
+  // OTA-420 — [audit fix #2] enemy damage is stored WITH a type word, e.g.
+  // "2D6 Psychic" / "3D8 Aetheric ×2". The old anchored ^…$ failed those (after
+  // whitespace-strip → "2d6psychic"), so rollFromNotation returned 0 and the
+  // hardest hitters silently fell back to 1d6. Match the FIRST NdM(±N) token
+  // anywhere and ignore any leading/trailing type text. Clean inputs ("2d6",
+  // "1d4") match identically; the damage-type word is parsed separately by
+  // parseIncomingDamageType, and the ×2/"twice" double-strike is handled by the
+  // caller — so dropping the junk here only fixes the dice roll.
+  const match = /(\d+)d(\d+)([+-]\d+)?/.exec(cleaned);
   if (!match) return null;
   const countStr = match[1]!;
   const sidesStr = match[2]!;

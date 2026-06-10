@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-420 — [audit #2] typed enemy damage ("2D6 Psychic") no longer collapses to 1d6;
+  // dice parser ignores the trailing type word. Element #15: Phosphorus.
+  '2026-06-10-420': 'Phosphorus Oxidation',
   // OTA-419 — [audit #1] fix enemy AC flattening (parseInt("Strength 4")→NaN→8); all
   // stat + Core-Guardian-tier AC scaling restored. Element #14: Silicon.
   '2026-06-10-419': 'Silicon Doping',

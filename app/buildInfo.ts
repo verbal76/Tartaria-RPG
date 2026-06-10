@@ -13386,4 +13386,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // thrown-attack / counter paths were fixed long ago (parseEnemyAP); enemyAC +
 // EnemyPanel's display AC were missed. Both now pull the number out of the string via
 // /\d+/ (the panel also now adds the boss +6 it was dropping). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-419';
+// OTA-420 (Phosphorus Oxidation) — [audit fix #2] typed enemy damage no longer collapses
+// to 1d6. 14 enemies store damage WITH a type word ("2D6 Psychic", "3D8 Aetheric ×2"),
+// and parseDiceNotation's anchored ^…$ failed those (after whitespace-strip →
+// "2d6psychic") → rollFromNotation returned 0 → the hardest hitters silently fell back
+// to 1d6. The parser now matches the FIRST NdM(±N) token anywhere and ignores
+// leading/trailing type text; clean notations parse identically. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-420';
