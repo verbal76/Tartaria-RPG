@@ -13451,4 +13451,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // durability band. grantItem now also refuses to merge any row where existing or incoming
 // carries instanceStats OR uniqueStats (mirrors the OTA-363 coating guard). Plain catalog
 // copies (no per-instance markers) still stack normally. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-427';
+// OTA-428 (Vanadium Aluminothermy) — [audit fix #10] Resurrection-Gem revival hardened on
+// three fronts. (a) The gem is now consumed AFTER the revived save durably lands (saveSlot
+// then addResurrectionGems(-1)); pre-OTA the decrement ran first, so a failed/half-written
+// save burned the gem AND left the run dead. (b) The character wakes at the BACKFILLED
+// hpMax rather than the raw saved.hpMax — a stale/missing stored max (old saves, gear-HP
+// not yet baked) no longer revives them at the wrong cap. (c) A markSlotLoadStart crash
+// breadcrumb now wraps the rehydrate (mirroring loadSlotIntoGame): a native crash mid-
+// revive flags the slot for Retry/Delete instead of an instant re-crash; cleared on clean
+// completion, and a JS-caught error surfaces slotLoadError without charging the gem.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-428';

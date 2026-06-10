@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-428 — [audit #10] Resurrection-Gem revival: spend gem only after the save lands,
+  // wake at backfilled hpMax, and wrap rehydrate in a load-crash breadcrumb. Element #23: Vanadium.
+  '2026-06-10-428': 'Vanadium Aluminothermy',
   // OTA-427 — [audit #9] per-instance gear (instanceStats / fused uniqueStats) never stacks,
   // so a rolled copy no longer drops its temper-driven durability+perks. Element #22: Titanium.
   '2026-06-10-427': 'Titanium Sponging',

@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-428 "Vanadium Aluminothermy" — [audit fix #10] Resurrection-Gem revival hardened**
+  *(element #23)*. (a) spend the gem only after the revived save lands (no save → no spend);
+  (b) wake at backfilled `hpMax` not the raw saved one; (c) wrap rehydrate in a
+  `markSlotLoadStart` crash breadcrumb so a native crash mid-revive flags Retry/Delete.
+  `gameStore.ts`. Covered by `__tests__/resurrectSlotGemSafety.test.ts`.
 - **OTA-427 "Titanium Sponging" — [audit fix #9] per-instance gear never stacks away its
   rolled stats** *(element #22)*. `grantItem` merge key ignored `instanceStats`
   (temper-rolled durability/perks) and `uniqueStats` (fused), so two same-name rolled copies

@@ -3315,42 +3315,74 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const saved = await loadSlot(slotId);
     if (!saved || !saved.player || saved.player.dead !== true) return false;
 
-    // Consume one gem from the install-wide stash first. If the write
-    // fails, we abort before mutating the save.
-    const remainingGems = await addResurrectionGems(-1);
-
+    // OTA-428 — backfill the saved player FIRST and revive to the BACKFILLED
+    // hpMax, not the raw saved one. A cross-version or interrupted-death save
+    // can carry a stale/missing hpMax (older saves, or gear-HP not yet baked
+    // into the stored number); backfillPlayer is the canonical normalization
+    // the regular load path runs, so the revived character wakes at the max the
+    // rest of the engine agrees on rather than whatever sat in the dead save.
+    const backfilled = backfillPlayer(saved.player);
     const revived: PlayerCharacter = {
-      ...backfillPlayer(saved.player),
+      ...backfilled,
       dead: false,
-      hp: saved.player.hpMax,
-      stamina: saved.player.staminaMax ?? saved.player.stamina,
+      hp: backfilled.hpMax,
+      stamina: backfilled.staminaMax ?? backfilled.stamina,
     };
-    await saveSlot(slotId, { ...saved, player: revived });
-    await setActiveSlot(slotId);
-    set({
-      player: revived,
-      worldMemory: saved.worldMemory,
-      gameLog: saved.gameLog,
-      currentScreen: 'exploration',
-      activeSlotId: slotId,
-      resurrectionGems: remainingGems,
-      currentScene: null,
-      pendingRolls: null,
-  pendingHookContinue: null,
-      wastelandStepsSinceEncounter: 0,
-      stepsSinceCombat: 0,
-    });
-    get().beginScene();
-    get().appendLog(
-      'reward',
-      `✦ Resurrection. ${revived.name} returns to Tartaria, restored. The Aetherstone hums in recognition.`,
-    );
-    recordMemorableEvent(get, set, {
-      kind: 'death_revive',
-      text: `returned from death by a Resurrection Gem`,
-    });
-    await get().refreshSlots();
-    return true;
+
+    // OTA-428 — drop the load-crash breadcrumb BEFORE touching the live scene.
+    // Resurrection rehydrates a (possibly stale cross-version) save and runs
+    // beginScene exactly like loadSlotIntoGame; if that drives native code into
+    // a SIGSEGV/SIGABRT the breadcrumb survives so the next boot offers
+    // Retry/Delete instead of an instant re-crash. Cleared on clean completion.
+    await markSlotLoadStart(slotId);
+    try {
+      // OTA-428 — persist the revived character, THEN consume the gem. Ordered
+      // so a failed/half-written save never costs the player their gem while
+      // still leaving them dead: no save lands, no gem spent. (Pre-OTA the gem
+      // was decremented first, so a save failure burned the gem AND the run.)
+      await saveSlot(slotId, { ...saved, player: revived });
+      const remainingGems = await addResurrectionGems(-1);
+      await setActiveSlot(slotId);
+      set({
+        player: revived,
+        worldMemory: saved.worldMemory,
+        gameLog: saved.gameLog,
+        currentScreen: 'exploration',
+        activeSlotId: slotId,
+        resurrectionGems: remainingGems,
+        currentScene: null,
+        pendingRolls: null,
+        pendingHookContinue: null,
+        wastelandStepsSinceEncounter: 0,
+        stepsSinceCombat: 0,
+      });
+      get().beginScene();
+      get().appendLog(
+        'reward',
+        `✦ Resurrection. ${revived.name} returns to Tartaria, restored. The Aetherstone hums in recognition.`,
+      );
+      recordMemorableEvent(get, set, {
+        kind: 'death_revive',
+        text: `returned from death by a Resurrection Gem`,
+      });
+      // Clean completion — drop the breadcrumb and clear any prior crash flag
+      // on this slot (it loads fine now).
+      await markSlotLoadDone();
+      try {
+        const remaining = await clearSlotCrash(slotId);
+        set({ crashedSlotIds: remaining });
+      } catch { /* best-effort — flag clears on next boot regardless */ }
+      await get().refreshSlots();
+      return true;
+    } catch (err) {
+      // A JS-caught error is NOT a native crash — clear the breadcrumb so it
+      // isn't counted as one next boot. The gem is only spent after the save
+      // lands, so an early throw here has not charged the player.
+      await markSlotLoadDone();
+      const msg = err instanceof Error ? err.message : String(err);
+      set({ slotLoadError: `Failed to resurrect character: ${msg}` });
+      return false;
+    }
   },
 
   async deleteSlotById(slotId) {
