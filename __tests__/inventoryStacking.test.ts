@@ -206,3 +206,34 @@ describe('mergeOrPushItem — per-instance gear stays separate', () => {
     expect(out[0]!.quantity).toBe(2);
   });
 });
+
+// ---------------------------------------------------------------------------
+// OTA-441 — generous caps on flood-prone junk commodities (audit #26)
+// ---------------------------------------------------------------------------
+
+import { capacityFor, grantItem } from '../app/engine/inventory';
+
+describe('OTA-441 — junk-commodity caps bound the forage flood', () => {
+  it('caps Small Rock / Big Rock / Stick, leaves real items uncapped', () => {
+    expect(capacityFor('Small Rock')).toBe(60);
+    expect(capacityFor('Big Rock')).toBe(40);
+    expect(capacityFor('Stick')).toBe(60);
+    // Anything meaningful is uncapped.
+    expect(capacityFor('Aether Dust')).toBe(Infinity);
+    expect(capacityFor('Iron Axe')).toBe(Infinity);
+  });
+
+  it('grantItem declines the overflow once a junk cap is reached', () => {
+    const inv = [makeItem({ name: 'Small Rock', kind: 'misc', quantity: 58 })];
+    const r = grantItem(inv, makeItem({ name: 'Small Rock', kind: 'misc', quantity: 10 }));
+    // Only 2 of the 10 fit (58 → cap 60); the rest are dropped.
+    expect(r.accepted).toBe(2);
+    expect(r.dropped).toBe(8);
+    expect(r.inventory[0]!.quantity).toBe(60);
+  });
+
+  it('the cap is far above any recipe need (never bites normal play)', () => {
+    // No recipe needs more than 3 of any junk item; the cap is >= 40.
+    expect(capacityFor('Small Rock')).toBeGreaterThanOrEqual(40);
+  });
+});

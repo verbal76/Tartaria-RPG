@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-441 — [audit #26 pt1] generous caps on flood-prone junk (Small/Big Rock, Stick) bound the
+  // unbounded forage hoard; per-action O(n²) clone refactor deferred (see notes). Element #36: Krypton.
+  '2026-06-10-441': 'Krypton Fractionation',
   // OTA-440 — [audit #25] one-time in-feed warning when the save blob crosses 70% of budget,
   // before the silent auto-trim starts shedding rooms/scene. Element #35: Bromine.
   '2026-06-10-440': 'Bromine Debromination',

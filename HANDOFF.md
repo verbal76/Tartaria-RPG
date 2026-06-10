@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-441 "Krypton Fractionation" — [audit fix #26 pt1] bound inventory growth** *(element #36)*.
+  Generous `ITEM_CAPS` for flood junk (Small Rock 60, Big Rock 40, Stick 60); meaningful items
+  uncapped. Row-generating farms bounded by OTA-437/438. **Deferred:** the per-action O(n²)
+  immutable-clone refactor (~118 `set()` sites) — too cross-cutting to rush; save-bloat harm
+  already mitigated by OTA-440. `inventory.ts`. Covered by `__tests__/inventoryStacking.test.ts`.
 - **OTA-440 "Bromine Debromination" — [audit fix #25] proactive save-size warning** *(element #35)*.
   `persist()` surfaces a one-time in-feed heads-up when the pre-trim blob crosses 70% of
   `SAFE_BLOB_CHARS`, before the silent auto-trim sheds rooms/scene; module-level session flag,

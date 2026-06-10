@@ -13554,4 +13554,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // first time the PRE-trim blob crosses 70% of the budget, advising the player to scrap/sell junk.
 // Light hysteresis (re-arms under 55%) lets a genuine later regrowth warn again. Session-scoped
 // flag (module-level, not persisted). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-440';
+// OTA-441 (Krypton Fractionation) — [audit fix #26, part 1 of 2] bound the unbounded inventory
+// growth. The pack has no encumbrance by design, but the three highest-weight forage drops
+// (Small Rock / Big Rock / Stick) could be stacked into the tens of thousands. No recipe needs
+// more than 3 of any junk item, so the deliberately-kept ITEM_CAPS infra is repopulated with
+// GENEROUS caps (Small Rock 60, Big Rock 40, Stick 60 — 20–60× any real use); grantItem cleanly
+// declines the overflow and the search handler already narrates "your pack is already full of
+// them." Everything meaningful stays uncapped. The row-generating farm vectors are separately
+// bounded by OTA-437/438. NOTE: the per-action O(n²) immutable-clone (the other half of audit
+// #26) is a cross-cutting refactor across ~118 set() sites and is intentionally DEFERRED rather
+// than rushed; its practical save-bloat harm is already mitigated by OTA-440. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-441';

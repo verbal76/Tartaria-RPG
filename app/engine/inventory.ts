@@ -1,16 +1,25 @@
 import type { InventoryItem } from './types';
 
-// The pack has NO carrying limit — every item stacks without bound, and
-// there is no total weight / slot / encumbrance system anywhere.
+// The pack has no weight / slot / encumbrance system — meaningful gear, loot,
+// and quest items stack without bound, and a full pack is never a constraint on
+// real play. The table below (kept deliberately alongside capacityFor() +
+// grantItem()'s accepted/dropped plumbing) re-introduces GENEROUS caps for the
+// three flood-prone improvised commodities only.
 //
-// A few improvised items (Small Rock, Big Rock, Stick) used to have small
-// per-name caps, but since nothing else was ever capped the pack had no
-// real limit anyway, and the "pack too full / upgrade" messaging promised a
-// capacity-upgrade system that was never built. Per design decision the
-// caps are removed: a full pack is never a constraint. The table is kept
-// (empty) alongside capacityFor() + grantItem()'s accepted/dropped plumbing
-// so re-introducing a genuine, intentional cap later is a one-line change.
-const ITEM_CAPS: Record<string, number> = {};
+// OTA-441 — [audit #26] bound the one trivially-abusable unbounded-growth vector.
+// Small Rock / Big Rock / Stick are the highest-weight forage drops (areaSearch
+// SMALL_FINDS), so a forage-farmer could stack tens of thousands of them. No
+// recipe needs more than 3 of any junk item, so caps of 40–60 are ~20–60× above
+// any genuine use — invisible to a normal player, while grantItem cleanly
+// declines the overflow (the search handler already narrates "your pack is
+// already full of them"). Everything else stays uncapped (Infinity). The
+// row-generating farm vectors (repeat-forage, oscillation encounters) are
+// separately bounded by OTA-437 / OTA-438.
+const ITEM_CAPS: Record<string, number> = {
+  'small rock': 60,
+  'big rock': 40,
+  'stick': 60,
+};
 
 export function capacityFor(itemName: string): number {
   return ITEM_CAPS[itemName.toLowerCase()] ?? Infinity;
