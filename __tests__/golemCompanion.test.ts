@@ -234,4 +234,43 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(after.hp).toBeLessThanOrEqual(10000 - 8);
     });
   });
+
+  // OTA-449 — a COMPANION killing blow routes through resolveEnemyDefeat, so
+  // loot / TC / kill-milestone (and, for bosses, the Core/gem/quest grants) fire
+  // regardless of who lands the final hit. Pre-OTA a golem-killed foe vanished
+  // with no reward.
+  describe('OTA-449 — golem kill grants the same rewards as a player kill', () => {
+    it('a golem killing the last enemy awards loot, TC, and a kill milestone', async () => {
+      const store = await bootstrap();
+      const p0 = store.getState().player!;
+      // Guaranteed-hit, lethal golem.
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hitBonus: 30, attackMod: 50, hp: 500, hpMax: 500 };
+      // A 1-HP foe with low AC (so the golem always connects) and real loot.
+      const enemy = {
+        name: 'Sentinel Husk', damage: '1d6', abilityPoint: 'Strength 0',
+        hp: 1, type: 'construct', loot: ['Scrap Metal'], rarity: 'Common', traits: [],
+      };
+      const scene = store.getState().currentScene!;
+      const tcBefore = p0.tc;
+      const killsBefore = p0.milestones?.enemiesDefeated ?? 0;
+      store.setState({
+        player: { ...p0, golem },
+        currentScene: {
+          ...scene, enemies: [enemy as never], enemyHps: [1], activeEnemyIdx: 0,
+          range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
+        },
+      });
+
+      await store.getState().submitPlayerAction('golem attack');
+
+      const after = store.getState();
+      // Enemy resolved out + combat ended.
+      expect(after.currentScene!.enemies.length).toBe(0);
+      // resolveEnemyDefeat fired: kill counted, TC awarded, defeat/loot logged.
+      expect((after.player!.milestones?.enemiesDefeated ?? 0)).toBe(killsBefore + 1);
+      expect(after.player!.tc).toBeGreaterThan(tcBefore);
+      const log = after.gameLog.map((l) => l.text).join('\n');
+      expect(log).toMatch(/Sentinel Husk defeated\. You recover/);
+    });
+  });
 });

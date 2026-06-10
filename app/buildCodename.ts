@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-449 — [playability/bug] companion (golem/dog) killing blows route through resolveEnemyDefeat,
+  // so loot/TC/Core-Guardian Core+gear+gem+quest-advance fire no matter who lands the last hit. Element #44: Ruthenium.
+  '2026-06-10-449': 'Ruthenium Plating',
   // OTA-448 — [playability] first Core Guardian eased to a straightforward (not easy) win for a
   // kitted player (AC 17→14, T1 hp eased); AC ramps monotonically, T7–T9 hardness preserved. Element #43: Technetium.
   '2026-06-10-448': 'Technetium Eluting',

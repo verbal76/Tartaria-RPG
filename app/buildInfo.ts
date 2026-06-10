@@ -13626,4 +13626,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // HP, all damage dice, counters, and trait layering are unchanged. The Guardians still have teeth and
 // the late game stays demanding — only the entry wall is lowered to match the intended "by now you
 // have gear + a dog + a golem" power level. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-448';
+// OTA-449 (Ruthenium Plating) — [playability/bug] companion killing blows now grant rewards. A
+// cadence-sim playthrough caught it: when the GOLEM (or the DOG) lands the final hit, the kill ran
+// through handleGolemCommand / the dog-bite path, which manually spliced the enemy out of the scene
+// and returned — NEVER calling resolveEnemyDefeat. So a companion-killed foe dropped no loot, no TC,
+// no kill-milestone — and, catastrophically, a companion-killed CORE GUARDIAN vanished with no Core,
+// no signature gear, no Resurrection Gem, and no main-quest phase advance: the player "won" the fight
+// but lost the entire reward + progression. Now amplified by the golem buffs (OTA-433/443/444), since
+// the intended Guardian kit IS a golem. Both companion-kill paths now point the active index at the
+// target and call resolveEnemyDefeat (a pure resolver — no recursion), so every grant fires no matter
+// who lands the last hit; rescue-captor completion routes through it too. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-449';

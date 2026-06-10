@@ -23219,44 +23219,20 @@ function handleGolemCommand(
       `${golem.name} lands ${dmg} ${golem.damageType} damage on ${target.name}. (${newEnemyHp} HP left)`,
     );
     if (newEnemyHp <= 0) {
-      // 2026-05-25 — splice all parallel arrays in lockstep, mirror
-      // resolveEnemyDefeat (gameStore.ts:8112). Failing to also
-      // splice enemyHps + enemyAmbushUsed + reset activeEnemyIdx
-      // corrupts the next combat round (player attack reads
-      // enemies[1] which is undefined → crash on enemy.name).
+      // OTA-449 — route the COMPANION killing blow through resolveEnemyDefeat,
+      // the SAME path a player kill uses, so loot / TC / Core-Guardian Core +
+      // signature gear / resurrection gem / hunt + faction-quest advance / kill
+      // milestone / titles all fire regardless of who lands the final hit.
+      // Pre-OTA this path manually spliced the enemy out and returned — so a
+      // golem that killed a Core Guardian made it VANISH with no Core, no gear,
+      // no gem, no main-quest advance: the player "won" but lost the entire
+      // reward + progression. resolveEnemyDefeat is a pure resolver (no recursive
+      // submitPlayerAction), splices all six per-enemy arrays, awards, and
+      // persists; we just point the active index at the golem's target first.
       get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
-      set((s) => {
-        if (!s.currentScene) return s;
-        // OTA-425 — [audit fix #7] splice ALL six per-enemy arrays in lockstep,
-        // not just enemies+hps+ambush. Missing enemyStatuses/armorShred/
-        // corruptionStacks/knockedOut meant a companion kill of a NON-last enemy
-        // shifted those out of alignment with enemies[] — a coating DOT, acid AC-
-        // shred, corruption stack, or KO flag then applied to the wrong surviving
-        // foe. Mirrors resolveEnemyDefeat's dropAt.
-        const dropAt = <T,>(arr: T[] | undefined): T[] | undefined =>
-          arr ? arr.filter((_, i) => i !== targetIdx) : arr;
-        const remainingEnemies = s.currentScene.enemies.filter((_, i) => i !== targetIdx);
-        const remainingHps = s.currentScene.enemyHps.filter((_, i) => i !== targetIdx);
-        const nextActiveIdx = remainingEnemies.length > 0
-          ? Math.min(s.currentScene.activeEnemyIdx, remainingEnemies.length - 1)
-          : 0;
-        return {
-          currentScene: {
-            ...s.currentScene,
-            enemies: remainingEnemies,
-            enemyHps: remainingHps,
-            enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
-            enemyStatuses: dropAt(s.currentScene.enemyStatuses),
-            enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
-            enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
-            enemyKnockedOut: dropAt(s.currentScene.enemyKnockedOut),
-            activeEnemyIdx: nextActiveIdx,
-            range: remainingEnemies.length > 0 ? s.currentScene.range : null,
-          },
-        };
-      });
       set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
-      void get().persist();
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: targetIdx } } : s));
+      get().resolveEnemyDefeat();
       return;
     }
     set((s) => s.currentScene
@@ -23689,40 +23665,18 @@ function handleDogCombat(
         );
       }
       if (newHp <= 0) {
-        // Kill — splice via resolveEnemyDefeat path; reuse internal logic
-        // by calling get().resolveEnemyDefeat()? It expects activeEnemyIdx
-        // to be set. We mirror the splice manually here to avoid recursive
-        // submitPlayerAction.
-        set((s) => {
-          if (!s.currentScene) return s;
-          // OTA-425 — [audit fix #7] splice ALL six per-enemy arrays in lockstep
-          // (was only enemies+hps+ambush) so a dog-bite kill of a non-last enemy
-          // doesn't misalign enemyStatuses/armorShred/corruptionStacks/knockedOut.
-          const dropAt = <T,>(arr: T[] | undefined): T[] | undefined =>
-            arr ? arr.filter((_, i) => i !== targetIdx) : arr;
-          const remaining = s.currentScene.enemies.filter((_, i) => i !== targetIdx);
-          const remHps = s.currentScene.enemyHps.filter((_, i) => i !== targetIdx);
-          return {
-            currentScene: {
-              ...s.currentScene,
-              enemies: remaining,
-              enemyHps: remHps,
-              enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
-              enemyStatuses: dropAt(s.currentScene.enemyStatuses),
-              enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
-              enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
-              enemyKnockedOut: dropAt(s.currentScene.enemyKnockedOut),
-              activeEnemyIdx: Math.min(s.currentScene.activeEnemyIdx, Math.max(0, remaining.length - 1)),
-              range: remaining.length > 0 ? s.currentScene.range : null,
-            },
-          };
-        });
+        // OTA-449 — route the dog's killing blow through resolveEnemyDefeat (a
+        // pure resolver — no recursive submitPlayerAction, despite the old worry
+        // noted here), the SAME path a player kill uses, so loot / TC / boss +
+        // Core-Guardian rewards / hunt + faction-quest advance / kill milestone /
+        // rescue-scenario completion all fire when the DOG lands the final hit.
+        // Pre-OTA the dog-bite kill manually spliced + returned, so a dog that
+        // killed a boss or Core Guardian dropped nothing and advanced no quest.
+        // (resolveEnemyDefeat handles the factionNeutralFight rescue completion
+        // itself, so we no longer call completeRescueScenario here.)
         get().appendLog('world', `${target.name} falls under ${dog.name}'s jaws.`);
-        // OTA-120 — rescue completion. If this was a rescue captor,
-        // trigger the onboarding.
-        if (target.factionNeutralFight) {
-          completeRescueScenario(get, set);
-        }
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: targetIdx } } : s));
+        get().resolveEnemyDefeat();
         return;
       }
     } else {
