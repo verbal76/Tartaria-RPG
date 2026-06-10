@@ -3820,6 +3820,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // vendor-turned-enemy — falls). Roadside traders are unaffected
     // (random + unnamed; can't be in defeatedEnemies meaningfully).
     const defeatedSet = new Set(get().worldMemory.defeatedEnemies ?? []);
+    // OTA-411 — is this peaceful scene a core/lost capital the player is standing
+    // in? A capital ALWAYS greets the arriving player with a named vendor, so it
+    // must take precedence over the 25% roadside roll (player: "begin scene at
+    // capital should ALWAYS get a named vendor"). The summon (Core Guardian) chip
+    // draws at exactly these LOST_CAPITAL_LOCATIONS.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const atCoreCapital = !opts?.isOpening && !hasEnemies && !hubRoom
+      && !!player?.currentLocationId
+      && (require('../engine/mainQuest').LOST_CAPITAL_LOCATIONS as readonly string[]).includes(player.currentLocationId);
     const vendor: VendorInstance | null = ((): VendorInstance | null => {
       let base: VendorInstance | null = opts?.isOpening
         ? null
@@ -3827,26 +3836,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? (defeatedSet.has(hubRoom.anchorNpc)
               ? null
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
-          : (!hasEnemies && !hubRoom && Math.random() < 0.25 ? pickRoadsideTrader() : null);
-      // OTA-410 — a core/lost capital ALWAYS greets the arriving player with a
-      // NAMED vendor (RNG-rolled which one), unless one already took the slot
-      // (a hub anchor) or the scene is hostile / the opening scene. Player ask:
-      // "I hit a core capital and wasn't greeted with a Vendor — as soon as the
-      // summon button is drawn, a vendor should appear; RNG roll which named
-      // vendor arrives." The SUMMON (Core Guardian) chip surfaces at exactly
-      // these LOST_CAPITAL_LOCATIONS, so the vendor lands the moment that button
-      // is drawn. A random non-defeated VENDORS entry is chosen each arrival
-      // (re-roll on re-entry is intended). Filtered against defeatedEnemies so a
-      // vendor the player killed doesn't walk back in.
-      if (!base && !opts?.isOpening && !hasEnemies && player?.currentLocationId) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const capList: readonly string[] = require('../engine/mainQuest').LOST_CAPITAL_LOCATIONS;
-        if (capList.includes(player.currentLocationId)) {
-          const candidates = VENDORS.filter((v) => !defeatedSet.has(v.name));
-          if (candidates.length > 0) {
-            const pickName = candidates[Math.floor(Math.random() * candidates.length)]!.name;
-            base = findVendorByName(pickName) ?? null;
-          }
+          // OTA-411 — a capital never falls to the 25% roadside roll; it always
+          // gets a NAMED vendor below. Only NON-capital outdoor tiles roll roadside.
+          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < 0.25 ? pickRoadsideTrader() : null);
+      // OTA-410/411 — capital named-vendor greeting. RNG-rolled which non-defeated
+      // VENDORS entry arrives, re-rolled each arrival (intended). Always fires at a
+      // capital (the roadside roll above is suppressed there), so a capital begin-
+      // scene ALWAYS lands a named vendor unless they've all been killed.
+      if (!base && atCoreCapital) {
+        const candidates = VENDORS.filter((v) => !defeatedSet.has(v.name));
+        if (candidates.length > 0) {
+          const pickName = candidates[Math.floor(Math.random() * candidates.length)]!.name;
+          base = findVendorByName(pickName) ?? null;
         }
       }
       // arb104 — the outpost Armory stocks the player's OWN faction's named
@@ -4193,6 +4194,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           sceneAmbientNouns = ambientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
           sceneDisplayedNouns = displayedAmbientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
         }
+      }
+    }
+    // OTA-411 — pin the "core" noun at an UNRECOVERED core capital so the mission
+    // objective is actually VISIBLE in look-around + the take/salvage chip menus,
+    // instead of being buried in the location's huge ambient pool where it almost
+    // never lands in the displayed-5. Player: "the core itself is a mission item, I
+    // should be able to see it in take or salvage menus." Interacting with it still
+    // routes through the Core gate (the faction gate verb summons the Guardian; any
+    // other verb gets the "that is the Tartarian Core — try the right approach"
+    // nudge), so pinning it only makes the objective discoverable, never bypasses
+    // the gate. Cleared once this capital's Core is recovered.
+    if (atCoreCapital) {
+      const mqState = get().player?.mainQuest;
+      const coreUnrecovered = !!mqState
+        && (mqState.phase === 'revelation' || mqState.phase === 'cores')
+        && !(mqState.coresRecovered ?? []).includes(player!.currentLocationId);
+      if (coreUnrecovered) {
+        sceneAmbientNouns = Array.from(new Set(['core', ...sceneAmbientNouns]));
+        sceneDisplayedNouns = Array.from(new Set(['core', ...sceneDisplayedNouns]));
       }
     }
     // microMicroId was resolved at the top of beginScene so the

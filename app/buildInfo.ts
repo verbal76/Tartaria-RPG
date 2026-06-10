@@ -13292,4 +13292,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // non-defeated VENDORS entry via findVendorByName — landing a named vendor the moment
 // the summon button is drawn. Re-rolls on re-entry (intended); defeated vendors are
 // filtered out. The existing non-anchor arrival narration + banner surface it. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-410';
+// OTA-411 (Carbon Pyrolysis) — capital vendor ALWAYS fires + pin the "core" noun.
+// (1) Player: "begin scene at capital should ALWAYS get a named vendor." OTA-410 only
+// fired when no vendor was already assigned, so the 25% roadside roll could win the
+// slot first (~25% of capital arrivals got a roadside trader instead of a named one).
+// Now a capital is excluded from the roadside roll entirely and always lands a named
+// vendor (unless every vendor's been killed). (2) Player: "the core itself is a mission
+// item, I should be able to see it in take or salvage menus." The "core" noun lives in
+// the capital's huge ambient pool and almost never lands in the displayed-5, so it was
+// invisible. beginScene now PINS "core" into the visible noun set at an UNRECOVERED
+// core capital (revelation/cores phase, not yet recovered), so it shows in look-around
+// + the take/salvage chips. Interacting still routes through the Core gate (faction
+// gate verb summons the Guardian; any other verb gets the nudge) — pinning only makes
+// the objective discoverable, never bypasses the gate. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-411';

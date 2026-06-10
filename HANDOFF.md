@@ -367,6 +367,17 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-411 "Carbon Pyrolysis" — capital vendor ALWAYS fires + pin the "core" noun**
+  *(element #6)*. (1) "begin scene at capital should ALWAYS get a named vendor": OTA-410
+  only fired when the slot was empty, so the 25% roadside roll could win first — a
+  capital is now excluded from the roadside roll and always lands a named vendor. (2)
+  "the core itself is a mission item, I should be able to see it in take or salvage
+  menus": `"core"` was buried in the capital's huge ambient pool; `beginScene` now PINS
+  it into the visible noun set at an unrecovered core capital so it shows in look + the
+  take/salvage chips. Interacting still routes through the Core gate (gate verb summons
+  the Guardian; other verbs get the nudge) — pinning never bypasses the gate. **City =
+  ONE tile** (the map-center anchor; a cardinal step leaves it into wilderness).
+  `gameStore.ts`.
 - **OTA-410 "Boron Crystallization" — a core capital always greets you with a named
   vendor (RNG-rolled)** *(element #5)*. Player: "I hit a core capital and wasn't greeted
   with a Vendor — as soon as the summon button is drawn, a vendor should appear; RNG
