@@ -13203,4 +13203,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // confirm the DOT landed or see how long it ticks. ExplorationScreen now threads
 // enemyStatuses[i] into each EnemyView; EnemyCard renders one badge per status
 // ("POISON · 3t left · 5/turn") with a per-kind accent color. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-402';
+// OTA-403 (Devilwood Anvil) — MANUAL weapon-coating damage roll. Player ask: "make
+// the dice roll manual … I never get a roll for the acid damage." The coating's
+// bonus dice were rolled INTERNALLY inside concludeRolls (rollFromNotation), so the
+// player never got a dice prompt for it. buildCombatSteps now appends a 4th
+// 'coating' RollStep (parsed from coating.dice) when the swinging weapon instance
+// is coated — picked from the SAME hand concludeRolls reads (usedOffHandForDmg) so
+// the rolled value lands on the right instance. It's hit-gated (resolveRollStep
+// skips both damage AND coating on a miss, via a skip-loop); concludeRolls prefers
+// the player's rolled total and only falls back to an internal roll for legacy
+// paths. The DiceRoller renders it generically (no target → bonus-damage card).
+// The elemental type/trait modifier still applies to the rolled total. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-403';

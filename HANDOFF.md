@@ -343,6 +343,17 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-403 "Devilwood Anvil" — manual weapon-coating damage roll.** Player ask:
+  "make the dice roll manual … I never get a roll for the acid damage." The
+  coating's bonus dice were rolled **internally** in `concludeRolls`
+  (`rollFromNotation`), so no prompt. `buildCombatSteps` now appends a 4th
+  **`coating`** `RollStep` (from `coating.dice`) when the swinging weapon instance is
+  coated — same hand `concludeRolls` reads (`usedOffHandForDmg`) so it lands on the
+  right instance. **Hit-gated:** `resolveRollStep` skips **both** damage + coating on
+  a miss (skip-loop). `concludeRolls` prefers the rolled total, falls back to an
+  internal roll only for legacy paths. `DiceRoller` renders it generically; the
+  elemental type/trait modifier still applies to the rolled total.
+  `combatRules.ts`, `gameStore.ts`; `weaponCoatingCombat.test.ts` (+1).
 - **OTA-402 "Fringetree Anvil" — enemy panel shows coating/DOT statuses + turns
   left.** Player ask: "it should show in the enemy info area it is applied and for
   how many turns of combat left it has." The scene already tracked per-enemy

@@ -437,7 +437,24 @@ export function buildCombatSteps(
   // bonuses on the SAME swing — the player's first attack after
   // the dog distracts gets initiative +1 AND attack +2.
   const distractBonus = (player.statusEffects ?? []).some((e) => e.kind === 'distracted') ? 1 : 0;
-  return [
+  // OTA-403 — manual weapon-coating damage roll. If the swinging weapon
+  // instance carries a coating, append a 4th 'coating' step so the player
+  // ROLLS the coating's bonus damage themselves (it was auto-rolled inside
+  // concludeRolls before — "I never get a roll for the acid damage").
+  // The hand picked here MUST match the one concludeRolls reads
+  // (usedOffHandForDmg = same `\boff[- ]?hand\b` test → same slot id), so
+  // the rolled value lands on the same instance. The step is hit-gated
+  // (skipped on a miss) and the elemental type/trait modifier is still
+  // applied to the rolled total in concludeRolls.
+  const coatSlotId = forcesBarehand
+    ? null
+    : prefersOff
+      ? (player.equipped?.offId ?? null)
+      : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
+  const coatInst = coatSlotId ? (player.inventory ?? []).find((i) => i.id === coatSlotId) : null;
+  const coating = coatInst?.coating ?? null;
+
+  const steps: RollStep[] = [
     {
       id: 'initiative',
       label: 'Roll for INITIATIVE',
@@ -511,6 +528,22 @@ export function buildCombatSteps(
       // no target — always applies if the attack hit
     },
   ];
+
+  if (coating) {
+    const cd = parseDamageDice(coating.dice);
+    steps.push({
+      id: 'coating',
+      label: `Roll for ${coating.label.toUpperCase()} COATING`,
+      sides: cd.sides,
+      count: cd.count,
+      bonus: 0,
+      bonusLabel: '',
+      context: `${coating.label} coating — extra ${coating.kind} damage to ${enemy.name}`,
+      // no target — bonus damage that applies whenever the strike landed
+    });
+  }
+
+  return steps;
 }
 
 // Parse a damage notation string like "2d6" or "1d10+1d6" into a single

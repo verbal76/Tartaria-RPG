@@ -12148,13 +12148,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Skip damage roll if attack missed. Double damage dice on crit
     // so the follow-up roll naturally produces the bigger number.
+    // OTA-403 — the coating step (manual coating-damage roll) is
+    // hit-gated the same way: when the attack missed, skip BOTH the
+    // damage and the trailing coating step (a coating only bites on a
+    // landed strike). The skip is a loop so it walks past every
+    // hit-gated step, not just the immediate next one.
     let nextIdx = idx + 1;
+    const attackStep = updatedSteps.find((s) => s.id === 'attack');
+    while (
+      nextIdx < updatedSteps.length
+      && attackStep?.success === false
+      && (updatedSteps[nextIdx]?.id === 'damage' || updatedSteps[nextIdx]?.id === 'coating')
+    ) {
+      nextIdx++;
+    }
     if (nextIdx < updatedSteps.length) {
       const nextStep = updatedSteps[nextIdx];
-      const attackStep = updatedSteps.find((s) => s.id === 'attack');
-      if (nextStep?.id === 'damage' && attackStep?.success === false) {
-        nextIdx++;
-      } else if (nextStep?.id === 'damage' && attackStep?.critical) {
+      if (nextStep?.id === 'damage' && attackStep?.critical) {
         updatedSteps[nextIdx] = {
           ...nextStep,
           count: nextStep.count * 2,
@@ -12980,7 +12990,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const coatInst = coatSlotId ? player.inventory.find((i) => i.id === coatSlotId) : null;
         const coating = coatInst?.coating;
         if (coating) {
-          const rawRolled = Math.max(1, rollFromNotation(coating.dice));
+          // OTA-403 — prefer the player's MANUAL coating roll (the new
+          // 'coating' RollStep) when present; fall back to an internal
+          // roll only for legacy paths that didn't stage the step.
+          const coatingStep = steps.find((s) => s.id === 'coating');
+          const rawRolled = coatingStep?.total != null
+            ? Math.max(1, coatingStep.total)
+            : Math.max(1, rollFromNotation(coating.dice));
           // OTA-386/387 — ELEMENTAL coatings (electrical, burn) deliver their own
           // damage-typed bonus, so the proc earns the enemy's weakness to that
           // type — both the macro type map AND the enemy's own resist:/vulnerable:

@@ -94,6 +94,49 @@ describe('acid armor shred lowers the attack target AC', () => {
   });
 });
 
+describe('OTA-403 — manual weapon-coating damage roll', () => {
+  beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
+
+  it('buildCombatSteps appends a coating step when the swinging weapon is coated', async () => {
+    const store = await boot('Coater');
+    const enemy = plant('Mud Boar');
+    const base = store.getState().player!;
+    // No coating equipped → no coating step (plain 3-step flow).
+    const plain = buildCombatSteps('attack', base, enemy, {});
+    expect(plain.find((s) => s.id === 'coating')).toBeUndefined();
+
+    // Equip a coated weapon instance in the main hand and rebuild.
+    const mainId = 'coated-blade-1';
+    const coatedPlayer = {
+      ...base,
+      inventory: [
+        ...base.inventory,
+        {
+          id: mainId,
+          name: 'Rusty Shortsword',
+          kind: 'weapon' as const,
+          rarity: 'Common' as const,
+          quantity: 1,
+          tags: [],
+          coating: { kind: 'acid' as const, dice: '1d4', label: 'Acid-Etched' },
+        },
+      ],
+      equipped: { ...(base.equipped ?? {}), main: 'Rusty Shortsword', mainId },
+    };
+    const steps = buildCombatSteps('attack', coatedPlayer as typeof base, enemy, {});
+    const coatStep = steps.find((s) => s.id === 'coating');
+    expect(coatStep).toBeDefined();
+    expect(coatStep!.sides).toBe(4);
+    expect(coatStep!.count).toBe(1);
+    // The coating step is hit-gated (no target — it applies on a landed hit).
+    expect(coatStep!.target).toBeUndefined();
+    // It comes after the damage step.
+    expect(steps.findIndex((s) => s.id === 'coating')).toBeGreaterThan(
+      steps.findIndex((s) => s.id === 'damage'),
+    );
+  });
+});
+
 describe('coating DOT ticks at the start of the next action', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
