@@ -32,7 +32,18 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-09) = OTA-398 "Sumacberry Anvil" — THE ACTUAL SAVE-LOSS
+> - **LIVE (pushed 2026-06-10) = OTA-463 "Cerium Polish" — VOICE (TTS) crash
+>   auto-disable, the real fix for the app-drop-to-home.** The whole **OTA-457→463**
+>   playtest batch (Tellurium Refining → Cerium Polish, elements 52–58) is published
+>   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
+>   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
+>   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
+>   each shipped when pushed. The user's device pulled 459→460→461 mid-session.
+>   Batch headline fixes: 457/459/460 (Qwen completion crash guard + batch shrink +
+>   in-session reload), **463 (the actual crasher: bundled Kokoro voice → system-voice
+>   fallback)**, 458 (Silt-Thief disc clobber + UI fetch gate + route-to-turn-in), 462
+>   (climb "already crested" mid-climb), 461 (Verbal crash-test kit).
+> - **PRIOR LIVE (pushed 2026-06-09) = OTA-398 "Sumacberry Anvil" — THE ACTUAL SAVE-LOSS
 >   FIX.** 397's telemetry showed the save blob at ~123KB → never a size issue (the
 >   385/395/396 blob-trim treated a non-problem; harmless dormant insurance). Real
 >   cause = "storage full": `appendLogToDisk` appended every log line to an
@@ -364,8 +375,12 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
-the user's push command).
+**Staging list: EMPTY.** The OTA-457→463 playtest batch was **SHIPPED 2026-06-10**
+(user: "push everything in the pipeline") — all CI-green and live on all channels.
+The entries below are retained for now as the shipped-batch record; next new fix
+starts a fresh staging list above this note.
+
+**SHIPPED 2026-06-10 — Playtest batch (OTA-457→463), live on all channels:**
 
 - **OTA-463 "Cerium Polish" — [CRASH — the real one] wire the VOICE (TTS) auto-disable** *(element #58)*.
   A tester's diagnostic named it: "Voice (TTS) guard: ⚠ VOICE CRASH … last voice: kokoro:am_michael". The
