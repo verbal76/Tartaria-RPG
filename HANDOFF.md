@@ -384,6 +384,14 @@ starts a fresh staging list above this note.
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
 **OTA-465 … 476 committed below (post-batch follow-ups).**
 
+- **Test-only (no OTA bump) — `golemStressSweep.test.ts`**: bounded stress sweep validating OTA-466
+  (repair) + OTA-467 (combat stat growth). 300-strike fight asserts golem HP stays finite + in [0,hpMax]
+  and trained stats only rise; a repair sweep asserts constituent parts mend (capped) + consume one each
+  while non-parts never do. Trims the gameLog each iteration to dodge the pre-existing
+  `dogGolemCombatStress` OOM (unbounded-log harness limitation, not engine logic). Full golem sweep:
+  **40/40 green** across golemCompanion / golemStressSweep / aethercraft / aethercraftDispatch /
+  companionAssist.
+
 - **OTA-476 "Lutetium Smelting" — [UX] splash scale nudge 0.92 → 0.97** *(element #71)*. `SPLASH_SCALE`.
 - **OTA-475 "Ytterbium Reduction" — [UX] splash scale nudge 0.85 → 0.92** *(element #70)*. `SPLASH_SCALE`.
 - **OTA-474 "Thulium Roasting" — [UX] splash scale tune (0.85)** *(element #69)*. 2/3 was too small, full too
