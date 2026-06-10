@@ -13179,4 +13179,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // includes the label), but the coating-proc line still prepended proc.label — so an
 // acid-coated bow read "Acid-Etched Acid-Etched Rusty Shortbow". Drop the redundant
 // prefix; the coated name carries the label. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-09-399';
+// OTA-400 (Tanoak Anvil) — backfill missing codename-map entries. The
+// CODENAMES map had lost the rows for OTA-381 (Boxelder), 386 (Manzanita), and
+// 387 (Madrone) — so getBuildCodename fell back to the raw id for those builds.
+// Re-added them in order; player-facing codename + bug reports resolve correctly
+// again. Map-only; no behavior change. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-09-400';

@@ -340,6 +340,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-400 — backfilled the missing 381/386/387 rows below (Boxelder, Manzanita,
+  // Madrone) that had dropped out of the map.
+  '2026-06-09-400': 'Tanoak Anvil',
   '2026-06-09-399': 'Shagbark Anvil',
   '2026-06-09-398': 'Sumacberry Anvil',
   '2026-06-09-397': 'Catkin Anvil',
@@ -352,10 +355,13 @@ const CODENAMES: Record<string, string> = {
   '2026-06-09-390': 'Witchhazel Anvil',
   '2026-06-09-389': 'Bristlecone Anvil',
   '2026-06-09-388': 'Hackmatack Anvil',
+  '2026-06-09-387': 'Madrone Anvil',
+  '2026-06-09-386': 'Manzanita Anvil',
   '2026-06-09-385': 'Sweetbay Anvil',
   '2026-06-09-384': 'Basswood Anvil',
   '2026-06-09-383': 'Yaupon Anvil',
   '2026-06-09-382': 'Loblolly Anvil',
+  '2026-06-09-381': 'Boxelder Anvil',
   '2026-06-09-380': 'Pawpaw Anvil',
   '2026-06-09-379': 'Mesquite Anvil',
   '2026-06-09-378': 'Chinquapin Anvil',
