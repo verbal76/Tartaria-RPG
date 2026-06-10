@@ -72,9 +72,9 @@ describe('OTA-450 — starter fetch quests', () => {
     expect(p.completedFactionQuestIds).toContain('fq_reclaimers_starter');
     expect(p.activeFactionQuestIds).not.toContain('fq_reclaimers_starter');
     expect(p.tc).toBe(tcBefore + 35); // reward paid
-    // 5 of 7 Scrap Metal consumed → 2 left.
+    // OTA-454 — Scrap Run needs 3 (was 5); 3 of 7 consumed → 4 left.
     const sm = p.inventory.filter((i) => i.name === 'Scrap Metal').reduce((n, i) => n + i.quantity, 0);
-    expect(sm).toBe(2);
+    expect(sm).toBe(4);
   });
 
   it('OTA-451 — the mission board (no vendor) accepts + turns in faction quests', async () => {

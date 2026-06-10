@@ -13667,4 +13667,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (uniqueStats.kind === 'weapon') is a bespoke forged piece and is coatable; catalog weapons keep the
 // damage-type gate; fused ARMOR stays non-coatable. The inventory coat-picker filter and the
 // applyCoating guard both use it now. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-453';
+// OTA-454 (Indium Reflow) — [playability] balance the starter fetch quantities to item availability. The
+// cadence re-run showed the rep-0 starter quests weren't comparable across factions: Scrap Metal is
+// Uncommon (dig weight 4) so "Scrap Run" (5×) took ~116 min of digging, while Big Rock is Common
+// (weight 22) so "Quarry Quota" (4×) took ~22 min. The low-availability fetches are trimmed so all
+// nine complete in a roughly comparable early-game window: Scrap Metal 5→3, Aether Mud 5→4, Patched
+// Cloth 6→4 (descriptions + objectives synced). The common-item fetches (Stick 6, Small/Big Rock,
+// Mud Fragment 5) are unchanged. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-454';

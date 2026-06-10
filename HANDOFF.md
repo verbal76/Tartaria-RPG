@@ -367,6 +367,9 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-454 "Indium Reflow" — [playability] balance starter-fetch quantities** *(element #49)*. Cadence
+  re-run found the starters weren't comparable (Scrap Metal Uncommon → 116 min vs Big Rock Common →
+  22 min); trimmed Scrap Metal 5→3, Aether Mud 5→4, Patched Cloth 6→4. `faction-quests.json`.
 - **OTA-453 "Cadmium Plating" — [bug] fused weapons can be coated** *(element #48)*. Coatability was
   name-only (`isCoatableWeapon` → `findWeaponByName`), which misses catalog-absent fused weapons. New
   `isCoatableItem(item)` reads `uniqueStats`; used by the inventory coat-picker + `applyCoating` guard.
