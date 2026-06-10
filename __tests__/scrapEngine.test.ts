@@ -122,6 +122,14 @@ describe('OTA-443 — scrap yields more, scaled by rarity, geared to crafting', 
     expect(qty(out, 'Mudstone')).toBe(1);
   });
 
+  it('OTA-447 — a mud-tagged-but-not-stone piece still yields Mudstone', () => {
+    // Mud-Rend Blade is metal/mud/blade — no stone tag. Pre-fix it gave none.
+    const out = scrapOutputFor(mkR('Mud-Rend Blade', 'weapon', 'Uncommon', ['metal', 'mud', 'blade']));
+    expect(qty(out, 'Mudstone')).toBe(1);
+    expect(qty(out, 'Scrap Metal')).toBeGreaterThanOrEqual(2); // still metal-representative
+    expect(qty(out, 'Small Rock')).toBe(0); // not stone → no rock
+  });
+
   it('stays REPRESENTATIVE — an iron spear never yields mud or aether mats', () => {
     const out = scrapOutputFor(mkR('Iron Spear', 'weapon', 'Rare', ['metal', 'blade', 'weapon']));
     const names = out.grants.map((g) => g.name);

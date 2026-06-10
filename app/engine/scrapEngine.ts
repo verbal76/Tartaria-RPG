@@ -102,11 +102,16 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
     grants.push({ name: 'Aether Crystal', quantity: 1 });
     if (rb >= 1) grants.push({ name: 'Aether Dust', quantity: 1 });
   }
-  // Stone / mud heads → Small Rock, and MUDSTONE (Mud-Golem fuel) from
-  // actually-muddy gear. Representative: only stone/mud pieces.
+  // Stone heads → Small Rock.
   if (tags.has('stone') || tags.has('mudstone') || tags.has('improvised')) {
     grants.push({ name: 'Small Rock', quantity: 2 + half });
-    if (tags.has('mud') || tags.has('mudstone')) grants.push({ name: 'Mudstone', quantity: 1 });
+  }
+  // OTA-447 — MUDSTONE (Mud-Golem fuel) from ANY muddy gear, independent of the
+  // stone branch. Pre-fix the Mudstone bonus was nested inside the stone check,
+  // so a `mud`-but-not-stone piece (e.g. a Mud-Rend Blade tagged metal/mud/blade)
+  // scrapped without it — the mud-tag path was effectively dead.
+  if (tags.has('mud') || tags.has('mudstone')) {
+    grants.push({ name: 'Mudstone', quantity: 1 });
   }
   // Cloth / fiber → Patched Cloth, and SPIDER SILK (a 7-recipe fiber) from
   // organic gear.

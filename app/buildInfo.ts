@@ -13609,4 +13609,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the pool; nothing is handed out. Together with OTA-443/444 (scrap + material drops) and OTA-445
 // (above-rare fusion), the wander-and-upgrade loop toward the 9 Guardians is now actually reachable
 // for an average-but-lucky player. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-446';
+// OTA-447 (Molybdenum Sintering) — [playability] close two Mud-Golem fuel gaps a validation sim
+// surfaced. (1) Mudstone was unforageable — it only dropped from a mud-enemy kill or mud+stone
+// scrap, so a combat-light wanderer couldn't summon even the baseline golem; it's now in SMALL_FINDS
+// at a LOW weight (3, Rare-tier) so it's a deliberate gather, not a flood. (2) The scrapEngine
+// Mudstone bonus was nested inside the STONE branch, so a `mud`-but-not-stone piece (e.g. a Mud-Rend
+// Blade tagged metal/mud/blade) scrapped without it — the mud-tag path was effectively dead. Mudstone
+// is now its own condition keyed on `mud`/`mudstone`, independent of stone (an iron spear with no mud
+// tag still yields none). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-447';

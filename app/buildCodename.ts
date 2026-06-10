@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-447 — [playability] close two Mud-Golem fuel gaps a sim found: Mudstone now low-weight
+  // forageable, and the scrap mud-tag path (dead inside the stone branch) yields Mudstone again. Element #42: Molybdenum.
+  '2026-06-10-447': 'Molybdenum Sintering',
   // OTA-446 — [playability] richer found-gear: Uncommon gear weights up + two low-weight Rare drops
   // in the investigate pool, so a lucky wanderer can actually upgrade toward the Guardians. Element #41: Niobium.
   '2026-06-10-446': 'Niobium Anodizing',

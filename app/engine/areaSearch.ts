@@ -133,6 +133,11 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   // — food, mushrooms, and the (capped) rocks/sticks are untouched.
   { name: 'Aether Mud', rarity: 'Common', weight: 8 },
   { name: 'Aether Dust', rarity: 'Common', weight: 4 },
+  // OTA-447 — Mudstone forageable at a LOW weight. It's the last Mud-Golem fuel
+  // gap: pre-fix it dropped only from mud-enemy kills / mud-stone scrap, so a
+  // combat-light wanderer couldn't summon even the baseline golem. Low weight
+  // keeps it a deliberate gather, not a flood (it's the Rare-tier mud stock).
+  { name: 'Mudstone', rarity: 'Rare', weight: 3 },
   // OTA 021 — rocks / sticks bumped HARD because the playtester
   // hadn't seen a Big Rock in their session at all. These are the
   // rulebook-promised cheap-stock items every starter relies on

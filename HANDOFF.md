@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-447 "Molybdenum Sintering" — [playability] Mud-Golem fuel gaps** *(element #42)*. Validation-sim
+  follow-up: Mudstone now low-weight forageable (was kill/scrap-only); scrap mud-tag path (dead inside
+  the stone branch) yields Mudstone again as its own condition. `areaSearch.ts`, `scrapEngine.ts`.
+  Covered by `__tests__/scrapEngine.test.ts` + `areaSearch.test.ts`.
 - **OTA-446 "Niobium Anodizing" — [playability] richer found-gear** *(element #41)*. Uncommon gear
   weights up + two low-weight Rare drops (Sentinel Cleaver, Aether-Seeker's Hood) in the investigate
   pool, so a lucky wanderer can upgrade toward the Guardians. `areaSearch.ts`. Covered by

@@ -94,6 +94,9 @@ describe('OTA-444 — golem/recipe material availability', () => {
     // The golem-fuel staples are reachable too.
     expect(found.has('Aether Crystal')).toBe(true);
     expect(found.has('Aether Mud')).toBe(true);
+    // OTA-447 — Mudstone now forageable so a combat-light wanderer can still
+    // gather the last Mud-Golem fuel without relying on a mud-enemy kill.
+    expect(found.has('Mudstone')).toBe(true);
   });
 
   it('common mud enemies drop Mudstone (Mud-Golem fuel)', () => {
