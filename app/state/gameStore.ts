@@ -14807,16 +14807,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const target = itemName.toLowerCase();
-    const item = player.inventory.find(
+    // OTA-431 — pick the RIGHT copy when several share a name. With per-instance
+    // durability (OTA-427) the player can carry several same-named pieces at
+    // different wear, so the old `.find` (first damaged match) could mend a
+    // near-full spare while leaving the battered piece the player actually
+    // meant untouched — and still charge for it. Resolve in player-intent order:
+    // the EQUIPPED instance first, then the MOST-damaged copy (lowest
+    // current/max ratio).
+    const damagedMatches = player.inventory.filter(
       (i) => i.name.toLowerCase() === target && i.durability && i.durability.current < i.durability.max,
     );
-    if (!item) {
+    if (damagedMatches.length === 0) {
       get().appendLog(
         'arbiter',
         `The Arbiter glances at your pack. "Nothing in your pack matches that — or it's already in good order."`,
       );
       return;
     }
+    const eqRep = player.equipped ?? {};
+    const equippedRepairIds = new Set(
+      [eqRep.mainId, eqRep.offId, eqRep.headId, eqRep.chestId, eqRep.handsId, eqRep.legsId, eqRep.feetId, eqRep.cloakId, eqRep.amuletId, eqRep.ringId, eqRep.ring2Id, eqRep.ring3Id].filter(Boolean) as string[],
+    );
+    const item = damagedMatches.find((i) => equippedRepairIds.has(i.id))
+      ?? damagedMatches.slice().sort((a, b) =>
+        (a.durability!.current / a.durability!.max) - (b.durability!.current / b.durability!.max),
+      )[0]!;
     const baseCost = repairCost(item);
     // arb45 — Architect's Eye perk: cheaper mends on relic / ancient gear.
     // eslint-disable-next-line @typescript-eslint/no-require-imports

@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-431 — [audit #16] vendor "repair <name>" mends the equipped instance first, then the
+  // most-damaged copy — no longer tops off a spare while the worn equipped piece stays broken. Element #26: Iron.
+  '2026-06-10-431': 'Iron Bloomery',
   // OTA-430 — [audit #13] main-quest hints: 'hook' lists all 9 Capitals (was 5), 'descent'
   // points to the Mud Flood Nexus (the reached_nexus trigger) not the Endless Stair. Element #25: Manganese.
   '2026-06-10-430': 'Manganese Nodulizing',

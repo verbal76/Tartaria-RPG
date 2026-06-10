@@ -13479,4 +13479,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reaching the Mud Flood Nexus (the `reached_nexus` trigger keys on locationId
 // 'mud_flood_nexus'); travelling to the Stair did nothing. The hint now names the Nexus as the
 // destination and keeps the Stair as path-flavor. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-430';
+// OTA-431 (Iron Bloomery) — [audit fix #16] vendor repair targets the RIGHT copy when several
+// share a name. With per-instance durability (OTA-427) the player can carry several same-named
+// pieces at different wear; repairWithVendor matched by name with `.find` (first damaged
+// match), so "repair iron axe" could top off a near-full spare while leaving the battered
+// EQUIPPED axe untouched — and still charge for it. The handler now collects all damaged
+// name-matches and resolves in player-intent order: the EQUIPPED instance first (by equipped
+// slot id), then the MOST-damaged copy (lowest current/max ratio). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-431';
