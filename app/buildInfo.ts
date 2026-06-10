@@ -13486,4 +13486,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // EQUIPPED axe untouched — and still charge for it. The handler now collects all damaged
 // name-matches and resolves in player-intent order: the EQUIPPED instance first (by equipped
 // slot id), then the MOST-damaged copy (lowest current/max ratio). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-431';
+// OTA-432 (Cobalt Roasting) — [audit fix #15] hook-noun matching is now word-boundary aware
+// instead of raw substring. matchHookNoun / matchAnyHookNoun tested `t.includes(n) ||
+// n.includes(t)`, so a tiny fragment matched a much longer noun — a 2–3 char token could snag
+// half a room's nouns, and a short word could route an indoor "investigate the candle" into an
+// outdoor "ridge"/"ridgeline" hook, firing the wrong scene. A single-word noun now matches only
+// when the target contains it as a whole word, or shares a ≥4-char word prefix (so
+// "stone" → "stonework" still helps); multi-word nouns keep phrase containment; an exact target
+// always matches. Verified against the full hook/investigate/search suite (105 tests).
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-432';

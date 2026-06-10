@@ -367,6 +367,11 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-432 "Cobalt Roasting" — [audit fix #15] word-boundary hook-noun matching** *(element #27)*.
+  `matchHookNoun`/`matchAnyHookNoun` did raw substring (`t.includes(n) || n.includes(t)`), so a
+  tiny fragment matched a longer noun and fired the wrong hook. Single-word nouns now match on
+  whole word or ≥4-char prefix; multi-word nouns keep phrase containment. `hooks.ts`. Covered by
+  `__tests__/hookNounMatch.test.ts`; full hook/investigate suite (105 tests) green.
 - **OTA-431 "Iron Bloomery" — [audit fix #16] vendor repair picks the right copy** *(element #26)*.
   `repairWithVendor` matched by name with `.find`, so with per-instance durability it could mend
   a near-full spare instead of the worn equipped piece. Now resolves equipped-first, then

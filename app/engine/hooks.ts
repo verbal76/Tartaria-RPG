@@ -850,6 +850,35 @@ export const ALL_HOOK_NOUNS: ReadonlySet<string> = new Set(
   Object.values(HOOK_PLANTS).flatMap((arr) => arr.flatMap((p) => p.nouns.map((n) => n.toLowerCase()))),
 );
 
+// OTA-432 — match a player target against a hook's nouns on WORD boundaries
+// rather than raw substrings. The old test (`t.includes(n) || n.includes(t)`)
+// let a tiny fragment match a much longer noun — a 2–3 char token could snag
+// half the nouns in a room, and a short word could route an indoor "investigate
+// the candle" into an outdoor "ridge"/"ridgeline" hook. A single-word noun now
+// matches only when the target contains it as a whole word, or shares a ≥4-char
+// word prefix (so "stone" → "stonework" still helps); a multi-word noun matches
+// as a phrase. Exact target always matches.
+function hookNounMatches(t: string, nouns: readonly string[]): boolean {
+  const words = t.split(/[^a-z0-9]+/).filter(Boolean);
+  for (const raw of nouns) {
+    const n = raw.toLowerCase();
+    if (!n) continue;
+    if (t === n) return true;
+    if (n.includes(' ')) {
+      // Multi-word noun ("hand rope"): keep phrase containment.
+      if (t.includes(n)) return true;
+      continue;
+    }
+    for (const w of words) {
+      if (w === n) return true;
+      // Helpful prefix overlap, but never on a tiny fragment (kills the
+      // 1–3 char false positives that fired the wrong hook).
+      if (w.length >= 4 && (w.startsWith(n) || n.startsWith(w))) return true;
+    }
+  }
+  return false;
+}
+
 // Match a player target string (or resolved noun) against an active hook's
 // noun list. Used to route "sneak up to the smoke" → the smoke hook.
 export function matchHookNoun(target: string | undefined, hooks: readonly Hook[]): Hook | null {
@@ -857,7 +886,7 @@ export function matchHookNoun(target: string | undefined, hooks: readonly Hook[]
   const t = target.toLowerCase();
   for (const hook of hooks) {
     if (hook.resolved) continue;
-    if (hook.nouns.some((n) => t.includes(n) || n.includes(t))) return hook;
+    if (hookNounMatches(t, hook.nouns)) return hook;
   }
   return null;
 }
@@ -871,7 +900,7 @@ export function matchAnyHookNoun(target: string | undefined, hooks: readonly Hoo
   if (!target) return null;
   const t = target.toLowerCase();
   for (const hook of hooks) {
-    if (hook.nouns.some((n) => t.includes(n) || n.includes(t))) return hook;
+    if (hookNounMatches(t, hook.nouns)) return hook;
   }
   return null;
 }
