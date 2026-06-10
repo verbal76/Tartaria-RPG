@@ -13781,4 +13781,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // returns true; loadMLHealth self-heals (clears) any KEY_TTS_DISABLED an OTA-463 device picked up, so
 // Kokoro returns on first load with no reset needed. The Qwen completion guard (OTA-457) is untouched.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-464';
+// OTA-465 (Neodymium Sinter) — [feature] TAP-TO-SET-COURSE for WHISPERS/leads (finishes the OTA-458 route
+// button, which only covered faction-quest cards). Players kept losing where to go for Yulka's stolen
+// Discs because whisper objectives live on map TILES (mapX/mapY) within the current area, not named
+// locations — so the location-based travel system literally could not target them. New intra-area
+// course: player.whisperCourse {mapX,mapY,label} + setWhisperCourse / continueWhisperCourse /
+// stopWhisperCourse, which walk the player CARDINALLY toward the tile (one step per continue, reusing the
+// same travel-row → CONTINUE / STOP UX + a Manhattan move-count badge). Stepping goes through the normal
+// cardinal walk, so arriving on the objective tile fires the chain's own beat (e.g. the Silt-Thief
+// spawn). A new whisperRouteTarget(whisper) picks the right tile for the current stage (Yulka's fire →
+// the thief's tile → back to Yulka), and the Contracts screen Whispers cards get a "▸ SET COURSE TO <X>"
+// button. Mutually exclusive with location travel. Covered by whisperYulka.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-465';

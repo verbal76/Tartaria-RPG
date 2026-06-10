@@ -10,7 +10,7 @@ import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
-import { describeWhisperStage, describeWhisperTitle, findChain } from '../engine/whispers';
+import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -79,6 +79,7 @@ export function ContractsScreen() {
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
   const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
+  const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
   const appendLog = useGameStore((s) => s.appendLog);
   const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
@@ -906,17 +907,40 @@ export function ContractsScreen() {
                 Tips overheard from non-vendor NPCs. No formal contract,
                 no faction rep — just rumour. Follow them or don't.
               </Text>
-              {whispers.map(({ rec, title, stageDesc }) => (
-                <View key={`w_${rec.id}`} style={styles.card}>
-                  <View style={styles.cardHead}>
-                    <Text style={styles.cardTitle}>{title}</Text>
-                    <Text style={styles.stagePill}>{rec.stage}</Text>
+              {whispers.map(({ rec, title, stageDesc }) => {
+                // OTA-465 — whisper objectives live on map tiles, so offer a
+                // "set course" that walks the player there (the player kept
+                // losing where to go for Yulka's discs).
+                const route = whisperRouteTarget(rec);
+                const here = !!route
+                  && player?.mapX === route.mapX
+                  && player?.mapY === route.mapY;
+                return (
+                  <View key={`w_${rec.id}`} style={styles.card}>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{title}</Text>
+                      <Text style={styles.stagePill}>{rec.stage}</Text>
+                    </View>
+                    <Text style={styles.cardFaction}>Whisper · informal</Text>
+                    <Text style={styles.cardStageLabel}>Next step</Text>
+                    <Text style={styles.cardStageBody}>{stageDesc}</Text>
+                    {route && !here && (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => {
+                          setWhisperCourse(route.mapX, route.mapY, route.label);
+                          setScreen('exploration');
+                        }}
+                      >
+                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {route.label.toUpperCase()}</Text>
+                      </Pressable>
+                    )}
+                    {route && here && (
+                      <Text style={styles.routeHereNote}>▸ You're here — {route.label} should be at this tile.</Text>
+                    )}
                   </View>
-                  <Text style={styles.cardFaction}>Whisper · informal</Text>
-                  <Text style={styles.cardStageLabel}>Next step</Text>
-                  <Text style={styles.cardStageBody}>{stageDesc}</Text>
-                </View>
-              ))}
+                );
+              })}
             </View>
           )}
 

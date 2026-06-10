@@ -44,7 +44,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
-import { isHourInWindow, reapExpiredWhispers, pickTargetTile, findChain } from '../app/engine/whispers';
+import { isHourInWindow, reapExpiredWhispers, pickTargetTile, findChain, whisperRouteTarget } from '../app/engine/whispers';
 import type { WhisperRecord } from '../app/engine/types';
 
 describe('Whisper engine — pure helpers', () => {
@@ -86,6 +86,26 @@ describe('Whisper engine — pure helpers', () => {
     expect(tile.x).toBeLessThanOrEqual(11);
     expect(tile.y).toBeGreaterThanOrEqual(7);
     expect(tile.y).toBeLessThanOrEqual(8);
+  });
+
+  // OTA-465 — the Contracts "set course" uses whisperRouteTarget to pick the tile.
+  it('whisperRouteTarget routes Yulka to the thief tile mid-fetch, and to Yulka on return', () => {
+    const base: WhisperRecord = {
+      id: 'yulka_discs', stage: 'fetch_active', plantedAtHour: 0,
+      targetMapX: 5, targetMapY: 5, targetLocationId: 'x',
+      ctx: { thiefMapX: 8, thiefMapY: 5 },
+    };
+    // Mid-fetch → head to the Silt Thief's tile.
+    const fetch = whisperRouteTarget(base);
+    expect(fetch).toEqual({ mapX: 8, mapY: 5, label: 'the Silt Thief' });
+    // Recovered → head back to Yulka.
+    const ret = whisperRouteTarget({ ...base, stage: 'fetch_returned' });
+    expect(ret?.mapX).toBe(5);
+    expect(ret?.mapY).toBe(5);
+    // Just-met → still head to Yulka's tile.
+    expect(whisperRouteTarget({ ...base, stage: 'met_yulka' })?.mapX).toBe(5);
+    // No fixed tile once the deed is done.
+    expect(whisperRouteTarget({ ...base, stage: 'ambush_armed' })).toBeNull();
   });
 });
 
@@ -280,5 +300,33 @@ describe('Yulka chain — full state-machine drive', () => {
     // And the whisper advanced to the return stage (was reverting to fetch_active).
     const w = (after.activeWhispers ?? []).find((x) => x.id === 'yulka_discs');
     expect(w?.stage).toBe('fetch_returned');
+  });
+
+  // OTA-465 — "set course" walks the player cardinally toward a whisper tile.
+  it('setWhisperCourse steps the player toward the objective tile and clears on arrival', async () => {
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Courser', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+    const p0 = store.getState().player!;
+    // Plant the player two tiles WEST of the objective, with ample stamina and no
+    // location course in play.
+    store.setState({
+      player: { ...p0, mapX: 0, mapY: 0, stamina: 20, staminaMax: 20, travelTarget: undefined, whisperCourse: null },
+    });
+
+    // Set a course to (2,0): the first step should move east and the course persists.
+    store.getState().setWhisperCourse(2, 0, 'the Silt Thief');
+    let after = store.getState().player!;
+    expect(after.mapX).toBe(1);
+    expect(after.whisperCourse).toEqual({ mapX: 2, mapY: 0, label: 'the Silt Thief' });
+
+    // One more continue lands on the tile and clears the course.
+    store.getState().continueWhisperCourse();
+    after = store.getState().player!;
+    expect(after.mapX).toBe(2);
+    expect(after.whisperCourse).toBeNull();
   });
 });

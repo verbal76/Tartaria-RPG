@@ -986,6 +986,8 @@ export function ExplorationScreen() {
             })()}
             onOpenRaceAbilities={() => useGameStore.getState().openRaceAbilityPicker()}
             travelTargetName={(() => {
+              // OTA-465 — a whisper/lead course shows in the same travel row.
+              if (player?.whisperCourse && !player?.travelTarget) return player.whisperCourse.label;
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports
               const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
@@ -1002,6 +1004,12 @@ export function ExplorationScreen() {
               // jumped (playtester: "23 → 2 → mud flats → 26").
               // Legacy path stays as a safety net for older saves
               // that travel started before this OTA landed.
+              // OTA-465 — whisper course distance = Manhattan to the tile.
+              if (player?.whisperCourse && !player?.travelTarget) {
+                const fx = typeof player.mapX === 'number' ? player.mapX : 0;
+                const fy = typeof player.mapY === 'number' ? player.mapY : 0;
+                return Math.abs(player.whisperCourse.mapX - fx) + Math.abs(player.whisperCourse.mapY - fy);
+              }
               if (!player?.travelTarget) return null;
               if (typeof player.travelTarget.distanceRemaining === 'number') {
                 return player.travelTarget.distanceRemaining;
@@ -1016,8 +1024,16 @@ export function ExplorationScreen() {
               const fromY = typeof player.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
               return Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
             })()}
-            onContinueTravel={() => useGameStore.getState().continueTravel()}
-            onStopTravel={() => useGameStore.getState().stopTravel()}
+            onContinueTravel={() => {
+              const st = useGameStore.getState();
+              if (st.player?.whisperCourse && !st.player?.travelTarget) st.continueWhisperCourse();
+              else st.continueTravel();
+            }}
+            onStopTravel={() => {
+              const st = useGameStore.getState();
+              if (st.player?.whisperCourse && !st.player?.travelTarget) st.stopWhisperCourse();
+              else st.stopTravel();
+            }}
           />
         )}
         {/* v2.4.1 (OTA 048) — bottom menu row removed. Gear icon

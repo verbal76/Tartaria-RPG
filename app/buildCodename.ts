@@ -345,6 +345,13 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-465 — [feature] tap-to-set-course for WHISPERS/leads (finishes the OTA-458 route button, which
+  // only covered faction quests). Whisper objectives live on map TILES, not named locations, so the
+  // location travel system couldn't reach them — players kept losing Yulka's discs. New intra-area
+  // whisperCourse + setWhisperCourse/continue/stop walks the player cardinally to the tile via the same
+  // travel-row UX; whisperRouteTarget picks the stage-correct tile; Contracts whisper cards get a SET
+  // COURSE button. Element #60: Neodymium.
+  '2026-06-10-465': 'Neodymium Sinter',
   // OTA-464 — [regression fix] REVERT the OTA-463 voice auto-disable. Its breadcrumb detection couldn't
   // tell a real Kokoro crash from a benign app termination (OTA reload mid-utterance / backgrounding), so
   // it false-tripped on reload churn and dropped a healthy Kokoro to the system voice. Bundled neural

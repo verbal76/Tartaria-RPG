@@ -197,6 +197,40 @@ export function describeWhisperTitle(whisper: WhisperRecord): string {
   return chain?.title ?? whisper.id;
 }
 
+/** OTA-465 — the map TILE the player should head to for this whisper's CURRENT
+ *  stage, so the Contracts screen can offer a "set course" (the player kept
+ *  losing the objective). Returns null when there's no concrete tile to route to
+ *  (e.g. the player is already at the meet, or the stage is "walk home anywhere").
+ *  Yulka's chain is stage-aware (Yulka's fire vs the thief's tile vs the return);
+ *  any other chain with a target tile routes there. */
+export function whisperRouteTarget(
+  whisper: WhisperRecord,
+): { mapX: number; mapY: number; label: string } | null {
+  const thiefX = whisper.ctx?.thiefMapX as number | undefined;
+  const thiefY = whisper.ctx?.thiefMapY as number | undefined;
+  const hasThief = typeof thiefX === 'number' && typeof thiefY === 'number';
+  const hasTarget = typeof whisper.targetMapX === 'number' && typeof whisper.targetMapY === 'number';
+  if (whisper.id === 'yulka_discs') {
+    switch (whisper.stage) {
+      case 'fetch_in_progress':
+      case 'fetch_active':
+        return hasThief ? { mapX: thiefX!, mapY: thiefY!, label: 'the Silt Thief' } : null;
+      case 'fetch_returned':
+        return hasTarget ? { mapX: whisper.targetMapX, mapY: whisper.targetMapY, label: "Yulka (return the Discs)" } : null;
+      case 'planted':
+      case 'met_yulka':
+        return hasTarget ? { mapX: whisper.targetMapX, mapY: whisper.targetMapY, label: "Yulka's fire" } : null;
+      default:
+        return null; // ambush_armed / done — no fixed tile.
+    }
+  }
+  // Generic chains: route to the thief-style sub-tile if one is set, else the
+  // whisper's target tile.
+  if (hasThief) return { mapX: thiefX!, mapY: thiefY!, label: describeWhisperTitle(whisper) };
+  if (hasTarget) return { mapX: whisper.targetMapX, mapY: whisper.targetMapY, label: describeWhisperTitle(whisper) };
+  return null;
+}
+
 /** Helper used by the spawn step — clones an enemy proto with a
  *  fresh HP and the requested name. Throws if the name doesn't
  *  resolve so chain authors find their typos fast. */

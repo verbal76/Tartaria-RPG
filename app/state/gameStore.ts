@@ -2232,6 +2232,13 @@ interface GameStore {
   setTravelCourse: (locationId: string) => void;
   continueTravel: () => void;
   stopTravel: () => void;
+  /** OTA-465 — intra-area "set course" toward a whisper/lead objective TILE
+   *  (mapX/mapY). Sets player.whisperCourse and takes the first cardinal step.
+   *  continueWhisperCourse steps once more; stopWhisperCourse clears it. Reuses
+   *  the travel-row continue/stop UX. */
+  setWhisperCourse: (mapX: number, mapY: number, label: string) => void;
+  continueWhisperCourse: () => void;
+  stopWhisperCourse: () => void;
   /** 2026-05-25 OTA-035 — when a player issues `travel to <city>` from
    *  inside an outpost, this field holds the pending destination until
    *  they confirm or cancel via the BrandedModal. The screen layer
@@ -16576,7 +16583,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-126 — snapshot tile count at travel-start so the badge
     // counts down monotonically regardless of which location is
     // currently centered on the regenerated world map.
-    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles } } } : s));
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null } } : s));
     get().appendLog(
       'world',
       `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
@@ -16747,6 +16754,73 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'world',
       'You set the course aside. Cardinal direction is yours again.',
     );
+  },
+
+  // OTA-465 — intra-area whisper/lead course. Whisper objectives live on map
+  // TILES (mapX/mapY) within the current area, not named locations, so the
+  // location-based travel system can't reach them. This walks the player
+  // cardinally toward the coordinate, one step per continue, reusing the same
+  // travel-row UX. Reaching the tile lets the chain's own beat fire (e.g. the
+  // Silt-Thief spawn). Players kept losing the objective; this gives them a
+  // "set course" from the Contracts screen.
+  setWhisperCourse(mapX, mapY, label) {
+    const player = get().player;
+    if (!player) return;
+    // A whisper course and a location course are mutually exclusive — clear any
+    // location travel first so the travel row shows the whisper destination.
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined, whisperCourse: { mapX, mapY, label } } } : s));
+    get().appendLog('world', `You set out toward ${label}. Tap the travel row to press on; STOP to halt.`);
+    get().continueWhisperCourse();
+  },
+
+  continueWhisperCourse() {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene || !player.whisperCourse) return;
+    const tgt = player.whisperCourse;
+    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
+    if (fromX === tgt.mapX && fromY === tgt.mapY) {
+      // Already on the tile — clear the course; the chain beat fires on its own.
+      set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+      get().appendLog('world', `You're standing where ${tgt.label} should be.`);
+      return;
+    }
+    if (player.stamina < STAMINA_COSTS.wander) {
+      set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
+      get().appendLog(
+        'arbiter',
+        `The Arbiter studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
+      );
+      buzzBlocked();
+      return;
+    }
+    const dir = nextCardinalToward(fromX, fromY, tgt.mapX, tgt.mapY);
+    if (!dir) {
+      set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+      return;
+    }
+    // Spend stamina + time, then take the cardinal step. stepDirection runs the
+    // normal walk — encounters, whisper-beat fires, tile-novelty — so arriving on
+    // the objective tile triggers the chain (e.g. fireYulkaFetch spawns the thief).
+    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
+    get().stepDirection(dir);
+    const after = get().player;
+    if (after && (after.mapX ?? WORLD_MAP_CENTER_X) === tgt.mapX && (after.mapY ?? WORLD_MAP_CENTER_Y) === tgt.mapY) {
+      // Arrived — clear the course. Any spawned encounter/beat is already in play.
+      set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+    } else if (after && after.travelTarget) {
+      // A cardinal step that crossed into a named-location course shouldn't keep
+      // both; the location course wins (stepDirection set it). Drop the whisper one.
+      set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+    }
+  },
+
+  stopWhisperCourse() {
+    const player = get().player;
+    if (!player || !player.whisperCourse) return;
+    set((s) => (s.player ? { player: { ...s.player, whisperCourse: null } } : s));
+    get().appendLog('world', 'You set the course aside. Cardinal direction is yours again.');
   },
 
   // 2026-05-25 OTA-035 — outpost-aware travel confirmation. When the

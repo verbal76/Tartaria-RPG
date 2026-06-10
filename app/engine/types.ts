@@ -990,6 +990,11 @@ export interface PlayerCharacter {
   // Optional so older saves don't crash; missing field falls back
   // to the legacy Manhattan calc in the ExplorationScreen badge.
   travelTarget?: { locationId: string; distanceRemaining?: number };
+  /** OTA-465 — intra-area "set course" to a whisper/lead objective TILE
+   *  (mapX/mapY), distinct from travelTarget (which routes to a named
+   *  location). Drives the same travel-row continue/stop UX, but steps
+   *  cardinally within the current area toward the coordinate. */
+  whisperCourse?: { mapX: number; mapY: number; label: string } | null;
   /** 2026-05-25 [MECHANIC-1b] — active golem sidekick. Persists on
    *  the player so it survives cardinal moves + scene transitions
    *  (the "follows until needed again" requirement). null when no

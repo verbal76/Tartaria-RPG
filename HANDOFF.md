@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-464 "Praseodymium Calcination" — REVERT of the
->   463 voice auto-disable; Kokoro is always used again (463 false-tripped on reload
->   churn and forced the system voice).** The whole **OTA-457→464**
->   playtest batch (Tellurium Refining → Praseodymium Calcination, elements 52–59) is published
+> - **LIVE (pushed 2026-06-10) = OTA-465 "Neodymium Sinter" — tap-to-set-course for
+>   whispers/leads (Yulka's discs are now routable from Contracts). 464 reverted the
+>   463 voice auto-disable; Kokoro is always used again.** The whole **OTA-457→465**
+>   playtest batch (Tellurium Refining → Neodymium Sinter, elements 52–60) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -381,7 +381,17 @@ checkout, not a special rollback tool.)
 The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
-**SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels:**
+**SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
+**OTA-465 committed below (post-batch follow-up).**
+
+- **OTA-465 "Neodymium Sinter" — [feature] tap-to-set-course for WHISPERS/leads** *(element #60)*. Finishes
+  the OTA-458 route button (faction quests only). Whisper objectives live on map TILES (mapX/mapY), not
+  named locations, so location travel couldn't reach them — players kept losing Yulka's discs. New
+  `player.whisperCourse` + `setWhisperCourse/continueWhisperCourse/stopWhisperCourse` walk the player
+  cardinally to the tile via the same travel-row CONTINUE/STOP UX; `whisperRouteTarget(whisper)` picks the
+  stage-correct tile; Contracts whisper cards get a "▸ SET COURSE TO <X>" button. Arriving fires the
+  chain beat (Silt-Thief spawn). `types.ts`, `whispers.ts`, `gameStore.ts`, `ExplorationScreen.tsx`,
+  `ContractsScreen.tsx`. Covered by `whisperYulka.test.ts`.
 
 - **OTA-464 "Praseodymium Calcination" — [regression fix] REVERT the OTA-463 voice auto-disable** *(element #59)*.
   OTA-463 was wrong: the breadcrumb-survives detection can't tell a real Kokoro SIGSEGV from a benign app
