@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-444 — [playability] crafting-material drop weights: Aether Dust now forageable, golem-fuel
+  // aether mats bumped, Mudstone added to common mud enemies; food/rocks untouched. Element #39: Yttrium.
+  '2026-06-10-444': 'Yttrium Garnet-Growth',
   // OTA-443 — [playability] scrap overhaul: 2–3+ representative, rarity-scaled mats geared to
   // crafting/golem fuel (metal→Scrap Metal+Golem Core, aether→Crystal+Dust, mud→Mudstone). Element #38: Strontium.
   '2026-06-10-443': 'Strontium Pyrotechny',

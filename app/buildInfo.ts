@@ -13584,4 +13584,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the better mats only come from gear worth more than they sell for (and the higher-tier
 // scrappables cost more of those mats to craft than scrapping returns). New mats are added to the
 // no-re-scrap guard. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-443';
+// OTA-444 (Yttrium Garnet-Growth) — [playability] crafting-material drop weights. The golem-fuel +
+// recipe-staple aether mats were too rare (Aether Dust, needed by 11 recipes, was UNFORAGEABLE at
+// all; Aetheric Shard fed 10 recipes at weight 2; Aether Crystal fed every golem at weight 4). In
+// SMALL_FINDS: Aether Dust added at weight 4, Aether Mud 6→8, Aether Crystal 4→7, Aetheric Shard
+// 2→4. Mudstone (the last Mud-Golem fuel gap, previously only from a rare enemy) added to the loot
+// of two COMMON mud enemies (Mud Boar, Mud Tortoise). Food, mushrooms, and the (capped) rock/stick
+// weights are untouched, so discoveries + cooking are unaffected — only the material niche grows.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-444';

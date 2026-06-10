@@ -117,7 +117,14 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   // cheap-kit pool the rulebook promises.
   { name: 'Mud Fragment', rarity: 'Common', weight: 12 },
   { name: 'Aether Residue', rarity: 'Common', weight: 8 },
-  { name: 'Aether Mud', rarity: 'Common', weight: 6 },
+  // OTA-444 — [playability] golem-fuel + recipe-staple aether mats bumped. A
+  // playtester cleared the start area + reached the first city able to craft
+  // almost nothing and rarely summon a golem; these are the bottleneck inputs
+  // (Aether Mud / Crystal feed every golem; Aether Dust feeds 11 recipes but was
+  // UNFORAGEABLE; Aetheric Shard feeds 10). Bumped within the material niche only
+  // — food, mushrooms, and the (capped) rocks/sticks are untouched.
+  { name: 'Aether Mud', rarity: 'Common', weight: 8 },
+  { name: 'Aether Dust', rarity: 'Common', weight: 4 },
   // OTA 021 — rocks / sticks bumped HARD because the playtester
   // hadn't seen a Big Rock in their session at all. These are the
   // rulebook-promised cheap-stock items every starter relies on
@@ -132,10 +139,12 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Firewood', rarity: 'Common', weight: 18 },
   { name: 'Spider Silk', rarity: 'Common', weight: 6 },
   { name: 'Patched Cloth', rarity: 'Common', weight: 6 },
-  { name: 'Aether Crystal', rarity: 'Common', weight: 4 },
+  // OTA-444 — Aether Crystal (golem fuel, 9 recipes) 4→7; Aetheric Shard
+  // (10 recipes, 1–3 per craft) 2→4. Still well under the food-tier weights.
+  { name: 'Aether Crystal', rarity: 'Common', weight: 7 },
   { name: 'Bone Bolt', rarity: 'Common', weight: 4 },
   { name: 'Trail Rations', rarity: 'Common', weight: 3 },
-  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 2 },
+  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 4 },
 
   // OTA 002 — wild foods. Playtester: "I want to find wild onions,
   // wild carrots... blueberries, raspberries, grapes picked from a

@@ -76,3 +76,31 @@ describe('areaSearch', () => {
     });
   });
 });
+
+// ---------------------------------------------------------------------------
+// OTA-444 — crafting-material drop weights (playability)
+// ---------------------------------------------------------------------------
+
+import enemiesData from '../app/data/enemies/enemies.json';
+
+describe('OTA-444 — golem/recipe material availability', () => {
+  it('Aether Dust is now forageable (was unobtainable from search)', () => {
+    const found = new Set<string>();
+    for (let i = 0; i < 8000; i++) {
+      const o = rollAreaSearch('the mud', { intent: 'search' });
+      if (o.kind === 'material') found.add(o.itemName);
+    }
+    expect(found.has('Aether Dust')).toBe(true);
+    // The golem-fuel staples are reachable too.
+    expect(found.has('Aether Crystal')).toBe(true);
+    expect(found.has('Aether Mud')).toBe(true);
+  });
+
+  it('common mud enemies drop Mudstone (Mud-Golem fuel)', () => {
+    const arr = (enemiesData as Array<{ name: string; loot?: string[] }>);
+    const boar = arr.find((e) => e.name === 'Mud Boar');
+    const tortoise = arr.find((e) => e.name === 'Mud Tortoise');
+    expect(boar?.loot).toContain('Mudstone');
+    expect(tortoise?.loot).toContain('Mudstone');
+  });
+});

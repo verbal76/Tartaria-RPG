@@ -367,6 +367,10 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-444 "Yttrium Garnet-Growth" — [playability] crafting-material drop weights** *(element #39)*.
+  Aether Dust now forageable (@4, was 0); Aether Mud 6→8, Aether Crystal 4→7, Aetheric Shard 2→4;
+  Mudstone added to Mud Boar + Mud Tortoise loot. Food/rocks untouched. `areaSearch.ts`,
+  `enemies.json`. Covered by `__tests__/areaSearch.test.ts`.
 - **OTA-443 "Strontium Pyrotechny" — [playability] scrap overhaul** *(element #38)*. `scrapOutputFor`
   yields 2–3+ representative, rarity-scaled mats geared to crafting/golem fuel (metal→Scrap Metal
   +Golem Core on Rare+, aether→Aetheric Shard+Aether Crystal+Aether Dust, mud→Mudstone, organic→

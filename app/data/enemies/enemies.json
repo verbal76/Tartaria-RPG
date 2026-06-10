@@ -9,7 +9,8 @@
     "rarity": "Common",
     "loot": [
       "Boar Hide",
-      "Aether Mud"
+      "Aether Mud",
+      "Mudstone"
     ],
     "aliases": [
       "boar",
@@ -217,7 +218,8 @@
     "rarity": "Common",
     "loot": [
       "Tortoise Shell",
-      "Mud Fragment"
+      "Mud Fragment",
+      "Mudstone"
     ],
     "traits": [
       "armored",
