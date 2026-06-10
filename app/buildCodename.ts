@@ -345,6 +345,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-407 — coated weapon name on the combat quick-buttons + equipped summary
+  // (resolved by equipped slot id, not ambiguous name). Element #2: Helium.
+  '2026-06-10-407': 'Helium Distillation',
   // OTA-406 — bulletproof "storage full" save self-heal: purge the regenerable
   // on-disk copy-log (removeItem) + retry, so saves land even on a stuffed DB.
   // First periodic-table codename (element #1 = OTA−405): Hydrogen + Electrolysis.

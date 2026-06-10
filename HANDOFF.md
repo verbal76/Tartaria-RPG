@@ -367,6 +367,17 @@ checkout, not a special rollback tool.)
 **Playtest batch (OTA-401→…)** — staged on `HaL2001`, **NOT pushed** (holding for
 the user's push command).
 
+- **OTA-407 "Helium Distillation" — coated weapon name on combat buttons + equipped
+  summary** *(element #2)*. Player (with screenshots): "the weapon still has the wrong
+  name." Combat narration was fixed (391/399), but the **"OFF: RUSTY SHORTBOW"**
+  quick-button + StatsPanel **"Equipped: …"** still showed the base name — an
+  Acid-Etched Rusty Shortbow read as plain, and with two same-named weapons equipped
+  (one coated) you couldn't tell the hands apart. Both now resolve coating by the
+  equipped **slot id** (name is ambiguous): `ExplorationScreen` passes per-hand coating
+  labels to `InputBox` (prepended to the button: "off: acid-etched rusty shortbow");
+  the attack ACTION keeps the base name + hand keyword so the parser still resolves the
+  right instance. `StatsPanel` uses `coatedDisplayName`. (`shortWeaponLabel` had been
+  trimming the coating adjective.) `InputBox.tsx`, `StatsPanel.tsx`, `ExplorationScreen.tsx`.
 - **OTA-406 "Hydrogen Electrolysis" — bulletproof "storage full" save self-heal**
   *(first periodic-table codename — element #1)*. A **Tanbark-Anvil (405)** device's
   log proved capDiskLog (398) isn't enough: saves STILL fail at a tiny ~159-182 KB

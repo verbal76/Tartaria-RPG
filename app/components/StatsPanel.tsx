@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
+import { coatedDisplayName } from '../engine/weaponCoating';
 import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -87,9 +88,17 @@ export function StatsPanel({ player }: Props) {
 
   // Compose a single-line summary of every filled slot so the panel
   // stays compact even with eight slots tracked.
+  // OTA-406 — show a weapon's COATED name in the equipped summary (resolved by
+  // the slot id so two same-named weapons, one coated, are told apart). Armor
+  // slots can't be coated, so they stay as the plain name.
+  const coatedSlotName = (slotName: string, id: string | null | undefined): string => {
+    if (!id) return slotName;
+    const inst = player.inventory?.find((i) => i.id === id);
+    return inst ? coatedDisplayName(inst) : slotName;
+  };
   const slotParts: string[] = [];
-  if (player.equipped?.main) slotParts.push(`R: ${player.equipped.main}`);
-  if (player.equipped?.off) slotParts.push(`L: ${player.equipped.off}`);
+  if (player.equipped?.main) slotParts.push(`R: ${coatedSlotName(player.equipped.main, player.equipped.mainId)}`);
+  if (player.equipped?.off) slotParts.push(`L: ${coatedSlotName(player.equipped.off, player.equipped.offId)}`);
   if (player.equipped?.head) slotParts.push(`Hd: ${player.equipped.head}`);
   if (player.equipped?.chest) slotParts.push(`Ch: ${player.equipped.chest}`);
   if (player.equipped?.legs) slotParts.push(`Lg: ${player.equipped.legs}`);

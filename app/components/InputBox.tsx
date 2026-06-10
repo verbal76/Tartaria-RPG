@@ -64,6 +64,14 @@ interface Props {
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
+  // OTA-406 — coating adjective ("Acid-Etched", "Poisoned", …) for the equipped
+  // weapon INSTANCE in each hand, or null. Resolved by the equipped slot id (so
+  // two same-named weapons — one coated, one not — are told apart) and prepended
+  // to the quick-button label so a coated weapon reads as itself ("off:
+  // acid-etched rusty shortbow"). The attack ACTION still uses the base name +
+  // hand keyword, so the parser resolves the right instance.
+  equippedMainCoating?: string | null;
+  equippedOffCoating?: string | null;
   inventory: ReadonlyArray<InventoryItem>;
   range?: 'arm' | 'close' | 'far' | null;
   // OTA-361 — at least one enemy in the scene is knocked out and lootable.
@@ -116,7 +124,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -374,11 +382,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               })()}
               {equippedMain ? (() => {
                 const mainT = weaponTone(equippedMain, range, playerInt, inventory);
-                return <QuickBtn label={shortWeaponLabel(equippedMain).toLowerCase()} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+                const coat = equippedMainCoating ? `${equippedMainCoating.toLowerCase()} ` : '';
+                return <QuickBtn label={`${coat}${shortWeaponLabel(equippedMain).toLowerCase()}`} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
                 const offT = weaponTone(equippedOff, range, playerInt, inventory);
-                return <QuickBtn label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+                const coat = equippedOffCoating ? `${equippedOffCoating.toLowerCase()} ` : '';
+                return <QuickBtn label={`off: ${coat}${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 

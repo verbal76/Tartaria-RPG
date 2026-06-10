@@ -404,6 +404,18 @@ export function ExplorationScreen() {
   const inCombat = enemyViews.length > 0;
   const equippedMain = player?.equipped?.main ?? null;
   const equippedOff = player?.equipped?.off ?? null;
+  // OTA-406 — coating adjective for the equipped instance in each hand, resolved
+  // by the equipped slot id (NOT by name — two same-named weapons, one coated
+  // and one not, must be told apart). Feeds the combat quick-button label so a
+  // coated weapon reads as itself ("off: acid-etched rusty shortbow") instead of
+  // its bare base name. Null when the hand is empty or the weapon is uncoated.
+  const coatingForSlot = (id: string | null | undefined): string | null => {
+    if (!id) return null;
+    const inst = player?.inventory?.find((i) => i.id === id);
+    return inst?.coating?.label ?? null;
+  };
+  const equippedMainCoating = coatingForSlot(player?.equipped?.mainId);
+  const equippedOffCoating = coatingForSlot(player?.equipped?.offId);
 
   if (!player) {
     return (
@@ -766,6 +778,8 @@ export function ExplorationScreen() {
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
+            equippedMainCoating={equippedMainCoating}
+            equippedOffCoating={equippedOffCoating}
             inventory={player?.inventory ?? []}
             range={currentScene?.range ?? null}
             knockedOutPresent={(currentScene?.enemyKnockedOut ?? []).some(Boolean)}

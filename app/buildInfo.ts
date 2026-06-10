@@ -13258,4 +13258,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist() surfaces a one-time "storage was full — cleared it, saving again" line.
 // (saveSystem.ts emergencyReclaimDiskSpace + consumeSaveReclaimedFlag; gameStore
 // persist wiring; atomicSaveWrites.test.ts +1.) JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-406';
+// OTA-407 (Helium Distillation) — coated weapon name on the combat quick-buttons +
+// equipped summary. A coated weapon's combat NARRATION was fixed (391/399), but the
+// "OFF: RUSTY SHORTBOW" quick-button and the StatsPanel "Equipped: …" line still
+// showed the BASE name — so an Acid-Etched Rusty Shortbow read as a plain Rusty
+// Shortbow (and with TWO same-named weapons equipped, one coated, you couldn't tell
+// which hand held which). Both now resolve the coating by the equipped slot ID (not
+// by name, which is ambiguous): ExplorationScreen passes the per-hand coating label
+// to InputBox, which prepends it to the button label ("off: acid-etched rusty
+// shortbow"); the attack ACTION still uses the base name + hand keyword so the parser
+// resolves the right instance. StatsPanel uses coatedDisplayName for the main/off
+// slots. shortWeaponLabel was dropping the coating adjective (last-2-tokens). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-407';
