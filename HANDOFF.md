@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-475 "Ytterbium Reduction" — splash top-left anchored,
->   scale 0.92. 471 full-bleed root overlay; 467 golem stats; 466 golem
->   repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→475**
->   playtest batch (Tellurium Refining → Ytterbium Reduction, elements 52–70) is published
+> - **LIVE (pushed 2026-06-10) = OTA-476 "Lutetium Smelting" — splash top-left anchored,
+>   scale 0.97. 471 full-bleed root overlay; 467 golem stats; 466 golem
+>   repair+naming; 465 whisper set-course; 464 reverted 463 voice auto-disable.** The whole **OTA-457→476**
+>   playtest batch (Tellurium Refining → Lutetium Smelting, elements 52–71) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,9 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 … 475 committed below (post-batch follow-ups).**
+**OTA-465 … 476 committed below (post-batch follow-ups).**
 
+- **OTA-476 "Lutetium Smelting" — [UX] splash scale nudge 0.92 → 0.97** *(element #71)*. `SPLASH_SCALE`.
 - **OTA-475 "Ytterbium Reduction" — [UX] splash scale nudge 0.85 → 0.92** *(element #70)*. `SPLASH_SCALE`.
 - **OTA-474 "Thulium Roasting" — [UX] splash scale tune (0.85)** *(element #69)*. 2/3 was too small, full too
   big → top-left-anchored `SPLASH_SCALE = 0.85`. `components/SplashOverlay.tsx`.

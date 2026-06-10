@@ -345,6 +345,8 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-476 — [UX] splash scale nudge 0.92 → 0.97 ("just a touch more"), top-left anchored. Element #71: Lutetium.
+  '2026-06-10-476': 'Lutetium Smelting',
   // OTA-475 — [UX] splash scale nudge 0.85 → 0.92 ("getting there"), top-left anchored. Element #70: Ytterbium.
   '2026-06-10-475': 'Ytterbium Reduction',
   // OTA-474 — [UX] splash scale tune: 2/3 was "too far" (small), full was "too big" → top-left-anchored

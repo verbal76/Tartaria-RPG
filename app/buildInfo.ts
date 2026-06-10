@@ -13858,4 +13858,6 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // named SPLASH_SCALE constant for easy further tuning). JS-only → OTA.
 // OTA-475 (Ytterbium Reduction) — [UX] splash scale nudge 0.85 → 0.92 ("getting there"), top-left
 // anchored. One-number SPLASH_SCALE tweak. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-475';
+// OTA-476 (Lutetium Smelting) — [UX] splash scale nudge 0.92 → 0.97 ("just a touch more"), top-left
+// anchored. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-476';
