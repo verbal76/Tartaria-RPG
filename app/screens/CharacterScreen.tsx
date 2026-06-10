@@ -339,6 +339,51 @@ export function CharacterScreen() {
           );
         })()}
 
+        {/* ── GOLEM ─────────────────────────────────────────────── */}
+        {/* OTA-467 — golem panel. Mirrors the dog: HP + trained stats (POWER /
+            RESILIENCE), which a kept-alive golem grows through combat. */}
+        {player.golem && player.golem.hp > 0 && (() => {
+          const golem = player.golem;
+          const hpPctG = golem.hpMax > 0 ? golem.hp / golem.hpMax : 0;
+          const hpColorG = hpPctG > 0.5 ? '#9ec96a' : hpPctG > 0.25 ? '#c9a86a' : '#e07a5f';
+          const gStats = golem.stats ?? { power: 0, resilience: 0 };
+          const gProg = golem.statProgress ?? { power: 0, resilience: 0 };
+          const typeLabel = golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+          const gBar = (key: 'power' | 'resilience') => {
+            const pct = Math.max(0, Math.min(1, (gProg[key] ?? 0) / 100));
+            const filled = Math.round(pct * 20);
+            return '▰'.repeat(filled) + '▱'.repeat(20 - filled);
+          };
+          return (
+            <>
+              <Text style={styles.sectionTitle}>GOLEM</Text>
+              <View style={styles.card}>
+                <Text style={styles.name}>{golem.name}</Text>
+                <Text style={styles.subline}>{typeLabel} · {golem.attackDie} {golem.damageType}</Text>
+                <View style={styles.barRow}>
+                  <Text style={styles.barLabel}>HP</Text>
+                  <View style={styles.barBg}>
+                    <View style={[styles.barFill, { width: `${Math.max(0, hpPctG * 100)}%`, backgroundColor: hpColorG }]} />
+                  </View>
+                  <Text style={styles.barValue}>{golem.hp}/{golem.hpMax}</Text>
+                </View>
+                {(['power', 'resilience'] as const).map((key) => (
+                  <View key={key} style={styles.statRow}>
+                    <Text style={styles.statKey}>{key.slice(0, 3).toUpperCase()}</Text>
+                    <View style={styles.statBody}>
+                      <Text style={styles.statTotal}>{gStats[key]}</Text>
+                      <Text style={styles.progressBar}>
+                        {gBar(key)}  <Text style={styles.progressPct}>{Math.round(gProg[key] ?? 0)}%</Text>
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+                <Text style={styles.subline}>Repair by feeding it the parts it's made of.</Text>
+              </View>
+            </>
+          );
+        })()}
+
         {/* ── STATUS EFFECTS ────────────────────────────────────── */}
         {(player.statusEffects ?? []).length > 0 && (
           <>

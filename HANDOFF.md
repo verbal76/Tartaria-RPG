@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-466 "Promethium Decay" — golem repair (feed it
->   the parts it's made of) + golem naming on summon. 465 added tap-to-set-course for
->   whispers; 464 reverted the 463 voice auto-disable (Kokoro always used).** The whole **OTA-457→466**
->   playtest batch (Tellurium Refining → Promethium Decay, elements 52–61) is published
+> - **LIVE (pushed 2026-06-10) = OTA-467 "Samarium Anneal" — golems now GAIN STATS
+>   (POWER/RESILIENCE) through combat like the dog, shown on the Character screen. 466
+>   added golem repair + naming; 465 whisper set-course; 464 reverted the 463 voice auto-disable.** The whole **OTA-457→467**
+>   playtest batch (Tellurium Refining → Samarium Anneal, elements 52–62) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,7 +382,14 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 / 466 committed below (post-batch follow-ups).**
+**OTA-465 / 466 / 467 committed below (post-batch follow-ups).**
+
+- **OTA-467 "Samarium Anneal" — [feature] golems gain stats through combat (mirrors the dog)** *(element #62)*.
+  Incentive to repair + keep a golem vs re-summon a base one. Two trainable Companion stats (optional,
+  backward-compat → 0): POWER (landed strike → +full to-hit / +half damage), RESILIENCE (surviving a hit →
+  soaks retaliation, min 1 lands). Dog's exact curve/threshold (`golems.ts` `golemStatBonus`/`trainGolemStat`).
+  Applied at both golem-damage sites. Character screen gets a GOLEM panel (HP + POW/RES bars) under the dog.
+  `types.ts`, `golems.ts`, `gameStore.ts`, `CharacterScreen.tsx`. Covered by `golemCompanion.test.ts`.
 
 - **OTA-466 "Promethium Decay" — [feature] golem repair + naming (mirrors the dog)** *(element #61)*. (1)
   Repair a surviving golem by feeding it the PARTS it's made of (its summon fuel set). `golems.ts` helpers

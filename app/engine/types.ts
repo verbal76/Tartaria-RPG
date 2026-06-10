@@ -1095,9 +1095,13 @@ export interface PendingDogOnboarding {
  *  golem QuickBtn in combat. Survives until HP ≤ 0 or until the
  *  player dismisses. */
 export type GolemKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem';
+/** OTA-467 — trainable golem stats, mirroring the dog's progression. POWER
+ *  boosts the golem's to-hit (full) and damage (half); RESILIENCE reduces the
+ *  damage it takes from retaliation. */
+export type GolemStatKey = 'power' | 'resilience';
 export interface Companion {
   kind: GolemKind;
-  /** Display label. "Mud Golem" / "Iron Golem" / etc. */
+  /** Display label. "Mud Golem" / "Iron Golem" / etc. (or a player-given name). */
   name: string;
   hp: number;
   hpMax: number;
@@ -1110,6 +1114,10 @@ export interface Companion {
   hitBonus: number;
   /** ISO ms — diagnostic only. */
   summonedAt: number;
+  /** OTA-467 — trained stats. Optional for backward-compat with golems summoned
+   *  before this OTA (absent → treated as 0). A kept-alive golem grows these. */
+  stats?: { power: number; resilience: number };
+  statProgress?: { power: number; resilience: number };
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest';

@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-467 — [feature] GOLEMS gain stats through combat, mirroring the dog — incentive to repair + keep
+  // one alive vs re-summon a base one. POWER (trains on a landed strike → +to-hit/+damage) and RESILIENCE
+  // (trains on surviving a hit → soaks retaliation) use the dog's exact progression curve. Character screen
+  // gets a GOLEM panel (HP + POW/RES progress bars) under the dog. Element #62: Samarium.
+  '2026-06-10-467': 'Samarium Anneal',
   // OTA-466 — [feature] GOLEM repair + naming, like the dog. Mend a surviving golem by feeding it the
   // PARTS it's made of (its own summon fuel: Iron ← Scrap Metal/Golem Core, etc.) via `feed/repair golem
   // <item>` + a "Repair <golem>" inventory button; only constituent parts work (heal = round(hpMax/4)). On

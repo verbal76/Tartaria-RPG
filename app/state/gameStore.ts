@@ -23576,16 +23576,28 @@ function handleGolemCommand(
   // parseEnemyAP so "Strength 4" parses to 4 instead of NaN→0; see
   // helper definition).
   const enemyAc = Math.max(5, Math.min(18, 5 + parseEnemyAP(target)));
+  // OTA-467 — trained POWER adds to the golem's to-hit (full) and damage (half),
+  // like the dog's STR. A working copy carries any stat-training from this turn
+  // through to the final state write (incl. the kill-return path).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { golemStatBonus, trainGolemStat } = require('../engine/golems');
+  let workingGolem = golem;
+  const golemPower: number = golemStatBonus(golem, 'power');
   const atkRoll = rollDie(20);
-  const atkTotal = atkRoll + golem.hitBonus;
+  const golemAtkBonus = golem.hitBonus + golemPower;
+  const atkTotal = atkRoll + golemAtkBonus;
   const hit = atkTotal >= enemyAc;
   get().appendLog(
     'combat',
-    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golem.hitBonus ? ` + ${golem.hitBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golemAtkBonus ? ` + ${golemAtkBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
   );
 
   if (hit) {
-    // Roll damage from attackDie like "1d8" + attackMod.
+    // OTA-467 — a landed strike trains POWER.
+    const tp = trainGolemStat(workingGolem, 'power', true);
+    workingGolem = tp.golem;
+    if (tp.leveled) get().appendLog('reward', `✦ ${workingGolem.name}'s Power rises to ${tp.leveled.to}.`);
+    // Roll damage from attackDie like "1d8" + attackMod + half POWER.
     const dieMatch = /^(\d+)d(\d+)$/.exec(golem.attackDie);
     let dmg = 0;
     if (dieMatch) {
@@ -23593,7 +23605,7 @@ function handleGolemCommand(
       const sides = parseInt(dieMatch[2]!, 10);
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
-    dmg += golem.attackMod;
+    dmg += golem.attackMod + Math.floor(golemPower / 2);
     const newEnemyHp = Math.max(0, targetHp - dmg);
     get().appendLog(
       'combat',
@@ -23611,6 +23623,9 @@ function handleGolemCommand(
       // submitPlayerAction), splices all six per-enemy arrays, awards, and
       // persists; we just point the active index at the golem's target first.
       get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
+      // OTA-467 — persist the POWER training the killing strike earned BEFORE the
+      // kill-resolver returns (the golem survives the fight; keep its growth).
+      set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: workingGolem } } : s));
       set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
       set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: targetIdx } } : s));
       get().resolveEnemyDefeat();
@@ -23650,11 +23665,14 @@ function handleGolemCommand(
     // for the same 1–7, so a summoned golem was an immortal tank that trivialized
     // boss fights. A tier-appropriate roll makes the golem a real but expendable
     // shield. Falls back to the old flat value if the foe has no parseable damage.
-    const enemyDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
-    const newGolemHp = Math.max(0, golem.hp - enemyDmg);
+    // OTA-467 — trained RESILIENCE soaks part of the hit (min 1 always lands).
+    const golemRes: number = golemStatBonus(workingGolem, 'resilience');
+    const rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
+    const enemyDmg = Math.max(1, rawDmg - golemRes);
+    const newGolemHp = Math.max(0, workingGolem.hp - enemyDmg);
     get().appendLog(
       'combat',
-      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}. (${newGolemHp}/${golem.hpMax})`,
+      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${golemRes > 0 ? ` (−${golemRes} soaked)` : ''}. (${newGolemHp}/${golem.hpMax})`,
     );
     if (newGolemHp <= 0) {
       get().appendLog(
@@ -23663,13 +23681,20 @@ function handleGolemCommand(
       );
       set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
     } else {
-      set((s) => s.player ? { player: { ...s.player, golem: { ...golem, hp: newGolemHp } } } : s);
+      // OTA-467 — surviving a hit trains RESILIENCE; carry the turn's POWER too.
+      let survived: typeof workingGolem = { ...workingGolem, hp: newGolemHp };
+      const tr = trainGolemStat(survived, 'resilience', true);
+      survived = tr.golem;
+      if (tr.leveled) get().appendLog('reward', `✦ ${survived.name}'s Resilience rises to ${tr.leveled.to}.`);
+      set((s) => s.player ? { player: { ...s.player, golem: survived } } : s);
     }
   } else {
     get().appendLog(
       'combat',
       `${target.name} swings at ${golem.name} and misses.`,
     );
+    // OTA-467 — no retaliation, but persist any POWER trained on this strike.
+    set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: workingGolem } } : s));
   }
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
   void get().persist();
@@ -24182,17 +24207,25 @@ function handleDogCombat(
           : s);
       }
     } else if (retaliateTarget === 'golem' && livePlayer.golem) {
-      const newGolemHp = Math.max(0, livePlayer.golem.hp - dmg);
+      // OTA-467 — trained RESILIENCE soaks part of the hit here too, and surviving
+      // it trains RESILIENCE (this is the dog-present retaliation-split path).
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { golemStatBonus: gsb, trainGolemStat: tgs } = require('../engine/golems');
+      const gRes: number = gsb(livePlayer.golem, 'resilience');
+      const gDmg = Math.max(1, dmg - gRes);
+      const newGolemHp = Math.max(0, livePlayer.golem.hp - gDmg);
       get().appendLog(
         'combat',
-        `${liveTarget.name} pivots to ${livePlayer.golem.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newGolemHp}/${livePlayer.golem.hpMax})`,
+        `${liveTarget.name} pivots to ${livePlayer.golem.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${gDmg}${gRes > 0 ? ` (−${gRes} soaked)` : ''}. (${newGolemHp}/${livePlayer.golem.hpMax})`,
       );
       if (newGolemHp <= 0) {
         set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
         get().appendLog('world', `The golem crumbles.`);
       } else {
+        const tr = tgs({ ...livePlayer.golem, hp: newGolemHp }, 'resilience', true);
+        if (tr.leveled) get().appendLog('reward', `✦ ${tr.golem.name}'s Resilience rises to ${tr.leveled.to}.`);
         set((s) => s.player && s.player.golem
-          ? { player: { ...s.player, golem: { ...s.player.golem, hp: newGolemHp } } }
+          ? { player: { ...s.player, golem: tr.golem } }
           : s);
       }
     } else {

@@ -13804,4 +13804,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // name." and the next typed input names the golem (or "skip" keeps the type label) — a one-input takeover
 // like the dog's, via the transient pendingGolemNaming flag (reset on new-game/load). Covered by
 // golemCompanion.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-466';
+// OTA-467 (Samarium Anneal) — [feature] GOLEMS now GAIN STATS through combat, mirroring the dog — the
+// incentive to repair + keep a golem alive instead of sacrificing it and re-summoning a base one. Two
+// trainable stats on Companion (optional, backward-compat: absent → 0): POWER (adds full to the golem's
+// to-hit + half to its damage) trains on a landed strike; RESILIENCE (soaks retaliation damage, min 1
+// always lands) trains on surviving a hit. Same per-tier diminishing-returns curve + 100-progress
+// level-up threshold as the dog (golems.ts golemStatBonus / trainGolemStat mirror dogCompanion). Applied
+// at BOTH golem-damage sites (handleGolemCommand's strike+retaliation and the dog-present retaliation
+// split). makeCompanion seeds {power:0, resilience:0}. The Character screen gets a GOLEM panel under the
+// dog's — HP + POW/RES with the same fractional progress bars — so a veteran golem reads as stronger than
+// a fresh summon. Covered by golemCompanion.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-10-467';

@@ -16,6 +16,7 @@
 // can see what fuel each variant needs.
 
 import type { Companion, GolemKind } from './types';
+import type { GolemStatKey } from './types';
 
 export interface GolemRecipeFuel {
   /** Item name as written in the catalog (materials.json). */
@@ -144,6 +145,69 @@ export function makeCompanion(def: GolemDefinition): Companion {
     hitBonus: def.hitBonus,
     damageType: def.damageType,
     summonedAt: Date.now(),
+    // OTA-467 — trainable stats start at 0; a kept-alive golem grows them.
+    stats: { power: 0, resilience: 0 },
+    statProgress: { power: 0, resilience: 0 },
+  };
+}
+
+// ----- OTA-467: golem stat progression (mirrors dogCompanion.trainDogStat) ----
+//
+// A golem that survives combat builds POWER (to-hit + damage) and RESILIENCE
+// (damage reduction). Same per-tier diminishing-returns curve and 100-progress
+// level-up threshold as the dog, so the two companions level on identical math.
+// This is the incentive to repair + keep a golem rather than re-summon a base one.
+
+function golemProgressAwardFor(currentStat: number): number {
+  if (currentStat <= 5)  return 3;
+  if (currentStat <= 10) return 2;
+  if (currentStat <= 14) return 1;
+  if (currentStat <= 18) return 0.5;
+  if (currentStat <= 22) return 0.25;
+  return 0.1;
+}
+
+const GOLEM_LEVEL_UP_THRESHOLD = 100;
+
+/** Read a trained golem stat, tolerating golems summoned before OTA-467. */
+export function golemStatBonus(golem: Companion, key: GolemStatKey): number {
+  return golem.stats?.[key] ?? 0;
+}
+
+export interface GolemTrainResult {
+  golem: Companion;
+  leveled: { stat: GolemStatKey; from: number; to: number } | null;
+}
+
+/** Train one golem stat on a successful action. Failures don't train. Preserves
+ *  hp and every other field — only stats/statProgress change. */
+export function trainGolemStat(
+  golem: Companion,
+  stat: GolemStatKey,
+  success: boolean,
+): GolemTrainResult {
+  if (!success) return { golem, leveled: null };
+  const stats = golem.stats ?? { power: 0, resilience: 0 };
+  const statProgress = golem.statProgress ?? { power: 0, resilience: 0 };
+  const baseStat = stats[stat];
+  const award = golemProgressAwardFor(baseStat);
+  if (award <= 0) return { golem, leveled: null };
+  let progress = statProgress[stat] + award;
+  let next = baseStat;
+  let leveled: GolemTrainResult['leveled'] = null;
+  while (progress >= GOLEM_LEVEL_UP_THRESHOLD) {
+    progress -= GOLEM_LEVEL_UP_THRESHOLD;
+    const before = next;
+    next = before + 1;
+    if (!leveled) leveled = { stat, from: before, to: next };
+  }
+  return {
+    golem: {
+      ...golem,
+      stats: { ...stats, [stat]: next },
+      statProgress: { ...statProgress, [stat]: progress },
+    },
+    leveled,
   };
 }
 
