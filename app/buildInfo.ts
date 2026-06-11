@@ -13905,4 +13905,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // corner by SPLASH_OFFSET = 40dp (≈1/4" at RN's 160dp-per-inch baseline; RN has no true DPI API) on both
 // top + left. Still grows down-right FROM the anchored corner; the thin top/left margin this exposes is the
 // overlay's near-black backing (#0b0a09), which matches the art's dark vignette. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-483';
+// OTA-484 (Gold Inlay) — [polish] REVERTS OTA-483's splash offset. The 40dp top/left offset read as the art
+// moving DOWN-AND-LEFT — it just exposed a black top/left margin (player: "you moved it down and left").
+// Correct model: the image is anchored by its TOP-LEFT corner, so enlarging ALONE grows it down-right from
+// that corner — no offset. Removed SPLASH_OFFSET (back to top/left = 0) and enlarged ~15% over the 0.97
+// baseline → SPLASH_SCALE = 1.12. Width grows, height follows the same ratio (aspect preserved, no stretch).
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-484';

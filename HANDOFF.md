@@ -378,14 +378,18 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
-- **OTA-483 "Platinum Leaf" — [polish] splash-art framing** *(element #78)*. Player: *"maybe just about a
-  1/4 inch down and right. enlarge it, not stretch. keep the top left anchored."* `SplashOverlay.tsx`:
-  bumped `SPLASH_SCALE` 0.97 → 1.06 (width grows, height follows the SAME ratio → aspect preserved, no
-  stretch) and added `SPLASH_OFFSET = 40dp` (≈1/4" at RN's 160dp/inch baseline) applied to the image's
-  `top` + `left`. Still top-left-anchored (grows down-right from that corner); the thin top/left margin
-  exposed is the overlay backing `#0b0a09`, matching the art's dark vignette. JS-only → OTA.
-  **NOTE:** purely visual — no test (no behavior to assert); eyeball on next launch and tell me to nudge
-  scale/offset if it overshoots.
+- **OTA-484 "Gold Inlay" — [polish] splash-art framing, REVERTS 483's offset** *(element #79)*. The 483
+  `SPLASH_OFFSET = 40dp` read as the art moving DOWN-AND-LEFT — it just exposed a black top/left margin
+  (player: *"you moved it down and left… the top left corner is the image's anchor so when you enlarge it
+  keep the top left anchored… enlarge it maybe 15% and then re-anchor the top left corner"*). Correct model:
+  enlarging ALONE grows the top-left-anchored image down-right; no offset. `SplashOverlay.tsx`: removed
+  `SPLASH_OFFSET` (back to `top/left = 0`) and bumped `SPLASH_SCALE` 0.97 → **1.12** (~15% over baseline,
+  aspect preserved, no stretch). Supersedes OTA-483. JS-only → OTA. **NOTE:** purely visual — no test;
+  eyeball on next launch, tell me to nudge the 15% up/down if needed.
+- **OTA-483 "Platinum Leaf" — [polish] splash-art framing — SUPERSEDED by 484 (offset reverted)** *(element
+  #78)*. Bumped `SPLASH_SCALE` 0.97 → 1.06 and added `SPLASH_OFFSET = 40dp` on `top`/`left`. The offset was
+  wrong (exposed a black margin → looked "down and left"); 484 reverts it and keeps just the enlarge.
+  `SplashOverlay.tsx`. Already published live (run #977) before the correction.
 
 ---
 
