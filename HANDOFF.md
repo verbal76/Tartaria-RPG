@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-485 "Mercury Gilding" — [polish] companion-item inventory stripes** *(element #80)*. Player: *"the
+  dog's name is in a gold color, and the [golem's] color is a purple color. so the items that can be fed or
+  used on them should have diagonal stripes on them in that color in the box that is the inventory item's
+  background… mostly translucent but still easily visible but not blocking anything in writing."*
+  `InventoryScreen.tsx`: new `CompanionStripes` (faint 45° diagonal hatch, plain `<View>` bands — no
+  svg/gradient dep so it's OTA-safe) rendered back-most in each item row with `pointerEvents none` @ ~0.2
+  opacity. Colour = the companion's name hue: GOLD `#c9a86a` (dog) / PURPLE `#9888a8` (golem). Eligibility
+  mirrors the modal buttons (no drift): dog = active dog + consumable **or** dog_armor; golem = active golem
+  + repair part **or** golem weapon. **NOTE:** purely visual — no test; eyeball on next launch, tell me if
+  the 0.2 opacity needs to be stronger/fainter.
 - **OTA-484 "Gold Inlay" — [polish] splash-art framing, REVERTS 483's offset** *(element #79)*. The 483
   `SPLASH_OFFSET = 40dp` read as the art moving DOWN-AND-LEFT — it just exposed a black top/left margin
   (player: *"you moved it down and left… the top left corner is the image's anchor so when you enlarge it

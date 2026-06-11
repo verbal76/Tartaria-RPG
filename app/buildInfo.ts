@@ -13911,4 +13911,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that corner — no offset. Removed SPLASH_OFFSET (back to top/left = 0) and enlarged ~15% over the 0.97
 // baseline → SPLASH_SCALE = 1.12. Width grows, height follows the same ratio (aspect preserved, no stretch).
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-484';
+// OTA-485 (Mercury Gilding) — [polish] COMPANION-ITEM stripes in the inventory. Items the player can FEED or
+// USE ON a companion now carry faint diagonal hatching in that companion's signature colour (the hue its
+// name renders in): GOLD (#c9a86a) for the dog, PURPLE (#9888a8) for the golem — a glanceable "this is for
+// my dog / golem" cue while scanning the pack. Eligibility mirrors the modal action buttons exactly (no
+// drift): dog = active dog + a consumable (Feed) or a dog_armor vest; golem = active golem + a repair part
+// (Repair) or a golem weapon (Arm). Drawn with plain <View> bands (oversized 45°-rotated flex row clipped by
+// the row's overflow:'hidden') — NO svg/gradient dep, so it ships OTA. Rendered back-most with
+// pointerEvents none at ~0.2 opacity: mostly translucent, still visible, never blocks a tap or any text.
+// app/screens/InventoryScreen.tsx. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-485';

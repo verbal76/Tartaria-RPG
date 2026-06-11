@@ -708,6 +708,30 @@ export function InventoryScreen() {
     coatPickerButtons.push({ label: 'Cancel', onPress: () => setCoatTarget(null), tone: 'neutral' });
   }
 
+  // OTA-485 — companion-item background stripes. Items the player can FEED or USE
+  // ON a companion get faint diagonal hatching in that companion's signature colour
+  // (the same hue its name renders in): GOLD for the dog, PURPLE for the golem — so
+  // the player can spot "this is for my dog / golem" at a glance while scanning the
+  // pack. Eligibility mirrors the modal action buttons exactly (no drift):
+  //   • dog (gold)   — active dog + a consumable (Feed) or a dog_armor vest (Equip on dog).
+  //   • golem (purple) — active golem + a repair part (Repair) or a golem weapon (Arm).
+  const dogActiveForStripe = !!player.dog
+    && player.dog.status !== 'abandoned'
+    && player.dog.status !== 'dead';
+  const golemForStripe = player.golem;
+  const golemActiveForStripe = !!golemForStripe && golemForStripe.hp > 0;
+  const companionStripeColor = (item: InventoryItem): string | null => {
+    if (dogActiveForStripe && (item.kind === 'consumable' || item.kind === 'dog_armor')) {
+      return COMPANION_STRIPE_DOG;
+    }
+    if (golemActiveForStripe && golemForStripe) {
+      if (isGolemRepairPart(golemForStripe.kind, item.name)) return COMPANION_STRIPE_GOLEM;
+      const w = findWeaponByName(item.name);
+      if (w && isGolemWeapon(w.tags)) return COMPANION_STRIPE_GOLEM;
+    }
+    return null;
+  };
+
   return (
     <View style={styles.container}>
       {/* OTA-230 — first-time inventory hint. Pops once per install
@@ -791,6 +815,7 @@ export function InventoryScreen() {
                   fillSlotLabel={slotFillLabelFor(item)}
                   isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
                   slotTaken={itemSlotTaken(item)}
+                  stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                 />
               ))}
@@ -989,6 +1014,35 @@ const pouchStyles = StyleSheet.create({
   slotEmptyTextActive: { color: '#c9a86a' },
 });
 
+// OTA-485 — companion signature colours, matched to the hues each name renders in
+// (StatsPanel: dogName #c9a86a gold, golemName #9888a8 purple).
+const COMPANION_STRIPE_DOG = '#c9a86a';
+const COMPANION_STRIPE_GOLEM = '#9888a8';
+
+// OTA-485 — diagonal hatch drawn with plain <View>s (no SVG / gradient dependency,
+// so the whole thing ships over-the-air). A row of vertical bands inside an
+// oversized layer rotated 45°; the row's overflow:'hidden' clips it to the item
+// box. Low opacity keeps it "mostly translucent but still visible," and
+// pointerEvents none + back-most paint order keep it from blocking taps or text.
+const STRIPE_BAND = 6;      // width of each coloured band (dp)
+const STRIPE_GAP = 9;       // clear gap between bands (dp)
+const STRIPE_COUNT = 60;    // enough bands to cover a full-width row once rotated
+const STRIPE_OPACITY = 0.2; // mostly translucent, still legible over the dark row
+
+function CompanionStripes({ color }: { color: string }) {
+  const bands = [];
+  for (let i = 0; i < STRIPE_COUNT; i++) {
+    bands.push(
+      <View key={i} style={{ width: STRIPE_BAND, marginRight: STRIPE_GAP, backgroundColor: color }} />,
+    );
+  }
+  return (
+    <View pointerEvents="none" style={styles.stripeClip}>
+      <View style={styles.stripeField}>{bands}</View>
+    </View>
+  );
+}
+
 function ItemRow({
   item,
   color,
@@ -997,6 +1051,7 @@ function ItemRow({
   fillSlotLabel,
   isPouched,
   slotTaken,
+  stripeColor,
   onPress,
 }: {
   item: InventoryItem;
@@ -1006,6 +1061,7 @@ function ItemRow({
   fillSlotLabel: string;
   isPouched: boolean;
   slotTaken: boolean;
+  stripeColor: string | null;
   onPress: () => void;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
@@ -1027,6 +1083,11 @@ function ItemRow({
       onPress={onPress}
       activeOpacity={0.7}
     >
+      {/* OTA-485 — faint diagonal hatching behind the row for companion-edible/
+          usable items. Rendered FIRST so it sits behind the rarity stripe + the
+          text body; pointerEvents none + low opacity so it never blocks a tap or
+          obscures any writing. */}
+      {stripeColor && <CompanionStripes color={stripeColor} />}
       <View style={[styles.rowStripe, { backgroundColor: color }]} />
       <View style={styles.rowBody}>
         <View style={styles.rowHead}>
@@ -1205,6 +1266,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 4,
     overflow: 'hidden',
+  },
+  // OTA-485 — companion hatch. `stripeClip` fills the row and clips (the row also
+  // has overflow:'hidden'); `stripeField` is an oversized, 45°-rotated flex row of
+  // bands so the diagonal lines cover the whole box at any width.
+  stripeClip: { ...StyleSheet.absoluteFillObject, opacity: STRIPE_OPACITY, overflow: 'hidden' },
+  stripeField: {
+    position: 'absolute',
+    top: -140, bottom: -140, left: -140, right: -140,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    transform: [{ rotate: '45deg' }],
   },
   rowStripe: { width: 4 },
   rowBody: { flex: 1, padding: 8 },
