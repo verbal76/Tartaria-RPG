@@ -75,6 +75,8 @@ export function ExplorationScreen() {
   // OTA-507 — drives the hidden-location "?" so the travel row doesn't leak the
   // real name before arrival/discovery.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  // OTA-508 — the Hidden Market offers the Fuse Cauldron at every stall.
+  const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
@@ -695,7 +697,7 @@ export function ExplorationScreen() {
           spawn macro-location). A wild fusion_bench permit (fusionPending)
           still shows it anywhere. This also keeps it off-screen for the whole
           tutorial, which runs before you've ever left. */}
-      {(player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)) && (() => {
+      {(player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts

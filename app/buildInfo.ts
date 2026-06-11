@@ -14105,4 +14105,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the name straight from the catalog with no reveal gate. Both now run it through revealedLocationName, so a
 // HIDDEN, not-yet-discovered destination stays "?" until the player actually arrives (discoveredLocationIds);
 // canon/static names are unaffected. app/screens/ExplorationScreen.tsx, app/state/gameStore.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-507';
+// OTA-508 (Lawrencium Bazaar) — [feature] the Hidden Market now PRESENTS as a market. Player arrived and saw
+// only the usual cardinal exits — the 4-stall market building (sceneBuilding='market', wired OTA-498) existed
+// but required a manual "enter". Now beginScene AUTO-ENTERS the market on arrival at hidden_market, so the
+// existing building UX takes over: the cardinal buttons become the four STALL buttons (weapons / armor / food
+// / materials — each a category vendor via buildStallVendor that sells only its kind and buys anything) + an
+// EXIT button (exitBuilding → back to the location, then the map). Plus the FUSE CAULDRON: the fusion banner
+// (ExplorationScreen) + the fuse permit (fuseAtCrucible) now both accept activeBuildingId==='market', so the
+// Crucible is available at the market without a wild fusion-bench. gameStore + ExplorationScreen. NOTE: per-
+// stall CONTRACTS (item-category contracts at each stall) are the remaining follow-up. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-508';

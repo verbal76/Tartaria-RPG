@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-508 "Lawrencium Bazaar" — [feature] Hidden Market auto-opens as a 4-stall market + Fuse Cauldron**
+  *(element #103)*. Player arrived at the Hidden Market and saw only the usual cardinal exits — the 4-stall
+  market building (sceneBuilding='market', OTA-498) existed but needed a manual "enter". Now `beginScene`
+  AUTO-ENTERS the market on arrival at `hidden_market` (deferred microtask, guarded), so the existing building
+  UX takes over: cardinals → the four STALL buttons (weapons/armor/food/materials, each a `buildStallVendor`
+  category vendor that sells only its kind + buys anything) + EXIT (exitBuilding → location → map). FUSE
+  CAULDRON: the fusion banner (`ExplorationScreen`) + the fuse permit (`fuseAtCrucible`) now both accept
+  `activeBuildingId==='market'`, so the Crucible works at the market with no wild fusion-bench. `gameStore.ts`,
+  `ExplorationScreen.tsx`. **REMAINING follow-up: per-stall CONTRACTS (item-category contracts at each stall).**
+  (Pre-existing unrelated red: `stealthGearAndFusion` synthesizeFusionDeterministic — strength bonus on a
+  metal fusion; not from this work.)
 - **OTA-507 "Nobelium Veil" — [bugfix] hidden-location name leaked on the travel row before arrival** *(element
   #102)*. Player routed to the Hidden Market "?" and the exploration window's travel button read "→ THE HIDDEN
   MARKET" while still 6 moves out (and the course log named it too), spoiling the reveal. The travel-row name

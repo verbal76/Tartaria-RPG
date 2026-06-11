@@ -4618,7 +4618,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb36 — announce a discovered structure so the new ENTER affordance
     // isn't unexplained. Skipped on the opening scene (you start on the
     // anchor, so sceneBuilding is null there anyway).
-    if (scene.sceneBuilding && !opts?.isOpening) {
+    if (scene.sceneBuilding === 'market' && scene.location.id === 'hidden_market' && !opts?.isOpening && !get().activeBuildingId) {
+      // OTA-508 — the Hidden Market IS the market: auto-enter it on arrival so the
+      // four stall buttons (weapons / armor / food / materials) + EXIT replace the
+      // cardinals immediately, instead of requiring a separate "enter" step. Deferred
+      // so it runs AFTER beginScene's own set() lands (no re-entrancy).
+      void Promise.resolve().then(() => {
+        if (get().currentScene?.location.id === 'hidden_market' && !get().activeBuildingId) {
+          get().enterBuilding('market');
+        }
+      });
+    } else if (scene.sceneBuilding && !opts?.isOpening) {
       get().appendLog('world', buildingApproachLine(scene.sceneBuilding));
     }
     // OTA-244 — danger-vs-tier warning. Player playtest: ate a
@@ -19109,7 +19119,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // macro-location). This keeps fusion out of the tutorial / first beat.
     const hasLeftOutpost = (player.macroVisitSeq ?? 0) >= 1;
     const atOutpostCrucible = !!player.hubRoomId && hasLeftOutpost;
-    if (!player.fusionPending && !atOutpostCrucible) {
+    // OTA-508 — the Hidden Market offers the Fuse Cauldron at every stall.
+    const atMarketCrucible = get().activeBuildingId === 'market';
+    if (!player.fusionPending && !atOutpostCrucible && !atMarketCrucible) {
       get().appendLog(
         'arbiter',
         !!player.hubRoomId && !hasLeftOutpost
