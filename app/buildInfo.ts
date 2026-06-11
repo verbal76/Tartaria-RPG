@@ -13990,4 +13990,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // locked item there first. Test: __tests__/questItemLock.test.ts (+ inventorySnapshot test corrected for the
 // OTA-491 throwable→Weapons move). questItems.ts, InventoryCategorize.ts, InventoryScreen.tsx, gameStore.ts.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-493';
+// OTA-494 (Actinium Sieve) — [bugfix] extend the foreign-word sieve (OTA-488) to the OTHER model-narration
+// sites. 488 only sieved narrateViaArbiter (the combat/world feed); the INVESTIGATION one-liner / lore
+// generator and the Ask-the-Arbiter persona answer were still raw, so a Qwen code-switch ("huà") could leak
+// there. Both now run their generated text through stripForeignWords: the LoreGenerator callback is wrapped
+// (`async (m,o) => stripForeignWords(await qwen.generate(...))`, covering investigate lines + the patched
+// entry.result.line) and arbiterPersonaAnswer sieves its answer. app/state/gameStore.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-494';

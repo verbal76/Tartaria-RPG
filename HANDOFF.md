@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-494 "Actinium Sieve" — [bugfix] foreign-word sieve on the OTHER narration sites** *(element #89)*.
+  OTA-488 only sieved `narrateViaArbiter` (the combat/world feed). The **investigation** one-liner / lore
+  generator and the **Ask-the-Arbiter** persona answer were still raw — a model code-switch ("huà") could
+  leak there. Both now run through `stripForeignWords`: the `LoreGenerator` callback is wrapped
+  (`async (m,o) => stripForeignWords(await qwen.generate(...))`, covering investigate lines + the patched
+  `entry.result.line`) and `arbiterPersonaAnswer` sieves its answer. `gameStore.ts`.
 - **OTA-493 "Radium Vault" — [feature] Quest Items section + lock** *(element #88)*. Player: clicking the
   Nimari Core let it be dropped or saved-to-be-fused; quest items should lock + sit in their own section at
   the end of the inventory. New `app/engine/questItems.ts` `isQuestLockedItem` (tags
@@ -1157,6 +1163,20 @@ The entries below are retained as the shipped-batch record.
 > **Reminder — `HaL2001` is the conduit because it owns the signed store workflows.** The
 > production AAB step strips `.hal2001` → `com.hotatticgames.tartarprim` for Play; the iOS
 > path is signed for TestFlight. Everything we do lands here and ships from here.
+>
+> ---
+> **🔧 QUEUED FOR THE NEXT NATIVE BUILD (whenever one is fired — NOT OTA-able):**
+> 1. **Raise the AsyncStorage DB cap.** Android AsyncStorage defaults to a ~6 MB SQLite DB;
+>    a player's Galaxy **S26** hit `persist FAILED — storage full` at only 193 KB of save
+>    because the DB was full (2026-06-11). OTA-490 (Astatine Purge) made the emergency
+>    reclaim deep-sweep all regenerable keys so a full DB self-heals — the OTA mitigation —
+>    but the **durable ceiling fix is native:** add `expo-build-properties` with
+>    `AsyncStorage_db_size_in_MB` (e.g. 50) in `app.json` plugins so the DB can't fill at
+>    realistic save sizes. Takes effect only on a native rebuild.
+> 2. **Confirm the S26 save behaves** once #1 (or the OTA-490 reclaim) is on-device. If it
+>    fails again, OTA-490's new diagnostic now prints the REAL cause in the persist log —
+>    `setItem threw …` (full DB) vs `readback mismatch (got N vs M)` (CursorWindow
+>    truncation) — so grab that line to confirm which path it is before acting further.
 >
 > ---
 > **ARCHIVED REFERENCE — iOS build → TestFlight (RESOLVED; keep for if a build is ever

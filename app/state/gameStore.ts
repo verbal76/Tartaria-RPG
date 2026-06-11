@@ -633,7 +633,9 @@ async function arbiterPersonaAnswer(question: string): Promise<string | null> {
       ],
       { maxNewTokens: 90, temperature: 0.7 },
     );
-    const line = (out ?? '').trim();
+    // OTA-494 — sieve foreign words from the Ask-the-Arbiter answer too (same
+    // model code-switch risk as the narration feed).
+    const line = stripForeignWords((out ?? '').trim());
     return line.length > 0 ? line : null;
   } catch {
     return null;
@@ -7824,8 +7826,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               //          repeat tap's callback or the next room
               //          entry's echo hook.
               const baseOutcome = rollInvestigationOutcome(tableEntry);
+              // OTA-494 — sieve foreign words out of the lore/investigation
+              // generator the same way narrateViaArbiter does (OTA-488), so a
+              // model code-switch ("huà") can't leak into investigate one-liners
+              // or the patched entry.result.line either.
               const qwenGenerator: LoreGenerator | null = qwen.isReady()
-                ? (messages, opts) => qwen.generate(messages, opts)
+                ? async (messages, opts) => stripForeignWords(await qwen.generate(messages, opts))
                 : null;
               const locationName =
                 currentScene.location.name ?? 'this place';
