@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-493 "Radium Vault" — [feature] Quest Items section + lock** *(element #88)*. Player: clicking the
+  Nimari Core let it be dropped or saved-to-be-fused; quest items should lock + sit in their own section at
+  the end of the inventory. New `app/engine/questItems.ts` `isQuestLockedItem` (tags
+  `quest|contract|broker|whisper`). Drop/sell/scrap/gift already refused `quest` (OTA-461); the **fusion**
+  reserve was the leak (the Core is catalog-absent → passed the inferred-item gate) — `toggleReserveForFusion`
+  now refuses locked items, and the inventory modal goes view-only for them (no drop/scrap/sell/gift/fuse +
+  a "reserved for your objective" note). New `quest` category ("Quest Items") pinned to the END of
+  `CATEGORY_ORDER`; `categorizeItem` routes locked items there first. Tests:
+  `__tests__/questItemLock.test.ts` (+ `inventorySnapshot.test.ts` corrected for the OTA-491 throwable→Weapons
+  move). `questItems.ts`, `InventoryCategorize.ts`, `InventoryScreen.tsx`, `gameStore.ts`.
 - **OTA-492 "Francium Wash" — [feature] coatings apply to BLUDGEONING weapons too** *(element #87)*. Player:
   *"let's change coatings to apply to piercing and bludgeoning weapons as well as slashing ones."*
   `isCoatableWeapon`'s melee gate was slashing|piercing; now all physical melee

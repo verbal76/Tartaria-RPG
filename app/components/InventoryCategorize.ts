@@ -1,6 +1,7 @@
 import type { InventoryItem } from '../engine/types';
 import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS } from '../engine/crafting';
 import { itemIsTool } from '../engine/pouchEligibility';
+import { isQuestLockedItem } from '../engine/questItems';
 
 export type InventoryCategory =
   | 'weapon'
@@ -10,7 +11,9 @@ export type InventoryCategory =
   | 'tool'
   | 'relic'
   | 'material'
-  | 'loot';
+  | 'loot'
+  // OTA-493 — locked objective items (quest / contract / whisper). Always LAST.
+  | 'quest';
 
 // Color coding used by both the inventory screen rows and the legend
 // strip at the bottom. Tuned to fit the existing dark/amber palette.
@@ -23,6 +26,7 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   relic: '#b88ce0',
   material: '#c9a86a',
   loot: '#a89a7a',
+  quest: '#d9c34a', // gold — reserved objective items (locked)
 };
 
 export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
@@ -34,6 +38,7 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   relic: 'Relics',
   material: 'Materials',
   loot: 'Loot',
+  quest: 'Quest Items',
 };
 
 // Order the categories appear in. Weapons first (most actionable),
@@ -48,6 +53,7 @@ export const CATEGORY_ORDER: InventoryCategory[] = [
   'relic',
   'material',
   'loot',
+  'quest', // OTA-493 — reserved objective items pinned to the END of the list
 ];
 
 // arb101 — the inventory TOOLS category now uses the SAME tool definition as
@@ -61,6 +67,10 @@ export const isToolItem = itemIsTool;
 
 export function categorizeItem(item: InventoryItem): InventoryCategory {
   const nameLower = item.name.toLowerCase();
+  // OTA-493 — locked objective items (quest / contract / whisper) ALWAYS go to the
+  // Quest Items section, ahead of every other bucket, regardless of their other
+  // tags/kind (a Core is kind 'misc'; a whisper token also carries 'aether').
+  if (isQuestLockedItem(item)) return 'quest';
   // Catalog name matches take precedence over kind/tag heuristics — if a
   // crafted Aetheric Torch shows up with kind='relic', it should still
   // resolve to 'relic' via the GEAR catalog.
@@ -113,6 +123,7 @@ export function groupInventoryByCategory(
     relic: [],
     material: [],
     loot: [],
+    quest: [],
   };
   for (const item of inventory) {
     groups[categorizeItem(item)].push(item);

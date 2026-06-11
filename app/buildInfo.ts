@@ -13980,4 +13980,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // physical-projectile (piercing) only; aetheric/energy melee + energy ranged + runecasters still can't be
 // coated (no surface to hold it). Golem armaments + fused weapons remain always-coatable (isCoatableItem).
 // Tests updated: __tests__/weaponCoating.test.ts. app/engine/weaponCoating.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-492';
+// OTA-493 (Radium Vault) — [feature] QUEST ITEMS section + lock. Player: clicking the Nimari Core let it be
+// dropped or saved-to-be-fused; quest items should be locked + live in their own end-of-list section. New
+// app/engine/questItems.ts `isQuestLockedItem` (tags quest|contract|broker|whisper). Drop/sell/scrap/gift
+// already refused 'quest' (OTA-461); the FUSION-reserve was the leak (the Core is catalog-absent so it
+// passed the inferred-item gate) — `toggleReserveForFusion` now refuses locked items, and the inventory
+// modal hides drop/scrap/sell/gift/fuse for them (view-only + a "reserved for your objective" note). New
+// 'quest' inventory category ("Quest Items") pinned to the END of CATEGORY_ORDER; categorizeItem routes any
+// locked item there first. Test: __tests__/questItemLock.test.ts (+ inventorySnapshot test corrected for the
+// OTA-491 throwable→Weapons move). questItems.ts, InventoryCategorize.ts, InventoryScreen.tsx, gameStore.ts.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-493';

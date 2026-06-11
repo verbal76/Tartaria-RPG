@@ -21,6 +21,7 @@ import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
 import { isGolemRepairPart, isGolemWeapon } from '../engine/golems';
+import { isQuestLockedItem } from '../engine/questItems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -414,6 +415,12 @@ export function InventoryScreen() {
     tone?: 'primary' | 'destructive' | 'neutral';
   }[] => {
     if (!pending) return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
+    // OTA-493 — locked objective items (quest / contract / whisper) are view-only:
+    // no drop, scrap, sell, gift, or fusion-reserve. They exist solely to be turned
+    // in for their purpose, so the modal offers nothing but Close.
+    if (isQuestLockedItem(pending.item)) {
+      return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
+    }
     try {
     // Only show Unequip buttons when THIS specific item is the equipped one
     // (not just same-named). Prevents the modal on a second locket from
@@ -655,9 +662,11 @@ export function InventoryScreen() {
     try { modalPreview = getItemPreviewForInstance(pending.item); }
     catch { modalPreview = null; }
   }
-  const modalBody = pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
-    ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
-    : undefined;
+  const modalBody = pending && isQuestLockedItem(pending.item)
+    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, gifted, or fused.'
+    : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
+      ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
+      : undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦

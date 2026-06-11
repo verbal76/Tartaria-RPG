@@ -67,17 +67,18 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     expect(out).toMatch(/Scrap Metal ×8/);
   });
 
-  it('OTA-204 — uses the UI LOOT bucket for gear.json kind:misc items + uncatalogued items', () => {
+  it('OTA-204/491 — uncatalogued kind:misc loot → LOOT; a throwable misc → Weapons', () => {
     const inv: InventoryItem[] = [
-      // Shaped Aetheric Shard lives in gear.json with kind:'misc'.
-      // The UI categorizer routes it to LOOT, NOT Materials.
+      // OTA-491 — Shaped Aetheric Shard (gear.json kind:'misc' + 'throwable') is a
+      // one-throw WEAPON now, so the categorizer routes it to Weapons, not Loot.
       mkItem({ name: 'Shaped Aetheric Shard', kind: 'misc', tags: ['throwable', 'aether'] }),
       // Tortoise Shell is NOT in any catalog AND has no material-tag
       // match (only 'loot', 'improvised') → falls through to LOOT.
       mkItem({ name: 'Tortoise Shell', kind: 'misc', tags: ['loot', 'improvised'] }),
     ];
     const out = buildInventorySnapshot(mkPlayer({ inventory: inv }));
-    expect(out).toMatch(/Loot \(2\)/);
+    expect(out).toMatch(/Loot \(1\)/);
+    expect(out).toMatch(/Weapons \(1\)/);
     expect(out).toMatch(/Shaped Aetheric Shard/);
     expect(out).toMatch(/Tortoise Shell/);
   });

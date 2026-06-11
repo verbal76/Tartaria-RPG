@@ -69,6 +69,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { stripForeignWords } from '../engine/foreignText';
+import { isQuestLockedItem } from '../engine/questItems';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
@@ -18867,6 +18868,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) return;
+    // OTA-493 — quest / contract / whisper items are locked objectives: they can
+    // only be turned in for their purpose, never fused. (The Nimari Core is
+    // catalog-absent, so it passed the inferred-item gate below and could be
+    // reserved — this closes that leak; the inventory modal also hides the button.)
+    if (isQuestLockedItem(item)) return;
     // Catalog-bound items can't be reserved — they have a fixed
     // identity and the fusion bench only operates on inferred items.
     // arb105 EXCEPTION: faction-gear items (tagged `faction_gear`) CAN be
