@@ -2,6 +2,7 @@ import vendorsData from '../data/npcs/vendors.json';
 import roadsideData from '../data/npcs/roadside_traders.json';
 import weaponsData from '../data/items/weapons.json';
 import armorData from '../data/items/armor.json';
+import ringsData from '../data/items/rings.json';
 import materialsData from '../data/items/materials.json';
 import gearData from '../data/items/gear.json';
 import { pickWeighted } from './rng';
@@ -44,6 +45,9 @@ interface FactionGearRow { name: string; faction?: string; tc?: number; rarity?:
 const FACTION_GEAR: FactionGearRow[] = [
   ...(((weaponsData as unknown as { weapons?: FactionGearRow[] }).weapons ?? [])),
   ...(((armorData as unknown as { armor?: FactionGearRow[] }).armor ?? [])),
+  // OTA-497 — faction-issue RINGS (perk-only, one per faction) now stock at the
+  // player's own faction armory alongside its weapons + armor.
+  ...(((ringsData as unknown as { rings?: FactionGearRow[] }).rings ?? [])),
 ].filter((it) => (it.tags ?? []).includes('faction_gear'));
 export function factionGearOffers(factionId: string): VendorOffer[] {
   return FACTION_GEAR

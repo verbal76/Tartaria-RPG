@@ -14012,4 +14012,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // __tests__/coatingNotARing.test.ts. ALSO resumed the codename-obfuscation layer (buildCodename.ts +
 // docs/build-codenames.md) which had lapsed after OTA-327 — backfilled OTA-483→496 so the About screen stops
 // leaking raw `(2026-06-11-NNN)` ids (328→482 gap still open). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-496';
+// OTA-497 (Uranium Band) — [feature] PERK-ONLY FACTION RINGS, one per faction (player request), sold by the
+// player's own faction armory. Each adds a single themed +2 stat bonus and NOTHING else (no AC, no HP, no
+// resist) — name matched to the faction's identity: Ring of Shadows (conspiracy_architects, +2 Stealth),
+// Titanhold Ring (servants_of_giants, STR), Tartarian Oath-Band (true_tartarians, STR), Light-Finger Guild
+// Band (reclaimers_guild, DEX), Ring of Forgotten Lore (forgotten_order, INT), Revivalist's Aether-Coil
+// (tartarian_revivalists, INT), Architect's Insight Ring (stone_builders, WIS), Monarch's Drowned Signet
+// (mud_monarchs, CHA), Aetherborn Signet (eternal_dynasty, CHA). Added to rings.json tagged faction_gear +
+// faction + tc; vendors.ts FACTION_GEAR now also reads rings (was weapons+armor only) so factionGearOffers
+// stocks them; CatalogAccessory gained optional faction/tc. Test: __tests__/factionRings.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-497';

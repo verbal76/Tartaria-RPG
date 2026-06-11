@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-497 "Uranium Band" — [feature] perk-only faction rings (one per faction)** *(element #92)*. Player:
+  *"a few more rings that add no ac or HP but only the other perks and are sold by factions… make the faction
+  names match what they do… do rings per faction."* Added 9 rings to `rings.json`, each a single themed +2
+  stat bonus and nothing else (no AC/HP/resist), tagged `faction_gear` + `<faction>` + `tc`. `vendors.ts`
+  `FACTION_GEAR` now also reads `rings.json` (was weapons+armor only), so `factionGearOffers(player.factionId)`
+  stocks the player's own faction ring at its armory. `CatalogAccessory` gained optional `faction`/`tc`.
+  Mapping: Ring of Shadows (conspiracy, +2 Stealth) · Titanhold (giants, STR) · Tartarian Oath-Band
+  (true_tartarians, STR) · Light-Finger Guild Band (reclaimers, DEX) · Ring of Forgotten Lore (forgotten_order,
+  INT) · Revivalist's Aether-Coil (revivalists, INT) · Architect's Insight (stone_builders, WIS) · Monarch's
+  Drowned Signet (mud_monarchs, CHA) · Aetherborn Signet (eternal_dynasty, CHA). Test: `factionRings.test.ts`.
 - **OTA-496 "Protactinium Glaze" — [bugfix] Searing Paste offered "Equip (Ring)" + codename-layer backfill**
   *(element #91)*. "Searing Paste" is a burn `weapon_coating` consumable, but `validSlotsForItem`'s GEAR
   branch tested `/ring|band/` with **no word boundaries**, so the "ring" inside "Sea·RING· Paste" matched →

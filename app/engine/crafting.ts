@@ -140,6 +140,10 @@ export interface CatalogAccessory {
   tags: string[];
   description: string;
   effect?: ItemEffect;
+  // OTA-497 — faction-issue accessories (rings) stocked by the player's own
+  // faction armory. Mirrors the weapon/armor faction_gear fields.
+  faction?: string;
+  tc?: number;
 }
 
 export interface RecipeIngredient {
