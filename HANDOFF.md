@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-487 "Lead Bonding" — [bugfix] system TTS spoke VIETNAMESE** *(element #82)*. Player: *"why did it
+  speak Vietnamese to my daughter?"* Cause: `TTSManager`'s `Speech.speak` (the system-engine fallback) never
+  set a `language`. Narration is always English, but with no system voice configured (`voiceId` defaults to
+  null) and Kokoro not carrying the line, the OS read the English text in the DEVICE's default-locale voice —
+  Vietnamese on that device. Fix: pin `language: 'en-US'` (new `TTS_LANGUAGE` const) on the speak call, like
+  STTManager already does. Regression test `__tests__/ttsLanguagePinnedEnglish.test.ts`. `app/voice/TTSManager.ts`.
+  (Note for later: the pasted combat log also showed `persist FAILED — storage full` at total≈193KB — the
+  known AsyncStorage-full save-loss; capDiskLog/OTA-398 should bound it, worth re-confirming on-device.)
 - **OTA-486 "Thallium Anneal" — [bugfix] equipped HANDS + CLOAK silently un-equipped on every load** *(element
   #81)*. Player: *"when I open a save or after a long fight half of my armor is [un]equipped — check all
   equipped/save routes to see if it's real or just getting destroyed."* **Verdict: NOT destroyed.**

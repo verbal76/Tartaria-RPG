@@ -13931,4 +13931,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Durability shatter (wearEquippedItem) was already correct: it removes the item AND clears the slot with a
 // "shatters from wear" log, so true breakage is real + announced, distinct from this silent load drop.
 // Regression test: __tests__/equippedHandsCloakSurvivesLoad.test.ts. app/state/gameStore.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-486';
+// OTA-487 (Lead Bonding) — [bugfix] TTS SPOKE VIETNAMESE. Player: "why did it speak Vietnamese to my
+// daughter?" Cause: the system-engine fallback (TTSManager `Speech.speak`) never set a `language`. The
+// Arbiter's narration is always English (the bundled voice is en_US-amy), but when no system voice was
+// configured (`voiceId` defaults to null) and Kokoro wasn't carrying the line, the OS read the English text
+// with the DEVICE'S default-locale voice — on a device defaulting to Vietnamese TTS, that came out
+// Vietnamese. Fix: pin `language: 'en-US'` on the Speech.speak call (a TTS_LANGUAGE const) so the engine
+// always selects an English voice/locale regardless of the device default — matching how STTManager already
+// pins en-US. Regression test: __tests__/ttsLanguagePinnedEnglish.test.ts. app/voice/TTSManager.ts.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-487';

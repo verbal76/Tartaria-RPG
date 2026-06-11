@@ -52,6 +52,17 @@ function recordTtsRoute(route: string, phase: string, text: string): void {
 export function getTtsRouteLog(): readonly TtsRouteRecord[] {
   return ttsRouteLog;
 }
+// OTA-487 — ALWAYS pin the system-TTS language to English. The Arbiter's
+// narration is English (the bundled voice is en_US-amy), but the system-engine
+// fallback path (Speech.speak) never set a `language`, so when no system voice
+// was configured (voiceId defaults to null) the OS read the English text with the
+// device's DEFAULT-locale voice. On a device whose default TTS locale was
+// Vietnamese, the narration came out in a Vietnamese voice (player report: "why
+// did it speak Vietnamese to my daughter?"). Forcing 'en-US' makes the engine
+// select an English voice/locale regardless of the device default. STT already
+// pins en-US the same way (STTManager).
+const TTS_LANGUAGE = 'en-US';
+
 const queue: QueuedUtterance[] = [];
 let currentlySpeaking: QueuedUtterance | null = null;
 let availabilityCache: boolean | null = null;
@@ -284,6 +295,10 @@ function drain(): void {
   const utteranceVoice = next.voiceId ?? settings.voiceId ?? undefined;
   try {
     Speech.speak(next.text, {
+      // OTA-487 — force English so the system engine never falls back to the
+      // device's default locale (which read the narration in Vietnamese on at
+      // least one device). The narration is always English.
+      language: TTS_LANGUAGE,
       rate: settings.rate,
       pitch: settings.pitch,
       // OTA-285 — master TTS volume. expo-speech honors `volume` on
