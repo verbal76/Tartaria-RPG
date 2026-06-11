@@ -278,11 +278,34 @@ export function consumeSaveReclaimedFlag(): boolean {
 // contrast, RELIABLY frees space (a DELETE doesn't need new pages). So when a
 // save can't stage, we sacrifice the debug copy-log — never the player's actual
 // progress — to get the save to land, and self-heal a DB the old bug had bricked.
-async function emergencyReclaimDiskSpace(slotId: string, currentTmpKey?: string): Promise<void> {
+// Exported for the OTA-490 reclaim test (must purge regenerable keys but never a
+// live save / .bak / index / active-slot / stash).
+export async function emergencyReclaimDiskSpace(slotId: string, currentTmpKey?: string): Promise<void> {
   try { await AsyncStorage.removeItem(slotLogKey(slotId)); } catch { /* ignore */ }
   // Drop THIS write's temp + any legacy single-temp leftover from a prior crash.
   if (currentTmpKey) { try { await AsyncStorage.removeItem(currentTmpKey); } catch { /* ignore */ } }
   try { await AsyncStorage.removeItem(slotSaveTmpKey(slotId)); } catch { /* ignore */ }
+  // OTA-490 — DEEP SWEEP. The active slot's copy-log alone often isn't enough:
+  // a DB stuffed by OTHER slots' copy-logs, orphaned save temps, the regenerable
+  // Qwen synth cache, or the ~190 KB crash-save snapshot will still refuse the
+  // stage (the daughter's S26 hit exactly this — FAILED at only 193 KB total).
+  // Purge every REGENERABLE key in one pass — NEVER a live save, its `.bak`, the
+  // slot index, the active-slot pointer, the `tartaria.global.v2` stash, or any
+  // settings. A removeItem reliably frees SQLite pages even when a full DB is
+  // refusing every setItem.
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const purge = keys.filter((k) => {
+      if (k === currentTmpKey) return false;               // we re-stage into it next
+      if (k.startsWith('tartaria.gamelog.')) return true;  // every slot's debug copy-log
+      if (k.includes('.v2.tmp')) return true;              // orphaned save temps (any slot)
+      if (k === 'tartaria.itemSynthCache.v1') return true; // Qwen synth cache — regenerates
+      if (k === '@tartaria/lastCrashSave') return true;    // ~190 KB crash snapshot (recovery copy)
+      if (k === '@tartaria/lastCrash') return true;        // small crash stage tag
+      return false;
+    });
+    if (purge.length > 0) await AsyncStorage.multiRemove(purge);
+  } catch { /* getAllKeys / multiRemove are best-effort */ }
 }
 
 // OTA-421 — [audit fix #3] bounded rotating temp-key counter. The old single
@@ -308,14 +331,29 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
   // (catches a truncated / quota-capped write BEFORE we touch the live slot).
   // setItem can THROW on a full DB, so guard it — a thrown write is a failed
   // stage, same as a mismatched readback.
+  // OTA-490 — capture WHY a stage fails so the device log disambiguates the two
+  // very different causes that the old catch-all "(truncated or storage full)"
+  // conflated: a setItem THROW = a full SQLite DB (storage full); a readback
+  // MISMATCH with a short length = a CursorWindow truncation (the value didn't
+  // round-trip). The next failure log now names which, with byte counts.
+  let stageReason = '';
   const tryStage = async (): Promise<boolean> => {
     try {
       await AsyncStorage.setItem(tmpKey, payload);
-      const staged = await AsyncStorage.getItem(tmpKey);
-      return staged === payload;
-    } catch {
+    } catch (e) {
+      stageReason = `setItem threw (${e instanceof Error ? e.message : String(e)})`;
       return false;
     }
+    let staged: string | null = null;
+    try {
+      staged = await AsyncStorage.getItem(tmpKey);
+    } catch (e) {
+      stageReason = `getItem threw (${e instanceof Error ? e.message : String(e)})`;
+      return false;
+    }
+    if (staged === payload) { stageReason = ''; return true; }
+    stageReason = `readback mismatch (got ${staged === null ? 'null' : `${staged.length} chars`} vs ${payload.length})`;
+    return false;
   };
 
   // OTA-344 — atomic write: temp → verify → snapshot last-good → swap → cleanup.
@@ -326,9 +364,12 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
     //      regenerable copy-log and retry ONCE; that frees space a stuffed DB
     //      wouldn't give an overwrite, so a save can finally land.
     if (!(await tryStage())) {
+      const preReclaimReason = stageReason;
       await emergencyReclaimDiskSpace(slotId, tmpKey);
       if (!(await tryStage())) {
-        throw new Error('staged save did not verify (truncated or storage full)');
+        throw new Error(
+          `staged save did not verify — ${stageReason} [pre-reclaim: ${preReclaimReason}; payload ${Math.round(payload.length / 1024)}KB]`,
+        );
       }
       lastSaveReclaimedSpace = true;
     }

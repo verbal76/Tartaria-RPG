@@ -13954,4 +13954,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // gold/purple at the UNCHANGED ~0.2 stripe opacity: COMPANION_STRIPE_DOG #c9a86a → #e3a82a (saturated gold),
 // COMPANION_STRIPE_GOLEM #9888a8 → #a45fe0 (saturated amethyst). Stripe-only; the name-label hues are
 // untouched. app/screens/InventoryScreen.tsx. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-489';
+// OTA-490 (Astatine Purge) — [bugfix+diag] SAVE FAILED "storage full" on a near-empty device. Player's
+// daughter's Galaxy S26 logged `persist FAILED — staged save did not verify` at only 193KB total. Cause: the
+// Android AsyncStorage DB (default ~6MB) filled, and emergencyReclaimDiskSpace only dropped the ACTIVE slot's
+// copy-log — so OTHER slots' copy-logs, orphaned save temps, the Qwen synth cache, and the ~190KB crash
+// snapshot kept it full and the retry still failed. Fix: reclaim now DEEP-SWEEPS every regenerable key in one
+// pass (all `tartaria.gamelog.*`, any `*.v2.tmp*`, the synth cache, the crash snapshots) via getAllKeys +
+// multiRemove — NEVER a live save, .bak, index, active-slot pointer, or the `tartaria.global.v2` stash. Also
+// DIAGNOSTIC: tryStage now records WHY it failed (setItem THREW = full DB, vs readback MISMATCH w/ byte
+// counts = CursorWindow truncation) so the next on-device log names the real cause instead of the old
+// catch-all. Tests: __tests__/emergencyReclaim.test.ts. app/engine/saveSystem.ts. JS-only → OTA. NOTE: the
+// durable ceiling fix — raising AsyncStorage's 6MB cap via expo-build-properties — needs a NATIVE build.
+export const OTA_BUILD_ID = '2026-06-11-490';

@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-490 "Astatine Purge" — [bugfix+diag] save "storage full" on a near-empty device** *(element #85)*.
+  Player's daughter's **Galaxy S26** logged `persist FAILED — staged save did not verify` at only **193KB**
+  total. Cause: Android AsyncStorage's default **~6MB DB filled**, and `emergencyReclaimDiskSpace` only
+  dropped the ACTIVE slot's copy-log, so OTHER slots' copy-logs + orphaned save temps + the Qwen synth cache
+  + the ~190KB crash snapshot kept it full → retry still failed. Fix: reclaim now **deep-sweeps** every
+  regenerable key (all `tartaria.gamelog.*`, any `*.v2.tmp*`, `itemSynthCache`, `@tartaria/lastCrashSave`/
+  `lastCrash`) via getAllKeys+multiRemove — **never** a live save/`.bak`/index/active-slot/`tartaria.global.v2`
+  stash. Plus DIAGNOSTIC: `tryStage` now records WHY it failed (setItem THREW = full DB vs readback MISMATCH
+  with byte counts = CursorWindow truncation) so the next device log names the real cause. Tests:
+  `__tests__/emergencyReclaim.test.ts`. `saveSystem.ts`. **FOLLOW-UP (native, not OTA): raise the 6MB
+  AsyncStorage cap via `expo-build-properties` (`AsyncStorage_db_size_in_MB`) — the durable ceiling fix.**
 - **OTA-489 "Polonium Tint" — [polish] companion-stripe saturation** *(element #84)*. Player on the OTA-485
   stripes: *"keep the translucence but bump the saturation."* Same gold/purple hues, richer chroma so they
   read clearly at the unchanged ~0.2 opacity: dog `#c9a86a → #e3a82a`, golem `#9888a8 → #a45fe0`. Stripe-only
