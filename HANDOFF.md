@@ -378,6 +378,18 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-503 "Californium Cipher" — [feature] KEYED GRID-EVENTS, stage 1: lifecycle + route-id resolution**
+  *(element #98)*. Player's design: a grid cell is a big region that can hold MANY keyed things; what fires on
+  arrival is decided by WHICH travel button (route id) you took, not the cell — and the "key" is an internal
+  identifier, NOT an item the player holds. Stage 1: a whisper-objective place is now a PENDING grid event
+  (`CanonLocation.marker`); the tapped route carries that event's id (`travelTarget.locationId`), so arriving
+  RESOLVES exactly that event → 'done', even when several events share one cell (market id vs gun-guy id at
+  the same coords). New `worldMemory.setCanonLocationMarker` (pending→done; register never downgrades a done);
+  `setWhisperCourse` canonizes `marker:'pending'`; `travelTo` flips the arrived event to 'done' + re-syncs the
+  world-map module. Test: `__tests__/canonLocations.test.ts`. **NEXT — stage 2: yellow "?"/red "X" map markers
+  for pending/done events (generalize the Hidden Market overlay); stage 3: wire contracts the same way.**
+  Travel time left at the current ~0.25h/step (player deferred the 8h/cell rebalance). `types.ts`,
+  `worldMemory.ts`, `gameStore.ts`.
 - **OTA-502 "Berkelium Survey" — [feature] canon locations resolved/plotted/routable + live source (grid-math
   pt.3)** *(element #97)*. Completes the directive. (1) `getLocationById` (encounter.ts) resolves canonized
   places → real name + minimal scene, not the locations[0] fallback. (2) MapScreen travel list folds in

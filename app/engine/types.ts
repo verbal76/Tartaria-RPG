@@ -1246,6 +1246,12 @@ export interface CanonLocation {
    *  deterministically from the id (canonicalCellFor). */
   gx?: number;
   gy?: number;
+  /** OTA-503 — event lifecycle for a place born from a whisper/contract objective:
+   *  'pending' = discovered, not yet resolved (yellow "?" on the map); 'done' =
+   *  resolved on arrival (red "X"). Omitted → a plain canon place, not an event.
+   *  Many events can share one cell; the route the player tapped carries THIS id,
+   *  so arriving resolves exactly the event you set out for, not its neighbours. */
+  marker?: 'pending' | 'done';
 }
 
 export interface WorldMemory {

@@ -29,7 +29,7 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -2318,7 +2318,7 @@ interface GameStore {
   /** OTA-500 — register a dynamically-mentioned place (whisper/contract/mission/
    *  narration) as install-canon: it persists in worldMemory, gets a permanent
    *  grid cell, and becomes plotted + routable with exact grid-to-grid distance. */
-  canonizeLocation: (loc: { id: string; name: string; type?: string; danger?: number; source?: string; gx?: number; gy?: number }) => void;
+  canonizeLocation: (loc: { id: string; name: string; type?: string; danger?: number; source?: string; gx?: number; gy?: number; marker?: 'pending' | 'done' }) => void;
   /** OTA-360 — paint a weapon-coating consumable onto a weapon
    *  instance. `coatingItemId` is the consumable (Poison Vial /
    *  Acid Flask / Corruption Tonic); `weaponId` is the target
@@ -13818,6 +13818,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       },
       worldMemory: discoverLocation(get().worldMemory, locationId),
     });
+    // OTA-503 — arriving via this route's id RESOLVES the matching grid event: a
+    // pending canon event at this destination flips 'pending' → 'done' ("?" → "X").
+    // Because the route carries THIS id, a neighbouring event sharing the cell
+    // (reached only by ITS own route) stays pending.
+    {
+      const wmNow = get().worldMemory;
+      const wmDone = setCanonLocationMarker(wmNow, locationId, 'done');
+      if (wmDone !== wmNow) {
+        set({ worldMemory: wmDone });
+        setCanonExtraLocations(wmDone.canonLocations ?? []);
+      }
+    }
     // The "You make your way to X" line was removed in favour of the
     // consolidated arrival flavor that beginScene now emits when
     // opts.arrivalFromName is set. One paragraph, not five.
@@ -16943,7 +16955,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const gy = cur.y + (mapY - WORLD_MAP_CENTER_Y);
       const id = `mention_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`;
       if (id !== 'mention_') {
-        get().canonizeLocation({ id, name: label, type: 'site', danger: 2, source: 'whisper', gx, gy });
+        // OTA-503 — a discovered whisper objective is a PENDING grid event ("?"
+        // on the map). Arriving via THIS route's id (travelTarget below) resolves
+        // exactly this event → 'done' ("X"), even if it shares a cell with others.
+        get().canonizeLocation({ id, name: label, type: 'site', danger: 2, source: 'whisper', gx, gy, marker: 'pending' });
       }
     }
     // A whisper course and a location course are mutually exclusive — clear any

@@ -2,7 +2,7 @@
 // install-canon: registered + persisted in worldMemory, then plotted on the grid
 // and routable with exact grid-to-grid distance, like a static location.
 
-import { registerCanonLocation, emptyMemory } from '../app/engine/worldMemory';
+import { registerCanonLocation, setCanonLocationMarker, emptyMemory } from '../app/engine/worldMemory';
 import {
   setCanonExtraLocations,
   allKnownLocations,
@@ -70,5 +70,35 @@ describe('OTA-502 — explicit cell + resolution everywhere', () => {
     expect(getLocationById('mention_yulkas_fire').name).toBe("Yulka's fire");
     // an unknown id still falls back to a real static location (never crashes)
     expect(getLocationById('not_a_place_xyz').name).toBeTruthy();
+  });
+});
+
+describe('OTA-503 — grid-event lifecycle (pending → done by route id)', () => {
+  it('a whisper objective registers as a PENDING event', () => {
+    let wm = emptyMemory();
+    wm = registerCanonLocation(wm, { id: 'mention_452', name: 'gun guy', source: 'whisper', marker: 'pending' });
+    expect(wm.canonLocations![0]!.marker).toBe('pending');
+  });
+
+  it('arriving via that id resolves it to DONE; register never downgrades a done event', () => {
+    let wm = emptyMemory();
+    wm = registerCanonLocation(wm, { id: 'mention_452', name: 'gun guy', marker: 'pending' });
+    // arrival (travelTo) calls this:
+    wm = setCanonLocationMarker(wm, 'mention_452', 'done');
+    expect(wm.canonLocations![0]!.marker).toBe('done');
+    // a later re-mention (register) must NOT knock it back to pending
+    wm = registerCanonLocation(wm, { id: 'mention_452', name: 'gun guy', marker: 'pending' });
+    expect(wm.canonLocations![0]!.marker).toBe('done');
+  });
+
+  it('two events can share a cell; resolving one leaves the other pending', () => {
+    let wm = emptyMemory();
+    // market (a plain place) + gun-guy (a pending event) at the same cell (50,18)
+    wm = registerCanonLocation(wm, { id: 'mkt', name: 'Market', gx: 50, gy: 18 });
+    wm = registerCanonLocation(wm, { id: 'mention_452', name: 'gun guy', gx: 50, gy: 18, marker: 'pending' });
+    // route to the gun-guy id → only it resolves
+    wm = setCanonLocationMarker(wm, 'mention_452', 'done');
+    expect(wm.canonLocations!.find((l) => l.id === 'mention_452')!.marker).toBe('done');
+    expect(wm.canonLocations!.find((l) => l.id === 'mkt')!.marker).toBeUndefined();
   });
 });

@@ -14067,4 +14067,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // whisper objective's place at the exact canonical cell it points to (player cell + tile offset) — so a
 // place a whisper names becomes a permanent, plotted, exact-distance location. Test:
 // __tests__/canonLocations.test.ts (+ explicit cell + getLocationById resolution). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-502';
+// OTA-503 (Californium Cipher) — [feature] keyed grid-events, stage 1: lifecycle + route-id resolution. A
+// place born from a whisper objective is now a PENDING grid event (CanonLocation.marker 'pending'); the route
+// the player taps carries THAT event's id (travelTarget.locationId — the internal "key", never an item), so
+// arriving RESOLVES exactly that event → 'done', even when several events share one canonical cell. New
+// worldMemory.setCanonLocationMarker (explicit pending→done; register never downgrades a done event);
+// setWhisperCourse canonizes with marker:'pending'; travelTo flips the arrived event's marker to 'done' +
+// re-syncs the world-map module. Test: __tests__/canonLocations.test.ts. NEXT (stage 2): "?"/"X" map markers
+// for pending/done events; (stage 3) wire contracts the same way. Travel time left as-is per the player. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-503';

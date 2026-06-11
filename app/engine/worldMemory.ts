@@ -25,15 +25,33 @@ export function registerCanonLocation(memory: WorldMemory, loc: CanonLocation): 
       source: existing.source ?? loc.source,
       gx: existing.gx ?? loc.gx,
       gy: existing.gy ?? loc.gy,
+      // OTA-503 — register enriches but NEVER downgrades a lifecycle: a 'done'
+      // event stays done; a marker is only filled in if it was absent. Use
+      // setCanonLocationMarker for explicit pending→done transitions.
+      marker: existing.marker ?? loc.marker,
     };
     if (merged.name === existing.name && merged.type === existing.type
       && merged.danger === existing.danger && merged.source === existing.source
-      && merged.gx === existing.gx && merged.gy === existing.gy) {
+      && merged.gx === existing.gx && merged.gy === existing.gy
+      && merged.marker === existing.marker) {
       return memory;
     }
     return { ...memory, canonLocations: list.map((l) => (l.id === loc.id ? merged : l)) };
   }
   return { ...memory, canonLocations: [...list, loc] };
+}
+
+// OTA-503 — explicit event-lifecycle transition (e.g. pending → done on arrival).
+// No-op if the id isn't a canon event or is already in that state.
+export function setCanonLocationMarker(
+  memory: WorldMemory,
+  id: string,
+  marker: 'pending' | 'done',
+): WorldMemory {
+  const list = memory.canonLocations ?? [];
+  const existing = list.find((l) => l.id === id);
+  if (!existing || existing.marker === marker) return memory;
+  return { ...memory, canonLocations: list.map((l) => (l.id === id ? { ...l, marker } : l)) };
 }
 
 export function recordTags(memory: WorldMemory, tags: readonly string[]): WorldMemory {
