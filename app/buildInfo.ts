@@ -14003,4 +14003,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lands, `advanceMainQuest` fires a one-shot Arbiter unlock line (`shouldFireFourCoreForge` /
 // `fourCoreForgeLine`, latched via the existing twistsFired flag, mirroring the 3-core twist). Test:
 // __tests__/coreFourForgeGate.test.ts. mainQuest.ts, crafting.ts, recipes.json, gameStore.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-495';
+// OTA-496 (Protactinium Glaze) — [bugfix] "Searing Paste" offered "Equip (Ring)". It's a burn WEAPON-COATING
+// consumable, but validSlotsForItem's GEAR branch tested /ring|band/ WITHOUT word boundaries, so the "ring"
+// inside "Sea·RING· Paste" matched → ring slot. Two fixes in equipment.ts: (1) any `weapon_coating`-tagged
+// item returns NO equip slots (coatings are applied via "Coat a weapon", never worn — semantic guard), and
+// (2) word-bounded the ring/band (and amulet/locket) GEAR-name + tag regexes so a name/tag merely CONTAINING
+// the token can't mis-route (Searing/Soaring/Headband…). Real rings + the coating flow still work. Test:
+// __tests__/coatingNotARing.test.ts. ALSO resumed the codename-obfuscation layer (buildCodename.ts +
+// docs/build-codenames.md) which had lapsed after OTA-327 — backfilled OTA-483→496 so the About screen stops
+// leaking raw `(2026-06-11-NNN)` ids (328→482 gap still open). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-496';

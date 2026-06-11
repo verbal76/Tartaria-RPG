@@ -378,6 +378,15 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-496 "Protactinium Glaze" — [bugfix] Searing Paste offered "Equip (Ring)" + codename-layer backfill**
+  *(element #91)*. "Searing Paste" is a burn `weapon_coating` consumable, but `validSlotsForItem`'s GEAR
+  branch tested `/ring|band/` with **no word boundaries**, so the "ring" inside "Sea·RING· Paste" matched →
+  ring slot. Fixes in `equipment.ts`: (1) `weapon_coating`-tagged items return NO equip slots (applied via
+  "Coat a weapon", never worn), (2) word-bounded the ring/band + amulet/locket GEAR-name & tag regexes. Test:
+  `__tests__/coatingNotARing.test.ts`. **ALSO** — resumed the **codename obfuscation layer**
+  (`buildCodename.ts` + `docs/build-codenames.md`), which had lapsed after OTA-327: backfilled the
+  2026-06-11 element run (OTA-483→496) so the About screen / bug reports resolve a codename instead of leaking
+  the raw `(2026-06-11-NNN)` id. **⚠️ The 328→482 codename gap is still un-backfilled — separate cleanup.**
 - **OTA-495 "Thorium Forge" — [feature] Core-4 forge gate for golem armaments (the last follow-up)**
   *(element #90)*. The four golem-weapon recipes (Sledge/Greatsword/Pike/Aether-Lance) were
   unlocked-for-testing since OTA-481/482; they now carry `coresRequired: 4` (new `Recipe` field) and the

@@ -16,6 +16,11 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // generic "vest" regex below (which would otherwise route to
   // 'chest') doesn't grab them onto the player.
   if (item.kind === 'dog_armor') return [];
+  // OTA-496 — weapon-coating consumables (Poison Vial, Acid Flask, Searing Paste,
+  // …) are APPLIED to a weapon via the "Coat a weapon" flow, never equipped. Guard
+  // here so a coating never gets an equip slot — e.g. "Sea·RING· Paste" matched the
+  // ring regex below and wrongly offered "Equip (Ring)".
+  if ((item.tags ?? []).some((t) => t.toLowerCase() === 'weapon_coating')) return [];
   // OTA-224 — fused items carry uniqueStats but their names are
   // synthesized (e.g. "Resonant Cleaver") and won't appear in any
   // catalog. validSlotsForItem used to short-circuit to [] for them
@@ -75,16 +80,19 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // Gear-side: relics with detection / locket-ish tags can be amulets.
   const gear = GEAR.find((g) => g.name.toLowerCase() === nameLower);
   if (gear) {
-    if (gear.tags.includes('detection') || /locket|amulet|necklace/i.test(gear.name)) {
+    if (gear.tags.includes('detection') || /\b(locket|amulet|necklace)\b/i.test(gear.name)) {
       return ['amulet'];
     }
-    if (/ring|band/i.test(gear.name)) {
+    // OTA-496 — word-bounded so a name that merely CONTAINS "ring"/"band"
+    // (Searing, Soaring, Headband…) isn't mis-routed to the ring slot.
+    if (/\b(ring|band)\b/i.test(gear.name)) {
       return ['ring'];
     }
   }
-  // Tag-based fallback for items not in the catalog yet.
-  if (item.tags.some((t) => /amulet|locket|necklace/i.test(t))) return ['amulet'];
-  if (item.tags.some((t) => /ring|band/i.test(t))) return ['ring'];
+  // Tag-based fallback for items not in the catalog yet. OTA-496 — word-bounded
+  // so a tag merely CONTAINING the token doesn't mis-route.
+  if (item.tags.some((t) => /\b(amulet|locket|necklace)\b/i.test(t))) return ['amulet'];
+  if (item.tags.some((t) => /\b(ring|band)\b/i.test(t))) return ['ring'];
   // Name-based fallback for items the catalog doesn't know yet.
   // Playtest report: player picked up "Mud-Rend Blade" — clearly a
   // weapon by name — but the inventory modal said "No record of this

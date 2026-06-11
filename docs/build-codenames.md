@@ -286,6 +286,25 @@ Tanbark Anvil**. Earlier still: `<Gem> Vault` on the retired `arbiters-line`.
 | `2026-06-04-arb49`      | Lead Casket    | **Readability fix** — retire the too-dark `#5a5246` everywhere. It was the color of the locked title **names + requirement descriptions** on the Character page (unreadable on the dark card) plus muted/placeholder text across ~13 files. All **20** occurrences → the Explore-screen amber `#c9a86a` (the brand accent, already used for *earned* title names). `#5a5246` now appears nowhere in the app. Note: this also recolors 8 input `placeholderTextColor`s + one border to amber — flagged for the user. Fresh-minted (pool exhausted). |
 | `2026-06-04-arb48`      | Cobalt Reliquary | **Labyrinth of Shadows BUILT + turned ON** — Wayfarer of the Lost Paths is now the **15th earnable** Arbiter title. New `engine/labyrinth.ts` (pure maze navigation over the plotted graph: false walls block, branches count wrong turns, finish-within-budget = clean run) + `gameStore` handler (ENTER LABYRINTH at Iskan-Veil → typed directions walk it → clean run calls `recordTitleProgress({labyrinthCleanRuns:1})` → Wayfarer + `pathfinder`). Master `TIER_C_ENABLED` flipped **true**; only the labyrinth `enabled` (other 5 Tier-C stay OFF — `challengeActive` needs both). The 14 Tier-A/B titles remain live (arb45 award loop). New `__tests__/labyrinthRun.test.ts`. Fresh-minted (pool exhausted). |
 
+> **Backfill note (OTA-496):** the codename map went un-maintained after OTA-327 — the entire `<Element> <Process>` run was missing from `buildCodename.ts`, so those builds leaked their raw `(2026-06-11-NNN)` id on the About screen. The 2026-06-11 batch is restored below; the **328→482 gap** is still open (separate cleanup).
+
+| OTA build ID            | Codename          | Notes                                                      |
+| ----------------------- | ----------------- | ---------------------------------------------------------- |
+| `2026-06-11-483`        | Platinum Leaf     | Splash art enlarged (re-anchored top-left)                 |
+| `2026-06-11-484`        | Gold Inlay        | Splash: revert 483 offset, enlarge from top-left           |
+| `2026-06-11-485`        | Mercury Gilding   | Companion-item inventory stripes (gold dog / purple golem) |
+| `2026-06-11-486`        | Thallium Anneal   | Fix equipped hands/cloak dropped on every load             |
+| `2026-06-11-487`        | Lead Bonding      | Pin system TTS to en-US (was reading Vietnamese)           |
+| `2026-06-11-488`        | Bismuth Sieve     | Strip foreign words from Arbiter narration ("huà")         |
+| `2026-06-11-489`        | Polonium Tint     | Companion-stripe saturation bump                           |
+| `2026-06-11-490`        | Astatine Purge    | Deep-sweep storage reclaim + save-failure diagnostics      |
+| `2026-06-11-491`        | Radon Sorting     | Shaped Aetheric Shard classifies as weapon, not tool       |
+| `2026-06-11-492`        | Francium Wash     | Coatings apply to bludgeoning weapons too                  |
+| `2026-06-11-493`        | Radium Vault      | Quest Items section + lock (no drop/scrap/fuse)            |
+| `2026-06-11-494`        | Actinium Sieve    | Foreign-word sieve on investigation + Ask-Arbiter          |
+| `2026-06-11-495`        | Thorium Forge     | Core-4 forge gate for golem armaments                      |
+| `2026-06-11-496`        | Protactinium Glaze | Searing Paste no longer offers "Equip (Ring)" (coating)   |
+
 ## AAB codenames (separate pool, keyed by versionCode)
 
 OTA-274 introduced a parallel codename scheme for native AAB

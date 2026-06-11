@@ -1011,6 +1011,24 @@ const CODENAMES: Record<string, string> = {
   // first 1.2 forward (title line) lost its head. Fix: warm at configured
   // rate; reverted the "Welcome." primer.
   '2026-06-05-arb70': 'Gold Goblet',
+  // OTA-496 — codename layer maintenance was dropped after OTA-327; backfilled the
+  // 2026-06-11 element run (OTA-483→496) so the About screen + bug reports resolve
+  // a stable codename instead of leaking the raw `(2026-06-11-NNN)` id. (Element #
+  // = OTA-NNN − 405.) The 328→482 gap is still un-backfilled — separate cleanup.
+  '2026-06-11-483': 'Platinum Leaf',
+  '2026-06-11-484': 'Gold Inlay',
+  '2026-06-11-485': 'Mercury Gilding',
+  '2026-06-11-486': 'Thallium Anneal',
+  '2026-06-11-487': 'Lead Bonding',
+  '2026-06-11-488': 'Bismuth Sieve',
+  '2026-06-11-489': 'Polonium Tint',
+  '2026-06-11-490': 'Astatine Purge',
+  '2026-06-11-491': 'Radon Sorting',
+  '2026-06-11-492': 'Francium Wash',
+  '2026-06-11-493': 'Radium Vault',
+  '2026-06-11-494': 'Actinium Sieve',
+  '2026-06-11-495': 'Thorium Forge',
+  '2026-06-11-496': 'Protactinium Glaze',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
