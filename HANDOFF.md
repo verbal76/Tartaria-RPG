@@ -378,6 +378,19 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-515 "Darmstadtium Inset" — [polish] uniform overlay-marker size + left-legend inset** *(element #110)*.
+  Two map-overlay fixes from the screenshot. (1) **Uniform size**: every overlay glyph (the `?`/`✕` grid events
+  + the `◆` contract pins) now scales to the atlas art exactly like the (player-approved) Hidden Market name
+  (`markerFont = 30×labelScale`, floor 5px), instead of fixed 15–18px that dwarfed the painted labels. (2)
+  **Left-legend inset**: the atlas reserves its leftmost stripe for the title/legend cartouche ("TARTARIA") —
+  no ground there — so contract/event pins anchored at left-edge locations (reclaimer_stake fx0.05, etc.)
+  drifted onto it. Treating the horizontal as a 92-column field whose left 10 are legend, overlay fractions are
+  squeezed into the right ground band (`insetGroundFx`, right edge anchored so correctly-placed pins barely
+  move). `cellToAtlasFraction` stays pure (round-trip test intact); the inset is applied at the MapScreen render
+  site. Hidden Market label untouched (own atlas coord, already on ground). `app/screens/MapScreen.tsx`.
+  **Heads-up:** the borderland faction outposts also sit near the TOP edge of the art (fy≈0.09), so faction-quest
+  pins anchored there still ride high; user only specified the LEFT stripe, so no vertical inset yet — offer one
+  if the top row looks off in play.
 - **OTA-514 "Meitnerium Cluster" — [polish] aggregate contract pins + shrink the Hidden Market name label**
   *(element #109)*. Two map fixes from playtest. (1) **Aggregate contract pins**: contracts sharing an anchor
   cell (faction quests on a home outpost, hunts on a biome anchor) now collapse into ONE pin showing a count

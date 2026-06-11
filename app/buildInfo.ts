@@ -14175,4 +14175,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resolved to "The Hidden Market". It now scales to the art (labelScale = renderedW ÷ ATLAS_W, min 5px) with a
 // lighter weight + tighter shadow, so it reads at the same scale as the painted names (and still scales with
 // pinch-zoom since it lives in the scaled layer). app/screens/MapScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-514';
+// OTA-515 (Darmstadtium Inset) — [polish] two map-overlay fixes. (1) UNIFORM marker size: every overlay glyph
+// (the "?"/"✕" grid events + the "◆" contract pins) now scales to the atlas art exactly like the Hidden Market
+// name (markerFont = 30×labelScale, floor 5px) instead of fixed 15-18px that dwarfed the painted labels — they
+// all read at that same player-approved size. (2) LEFT-legend inset: the atlas reserves its leftmost stripe for
+// the title/legend cartouche ("TARTARIA") — no ground there — so contract/event pins anchored at left-edge
+// locations drifted onto it. Treating the horizontal as a 92-column field whose left 10 are legend, overlay
+// fractions are now squeezed into the right ground band (insetGroundFx, right edge anchored so correctly-placed
+// pins barely move). cellToAtlasFraction stays pure (round-trip test intact); the inset is applied at the
+// MapScreen render site. The Hidden Market label is untouched (its own atlas coord, already on the ground).
+// app/screens/MapScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-515';

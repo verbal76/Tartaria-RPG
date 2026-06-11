@@ -119,6 +119,14 @@ function describeWhereabouts(locId: string, locs: Location[]): string {
 // is aspect-driven, so these MUST match the live asset's real dimensions.
 const ATLAS_W = 1774;
 const ATLAS_H = 887;
+// arb102 — the atlas art reserves its leftmost stripe for the title/legend
+// cartouche ("TARTARIA") — there's no ground there. Treat the horizontal as a
+// 92-column field whose left 10 columns are that legend, and squeeze overlay
+// marker fractions into the remaining ground band so a pin never lands on it.
+// Visual-only (the gameplay grid + distances are untouched); the right edge is
+// anchored so correctly-placed right-side pins barely move.
+const ATLAS_LEGEND_FRAC = 10 / 92;
+const insetGroundFx = (fx: number): number => ATLAS_LEGEND_FRAC + fx * (1 - ATLAS_LEGEND_FRAC);
 
 // arb99 — the world atlas, plus per-faction outpost INTERIOR maps. When the
 // player is inside their outpost the Map screen shows that faction's interior;
@@ -575,7 +583,7 @@ export function MapScreen() {
         eventMarkerStyles.push({
           id: ev.id,
           kind: ev.marker,
-          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          left: offsetX + renderedW * insetGroundFx(f.fx) - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
@@ -593,12 +601,16 @@ export function MapScreen() {
         contractMarkerStyles.push({
           key: cellKey,
           label: v.count > 1 ? `◆×${v.count}` : `${v.sole}◆`,
-          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          left: offsetX + renderedW * insetGroundFx(f.fx) - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
     }
   }
+  // arb102 — every overlay glyph (the "?"/"✕" events, the "◆" contract pins) now
+  // scales to the atlas art exactly like the Hidden Market name, so they all read
+  // at that same (player-approved) size instead of dwarfing the painted labels.
+  const markerFont = { fontSize: Math.max(5, 30 * labelScale), lineHeight: Math.max(6, 33 * labelScale) };
 
   // Footer prose — at the named tile, name it. Otherwise report the
   // cardinal direction + tile count from the CURRENT location (mapX/Y
@@ -691,7 +703,7 @@ export function MapScreen() {
                   The Hidden{'\n'}Market
                 </Text>
               ) : (
-                <Text style={styles.hiddenMarketQ}>
+                <Text style={[styles.hiddenMarketQ, markerFont]}>
                   {questionNumbers.hidden_market ? `${questionNumbers.hidden_market}?` : '?'}
                 </Text>
               )}
@@ -702,7 +714,7 @@ export function MapScreen() {
               list button below. Same atlas-anchored overlay as the Hidden Market. */}
           {eventMarkerStyles.map((m) => (
             <View key={m.id} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
-              <Text style={m.kind === 'done' ? styles.eventDoneX : styles.eventPendingQ}>
+              <Text style={[m.kind === 'done' ? styles.eventDoneX : styles.eventPendingQ, markerFont]}>
                 {m.kind === 'done' ? '✕' : (questionNumbers[m.id] ? `${questionNumbers[m.id]}?` : '?')}
               </Text>
             </View>
@@ -712,7 +724,7 @@ export function MapScreen() {
               the matching card + route button in the Contracts screen. */}
           {contractMarkerStyles.map((m) => (
             <View key={m.key} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
-              <Text style={styles.contractPin}>{m.label}</Text>
+              <Text style={[styles.contractPin, markerFont]}>{m.label}</Text>
             </View>
           ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
