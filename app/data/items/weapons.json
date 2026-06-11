@@ -5913,7 +5913,7 @@
       "description": "Faction-issue ranged weapon, struck for the tartarian revivalists. Marked with their sigil."
     },
     {
-      "name": "Mire Maul",
+      "name": "Golem Sledge",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
       "damageDice": "2d8",
@@ -5924,15 +5924,15 @@
         "weapon",
         "melee",
         "golem_weapon",
-        "golem:mud_golem"
+        "two_handed"
       ],
-      "description": "A slab of bound mudstone on a haft, sized for a Mud Golem's grip. Dead weight in your hands; a wrecking ball in its.",
+      "baseDurability": 45,
+      "description": "A two-handed wrecking sledge sized for a construct's grip — dead weight in your hands, a wall-breaker in its. Smear it with whatever you like; the golem doesn't mind the mess.",
       "statRequirement": null,
-      "tc": 0,
-      "baseDurability": 45
+      "tc": 0
     },
     {
-      "name": "Sentinel Greatcleaver",
+      "name": "Golem Greatsword",
       "weaponKind": "melee",
       "damageType": "slashing",
       "damageDice": "2d8",
@@ -5943,50 +5943,12 @@
         "weapon",
         "melee",
         "golem_weapon",
-        "golem:iron_golem"
+        "two_handed"
       ],
-      "description": "A scrap-forged greatcleaver balanced for an Iron Golem's reach. Too heavy to swing yourself; perfect for a thing that doesn't tire.",
+      "baseDurability": 45,
+      "description": "A scrap-forged greatsword balanced for a construct's reach. Too heavy to swing yourself; perfect for a thing that doesn't tire. Takes a coating and carries it through every swing.",
       "statRequirement": null,
-      "tc": 0,
-      "baseDurability": 45
-    },
-    {
-      "name": "Aetheric Lance",
-      "weaponKind": "melee",
-      "damageType": "aetheric",
-      "damageDice": "2d10",
-      "stat": "intelligence",
-      "rarity": "Rare",
-      "defense": 0,
-      "tags": [
-        "weapon",
-        "melee",
-        "golem_weapon",
-        "golem:aether_golem"
-      ],
-      "description": "A lance of channelled Aether, lashed to an Aether Golem's arm. It hums with the same charge that animates the construct.",
-      "statRequirement": null,
-      "tc": 0,
-      "baseDurability": 45
-    },
-    {
-      "name": "Shard Glaive",
-      "weaponKind": "melee",
-      "damageType": "piercing",
-      "damageDice": "2d10",
-      "stat": "strength",
-      "rarity": "Rare",
-      "defense": 0,
-      "tags": [
-        "weapon",
-        "melee",
-        "golem_weapon",
-        "golem:crystal_golem"
-      ],
-      "description": "A glaive grown from a single Aether-crystal, keyed to a Crystal Golem's lattice. It cuts the way the construct's own edges do.",
-      "statRequirement": null,
-      "tc": 0,
-      "baseDurability": 45
+      "tc": 0
     }
   ]
 }

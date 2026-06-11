@@ -16520,18 +16520,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isGolemWeapon, golemWeaponKind, GOLEM_WEAPON_NAME } = require('../engine/golems');
+    const { isGolemWeapon } = require('../engine/golems');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { findWeaponByName: fwbn } = require('../engine/crafting');
     const cat = fwbn(item.name);
     if (!cat || !isGolemWeapon(cat.tags)) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament."`);
-      return;
-    }
-    const forKind = golemWeaponKind(cat.tags);
-    if (forKind !== golem.kind) {
-      const want = GOLEM_WEAPON_NAME[golem.kind] ?? 'its own armament';
-      get().appendLog('arbiter', `The Arbiter eyes the fit. "The ${item.name} is built for a ${String(forKind).replace(/_/g, ' ')}, not your ${golem.kind.replace(/_/g, ' ')}. ${golem.name} needs the ${want}."`);
+      get().appendLog('arbiter', `The Arbiter shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament — a Sledge or a Greatsword."`);
       return;
     }
     // Stamp durability + take one instance out of the pack; return any current

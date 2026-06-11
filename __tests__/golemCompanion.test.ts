@@ -393,37 +393,37 @@ describe('MECHANIC-1b — golem sidekick', () => {
     });
   });
 
-  // OTA-478 — golem armaments (wielding a crafted weapon).
-  describe('OTA-478 — golem wields a kind-matched weapon', () => {
-    it('arm golem rejects a wrong-kind weapon, accepts the matching one (pack <-> golem)', async () => {
+  // OTA-481 — golem armaments: two universal forms (Sledge / Greatsword), any golem.
+  describe('OTA-481 — golem wields a universal weapon (Sledge / Greatsword)', () => {
+    it('any golem can wield either form; a non-golem weapon is refused; pack <-> golem', async () => {
       const store = await bootstrap([
-        { id: 'w1', name: 'Sentinel Greatcleaver', kind: 'weapon', rarity: 'Rare', quantity: 1, tags: ['weapon', 'golem_weapon', 'golem:iron_golem'] } as never,
+        { id: 'w1', name: 'Golem Greatsword', kind: 'weapon', rarity: 'Rare', quantity: 1, tags: ['weapon', 'golem_weapon', 'two_handed'] } as never,
+        { id: 'w2', name: 'Tartarian Spear', kind: 'weapon', rarity: 'Uncommon', quantity: 1, tags: ['weapon'] } as never,
       ]);
       const p0 = store.getState().player!;
-      // A MUD golem can't wield the iron weapon.
+      // A MUD golem (any kind) CAN wield the universal greatsword.
       store.setState({ player: { ...p0, golem: makeCompanion(GOLEM_DEFINITIONS.mud_golem) } });
-      store.getState().submitPlayerAction('arm golem with Sentinel Greatcleaver');
-      expect(store.getState().player!.golem!.weapon ?? null).toBeNull();
-      expect(store.getState().player!.inventory.some((i) => i.name === 'Sentinel Greatcleaver')).toBe(true);
-
-      // An IRON golem can: weapon leaves the pack, lands on the golem with durability.
-      store.setState((s) => (s.player ? { player: { ...s.player, golem: makeCompanion(GOLEM_DEFINITIONS.iron_golem) } } : s));
-      store.getState().submitPlayerAction('arm golem with Sentinel Greatcleaver');
+      store.getState().submitPlayerAction('arm golem with Golem Greatsword');
       const g = store.getState().player!.golem!;
-      expect(g.weapon?.name).toBe('Sentinel Greatcleaver');
+      expect(g.weapon?.name).toBe('Golem Greatsword');
       expect(g.weapon?.durability?.current).toBeGreaterThan(0);
-      expect(store.getState().player!.inventory.some((i) => i.name === 'Sentinel Greatcleaver')).toBe(false);
+      expect(store.getState().player!.inventory.some((i) => i.name === 'Golem Greatsword')).toBe(false);
 
-      // Disarm returns it to the pack.
+      // A normal (non-golem) weapon is refused — golem keeps the greatsword.
+      store.getState().submitPlayerAction('arm golem with Tartarian Spear');
+      expect(store.getState().player!.golem!.weapon?.name).toBe('Golem Greatsword');
+      expect(store.getState().player!.inventory.some((i) => i.name === 'Tartarian Spear')).toBe(true);
+
+      // Disarm returns the greatsword to the pack.
       store.getState().submitPlayerAction('disarm golem');
       expect(store.getState().player!.golem!.weapon ?? null).toBeNull();
-      expect(store.getState().player!.inventory.some((i) => i.name === 'Sentinel Greatcleaver')).toBe(true);
+      expect(store.getState().player!.inventory.some((i) => i.name === 'Golem Greatsword')).toBe(true);
     });
 
     it('a wielded weapon raises golem damage and wears down on strikes', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
-      const weapon = { id: 'gw', name: 'Shard Glaive', kind: 'weapon' as const, rarity: 'Rare' as const, quantity: 1, tags: ['weapon', 'golem_weapon', 'golem:crystal_golem'], durability: { current: 3, max: 45 } };
+      const weapon = { id: 'gw', name: 'Golem Sledge', kind: 'weapon' as const, rarity: 'Rare' as const, quantity: 1, tags: ['weapon', 'golem_weapon', 'two_handed'], durability: { current: 3, max: 45 } };
       const golem = { ...makeCompanion(GOLEM_DEFINITIONS.crystal_golem), hp: 200, hpMax: 200, hitBonus: 40, weapon: weapon as never };
       const scene = store.getState().currentScene!;
       store.setState({
@@ -435,21 +435,21 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const g = store.getState().player!.golem!;
       expect(g.weapon ?? null).toBeNull();
       const log = store.getState().gameLog.map((l) => l.text).join('\n');
-      expect(log).toMatch(/swings the Shard Glaive/);
+      expect(log).toMatch(/swings the Golem Sledge/);
       expect(log).toMatch(/shatters in .* grip/);
     });
 
     it('a coated golem weapon applies the coating on hit (acid shreds enemy armor)', async () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { isCoatableItem } = require('../app/engine/weaponCoating');
-      // Even a bludgeoning golem weapon is coatable (construct smears it on).
-      expect(isCoatableItem({ name: 'Mire Maul', kind: 'weapon', tags: ['weapon', 'golem_weapon', 'golem:mud_golem'] })).toBe(true);
+      // A bludgeoning golem sledge is still coatable (construct smears it on).
+      expect(isCoatableItem({ name: 'Golem Sledge', kind: 'weapon', tags: ['weapon', 'golem_weapon', 'two_handed'] })).toBe(true);
 
       const store = await bootstrap();
       const p0 = store.getState().player!;
       const weapon = {
-        id: 'gw2', name: 'Shard Glaive', kind: 'weapon' as const, rarity: 'Rare' as const, quantity: 1,
-        tags: ['weapon', 'golem_weapon', 'golem:crystal_golem'], durability: { current: 45, max: 45 },
+        id: 'gw2', name: 'Golem Sledge', kind: 'weapon' as const, rarity: 'Rare' as const, quantity: 1,
+        tags: ['weapon', 'golem_weapon', 'two_handed'], durability: { current: 45, max: 45 },
         coating: { kind: 'acid' as const, label: 'Acid', dice: '1d4' },
       };
       const golem = { ...makeCompanion(GOLEM_DEFINITIONS.crystal_golem), hp: 300, hpMax: 300, hitBonus: 40, weapon: weapon as never };

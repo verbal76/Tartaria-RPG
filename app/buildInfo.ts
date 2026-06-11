@@ -13884,4 +13884,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coated weapon — especially a coated GOLEM weapon (OTA-479) — can wear a high-tier Core Guardian's guard
 // down over a long fight and restore the player's collapsing hit rate. Both shred sites (player attack +
 // the shared golem helper) use the scaled cap. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-480';
+// OTA-481 (Osmium Casting) — [feature] GOLEM ARMAMENTS — revised to the player's design: instead of four
+// type-locked weapons, there are now TWO universal forms you CRAFT and ANY golem can wield — a Golem
+// SLEDGE (two-handed bludgeoning, 2d8) or a Golem GREATSWORD (two-handed slashing, 2d8), both Rare,
+// durability 45, and coatable with any normal coating (OTA-479). Added craft recipes (Sledge = 4 Scrap
+// Metal + 2 Big Rock + 1 Golem Core; Greatsword = 5 Scrap Metal + 1 Golem Core + 1 Aether Crystal) so
+// they're actually buildable. Dropped the kind-matching from arm-golem + the inventory "Arm" button (the
+// form is the player's choice; damage type now matters for coatings/resists). The recipes are unlocked
+// for now (testable); the Core-4 forge-quest GATE + narrative beat is the last follow-up. Supersedes the
+// OTA-478 type-locked design. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-481';

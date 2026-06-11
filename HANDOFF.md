@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-11) = OTA-480 "Rhenium Etch" — armor-shred scales (boss cap 11,
->   so a coated golem weapon strips a guardian's guard). 479 golem coatings carry through;
->   478 golem wields weapons; 467 golem stats; 464 reverted 463 voice auto-disable.** The whole **OTA-457→480**
->   playtest batch (Tellurium Refining → Rhenium Etch, elements 52–75; 477 was test-only) is published
+> - **LIVE (pushed 2026-06-11) = OTA-481 "Osmium Casting" — golem armaments revised: craft a
+>   Sledge or Greatsword, any golem wields it, coatable. 480 armor-shred scales; 479 golem coatings;
+>   478 golem wields weapons; 467 golem stats; 464 reverted 463 voice auto-disable.** The whole **OTA-457→481**
+>   playtest batch (Tellurium Refining → Osmium Casting, elements 52–76; 477 was test-only) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,14 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 … 476, 478, 479, 480 committed below (post-batch follow-ups).**
+**OTA-465 … 476, 478, 479, 480, 481 committed below (post-batch follow-ups).**
 
+- **OTA-481 "Osmium Casting" — [feature] Golem Armaments revised: 2 universal craftable forms** *(element #76)*.
+  Replaced OTA-478's 4 type-locked weapons with 2 forms ANY golem can wield + craft: **Golem Sledge** (2H
+  bludgeoning) / **Golem Greatsword** (2H slashing), Rare 2d8, coatable. Craft recipes added (buildable now).
+  Dropped kind-matching. **NEXT (last piece): Core-4 forge-quest GATE + narrative beat** (recipes currently
+  unlocked for testing). `weapons.json`, `recipes.json`, `golems.ts`, `gameStore.ts`, `InventoryScreen.tsx`.
+  Covered by `golemCompanion.test.ts`.
 - **OTA-480 "Rhenium Etch" — [balance] armor-shred scales** *(element #75)*. Flat −5 acid cap couldn't strip
   a guardian's +6 boss AC; now per-enemy (`acidShredCap`): normal foes cap 5, bosses 11. Both shred sites
   (player + golem helper) use it. **NEXT (last piece): Core-4 forge-quest unlock + 4 craft recipes.**

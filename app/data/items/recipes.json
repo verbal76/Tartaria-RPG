@@ -3,120 +3,237 @@
     {
       "result": "Aether-Purge Tonic",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 1 },
-        { "name": "Orange Sporecap", "quantity": 1 },
-        { "name": "Red Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Orange Sporecap",
+          "quantity": 1
+        },
+        {
+          "name": "Red Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Hollow-Cleanse Decoction",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Violet Cap Mushroom", "quantity": 1 },
-        { "name": "Blue Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Violet Cap Mushroom",
+          "quantity": 1
+        },
+        {
+          "name": "Blue Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Poison Vial",
       "ingredients": [
-        { "name": "Leech Mucus", "quantity": 1 },
-        { "name": "Violet Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Leech Mucus",
+          "quantity": 1
+        },
+        {
+          "name": "Violet Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Acid Flask",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Corruption Tonic",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Blue Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Blue Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Plague Tonic",
       "ingredients": [
-        { "name": "Disease Sample", "quantity": 1 },
-        { "name": "Blue Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Disease Sample",
+          "quantity": 1
+        },
+        {
+          "name": "Blue Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Plague Vial",
       "ingredients": [
-        { "name": "Disease Sample", "quantity": 1 },
-        { "name": "Violet Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Disease Sample",
+          "quantity": 1
+        },
+        {
+          "name": "Violet Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Inoculant Draught",
       "ingredients": [
-        { "name": "Disease Sample", "quantity": 1 },
-        { "name": "Aether Dust", "quantity": 1 },
-        { "name": "Orange Sporecap", "quantity": 1 }
+        {
+          "name": "Disease Sample",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Orange Sporecap",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Viper Venom Vial",
       "ingredients": [
-        { "name": "Viper Venom", "quantity": 1 },
-        { "name": "Violet Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Viper Venom",
+          "quantity": 1
+        },
+        {
+          "name": "Violet Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Antivenom",
       "ingredients": [
-        { "name": "Viper Venom", "quantity": 1 },
-        { "name": "Orange Sporecap", "quantity": 1 }
+        {
+          "name": "Viper Venom",
+          "quantity": 1
+        },
+        {
+          "name": "Orange Sporecap",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Static Paste",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Speckled Egg", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Speckled Egg",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Galvanic Paste",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Speckled Egg", "quantity": 1 },
-        { "name": "Aether Residue", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Speckled Egg",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Resonant Paste",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Speckled Egg", "quantity": 1 },
-        { "name": "Aether Crystal", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Speckled Egg",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Incendiary Paste",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Aether Crystal", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Searing Paste",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Smoldering Paste",
       "ingredients": [
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Aether Residue", "quantity": 1 }
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
       ]
     },
     {
@@ -225,25 +342,52 @@
     {
       "result": "Field Dressing",
       "ingredients": [
-        { "name": "Patched Cloth", "quantity": 1 },
-        { "name": "Red Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Red Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "First Aid Kit",
       "ingredients": [
-        { "name": "Patched Cloth", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 },
-        { "name": "Aether Residue", "quantity": 1 }
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Trauma Kit",
       "ingredients": [
-        { "name": "Patched Cloth", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 },
-        { "name": "Aether Residue", "quantity": 1 },
-        { "name": "Red Cap Mushroom", "quantity": 1 }
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        },
+        {
+          "name": "Red Cap Mushroom",
+          "quantity": 1
+        }
       ]
     },
     {
@@ -730,7 +874,7 @@
       ]
     },
     {
-      "_note": "MECHANIC-2 (2026-05-25) \u2014 scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool \u2014 OTA-033.",
+      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool — OTA-033.",
       "result": "Pulse Scanner",
       "ingredients": [
         {
@@ -1058,6 +1202,40 @@
         }
       ],
       "intRequirement": 11
+    },
+    {
+      "result": "Golem Sledge",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 4
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 2
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Golem Greatsword",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 5
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }

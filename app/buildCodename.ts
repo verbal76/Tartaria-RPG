@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-481 — [feature] GOLEM ARMAMENTS revised to the player's design: two UNIVERSAL craftable forms any
+  // golem can wield — a Golem Sledge (2H bludgeoning) or Golem Greatsword (2H slashing), Rare 2d8, coatable.
+  // Added craft recipes; dropped the OTA-478 kind-matching (form is the player's choice). Element #76: Osmium.
+  '2026-06-11-481': 'Osmium Casting',
   // OTA-480 — [balance] armor-shred scales: the flat −5 acid cap couldn't strip a guardian's +6 boss-AC
   // bonus; now per-enemy (normal foes cap at 5, bosses at 5+6=11 via acidShredCap), so a coated weapon —
   // especially a coated golem weapon — wears a high-tier guardian's guard down. Element #75: Rhenium.
