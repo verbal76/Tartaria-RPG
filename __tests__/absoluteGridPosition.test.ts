@@ -206,4 +206,33 @@ describe('arb47 — absolute-grid player position never warps', () => {
     expect(arrived.gridX).toBe(cell.x);
     expect(arrived.gridY).toBe(cell.y);
   });
+
+  it('routing BACK to the location you wandered off (open ground) walks you home, not strands you (INV8b)', async () => {
+    const store = await bootstrap();
+    const home = store.getState().player!.currentLocationId;
+    const cell = canonicalCellOf(home);
+
+    // Wander 6 tiles east into open ground — currentLocationId still reads home
+    // (you never crossed a NEW named tile), but the cell is 6 away.
+    const p0 = store.getState().player!;
+    store.setState({ player: { ...p0, gridX: cell.x + 6, gridY: cell.y, stamina: 500, staminaMax: 500 } });
+    expect(store.getState().player!.currentLocationId).toBe(home);
+
+    // Route home and walk it out the way the UI does.
+    store.getState().setTravelCourse(home);
+    let safety = 60;
+    while (safety-- > 0) {
+      const cur = store.getState().player!;
+      if (!cur.travelTarget) break;
+      store.setState({ player: { ...cur, stamina: cur.staminaMax } });
+      store.getState().continueTravel();
+    }
+    const end = store.getState().player!;
+    // Pre-fix: continueTravel saw targetId === currentLocationId and cleared the
+    // course on the first tick, stranding the player ~5 tiles out. Now arrival is
+    // cell-based, so we actually reach home's canon cell.
+    expect(end.gridX).toBe(cell.x);
+    expect(end.gridY).toBe(cell.y);
+    expect(end.travelTarget).toBeFalsy();
+  });
 });

@@ -378,6 +378,20 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-516 "Roentgenium Return" — [bugfix] route-back-home stranding + chaos-sweep hardening** *(element #111)*.
+  Output of a 4-agent chaos/stress sweep of the last day's work (~25k fuzz iterations + 4.5k random gameplay
+  ticks). **MAIN FIX (chaos INV8b):** routing BACK to a location you'd wandered off in open ground stranded you.
+  `currentLocationId` sticks to a place until you cross a NEW named tile, but `continueTravel` + `setTravelCourse`'s
+  first step detected "arrived" via `targetId === currentLocationId` — so routing home cleared the course on tick
+  one and left you ~5 tiles out (the user's "route to it to recheck" case). Arrival is now **cell-based**
+  everywhere (`playerGridCell === canonicalCellOf(target)`); also clears the lingering "near X" transit label.
+  Regression test added (`absoluteGridPosition.test.ts` INV8b). **SECONDARY (INV5b):** travel-row distance read
+  +1 stale when the auto first-step landed on a town between you and the target — `setTravelCourse` now always
+  re-plots after the first step. **HARDENING (GAP1/GAP2, unreachable in normal play):** `contractMarkers` dedups
+  duplicate ids; `questionMarkers` uses `Number.isFinite` so a corrupt NaN cell can't leak a non-finite "?".
+  Everything else (grid math, reversibility, marker numbering/aggregation, overlay geometry, save/reload) came
+  back **clean**. Scratch fuzz harnesses were removed (not shipped). `app/state/gameStore.ts`,
+  `app/engine/questionMarkers.ts`, `app/engine/contractMarkers.ts`.
 - **OTA-515 "Darmstadtium Inset" — [polish] uniform overlay-marker size + left-legend inset** *(element #110)*.
   Two map-overlay fixes from the screenshot. (1) **Uniform size**: every overlay glyph (the `?`/`✕` grid events
   + the `◆` contract pins) now scales to the atlas art exactly like the (player-approved) Hidden Market name

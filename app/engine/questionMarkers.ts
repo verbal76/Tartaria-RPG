@@ -37,8 +37,10 @@ export function questionMarkerPlaces(wm: QuestionMemory | null | undefined): Que
   // Pending grid-event objectives are "?"; resolved ones ("done" → "X") are not.
   for (const ev of wm?.canonLocations ?? []) {
     if (ev.marker !== 'pending') continue;
-    const c = (typeof ev.gx === 'number' && typeof ev.gy === 'number')
-      ? { x: ev.gx, y: ev.gy }
+    // Number.isFinite (not typeof === 'number') so a corrupt NaN cell falls back
+    // to the id's canon cell instead of leaking a non-finite marker off-map.
+    const c = (Number.isFinite(ev.gx) && Number.isFinite(ev.gy))
+      ? { x: ev.gx as number, y: ev.gy as number }
       : canonicalCellOf(ev.id);
     list.push({ id: ev.id, x: c.x, y: c.y });
   }

@@ -67,9 +67,13 @@ function anchorForFaction(factionId: string | null | undefined): string {
 export function openContractMarkers(player: PlayerCharacter | null | undefined): ContractMarker[] {
   if (!player) return [];
   const draft: Omit<ContractMarker, 'number'>[] = [];
+  const seen = new Set<string>();
   const add = (family: ContractFamily, id: string, label: string, anchorId: string): void => {
+    const key = `${family}:${id}`;
+    if (seen.has(key)) return; // a corrupt save with a duplicate id must not double-number
+    seen.add(key);
     const c = canonicalCellOf(anchorId);
-    draft.push({ key: `${family}:${id}`, family, label, anchorId, x: c.x, y: c.y });
+    draft.push({ key, family, label, anchorId, x: c.x, y: c.y });
   };
 
   for (const h of player.activeHunts ?? []) {

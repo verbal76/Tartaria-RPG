@@ -14185,4 +14185,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pins barely move). cellToAtlasFraction stays pure (round-trip test intact); the inset is applied at the
 // MapScreen render site. The Hidden Market label is untouched (its own atlas coord, already on the ground).
 // app/screens/MapScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-515';
+// OTA-516 (Roentgenium Return) — [bugfix] from a multi-agent chaos/stress sweep of the last day's work. MAIN FIX
+// (chaos INV8b): routing BACK to the location you'd wandered off in open ground stranded you. When you walk away
+// from a place without crossing a new named tile, currentLocationId still reads that place — and continueTravel
+// (and setTravelCourse's first step) detected "arrived" via `targetId === currentLocationId`, so routing home
+// cleared the course on the first tick and left you ~5 tiles out (the user's "route to it to recheck" case).
+// Arrival is now CELL-BASED everywhere (playerGridCell === canonicalCellOf(target)), so you actually walk home;
+// arrival also clears the lingering "near X" transit label. SECONDARY (chaos INV5b): the travel-row distance
+// read +1 stale when the auto first-step landed on a town between you and the target (stepDirection skips its
+// re-plot on a named-tile landing) — setTravelCourse now always re-plots after the first step. HARDENING (chaos
+// GAP1/GAP2, unreachable in normal play): contractMarkers dedups duplicate ids; questionMarkers uses
+// Number.isFinite so a corrupt NaN cell can't leak a non-finite "?" marker. The sweep otherwise found the grid
+// math, markers, geometry, and reload paths clean across ~25k fuzz iterations + 4.5k random gameplay ticks.
+// app/state/gameStore.ts, app/engine/questionMarkers.ts, app/engine/contractMarkers.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-516';

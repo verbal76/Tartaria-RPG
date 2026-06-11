@@ -16924,15 +16924,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (firstDir) {
       set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
       get().stepDirection(firstDir);
-      // If the first step IS the arrival, clear travelTarget here
-      // (stepDirection already fired travelTo via its landedOn branch).
+      // arb103 — arrival is cell-based; and ALWAYS re-plot the badge from the new
+      // cell. stepDirection skips its own re-plot when the first step lands ON a
+      // named tile (a town between you and the target), which left the travel-row
+      // reading stale by +1 (chaos INV5b). Re-plotting here makes the first reading
+      // honest in every case.
       const after = get().player;
-      if (after && after.currentLocationId === locationId) {
+      const ag = after ? playerGridCell(after) : null;
+      const arrived = !!ag && ag.x === tgtCell.x && ag.y === tgtCell.y;
+      if (arrived) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      } else if (after?.travelTarget && ag) {
+        const d = canonicalDistanceFromGrid(ag.x, ag.y, locationId);
+        set((s) => (s.player?.travelTarget ? {
+          player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: d } },
+        } : s));
       }
-      // arb28 — the auto first step goes through stepDirection, which already
-      // re-plots distanceRemaining from the new position (position-derived).
-      // No manual decrement here (it would double-count).
     }
   },
 
@@ -16961,10 +16968,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const targetId = player.travelTarget.locationId;
-    if (targetId === player.currentLocationId) {
-      // Arrived — clear the target and announce.
-      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
-      return;
+    // arb103 — ARRIVAL is "standing on the target's canon cell", NOT "currentLocationId
+    // equals the target". When you've wandered off a location in open ground (the
+    // location id sticks until you cross a NEW named tile) and route BACK to it, the
+    // old currentLocationId check fired a false "arrived" and stranded you mid-field
+    // (chaos INV8b — the user's "route to it to recheck" case). Cell-based fixes it.
+    const tgtCell = canonicalCellOf(targetId);
+    {
+      const pg = playerGridCell(player);
+      if (pg.x === tgtCell.x && pg.y === tgtCell.y) {
+        // Arrived — clear the target (also drop any lingering transit label).
+        set((s) => (s.player ? {
+          player: { ...s.player, travelTarget: undefined },
+          currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
+        } : s));
+        return;
+      }
     }
     const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
     const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
@@ -16981,7 +17000,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (
       tgtPos
       && (player.travelTarget.distanceRemaining ?? 0) <= 0
-      && player.currentLocationId !== targetId
+      // We only reach here when NOT on the target cell (the cell-based arrival
+      // check above already returned), so a 0 reading is a genuine desync.
     ) {
       // arb47 — recover from the EXACT distance at the player's absolute cell.
       const recGrid = playerGridCell(player);
@@ -17009,7 +17029,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb47 — step toward the target's fixed CANON cell from the player's
     // absolute grid cell. Movement + distance share the canon frame.
     const fromGrid = playerGridCell(player);
-    const tgtCell = canonicalCellOf(targetId);
     const dir = nextCardinalToward(fromGrid.x, fromGrid.y, tgtCell.x, tgtCell.y);
     if (!dir) {
       // Player is on the target tile but somehow currentLocationId
@@ -17028,13 +17047,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // travelTo() handler clears mapX/mapY and switches currentLocationId.
     // Clear travelTarget AFTER the step so the UI swaps back.
     const after = get().player;
-    if (after && after.currentLocationId === targetId) {
-      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
-    } else if (after?.travelTarget) {
+    const afterGrid = after ? playerGridCell(after) : null;
+    const arrived = !!afterGrid && afterGrid.x === tgtCell.x && afterGrid.y === tgtCell.y;
+    if (arrived) {
+      // arb103 — arrival is cell-based (see above): clears even when routing back
+      // to the location you were nominally "at" from open ground.
+      set((s) => (s.player ? {
+        player: { ...s.player, travelTarget: undefined },
+        currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
+      } : s));
+    } else if (after?.travelTarget && afterGrid) {
       // arb47 — EXACT distance from the player's absolute cell to the target's
       // fixed canon cell, fresh each step. Walks down monotonically as auto-travel
       // steps toward the target — no countdown drift, no clamp, no warp.
-      const afterGrid = playerGridCell(after);
       const dist = canonicalDistanceFromGrid(afterGrid.x, afterGrid.y, targetId);
       set((s) => (s.player?.travelTarget ? {
         player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
