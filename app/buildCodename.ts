@@ -1046,6 +1046,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-11-511': 'Seaborgium Tally',
   '2026-06-11-512': 'Bohrium Ledger',
   '2026-06-11-513': 'Hassium Docket',
+  '2026-06-11-514': 'Meitnerium Cluster',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

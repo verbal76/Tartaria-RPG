@@ -14167,4 +14167,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // button is prefixed with its number) so the route blocks match the pins. Distinct "◆" glyph (not "?") because a
 // contract sits on an already-named place. app/engine/contractMarkers.ts, app/screens/MapScreen.tsx,
 // app/screens/ContractsScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-513';
+// OTA-514 (Meitnerium Cluster) — [polish] two map fixes. (1) AGGREGATE contract pins: contracts that share an
+// anchor cell (faction quests on a home outpost, hunts on a biome anchor) now collapse into ONE pin showing a
+// count ("◆×4"); a lone contract still shows its number ("3◆"). One mark per place — the per-contract numbers
+// live on the Contracts cards. Replaces the OTA-513 per-contract stagger that clustered. (2) Hidden Market NAME
+// label was a fixed ~10px overlay that dwarfed the atlas's painted labels and ate ~a map quadrant once the "?"
+// resolved to "The Hidden Market". It now scales to the art (labelScale = renderedW ÷ ATLAS_W, min 5px) with a
+// lighter weight + tighter shadow, so it reads at the same scale as the painted names (and still scales with
+// pinch-zoom since it lives in the scaled layer). app/screens/MapScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-514';

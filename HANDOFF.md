@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-514 "Meitnerium Cluster" — [polish] aggregate contract pins + shrink the Hidden Market name label**
+  *(element #109)*. Two map fixes from playtest. (1) **Aggregate contract pins**: contracts sharing an anchor
+  cell (faction quests on a home outpost, hunts on a biome anchor) now collapse into ONE pin showing a count
+  (`◆×4`); a lone contract still shows its number (`3◆`). One mark per place — per-contract numbers stay on the
+  Contracts cards. Replaces the OTA-513 per-contract diagonal stagger (user: "aggregate"). (2) **Hidden Market
+  NAME label too big**: once the `?` resolved to "The Hidden Market" the fixed ~10px overlay dwarfed the atlas's
+  painted labels and ate ~a map quadrant (the painted labels shrink with the contain-fit; a constant overlay
+  doesn't). Now scaled to the art (`labelScale = renderedW ÷ ATLAS_W`, floor 5px) with lighter weight + tighter
+  shadow, so it reads at the painted-label scale and still grows with pinch-zoom (it lives in the scaled layer).
+  `app/screens/MapScreen.tsx`.
 - **OTA-513 "Hassium Docket" — [feature] plot OPEN contracts on the atlas as distinct numbered "◆" pins**
   *(element #108)*. User: plot "all of them" with "a distinct numbered contract pin". Every open contract now
   shows a teal `N◆` pin on the map at its anchor cell — **leads** at their own location, **hunts** at a

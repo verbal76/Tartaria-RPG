@@ -508,10 +508,17 @@ export function MapScreen() {
   // "X" at every DONE one. Positioned by converting each event's canonical cell
   // back to its atlas fraction (cellToAtlasFraction), same letterbox math as above.
   const eventMarkerStyles: { id: string; left: number; top: number; kind: 'pending' | 'done' }[] = [];
-  // arb100 — open-contract pins (distinct "◆" glyph + number). Co-located pins
-  // (faction quests share a home outpost, hunts share a biome anchor) cascade by a
-  // small diagonal stagger so each stays legible and tappable.
-  const contractMarkerStyles: { key: string; number: number; left: number; top: number }[] = [];
+  // arb100 — open-contract pins (distinct teal "◆" glyph). AGGREGATED per cell:
+  // contracts that share an anchor (faction quests on a home outpost, hunts on a
+  // biome anchor) collapse into ONE pin showing a count ("◆×4"); a lone contract
+  // shows its number ("3◆"). Keeps the map uncluttered — the per-contract numbers
+  // live on the Contracts cards.
+  const contractMarkerStyles: { key: string; label: string; left: number; top: number }[] = [];
+  // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
+  // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
+  // width ÷ atlas natural width keeps overlay text proportional to the art at the
+  // base zoom (and it still scales with pinch since it lives in the scaled layer).
+  let labelScale = 1;
   if (imgBox) {
     // OTA 055 — letterbox-aware dot positioning. The imageBox is
     // now flex-filled (fills the available height between header
@@ -538,6 +545,9 @@ export function MapScreen() {
       offsetX = 0;
       offsetY = (imgBox.height - renderedH) / 2;
     }
+    // arb101 — how much the atlas art was shrunk to fit; overlay labels multiply
+    // their base size by this so they read at the same scale as the painted text.
+    labelScale = renderedW / ATLAS_W;
     // OTA 057 — marker is offset by HALF its constant screen-size
     // (not its scaled size — the inverse-scale on markerWrapper
     // cancels the parent's transform). Anchoring on the marker's
@@ -569,19 +579,22 @@ export function MapScreen() {
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
-      // arb100 — contract pins, staggered when several share a cell.
-      const perCell: Record<string, number> = {};
+      // arb100 — AGGREGATE contracts by cell into one pin (count when >1, else the
+      // lone contract's number). One mark per place keeps the atlas readable.
+      const byCell: Record<string, { x: number; y: number; count: number; sole: number }> = {};
       for (const cm of contractMarkers) {
-        const f = cellToAtlasFraction(cm.x, cm.y);
         const cellKey = `${cm.x},${cm.y}`;
-        const stack = perCell[cellKey] ?? 0;
-        perCell[cellKey] = stack + 1;
-        const stagger = stack * 14;
+        const e = byCell[cellKey];
+        if (e) e.count += 1;
+        else byCell[cellKey] = { x: cm.x, y: cm.y, count: 1, sole: cm.number };
+      }
+      for (const [cellKey, v] of Object.entries(byCell)) {
+        const f = cellToAtlasFraction(v.x, v.y);
         contractMarkerStyles.push({
-          key: cm.key,
-          number: cm.number,
-          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2 + stagger,
-          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2 + stagger,
+          key: cellKey,
+          label: v.count > 1 ? `◆×${v.count}` : `${v.sole}◆`,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
         });
       }
     }
@@ -666,11 +679,22 @@ export function MapScreen() {
               drifting player marker that OTA-182 removed. */}
           {hiddenMarketStyle && (
             <View pointerEvents="none" style={[styles.hiddenMarketWrap, hiddenMarketStyle]}>
-              <Text style={hiddenMarketRevealed ? styles.hiddenMarketName : styles.hiddenMarketQ}>
-                {hiddenMarketRevealed
-                  ? 'The Hidden\nMarket'
-                  : (questionNumbers.hidden_market ? `${questionNumbers.hidden_market}?` : '?')}
-              </Text>
+              {hiddenMarketRevealed ? (
+                // arb101 — the resolved NAME is scaled to the atlas art (was a fixed
+                // 10px overlay that dwarfed the painted labels + ate a map quadrant).
+                <Text
+                  style={[
+                    styles.hiddenMarketName,
+                    { fontSize: Math.max(5, 30 * labelScale), lineHeight: Math.max(6, 33 * labelScale) },
+                  ]}
+                >
+                  The Hidden{'\n'}Market
+                </Text>
+              ) : (
+                <Text style={styles.hiddenMarketQ}>
+                  {questionNumbers.hidden_market ? `${questionNumbers.hidden_market}?` : '?'}
+                </Text>
+              )}
             </View>
           )}
           {/* OTA-505 — grid-event markers: yellow "?" for a pending whisper/contract
@@ -688,7 +712,7 @@ export function MapScreen() {
               the matching card + route button in the Contracts screen. */}
           {contractMarkerStyles.map((m) => (
             <View key={m.key} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
-              <Text style={styles.contractPin}>{`${m.number}◆`}</Text>
+              <Text style={styles.contractPin}>{m.label}</Text>
             </View>
           ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
@@ -901,14 +925,16 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   hiddenMarketName: {
+    // arb101 — fontSize/lineHeight are set inline (scaled to the atlas art). Lighter
+    // weight + tighter shadow so the label blends with the painted names instead of
+    // overpowering them.
     color: '#f0d27a',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontWeight: '700',
+    letterSpacing: 0.3,
     textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowColor: 'rgba(0,0,0,0.9)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    textShadowRadius: 2,
   },
   // OTA-505 — grid-event markers. Pending = bright yellow "?"; done = red "✕".
   eventPendingQ: {
