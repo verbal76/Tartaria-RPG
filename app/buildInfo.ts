@@ -13878,4 +13878,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // substance however it strikes) so all four golem kinds can run the armor-breaker, not just slashing/
 // piercing. Net: a repaired, high-Resilience golem wielding a coated weapon becomes the late-game
 // guard-cracker that the trio needs at tiers 5+. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-479';
+// OTA-480 (Rhenium Etch) — [balance] ARMOR-SHRED SCALES. The flat −5 acid-shred cap couldn't strip a
+// guardian's +6 boss-AC bonus, so it didn't matter where it's needed most. The cap is now per-enemy:
+// normal foes still cap at 5 (no trivialising trash), but a BOSS cap is 5+6 = 11 (acidShredCap), so a
+// coated weapon — especially a coated GOLEM weapon (OTA-479) — can wear a high-tier Core Guardian's guard
+// down over a long fight and restore the player's collapsing hit rate. Both shred sites (player attack +
+// the shared golem helper) use the scaled cap. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-480';

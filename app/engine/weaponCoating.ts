@@ -100,8 +100,19 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
 export const COATING_DOT_TURNS = 3;
 /** AC reduction an acid coating inflicts per landing hit. */
 export const ACID_SHRED_PER_HIT = 1;
-/** Cap on accumulated acid armor shred per enemy. */
+/** Base cap on accumulated acid armor shred per enemy (normal foes). */
 export const ACID_SHRED_MAX = 5;
+/** OTA-480 — extra shred headroom against a BOSS, so acid can strip the +6
+ *  boss-AC bonus that makes high-tier Core Guardians a "find another way" wall.
+ *  A normal enemy still caps at 5 (no trivialising trash); a guardian can be
+ *  worn down to 5+6 = 11 over a long fight, restoring the player's hit rate as
+ *  the fight goes. This is the late-game lever a coated golem (the armor-breaker)
+ *  drives. */
+export const ACID_SHRED_BOSS_BONUS = 6;
+/** Per-enemy shred cap: base + boss headroom. */
+export function acidShredCap(enemy: { boss?: boolean } | null | undefined): number {
+  return ACID_SHRED_MAX + (enemy?.boss ? ACID_SHRED_BOSS_BONUS : 0);
+}
 /** Extra DOT-per-turn a corruption coating gains per accumulated stack. */
 export const CORRUPTION_STACK_BONUS = 1;
 

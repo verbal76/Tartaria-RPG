@@ -1,7 +1,7 @@
 import {
   isCoatableWeapon, isCoatableItem, coatedDisplayName, coatingBlurb,
   coatingStatusKind, coatingDotPerTurn, rollLootCoating,
-  COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, CORRUPTION_STACK_BONUS,
+  COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, CORRUPTION_STACK_BONUS, acidShredCap, ACID_SHRED_BOSS_BONUS,
 } from '../app/engine/weaponCoating';
 import { mergeOrPushItem } from '../app/engine/inventory';
 import type { InventoryItem } from '../app/engine/types';
@@ -210,5 +210,14 @@ describe('Disease Sample crafted items (OTA-370)', () => {
       expect(matches).toHaveLength(1); // one recipe per result (convention held)
       expect(matches[0]!.ingredients.some((i) => i.name === 'Disease Sample')).toBe(true);
     }
+  });
+
+  // OTA-480 — armor-shred cap scales on bosses so acid can strip the +6 boss-AC
+  // wall (a normal foe still caps at base, no trivialising trash).
+  it('acidShredCap: normal foe caps at base, a boss gets the boss headroom', () => {
+    expect(acidShredCap({ boss: false })).toBe(ACID_SHRED_MAX);
+    expect(acidShredCap(null)).toBe(ACID_SHRED_MAX);
+    expect(acidShredCap({ boss: true })).toBe(ACID_SHRED_MAX + ACID_SHRED_BOSS_BONUS);
+    expect(ACID_SHRED_BOSS_BONUS).toBe(6); // matches the boss AC bonus it's meant to strip
   });
 });

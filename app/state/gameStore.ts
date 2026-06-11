@@ -155,7 +155,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, rollLootCoating } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, rollLootCoating } from '../engine/weaponCoating';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
@@ -13669,7 +13669,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (proc.kind === 'acid') {
               shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
               while (shred.length < n) shred.push(0);
-              shred[activeIdx] = Math.min(ACID_SHRED_MAX, (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
+              shred[activeIdx] = Math.min(acidShredCap(s.currentScene.enemies[activeIdx]), (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
             }
             const dotKind = coatingStatusKind(proc.kind);
             const dotPerTurn = coatingDotPerTurn(proc.kind, proc.rolled, stacksAfter);
@@ -23627,7 +23627,7 @@ function applyWeaponCoatingProc(
     if (proc.kind === 'acid') {
       shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
       while (shred.length < n) shred.push(0);
-      shred[activeIdx] = Math.min(ACID_SHRED_MAX, (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
+      shred[activeIdx] = Math.min(acidShredCap(s.currentScene.enemies[activeIdx]), (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
     }
     const dotKind = coatingStatusKind(proc.kind);
     const dotPerTurn = coatingDotPerTurn(proc.kind, proc.rolled, stacksAfter);

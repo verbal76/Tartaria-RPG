@@ -345,6 +345,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-480 — [balance] armor-shred scales: the flat −5 acid cap couldn't strip a guardian's +6 boss-AC
+  // bonus; now per-enemy (normal foes cap at 5, bosses at 5+6=11 via acidShredCap), so a coated weapon —
+  // especially a coated golem weapon — wears a high-tier guardian's guard down. Element #75: Rhenium.
+  '2026-06-11-480': 'Rhenium Etch',
   // OTA-479 — [feature] GOLEM ARMAMENTS pt.2: COATINGS carry through. A coated golem weapon applies its
   // on-hit effect (acid shred / corruption / DOT) like a player's coated strike — the late-game
   // armor-breaker. Shared applyWeaponCoatingProc helper (player+golem); golem weapons coatable regardless
