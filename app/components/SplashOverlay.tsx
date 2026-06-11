@@ -13,7 +13,15 @@ const SPLASH_W = 941;
 const SPLASH_H = 1672;
 // OTA-475/476 — top-left-anchored splash scale (fraction of screen width). Full
 // "too big", 2/3 "too far", 0.85 "getting there", 0.92 "just a touch more" → 0.97.
-const SPLASH_SCALE = 0.97;
+// OTA-483 — "enlarge it, not stretch" → bump scale; width grows, height follows by
+// the same ratio so aspect is preserved (no distortion). Still grows down-right from
+// the anchored corner.
+const SPLASH_SCALE = 1.06;
+// OTA-483 — nudge the anchored top-left corner ~1/4" down and right. RN has no DPI
+// API, so we use the 160dp-per-inch baseline: 1/4" ≈ 40dp. The thin top/left margin
+// this exposes is the overlay's near-black backing (#0b0a09), matching the art's
+// dark vignette.
+const SPLASH_OFFSET = 40;
 
 // Module-scoped so it survives remounts within the same JS process; resets on a
 // fresh process / OTA reload.
@@ -53,7 +61,7 @@ export function SplashOverlay() {
     <View style={styles.overlay} pointerEvents="auto">
       <Image
         source={require('../../assets/splash-art.jpg')}
-        style={{ position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
+        style={{ position: 'absolute', top: SPLASH_OFFSET, left: SPLASH_OFFSET, width: imgW, height: imgH }}
         resizeMode="cover"
       />
       <View style={styles.barWrap}>

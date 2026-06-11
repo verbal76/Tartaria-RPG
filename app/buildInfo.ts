@@ -13899,4 +13899,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2d8; 2 Aether Crystal + 1 Aetheric Shard + 1 Golem Core). Now: Sledge (bludgeoning) / Greatsword
 // (slashing) / Pike (piercing) / Aether-Lance (aetheric) — any golem wields any of them, all coatable, so
 // the player picks the damage type to match the guardian's weakness and coats it. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-482';
+// OTA-483 (Platinum Leaf) — [polish] SPLASH ART framing (player request). Nudge the opening splash art
+// ~1/4" DOWN and RIGHT and ENLARGE it — "not stretch." Bumped SPLASH_SCALE 0.97 → 1.06 (width grows;
+// height follows by the SAME ratio so aspect is preserved — no distortion) and offset the top-left-anchored
+// corner by SPLASH_OFFSET = 40dp (≈1/4" at RN's 160dp-per-inch baseline; RN has no true DPI API) on both
+// top + left. Still grows down-right FROM the anchored corner; the thin top/left margin this exposes is the
+// overlay's near-black backing (#0b0a09), which matches the art's dark vignette. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-483';

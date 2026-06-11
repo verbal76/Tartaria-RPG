@@ -376,10 +376,22 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Staging list: EMPTY.** The OTA-457→463 playtest batch was **SHIPPED 2026-06-10**
+**Staging list (fresh — accumulating toward the next ≥5 push):**
+
+- **OTA-483 "Platinum Leaf" — [polish] splash-art framing** *(element #78)*. Player: *"maybe just about a
+  1/4 inch down and right. enlarge it, not stretch. keep the top left anchored."* `SplashOverlay.tsx`:
+  bumped `SPLASH_SCALE` 0.97 → 1.06 (width grows, height follows the SAME ratio → aspect preserved, no
+  stretch) and added `SPLASH_OFFSET = 40dp` (≈1/4" at RN's 160dp/inch baseline) applied to the image's
+  `top` + `left`. Still top-left-anchored (grows down-right from that corner); the thin top/left margin
+  exposed is the overlay backing `#0b0a09`, matching the art's dark vignette. JS-only → OTA.
+  **NOTE:** purely visual — no test (no behavior to assert); eyeball on next launch and tell me to nudge
+  scale/offset if it overshoots.
+
+---
+
+**Staging list (shipped-batch record below).** The OTA-457→463 playtest batch was **SHIPPED 2026-06-10**
 (user: "push everything in the pipeline") — all CI-green and live on all channels.
-The entries below are retained for now as the shipped-batch record; next new fix
-starts a fresh staging list above this note.
+The entries below are retained as the shipped-batch record.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
 **OTA-465 … 476, 478–482 committed below (post-batch follow-ups).**
