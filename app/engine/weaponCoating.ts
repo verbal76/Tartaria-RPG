@@ -45,8 +45,13 @@ export function isCoatableWeapon(name: string): boolean {
  *  forged piece the player invested in; treat any fused WEAPON as coatable.
  *  Catalog weapons keep the damage-type gate. Prefer this over isCoatableWeapon
  *  wherever an actual InventoryItem is in hand. */
-export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniqueStats'>): boolean {
+export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniqueStats' | 'tags'>): boolean {
   if (item.kind === 'weapon' && item.uniqueStats?.kind === 'weapon') return true;
+  // OTA-479 — golem armaments are always coatable regardless of damage type (a
+  // construct smears/channels the substance however it strikes), so a coated golem
+  // weapon can be the late-game armor-breaker for ANY golem kind — not just the
+  // slashing/piercing ones the normal melee gate allows.
+  if ((item.tags ?? []).includes('golem_weapon')) return true;
   return isCoatableWeapon(item.name);
 }
 

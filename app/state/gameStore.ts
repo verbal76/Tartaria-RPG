@@ -13677,7 +13677,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             while (statuses.length < n) statuses.push([]);
             // Refresh: drop any prior coating-of-this-kind, push a fresh one.
             const list = (statuses[activeIdx] ?? []).filter((st) => st.kind !== dotKind);
-            list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source });
+            list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source ?? 'coating' });
             statuses[activeIdx] = list;
             const next: typeof s.currentScene = { ...s.currentScene, enemyStatuses: statuses };
             if (corr) next.enemyCorruptionStacks = corr;
@@ -23602,6 +23602,47 @@ function runAethercraft(
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
 }
 
+// OTA-479 — apply a weapon coating's ON-HIT effects to the active enemy: acid
+// shreds armor (capped), corruption stacks, and every coating seeds a refreshing
+// DOT. Mirrors the player attack path (gameStore ~13655) so a coated GOLEM weapon
+// behaves identically — the construct becomes the armor-breaker / anti-foe DOT
+// engine. Pure state mutation; the caller logs the bite line.
+function applyWeaponCoatingProc(
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  activeIdx: number,
+  proc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string },
+): void {
+  set((s) => {
+    if (!s.currentScene) return s;
+    const n = s.currentScene.enemies.length;
+    let stacksAfter = 0;
+    let corr = s.currentScene.enemyCorruptionStacks;
+    if (proc.kind === 'corruption') {
+      corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
+      while (corr.length < n) corr.push(0);
+      corr[activeIdx] = (corr[activeIdx] ?? 0) + 1;
+      stacksAfter = corr[activeIdx]!;
+    }
+    let shred = s.currentScene.enemyArmorShred;
+    if (proc.kind === 'acid') {
+      shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
+      while (shred.length < n) shred.push(0);
+      shred[activeIdx] = Math.min(ACID_SHRED_MAX, (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
+    }
+    const dotKind = coatingStatusKind(proc.kind);
+    const dotPerTurn = coatingDotPerTurn(proc.kind, proc.rolled, stacksAfter);
+    const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
+    while (statuses.length < n) statuses.push([]);
+    const list = (statuses[activeIdx] ?? []).filter((st) => st.kind !== dotKind);
+    list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source ?? 'coating' });
+    statuses[activeIdx] = list;
+    const next: typeof s.currentScene = { ...s.currentScene, enemyStatuses: statuses };
+    if (corr) next.enemyCorruptionStacks = corr;
+    if (shred) next.enemyArmorShred = shred;
+    return { currentScene: next };
+  });
+}
+
 // 2026-05-25 [MECHANIC-1b] — golem sidekick command handler. Fires
 // when player taps the golem QuickBtn or types "command golem [tgt]".
 // Picks a target enemy, rolls the golem's attack, applies damage,
@@ -23696,6 +23737,23 @@ function handleGolemCommand(
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
     dmg += golem.attackMod + Math.floor(golemPower / 2);
+    // OTA-479 — a COATED golem weapon adds its bite to the hit AND seeds the
+    // coating's shred/stack/DOT on the enemy (the armor-breaker payoff). Mirrors
+    // the player's coated-strike math.
+    const golemCoating = workingGolem.weapon?.coating;
+    let golemCoatProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string } | null = null;
+    if (golemCoating) {
+      const rawRolled = Math.max(1, rollFromNotation(golemCoating.dice));
+      const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn';
+      const rolled = isElemental
+        ? Math.max(1, Math.round(
+            applyDamageTypeModifier(rawRolled, golemCoating.kind, target.type).damage
+            * traitDamageMultiplier(target.traits, golemCoating.kind).multiplier,
+          ))
+        : rawRolled;
+      dmg += rolled;
+      golemCoatProc = { kind: golemCoating.kind, rolled, source: workingGolem.weapon?.name };
+    }
     const newEnemyHp = Math.max(0, targetHp - dmg);
     get().appendLog(
       'combat',
@@ -23741,6 +23799,20 @@ function handleGolemCommand(
           },
         }
       : s);
+    // OTA-479 — enemy survived a COATED golem strike → seed the coating effect.
+    if (golemCoatProc) {
+      applyWeaponCoatingProc(set, targetIdx, golemCoatProc);
+      const total = get().currentScene?.enemyArmorShred?.[targetIdx] ?? 0;
+      const extra = golemCoatProc.kind === 'acid'
+        ? ` Its guard pits — easier to hit now (−${ACID_SHRED_PER_HIT} AC, ${total} total).`
+        : golemCoatProc.kind === 'corruption'
+          ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1} stacks).`
+          : '';
+      get().appendLog(
+        'combat',
+        `${workingGolem.weapon?.name ?? golem.name}'s coating — ${golemCoatProc.rolled} ${golemCoatProc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
+      );
+    }
   } else {
     get().appendLog(
       'world',

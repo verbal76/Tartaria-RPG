@@ -13869,4 +13869,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the innate attackDie (Power still adds half), and it WEARS down per connecting strike — shattering like
 // any weapon and reverting the golem to bare fists. Shown on the Character-screen golem panel. Coatings
 // carry-through + the Core-4 forge-quest unlock land in the follow-up OTAs. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-10-478';
+// OTA-479 (Tungsten Coating) — [feature] GOLEM ARMAMENTS pt.2: COATINGS CARRY THROUGH — the armor-breaker
+// payoff. A coated golem weapon now applies its on-hit effect to the enemy exactly like a player's coated
+// strike: acid SHREDS the guard (lets YOU hit the rising guardian AC), corruption stacks, and every
+// coating seeds a refreshing DOT (which also chips REGENERATE guardians). The shred/stack/DOT logic is
+// extracted into a shared applyWeaponCoatingProc helper used by both the player and golem paths (no
+// drift). Golem armaments are made coatable regardless of damage type (a construct smears/channels the
+// substance however it strikes) so all four golem kinds can run the armor-breaker, not just slashing/
+// piercing. Net: a repaired, high-Resilience golem wielding a coated weapon becomes the late-game
+// guard-cracker that the trio needs at tiers 5+. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-479';

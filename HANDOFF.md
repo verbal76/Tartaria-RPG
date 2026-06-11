@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-10) = OTA-478 "Tantalum Forging" — Golem Armaments pt.1: golems
->   wield crafted weapons (kind-matched, durability, Character-screen display). 467 golem stats;
->   466 golem repair+naming; 471 full-bleed splash; 464 reverted 463 voice auto-disable.** The whole **OTA-457→478**
->   playtest batch (Tellurium Refining → Tantalum Forging, elements 52–73; 477 was test-only) is published
+> - **LIVE (pushed 2026-06-11) = OTA-479 "Tungsten Coating" — Golem Armaments pt.2: coated
+>   golem weapons apply acid-shred/DOT on hit (the armor-breaker). 478 golem wields weapons;
+>   467 golem stats; 466 golem repair+naming; 464 reverted 463 voice auto-disable.** The whole **OTA-457→479**
+>   playtest batch (Tellurium Refining → Tungsten Coating, elements 52–74; 477 was test-only) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,14 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 … 476, 478 committed below (post-batch follow-ups).**
+**OTA-465 … 476, 478, 479 committed below (post-batch follow-ups).**
 
+- **OTA-479 "Tungsten Coating" — [feature] Golem Armaments pt.2 (coatings carry through)** *(element #74)*.
+  A coated golem weapon applies its on-hit effect (acid shred / corruption / DOT) like a player's coated
+  strike — the late-game armor-breaker. Shared `applyWeaponCoatingProc` helper (player+golem, no drift);
+  golem weapons coatable regardless of damage type. **NEXT: armor-shred scaling (−5 cap can't cover the
+  +10 AC swing), then the Core-4 forge-quest unlock + 4 craft recipes.** `gameStore.ts`, `weaponCoating.ts`.
+  Covered by `golemCompanion.test.ts`.
 - **OTA-478 "Tantalum Forging" — [feature] Golem Armaments pt.1 (wielding)** *(element #73)*. Golem can wield
   a crafted melee weapon: 4 kind-matched Rare weapons (`golem_weapon`+`golem:<kind>` tags, 2d8–2d10, dur 45);
   `Companion.weapon` + `arm/disarm golem` verbs + "Arm <golem>" inv button (kind-matched); combat uses the

@@ -345,6 +345,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-399 — fix doubled coating label in the acid/coating on-hit line ("Acid-
   // Etched Acid-Etched Rusty Shortbow"): OTA-391 made weaponName the coated name
   // (already has the label) but the proc line still prepended proc.label.
+  // OTA-479 — [feature] GOLEM ARMAMENTS pt.2: COATINGS carry through. A coated golem weapon applies its
+  // on-hit effect (acid shred / corruption / DOT) like a player's coated strike — the late-game
+  // armor-breaker. Shared applyWeaponCoatingProc helper (player+golem); golem weapons coatable regardless
+  // of damage type. Element #74: Tungsten.
+  '2026-06-11-479': 'Tungsten Coating',
   // OTA-478 — [feature] GOLEM ARMAMENTS pt.1: the golem can WIELD a crafted melee weapon (4 kind-matched
   // Rare weapons; arm/disarm verb + "Arm <golem>" button; wielded dice replace innate + durability wear;
   // shown on the Character screen). Coatings + Core-4 unlock follow. (OTA-477 was a test-only commit, no

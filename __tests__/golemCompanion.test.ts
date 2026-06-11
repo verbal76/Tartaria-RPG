@@ -438,5 +438,34 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(log).toMatch(/swings the Shard Glaive/);
       expect(log).toMatch(/shatters in .* grip/);
     });
+
+    it('a coated golem weapon applies the coating on hit (acid shreds enemy armor)', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { isCoatableItem } = require('../app/engine/weaponCoating');
+      // Even a bludgeoning golem weapon is coatable (construct smears it on).
+      expect(isCoatableItem({ name: 'Mire Maul', kind: 'weapon', tags: ['weapon', 'golem_weapon', 'golem:mud_golem'] })).toBe(true);
+
+      const store = await bootstrap();
+      const p0 = store.getState().player!;
+      const weapon = {
+        id: 'gw2', name: 'Shard Glaive', kind: 'weapon' as const, rarity: 'Rare' as const, quantity: 1,
+        tags: ['weapon', 'golem_weapon', 'golem:crystal_golem'], durability: { current: 45, max: 45 },
+        coating: { kind: 'acid' as const, label: 'Acid', dice: '1d4' },
+      };
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.crystal_golem), hp: 300, hpMax: 300, hitBonus: 40, weapon: weapon as never };
+      const scene = store.getState().currentScene!;
+      store.setState({
+        player: { ...p0, golem },
+        currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
+      });
+
+      await store.getState().submitPlayerAction('golem attack');
+
+      const after = store.getState().currentScene!;
+      // Acid shred accumulated on the enemy, and a DOT status seeded.
+      expect((after.enemyArmorShred?.[0] ?? 0)).toBeGreaterThan(0);
+      expect((after.enemyStatuses?.[0]?.length ?? 0)).toBeGreaterThan(0);
+      expect(store.getState().gameLog.map((l) => l.text).join('\n')).toMatch(/coating — \d+ acid bites in/);
+    });
   });
 });
