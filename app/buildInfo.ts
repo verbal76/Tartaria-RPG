@@ -14053,4 +14053,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // handled any id, so distance is exact the moment a place is canonized. Tests: __tests__/canonLocations.test.ts.
 // NEXT (pt.3): wire the mention SOURCES (whisper route targets, broker contracts, faction missions) to call
 // canonizeLocation, and surface canon locations as rows in the MapScreen travel list. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-500';
+// OTA-501 (Curium Nudge) — [polish] Hidden Market "?" tuning (player). Shrank the "?" overlay ~30%
+// (fontSize 26 → 18, MapScreen) and moved the market 6 grid cells EAST + 1 SOUTH — fx 0.51→0.66, fy
+// 0.23→0.275 in hiddenLocations.ts. Those fx/fy drive BOTH the canonical grid cell (canonicalCellFor:
+// gridX 41→47 = +6, gridY 14→15 = +1) AND the "?"/name overlay, so the grid coordinate, the travel distance,
+// and the visual marker all moved together. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-501';

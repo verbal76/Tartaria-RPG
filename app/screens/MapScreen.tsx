@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
   },
   hiddenMarketQ: {
     color: '#f0d27a',
-    fontSize: 26,
+    fontSize: 18, // OTA-501 — shrunk ~30% from 26 (player: "?" was too big)
     fontWeight: '900',
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.95)',

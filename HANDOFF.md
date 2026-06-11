@@ -378,6 +378,11 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-501 "Curium Nudge" — [polish] Hidden Market "?" tuning** *(element #96)*. Player: the "?" was too big
+  and slightly off. Shrank it ~30% (MapScreen `hiddenMarketQ` fontSize 26→18) and moved the market **6 grid
+  cells east + 1 south** (`hiddenLocations.ts` fx 0.51→0.66, fy 0.23→0.275). Those fx/fy drive BOTH the
+  canonical grid cell (canonicalCellFor: gridX 41→47, gridY 14→15) AND the "?"/name overlay, so the grid
+  coordinate, the travel distance, and the visual marker all moved together — exactly as asked. `hiddenMarket.test.ts` still green.
 - **OTA-500 "Americium Plot" — [feature] canon-location registry (grid-math directive pt.2)** *(element #95)*.
   Any place named by a whisper/contract/mission/narration can be CANONIZED for the install: persists in
   `worldMemory.canonLocations`, gets a permanent grid cell, and is plotted on BOTH the canonical grid and the

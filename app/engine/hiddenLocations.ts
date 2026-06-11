@@ -13,10 +13,11 @@
  *  atlasCoords.LOCATION_ATLAS_COORDS) on purpose: that table is the IDW anchor set
  *  for the player-dot interpolation, and a hidden marker must not perturb it. */
 export const HIDDEN_LOCATIONS: Record<string, { placeholder: string; fx: number; fy: number }> = {
-  // Right-of-centre on the Sunken Middens ring — the player's marked spot, just
-  // below the gap between Builders' Survey Camp and Giant-Watch Shrine, above the
-  // Silt Wastes capitals.
-  hidden_market: { placeholder: '?', fx: 0.51, fy: 0.23 },
+  // OTA-501 — moved 6 grid cells east + 1 south from the original spot (player
+  // tuning). fx/fy drive BOTH the canonical grid cell (canonicalCellFor) AND the
+  // "?" overlay, so the grid coordinate and the visual location move together.
+  // gridX = CENTER+round((0.66-0.5)*40) = +6 east; gridY = CENTER+round((0.275-0.5)*22) = +1 south.
+  hidden_market: { placeholder: '?', fx: 0.66, fy: 0.275 },
 };
 
 export function isHiddenLocation(id: string | null | undefined): boolean {
