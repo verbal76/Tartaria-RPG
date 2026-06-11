@@ -9,29 +9,33 @@
 // derive the player-facing name ("Corrupted Battle Axe") here.
 //
 // Coatability is gated on damage type, not on a hand-maintained
-// list: a coating needs an edge or a point to carry the substance
-// into the wound. So a bladed melee weapon (slashing / piercing)
-// or a projectile ranged weapon (piercing — arrows, bolts, bolt-
-// casters) qualifies; a bludgeoning cudgel or an energy caster
-// does not. The combat on-hit wiring (OTA-361) reads coating.kind
-// to land a differentiated enemy status: poison = pure DOT, acid =
-// DOT + armor shred, corruption = DOT + corruption stacks.
+// list. OTA-492 — per the player, coatings now apply to ALL physical
+// melee: slashing, piercing AND bludgeoning (a mace head / cudgel still
+// smears the substance into the strike). Ranged stays physical-
+// projectile only (a point that carries the substance — arrows, bolts,
+// bolt-casters); energy casters (runecaster / aetheric / electrical /
+// burn) fire no surface to coat. The combat on-hit wiring (OTA-361)
+// reads coating.kind to land a differentiated enemy status: poison =
+// pure DOT, acid = DOT + armor shred, corruption = DOT + corruption stacks.
 
 import type { InventoryItem, WeaponCoating } from './types';
 import { findWeaponByName } from './crafting';
 
 /** True iff a weapon by this name can carry a coating. Resolves the
  *  weapon via the same catalog/inference path combat uses, then
- *  gates on weaponKind + damageType: a bladed melee weapon
- *  (slashing / piercing) or a projectile ranged weapon (piercing)
- *  qualifies. Returns false for non-weapons, bludgeoning melee, and
- *  energy ranged (electrical / aetheric / burn / radiation). */
+ *  gates on weaponKind + damageType: any PHYSICAL melee weapon
+ *  (slashing / piercing / bludgeoning) or a projectile ranged weapon
+ *  (piercing) qualifies. Returns false for non-weapons, aetheric/energy
+ *  melee, and energy ranged (electrical / aetheric / burn / radiation). */
 export function isCoatableWeapon(name: string): boolean {
   const w = findWeaponByName(name);
   if (!w) return false;
   if (w.weaponKind === 'runecaster') return false;
   if (w.weaponKind === 'melee') {
-    return w.damageType === 'slashing' || w.damageType === 'piercing';
+    // OTA-492 — all physical melee, bludgeoning included (per the player).
+    return w.damageType === 'slashing'
+      || w.damageType === 'piercing'
+      || w.damageType === 'bludgeoning';
   }
   // ranged — only physical projectiles (a point that carries the
   // substance). Energy casters fire no edge to coat.

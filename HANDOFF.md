@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-492 "Francium Wash" — [feature] coatings apply to BLUDGEONING weapons too** *(element #87)*. Player:
+  *"let's change coatings to apply to piercing and bludgeoning weapons as well as slashing ones."*
+  `isCoatableWeapon`'s melee gate was slashing|piercing; now all physical melee
+  (slashing|piercing|**bludgeoning** — a mace/cudgel smears it on). Ranged stays piercing-projectile only;
+  aetheric/energy melee, energy ranged, runecasters still can't be coated. Golem armaments + fused weapons
+  remain always-coatable. Tests updated: `weaponCoating.test.ts`. `weaponCoating.ts`.
 - **OTA-491 "Radon Sorting" — [bugfix] Shaped Aetheric Shard mis-classified as a TOOL** *(element #86)*.
   Player: *"shaped Aetheric shard is a one use throwing weapon, why is it marked as a tool?"* The shard is
   `gear.json` kind `misc` + `throwable` (2d20 aetheric), but its NAME makes `itemDefaults` restamp synthesize

@@ -13974,4 +13974,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the pouch refusal reads "a throwing weapon — hurl it, don't pouch it." Genuine aetheric tools (Vision Lens)
 // still classify correctly. Test: __tests__/shapedShardNotATool.test.ts. pouchEligibility.ts +
 // InventoryCategorize.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-491';
+// OTA-492 (Francium Wash) — [feature] COATINGS now apply to BLUDGEONING weapons too (player request).
+// isCoatableWeapon's melee gate was slashing|piercing only; now it's all PHYSICAL melee —
+// slashing|piercing|bludgeoning (a mace head / cudgel smears the substance into the strike). Ranged stays
+// physical-projectile (piercing) only; aetheric/energy melee + energy ranged + runecasters still can't be
+// coated (no surface to hold it). Golem armaments + fused weapons remain always-coatable (isCoatableItem).
+// Tests updated: __tests__/weaponCoating.test.ts. app/engine/weaponCoating.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-492';

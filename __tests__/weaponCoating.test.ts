@@ -26,8 +26,8 @@ describe('isCoatableWeapon — only edges and points hold a coating', () => {
   it('a piercing ranged weapon (arrows / bolts) is coatable', () => {
     expect(isCoatableWeapon('Salvaged Bow')).toBe(true);
   });
-  it('a bludgeoning melee weapon is NOT coatable (no edge to carry it)', () => {
-    expect(isCoatableWeapon('Mud-fist Wraps')).toBe(false);
+  it('OTA-492 — a bludgeoning melee weapon IS now coatable (per the player)', () => {
+    expect(isCoatableWeapon('Mud-fist Wraps')).toBe(true);
   });
   it('an energy ranged weapon is NOT coatable (fires no point)', () => {
     expect(isCoatableWeapon('Rail Cannon')).toBe(false);
@@ -48,9 +48,9 @@ describe('isCoatableWeapon — only edges and points hold a coating', () => {
   it('isCoatableItem does NOT coat fused armor', () => {
     expect(isCoatableItem({ name: 'Woven Mantle', kind: 'armor', uniqueStats: { kind: 'armor' } })).toBe(false);
   });
-  it('isCoatableItem keeps the damage-type gate for catalog weapons', () => {
+  it('isCoatableItem allows all physical melee, incl. bludgeoning (OTA-492)', () => {
     expect(isCoatableItem({ name: 'Rusted Blade', kind: 'weapon' })).toBe(true);
-    expect(isCoatableItem({ name: 'Mud-fist Wraps', kind: 'weapon' })).toBe(false);
+    expect(isCoatableItem({ name: 'Mud-fist Wraps', kind: 'weapon' })).toBe(true);
   });
 });
 
@@ -103,7 +103,7 @@ describe('coating combat math (OTA-362)', () => {
 
 describe('rollLootCoating (OTA-363) — occasional coated-weapon loot', () => {
   it('never coats a non-coatable weapon, even on a guaranteed roll', () => {
-    expect(rollLootCoating('Cudgel', { rng: () => 0 })).toBeNull(); // bludgeoning
+    expect(rollLootCoating('Rail Cannon', { rng: () => 0 })).toBeNull(); // energy ranged — no point to coat
     expect(rollLootCoating('Scrap Metal', { rng: () => 0 })).toBeNull(); // not a weapon
   });
 
