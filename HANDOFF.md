@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-510 "Dubnium Waypoint" — [dev] one-shot: place the player 1 tile west of the Hidden Market** *(element
+  #105)*. User asked to set their position just west of the Hidden Market so the next auto-route reads **1** in
+  the travel-spaces block. On next load, `backfillPlayer` snaps the player's absolute grid cell to ONE tile west
+  of the market (canon cell `(47,15)` → west `(46,15)`, an empty tile; `canonicalDistanceFromGrid` from there to
+  `hidden_market` = 1, then one step east arrives). Flag-guarded by `player._placedWestOfHiddenMarket510` so it
+  fires ONCE and never re-yanks the player back on later loads; west is computed from the market's live canon
+  cell (stays correct if the market moves), and derived `mapX/mapY` are synced via `gridToVisual`.
+  `app/engine/types.ts`, `app/state/gameStore.ts`.
 - **OTA-509 "Rutherfordium Lattice" — [bugfix] the player's grid position warped (6/11/24-day estimate drift)**
   *(element #104)*. Playtest: setting course for the Hidden Market from the same area read **6**, then **11**,
   then **24** days; "7 paces south of the market" re-measured as "24 paces west". ROOT CAUSE: the player had no

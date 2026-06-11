@@ -346,6 +346,10 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
       const cell = canonicalCellOf(startId);
       return { gridX: cell.x, gridY: cell.y };
     })(),
+    // OTA-510 — a freshly created character is born at their start cell and must
+    // NOT be repositioned by the one-shot west-of-Hidden-Market dev placement;
+    // pre-set the guard so only pre-OTA-510 SAVES (the existing game) get moved.
+    _placedWestOfHiddenMarket510: true,
     // v2.4.1 (OTA 033) — initialize the Mud Flood Nexus main quest at
     // the 'hook' phase. The Arbiter's first-scene intro mentions the
     // Nexus once and seeds the arc.

@@ -1042,6 +1042,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-11-507': 'Nobelium Veil',
   '2026-06-11-508': 'Lawrencium Bazaar',
   '2026-06-11-509': 'Rutherfordium Lattice',
+  '2026-06-11-510': 'Dubnium Waypoint',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

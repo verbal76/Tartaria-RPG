@@ -1438,11 +1438,28 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // may be out in open ground between locations). From here on it only ever
     // moves ±1 per step or snaps to a location's canon cell on arrival.
     ...(() => {
+      // Base absolute cell: keep an existing one, else the current location's cell.
+      let gx: number;
+      let gy: number;
       if (typeof p.gridX === 'number' && typeof p.gridY === 'number') {
-        return { gridX: p.gridX, gridY: p.gridY };
+        gx = p.gridX; gy = p.gridY;
+      } else {
+        const cell = canonicalCellOf(p.currentLocationId);
+        gx = cell.x; gy = cell.y;
       }
-      const cell = canonicalCellOf(p.currentLocationId);
-      return { gridX: cell.x, gridY: cell.y };
+      // OTA-510 — one-shot: drop the player ONE tile west of the Hidden Market so
+      // the next auto-route to it reads exactly 1 pace. Flag-guarded so it fires
+      // once and never re-yanks the player back on subsequent loads. Computed from
+      // the market's live canon cell so it stays correct if the market ever moves.
+      if (!p._placedWestOfHiddenMarket510) {
+        const mk = canonicalCellOf('hidden_market');
+        gx = mk.x - 1; gy = mk.y;
+        // Keep the derived visual frame consistent with the new absolute cell so
+        // the map dot + per-tile room keys aren't stale until the first step.
+        const vis = gridToVisual(gx, gy, p.currentLocationId);
+        return { gridX: gx, gridY: gy, mapX: vis.mapX, mapY: vis.mapY, _placedWestOfHiddenMarket510: true };
+      }
+      return { gridX: gx, gridY: gy };
     })(),
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's

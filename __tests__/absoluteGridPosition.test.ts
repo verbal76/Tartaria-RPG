@@ -149,6 +149,40 @@ describe('arb47 — absolute-grid player position never warps', () => {
     }
   });
 
+  it('OTA-510 one-shot: a pre-510 save reloads ONE tile west of the Hidden Market (route reads 1)', async () => {
+    const store = await bootstrap();
+    const slotId = store.getState().activeSlotId!;
+    const market = canonicalCellOf('hidden_market');
+
+    // Simulate a pre-OTA-510 save: strip the one-shot guard + stand somewhere else.
+    const p = store.getState().player!;
+    store.setState({
+      player: {
+        ...p,
+        _placedWestOfHiddenMarket510: undefined,
+        gridX: 5,
+        gridY: 5,
+      },
+    });
+    await store.getState().persist();
+
+    // Cold reload through the real boot path — backfillPlayer fires the one-shot.
+    await store.getState().loadSlotIntoGame(slotId);
+    const after = store.getState().player!;
+    expect(after.gridX).toBe(market.x - 1);
+    expect(after.gridY).toBe(market.y);
+    expect(after._placedWestOfHiddenMarket510).toBe(true);
+    expect(canonicalDistanceFromGrid(after.gridX!, after.gridY!, 'hidden_market')).toBe(1);
+
+    // And it does NOT fire a second time — reloading again keeps the player put.
+    store.setState({ player: { ...store.getState().player!, gridX: 9, gridY: 9 } });
+    await store.getState().persist();
+    await store.getState().loadSlotIntoGame(slotId);
+    const again = store.getState().player!;
+    expect(again.gridX).toBe(9);
+    expect(again.gridY).toBe(9);
+  });
+
   it('arriving at a location snaps the cell to that location\'s fixed canon cell', async () => {
     const store = await bootstrap();
     const startId = store.getState().player!.currentLocationId;

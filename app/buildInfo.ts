@@ -14130,4 +14130,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // travelTo). New helpers in worldMap (canonicalCellOf / canonicalDistanceFromGrid / canonicalLocationAtCell /
 // clampGridCell / gridToVisual). character.ts + backfill seed gridX/gridY (legacy saves = current location's
 // canon cell). app/engine/worldMap.ts, types.ts, character.ts, app/state/gameStore.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-509';
+// OTA-510 (Dubnium Waypoint) — [dev] one-shot reposition: on next load, snap the player's absolute grid cell to
+// ONE tile WEST of the Hidden Market (its canon cell is (47,15); west = (46,15), an empty tile) so the next
+// auto-route to the Hidden Market reads exactly 1 in the travel-spaces block (then a single step east arrives).
+// Implemented in backfillPlayer, flag-guarded by player._placedWestOfHiddenMarket510 so it fires ONCE and never
+// re-yanks the player back on later loads; the west cell is computed from the market's live canon cell (stays
+// correct if the market moves), and the derived visual mapX/mapY are synced to the new cell. types.ts,
+// app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-510';

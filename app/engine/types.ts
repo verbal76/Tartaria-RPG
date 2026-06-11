@@ -979,6 +979,11 @@ export interface PlayerCharacter {
    *  (from their current location's canon cell) on load. */
   gridX?: number;
   gridY?: number;
+  /** OTA-510 — one-shot dev placement marker. When absent, backfillPlayer snaps
+   *  the player to the cell ONE tile west of the Hidden Market (so the next
+   *  auto-route to it reads exactly 1) and sets this true so it fires only once
+   *  and never yanks the player back on later loads. */
+  _placedWestOfHiddenMarket510?: boolean;
   /** Last cardinal direction the player traveled. Lets "continue" /
    *  "keep going" / "onward" repeat the previous step without forcing the
    *  player to retype the direction. Cleared on travelTo() to a named
