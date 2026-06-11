@@ -21,8 +21,13 @@ import {
 } from '../app/engine/atlasCoords';
 import locationsData from '../app/data/locations/locations.json';
 import type { Location } from '../app/engine/types';
+import { isHiddenLocation } from '../app/engine/hiddenLocations';
 
-const LOCATIONS = locationsData as Location[];
+// OTA-498 — hidden locations (the Hidden Market) are deliberately NOT painted on
+// the atlas and carry no LOCATION_ATLAS_COORDS entry (their "?" overlay coord
+// lives on the hidden-location record instead), so they're exempt from the
+// "every location is depicted" / dot-path coverage checks below.
+const LOCATIONS = (locationsData as Location[]).filter((l) => !isHiddenLocation(l.id));
 const LOC_BY_ID = new Map(LOCATIONS.map((l) => [l.id, l]));
 
 describe('OTA 051 — atlas coordinate calibration', () => {

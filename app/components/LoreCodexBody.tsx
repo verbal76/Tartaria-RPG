@@ -29,6 +29,7 @@ import locationsData from '../data/locations/locations.json';
 import timelineData from '../data/events/timeline.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
+import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
 
 type Section = 'races' | 'factions' | 'places' | 'timeline';
 
@@ -43,6 +44,8 @@ export function LoreCodexBody() {
   const setScreen = useGameStore((s) => s.setScreen);
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
   const appendLog = useGameStore((s) => s.appendLog);
+  // OTA-498 — hidden locations (the Hidden Market) read as "?" here too until visited.
+  const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -116,11 +119,12 @@ export function LoreCodexBody() {
         ))}
         {section === 'places' && (locationsData as Location[]).map((l) => {
           const atHere = canPlanRoute && l.id === here;
+          const hidden = isHiddenLocation(l.id) && !isLocationRevealed(l.id, discoveredIds);
           const content = (
             <>
-              <Text style={styles.name}>{l.name}</Text>
-              <Text style={styles.subtitle}>{l.type}</Text>
-              <Text style={styles.desc}>{l.description}</Text>
+              <Text style={styles.name}>{revealedLocationName(l.id, l.name, discoveredIds)}</Text>
+              <Text style={styles.subtitle}>{hidden ? 'unknown — travel to reveal' : l.type}</Text>
+              <Text style={styles.desc}>{hidden ? 'A place that keeps no name on any map until you find it yourself.' : l.description}</Text>
               <Text style={styles.meta}>Danger {l.danger}/5</Text>
               {canPlanRoute ? (
                 <Text style={styles.tapHint}>

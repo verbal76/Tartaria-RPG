@@ -4431,10 +4431,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const bX = player?.mapX ?? WORLD_MAP_CENTER_X;
     const bY = player?.mapY ?? WORLD_MAP_CENTER_Y;
     const onAnchorTile = bX === WORLD_MAP_CENTER_X && bY === WORLD_MAP_CENTER_Y;
+    // OTA-498 — the Hidden Market location HOSTS the 4-stall market building at its
+    // own anchor (it IS the market), so force it here rather than leaving the anchor
+    // building-less like other named tiles. Still suppressed if a fight is underway.
     const sceneBuilding: string | null =
-      !hasEnemies && !hubRoom && !onAnchorTile
-        ? buildingForTile(location.id, bX, bY)
-        : null;
+      location.id === 'hidden_market' && !hasEnemies
+        ? 'market'
+        : !hasEnemies && !hubRoom && !onAnchorTile
+          ? buildingForTile(location.id, bX, bY)
+          : null;
     // OTA-451 — a Mission Board stands in the central square of every faction
     // Outpost (outpost_central — the one shared room with no vendor anchor). It
     // posts the player's own faction's contracts (the rep-0 starters + anything
@@ -16881,8 +16886,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (t) {
           const dist = Math.abs(t.x - (live.mapX ?? WORLD_MAP_CENTER_X))
             + Math.abs(t.y - (live.mapY ?? WORLD_MAP_CENTER_Y));
+          // OTA-498 — keep the player-facing "days remaining" badge monotonic: a
+          // re-plot from a fresh map (e.g. after crossing an intermediate named
+          // location) can land a tile or two HIGHER for a far diagonal target;
+          // clamp so the countdown never ticks UP (re-plot decreases still pass).
           set((s) => (s.player?.travelTarget ? {
-            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
+            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: Math.min(dist, s.player.travelTarget.distanceRemaining ?? dist) } },
           } : s));
         }
       }

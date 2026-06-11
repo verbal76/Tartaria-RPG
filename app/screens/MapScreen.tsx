@@ -50,6 +50,7 @@ import {
   OUTPOST_ATLAS_COORD,
   LOCATION_ATLAS_COORDS,
 } from '../engine/atlasCoords';
+import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
@@ -163,6 +164,9 @@ export function MapScreen() {
   // place row calls setTravelCourse + bounces to exploration.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
   const appendLog = useGameStore((s) => s.appendLog);
+  // OTA-498 — discovered-location set drives the Hidden Market "?" reveal: the
+  // travel-list row + the map overlay both show "?" until the id is in here.
+  const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
   // OTA-171 — Places list sorted with the current location pinned at
   // the top so the player can see where they are at a glance, then
   // by danger ascending (safer trips first) so the easiest
@@ -474,6 +478,10 @@ export function MapScreen() {
   const onDepictedTile = !!atlasCoordForLocation(player.currentLocationId);
 
   let dotStyle: { left: number; top: number } | null = null;
+  // OTA-498 — Hidden Market overlay position (a static "?" / name pinned to its
+  // fixed atlas coord; unlike the removed player marker this never drifts).
+  let hiddenMarketStyle: { left: number; top: number } | null = null;
+  const hiddenMarketRevealed = isLocationRevealed('hidden_market', discoveredIds);
   if (imgBox) {
     // OTA 055 — letterbox-aware dot positioning. The imageBox is
     // now flex-filled (fills the available height between header
@@ -508,6 +516,15 @@ export function MapScreen() {
       left: offsetX + renderedW * atlasPos.fx - MARKER_W / 2,
       top: offsetY + renderedH * atlasPos.fy - MARKER_H / 2,
     };
+    // OTA-498 — pin the Hidden Market overlay to its fixed atlas fraction (world
+    // atlas only). Centered on the point via the fixed wrap size.
+    const hm = showingOutpost ? null : HIDDEN_LOCATIONS.hidden_market;
+    if (hm) {
+      hiddenMarketStyle = {
+        left: offsetX + renderedW * hm.fx - HM_LABEL_W / 2,
+        top: offsetY + renderedH * hm.fy - HM_LABEL_H / 2,
+      };
+    }
   }
 
   // Footer prose — at the named tile, name it. Otherwise report the
@@ -581,6 +598,19 @@ export function MapScreen() {
             style={styles.atlas}
             resizeMode="contain"
           />
+          {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
+              art, so this overlay both marks it and explains the blank: a
+              stylized "?" pinned to its fixed coord (right of the frontier camps,
+              on the Sunken Middens ring) until the player travels there, then it
+              flips to the location's name. A static atlas-anchored label — not the
+              drifting player marker that OTA-182 removed. */}
+          {hiddenMarketStyle && (
+            <View pointerEvents="none" style={[styles.hiddenMarketWrap, hiddenMarketStyle]}>
+              <Text style={hiddenMarketRevealed ? styles.hiddenMarketName : styles.hiddenMarketQ}>
+                {hiddenMarketRevealed ? 'The Hidden\nMarket' : '?'}
+              </Text>
+            </View>
+          )}
           {/* OTA-182 — player marker (silhouette + halo) removed.
               Player ask: "let's take the player marker off of the
               map, we were never able to make it accurate so let's
@@ -634,6 +664,9 @@ export function MapScreen() {
         >
           {placesView.map((p) => {
             const isHere = player?.currentLocationId === p.id;
+            // OTA-498 — a hidden location reads as "?" (routable) until visited.
+            const hidden = isHiddenLocation(p.id) && !isLocationRevealed(p.id, discoveredIds);
+            const rowName = revealedLocationName(p.id, p.name, discoveredIds);
             return (
               <TouchableOpacity
                 key={p.id}
@@ -655,13 +688,13 @@ export function MapScreen() {
               >
                 <View style={styles.placeRowLeft}>
                   <Text style={[styles.placeName, isHere && styles.placeNameHere]}>
-                    {p.name}
-                    {OUTPOST_NAME_BY_LOCATION[p.id]
+                    {rowName}
+                    {!hidden && OUTPOST_NAME_BY_LOCATION[p.id]
                       ? `  (${OUTPOST_NAME_BY_LOCATION[p.id]})`
                       : ''}
                   </Text>
                   <Text style={styles.placeType}>
-                    {OUTPOST_NAME_BY_LOCATION[p.id] ? 'faction outpost' : p.type}
+                    {hidden ? 'unknown — travel to reveal' : OUTPOST_NAME_BY_LOCATION[p.id] ? 'faction outpost' : p.type}
                   </Text>
                 </View>
                 <View style={styles.placeRowRight}>
@@ -693,6 +726,9 @@ export function MapScreen() {
 const MARKER_W = 56;
 const MARKER_H = 40;
 const HALO_SIZE = 48;
+// OTA-498 — Hidden Market overlay wrap size (centers the "?" / name on the coord).
+const HM_LABEL_W = 96;
+const HM_LABEL_H = 34;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
@@ -759,6 +795,33 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: MARKER_W,
     height: MARKER_H,
+  },
+  // OTA-498 — Hidden Market "?" / name overlay (pinned to its atlas coord).
+  hiddenMarketWrap: {
+    position: 'absolute',
+    width: HM_LABEL_W,
+    height: HM_LABEL_H,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hiddenMarketQ: {
+    color: '#f0d27a',
+    fontSize: 26,
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  hiddenMarketName: {
+    color: '#f0d27a',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   markerImage: {
     width: '100%',

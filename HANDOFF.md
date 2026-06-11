@@ -378,6 +378,19 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-498 "Neptunium Veil" — [feature] The Hidden Market (static location + reveal-on-travel "?")** *(element
+  #93)*. New `hidden_market` location on the **Sunken Middens** ring (labelled on the atlas art) at the
+  player's marked spot — `engine/hiddenLocations.ts` holds its overlay coord (fx 0.51 / fy 0.23), kept OUT of
+  `LOCATION_ATLAS_COORDS` so it never perturbs the IDW player-dot anchors; `worldMap` places it via that coord
+  and LAST so it can't displace other locations' canonical tiles. It HOSTS the existing 4-stall **market**
+  building (`gameStore` forces `scene.sceneBuilding='market'` at the anchor). **Reveal:** the atlas has no
+  painted icon for it, so MapScreen renders a stylized **"?"** overlay pinned at the coord (static,
+  atlas-anchored — not the drifting marker OTA-182 removed), and the travel list + Lore Codex show "?" /
+  "unknown — travel to reveal"; on first travel (`discoveredLocationIds`) all three flip to **"The Hidden
+  Market"**. Also clamped the auto-travel "days remaining" badge **monotonic** (a far-diagonal re-plot could
+  tick it UP — `gameStore` continueTravel). Test: `__tests__/hiddenMarket.test.ts`. **NOTE:** position is
+  eyeballed off the red dot — easy to nudge fx/fy in hiddenLocations.ts if it's off on-device. Pre-existing
+  reds (atlasCoords iskan_veil 0.05 boundary, dogTravelClimb) are untouched by this.
 - **OTA-497 "Uranium Band" — [feature] perk-only faction rings (one per faction)** *(element #92)*. Player:
   *"a few more rings that add no ac or HP but only the other perks and are sold by factions… make the faction
   names match what they do… do rings per faction."* Added 9 rings to `rings.json`, each a single themed +2

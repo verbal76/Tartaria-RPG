@@ -2196,5 +2196,16 @@
       "footprint",
       "architect blind"
     ]
+  },
+  {
+    "id": "hidden_market",
+    "name": "The Hidden Market",
+    "type": "settlement",
+    "danger": 2,
+    "discoverable": true,
+    "description": "A neutral-ground bazaar that does not advertise itself — four canvas stalls pitched in a wind-scoured hollow of the Sunken Middens, out past the frontier camps. Agents of every faction trade here under an unspoken truce; the place keeps no banner and no name on any map, only the rumor of one. Weapons, armor, food, and salvage change hands, and no questions are asked.",
+    "aliases": ["hidden market", "the hidden market", "market", "bazaar", "the middens market", "secret market", "question mark"],
+    "tags": ["settlement", "market", "neutral", "sunken_middens", "middens", "borderlands", "mud", "starter_friendly", "hidden"],
+    "interactables": ["stall", "canvas", "trader", "wares", "counter", "crate", "barrel", "lantern", "rope", "scale", "coin", "tarp", "mud", "silt"]
   }
 ]

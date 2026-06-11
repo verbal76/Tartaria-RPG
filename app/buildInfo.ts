@@ -14021,4 +14021,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (mud_monarchs, CHA), Aetherborn Signet (eternal_dynasty, CHA). Added to rings.json tagged faction_gear +
 // faction + tc; vendors.ts FACTION_GEAR now also reads rings (was weapons+armor only) so factionGearOffers
 // stocks them; CatalogAccessory gained optional faction/tc. Test: __tests__/factionRings.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-497';
+// OTA-498 (Neptunium Veil) — [feature] THE HIDDEN MARKET — a static map location + reveal-on-travel "?".
+// New `hidden_market` location (locations.json) on the Sunken Middens ring at the player's marked spot
+// (engine/hiddenLocations.ts coord fx 0.51/fy 0.23 — kept OUT of LOCATION_ATLAS_COORDS so it never perturbs
+// the IDW player-dot anchors; worldMap places it via that coord, LAST so it can't displace other tiles). It
+// HOSTS the existing 4-stall market building (gameStore forces scene.sceneBuilding='market' there). Reveal
+// mechanic (new engine/hiddenLocations.ts): the atlas shows a stylized "?" overlay pinned at its coord (the
+// map art has no painted icon for it), and the travel list + Lore Codex show "?" / "unknown — travel to
+// reveal"; once the player travels there (discoveredLocationIds), all three flip to "The Hidden Market".
+// MapScreen renders the "?"/name overlay (static, atlas-anchored — not the drifting marker OTA-182 removed);
+// LoreCodexBody + MapScreen list use revealedLocationName. Also clamped the auto-travel "days remaining"
+// badge monotonic (a far-diagonal re-plot could tick it UP). Test: __tests__/hiddenMarket.test.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-498';

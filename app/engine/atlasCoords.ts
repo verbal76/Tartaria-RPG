@@ -116,6 +116,9 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   giant_vault: { fx: 0.78, fy: 0.86 },
   etheric_chamber: { fx: 0.88, fy: 0.87 },
   mud_flood_nexus: { fx: 0.84, fy: 0.94 },
+  // NOTE: the Hidden Market is deliberately NOT here — its "?" overlay coord lives
+  // on the hidden-location record (engine/hiddenLocations.ts) so it doesn't perturb
+  // the IDW player-dot interpolation that uses every entry in this table as an anchor.
 };
 
 /**

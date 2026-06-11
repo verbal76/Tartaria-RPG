@@ -11,6 +11,7 @@
 import locationsData from '../data/locations/locations.json';
 import type { Location } from './types';
 import { LOCATION_ATLAS_COORDS, OUTPOST_ATLAS_COORD } from './atlasCoords';
+import { HIDDEN_LOCATIONS } from './hiddenLocations';
 
 export type Direction = 'north' | 'east' | 'south' | 'west';
 
@@ -143,11 +144,26 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   // same bearing + distance from Asgardar. No seed, no per-save scatter.
   // Deterministic id-sorted order makes the rare same-tile nudge stable.
   const others = ALL_LOCATIONS.filter((l) => l.id !== startLoc.id);
-  others.sort((a, b) => a.id.localeCompare(b.id));
+  // OTA-498 — hidden locations (the Hidden Market) are placed LAST so they only
+  // ever fill a leftover free tile and never displace an existing location's
+  // canonical tile via findFreeTile — keeping every other location's grid
+  // position (and travel distances) identical to before this location existed.
+  others.sort((a, b) => {
+    const ah = HIDDEN_LOCATIONS[a.id] ? 1 : 0;
+    const bh = HIDDEN_LOCATIONS[b.id] ? 1 : 0;
+    if (ah !== bh) return ah - bh;
+    return a.id.localeCompare(b.id);
+  });
   const startAtlas = LOCATION_ATLAS_COORDS[startLoc.id] ?? OUTPOST_ATLAS_COORD;
   const taken = new Set<string>([`${CENTER_X},${CENTER_Y}`]);
   for (const loc of others) {
-    const locAtlas = LOCATION_ATLAS_COORDS[loc.id];
+    // OTA-498 — a hidden location (the Hidden Market) is kept OUT of
+    // LOCATION_ATLAS_COORDS so it doesn't perturb the IDW player-dot anchors, but
+    // it still carries an atlas fraction on its hidden-location record. Use it for
+    // canonical grid placement so the market sits where it's drawn (near the
+    // frontier camps), not flung to the id-hash fallback ring.
+    const hid = HIDDEN_LOCATIONS[loc.id];
+    const locAtlas = LOCATION_ATLAS_COORDS[loc.id] ?? (hid ? { fx: hid.fx, fy: hid.fy } : undefined);
     let baseX: number;
     let baseY: number;
     if (locAtlas) {
