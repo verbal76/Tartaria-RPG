@@ -16525,7 +16525,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { findWeaponByName: fwbn } = require('../engine/crafting');
     const cat = fwbn(item.name);
     if (!cat || !isGolemWeapon(cat.tags)) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament — a Sledge or a Greatsword."`);
+      get().appendLog('arbiter', `The Arbiter shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament — a Sledge, Greatsword, Pike, or Aether-Lance."`);
       return;
     }
     // Stamp durability + take one instance out of the pack; return any current

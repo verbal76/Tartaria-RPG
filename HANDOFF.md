@@ -32,10 +32,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-11) = OTA-481 "Osmium Casting" — golem armaments revised: craft a
->   Sledge or Greatsword, any golem wields it, coatable. 480 armor-shred scales; 479 golem coatings;
->   478 golem wields weapons; 467 golem stats; 464 reverted 463 voice auto-disable.** The whole **OTA-457→481**
->   playtest batch (Tellurium Refining → Osmium Casting, elements 52–76; 477 was test-only) is published
+> - **LIVE (pushed 2026-06-11) = OTA-482 "Iridium Crucible" — golem armaments = four forms (one per
+>   damage type): Sledge/Greatsword/Pike/Aether-Lance, any golem, all coatable. 480 armor-shred scales;
+>   479 golem coatings; 478 golem wields weapons; 467 golem stats; 464 reverted 463 voice auto-disable.** The whole **OTA-457→482**
+>   playtest batch (Tellurium Refining → Iridium Crucible, elements 52–77; 477 was test-only) is published
 >   live on all channels — every `eas-update.yml` run for 457–463 is CI-green
 >   (verified via GH Actions on 2026-06-10). NOTE: in this repo a `HaL2001` code push
 >   IS the ship (auto multi-channel publish per §P2) — these were never a held queue;
@@ -382,8 +382,13 @@ The entries below are retained for now as the shipped-batch record; next new fix
 starts a fresh staging list above this note.
 
 **SHIPPED 2026-06-10 — Playtest batch (OTA-457→464), live on all channels.**
-**OTA-465 … 476, 478, 479, 480, 481 committed below (post-batch follow-ups).**
+**OTA-465 … 476, 478–482 committed below (post-batch follow-ups).**
 
+- **OTA-482 "Iridium Crucible" — [feature] Golem Armaments → FOUR forms (one per damage type)** *(element #77)*.
+  Added Golem Pike (piercing) + Golem Aether-Lance (aetheric) + recipes to the Sledge/Greatsword. Full set:
+  Sledge=bludgeoning, Greatsword=slashing, Pike=piercing, Aether-Lance=aetheric. Any golem, all coatable.
+  **NEXT (last piece): Core-4 forge-quest GATE + narrative beat** (recipes currently unlocked for testing).
+  `weapons.json`, `recipes.json`, `gameStore.ts`. Covered by `golemCompanion.test.ts`.
 - **OTA-481 "Osmium Casting" — [feature] Golem Armaments revised: 2 universal craftable forms** *(element #76)*.
   Replaced OTA-478's 4 type-locked weapons with 2 forms ANY golem can wield + craft: **Golem Sledge** (2H
   bludgeoning) / **Golem Greatsword** (2H slashing), Rare 2d8, coatable. Craft recipes added (buildable now).

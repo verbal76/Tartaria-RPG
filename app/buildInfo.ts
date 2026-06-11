@@ -13893,4 +13893,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // form is the player's choice; damage type now matters for coatings/resists). The recipes are unlocked
 // for now (testable); the Core-4 forge-quest GATE + narrative beat is the last follow-up. Supersedes the
 // OTA-478 type-locked design. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-481';
+// OTA-482 (Iridium Crucible) — [feature] GOLEM ARMAMENTS — completes the form set to FOUR, one per damage
+// type (per the player's spec). Added the two missing universal forms + recipes: Golem PIKE (two-handed
+// piercing, 2d8; 4 Scrap Metal + 2 Mudstone + 1 Golem Core) and Golem AETHER-LANCE (two-handed aetheric,
+// 2d8; 2 Aether Crystal + 1 Aetheric Shard + 1 Golem Core). Now: Sledge (bludgeoning) / Greatsword
+// (slashing) / Pike (piercing) / Aether-Lance (aetheric) — any golem wields any of them, all coatable, so
+// the player picks the damage type to match the guardian's weakness and coats it. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-482';

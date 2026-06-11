@@ -5949,6 +5949,44 @@
       "description": "A scrap-forged greatsword balanced for a construct's reach. Too heavy to swing yourself; perfect for a thing that doesn't tire. Takes a coating and carries it through every swing.",
       "statRequirement": null,
       "tc": 0
+    },
+    {
+      "name": "Golem Pike",
+      "weaponKind": "melee",
+      "damageType": "piercing",
+      "damageDice": "2d8",
+      "stat": "strength",
+      "rarity": "Rare",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 45,
+      "description": "A two-handed pike sized for a construct — a single driving thrust that punches through a guard. Coat the point and the golem carries the bite home.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
+      "name": "Golem Aether-Lance",
+      "weaponKind": "melee",
+      "damageType": "aetheric",
+      "damageDice": "2d8",
+      "stat": "intelligence",
+      "rarity": "Rare",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 45,
+      "description": "A lance of bound Aether keyed to a construct's frame; it strikes with the same charge that animates the golem. Coatings ride the discharge.",
+      "statRequirement": null,
+      "tc": 0
     }
   ]
 }

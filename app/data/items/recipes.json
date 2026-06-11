@@ -1236,6 +1236,40 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "result": "Golem Pike",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 4
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Golem Aether-Lance",
+      "ingredients": [
+        {
+          "name": "Aether Crystal",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }
