@@ -378,6 +378,18 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-486 "Thallium Anneal" — [bugfix] equipped HANDS + CLOAK silently un-equipped on every load** *(element
+  #81)*. Player: *"when I open a save or after a long fight half of my armor is [un]equipped — check all
+  equipped/save routes to see if it's real or just getting destroyed."* **Verdict: NOT destroyed.**
+  `backfillPlayerInner` (the load-time migration every save funnels through, `gameStore.ts` ~1269) rebuilt
+  `equipped` from a hardcoded slot list that was never updated when the arb63 `hands` (gauntlets/gloves) +
+  `cloak` (back) slots were added; since the rebuild is spread OVER `...p`, every load dropped those two
+  equipped slots — items stayed in the pack, only the equip link + AC/resists were lost (any reload after a
+  fight hits the same path). **Fix:** added `hands`/`cloak` (+`handsId`/`cloakId` backfill) AND a `...eq` base
+  so the rebuild preserves every slot and future slots can't fall off again. (Durability shatter was already
+  correct — `wearEquippedItem` removes the item AND clears the slot with a "shatters from wear" log, so real
+  breakage is announced; this load drop was silent.) Exported `backfillPlayer` for the regression test
+  `__tests__/equippedHandsCloakSurvivesLoad.test.ts`. `gameStore.ts`.
 - **OTA-485 "Mercury Gilding" — [polish] companion-item inventory stripes** *(element #80)*. Player: *"the
   dog's name is in a gold color, and the [golem's] color is a purple color. so the items that can be fed or
   used on them should have diagonal stripes on them in that color in the box that is the inventory item's

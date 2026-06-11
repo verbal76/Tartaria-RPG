@@ -1153,7 +1153,9 @@ function acceptKeyword(title: string): string {
 // to the raw saved player (which still loads — and the persist integrity
 // guard then refuses to write it back if it's missing core identity)
 // instead of failing the load to .bak / a slot-load error.
-function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
+// Exported for the OTA-486 regression test (equipped hands/cloak must survive a
+// load). The save/load round-trip funnels every load through this migration.
+export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   let out: PlayerCharacter;
   try {
     out = backfillPlayerInner(p);
@@ -1266,13 +1268,24 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     const lower = name.toLowerCase();
     return inventory.find((i) => i.name.toLowerCase() === lower && i.quantity > 0)?.id;
   };
+  // OTA-486 — `...eq` base FIRST so any slot we don't explicitly list survives the
+  // load untouched. This rebuild used to enumerate every slot by hand, and when the
+  // arb63 `hands` (gauntlets/gloves) + `cloak` (back) slots were added the list was
+  // never updated — so on EVERY load the rebuilt object (spread over `...p` below)
+  // dropped a player's equipped hands + cloak, silently un-equipping them (the items
+  // stayed in the pack; only the equip link + their AC/resists were lost). Spreading
+  // `eq` first makes the explicit lines pure overrides for the migrated/id-backfilled
+  // fields, and future slots can never silently fall off again.
   const equipped: PlayerCharacter['equipped'] = {
+    ...eq,
     main: eq.main ?? eq.weaponName,
     off: eq.off,
     head: eq.head,
     chest: legacyArmor,
+    hands: eq.hands,
     legs: eq.legs,
     feet: eq.feet,
+    cloak: eq.cloak,
     amulet: eq.amulet,
     ring: eq.ring,
     // OTA-239 — three concurrent ring slots. Legacy saves with only
@@ -1283,8 +1296,10 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     offId: eq.offId ?? findFirstId(eq.off),
     headId: eq.headId ?? findFirstId(eq.head),
     chestId: eq.chestId ?? findFirstId(legacyArmor),
+    handsId: eq.handsId ?? findFirstId(eq.hands),
     legsId: eq.legsId ?? findFirstId(eq.legs),
     feetId: eq.feetId ?? findFirstId(eq.feet),
+    cloakId: eq.cloakId ?? findFirstId(eq.cloak),
     amuletId: eq.amuletId ?? findFirstId(eq.amulet),
     ringId: eq.ringId ?? findFirstId(eq.ring),
     ring2Id: eq.ring2Id ?? findFirstId(eq.ring2),

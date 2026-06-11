@@ -13920,4 +13920,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the row's overflow:'hidden') — NO svg/gradient dep, so it ships OTA. Rendered back-most with
 // pointerEvents none at ~0.2 opacity: mostly translucent, still visible, never blocks a tap or any text.
 // app/screens/InventoryScreen.tsx. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-485';
+// OTA-486 (Thallium Anneal) — [bugfix] EQUIPPED HANDS + CLOAK LOST ON LOAD. Player: "when I open a save or
+// after a long fight half of my armor is [un]equipped — is it real or just getting destroyed?" Verdict: NOT
+// destroyed. `backfillPlayerInner` (the load-time migration EVERY save passes through) rebuilt `equipped`
+// from a hardcoded slot list that was never updated when the arb63 `hands` (gauntlets/gloves) + `cloak`
+// (back) slots were added — and since the rebuilt object is spread OVER `...p`, every load silently dropped
+// those two equipped slots (the items stayed in the pack; only the equip link + their AC/resists were lost;
+// any reload after a fight hits the same path). Fix: added hands/cloak (+ handsId/cloakId backfill) AND a
+// `...eq` base so the rebuild now preserves every slot — future slots can't silently fall off again.
+// Durability shatter (wearEquippedItem) was already correct: it removes the item AND clears the slot with a
+// "shatters from wear" log, so true breakage is real + announced, distinct from this silent load drop.
+// Regression test: __tests__/equippedHandsCloakSurvivesLoad.test.ts. app/state/gameStore.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-486';
