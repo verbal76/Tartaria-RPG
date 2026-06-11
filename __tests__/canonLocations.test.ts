@@ -2,7 +2,7 @@
 // install-canon: registered + persisted in worldMemory, then plotted on the grid
 // and routable with exact grid-to-grid distance, like a static location.
 
-import { registerCanonLocation, setCanonLocationMarker, emptyMemory } from '../app/engine/worldMemory';
+import { registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, emptyMemory } from '../app/engine/worldMemory';
 import {
   setCanonExtraLocations,
   allKnownLocations,
@@ -89,6 +89,20 @@ describe('OTA-503 — grid-event lifecycle (pending → done by route id)', () =
     // a later re-mention (register) must NOT knock it back to pending
     wm = registerCanonLocation(wm, { id: 'mention_452', name: 'gun guy', marker: 'pending' });
     expect(wm.canonLocations![0]!.marker).toBe('done');
+  });
+
+  it('a LONE event at the cell fires on ANY arrival (routed or just walked there)', () => {
+    const here = [{ id: 'mention_3451' }];
+    expect(pickResolvedEvent(here, undefined)).toBe('mention_3451'); // walked there, no course
+    expect(pickResolvedEvent(here, 'mention_3451')).toBe('mention_3451'); // routed there
+    expect(pickResolvedEvent(here, 'some_other_route')).toBe('mention_3451'); // even a different course
+  });
+
+  it('with SEVERAL events at one cell, only the routed id resolves (none if no match)', () => {
+    const here = [{ id: 'market_156' }, { id: 'mention_452' }];
+    expect(pickResolvedEvent(here, 'mention_452')).toBe('mention_452'); // came for the gun guy
+    expect(pickResolvedEvent(here, 'market_156')).toBe('market_156');   // came for the market
+    expect(pickResolvedEvent(here, undefined)).toBeNull();              // walked in blind → ambiguous
   });
 
   it('two events can share a cell; resolving one leaves the other pending', () => {

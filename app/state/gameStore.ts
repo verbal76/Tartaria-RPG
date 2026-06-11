@@ -29,7 +29,7 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -1645,6 +1645,32 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
     }
   }
   return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger, dog };
+}
+
+// OTA-503 — resolve the grid event the player has ARRIVED on (their canonical
+// cell). Player rule: a LONE pending event at the cell fires on ANY arrival —
+// routed there or just walked there. Only when SEVERAL events share the cell does
+// the route matter: the one whose id matches the route you took resolves; the rest
+// stay pending (you came for one of them, not the others). Pure — returns the
+// updated worldMemory (flips the resolved event 'pending' → 'done') or the same.
+function resolveGridEventAt(
+  player: PlayerCharacter,
+  wm: WorldMemory,
+  routedId?: string | null,
+): WorldMemory {
+  const pending = (wm.canonLocations ?? []).filter((l) => l.marker === 'pending');
+  if (pending.length === 0) return wm;
+  const cur = canonicalCellFor(player.currentLocationId);
+  const px = cur.x + ((player.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X);
+  const py = cur.y + ((player.mapY ?? WORLD_MAP_CENTER_Y) - WORLD_MAP_CENTER_Y);
+  const here = pending.filter((e) => {
+    const c = (typeof e.gx === 'number' && typeof e.gy === 'number')
+      ? { x: e.gx, y: e.gy }
+      : canonicalCellFor(e.id);
+    return c.x === px && c.y === py;
+  });
+  const target = pickResolvedEvent(here, routedId);
+  return target ? setCanonLocationMarker(wm, target, 'done') : wm;
 }
 
 function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
@@ -13823,8 +13849,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Because the route carries THIS id, a neighbouring event sharing the cell
     // (reached only by ITS own route) stays pending.
     {
+      const liveP = get().player;
       const wmNow = get().worldMemory;
-      const wmDone = setCanonLocationMarker(wmNow, locationId, 'done');
+      const wmDone = liveP ? resolveGridEventAt(liveP, wmNow, locationId) : wmNow;
       if (wmDone !== wmNow) {
         set({ worldMemory: wmDone });
         setCanonExtraLocations(wmDone.canonLocations ?? []);
@@ -17089,6 +17116,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
         : s,
     );
+    // OTA-503 — walking ONTO a grid event's cell resolves it (the player rule: a
+    // lone pending event fires on any arrival, routed or not; with several, only
+    // the route's id resolves). travelTo handles named-location arrivals; this
+    // catches walking onto an event cell mid-area, with or without a course set.
+    {
+      const liveP = get().player;
+      const wmNow = get().worldMemory;
+      const wmDone = liveP ? resolveGridEventAt(liveP, wmNow, liveP.travelTarget?.locationId) : wmNow;
+      if (wmDone !== wmNow) {
+        set({ worldMemory: wmDone });
+        setCanonExtraLocations(wmDone.canonLocations ?? []);
+      }
+    }
     // OTA-127 — per-step intermediate-area label + weather drift while
     // the player is in transit. Without this the scene bar would
     // claim the last named location (e.g. "Asgardar") the whole walk

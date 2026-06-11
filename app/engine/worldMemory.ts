@@ -41,6 +41,21 @@ export function registerCanonLocation(memory: WorldMemory, loc: CanonLocation): 
   return { ...memory, canonLocations: [...list, loc] };
 }
 
+// OTA-503 — given the pending events sharing the player's arrival cell + the route
+// id they came by, pick which ONE resolves (the player's rule): a LONE event at the
+// cell fires on ANY arrival, routed or not; when SEVERAL share the cell, only the
+// one matching the route's id resolves (you came for that one) and the rest stay
+// pending. Returns the id to resolve, or null (ambiguous / none). Pure.
+export function pickResolvedEvent(
+  eventsAtCell: ReadonlyArray<{ id: string }>,
+  routedId?: string | null,
+): string | null {
+  if (eventsAtCell.length === 0) return null;
+  if (routedId && eventsAtCell.some((e) => e.id === routedId)) return routedId;
+  if (eventsAtCell.length === 1) return eventsAtCell[0]!.id;
+  return null;
+}
+
 // OTA-503 — explicit event-lifecycle transition (e.g. pending → done on arrival).
 // No-op if the id isn't a canon event or is already in that state.
 export function setCanonLocationMarker(

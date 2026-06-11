@@ -14075,4 +14075,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // setWhisperCourse canonizes with marker:'pending'; travelTo flips the arrived event's marker to 'done' +
 // re-syncs the world-map module. Test: __tests__/canonLocations.test.ts. NEXT (stage 2): "?"/"X" map markers
 // for pending/done events; (stage 3) wire contracts the same way. Travel time left as-is per the player. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-503';
+// OTA-504 (Einsteinium Tell) — [feature] keyed grid-events, stage 1b: arrival resolution RULE (player's
+// clarification). A LONE pending event at the player's canonical cell fires on ANY arrival — routed there OR
+// just walked there cardinally; the route id only disambiguates when SEVERAL events share the cell (then only
+// the one whose id matches the route you took resolves; the rest stay pending). New pure
+// worldMemory.pickResolvedEvent + gameStore.resolveGridEventAt (computes the player's canonical cell, finds
+// pending events there, applies the rule), called from BOTH travelTo (named-location arrival) and
+// stepDirection (walking onto an event's cell mid-area, course or not). Tests: __tests__/canonLocations.test.ts.
+// NEXT: stage 2 = "?"/"X" map markers. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-504';

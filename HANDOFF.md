@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-504 "Einsteinium Tell" — [feature] keyed grid-events, stage 1b: arrival resolution RULE** *(element
+  #99)*. Player's clarification: a LONE pending event at the player's canonical cell fires on ANY arrival —
+  routed there OR just walked there cardinally; the route id only disambiguates when SEVERAL events share the
+  cell (then only the one matching the route resolves; the rest stay pending). New pure
+  `worldMemory.pickResolvedEvent` + `gameStore.resolveGridEventAt` (computes the player's canonical cell from
+  currentLocation + mapX/mapY offset, finds pending events there, applies the rule), called from BOTH
+  `travelTo` (named-location arrival) and `stepDirection` (walking onto an event cell mid-area, course or not).
+  Tests: `__tests__/canonLocations.test.ts`. `worldMemory.ts`, `gameStore.ts`.
 - **OTA-503 "Californium Cipher" — [feature] KEYED GRID-EVENTS, stage 1: lifecycle + route-id resolution**
   *(element #98)*. Player's design: a grid cell is a big region that can hold MANY keyed things; what fires on
   arrival is decided by WHICH travel button (route id) you took, not the cell — and the "key" is an internal
