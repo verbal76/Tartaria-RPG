@@ -14043,4 +14043,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // every tile and walks down monotonically with no drift. REMOVES the OTA-498 monotonic clamp (the exact
 // grid math made it unnecessary). Test: __tests__/canonicalGrid.test.ts. NEXT (part 2): canonize + persist
 // dynamically-mentioned places (whispers/contracts/missions) onto the same grid. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-499';
+// OTA-500 (Americium Plot) — [feature] CANON-LOCATION REGISTRY (grid-math directive pt.2). Any place named
+// by a whisper/contract/mission/narration can now be CANONIZED for the install: it persists in
+// worldMemory.canonLocations, gets a permanent grid cell, and is plotted on BOTH the canonical grid and the
+// visual map so it's routable with exact grid-to-grid distance like a static location. New
+// `worldMemory.registerCanonLocation`, `worldMap.setCanonExtraLocations` + `allKnownLocations()` (the world
+// map + canonical positions now iterate static ∪ canonized), and a `canonizeLocation(loc)` store action
+// (idempotent, never shadows a static id, re-syncs the module on save load). canonicalDistance already
+// handled any id, so distance is exact the moment a place is canonized. Tests: __tests__/canonLocations.test.ts.
+// NEXT (pt.3): wire the mention SOURCES (whisper route targets, broker contracts, faction missions) to call
+// canonizeLocation, and surface canon locations as rows in the MapScreen travel list. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-500';

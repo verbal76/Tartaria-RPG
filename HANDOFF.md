@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-500 "Americium Plot" — [feature] canon-location registry (grid-math directive pt.2)** *(element #95)*.
+  Any place named by a whisper/contract/mission/narration can be CANONIZED for the install: persists in
+  `worldMemory.canonLocations`, gets a permanent grid cell, and is plotted on BOTH the canonical grid and the
+  visual map → routable with exact grid-to-grid distance like a static location. New
+  `worldMemory.registerCanonLocation`, `worldMap.setCanonExtraLocations` + `allKnownLocations()` (the visual
+  map AND `canonicalPositions` now iterate static ∪ canonized), and a `canonizeLocation(loc)` store action
+  (idempotent, never shadows a static id, re-syncs the world-map module on save load). `canonicalDistance`
+  already handled any id, so distance is exact the instant a place is canonized. Tests:
+  `__tests__/canonLocations.test.ts`. **NEXT (pt.3): wire the mention SOURCES (whisper route targets, broker
+  contracts, faction missions) to call `canonizeLocation`, and add canon-location ROWS to the MapScreen travel
+  list + name resolution in travel messages.** `types.ts`, `worldMemory.ts`, `worldMap.ts`, `gameStore.ts`.
 - **OTA-499 "Plutonium Lattice" — [refactor] exact canonical-grid travel distance (grid-math directive pt.1)**
   *(element #94)*. Player: *"distance to any location should be based on the exact location of each place as
   plotted… locations are all grid locations and math; visual overlays are thematic."* New `worldMap`

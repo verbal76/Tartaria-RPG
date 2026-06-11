@@ -17,6 +17,30 @@ export type Direction = 'north' | 'east' | 'south' | 'west';
 
 const ALL_LOCATIONS = locationsData as Location[];
 
+// OTA-500 — dynamically-canonized locations the store keeps in sync via
+// setCanonExtraLocations. Merged into BOTH the visual map and the canonical grid
+// so a place named by a whisper/contract/mission is plotted, routable, and gets an
+// exact grid cell. Module state (not threaded through every call site); the store
+// re-pushes the persisted list on load + whenever a new place is canonized.
+let _extraLocations: Location[] = [];
+export function setCanonExtraLocations(
+  locs: ReadonlyArray<{ id: string; name: string; type?: string; danger?: number }>,
+): void {
+  const known = new Set(ALL_LOCATIONS.map((l) => l.id));
+  _extraLocations = locs
+    .filter((l) => l.id && !known.has(l.id))
+    .map((l) => ({
+      id: l.id, name: l.name, type: l.type ?? 'site', danger: l.danger ?? 2,
+      description: '', tags: ['canon', 'mentioned'], discoverable: true,
+    }) as unknown as Location);
+  _canonCache = null; // the canonical positions table must include the new ids
+}
+/** All locations the world knows about = static (locations.json) + dynamically
+ *  canonized. Used by the visual map, the canonical grid, and the travel list. */
+export function allKnownLocations(): Location[] {
+  return _extraLocations.length === 0 ? ALL_LOCATIONS : [...ALL_LOCATIONS, ..._extraLocations];
+}
+
 // A pure deterministic PRNG. xmur3 hash → mulberry32. Identical seed always
 // produces the same map for a character.
 function xmur3(str: string): () => number {
@@ -127,7 +151,7 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   const positions: Record<string, { x: number; y: number }> = {};
 
   // Center the start.
-  const startLoc = ALL_LOCATIONS.find((l) => l.id === startingLocationId) ?? ALL_LOCATIONS[0]!;
+  const startLoc = allKnownLocations().find((l) => l.id === startingLocationId) ?? ALL_LOCATIONS[0]!;
   tiles[CENTER_Y]![CENTER_X] = {
     x: CENTER_X,
     y: CENTER_Y,
@@ -143,7 +167,7 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   // so the geometry is identical for every character — Drakova is always the
   // same bearing + distance from Asgardar. No seed, no per-save scatter.
   // Deterministic id-sorted order makes the rare same-tile nudge stable.
-  const others = ALL_LOCATIONS.filter((l) => l.id !== startLoc.id);
+  const others = allKnownLocations().filter((l) => l.id !== startLoc.id);
   // OTA-498 — hidden locations (the Hidden Market) are placed LAST so they only
   // ever fill a leftover free tile and never displace an existing location's
   // canonical tile via findFreeTile — keeping every other location's grid
@@ -228,7 +252,7 @@ export function canonicalPositions(): Record<string, { x: number; y: number }> {
   if (_canonCache) return _canonCache;
   const positions: Record<string, { x: number; y: number }> = {};
   const taken = new Set<string>();
-  const ordered = [...ALL_LOCATIONS].sort((a, b) => {
+  const ordered = [...allKnownLocations()].sort((a, b) => {
     const ah = HIDDEN_LOCATIONS[a.id] ? 1 : 0;
     const bh = HIDDEN_LOCATIONS[b.id] ? 1 : 0;
     if (ah !== bh) return ah - bh;

@@ -1032,6 +1032,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-11-497': 'Uranium Band',
   '2026-06-11-498': 'Neptunium Veil',
   '2026-06-11-499': 'Plutonium Lattice',
+  '2026-06-11-500': 'Americium Plot',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

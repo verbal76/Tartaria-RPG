@@ -29,7 +29,7 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -264,6 +264,7 @@ import {
   surveyAll,
   canonicalDistance,
   canonicalDistanceFromPlayer,
+  setCanonExtraLocations,
   WORLD_MAP_CENTER_X,
   WORLD_MAP_CENTER_Y,
   type Direction,
@@ -2313,6 +2314,10 @@ interface GameStore {
    *  OTA-193 auto-substitute drain so they survive for the fusion
    *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
   toggleReserveForFusion: (itemId: string) => void;
+  /** OTA-500 — register a dynamically-mentioned place (whisper/contract/mission/
+   *  narration) as install-canon: it persists in worldMemory, gets a permanent
+   *  grid cell, and becomes plotted + routable with exact grid-to-grid distance. */
+  canonizeLocation: (loc: { id: string; name: string; type?: string; danger?: number; source?: string }) => void;
   /** OTA-360 — paint a weapon-coating consumable onto a weapon
    *  instance. `coatingItemId` is the consumable (Poison Vial /
    *  Acid Flask / Corruption Tonic); `weaponId` is the target
@@ -3243,6 +3248,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // get a fresh warning otherwise.
         lowHpWarned: false,
       });
+      // OTA-500 — re-sync the install's canonized locations into the world-map
+      // module on load so dynamically-mentioned places stay plotted + routable
+      // (the module state is per-JS-process; the registry is the persisted truth).
+      setCanonExtraLocations(migratedWorldMemory.canonLocations ?? []);
       // 2026-05-27 OTA-099 — OTA-applied + session-start markers
       // in the log. User asked: "when you update via OTA can a
       // record of that be in the log, but not visible to the
@@ -18892,6 +18901,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     get().appendLog('arbiter', `The Arbiter shrugs. "The ${item.name} doesn't have a single obvious 'use' — keep it, gift it, or scrap it."`);
+  },
+
+  canonizeLocation(loc) {
+    if (!loc?.id || !loc.name) return;
+    // Don't shadow a static location.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const staticLocs = require('../data/locations/locations.json') as Array<{ id: string }>;
+    if (staticLocs.some((l) => l.id === loc.id)) return;
+    const before = get().worldMemory;
+    const after = registerCanonLocation(before, loc);
+    if (after === before) return; // already canon, no change
+    set({ worldMemory: after });
+    // Push the updated registry into the world-map module so the new place is
+    // plotted on the visual map + the canonical grid (exact distance) immediately.
+    setCanonExtraLocations(after.canonLocations ?? []);
   },
 
   toggleReserveForFusion(itemId) {

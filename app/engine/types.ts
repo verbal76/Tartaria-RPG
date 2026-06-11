@@ -1231,9 +1231,23 @@ export interface MemorableEvent {
   detail?: string;
 }
 
+/** OTA-500 — a location CANONIZED for this install from a dynamic mention (a
+ *  whisper / contract / mission / narration). Once registered it gets a permanent
+ *  grid cell (canonicalCellFor(id)) and is plotted + routable like a static one. */
+export interface CanonLocation {
+  id: string;
+  name: string;
+  type?: string;
+  danger?: number;
+  /** What first named it ("whisper" | "contract" | "mission" | …). */
+  source?: string;
+}
+
 export interface WorldMemory {
   tagCounts: Record<string, number>;
   discoveredLocationIds: string[];
+  /** OTA-500 — install-canon locations registered from dynamic mentions. */
+  canonLocations?: CanonLocation[];
   defeatedEnemies: string[];
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has

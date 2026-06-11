@@ -1,12 +1,36 @@
-import type { NpcMet, WorldMemory } from './types';
+import type { NpcMet, WorldMemory, CanonLocation } from './types';
 
 export function emptyMemory(): WorldMemory {
   return {
     tagCounts: {},
     discoveredLocationIds: [],
+    canonLocations: [],
     defeatedEnemies: [],
     completedQuestIds: [],
   };
+}
+
+// OTA-500 — register a dynamically-mentioned place as install-canon. Idempotent by
+// id; enriches an existing entry if a later mention is richer. Once registered it
+// gets a permanent grid cell + is plotted/routable like a static location.
+export function registerCanonLocation(memory: WorldMemory, loc: CanonLocation): WorldMemory {
+  const list = memory.canonLocations ?? [];
+  const existing = list.find((l) => l.id === loc.id);
+  if (existing) {
+    const merged: CanonLocation = {
+      ...existing,
+      name: existing.name || loc.name,
+      type: existing.type ?? loc.type,
+      danger: existing.danger ?? loc.danger,
+      source: existing.source ?? loc.source,
+    };
+    if (merged.name === existing.name && merged.type === existing.type
+      && merged.danger === existing.danger && merged.source === existing.source) {
+      return memory;
+    }
+    return { ...memory, canonLocations: list.map((l) => (l.id === loc.id ? merged : l)) };
+  }
+  return { ...memory, canonLocations: [...list, loc] };
 }
 
 export function recordTags(memory: WorldMemory, tags: readonly string[]): WorldMemory {
