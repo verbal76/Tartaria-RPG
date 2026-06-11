@@ -14098,4 +14098,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pact — only the seal does; whisper/default events still fire on arrival). handleBroker open+seal hooks.
 // Test: __tests__/canonLocations.test.ts. The keyed-grid-events arc (stages 1-3) is now COMPLETE: whispers +
 // contracts both drop "?"/"X" markers, resolve by route-id / completion, on the exact grid. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-506';
+// OTA-507 (Nobelium Veil) — [bugfix] hidden-location name leaked on the travel row + course log BEFORE
+// arrival. Player routed to the Hidden Market "?" and the exploration window's travel button read "→ THE
+// HIDDEN MARKET" while still 6 moves out, spoiling the reveal. The travel-row name (ExplorationScreen
+// travelTargetName) and the "set course" / "your road runs to" log lines (gameStore setTravelCourse) built
+// the name straight from the catalog with no reveal gate. Both now run it through revealedLocationName, so a
+// HIDDEN, not-yet-discovered destination stays "?" until the player actually arrives (discoveredLocationIds);
+// canon/static names are unaffected. app/screens/ExplorationScreen.tsx, app/state/gameStore.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-507';

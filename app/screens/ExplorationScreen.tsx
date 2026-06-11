@@ -18,6 +18,8 @@ import { HookContinueModal } from '../components/HookContinueModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
+import { getLocationById } from '../engine/encounter';
+import { revealedLocationName } from '../engine/hiddenLocations';
 import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
@@ -70,6 +72,9 @@ export function ExplorationScreen() {
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
+  // OTA-507 — drives the hidden-location "?" so the travel row doesn't leak the
+  // real name before arrival/discovery.
+  const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
@@ -989,10 +994,13 @@ export function ExplorationScreen() {
               // OTA-465 — a whisper/lead course shows in the same travel row.
               if (player?.whisperCourse && !player?.travelTarget) return player.whisperCourse.label;
               if (!player?.travelTarget) return null;
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
               const id = player.travelTarget.locationId;
-              return locs.find((l) => l.id === id)?.name ?? id;
+              // OTA-507 — canon-aware name (resolves canonized places), but a HIDDEN
+              // location stays "?" until the player actually arrives + discovers it.
+              // Without this the travel row read "→ THE HIDDEN MARKET" while still
+              // 6 moves out, spoiling the reveal.
+              const real = getLocationById(id).name ?? id;
+              return revealedLocationName(id, real, discoveredIds);
             })()}
             movesLeft={(() => {
               // OTA-126 — prefer the stored distanceRemaining counter

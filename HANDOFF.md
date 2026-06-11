@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-507 "Nobelium Veil" — [bugfix] hidden-location name leaked on the travel row before arrival** *(element
+  #102)*. Player routed to the Hidden Market "?" and the exploration window's travel button read "→ THE HIDDEN
+  MARKET" while still 6 moves out (and the course log named it too), spoiling the reveal. The travel-row name
+  (`ExplorationScreen` travelTargetName) + the "set course"/"your road runs to" lines (`gameStore`
+  setTravelCourse) built the name straight from the catalog with no reveal gate. Both now run through
+  `revealedLocationName`, so a HIDDEN, not-yet-discovered destination stays "?" until the player actually
+  arrives (discoveredLocationIds); canon/static names unaffected. `ExplorationScreen.tsx`, `gameStore.ts`.
 - **OTA-506 "Mendelevium Pact" — [feature] keyed grid-events, stage 3: CONTRACTS wired** *(element #101)*.
   Opening a broker parley canonizes a pending grid event at EACH faction's relic location
   (`contract_<faction>`, source:'contract', co-located with the static location but a distinct id) → a yellow

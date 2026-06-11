@@ -70,6 +70,7 @@ import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
+import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
@@ -16802,7 +16803,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // Locate the destination's friendly name for the announcement line.
     // OTA-502 — getLocationById resolves canonized places too (not just static).
-    const tgtName = getLocationById(locationId).name ?? locationId;
+    // OTA-507 — a HIDDEN destination (the Hidden Market) stays "?" in the course
+    // log + travel row until the player actually arrives there; don't spoil it.
+    const tgtName = revealedLocationName(locationId, getLocationById(locationId).name ?? locationId, get().worldMemory?.discoveredLocationIds);
     // fromX/fromY drive the first STEP on the re-centered visual map (below).
     const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
     const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
