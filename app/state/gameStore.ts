@@ -262,6 +262,8 @@ import {
   generateWorldMap,
   stepInDirection,
   surveyAll,
+  canonicalDistance,
+  canonicalDistanceFromPlayer,
   WORLD_MAP_CENTER_X,
   WORLD_MAP_CENTER_Y,
   type Direction,
@@ -1423,16 +1425,12 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      // arb29 — recompute the distance from the new canonical map + the
-      // (snapped) center, since the geometry was recalibrated. The player
-      // resumes their journey from their current location.
+      // OTA-499 — re-seed the resumed journey from the EXACT canonical grid
+      // distance (install-fixed, player-independent) so the badge is stable
+      // across loads. A 0 to a different location means the bearing is lost.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { generateWorldMap, WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-      const seed = p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
-      const map = generateWorldMap(seed, p.currentLocationId);
-      const tgtPos = map.positions[t.locationId];
-      if (!tgtPos) return undefined; // bearing lost — clear cleanly
-      const tiles = Math.abs(tgtPos.x - cx) + Math.abs(tgtPos.y - cy);
+      const { canonicalDistance } = require('../engine/worldMap');
+      const tiles = canonicalDistance(p.currentLocationId, t.locationId) as number;
       if (tiles === 0 && p.currentLocationId !== t.locationId) return undefined;
       return { locationId: t.locationId, distanceRemaining: tiles };
     })(),
@@ -16732,9 +16730,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
     const tgtName = locs.find((l) => l.id === locationId)?.name ?? locationId;
+    // fromX/fromY drive the first STEP on the re-centered visual map (below).
     const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
     const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
-    const tiles = Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
+    // OTA-499 — distance is EXACT canonical grid-to-grid (the install-fixed grid),
+    // not the re-centered visual map. The two named locations are always the same
+    // distance apart no matter where the player stands, so the estimate is stable.
+    const tiles = canonicalDistance(player.currentLocationId, locationId);
     // OTA-126 — snapshot tile count at travel-start so the badge
     // counts down monotonically regardless of which location is
     // currently centered on the regenerated world map.
@@ -16826,9 +16828,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       && (player.travelTarget.distanceRemaining ?? 0) <= 0
       && player.currentLocationId !== targetId
     ) {
-      const fxRecover = player.mapX ?? WORLD_MAP_CENTER_X;
-      const fyRecover = player.mapY ?? WORLD_MAP_CENTER_Y;
-      const tilesRecover = Math.abs(tgtPos.x - fxRecover) + Math.abs(tgtPos.y - fyRecover);
+      // OTA-499 — recover from the EXACT canonical distance at the player's live
+      // grid cell, not the re-centered map (which is what desynced it in the first
+      // place).
+      const tilesRecover = canonicalDistanceFromPlayer(
+        player.currentLocationId,
+        player.mapX ?? WORLD_MAP_CENTER_X,
+        player.mapY ?? WORLD_MAP_CENTER_Y,
+        targetId,
+      );
       if (tilesRecover > 0) {
         set((s) => s.player?.travelTarget ? {
           player: {
@@ -16871,30 +16879,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const after = get().player;
     if (after && after.currentLocationId === targetId) {
       set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
-    } else {
-      // arb28 — position-derived distance. stepDirection already re-plots
-      // on in-transit steps; recompute here too (from a FRESH map centred
-      // on the post-step current location) so an auto-step that crosses an
-      // intermediate named location re-plots from the new centre instead of
-      // running a blind countdown. Authoritative replacement for the old
-      // OTA-126 monotonic decrement.
-      const live = get().player;
-      if (live?.travelTarget) {
-        const liveSeed = live.mapSeed ?? `${live.name}|${live.raceId}|${live.factionId}|legacy`;
-        const m = generateWorldMap(liveSeed, live.currentLocationId);
-        const t = m.positions[targetId];
-        if (t) {
-          const dist = Math.abs(t.x - (live.mapX ?? WORLD_MAP_CENTER_X))
-            + Math.abs(t.y - (live.mapY ?? WORLD_MAP_CENTER_Y));
-          // OTA-498 — keep the player-facing "days remaining" badge monotonic: a
-          // re-plot from a fresh map (e.g. after crossing an intermediate named
-          // location) can land a tile or two HIGHER for a far diagonal target;
-          // clamp so the countdown never ticks UP (re-plot decreases still pass).
-          set((s) => (s.player?.travelTarget ? {
-            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: Math.min(dist, s.player.travelTarget.distanceRemaining ?? dist) } },
-          } : s));
-        }
-      }
+    } else if (after?.travelTarget) {
+      // OTA-499 — EXACT canonical distance from the player's live grid cell to the
+      // target (replaces the OTA-498 re-centered re-plot + clamp). Computed fresh
+      // each step from the player's current location + in-transit offset, so it's
+      // the real grid distance at every tile and walks down monotonically as auto-
+      // travel steps toward the target — no countdown drift, no clamp.
+      const dist = canonicalDistanceFromPlayer(
+        after.currentLocationId,
+        after.mapX ?? WORLD_MAP_CENTER_X,
+        after.mapY ?? WORLD_MAP_CENTER_Y,
+        targetId,
+      );
+      set((s) => (s.player?.travelTarget ? {
+        player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
+      } : s));
     }
   },
 
@@ -17126,9 +17125,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // discrete-location switch below.
       if (!step.landedOn) {
         const tgtId = get().player?.travelTarget?.locationId;
-        const tgt = tgtId ? map.positions[tgtId] : undefined;
-        if (tgt) {
-          const dist = Math.abs(tgt.x - step.x) + Math.abs(tgt.y - step.y);
+        if (tgtId) {
+          // OTA-499 — EXACT canonical distance from the player's new grid cell. A
+          // manual cardinal step honestly climbs as you walk away from the target
+          // and drops as you head back, because it's the real grid-to-grid math
+          // from the player's live position — not a re-centered re-plot.
+          const dist = canonicalDistanceFromPlayer(get().player?.currentLocationId, step.x, step.y, tgtId);
           set((s) => (s.player?.travelTarget ? {
             player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
           } : s));

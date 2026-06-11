@@ -14032,4 +14032,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // MapScreen renders the "?"/name overlay (static, atlas-anchored — not the drifting marker OTA-182 removed);
 // LoreCodexBody + MapScreen list use revealedLocationName. Also clamped the auto-travel "days remaining"
 // badge monotonic (a far-diagonal re-plot could tick it UP). Test: __tests__/hiddenMarket.test.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-498';
+// OTA-499 (Plutonium Lattice) — [refactor] EXACT canonical-grid travel distance (part 1 of the grid-math
+// directive). Locations are fixed grid cells + math; the atlas is a thematic overlay. New worldMap helpers:
+// canonicalPositions() = one install-fixed cell per location (derived from the SAME atlas fractions the map
+// art was drawn from, collision-resolved once in a fixed order — never re-centered on the player); plus
+// canonicalDistance(a,b) and canonicalDistanceFromPlayer(curLoc,mapX,mapY,target) = EXACT grid-to-grid
+// Manhattan from the player's live cell (current location + in-transit offset). gameStore travel now reads
+// these everywhere distance is set (setTravelCourse seed, continueTravel auto-step, manual-step re-plot,
+// stuck-at-0 self-heal, legacy-save migration) → the "days of travel" badge is the real grid distance at
+// every tile and walks down monotonically with no drift. REMOVES the OTA-498 monotonic clamp (the exact
+// grid math made it unnecessary). Test: __tests__/canonicalGrid.test.ts. NEXT (part 2): canonize + persist
+// dynamically-mentioned places (whispers/contracts/missions) onto the same grid. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-499';

@@ -185,6 +185,97 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   return { tiles, positions };
 }
 
+// ─── OTA-499 — ABSOLUTE canonical grid (the install-canon MATH layer) ──────────
+// generateWorldMap above re-centers the grid on the player every call (the VISUAL
+// / wander map). THIS layer gives every location ONE fixed grid cell for the
+// install, independent of where the player stands — so travel distance is exact
+// grid-to-grid and never wobbles as the player moves ("locations are grid + math;
+// visual overlays are thematic"). Reference is a fixed atlas point (the centre),
+// not the player; the SPREAD matches the visual map so travel TIMES are unchanged.
+const CANON_REF_FX = 0.5;
+const CANON_REF_FY = 0.5;
+let _canonCache: Record<string, { x: number; y: number }> | null = null;
+
+function atlasFractionFor(id: string): { fx: number; fy: number } | null {
+  const a = LOCATION_ATLAS_COORDS[id];
+  if (a) return a;
+  const h = HIDDEN_LOCATIONS[id];
+  if (h) return { fx: h.fx, fy: h.fy };
+  return null;
+}
+
+/** Deterministic absolute grid cell for a location id, from its atlas fraction
+ *  (or a stable id-hash for ids the atlas doesn't place). Pure — no player. */
+export function canonicalCellFor(id: string): { x: number; y: number } {
+  const frac = atlasFractionFor(id);
+  if (frac) {
+    return {
+      x: clampX(CENTER_X + Math.round((frac.fx - CANON_REF_FX) * SPREAD_X)),
+      y: clampY(CENTER_Y + Math.round((frac.fy - CANON_REF_FY) * SPREAD_Y)),
+    };
+  }
+  // Unknown/atlas-less id → stable hash angle (matches generateWorldMap's fallback).
+  const a = (xmur3(id)() % 360) * Math.PI / 180;
+  return {
+    x: clampX(CENTER_X + Math.round(Math.cos(a) * 22)),
+    y: clampY(CENTER_Y + Math.round(Math.sin(a) * 12)),
+  };
+}
+
+/** The install-canon position table for every static location, collision-resolved
+ *  once in a fixed (id-sorted, hidden-last) order so it's identical every load. */
+export function canonicalPositions(): Record<string, { x: number; y: number }> {
+  if (_canonCache) return _canonCache;
+  const positions: Record<string, { x: number; y: number }> = {};
+  const taken = new Set<string>();
+  const ordered = [...ALL_LOCATIONS].sort((a, b) => {
+    const ah = HIDDEN_LOCATIONS[a.id] ? 1 : 0;
+    const bh = HIDDEN_LOCATIONS[b.id] ? 1 : 0;
+    if (ah !== bh) return ah - bh;
+    return a.id.localeCompare(b.id);
+  });
+  for (const loc of ordered) {
+    const base = canonicalCellFor(loc.id);
+    const place = findFreeTile(taken, base.x, base.y);
+    positions[loc.id] = place;
+    taken.add(`${place.x},${place.y}`);
+  }
+  _canonCache = positions;
+  return positions;
+}
+
+/** Exact grid-to-grid Manhattan distance between two locations on the canonical
+ *  grid. Stable for the install — the same two locations are always the same
+ *  distance apart, no matter where the player currently stands. */
+export function canonicalDistance(fromId: string | null | undefined, toId: string | null | undefined): number {
+  if (!fromId || !toId) return 0;
+  const p = canonicalPositions();
+  const a = p[fromId] ?? canonicalCellFor(fromId);
+  const b = p[toId] ?? canonicalCellFor(toId);
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+/** EXACT canonical distance from the PLAYER's live position to a target. The
+ *  player's canonical cell = their current location's canonical cell + their
+ *  in-transit offset (mapX/mapY are measured against CENTER on the re-centered
+ *  visual map, and that offset translates 1:1 to the canonical grid since both
+ *  share bearing + SPREAD). So mid-journey the distance is the real grid distance,
+ *  not a blind countdown — exact at every tile, no clamp, no extra state. */
+export function canonicalDistanceFromPlayer(
+  currentLocationId: string | null | undefined,
+  mapX: number,
+  mapY: number,
+  targetId: string | null | undefined,
+): number {
+  if (!currentLocationId || !targetId) return 0;
+  const p = canonicalPositions();
+  const cur = p[currentLocationId] ?? canonicalCellFor(currentLocationId);
+  const tgt = p[targetId] ?? canonicalCellFor(targetId);
+  const px = clampX(cur.x + (mapX - CENTER_X));
+  const py = clampY(cur.y + (mapY - CENTER_Y));
+  return Math.abs(px - tgt.x) + Math.abs(py - tgt.y);
+}
+
 // Step one tile in a cardinal direction. Returns the new x/y (clamped to
 // the grid) and whether the player crossed into a named location.
 export function stepInDirection(

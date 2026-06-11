@@ -378,6 +378,19 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-499 "Plutonium Lattice" — [refactor] exact canonical-grid travel distance (grid-math directive pt.1)**
+  *(element #94)*. Player: *"distance to any location should be based on the exact location of each place as
+  plotted… locations are all grid locations and math; visual overlays are thematic."* New `worldMap`
+  helpers: `canonicalPositions()` = one install-fixed grid cell per location (from the SAME atlas fractions
+  the map art was drawn from — collision-resolved once, NOT re-centered on the player), `canonicalDistance`,
+  and `canonicalDistanceFromPlayer(curLoc, mapX, mapY, target)` = EXACT grid-to-grid Manhattan from the
+  player's live cell (current location + in-transit `mapX/mapY` offset). `gameStore` reads these at every
+  distance site (setTravelCourse seed, continueTravel, manual step, stuck-at-0 self-heal, legacy migration)
+  → the "days of travel" badge is the real grid distance at every tile, monotonic, no drift. **Removed the
+  OTA-498 clamp** (exact math made it moot). The re-centered visual map stays ONLY for rendering/stepping.
+  Test: `__tests__/canonicalGrid.test.ts`. **NEXT (pt.2 = OTA-500): canonize + persist dynamically-mentioned
+  places (whispers/contracts/missions) onto the same grid.** No new test reds (atlasCoords/atlasIdw/
+  dogTravelClimb are pre-existing). `worldMap.ts`, `gameStore.ts`.
 - **OTA-498 "Neptunium Veil" — [feature] The Hidden Market (static location + reveal-on-travel "?")** *(element
   #93)*. New `hidden_market` location on the **Sunken Middens** ring (labelled on the atlas art) at the
   player's marked spot — `engine/hiddenLocations.ts` holds its overlay coord (fx 0.51 / fy 0.23), kept OUT of
