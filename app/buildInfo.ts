@@ -13949,4 +13949,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // \p{} escapes (Hermes-safe). Applied in narrateViaArbiter BEFORE sentence-cap/trim; if it empties the line
 // the existing template fallback restores it. Regression test: __tests__/stripForeignWords.test.ts.
 // app/state/gameStore.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-488';
+// OTA-489 (Polonium Tint) — [polish] companion-stripe saturation. Player on the OTA-485 stripes: "keep the
+// translucence but bump the saturation." Same gold/purple HUES, richer chroma so they read clearly as
+// gold/purple at the UNCHANGED ~0.2 stripe opacity: COMPANION_STRIPE_DOG #c9a86a → #e3a82a (saturated gold),
+// COMPANION_STRIPE_GOLEM #9888a8 → #a45fe0 (saturated amethyst). Stripe-only; the name-label hues are
+// untouched. app/screens/InventoryScreen.tsx. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-489';

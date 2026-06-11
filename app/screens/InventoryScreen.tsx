@@ -1014,10 +1014,14 @@ const pouchStyles = StyleSheet.create({
   slotEmptyTextActive: { color: '#c9a86a' },
 });
 
-// OTA-485 — companion signature colours, matched to the hues each name renders in
+// OTA-485 — companion signature colours, keyed to the hues each name renders in
 // (StatsPanel: dogName #c9a86a gold, golemName #9888a8 purple).
-const COMPANION_STRIPE_DOG = '#c9a86a';
-const COMPANION_STRIPE_GOLEM = '#9888a8';
+// OTA-489 — player asked to "keep the translucence but bump the saturation": same
+// gold/purple HUES, richer chroma so they read clearly as gold/purple at the
+// unchanged ~0.2 stripe opacity (the name-label hues stay as-is; these brighter
+// variants are stripe-only, since a faint 0.2 wash needs more saturation to land).
+const COMPANION_STRIPE_DOG = '#e3a82a';   // saturated gold (hue ~40°)
+const COMPANION_STRIPE_GOLEM = '#a45fe0'; // saturated amethyst (hue ~268°)
 
 // OTA-485 — diagonal hatch drawn with plain <View>s (no SVG / gradient dependency,
 // so the whole thing ships over-the-air). A row of vertical bands inside an

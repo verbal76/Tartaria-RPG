@@ -378,6 +378,10 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-489 "Polonium Tint" — [polish] companion-stripe saturation** *(element #84)*. Player on the OTA-485
+  stripes: *"keep the translucence but bump the saturation."* Same gold/purple hues, richer chroma so they
+  read clearly at the unchanged ~0.2 opacity: dog `#c9a86a → #e3a82a`, golem `#9888a8 → #a45fe0`. Stripe-only
+  (name-label hues untouched). `InventoryScreen.tsx`.
 - **OTA-488 "Bismuth Sieve" — [bugfix] foreign word in narration TEXT (corrects 487's misdiagnosis)**
   *(element #83)*. Player clarified: *"it was text, it didn't speak it. there was huà in the text."* So the
   Vietnamese/Chinese leak is the local **Qwen model code-switching a foreign word** into the English Arbiter
