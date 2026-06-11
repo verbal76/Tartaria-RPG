@@ -52,6 +52,7 @@ import {
 } from '../engine/atlasCoords';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
+import { openContractMarkers } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
@@ -198,6 +199,10 @@ export function MapScreen() {
     () => questionMarkerNumbers({ discoveredLocationIds: discoveredIds, canonLocations }),
     [discoveredIds, canonLocations],
   );
+  // arb100 — open contracts plotted as distinct numbered "◆" pins (derived live
+  // from the player's open-contract lists, so they back-populate + clear on their
+  // own). Numbered in Contracts-screen order; the cards carry the same number.
+  const contractMarkers = useMemo(() => openContractMarkers(player), [player]);
 
   // Rendered image-box layout, captured via onLayout.
   const [imgBox, setImgBox] = useState<{ width: number; height: number } | null>(null);
@@ -503,6 +508,10 @@ export function MapScreen() {
   // "X" at every DONE one. Positioned by converting each event's canonical cell
   // back to its atlas fraction (cellToAtlasFraction), same letterbox math as above.
   const eventMarkerStyles: { id: string; left: number; top: number; kind: 'pending' | 'done' }[] = [];
+  // arb100 — open-contract pins (distinct "◆" glyph + number). Co-located pins
+  // (faction quests share a home outpost, hunts share a biome anchor) cascade by a
+  // small diagonal stagger so each stays legible and tappable.
+  const contractMarkerStyles: { key: string; number: number; left: number; top: number }[] = [];
   if (imgBox) {
     // OTA 055 — letterbox-aware dot positioning. The imageBox is
     // now flex-filled (fills the available height between header
@@ -558,6 +567,21 @@ export function MapScreen() {
           kind: ev.marker,
           left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
           top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+        });
+      }
+      // arb100 — contract pins, staggered when several share a cell.
+      const perCell: Record<string, number> = {};
+      for (const cm of contractMarkers) {
+        const f = cellToAtlasFraction(cm.x, cm.y);
+        const cellKey = `${cm.x},${cm.y}`;
+        const stack = perCell[cellKey] ?? 0;
+        perCell[cellKey] = stack + 1;
+        const stagger = stack * 14;
+        contractMarkerStyles.push({
+          key: cm.key,
+          number: cm.number,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2 + stagger,
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2 + stagger,
         });
       }
     }
@@ -657,6 +681,14 @@ export function MapScreen() {
               <Text style={m.kind === 'done' ? styles.eventDoneX : styles.eventPendingQ}>
                 {m.kind === 'done' ? '✕' : (questionNumbers[m.id] ? `${questionNumbers[m.id]}?` : '?')}
               </Text>
+            </View>
+          ))}
+          {/* arb100 — open-contract pins: a distinct "◆N" glyph at each contract's
+              anchor cell (faction home / biome / lead location), numbered to match
+              the matching card + route button in the Contracts screen. */}
+          {contractMarkerStyles.map((m) => (
+            <View key={m.key} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
+              <Text style={styles.contractPin}>{`${m.number}◆`}</Text>
             </View>
           ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
@@ -891,6 +923,17 @@ const styles = StyleSheet.create({
   eventDoneX: {
     color: '#e0584a',
     fontSize: 16,
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  // arb100 — open-contract pin: a distinct teal "◆" + number (NOT "?", which means
+  // "unknown place"). Sits on an already-named location, so it reads as a marker.
+  contractPin: {
+    color: '#54d6c4',
+    fontSize: 15,
     fontWeight: '900',
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.95)',

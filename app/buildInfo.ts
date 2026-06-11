@@ -14155,4 +14155,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // to, or the broker/alliance parley legs) — ordinary faction contracts do NOT each drop a map "?" today, so this
 // does NOT back-populate one per open contract. app/screens/ContractsScreen.tsx, app/engine/questionMarkers.ts.
 // JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-512';
+// OTA-513 (Hassium Docket) — [feature] plot OPEN contracts on the atlas as distinct numbered pins (user: "plot
+// all of them" with "a distinct numbered contract pin"). Every open contract now shows a teal "N◆" pin on the
+// map at its anchor cell — leads at their own location, hunts at a representative cell for their biomeTag,
+// faction quests / mysteries / storylines at the posting faction's home outpost. Pins are DERIVED live from the
+// player's open-contract lists (new app/engine/contractMarkers.ts), so they back-populate every currently-open
+// contract automatically and clear the instant one closes — no persistence, no migration. Co-located pins
+// (faction quests share a home, hunts share a biome anchor) cascade with a small stagger so each stays legible.
+// Numbered in Contracts-screen list order (hunts → mysteries → storylines → faction quests → leads); each
+// Contracts CARD now carries the same "N◆" badge and a "▸ N◆ ROUTE TO <anchor>" block (the faction turn-in
+// button is prefixed with its number) so the route blocks match the pins. Distinct "◆" glyph (not "?") because a
+// contract sits on an already-named place. app/engine/contractMarkers.ts, app/screens/MapScreen.tsx,
+// app/screens/ContractsScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-513';

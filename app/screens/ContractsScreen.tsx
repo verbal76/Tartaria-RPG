@@ -12,6 +12,7 @@ import { getLocationById } from '../engine/encounter';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
+import { openContractMarkers } from '../engine/contractMarkers';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -106,6 +107,52 @@ export function ContractsScreen() {
   // arb99 — same "?" numbering the atlas + map rows use, so a whisper's SET COURSE
   // block here shows the same number as its mark on the map.
   const questionNumbers = questionMarkerNumbers(worldMemory);
+
+  // arb100 — open-contract pins: key (`${family}:${id}`) → its atlas number +
+  // routable anchor, so each card can carry the same "N◆" its map pin shows and
+  // offer a route to its anchor place.
+  const contractMarkerByKey: Record<string, { number: number; anchorId: string; anchorName: string }> = {};
+  for (const cm of openContractMarkers(player)) {
+    let anchorName = cm.anchorId;
+    try { anchorName = getLocationById(cm.anchorId).name ?? cm.anchorId; } catch { /* keep id */ }
+    contractMarkerByKey[cm.key] = { number: cm.number, anchorId: cm.anchorId, anchorName };
+  }
+  // Translate a card's local toggle key (`h_`/`m_`/`s_`/`q_…_i`/`lead_`) to the
+  // contract-marker key (`hunt:`/`mystery:`/`storyline:`/`faction:`/`lead:`) so the
+  // same badge/route call works inline at every card.
+  const toContractKey = (toggleKey: string): string | null => {
+    if (toggleKey.startsWith('h_')) return `hunt:${toggleKey.slice(2)}`;
+    if (toggleKey.startsWith('m_')) return `mystery:${toggleKey.slice(2)}`;
+    if (toggleKey.startsWith('s_')) return `storyline:${toggleKey.slice(2)}`;
+    if (toggleKey.startsWith('lead_')) return `lead:${toggleKey.slice(5)}`;
+    if (toggleKey.startsWith('q_')) {
+      const rest = toggleKey.slice(2); // q_<defId>_<stageIndex> → strip the index
+      const cut = rest.lastIndexOf('_');
+      return `faction:${cut >= 0 ? rest.slice(0, cut) : rest}`;
+    }
+    return null;
+  };
+  const contractBadge = (toggleKey: string) => {
+    const ck = toContractKey(toggleKey);
+    const info = ck ? contractMarkerByKey[ck] : undefined;
+    return info ? <Text style={styles.contractBadge}>{info.number}◆ </Text> : null;
+  };
+  const contractRoute = (toggleKey: string) => {
+    const ck = toContractKey(toggleKey);
+    const info = ck ? contractMarkerByKey[ck] : undefined;
+    if (!info) return null;
+    if (player?.currentLocationId === info.anchorId) {
+      return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
+    }
+    return (
+      <Pressable
+        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+        onPress={() => setPendingRoute({ id: info.anchorId, name: info.anchorName })}
+      >
+        <Text style={styles.routeBtnText}>▸ {info.number}◆ ROUTE TO {info.anchorName.toUpperCase()}</Text>
+      </Pressable>
+    );
+  };
 
   if (!player) {
     return (
@@ -522,11 +569,12 @@ export function ContractsScreen() {
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
-                      <Text style={styles.cardTitle}>{def.title}</Text>
+                      <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={styles.stagePill}>
                         {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
+                    {contractRoute(key)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
                         didn't tell them where to go or what to do.
@@ -666,11 +714,12 @@ export function ContractsScreen() {
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
-                      <Text style={styles.cardTitle}>{def.title}</Text>
+                      <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={styles.stagePill}>
                         {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
+                    {contractRoute(key)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -730,11 +779,12 @@ export function ContractsScreen() {
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
-                      <Text style={styles.cardTitle}>{def.title}</Text>
+                      <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={styles.stagePill}>
                         {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
+                    {contractRoute(key)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -797,7 +847,7 @@ export function ContractsScreen() {
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
-                      <Text style={styles.cardTitle}>{def.title}</Text>
+                      <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
                       <Text style={styles.stagePill}>
                         {def.stages && def.stages.length > 0
                           ? readyToTurnIn
@@ -866,10 +916,13 @@ export function ContractsScreen() {
                       const dest = startingLocationForFaction(def.factionId);
                       const destName = getLocationById(dest).name;
                       const here = player?.currentLocationId === dest;
+                      // arb100 — the faction quest's pin sits on this same home
+                      // outpost, so prefix the turn-in route with its number.
+                      const fNum = contractMarkerByKey[`faction:${def.id}`]?.number;
                       if (here) {
                         return (
                           <Text style={styles.routeHereNote}>
-                            ▸ You're at {destName} — turn in at the mission board or a same-faction agent.
+                            ▸ {fNum ? `${fNum}◆ ` : ''}You're at {destName} — turn in at the mission board or a same-faction agent.
                           </Text>
                         );
                       }
@@ -878,7 +931,7 @@ export function ContractsScreen() {
                           style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                           onPress={() => setPendingRoute({ id: dest, name: destName })}
                         >
-                          <Text style={styles.routeBtnText}>▸ ROUTE TO TURN-IN ({destName})</Text>
+                          <Text style={styles.routeBtnText}>▸ {fNum ? `${fNum}◆ ` : ''}ROUTE TO TURN-IN ({destName})</Text>
                         </Pressable>
                       );
                     })()}
@@ -969,10 +1022,11 @@ export function ContractsScreen() {
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
-                      <Text style={styles.cardTitle}>{title}</Text>
+                      <Text style={styles.cardTitle}>{contractBadge(key)}{title}</Text>
                       <Text style={styles.stagePill}>{q.state}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
+                    {contractRoute(key)}
                     {!open && (
                       <>
                         <Text style={styles.cardStageLabel}>Complication</Text>
@@ -1355,6 +1409,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   cardTitle: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', flex: 1, marginRight: 8 },
+  // arb100 — the contract's atlas-pin number, inline before the title. Teal "◆"
+  // matches the map pin so a card and its mark read the same.
+  contractBadge: { color: '#54d6c4', fontWeight: '900' },
   stagePill: {
     color: '#9ec96a',
     fontSize: 10,

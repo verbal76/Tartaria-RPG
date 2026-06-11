@@ -378,6 +378,24 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-513 "Hassium Docket" — [feature] plot OPEN contracts on the atlas as distinct numbered "◆" pins**
+  *(element #108)*. User: plot "all of them" with "a distinct numbered contract pin". Every open contract now
+  shows a teal `N◆` pin on the map at its anchor cell — **leads** at their own location, **hunts** at a
+  representative cell for their `biomeTag` (`buried_capital→asgardar`, `mud_seas→mud_seas`,
+  `outskirts→tartarian_outskirts`, `sentinel_ward→obsidian_pillars`), **faction quests / mysteries / storylines**
+  at the posting faction's home outpost (neutral fallback `tartarian_outskirts`). Pins are DERIVED live from the
+  player's open-contract lists (new `app/engine/contractMarkers.ts` — `openContractMarkers` /
+  `contractMarkerNumbers`), so they **back-populate every currently-open contract automatically** and clear the
+  instant one closes — no persistence, no migration. Co-located pins (faction quests share a home, hunts share a
+  biome anchor) cascade with a small diagonal stagger so each stays legible. Numbered in Contracts-screen list
+  order (hunts → mysteries → storylines → faction quests → leads); each Contracts CARD carries the same `N◆`
+  badge + a `▸ N◆ ROUTE TO <anchor>` block (faction turn-in button prefixed with its number) so the route blocks
+  match the pins. Distinct `◆` glyph (NOT `?`) because a contract sits on an already-named place. Files:
+  `app/engine/contractMarkers.ts`, `app/screens/MapScreen.tsx`, `app/screens/ContractsScreen.tsx`. Test
+  `contractMarkers.test.ts` (anchor resolution per family, list-order numbering, lead skip rules). **Heads-up:**
+  faction quests/mysteries/storylines carry no location data, so they all anchor to the faction home outpost —
+  many such contracts for one faction will cluster (staggered) on that outpost cell. Hunts anchor by biome (4
+  anchors), so they cluster too. This is inherent to the contract data (contracts aren't precisely located).
 - **OTA-512 "Bohrium Ledger" — [feature] extend "?" numbering to the Contracts route blocks** *(element #107)*.
   A whisper/lead's `▸ SET COURSE TO X` button now leads with the same number its mark carries on the atlas
   (`▸ 2? SET COURSE TO THE SILT THIEF`) when that objective is one of the numbered "?" places. Uses the shared
