@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-512 "Bohrium Ledger" — [feature] extend "?" numbering to the Contracts route blocks** *(element #107)*.
+  A whisper/lead's `▸ SET COURSE TO X` button now leads with the same number its mark carries on the atlas
+  (`▸ 2? SET COURSE TO THE SILT THIEF`) when that objective is one of the numbered "?" places. Uses the shared
+  `questionMarkers` helper + new `mentionIdForLabel` (same slug `setWhisperCourse` canonizes under) so the
+  Contracts block and the map mark always agree. **IMPORTANT (answer to "will my open contracts back-populate
+  numbered ?s"): NO.** Only objectives actually plotted as "?" on the map get a number — an unrevealed hidden
+  location, a whisper objective you've SET COURSE to (canonized via `setWhisperCourse`), or the broker/alliance
+  parley legs. Ordinary faction contracts (`def.targetLocationName`/`biomeTag`) do NOT each drop a map "?"
+  today. Plotting one "?" per open contract is a separate feature (pending a product decision — biome-targeted
+  contracts have no single cell, and a contract target is often an already-named location, where "?" conflicts
+  with the "unknown place" semantics). `app/screens/ContractsScreen.tsx`, `app/engine/questionMarkers.ts`.
 - **OTA-511 "Seaborgium Tally" — [feature] number the "?" places (1? 2? 3?) + route blocks match** *(element
   #106)*. When MORE THAN ONE unknown "?" is on the atlas at once — an unrevealed hidden location (the Hidden
   Market) plus any PENDING grid-event objective (whisper/contract "?") — each gets an ascending number in

@@ -63,3 +63,10 @@ export function questionGlyph(id: string, numbers: Record<string, number>): stri
   const n = numbers[id];
   return n ? `${n}?` : '?';
 }
+
+/** The canon id a whisper/lead objective is registered under when its course is
+ *  set (gameStore.setWhisperCourse uses the same slug). Lets the Contracts screen
+ *  look up a whisper route's "?" number so its SET COURSE block matches the atlas. */
+export function mentionIdForLabel(label: string): string {
+  return `mention_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`;
+}

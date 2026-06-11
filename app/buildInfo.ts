@@ -14146,4 +14146,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // helper app/engine/questionMarkers.ts (questionMarkerPlaces / questionMarkerNumbers) read by both the map
 // overlay and the rows so a mark and its row never disagree. app/screens/MapScreen.tsx,
 // app/screens/ExplorationScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-511';
+// OTA-512 (Bohrium Ledger) — [feature] extend the "?" numbering to the Contracts screen route blocks. A
+// whisper/lead's "▸ SET COURSE TO X" button now leads with the same number its mark carries on the atlas (e.g.
+// "▸ 2? SET COURSE TO THE SILT THIEF") when that objective is one of the numbered "?" places. Uses the shared
+// app/engine/questionMarkers helper + a new mentionIdForLabel (the same slug gameStore.setWhisperCourse
+// canonizes under) so the Contracts block and the map mark always agree. NOTE: this only numbers objectives that
+// are actually plotted as "?" on the map (an unrevealed hidden location, a whisper objective you've set course
+// to, or the broker/alliance parley legs) — ordinary faction contracts do NOT each drop a map "?" today, so this
+// does NOT back-populate one per open contract. app/screens/ContractsScreen.tsx, app/engine/questionMarkers.ts.
+// JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-512';

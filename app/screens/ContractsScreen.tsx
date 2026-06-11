@@ -11,6 +11,7 @@ import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
+import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -102,6 +103,9 @@ export function ContractsScreen() {
     null | 'enemies' | 'travels' | 'checks' | 'npcs'
   >(null);
   const worldMemory = useGameStore((s) => s.worldMemory);
+  // arb99 — same "?" numbering the atlas + map rows use, so a whisper's SET COURSE
+  // block here shows the same number as its mark on the map.
+  const questionNumbers = questionMarkerNumbers(worldMemory);
 
   if (!player) {
     return (
@@ -915,6 +919,9 @@ export function ContractsScreen() {
                 const here = !!route
                   && player?.mapX === route.mapX
                   && player?.mapY === route.mapY;
+                // arb99 — if this objective is plotted as a numbered "?" on the
+                // atlas, lead the SET COURSE block with the same number.
+                const qNum = route ? questionNumbers[mentionIdForLabel(route.label)] : undefined;
                 return (
                   <View key={`w_${rec.id}`} style={styles.card}>
                     <View style={styles.cardHead}>
@@ -932,7 +939,7 @@ export function ContractsScreen() {
                           setScreen('exploration');
                         }}
                       >
-                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {route.label.toUpperCase()}</Text>
+                        <Text style={styles.routeBtnText}>▸ {qNum ? `${qNum}? ` : ''}SET COURSE TO {route.label.toUpperCase()}</Text>
                       </Pressable>
                     )}
                     {route && here && (
