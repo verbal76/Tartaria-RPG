@@ -378,6 +378,15 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-491 "Radon Sorting" — [bugfix] Shaped Aetheric Shard mis-classified as a TOOL** *(element #86)*.
+  Player: *"shaped Aetheric shard is a one use throwing weapon, why is it marked as a tool?"* The shard is
+  `gear.json` kind `misc` + `throwable` (2d20 aetheric), but its NAME makes `itemDefaults` restamp synthesize
+  an `aetheric` tag — which is a tool-tag — so `itemIsTool` filed it under the inventory TOOLS section and
+  offered it as pouch-eligible. Fix: a `weapon`/`throwable`/`thrown` tag now disqualifies an item from
+  `itemIsTool` (shared source of truth for pouch + TOOLS category), and `categorizeItem` buckets a throwable
+  as a WEAPON before the tool check; pouch refusal now reads "a throwing weapon — hurl it, don't pouch it."
+  Genuine aetheric tools (Vision Lens) still classify right. Test: `__tests__/shapedShardNotATool.test.ts`.
+  `pouchEligibility.ts` + `InventoryCategorize.ts`.
 - **OTA-490 "Astatine Purge" — [bugfix+diag] save "storage full" on a near-empty device** *(element #85)*.
   Player's daughter's **Galaxy S26** logged `persist FAILED — staged save did not verify` at only **193KB**
   total. Cause: Android AsyncStorage's default **~6MB DB filled**, and `emergencyReclaimDiskSpace` only

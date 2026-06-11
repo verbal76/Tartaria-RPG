@@ -68,6 +68,11 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
   if (AMULETS.some((a) => a.name.toLowerCase() === nameLower)) return 'accessory';
   if (RINGS.some((r) => r.name.toLowerCase() === nameLower)) return 'accessory';
+  // OTA-491 — a thrown one-shot weapon (e.g. the Shaped Aetheric Shard, a GEAR-
+  // catalog item with kind 'misc' + 'throwable', not in the WEAPONS catalog) is a
+  // WEAPON. Bucket it by the weapon tag BEFORE the tool check — otherwise its
+  // name-synthesized 'aetheric' tag made isToolItem file it under Tools.
+  if (item.tags.some((t) => /^(throwable|thrown)$/i.test(t))) return 'weapon';
   // arb90 — tools before the generic gear/material buckets so utility
   // implements get their own section (and the pry bar lands there).
   if (isToolItem(item)) return 'tool';

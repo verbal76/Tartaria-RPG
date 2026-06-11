@@ -13965,4 +13965,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // counts = CursorWindow truncation) so the next on-device log names the real cause instead of the old
 // catch-all. Tests: __tests__/emergencyReclaim.test.ts. app/engine/saveSystem.ts. JS-only → OTA. NOTE: the
 // durable ceiling fix — raising AsyncStorage's 6MB cap via expo-build-properties — needs a NATIVE build.
-export const OTA_BUILD_ID = '2026-06-11-490';
+// OTA-491 (Radon Sorting) — [bugfix] Shaped Aetheric Shard mis-classified as a TOOL. The shard is a one-throw
+// WEAPON (gear.json kind 'misc' + 'throwable', 2d20 aetheric), but its NAME auto-synthesizes an 'aetheric'
+// tag (itemDefaults restamp), and 'aetheric' is a tool-tag — so itemIsTool waved it through, filing it in the
+// inventory TOOLS section + offering it as pouch-eligible. Fix: a `weapon`/`throwable`/`thrown` tag now
+// disqualifies an item from being a tool (pouchEligibility.itemIsTool, the shared source of truth for the
+// pouch AND the TOOLS category), and categorizeItem buckets a throwable as a WEAPON before the tool check;
+// the pouch refusal reads "a throwing weapon — hurl it, don't pouch it." Genuine aetheric tools (Vision Lens)
+// still classify correctly. Test: __tests__/shapedShardNotATool.test.ts. pouchEligibility.ts +
+// InventoryCategorize.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-491';

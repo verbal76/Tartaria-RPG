@@ -50,6 +50,11 @@ const TOOL_TAGS = [
 // reasons but must NOT count as a tool / pouch item. Tag it `wardrobe`.
 const NON_TOOL_TAGS = ['wardrobe', 'worn', 'apparel'] as const;
 const NON_TOOL_KINDS = ['consumable', 'weapon', 'armor', 'accessory', 'amulet', 'ring'] as const;
+// OTA-491 — weapon-signal tags. A THROWN one-shot weapon (e.g. the Shaped
+// Aetheric Shard: kind 'misc' + 'throwable', whose name auto-synthesizes an
+// 'aetheric' tag that would otherwise read as a tool) is a WEAPON you hurl, not a
+// tool you stow. Exclude any item carrying a weapon tag from the tool definition.
+const WEAPON_TAGS = ['weapon', 'throwable', 'thrown'] as const;
 
 /** arb101 — THE single source of truth for "is this item a tool?" (pure,
  *  item-only — no player context). Used by both the tool-pouch eligibility
@@ -62,6 +67,9 @@ export function itemIsTool(item: InventoryItem): boolean {
   if ((NON_TOOL_KINDS as readonly string[]).includes(kind)) return false;
   const tags = (item.tags ?? []).map((t) => t.toLowerCase());
   if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) return false;
+  // OTA-491 — a thrown/throwable weapon is never a tool, even if its kind is
+  // 'misc' and an auto-tag (e.g. 'aetheric' from the name) would otherwise match.
+  if (tags.some((t) => (WEAPON_TAGS as readonly string[]).includes(t))) return false;
   if ((TOOL_KINDS as readonly string[]).includes(kind)) return true;
   return tags.some((t) => (TOOL_TAGS as readonly string[]).includes(t));
 }
@@ -112,6 +120,11 @@ export function isPouchEligible(
   const tags = (item.tags ?? []).map((t) => t.toLowerCase());
   if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) {
     return { eligible: false, reason: "you wear that — it's not a tool" };
+  }
+  // OTA-491 — a thrown one-shot weapon (kind 'misc' + 'throwable', e.g. the
+  // Shaped Aetheric Shard) is a weapon, not a tool. Refuse with weapon wording.
+  if (tags.some((t) => (WEAPON_TAGS as readonly string[]).includes(t))) {
+    return { eligible: false, reason: "a throwing weapon — hurl it, don't pouch it" };
   }
   // OTA-385 — rope is carried gear, not a pouch tool. A rope grants its climb
   // capability (the `climb_steep` gate) just by sitting in your pack — the gate
