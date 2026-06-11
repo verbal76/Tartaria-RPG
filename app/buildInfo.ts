@@ -14114,4 +14114,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (ExplorationScreen) + the fuse permit (fuseAtCrucible) now both accept activeBuildingId==='market', so the
 // Crucible is available at the market without a wild fusion-bench. gameStore + ExplorationScreen. NOTE: per-
 // stall CONTRACTS (item-category contracts at each stall) are the remaining follow-up. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-508';
+// OTA-509 (Rutherfordium Lattice) — [bugfix] the player's grid position warped. Setting course for the same
+// place from the same area read wildly different estimates (playtest log: 6, then 11, then 24 days), and "7
+// paces south of the Hidden Market" re-measured as "24 paces west". ROOT CAUSE: the player had no persistent
+// absolute position — it was RECONSTRUCTED every time as "current location's canon cell + the re-centered
+// mapX/mapY offset", and that anchor JUMPED whenever a named tile was crossed (and the initial course estimate
+// used pure location-to-location distance, ignoring the in-transit offset entirely). FIX: the player now
+// carries a persistent ABSOLUTE cell (player.gridX/gridY) on the install-fixed canon grid as the single source
+// of truth. A cardinal step moves it by exactly ±1 (clamped to the board, nothing else); routing walks it
+// toward a target's fixed canon cell; travelTo SNAPS it to the arrived location's canon cell (its permanent
+// position, not a warp); and distance is always |grid − canonCell|. So routing to the same place from the same
+// spot always reads the same number, and 5 paces south then 5 north returns to the EXACT same cell. mapX/mapY
+// are now a DERIVED visual coordinate (the thematic re-centered map + surveys + per-tile micro state stay in
+// sync); grid-event "?"/"X" markers are excluded from arrival (they resolve via resolveGridEventAt, not
+// travelTo). New helpers in worldMap (canonicalCellOf / canonicalDistanceFromGrid / canonicalLocationAtCell /
+// clampGridCell / gridToVisual). character.ts + backfill seed gridX/gridY (legacy saves = current location's
+// canon cell). app/engine/worldMap.ts, types.ts, character.ts, app/state/gameStore.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-509';

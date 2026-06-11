@@ -962,9 +962,23 @@ export interface PlayerCharacter {
    *  ContractsScreen reads this list to compute per-character progress
    *  and reveal which fragments are still in the field. */
   collectables?: string[];
-  /** Current (x, y) on the procedural grid. Defaults to map center. */
+  /** Current (x, y) on the procedural grid. Defaults to map center.
+   *  arb47 — mapX/mapY are the player's coordinate on the RE-CENTERED VISUAL
+   *  map (current location at CENTER). They are now a DERIVED display value,
+   *  kept in sync with the authoritative absolute position below. Surveys and
+   *  the thematic map still read them; real movement + distance do not. */
   mapX?: number;
   mapY?: number;
+  /** arb47 — the player's PERSISTENT ABSOLUTE cell on the install-fixed canon
+   *  grid (worldMap canonicalPositions). This is the single source of truth for
+   *  where the player is: cardinal steps move it by exactly ±1, routing walks it
+   *  toward a target's fixed canon cell, and travelTo snaps it to a location's
+   *  canon cell — it NEVER warps or re-anchors when a named tile is crossed. So
+   *  distance to any location is always |grid − canonCell| and 5 paces south then
+   *  5 north returns to the exact same cell. Optional so legacy saves backfill it
+   *  (from their current location's canon cell) on load. */
+  gridX?: number;
+  gridY?: number;
   /** Last cardinal direction the player traveled. Lets "continue" /
    *  "keep going" / "onward" repeat the previous step without forcing the
    *  player to retype the direction. Cleared on travelTo() to a named

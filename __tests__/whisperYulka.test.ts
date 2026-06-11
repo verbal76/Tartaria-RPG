@@ -44,6 +44,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
+import { canonicalLocationAtCell } from '../app/engine/worldMap';
 import { isHourInWindow, reapExpiredWhispers, pickTargetTile, findChain, whisperRouteTarget } from '../app/engine/whispers';
 import type { WhisperRecord } from '../app/engine/types';
 
@@ -311,22 +312,48 @@ describe('Yulka chain — full state-machine drive', () => {
     await store.getState().startNewGame({ name: 'Courser', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
     const p0 = store.getState().player!;
-    // Plant the player two tiles WEST of the objective, with ample stamina and no
-    // location course in play.
+    // arb47 — the player's position is the persistent absolute grid cell (gridX/
+    // gridY); mapX/mapY are the derived CENTER-based visual frame the whisper
+    // course lives in (target = playerMapX + dx at spawn). Stand at the start
+    // anchor (mapX/mapY at CENTER, gridX/gridY at the location's canon cell) and
+    // put the objective two tiles EAST in that same frame.
     store.setState({
-      player: { ...p0, mapX: 0, mapY: 0, stamina: 20, staminaMax: 20, travelTarget: undefined, whisperCourse: null },
+      player: { ...p0, stamina: 20, staminaMax: 20, travelTarget: undefined, whisperCourse: null },
     });
+    const baseMapX = p0.mapX!;
+    const baseMapY = p0.mapY!;
+    const baseGridX = p0.gridX!;
+    const baseGridY = p0.gridY!;
+    // Pick a cardinal whose first TWO cells hold no named location, so the whisper
+    // course doesn't accidentally "arrive" at a neighbour (which would fire
+    // travelTo and re-center). The objective tile sits two cells out in that dir.
+    const dirs = [
+      { dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
+    ];
+    const clear = dirs.find((d) =>
+      !canonicalLocationAtCell(baseGridX + d.dx, baseGridY + d.dy)
+      && !canonicalLocationAtCell(baseGridX + 2 * d.dx, baseGridY + 2 * d.dy))!;
+    expect(clear).toBeDefined();
+    const tgtMapX = baseMapX + 2 * clear.dx;
+    const tgtMapY = baseMapY + 2 * clear.dy;
 
-    // Set a course to (2,0): the first step should move east and the course persists.
-    store.getState().setWhisperCourse(2, 0, 'the Silt Thief');
+    // Set a course two cells out: the first step moves toward it and the course
+    // persists (still one cell short).
+    store.getState().setWhisperCourse(tgtMapX, tgtMapY, 'the Silt Thief');
     let after = store.getState().player!;
-    expect(after.mapX).toBe(1);
-    expect(after.whisperCourse).toEqual({ mapX: 2, mapY: 0, label: 'the Silt Thief' });
+    expect(after.mapX).toBe(baseMapX + clear.dx);
+    expect(after.mapY).toBe(baseMapY + clear.dy);
+    expect(after.gridX).toBe(baseGridX + clear.dx); // authoritative cell stepped one
+    expect(after.gridY).toBe(baseGridY + clear.dy);
+    expect(after.whisperCourse).toEqual({ mapX: tgtMapX, mapY: tgtMapY, label: 'the Silt Thief' });
 
     // One more continue lands on the tile and clears the course.
     store.getState().continueWhisperCourse();
     after = store.getState().player!;
-    expect(after.mapX).toBe(2);
+    expect(after.mapX).toBe(tgtMapX);
+    expect(after.mapY).toBe(tgtMapY);
+    expect(after.gridX).toBe(baseGridX + 2 * clear.dx);
+    expect(after.gridY).toBe(baseGridY + 2 * clear.dy);
     expect(after.whisperCourse).toBeNull();
   });
 });

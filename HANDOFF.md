@@ -378,6 +378,28 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-509 "Rutherfordium Lattice" — [bugfix] the player's grid position warped (6/11/24-day estimate drift)**
+  *(element #104)*. Playtest: setting course for the Hidden Market from the same area read **6**, then **11**,
+  then **24** days; "7 paces south of the market" re-measured as "24 paces west". ROOT CAUSE: the player had no
+  persistent absolute position — it was RECONSTRUCTED each time as *current location's canon cell + the
+  re-centered `mapX/mapY` offset*, and that anchor JUMPED whenever a named tile was crossed; worse, the initial
+  course estimate (`setTravelCourse`) used pure location-to-location distance and ignored the in-transit offset
+  entirely, so it disagreed with the per-step countdown. FIX: the player now carries a persistent **ABSOLUTE
+  cell** `player.gridX/gridY` on the install-fixed canon grid as the single source of truth. A cardinal step
+  moves it by exactly **±1** (clamped to the board, nothing else); routing walks it toward a target's fixed
+  canon cell; `travelTo` **snaps** it to the arrived location's canon cell (its permanent position — not a
+  warp); distance is always `|grid − canonCell|`. So routing to the same place from the same spot always reads
+  the same number, and **5 paces south then 5 north returns to the exact same cell** (reversible). `mapX/mapY`
+  are now a DERIVED visual coordinate — the thematic re-centered map, surveys, and per-tile micro/room state
+  stay in sync via `gridToVisual`. Grid-event `?`/`X` markers (whisper/contract objectives canonized at their
+  tile) are excluded from arrival, so walking onto one resolves it via `resolveGridEventAt` instead of firing
+  `travelTo`. New worldMap helpers: `canonicalCellOf` (collision-resolved placed cell — the cell the visual
+  map + reverse index agree on), `canonicalDistanceFromGrid`, `canonicalLocationAtCell`, `clampGridCell`,
+  `gridToVisual`. `character.ts` + `backfillPlayer` seed `gridX/gridY` (legacy saves = current location's canon
+  cell). Files: `app/engine/worldMap.ts`, `app/engine/types.ts`, `app/engine/character.ts`,
+  `app/state/gameStore.ts`. New test `absoluteGridPosition.test.ts` (±1 steps, reversibility, stable estimate,
+  arrival-snap); `whisperYulka.test.ts` updated for the now-derived `mapX/mapY` (the whisper course still walks
+  the visual frame intra-area, which stays in sync). Full travel/grid/movement suites green. JS-only → OTA.
 - **OTA-508 "Lawrencium Bazaar" — [feature] Hidden Market auto-opens as a 4-stall market + Fuse Cauldron**
   *(element #103)*. Player arrived at the Hidden Market and saw only the usual cardinal exits — the 4-stall
   market building (sceneBuilding='market', OTA-498) existed but needed a manual "enter". Now `beginScene`

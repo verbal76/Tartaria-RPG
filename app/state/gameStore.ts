@@ -261,10 +261,13 @@ import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/por
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
-  stepInDirection,
   surveyAll,
   canonicalDistance,
-  canonicalDistanceFromPlayer,
+  canonicalDistanceFromGrid,
+  canonicalLocationAtCell,
+  canonicalCellOf,
+  clampGridCell,
+  gridToVisual,
   canonicalCellFor,
   setCanonExtraLocations,
   WORLD_MAP_CENTER_X,
@@ -1428,6 +1431,19 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // arrivals already use the new center via character.ts / travelTo.
     mapX: WORLD_MAP_CENTER_X,
     mapY: WORLD_MAP_CENTER_Y,
+    // arb47 — the authoritative ABSOLUTE position. Legacy saves (and any save
+    // mid-journey, since mapX/mapY snap to center above) are treated as standing
+    // AT their current location, so the absolute cell is that location's fixed
+    // canon cell. A save that already carries gridX/gridY keeps it (the player
+    // may be out in open ground between locations). From here on it only ever
+    // moves ±1 per step or snaps to a location's canon cell on arrival.
+    ...(() => {
+      if (typeof p.gridX === 'number' && typeof p.gridY === 'number') {
+        return { gridX: p.gridX, gridY: p.gridY };
+      }
+      const cell = canonicalCellOf(p.currentLocationId);
+      return { gridX: cell.x, gridY: cell.y };
+    })(),
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
@@ -1670,6 +1686,22 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger, dog };
 }
 
+// arb47 — the player's authoritative ABSOLUTE cell on the canon grid. Reads the
+// persistent gridX/gridY when present; falls back (legacy saves / first load
+// before backfill) to the current location's canon cell plus the re-centered
+// in-transit offset so old behaviour still resolves. Every movement/distance path
+// funnels through this so there is ONE source of truth for "where the player is".
+function playerGridCell(player: PlayerCharacter): { x: number; y: number } {
+  if (typeof player.gridX === 'number' && typeof player.gridY === 'number') {
+    return { x: player.gridX, y: player.gridY };
+  }
+  const cur = canonicalCellOf(player.currentLocationId);
+  return {
+    x: cur.x + ((player.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X),
+    y: cur.y + ((player.mapY ?? WORLD_MAP_CENTER_Y) - WORLD_MAP_CENTER_Y),
+  };
+}
+
 // OTA-503 — resolve the grid event the player has ARRIVED on (their canonical
 // cell). Player rule: a LONE pending event at the cell fires on ANY arrival —
 // routed there or just walked there. Only when SEVERAL events share the cell does
@@ -1687,9 +1719,8 @@ function resolveGridEventAt(
     (l) => l.marker === 'pending' && l.source !== 'contract',
   );
   if (pending.length === 0) return wm;
-  const cur = canonicalCellFor(player.currentLocationId);
-  const px = cur.x + ((player.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X);
-  const py = cur.y + ((player.mapY ?? WORLD_MAP_CENTER_Y) - WORLD_MAP_CENTER_Y);
+  // arb47 — the player's authoritative absolute cell (no offset reconstruction).
+  const { x: px, y: py } = playerGridCell(player);
   const here = pending.filter((e) => {
     const c = (typeof e.gx === 'number' && typeof e.gy === 'number')
       ? { x: e.gx, y: e.gy }
@@ -13875,6 +13906,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // location (sim trace showed `south` bouncing A→B→A→B).
         mapX: WORLD_MAP_CENTER_X,
         mapY: WORLD_MAP_CENTER_Y,
+        // arb47 — snap the AUTHORITATIVE absolute cell to this location's fixed
+        // canon cell. This is not a warp: it's the location's permanent grid
+        // position, and when you arrive by walking, gridX/gridY already equals it
+        // (that's how arrival was detected). Routing here from afar sets it once,
+        // and from then on the player only moves ±1 per step from this cell.
+        ...(() => {
+          const cell = canonicalCellOf(locationId);
+          return { gridX: cell.x, gridY: cell.y };
+        })(),
         // Named travelTo breaks the cardinal-step flow — clear the saved
         // direction so "continue" can't snap back to the old bearing.
         lastTravelDirection: undefined,
@@ -16766,7 +16806,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
-    if (locationId === player.currentLocationId) return;
+    // arb47 — block only when the player is ACTUALLY standing on the target's
+    // fixed canon cell. (You can have wandered paces away from your home location
+    // in open ground — currentLocationId still reads it — and re-route back to it
+    // to "recheck"; that should walk you home, not no-op.)
+    {
+      const grid0 = playerGridCell(player);
+      const tgtCell0 = canonicalCellOf(locationId);
+      if (grid0.x === tgtCell0.x && grid0.y === tgtCell0.y) return;
+    }
     const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
     const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
     const tgtPos = map.positions[locationId];
@@ -16816,13 +16864,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-507 — a HIDDEN destination (the Hidden Market) stays "?" in the course
     // log + travel row until the player actually arrives there; don't spoil it.
     const tgtName = revealedLocationName(locationId, getLocationById(locationId).name ?? locationId, get().worldMemory?.discoveredLocationIds);
-    // fromX/fromY drive the first STEP on the re-centered visual map (below).
-    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
-    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
-    // OTA-499 — distance is EXACT canonical grid-to-grid (the install-fixed grid),
-    // not the re-centered visual map. The two named locations are always the same
-    // distance apart no matter where the player stands, so the estimate is stable.
-    const tiles = canonicalDistance(player.currentLocationId, locationId);
+    // arb47 — the player's authoritative ABSOLUTE cell + the target's fixed canon
+    // cell drive BOTH the estimate and the first step. The estimate is the real
+    // grid distance from exactly where the player stands — so routing to the same
+    // place from the same spot always reads the same number, and it agrees with
+    // the per-step countdown (which is the same math). No more anchor jumps.
+    const grid = playerGridCell(player);
+    const tgtCell = canonicalCellOf(locationId);
+    const tiles = canonicalDistanceFromGrid(grid.x, grid.y, locationId);
     // OTA-126 — snapshot tile count at travel-start so the badge
     // counts down monotonically regardless of which location is
     // currently centered on the regenerated world map.
@@ -16851,7 +16900,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // v2.4.1 (OTA 053) — this step now costs stamina + advances time
     // like the cardinal walks do, so multi-step travel can't be used
     // to bypass the fatigue economy.
-    const firstDir = nextCardinalToward(fromX, fromY, tgtPos.x, tgtPos.y);
+    // arb47 — step toward the target's fixed CANON cell from the player's
+    // absolute grid cell, not the re-centered visual map. Movement and distance
+    // now share one frame, so every step provably shortens the canon distance.
+    const firstDir = nextCardinalToward(grid.x, grid.y, tgtCell.x, tgtCell.y);
     if (firstDir) {
       set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
       get().stepDirection(firstDir);
@@ -16914,15 +16966,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       && (player.travelTarget.distanceRemaining ?? 0) <= 0
       && player.currentLocationId !== targetId
     ) {
-      // OTA-499 — recover from the EXACT canonical distance at the player's live
-      // grid cell, not the re-centered map (which is what desynced it in the first
-      // place).
-      const tilesRecover = canonicalDistanceFromPlayer(
-        player.currentLocationId,
-        player.mapX ?? WORLD_MAP_CENTER_X,
-        player.mapY ?? WORLD_MAP_CENTER_Y,
-        targetId,
-      );
+      // arb47 — recover from the EXACT distance at the player's absolute cell.
+      const recGrid = playerGridCell(player);
+      const tilesRecover = canonicalDistanceFromGrid(recGrid.x, recGrid.y, targetId);
       if (tilesRecover > 0) {
         set((s) => s.player?.travelTarget ? {
           player: {
@@ -16943,9 +16989,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } : s));
       return;
     }
-    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
-    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
-    const dir = nextCardinalToward(fromX, fromY, tgtPos.x, tgtPos.y);
+    // arb47 — step toward the target's fixed CANON cell from the player's
+    // absolute grid cell. Movement + distance share the canon frame.
+    const fromGrid = playerGridCell(player);
+    const tgtCell = canonicalCellOf(targetId);
+    const dir = nextCardinalToward(fromGrid.x, fromGrid.y, tgtCell.x, tgtCell.y);
     if (!dir) {
       // Player is on the target tile but somehow currentLocationId
       // didn't update — clear travel and let beginScene catch up.
@@ -16966,17 +17014,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (after && after.currentLocationId === targetId) {
       set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
     } else if (after?.travelTarget) {
-      // OTA-499 — EXACT canonical distance from the player's live grid cell to the
-      // target (replaces the OTA-498 re-centered re-plot + clamp). Computed fresh
-      // each step from the player's current location + in-transit offset, so it's
-      // the real grid distance at every tile and walks down monotonically as auto-
-      // travel steps toward the target — no countdown drift, no clamp.
-      const dist = canonicalDistanceFromPlayer(
-        after.currentLocationId,
-        after.mapX ?? WORLD_MAP_CENTER_X,
-        after.mapY ?? WORLD_MAP_CENTER_Y,
-        targetId,
-      );
+      // arb47 — EXACT distance from the player's absolute cell to the target's
+      // fixed canon cell, fresh each step. Walks down monotonically as auto-travel
+      // steps toward the target — no countdown drift, no clamp, no warp.
+      const afterGrid = playerGridCell(after);
+      const dist = canonicalDistanceFromGrid(afterGrid.x, afterGrid.y, targetId);
       set((s) => (s.player?.travelTarget ? {
         player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
       } : s));
@@ -17016,7 +17058,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // exact grid-to-grid distance like any location ("any place mentioned becomes
     // canon and is plotted on an exact grid").
     if (label) {
-      const cur = canonicalCellFor(player.currentLocationId);
+      const cur = canonicalCellOf(player.currentLocationId);
       const gx = cur.x + (mapX - WORLD_MAP_CENTER_X);
       const gy = cur.y + (mapY - WORLD_MAP_CENTER_Y);
       const id = `mention_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`;
@@ -17145,14 +17187,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player || !scene) return;
     const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
     const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
-    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
-    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
-    const step = stepInDirection(map, fromX, fromY, dir);
-    // Record both the new coordinates AND the direction so "continue" can
-    // repeat the same step without the player retyping the bearing.
+    // arb47 — movement is now ABSOLUTE-GRID native. The player's authoritative
+    // position is gridX/gridY on the install-fixed canon grid; a cardinal step
+    // moves it by exactly ±1 (clamped to the board) and NOTHING else. So 5 paces
+    // south then 5 north lands on the exact same cell — no warp, no re-anchor.
+    const prevGrid = playerGridCell(player);
+    const dx = dir === 'east' ? 1 : dir === 'west' ? -1 : 0;
+    const dy = dir === 'south' ? 1 : dir === 'north' ? -1 : 0;
+    const newGrid = clampGridCell(prevGrid.x + dx, prevGrid.y + dy);
+    // Arrival = the new cell IS a named location's fixed canon cell (and it isn't
+    // the location we already stand on). Resolved against the canon table, never
+    // the re-centered visual map — so the cell that reads "Drakova" is always the
+    // same cell. EXCLUDE grid-event markers (whisper/contract "?"/"X" objectives,
+    // which are canonized at their tile but are NOT places you "arrive at" as a
+    // scene) — those are flipped to 'done' by resolveGridEventAt below instead.
+    const canonHere = canonicalLocationAtCell(newGrid.x, newGrid.y);
+    const isGridEventMarker = !!canonHere
+      && (get().worldMemory?.canonLocations ?? []).some(
+        (e) => e.id === canonHere.locationId && !!e.marker,
+      );
+    const arrival = canonHere && canonHere.locationId !== player.currentLocationId && !isGridEventMarker
+      ? canonHere
+      : null;
+    // Derive the re-centered VISUAL coordinate (mapX/mapY) for the thematic map +
+    // surveys + per-tile micro state. `step` keeps the old shape so the unchanged
+    // visual-frame code below works as-is; only `landedOn` and the distance math
+    // are now canon-grid authoritative.
+    const visual = gridToVisual(newGrid.x, newGrid.y, player.currentLocationId);
+    const step = { x: visual.mapX, y: visual.mapY, landedOn: arrival };
+    // Record the new ABSOLUTE cell + derived visual coords + direction so
+    // "continue" can repeat the same step without the player retyping the bearing.
     set((s) =>
       s.player
-        ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
+        ? { player: { ...s.player, gridX: newGrid.x, gridY: newGrid.y, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
         : s,
     );
     // OTA-503 — walking ONTO a grid event's cell resolves it (the player rule: a
@@ -17242,11 +17309,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!step.landedOn) {
         const tgtId = get().player?.travelTarget?.locationId;
         if (tgtId) {
-          // OTA-499 — EXACT canonical distance from the player's new grid cell. A
-          // manual cardinal step honestly climbs as you walk away from the target
-          // and drops as you head back, because it's the real grid-to-grid math
-          // from the player's live position — not a re-centered re-plot.
-          const dist = canonicalDistanceFromPlayer(get().player?.currentLocationId, step.x, step.y, tgtId);
+          // arb47 — EXACT distance from the player's new ABSOLUTE cell to the
+          // target's fixed canon cell. A manual cardinal step honestly climbs as
+          // you walk away and drops as you head back — real grid-to-grid math from
+          // the authoritative position, never a re-centered re-plot that warps.
+          const dist = canonicalDistanceFromGrid(newGrid.x, newGrid.y, tgtId);
           set((s) => (s.player?.travelTarget ? {
             player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
           } : s));

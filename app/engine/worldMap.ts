@@ -45,6 +45,7 @@ export function setCanonExtraLocations(
   _extraLocations = next;
   _explicitCells = cells;
   _canonCache = null; // the canonical positions table must include the new ids
+  _canonCellIndex = null; // arb47 — and the cell→id reverse index derived from it
 }
 /** All locations the world knows about = static (locations.json) + dynamically
  *  canonized. Used by the visual map, the canonical grid, and the travel list. */
@@ -321,6 +322,90 @@ export function canonicalDistanceFromPlayer(
   const px = clampX(cur.x + (mapX - CENTER_X));
   const py = clampY(cur.y + (mapY - CENTER_Y));
   return Math.abs(px - tgt.x) + Math.abs(py - tgt.y);
+}
+
+// ─── arb47 — ABSOLUTE-GRID player position (the warp fix) ───────────────────────
+// The player carries a persistent absolute canonical cell (player.gridX/gridY).
+// Distance + movement are measured DIRECTLY against the install-fixed canon grid
+// — never reconstructed from "current location + re-centered offset" (which
+// jumped the anchor whenever the player crossed a named tile). These helpers are
+// the canon-grid-native primitives the store uses for stepping and routing, so a
+// place is always the same distance from a given cell and 5 south + 5 north
+// returns to the exact same cell.
+
+/** The location's TRUE placed cell on the install-fixed canon grid: the
+ *  collision-resolved `canonicalPositions()` entry (what the visual map and the
+ *  cell→id reverse index agree on), falling back to the raw atlas cell only for
+ *  ids the table doesn't carry. This — not raw `canonicalCellFor` — is the cell
+ *  the player snaps to on arrival and routes toward, so "where Drakova is" is one
+ *  number everything agrees on (matters when a location was nudged off a
+ *  collision). */
+export function canonicalCellOf(id: string): { x: number; y: number } {
+  return canonicalPositions()[id] ?? canonicalCellFor(id);
+}
+
+/** Exact grid-to-grid Manhattan distance from an ABSOLUTE player cell to a target
+ *  location's fixed canon cell. The player's cell is authoritative — no offset
+ *  reconstruction, so the estimate never warps as the player crosses locations. */
+export function canonicalDistanceFromGrid(
+  gridX: number,
+  gridY: number,
+  targetId: string | null | undefined,
+): number {
+  if (!targetId) return 0;
+  const p = canonicalPositions();
+  const tgt = p[targetId] ?? canonicalCellFor(targetId);
+  return Math.abs(gridX - tgt.x) + Math.abs(gridY - tgt.y);
+}
+
+// Reverse index of the canon position table: "cellKey" → locationId. Built once
+// (the canon table is install-fixed) so stepping onto a cell can resolve the
+// named location sitting there in O(1).
+let _canonCellIndex: Record<string, { locationId: string; locationName: string }> | null = null;
+function canonCellIndex(): Record<string, { locationId: string; locationName: string }> {
+  if (_canonCellIndex) return _canonCellIndex;
+  const idx: Record<string, { locationId: string; locationName: string }> = {};
+  const positions = canonicalPositions();
+  const byId = new Map(allKnownLocations().map((l) => [l.id, l] as const));
+  for (const [id, pos] of Object.entries(positions)) {
+    const loc = byId.get(id);
+    idx[`${pos.x},${pos.y}`] = { locationId: id, locationName: loc?.name ?? id };
+  }
+  _canonCellIndex = idx;
+  return idx;
+}
+
+/** The named location whose fixed canon cell IS (x, y), or null. Used by cardinal
+ *  stepping: walking onto a location's canon cell is an arrival. */
+export function canonicalLocationAtCell(
+  x: number,
+  y: number,
+): { locationId: string; locationName: string } | null {
+  return canonCellIndex()[`${x},${y}`] ?? null;
+}
+
+/** Clamp an absolute grid cell to the board. Exposed so the store can keep the
+ *  player on the grid (movement is grid-bounded; there is no warp past an edge). */
+export function clampGridCell(x: number, y: number): { x: number; y: number } {
+  return { x: clampX(x), y: clampY(y) };
+}
+
+/** The re-centered VISUAL coordinate (mapX/mapY) for an absolute player cell,
+ *  given the location the visual map is currently centered on. Lets the store
+ *  keep the thematic re-centered map + surveys in sync with the authoritative
+ *  absolute position without that visual frame ever driving real movement. */
+export function gridToVisual(
+  gridX: number,
+  gridY: number,
+  centeredLocationId: string | null | undefined,
+): { mapX: number; mapY: number } {
+  const cur = centeredLocationId
+    ? (canonicalPositions()[centeredLocationId] ?? canonicalCellFor(centeredLocationId))
+    : { x: CENTER_X, y: CENTER_Y };
+  return {
+    mapX: clampX(CENTER_X + (gridX - cur.x)),
+    mapY: clampY(CENTER_Y + (gridY - cur.y)),
+  };
 }
 
 // Step one tile in a cardinal direction. Returns the new x/y (clamped to

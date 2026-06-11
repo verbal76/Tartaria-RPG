@@ -6,7 +6,7 @@ import explorationData from '../data/items/exploration.json';
 import armorData from '../data/items/armor.json';
 import weaponsData from '../data/items/weapons.json';
 import { stampDurability } from './durability';
-import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, canonicalCellOf } from './worldMap';
 import { initMainQuest } from './mainQuest';
 
 // Race + faction starter weapon kits. Every character begins with:
@@ -339,6 +339,13 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     // makes the first cardinal step walk from the wrong tile.
     mapX: WORLD_MAP_CENTER_X,
     mapY: WORLD_MAP_CENTER_Y,
+    // arb47 — the authoritative ABSOLUTE position: the starting location's fixed
+    // canon cell. Cardinal steps + routing move this directly; it never warps.
+    ...(() => {
+      const startId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
+      const cell = canonicalCellOf(startId);
+      return { gridX: cell.x, gridY: cell.y };
+    })(),
     // v2.4.1 (OTA 033) — initialize the Mud Flood Nexus main quest at
     // the 'hook' phase. The Arbiter's first-scene intro mentions the
     // Nexus once and seeds the arc.
