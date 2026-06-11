@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-505 "Fermium Mark" — [feature] keyed grid-events, stage 2: the "?"/"X" MAP MARKERS** *(element #100)*.
+  Generalized the Hidden Market overlay: every PENDING grid event (whisper/contract objective) renders a
+  yellow "?" at its canonical cell, flipping to a red "✕" once resolved (OTA-503/504 lifecycle). New
+  `worldMap.cellToAtlasFraction` (inverse of canonicalCellFor) maps an event's grid cell → atlas fraction;
+  MapScreen plots one marker per event with the same letterbox/pan/zoom math as the Hidden Market "?". No name
+  on the map — travel is the list row. Test: `__tests__/canonicalGrid.test.ts` (cell↔fraction round-trip).
+  **NEXT — stage 3: wire contracts to canonize like whispers do.** `worldMap.ts`, `MapScreen.tsx`.
 - **OTA-504 "Einsteinium Tell" — [feature] keyed grid-events, stage 1b: arrival resolution RULE** *(element
   #99)*. Player's clarification: a LONE pending event at the player's canonical cell fires on ANY arrival —
   routed there OR just walked there cardinally; the route id only disambiguates when SEVERAL events share the

@@ -7,6 +7,7 @@ import {
   canonicalDistance,
   canonicalDistanceFromPlayer,
   canonicalCellFor,
+  cellToAtlasFraction,
   WORLD_MAP_CENTER_X,
   WORLD_MAP_CENTER_Y,
 } from '../app/engine/worldMap';
@@ -55,5 +56,18 @@ describe('OTA-499 — canonical grid distance', () => {
 
   it('canonicalCellFor is deterministic for the same id', () => {
     expect(canonicalCellFor(A)).toEqual(canonicalCellFor(A));
+  });
+
+  it('OTA-505 — cellToAtlasFraction round-trips through canonicalCellFor (cell -> fraction -> cell)', () => {
+    // for several in-range cells, fraction back to a cell returns the same cell
+    for (const [x, y] of [[41, 20], [47, 15], [30, 25], [55, 10]] as const) {
+      const f = cellToAtlasFraction(x, y);
+      expect(f.fx).toBeGreaterThanOrEqual(0);
+      expect(f.fx).toBeLessThanOrEqual(1);
+      // re-derive the cell from the fraction the way canonicalCellFor does
+      const rx = WORLD_MAP_CENTER_X + Math.round((f.fx - 0.5) * 40);
+      const ry = WORLD_MAP_CENTER_Y + Math.round((f.fy - 0.5) * 22);
+      expect({ x: rx, y: ry }).toEqual({ x, y });
+    }
   });
 });

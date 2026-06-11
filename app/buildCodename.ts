@@ -1037,6 +1037,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-11-502': 'Berkelium Survey',
   '2026-06-11-503': 'Californium Cipher',
   '2026-06-11-504': 'Einsteinium Tell',
+  '2026-06-11-505': 'Fermium Mark',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -260,6 +260,15 @@ export function canonicalCellFor(id: string): { x: number; y: number } {
   };
 }
 
+/** OTA-505 — inverse of the canonicalCellFor placement: a grid cell → its atlas
+ *  fraction (0..1), for positioning an overlay (a "?"/"X" event marker) at a cell.
+ *  Clamped to the image so a far cell still lands on the map. */
+export function cellToAtlasFraction(x: number, y: number): { fx: number; fy: number } {
+  const fx = CANON_REF_FX + (x - CENTER_X) / SPREAD_X;
+  const fy = CANON_REF_FY + (y - CENTER_Y) / SPREAD_Y;
+  return { fx: Math.max(0, Math.min(1, fx)), fy: Math.max(0, Math.min(1, fy)) };
+}
+
 /** The install-canon position table for every static location, collision-resolved
  *  once in a fixed (id-sorted, hidden-last) order so it's identical every load. */
 export function canonicalPositions(): Record<string, { x: number; y: number }> {

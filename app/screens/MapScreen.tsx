@@ -42,7 +42,7 @@ import { useGameStore } from '../state/gameStore';
 // the existing LOCATIONS const; reused here for the Places list
 // panel so a player can tap any known location and start travel
 // without digging through Lore.
-import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
   cardinalOffsetFromAnchor,
@@ -489,6 +489,10 @@ export function MapScreen() {
   // fixed atlas coord; unlike the removed player marker this never drifts).
   let hiddenMarketStyle: { left: number; top: number } | null = null;
   const hiddenMarketRevealed = isLocationRevealed('hidden_market', discoveredIds);
+  // OTA-505 — grid-event markers: a yellow "?" at every PENDING event cell, a red
+  // "X" at every DONE one. Positioned by converting each event's canonical cell
+  // back to its atlas fraction (cellToAtlasFraction), same letterbox math as above.
+  const eventMarkerStyles: { id: string; left: number; top: number; kind: 'pending' | 'done' }[] = [];
   if (imgBox) {
     // OTA 055 — letterbox-aware dot positioning. The imageBox is
     // now flex-filled (fills the available height between header
@@ -531,6 +535,21 @@ export function MapScreen() {
         left: offsetX + renderedW * hm.fx - HM_LABEL_W / 2,
         top: offsetY + renderedH * hm.fy - HM_LABEL_H / 2,
       };
+    }
+    if (!showingOutpost) {
+      for (const ev of canonLocations ?? []) {
+        if (ev.marker !== 'pending' && ev.marker !== 'done') continue;
+        const cell = (typeof ev.gx === 'number' && typeof ev.gy === 'number')
+          ? { x: ev.gx, y: ev.gy }
+          : canonicalCellFor(ev.id);
+        const f = cellToAtlasFraction(cell.x, cell.y);
+        eventMarkerStyles.push({
+          id: ev.id,
+          kind: ev.marker,
+          left: offsetX + renderedW * f.fx - HM_LABEL_W / 2,
+          top: offsetY + renderedH * f.fy - HM_LABEL_H / 2,
+        });
+      }
     }
   }
 
@@ -618,6 +637,16 @@ export function MapScreen() {
               </Text>
             </View>
           )}
+          {/* OTA-505 — grid-event markers: yellow "?" for a pending whisper/contract
+              objective at its cell, red "X" once resolved. No name — travel is the
+              list button below. Same atlas-anchored overlay as the Hidden Market. */}
+          {eventMarkerStyles.map((m) => (
+            <View key={m.id} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
+              <Text style={m.kind === 'done' ? styles.eventDoneX : styles.eventPendingQ}>
+                {m.kind === 'done' ? '✕' : '?'}
+              </Text>
+            </View>
+          ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
               Player ask: "let's take the player marker off of the
               map, we were never able to make it accurate so let's
@@ -825,6 +854,25 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.5,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  // OTA-505 — grid-event markers. Pending = bright yellow "?"; done = red "✕".
+  eventPendingQ: {
+    color: '#f7e04a',
+    fontSize: 16,
+    fontWeight: '900',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  eventDoneX: {
+    color: '#e0584a',
+    fontSize: 16,
+    fontWeight: '900',
     textAlign: 'center',
     textShadowColor: 'rgba(0,0,0,0.95)',
     textShadowOffset: { width: 0, height: 1 },

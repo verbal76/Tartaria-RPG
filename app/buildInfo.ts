@@ -14083,4 +14083,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pending events there, applies the rule), called from BOTH travelTo (named-location arrival) and
 // stepDirection (walking onto an event's cell mid-area, course or not). Tests: __tests__/canonLocations.test.ts.
 // NEXT: stage 2 = "?"/"X" map markers. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-504';
+// OTA-505 (Fermium Mark) — [feature] keyed grid-events, stage 2: the "?"/"X" MAP MARKERS. Generalized the
+// Hidden Market overlay: every PENDING grid event (whisper/contract objective) now renders a yellow "?" at
+// its canonical cell, flipping to a red "✕" once resolved (OTA-503/504 lifecycle). New worldMap.cellToAtlasFraction
+// (inverse of canonicalCellFor) converts each event's grid cell back to its atlas fraction; MapScreen plots a
+// marker per event with the same letterbox/pan/zoom math as the Hidden Market "?" (static, atlas-anchored).
+// No name on the map — travel is the list row. Test: __tests__/canonicalGrid.test.ts (cell↔fraction round-trip).
+// NEXT (stage 3): wire contracts to canonize the same way whispers do. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-505';
