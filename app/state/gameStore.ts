@@ -12322,6 +12322,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
+        // OTA-495 — Core-4 forge gate. The golem armaments (Sledge / Greatsword /
+        // Pike / Aether-Lance) are pre-Flood war-forging the Arbiter only entrusts
+        // once the player has carried FOUR Cores out of the Lost Capitals (the
+        // four_core_forge beat). Until then the schematic reads but won't assemble.
+        if (typeof recipe.coresRequired === 'number') {
+          const cores = player.mainQuest?.coresRecovered?.length ?? 0;
+          if (cores < recipe.coresRequired) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter sets a hand on the schematic. "${recipe.result} is war-forging from before the flood — I'll guide your hands once you've carried ${recipe.coresRequired} Cores out of the dark. You've recovered ${cores}. Bring more home."`,
+            );
+            break;
+          }
+        }
         // OTA-193 — check shortfall AFTER tag-substitution. Misc items
         // with the right material tag (a synthesized "Brass Sextant"
         // carrying ['metal'], say) count toward "Scrap Metal" cost so
@@ -21433,6 +21447,15 @@ function triggerMainQuest(
     const twistLine = mq.threeCoreTwistLine(player.factionId);
     if (twistLine) get().appendLog('arbiter', twistLine);
     const flagged = mq.markTwistFired(nextState, 'three_core_pressure');
+    const cur = get().player;
+    if (cur) set({ player: { ...cur, mainQuest: flagged } });
+  }
+  // OTA-495 — Core-4 golem-forge unlock beat (one-shot, mirrors the 3-core
+  // twist). Fires the moment coresRecovered hits 4 and opens the golem-armament
+  // recipes (gated in the craft handler on recipe.coresRequired).
+  if (mq.shouldFireFourCoreForge(nextState)) {
+    get().appendLog('arbiter', mq.fourCoreForgeLine());
+    const flagged = mq.markTwistFired(nextState, 'four_core_forge');
     const cur = get().player;
     if (cur) set({ player: { ...cur, mainQuest: flagged } });
   }

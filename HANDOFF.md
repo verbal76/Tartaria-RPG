@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-495 "Thorium Forge" — [feature] Core-4 forge gate for golem armaments (the last follow-up)**
+  *(element #90)*. The four golem-weapon recipes (Sledge/Greatsword/Pike/Aether-Lance) were
+  unlocked-for-testing since OTA-481/482; they now carry `coresRequired: 4` (new `Recipe` field) and the
+  craft handler refuses them — INT-gate style — with an Arbiter line until `coresRecovered.length >= 4`.
+  Narrative beat: when the 4th Core lands, `advanceMainQuest` fires a one-shot Arbiter unlock line
+  (`shouldFireFourCoreForge` / `fourCoreForgeLine`, latched via `twistsFired`, mirrors the 3-core twist).
+  Test: `__tests__/coreFourForgeGate.test.ts`. `mainQuest.ts`, `crafting.ts`, `recipes.json`, `gameStore.ts`.
+  **This closes the Golem Armaments arc (OTA-478→482, 495).**
 - **OTA-494 "Actinium Sieve" — [bugfix] foreign-word sieve on the OTHER narration sites** *(element #89)*.
   OTA-488 only sieved `narrateViaArbiter` (the combat/world feed). The **investigation** one-liner / lore
   generator and the **Ask-the-Arbiter** persona answer were still raw — a model code-switch ("huà") could

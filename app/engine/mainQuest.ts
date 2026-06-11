@@ -727,6 +727,27 @@ export function markTwistFired(state: MainQuestState, twistId: string): MainQues
   return { ...state, twistsFired: [...fired, twistId] };
 }
 
+/** OTA-495 — true exactly once, the moment the 4th Core lands: the Arbiter
+ *  entrusts the pre-Flood golem-armament forging (which gates the Sledge /
+ *  Greatsword / Pike / Aether-Lance recipes). One-shot per character via the
+ *  shared twistsFired flag. */
+export function shouldFireFourCoreForge(state: MainQuestState): boolean {
+  if (state.coresRecovered.length !== 4) return false;
+  if ((state.twistsFired ?? []).includes('four_core_forge')) return false;
+  return true;
+}
+
+/** The narrative beat that unlocks golem-armament crafting at the 4th Core. */
+export function fourCoreForgeLine(): string {
+  return (
+    'The Arbiter watches the fourth Core settle into your pack, and something in '
+    + 'the buried country shifts. "Four. The old grid kept a forging from common '
+    + 'hands — war-arms a golem can carry into the dark. Bring its Core and the '
+    + 'metal, and I will guide your hands. You have earned the schematics." '
+    + '(Golem armaments can now be forged.)'
+  );
+}
+
 // v2.4.1 (OTA 035) — Phase 2: per-faction Core-recovery gates.
 //
 // Replaces the OTA 033 auto-grant-on-arrival with intentional play.

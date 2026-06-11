@@ -13996,4 +13996,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // there. Both now run their generated text through stripForeignWords: the LoreGenerator callback is wrapped
 // (`async (m,o) => stripForeignWords(await qwen.generate(...))`, covering investigate lines + the patched
 // entry.result.line) and arbiterPersonaAnswer sieves its answer. app/state/gameStore.ts. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-494';
+// OTA-495 (Thorium Forge) — [feature] CORE-4 FORGE GATE for golem armaments (the last golem-armament
+// follow-up). The four golem-weapon recipes (Sledge/Greatsword/Pike/Aether-Lance) were unlocked-for-testing;
+// they now carry `coresRequired: 4` (new Recipe field) and the craft handler refuses them — INT-gate style —
+// with an Arbiter line until `mainQuest.coresRecovered.length >= 4`. Narrative beat: the moment the 4th Core
+// lands, `advanceMainQuest` fires a one-shot Arbiter unlock line (`shouldFireFourCoreForge` /
+// `fourCoreForgeLine`, latched via the existing twistsFired flag, mirroring the 3-core twist). Test:
+// __tests__/coreFourForgeGate.test.ts. mainQuest.ts, crafting.ts, recipes.json, gameStore.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-495';
