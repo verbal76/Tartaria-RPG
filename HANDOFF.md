@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-511 "Seaborgium Tally" — [feature] number the "?" places (1? 2? 3?) + route blocks match** *(element
+  #106)*. When MORE THAN ONE unknown "?" is on the atlas at once — an unrevealed hidden location (the Hidden
+  Market) plus any PENDING grid-event objective (whisper/contract "?") — each gets an ascending number in
+  spatial reading order (top→bottom, then left→right): `1?`, `2?`, `3?`. A lone "?" stays an un-numbered "?".
+  The SAME numbering drives the route blocks so they match: the MapScreen TRAVEL-TO rows lead with `2?` /
+  `2?  Label`, and the ExplorationScreen travel-row destination carries the number while routing. Resolved "X"
+  (done) events don't count. New single-source helper `app/engine/questionMarkers.ts`
+  (`questionMarkerPlaces` / `questionMarkerNumbers`) read by both the map overlay and the rows so a mark and its
+  row never disagree. `app/screens/MapScreen.tsx`, `app/screens/ExplorationScreen.tsx`. Test
+  `questionMarkerNumbers.test.ts` (lone "?" un-numbered; ascending spatial order; done excluded; y/x/id tiebreak).
 - **OTA-510 "Dubnium Waypoint" — [dev] one-shot: place the player 1 tile west of the Hidden Market** *(element
   #105)*. User asked to set their position just west of the Hidden Market so the next auto-route reads **1** in
   the travel-spaces block. On next load, `backfillPlayer` snaps the player's absolute grid cell to ONE tile west

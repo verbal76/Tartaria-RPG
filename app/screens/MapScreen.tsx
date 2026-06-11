@@ -51,6 +51,7 @@ import {
   LOCATION_ATLAS_COORDS,
 } from '../engine/atlasCoords';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
+import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
@@ -188,6 +189,15 @@ export function MapScreen() {
       return a.name.localeCompare(b.name);
     });
   }, [player?.currentLocationId, canonLocations]);
+
+  // arb99 — ascending numbers for the "?" places (unrevealed hidden locations +
+  // pending grid events). Only assigned when more than one "?" exists, so a single
+  // unknown stays a plain "?". The map overlay AND the travel rows read this map,
+  // so a mark like "2?" and its route row carry the same number.
+  const questionNumbers = useMemo(
+    () => questionMarkerNumbers({ discoveredLocationIds: discoveredIds, canonLocations }),
+    [discoveredIds, canonLocations],
+  );
 
   // Rendered image-box layout, captured via onLayout.
   const [imgBox, setImgBox] = useState<{ width: number; height: number } | null>(null);
@@ -633,7 +643,9 @@ export function MapScreen() {
           {hiddenMarketStyle && (
             <View pointerEvents="none" style={[styles.hiddenMarketWrap, hiddenMarketStyle]}>
               <Text style={hiddenMarketRevealed ? styles.hiddenMarketName : styles.hiddenMarketQ}>
-                {hiddenMarketRevealed ? 'The Hidden\nMarket' : '?'}
+                {hiddenMarketRevealed
+                  ? 'The Hidden\nMarket'
+                  : (questionNumbers.hidden_market ? `${questionNumbers.hidden_market}?` : '?')}
               </Text>
             </View>
           )}
@@ -643,7 +655,7 @@ export function MapScreen() {
           {eventMarkerStyles.map((m) => (
             <View key={m.id} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
               <Text style={m.kind === 'done' ? styles.eventDoneX : styles.eventPendingQ}>
-                {m.kind === 'done' ? '✕' : '?'}
+                {m.kind === 'done' ? '✕' : (questionNumbers[m.id] ? `${questionNumbers[m.id]}?` : '?')}
               </Text>
             </View>
           ))}
@@ -703,6 +715,13 @@ export function MapScreen() {
             // OTA-498 — a hidden location reads as "?" (routable) until visited.
             const hidden = isHiddenLocation(p.id) && !isLocationRevealed(p.id, discoveredIds);
             const rowName = revealedLocationName(p.id, p.name, discoveredIds);
+            // arb99 — if this row is one of the numbered "?" places, lead with the
+            // matching number so the route block reads the same mark as the atlas
+            // ("2?" on the map → "2?" / "2?  Label" in the list).
+            const qNum = questionNumbers[p.id];
+            const numberedName = qNum
+              ? (rowName === '?' ? `${qNum}?` : `${qNum}?  ${rowName}`)
+              : rowName;
             return (
               <TouchableOpacity
                 key={p.id}
@@ -724,7 +743,7 @@ export function MapScreen() {
               >
                 <View style={styles.placeRowLeft}>
                   <Text style={[styles.placeName, isHere && styles.placeNameHere]}>
-                    {rowName}
+                    {numberedName}
                     {!hidden && OUTPOST_NAME_BY_LOCATION[p.id]
                       ? `  (${OUTPOST_NAME_BY_LOCATION[p.id]})`
                       : ''}

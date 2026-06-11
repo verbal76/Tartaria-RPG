@@ -20,6 +20,7 @@ import { HookContinueModal } from '../components/HookContinueModal';
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
 import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
+import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
@@ -1002,7 +1003,11 @@ export function ExplorationScreen() {
               // Without this the travel row read "→ THE HIDDEN MARKET" while still
               // 6 moves out, spoiling the reveal.
               const real = getLocationById(id).name ?? id;
-              return revealedLocationName(id, real, discoveredIds);
+              const shown = revealedLocationName(id, real, discoveredIds);
+              // arb99 — if the destination is one of the numbered "?" places, lead
+              // with the same number the atlas shows so this route block matches.
+              const qNum = questionMarkerNumbers(worldMemory)[id];
+              return qNum ? (shown === '?' ? `${qNum}?` : `${qNum}?  ${shown}`) : shown;
             })()}
             movesLeft={(() => {
               // OTA-126 — prefer the stored distanceRemaining counter

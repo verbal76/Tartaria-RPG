@@ -14137,4 +14137,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // re-yanks the player back on later loads; the west cell is computed from the market's live canon cell (stays
 // correct if the market moves), and the derived visual mapX/mapY are synced to the new cell. types.ts,
 // app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-510';
+// OTA-511 (Seaborgium Tally) — [feature] number the "?" places. When MORE THAN ONE unknown "?" sits on the
+// atlas at once (an unrevealed hidden location like the Hidden Market, plus any PENDING grid-event objective —
+// whisper/contract "?"), each now gets an ascending number in spatial reading order (top-to-bottom, then
+// left-to-right): 1?, 2?, 3?. A lone "?" stays an un-numbered "?". The same numbering drives the ROUTE BLOCKS so
+// they match: the MapScreen TRAVEL-TO rows lead with "2?" / "2?  Label", and the ExplorationScreen travel-row
+// destination shows the number too while routing. Resolved "X" (done) events don't count. New single-source
+// helper app/engine/questionMarkers.ts (questionMarkerPlaces / questionMarkerNumbers) read by both the map
+// overlay and the rows so a mark and its row never disagree. app/screens/MapScreen.tsx,
+// app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-511';
