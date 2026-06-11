@@ -167,12 +167,19 @@ export function MapScreen() {
   // OTA-498 — discovered-location set drives the Hidden Market "?" reveal: the
   // travel-list row + the map overlay both show "?" until the id is in here.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  // OTA-502 — dynamically-canonized places (whisper/contract/mission mentions) are
+  // routable too: fold them into the travel list as ordinary rows.
+  const canonLocations = useGameStore((s) => s.worldMemory?.canonLocations);
   // OTA-171 — Places list sorted with the current location pinned at
   // the top so the player can see where they are at a glance, then
   // by danger ascending (safer trips first) so the easiest
   // destinations are visible without scrolling.
   const placesView = useMemo(() => {
-    const all = LOCATIONS;
+    const known = new Set(LOCATIONS.map((l) => l.id));
+    const extras = (canonLocations ?? [])
+      .filter((c) => !known.has(c.id))
+      .map((c) => ({ id: c.id, name: c.name, type: c.type ?? 'site', danger: c.danger ?? 2 } as typeof LOCATIONS[number]));
+    const all = [...LOCATIONS, ...extras];
     const here = player?.currentLocationId;
     return [...all].sort((a, b) => {
       if (a.id === here && b.id !== here) return -1;
@@ -180,7 +187,7 @@ export function MapScreen() {
       if (a.danger !== b.danger) return a.danger - b.danger;
       return a.name.localeCompare(b.name);
     });
-  }, [player?.currentLocationId]);
+  }, [player?.currentLocationId, canonLocations]);
 
   // Rendered image-box layout, captured via onLayout.
   const [imgBox, setImgBox] = useState<{ width: number; height: number } | null>(null);

@@ -23,16 +23,27 @@ const ALL_LOCATIONS = locationsData as Location[];
 // exact grid cell. Module state (not threaded through every call site); the store
 // re-pushes the persisted list on load + whenever a new place is canonized.
 let _extraLocations: Location[] = [];
+// OTA-502 — explicit canonical cells for canon locations born at a known spot
+// (e.g. a whisper target tile). canonicalCellFor honors these before deriving.
+let _explicitCells: Record<string, { x: number; y: number }> = {};
 export function setCanonExtraLocations(
-  locs: ReadonlyArray<{ id: string; name: string; type?: string; danger?: number }>,
+  locs: ReadonlyArray<{ id: string; name: string; type?: string; danger?: number; gx?: number; gy?: number }>,
 ): void {
   const known = new Set(ALL_LOCATIONS.map((l) => l.id));
-  _extraLocations = locs
-    .filter((l) => l.id && !known.has(l.id))
-    .map((l) => ({
+  const next: Location[] = [];
+  const cells: Record<string, { x: number; y: number }> = {};
+  for (const l of locs) {
+    if (!l.id || known.has(l.id)) continue;
+    next.push({
       id: l.id, name: l.name, type: l.type ?? 'site', danger: l.danger ?? 2,
       description: '', tags: ['canon', 'mentioned'], discoverable: true,
-    }) as unknown as Location);
+    } as unknown as Location);
+    if (typeof l.gx === 'number' && typeof l.gy === 'number') {
+      cells[l.id] = { x: clampX(l.gx), y: clampY(l.gy) };
+    }
+  }
+  _extraLocations = next;
+  _explicitCells = cells;
   _canonCache = null; // the canonical positions table must include the new ids
 }
 /** All locations the world knows about = static (locations.json) + dynamically
@@ -231,6 +242,9 @@ function atlasFractionFor(id: string): { fx: number; fy: number } | null {
 /** Deterministic absolute grid cell for a location id, from its atlas fraction
  *  (or a stable id-hash for ids the atlas doesn't place). Pure — no player. */
 export function canonicalCellFor(id: string): { x: number; y: number } {
+  // OTA-502 — a place born at a known spot (whisper target) carries its exact cell.
+  const explicit = _explicitCells[id];
+  if (explicit) return explicit;
   const frac = atlasFractionFor(id);
   if (frac) {
     return {

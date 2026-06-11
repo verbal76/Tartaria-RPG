@@ -8,8 +8,10 @@ import {
   allKnownLocations,
   canonicalPositions,
   canonicalDistance,
+  canonicalCellFor,
   generateWorldMap,
 } from '../app/engine/worldMap';
+import { getLocationById } from '../app/engine/encounter';
 
 afterEach(() => setCanonExtraLocations([])); // reset module state between tests
 
@@ -49,5 +51,24 @@ describe('OTA-500 — canon location is plotted + has exact distance', () => {
   it('never shadows / duplicates a static location id', () => {
     setCanonExtraLocations([{ id: 'pilgrim_waycamp', name: 'dup' }]);
     expect(allKnownLocations().filter((l) => l.id === 'pilgrim_waycamp')).toHaveLength(1);
+  });
+});
+
+describe('OTA-502 — explicit cell + resolution everywhere', () => {
+  it('a place born at a known spot is pinned to its EXACT cell (whisper target)', () => {
+    setCanonExtraLocations([{ id: 'mention_yulkas_fire', name: "Yulka's fire", gx: 50, gy: 18 }]);
+    expect(canonicalCellFor('mention_yulkas_fire')).toEqual({ x: 50, y: 18 });
+    expect(canonicalPositions().mention_yulkas_fire).toEqual({ x: 50, y: 18 });
+    // distance is the exact grid math to that pinned cell
+    const cur = canonicalPositions().pilgrim_waycamp!;
+    expect(canonicalDistance('pilgrim_waycamp', 'mention_yulkas_fire'))
+      .toBe(Math.abs(cur.x - 50) + Math.abs(cur.y - 18));
+  });
+
+  it('getLocationById resolves a canonized place to its real name (not a fallback)', () => {
+    setCanonExtraLocations([{ id: 'mention_yulkas_fire', name: "Yulka's fire" }]);
+    expect(getLocationById('mention_yulkas_fire').name).toBe("Yulka's fire");
+    // an unknown id still falls back to a real static location (never crashes)
+    expect(getLocationById('not_a_place_xyz').name).toBeTruthy();
   });
 });

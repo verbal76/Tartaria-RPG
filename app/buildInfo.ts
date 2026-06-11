@@ -14058,4 +14058,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 0.23→0.275 in hiddenLocations.ts. Those fx/fy drive BOTH the canonical grid cell (canonicalCellFor:
 // gridX 41→47 = +6, gridY 14→15 = +1) AND the "?"/name overlay, so the grid coordinate, the travel distance,
 // and the visual marker all moved together. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-501';
+// OTA-502 (Berkelium Survey) — [feature] grid-math directive pt.3: canon locations are now RESOLVED,
+// PLOTTED, ROUTABLE everywhere + fed by a live source. (1) getLocationById (encounter.ts) resolves
+// canonized places (real name + minimal scene, not a fallback). (2) MapScreen travel list folds in
+// worldMemory.canonLocations as ordinary routable rows; setTravelCourse names them via getLocationById.
+// (3) EXPLICIT-CELL support: CanonLocation gained gx/gy + worldMap.canonicalCellFor honors them, so a place
+// born at a known spot pins to its EXACT grid cell. (4) SOURCE WIRED: setWhisperCourse now canonizes the
+// whisper objective's place at the exact canonical cell it points to (player cell + tile offset) — so a
+// place a whisper names becomes a permanent, plotted, exact-distance location. Test:
+// __tests__/canonLocations.test.ts (+ explicit cell + getLocationById resolution). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-502';

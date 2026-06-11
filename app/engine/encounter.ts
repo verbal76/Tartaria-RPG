@@ -145,7 +145,14 @@ function rarityRank(r: Rarity): number {
 }
 
 export function getLocationById(id: string): Location {
-  return locations.find((l) => l.id === id) ?? locations[0]!;
+  const stat = locations.find((l) => l.id === id);
+  if (stat) return stat;
+  // OTA-502 — resolve install-canonized locations (whisper/contract/mission
+  // mentions) too, so they get their real name + a minimal scene instead of
+  // silently falling back to locations[0].
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { allKnownLocations } = require('./worldMap') as typeof import('./worldMap');
+  return allKnownLocations().find((l) => l.id === id) ?? locations[0]!;
 }
 
 // ---------------------------------------------------------------------------

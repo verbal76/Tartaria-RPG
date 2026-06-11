@@ -1241,6 +1241,11 @@ export interface CanonLocation {
   danger?: number;
   /** What first named it ("whisper" | "contract" | "mission" | …). */
   source?: string;
+  /** OTA-502 — explicit canonical grid cell, when the place is born at a known
+   *  spot (e.g. a whisper target tile). Omitted → the cell is derived
+   *  deterministically from the id (canonicalCellFor). */
+  gx?: number;
+  gy?: number;
 }
 
 export interface WorldMemory {

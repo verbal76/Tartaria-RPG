@@ -23,9 +23,12 @@ export function registerCanonLocation(memory: WorldMemory, loc: CanonLocation): 
       type: existing.type ?? loc.type,
       danger: existing.danger ?? loc.danger,
       source: existing.source ?? loc.source,
+      gx: existing.gx ?? loc.gx,
+      gy: existing.gy ?? loc.gy,
     };
     if (merged.name === existing.name && merged.type === existing.type
-      && merged.danger === existing.danger && merged.source === existing.source) {
+      && merged.danger === existing.danger && merged.source === existing.source
+      && merged.gx === existing.gx && merged.gy === existing.gy) {
       return memory;
     }
     return { ...memory, canonLocations: list.map((l) => (l.id === loc.id ? merged : l)) };

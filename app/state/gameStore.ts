@@ -264,6 +264,7 @@ import {
   surveyAll,
   canonicalDistance,
   canonicalDistanceFromPlayer,
+  canonicalCellFor,
   setCanonExtraLocations,
   WORLD_MAP_CENTER_X,
   WORLD_MAP_CENTER_Y,
@@ -2317,7 +2318,7 @@ interface GameStore {
   /** OTA-500 — register a dynamically-mentioned place (whisper/contract/mission/
    *  narration) as install-canon: it persists in worldMemory, gets a permanent
    *  grid cell, and becomes plotted + routable with exact grid-to-grid distance. */
-  canonizeLocation: (loc: { id: string; name: string; type?: string; danger?: number; source?: string }) => void;
+  canonizeLocation: (loc: { id: string; name: string; type?: string; danger?: number; source?: string; gx?: number; gy?: number }) => void;
   /** OTA-360 — paint a weapon-coating consumable onto a weapon
    *  instance. `coatingItemId` is the consumable (Poison Vial /
    *  Acid Flask / Corruption Tonic); `weaponId` is the target
@@ -16716,9 +16717,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (player.stamina < STAMINA_COSTS.wander) {
       const tgtNameForRefusal = (() => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
-          return locs.find((l) => l.id === locationId)?.name ?? 'that destination';
+          // OTA-502 — canon-aware (resolves dynamically-canonized places too).
+          return getLocationById(locationId).name ?? 'that destination';
         } catch {
           return 'that destination';
         }
@@ -16736,9 +16736,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // Locate the destination's friendly name for the announcement line.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
-    const tgtName = locs.find((l) => l.id === locationId)?.name ?? locationId;
+    // OTA-502 — getLocationById resolves canonized places too (not just static).
+    const tgtName = getLocationById(locationId).name ?? locationId;
     // fromX/fromY drive the first STEP on the re-centered visual map (below).
     const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
     const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
@@ -16933,6 +16932,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setWhisperCourse(mapX, mapY, label) {
     const player = get().player;
     if (!player) return;
+    // OTA-502 — the place this whisper objective points to becomes install-canon:
+    // canonized at the EXACT canonical grid cell it sits on (the player's current
+    // cell + the tile offset), so it's plotted on the map, routable, and carries an
+    // exact grid-to-grid distance like any location ("any place mentioned becomes
+    // canon and is plotted on an exact grid").
+    if (label) {
+      const cur = canonicalCellFor(player.currentLocationId);
+      const gx = cur.x + (mapX - WORLD_MAP_CENTER_X);
+      const gy = cur.y + (mapY - WORLD_MAP_CENTER_Y);
+      const id = `mention_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')}`;
+      if (id !== 'mention_') {
+        get().canonizeLocation({ id, name: label, type: 'site', danger: 2, source: 'whisper', gx, gy });
+      }
+    }
     // A whisper course and a location course are mutually exclusive — clear any
     // location travel first so the travel row shows the whisper destination.
     set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined, whisperCourse: { mapX, mapY, label } } } : s));

@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-502 "Berkelium Survey" — [feature] canon locations resolved/plotted/routable + live source (grid-math
+  pt.3)** *(element #97)*. Completes the directive. (1) `getLocationById` (encounter.ts) resolves canonized
+  places → real name + minimal scene, not the locations[0] fallback. (2) MapScreen travel list folds in
+  `worldMemory.canonLocations` as routable rows; `setTravelCourse` names them via getLocationById. (3)
+  EXPLICIT-CELL support: `CanonLocation` gained `gx/gy`, `worldMap.canonicalCellFor` honors them → a place born
+  at a known spot pins to its EXACT grid cell. (4) SOURCE WIRED: `setWhisperCourse` canonizes the whisper
+  objective's place at the exact canonical cell it points to (player cell + tile offset) — so any place a
+  whisper names becomes a permanent, plotted, exact-distance location. Test: `__tests__/canonLocations.test.ts`.
+  (Broker/faction-quest sources already reference STATIC locations.json ids, so they're already canon — no
+  wiring needed; the dynamic feeder is whispers.) No new test reds. `encounter.ts`, `worldMap.ts`,
+  `worldMemory.ts`, `types.ts`, `gameStore.ts`, `MapScreen.tsx`. **Grid-math directive (pt.1-3) COMPLETE.**
 - **OTA-501 "Curium Nudge" — [polish] Hidden Market "?" tuning** *(element #96)*. Player: the "?" was too big
   and slightly off. Shrank it ~30% (MapScreen `hiddenMarketQ` fontSize 26→18) and moved the market **6 grid
   cells east + 1 south** (`hiddenLocations.ts` fx 0.51→0.66, fy 0.23→0.275). Those fx/fy drive BOTH the
