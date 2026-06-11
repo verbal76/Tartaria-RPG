@@ -105,6 +105,17 @@ describe('OTA-503 — grid-event lifecycle (pending → done by route id)', () =
     expect(pickResolvedEvent(here, undefined)).toBeNull();              // walked in blind → ambiguous
   });
 
+  it('OTA-506 — a contract event stays pending until completion (seal), tagged source:contract', () => {
+    let wm = emptyMemory();
+    wm = registerCanonLocation(wm, { id: 'contract_mud_monarchs', name: 'Mud Monarchs: relic', source: 'contract', gx: 30, gy: 20, marker: 'pending' });
+    const ev = wm.canonLocations![0]!;
+    expect(ev.source).toBe('contract');
+    expect(ev.marker).toBe('pending'); // not arrival-resolved; resolveGridEventAt skips source:'contract'
+    // sealing the alliance flips it to done
+    wm = setCanonLocationMarker(wm, 'contract_mud_monarchs', 'done');
+    expect(wm.canonLocations![0]!.marker).toBe('done');
+  });
+
   it('two events can share a cell; resolving one leaves the other pending', () => {
     let wm = emptyMemory();
     // market (a plain place) + gun-guy (a pending event) at the same cell (50,18)

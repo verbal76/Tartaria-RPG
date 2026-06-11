@@ -14090,4 +14090,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // marker per event with the same letterbox/pan/zoom math as the Hidden Market "?" (static, atlas-anchored).
 // No name on the map — travel is the list row. Test: __tests__/canonicalGrid.test.ts (cell↔fraction round-trip).
 // NEXT (stage 3): wire contracts to canonize the same way whispers do. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-505';
+// OTA-506 (Mendelevium Pact) — [feature] keyed grid-events, stage 3: CONTRACTS wired. Opening a broker
+// parley now canonizes a pending grid event at EACH faction's relic location (id `contract_<faction>`,
+// source:'contract', co-located with the static location but a distinct id) → a yellow "?" appears at both;
+// sealing the alliance flips both to "X" (done). Contracts resolve on COMPLETION, not arrival, so
+// resolveGridEventAt now SKIPS source:'contract' events (walking up to a relic site doesn't auto-complete the
+// pact — only the seal does; whisper/default events still fire on arrival). handleBroker open+seal hooks.
+// Test: __tests__/canonLocations.test.ts. The keyed-grid-events arc (stages 1-3) is now COMPLETE: whispers +
+// contracts both drop "?"/"X" markers, resolve by route-id / completion, on the exact grid. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-506';

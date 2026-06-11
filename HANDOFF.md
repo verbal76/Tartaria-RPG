@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-506 "Mendelevium Pact" — [feature] keyed grid-events, stage 3: CONTRACTS wired** *(element #101)*.
+  Opening a broker parley canonizes a pending grid event at EACH faction's relic location
+  (`contract_<faction>`, source:'contract', co-located with the static location but a distinct id) → a yellow
+  "?" at both; sealing the alliance flips both to "X". Contracts resolve on COMPLETION, not arrival, so
+  `resolveGridEventAt` now SKIPS source:'contract' events (walking up to a relic site doesn't complete the
+  pact — only the seal does; whisper/default events still fire on arrival). `handleBroker` open+seal hooks.
+  Test: `__tests__/canonLocations.test.ts`. **The keyed-grid-events arc (stages 1-3) is COMPLETE** — whispers
+  + contracts both drop "?"/"X" markers, resolve by route-id / completion, on the exact grid. `gameStore.ts`.
 - **OTA-505 "Fermium Mark" — [feature] keyed grid-events, stage 2: the "?"/"X" MAP MARKERS** *(element #100)*.
   Generalized the Hidden Market overlay: every PENDING grid event (whisper/contract objective) renders a
   yellow "?" at its canonical cell, flipping to a red "✕" once resolved (OTA-503/504 lifecycle). New

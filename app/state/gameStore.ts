@@ -893,6 +893,16 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
         .filter((it) => (it.quantity ?? 1) > 0);
     }
     setStore((s) => (s.player ? { player: { ...s.player, inventory: inv, brokerMission: { ...mission!, done: true } } } : s));
+    // OTA-506 — contract complete: flip both faction relic events "?" → "X".
+    {
+      const wm = getStore().worldMemory;
+      let next = wm;
+      for (const l of legs) next = setCanonLocationMarker(next, `contract_${(l as { factionId: string }).factionId}`, 'done');
+      if (next !== wm) {
+        setStore(() => ({ worldMemory: next }));
+        setCanonExtraLocations(next.canonLocations ?? []);
+      }
+    }
     getStore().appendLog('world',
       `You lay both relics on the parley stone. ${legs[0].factionName} and ${legs[1].factionName} take their due — and, grudgingly, each other's hand. The alliance is brokered.`);
     recordTitleProgress(getStore, setStore, { alliancesBrokered: 1 });
@@ -905,6 +915,18 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
     if (!picked) { getStore().appendLog('world', 'No two factions will sit with you on neutral ground right now.'); return; }
     mission = { factionA: picked[0], factionB: picked[1] };
     setStore((s) => (s.player ? { player: { ...s.player, brokerMission: mission } } : s));
+    // OTA-506 — the parley contract becomes grid events: a yellow "?" at each
+    // faction's relic location (co-located with that static location, different id),
+    // flipped to a red "X" when the alliance is sealed below.
+    for (const l of (broker.missionLegs(mission) ?? [])) {
+      const cell = canonicalCellFor((l as { tileId: string }).tileId);
+      getStore().canonizeLocation({
+        id: `contract_${(l as { factionId: string }).factionId}`,
+        name: `${(l as { factionName: string }).factionName}: ${(l as { itemName: string }).itemName}`,
+        type: 'contract', danger: 2, source: 'contract',
+        gx: cell.x, gy: cell.y, marker: 'pending',
+      });
+    }
   }
   if (mission.done) { getStore().appendLog('world', 'The alliance you brokered here holds.'); return; }
   const legs = broker.missionLegs(mission);
@@ -1658,7 +1680,11 @@ function resolveGridEventAt(
   wm: WorldMemory,
   routedId?: string | null,
 ): WorldMemory {
-  const pending = (wm.canonLocations ?? []).filter((l) => l.marker === 'pending');
+  const pending = (wm.canonLocations ?? []).filter(
+    // OTA-506 — only ARRIVAL-resolved events (whispers/default) fire by walking up;
+    // 'contract' events resolve on completion (the seal/turn-in), not on arrival.
+    (l) => l.marker === 'pending' && l.source !== 'contract',
+  );
   if (pending.length === 0) return wm;
   const cur = canonicalCellFor(player.currentLocationId);
   const px = cur.x + ((player.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X);
