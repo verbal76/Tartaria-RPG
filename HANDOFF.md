@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-488 "Bismuth Sieve" — [bugfix] foreign word in narration TEXT (corrects 487's misdiagnosis)**
+  *(element #83)*. Player clarified: *"it was text, it didn't speak it. there was huà in the text."* So the
+  Vietnamese/Chinese leak is the local **Qwen model code-switching a foreign word** into the English Arbiter
+  narration — NOT a voice bug (487's en-US TTS pin stays as a harmless safety net). Fix: new
+  `app/engine/foreignText.ts` `stripForeignWords` drops any word carrying a foreign letter (CJK/Cyrillic/
+  Greek/Thai/etc., accented Latin, or pinyin/Vietnamese tone mark); keeps English + stylized punctuation
+  (smart quotes, em dash, ellipsis, × tags). Range-based, no `\p{}` escapes (Hermes-safe). Wired into
+  `narrateViaArbiter` before sentence-cap/trim; empties → existing template fallback. Test:
+  `__tests__/stripForeignWords.test.ts`. `gameStore.ts`. (Other model-narration sites, e.g. investigation
+  one-liners, still raw — apply the same sieve there if it recurs.)
 - **OTA-487 "Lead Bonding" — [bugfix] system TTS spoke VIETNAMESE** *(element #82)*. Player: *"why did it
   speak Vietnamese to my daughter?"* Cause: `TTSManager`'s `Speech.speak` (the system-engine fallback) never
   set a `language`. Narration is always English, but with no system voice configured (`voiceId` defaults to

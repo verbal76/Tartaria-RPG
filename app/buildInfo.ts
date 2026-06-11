@@ -13940,4 +13940,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // always selects an English voice/locale regardless of the device default — matching how STTManager already
 // pins en-US. Regression test: __tests__/ttsLanguagePinnedEnglish.test.ts. app/voice/TTSManager.ts.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-11-487';
+// OTA-488 (Bismuth Sieve) — [bugfix] FOREIGN WORD IN NARRATION TEXT. Correction to OTA-487: the Vietnamese
+// wasn't spoken, it was TEXT — the local Qwen model code-switched a foreign word ("huà", romanized Chinese
+// 话) into the English Arbiter narration. (487's en-US TTS pin stays as a harmless safety net but wasn't the
+// cause.) Fix: new app/engine/foreignText.ts `stripForeignWords` drops any whitespace-delimited word carrying
+// a foreign letter — CJK/Cyrillic/Greek/Thai/etc., an accented Latin letter, or a pinyin/Vietnamese tone mark
+// — keeping English + stylized punctuation (smart quotes, em dash, ellipsis, × tags) intact. Range-based, no
+// \p{} escapes (Hermes-safe). Applied in narrateViaArbiter BEFORE sentence-cap/trim; if it empties the line
+// the existing template fallback restores it. Regression test: __tests__/stripForeignWords.test.ts.
+// app/state/gameStore.ts. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-11-488';

@@ -68,6 +68,7 @@ import {
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
+import { stripForeignWords } from '../engine/foreignText';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
@@ -25541,9 +25542,15 @@ async function narrateViaArbiter(
     // ending like "...each stroke echoing in the". Falls back to the raw
     // text only when nothing terminal-punctuated is present, then to the
     // template if that's empty.
+    // OTA-488 — drop any foreign-language word the local model code-switched
+    // into the English narration (playtester saw "huà" — romanized Chinese — in
+    // the feed). Done FIRST so sentence-capping / trimming operate on the cleaned
+    // English; if it empties the line, the `|| trimmed` fallback below restores
+    // the template.
+    const deforeigned = stripForeignWords(text);
     // Cap sentences before trimming so we never emit the 4-sentence
     // hallucination paragraphs the playtest log caught.
-    const capped = clampSentences(text, ctx.in_combat ? 1 : 2);
+    const capped = clampSentences(deforeigned, ctx.in_combat ? 1 : 2);
     // Anti-third-person filter. Qwen still occasionally writes "The
     // player paused..." despite the prompt. Drop those sentences and
     // fall back to the template if NOTHING usable survives, so the
