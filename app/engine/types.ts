@@ -632,6 +632,13 @@ export interface PlayerEquipped {
    *  pouched torch fires faster than digging through the pack.
    *  Cap enforced in stowItem (gameStore action). */
   toolPouchIds?: string[];
+  /** arb110 — the BANDOLIER: up to 5 one-shot THROWABLES (items tagged
+   *  `throwable` — Shaped Aetheric Shard, Disease Sample, …) loaded for fast use.
+   *  Like toolPouchIds, the items stay in player.inventory; this tracks WHICH ones
+   *  (by instance id) are racked. In combat a Bandolier button opens a popup and
+   *  tapping an item throws it (full attack + status), decrementing the stack and
+   *  clearing the slot when it empties. Cap enforced in stowInBandolier. */
+  bandolierIds?: string[];
 
   // Legacy fields kept on the type so existing saves still deserialize
   // cleanly. backfillPlayer migrates them to the new slot shape.

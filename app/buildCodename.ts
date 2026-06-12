@@ -1055,6 +1055,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-11-520': 'Moscovium Split',
   '2026-06-11-521': 'Livermorium Fold',
   '2026-06-11-522': 'Tennessine Twin',
+  '2026-06-11-523': 'Oganesson Sling',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -13,6 +13,7 @@ import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
+import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
@@ -133,6 +134,7 @@ export function InventoryScreen() {
   // the equip modal entirely when pouchFilterActive — a single tap
   // on the eligible item stows it and clears the filter.
   const stowInPouch = useGameStore((s) => s.stowInPouch);
+  const stowInBandolier = useGameStore((s) => s.stowInBandolier);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -167,6 +169,8 @@ export function InventoryScreen() {
   // eligible item stows it and clears the filter. Cancel button or
   // toggling the slot off also clears.
   const [pouchFilterActive, setPouchFilterActive] = useState(false);
+  // arb110 — bandolier fill mode (mutually exclusive with the pouch fill mode).
+  const [bandolierFilterActive, setBandolierFilterActive] = useState(false);
   // arb108 — per-category collapse. Tapping a section header folds that whole
   // category away so the player can skip past Weapons/Armor to reach Materials /
   // Food without scrolling through every row. Keyed by category id; default open.
@@ -201,7 +205,10 @@ export function InventoryScreen() {
     : player.inventory;
   const filtered = pouchFilterActive
     ? queryFiltered.filter((i) => isPouchEligible(i, player).eligible)
-    : queryFiltered;
+    // arb110 — bandolier fill mode narrows the list to throwables.
+    : bandolierFilterActive
+      ? queryFiltered.filter((i) => isBandolierEligible(i, player).eligible)
+      : queryFiltered;
   // arb-fix — the FUSABLE tab is a filter, not just a sort: narrow to items
   // that qualify for the Crucible (reserved or not).
   const fusionFiltered = sortKey === 'fusionable'
@@ -340,6 +347,12 @@ export function InventoryScreen() {
     if (pouchFilterActive) {
       stowInPouch(item.name);
       setPouchFilterActive(false);
+      return;
+    }
+    // arb110 — same direct-stow path for the bandolier fill mode.
+    if (bandolierFilterActive) {
+      stowInBandolier(item.name);
+      setBandolierFilterActive(false);
       return;
     }
     setScrapResult(null); // fresh modal — clear any prior result
@@ -795,8 +808,24 @@ export function InventoryScreen() {
         <ToolPouchBanner
           player={player}
           pouchFilterActive={pouchFilterActive}
-          onTapEmptySlot={() => setPouchFilterActive((v) => !v)}
+          onTapEmptySlot={() => { setBandolierFilterActive(false); setPouchFilterActive((v) => !v); }}
         />
+        {/* arb110 — BANDOLIER (throwables), mutually exclusive fill mode with the pouch. */}
+        <BandolierBanner
+          player={player}
+          filterActive={bandolierFilterActive}
+          onTapEmptySlot={() => { setPouchFilterActive(false); setBandolierFilterActive((v) => !v); }}
+        />
+        {bandolierFilterActive && (
+          <View style={styles.pouchFilterBanner}>
+            <Text style={styles.pouchFilterText}>
+              Tap a throwable below to rack it on your bandolier.
+            </Text>
+            <TouchableOpacity onPress={() => setBandolierFilterActive(false)} style={styles.pouchFilterCancel}>
+              <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {/* OTA-269 — filter active callout. Shows when the player
             has tapped an empty pouch slot above; the inventory below
             is now narrowed to pouch-eligible tools. CANCEL clears
@@ -846,11 +875,11 @@ export function InventoryScreen() {
                   equippedSlotLabel={equippedSlotLabelFor(item)}
                   fillSlotLabel={slotFillLabelFor(item)}
                   isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
+                  isBandoliered={(player.equipped?.bandolierIds ?? []).includes(item.id)}
                   // arb105 — the red ✗ means "this item's EQUIP slot is already
-                  // worn". In pouch-stow mode (player tapped an empty pouch slot,
-                  // list filtered to eligible tools) the player isn't equipping —
+                  // worn". In pouch/bandolier fill mode the player isn't equipping —
                   // a scanner's off-hand being full is irrelevant — so suppress it.
-                  slotTaken={!pouchFilterActive && itemSlotTaken(item)}
+                  slotTaken={!pouchFilterActive && !bandolierFilterActive && itemSlotTaken(item)}
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                 />
@@ -1050,6 +1079,101 @@ const pouchStyles = StyleSheet.create({
   slotEmptyTextActive: { color: '#c9a86a' },
 });
 
+// arb110 — BANDOLIER banner. The throwables counterpart to the tool pouch: five
+// slots that rack one-shot throwables (Shaped Aetheric Shard, Disease Sample, …).
+// In combat a Bandolier button opens a popup and tapping an item throws it.
+function BandolierBanner({
+  player,
+  filterActive,
+  onTapEmptySlot,
+}: {
+  player: PlayerCharacter;
+  filterActive: boolean;
+  onTapEmptySlot: () => void;
+}) {
+  const BANDOLIER_MAX = 5;
+  const ids = player.equipped?.bandolierIds ?? [];
+  const removeFromBandolier = useGameStore((s) => s.removeFromBandolier);
+  const slots: Array<{ name: string | null; qty: number }> = [];
+  for (let i = 0; i < BANDOLIER_MAX; i++) {
+    const id = ids[i];
+    const item = id ? player.inventory.find((it) => it.id === id) : undefined;
+    slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0 });
+  }
+  return (
+    <View style={bandolierStyles.banner}>
+      <Text style={bandolierStyles.title}>BANDOLIER</Text>
+      <Text style={bandolierStyles.hint}>Ready-to-throw (5 slots). Tap an empty slot to rack a throwable; in combat, tap the bandolier to hurl one.</Text>
+      <View style={bandolierStyles.row}>
+        {slots.map((slot, idx) => (
+          <View key={idx} style={bandolierStyles.slot}>
+            {slot.name ? (
+              <TouchableOpacity
+                style={bandolierStyles.slotFilled}
+                activeOpacity={0.7}
+                onPress={() => removeFromBandolier(slot.name!)}
+              >
+                <Text style={bandolierStyles.slotName} numberOfLines={1}>
+                  {slot.name}{slot.qty > 1 ? ` ×${slot.qty}` : ''}
+                </Text>
+                <Text style={bandolierStyles.slotAction}>tap to unrack</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[bandolierStyles.slotEmpty, filterActive && bandolierStyles.slotEmptyActive]}
+                activeOpacity={0.7}
+                onPress={onTapEmptySlot}
+              >
+                <Text style={[bandolierStyles.slotEmptyText, filterActive && bandolierStyles.slotEmptyTextActive]}>
+                  {filterActive ? 'pick a throwable ↓' : '+ rack throw'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const bandolierStyles = StyleSheet.create({
+  banner: {
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    backgroundColor: '#1d1411',
+    borderColor: '#5a3a30',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
+  title: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
+  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  row: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  slot: { flexBasis: '18%', flexGrow: 1 },
+  slotFilled: {
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+    borderColor: '#e07a5f',
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#2a1a14',
+  },
+  slotEmpty: {
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#13110f',
+    alignItems: 'center',
+  },
+  slotEmptyActive: { backgroundColor: '#2a1a14', borderColor: '#e07a5f' },
+  slotName: { color: '#e6d8b3', fontSize: 10, fontWeight: '700' },
+  slotAction: { color: '#7a705c', fontSize: 8, marginTop: 2 },
+  slotEmptyText: { color: '#9ec96a', fontSize: 9, fontWeight: '600', letterSpacing: 0.3, textAlign: 'center' },
+  slotEmptyTextActive: { color: '#e07a5f' },
+});
+
 // OTA-485 — companion signature colours, keyed to the hues each name renders in
 // (StatsPanel: dogName #c9a86a gold, golemName #9888a8 purple).
 // OTA-489 — player asked to "keep the translucence but bump the saturation": same
@@ -1090,6 +1214,7 @@ function ItemRow({
   equippedSlotLabel,
   fillSlotLabel,
   isPouched,
+  isBandoliered,
   slotTaken,
   stripeColor,
   onPress,
@@ -1100,6 +1225,7 @@ function ItemRow({
   equippedSlotLabel: string;
   fillSlotLabel: string;
   isPouched: boolean;
+  isBandoliered: boolean;
   slotTaken: boolean;
   stripeColor: string | null;
   onPress: () => void;
@@ -1171,6 +1297,7 @@ function ItemRow({
           {/* arb58 — mark items currently stowed in the tool pouch so the
               player can see at a glance which pack items are pouched. */}
           {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[tool pouch]</Text>}
+          {isBandoliered && <Text style={[styles.rowMeta, styles.rowBandolier]}>[bandolier]</Text>}
           {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
           {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}
           {/* OTA 028 — surface the weapon's damage dice next to
@@ -1352,6 +1479,7 @@ const styles = StyleSheet.create({
   // an applied toxin distinct from the green damage-dice chip.
   rowCoating: { color: '#b08fd4', fontWeight: '700' },
   rowPouch: { color: '#c9a86a', fontWeight: '700' },
+  rowBandolier: { color: '#e07a5f', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },

@@ -183,6 +183,7 @@ import {
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
+import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
 import {
@@ -1342,6 +1343,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // explicitly stows items into it via the `stow <item>` verb or
     // the InventoryScreen TOOL POUCH section.
     toolPouchIds: Array.isArray(eq.toolPouchIds) ? eq.toolPouchIds : [],
+    // arb110 — Bandolier (5 throwable slots). Empty on legacy saves; the player
+    // racks throwables via the InventoryScreen BANDOLIER section.
+    bandolierIds: Array.isArray(eq.bandolierIds) ? eq.bandolierIds : [],
   };
   // v2.4.1 (OTA 029) — never let currentLocationId be undefined.
   // The hub system, scene rebuild, mapX/mapY math, atlas marker
@@ -2396,6 +2400,14 @@ interface GameStore {
    *  `use <item>` verb a faster resolution path. */
   stowInPouch: (itemName: string) => void;
   unpouchItem: (itemName: string) => void;
+  /** arb110 — Bandolier (max 5 throwables). Rack a throwable by name; it stays in
+   *  inventory but surfaces in the InventoryScreen BANDOLIER section + the combat
+   *  bandolier popup. removeFromBandolier pulls it back out. throwFromBandolier
+   *  hurls one unit at the active enemy (full attack + status), clearing the slot
+   *  when the stack empties. */
+  stowInBandolier: (itemName: string) => void;
+  removeFromBandolier: (itemName: string) => void;
+  throwFromBandolier: (itemName: string) => void;
   /** Drop one of the named item from the player's inventory onto the
    *  ground of the current room (worldMemory.visitedRooms[key].droppedItems).
    *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
@@ -19045,6 +19057,98 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       : s);
     get().appendLog('world', `You move ${item.name} back into your pack.`);
+    void get().persist();
+  },
+
+  // arb110 — Bandolier: rack a throwable (mirrors stowInPouch but the positive gate
+  // is "is a throwable", cap 5).
+  stowInBandolier(itemName) {
+    const BANDOLIER_MAX = 5;
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      return;
+    }
+    const eligibility = isBandolierEligible(item, player);
+    if (!eligibility.eligible) {
+      get().appendLog('arbiter', `The Arbiter looks at the ${item.name}. "${eligibility.reason}."`);
+      return;
+    }
+    const current = player.equipped?.bandolierIds ?? [];
+    if (current.length >= BANDOLIER_MAX) {
+      get().appendLog('arbiter', `The Arbiter taps the bandolier. "Five loops, five throws. Pull one before you rack another."`);
+      return;
+    }
+    set((s) => s.player
+      ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), bandolierIds: [...current, item.id] } } }
+      : s);
+    get().appendLog('world', `You rack ${item.name} on your bandolier. Ready to throw.`);
+    void get().persist();
+  },
+
+  removeFromBandolier(itemName) {
+    const player = get().player;
+    if (!player) return;
+    const current = player.equipped?.bandolierIds ?? [];
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter looks at the bandolier. "${itemName} isn't racked."`);
+      return;
+    }
+    set((s) => s.player
+      ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), bandolierIds: current.filter((id) => id !== item.id) } } }
+      : s);
+    get().appendLog('world', `You pull ${item.name} off the bandolier and back into your pack.`);
+    void get().persist();
+  },
+
+  // arb110 — hurl one unit of a racked throwable at the active enemy. Reuses the
+  // full OTA-208 throw path (synthesized weapon damage + on-hit status + consume +
+  // auto-unequip) by transiently equipping the throwable to the off hand, attacking,
+  // then restoring the player's real off hand. submitPlayerAction resolves combat
+  // synchronously, so the equip→attack→restore happens in one tick (no visible
+  // churn). When the stack empties, the slot is cleared off the bandolier.
+  throwFromBandolier(itemName) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
+      return;
+    }
+    const prevOff = player.equipped?.off;
+    const prevOffId = player.equipped?.offId;
+    // Rack the throwable in the off hand and hurl it.
+    set((s) => s.player
+      ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), off: item.name, offId: item.id } } }
+      : s);
+    get().submitPlayerAction(`attack with the off-hand ${item.name}`);
+    // Did the stack survive the throw?
+    const after = get().player;
+    const stillHas = !!after?.inventory.some((i) => i.id === item.id && i.quantity > 0);
+    // Restore the prior off hand — unless what was there IS the now-spent throwable
+    // (it's gone from inventory), in which case leave the hand empty.
+    set((s) => {
+      if (!s.player) return s;
+      const eq = { ...(s.player.equipped ?? {}) };
+      const danglingSpent = prevOffId === item.id && !stillHas;
+      if (prevOff && !danglingSpent) eq.off = prevOff; else delete eq.off;
+      if (prevOffId && !danglingSpent) eq.offId = prevOffId; else delete eq.offId;
+      // Clear the slot off the bandolier once the stack is empty.
+      if (!stillHas) {
+        eq.bandolierIds = (eq.bandolierIds ?? []).filter((id) => id !== item.id);
+      }
+      return { player: { ...s.player, equipped: eq } };
+    });
     void get().persist();
   },
 

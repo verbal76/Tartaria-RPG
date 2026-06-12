@@ -126,6 +126,13 @@ function shortWeaponLabel(name: string): string {
 
 export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
+  // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
+  // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
+  const [bandolierOpen, setBandolierOpen] = useState(false);
+  const bandolierIds = useGameStore((s) => s.player?.equipped?.bandolierIds ?? []);
+  const bandolierItems = bandolierIds
+    .map((id) => inventory.find((it) => it.id === id))
+    .filter((it): it is InventoryItem => !!it && it.quantity > 0);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
 
@@ -424,6 +431,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {knockedOutPresent ? (
                 <QuickBtn label="loot" tone="ready" onPress={() => useGameStore.getState().lootKnockedOutEnemy()} />
               ) : null}
+              {/* arb110 — bandolier: opens a popup of racked throwables to hurl. */}
+              {bandolierItems.length > 0 ? (
+                <QuickBtn label={`✦ bandolier (${bandolierItems.length})`} tone="ready" onPress={() => setBandolierOpen((v) => !v)} />
+              ) : null}
             </View>
 
             <View style={styles.quickRowLine}>
@@ -501,6 +512,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <Text style={styles.dogPickerLabel}>DISTRACT</Text>
             <Text style={styles.dogPickerHint}>pounces + barks · +1 init, +2 atk next swing</Text>
           </Pressable>
+        </View>
+      ) : null}
+      {/* arb110 — bandolier throw popup: one button per racked throwable; tap to hurl. */}
+      {inCombat && bandolierOpen && bandolierItems.length > 0 ? (
+        <View style={styles.bandolierPicker}>
+          {bandolierItems.map((it) => (
+            <Pressable
+              key={it.id}
+              onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name); }}
+              style={styles.bandolierPickerBtn}
+            >
+              <Text style={styles.bandolierPickerLabel} numberOfLines={1}>{it.name.toUpperCase()}</Text>
+              <Text style={styles.bandolierPickerHint}>hurl{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
+            </Pressable>
+          ))}
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
@@ -658,6 +684,21 @@ const styles = StyleSheet.create({
   },
   dogPickerLabel: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
   dogPickerHint: { color: '#8a7e66', fontSize: 10, marginTop: 4, textAlign: 'center' },
+  // arb110 — bandolier throw popup (orange accent, wraps for up to 5 items).
+  bandolierPicker: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
+  bandolierPickerBtn: {
+    flexBasis: '31%',
+    flexGrow: 1,
+    backgroundColor: '#1d1411',
+    borderColor: '#5a3a30',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 9,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  bandolierPickerLabel: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  bandolierPickerHint: { color: '#8a7e66', fontSize: 9, marginTop: 3, textAlign: 'center' },
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
   travelBtn: {
     flex: 1,

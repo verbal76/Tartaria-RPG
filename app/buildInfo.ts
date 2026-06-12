@@ -14240,4 +14240,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (single source) that groupInventoryByCategory fans out over; the consume paths are untouched (they always
 // operated on the one stack). Improvised `thrown` junk (rocks) is NOT a real weapon (validSlotsForItem ignores
 // `thrown`), so it stays Materials-only. app/components/InventoryCategorize.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-522';
+// OTA-523 (Oganesson Sling) — [feature] the BANDOLIER — a 5-slot throwables container (the throwables
+// counterpart to the tool pouch). New player.equipped.bandolierIds (backfilled []). In inventory a BANDOLIER
+// banner sits under the tool pouch in the weapons area: tap an empty slot → the list filters to your throwables
+// (items tagged `throwable` — Shaped Aetheric Shard, Disease Sample, … NOT improvised `thrown` rocks) → tap one
+// to rack it; tap a filled slot to pull it back. Racked items stay in the pack (tagged [bandolier]) and the pouch
+// vs bandolier fill modes are mutually exclusive. In COMBAT a "✦ bandolier" button opens a popup of racked
+// throwables; tapping one hurls it via throwFromBandolier, which reuses the full OTA-208 throw path (synthesized
+// damage + on-hit status like the Disease-Sample DoT + consume + auto-unequip) by transiently equipping it to the
+// off hand, attacking, then restoring the prior off hand — clearing the slot when the stack empties. New
+// app/engine/bandolierEligibility.ts; store actions stowInBandolier/removeFromBandolier/throwFromBandolier;
+// app/screens/InventoryScreen.tsx; app/components/InputBox.tsx; types.ts + backfill. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-523';

@@ -378,6 +378,19 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-523 "Oganesson Sling" — [feature] the BANDOLIER (5-slot throwables container + combat throw popup)**
+  *(element #118)*. The throwables counterpart to the tool pouch. New `player.equipped.bandolierIds` (backfilled
+  `[]`). Inventory: a BANDOLIER banner under the tool pouch — tap an empty slot → list filters to throwables
+  (tag `throwable`: Shaped Aetheric Shard, Disease Sample, Sentinel Core Plate, … NOT improvised `thrown` rocks)
+  → tap to rack; tap a filled slot to unrack. Racked items stay in the pack (`[bandolier]` tag); pouch/bandolier
+  fill modes are mutually exclusive. Combat: a "✦ bandolier" button opens a popup of racked throwables; tapping
+  one hurls it via `throwFromBandolier`, which **reuses the full OTA-208 throw path** (synth damage + on-hit
+  status incl. Disease-Sample DoT + consume + auto-unequip) by transiently equipping to the off hand, attacking,
+  then restoring the prior off hand; clears the slot when the stack empties. New
+  `app/engine/bandolierEligibility.ts`; store `stowInBandolier`/`removeFromBandolier`/`throwFromBandolier`;
+  `InventoryScreen.tsx`; `InputBox.tsx`; `types.ts` + backfill. Test `bandolier.test.ts` (rack/unrack/eligibility/
+  cap). Built from a full system-map agent pass. **Follow-ups noted:** dual-category throwables show twice in the
+  fill list (harmless — both tap-stow the same id).
 - **OTA-522 "Tennessine Twin" — [feature] dual-category listing (weapon + material) for throwable reagents**
   *(element #117)*. A crafting MATERIAL that is also a deliberate thrown WEAPON (the `throwable` tag — what
   `validSlotsForItem` routes to a hand: Disease Sample, Sentinel Core Plate) now lists under BOTH Weapons and
