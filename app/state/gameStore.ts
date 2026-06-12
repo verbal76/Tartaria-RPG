@@ -3693,6 +3693,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activeBuildingId: null,
       activeBuildingRoomId: null,
       buildingRevealed: [],
+      // arb119 — a fresh game must not inherit a stale open call-dog modal
+      // (a transient UI flag that otherwise survives from a prior session).
+      callDogModalOpen: false,
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -9216,8 +9219,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // arb37 — gate on stamina + corruption only (rest no longer
           // touches HP). A wounded-but-rested player is pointed at food,
           // not told to sleep off the wound.
+          // arb119 — a benched dog (waiting_at_base, e.g. left at a climb
+          // origin) rejoins when you make camp, so DON'T short-circuit the rest
+          // if there's a dog to recall — otherwise a full-stamina player could
+          // never call the dog back down by resting (the restore lives below).
+          const dogToRecall = player.dog?.status === 'waiting_at_base';
           const fullyRested =
-            stamRoom === 0 && (player.corruption ?? 0) === 0;
+            stamRoom === 0 && (player.corruption ?? 0) === 0 && !dogToRecall;
           if (fullyRested) {
             get().appendLog(
               'arbiter',

@@ -69,6 +69,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { TUTORIAL_STEPS } from '../app/components/tutorialSteps';
 import { findVendorByName } from '../app/engine/vendors';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../app/engine/worldMap';
 import type { ScreenName } from '../app/engine/types';
 
 // The 11 canonical screens — must all be reachable and returnable.
@@ -479,6 +480,15 @@ describe('Meta navigation stress', () => {
                 // doesn't read as a leak.
                 .sort((a: any, b: any) => String(a.id).localeCompare(String(b.id)));
             }
+            // mapX/mapY are the DERIVED visual frame, re-centered to the world
+            // center on every load by design (arb29); gridX/gridY is the
+            // authoritative position and round-trips. Strip the visual coords
+            // from the integrity diff the same way catalog-derived item fields
+            // are stripped — a real corruption is still caught by the
+            // critical-field check (which flags any mapX/mapY drift to a
+            // NON-center value).
+            delete o.mapX;
+            delete o.mapY;
             return JSON.stringify(o);
           };
           const preNorm = stripBackfills(preSnap);
@@ -508,15 +518,16 @@ describe('Meta navigation stress', () => {
           const postObj = JSON.parse(postSnap);
           for (const critical of ['hp', 'hpMax', 'stamina', 'staminaMax', 'tc', 'currentLocationId', 'hoursElapsed', 'mapX', 'mapY', 'hubRoomId']) {
             if (JSON.stringify(preObj[critical]) !== JSON.stringify(postObj[critical])) {
-              // Documented map-calibration migration (gameStore load path):
-              // coords on the OLD calibration (mapX<=14 && mapY<=14) snap to
-              // the new world center on rehydrate. That's an intentional
-              // one-way migration, not a save corruption, so don't flag a
-              // mapX/mapY drift that originates from a low (old-cal) coord.
-              if ((critical === 'mapX' || critical === 'mapY')
-                && (preObj.mapX ?? 99) <= 14 && (preObj.mapY ?? 99) <= 14) {
-                continue;
-              }
+              // mapX/mapY are the DERIVED visual frame, not authoritative
+              // position — gridX/gridY is the source of truth (preserved across
+              // load). By design (arb29 re-centered model) the load path snaps
+              // the visual frame to the world CENTER, treating the player as
+              // standing at their current location; the dot re-derives from
+              // gridX/gridY on the next step. So a mapX/mapY drift whose
+              // post-load value is the world center is the intended re-center,
+              // not corruption — skip it. (A drift to anything ELSE still fails.)
+              if (critical === 'mapX' && postObj.mapX === WORLD_MAP_CENTER_X) continue;
+              if (critical === 'mapY' && postObj.mapY === WORLD_MAP_CENTER_Y) continue;
               stateLeaks.push(`save/load iter ${iter}: critical field ${critical} drifted ${preObj[critical]}→${postObj[critical]}`);
             }
           }

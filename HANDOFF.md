@@ -378,6 +378,22 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-533 "Unbioctium Tether" — [bugfix] two companion/UI state fixes** *(element #128)*. Found while clearing
+  the test backlog. (1) **Dog recall** — a dog benched at a climb origin (`waiting_at_base`) is meant to rejoin
+  when you `rest`, but the "already fully rested, save the hours" early-return fired first, so a full-stamina
+  player could never recall the dog by resting. The short-circuit now yields when there's a benched dog, so the
+  rejoin/heal path runs. (2) **Stale modal** — `startNewGame` didn't reset `callDogModalOpen`, so a fresh game
+  could inherit a still-open call-dog modal; now cleared. `app/state/gameStore.ts`. Tests `dogTravelClimb`,
+  `parserFuzzWithDogVerbs`.
+  - **Test-board cleanup (no shipped behavior change):** alongside this, ~16 stale/over-strict test suites were
+    fixed to match deliberate prior behavior (stealth stat, OTA-441 forage caps, OTA-526 categorization, food
+    preview, voice/lore/apk pointers, item-gate resolver, steal-rolls-stealth, parser `grapple` example,
+    inferred-preview contract, OTA-356 climb tripwire, OTA-348 stealth steal, arb29 map re-centering in
+    metaNavStress). Remaining red (tracked): `variableRewards`/`engagementSmoke`/`interactionStress` (harness
+    must walk novel outdoor tiles vs. anti-farm gates), `questProgressionAudit` (scaleHuntBoss not spawning in
+    test env), `atlasCoords`/`atlasIdw` (need the map image to adjudicate inset coords + dot snap),
+    `stealthGearAndFusion`, `combatStress` (700-day sim, real failure TBD). Flaky-not-real (pass alone):
+    `yearSimulation`, `armorRegenApply`, `dogSystemPerfSmoke`, `engineStateChaosSim`.
 - **OTA-532 "Unbiseptium Ledger" — [bugfix] whole-game degenerate-exploit hardening (5-agent red-team sweep)**
   *(element #127)*. Sweep covered economy/crafting, progression/rep, quests/companions, survival/save, and
   world/exploration. **Seven live exploits closed:** (1) **Rep farm** — vendor buy (+1) / gift (+5) ran faction

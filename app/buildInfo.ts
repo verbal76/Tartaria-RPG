@@ -14339,4 +14339,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `||`. Plus a survival cap: parser-rest / food now refill stamina against effectiveStaminaMax (hunger-adjusted),
 // not the raw ceiling. app/engine/factions.ts, app/engine/scrapEngine.ts, app/engine/vendors.ts,
 // app/engine/digging.ts, app/engine/types.ts, app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-532';
+// OTA-533 (Unbioctium Tether) — [bugfix] two companion/UI state fixes surfaced while clearing the test
+// backlog. (1) DOG RECALL — a dog benched at a climb origin (status waiting_at_base) is supposed to rejoin
+// when you make camp (rest), but the rest action's "you're already fully rested, save the hours" early-return
+// fired FIRST, so a full-stamina player could never call the dog back down by resting. The fully-rested
+// short-circuit now yields when there's a benched dog to recall, so the rejoin path (which heals + restores the
+// dog) actually runs. (2) STALE MODAL — startNewGame reset many flags but not callDogModalOpen, so a fresh
+// game could inherit a still-open call-dog modal from a prior session; it's now cleared on new-game. app/state/
+// gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-533';
