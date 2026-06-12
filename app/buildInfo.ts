@@ -14211,4 +14211,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // mark. But in pouch-stow mode (player tapped an empty pouch slot → list filtered to eligible tools) the player
 // isn't equipping, so the equip-slot state is irrelevant and the "✗" was misleading. Now suppressed whenever
 // `pouchFilterActive`. app/screens/InventoryScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-518';
+// OTA-519 (Flerovium Vitals) — [feature] the inventory action buttons for eating / feeding / healing now show the
+// TARGET's current HP so you can see if they still need it: the player's eat/drink button reads "Use (eat)
+// 13/16", the dog feed reads "Feed Rocky 13/16", and the golem button reads "Heal <name> 8/12" — and the golem
+// action is renamed from "Repair" to "Heal" (also updated the CharacterScreen golem subline "Heal by feeding it
+// the parts it's made of."). app/screens/InventoryScreen.tsx, app/screens/CharacterScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-519';

@@ -486,8 +486,11 @@ export function InventoryScreen() {
     // the dedicated Equip button only.
     const useIsRealAction = isConsumable || hasEffect || offEligible;
     if (useIsRealAction) {
+      // arb106 — show YOUR current HP on the eat/drink button so you can see at a
+      // glance whether you actually need it (player ask).
+      const hpTag = isConsumable && player ? `  ${player.hp}/${player.hpMax}` : '';
       buttons.push({
-        label: isConsumable ? `Use (${consumeVerb(pending.item)})` : (offEligible ? 'Use (off hand)' : 'Use'),
+        label: isConsumable ? `Use (${consumeVerb(pending.item)})${hpTag}` : (offEligible ? 'Use (off hand)' : 'Use'),
         onPress: doUse,
         tone: 'primary',
       });
@@ -532,8 +535,10 @@ export function InventoryScreen() {
       // inventory affordance reads like every other personal beat.
       // Player ask: "let's use the dogs name instead of just dog."
       const dogName = player!.dog!.name;
+      // arb106 — show the dog's current HP so you know if they still need feeding.
+      const dog = player!.dog!;
       buttons.push({
-        label: `Feed ${dogName}`,
+        label: `Feed ${dogName}  ${dog.hp}/${dog.hpMax}`,
         onPress: () => {
           useGameStore.getState().submitPlayerAction(`feed dog ${pending.item.name}`);
           closeModal();
@@ -549,7 +554,8 @@ export function InventoryScreen() {
       const golemActive = !!golem && golem.hp > 0;
       if (golemActive && golem.hp < golem.hpMax && isGolemRepairPart(golem.kind, pending.item.name)) {
         buttons.push({
-          label: `Repair ${golem.name}`,
+          // arb106 — "Heal" (not "Repair") per player, with the golem's current HP.
+          label: `Heal ${golem.name}  ${golem.hp}/${golem.hpMax}`,
           onPress: () => {
             useGameStore.getState().submitPlayerAction(`feed golem ${pending.item.name}`);
             closeModal();

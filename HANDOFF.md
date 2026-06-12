@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-519 "Flerovium Vitals" — [feature] HP readout on eat/feed/heal buttons + "Heal" not "Repair" for golems**
+  *(element #114)*. The inventory item-action buttons now show the TARGET's current HP so you can tell if they
+  still need it: the player's eat/drink button reads `Use (eat)  13/16`, the dog feed reads `Feed Rocky  13/16`,
+  and the golem button reads `Heal <name>  8/12`. The golem action is renamed **Repair → Heal** (and the
+  CharacterScreen golem subline now reads "Heal by feeding it the parts it's made of."). HP shown only on the
+  consumable eat path (not on torch/lens "Use"). `app/screens/InventoryScreen.tsx`,
+  `app/screens/CharacterScreen.tsx`. (Item-durability "Repair tab" in CraftingScreen is unrelated and unchanged.)
 - **OTA-518 "Nihonium Stow" — [bugfix] red "✗" on a pouch-eligible tool while stowing** *(element #113)*. The
   player crafted a Pulse Scanner, tapped an empty tool-pouch slot (which filters the inventory to eligible
   tools), and saw a red "✗" next to the scanner. The "✗" means "this item's EQUIP slot is already worn" — a

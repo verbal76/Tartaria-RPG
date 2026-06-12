@@ -389,7 +389,7 @@ export function CharacterScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text style={styles.subline}>Repair by feeding it the parts it's made of.</Text>
+                <Text style={styles.subline}>Heal by feeding it the parts it's made of.</Text>
               </View>
             </>
           );
