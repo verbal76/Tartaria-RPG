@@ -12,7 +12,7 @@ import {
   searchRequirementFor,
   PASSIVE_STAT_CAP,
 } from '../app/engine/itemEffect';
-import { findExplorationItemByName } from '../app/engine/crafting';
+import { findExplorationItemByName, findArmorByName } from '../app/engine/crafting';
 
 describe('itemEffect — passive bonus aggregation', () => {
   // Resolver list that delegates only to the exploration catalog;
@@ -43,7 +43,10 @@ describe('itemEffect — passive bonus aggregation', () => {
 });
 
 describe('itemEffect — gate lookup', () => {
-  const resolvers = [findExplorationItemByName];
+  // The Aether masks' `gate: breathe_toxic` migrated from exploration.json into
+  // armor.json, so the resolver list must include the armor catalog too — this
+  // mirrors equipment.ts's EFFECT_RESOLVERS (which carries findArmorByName).
+  const resolvers = [findExplorationItemByName, findArmorByName];
 
   it('Climbing Gear in inventory grants climb_steep', () => {
     expect(inventoryHasGate(['Climbing Gear'], 'climb_steep', resolvers)).toBe(true);
