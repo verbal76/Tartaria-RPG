@@ -630,7 +630,7 @@ const ACTION_REFERENCE_EXAMPLES: Record<string, { phrases: string[]; allowed: In
   attack_action: { phrases: ['attack the goblin', 'strike the sentinel', 'swing at it'], allowed: ['attack'] },
   brawl_action: { phrases: ['punch', 'kick', 'grapple the goblin'], allowed: ['attack', 'maneuver'] },
   use_weapon_action: { phrases: ['attack with the rust rifle', 'use the bone maul'], allowed: ['attack', 'use_relic'] },
-  fighting_maneuver: { phrases: ['disarm', 'trip the goblin', 'shove'], allowed: ['maneuver', 'open'] },
+  fighting_maneuver: { phrases: ['disarm', 'trip the goblin', 'grapple'], allowed: ['maneuver', 'open'] },
   overwhelm_action: { phrases: ['overwhelm', 'press the attack'], allowed: ['attack'] },
   throw_action: { phrases: ['throw the knife', 'hurl the rock at the goblin'], allowed: ['throw'] },
   dash_action: { phrases: ['dash', 'rush forward'], allowed: ['dash'] },

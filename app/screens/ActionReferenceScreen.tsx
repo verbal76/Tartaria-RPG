@@ -112,7 +112,7 @@ const EXAMPLES: Record<string, string[]> = {
   attack_action: ['attack the goblin', 'strike the sentinel', 'swing at it'],
   brawl_action: ['punch', 'kick', 'grapple the goblin'],
   use_weapon_action: ['attack with the rust rifle', 'use the bone maul'],
-  fighting_maneuver: ['disarm', 'trip the goblin', 'shove'],
+  fighting_maneuver: ['disarm', 'trip the goblin', 'grapple'],
   overwhelm_action: ['overwhelm', 'press the attack'],
   throw_action: ['throw the knife', 'hurl the rock at the goblin'],
   dash_action: ['dash', 'rush forward'],

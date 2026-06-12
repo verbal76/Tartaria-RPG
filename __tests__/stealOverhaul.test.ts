@@ -192,6 +192,11 @@ describe('OTA 23-009 — steal overhaul', () => {
       store.setState({
         player: {
           ...p,
+          // OTA-348 — vendor theft rolls STEALTH (not DEX). With Math.random
+          // mocked to 0 the d20 lands on 1, so the lift only clears the DC-11
+          // sketchy stall if stealth is high; 30 guarantees success at the worst
+          // roll while random=0 still passes the later scrap-success check.
+          stats: { ...p.stats, stealth: 30 },
           equipped: {},
           inventory: p.inventory.filter(
             (i) => i.name !== 'Rusted Blade' && i.name !== 'Scrap Metal',
@@ -217,6 +222,8 @@ describe('OTA 23-009 — steal overhaul', () => {
       store.setState({
         player: {
           ...p,
+          // OTA-348 — see note above: stealth drives the steal roll now.
+          stats: { ...p.stats, stealth: 30 },
           equipped: {},
           inventory: p.inventory.filter(
             (i) => i.name !== 'Rusted Blade' && i.name !== 'Scrap Metal',
