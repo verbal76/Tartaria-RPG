@@ -446,16 +446,23 @@ describe('craftingInventoryChaosSim — Crafting / Scrap / Pack / Catalog', () =
   });
 
   // ====================================================================
-  // 3. Uncapped pack invariants (was "Pack-full handling", OTA-078)
+  // 3. Pack-cap invariants (OTA-078 uncapped → OTA-441 generous caps)
   // ====================================================================
-  describe('Uncapped pack invariants', () => {
-    // The pack now has NO carrying limit — the old per-name caps
-    // (Small Rock 10 / Big Rock 1 / Stick 6) were removed. These names are
-    // the regression canaries: if a cap ever sneaks back, these fail.
-    const FORMERLY_CAPPED = ['Small Rock', 'Big Rock', 'Stick'];
+  describe('Pack-cap invariants', () => {
+    // OTA-078 removed all pack caps; OTA-441 (audit #26) re-introduced GENEROUS
+    // caps on the three flood-prone forage commodities ONLY — Small Rock 60 /
+    // Big Rock 40 / Stick 60 — to bound a stockpile-farm vector. Caps are
+    // ~20–60× any genuine crafting use, so invisible in real play. Everything
+    // else stays uncapped (Infinity). These assertions are the regression
+    // canary: if a NEW cap sneaks onto a non-forage item, or the forage caps
+    // drift, this fails.
+    const FORAGE_CAPS: Record<string, number> = { 'Small Rock': 60, 'Big Rock': 40, 'Stick': 60 };
 
-    it('no item is capped — capacityFor is Infinity for every name', () => {
-      for (const name of [...FORMERLY_CAPPED, 'Scrap Metal', 'Iron Spear', 'Aether Residue']) {
+    it('only the three forage commodities are capped; everything else is uncapped', () => {
+      for (const [name, cap] of Object.entries(FORAGE_CAPS)) {
+        expect(capacityFor(name)).toBe(cap);
+      }
+      for (const name of ['Scrap Metal', 'Iron Spear', 'Aether Residue']) {
         expect(capacityFor(name)).toBe(Infinity);
       }
     });
@@ -463,12 +470,14 @@ describe('craftingInventoryChaosSim — Crafting / Scrap / Pack / Catalog', () =
     it('100 grant attempts never lose a unit, never drop, and stack into one row', () => {
       const rng = makeRng(0xDECAFBAD);
       const violations: string[] = [];
+      const forageNames = Object.keys(FORAGE_CAPS);
       for (let t = 0; t < 100; t++) {
-        const name = FORMERLY_CAPPED[Math.floor(rng() * FORMERLY_CAPPED.length)]!;
+        const name = forageNames[Math.floor(rng() * forageNames.length)]!;
         const inv: InventoryItem[] = [{ id: `seed_${t}`, name, kind: 'misc', quantity: 3, tags: [] }];
         const grantQty = 1 + Math.floor(rng() * 5);
         const result = grantItem(inv, { id: `grant_${t}`, name, kind: 'misc', quantity: grantQty, tags: [] });
-        // Uncapped: everything is accepted, nothing dropped, no unit lost.
+        // Totals stay at 8 max (3 seed + ≤5) — far under the 40/60 forage caps,
+        // so everything is accepted, nothing dropped, no unit lost.
         if (result.accepted !== grantQty) {
           violations.push(`trial ${t}: accepted(${result.accepted}) != grantQty(${grantQty})`);
         }

@@ -158,13 +158,13 @@ describe('OTA 058 — ensureStatProgress', () => {
     delete legacy.statProgress;
     const repaired = ensureStatProgress(legacy as PlayerCharacter);
     expect(repaired.statProgress).toEqual({
-      strength: 0, dexterity: 0, intelligence: 0, wisdom: 0, charisma: 0,
+      strength: 0, dexterity: 0, intelligence: 0, wisdom: 0, charisma: 0, stealth: 0,
     });
   });
 
   it('leaves a complete statProgress untouched', () => {
     const p = makePlayer({
-      statProgress: { strength: 30, dexterity: 10, intelligence: 20, wisdom: 5, charisma: 0 },
+      statProgress: { strength: 30, dexterity: 10, intelligence: 20, wisdom: 5, charisma: 0, stealth: 0 },
     });
     const repaired = ensureStatProgress(p);
     expect(repaired.statProgress).toEqual(p.statProgress);

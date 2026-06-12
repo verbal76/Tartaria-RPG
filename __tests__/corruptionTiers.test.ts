@@ -40,12 +40,12 @@ describe('OTA 039 — corruption tier ladder', () => {
     });
     it('corrupted returns -1 to all stats', () => {
       expect(corruptionStatPenalty('corrupted')).toEqual({
-        strength: -1, dexterity: -1, intelligence: -1, wisdom: -1, charisma: -1,
+        strength: -1, dexterity: -1, intelligence: -1, wisdom: -1, charisma: -1, stealth: -1,
       });
     });
     it('hollowed returns -2 to all stats', () => {
       expect(corruptionStatPenalty('hollowed')).toEqual({
-        strength: -2, dexterity: -2, intelligence: -2, wisdom: -2, charisma: -2,
+        strength: -2, dexterity: -2, intelligence: -2, wisdom: -2, charisma: -2, stealth: -2,
       });
     });
   });
