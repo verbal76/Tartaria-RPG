@@ -14299,4 +14299,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // immunity. Wired into both combat (aggregateArmor) and the item preview so the displayed Resists = what
 // actually mitigates. New crafting.armorResistances. app/engine/crafting.ts, app/state/gameStore.ts,
 // app/components/itemPreview.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-529';
+// OTA-530 (Unbipentium Aegis) — [balance] FUSED unique armor now follows the same rarity resistance ladder as
+// catalog armor (OTA-529). The Crucible synth gives a fused piece one resistance; aggregateArmor now tops it up
+// to its rarity (Rare 2 / Legendary 3) via the shared crafting.fusedArmorResistances (seeded from the synth
+// resistance, material primary read off the fused NAME). The item preview shows the laddered set for fused armor
+// too. app/engine/crafting.ts, app/state/gameStore.ts, app/components/itemPreview.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-530';

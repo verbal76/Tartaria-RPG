@@ -640,16 +640,15 @@ function resistCountForRarity(rarity: Rarity, hash: number): number {
   }
 }
 
-/** The EFFECTIVE resistance list for an armor piece (authored seeds + rarity/
- *  material-derived top-up). Used by both combat (aggregateArmor) and the item
- *  preview so what the player SEES is what actually mitigates. Deterministic. */
-export function armorResistances(piece: CatalogArmor): string[] {
-  const hash = armorNameHash(piece.name);
-  const count = resistCountForRarity(piece.rarity, hash);
-  const out: string[] = [...(piece.resistances ?? [])];
+/** Core ladder: seed list + rarity/material-derived top-up, deterministic by
+ *  name. Shared by catalog armor AND fused unique armor. */
+function ladderResistances(name: string, rarity: Rarity, seed: readonly string[], tags: readonly string[] = []): string[] {
+  const hash = armorNameHash(name);
+  const count = resistCountForRarity(rarity, hash);
+  const out: string[] = [...seed];
   if (count <= out.length) return out; // already meets/exceeds the floor (or count 0)
   const add = (r: string): void => { if (!out.includes(r)) out.push(r); };
-  add(primaryArmorResist(piece.name, piece.tags ?? []));
+  add(primaryArmorResist(name, tags));
   const pool = [...PHYSICAL_RESISTS, ...ELEMENTAL_RESISTS];
   let h = hash;
   let guard = 0;
@@ -658,6 +657,20 @@ export function armorResistances(piece: CatalogArmor): string[] {
     h = (Math.imul(h, 1103515245) + 12345) >>> 0;
   }
   return out;
+}
+
+/** The EFFECTIVE resistance list for a CATALOG armor piece (authored seeds +
+ *  rarity/material top-up). Used by combat (aggregateArmor) AND the item preview
+ *  so what the player SEES is what actually mitigates. Deterministic. */
+export function armorResistances(piece: CatalogArmor): string[] {
+  return ladderResistances(piece.name, piece.rarity, piece.resistances ?? [], piece.tags ?? []);
+}
+
+/** Same ladder for a FUSED unique armor piece — the synth gives it one resistance
+ *  (the seed); this tops it up to its rarity (Rare 2 / Legendary 3). The fused
+ *  NAME carries the material theme (e.g. "Resonant Mantle" → aether primary). */
+export function fusedArmorResistances(name: string, rarity: Rarity, resistance?: string | null): string[] {
+  return ladderResistances(name, rarity, resistance ? [resistance] : []);
 }
 
 export function findArmorByName(name: string): CatalogArmor | null {

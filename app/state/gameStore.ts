@@ -155,6 +155,7 @@ import {
   applyDamageTypeModifier,
   applyArmorResistance,
   armorResistances,
+  fusedArmorResistances,
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
@@ -22085,7 +22086,11 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     );
     if (unique?.uniqueStats) {
       acBonus += unique.uniqueStats.acBonus ?? 0;
-      if (unique.uniqueStats.resistance) resistances.push(unique.uniqueStats.resistance);
+      // arb117 — ladder fused armor resistances by rarity too (Rare 2 / Legendary 3),
+      // seeded from the synth's single resistance.
+      for (const r of fusedArmorResistances(unique.name, unique.uniqueStats.rarity, unique.uniqueStats.resistance)) {
+        resistances.push(r);
+      }
       continue;
     }
     const piece = findArmorByName(name);

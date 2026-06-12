@@ -7,6 +7,7 @@ import {
   EXPLORATION,
   MATERIALS,
   armorResistances,
+  fusedArmorResistances,
   type CatalogWeapon,
   type CatalogArmor,
   type CatalogAccessory,
@@ -54,7 +55,14 @@ export function getItemPreviewForInstance(item: {
     if (u.damageDice && u.damageType) stats.push(`Damage: ${u.damageDice} (${u.damageType})`);
     if (u.scalesWith) stats.push(`Scales with ${u.scalesWith.toUpperCase().slice(0, 3)}`);
     if (u.acBonus !== undefined) stats.push(`AC +${u.acBonus}`);
-    if (u.resistance) stats.push(`Resists: ${u.resistance}`);
+    // arb117 — fused ARMOR shows its laddered resist set (Rare 2 / Legendary 3),
+    // matching what aggregateArmor applies; weapons/dog-vests keep the single line.
+    if (u.kind === 'armor') {
+      const fr = fusedArmorResistances(item.name, u.rarity, u.resistance);
+      if (fr.length > 0) stats.push(`Resists: ${fr.join(', ')}`);
+    } else if (u.resistance) {
+      stats.push(`Resists: ${u.resistance}`);
+    }
     if (u.special) stats.push(`Special: ${u.special}`);
     stats.push(`Durability: ${u.durability.current}/${u.durability.max}`);
     return {

@@ -2,7 +2,7 @@
 // 2, Legendary 3 — applied across the WHOLE armor catalog (deterministically),
 // while preserving hand-authored resistances.
 
-import { armorResistances, ARMOR } from '../app/engine/crafting';
+import { armorResistances, fusedArmorResistances, ARMOR } from '../app/engine/crafting';
 import type { CatalogArmor } from '../app/engine/crafting';
 
 describe('armor resistance ladder', () => {
@@ -38,5 +38,16 @@ describe('armor resistance ladder', () => {
     for (const a of ARMOR as CatalogArmor[]) {
       for (const r of armorResistances(a)) expect(valid.has(r)).toBe(true);
     }
+  });
+
+  it('FUSED armor ladders too: Rare ≥2, Legendary ≥3, seeded from the synth resistance', () => {
+    const rare = fusedArmorResistances('Resonant Mantle', 'Rare', 'aetheric');
+    expect(rare.length).toBeGreaterThanOrEqual(2);
+    expect(rare).toContain('aetheric'); // synth seed preserved
+    const leg = fusedArmorResistances('Iron-Bound Bulwark', 'Legendary', 'slashing');
+    expect(leg.length).toBeGreaterThanOrEqual(3);
+    expect(leg).toContain('slashing');
+    // No synth resistance? Still ladders by name/rarity.
+    expect(fusedArmorResistances('Bone-Stitched Shroud', 'Legendary', null).length).toBeGreaterThanOrEqual(3);
   });
 });

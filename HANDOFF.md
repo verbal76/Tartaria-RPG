@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-530 "Unbipentium Aegis" — [balance] FUSED armor follows the rarity resistance ladder too** *(element
+  #125)*. The Crucible synth gives a fused piece one resistance; `aggregateArmor` now tops it up to its rarity
+  (Rare 2 / Legendary 3) via the shared `crafting.fusedArmorResistances` (seeded from the synth resistance,
+  material primary read off the fused NAME). Item preview shows the laddered set for fused armor too.
+  `app/engine/crafting.ts`, `app/state/gameStore.ts`, `app/components/itemPreview.ts`. **AC answer (no change
+  needed):** a Nat-20 ALWAYS hits regardless of AC (and crits/doubles) — `gameStore.ts:22327` `enemyCrit ? true`
+  — so you can NEVER be untouchable; high AC (base 10 + 6 from all-+1 armor ≈ 16, ~22 with full kit) just dodges
+  ~95%, and the ~5% nat-20s that land are guaranteed double-damage crits.
 - **OTA-529 "Unbiquadium Bulwark" — [balance] armor resistance ladder by rarity** *(element #124)*. Only 20 of
   279 catalog pieces carried any damage-type resistance, so armor was almost entirely the AC (miss-chance) stat.
   Now EVERY piece derives its resistances from RARITY (count) + MATERIAL (which types), deterministically by
