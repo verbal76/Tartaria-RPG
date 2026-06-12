@@ -23,6 +23,7 @@
 
 import type { InventoryItem, UniqueItemStats } from './types';
 import { isInferredItem } from './crafting';
+import { inferGearTagPack } from './itemDefaults';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
  *  pass a mock without dragging the full LlamaRuntime stack. */
@@ -125,9 +126,19 @@ export function gateFusion(
   const tagSet = new Set<string>();
   const tagSources = hasCatalyst ? [...inputs, factionCatalyst] : inputs;
   for (const inp of tagSources) {
+    if (!inp) continue;
     for (const t of inp.tags ?? []) {
       const k = t.toLowerCase();
       if (MATERIAL_TAG_SET.has(k)) tagSet.add(k);
+    }
+    // arb112 — ALSO re-derive material tags from the item's NAME. Inferred loot
+    // (and inferred weapons like "Shrike Claw") often persist sparse tags — a vial
+    // of "Aetheric Blood" carries only [loot,improvised,aether], no `organic` — so
+    // the diversity gate was a dead end. Re-deriving from the name (which knows
+    // blood/feather/moss/claw → organic) restores that diversity for items already
+    // in old saves, with no migration.
+    for (const t of inferGearTagPack(inp.name)) {
+      if (MATERIAL_TAG_SET.has(t)) tagSet.add(t);
     }
   }
   const tagProfile = Array.from(tagSet);
@@ -135,7 +146,7 @@ export function gateFusion(
   if (tagProfile.length < minTags) {
     return {
       ok: false,
-      reason: `The Crucible needs at least ${minTags} distinct material tags across your reserved items; your profile carries only ${tagProfile.length} (${tagProfile.join(', ') || 'none'}).`,
+      reason: `Your reserved items are too alike — the Crucible needs ${minTags} DIFFERENT material types to fuse (not just more of the same), but yours span only ${tagProfile.length} (${tagProfile.join(', ') || 'none'}). Reserve something of another material — metal, bone, stone, cloth, wood, crystal.`,
       inputs: [],
       tagProfile,
     };

@@ -14258,4 +14258,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chevrons are now up/down (▾ collapsed = tap to drop open, ▴ expanded = tap to fold up) instead of the
 // right/down disclosure triangle, per player request for a clearer collapse/expand cue. (Element 119 — past
 // Oganesson; codenames now use IUPAC systematic names.) app/screens/InventoryScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-524';
+// OTA-525 (Unbinilium Reagent) — [bugfix] the fuse Crucible was an unwinnable dead end for the buried world's
+// loot. The gate needs ≥3 DISTINCT material tags across reserved items, but inferred creature-parts (Aetheric
+// Blood / Leech Mucus / Aether Feather / Aetheric Moss / Shrike Claw) persisted only sparse tags — [loot,
+// improvised, aether] — so no matter how many you reserved you stayed at 2 tags (improvised, aether) and could
+// never fuse. ROOT CAUSE: inferGearTagPack's `organic` detection matched only HARD parts (bone/claw/fang), never
+// soft creature-parts (blood/mucus/feather/moss/hide/…), and the inferred-WEAPON path (Shrike Claw) skipped that
+// tagger entirely. FIX: (1) inferGearTagPack now tags soft organics as `organic`; (2) gateFusion ALSO re-derives
+// each input's material tags from its NAME, so items ALREADY in old saves (no `organic` persisted) gain it with
+// no migration — the player's reserved loot now reads {improvised, aether, organic} = 3 and fuses. Also clearer
+// gate message ("too alike — needs DIFFERENT material types … reserve metal/bone/stone/cloth/wood/crystal").
+// app/engine/itemDefaults.ts, app/engine/itemFusion.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-525';

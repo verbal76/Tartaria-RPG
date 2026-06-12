@@ -378,6 +378,20 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-525 "Unbinilium Reagent" — [bugfix] fuse Crucible was an unwinnable dead end (material-tag diversity)**
+  *(element #120)*. The gate needs ≥3 DISTINCT material tags across reserved items, but inferred creature-parts
+  (Aetheric Blood / Leech Mucus / Aether Feather / Aetheric Moss / Shrike Claw) persisted only `[loot,improvised,
+  aether]` — so however many you reserved, you stayed at 2 tags (improvised, aether) and could never fuse (the
+  player reserved ~6 items and was hard-stuck). ROOT CAUSE: `inferGearTagPack`'s `organic` regex matched only
+  HARD parts (bone/claw/fang), never soft creature-parts (blood/mucus/feather/moss/hide/…), and the
+  inferred-WEAPON path (Shrike Claw) skipped that tagger. FIX: (1) `inferGearTagPack` now tags soft organics as
+  `organic`; (2) `gateFusion` ALSO re-derives each input's material tags from its NAME, so items already in old
+  saves gain `organic` with no migration — the player's reserved loot now reads `{improvised, aether, organic}` =
+  3 and fuses. Clearer gate message too. `app/engine/itemDefaults.ts`, `app/engine/itemFusion.ts`. Test
+  `fuseDiversityGate.test.ts`. **Known minor follow-up:** a reserved CONSUMABLE (Aether-Distilled Spirit) or
+  fungus (Aetheric Moss → kind consumable) doesn't count as a fusion input (eligibleInputs requires kind
+  `misc`), yet the UI lets you reserve it + shows ♥ — misleading but harmless (the misc loot already satisfies
+  the gate).
 - **OTA-524 "Ununennium Readout" — [polish] Heal-golem button stays visible at full HP + up/down collapse chevrons**
   *(element #119 — past Oganesson, now IUPAC systematic names)*. (1) The "Heal <golem>" button stays visible even
   at FULL HP (was gated by `hp < hpMax`, so after topping the golem off the modal only showed Drop). Reads

@@ -337,13 +337,18 @@ function consumableEffectFor(
  *  .ts:34) passes and scrapOutputFor routes to the right materials.
  *  Without these, an inferred rope / lantern / compass has tags=[]
  *  and scrap refuses with "nothing to break down here." */
-function inferGearTagPack(name: string): string[] {
+export function inferGearTagPack(name: string): string[] {
   const lower = name.toLowerCase();
   const out: string[] = [];
   if (/\b(rope|cord|line|chain|cable|braid|sinew)\b/.test(lower)) out.push('fiber');
   if (/\b(torch|lantern|lamp|candle|brazier|sconce)\b/.test(lower)) { out.push('metal'); out.push('fiber'); }
   if (/\b(compass|sextant|chronometer|gauge|dial|instrument)\b/.test(lower)) out.push('metal');
-  if (/\b(bone|skull|tooth|fang|claw|tusk)\b/.test(lower)) out.push('organic');
+  // arb112 — ORGANIC now covers soft creature-parts too, not just hard bone. The
+  // buried world's loot is mostly blood / mucus / feather / moss / hide, and these
+  // were going untagged (collapsing to just 'improvised'/'aether'), which made the
+  // Crucible's "3 distinct material tags" gate effectively unreachable.
+  if (/\b(bone|skull|tooth|fang|claw|tusk|horn|antler|shell|carapace|chitin)\b/.test(lower)) out.push('organic');
+  if (/\b(blood|mucus|slime|ichor|feather|moss|lichen|hide|pelt|fur|gut|gland|scale|membrane|marrow|spore|fungus|mushroom|wing|organ|flesh|meat|venom|vein|root|leaf|petal|silk|web)\b/.test(lower)) out.push('organic');
   if (/\b(crystal|shard|gem|geode|prism)\b/.test(lower)) out.push('crystal');
   if (/\b(plate|sheet|tin|iron|bronze|copper|brass|steel)\b/.test(lower)) out.push('metal');
   if (/\b(stone|rock|slab|brick)\b/.test(lower)) out.push('stone');
