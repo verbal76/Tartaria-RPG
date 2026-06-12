@@ -823,7 +823,11 @@ export function InventoryScreen() {
                   equippedSlotLabel={equippedSlotLabelFor(item)}
                   fillSlotLabel={slotFillLabelFor(item)}
                   isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
-                  slotTaken={itemSlotTaken(item)}
+                  // arb105 — the red ✗ means "this item's EQUIP slot is already
+                  // worn". In pouch-stow mode (player tapped an empty pouch slot,
+                  // list filtered to eligible tools) the player isn't equipping —
+                  // a scanner's off-hand being full is irrelevant — so suppress it.
+                  slotTaken={!pouchFilterActive && itemSlotTaken(item)}
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                 />

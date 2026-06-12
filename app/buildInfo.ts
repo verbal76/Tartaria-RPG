@@ -14205,4 +14205,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Materials while a genuine thrown weapon not in the materials catalog (the Shaped Aetheric Shard) stays a
 // weapon. [polish] Hidden Market map label shrunk a further 15% per player (fontSize base 30→25.5).
 // app/components/InventoryCategorize.ts, app/screens/MapScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-517';
+// OTA-518 (Nihonium Stow) — [bugfix] a red "✗" showed next to a pouch-eligible tool (e.g. a freshly-crafted
+// Pulse Scanner) while STOWING into the tool pouch. The "✗" means "this item's EQUIP slot is already worn" — a
+// scanner's only slot is the off-hand, so with a weapon in the off-hand `itemSlotTaken` was true and painted the
+// mark. But in pouch-stow mode (player tapped an empty pouch slot → list filtered to eligible tools) the player
+// isn't equipping, so the equip-slot state is irrelevant and the "✗" was misleading. Now suppressed whenever
+// `pouchFilterActive`. app/screens/InventoryScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-518';

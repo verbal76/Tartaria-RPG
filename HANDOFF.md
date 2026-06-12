@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-518 "Nihonium Stow" — [bugfix] red "✗" on a pouch-eligible tool while stowing** *(element #113)*. The
+  player crafted a Pulse Scanner, tapped an empty tool-pouch slot (which filters the inventory to eligible
+  tools), and saw a red "✗" next to the scanner. The "✗" means "this item's EQUIP slot is already worn" — a
+  scanner's only equip slot is the off-hand, so with a weapon in the off-hand `itemSlotTaken` returned true and
+  rendered the mark. But in pouch-stow mode (`pouchFilterActive`) the player isn't equipping, so the equip-slot
+  state is irrelevant and the mark was misleading (player: "there should not be a red x… I'm not trying to equip
+  it"). Now `slotTaken` is suppressed (`!pouchFilterActive && itemSlotTaken(item)`) so the stow list is clean.
+  Confirmed the player's own hypothesis (off-hand full) was the cause. `app/screens/InventoryScreen.tsx`.
 - **OTA-517 "Copernicium Cairn" — [bugfix] rocks → Materials, not Weapons + Hidden Market label −15%** *(element
   #112)*. Big Rock + Small Rock showed under WEAPONS in inventory. They're crafting stock (`materials.json`) that
   also carry a `thrown` tag (double as improvised throws), and `InventoryCategorize`'s `/(throwable|thrown)/ →
