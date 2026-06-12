@@ -320,11 +320,13 @@ const styles = StyleSheet.create({
   chipFullHint: { color: '#c9a86a', fontSize: 11, letterSpacing: 0.5, flexShrink: 0, marginLeft: 8 },
   chipFullConsumed: {
     backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    opacity: 0.55,
+    borderColor: '#2a2622',
   },
-  chipFullTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
-  chipFullArrowConsumed: { color: '#5e5547' },
+  // arb115 — a finished investigation now reads in the SAME completed-gold as a
+  // cleared climb (ClimbModal rowNameCleared/rowHeightCleared, #c9a86a italic),
+  // instead of the old dim grey, so "done" looks consistent across the game.
+  chipFullTextConsumed: { color: '#c9a86a', fontStyle: 'italic' },
+  chipFullArrowConsumed: { color: '#c9a86a' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

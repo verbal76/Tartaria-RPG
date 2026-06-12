@@ -14286,4 +14286,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // banks ~4× (theme banks to ~16 per material, weapon/armor suffix banks to ~16-20), taking aether-weapon names
 // from ~20 distinct to ~220+ (measured 222 distinct across 400 input sets). Names stay deterministic per input
 // set. app/engine/itemFusion.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-527';
+// OTA-528 (Unbitrium Gilt) — [polish] a finished investigation in the Search modal now turns the SAME
+// completed-gold (#c9a86a italic + ✓) as a cleared CLIMB row (ClimbModal rowNameCleared/rowHeightCleared),
+// instead of the old dim grey (#7a705c/#5e5547 at 0.55 opacity). "Done" now reads consistently across the
+// game. app/components/SearchModal.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-528';

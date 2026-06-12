@@ -378,6 +378,11 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-528 "Unbitrium Gilt" — [polish] finished investigations turn completed-gold like cleared climbs**
+  *(element #123)*. A consumed/flavor-exhausted noun in the Search modal turned dim grey (`#7a705c`/`#5e5547`,
+  0.55 opacity) with its ✓; it now reads in the SAME completed-gold (`#c9a86a` italic) as a cleared CLIMB row
+  (`ClimbModal` rowNameCleared/rowHeightCleared), so "done" looks consistent across the game. Dropped the heavy
+  opacity dim + matched the cleared-climb dark border. `app/components/SearchModal.tsx`.
 - **OTA-527 "Unbibium Lexicon" — [polish] far more fused-weapon name variety** *(element #122)*. The Crucible
   repeated fused names because — with Qwen disabled (the player's case) — names come from
   `synthesizeFusionDeterministic`'s word banks, which were tiny (~4 themes × ~5 suffixes ≈ 20 combos per
