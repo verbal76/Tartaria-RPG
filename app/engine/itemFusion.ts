@@ -80,14 +80,22 @@ export interface FusionGate {
  *  catalog row), reservedForFusion=true, not stolen, not equipped. The
  *  equip check is handled by the caller via the kind filter — we only
  *  consider 'misc' here. */
+/** arb113 — equip kinds (worn/wielded) and edible/usable tags are never fusion
+ *  scrap. Everything else inferred + reserved is fair game — INCLUDING reagents
+ *  whose kind got mis-stamped (e.g. "Aetheric Moss" → kind 'consumable' via the
+ *  fungus name heuristic). The old `kind === 'misc'` filter silently dropped those,
+ *  so a reserved material you could SEE (♥) didn't actually count. */
+const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
+const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
 function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
-    if (it.kind !== 'misc') continue;
     if (it.stolen) continue;
     if (!it.reservedForFusion) continue;
     if (!isInferredItem(it.name)) continue;
     if (it.quantity <= 0) continue;
+    if (FUSION_EQUIP_KINDS.includes(it.kind)) continue;
+    if ((it.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) continue;
     out.push(it);
   }
   return out;

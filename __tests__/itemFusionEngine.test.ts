@@ -75,7 +75,7 @@ describe('OTA-195 gateFusion — input rules', () => {
     ];
     const gate = gateFusion(inv);
     expect(gate.ok).toBe(false);
-    expect(gate.reason).toMatch(/distinct material tags/i);
+    expect(gate.reason).toMatch(/different material types/i);
     expect(gate.tagProfile).toEqual(['metal']);
   });
 

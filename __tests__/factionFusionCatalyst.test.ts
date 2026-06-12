@@ -112,10 +112,13 @@ describe('faction fusion catalyst (arb105)', () => {
 
   it('arb107 — faction rarity is bump-one-tier, not forced Legendary (a Rare theme stays Rare)', () => {
     // A minimal 3-distinct-tag set → caller computes Rare (< 4 tags).
+    // arb113 — names chosen so the gate's name-derivation doesn't ADD tags beyond
+    // the intended 3 (e.g. "Bone Shard" would derive organic+crystal). These read
+    // as exactly one material each → a clean 3-distinct-tag set (< 4 → Rare).
     const minimal: InventoryItem[] = [
-      scrap('m1', 'Inferred Aether Sliver', ['aether']),
+      scrap('m1', 'Inferred Aether Wisp', ['aether']),
       scrap('m2', 'Inferred Iron Strip', ['metal']),
-      scrap('m3', 'Inferred Bone Shard', ['bone']),
+      scrap('m3', 'Inferred Granite Nub', ['stone']),
     ];
     const gate = gateFusion(minimal);
     expect(gate.tagProfile.length).toBe(3);

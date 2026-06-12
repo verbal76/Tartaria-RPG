@@ -14269,4 +14269,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // no migration — the player's reserved loot now reads {improvised, aether, organic} = 3 and fuses. Also clearer
 // gate message ("too alike — needs DIFFERENT material types … reserve metal/bone/stone/cloth/wood/crystal").
 // app/engine/itemDefaults.ts, app/engine/itemFusion.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-525';
+// OTA-526 (Unbiunium Sort) — [bugfix] creature-part reagents were scattered across the wrong inventory
+// categories and silently dropped by fusion. (1) CATEGORY: a material reagent whose kind got mis-stamped (Aetheric
+// Moss — "moss" tripped the fungus→consumable heuristic) or whose persisted tags are too sparse to read (Leech
+// Mucus → was Loot) now files under MATERIALS. categorizeItem gained a material check (BEFORE the consumable/loot
+// fallbacks) that recognizes organic/bone/stone/wood/vermin tags AND re-derives `organic` from the NAME (so old
+// saves benefit, no migration), gated to keep genuine food/drink/potions (Bioluminescent Fungus etc.) edible.
+// (2) FUSION: eligibleInputs no longer hard-requires kind 'misc' — it now accepts any reserved inferred item that
+// isn't worn/wielded gear or genuine food/drink, so a reserved reagent you can SEE (♥) like Aetheric Moss actually
+// COUNTS (a real drink like Aether-Distilled Spirit is still excluded). Note: a reserved STACK counts as ONE input
+// (not per-unit) and a fuse drains ONE unit per input (the rest of the stack stays). app/components/
+// InventoryCategorize.ts, app/engine/itemFusion.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-526';

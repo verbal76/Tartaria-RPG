@@ -1,5 +1,6 @@
 import type { InventoryItem } from '../engine/types';
 import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS, findWeaponByName } from '../engine/crafting';
+import { inferGearTagPack } from '../engine/itemDefaults';
 import { itemIsTool } from '../engine/pouchEligibility';
 import { isQuestLockedItem } from '../engine/questItems';
 
@@ -114,6 +115,19 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   if (item.kind === 'weapon') return 'weapon';
   if (item.kind === 'armor') return 'armor';
   if (item.tags.some((t) => /^(amulet|ring|locket|necklace|band|seal|diadem|charm)$/i.test(t))) return 'accessory';
+  // arb113 — MATERIAL stock BEFORE the consumable/loot fallbacks. Catches creature-
+  // part reagents whose kind got mis-stamped consumable (Aetheric Moss — "moss"
+  // tripped the fungus heuristic) or whose persisted tags are too sparse to read
+  // (Leech Mucus → was Loot). Re-derives `organic` from the NAME (blood/mucus/
+  // feather/moss → organic) so items already in old saves file correctly with no
+  // migration. Gated to exclude genuine food/drink/potions so foraged edibles
+  // (Bioluminescent Fungus, etc.) stay consumable.
+  {
+    const isEdible = item.tags.some((t) => /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i.test(t));
+    const hasMaterial = item.tags.some((t) => /aether|crystal|mud|metal|cloth|fiber|construct|organic|bone|stone|wood|vermin/i.test(t))
+      || inferGearTagPack(item.name).includes('organic');
+    if (!isEdible && hasMaterial) return 'material';
+  }
   if (item.kind === 'consumable' || item.tags.some((t) => /food|healing/i.test(t))) return 'consumable';
   if (item.kind === 'relic' || item.tags.some((t) => /relic|detection|light/i.test(t))) return 'relic';
   if (item.tags.some((t) => /aether|crystal|mud|metal|cloth|fiber|construct/i.test(t))) return 'material';

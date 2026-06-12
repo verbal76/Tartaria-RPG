@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-526 "Unbiunium Sort" — [bugfix] creature-part reagents → Materials + fusion accepts them** *(element
+  #121)*. (1) **Category:** a reagent whose kind got mis-stamped (Aetheric Moss — "moss" tripped the
+  fungus→consumable heuristic) or whose tags are too sparse (Leech Mucus → was Loot) now files under MATERIALS.
+  `categorizeItem` gained a material check (before the consumable/loot fallbacks) recognizing
+  organic/bone/stone/wood/vermin AND re-deriving `organic` from the NAME (old saves benefit, no migration), gated
+  to keep food/drink/potions edible. (2) **Fusion:** `eligibleInputs` no longer hard-requires kind `misc` — it
+  accepts any reserved inferred item that isn't worn/wielded gear or genuine food/drink, so a reserved reagent you
+  can SEE (♥) like Aetheric Moss actually COUNTS (a real drink like Aether-Distilled Spirit is still excluded).
+  **Answered the player's stacks question:** a reserved STACK counts as ONE input (not per-unit), and a fuse
+  drains ONE unit per input (the rest of the stack stays). `app/components/InventoryCategorize.ts`,
+  `app/engine/itemFusion.ts`. Tests updated (`fuseDiversityGate`, `itemFusionEngine`, `factionFusionCatalyst`).
 - **OTA-525 "Unbinilium Reagent" — [bugfix] fuse Crucible was an unwinnable dead end (material-tag diversity)**
   *(element #120)*. The gate needs ≥3 DISTINCT material tags across reserved items, but inferred creature-parts
   (Aetheric Blood / Leech Mucus / Aether Feather / Aetheric Moss / Shrike Claw) persisted only `[loot,improvised,

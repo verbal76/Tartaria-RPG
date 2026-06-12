@@ -1059,6 +1059,7 @@ const CODENAMES: Record<string, string> = {
   // Past Oganesson (118) — element 119+ uses the IUPAC systematic placeholder names.
   '2026-06-11-524': 'Ununennium Readout',
   '2026-06-11-525': 'Unbinilium Reagent',
+  '2026-06-11-526': 'Unbiunium Sort',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

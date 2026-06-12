@@ -45,4 +45,17 @@ describe('fuse crucible — material-tag diversity', () => {
     expect(g.ok).toBe(false);
     expect(g.reason).toMatch(/at least 3 inferred/i);
   });
+
+  it('a reserved reagent mis-stamped as a consumable (Aetheric Moss) now counts; a real drink does not', () => {
+    const k = (name: string, kind: string, tags: string[]): InventoryItem =>
+      ({ id: name, name, kind, rarity: 'Common', quantity: 1, reservedForFusion: true, tags } as InventoryItem);
+    const g = gateFusion([
+      k('Aetheric Moss', 'consumable', ['loot', 'aether']),           // material reagent → counts
+      k('Aetheric Blood', 'misc', ['loot', 'improvised', 'aether']),
+      k('Leech Mucus', 'misc', ['loot', 'improvised']),
+      k('Aether-Distilled Spirit', 'consumable', ['alcohol', 'aether', 'drink']), // real drink → excluded
+    ]);
+    expect(g.inputs.map((i) => i.name).sort()).toEqual(['Aetheric Blood', 'Aetheric Moss', 'Leech Mucus']);
+    expect(g.ok).toBe(true);
+  });
 });
