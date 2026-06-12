@@ -154,6 +154,7 @@ import {
   findWeaponByName,
   applyDamageTypeModifier,
   applyArmorResistance,
+  armorResistances,
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
@@ -22094,7 +22095,8 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     // still come from the catalog (not part of the instance roll).
     const inst = resolveEquippedItem(player, slot);
     acBonus += inst?.instanceStats?.acBonus ?? piece.acBonus;
-    for (const r of piece.resistances) resistances.push(r);
+    // arb116 — rarity/material resistance ladder (not just the ~20 authored pieces).
+    for (const r of armorResistances(piece)) resistances.push(r);
   }
   return { acBonus, resistances };
 }

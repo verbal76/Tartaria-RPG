@@ -6,6 +6,7 @@ import {
   GEAR,
   EXPLORATION,
   MATERIALS,
+  armorResistances,
   type CatalogWeapon,
   type CatalogArmor,
   type CatalogAccessory,
@@ -182,7 +183,10 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
 function previewArmor(a: CatalogArmor): ItemPreview {
   const slotLabel = a.slot.charAt(0).toUpperCase() + a.slot.slice(1);
   const stats: string[] = [`AC +${a.acBonus}`];
-  if (a.resistances.length > 0) stats.push(`Resists: ${a.resistances.join(', ')}`);
+  // arb116 — show the EFFECTIVE (rarity/material-derived) resists, so what the
+  // player reads on the piece is exactly what mitigates in combat.
+  const resists = armorResistances(a);
+  if (resists.length > 0) stats.push(`Resists: ${resists.join(', ')}`);
   if (a.statBonus) stats.push(`${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}`);
   if (a.baseDurability !== undefined) stats.push(`Durability: ${a.baseDurability}`);
   return { name: a.name, kindLabel: `${slotLabel} Armor`, rarity: a.rarity, description: a.description, stats };

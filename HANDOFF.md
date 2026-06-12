@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-529 "Unbiquadium Bulwark" — [balance] armor resistance ladder by rarity** *(element #124)*. Only 20 of
+  279 catalog pieces carried any damage-type resistance, so armor was almost entirely the AC (miss-chance) stat.
+  Now EVERY piece derives its resistances from RARITY (count) + MATERIAL (which types), deterministically by
+  name: **Common 0–1** (seeded coin-flip), **Uncommon 1**, **Rare 2**, **Legendary 3**. Hand-authored
+  resistances are PRESERVED (seed the list, only topped up). Resistances HALVE matching-type damage and each type
+  halves only ONCE regardless of how many worn pieces resist it → a full set caps at 50%-per-type, never
+  immunity. Wired into combat (`aggregateArmor`) AND the item preview so displayed Resists = what mitigates. New
+  `crafting.armorResistances`. `app/engine/crafting.ts`, `app/state/gameStore.ts`, `app/components/itemPreview.ts`.
+  Test `armorResistanceLadder.test.ts`. **Note:** FUSED unique armor still uses its single synth resistance (not
+  yet laddered); a follow-up could ladder those too. Also added `equippedArmorPersists.test.ts` confirming
+  footwear/cloak/gloves survive save→reload (no bug — verification per player request).
 - **OTA-528 "Unbitrium Gilt" — [polish] finished investigations turn completed-gold like cleared climbs**
   *(element #123)*. A consumed/flavor-exhausted noun in the Search modal turned dim grey (`#7a705c`/`#5e5547`,
   0.55 opacity) with its ✓; it now reads in the SAME completed-gold (`#c9a86a` italic) as a cleared CLIMB row

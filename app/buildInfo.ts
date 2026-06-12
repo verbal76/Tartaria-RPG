@@ -14290,4 +14290,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // completed-gold (#c9a86a italic + ✓) as a cleared CLIMB row (ClimbModal rowNameCleared/rowHeightCleared),
 // instead of the old dim grey (#7a705c/#5e5547 at 0.55 opacity). "Done" now reads consistently across the
 // game. app/components/SearchModal.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-528';
+// OTA-529 (Unbiquadium Bulwark) — [balance] armor RESISTANCE LADDER. Only 20 of 279 catalog pieces carried any
+// damage-type resistance, so armor was almost entirely the AC (miss-chance) stat. Now EVERY piece derives its
+// resistances from RARITY (how many) + MATERIAL (which types), deterministically by name: Common 0–1 (a seeded
+// coin-flip), Uncommon 1, Rare 2, Legendary 3. Hand-authored resistances are PRESERVED (they seed the list and
+// are only topped up), so the 20 tuned pieces keep their flavor. Resistances HALVE matching-type damage and a
+// type only halves ONCE no matter how many worn pieces resist it, so a full set caps at 50%-per-type, never
+// immunity. Wired into both combat (aggregateArmor) and the item preview so the displayed Resists = what
+// actually mitigates. New crafting.armorResistances. app/engine/crafting.ts, app/state/gameStore.ts,
+// app/components/itemPreview.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-529';

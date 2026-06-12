@@ -589,6 +589,77 @@ export function findWeaponByName(name: string): CatalogWeapon | null {
   return inferWeapon(name);
 }
 
+// arb116 — rarity-driven RESISTANCE LADDER. Hand-authored content only put a
+// resistance on ~20 of 279 pieces; the rest halved nothing, so armor "balance"
+// was almost entirely the AC (miss-chance) stat. Now EVERY piece derives its
+// damage-type resistances from its RARITY (how many) and its MATERIAL (which
+// types), deterministically by name (so a given piece is ALWAYS the same):
+//     Common    → 0 or 1   (a name-seeded coin-flip — "may or may not")
+//     Uncommon  → 1
+//     Rare      → 2         (guaranteed ≥1, a clear step up)
+//     Legendary → 3
+// Authored resistances are PRESERVED — they seed the list and the piece is only
+// topped up toward its rarity count — so the 20 hand-tuned pieces keep their
+// flavor. (Resistances halve matching-type damage; the same type halves only
+// once no matter how many pieces resist it, so a full set caps at 50% per type,
+// never immunity.)
+const PHYSICAL_RESISTS = ['slashing', 'piercing', 'bludgeoning'] as const;
+const ELEMENTAL_RESISTS = ['aetheric', 'burn', 'cold', 'poison'] as const;
+
+function armorNameHash(s: string): number {
+  let h = 2166136261 >>> 0; // FNV-1a, no external deps
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
+/** The thematic primary resistance from the piece's dominant material. */
+function primaryArmorResist(name: string, tags: readonly string[]): string {
+  const n = name.toLowerCase();
+  const t = tags.map((x) => x.toLowerCase());
+  const has = (re: RegExp): boolean => re.test(n) || t.some((x) => re.test(x));
+  if (has(/metal|plate|iron|steel|bronze|brass|copper|mail|gauntlet|rivet/)) return 'slashing';
+  if (has(/bone|chitin|carapace|tooth|fang|tusk|spine|shell|scale/)) return 'piercing';
+  if (has(/aether|aetheric|crystal|resonant|ether|lumen/)) return 'aetheric';
+  if (has(/leather|hide|pelt|fur|gut|sinew/)) return 'bludgeoning';
+  if (has(/cloth|linen|silk|wool|padded|wrap|veil|robe|cloak|coat|fiber|gauze/)) return 'cold';
+  if (has(/stone|mudstone|obsidian|granite|slate|cairn/)) return 'bludgeoning';
+  if (has(/mud|silt|sludge|bog|swamp/)) return 'poison';
+  return 'slashing';
+}
+
+function resistCountForRarity(rarity: Rarity, hash: number): number {
+  switch (rarity) {
+    case 'Legendary': return 3;
+    case 'Rare': return 2;
+    case 'Uncommon': return 1;
+    case 'Common': return (hash & 1) ? 1 : 0; // ~half of commons carry one
+    default: return 0;
+  }
+}
+
+/** The EFFECTIVE resistance list for an armor piece (authored seeds + rarity/
+ *  material-derived top-up). Used by both combat (aggregateArmor) and the item
+ *  preview so what the player SEES is what actually mitigates. Deterministic. */
+export function armorResistances(piece: CatalogArmor): string[] {
+  const hash = armorNameHash(piece.name);
+  const count = resistCountForRarity(piece.rarity, hash);
+  const out: string[] = [...(piece.resistances ?? [])];
+  if (count <= out.length) return out; // already meets/exceeds the floor (or count 0)
+  const add = (r: string): void => { if (!out.includes(r)) out.push(r); };
+  add(primaryArmorResist(piece.name, piece.tags ?? []));
+  const pool = [...PHYSICAL_RESISTS, ...ELEMENTAL_RESISTS];
+  let h = hash;
+  let guard = 0;
+  while (out.length < count && guard++ < 32) {
+    add(pool[h % pool.length]!);
+    h = (Math.imul(h, 1103515245) + 12345) >>> 0;
+  }
+  return out;
+}
+
 export function findArmorByName(name: string): CatalogArmor | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
