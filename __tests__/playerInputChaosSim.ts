@@ -649,11 +649,14 @@ describe('OTA-110-CHAOS — playerInputChaosSim', () => {
     });
 
     it('the engine code path that handles 0-stamina climb is present and unchanged', () => {
-      // String-grep the gameStore source for the climbFall call
-      // gated on stamina insufficiency. If a future refactor renames
-      // or removes the gate, this test fails loudly and the OTA
-      // author has to update the test + verify the design ask is
-      // still honored.
+      // String-grep the gameStore source for the climbFall call gated on
+      // stamina insufficiency. If a future refactor renames or removes the
+      // gate, this test fails loudly and the OTA author has to update it.
+      // OTA-356 — "no ground, no fall": the stamina-shortfall branch now FORKS
+      // on whether the player is already elevated. On the GROUND it refuses
+      // ("rest first") — you can't fall off a thing you haven't left; only a
+      // shortfall while ALREADY UP drops you via climbFall. So the branch
+      // legitimately contains BOTH a ground-refusal and the mid-climb fall.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const fs = require('fs') as typeof import('fs');
       const src = fs.readFileSync(
@@ -663,14 +666,17 @@ describe('OTA-110-CHAOS — playerInputChaosSim', () => {
       // Look for the stamina<cost guard. The exact line is
       // "if (player.stamina < climbStaminaCost) {".
       expect(src).toMatch(/if \(player\.stamina < climbStaminaCost\)/);
-      // And that it routes to climbFall, not an early refusal.
       const idx = src.indexOf('if (player.stamina < climbStaminaCost)');
       expect(idx).toBeGreaterThan(0);
-      const window = src.slice(idx, idx + 400);
+      // Window wide enough to span the OTA-356 fork (ground-refusal + fall).
+      const window = src.slice(idx, idx + 1600);
+      // The mid-climb fall path is still present...
       expect(window).toMatch(/climbFall\(/);
-      // And it must NOT contain a "too tired" / "rest first" line
-      // in the same branch — that would be the regression.
-      expect(window).not.toMatch(/too tired|rest first|refuse|cannot climb without/i);
+      // ...gated on already being elevated (the "no ground, no fall" fork)...
+      expect(window).toMatch(/alreadyUp|elevatedOn/);
+      // ...and the ground case refuses rather than falling (this is the design,
+      // not a regression).
+      expect(window).toMatch(/rest first|never leave the ground/i);
     });
   });
 });
