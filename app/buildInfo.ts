@@ -14347,4 +14347,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog) actually runs. (2) STALE MODAL — startNewGame reset many flags but not callDogModalOpen, so a fresh
 // game could inherit a still-open call-dog modal from a prior session; it's now cleared on new-game. app/state/
 // gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-533';
+// OTA-534 (Unbiennium Caliber) — [feature] EVERY enemy attack now resolves to a concrete, player-visible
+// DAMAGE TYPE. ~Half the bestiary authored bare dice ("2D6", "3D10") with no type word, so the OTA-529/530
+// armor-resistance ladder couldn't engage and the portrait/log had nothing to show. New engine/damageTypes.ts
+// `enemyDamageType` derives it in three tiers: (1) an explicit word in the damage string ("1d6 piercing"), (2)
+// inferred from the attack/name verb (Claw→slashing, Bite→piercing, Slam→bludgeoning, Venom→poison, Mind→
+// aetheric, …), (3) a bludgeoning physical default — so nothing is typeless. Surfaced two ways for the
+// D&D-and-Pokémon player spread: the combat hit line now NAMES it ("the Iron Spider deals 7 piercing damage")
+// and the EnemyPanel portrait shows a DEALS line under RESIST/WEAK. Because the type is now concrete for all
+// enemies, armor resistances ENGAGE against the previously-untyped half too (the intended setup for the armor
+// rework) — a real, bounded defensive buff. STATUS-effect procs (bleed/armor-sever/burn/…) stay gated to
+// enemies that EXPLICITLY declared a type, so inferring a type does NOT silently add new on-hit statuses.
+// app/engine/damageTypes.ts (new), app/state/gameStore.ts, app/components/EnemyPanel.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-534';

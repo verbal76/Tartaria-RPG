@@ -234,7 +234,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     // parser dumps and location descriptions that produce false
     // positives ("on to the Square" should not credit "jump").
     const PATTERNS: Array<[RegExp, string]> = [
-      [/✓ HIT.*for \d+ damage|hits .* for \d+|deals \d+ damage|drops .* dead|✗ MISS/i, 'attack'],
+      [/✓ HIT.*for \d+ damage|hits .* for \d+|deals \d+(?: \w+)? damage|drops .* dead|✗ MISS/i, 'attack'],
       [/dodging stance|drop into a dodging|shift your weight, ready to evade/i, 'dodge'],
       [/raise the .* into a block|take a defensive stance|defense [+]\d/i, 'block'],
       [/set your stance|fight back against|Fight Back —|opposed Fighting roll/i, 'fight_back'],

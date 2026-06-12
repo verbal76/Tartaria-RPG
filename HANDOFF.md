@@ -378,6 +378,18 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-534 "Unbiennium Caliber" — [feature] every enemy attack carries a visible DAMAGE TYPE** *(element #129)*.
+  ~Half the bestiary authored bare dice ("2D6") with no type word, so the OTA-529/530 resistance ladder couldn't
+  engage and the portrait/log showed nothing. New `engine/damageTypes.ts` `enemyDamageType` resolves a concrete
+  type in three tiers: explicit word in the damage string → inferred from the attack/name verb (Claw→slashing,
+  Bite→piercing, Slam→bludgeoning, Venom→poison, Mind→aetheric, …) → bludgeoning default. Surfaced for the D&D↔
+  Pokémon player spread: the combat hit line NAMES it ("…deals 7 piercing damage") and the EnemyPanel shows a
+  **DEALS** line under RESIST/WEAK. Side effect (intentional, sets up the armor rework): resistances now engage
+  against the previously-untyped half too — a real, bounded defensive buff (still floored at 1, 50%-max today).
+  On-hit STATUS procs (bleed/armor-sever/…) stay gated to enemies that EXPLICITLY declared a type, so inference
+  adds no new statuses. `engine/damageTypes.ts` (new), `state/gameStore.ts`, `components/EnemyPanel.tsx`. Test
+  `damageTypes.test.ts`. **Next: armor-resistance rework** (user's choice — diminishing stacking by piece, chest
+  first → cloak last; each matching piece adds, focused builds beat the rainbow, never immunity).
 - **OTA-533 "Unbioctium Tether" — [bugfix] two companion/UI state fixes** *(element #128)*. Found while clearing
   the test backlog. (1) **Dog recall** — a dog benched at a climb origin (`waiting_at_base`) is meant to rejoin
   when you `rest`, but the "already fully rested, save the hours" early-return fired first, so a full-stamina

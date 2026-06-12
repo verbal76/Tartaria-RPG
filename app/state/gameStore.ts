@@ -287,6 +287,7 @@ import {
   hasFullCover,
   aethericVulnerabilityMultiplier,
 } from '../engine/statusEffects';
+import { enemyDamageType as resolveEnemyDamageType, parseDamageTypeKeyword } from '../engine/damageTypes';
 import type { StatusEffect, MemorableEvent, WhisperRecord } from '../engine/types';
 import {
   CHAINS,
@@ -22439,7 +22440,15 @@ function applyEnemyCounter(
     if (enemy.boss) {
       rawDmg += rollDie(6);
     }
-    const enemyDamageType = parseIncomingDamageType(String(enemy.damage));
+    // arb119 — concrete damage type for EVERY enemy (explicit word in the
+    // damage string, else inferred from the attack/name verb, else physical).
+    // Drives the resistance check + the player-facing display so the OTA-529
+    // armor ladder engages against the ~half of the bestiary that authored bare
+    // dice. Status-effect rolls below stay gated to EXPLICITLY-typed enemies
+    // (`explicitDamageType`) so inferring a type doesn't silently add bleed /
+    // armor-sever procs to creatures that never had them.
+    const enemyDamageType = resolveEnemyDamageType(enemy);
+    const explicitDamageType = parseDamageTypeKeyword(String(enemy.damage));
 
     // Burn scars (aetheric vulnerability) amplify incoming aetheric damage.
     if (enemyDamageType === 'aetheric') {
@@ -22612,7 +22621,7 @@ function applyEnemyCounter(
     }
 
     // Roll for a status effect to apply based on the damage type.
-    const newEffect = rollIncomingStatusEffect(enemyDamageType, player.statusEffects ?? []);
+    const newEffect = rollIncomingStatusEffect(explicitDamageType, player.statusEffects ?? []);
     // Per-enemy trait effects on a successful hit (bleeder / corrupting /
     // concussive). Independent of the damage-type roll so a trait can
     // stack with a type-based status.
@@ -22641,8 +22650,8 @@ function applyEnemyCounter(
           : '';
       const resistTag = (resisted.blocked ? ` (armor halves the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag;
       const msg = killed
-        ? `${enemy.name} deals ${dmg} damage${resistTag}. You fall.`
-        : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
+        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {
@@ -22750,27 +22759,8 @@ function applyEnemyCounter(
   }
 }
 
-const DAMAGE_TYPE_KEYWORDS = [
-  'degradation',
-  'bludgeoning',
-  'burn',
-  'aetheric',
-  'electrical',
-  'piercing',
-  'poison',
-  'radiation',
-  'slashing',
-  'stun',
-  'psychic', // common in enemy data — fold into aetheric for resistance purposes
-];
-
-function parseIncomingDamageType(damageString: string): string | null {
-  const lower = damageString.toLowerCase();
-  for (const t of DAMAGE_TYPE_KEYWORDS) {
-    if (lower.includes(t)) return t === 'psychic' ? 'aetheric' : t;
-  }
-  return null;
-}
+// arb119 — damage-type parsing/inference moved to engine/damageTypes.ts
+// (parseDamageTypeKeyword + enemyDamageType), shared with the EnemyPanel.
 
 // OTA-260 — boxing/karate-style body strikes that should still graze
 // the player on a successful dodge/parry. Keyed on humanoid-fighter

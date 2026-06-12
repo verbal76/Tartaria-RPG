@@ -15,6 +15,7 @@ import {
 import type { Enemy } from '../engine/types';
 import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
 import { enemyTypeDefenses } from '../engine/crafting';
+import { enemyDamageType } from '../engine/damageTypes';
 
 /** OTA-401 — a single active status (coating DOT / infection) on an
  *  enemy, mirrored from `currentScene.enemyStatuses[i]`. Surfaced on the
@@ -193,6 +194,10 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
   // added this becomes view.inRange.
   const inRange = view.inRange ?? true;
   const defenses = defensesFor(view.enemy);
+  // arb119 — the damage type THIS enemy deals (what to armor up against),
+  // shown under RESIST/WEAK so the portrait answers "what hits me?" for the
+  // resistance-minded player without reading the combat log.
+  const dealsType = enemyDamageType(view.enemy);
 
   return (
     <View style={[styles.card, { width: cardWidth }]}>
@@ -230,22 +235,25 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
         <Stat label="ATK" value={atkLabel} />
         <Stat label="DMG" value={String(view.enemy.damage)} />
       </View>
-      {(defenses.resists.length > 0 || defenses.weaknesses.length > 0) && (
-        <View style={styles.defs}>
-          {defenses.resists.length > 0 && (
-            <Text style={styles.defLine} numberOfLines={2}>
-              <Text style={styles.defResist}>RESIST </Text>
-              <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
-            </Text>
-          )}
-          {defenses.weaknesses.length > 0 && (
-            <Text style={styles.defLine} numberOfLines={2}>
-              <Text style={styles.defWeak}>WEAK </Text>
-              <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
-            </Text>
-          )}
-        </View>
-      )}
+      <View style={styles.defs}>
+        {defenses.resists.length > 0 && (
+          <Text style={styles.defLine} numberOfLines={2}>
+            <Text style={styles.defResist}>RESIST </Text>
+            <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
+          </Text>
+        )}
+        {defenses.weaknesses.length > 0 && (
+          <Text style={styles.defLine} numberOfLines={2}>
+            <Text style={styles.defWeak}>WEAK </Text>
+            <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
+          </Text>
+        )}
+        {/* arb119 — what the enemy DEALS, so armor choices have a target. */}
+        <Text style={styles.defLine} numberOfLines={1}>
+          <Text style={styles.defDeals}>DEALS </Text>
+          <Text style={styles.defVal}>{cap(dealsType)}</Text>
+        </Text>
+      </View>
       {/* OTA-401 — active coating/DOT statuses on this enemy + turns left.
           One badge per status: "POISON · 3t · 4/turn". Lets the player
           confirm a coating actually landed and track how long it ticks. */}
@@ -331,6 +339,9 @@ const styles = StyleSheet.create({
   defLine: { fontSize: 10, letterSpacing: 0.5 },
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   defWeak: { color: '#e07a5f', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
+  // arb119 — DEALS uses a neutral amber (distinct from RESIST green / WEAK red):
+  // it's neither good nor bad for the player, just "what's coming at you."
+  defDeals: { color: '#d9a566', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   defVal: { color: '#c9b89a', fontSize: 10 },
   statusCol: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   statusBadge: {
