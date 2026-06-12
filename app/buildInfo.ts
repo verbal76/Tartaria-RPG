@@ -14225,4 +14225,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inventory category instead of falling through to Loot (categorizeItem uses findWeaponByName, whose
 // isCataloguedElsewhere guard keeps armor/material/amulet drops out). app/state/gameStore.ts,
 // app/components/InventoryCategorize.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-520';
+// OTA-521 (Livermorium Fold) — [feature] inventory section headers are now COLLAPSIBLE and have a semi-transparent
+// backing. Each category header (Weapons / Armor / … / Materials / Food) sits on a translucent rounded plate
+// (rgba(8,6,4,0.55)) so the label never blends into the page background, and a chevron (▾ open / ▸ collapsed)
+// sits left of the label — tapping anywhere on the header folds that whole category away, so the player can skip
+// past Weapons/Armor to reach Materials/Food without scrolling every row. Collapse state is per-category, default
+// open, screen-local. app/screens/InventoryScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-521';

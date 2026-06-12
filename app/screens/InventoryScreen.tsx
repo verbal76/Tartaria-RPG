@@ -167,6 +167,10 @@ export function InventoryScreen() {
   // eligible item stows it and clears the filter. Cancel button or
   // toggling the slot off also clears.
   const [pouchFilterActive, setPouchFilterActive] = useState(false);
+  // arb108 — per-category collapse. Tapping a section header folds that whole
+  // category away so the player can skip past Weapons/Armor to reach Materials /
+  // Food without scrolling through every row. Keyed by category id; default open.
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
   // OTA-360 — weapon-coating picker. When the player taps "Coat a
   // weapon" on a coating consumable, this holds that consumable and
   // the second modal lists the coatable weapons in the pack as
@@ -810,17 +814,30 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
+          const collapsed = !!collapsedSections[cat];
           return (
             <View key={cat} style={styles.section}>
-              <View style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}>
-                <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>
-                  {CATEGORY_LABEL[cat].toUpperCase()}
-                </Text>
+              {/* arb108 — semi-transparent backing so the label reads over any
+                  background; tap anywhere on the header (chevron included) to
+                  collapse/expand the whole section. */}
+              <TouchableOpacity
+                style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
+                activeOpacity={0.7}
+                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !s[cat] }))}
+              >
+                <View style={styles.sectionHeaderLeft}>
+                  <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
+                    {collapsed ? '▸' : '▾'}
+                  </Text>
+                  <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>
+                    {CATEGORY_LABEL[cat].toUpperCase()}
+                  </Text>
+                </View>
                 <Text style={styles.sectionCount}>
                   {items.reduce((sum, i) => sum + i.quantity, 0)}
                 </Text>
-              </View>
-              {items.map((item) => (
+              </TouchableOpacity>
+              {!collapsed && items.map((item) => (
                 <ItemRow
                   key={item.id}
                   item={item}
@@ -1276,11 +1293,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderLeftWidth: 4,
     paddingLeft: 8,
-    paddingVertical: 4,
+    paddingRight: 10,
+    paddingVertical: 6,
     marginBottom: 4,
+    // arb108 — semi-transparent backing so the category label never blends into
+    // the page background, and a subtle rounded plate to read as a tappable bar.
+    backgroundColor: 'rgba(8,6,4,0.55)',
+    borderRadius: 3,
   },
+  sectionHeaderLeft: { flexDirection: 'row', alignItems: 'center' },
+  // arb108 — collapse chevron (▾ open / ▸ collapsed).
+  sectionChevron: { fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
-  sectionCount: { color: '#7a705c', fontSize: 11 },
+  sectionCount: { color: '#9a8e74', fontSize: 11 },
   row: {
     flexDirection: 'row',
     backgroundColor: '#13110f',

@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-521 "Livermorium Fold" — [feature] collapsible inventory sections + semi-transparent header backing**
+  *(element #116)*. Each inventory category header (Weapons / Armor / … / Materials / Food) now sits on a
+  translucent rounded plate (`rgba(8,6,4,0.55)`) so the label never blends into the page background, and a
+  chevron (▾ open / ▸ collapsed) sits left of the label — tapping anywhere on the header folds that whole
+  category away, so the player can skip past Weapons/Armor to reach Materials/Food without scrolling every row.
+  Collapse state is per-category, default open, screen-local (`collapsedSections`). `app/screens/InventoryScreen.tsx`.
 - **OTA-520 "Moscovium Split" — [bugfix] fuse-reserve stack split + inferred weapons categorize as Weapons**
   *(element #115)*. Two Shrike-Claw issues. (1) **Reserve-for-fusion splits a stack:** marking one unit of a ×2
   stack "Save for fusion" peels exactly ONE unit out (reserved ×1) and leaves the rest free (×1) — was
