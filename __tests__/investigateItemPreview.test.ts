@@ -44,12 +44,13 @@ describe('getItemPreview — contract for the investigate handler', () => {
     // Previously this returned "No record of this item in the
     // catalog." Now itemDefaults.inferGear / inferWeapon / inferArmor
     // synthesize stats from the name so the player always sees
-    // something. The description still flags it as inferred so a
-    // catalog backfill can populate the real row later.
+    // something. The inferred description is immersive flavor (no dev
+    // jargon shown to the player) — the contract is just that the
+    // "no record" gap is gone and the preview is usable.
     const preview = getItemPreview('Definitely Not A Real Item');
     expect(preview.name).toBe('Definitely Not A Real Item');
     expect(preview.description.length).toBeGreaterThan(0);
-    expect(preview.description.toLowerCase()).toMatch(/field-inferred|inferred|backfill|catalog/);
+    expect(preview.description.toLowerCase()).not.toMatch(/no record/);
   });
 
   it('infers weapon stats for an uncatalogued blade name', () => {
