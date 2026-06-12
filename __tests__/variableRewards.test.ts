@@ -105,6 +105,12 @@ describe('OTA-043 — variable rewards on cardinal step', () => {
   it('cardinal step occasionally drops a trinket (≥1 hit in 300 trials at p≈10%)', async () => {
     const store = await bootstrap();
     for (let i = 0; i < 300; i++) {
+      // The step-trinket roll is gated on a NOVEL tile (anti-farm, OTA-532) and
+      // costs stamina. This test verifies the lottery FIRES when its conditions
+      // hold (statSpamGates owns the novelty gate itself), so keep every tile
+      // novel and the tank topped up — otherwise a 2-tile bounce trips the gate
+      // and a drained tank turns steps into no-ops.
+      store.setState((s) => (s.player ? { player: { ...s.player, recentTileHistory: [], stamina: s.player.staminaMax } } : s));
       const dir = (i % 2 === 0 ? 'north' : 'south') as 'north' | 'south';
       store.getState().stepDirection(dir);
       // Bail out if combat starts — encounter takes over the scene
@@ -135,6 +141,8 @@ describe('OTA-043 — variable rewards on cardinal step', () => {
     // "glint" / "snags" / "shifts" / "shadow" / "nudges" cues from
     // STEP_TRINKET_LINES.
     for (let i = 0; i < 200; i++) {
+      // Keep every tile novel + stamina topped (see note above).
+      store.setState((s) => (s.player ? { player: { ...s.player, recentTileHistory: [], stamina: s.player.staminaMax } } : s));
       const dir = (i % 2 === 0 ? 'east' : 'west') as 'east' | 'west';
       store.getState().stepDirection(dir);
       const scene = store.getState().currentScene;
@@ -178,8 +186,11 @@ describe('OTA-051 — hub rests can fire ambushes at a lower rate', () => {
     const { isHubLocation } = require('../app/engine/hub');
     const inHub = scene && isHubLocation(scene.location.id);
     if (!inHub) return; // starter location isn't a hub — can't test
+    // Stamina must be BELOW max or the OTA-238 "already fully rested, save the
+    // hours" gate refuses the rest before the while-you-slept/ambush roll. A
+    // deficit makes each rest a real rest (which then rolls + refills).
     store.setState({
-      player: { ...p0, hp: p0.hpMax, stamina: p0.staminaMax, hungerStaminaPenalty: 0 },
+      player: { ...p0, hp: p0.hpMax, stamina: 1, hungerStaminaPenalty: 0 },
       gameLog: [],
     });
     let encounters = 0;
@@ -191,7 +202,7 @@ describe('OTA-051 — hub rests can fire ambushes at a lower rate', () => {
       if (after.some((e) => ENCOUNTER_CUES.test(e.text))) encounters++;
       // Re-fill and clear enemies for next iteration
       store.setState((s) => (s.player ? {
-        player: { ...s.player, hp: s.player.hpMax, stamina: s.player.staminaMax },
+        player: { ...s.player, hp: s.player.hpMax, stamina: 1 },
       } : s));
       const liveScene = useGameStore.getState().currentScene;
       if (liveScene?.enemies && liveScene.enemies.length > 0) {
@@ -222,8 +233,11 @@ describe('OTA-050 — parser-routed rest also rolls the OTA-043 pull', () => {
     // OTA-043 pull only fired on the dead store-method rest() that
     // the UI doesn't reach. Now it fires on the parser path too.
     const p0 = store.getState().player!;
+    // Stamina must be BELOW max or the OTA-238 "already fully rested, save the
+    // hours" gate refuses the rest before the while-you-slept/ambush roll. A
+    // deficit makes each rest a real rest (which then rolls + refills).
     store.setState({
-      player: { ...p0, hp: p0.hpMax, stamina: p0.staminaMax, hungerStaminaPenalty: 0 },
+      player: { ...p0, hp: p0.hpMax, stamina: 1, hungerStaminaPenalty: 0 },
       gameLog: [],
     });
     let pullHits = 0;
@@ -233,9 +247,10 @@ describe('OTA-050 — parser-routed rest also rolls the OTA-043 pull', () => {
       store.getState().submitPlayerAction('rest');
       const after = useGameStore.getState().gameLog.slice(before);
       if (after.some((e) => PULL_CUES.test(e.text))) pullHits++;
-      // Re-fill the player so the next iteration is also a full-HP
-      // rest.
-      store.setState((s) => (s.player ? { player: { ...s.player, hp: s.player.hpMax, stamina: s.player.staminaMax } } : s));
+      // Re-fill HP but keep stamina LOW so the next iteration is a real rest
+      // (full HP + full stamina would trip the OTA-238 "already fully rested"
+      // refusal before the while-you-slept pull rolls).
+      store.setState((s) => (s.player ? { player: { ...s.player, hp: s.player.hpMax, stamina: 1 } } : s));
     }
     // 30% per rest → expected ~30 hits over 100, P(0 hits) negligible.
     expect(pullHits).toBeGreaterThan(0);

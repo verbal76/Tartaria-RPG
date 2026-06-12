@@ -66,7 +66,10 @@ describe('fusion carries stealth through from stealthy inputs', () => {
   it('no stealthy input → no stealth statBonus', () => {
     const inputs = [mkInput({ tags: ['metal'] })];
     const res = synthesizeFusionDeterministic(inputs, ['metal', 'iron']);
-    expect(res.stats.statBonus).toBeUndefined();
+    // A fused item still earns a thematic stat bonus from its material (metal →
+    // strength); the invariant is that STEALTH never leaks in without a stealthy
+    // input — not that the result is bonus-less.
+    expect(res.stats.statBonus?.stat).not.toBe('stealth');
   });
 
   it('an equipped fused item with a stealth statBonus applies through effectiveStats', () => {
