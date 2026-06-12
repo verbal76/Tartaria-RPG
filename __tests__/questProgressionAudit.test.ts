@@ -74,6 +74,12 @@ import { STORYLINES } from '../app/engine/factionStorylines';
 import { FACTIONS } from '../app/engine/factions';
 import { VENDORS } from '../app/engine/vendors';
 import enemiesData from '../app/data/enemies/enemies.json';
+import locationsData from '../app/data/locations/locations.json';
+
+// A ring of distinct, travelable location ids. A multi-stage `travel` quest
+// advances on reaching a NEW location, so bouncing between two isn't enough —
+// rotate through fresh ones.
+const TRAVEL_RING: string[] = (locationsData as Array<{ id: string }>).map((l) => l.id);
 
 interface Failure {
   id: string;
@@ -317,9 +323,11 @@ describe('Quest progression audit', () => {
           .find((r) => r.id === q.id)?.stage ?? -1;
 
         if (trigger === 'travel' || trigger === 'any' && stage.advanceOn === undefined) {
-          // For travel: hop to a *different* location to fire travelTo.
+          // For travel: hop to a NEW location each stage (these stages advance on
+          // discovering a fresh place, so rotate the ring rather than bounce two).
           const cur = store.getState().player?.currentLocationId;
-          const targetLoc = cur === 'varakush' ? 'drakova' : 'varakush';
+          let targetLoc = TRAVEL_RING[i % TRAVEL_RING.length]!;
+          if (targetLoc === cur) targetLoc = TRAVEL_RING[(i + 1) % TRAVEL_RING.length]!;
           store.getState().travelTo(targetLoc);
         } else if (trigger === 'kill' || trigger === 'any') {
           // Inject a 0-HP enemy on the scene and call resolveEnemyDefeat,
@@ -380,6 +388,37 @@ describe('Quest progression audit', () => {
 
       if (stalled) continue;
 
+      // OTA-450 fetch quests gate turn-in on holding the gathered items (they're
+      // consumed on hand-in). The stage walk above only fires travel/kill
+      // triggers, so put the required items in the pack before turning in —
+      // otherwise turn-in correctly refuses an unfulfilled fetch.
+      const fetchReq = (q as { fetch?: { itemName: string; quantity: number } }).fetch;
+      if (fetchReq) {
+        store.setState((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: [
+              ...s.player.inventory,
+              { id: `fetch_${q.id}`, name: fetchReq.itemName, kind: 'misc' as const, rarity: 'Common' as const, quantity: fetchReq.quantity, tags: [] },
+            ],
+          },
+        } : s));
+      }
+
+      // Force a SAME-FACTION vendor onto the scene for the hand-in. The last
+      // travel stage rolls a fresh scene that may carry a DIFFERENT faction's
+      // real vendor, which turn-in correctly refuses — overwrite it so we're
+      // exercising the turn-in path, not the wrong-faction guard.
+      store.setState((s) => (s.currentScene ? {
+        currentScene: {
+          ...s.currentScene,
+          vendor: {
+            id: 'audit_vendor', name: 'Audit Vendor', title: 'Auditor',
+            faction: q.factionId, description: '', offers: [], gender: 'female' as const,
+          },
+        },
+      } : s));
+
       // Turn-in — record pre-state to verify TC + rep deltas.
       const pBefore = store.getState().player!;
       const tcBefore = pBefore.tc;
@@ -392,9 +431,10 @@ describe('Quest progression audit', () => {
       const repAfter = pAfter.factionStanding.find((r) => r.factionId === q.factionId)?.standing ?? 0;
       const repDelta = repAfter - repBefore;
       if (!inCompleted || stillActive || tcDelta < q.reward.tc || repDelta < q.reward.rep) {
+        const recAtTurnIn = (pBefore.activeFactionQuests ?? []).find((r) => r.id === q.id);
         turnInFailures.push({
           id: q.id, title: q.title, kind: 'fq',
-          reason: `turn-in failed: completed=${inCompleted}, stillActive=${stillActive}, tcDelta=${tcDelta}/${q.reward.tc}, repDelta=${repDelta}/${q.reward.rep}`,
+          reason: `turn-in failed: completed=${inCompleted}, stillActive=${stillActive}, tcDelta=${tcDelta}/${q.reward.tc}, repDelta=${repDelta}/${q.reward.rep}, stage=${recAtTurnIn?.stage ?? '?'}/${(q.stages ?? []).length}`,
         });
       }
     }
@@ -413,22 +453,28 @@ describe('Quest progression audit', () => {
         continue;
       }
 
-      // Drive every stage forward via advanceHunt. The boss stage
-      // spawns a scaled enemy; resolveEnemyDefeat closes it.
+      // Drive every stage forward via advanceHunt. Each boss stage spawns a
+      // scaled enemy; resolveEnemyDefeat closes it. NOTE (OTA-426): several
+      // hunts carry a MID-hunt boss stage AND a final boss stage, and only the
+      // FINAL one completes the hunt (resolveEnemyDefeat advances only when the
+      // record is already past the last boss stage). So we must NOT stop at the
+      // first boss — keep advancing and resolving each boss stage until the hunt
+      // actually completes.
       let bossSpawned = false;
       let bossKilled = false;
-      for (let i = 1; i < h.stages.length; i++) {
+      for (let i = 0; i < h.stages.length + 2 && !bossKilled; i++) {
+        const cur = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
+        if (!cur) break;
+        if (cur.stage >= h.stages.length) { bossKilled = true; break; }
         store.getState().advanceHunt(h.id);
         const updated = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
         if (!updated) break;
         if (h.stages[updated.stage - 1]?.checkKind === 'boss') {
           bossSpawned = true;
-          // Resolve the boss kill — completes hunt by stamping
-          // stage past the end.
+          // Boss scene was set by advanceHunt; zero its HP so resolveEnemyDefeat
+          // registers the kill (and advances the hunt iff it's the final boss).
           store.setState((s) => {
             if (!s.currentScene) return s;
-            // Boss scene was set by advanceHunt; ensure HP=0 so
-            // resolveEnemyDefeat closes the loop.
             return {
               ...s,
               currentScene: {
@@ -440,7 +486,6 @@ describe('Quest progression audit', () => {
           store.getState().resolveEnemyDefeat();
           const finalRec = (store.getState().player?.activeHunts ?? []).find((r) => r.id === h.id);
           if (finalRec && finalRec.stage >= h.stages.length) bossKilled = true;
-          break;
         }
       }
       if (!bossSpawned || !bossKilled) {

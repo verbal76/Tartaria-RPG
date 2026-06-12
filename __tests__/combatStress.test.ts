@@ -81,10 +81,10 @@ function mulberry32(seed: number): () => number {
 }
 
 describe('combatStress — quick-action combat verbs across 700 in-game days', () => {
-  // 700-day forced-encounter sim — heavy, and it was running right at the old
-  // 170s edge (170.8s observed), so a slower machine tipped it into a timeout
-  // with no logic failure. Give generous headroom.
-  jest.setTimeout(300000);
+  // 700-day forced-encounter sim — genuinely heavy (~300s observed), with no
+  // logic failure; it was just tipping over tight timeouts on slower machines.
+  // Give wide headroom so it never reads as a spurious timeout.
+  jest.setTimeout(480000);
 
   beforeAll(() => {
     console.log = () => {};
