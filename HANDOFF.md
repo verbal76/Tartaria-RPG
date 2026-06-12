@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-527 "Unbibium Lexicon" — [polish] far more fused-weapon name variety** *(element #122)*. The Crucible
+  repeated fused names because — with Qwen disabled (the player's case) — names come from
+  `synthesizeFusionDeterministic`'s word banks, which were tiny (~4 themes × ~5 suffixes ≈ 20 combos per
+  material), so an aether-heavy pack kept hitting the same handful. Expanded BOTH banks ~4× (theme banks to ~16
+  per material; weapon/armor suffix banks to ~16–20), taking aether-weapon names from ~20 distinct to **~220+**
+  (measured 222 distinct across 400 input sets). Still deterministic per input set. `app/engine/itemFusion.ts`.
+  Test `fusionNameVariety.test.ts`.
 - **OTA-526 "Unbiunium Sort" — [bugfix] creature-part reagents → Materials + fusion accepts them** *(element
   #121)*. (1) **Category:** a reagent whose kind got mis-stamped (Aetheric Moss — "moss" tripped the
   fungus→consumable heuristic) or whose tags are too sparse (Leech Mucus → was Loot) now files under MATERIALS.

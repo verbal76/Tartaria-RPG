@@ -14280,4 +14280,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // COUNTS (a real drink like Aether-Distilled Spirit is still excluded). Note: a reserved STACK counts as ONE input
 // (not per-unit) and a fuse drains ONE unit per input (the rest of the stack stays). app/components/
 // InventoryCategorize.ts, app/engine/itemFusion.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-526';
+// OTA-527 (Unbibium Lexicon) — [polish] the fuse Crucible repeated fused names too often. With Qwen disabled
+// (the player's case), names come from synthesizeFusionDeterministic's word banks, which were tiny: ~4 themes ×
+// ~5 suffixes ≈ 20 combos per material — so an aether-heavy pack kept landing on the same handful. Expanded BOTH
+// banks ~4× (theme banks to ~16 per material, weapon/armor suffix banks to ~16-20), taking aether-weapon names
+// from ~20 distinct to ~220+ (measured 222 distinct across 400 input sets). Names stay deterministic per input
+// set. app/engine/itemFusion.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-527';

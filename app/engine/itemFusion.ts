@@ -447,19 +447,59 @@ export function synthesizeFusionDeterministic(
   const rarity: 'Rare' | 'Legendary' = tagProfile.length >= 4 ? 'Legendary' : 'Rare';
   // Name from a theme word + suffix. Deterministic via the input hash
   // so the same input set always produces the same name.
+  // arb114 — MUCH larger word banks so the Crucible stops repeating names. Each
+  // dominant-tag theme bank and each kind suffix bank is now ~16 deep, taking a
+  // weapon's combination space from ~20 to ~250+ per material (and the hash picks
+  // two independent slices, so different input sets rarely collide on a name).
   const themePool: Record<string, string[]> = {
-    aether: ['Resonant', 'Humming', 'Singing', 'Aether-Veined'],
-    metal: ['Iron-Bound', 'Salvaged', 'Tempered', 'Brass-Edged'],
-    cloth: ['Patched', 'Woven', 'Mud-Worn', 'Veil-Stitched'],
-    organic: ['Marrow-Etched', 'Bone-Stitched', 'Sinew-Wrapped', 'Carapace'],
-    wood: ['Hardwood', 'Burl', 'Rooted', 'Splint'],
-    stone: ['Mudstone', 'Cairn', 'Slate', 'Pillar'],
-    improvised: ['Field-Forged', 'Reclaimed', 'Salt-Worn', 'Veteran'],
+    aether: [
+      'Resonant', 'Humming', 'Singing', 'Aether-Veined', 'Etheric', 'Glimmerwrought',
+      'Stormcalled', 'Voltaic', 'Pulse-Woven', 'Lumenforged', 'Aether-Touched', 'Spark-Riven',
+      'Choir-Bound', 'Static-Laced', 'Witchlit', 'Ghost-Charged', 'Auralite', 'Halcyon',
+    ],
+    metal: [
+      'Iron-Bound', 'Salvaged', 'Tempered', 'Brass-Edged', 'Forge-Black', 'Rust-Eaten',
+      'Scrap-Welded', 'Anvil-Struck', 'Cold-Drawn', 'Slag-Cast', 'Rivet-Seamed', 'Hammer-Folded',
+      'Galvanized', 'Bolt-Riveted', 'Foundry-Born', 'Pig-Iron',
+    ],
+    cloth: [
+      'Patched', 'Woven', 'Mud-Worn', 'Veil-Stitched', 'Tatter-Sewn', 'Threadbare',
+      'Shroud-Spun', 'Sackcloth', 'Frayed', 'Loom-Bound', 'Gauze-Wrapped', 'Quilted',
+      'Ragspun', 'Weft-Knit',
+    ],
+    organic: [
+      'Marrow-Etched', 'Bone-Stitched', 'Sinew-Wrapped', 'Chitin-Plated', 'Gut-Strung', 'Hide-Bound',
+      'Tallow-Cured', 'Tooth-Set', 'Vein-Threaded', 'Husk-Grown', 'Spore-Crusted', 'Ichor-Slick',
+      'Scale-Lapped', 'Tendon-Lashed',
+    ],
+    wood: [
+      'Hardwood', 'Burl', 'Rooted', 'Splint', 'Knot-Grained', 'Greenwood',
+      'Driftwood', 'Bog-Oak', 'Sap-Sealed', 'Bark-Lashed', 'Pith-Cored', 'Timberbound',
+    ],
+    stone: [
+      'Mudstone', 'Cairn', 'Slate', 'Pillar', 'Granite-Cut', 'Cobble-Set',
+      'Flint-Knapped', 'Basalt', 'Quarry-Hewn', 'Shale-Split', 'Geode-Cored', 'Menhir',
+    ],
+    improvised: [
+      'Field-Forged', 'Reclaimed', 'Salt-Worn', 'Veteran', 'Jury-Rigged', 'Scavenged',
+      'Makeshift', 'Lashed-Together', 'Roadworn', 'Gutter-Made', 'Half-Mended', "Drifter's",
+      'Castoff', 'Pieced', 'Cobbled', 'Stopgap',
+    ],
   };
   const suffixPool: Record<string, string[]> = {
-    weapon: ['Cleaver', 'Edge', 'Spike', 'Lash', 'Maul'],
-    armor: ['Brace', 'Vigil', 'Mantle', 'Shroud', 'Bulwark'],
-    dog_armor: ['Vigil', 'Wrap', 'Pattern', 'Stride'],
+    weapon: [
+      'Cleaver', 'Edge', 'Spike', 'Lash', 'Maul', 'Reaver', 'Fang', 'Render',
+      'Splitter', 'Brand', 'Gouge', 'Hewer', 'Cudgel', 'Talon', 'Ripper', 'Crusher',
+      'Skewer', 'Breaker', 'Sunder', 'Biter',
+    ],
+    armor: [
+      'Brace', 'Vigil', 'Mantle', 'Shroud', 'Bulwark', 'Ward', 'Carapace', 'Aegis',
+      'Husk', 'Bastion', 'Girdle', 'Plating', 'Cuirass', 'Harness', 'Shell', 'Guard',
+    ],
+    dog_armor: [
+      'Vigil', 'Wrap', 'Pattern', 'Stride', 'Harness', 'Coat', 'Barding', 'Hide',
+      'Saddle', 'Collar', 'Vest', 'Cover',
+    ],
   };
   const hash = parseInt(fusionInputHash(inputs).substring(0, 8), 16);
   const theme = themePool[dominantTag] ?? themePool.improvised!;
