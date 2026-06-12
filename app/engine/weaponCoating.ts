@@ -119,6 +119,17 @@ export function acidShredCap(enemy: { boss?: boolean } | null | undefined): numb
 }
 /** Extra DOT-per-turn a corruption coating gains per accumulated stack. */
 export const CORRUPTION_STACK_BONUS = 1;
+// arb118 — corruption stacks are now CAPPED (mirrors acid's acidShredCap). Without
+// this the stack counter grew +1 per hit forever, so a single permanent corruption
+// coating's DOT climbed without limit (30 hits → 30+ dmg/turn) and guaranteed a
+// kill on any HP pool. The "accelerating rot, worst against tough foes" design is
+// preserved — it escalates over the first several hits, more so against bosses —
+// it just can't grow unbounded.
+export const CORRUPTION_STACK_MAX = 5;
+export const CORRUPTION_STACK_BOSS_BONUS = 6;
+export function corruptionStackCap(enemy: { boss?: boolean } | null | undefined): number {
+  return CORRUPTION_STACK_MAX + (enemy?.boss ? CORRUPTION_STACK_BOSS_BONUS : 0);
+}
 
 /** The enemyStatuses `kind` string a coating lands as a DOT. */
 export function coatingStatusKind(

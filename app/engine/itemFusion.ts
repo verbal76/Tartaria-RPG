@@ -353,13 +353,17 @@ export function validateFusionResponse(raw: RawFusionResponse): { name: string; 
   } else if (kind === 'armor') {
     const slot = typeof raw.armorSlot === 'string' ? raw.armorSlot.toLowerCase() : '';
     if (!(VALID_ARMOR_SLOTS as readonly string[]).includes(slot)) return null;
-    const ac = typeof raw.acBonus === 'number' ? Math.floor(raw.acBonus) : 0;
+    // arb118 — Number.isFinite (not typeof === 'number') so a NaN acBonus can't
+    // slip through (NaN < 1 and NaN > cap are BOTH false) and poison AC math.
+    const ac = Number.isFinite(raw.acBonus) ? Math.floor(raw.acBonus as number) : 0;
     if (ac < 1 || ac > FUSION_CLAMPS.acBonus) return null;
     stats.armorSlot = slot as UniqueItemStats['armorSlot'];
     stats.acBonus = ac;
   } else {
     // dog_armor — no slot, but needs acBonus
-    const ac = typeof raw.acBonus === 'number' ? Math.floor(raw.acBonus) : 0;
+    // arb118 — Number.isFinite (not typeof === 'number') so a NaN acBonus can't
+    // slip through (NaN < 1 and NaN > cap are BOTH false) and poison AC math.
+    const ac = Number.isFinite(raw.acBonus) ? Math.floor(raw.acBonus as number) : 0;
     if (ac < 1 || ac > FUSION_CLAMPS.acBonus) return null;
     stats.acBonus = ac;
   }

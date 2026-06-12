@@ -378,6 +378,20 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-531 "Unbihexium Seal" — [bugfix] combat-exploit hardening (4-agent red-team sweep)** *(element #126)*.
+  THREE live exploits closed: (1) **Corruption coating** DOT grew +1 dmg/turn EVERY hit forever (uncapped stack
+  counter) → a single permanent coating killed any HP pool; now capped via `corruptionStackCap` (base 5, +6 vs
+  bosses), mirroring `acidShredCap` — escalation preserved, bounded. (2) **Disease-Sample `infected`** stacked N
+  independent 10-round DOTs (unfiltered push) → N HP/turn insta-kill; now REFRESHES one DOT (filters prior
+  `infected`), matching the coating model. (3) **`staminaMax` travel-farm**: the "+1 per 5 travels" milestone
+  counted EVERY travel; now only a FIRST arrival (not yet in discoveredLocationIds) advances it. Two latent
+  guards: fusion `validateFusionResponse` uses `Number.isFinite` (a NaN acBonus slipped `<1`/`>cap`); `rollDice`
+  clamps count/sides ≤1000 (malformed-notation DoS). Everything else came back **clean** — defense math (no
+  0-damage/immunity, no unbounded AC/HP/stat), fusion conservation + clamps (no dup/free-fuse/out-of-range),
+  HP/stamina bounds, one-shot buffs (aim/dodge/stealth don't re-stack), defeat/KO-loot (no re-farm).
+  `app/engine/weaponCoating.ts`, `app/engine/rng.ts`, `app/engine/itemFusion.ts`, `app/state/gameStore.ts`. Test
+  `exploitFixesHardening.test.ts`. (The user's "AC tank can't be untouchable" concern was already safe — nat-20
+  always hits.)
 - **OTA-530 "Unbipentium Aegis" — [balance] FUSED armor follows the rarity resistance ladder too** *(element
   #125)*. The Crucible synth gives a fused piece one resistance; `aggregateArmor` now tops it up to its rarity
   (Rare 2 / Legendary 3) via the shared `crafting.fusedArmorResistances` (seeded from the synth resistance,

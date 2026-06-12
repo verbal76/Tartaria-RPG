@@ -3,8 +3,13 @@ export function rollDie(sides: number): number {
 }
 
 export function rollDice(count: number, sides: number): number {
+  // arb118 — clamp to sane bounds so a malformed / data-driven notation (e.g.
+  // "999999d6") can't spin a multi-million-iteration loop (latent DoS). No legit
+  // notation in the game exceeds ~2d20, so this never touches real rolls.
+  const c = Math.max(0, Math.min(1000, Math.floor(count) || 0));
+  const s = Math.max(1, Math.min(1000, Math.floor(sides) || 1));
   let total = 0;
-  for (let i = 0; i < count; i++) total += rollDie(sides);
+  for (let i = 0; i < c; i++) total += rollDie(s);
   return total;
 }
 

@@ -160,7 +160,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, rollLootCoating } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
@@ -13736,8 +13736,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 if (!s.currentScene) return s;
                 const next = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
                 while (next.length <= idx) next.push([]);
+                // arb118 — REFRESH the infection (drop any prior `infected` first),
+                // mirroring the coating DOT model. Was an unfiltered push, so spamming
+                // Disease Sample throws stacked N independent 10-round DOTs (N HP/turn)
+                // — a guaranteed insta-kill. Now it's a single refreshing 1 HP/turn DOT.
                 next[idx] = [
-                  ...(next[idx] ?? []),
+                  ...(next[idx] ?? []).filter((st) => st.kind !== 'infected'),
                   { kind: 'infected' as const, turnsRemaining: 10, dmgPerTurn: 1, sourceName: equippedItem.name },
                 ];
                 return { currentScene: { ...s.currentScene, enemyStatuses: next } };
@@ -13837,7 +13841,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (proc.kind === 'corruption') {
               corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
               while (corr.length < n) corr.push(0);
-              corr[activeIdx] = (corr[activeIdx] ?? 0) + 1;
+              // arb118 — CAP the stack (was uncapped → unbounded DOT exploit).
+              corr[activeIdx] = Math.min(
+                corruptionStackCap(s.currentScene.enemies[activeIdx]),
+                (corr[activeIdx] ?? 0) + 1,
+              );
               stacksAfter = corr[activeIdx]!;
             }
             let shred = s.currentScene.enemyArmorShred;
@@ -13915,10 +13923,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Stair.").
     const fromLocationName = getLocationById(player.currentLocationId).name;
 
-    // Travel milestone: every 5 distinct travels → +1 stamina max.
+    // Travel milestone: every 5 DISTINCT destinations → +1 stamina max. arb118 —
+    // the code counted EVERY travel (the "distinct" comment was aspirational), so
+    // bouncing between two tiles farmed permanent staminaMax forever. Now only a
+    // FIRST arrival at a place (not yet in discoveredLocationIds) advances the
+    // counter; re-treading a known place no longer counts.
+    const firstArrival = !((get().worldMemory?.discoveredLocationIds ?? []).includes(locationId));
     const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
-    const newTravels = prevMs.travelsCompleted + 1;
-    const hitMilestone = checkMilestone(newTravels, MILESTONE_TRAVEL_STEP);
+    const newTravels = firstArrival ? prevMs.travelsCompleted + 1 : prevMs.travelsCompleted;
+    const hitMilestone = firstArrival && checkMilestone(newTravels, MILESTONE_TRAVEL_STEP);
     const newStaminaMax = hitMilestone ? player.staminaMax + 1 : player.staminaMax;
     const newStamina = hitMilestone ? player.stamina + 1 : player.stamina;
 

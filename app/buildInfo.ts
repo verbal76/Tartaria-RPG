@@ -14304,4 +14304,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // to its rarity (Rare 2 / Legendary 3) via the shared crafting.fusedArmorResistances (seeded from the synth
 // resistance, material primary read off the fused NAME). The item preview shows the laddered set for fused armor
 // too. app/engine/crafting.ts, app/state/gameStore.ts, app/components/itemPreview.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-530';
+// OTA-531 (Unbihexium Seal) — [bugfix] combat-exploit hardening from a 4-agent red-team sweep (armor/resist,
+// coatings/weapons, fusion, status/economy). THREE live exploits closed: (1) CORRUPTION coating DOT grew +1
+// dmg/turn EVERY hit forever (uncapped stack counter) — a single permanent coating guaranteed a kill on any HP;
+// now capped via corruptionStackCap (base 5, +6 vs bosses), mirroring acid's acidShredCap, so the "accelerating
+// rot" still escalates but is bounded. (2) Disease-Sample `infected` DOT stacked N independent 10-round DOTs (N
+// HP/turn) because the apply was an unfiltered push; now REFRESHES a single DOT (filters prior `infected` first),
+// matching the coating model. (3) "+1 staminaMax per 5 travels" milestone counted EVERY travel, so bouncing two
+// tiles farmed it forever; now only a FIRST arrival (not yet discovered) advances the counter. Plus two latent
+// guards: fusion validateFusionResponse uses Number.isFinite (a NaN acBonus slipped < 1 / > cap); rollDice clamps
+// count/sides (≤1000) against a malformed-notation DoS. Everything else (defense math, fusion conservation/clamps,
+// HP/stamina bounds, one-shot buffs, loot farming) came back CLEAN. app/engine/weaponCoating.ts, app/engine/rng.ts,
+// app/engine/itemFusion.ts, app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-531';
