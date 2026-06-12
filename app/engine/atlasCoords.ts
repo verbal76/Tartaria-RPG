@@ -102,7 +102,7 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   // v2.4.1 (OTA 052) — four additional Lost Capitals so the count
   // matches the 9 playable factions. Placed in previously-empty
   // atlas regions so the player has to actually travel for each.
-  iskan_veil:  { fx: 0.05, fy: 0.32 },  // far northwest — Architect's hidden city
+  iskan_veil:  { fx: 0.07, fy: 0.32 },  // far northwest — Architect's hidden city (kept just inside the painted west edge; the dot clamp floors at 0.06)
   yuldra_tul:  { fx: 0.88, fy: 0.18 },  // northeast mountains — Giants' tomb-gate capital
   ostragar:    { fx: 0.93, fy: 0.42 },  // far east wetlands — river-dynasty city
   karok_sa:    { fx: 0.42, fy: 0.72 },  // south band — Forgotten Order ritual seat
@@ -366,10 +366,18 @@ export function interpolateAtlasPosition(
     const dx = gridPos.x - playerX;
     const dy = gridPos.y - playerY;
     const manhattan = Math.abs(dx) + Math.abs(dy);
-    // Inverse-square weight with an epsilon floor so a player
-    // standing exactly on an anchor tile (manhattan=0) doesn't
-    // explode the weight to infinity — the anchor still wins by
-    // ~4 orders of magnitude.
+    // arb119 — HARD SNAP. Standing EXACTLY on a location's tile should put the
+    // dot precisely on that location's icon. The old epsilon-floored inverse-
+    // square only gave the on-tile anchor ~96% of the weight, so a close
+    // neighbour could still drag the dot a few percent off its icon (measured
+    // 0.041 for yuldra_tul, which sits beside another capital on some seeds).
+    // A zero-distance anchor wins outright — and snaps to the location's RAW
+    // icon coord (MapScreen draws icons from the raw table, unclamped), so the
+    // dot sits exactly on the icon even for edge/inset-adjacent capitals. The
+    // off-limits clamp below still governs INTERPOLATED (between-location) dots.
+    if (manhattan === 0) {
+      return { fx: atlasCoord.fx, fy: atlasCoord.fy };
+    }
     const w = 1 / Math.pow(manhattan + IDW_EPSILON, IDW_POWER);
     weightedFx += atlasCoord.fx * w;
     weightedFy += atlasCoord.fy * w;

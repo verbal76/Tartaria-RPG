@@ -44,7 +44,15 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       // Nexus bottom-right). Bounds catch typos that would land a
       // dot on the TARTARIA title, the Vertical Strata inset, the
       // legend, or the Reclaimers' Outpost Interior inset.
+      // INSET locations are drawn in their own panels, NOT on the main painted
+      // world — the Reclaimers' Outpost Interior inset (outpost_*) and the
+      // buried sub-surface levels (buried_*), which legitimately sit at the
+      // edges/below the main image. The main-world bounds only apply to the
+      // overworld dots (those are what could wrongly land on the title/legend).
+      const isInset = (id: string) => id.startsWith('outpost_') || id.startsWith('buried_');
       for (const [id, c] of Object.entries(LOCATION_ATLAS_COORDS)) {
+        expect(id.length).toBeGreaterThan(0);
+        if (isInset(id)) continue;
         expect(c.fx).toBeGreaterThanOrEqual(0);
         expect(c.fx).toBeLessThanOrEqual(1);
         expect(c.fy).toBeGreaterThanOrEqual(0);
@@ -53,7 +61,6 @@ describe('OTA 051 — atlas coordinate calibration', () => {
         expect(c.fx).toBeLessThan(0.95);
         expect(c.fy).toBeGreaterThan(0.05);
         expect(c.fy).toBeLessThan(0.97);
-        expect(id.length).toBeGreaterThan(0);
       }
     });
 

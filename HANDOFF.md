@@ -378,6 +378,18 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-535 "Untrinilium Plot" — [bugfix] map-dot accuracy** *(element #130)*. (1) Standing EXACTLY on a
+  location's tile now snaps the player dot precisely onto that location's icon — the IDW plot only gave the
+  on-tile anchor ~96% weight, so a nearby capital dragged the dot a few % off (0.041 for yuldra_tul). A
+  zero-distance anchor now wins outright and snaps to the location's RAW icon coord (MapScreen draws icons
+  unclamped); the off-limits clamp still governs interpolated between-location dots. (2) `iskan_veil` sat at the
+  very west edge (fx 0.05, below the 0.06 clamp floor); nudged just inside. `app/engine/atlasCoords.ts`. Tests
+  `atlasIdw`, `atlasCoords`.
+  - **TEST-BOARD CLEANUP COMPLETE** — the full backlog the user asked to green is cleared: **all ~26 previously
+    red suites now pass** (stale assertions updated to deliberate behavior; harness gaps in `questProgressionAudit`/
+    `variableRewards`/`interactionStress` fixed; 4 real gameplay bugs fixed → OTA-533/535; `metaNavStress`
+    recognized as derived re-centering; `combatStress` was a timeout, not a failure). Flaky-not-real (pass alone):
+    `yearSimulation`, `armorRegenApply`, `dogSystemPerfSmoke`, `engineStateChaosSim`.
 - **OTA-534 "Unbiennium Caliber" — [feature] every enemy attack carries a visible DAMAGE TYPE** *(element #129)*.
   ~Half the bestiary authored bare dice ("2D6") with no type word, so the OTA-529/530 resistance ladder couldn't
   engage and the portrait/log showed nothing. New `engine/damageTypes.ts` `enemyDamageType` resolves a concrete

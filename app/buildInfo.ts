@@ -14359,4 +14359,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rework) — a real, bounded defensive buff. STATUS-effect procs (bleed/armor-sever/burn/…) stay gated to
 // enemies that EXPLICITLY declared a type, so inferring a type does NOT silently add new on-hit statuses.
 // app/engine/damageTypes.ts (new), app/state/gameStore.ts, app/components/EnemyPanel.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-534';
+// OTA-535 (Untrinilium Plot) — [bugfix] map-dot accuracy. (1) HARD SNAP: standing EXACTLY on a location's
+// tile now puts the player dot precisely on that location's icon. The IDW dot plot only gave the on-tile
+// anchor ~96% of the weight, so a nearby capital could drag the dot a few percent off its icon (measured
+// 0.041 for yuldra_tul); a zero-distance anchor now wins outright and snaps to the location's RAW icon coord
+// (MapScreen draws icons unclamped), so dot and icon coincide even at the map edges. The off-limits clamp
+// still governs interpolated between-location dots. (2) iskan_veil's coord was at the very west edge
+// (fx 0.05, below the 0.06 dot-clamp floor); nudged just inside so its dot/icon don't disagree.
+// app/engine/atlasCoords.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-535';
