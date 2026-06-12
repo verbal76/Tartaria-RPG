@@ -14198,4 +14198,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Number.isFinite so a corrupt NaN cell can't leak a non-finite "?" marker. The sweep otherwise found the grid
 // math, markers, geometry, and reload paths clean across ~25k fuzz iterations + 4.5k random gameplay ticks.
 // app/state/gameStore.ts, app/engine/questionMarkers.ts, app/engine/contractMarkers.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-516';
+// OTA-517 (Copernicium Cairn) — [bugfix] Big Rock + Small Rock filed under WEAPONS in the inventory instead of
+// MATERIALS. They're crafting stock (materials.json) that also carry a `thrown` tag (they double as improvised
+// throws), and InventoryCategorize's `/(throwable|thrown)/ → weapon` heuristic fired before the materials-catalog
+// check. Now a catalog MATERIAL is bucketed as 'material' BEFORE that heuristic, so the rocks land under
+// Materials while a genuine thrown weapon not in the materials catalog (the Shaped Aetheric Shard) stays a
+// weapon. [polish] Hidden Market map label shrunk a further 15% per player (fontSize base 30→25.5).
+// app/components/InventoryCategorize.ts, app/screens/MapScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-517';

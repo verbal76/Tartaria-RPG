@@ -78,6 +78,11 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
   if (AMULETS.some((a) => a.name.toLowerCase() === nameLower)) return 'accessory';
   if (RINGS.some((r) => r.name.toLowerCase() === nameLower)) return 'accessory';
+  // arb104 — a catalog MATERIAL wins before the thrown-weapon heuristic below.
+  // Big Rock / Small Rock are crafting stock in materials.json that also carry a
+  // `thrown` tag (they double as improvised throws), so the `/(throwable|thrown)/`
+  // rule was filing them under Weapons. They're materials — bucket them as such.
+  if (MATERIALS.some((m) => m.name.toLowerCase() === nameLower)) return 'material';
   // OTA-491 — a thrown one-shot weapon (e.g. the Shaped Aetheric Shard, a GEAR-
   // catalog item with kind 'misc' + 'throwable', not in the WEAPONS catalog) is a
   // WEAPON. Bucket it by the weapon tag BEFORE the tool check — otherwise its
@@ -99,7 +104,6 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
     if (gearKind === 'relic') return 'relic';
     return 'loot';
   }
-  if (MATERIALS.some((m) => m.name.toLowerCase() === nameLower)) return 'material';
 
   // Fallback by kind/tags.
   if (item.kind === 'weapon') return 'weapon';

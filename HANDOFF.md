@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-517 "Copernicium Cairn" — [bugfix] rocks → Materials, not Weapons + Hidden Market label −15%** *(element
+  #112)*. Big Rock + Small Rock showed under WEAPONS in inventory. They're crafting stock (`materials.json`) that
+  also carry a `thrown` tag (double as improvised throws), and `InventoryCategorize`'s `/(throwable|thrown)/ →
+  weapon` heuristic ran before the materials-catalog check. Now a catalog MATERIAL is bucketed `material` BEFORE
+  that heuristic, so the rocks land under Materials while a genuine thrown weapon NOT in the materials catalog
+  (the Shaped Aetheric Shard) stays a weapon. Verified both. Also shrank the Hidden Market map label a further
+  15% (fontSize base 30→25.5). `app/components/InventoryCategorize.ts`, `app/screens/MapScreen.tsx`.
 - **OTA-516 "Roentgenium Return" — [bugfix] route-back-home stranding + chaos-sweep hardening** *(element #111)*.
   Output of a 4-agent chaos/stress sweep of the last day's work (~25k fuzz iterations + 4.5k random gameplay
   ticks). **MAIN FIX (chaos INV8b):** routing BACK to a location you'd wandered off in open ground stranded you.

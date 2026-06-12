@@ -697,7 +697,8 @@ export function MapScreen() {
                 <Text
                   style={[
                     styles.hiddenMarketName,
-                    { fontSize: Math.max(5, 30 * labelScale), lineHeight: Math.max(6, 33 * labelScale) },
+                    // arb104 — shrunk a further 15% on player request (30→25.5).
+                    { fontSize: Math.max(4.25, 25.5 * labelScale), lineHeight: Math.max(5.1, 28 * labelScale) },
                   ]}
                 >
                   The Hidden{'\n'}Market
