@@ -120,6 +120,23 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   return 'loot';
 }
 
+// arb109 — every category an item should be LISTED under. Usually one. But a
+// crafting MATERIAL that is also a deliberate thrown WEAPON (the `throwable` tag —
+// exactly what validSlotsForItem routes to a hand, e.g. Disease Sample / Sentinel
+// Core Plate) is listed under BOTH Weapons AND Materials. It's the SAME underlying
+// stack shown twice (shared quantity, same item id), so consuming it for EITHER
+// purpose — throw it OR craft with it — decrements the one stack and BOTH listings
+// drop together: 4 samples read "×4" in both sections, not 8, and crafting 3 +
+// throwing 1 empties it everywhere. Improvised `thrown` junk (rocks) is not a real
+// weapon (validSlotsForItem ignores `thrown`), so it stays Materials-only.
+export function categoriesForItem(item: InventoryItem): InventoryCategory[] {
+  const primary = categorizeItem(item);
+  if (primary === 'material' && (item.tags ?? []).some((t) => /^throwable$/i.test(t))) {
+    return ['weapon', 'material'];
+  }
+  return [primary];
+}
+
 export function groupInventoryByCategory(
   inventory: InventoryItem[],
 ): Record<InventoryCategory, InventoryItem[]> {
@@ -135,7 +152,7 @@ export function groupInventoryByCategory(
     quest: [],
   };
   for (const item of inventory) {
-    groups[categorizeItem(item)].push(item);
+    for (const cat of categoriesForItem(item)) groups[cat].push(item);
   }
   return groups;
 }

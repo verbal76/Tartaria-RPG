@@ -378,6 +378,15 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-522 "Tennessine Twin" — [feature] dual-category listing (weapon + material) for throwable reagents**
+  *(element #117)*. A crafting MATERIAL that is also a deliberate thrown WEAPON (the `throwable` tag — what
+  `validSlotsForItem` routes to a hand: Disease Sample, Sentinel Core Plate) now lists under BOTH Weapons and
+  Materials. It's the SAME underlying stack shown twice (same item id + shared quantity), so a stack of 4 reads
+  "×4" in BOTH sections (you have 4, not 8) and consuming it for EITHER purpose — throw OR craft — decrements the
+  one stack so both listings drop together (craft 3 + throw 1 → empty everywhere). New `categoriesForItem`
+  (single source) that `groupInventoryByCategory` fans out over; consume paths untouched (always operated on the
+  one stack). Improvised `thrown` junk (rocks) stays Materials-only (`validSlotsForItem` ignores `thrown`).
+  Test `dualCategoryItems.test.ts` asserts same-reference/shared-quantity. `app/components/InventoryCategorize.ts`.
 - **OTA-521 "Livermorium Fold" — [feature] collapsible inventory sections + semi-transparent header backing**
   *(element #116)*. Each inventory category header (Weapons / Armor / … / Materials / Food) now sits on a
   translucent rounded plate (`rgba(8,6,4,0.55)`) so the label never blends into the page background, and a

@@ -14231,4 +14231,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sits left of the label — tapping anywhere on the header folds that whole category away, so the player can skip
 // past Weapons/Armor to reach Materials/Food without scrolling every row. Collapse state is per-category, default
 // open, screen-local. app/screens/InventoryScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-521';
+// OTA-522 (Tennessine Twin) — [feature] dual-category inventory listing. A crafting MATERIAL that is also a
+// deliberate thrown WEAPON (the `throwable` tag — exactly what validSlotsForItem routes to a hand: Disease
+// Sample, Sentinel Core Plate) now lists under BOTH Weapons and Materials. Crucially it's the SAME underlying
+// stack shown twice (same item id + shared quantity), so a stack of 4 reads "×4" in BOTH sections (you have 4,
+// not 8) and consuming it for EITHER purpose — throw it OR craft with it — decrements the one stack so both
+// listings drop together (craft 3 coatings + throw 1 → empty everywhere). Implemented as a new categoriesForItem
+// (single source) that groupInventoryByCategory fans out over; the consume paths are untouched (they always
+// operated on the one stack). Improvised `thrown` junk (rocks) is NOT a real weapon (validSlotsForItem ignores
+// `thrown`), so it stays Materials-only. app/components/InventoryCategorize.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-522';
