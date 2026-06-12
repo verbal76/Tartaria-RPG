@@ -1,5 +1,5 @@
 import type { InventoryItem } from '../engine/types';
-import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS } from '../engine/crafting';
+import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS, findWeaponByName } from '../engine/crafting';
 import { itemIsTool } from '../engine/pouchEligibility';
 import { isQuestLockedItem } from '../engine/questItems';
 
@@ -74,7 +74,12 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // Catalog name matches take precedence over kind/tag heuristics — if a
   // crafted Aetheric Torch shows up with kind='relic', it should still
   // resolve to 'relic' via the GEAR catalog.
-  if (WEAPONS.some((w) => w.name.toLowerCase() === nameLower)) return 'weapon';
+  // arb107 — use findWeaponByName (not the direct catalog) so an INFERRED weapon —
+  // a catalog-absent drop whose name reads as a weapon, e.g. "Shrike Claw" (claw),
+  // which combat + validSlotsForItem already wield as a melee weapon — lands in the
+  // Weapons category instead of falling through to Loot. findWeaponByName's own
+  // isCataloguedElsewhere guard keeps armor/material/amulet drops out of here.
+  if (findWeaponByName(item.name)) return 'weapon';
   if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
   if (AMULETS.some((a) => a.name.toLowerCase() === nameLower)) return 'accessory';
   if (RINGS.some((r) => r.name.toLowerCase() === nameLower)) return 'accessory';

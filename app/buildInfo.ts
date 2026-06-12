@@ -14216,4 +14216,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 13/16", the dog feed reads "Feed Rocky 13/16", and the golem button reads "Heal <name> 8/12" — and the golem
 // action is renamed from "Repair" to "Heal" (also updated the CharacterScreen golem subline "Heal by feeding it
 // the parts it's made of."). app/screens/InventoryScreen.tsx, app/screens/CharacterScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-519';
+// OTA-520 (Moscovium Split) — [bugfix] two Shrike-Claw issues. (1) RESERVE-FOR-FUSION now splits a stack: marking
+// one unit of a ×2 stack to "Save for fusion" peels exactly ONE unit out (reserved ×1) and leaves the rest free
+// (×1) — was all-or-nothing (it flagged the whole stack, so you could only save-all or save-none). Tapping again
+// moves another unit; un-saving re-absorbs the unit into the free stack. Same name+kind/no-instance merge rule as
+// grantItem. (2) CATEGORY: an INFERRED weapon — a catalog-absent drop whose name reads as a weapon, e.g. "Shrike
+// Claw" (claw), which combat + validSlotsForItem already wield as a melee weapon — now lands in the WEAPONS
+// inventory category instead of falling through to Loot (categorizeItem uses findWeaponByName, whose
+// isCataloguedElsewhere guard keeps armor/material/amulet drops out). app/state/gameStore.ts,
+// app/components/InventoryCategorize.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-520';

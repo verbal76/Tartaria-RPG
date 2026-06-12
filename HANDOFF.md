@@ -378,6 +378,17 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-520 "Moscovium Split" — [bugfix] fuse-reserve stack split + inferred weapons categorize as Weapons**
+  *(element #115)*. Two Shrike-Claw issues. (1) **Reserve-for-fusion splits a stack:** marking one unit of a ×2
+  stack "Save for fusion" peels exactly ONE unit out (reserved ×1) and leaves the rest free (×1) — was
+  all-or-nothing (it flagged the whole stack; you could only save-all or save-none). Tapping again moves another
+  unit; un-saving re-absorbs the unit into the free stack. Same name+kind / no-instance merge rule as `grantItem`.
+  (`toggleReserveForFusion`, gameStore.) (2) **Category:** an INFERRED weapon — a catalog-absent drop whose name
+  reads as a weapon, e.g. "Shrike Claw" (claw), which combat + `validSlotsForItem` already wield as a melee
+  weapon — now lands in the **Weapons** category instead of falling through to **Loot** (`categorizeItem` uses
+  `findWeaponByName`, whose `isCataloguedElsewhere` guard keeps armor/material/amulet drops out). Tests:
+  `fuseReserveSplit.test.ts` (split / merge-back / single-unit flip). `app/state/gameStore.ts`,
+  `app/components/InventoryCategorize.ts`.
 - **OTA-519 "Flerovium Vitals" — [feature] HP readout on eat/feed/heal buttons + "Heal" not "Repair" for golems**
   *(element #114)*. The inventory item-action buttons now show the TARGET's current HP so you can tell if they
   still need it: the player's eat/drink button reads `Use (eat)  13/16`, the dog feed reads `Feed Rocky  13/16`,

@@ -19152,17 +19152,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // applyFusion). They still don't count toward the 3-scrap gate.
     const isFactionCatalyst = (item.tags ?? []).includes('faction_gear');
     if (!isInferredItem(item.name) && !isFactionCatalyst) return;
-    const next = !item.reservedForFusion;
-    set((s) => s.player
-      ? {
-          player: {
-            ...s.player,
-            inventory: s.player.inventory.map((i) =>
-              i.id === itemId ? { ...i, reservedForFusion: next } : i,
-            ),
-          },
-        }
-      : s);
+    const reserving = !item.reservedForFusion;
+    const qty = item.quantity ?? 1;
+    // arb107 — a SINGLE-unit stack just flips the flag in place.
+    if (qty <= 1) {
+      set((s) => s.player
+        ? {
+            player: {
+              ...s.player,
+              inventory: s.player.inventory.map((i) =>
+                i.id === itemId ? { ...i, reservedForFusion: reserving } : i,
+              ),
+            },
+          }
+        : s);
+      return;
+    }
+    // arb107 — a MULTI-unit stack peels exactly ONE unit across the reserved/free
+    // boundary, so the player can save one and keep the rest (was all-or-nothing:
+    // marking a Shrike Claw ×2 reserved BOTH; you couldn't split one out). Tapping
+    // again moves another unit; the opposite-state stack re-absorbs it on un-save.
+    // Same "is this the same stackable unit" rule as grantItem (name+kind, no
+    // coating / per-instance stats).
+    const sameUnit = (a: InventoryItem, b: InventoryItem): boolean =>
+      a.name === b.name && a.kind === b.kind
+      && !a.coating && !b.coating
+      && !a.instanceStats && !b.instanceStats
+      && !a.uniqueStats && !b.uniqueStats;
+    set((s) => {
+      if (!s.player) return s;
+      // Drop one off the tapped stack (remove the row if it empties).
+      let inv = s.player.inventory
+        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - 1 } : i))
+        .filter((i) => (i.quantity ?? 1) > 0);
+      // Merge the peeled unit into an existing opposite-state stack, else add a row.
+      const destIdx = inv.findIndex(
+        (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForFusion === true) === reserving,
+      );
+      if (destIdx >= 0) {
+        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + 1 } : i));
+      } else {
+        inv = [...inv, {
+          ...item,
+          id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'rsv' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          quantity: 1,
+          reservedForFusion: reserving,
+        }];
+      }
+      return { player: { ...s.player, inventory: inv } };
+    });
   },
 
   applyCoating(coatingItemId, weaponId) {
