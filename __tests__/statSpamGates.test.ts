@@ -142,12 +142,13 @@ describe('OTA-057 — stat spam gates', () => {
     expect(gained).toBeGreaterThan(30);
   });
 
-  it('history window caps at 20 tiles', async () => {
+  it('history window caps at 50 tiles', async () => {
     const store = await bootstrap();
-    // Walk east 30 tiles. The history should hold the most recent 20.
-    for (let i = 0; i < 30; i++) store.getState().stepDirection('east');
+    // Walk east 60 tiles. The sliding window holds the most recent 50
+    // (raised from 20 → 50 alongside the novel-tile anti-farm work).
+    for (let i = 0; i < 60; i++) store.getState().stepDirection('east');
     const hist = store.getState().player!.recentTileHistory ?? [];
-    expect(hist.length).toBeLessThanOrEqual(20);
+    expect(hist.length).toBeLessThanOrEqual(50);
   });
 
   it('buying from a vendor trains CHA only, not WIS', async () => {

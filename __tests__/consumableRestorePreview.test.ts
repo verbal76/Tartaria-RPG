@@ -1,14 +1,19 @@
 import { getItemPreview } from '../app/components/itemPreview';
 
-// arb-fix — Trail Rations (and other effect-less food) showed no restore value
-// in the inventory; the eat handler heals a default 2d6 HP. The preview now
-// surfaces that. Structured-effect foods are unchanged.
+// arb-fix — food/consumables surface their restore value in the inventory
+// preview. Trail Rations was originally effect-less (the eat handler healed a
+// default 2d6 HP); it (and the rest of the food catalog) has since been given a
+// structured effect block, so the preview now shows the exact authored values.
+// The 2d6 fallback survives only for the rare consumable the inference can't
+// resolve any restore for at all.
 describe('consumable restore preview', () => {
-  it('Trail Rations surfaces the default 2d6 HP food heal', () => {
+  it('Trail Rations surfaces its structured +6 HP / +3 stamina heal', () => {
     const p = getItemPreview('Trail Rations');
     const restore = p.stats.find((s) => s.startsWith('Restores:'));
     expect(restore).toBeDefined();
-    expect(restore).toMatch(/2d6 HP/);
+    expect(restore).toMatch(/\+6 HP/);
+    expect(restore).toMatch(/\+3 stamina/);
+    expect(restore).not.toMatch(/2d6/);
   });
 
   it('First Aid Kit still shows its structured +25 HP (not the 2d6 fallback)', () => {

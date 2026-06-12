@@ -72,15 +72,17 @@ describe('OTA-202 — buildInventorySnapshot', () => {
       // OTA-491 — Shaped Aetheric Shard (gear.json kind:'misc' + 'throwable') is a
       // one-throw WEAPON now, so the categorizer routes it to Weapons, not Loot.
       mkItem({ name: 'Shaped Aetheric Shard', kind: 'misc', tags: ['throwable', 'aether'] }),
-      // Tortoise Shell is NOT in any catalog AND has no material-tag
-      // match (only 'loot', 'improvised') → falls through to LOOT.
-      mkItem({ name: 'Tortoise Shell', kind: 'misc', tags: ['loot', 'improvised'] }),
+      // Odd Bauble is NOT in any catalog, has no material tag, and its NAME
+      // reads no organic/material keyword (cf. OTA-526, where 'Tortoise Shell'
+      // now correctly files under Materials via the name→organic re-derivation)
+      // → it falls through to LOOT.
+      mkItem({ name: 'Odd Bauble', kind: 'misc', tags: ['loot', 'improvised'] }),
     ];
     const out = buildInventorySnapshot(mkPlayer({ inventory: inv }));
     expect(out).toMatch(/Loot \(1\)/);
     expect(out).toMatch(/Weapons \(1\)/);
     expect(out).toMatch(/Shaped Aetheric Shard/);
-    expect(out).toMatch(/Tortoise Shell/);
+    expect(out).toMatch(/Odd Bauble/);
   });
 
   it('OTA-204 — surfaces weapon damage dice + damage type from the catalog', () => {
