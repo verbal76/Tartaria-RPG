@@ -3,6 +3,12 @@ import factionsData from '../data/factions/factions.json';
 
 export const FACTIONS = factionsData as Faction[];
 
+// arb119 — reputation is a bounded standing, never an unbounded resource. The join
+// threshold is 20; ±100 is "fully allied / sworn enemy". Clamping here stops the
+// vendor-purchase (+1) / gift (+5) rep farms from running standing to infinity.
+export const REP_MAX = 100;
+export const REP_MIN = -100;
+
 // Some faction data entries use suffixed names ("_situational",
 // "_partial", "_when_unpaid") or virtual references ("anyone_paying",
 // "conspiracy_architects") that aren't real faction IDs. Normalize so
@@ -45,23 +51,19 @@ export function applyRepChange(
 
   const halfDelta = Math.trunc(delta / 2);
   const changed: { factionId: string; delta: number; newStanding: number }[] = [];
+  // arb119 — clamp to [REP_MIN, REP_MAX]; report the REAL delta after clamping so a
+  // log never claims a bump that the cap swallowed.
+  const apply = (row: FactionStanding, raw: number): FactionStanding => {
+    const newStanding = Math.max(REP_MIN, Math.min(REP_MAX, row.standing + raw));
+    const realDelta = newStanding - row.standing;
+    if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding });
+    return { ...row, standing: newStanding };
+  };
 
   const next: FactionStanding[] = standing.map((row) => {
-    if (row.factionId === withFaction) {
-      const newStanding = row.standing + delta;
-      changed.push({ factionId: row.factionId, delta, newStanding });
-      return { ...row, standing: newStanding };
-    }
-    if (allyIds.has(row.factionId) && halfDelta !== 0) {
-      const newStanding = row.standing + halfDelta;
-      changed.push({ factionId: row.factionId, delta: halfDelta, newStanding });
-      return { ...row, standing: newStanding };
-    }
-    if (rivalIds.has(row.factionId) && halfDelta !== 0) {
-      const newStanding = row.standing - halfDelta;
-      changed.push({ factionId: row.factionId, delta: -halfDelta, newStanding });
-      return { ...row, standing: newStanding };
-    }
+    if (row.factionId === withFaction) return apply(row, delta);
+    if (allyIds.has(row.factionId) && halfDelta !== 0) return apply(row, halfDelta);
+    if (rivalIds.has(row.factionId) && halfDelta !== 0) return apply(row, -halfDelta);
     return row;
   });
 

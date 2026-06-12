@@ -378,6 +378,32 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-532 "Unbiseptium Ledger" — [bugfix] whole-game degenerate-exploit hardening (5-agent red-team sweep)**
+  *(element #127)*. Sweep covered economy/crafting, progression/rep, quests/companions, survival/save, and
+  world/exploration. **Seven live exploits closed:** (1) **Rep farm** — vendor buy (+1) / gift (+5) ran faction
+  standing to infinity (no clamp); `applyRepChange` now clamps to `[-100, 100]` (`factions.REP_MIN/REP_MAX`) and
+  reports the REAL post-clamp delta so a log never claims a bump the cap swallowed. (2) **Faction-quest re-claim** —
+  contract turn-in checked the catalog (`def`) but not whether the player actually HELD the quest (`rec`), so a
+  finished contract re-paid on repeat; now requires the active record. (3) **Kill milestone** — "+1 HP per N kills"
+  counted EVERY kill → farm one respawn, pump HP forever; now only the FIRST kill of a DISTINCT enemy type advances
+  it (mirrors the OTA-531 travel fix). (4) **Vendor-spawn + step-trinket farms** — the wandering-vendor and
+  free-trinket step rolls fired on any outdoor step (pace two tiles → farm); both now gate on tile NOVELTY
+  (`tileIsNovel`). (5) **Dig farm** — wild-tile `digHere` had no per-spot lockout (200 digs on one tile → 100+
+  items incl. rares); a generous per-spot productive-dig cap (`DIG_SPOT_PRODUCTIVE_CAP = 16`, enough to gather
+  crafting stock without walking) now marks the patch worked-out via `VisitedRoom.groundDigCount`. (6) **Scrap money
+  pumps** — `scrapOutputFor` minted Uncommon Aetheric Shards from ANY `kind:'relic'` (even a mundane Climbing Rope /
+  Pry Bar / ring) → buy→scrap→sell printer; the aether branch now needs a real `aether`/`crystal` tag. And
+  craft→scrap→sell ran net-positive by SELL value (craft a Sentinel Cleaver → scrap → Golem Core + Scrap Metal worth
+  ~2× the mats → sell); crafted items now carry a `selfCrafted` provenance flag and scrap to reduced, premium-free
+  output, while LOOTED gear scraps in FULL so the intended loot→scrap→golem-feed loop (OTA-443) is untouched. (7)
+  **Golem-weapon stall price** — construct-only golem weapons (authored `tc:0`) and faction-issue gear leaked into
+  random stall pools and the `tc ?? x` math floored them at 2 TC (a 2-TC Rare 2d8 sledge); `stallCatalog` now
+  filters `golem_weapon`/`faction_gear` and the price falls back via `||`. Plus a survival cap: parser-rest / food
+  refill stamina against `effectiveStaminaMax` (hunger-adjusted), not the raw ceiling. **Verified clean:** item dup,
+  recipe substitution, save-scum, death/resurrection, one-shot grants, dog/golem feed caps, climb re-reward, node
+  re-use, hazards. `app/engine/factions.ts`, `app/engine/scrapEngine.ts`, `app/engine/vendors.ts`,
+  `app/engine/digging.ts`, `app/engine/types.ts`, `app/state/gameStore.ts`. Tests `exploitFixesWholeGame.test.ts` +
+  dig-cap case in `exploitFixesHardening.test.ts`.
 - **OTA-531 "Unbihexium Seal" — [bugfix] combat-exploit hardening (4-agent red-team sweep)** *(element #126)*.
   THREE live exploits closed: (1) **Corruption coating** DOT grew +1 dmg/turn EVERY hit forever (uncapped stack
   counter) → a single permanent coating killed any HP pool; now capped via `corruptionStackCap` (base 5, +6 vs

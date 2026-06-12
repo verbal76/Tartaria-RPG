@@ -181,6 +181,15 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Aether-Shard Spear', rarity: 'Uncommon', baseWeight: 1 },
 ];
 
+// arb119 — how many PRODUCTIVE digs (an item actually landed) a single
+// wild tile yields before the patch reads as worked-out. Wild digs
+// deliberately re-roll stackable commodities so the player can gather
+// crafting stock in place, but with no cap the loop minted 100+ items
+// (incl. rares) over a couple hundred taps on one tile. 16 is plenty to
+// build a Stone Spear or Cudgel without walking, yet kills the in-place
+// farm dead. Hub/outpost digs use their own restock path and ignore this.
+export const DIG_SPOT_PRODUCTIVE_CAP = 16;
+
 // Roll the dig outcome. Returns null when nothing was found (always
 // possible, especially with low score). Includes a flat "found nothing"
 // chance that decreases as score increases.

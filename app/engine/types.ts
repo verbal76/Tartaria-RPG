@@ -402,6 +402,16 @@ export interface InventoryItem {
    *  (it's recognisably the vendor's own). The player can still
    *  USE the item or SCRAP it; the scrap outputs are clean. */
   stolen?: boolean;
+  /** arb119 — set on items the player CRAFTED themselves (the parser
+   *  `craft` chokepoint stamps it). Scrapping a self-crafted item yields
+   *  only token fallback materials, never the premium golem/aether stock —
+   *  this enforces the OTA-443 author's stated intent that "crafting the
+   *  scrappables costs more than scrapping returns, so the money pump stays
+   *  closed." By SELL value the loop was actually net-positive (craft a
+   *  Sentinel Cleaver → scrap → Golem Core + Scrap Metal worth ~2× the
+   *  ingredients → sell). LOOTED gear carries no flag and scraps in full, so
+   *  the intended loot→scrap→golem-feed loop is untouched. */
+  selfCrafted?: boolean;
   /** OTA-194 — player-tapped heart marker that locks an inferred
    *  item out of OTA-193's auto-substitute crafting drain. Only
    *  inferred items (no hand-authored catalog row) can carry this
@@ -1439,6 +1449,16 @@ export interface VisitedRoom {
    *  added to searchedAmbientNouns (consumed), so a search is a real risk again
    *  after a couple of grace retries. */
   searchNothingCounts?: Record<string, number>;
+  /** arb119 — number of PRODUCTIVE digs (a real item landed in the pack)
+   *  the player has pulled from this wild tile's ground via `digHere`.
+   *  Wild-tile digs intentionally re-roll stackable commodities so a
+   *  player can gather crafting stock in place, but that left the dig
+   *  loop totally uncapped — 200 digs on one tile minted 100+ items
+   *  (including rares). Once this count reaches DIG_SPOT_PRODUCTIVE_CAP
+   *  the patch reads as worked-out and refuses further productive digs
+   *  until the player moves on. The cap is generous (enough to build a
+   *  Stone Spear or Cudgel without walking) but kills the in-place farm. */
+  groundDigCount?: number;
   /** 2026-05-25 [POLISH-3] — ambient nouns whose investigate
    *  outcome was pure flavor (no item / no XP / no hook produced).
    *  Kept SEPARATE from searchedAmbientNouns so other verbs

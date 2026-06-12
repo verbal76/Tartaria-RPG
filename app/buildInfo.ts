@@ -14316,4 +14316,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // count/sides (≤1000) against a malformed-notation DoS. Everything else (defense math, fusion conservation/clamps,
 // HP/stamina bounds, one-shot buffs, loot farming) came back CLEAN. app/engine/weaponCoating.ts, app/engine/rng.ts,
 // app/engine/itemFusion.ts, app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-531';
+// OTA-532 (Unbiseptium Ledger) — [bugfix] whole-game degenerate-exploit hardening from a 5-agent red-team sweep
+// (economy/crafting, progression/rep, quests/companions, survival/save, world/exploration). Live exploits closed:
+// (1) REP FARM — vendor buy (+1) / gift (+5) ran faction standing to infinity (no clamp); applyRepChange now
+// clamps to [-100, 100] and reports the REAL post-clamp delta (factions.ts REP_MIN/REP_MAX). (2) FACTION-QUEST
+// RE-CLAIM — turning in a contract checked the catalog but not whether the player actually HELD it, so a finished
+// quest could be re-claimed for repeat rewards; now requires the active record. (3) KILL MILESTONE — "+1 HP per N
+// kills" counted EVERY kill, so farming one respawn pumped HP forever; now only the FIRST kill of a given enemy
+// type (distinct) advances it, mirroring the OTA-531 travel-milestone fix. (4) VENDOR-SPAWN & STEP-TRINKET FARMS —
+// the wandering-vendor and free-trinket step rolls fired on any outdoor step, farmable by pacing two tiles; both
+// now gate on tile NOVELTY (recentTileHistory). (5) DIG FARM — wild-tile `digHere` had no per-spot lockout (200
+// digs on one tile minted 100+ items incl. rares); now a generous per-spot productive-dig cap (16, enough to
+// gather crafting stock without walking) marks the patch worked-out (digging.DIG_SPOT_PRODUCTIVE_CAP +
+// VisitedRoom.groundDigCount). (6) SCRAP MONEY PUMPS — scrapOutputFor minted Uncommon Aetheric Shards from ANY
+// kind:'relic' (a mundane Climbing Rope / Pry Bar / ring), a buy→scrap→sell printer; the aether branch now
+// requires a real aether/crystal tag. And craft→scrap→sell ran net-positive by SELL value (craft a Sentinel
+// Cleaver → scrap → Golem Core + Scrap Metal worth ~2× the mats → sell); self-crafted items now carry a
+// `selfCrafted` provenance flag and scrap to reduced, premium-free output, while LOOTED gear scraps in full so the
+// intended loot→scrap→golem-feed loop is untouched. (7) GOLEM-WEAPON STALL PRICE — construct-only golem weapons
+// (authored tc:0) and faction-issue gear leaked into random stall pools and the `tc ?? x` math floored them at 2
+// TC (a 2-TC Rare 2d8 sledge); stallCatalog now filters golem_weapon/faction_gear and the price falls back via
+// `||`. Plus a survival cap: parser-rest / food now refill stamina against effectiveStaminaMax (hunger-adjusted),
+// not the raw ceiling. app/engine/factions.ts, app/engine/scrapEngine.ts, app/engine/vendors.ts,
+// app/engine/digging.ts, app/engine/types.ts, app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-532';

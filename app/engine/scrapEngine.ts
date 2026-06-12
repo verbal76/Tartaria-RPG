@@ -96,8 +96,16 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   }
   // Aether content → Aetheric Shard + Aether Crystal (golem fuel), plus
   // Aether Dust (the most-demanded recipe staple, otherwise unforageable) on
-  // Uncommon+ pieces. Relics + Aether-tagged gear.
-  if (tags.has('aether') || tags.has('crystal') || item.kind === 'relic') {
+  // Uncommon+ pieces. Aether-tagged gear ONLY.
+  // arb119 — previously ANY `kind:'relic'` minted aether mats here, even a
+  // mundane Climbing Rope / Pry Bar / plain amulet / ring (all 'relic' kind,
+  // no aether tag). An Uncommon Aetheric Shard sells for ~14 TC and a relic
+  // poured out TWO of them plus a Crystal — so buy a 12 TC Common relic →
+  // scrap → sell for ~33 TC was a clean, repeatable money pump (red-team
+  // confirmed). Genuinely-aetheric relics carry the `aether`/`crystal` tag
+  // (e.g. Voidspawn Bolt) and still qualify; mundane relics fall through to
+  // the basic-material fallback, so scrapping one is a loss, not a profit.
+  if (tags.has('aether') || tags.has('crystal')) {
     grants.push({ name: 'Aetheric Shard', quantity: 2 + half });
     grants.push({ name: 'Aether Crystal', quantity: 1 });
     if (rb >= 1) grants.push({ name: 'Aether Dust', quantity: 1 });
@@ -135,7 +143,27 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   for (const g of grants) {
     merged.set(g.name, (merged.get(g.name) ?? 0) + g.quantity);
   }
-  const finalGrants = Array.from(merged.entries()).map(([name, quantity]) => ({ name, quantity }));
+  let finalGrants = Array.from(merged.entries()).map(([name, quantity]) => ({ name, quantity }));
+
+  // arb119 — SELF-CRAFTED items scrap to a reduced yield. By SELL value the
+  // full output of a crafted scrappable ran net-positive against its
+  // ingredients (craft a Sentinel Cleaver → scrap → Golem Core + Scrap Metal
+  // worth ~2× the mats it cost → sell), which is the OTA-423 money pump the
+  // OTA-443 comment believed was closed. We strip the premium (high-sell)
+  // mats a forge could otherwise mint from itself and halve the rest, so
+  // recycling your OWN craft never out-earns the ingredients. LOOTED gear is
+  // unflagged and scraps in FULL — the intended loot→scrap→golem-feed loop is
+  // untouched.
+  if (item.selfCrafted) {
+    const PREMIUM = new Set(['Golem Core', 'Aetheric Shard', 'Aether Crystal', 'Aether Dust', 'Mudstone']);
+    const trimmed = finalGrants
+      .filter((g) => !PREMIUM.has(g.name))
+      .map((g) => ({ name: g.name, quantity: Math.floor(g.quantity / 2) }))
+      .filter((g) => g.quantity > 0);
+    // Always return SOMETHING so the scrap click isn't wasted — a single
+    // Small Rock if the halving zeroed everything out.
+    finalGrants = trimmed.length > 0 ? trimmed : [{ name: 'Small Rock', quantity: 1 }];
+  }
   const summary = finalGrants
     .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
     .join(', ');

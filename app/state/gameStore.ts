@@ -261,7 +261,7 @@ import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
 import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/portability';
-import { bestDigTool, rollDig } from '../engine/digging';
+import { bestDigTool, rollDig, DIG_SPOT_PRODUCTIVE_CAP } from '../engine/digging';
 import {
   generateWorldMap,
   surveyAll,
@@ -8883,7 +8883,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 messages.push(amt > 0 ? `+${amt} HP` : 'HP already full');
               }
               if (fx.restoreStamina) {
-                const room = Math.max(0, p.staminaMax - p.stamina);
+                const room = Math.max(0, effectiveStaminaMax(p) - p.stamina);
                 const amt = Math.min(room, fx.restoreStamina);
                 p = { ...p, stamina: p.stamina + amt };
                 messages.push(amt > 0 ? `+${amt} stamina` : 'stamina already full');
@@ -9054,7 +9054,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             : null;
           const hpRoom = player.hpMax - player.hp;
-          const stamRoom = player.staminaMax - player.stamina;
+          const stamRoom = effectiveStaminaMax(player) - player.stamina;
           const heal = fx
             ? Math.min(Math.max(0, hpRoom), fx.healHP ?? 0)
             : Math.min(Math.max(0, hpRoom), rollDie(6) + rollDie(6));
@@ -9200,7 +9200,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // (food → health), so food markets and food lore carry real
           // weight and the player tops HP to full by eating, never by
           // sleeping. hpRoom is no longer consulted by rest.
-          const stamRoom = player.staminaMax - player.stamina;
+          const stamRoom = effectiveStaminaMax(player) - player.stamina;
           // OTA-238 — block rest when already fully whole. Playtester:
           // "there should be a block on resting if you're already
           // fully rested, that way I don't just spam that button to
@@ -12519,6 +12519,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           rarity: catEntry.rarity,
           quantity: 1,
           tags: catEntry.tags,
+          // arb119 — mark provenance so scrapping this back yields only token
+          // mats (closes the craft→scrap→sell money pump); looted copies of the
+          // same item are unflagged and still scrap in full.
+          selfCrafted: true,
         });
         // Refuse the craft if the result can't fit (per-name cap). The
         // ingredients have not been consumed yet at this point — fail
@@ -12838,7 +12842,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (restRoll) {
       const hours = restRoll.total ?? 4;
       const hpRoom = player.hpMax - player.hp;
-      const stamRoom = player.staminaMax - player.stamina;
+      const stamRoom = effectiveStaminaMax(player) - player.stamina;
       // Refuse pointless rest. Playtest: rapid-tapping rest at full
       // HP+stamina was burning game-time hours for no benefit, advancing
       // from Day 1 evening to Day 2 afternoon in four taps.
@@ -14255,10 +14259,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', enemy.signatureWeapon.reason);
     }
 
-    // Increment lifetime kill count and check for a milestone bump.
+    // Increment lifetime kill count and check for a milestone bump. arb119 — the
+    // +1 HP milestone now fires on every 5 DISTINCT enemy types (mirrors the travel
+    // firstArrival fix), so re-killing a respawnable enemy can't farm unbounded
+    // hpMax. enemiesDefeated stays the lifetime TOTAL; the milestone keys off the
+    // distinct-name count (recordEnemyDefeat below appends this name).
+    const defeatedBefore = get().worldMemory?.defeatedEnemies ?? [];
+    const firstOfType = !defeatedBefore.includes(enemy.name);
+    const distinctKills = new Set(defeatedBefore).size + (firstOfType ? 1 : 0);
     const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
     const newKills = prevMs.enemiesDefeated + 1;
-    const hitMilestone = checkMilestone(newKills, MILESTONE_KILL_STEP);
+    const hitMilestone = firstOfType && checkMilestone(distinctKills, MILESTONE_KILL_STEP);
     const newHpMax = hitMilestone ? player.hpMax + 1 : player.hpMax;
     const newHp = hitMilestone ? player.hp + 1 : player.hp;
 
@@ -16651,7 +16662,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (kind === 'faction_quest') {
       const def = findFactionQuestById(id);
       const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
-      if (!def) {
+      // arb119 — REQUIRE an active record, like the hunt/mystery/storyline branches.
+      // Without `!rec`, a COMPLETED fetch quest (no stages) could be re-claimed for
+      // its TC + rep over and over — a Scrap-Metal→TC + rep pump.
+      if (!def || !rec) {
         get().appendLog('arbiter', `The Arbiter shakes their head. "That contract isn't on file."`);
         return;
       }
@@ -17594,7 +17608,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.20) {
+      // arb119 — gate on tileIsNovel (like the wasteland-encounter roll). Without
+      // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
+      // stock). Now a stall only appears on ground you haven't just walked.
+      if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
         const stall = pickRoadsideTrader();
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(
@@ -18034,7 +18051,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && Math.random() < 0.07) {
+      // arb119 — gate on tileIsNovel so pacing a short loop can't farm free trinkets.
+      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && tileIsNovel && Math.random() < 0.07) {
         const trinket = pick(INVESTIGATE_TRINKETS);
         const qty = trinket.qtyMin === trinket.qtyMax
           ? trinket.qtyMin
@@ -18409,6 +18427,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // arb119 — wild-tile dig farm guard. Stackable commodities re-roll
+    // freely here (by design, so the player can gather crafting stock in
+    // place), but with no ceiling the loop minted 100+ items — including
+    // rares — over a couple hundred taps on ONE tile. Once this patch has
+    // yielded DIG_SPOT_PRODUCTIVE_CAP productive digs it reads as worked
+    // out; the player has to move to fresh ground. The cap is generous
+    // (enough to build a Stone Spear / Cudgel without walking) but kills
+    // the in-place farm. Failed ("nothing") digs don't count toward it.
+    const groundDigCount = get().worldMemory.visitedRooms?.[groundRoomKey]?.groundDigCount ?? 0;
+    if (groundDigCount >= DIG_SPOT_PRODUCTIVE_CAP) {
+      get().appendLog(
+        'world',
+        `You work the same patch of ground again, but it's spent — you've turned over everything this spot had to give. Try fresh ground.`,
+      );
+      return;
+    }
     // Digging takes a beat and a little stamina.
     set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.4) } : s));
     // Lock the spot up-front so even failed digs count as "worked".
@@ -18482,6 +18516,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // when at least one unit actually landed.
     if (!isStackableCommodity && grantResult.accepted > 0) {
       set((s) => recordRoomLootGrabbed(s, dugRoomKey, found.name));
+    }
+    // arb119 — count every productive dig (stackable OR unique) against
+    // this spot so the worked-out cap above can fire. Only successful
+    // grants tick; whiffs and full-pack clamps don't burn the patch.
+    if (grantResult.accepted > 0) {
+      set((s) => {
+        const room = s.worldMemory.visitedRooms?.[groundRoomKey] ?? {
+          firstVisitAt: Date.now(),
+          lastVisitAt: Date.now(),
+          visitCount: 1,
+        };
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [groundRoomKey]: {
+                ...room,
+                groundDigCount: (room.groundDigCount ?? 0) + 1,
+              },
+            },
+          },
+        };
+      });
     }
     if (grantResult.accepted > 0) {
       get().appendLog(

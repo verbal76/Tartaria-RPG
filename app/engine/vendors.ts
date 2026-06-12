@@ -184,10 +184,21 @@ interface StallCatalogItem {
 }
 
 function stallCatalog(category: StallCategory): StallCatalogItem[] {
+  // arb119 — keep gear that ISN'T meant for the open market off a random
+  // stall's shelf. `golem_weapon` rows are construct-only (authored `tc:0`)
+  // and `faction_gear` is sold ONLY at the player's own faction armory.
+  // Both slipped into the generic weapon/armor stall pool, and because they
+  // carry `tc:0` the price math floored them at 2 TC — a 2-TC Rare 2d8 Golem
+  // Sledge. Filtering them here is the real fix; the `||` price fallback
+  // below is belt-and-suspenders for any other tc:0 row.
+  const stallable = (it: StallCatalogItem) => {
+    const tags = (it.tags ?? []);
+    return !tags.includes('golem_weapon') && !tags.includes('faction_gear');
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   switch (category) {
-    case 'weapons': return ((weaponsData as any).weapons ?? []) as StallCatalogItem[];
-    case 'armor': return ((armorData as any).armor ?? []) as StallCatalogItem[];
+    case 'weapons': return (((weaponsData as any).weapons ?? []) as StallCatalogItem[]).filter(stallable);
+    case 'armor': return (((armorData as any).armor ?? []) as StallCatalogItem[]).filter(stallable);
     case 'materials': return ((materialsData as any).materials ?? []) as StallCatalogItem[];
     case 'food':
       return (((gearData as any).gear ?? []) as StallCatalogItem[]).filter(
@@ -229,7 +240,10 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
   const n = Math.min(items.length, 3 + Math.floor(Math.random() * 4)); // 3-6
   const shuffled = [...items].sort(() => Math.random() - 0.5).slice(0, n);
   const offers: VendorOffer[] = shuffled.map((it) => {
-    const base = it.tc ?? it.tcBuy ?? estimatedStallValue(it, category);
+    // arb119 — `||` not `??`: an authored `tc:0` means "not for open sale",
+    // not "free". `0 ?? x` keeps the 0 and the price floors at 2 TC; `0 || x`
+    // falls through to the value estimate so nothing prices at the 2-TC floor.
+    const base = it.tc || it.tcBuy || estimatedStallValue(it, category);
     // Wider per-offer haggling spread (±~22%) on top of the value-based base so
     // even two of the same item vary a little visit to visit.
     const price = Math.max(2, Math.round(base * (0.8 + Math.random() * 0.45)));
