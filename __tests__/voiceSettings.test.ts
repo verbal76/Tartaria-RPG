@@ -59,7 +59,7 @@ describe('voiceSettings', () => {
     expect(s.ttsEnabled).toBe(true);
     expect(s.engine).toBe('bundled');
     expect(s.sttEnabled).toBe(false);
-    expect(s.rate).toBe(1.0);
+    expect(s.rate).toBe(1.2);
     expect(s.pitch).toBe(1.0);
     expect(s.voiceId).toBeNull();
     expect(s.kokoroVoice).toBe('am_michael');

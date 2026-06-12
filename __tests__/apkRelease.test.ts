@@ -51,13 +51,17 @@ describe('apkRelease pointer', () => {
     // Samsung Internet — download "completes" but the file isn't
     // visible to the file manager or package installer. The page
     // URL renders a click-to-download UI that uses Downloads/.
+    // The live pointer only wins when it's NEWER than the baked-in
+    // LATEST_APK_BUILD constant, so derive the mock build from it (constant +
+    // 100). Keeps the test valid every time the constant is bumped on release.
+    const b = LATEST_APK_BUILD + 100;
     const mockResponse = {
-      tag_name: 'apk-build-200',
-      html_url: 'https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-200',
+      tag_name: `apk-build-${b}`,
+      html_url: `https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-${b}`,
       assets: [
         {
-          name: 'tartaria-realms-apk-build-200.apk',
-          browser_download_url: 'https://example.com/direct/apk-build-200.apk',
+          name: `tartaria-realms-apk-build-${b}.apk`,
+          browser_download_url: `https://example.com/direct/apk-build-${b}.apk`,
           content_type: 'application/vnd.android.package-archive',
         },
       ],
@@ -69,21 +73,22 @@ describe('apkRelease pointer', () => {
 
     await refreshFromGitHub();
 
-    expect(getLatestApkBuild()).toBe(200);
+    expect(getLatestApkBuild()).toBe(b);
     // Note: html_url, NOT the asset's browser_download_url.
-    expect(getLatestApkUrl()).toBe('https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-200');
+    expect(getLatestApkUrl()).toBe(`https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-${b}`);
     const cached = await AsyncStorage.getItem('tartaria.apk.releasePointer.v1');
     expect(cached).not.toBeNull();
     const parsed = JSON.parse(cached!);
-    expect(parsed.build).toBe(200);
-    expect(parsed.url).toContain('/releases/tag/apk-build-200');
+    expect(parsed.build).toBe(b);
+    expect(parsed.url).toContain(`/releases/tag/apk-build-${b}`);
   });
 
   it('falls back to a constructed release-page URL when html_url is missing', async () => {
+    const b = LATEST_APK_BUILD + 101;
     global.fetch = jest.fn(async () => ({
       ok: true,
       json: async () => ({
-        tag_name: 'apk-build-201',
+        tag_name: `apk-build-${b}`,
         // no html_url
         assets: [],
       }),
@@ -91,7 +96,7 @@ describe('apkRelease pointer', () => {
 
     await refreshFromGitHub();
 
-    expect(getLatestApkUrl()).toContain('/releases/tag/apk-build-201');
+    expect(getLatestApkUrl()).toContain(`/releases/tag/apk-build-${b}`);
   });
 
   it('refreshFromGitHub silently no-ops when GitHub returns non-OK', async () => {
