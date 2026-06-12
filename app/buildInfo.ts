@@ -14251,4 +14251,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // off hand, attacking, then restoring the prior off hand — clearing the slot when the stack empties. New
 // app/engine/bandolierEligibility.ts; store actions stowInBandolier/removeFromBandolier/throwFromBandolier;
 // app/screens/InventoryScreen.tsx; app/components/InputBox.tsx; types.ts + backfill. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-11-523';
+// OTA-524 (Ununennium Readout) — [polish] two inventory tweaks from playtest. (1) The "Heal <golem>" button now
+// stays visible even when the golem is at FULL HP (was hidden by a `hp < hpMax` gate, so after topping it off the
+// item modal only showed Drop). It reads "Heal <name> 31/31 (full)" as a neutral, NON-consuming info button so
+// you can confirm it doesn't need the part; only a hurt golem actually feeds. (2) Collapsible inventory section
+// chevrons are now up/down (▾ collapsed = tap to drop open, ▴ expanded = tap to fold up) instead of the
+// right/down disclosure triangle, per player request for a clearer collapse/expand cue. (Element 119 — past
+// Oganesson; codenames now use IUPAC systematic names.) app/screens/InventoryScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-11-524';

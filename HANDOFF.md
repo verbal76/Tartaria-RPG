@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-524 "Ununennium Readout" — [polish] Heal-golem button stays visible at full HP + up/down collapse chevrons**
+  *(element #119 — past Oganesson, now IUPAC systematic names)*. (1) The "Heal <golem>" button stays visible even
+  at FULL HP (was gated by `hp < hpMax`, so after topping the golem off the modal only showed Drop). Reads
+  "Heal <name> 31/31 (full)" as a neutral, NON-consuming info button; only a hurt golem feeds. (2) Collapsible
+  section chevrons are now up/down (▾ collapsed = drop open, ▴ expanded = fold up) instead of the right/down
+  disclosure triangle, per player request. `app/screens/InventoryScreen.tsx`.
 - **OTA-523 "Oganesson Sling" — [feature] the BANDOLIER (5-slot throwables container + combat throw popup)**
   *(element #118)*. The throwables counterpart to the tool pouch. New `player.equipped.bandolierIds` (backfilled
   `[]`). Inventory: a BANDOLIER banner under the tool pouch — tap an empty slot → list filters to throwables

@@ -569,15 +569,20 @@ export function InventoryScreen() {
     {
       const golem = player?.golem;
       const golemActive = !!golem && golem.hp > 0;
-      if (golemActive && golem.hp < golem.hpMax && isGolemRepairPart(golem.kind, pending.item.name)) {
+      if (golemActive && isGolemRepairPart(golem.kind, pending.item.name)) {
+        // arb111 — keep the Heal button visible even when the golem is FULL (player
+        // ask: "should still show heal golem but show its health full like 31/31")
+        // so you can confirm it doesn't need the part. When full it's a neutral,
+        // non-consuming info button; only a hurt golem actually feeds.
+        const full = golem.hp >= golem.hpMax;
         buttons.push({
-          // arb106 — "Heal" (not "Repair") per player, with the golem's current HP.
-          label: `Heal ${golem.name}  ${golem.hp}/${golem.hpMax}`,
+          // arb106 — "Heal" (not "Repair"), with the golem's current HP.
+          label: `Heal ${golem.name}  ${golem.hp}/${golem.hpMax}${full ? ' (full)' : ''}`,
           onPress: () => {
-            useGameStore.getState().submitPlayerAction(`feed golem ${pending.item.name}`);
+            if (!full) useGameStore.getState().submitPlayerAction(`feed golem ${pending.item.name}`);
             closeModal();
           },
-          tone: 'primary',
+          tone: full ? 'neutral' : 'primary',
         });
       }
       // OTA-478/481 — ARM GOLEM. If this is a golem armament (Sledge / Greatsword,
@@ -856,7 +861,7 @@ export function InventoryScreen() {
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
-                    {collapsed ? '▸' : '▾'}
+                    {collapsed ? '▾' : '▴'}
                   </Text>
                   <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>
                     {CATEGORY_LABEL[cat].toUpperCase()}
