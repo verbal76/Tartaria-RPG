@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-539 "Untriquadium Sieve" — [cleanup] false inferred-stats warnings + tracker audit** *(element #134)*.
+  `itemDefaults.ts` `note()` now suppresses the `[inferred-stats]` debug nag when the bare name owns a row in a
+  non-kind catalog (materials / exploration) — the keyword classifier guesses a kind from such a name (e.g.
+  "Sentinel Core Plate" → armor) and warns about a missing row that exists elsewhere. Genuine unknowns still
+  warn. Also audited HANDOFF §0.A vs the live code and pruned six already-shipped entries (catalog dups OTA-135,
+  `Aetheric Shield` dup OTA-134, DOG_GEAR guard OTA-133, per-golem `summonDC` OTA-137, `tutorialSteps` copy, Dog
+  Companion system). `app/engine/itemDefaults.ts`, `HANDOFF.md`. Test: verified silence-vs-warn behavior.
+
 - **OTA-538 "Untritrium Fold" — [ux] collapsible Character-sheet sections** *(element #133)*. Every header on the
   full character breakdown (CORE STATS, DEFENSE, WALLET, FACTION STANDINGS, EQUIPPED, COMPANION, GOLEM, STATUS
   EFFECTS, RACIAL TRAITS, ACTIVE CONTRACTS, MILESTONES, TITLES) now uses the **inventory header treatment** — a
@@ -1556,6 +1564,17 @@ The entries below are retained as the shipped-batch record.
 
 ### 0.A — Open Issues
 
+> **Tracker audit (2026-06-13, OTA-539 pass).** Every entry below was re-verified against the
+> live code. **Pruned as already-closed** (the fixes shipped but the entries were never cleared):
+> catalog cross-file duplicates (OTA-135), within-file `Aetheric Shield` dup (OTA-134),
+> `isCataloguedElsewhere` DOG_GEAR guard (OTA-133, crafting.ts:574), per-golem `summonDC`
+> differentiation (OTA-137, reads `def.summonDC`), `tutorialSteps.ts` "ACTIONS and RECIPES" copy
+> (string no longer present), and the entire **Dog Companion system** planning block (fully shipped
+> across OTA-114→120/340 — `player.dog`, `CallDogModal`, combat/travel/hunger/vests all live).
+> **Fixed in this pass:** the `materials.json` inference warning (OTA-539 — `note()` in
+> `itemDefaults.ts` now skips the false "no catalog row" nag for names that own a row in
+> materials/exploration). What remains below is genuinely open.
+
 - **Weapon-swap-during-combat turn cost — RESOLVED (working as intended).** The
   log's 8+ mid-fight swaps prompted a "does equip cost a turn?" question. Confirmed
   in code: `equipItem` calls no `advanceTime` / no stamina / no enemy reaction —
@@ -1666,14 +1685,12 @@ The entries below are retained as the shipped-batch record.
 
 - **Rumor-of-trapped-dog Arbiter hint for old-save players (OTA-125 follow-up).** Day-32 character on OTA-124 went 2 days of gameplay without ever encountering a rescue hook noun. The rescue system is wired correctly (fires on any future tap of cage / chain / wagon / wheel / cellar / trapdoor / snare / trap / pit / smelter / forge ruin on investigate / attack / advance / travel / ask / use_relic), but discoverability is RNG-bound — a player who travels through scenes without those noun chips will never know the system exists. **Fix shape:** if `!player.dog && !worldMemory.dogRescueTipFired && day-count > 5`, the Arbiter periodically (~0.5% per scene entry) drops a rumor hint: *"Travelers have been speaking of a dog held at a smelter ruin to the [random cardinal]. The Reclaimers have been quiet about it."* Set the flag so the hint only fires once per save. Low priority — system works, just needs a discovery nudge. **Status:** open.
 
-- **Catalog cross-file duplicates (OTA-124 stress-sweep finding).** Five items appear in BOTH `app/data/items/gear.json`/`amulets.json` AND `app/data/items/exploration.json`: `Aetheric Torch`, `Aetheric Compass`, `Minor Aetheric Amulet`, `Lightstone Amulet`, `Whisperer's Charm`. `findCatalogItem` first-hit-wins masks the issue at the call site, but the second-file row's `effect` / `tcBuy` / `faction` fields silently drop. **Fix shape:** decide canonical home per item and remove the other. **Status:** open; not user-facing today (engine handles), but a real authoring trap. Captured in `__tests__/catalogIntegrityWithDogGear.test.ts:178` as `test.failing`.
 
-- **Within-file duplicate: `Aetheric Shield` (OTA-124 stress-sweep finding).** `app/data/items/weapons.json` has TWO `Aetheric Shield` entries — a melee shield at line 95 and a runecaster variant at line 228. Different mechanics; the second row is UNREACHABLE through `findWeaponByName` (`Array.find` returns first). **Fix shape:** rename one or merge. **Status:** open. Captured in `__tests__/catalogIntegrityWithDogGear.test.ts:226` as `test.failing`.
-
-- **`isCataloguedElsewhere` guard missing DOG_GEAR (OTA-124 defensive add).** `app/engine/crafting.ts:320` doesn't include `DOG_GEAR` in the catalog-elsewhere check, so a future dog vest with weapon-y / armor-y keyword names ("Plated Vest", "Bladed Harness") could slip past the guard and trigger false `inferred-stats:` warnings. Current 4 vests are safe (names don't trip the keyword heuristics). **Fix shape:** add `DOG_GEAR` to the guard list. **Status:** open; low priority.
-
-
-- **Dog Companion system (OTA-114 planning entry — implementation NOT started).** User spec: a one-at-a-time canine companion the player meets early, names, and travels with. Stats live on the player Stats page; combat reflects the dog's actions like the golem system; dogs need feeding or abandon; dogs and golems are mutually antagonistic; dogs can't climb. Below is the full implementation framework. **Status: planning only — no code lands until user signs off.**
+- **✅ Dog Companion system — SHIPPED (OTA-114 → 120 / 340).** The full canine-companion system is
+  live: `player.dog`, the three-step Arbiter onboarding (breed → name → sex), the rescue scenarios,
+  combat/travel/hunger/loyalty, dog vests, the Character-screen Companion panel, `CallDogModal`, and the
+  puppy-vendor safety net. **Status: closed** — the original planning framework is retained below purely as
+  historical reference; nothing in it is still open.
 
   **Acquisition — rescue scenarios.** Dog acquisition fires as a sub-hook off the existing investigation table. The hook spawns a captor (human, from a faction the player is NOT part of) holding the dog. Combat resolves the rescue. **The captor fight is faction-neutral** — a new `factionNeutralFight: true` flag on the enemy record skips the standing-change pass that normally runs on hostile-NPC kills. Drafted scenarios (3-5 to choose from at world-gen):
 
@@ -1866,21 +1883,15 @@ The entries below are retained as the shipped-batch record.
 
   **Files this would touch (preview):** `app/engine/types.ts` (DogCompanion type, dog_armor kind, treat tag, factionNeutralFight flag, puppyVendor template type), `app/state/gameStore.ts` (rescue spawn / combat / travel / rest / hunger / call / smell-find / heal / feed handlers / puppy-vendor trigger), `app/engine/dogCompanion.ts` (NEW — central module like `golems.ts`), `app/engine/puppyVendor.ts` (NEW — Phase 6 trade interaction), `app/data/items/dogGear.json` (NEW — 4 vests), `app/data/items/consumables.json` (4 new treats with `dogTreat: true`), `app/data/world/*.json` (hidden smell nouns per scene archetype), `app/screens/TitleScreen.tsx` (character slot tile — dog name + breed sub-line), `app/screens/CharacterScreen.tsx` (Companion panel), `app/screens/InventoryScreen.tsx` (vest + treat tagging), `app/screens/VendorScreen.tsx` (puppy-vendor trade rendering), `app/components/CallDogModal.tsx` (NEW), `app/components/tutorialSteps.ts` (new step). Approximate scope: 3-4k lines across 6 OTAs.
 
-- **Per-golem summonDC differentiation (OTA-111 design call).** `runAethercraft` at `app/state/gameStore.ts:16592` uses a single hard-coded `dcBase = 15` (INT) for all four golem kinds. Lore-wise, Crystal and Aether golems are stronger anchors than Mud and Iron — they should arguably cost more. The OTA-111 AETHERIC tab footer surfaces the uniform DC-15 line to the player. **Fix shape:** add optional `summonDC?: number` to `GolemDefinition` in `app/engine/golems.ts`; `runAethercraft` reads `def.summonDC ?? 15`. Recommended values for design discussion: Mud 13, Iron 15, Aether 17, Crystal 19. **Status:** open; needs user input.
-
 - **WIS-novel-step rate limit (OTA-112 deferred recommendation).** WIS is the fastest-growing stat at 0.168 XP/turn — every novel cardinal step trains it, and ~40% of turns are moves. After 5000 turns the player sits at WIS 18 while still at DEX 13. The audit recommended raising the novelty window from 20 to 50 tiles so wandering can't farm WIS. **Status:** open; deferred — nerfing the highest-growing stat is a feel call, not a correctness call. Pick up if playtest reports WIS-cap-then-cruise behavior.
 
 — *Hook-puzzle parser-miss issues closed in OTAs 129/130/131/132 — see 0.B. The `rotate the ring`, `turn the locking ring`, `tap the steeple`, and `knock on the steeple` entries that previously lived here all resolve now: `rotate` / `knock` / `turn` / `twist` / `press` / `push` / `pull` are real intents with real puzzle resolution, deterministic sequences, hint copy at failure thresholds, mercy auto-solve, save/load preservation, examine-peek, and a direction-only fallback for "rotate left" without a noun.*
-
-- **`tutorialSteps.ts` references the pre-OTA-095 screen layout.** Surfaced by the OTA-110 static audit. `app/components/tutorialSteps.ts` says "ACTIONS and RECIPES" tabs as if both live on `ActionReferenceScreen`, but OTA-095 ripped Recipes out of that screen and moved them into Crafting (OTA-091 also moved Aetheric there as a 4th tab). Non-breaking — players will just see slightly misleading guidance the first time. **Status:** low priority; refresh on the next tutorial copy pass.
 
 - **Hub-room key collision (deferred from OTA-080 plan).** `makeRoomKey(locationId, microMicroId, mapX, mapY)` omits `hubRoomId`, so hub interiors that share `locationId` + `mapX/mapY` (chandelier study + armory + atlas hall in Asgardar) collide on the same per-room state. OTA-076 self-heals via inline table-seeding when a room is missing its investigation table, which masks the symptom for the investigate path, but other per-room data (climb markers, dedup lists) can still cross-pollute between hub interiors. **Fix shape:** add `hubRoomId` to `makeRoomKey` signature, update ~20 call sites, accept that old saves' explored rooms go cold + re-seed on the new key. **Status:** deferred — was planned as "OTA-081 will fix" in OTA-080 notes; OTA-081 shipped as the enemy HP bar fix instead, room-key never landed. Pick up when impact is observed (so far, only theoretical for hub-only data; OTA-076 covers the practical investigation case).
 
 - **Ongoing catalog backfill from `inferred-stats:` debug lines.** Pattern: when an inventory item resolves through `app/engine/itemDefaults.ts` (no authored catalog entry), the engine logs `[debug] inferred-stats: <kind>:<name> — engine guessed stats; add catalog row when convenient.` Backfill these into the relevant `app/data/items/*.json` as logs surface them. **Status:** active. Last batch (OTA-093) added Bone Fragment. Future logs that show new inferred items → batch into the next OTA touching the catalog. No workflow change needed — grep logs for `inferred-stats:` each pass.
 
 — *(Resolved across OTAs 129/130/131/132 — see 0.B for the wave summary.)*
-
-- **Inference engine doesn't check `materials.json` before warning.** Surfaced 2026-05-27 when a playtest log showed `[debug] inferred-stats: armor:Sentinel Core Plate — engine guessed stats; add catalog row when convenient.` — but Sentinel Core Plate IS in `materials.json` as an Uncommon misc material. The keyword classifier in `itemDefaults.ts` saw "Plate" → guessed armor → emitted the warning even though the catalog has an authoritative row in a different lookup table. **Fix shape:** extend the fallback chain to consult `MATERIALS` (and similarly `CONSUMABLES`, `EXPLORATION` etc.) before invoking the name-classifier inference. **Status:** open. Not user-facing — just a noisy debug warning. Pick up next time we touch `itemDefaults.ts`.
 
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 

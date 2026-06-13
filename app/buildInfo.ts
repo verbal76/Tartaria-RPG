@@ -14391,4 +14391,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // semi-transparent backing plate + gold left bar so the label reads over any background, and a ▾/▴ chevron —
 // tap anywhere on the bar to fold that section away. Collapse state is per-visit (matches the inventory).
 // app/screens/CharacterScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-538';
+// OTA-539 (Untriquadium Sieve) — [cleanup] silence false inferred-stats warnings + HANDOFF tracker audit.
+// itemDefaults.ts `note()` (the single chokepoint for "[inferred-stats] kind:Name — engine guessed stats"
+// debug lines) now skips the warning when the bare name owns an authoritative row in a NON-kind catalog
+// (materials / exploration). The keyword classifier can guess a kind from a material's name (e.g. "Sentinel
+// Core Plate" → armor because of "Plate") and nag about a missing catalog row that actually exists elsewhere —
+// that's noise, not a gap. Genuine unknowns still warn. Also audited HANDOFF §0.A against the live code and
+// pruned six already-shipped entries (catalog dups OTA-135, Aetheric Shield dup OTA-134, DOG_GEAR guard
+// OTA-133, per-golem summonDC OTA-137, tutorialSteps copy, Dog Companion system) so the open list is trustworthy.
+// app/engine/itemDefaults.ts, HANDOFF.md. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-539';

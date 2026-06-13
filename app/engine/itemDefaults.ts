@@ -29,6 +29,11 @@ import type {
 import type { Rarity, DamageType } from './types';
 import type { ItemEffect, StatKey } from './itemEffect';
 import { getCachedSynth } from './itemSynthesisCache';
+// arb119 — raw catalogs imported directly (NOT via crafting.ts, which imports
+// THIS module — that would be a circular dep) so `note()` can recognise a name
+// that's authoritatively catalogued in a non-kind table and skip a false warning.
+import materialsData from '../data/items/materials.json';
+import explorationData from '../data/items/exploration.json';
 
 const INFERRED_EVER: Set<string> = new Set();
 
@@ -54,8 +59,21 @@ export function setOnInferred(cb: ((label: string) => void) | null): void {
   onInferred = cb;
 }
 
+// arb119 — names that own an authoritative row in a NON-kind catalog (materials
+// / exploration). The keyword classifier can guess a kind from such a name (e.g.
+// "Sentinel Core Plate" → armor because of "Plate") and emit a false "no catalog
+// row, engine guessed stats" warning even though the catalog HAS the item, just
+// in a different lookup table. Those aren't authoring gaps, so don't nag.
+const CATALOGUED_ELSEWHERE: ReadonlySet<string> = new Set<string>([
+  ...((materialsData as { materials?: Array<{ name: string }> }).materials ?? []).map((m) => m.name.toLowerCase()),
+  ...((explorationData as Array<{ name: string }>) ?? []).map((x) => x.name.toLowerCase()),
+]);
+
 function note(label: string): void {
   if (INFERRED_EVER.has(label)) return;
+  // Strip the `kind:` prefix and skip the warning for a known non-kind catalog item.
+  const name = label.slice(label.indexOf(':') + 1).trim().toLowerCase();
+  if (CATALOGUED_ELSEWHERE.has(name)) return;
   INFERRED_EVER.add(label);
   try { onInferred?.(label); } catch { /* ignore */ }
 }
