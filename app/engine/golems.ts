@@ -52,9 +52,14 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
   mud_golem: {
     kind: 'mud_golem',
     name: 'Mud Golem',
+    // arb119 — the STARTER anchor ("cheap to bind, easiest") was gated by RARE
+    // Mudstone, which made the first golem effectively unbuildable. Now fueled by
+    // the COMMON mud you actually forage (Aether Mud + Mud Fragment), matching the
+    // flavor. Mudstone is reserved for higher-tier mud gear and is refinable from
+    // Mud Fragment for anything that still wants it.
     fuel: [
       { name: 'Aether Mud', quantity: 2 },
-      { name: 'Mudstone', quantity: 1 },
+      { name: 'Mud Fragment', quantity: 2 },
       { name: 'Aether Crystal', quantity: 1 },
     ],
     hpMax: 16,

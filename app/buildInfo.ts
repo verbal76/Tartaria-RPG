@@ -14367,4 +14367,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // still governs interpolated between-location dots. (2) iskan_veil's coord was at the very west edge
 // (fx 0.05, below the 0.06 dot-clamp floor); nudged just inside so its dot/icon don't disagree.
 // app/engine/atlasCoords.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-535';
+// OTA-536 (Untriunium Silt) — [balance] mud-material bottleneck. Mudstone is RARE, yet it gated the CHEAPEST
+// mud crafts — the Common Mud Scanner and the STARTER Mud Golem ("cheap to bind, easiest") — so the first
+// scanner/golem was effectively unbuildable. Raising Mudstone's drop weight would just make every other dig/
+// salvage item scarcer (zero-sum). Fixed at the recipe layer instead: (1) the Mud Scanner + starter Mud Golem
+// now use COMMON mud you actually forage (Mud Fragment ×2 in place of Mudstone ×1); (2) a new REFINE recipe
+// compresses Mud Fragment ×3 → Mudstone ×1, so higher-tier mud gear (Mudstone Bulwark, Hardened-Mudstone
+// items) has a craftable path from common mud instead of an RNG wall. No drop-rate changes, no inflation.
+// app/data/items/recipes.json, app/engine/golems.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-536';

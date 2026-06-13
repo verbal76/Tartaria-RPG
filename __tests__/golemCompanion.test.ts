@@ -55,9 +55,11 @@ function stockItem(name: string, qty: number): InventoryItem {
 }
 
 function mudGolemFuelStock(): InventoryItem[] {
+  // arb119 — the starter mud golem was re-tiered off RARE Mudstone onto COMMON
+  // Mud Fragment (×2); keep the test fuel in step with GOLEM_DEFINITIONS.
   return [
     stockItem('Aether Mud', 3),
-    stockItem('Mudstone', 2),
+    stockItem('Mud Fragment', 2),
     stockItem('Aether Crystal', 2),
   ];
 }
@@ -107,7 +109,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
     it('returns empty when inventory has the full recipe', () => {
       const missing = missingFuelFor(GOLEM_DEFINITIONS.mud_golem, [
         { name: 'Aether Mud', quantity: 5 },
-        { name: 'Mudstone', quantity: 5 },
+        { name: 'Mud Fragment', quantity: 5 },
         { name: 'Aether Crystal', quantity: 5 },
       ]);
       expect(missing).toEqual([]);
@@ -115,7 +117,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
     it('reports a partial shortfall correctly', () => {
       const missing = missingFuelFor(GOLEM_DEFINITIONS.mud_golem, [
         { name: 'Aether Mud', quantity: 1 }, // need 2, have 1 → short 1
-        { name: 'Mudstone', quantity: 1 },
+        { name: 'Mud Fragment', quantity: 2 }, // need 2, have 2 → ok
         { name: 'Aether Crystal', quantity: 1 },
       ]);
       expect(missing.length).toBe(1);
@@ -127,14 +129,14 @@ describe('MECHANIC-1b — golem sidekick', () => {
     it('decrements the correct quantities from the inventory', () => {
       const inv = [
         { name: 'Aether Mud', quantity: 5 },
-        { name: 'Mudstone', quantity: 3 },
+        { name: 'Mud Fragment', quantity: 3 },
         { name: 'Aether Crystal', quantity: 2 },
         { name: 'Unrelated', quantity: 1 },
       ];
       const after = consumeFuel(GOLEM_DEFINITIONS.mud_golem, inv);
       const byName = Object.fromEntries(after.map((i) => [i.name, i.quantity]));
       expect(byName['Aether Mud']).toBe(3); // 5 - 2
-      expect(byName['Mudstone']).toBe(2);   // 3 - 1
+      expect(byName['Mud Fragment']).toBe(1); // 3 - 2
       expect(byName['Aether Crystal']).toBe(1); // 2 - 1
       expect(byName['Unrelated']).toBe(1); // untouched
     });

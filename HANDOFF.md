@@ -378,6 +378,15 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-536 "Untriunium Silt" — [balance] mud-material bottleneck** *(element #131)*. RARE Mudstone gated the
+  CHEAPEST mud crafts (Common Mud Scanner + the "cheap to bind" STARTER Mud Golem), so the first scanner/golem
+  was effectively unbuildable — and raising Mudstone's drop weight is zero-sum (every other forage item gets
+  rarer). Fixed at the recipe layer: (1) Mud Scanner + starter Mud Golem now use COMMON Mud Fragment ×2 instead
+  of Mudstone ×1; (2) new REFINE recipe Mud Fragment ×3 → Mudstone ×1 gives higher-tier mud gear a craftable
+  path from common mud. No drop-rate changes, no inflation. `app/data/items/recipes.json`, `app/engine/golems.ts`.
+  Tests `golemCompanion` (fuel updated). **Next: the armor resistance rework** (diminishing stacking, chest-first
+  → cloak-last — still pending; today armor is flat 50%-once).
+
 - **OTA-535 "Untrinilium Plot" — [bugfix] map-dot accuracy** *(element #130)*. (1) Standing EXACTLY on a
   location's tile now snaps the player dot precisely onto that location's icon — the IDW plot only gave the
   on-tile anchor ~96% weight, so a nearby capital dragged the dot a few % off (0.041 for yuldra_tul). A

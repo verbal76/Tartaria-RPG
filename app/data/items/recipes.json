@@ -920,8 +920,8 @@
           "quantity": 3
         },
         {
-          "name": "Mudstone",
-          "quantity": 1
+          "name": "Mud Fragment",
+          "quantity": 2
         },
         {
           "name": "Aether Crystal",
@@ -1272,6 +1272,16 @@
         {
           "name": "Golem Core",
           "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "arb119 — REFINE path. Mudstone is Rare and was the hard wall on the starter mud golem + Mud Scanner (both re-tiered to Common mud). Compressing 3 Common Mud Fragments into 1 Mudstone gives every higher-tier mud recipe (Mudstone Bulwark, Hardened-Mudstone gear) a craftable path from the mud you actually forage, instead of an RNG wall.",
+      "result": "Mudstone",
+      "ingredients": [
+        {
+          "name": "Mud Fragment",
+          "quantity": 3
         }
       ]
     }
