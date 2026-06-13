@@ -378,6 +378,8 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-554 "Unquadennium Grade" — [balance] golem substitute-repair scales by rarity** *(element #149)*. Refines OTA-553: a substitute material now heals a fraction of a full fuel part by its rarity — Common/untiered ¼, Uncommon ½, Rare ¾, Legendary full (min 1). Aether Golem: Common 1, Uncommon 3, Rare 4, Legendary 6. `app/engine/golems.ts`, `app/state/gameStore.ts`, `app/screens/CharacterScreen.tsx`. Tests `golemCompanion` (26).
+
 - **OTA-553 "Unquadoctium Substitute" — [feature] weaker elemental substitutes for golem repair** *(element #148)*. A golem heals FULL from its exact fuel parts, and now ALSO accepts any raw MATERIAL sharing its element at HALF value — an Aether Golem mends from any aether loot (Dust/Residue/Venom/Disc/Moss/Sludge), a Mud Golem from mud loot, an Iron Golem from scrap. Misc/material only (no feeding it an aether weapon). Panel + refusal spell out the substitute path. `app/engine/golems.ts`, `app/state/gameStore.ts`, `app/screens/CharacterScreen.tsx`. Tests `golemCompanion` (26).
 
 - **OTA-552 "Unquadseptium Assay" — [bugfix] item rarity audit (creation rank vs catalog rank)** *(element #147)*. Scripted all 763 catalog rarities vs code creation sites; fixed Scrap Metal (dug Uncommon → catalog Common) and an Aetheric Shard salvage entry (Common → Uncommon, matching its catalog + sibling entries). Flagged but left: Iron Core name-collision (Rare scanner find vs Legendary boss core). `app/engine/digging.ts`, `app/engine/salvagePools.ts`.

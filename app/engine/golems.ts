@@ -15,7 +15,7 @@
 // here, optionally surface in the recipe-list UI so the player
 // can see what fuel each variant needs.
 
-import type { Companion, GolemKind } from './types';
+import type { Companion, GolemKind, Rarity } from './types';
 import type { GolemStatKey } from './types';
 
 export interface GolemRecipeFuel {
@@ -273,10 +273,18 @@ export function isGolemSubstitutePart(
   return (item.tags ?? []).some((t) => el.includes(t.toLowerCase()));
 }
 
-/** arb121 — HP a SUBSTITUTE material restores: half a true fuel part's value
- *  (min 1). Aether Golem: 6 → 3; Mud: 4 → 2; Crystal: 8 → 4. */
-export function golemSubstituteHeal(kind: GolemKind): number {
-  return Math.max(1, Math.floor(golemRepairHeal(kind) / 2));
+/** arb122 — HP a SUBSTITUTE material restores, SCALED BY RARITY so a pinch of
+ *  garbage scrap isn't worth half a true part. Fraction of a full fuel part:
+ *  Common/untiered ¼, Uncommon ½, Rare ¾, Legendary full. Aether Golem (full 6):
+ *  Common 1, Uncommon 3, Rare 4, Legendary 6. Min 1 so a feed always does
+ *  *something*. */
+export function golemSubstituteHeal(kind: GolemKind, rarity?: Rarity | null): number {
+  const full = golemRepairHeal(kind);
+  const frac = rarity === 'Legendary' ? 1
+    : rarity === 'Rare' ? 0.75
+    : rarity === 'Uncommon' ? 0.5
+    : 0.25; // Common / untiered = garbage tier
+  return Math.max(1, Math.floor(full * frac));
 }
 
 /** Validate that the player's inventory holds the full fuel set.

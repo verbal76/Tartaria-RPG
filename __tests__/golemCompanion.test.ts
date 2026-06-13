@@ -322,20 +322,23 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().gameLog.map((l) => l.text).join('\n')).toMatch(/mends best from what it's made of/);
     });
 
-    it('arb121 — an element-matched MATERIAL substitute heals at HALF and is consumed', async () => {
+    it('arb122 — an element-matched MATERIAL substitute heals SCALED BY RARITY and is consumed', async () => {
       const store = await bootstrap([
+        // Common garbage aether loot — NOT aether-golem fuel, but shares the element.
         { id: 'ad', name: 'Aether Dust', kind: 'misc', rarity: 'Common', quantity: 2, tags: ['aether', 'dust'] } as never,
+        // An Uncommon aether material for the half tier.
+        { id: 'ar', name: 'Aether Residue', kind: 'misc', rarity: 'Uncommon', quantity: 2, tags: ['aether'] } as never,
       ]);
       const p0 = store.getState().player!;
-      // Aether Dust is NOT aether-golem fuel (fuel = Aether Crystal + Aetheric Shard),
-      // but it shares the 'aether' element tag, so it mends at half a part's worth.
       const golem = { ...makeCompanion(GOLEM_DEFINITIONS.aether_golem), hp: 1 };
       store.setState({ player: { ...p0, golem } });
+      // aether golem full part = round(24/4) = 6. Common substitute = floor(6 * 0.25) = 1.
       store.getState().submitPlayerAction('feed golem aether dust');
-      const after = store.getState().player!;
-      // aether golem full part = round(24/4)=6 → substitute = floor(6/2)=3.
-      expect(after.golem!.hp).toBe(4); // 1 + 3
-      expect((after.inventory.find((i) => i.name === 'Aether Dust')?.quantity) ?? 0).toBe(1); // one consumed
+      expect(store.getState().player!.golem!.hp).toBe(2); // 1 + 1 (Common = quarter)
+      expect((store.getState().player!.inventory.find((i) => i.name === 'Aether Dust')?.quantity) ?? 0).toBe(1);
+      // Uncommon substitute = floor(6 * 0.5) = 3.
+      store.getState().submitPlayerAction('feed golem aether residue');
+      expect(store.getState().player!.golem!.hp).toBe(5); // 2 + 3 (Uncommon = half)
     });
 
     it('naming takeover: the input after a summon names the golem', async () => {

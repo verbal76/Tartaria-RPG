@@ -25306,7 +25306,7 @@ function applyItemToGolem(
   const isSub = !isPart && isGolemSubstitutePart(golem.kind, item);
   if (!isPart && !isSub) {
     const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
-    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at half worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} scrap. The ${item.name} won't take."`);
+    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
     return false;
   }
   if (golem.hp >= golem.hpMax) {
@@ -25315,7 +25315,7 @@ function applyItemToGolem(
   }
   const heal = Math.min(
     golem.hpMax - golem.hp,
-    (isSub ? golemSubstituteHeal(golem.kind) : golemRepairHeal(golem.kind)) as number,
+    (isSub ? golemSubstituteHeal(golem.kind, item.rarity) : golemRepairHeal(golem.kind)) as number,
   );
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))

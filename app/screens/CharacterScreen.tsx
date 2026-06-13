@@ -433,7 +433,7 @@ export function CharacterScreen() {
                   {heldRepair.length > 0
                     ? ` — you're carrying ${heldRepair.join(' & ')}.`
                     : ' — none in your pack right now.'}
-                  {elementWord ? ` Any raw ${elementWord} material also mends it, at half value.` : ''}
+                  {elementWord ? ` Any raw ${elementWord} material also mends it — at reduced value, more from higher-grade material.` : ''}
                 </Text>
               </View>
               )}

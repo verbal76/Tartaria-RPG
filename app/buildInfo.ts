@@ -14497,4 +14497,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // misc/material items (no feeding it an aether WEAPON). golemSubstituteHeal = floor(fullHeal/2); the panel + the
 // wrong-item refusal both spell out the substitute path. app/engine/golems.ts, app/state/gameStore.ts,
 // app/screens/CharacterScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-553';
+// OTA-554 (Unquadennium Grade) — [balance] golem substitute-repair now SCALES BY RARITY (refines OTA-553). A flat
+// half-value heal was too generous for garbage scrap, so a substitute material now mends a fraction of a full
+// fuel part by its rarity: Common/untiered ¼, Uncommon ½, Rare ¾, Legendary full (min 1). Aether Golem (full 6):
+// Common 1, Uncommon 3, Rare 4, Legendary 6 — so a pinch of common Aether Dust tops it a little, a Rare aether
+// material a lot. Panel + refusal reworded ("more from higher-grade material"). app/engine/golems.ts,
+// app/state/gameStore.ts, app/screens/CharacterScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-554';
