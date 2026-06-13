@@ -317,7 +317,25 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const after = store.getState().player!;
       expect(after.golem!.hp).toBe(5); // unchanged
       expect((after.inventory.find((i) => i.name === 'Aether Mud')?.quantity) ?? 0).toBe(1); // not consumed
-      expect(store.getState().gameLog.map((l) => l.text).join('\n')).toMatch(/mends only from what it's made of/);
+      // arb121 — refusal now reads "mends best … or, at half worth, any raw <element> scrap"
+      // (a true non-matching item like tagless Aether Mud on an IRON golem still won't take).
+      expect(store.getState().gameLog.map((l) => l.text).join('\n')).toMatch(/mends best from what it's made of/);
+    });
+
+    it('arb121 — an element-matched MATERIAL substitute heals at HALF and is consumed', async () => {
+      const store = await bootstrap([
+        { id: 'ad', name: 'Aether Dust', kind: 'misc', rarity: 'Common', quantity: 2, tags: ['aether', 'dust'] } as never,
+      ]);
+      const p0 = store.getState().player!;
+      // Aether Dust is NOT aether-golem fuel (fuel = Aether Crystal + Aetheric Shard),
+      // but it shares the 'aether' element tag, so it mends at half a part's worth.
+      const golem = { ...makeCompanion(GOLEM_DEFINITIONS.aether_golem), hp: 1 };
+      store.setState({ player: { ...p0, golem } });
+      store.getState().submitPlayerAction('feed golem aether dust');
+      const after = store.getState().player!;
+      // aether golem full part = round(24/4)=6 → substitute = floor(6/2)=3.
+      expect(after.golem!.hp).toBe(4); // 1 + 3
+      expect((after.inventory.find((i) => i.name === 'Aether Dust')?.quantity) ?? 0).toBe(1); // one consumed
     });
 
     it('naming takeover: the input after a summon names the golem', async () => {

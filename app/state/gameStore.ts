@@ -25288,7 +25288,8 @@ function applyItemToGolem(
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getGolemDefinition, isGolemRepairPart, golemRepairParts, golemRepairHeal } = require('../engine/golems');
+  const { getGolemDefinition, isGolemRepairPart, golemRepairParts, golemRepairHeal,
+    isGolemSubstitutePart, golemSubstituteHeal, GOLEM_ELEMENT_TAGS } = require('../engine/golems');
   const def = getGolemDefinition(golem.kind);
   const lower = itemName.toLowerCase().trim();
   const item = player.inventory.find((i) =>
@@ -25298,16 +25299,24 @@ function applyItemToGolem(
     get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
     return false;
   }
-  if (!isGolemRepairPart(golem.kind, item.name)) {
+  // arb121 — a full FUEL PART heals full; an elemental MATERIAL substitute (e.g.
+  // any aether loot for an Aether Golem) heals half. Anything else is refused —
+  // and the refusal now names both the parts AND that its element scraps will do.
+  const isPart = isGolemRepairPart(golem.kind, item.name);
+  const isSub = !isPart && isGolemSubstitutePart(golem.kind, item);
+  if (!isPart && !isSub) {
     const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
-    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends only from what it's made of — ${parts}. The ${item.name} won't take."`);
+    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at half worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} scrap. The ${item.name} won't take."`);
     return false;
   }
   if (golem.hp >= golem.hpMax) {
     get().appendLog('world', `${golem.name} is already whole — no repair needed.`);
     return false;
   }
-  const heal = Math.min(golem.hpMax - golem.hp, golemRepairHeal(golem.kind) as number);
+  const heal = Math.min(
+    golem.hpMax - golem.hp,
+    (isSub ? golemSubstituteHeal(golem.kind) : golemRepairHeal(golem.kind)) as number,
+  );
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
     .filter((i) => i.quantity > 0);
@@ -25317,7 +25326,9 @@ function applyItemToGolem(
     : s));
   get().appendLog(
     'world',
-    `You work the ${item.name} into ${golem.name}'s frame. It fuses into the Aetherstone and the cracks seal over. (+${heal} HP, ${newHp}/${golem.hpMax})`,
+    isSub
+      ? `You pack the ${item.name} into ${golem.name}'s frame. It's not true fuel — the Aetherstone takes it grudgingly, but the worst cracks close. (+${heal} HP, ${newHp}/${golem.hpMax})`
+      : `You work the ${item.name} into ${golem.name}'s frame. It fuses into the Aetherstone and the cracks seal over. (+${heal} HP, ${newHp}/${golem.hpMax})`,
   );
   return true;
 }

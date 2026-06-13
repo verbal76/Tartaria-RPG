@@ -14489,4 +14489,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // core shares a name with a Rare-tier Pulse-Scanner find (pool typed Common|Uncommon|Rare); forcing Legendary
 // would make a scanner hand out a boss core, so it stays Rare in that pool. app/engine/digging.ts,
 // app/engine/salvagePools.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-552';
+// OTA-553 (Unquadoctium Substitute) — [feature] weaker elemental substitutes for golem repair. A golem still
+// heals FULL from its exact fuel parts, but now ALSO accepts any raw MATERIAL sharing its element as a half-value
+// substitute: an Aether Golem mends from any aether material (Aether Dust/Residue/Venom/Disc/Moss/Sludge), a Mud
+// Golem from mud loot, an Iron Golem from scrap metal. So a pack of aether loot can top one up when you're out of
+// its exact fuel — answering "I have a ton of aetheric items but can't heal my aether golem." Restricted to
+// misc/material items (no feeding it an aether WEAPON). golemSubstituteHeal = floor(fullHeal/2); the panel + the
+// wrong-item refusal both spell out the substitute path. app/engine/golems.ts, app/state/gameStore.ts,
+// app/screens/CharacterScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-553';

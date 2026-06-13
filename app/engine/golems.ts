@@ -249,6 +249,36 @@ export function golemRepairHeal(kind: GolemKind): number {
   return Math.max(3, Math.round(GOLEM_DEFINITIONS[kind].hpMax / 4));
 }
 
+/** arb121 — the elemental material tags a golem can mend from as a WEAKER
+ *  SUBSTITUTE when you're out of its exact fuel parts. A pack of aether loot can
+ *  top up an Aether Golem; mud sludge an mud golem; scrap an iron golem. */
+export const GOLEM_ELEMENT_TAGS: Record<GolemKind, readonly string[]> = {
+  mud_golem: ['mud'],
+  iron_golem: ['metal', 'iron'],
+  aether_golem: ['aether', 'aetheric'],
+  crystal_golem: ['aether', 'crystal'],
+};
+
+/** arb121 — true if `item` is a raw MATERIAL sharing the golem's element (but
+ *  not one of its exact fuel parts). Such items mend the golem at a reduced
+ *  rate (see golemSubstituteHeal). Restricted to misc/material items so you
+ *  can't feed it an aether-tagged WEAPON or armor piece. */
+export function isGolemSubstitutePart(
+  kind: GolemKind,
+  item: { name: string; kind?: string; tags?: readonly string[] },
+): boolean {
+  if (item.kind && item.kind !== 'misc') return false; // materials/loot only
+  if (isGolemRepairPart(kind, item.name)) return false; // exact fuel → full-heal path
+  const el = GOLEM_ELEMENT_TAGS[kind] ?? [];
+  return (item.tags ?? []).some((t) => el.includes(t.toLowerCase()));
+}
+
+/** arb121 — HP a SUBSTITUTE material restores: half a true fuel part's value
+ *  (min 1). Aether Golem: 6 → 3; Mud: 4 → 2; Crystal: 8 → 4. */
+export function golemSubstituteHeal(kind: GolemKind): number {
+  return Math.max(1, Math.floor(golemRepairHeal(kind) / 2));
+}
+
 /** Validate that the player's inventory holds the full fuel set.
  *  Returns the names of missing items (empty array when fully
  *  funded). Used by the summon handler before the skill check. */
