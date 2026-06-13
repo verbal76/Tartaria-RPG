@@ -192,6 +192,13 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     crashCount += 1;
     try {
       await AsyncStorage.setItem(KEY_CRASH_COUNT, String(crashCount));
+      // arb125 — CLEAR the attempted breadcrumb after counting, so this same
+      // stale "attempted, no success" record can't re-count a PHANTOM crash on
+      // every subsequent boot. Without this, a device that stopped attempting
+      // (qwen:skipped) climbs its crash count forever just by booting — observed
+      // 74 → 78 over four launches with zero real init attempts. A genuine next
+      // attempt writes a fresh KEY_ATTEMPTED.
+      await AsyncStorage.removeItem(KEY_ATTEMPTED);
     } catch {
       // Best-effort — if AsyncStorage write fails the counter stays
       // in-memory; we'll re-detect next launch.

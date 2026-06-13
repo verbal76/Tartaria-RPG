@@ -64,4 +64,17 @@ describe('arb124 — Qwen false-disable recovery', () => {
     expect(mockStore[K.crash]).toBeUndefined();
     expect(mockStore[K.disabled]).toBeUndefined();
   });
+
+  it('does NOT re-count a phantom crash every boot — clears the stale attempted breadcrumb', async () => {
+    // A stale "attempted (newer) without a matching success" = one detectable
+    // crash. Before the fix it re-counted on EVERY boot (74 → 78 in the field).
+    mockStore[K.attempted] = '2026-06-10T22:38:22.000Z';
+    mockStore[K.succeeded] = '2026-06-10T22:38:19.000Z';
+    mockStore[K.crash] = '5';
+    await bootAndGates(); // boot 1: detect → crashCount 6, breadcrumb cleared
+    expect(Number(mockStore[K.crash])).toBe(6);
+    expect(mockStore[K.attempted]).toBeUndefined();
+    await bootAndGates(); // boot 2: no breadcrumb → no phantom crash
+    expect(Number(mockStore[K.crash])).toBe(6);
+  });
 });

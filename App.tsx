@@ -269,17 +269,43 @@ export default function App() {
           if (!shouldAttemptMLInit()) {
             // eslint-disable-next-line no-console
             console.warn(
-              `mlHealth: ML init disabled (${health.crashCount} crashes detected). Template fallback only this session.`,
+              `mlHealth: cognitive init held (${health.crashCount} crashes detected). Template parsing this session.`,
             );
+            // The MiniLM classifier sits on the CRITICAL boot path, so it stays
+            // gated by the strict general guard (no boot-loop risk).
             setStage('cognitive:skipped');
-            setStage('qwen:skipped');
-            // OTA-405 — reflect the DISABLED state in the store status (not
-            // just the boot-stage global), so the TitleScreen's Gate B sees a
-            // terminal state and opens character entry IMMEDIATELY instead of
-            // waiting out its safety cap. On a disabled device there is no
-            // classifier to wait for — the game runs on deterministic
-            // fallback — so a wait here would be pure dead time.
-            useGameStore.setState({ cognitiveStatus: 'skipped', qwenStatus: 'skipped' });
+            useGameStore.setState({ cognitiveStatus: 'skipped' });
+            // arb125 — but the general guard is polluted by OS-kill-during-load
+            // FALSE POSITIVES (the "attempted, no success" breadcrumb trips
+            // whenever the OS kills the app mid model-load), so it must not
+            // permanently bench QWEN on a device that has loaded a model before.
+            // Qwen's boot is DEFERRED + crash-caught, so retrying it can't
+            // boot-loop the critical path — and a successful init resets the
+            // general crash state (markMLInitSucceeded), healing the classifier
+            // on the NEXT launch. So honor only Qwen's own guards here.
+            if (shouldAttemptQwen()) {
+              setTimeout(() => {
+                if (!shouldAttemptQwen()) {
+                  setStage('qwen:skipped');
+                  useGameStore.setState({ qwenStatus: 'skipped' });
+                  return;
+                }
+                setStage('qwen:start');
+                void markMLInitAttempted();
+                void bootQwen()
+                  .then(() => {
+                    setStage('qwen:done');
+                    void markMLInitSucceeded();
+                  })
+                  .catch((e) => {
+                    // eslint-disable-next-line no-console
+                    console.warn('bootQwen failed:', e);
+                  });
+              }, 3000);
+            } else {
+              setStage('qwen:skipped');
+              useGameStore.setState({ qwenStatus: 'skipped' });
+            }
             return;
           }
           if (health.detectedCrashThisBoot) {

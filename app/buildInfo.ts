@@ -14526,4 +14526,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // real completion guard; (2) markMLInitSucceeded wipes the general crash count + disable on each success, so a
 // working device self-heals and false positives can't accumulate. Boot-resilience preserved for devices that have
 // NEVER succeeded. app/diagnostics/mlHealth.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-557';
+// OTA-558 (Unpenttrium Rekindle) — [bugfix] OTA-557 didn't actually re-enable Qwen; two deeper faults found from
+// a post-557 log (crash count CLIMBED 74→78 with `qwen:skipped`). (1) The general crash detector never cleared
+// its KEY_ATTEMPTED breadcrumb after counting, so a stale "attempted, no success" record (last real attempt was
+// days ago) re-counted a PHANTOM crash on EVERY boot — the count inflated purely by launching. Now it removes the
+// breadcrumb after counting. (2) App.tsx gated BOTH the classifier AND Qwen on the general shouldAttemptMLInit(),
+// so the disabled flag skipped everything before the OTA-557 shouldAttemptQwen() bypass was ever reached. The
+// classifier stays on the strict guard (critical boot path), but Qwen — deferred + crash-caught — now re-attempts
+// via shouldAttemptQwen() even when the general guard is tripped; a successful Qwen init resets the general crash
+// state (markMLInitSucceeded), healing the classifier on the next launch. app/diagnostics/mlHealth.ts, App.tsx.
+// JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-558';
