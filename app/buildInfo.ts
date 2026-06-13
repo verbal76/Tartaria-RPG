@@ -14503,4 +14503,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Common 1, Uncommon 3, Rare 4, Legendary 6 — so a pinch of common Aether Dust tops it a little, a Rare aether
 // material a lot. Panel + refusal reworded ("more from higher-grade material"). app/engine/golems.ts,
 // app/state/gameStore.ts, app/screens/CharacterScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-554';
+// OTA-555 (Unpentnilium Marker) — [ux] inventory now flags SUBSTITUTE repair materials for the equipped golem,
+// not just its exact fuel parts. The purple golem stripe + the one-tap "Heal <golem>" button used isGolemRepairPart
+// (fuel parts only), so the new element-matched substitutes (OTA-553/554) were feedable by typing but had no
+// visual cue. Both now also honor isGolemSubstitutePart(equipped golem kind, item) — so every mud/metal/aether
+// material that can mend YOUR golem gets the purple hatch + Heal action, and it stays kind-specific (never lights
+// for a golem you don't have). app/screens/InventoryScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-555';

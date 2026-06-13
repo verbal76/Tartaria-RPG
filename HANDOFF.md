@@ -378,6 +378,8 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-555 "Unpentnilium Marker" — [ux] inventory flags SUBSTITUTE repair materials for the equipped golem** *(element #150)*. The purple golem stripe + one-tap Heal button used `isGolemRepairPart` (exact fuel only), so OTA-553/554 substitutes had no visual cue. Both now also honor `isGolemSubstitutePart(equipped kind, item)` — every mud/metal/aether material that can mend YOUR golem gets the purple hatch + Heal action, kind-specific. `app/screens/InventoryScreen.tsx`.
+
 - **OTA-554 "Unquadennium Grade" — [balance] golem substitute-repair scales by rarity** *(element #149)*. Refines OTA-553: a substitute material now heals a fraction of a full fuel part by its rarity — Common/untiered ¼, Uncommon ½, Rare ¾, Legendary full (min 1). Aether Golem: Common 1, Uncommon 3, Rare 4, Legendary 6. `app/engine/golems.ts`, `app/state/gameStore.ts`, `app/screens/CharacterScreen.tsx`. Tests `golemCompanion` (26).
 
 - **OTA-553 "Unquadoctium Substitute" — [feature] weaker elemental substitutes for golem repair** *(element #148)*. A golem heals FULL from its exact fuel parts, and now ALSO accepts any raw MATERIAL sharing its element at HALF value — an Aether Golem mends from any aether loot (Dust/Residue/Venom/Disc/Moss/Sludge), a Mud Golem from mud loot, an Iron Golem from scrap. Misc/material only (no feeding it an aether weapon). Panel + refusal spell out the substitute path. `app/engine/golems.ts`, `app/state/gameStore.ts`, `app/screens/CharacterScreen.tsx`. Tests `golemCompanion` (26).
