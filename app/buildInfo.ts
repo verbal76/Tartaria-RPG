@@ -14426,4 +14426,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // one-line recognition and resolves on the spot. Loot threads (hidden compartment, bricked doorway, stopped
 // clock, etc.) return null from the new clueThreadMemoText() guard and STAY repeatable per room. app/engine/hooks.ts,
 // app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-543';
+// OTA-544 (Untriennium Waypoint) — [bugfix] two auto-travel readout fixes from the mission report. (a) When the
+// Yulka fetch completes — the instant the Discs are in hand, even from a RANDOM Silt Thief, not just the planted
+// one — an active auto-route is re-pointed off the now-pointless thief tile onto Yulka's return tile, so the
+// travel readout names the CURRENT objective ("→ Yulka (return the Discs)") instead of a stale "N steps to the
+// Silt Thief". (b) A POI discovered WHILE auto-travelling no longer dangles a "Tap ENTER" with no ENTER button
+// (the travel row shows STOP); on a route the line now reads "You're on a route — type ENTER to step inside, or
+// keep traveling," naming the typed path the player had to guess at. app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-544';

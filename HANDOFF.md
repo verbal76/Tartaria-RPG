@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-544 "Untriennium Waypoint" — [bugfix] auto-travel readout fixes (report items a + b)** *(element #139)*.
+  (a) The Yulka fetch completes the instant the Discs are in hand (even from a random Silt Thief); an active
+  auto-route now re-points off the stale thief tile onto Yulka's return tile, so the readout names the current
+  objective. (b) A POI discovered while auto-travelling no longer dangles "Tap ENTER" with no button — on a route
+  it reads "type ENTER to step inside, or keep traveling." `app/state/gameStore.ts`. Tests `whisperYulka` (11).
+
 - **OTA-543 "Untrioctium Recall" — [bugfix] clue story threads stop replaying room-to-room** *(element #138)*.
   From the same mission report (item c): a memo-only thread (watching-portrait warning, open-ledger lead,
   child's-drawing memo) reads identically wherever the prop appears, so a second copy in the next room replayed

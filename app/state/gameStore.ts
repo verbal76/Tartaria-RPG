@@ -400,10 +400,16 @@ function indoorsForOutdoorHooks(get: () => GameStore): boolean {
 /** arb36 — "you stumble on a structure" line for an enterable building
  *  discovered on a wild tile. Uses the template's article-friendly
  *  hookLabel ("a leaning shack" → "A leaning shack…"). */
-function buildingApproachLine(buildingId: string): string {
+function buildingApproachLine(buildingId: string, autoTraveling = false): string {
   const label = getBuilding(buildingId)?.hookLabel ?? 'a structure';
   const Cap = label.charAt(0).toUpperCase() + label.slice(1);
-  return `${Cap} stands off the path here — weathered and quiet, a way in still clear. (Tap ENTER to step inside.)`;
+  // arb120 — while auto-travelling the travel row shows STOP, not an ENTER
+  // button, so a plain "Tap ENTER" dangles (the player had to discover they
+  // could TYPE it). Name the typed path explicitly when on a route.
+  const enterHint = autoTraveling
+    ? '(You’re on a route — type ENTER to step inside, or keep traveling.)'
+    : '(Tap ENTER to step inside.)';
+  return `${Cap} stands off the path here — weathered and quiet, a way in still clear. ${enterHint}`;
 }
 
 interface CurrentScene {
@@ -4697,7 +4703,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       });
     } else if (scene.sceneBuilding && !opts?.isOpening) {
-      get().appendLog('world', buildingApproachLine(scene.sceneBuilding));
+      const onRoute = !!get().player?.travelTarget || !!get().player?.whisperCourse;
+      get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute));
     }
     // OTA-244 — danger-vs-tier warning. Player playtest: ate a
     // Mud Giant (Legendary, 360 HP) rest-ambush in Asgardar
@@ -14142,6 +14149,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           `The Silt Thief drops. Under their cloak, wrapped in oilcloth, half-stamped Aetheric Discs spill across the silt. You scoop them into your own pack. Yulka's stock, recovered.`,
         );
         get().appendLog('reward', `✦ Stolen Aetheric Discs (12).`);
+        // arb120 — the fetch is DONE the instant the Discs are in hand (even from
+        // a random Silt Thief, not just the planted one). Re-point an active
+        // auto-route off the now-pointless thief tile onto Yulka's return tile, so
+        // the travel readout names the CURRENT objective ("→ Yulka (return the
+        // Discs)") instead of a stale "… N steps to the Silt Thief".
+        if (live.targetMapX != null && live.targetMapY != null) {
+          const yx = live.targetMapX;
+          const yy = live.targetMapY;
+          set((s) => (s.player?.whisperCourse ? {
+            player: {
+              ...s.player,
+              whisperCourse: { mapX: yx, mapY: yy, label: 'Yulka (return the Discs)' },
+            },
+          } : s));
+          get().appendLog('world', `Discs in hand. The thread pulls you back the way you came — Yulka's owed.`);
+        }
       }
     }
     // HANDOFF #15 — record the kill against the current room so re-entry
@@ -17649,7 +17672,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const prior = liveScene.sceneBuilding ?? null;
         if (here !== prior) {
           set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sceneBuilding: here } } : s));
-          if (here) get().appendLog('world', buildingApproachLine(here));
+          if (here) get().appendLog('world', buildingApproachLine(here, !!livePlayer.whisperCourse));
         }
       }
     }
