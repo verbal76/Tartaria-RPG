@@ -400,6 +400,21 @@ function indoorsForOutdoorHooks(get: () => GameStore): boolean {
 /** arb36 — "you stumble on a structure" line for an enterable building
  *  discovered on a wild tile. Uses the template's article-friendly
  *  hookLabel ("a leaning shack" → "A leaning shack…"). */
+// arb120 — the dedicated "ask arbiter" button was dropped as unused; instead the
+// Arbiter occasionally seeds the interaction organically by inviting a deeper
+// question. The player answers by typing it ("ask the arbiter about the flood",
+// "what are the Sentinels", "why did the water come" — all route through the
+// `ask` intent), so the prompts read as open doors, not menu items.
+const ARBITER_QUESTION_PROMPTS: readonly string[] = [
+  `The Arbiter watches the horizon a moment. "Ask me about the flood sometime — why the water rose, and what it left buried."`,
+  `The Arbiter trails a hand through the silt. "You could ask me about the Sentinels, if you ever wonder what still walks the deep ruins."`,
+  `The Arbiter glances at you sidelong. "Ask me about the Tartarians when you like. It's their world you're walking through."`,
+  `The Arbiter is quiet, then: "Ask about the Aether sometime. Most who carry it never learn what it costs them."`,
+  `The Arbiter studies a far spire. "Ask me about the Core Guardians before you face one — better to know what waits than meet it blind."`,
+  `The Arbiter tilts their head toward you. "You can just ask me things, you know — a faction, a place, a name you half-remember. I keep more than I offer."`,
+  `The Arbiter thumbs the edge of an old coin. "Ask me about the factions sometime, if you can't tell whose side the dust is on."`,
+];
+
 function buildingApproachLine(buildingId: string, autoTraveling = false): string {
   const label = getBuilding(buildingId)?.hookLabel ?? 'a structure';
   const Cap = label.charAt(0).toUpperCase() + label.slice(1);
@@ -4716,6 +4731,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else if (scene.sceneBuilding && !opts?.isOpening) {
       const onRoute = !!get().player?.travelTarget || !!get().player?.whisperCourse;
       get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute));
+    }
+    // arb120 — occasional Arbiter nudge inviting a deeper question (replaces the
+    // dropped "ask arbiter" button with an organic prompt). Peaceful outdoor
+    // scenes only, rare, and never piled on a vendor / board / building moment.
+    if (!opts?.isOpening
+        && (!scene.enemies || scene.enemies.length === 0)
+        && !scene.vendor && !scene.missionBoard && !scene.sceneBuilding
+        && !get().player?.hubRoomId
+        && Math.random() < 0.04) {
+      const prompt = ARBITER_QUESTION_PROMPTS[Math.floor(Math.random() * ARBITER_QUESTION_PROMPTS.length)];
+      if (prompt) get().appendLog('arbiter', prompt);
     }
     // OTA-244 — danger-vs-tier warning. Player playtest: ate a
     // Mud Giant (Legendary, 360 HP) rest-ambush in Asgardar

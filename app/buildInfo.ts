@@ -14451,4 +14451,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // they stayed sellable and unmarked — a player report worried about dumping working-loadout gear by accident.
 // Each sellable row now shows a "⚑ in bandolier" / "⚑ in pouch" tag (keyed by instance id, so a spare of the same
 // name stays cleanly sellable). app/screens/VendorScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-547';
+// OTA-548 (Unquadtrium Inquiry) — [ux] drop the "ask arbiter" quick-button; seed the interaction organically.
+// Player feedback: the dedicated button felt unused/extra. Removed it from the quick-row (the typed path still
+// works — "ask the arbiter about X", "what is the flood", "why did the water come" all route through the parser's
+// `ask` intent). In its place, the Arbiter now occasionally (~4% of peaceful outdoor scene entries, never atop a
+// vendor/board/building beat) drops a line INVITING a deeper question — about the flood, the Sentinels, the
+// Tartarians, the Aether, the Guardians, the factions — so the player-Arbiter dialogue is prompted in-fiction
+// rather than via a menu button. app/components/InputBox.tsx, app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-548';

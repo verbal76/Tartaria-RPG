@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-548 "Unquadtrium Inquiry" — [ux] drop the "ask arbiter" button; organic question prompts** *(element
+  #143)*. Player: the button felt unused/extra. Removed from the quick-row (typed asks still work via the parser
+  `ask` intent). In its place the Arbiter occasionally (~4% of peaceful outdoor scene entries) drops a line
+  inviting a deeper question — flood, Sentinels, Tartarians, Aether, Guardians, factions — prompting the dialogue
+  in-fiction. (AskArbiterModal left dormant.) `app/components/InputBox.tsx`, `app/state/gameStore.ts`.
+- **OTA-547 "Unquadbium Safeguard" — [ux] vendor SELL list flags bandolier/pouch loadout items** *(element #142)*.
+  Equipped pieces were already filtered from the sell list, but bandolier throwables + tool-pouch items stayed
+  sellable and unmarked; each sellable row now shows a `⚑ in bandolier` / `⚑ in pouch` tag (keyed by instance id
+  so spares stay sellable). `app/screens/VendorScreen.tsx`.
+
 - **OTA-546 "Unquadunium Roster" — [ux] MISSIONS quick-button + slimmer main-quest chip** *(element #141)*.
   Player ask: a "missions" button by "ask arbiter" → the same Contracts screen, so the top main-quest chip can
   shrink for more exploration room. Added the MISSIONS quick-button (peace row) and slimmed the top objective
