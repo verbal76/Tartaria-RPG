@@ -378,6 +378,8 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-556 "Unpentunium Spent" — [bugfix] flavor-exhausted investigate nouns stayed tappable** *(element #151)*. A noun that gave a dead-end FLAVOR read (fisher's net → nothing) went to flavorExhaustedNouns, but roomConsumedSet only counted searchedAmbientNouns, so the chip never dropped — you could re-investigate forever. Now roomConsumedSet includes flavor-exhausted nouns (filters on rebuild) AND the noun drops from the LIVE scene chips immediately. `app/state/gameStore.ts`.
+
 - **OTA-555 "Unpentnilium Marker" — [ux] inventory flags SUBSTITUTE repair materials for the equipped golem** *(element #150)*. The purple golem stripe + one-tap Heal button used `isGolemRepairPart` (exact fuel only), so OTA-553/554 substitutes had no visual cue. Both now also honor `isGolemSubstitutePart(equipped kind, item)` — every mud/metal/aether material that can mend YOUR golem gets the purple hatch + Heal action, kind-specific. `app/screens/InventoryScreen.tsx`.
 
 - **OTA-554 "Unquadennium Grade" — [balance] golem substitute-repair scales by rarity** *(element #149)*. Refines OTA-553: a substitute material now heals a fraction of a full fuel part by its rarity — Common/untiered ¼, Uncommon ½, Rare ¾, Legendary full (min 1). Aether Golem: Common 1, Uncommon 3, Rare 4, Legendary 6. `app/engine/golems.ts`, `app/state/gameStore.ts`, `app/screens/CharacterScreen.tsx`. Tests `golemCompanion` (26).

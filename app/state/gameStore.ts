@@ -3937,30 +3937,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => {
       const room = s.worldMemory.visitedRooms?.[roomKey];
       if (!room) return s;
+      let updatedRoom = room;
       if (kind === 'productive') {
         const existing = room.searchedAmbientNouns ?? [];
-        if (existing.includes(lower)) return s;
-        return {
-          worldMemory: {
-            ...s.worldMemory,
-            visitedRooms: {
-              ...(s.worldMemory.visitedRooms ?? {}),
-              [roomKey]: { ...room, searchedAmbientNouns: [...existing, lower] },
-            },
-          },
-        };
+        if (!existing.includes(lower)) updatedRoom = { ...room, searchedAmbientNouns: [...existing, lower] };
+      } else {
+        // kind === 'flavor'
+        const existing = room.flavorExhaustedNouns ?? [];
+        if (!existing.includes(lower)) updatedRoom = { ...room, flavorExhaustedNouns: [...existing, lower] };
       }
-      // kind === 'flavor'
-      const existing = room.flavorExhaustedNouns ?? [];
-      if (existing.includes(lower)) return s;
+      // arb123 — drop the spent noun from the LIVE scene chips immediately so it
+      // can't be re-tapped within the same scene (you could keep re-investigating
+      // a flavor-exhausted noun forever, getting "already examined" each time).
+      // The roomConsumedSet update above keeps it gone across rebuilds too.
+      const sc = s.currentScene;
+      const scenePatch = sc ? {
+        currentScene: {
+          ...sc,
+          ambientNouns: sc.ambientNouns.filter((n) => n.toLowerCase() !== lower),
+          displayedAmbientNouns: (sc.displayedAmbientNouns ?? sc.ambientNouns).filter((n) => n.toLowerCase() !== lower),
+        },
+      } : {};
       return {
         worldMemory: {
           ...s.worldMemory,
-          visitedRooms: {
-            ...(s.worldMemory.visitedRooms ?? {}),
-            [roomKey]: { ...room, flavorExhaustedNouns: [...existing, lower] },
-          },
+          visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [roomKey]: updatedRoom },
         },
+        ...scenePatch,
       };
     });
   },
@@ -21921,8 +21924,14 @@ function roomConsumedSet(
   roomKey: string | null | undefined,
 ): Set<string> {
   if (!roomKey) return new Set();
-  const searched = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns;
-  return new Set(nonClimbMarkers(searched).map((n) => n.toLowerCase()));
+  const room = worldMemory.visitedRooms?.[roomKey];
+  // arb123 — a noun is "spent" whether it gave a PRODUCTIVE find (searched) OR a
+  // dead-end FLAVOR read (flavorExhausted). Both should drop from the chip list;
+  // before, flavor-only nouns (e.g. a fisher's net that yields nothing) stayed
+  // tappable forever — you could re-investigate to the same "already examined".
+  const searched = nonClimbMarkers(room?.searchedAmbientNouns);
+  const flavorDone = room?.flavorExhaustedNouns ?? [];
+  return new Set([...searched, ...flavorDone].map((n) => n.toLowerCase()));
 }
 
 /** True when `noun` has already been consumed (taken/salvaged) in this

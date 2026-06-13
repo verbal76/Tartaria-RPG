@@ -14509,4 +14509,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // visual cue. Both now also honor isGolemSubstitutePart(equipped golem kind, item) — so every mud/metal/aether
 // material that can mend YOUR golem gets the purple hatch + Heal action, and it stays kind-specific (never lights
 // for a golem you don't have). app/screens/InventoryScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-555';
+// OTA-556 (Unpentunium Spent) — [bugfix] flavor-exhausted investigate nouns stayed tappable forever. A noun that
+// gave a dead-end FLAVOR read (e.g. a fisher's net yielding nothing) landed in flavorExhaustedNouns, but
+// roomConsumedSet only counted searchedAmbientNouns (productive finds) — so the chip never dropped and you could
+// re-investigate it endlessly, getting "already examined" each time. Now (1) roomConsumedSet also includes
+// flavorExhaustedNouns so spent nouns filter out of the chips on rebuild, and (2) marking a noun consumed
+// (productive OR flavor) drops it from the LIVE scene chips immediately, no rebuild needed. app/state/gameStore.ts.
+// JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-556';
