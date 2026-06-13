@@ -61,6 +61,12 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
+      # Isolated personal-testing branch. Builds a preview/sideload APK on the
+      # dedicated 'arbiters-line' OTA channel (app.json sets expo-channel-name:
+      # arbiters-line + package .arbiters). It is NOT in eas-update.yml's branch
+      # list, so a push here can publish ONLY via eas-update-arbiters.yml to the
+      # arbiters-line channel — it can never reach live HaL2001/preview testers.
+      - 'arbiters-line'
     tags:
       - 'v*'
     paths-ignore:
@@ -78,6 +84,10 @@ on:
       # any iOS-specific trigger file should NOT fire an Android
       # build (burns 30 min for nothing). Same in reverse.
       - '.github/workflows/build-ios.yml'
+      # ...and the OTA publishers. Editing an OTA workflow (JS-only, self-
+      # publishing) should NOT burn a ~20-min APK build.
+      - '.github/workflows/eas-update.yml'
+      - '.github/workflows/eas-update-arbiters.yml'
   workflow_dispatch:
     inputs:
       profile:

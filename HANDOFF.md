@@ -1749,6 +1749,45 @@ The entries below are retained as the shipped-batch record.
 > path is signed for TestFlight. Everything we do lands here and ships from here.
 >
 > ---
+> **🧪 ARBITERS-LINE ISOLATED TEST BUILD (2026-06-13 — user request).** The user
+> asked for a fully isolated build line to validate the native fixes on their own
+> Pixel 10 Pro XL **without any risk to the live HaL2001/preview testers**. What was
+> done:
+> 1. **Clean mirror.** `arbiters-line` was reset to **exactly current HaL2001**
+>    (through OTA-562), discarding its stale 130-commit fork (old Piper voice, a
+>    ~2,200-line-divergent gameStore, parallel assets) per the user's "clean mirror"
+>    choice. The old fork's unique work was deemed superseded.
+> 2. **Isolation overlay re-applied** (the only deltas from HaL2001):
+>    `app.json` → name `Tartaria Realms ARB`, package/bundleId
+>    `com.hotatticgames.tartarprim.arbiters`, `expo-channel-name: arbiters-line`;
+>    `.github/workflows/eas-update-arbiters.yml` (publishes ONLY to the
+>    `arbiters-line` EAS channel, with hard guards: refuses any non-arbiters-line
+>    branch, refuses live channels, refuses if app.json's channel ≠ arbiters-line);
+>    `build-apk.yml` arbiters-line trigger + OTA-workflow path-ignores.
+> 3. **ISOLATION GUARANTEE (verified):** `eas-update.yml` (the LIVE publisher) does
+>    NOT list `arbiters-line`, so a push here can never publish to `hal2001`/`preview`.
+>    OTAs from this line reach ONLY the arbiters APK install. No spillover.
+> 4. **Native fixes baked in** (this IS a native build of the arbiters APK):
+>    - **Qwen SVE-crash fix (queue #3).** Root cause found: `llama.rn` 0.4.8 compiles
+>      7 `-march` variant libs and `LlamaContext.java` picks one from `/proc/cpuinfo`.
+>      The Tensor G5 reports `sve` → loads `rnllama_v8_4_fp16_dotprod_i8mm_sve` whose
+>      SVE/streaming kernels SIGSEGV mid-generation on Android 16. **NOTE: KleidiAI is
+>      NOT compiled in this llama.rn (0 refs), so the generic `GGML_CPU_KLEIDIAI=OFF`
+>      flag is a no-op here — the real lever is the runtime variant selector.** Fix:
+>      `patches/llama.rn+0.4.8.patch` extended to force `hasSve = false`, dropping
+>      selection to the SVE-free `rnllama_v8_4_fp16_dotprod_i8mm` variant (i8mm+dotprod,
+>      stable, marginally slower). Sits alongside the existing OTA-273 v8.4
+>      misclassification fix in the same patch. **Verify on-device:** long Qwen session,
+>      no SIGSEGV; if it still crashes, also drop `hasI8mm`.
+>    - **AsyncStorage DB cap (queue #1).** New `plugins/withAsyncStorageDbSize.js`
+>      config plugin sets `AsyncStorage_db_size_in_MB=50` at prebuild.
+> 5. **Build trigger.** Pushed to `arbiters-line` (non-path-ignored files: app.json,
+>    build-apk.yml, patches/, plugins/) → fires `build-apk.yml` → preview/sideload APK.
+>    Commit message kept free of the `[build-aab]` token so the resolver lands on the
+>    APK profile, not a production AAB.
+> 6. **Still queued #2:** confirm the S26 save behaves once the DB cap is on-device.
+>
+> ---
 > **🔧 QUEUED FOR THE NEXT NATIVE BUILD (whenever one is fired — NOT OTA-able):**
 > 1. **Raise the AsyncStorage DB cap.** Android AsyncStorage defaults to a ~6 MB SQLite DB;
 >    a player's Galaxy **S26** hit `persist FAILED — storage full` at only 193 KB of save

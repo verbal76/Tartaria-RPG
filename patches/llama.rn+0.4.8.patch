@@ -1,9 +1,25 @@
 diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-index 91b2397..d41dd54 100644
+index 91b2397..becf26e 100644
 --- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 +++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-@@ -333,13 +333,34 @@ public class LlamaContext {
-     boolean hasSve = cpuFeatures.contains("sve");
+@@ -330,16 +330,49 @@ public class LlamaContext {
+     Log.d(NAME, "CPU features: " + cpuFeatures);
+     boolean hasFp16 = cpuFeatures.contains("fp16") || cpuFeatures.contains("fphp");
+     boolean hasDotProd = cpuFeatures.contains("dotprod") || cpuFeatures.contains("asimddp");
+-    boolean hasSve = cpuFeatures.contains("sve");
++    // Tartaria Realms patch (arbiters-line / native Qwen-crash fix).
++    // Force-OFF SVE variant selection. On the Tensor G5 (Pixel 10 Pro XL)
++    // + Android 16, the SVE / streaming-SME kernels in the `+sve` libraries
++    // SIGSEGV mid-generation — the kernel fails to save/restore streaming-mode
++    // vector registers across thread preemption, corrupting state and crashing
++    // the app to the home screen (and thrashing the JS narration pipeline into
++    // a "Maximum update depth exceeded" render loop). Dropping SVE selection
++    // sends this chip to librnllama_v8_4_fp16_dotprod_i8mm (i8mm + dotprod, no
++    // SVE) — stable, still accelerated, marginally slower. SVE on mobile ARM is
++    // bleeding-edge; the non-SVE path is the same one every other device uses
++    // fine, so we opt out of SVE globally for stability. Verify on-device: a
++    // long Qwen narration session with no SIGSEGV.
++    boolean hasSve = false; // was: cpuFeatures.contains("sve");
      boolean hasI8mm = cpuFeatures.contains("i8mm");
      boolean isAtLeastArmV82 = cpuFeatures.contains("asimd") && cpuFeatures.contains("crc32") && cpuFeatures.contains("aes");
 -    boolean isAtLeastArmV84 = cpuFeatures.contains("dcpop") && cpuFeatures.contains("uscat");
@@ -39,7 +55,7 @@ index 91b2397..d41dd54 100644
  
      // TODO: Add runtime check for cpu features
      if (LlamaContext.isArm64V8a()) {
-@@ -404,6 +425,72 @@ public class LlamaContext {
+@@ -404,6 +437,72 @@ public class LlamaContext {
      }
    }
  
