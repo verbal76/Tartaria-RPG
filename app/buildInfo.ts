@@ -14536,4 +14536,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // via shouldAttemptQwen() even when the general guard is tripped; a successful Qwen init resets the general crash
 // state (markMLInitSucceeded), healing the classifier on the next launch. app/diagnostics/mlHealth.ts, App.tsx.
 // JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-558';
+// OTA-559 (Unpentquadium Steadfast) — [bugfix] OTA-558 re-enabled Qwen (qwen:done confirmed), but the very next log
+// showed it AUTO-DISABLED again: "Qwen completion guard: auto-disabled after 1 completion crashes" + "VOICE CRASH
+// detected — last voice: kokoro:af_heart", BOTH recorded on the SAME launch on a device that never crashes (Kokoro
+// audibly plays every session). Root cause: the Qwen-completion + TTS breadcrumbs can't tell a real foreground
+// SIGSEGV from a BENIGN app exit — a swipe-away / OS background / OTA reload mid-narration leaves the identical
+// surviving breadcrumb. OTA-464 already conceded this for VOICE (detection-only), but the Qwen completion guard
+// still auto-disables at threshold 1, so one benign close (which left BOTH breadcrumbs — same event, double-counted)
+// benched the Arbiter. Fix: the App.tsx AppState handler (which already persists + shuts down Qwen on background)
+// now also clears the in-flight breadcrumbs on leaving the foreground — an ORDERLY exit, so nothing crashed. A
+// breadcrumb that survives to next boot therefore means a genuine FOREGROUND crash (the only real signal), and
+// since generation/narration only run foregrounded this never masks a true failure. Also: a clean completion now
+// wipes lingering completion-crash suspicion (symmetric to OTA-558's init self-heal). app/diagnostics/mlHealth.ts,
+// App.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-559';

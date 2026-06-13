@@ -389,10 +389,18 @@ export async function markQwenCompletionStart(): Promise<void> {
 }
 
 /** OTA-351 — call AFTER a Qwen completion returns (success). Clears the
- *  breadcrumb so a clean completion is never counted as a crash. */
+ *  breadcrumb so a clean completion is never counted as a crash.
+ *  arb126 — a clean completion also PROVES this device can generate without
+ *  crashing, so wipe any lingering completion-crash suspicion (symmetric to
+ *  markMLInitSucceeded wiping the general init suspicion). Guarded on the cached
+ *  count so a healthy device doesn't write to AsyncStorage on every narration. */
 export async function markQwenCompletionDone(): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS);
+    if (cached && cached.qwenCompletionCrashCount > 0) {
+      await AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT);
+      cached.qwenCompletionCrashCount = 0;
+    }
   } catch { /* ignore — re-detected only if a crash also occurs, which it didn't */ }
 }
 
@@ -413,6 +421,33 @@ export async function markTTSDone(): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS);
   } catch { /* ignore */ }
+}
+
+// arb126 — ROOT-CAUSE fix for the Qwen completion guard re-disabling a healthy
+// device. The completion + TTS breadcrumbs (KEY_COMPLETION_IN_PROGRESS /
+// KEY_TTS_IN_PROGRESS) can't, on their own, distinguish a real native SIGSEGV
+// mid-generation from a perfectly benign app termination — the user swiping the
+// app away, the OS backgrounding it to reclaim memory, or an OTA reload — all of
+// which leave the SAME surviving breadcrumb. OTA-464 already conceded this for
+// the VOICE guard (so it's detection-only). But the Qwen completion guard still
+// AUTO-DISABLES at a threshold of 1, so a single backgrounding-while-narrating
+// benched the Arbiter on a device with ZERO real crashes (observed: 1 Qwen
+// "completion crash" + 1 Kokoro "voice crash" recorded on the SAME launch — the
+// same benign close, double-counted by two guards).
+//
+// The distinguisher: a real foreground SIGSEGV kills the process with NO warning,
+// but a benign exit fires an AppState 'background'/'inactive' transition FIRST.
+// So the moment the app leaves the foreground (an orderly exit), we wipe the
+// in-flight breadcrumbs. Anything that survives to the next boot therefore died
+// while still in the foreground mid-op = a genuine crash, which is exactly the
+// signal both guards want. Generation + narration only ever run in the
+// foreground (driven by player actions), so this never masks a real failure.
+// Wired into the existing App.tsx AppState handler (which already persists the
+// save + shuts down Qwen/cognitive on background).
+export async function clearInFlightBreadcrumbs(): Promise<void> {
+  try {
+    await AsyncStorage.multiRemove([KEY_COMPLETION_IN_PROGRESS, KEY_TTS_IN_PROGRESS]);
+  } catch { /* best effort — a stale breadcrumb at worst counts one benign exit */ }
 }
 
 /**

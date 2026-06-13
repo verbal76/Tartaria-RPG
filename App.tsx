@@ -14,6 +14,7 @@ import {
   shouldAttemptQwen,
   markMLInitAttempted,
   markMLInitSucceeded,
+  clearInFlightBreadcrumbs,
 } from './app/diagnostics/mlHealth';
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
@@ -458,6 +459,15 @@ export default function App() {
         void useGameStore.getState().persist();
         void shutdownCognitive();
         void shutdownQwen();
+        // arb126 — leaving the foreground is an ORDERLY exit, so any Qwen
+        // completion / TTS breadcrumb still sitting in storage did NOT crash the
+        // process. Wipe it now, before the OS can reclaim us. A breadcrumb that
+        // survives to next boot then means a real FOREGROUND native crash — the
+        // only signal the completion/voice guards should ever act on. This stops
+        // a benign swipe-away / background from being mis-counted as a crash and
+        // falsely benching the Arbiter (the user never crashes, yet the guard
+        // disabled Qwen + flagged a Kokoro "voice crash" off one benign close).
+        void clearInFlightBreadcrumbs();
       } else if (status === 'active') {
         void resumeCognitive();
         // Re-hide the navigation bar — Android sometimes restores it

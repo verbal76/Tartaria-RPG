@@ -11,6 +11,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     setItem: jest.fn(async (k: string, v: string) => { mockStore[k] = v; }),
     getItem: jest.fn(async (k: string) => (k in mockStore ? mockStore[k] : null)),
     removeItem: jest.fn(async (k: string) => { delete mockStore[k]; }),
+    multiRemove: jest.fn(async (ks: string[]) => { for (const k of ks) delete mockStore[k]; }),
   },
 }));
 
@@ -19,6 +20,11 @@ const K = {
   disabled: 'tartaria.ml.disabledByCrash',
   succeeded: 'tartaria.ml.lastInitSuccess',
   attempted: 'tartaria.ml.lastInitAttempt',
+  qwenInProgress: 'tartaria.ml.qwenCompletionInProgress',
+  qwenCrash: 'tartaria.ml.qwenCompletionCrashCount',
+  qwenDisabled: 'tartaria.ml.qwenDisabledByCrash',
+  ttsInProgress: 'tartaria.ml.ttsInProgress',
+  ttsCrash: 'tartaria.ml.ttsCrashCount',
 };
 
 async function bootAndGates(): Promise<{ qwen: boolean; mlInit: boolean }> {
@@ -76,5 +82,56 @@ describe('arb124 — Qwen false-disable recovery', () => {
     expect(mockStore[K.attempted]).toBeUndefined();
     await bootAndGates(); // boot 2: no breadcrumb → no phantom crash
     expect(Number(mockStore[K.crash])).toBe(6);
+  });
+});
+
+describe('arb126 — completion/voice breadcrumb is not a benign-exit false positive', () => {
+  it('clearInFlightBreadcrumbs wipes BOTH the Qwen-completion and TTS breadcrumbs', async () => {
+    mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
+    mockStore[K.ttsInProgress] = JSON.stringify({ label: 'kokoro:af_heart', at: '2026-06-13T17:43:00.000Z' });
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ml = require('../app/diagnostics/mlHealth');
+      await ml.clearInFlightBreadcrumbs();
+    });
+    expect(mockStore[K.qwenInProgress]).toBeUndefined();
+    expect(mockStore[K.ttsInProgress]).toBeUndefined();
+  });
+
+  it('a backgrounded exit (breadcrumbs cleared) is NOT counted as a crash next boot', async () => {
+    // Qwen loaded + ran a completion last session; then the user backgrounded the
+    // app. The AppState handler calls clearInFlightBreadcrumbs → breadcrumbs gone.
+    mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
+    mockStore[K.ttsInProgress] = JSON.stringify({ label: 'kokoro:af_heart', at: '2026-06-13T17:43:00.000Z' });
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ml = require('../app/diagnostics/mlHealth');
+      await ml.clearInFlightBreadcrumbs(); // app goes to background
+    });
+    const before = mockStore[K.qwenCrash];
+    await bootAndGates(); // next cold boot: nothing survived → nothing to count
+    expect(mockStore[K.qwenCrash]).toBe(before); // still undefined / unchanged
+    expect(mockStore[K.qwenDisabled]).toBeUndefined();
+    expect(Number(mockStore[K.ttsCrash] ?? '0')).toBe(0);
+  });
+
+  it('a real FOREGROUND crash (breadcrumb survives) still trips the guard', async () => {
+    // Process died mid-completion while foregrounded → no AppState background
+    // event fired → breadcrumb survives → correctly counted + (threshold 1) disabled.
+    mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
+    await bootAndGates();
+    expect(Number(mockStore[K.qwenCrash])).toBe(1);
+    expect(mockStore[K.qwenDisabled]).toBe('true');
+  });
+
+  it('a clean completion wipes lingering completion-crash suspicion (self-heal)', async () => {
+    mockStore[K.qwenCrash] = '1';
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ml = require('../app/diagnostics/mlHealth');
+      await ml.loadMLHealth();
+      await ml.markQwenCompletionDone();
+    });
+    expect(mockStore[K.qwenCrash]).toBeUndefined();
   });
 });
