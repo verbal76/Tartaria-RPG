@@ -17,34 +17,42 @@ import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
 import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
-import type { InventoryItem } from '../engine/types';
+import { reachClassFor } from '../engine/combatRules';
+import { reachBandsFor } from '../engine/types';
+import type { InventoryItem, CombatRange } from '../engine/types';
+
+/** OTA 207 / OTA-550 — do the bands a weapon reaches include the current
+ *  combat range? Resolves the weapon's four-band reach class (ranged /
+ *  throwable / long / melee / runecaster) and checks band membership. */
+function bandsReachRange(
+  weaponName: string | null | undefined,
+  range: CombatRange,
+  intelligence: number,
+  inventory: ReadonlyArray<InventoryItem>,
+): boolean {
+  if (!weaponName) return reachBandsFor('barehanded').includes(range);
+  // A throwable inventory item equipped to a hand throws from 'far' inward.
+  const throwInst = inventory.find(
+    (it) => it.name.toLowerCase() === weaponName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)),
+  );
+  if (throwInst) return reachBandsFor('throwable').includes(range);
+  const w = resolveDisplayWeaponByName(weaponName, inventory);
+  if (!w) return reachBandsFor('melee').includes(range);
+  const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
+  let bands = reachBandsFor(cls);
+  if (cls === 'runecaster' && intelligence < 9) bands = reachBandsFor('throwable');
+  return bands.includes(range);
+}
 
 /** OTA 207 — does the equipped weapon reach the current combat range? */
 function weaponTone(
   weaponName: string | null | undefined,
-  range: 'arm' | 'close' | 'far' | null | undefined,
+  range: CombatRange | null | undefined,
   intelligence: number,
   inventory: ReadonlyArray<InventoryItem>,
 ): 'ready' | 'needs-approach' | undefined {
   if (!range) return undefined;
-  if (!weaponName) return range === 'arm' ? 'ready' : 'needs-approach';
-  const w = resolveDisplayWeaponByName(weaponName, inventory);
-  if (!w) return range === 'arm' ? 'ready' : 'needs-approach';
-  let bands: Array<'arm' | 'close' | 'far'>;
-  switch (w.weaponKind) {
-    case 'melee':
-      bands = ['arm'];
-      break;
-    case 'ranged':
-      bands = ['arm', 'close', 'far'];
-      break;
-    case 'runecaster':
-      bands = intelligence >= 9 ? ['arm', 'close', 'far'] : ['arm', 'close'];
-      break;
-    default:
-      bands = ['arm'];
-  }
-  return bands.includes(range) ? 'ready' : 'needs-approach';
+  return bandsReachRange(weaponName, range, intelligence, inventory) ? 'ready' : 'needs-approach';
 }
 
 interface Props {
@@ -76,7 +84,7 @@ interface Props {
   equippedMainCoating?: string | null;
   equippedOffCoating?: string | null;
   inventory: ReadonlyArray<InventoryItem>;
-  range?: 'arm' | 'close' | 'far' | null;
+  range?: CombatRange | null;
   // OTA-361 — at least one enemy in the scene is knocked out and lootable.
   // Surfaces the combat "loot" button.
   knockedOutPresent?: boolean;
@@ -441,8 +449,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </View>
 
             <View style={styles.quickRowLine}>
-              <QuickBtn label="approach" onPress={onOpenApproach} tone={range === 'far' ? 'needs-approach' : undefined} />
-              {range && range !== 'far' && (
+              {/* OTA-550 — approach highlights whenever you're not yet at the
+                  closest band; step back shows whenever you're not at the
+                  farthest (distant). */}
+              <QuickBtn label="approach" onPress={onOpenApproach} tone={range && range !== 'close' ? 'needs-approach' : undefined} />
+              {range && range !== 'distant' && (
                 <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
               )}
               <QuickBtn label="inventory" onPress={onOpenInventory} />
@@ -520,16 +531,23 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       {/* arb110 — bandolier throw popup: one button per racked throwable; tap to hurl. */}
       {inCombat && bandolierOpen && bandolierItems.length > 0 ? (
         <View style={styles.bandolierPicker}>
-          {bandolierItems.map((it) => (
-            <Pressable
-              key={it.id}
-              onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name); }}
-              style={styles.bandolierPickerBtn}
-            >
-              <Text style={styles.bandolierPickerLabel} numberOfLines={1}>{it.name.toUpperCase()}</Text>
-              <Text style={styles.bandolierPickerHint}>hurl{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
-            </Pressable>
-          ))}
+          {bandolierItems.map((it) => {
+            // OTA-550 — color each throwable by reach. Throwables strike from
+            // 'far' inward (far/mid/close); the only out-of-range band is
+            // 'distant'. RED when the current combat range is beyond reach
+            // (too far to throw), GREEN when in range.
+            const inRange = range ? reachBandsFor('throwable').includes(range) : true;
+            return (
+              <Pressable
+                key={it.id}
+                onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name); }}
+                style={[styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange]}
+              >
+                <Text style={[styles.bandolierPickerLabel, inRange ? null : styles.bandolierOutOfRangeLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
+                <Text style={styles.bandolierPickerHint}>{inRange ? 'hurl' : 'too far'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
+              </Pressable>
+            );
+          })}
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
@@ -702,6 +720,11 @@ const styles = StyleSheet.create({
   },
   bandolierPickerLabel: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
   bandolierPickerHint: { color: '#8a7e66', fontSize: 9, marginTop: 3, textAlign: 'center' },
+  // OTA-550 — reach coloring on the bandolier picker: green border when the
+  // throwable can reach the current combat range, red when it's out of range.
+  bandolierInRange: { borderColor: '#4f7a3a' },
+  bandolierOutOfRange: { borderColor: '#7a2f2f', backgroundColor: '#241211' },
+  bandolierOutOfRangeLabel: { color: '#c45b4a' },
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
   travelBtn: {
     flex: 1,

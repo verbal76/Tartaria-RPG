@@ -1083,6 +1083,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-547': 'Unquadbium Safeguard',
   '2026-06-12-548': 'Unquadtrium Inquiry',
   '2026-06-12-549': 'Unquadquadium Clarity',
+  '2026-06-12-550': 'Unquadpentium Stride',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

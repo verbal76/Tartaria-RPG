@@ -45,17 +45,20 @@ export function isInventoryQuestion(text: string): boolean {
  * extracted target is "armor" — a category — and the handler should answer
  * with what they're wearing in that category, not "No armor on you."
  */
-export const INVENTORY_CATEGORIES: Record<string, { kind?: string[]; slot?: string[]; label: string }> = {
+export const INVENTORY_CATEGORIES: Record<string, { kind?: string[]; slot?: string[]; tagAny?: string[]; excludeTagAny?: string[]; label: string }> = {
   armor: { kind: ['armor'], label: 'armor' },
   armour: { kind: ['armor'], label: 'armor' },
-  weapon: { kind: ['weapon'], label: 'weapon' },
-  weapons: { kind: ['weapon'], label: 'weapons' },
+  // OTA-550 — a throwable (e.g. the misc-kind Shaped Aetheric Shard) is a
+  // weapon, not gear: it categorizes under "weapon" via tagAny and is
+  // excluded from "gear" via excludeTagAny.
+  weapon: { kind: ['weapon'], tagAny: ['throwable'], label: 'weapon' },
+  weapons: { kind: ['weapon'], tagAny: ['throwable'], label: 'weapons' },
   ring: { slot: ['ring'], label: 'ring' },
   rings: { slot: ['ring'], label: 'rings' },
   amulet: { slot: ['amulet'], label: 'amulet' },
   amulets: { slot: ['amulet'], label: 'amulets' },
   necklace: { slot: ['amulet'], label: 'necklace' },
-  gear: { kind: ['misc', 'consumable'], label: 'gear' },
+  gear: { kind: ['misc', 'consumable'], excludeTagAny: ['throwable'], label: 'gear' },
   // "ac" / "defense" map to armor because that's what affects them.
   ac: { kind: ['armor'], label: 'armor (AC source)' },
   defense: { kind: ['armor'], label: 'armor (AC source)' },

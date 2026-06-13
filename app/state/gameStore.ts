@@ -159,7 +159,8 @@ import {
   type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } from '../engine/combatRules';
+import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
@@ -4229,10 +4230,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return base;
     })();
-    // Enemies start at 'close' range — close enough to be a problem but not
-    // already swinging. Players have to advance (or be charged) to land
-    // melee, retreat to set up ranged shots.
-    const range: CombatRange | null = hasEnemies ? 'close' : null;
+    // OTA-550 — enemies open at 'mid' range: close enough to be a problem but
+    // not already swinging. The player advances (distant→far→mid→close) to
+    // land melee, or holds the gap for a ranged/throwable shot. (This is the
+    // four-band remap of the old middle 'close' opening band.)
+    const range: CombatRange | null = hasEnemies ? 'mid' : null;
     // Hooks — pending cross-scene chains land first; otherwise no hook is
     // planted at scene start. Wandering / exploration plants fresh hooks.
     const initialHooks: Hook[] = [];
@@ -5158,31 +5160,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // announcement, matching the GREEN / YELLOW tones on the
     // weapon buttons in InputBox.
     if (hasEnemies && range) {
-      // Widen the literal type — `range` was inferred as 'close' from
-      // the assignment above, but reachLabelFor compares against all
-      // three bands for the future case where this block ever fires
-      // at a different starting range.
+      // OTA-550 — drive the reach display off the shared four-band reach
+      // resolver so it stays in lockstep with the attack-gate logic.
       const r = range as CombatRange;
       const eq = player.equipped ?? {};
       const mainName = eq.main ?? eq.weaponName ?? null;
       const offName = eq.off ?? null;
       const reachLabelFor = (name: string | null): string => {
-        if (!name) return `bare hands ${r === 'arm' ? '✓' : '— need to close'}`;
+        if (!name) {
+          const inReach = reachBandsFor('barehanded').includes(r);
+          return `bare hands ${inReach ? '✓' : '— need to close'}`;
+        }
         const w = findWeaponByName(name);
-        if (!w) return `${name} ${r === 'arm' ? '✓' : '— need to close'}`;
-        let bands: CombatRange[];
-        switch (w.weaponKind) {
-          case 'melee': bands = ['arm']; break;
-          case 'ranged': bands = ['arm', 'close', 'far']; break;
-          case 'runecaster':
-            bands = (player.stats.intelligence ?? 0) >= 9 ? ['arm', 'close', 'far'] : ['arm', 'close'];
-            break;
-          default: bands = ['arm'];
+        if (!w) {
+          const inReach = reachBandsFor('melee').includes(r);
+          return `${name} ${inReach ? '✓ in range' : '— needs approach'}`;
+        }
+        let cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
+        let bands = reachBandsFor(cls);
+        if (cls === 'runecaster' && (player.stats.intelligence ?? 0) < 9) {
+          bands = reachBandsFor('throwable'); // low-INT caster: far inward
         }
         const inReach = bands.includes(r);
         return `${name} ${inReach ? '✓ in range' : '— needs approach'}`;
       };
-      const rangeLabel = r === 'arm' ? "arm's reach" : r === 'far' ? 'far' : 'close range';
+      const rangeLabel = RANGE_LABEL[r];
       const lines = [reachLabelFor(mainName)];
       if (offName) lines.push(reachLabelFor(offName));
       get().appendLog(
@@ -6783,7 +6785,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         enemies: [...s.currentScene.enemies, guardian],
                         enemyHps: [...s.currentScene.enemyHps, guardian.hp],
                         activeEnemyIdx: s.currentScene.enemies.length,
-                        range: 'close',
+                        range: 'mid',
                       },
                     }
                   : s
@@ -6990,7 +6992,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // already has the same check via usedOffHandForDmg.
           const offHandSwing = /\boff[- ]?hand\b/i.test(trimmed);
           const reach = barehand
-            ? { bands: ['arm'] as CombatRange[], label: 'Bare hands' }
+            ? { bands: reachBandsFor('barehanded'), label: 'Bare hands' }
             : playerWeaponReach(player, offHandSwing ? 'off' : 'main');
           get().appendLog(
             'debug',
@@ -7002,17 +7004,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // movement. Iron Fog / Silent Blizzard slow the move to two
             // turns each but no longer block entirely, so the auto-move
             // always makes progress.
-            const needArm = reach.bands.includes('arm') && range !== 'arm';
-            const needRanged = !reach.bands.includes(range) && (reach.bands.includes('close') || reach.bands.includes('far'));
-            if (needArm) {
+            // OTA-550 — reach bands are contiguous in RANGE_ORDER (a band +
+            // every band closer). Compare ordinals: if the current range is
+            // FARTHER than the weapon's farthest reachable band, advance
+            // (close the gap); if it's CLOSER than the nearest band (a ranged
+            // weapon shoved into arm's reach), retreat.
+            const curIdx = RANGE_ORDER.indexOf(range);
+            const reachIdxs = reach.bands.map((b) => RANGE_ORDER.indexOf(b));
+            const nearest = Math.min(...reachIdxs); // farthest band (smallest idx)
+            const farthestClose = Math.max(...reachIdxs); // closest band (largest idx)
+            if (curIdx < nearest) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter nods at the distance. "${reach.label} needs arm's reach — closing the gap for you."`,
+                `The Arbiter nods at the distance. "${reach.label} needs you closer — closing the gap for you."`,
               );
               runMoveCombatRange(get, set, player, currentScene, 'advance');
               break;
             }
-            if (needRanged && range === 'arm') {
+            if (curIdx > farthestClose) {
               get().appendLog(
                 'arbiter',
                 `The Arbiter steps back with you. "${reach.label} needs space — pulling you back."`,
@@ -7020,12 +7029,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               runMoveCombatRange(get, set, player, currentScene, 'retreat');
               break;
             }
-            // Last-resort refusal (e.g. a weapon with no bands matching
-            // any reachable range) — keep the old message but exempt from
-            // dedup so the player sees the diagnosis on every failed try.
-            const remedy = range === 'arm'
+            // Last-resort refusal (shouldn't happen for contiguous bands) —
+            // keep a clear diagnosis, exempt from dedup so it shows each try.
+            const remedy = curIdx > farthestClose
               ? `type 'retreat' to step back for a ranged shot`
-              : `type 'advance' to close in for melee`;
+              : `type 'advance' to close in`;
             get().appendLog(
               'arbiter',
               `The Arbiter holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
@@ -7062,7 +7070,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Point-blank bonus: ranged weapon at arm's reach is a bonus
           // die on the attack roll (offset by the disarm/melee risk
           // described in the action card).
-          const pointBlankBonus = isRangedAttack && range === 'arm';
+          const pointBlankBonus = isRangedAttack && range === 'close';
           if (statusMods.sources.length > 0) {
             get().appendLog('debug', `attack: status mods ${statusMods.sources.join(' · ')}`);
           }
@@ -7538,7 +7546,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemies: [...s.currentScene.enemies, finalSpawn],
                   enemyHps: [...s.currentScene.enemyHps, finalSpawn.hp],
                   activeEnemyIdx: s.currentScene.enemies.length,
-                  range: 'close',
+                  range: 'mid',
                   enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
                 },
                 stepsSinceCombat: 0,
@@ -10338,7 +10346,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (category) {
             const owned = player.inventory.filter((i) => {
               if (i.quantity <= 0) return false;
+              // OTA-550 — a tag exclusion wins outright (throwables aren't "gear").
+              if (category.excludeTagAny && (i.tags ?? []).some((t) => category.excludeTagAny!.some((x) => new RegExp(x, 'i').test(t)))) return false;
               if (category.kind && category.kind.includes(i.kind)) return true;
+              // OTA-550 — tag match folds throwable-tagged items into "weapon".
+              if (category.tagAny && (i.tags ?? []).some((t) => category.tagAny!.some((x) => new RegExp(x, 'i').test(t)))) return true;
               if (category.slot) {
                 const validSlots = validSlotsForItem(i);
                 if (validSlots.some((s) => category.slot!.includes(s))) return true;
@@ -15220,7 +15232,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 enemies: [enemy],
                 enemyHps: [enemy.hp],
                 activeEnemyIdx: 0,
-                range: 'close',
+                range: 'mid',
                 enemyAmbushUsed: [false],
               },
             }
@@ -15945,7 +15957,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemies: [boss],
                   enemyHps: [boss.hp],
                   activeEnemyIdx: 0,
-                  range: 'close',
+                  range: 'mid',
                 },
               }
             : s,
@@ -17745,7 +17757,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 enemies: [{ ...purifier }],
                 enemyHps: [purifier.hp],
                 activeEnemyIdx: 0,
-                range: 'close',
+                range: 'mid',
                 enemyAmbushUsed: [false],
               },
               player: { ...s.player, stepsSinceLastPurifier: 0 },
@@ -17770,7 +17782,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemies: [{ ...apparition }],
                   enemyHps: [apparition.hp],
                   activeEnemyIdx: 0,
-                  range: 'close',
+                  range: 'mid',
                   enemyAmbushUsed: [false],
                 },
               } : s);
@@ -20523,7 +20535,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               enemies: [...s.currentScene.enemies, guardian],
               enemyHps: [...s.currentScene.enemyHps, guardian.hp],
               activeEnemyIdx: s.currentScene.enemies.length,
-              range: 'close',
+              range: 'mid',
             },
           }
         : s
@@ -20678,12 +20690,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 }));
 
-// Human-readable label for the combat range bands.
-const RANGE_LABEL: Record<CombatRange, string> = {
-  arm: "arm's reach",
-  close: 'close',
-  far: 'far',
-};
+// Human-readable label for the combat range bands. OTA-550 — sourced from
+// the shared RANGE_LABELS map (distant / far / mid-range / close-arm's-reach).
+const RANGE_LABEL: Record<CombatRange, string> = RANGE_LABELS;
 
 // Apply a single HookEffect to player + world state. Returns true if the
 // effect caused a fatal HP drop so the caller can stage the death handler.
@@ -20771,7 +20780,7 @@ function applyHookEffect(
       if (!spawn) return { inlineSummary: null, fatal: false };
       set((s) =>
         s.currentScene
-          ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'close' } }
+          ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
           : s,
       );
       get().appendLog('combat', `${spawn.name} emerges from the hook. Combat begins at close range.`);
@@ -21088,10 +21097,13 @@ function runMoveCombatRange(
     get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
     return;
   }
-  const order: CombatRange[] = ['arm', 'close', 'far'];
-  const cur = scene.range ?? 'close';
+  // OTA-550 — RANGE_ORDER runs farthest → closest (distant,far,mid,close).
+  // "advance"/"approach" moves one band CLOSER (index up); "retreat" moves
+  // one band farther (index down).
+  const order = RANGE_ORDER;
+  const cur: CombatRange = scene.range ?? 'mid';
   const curIdx = order.indexOf(cur);
-  const nextIdx = direction === 'advance' ? Math.max(0, curIdx - 1) : Math.min(order.length - 1, curIdx + 1);
+  const nextIdx = direction === 'advance' ? Math.min(order.length - 1, curIdx + 1) : Math.max(0, curIdx - 1);
   const next = order[nextIdx]!;
   // OTA-146 — pluralization grammar fix. Pre-fix this always did
   // "the N {moveEnemy.name}s" — when the scene held two DIFFERENT
@@ -21113,7 +21125,7 @@ function runMoveCombatRange(
     get().appendLog(
       'world',
       direction === 'advance'
-        ? `You are already at arm's reach with ${groupLabel}.`
+        ? `You are already at close / arm's reach with ${groupLabel}.`
         : `You cannot put more ground between you and ${groupLabel}.`,
     );
     return;
@@ -21180,8 +21192,10 @@ function runMoveCombatRange(
 // + arm. We use a conservative default — most generic enemies threaten arm
 // and close, plus anything carrying a ranged hint reaches at far.
 function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
-  if (range === 'arm' || range === 'close') return true;
-  // 'far' — only ranged enemies (loose hint via attack/damage string).
+  // OTA-550 — at close/mid a generic (melee-capable) enemy threatens the
+  // player; at far/distant only a ranged enemy can still strike.
+  if (range === 'close' || range === 'mid') return true;
+  // 'far' / 'distant' — only ranged enemies (loose hint via attack/damage str).
   const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
   return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart)/.test(sig);
 }
@@ -21639,7 +21653,7 @@ function fireYulkaFetch(
         enemies: [...s.currentScene.enemies, proto],
         enemyHps: [...s.currentScene.enemyHps, proto.hp],
         activeEnemyIdx: s.currentScene.enemies.length,
-        range: 'close',
+        range: 'mid',
         enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
       },
     };
@@ -21742,7 +21756,7 @@ function fireYulkaReturn(
         enemies: [...s.currentScene.enemies, proto],
         enemyHps: [...s.currentScene.enemyHps, proto.hp],
         activeEnemyIdx: s.currentScene.enemies.length,
-        range: 'close',
+        range: 'mid',
         enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
       },
     } : s));
@@ -21777,7 +21791,7 @@ function fireYulkaAmbush(
           enemies: [...s.currentScene.enemies, proto],
           enemyHps: [...s.currentScene.enemyHps, proto.hp],
           activeEnemyIdx: s.currentScene.enemies.length,
-          range: 'close',
+          range: 'mid',
           enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
         },
       };
@@ -22137,22 +22151,26 @@ function playerWeaponReach(
 ): { bands: CombatRange[]; label: string } {
   const eq = player.equipped ?? {};
   const wpName = slot === 'off' ? eq.off : (eq.main ?? eq.weaponName);
-  if (!wpName) return { bands: ['arm'], label: 'Bare hands' };
-  const w = findWeaponByName(wpName);
-  if (!w) return { bands: ['arm'], label: wpName };
-  switch (w.weaponKind) {
-    case 'melee':
-      return { bands: ['arm'], label: w.name };
-    case 'ranged':
-      return { bands: ['arm', 'close', 'far'], label: w.name };
-    case 'runecaster': {
-      const intel = player.stats.intelligence ?? 0;
-      const farReach = intel >= 9; // Rare/Legendary access
-      return { bands: farReach ? ['arm', 'close', 'far'] : ['arm', 'close'], label: w.name };
-    }
-    default:
-      return { bands: ['arm'], label: w.name };
+  if (!wpName) return { bands: reachBandsFor('barehanded'), label: 'Bare hands' };
+  // OTA-550 — a throwable inventory item (Shaped Aetheric Shard, etc.) equipped
+  // to a hand throws from 'far' inward even though it's not in the weapon
+  // catalog. Detect it off the inventory tags before the catalog lookup.
+  const throwInst = (player.inventory ?? []).find(
+    (it) => it.name.toLowerCase() === wpName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)),
+  );
+  if (throwInst) {
+    return { bands: reachBandsFor('throwable'), label: throwInst.name };
   }
+  const w = findWeaponByName(wpName);
+  if (!w) return { bands: reachBandsFor('melee'), label: wpName };
+  const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
+  // OTA-550 — preserve the legacy runecaster INT gate: a low-INT caster
+  // (Common/Uncommon, INT < 9) can't reach the outermost 'distant' band;
+  // it tops out at 'far' inward. INT ≥ 9 (Rare/Legendary access) reaches all.
+  if (cls === 'runecaster' && (player.stats.intelligence ?? 0) < 9) {
+    return { bands: reachBandsFor('throwable'), label: w.name }; // far/mid/close
+  }
+  return { bands: reachBandsFor(cls), label: w.name };
 }
 
 // Wear the named equipped item by one point. If it breaks, remove it from
@@ -24607,7 +24625,7 @@ function tryFireRescueScenario(
           enemyHps: [...s.currentScene.enemyHps, captor.hp],
           enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
           activeEnemyIdx: s.currentScene.enemies.length,
-          range: 'close',
+          range: 'mid',
         },
       }
     : s);

@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-550 "Unquadpentium Stride" — [feature] 4-band combat range model** *(element #145)*. 3 bands
+  (arm/close/far) → FOUR ordered bands **distant → far → mid → close** (`RANGE_ORDER`/`rangeIndex`/`reachBandsFor`
+  in types.ts). Reach capped by class: ranged = distant inward; throwables = far inward (not distant); a NEW
+  long/spear class (name OR tag: spear/pike/halberd/glaive/lance/polearm/harpoon/trident/…) = mid inward; melee =
+  close only. Throwable-tagged items win their class regardless of catalog kind, so the misc Shaped Aetheric Shard
+  finally throws at range. Approach steps one band closer across all four; bandolier picker tints throwables by
+  reach. Built by a sub-agent; full combat suite green (`combat`/`reach`/`bandolier`/`throwable`/`combatStress`).
+  `app/engine/types.ts`, `combatRules.ts`, `app/state/gameStore.ts`, `InputBox.tsx`, `ExplorationScreen.tsx`,
+  `askInventory.ts`.
+
 - **OTA-548 "Unquadtrium Inquiry" — [ux] drop the "ask arbiter" button; organic question prompts** *(element
   #143)*. Player: the button felt unused/extra. Removed from the quick-row (typed asks still work via the parser
   `ask` intent). In its place the Arbiter occasionally (~4% of peaceful outdoor scene entries) drops a line

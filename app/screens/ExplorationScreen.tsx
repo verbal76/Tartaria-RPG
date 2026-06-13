@@ -33,6 +33,9 @@ import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
+import { reachClassFor } from '../engine/combatRules';
+import { reachBandsFor, RANGE_LABELS } from '../engine/types';
+import type { CombatRange } from '../engine/types';
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -384,19 +387,30 @@ export function ExplorationScreen() {
   // enemy the player is currently looking at.
   const enemyViews: EnemyView[] = useMemo(() => {
     if (!currentScene || currentScene.enemies.length === 0) return [];
-    const range = currentScene.range ?? 'close';
-    const rangeLabel = range === 'arm' ? "arm's reach" : range === 'far' ? 'far' : 'close';
+    const range: CombatRange = currentScene.range ?? 'mid';
+    const rangeLabel = RANGE_LABELS[range];
     const mainName = player?.equipped?.main ?? player?.equipped?.weaponName;
     // OTA-227 — resolveDisplayWeaponByName so fused weapons (catalog-
     // absent, uniqueStats-bearing) get their actual weaponKind instead
     // of barehand-only fallback. Resonant Edge (aetheric → runecaster)
     // now reports in-range at close, not just arm's reach.
+    // OTA-550 — four-band reach via the shared resolver (ranged/throwable/
+    // long/melee). A throwable inventory item reaches from 'far' inward.
     const w = mainName ? resolveDisplayWeaponByName(mainName, player?.inventory ?? []) : null;
-    let canHit = false;
-    if (!w) canHit = range === 'arm';
-    else if (w.weaponKind === 'melee') canHit = range === 'arm';
-    else if (w.weaponKind === 'ranged') canHit = true;
-    else canHit = range !== 'far' || (player?.stats?.intelligence ?? 0) >= 9;
+    const throwInst = mainName
+      ? (player?.inventory ?? []).find((it) => it.name.toLowerCase() === mainName.toLowerCase() && (it.tags ?? []).some((t) => /throwable/i.test(t)))
+      : undefined;
+    let canHit: boolean;
+    if (throwInst) {
+      canHit = reachBandsFor('throwable').includes(range);
+    } else if (!w) {
+      canHit = reachBandsFor('barehanded').includes(range);
+    } else {
+      const cls = reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags });
+      let bands = reachBandsFor(cls);
+      if (cls === 'runecaster' && (player?.stats?.intelligence ?? 0) < 9) bands = reachBandsFor('throwable');
+      canHit = bands.includes(range);
+    }
     return currentScene.enemies.map((e, i) => ({
       enemy: e,
       currentHp: currentScene.enemyHps[i] ?? e.hp,

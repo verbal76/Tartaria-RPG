@@ -508,7 +508,68 @@ export interface UniqueItemStats {
   statBonus?: { stat: keyof Stats; amount: number };
 }
 
-export type CombatRange = 'arm' | 'close' | 'far';
+// OTA-550 — four-band combat range model. Ordered farthest → closest.
+//   distant — only ranged weapons (bows/casters/pistols/slings/energy) reach
+//   far     — throwables (thrown items) reach from here inward
+//   mid     — long/reach weapons (spears/pikes/halberds/glaives/lances) reach
+//   close   — arm's reach; melee + barehanded only strike here
+// A combat opens at the farthest applicable band; "approach"/"advance" steps
+// one band CLOSER (distant→far→mid→close). The legacy 3-band names map:
+//   old 'arm'   → new 'close'  (arm's reach)
+//   old 'close' → new 'mid'    (the old middle band)
+//   old 'far'   → new 'far'    (unchanged); 'distant' is the new outermost band
+export type CombatRange = 'distant' | 'far' | 'mid' | 'close';
+
+// Ordered farthest → closest. rangeIndex grows as you close the gap.
+export const RANGE_ORDER = ['distant', 'far', 'mid', 'close'] as const;
+
+/** Index of a band in RANGE_ORDER (0 = distant/farthest, 3 = close). */
+export function rangeIndex(r: CombatRange): number {
+  return RANGE_ORDER.indexOf(r);
+}
+
+/** True when `a` is at least as close as `b` (a's index ≥ b's index). */
+export function isCloserOrEqual(a: CombatRange, b: CombatRange): boolean {
+  return rangeIndex(a) >= rangeIndex(b);
+}
+
+/** Weapon reach classes. `long` = spears/pikes/polearms (mid inward);
+ *  `throwable` = thrown items (far inward); `ranged` = bows/casters/etc
+ *  (distant inward); `melee`/`barehanded` = close only; `runecaster`
+ *  reaches distant inward (kept ranged-like). */
+export type WeaponReachClass =
+  | 'ranged'
+  | 'throwable'
+  | 'long'
+  | 'melee'
+  | 'barehanded'
+  | 'runecaster';
+
+/** The range bands a weapon class can strike from: its band AND every
+ *  band closer. Returned outermost → closest, matching RANGE_ORDER. */
+export function reachBandsFor(cls: WeaponReachClass): CombatRange[] {
+  switch (cls) {
+    case 'ranged':
+    case 'runecaster':
+      return ['distant', 'far', 'mid', 'close'];
+    case 'throwable':
+      return ['far', 'mid', 'close'];
+    case 'long':
+      return ['mid', 'close'];
+    case 'melee':
+    case 'barehanded':
+    default:
+      return ['close'];
+  }
+}
+
+/** Human-readable band labels for combat-log / range-display lines. */
+export const RANGE_LABELS: Record<CombatRange, string> = {
+  distant: 'distant',
+  far: 'far',
+  mid: 'mid-range',
+  close: "close / arm's reach",
+};
 
 export interface FactionStanding { factionId: string; standing: number; }
 

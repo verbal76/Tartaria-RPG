@@ -14463,4 +14463,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // read; text is now always readable amber and the BORDER alone marks the active sort. (2) Shaped Aetheric Shard
 // was CREATED as rarity Common despite its Rare catalog row, so it sold for a pittance; the shape recipe now
 // stamps Rare to match (a 2d20 one-shot). app/screens/VendorScreen.tsx, app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-549';
+// OTA-550 (Unquadpentium Stride) — [feature] 4-band combat range model. Replaces the 3-band reach system
+// (arm/close/far) with FOUR ordered bands: distant → far → mid → close (RANGE_ORDER + rangeIndex helpers in
+// types.ts). Reach is now capped by weapon class via reachBandsFor(): RANGED strikes from distant inward;
+// THROWABLES from far inward (not distant); a new LONG/spear class (spear/pike/halberd/glaive/lance/polearm/
+// harpoon/trident/… by name OR tag) from mid inward; MELEE/barehanded only at close. Throwable-tagged items win
+// their reach class regardless of catalog kind, so the misc-kind Shaped Aetheric Shard finally gets true
+// throwable reach instead of melee-only. Approach now steps one band closer across all four; combat range labels
+// updated. Bandolier picker tints each throwable by reach (in-range vs too-far). Built + verified by a focused
+// sub-agent; full combat suite green (combat/reach/bandolier/throwable/combatStress/dotKill/weaponCoating).
+// app/engine/types.ts, app/engine/combatRules.ts, app/state/gameStore.ts, app/components/InputBox.tsx,
+// app/screens/ExplorationScreen.tsx, app/engine/askInventory.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-550';

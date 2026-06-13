@@ -1,4 +1,4 @@
-import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect } from './types';
+import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect, WeaponReachClass } from './types';
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
@@ -313,6 +313,38 @@ function detectWeaponClass(text: string): WeaponClass {
   if (/rune|spell|cast|aether|channel|arcane/.test(t)) return 'runecaster';
   if (/sword|blade|axe|knife|dagger|spear|hammer|mace|club|strike|slash|cut|stab|melee/.test(t)) return 'melee';
   return 'barehanded';
+}
+
+// OTA-550 — long/reach weapon detection (spears, pikes, halberds, glaives,
+// lances, polearms). Matched on the weapon NAME and/or its catalog tags so a
+// "Tartarian Spear" (catalog weaponKind 'melee', tag 'spear') resolves to the
+// `long` reach class (mid inward) instead of plain melee (close only).
+export const LONG_WEAPON_RE = /\b(spear|pike|halberd|glaive|lance|polearm|harpoon|naginata|trident|partisan|guisarme|bardiche|voulge)\b/i;
+export function isLongWeapon(name: string | undefined, tags?: readonly string[]): boolean {
+  if (name && LONG_WEAPON_RE.test(name)) return true;
+  // Direct tag hit: 'spear' / 'pike' / 'polearm' / 'halberd' etc.
+  if (tags && tags.some((t) => LONG_WEAPON_RE.test(t) || /\bpolearm\b/i.test(t))) return true;
+  return false;
+}
+
+/** OTA-550 — resolve a catalog weapon (by weaponKind + tags + name + a
+ *  throwable flag) to its four-band reach class. Throwable-tagged items win
+ *  regardless of weaponKind (so a misc-kind Shaped Aetheric Shard still
+ *  throws). Then long/reach weapons, then ranged/runecaster, else melee. */
+export function reachClassFor(opts: {
+  weaponKind?: 'melee' | 'ranged' | 'runecaster';
+  name?: string;
+  tags?: readonly string[];
+  throwable?: boolean;
+}): WeaponReachClass {
+  const tags = opts.tags ?? [];
+  const throwable = opts.throwable || tags.some((t) => /throwable/i.test(t));
+  if (throwable) return 'throwable';
+  if (opts.weaponKind === 'runecaster') return 'runecaster';
+  if (opts.weaponKind === 'ranged') return 'ranged';
+  if (isLongWeapon(opts.name, tags)) return 'long';
+  if (opts.weaponKind === 'melee') return 'melee';
+  return 'melee';
 }
 
 function attackStatFor(

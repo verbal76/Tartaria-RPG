@@ -48,7 +48,7 @@ function plant(name = 'Mud Boar') {
       enemies: [enemy],
       enemyHps: [enemy.hp],
       activeEnemyIdx: 0,
-      range: 'arm',
+      range: 'close',
       enemyAmbushUsed: [false],
       enemyKnockedOut: [false],
       enemyStatuses: [[]],
@@ -94,7 +94,7 @@ describe('OTA-429 — DOT kill of the last enemy ends combat', () => {
         enemies: [a, b],
         enemyHps: [1, b.hp],
         activeEnemyIdx: 1,
-        range: 'arm',
+        range: 'close',
         enemyAmbushUsed: [false, false],
         enemyKnockedOut: [false, false],
         // Only enemy A is poisoned; B stays alive, so combat must NOT auto-end.
