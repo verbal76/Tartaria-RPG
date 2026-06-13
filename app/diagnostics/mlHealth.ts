@@ -142,6 +142,11 @@ interface MLHealthState {
   /** Cold boots until the next Qwen retry while disabled, or null when enabled /
    *  retrying this boot. */
   qwenNextRetryInBoots: number | null;
+  /** arb129 — last-loaded Qwen native kernel variant (e.g. rnllama_v8_4_fp16_dotprod_i8mm)
+   *  + the one-line CPU/SoC/kernel diagnostic, reported by LlamaRuntime after init.
+   *  Persisted so the copyable bug report names the variant even after a crash. */
+  qwenVariant: string | null;
+  qwenCpuDiag: string | null;
 }
 
 let cached: MLHealthState | null = null;
@@ -352,6 +357,17 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     } catch { /* re-detected next launch if the write fails */ }
   }
 
+  // arb129 — last-loaded Qwen kernel variant + CPU/SoC diag (best-effort; read
+  // separately so a failure here can't disturb the core health load).
+  let qwenVariant: string | null = null;
+  let qwenCpuDiag: string | null = null;
+  try {
+    [qwenVariant, qwenCpuDiag] = await Promise.all([
+      AsyncStorage.getItem('tartaria.ml.qwenVariant'),
+      AsyncStorage.getItem('tartaria.ml.qwenCpuDiag'),
+    ]);
+  } catch { /* diagnostics only */ }
+
   cached = {
     lastAttemptAt: attempted,
     lastSuccessAt: succeeded,
@@ -369,8 +385,28 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     qwenRetryingThisBoot,
     qwenRecoveredThisBoot,
     qwenNextRetryInBoots,
+    qwenVariant,
+    qwenCpuDiag,
   };
   return cached;
+}
+
+/**
+ * arb129 — record the native Qwen kernel variant + CPU/SoC diagnostic that
+ * LlamaRuntime captured from the patched llama.rn selector after a successful
+ * init. Persisted so the copyable bug report shows which kernel this device ran
+ * (e.g. confirming the SVE-disable workaround steered it to a non-SVE variant),
+ * and so the variant survives into the NEXT boot's report after a crash.
+ */
+export async function recordQwenRuntime(variant: string, diag: string): Promise<void> {
+  try {
+    if (variant) await AsyncStorage.setItem('tartaria.ml.qwenVariant', variant);
+    if (diag) await AsyncStorage.setItem('tartaria.ml.qwenCpuDiag', diag);
+  } catch { /* best effort — diagnostics only */ }
+  if (cached) {
+    if (variant) cached.qwenVariant = variant;
+    if (diag) cached.qwenCpuDiag = diag;
+  }
 }
 
 /**
@@ -648,6 +684,12 @@ export function mlHealthSummary(): string {
     `  Last init success: ${state.lastSuccessAt ?? 'never'}`,
     `  Crashes-before-disable threshold: ${MAX_CRASHES_BEFORE_DISABLE}`,
     `  Qwen completion guard: ${qwenStatus}`,
+    // arb129 — which native kernel variant this device loaded + its CPU/SoC
+    // signature. `sveUsed=false` with `sveRaw=true` confirms the SVE-disable
+    // workaround steered an SVE-reporting chip (e.g. Tensor G5) off the crashing
+    // variant. Surfaced here so it lands in every copied bug report (no adb).
+    `  Qwen kernel variant: ${state.qwenVariant ?? '(not yet loaded this install)'}`,
+    `  Qwen CPU/SoC: ${state.qwenCpuDiag ?? '(not yet loaded this install)'}`,
     `  Voice (TTS) guard: ${ttsStatus}`,
   ].join('\n');
 }

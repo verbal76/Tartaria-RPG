@@ -178,6 +178,18 @@ export class LlamaRuntime {
       n_ubatch: opts.ubatch ?? 128,
     });
     this.modelPath = opts.modelPath;
+    // arb129 — record which native kernel variant llama.rn selected + the CPU/SoC
+    // signature (forwarded by the patched llama.rn) into mlHealth, so the copyable
+    // bug report shows it (no adb logcat needed). Diagnostics only — never throw.
+    try {
+      const ctx = this.context as unknown as { loadedVariant?: string; cpuDiag?: string };
+      const variant = ctx?.loadedVariant ?? '';
+      const diag = ctx?.cpuDiag ?? '';
+      if (variant || diag) {
+        const ml = require('../../diagnostics/mlHealth') as typeof import('../../diagnostics/mlHealth');
+        void ml.recordQwenRuntime(variant, diag);
+      }
+    } catch { /* diagnostics only */ }
   }
 
   async generate(

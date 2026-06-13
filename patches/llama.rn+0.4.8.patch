@@ -1,8 +1,23 @@
 diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-index 91b2397..becf26e 100644
+index 91b2397..77fbb34 100644
 --- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 +++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-@@ -330,16 +330,49 @@ public class LlamaContext {
+@@ -323,6 +323,14 @@ public class LlamaContext {
+     freeContext(context);
+   }
+ 
++  // Tartaria diagnostics — captured at native-lib selection time (the static
++  // block below) and exposed to JS via RNLlama.initContext, so the chosen kernel
++  // variant + CPU/SoC signature land in the copyable in-app log (no adb needed).
++  static String sSelectedVariant = "unknown";
++  static String sTartariaDiag = "";
++  public static String getSelectedVariant() { return sSelectedVariant; }
++  public static String getTartariaDiag() { return sTartariaDiag; }
++
+   static {
+     Log.d(NAME, "Primary ABI: " + Build.SUPPORTED_ABIS[0]);
+ 
+@@ -330,50 +338,105 @@ public class LlamaContext {
      Log.d(NAME, "CPU features: " + cpuFeatures);
      boolean hasFp16 = cpuFeatures.contains("fp16") || cpuFeatures.contains("fphp");
      boolean hasDotProd = cpuFeatures.contains("dotprod") || cpuFeatures.contains("asimddp");
@@ -19,7 +34,8 @@ index 91b2397..becf26e 100644
 +    // bleeding-edge; the non-SVE path is the same one every other device uses
 +    // fine, so we opt out of SVE globally for stability. Verify on-device: a
 +    // long Qwen narration session with no SIGSEGV.
-+    boolean hasSve = false; // was: cpuFeatures.contains("sve");
++    boolean hasSveRaw = cpuFeatures.contains("sve"); // raw cpuinfo flag, for diagnostics only
++    boolean hasSve = false; // was: cpuFeatures.contains("sve"); — SVE-disable workaround (see above)
      boolean hasI8mm = cpuFeatures.contains("i8mm");
      boolean isAtLeastArmV82 = cpuFeatures.contains("asimd") && cpuFeatures.contains("crc32") && cpuFeatures.contains("aes");
 -    boolean isAtLeastArmV84 = cpuFeatures.contains("dcpop") && cpuFeatures.contains("uscat");
@@ -55,7 +71,62 @@ index 91b2397..becf26e 100644
  
      // TODO: Add runtime check for cpu features
      if (LlamaContext.isArm64V8a()) {
-@@ -404,6 +437,72 @@ public class LlamaContext {
+       if (isAtLeastArmV84 && hasSve && hasI8mm && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod_i8mm_sve.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod_i8mm_sve");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod_i8mm_sve";
+       } else if (isAtLeastArmV84 && hasSve && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod_sve.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod_sve");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod_sve";
+       } else if (isAtLeastArmV84 && hasI8mm && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod_i8mm.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod_i8mm");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod_i8mm";
+       } else if (isAtLeastArmV84 && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod";
+       } else if (isAtLeastArmV82 && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_2_fp16_dotprod.so");
+         System.loadLibrary("rnllama_v8_2_fp16_dotprod");
++        sSelectedVariant = "rnllama_v8_2_fp16_dotprod";
+       } else if (isAtLeastArmV82 && hasFp16) {
+         Log.d(NAME, "Loading librnllama_v8_2_fp16.so");
+         System.loadLibrary("rnllama_v8_2_fp16");
++        sSelectedVariant = "rnllama_v8_2_fp16";
+       } else {
+         Log.d(NAME, "Loading librnllama_v8.so");
+         System.loadLibrary("rnllama_v8");
++        sSelectedVariant = "rnllama_v8";
+       }
+       //  Log.d(NAME, "Loading librnllama_v8_7.so with runtime feature detection");
+       //  System.loadLibrary("rnllama_v8_7");
+     } else if (LlamaContext.isX86_64()) {
+         Log.d(NAME, "Loading librnllama_x86_64.so");
+         System.loadLibrary("rnllama_x86_64");
++        sSelectedVariant = "rnllama_x86_64";
+     } else {
+         Log.d(NAME, "Loading default librnllama.so");
+         System.loadLibrary("rnllama");
++        sSelectedVariant = "rnllama";
+     }
++
++    // Tartaria diagnostics — one greppable line + a static string exposed to JS.
++    // sveRaw=true with sveUsed=false confirms the device reported SVE but the
++    // arbiters SVE-disable workaround steered it to a non-SVE variant.
++    String socModel = (Build.VERSION.SDK_INT >= 31) ? Build.SOC_MODEL : "n/a";
++    sTartariaDiag = "variant=" + sSelectedVariant
++      + " sveRaw=" + hasSveRaw + " sveUsed=" + hasSve + " i8mm=" + hasI8mm
++      + " v84raw=" + isAtLeastArmV84Raw + " v84used=" + isAtLeastArmV84
++      + " blocklisted=" + isBlocklistedChip
++      + " soc=" + socModel + " hw=" + Build.HARDWARE + " model=" + Build.MODEL
++      + " sdk=" + Build.VERSION.SDK_INT + " kernel=" + System.getProperty("os.version");
++    Log.d(NAME, "TARTARIA_QWEN_DIAG " + sTartariaDiag);
+ }
+ 
+   private static boolean isArm64V8a() {
+@@ -404,6 +467,72 @@ public class LlamaContext {
      }
    }
  
@@ -128,3 +199,82 @@ index 91b2397..becf26e 100644
    protected static native WritableMap modelInfo(
      String model,
      String[] skip
+diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java
+index ab98a92..4c23d50 100644
+--- a/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java
++++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java
+@@ -92,6 +92,10 @@ public class RNLlama implements LifecycleEventListener {
+           result.putBoolean("gpu", false);
+           result.putString("reasonNoGPU", "Currently not supported");
+           result.putMap("model", llamaContext.getModelDetails());
++          // Tartaria diagnostics — surface the chosen native kernel variant + the
++          // CPU/SoC signature to JS, so they land in the copyable in-app log.
++          result.putString("loadedVariant", LlamaContext.getSelectedVariant());
++          result.putString("cpuDiag", LlamaContext.getTartariaDiag());
+           return result;
+         } catch (Exception e) {
+           exception = e;
+diff --git a/node_modules/llama.rn/src/index.ts b/node_modules/llama.rn/src/index.ts
+index 57fa208..f7621f9 100644
+--- a/node_modules/llama.rn/src/index.ts
++++ b/node_modules/llama.rn/src/index.ts
+@@ -121,11 +121,27 @@ export class LlamaContext {
+     isChatTemplateSupported?: boolean
+   } = {}
+ 
+-  constructor({ contextId, gpu, reasonNoGPU, model }: NativeLlamaContext) {
++  // Tartaria diagnostics — the native kernel variant chosen by LlamaContext.java's
++  // CPU selector + the CPU/SoC signature, forwarded so JS can put them in the
++  // copyable in-app log (no adb needed).
++  loadedVariant: string = ''
++
++  cpuDiag: string = ''
++
++  constructor({
++    contextId,
++    gpu,
++    reasonNoGPU,
++    model,
++    loadedVariant,
++    cpuDiag,
++  }: NativeLlamaContext & { loadedVariant?: string; cpuDiag?: string }) {
+     this.id = contextId
+     this.gpu = gpu
+     this.reasonNoGPU = reasonNoGPU
+     this.model = model
++    this.loadedVariant = loadedVariant ?? ''
++    this.cpuDiag = cpuDiag ?? ''
+   }
+ 
+   /**
+@@ -331,11 +347,7 @@ export async function initLlama(
+   }
+ 
+   const poolType = poolTypeMap[poolingType as keyof typeof poolTypeMap]
+-  const {
+-    gpu,
+-    reasonNoGPU,
+-    model: modelDetails,
+-  } = await RNLlama.initContext(contextId, {
++  const initRes: any = await RNLlama.initContext(contextId, {
+     model: path,
+     is_model_asset: !!isModelAsset,
+     use_progress_callback: !!onProgress,
+@@ -347,8 +359,16 @@ export async function initLlama(
+     removeProgressListener?.remove()
+     throw err
+   })
++  const { gpu, reasonNoGPU, model: modelDetails, loadedVariant, cpuDiag } = initRes
+   removeProgressListener?.remove()
+-  return new LlamaContext({ contextId, gpu, reasonNoGPU, model: modelDetails })
++  return new LlamaContext({
++    contextId,
++    gpu,
++    reasonNoGPU,
++    model: modelDetails,
++    loadedVariant,
++    cpuDiag,
++  })
+ }
+ 
+ export async function releaseAllLlama(): Promise<void> {

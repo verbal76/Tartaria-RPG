@@ -1781,6 +1781,14 @@ The entries below are retained as the shipped-batch record.
 >      no SIGSEGV; if it still crashes, also drop `hasI8mm`.
 >    - **AsyncStorage DB cap (queue #1).** New `plugins/withAsyncStorageDbSize.js`
 >      config plugin sets `AsyncStorage_db_size_in_MB=50` at prebuild.
+>    - **Kernel-variant diagnostics (debug instrumentation).** The llama.rn patch now
+>      records which `librnllama_*` variant the selector loaded + a CPU/SoC/kernel
+>      signature, exposed to JS via `initContext`. `LlamaRuntime` reports it to
+>      `mlHealth.recordQwenRuntime`, and `mlHealthSummary` surfaces `Qwen kernel variant`
+>      + `Qwen CPU/SoC` in the COPYABLE bug report (plus a one-line `TARTARIA_QWEN_DIAG`
+>      in logcat). `sveRaw=true sveUsed=false` proves the SVE-disable workaround steered
+>      an SVE-reporting chip off the crashing variant — verifiable from a pasted log, no
+>      adb. Persisted, so it names the variant even after a crash.
 > 5. **Build trigger.** Pushed to `arbiters-line` (non-path-ignored files: app.json,
 >    build-apk.yml, patches/, plugins/) → fires `build-apk.yml` → preview/sideload APK.
 >    Commit message kept free of the `[build-aab]` token so the resolver lands on the
