@@ -114,6 +114,10 @@ export function AboutScreen() {
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
   const [invCharCount, setInvCharCount] = useState(0);
+  // arb119 — COPY AI HEALTH: the full ML/voice diagnostic, on demand (was an
+  // inline wall of text under RESET AI NARRATION).
+  const [aiHealthCopied, setAiHealthCopied] = useState(false);
+  const [aiHealthCharCount, setAiHealthCharCount] = useState(0);
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
@@ -213,6 +217,19 @@ export function AboutScreen() {
       setInvCharCount(stamped.length);
       setInvCopied(true);
       setTimeout(() => setInvCopied(false), 2500);
+    } catch { /* clipboard rarely fails on Android */ }
+  }
+  // arb119 — COPY AI HEALTH. Drops the full ML/voice runtime diagnostic (crash
+  // counters, auto-disable state, Qwen + TTS guards) on the clipboard, paired
+  // with the device/build summary, so it's bug-report-ready — instead of
+  // printing the whole 8-line readout inline under RESET AI NARRATION.
+  async function handleCopyAiHealth() {
+    try {
+      const body = `${buildBasicDeviceSummary()}\n\n${mlHealthSummary()}`;
+      await Clipboard.setStringAsync(body);
+      setAiHealthCharCount(body.length);
+      setAiHealthCopied(true);
+      setTimeout(() => setAiHealthCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
   }
   // OTA-341 — COPY SAVE. Exports the loadable save state (player +
@@ -760,9 +777,22 @@ export function AboutScreen() {
             local AI after repeated native crashes, then loads it right now (no restart
             needed). Once it reads LOADED, trigger some Arbiter narration to test.
             {qwenStatus === 'failed' && qwenError ? `\nLoad error: ${qwenError}` : ''}
-            {'\n'}Current state:{'\n'}
-            {mlHealthSummary()}
+            {'\n'}Current state: {mlHealthSummary().split('\n')[1]?.replace(/^\s*Status:\s*/, '').trim() ?? 'unknown'}
           </Text>
+          {/* arb119 — the FULL ML/voice diagnostic (crash counters, auto-disable
+              state, Qwen + TTS guards) used to print inline as an 8-line wall of
+              text. It's bug-report material, so it now drops on the clipboard on
+              demand — matching COPY LOG / COPY INVENTORY / COPY SAVE — while the
+              one-line status above keeps the at-a-glance signal. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            onPress={() => { void handleCopyAiHealth(); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {aiHealthCopied ? `✓ ${aiHealthCharCount.toLocaleString()} CHARS` : 'COPY AI HEALTH'}
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
             COPY LOG drops the full disk log on the clipboard. Long-press it in the
             in-game menu (or use the LOG screen) for the share + chunked-paste view.

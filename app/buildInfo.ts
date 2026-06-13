@@ -14400,4 +14400,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pruned six already-shipped entries (catalog dups OTA-135, Aetheric Shield dup OTA-134, DOG_GEAR guard
 // OTA-133, per-golem summonDC OTA-137, tutorialSteps copy, Dog Companion system) so the open list is trustworthy.
 // app/engine/itemDefaults.ts, HANDOFF.md. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-539';
+// OTA-540 (Untripentium Clip) — [ux] COPY AI HEALTH button replaces the inline diagnostic wall. Under RESET AI
+// NARRATION on the About/Settings screen, the full 8-line ML/voice runtime readout (crash counters, auto-disable
+// state, Qwen + TTS guards) printed inline as a wall of text. It's bug-report material, so it now drops on the
+// clipboard via a COPY AI HEALTH button (matching COPY LOG / COPY INVENTORY / COPY SAVE), paired with the
+// device/build summary. A one-line "Current state: <status>" stays inline for the at-a-glance active/disabled
+// signal. app/screens/AboutScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-540';

@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-540 "Untripentium Clip" — [ux] COPY AI HEALTH button replaces the inline diagnostic wall** *(element
+  #135)*. Under RESET AI NARRATION on the About/Settings screen, the full 8-line ML/voice runtime readout
+  (`mlHealthSummary()` — crash counters, auto-disable state, Qwen + TTS guards) printed inline as a wall of text.
+  It's bug-report material, so it now drops on the clipboard via a **COPY AI HEALTH** button (matching COPY LOG /
+  COPY INVENTORY / COPY SAVE), paired with the device/build summary. A one-line `Current state: <status>` stays
+  inline for the at-a-glance active/disabled signal. `app/screens/AboutScreen.tsx`.
+
 - **OTA-539 "Untriquadium Sieve" — [cleanup] false inferred-stats warnings + tracker audit** *(element #134)*.
   `itemDefaults.ts` `note()` now suppresses the `[inferred-stats]` debug nag when the bare name owns a row in a
   non-kind catalog (materials / exploration) — the keyword classifier guesses a kind from such a name (e.g.
