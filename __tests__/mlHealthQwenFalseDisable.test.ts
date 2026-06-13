@@ -8,10 +8,12 @@ const mockStore: Record<string, string> = {};
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
   default: {
+    // arb127 — deliberately NO multiRemove: the device's AsyncStorage silently
+    // no-op'd it, so the clear functions must work with removeItem alone. This
+    // mock omitting multiRemove is the regression guard for that.
     setItem: jest.fn(async (k: string, v: string) => { mockStore[k] = v; }),
     getItem: jest.fn(async (k: string) => (k in mockStore ? mockStore[k] : null)),
     removeItem: jest.fn(async (k: string) => { delete mockStore[k]; }),
-    multiRemove: jest.fn(async (ks: string[]) => { for (const k of ks) delete mockStore[k]; }),
   },
 }));
 
@@ -115,13 +117,25 @@ describe('arb126 — completion/voice breadcrumb is not a benign-exit false posi
     expect(Number(mockStore[K.ttsCrash] ?? '0')).toBe(0);
   });
 
-  it('a real FOREGROUND crash (breadcrumb survives) still trips the guard', async () => {
-    // Process died mid-completion while foregrounded → no AppState background
-    // event fired → breadcrumb survives → correctly counted + (threshold 1) disabled.
+  it('one surviving breadcrumb COUNTS but does not disable (arb127 threshold 3)', async () => {
+    // Process died mid-completion while foregrounded → breadcrumb survives →
+    // counted, but a single one is below the threshold so the Arbiter stays on.
     mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
-    await bootAndGates();
+    const g = await bootAndGates();
     expect(Number(mockStore[K.qwenCrash])).toBe(1);
+    expect(mockStore[K.qwenDisabled]).toBeUndefined();
+    expect(g.qwen).toBe(true);
+  });
+
+  it('a THIRD consecutive foreground crash trips the guard (arb127 threshold 3)', async () => {
+    // A genuinely-incapable device: every completion crashes, no success resets
+    // the count → it climbs to 3 and disables.
+    mockStore[K.qwenCrash] = '2';
+    mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
+    const g = await bootAndGates();
+    expect(Number(mockStore[K.qwenCrash])).toBe(3);
     expect(mockStore[K.qwenDisabled]).toBe('true');
+    expect(g.qwen).toBe(false);
   });
 
   it('a clean completion wipes lingering completion-crash suspicion (self-heal)', async () => {
@@ -152,12 +166,12 @@ describe('arb126 — completion/voice breadcrumb is not a benign-exit false posi
     expect(mockStore[K.qwenDisabled]).toBeUndefined();
     expect(mockStore[K.qwenCrash]).toBeUndefined();
     expect(mockStore[K.ttsCrash]).toBeUndefined();
-    expect(mockStore['tartaria.ml.guardResetVersion']).toBe('arb126-benign-exit-amnesty');
+    expect(mockStore['tartaria.ml.guardResetVersion']).toBe('arb127-benign-exit-amnesty');
     expect(gates!.qwen).toBe(true); // Arbiter back this very boot
   });
 
   it('healStaleGuardState is a no-op once already migrated (does not wipe a real later disable)', async () => {
-    mockStore['tartaria.ml.guardResetVersion'] = 'arb126-benign-exit-amnesty';
+    mockStore['tartaria.ml.guardResetVersion'] = 'arb127-benign-exit-amnesty';
     // A genuine disable accrued AFTER the amnesty (a real foreground crash).
     mockStore[K.qwenDisabled] = 'true';
     mockStore[K.qwenCrash] = '1';

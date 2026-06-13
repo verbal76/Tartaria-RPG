@@ -14559,4 +14559,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // genuinely-incapable device simply re-trips at its next REAL foreground crash (the breadcrumb survives because no
 // background event fires). Net: the falsely-disabled Arbiter is back on the very next boot. app/diagnostics/mlHealth.ts,
 // App.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-560';
+// OTA-561 (Unpenthexium Forbearance) — [bugfix] the OTA-559/560 fixes silently DID NOTHING on the device, and the
+// guard was too trigger-happy anyway. A post-560 log showed Qwen STILL auto-disabled with the retry schedule intact
+// (proof the OTA-560 amnesty never ran) and the voice count unchanged. Root cause: both new functions used
+// AsyncStorage.multiRemove, which silently no-ops on the device's AsyncStorage build (the jest mocks implement it, so
+// it passed tests) — so neither OTA-559's breadcrumb-clear-on-background NOR OTA-560's amnesty actually cleared
+// anything. (1) clearInFlightBreadcrumbs + healStaleGuardState now use removeItem via Promise.all (the proven pattern
+// resetMLHealth already uses); the amnesty version is bumped (arb126→arb127) so the now-working amnesty re-runs and
+// recovers devices the broken one left benched. (2) DEEPER: MAX_QWEN_COMPLETION_CRASHES restored 1→3. The breadcrumb
+// can't distinguish a real SVE SIGSEGV from a benign mid-generation app close, so threshold 1 re-benched the Arbiter
+// on a device that never crashes. With OTA-559's success-reset (a clean completion wipes the count) only CONSECUTIVE
+// failures accumulate, so a genuinely-broken device still trips after 3 while a healthy one oscillates 0↔1 and is
+// never falsely disabled. app/diagnostics/mlHealth.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-561';

@@ -62,14 +62,20 @@ const MAX_CRASHES_BEFORE_DISABLE = 2;
 const KEY_COMPLETION_IN_PROGRESS = 'tartaria.ml.qwenCompletionInProgress';
 const KEY_QWEN_CRASH_COUNT = 'tartaria.ml.qwenCompletionCrashCount';
 const KEY_QWEN_DISABLED = 'tartaria.ml.qwenDisabledByCrash';
-// OTA-457 — lowered 3→1. On the Pixel 10 Pro XL / Tensor G5 an SVE-kernel SIGSEGV
-// during token generation drops the WHOLE app to the home screen mid-action (a
-// tester fed the dog and the game vanished). That's a hard, user-visible failure,
-// not a recoverable hiccup — one occurrence is enough signal to self-protect and
-// fall back to template narration. OTA-414 auto-retry re-enables Qwen on its own
-// once the device strings together enough clean cold boots, so a one-off blip on a
-// healthy device costs nothing; affected devices stop losing their game.
-const MAX_QWEN_COMPLETION_CRASHES = 1;
+// arb127 — RESTORED to 3 (OTA-457 had lowered it to 1). The completion breadcrumb
+// can't distinguish a real SVE-kernel SIGSEGV from a BENIGN app close mid-generation
+// (swipe-away / OS background / OTA reload), and at threshold 1 a single benign
+// close re-benched the Arbiter over and over on a device that never actually
+// crashes — the user always hears Kokoro and the game never vanishes. Two new
+// safety nets now make 3 the right number: (1) OTA-559's success-reset — a clean
+// completion wipes the count, so a healthy device that keeps generating can NEVER
+// accumulate across sessions (only CONSECUTIVE failures with no success between
+// add up); (2) clearInFlightBreadcrumbs wipes the breadcrumb on an orderly exit.
+// So a genuinely-incapable device (crashes every completion, never reaches a
+// success) still trips after 3 bad boots and falls back to template narration,
+// while a healthy device oscillates 0↔1 and is never falsely disabled. OTA-414
+// auto-retry still re-enables on clean boots.
+const MAX_QWEN_COMPLETION_CRASHES = 3;
 
 // OTA-413 — VOICE (TTS) crash breadcrumb. Same trick as the Qwen completion guard,
 // scoped to the bundled neural TTS (executorch Kokoro/Piper): the native synth +
@@ -114,7 +120,12 @@ const QWEN_RETRY_MAX_BOOTS = 40;  // cap — a bad device retries at most every 
 // next boot instead of waiting out the auto-retry cooldown. Bump the version to
 // re-run the amnesty after a future guard change.
 const KEY_GUARD_RESET_VERSION = 'tartaria.ml.guardResetVersion';
-const GUARD_RESET_VERSION = 'arb126-benign-exit-amnesty';
+// arb127 — bumped from arb126: the OTA-560 amnesty used multiRemove, which
+// silently no-op'd on the device, so it never ran AND may have left the version
+// key set (the setItem ran even though the clear didn't). A fresh version forces
+// the now-working (removeItem-based) amnesty to run once more on every install,
+// recovering devices the broken amnesty left benched.
+const GUARD_RESET_VERSION = 'arb127-benign-exit-amnesty';
 
 interface MLHealthState {
   lastAttemptAt: string | null;
@@ -459,7 +470,15 @@ export async function markTTSDone(): Promise<void> {
 // save + shuts down Qwen/cognitive on background).
 export async function clearInFlightBreadcrumbs(): Promise<void> {
   try {
-    await AsyncStorage.multiRemove([KEY_COMPLETION_IN_PROGRESS, KEY_TTS_IN_PROGRESS]);
+    // arb127 — use removeItem (the pattern the rest of this module + resetMLHealth
+    // use), NOT multiRemove. multiRemove silently did nothing on the device's
+    // AsyncStorage build (the jest mocks implement it, so this went unnoticed) —
+    // so OTA-559's breadcrumb-clear never actually fired and benign closes kept
+    // being mis-counted. removeItem is proven to work here.
+    await Promise.all([
+      AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS),
+      AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS),
+    ]);
   } catch { /* best effort — a stale breadcrumb at worst counts one benign exit */ }
 }
 
@@ -477,15 +496,19 @@ export async function healStaleGuardState(): Promise<void> {
   try {
     const v = await AsyncStorage.getItem(KEY_GUARD_RESET_VERSION);
     if (v === GUARD_RESET_VERSION) return; // already migrated — leave live state alone
-    await AsyncStorage.multiRemove([
-      KEY_QWEN_CRASH_COUNT,
-      KEY_QWEN_DISABLED,
-      KEY_COMPLETION_IN_PROGRESS,
-      KEY_TTS_CRASH_COUNT,
-      KEY_TTS_IN_PROGRESS,
-      KEY_QWEN_RETRY_AT,
-      KEY_QWEN_RETRY_PENDING,
-      KEY_QWEN_BACKOFF,
+    // arb127 — removeItem, not multiRemove (which silently no-op'd on the device's
+    // AsyncStorage build, so the OTA-560 amnesty never actually ran — the device
+    // stayed benched in its pre-fix state). The version key is set LAST so a
+    // partial clear retries next boot rather than marking a no-op as done.
+    await Promise.all([
+      AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT),
+      AsyncStorage.removeItem(KEY_QWEN_DISABLED),
+      AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS),
+      AsyncStorage.removeItem(KEY_TTS_CRASH_COUNT),
+      AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS),
+      AsyncStorage.removeItem(KEY_QWEN_RETRY_AT),
+      AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING),
+      AsyncStorage.removeItem(KEY_QWEN_BACKOFF),
     ]);
     await AsyncStorage.setItem(KEY_GUARD_RESET_VERSION, GUARD_RESET_VERSION);
   } catch { /* best effort — the auto-retry cooldown still heals over a few boots */ }
