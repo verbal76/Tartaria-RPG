@@ -341,6 +341,24 @@ describe('MECHANIC-1b — golem sidekick', () => {
       expect(store.getState().player!.golem!.hp).toBe(5); // 2 + 3 (Uncommon = half)
     });
 
+    it('arb122 — the substitute system covers MUD and IRON golems too (generic by element tag)', async () => {
+      // MUD golem (hpMax 16 → full part 4) mends from a mud material that isn't its fuel.
+      const store = await bootstrap([
+        { id: 'ms', name: 'Mudstone', kind: 'misc', rarity: 'Rare', quantity: 1, tags: ['mud', 'stone'] } as never,
+        { id: 'bn', name: 'Bent Nail', kind: 'misc', rarity: 'Common', quantity: 1, tags: ['metal', 'junk', 'scrap'] } as never,
+      ]);
+      const p0 = store.getState().player!;
+      store.setState({ player: { ...p0, golem: { ...makeCompanion(GOLEM_DEFINITIONS.mud_golem), hp: 1 } } });
+      store.getState().submitPlayerAction('feed golem mudstone'); // Rare mud → floor(4 * 0.75) = 3
+      expect(store.getState().player!.golem!.hp).toBe(4); // 1 + 3
+
+      // IRON golem (hpMax 24 → full part 6) mends from common metal scrap.
+      const p1 = store.getState().player!;
+      store.setState({ player: { ...p1, golem: { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hp: 1 } } });
+      store.getState().submitPlayerAction('feed golem bent nail'); // Common metal → floor(6 * 0.25) = 1
+      expect(store.getState().player!.golem!.hp).toBe(2); // 1 + 1
+    });
+
     it('naming takeover: the input after a summon names the golem', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
