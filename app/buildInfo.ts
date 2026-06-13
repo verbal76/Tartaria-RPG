@@ -14433,4 +14433,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Silt Thief". (b) A POI discovered WHILE auto-travelling no longer dangles a "Tap ENTER" with no ENTER button
 // (the travel row shows STOP); on a route the line now reads "You're on a route — type ENTER to step inside, or
 // keep traveling," naming the typed path the player had to guess at. app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-544';
+// OTA-545 (Unquadnilium Tally) — [ux] side-contract completion popup (report item d). A whisper that paid out at
+// the end of a long run dropped its reward straight into the log, where the next narration beat scrolled it off —
+// "I didn't even know I'd completed the task." Whisper turn-in now raises a CONTRACT COMPLETE modal (title +
+// close-out line + reward block, single CLOSE button), mirroring the HookContinue/Craft modals, so the payout
+// waits for the player. Wired for the Yulka discs whisper; reusable for future whisper turn-ins via
+// pendingWhisperComplete. app/components/WhisperCompleteModal.tsx (new), app/state/gameStore.ts,
+// app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-545';

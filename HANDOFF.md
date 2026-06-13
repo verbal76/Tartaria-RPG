@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-545 "Unquadnilium Tally" — [ux] side-contract completion popup (report item d)** *(element #140)*. A
+  whisper that paid out at the end of a long run dropped its reward into the log, where the next beat scrolled it
+  off ("I didn't even know I'd completed the task"). Whisper turn-in now raises a CONTRACT COMPLETE modal (title +
+  close-out line + reward block + CLOSE), mirroring the HookContinue/Craft modals. Wired for Yulka discs; reusable
+  via `pendingWhisperComplete`. `app/components/WhisperCompleteModal.tsx` (new), `app/state/gameStore.ts`,
+  `app/screens/ExplorationScreen.tsx`. **All four follow-ups from the mission report (a/b/c/d) now shipped (OTA-542–545).**
+
 - **OTA-544 "Untriennium Waypoint" — [bugfix] auto-travel readout fixes (report items a + b)** *(element #139)*.
   (a) The Yulka fetch completes the instant the Discs are in hand (even from a random Silt Thief); an active
   auto-route now re-points off the stale thief tile onto Yulka's return tile, so the readout names the current

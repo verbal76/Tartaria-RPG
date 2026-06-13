@@ -15,6 +15,7 @@ import { BrandedModal } from '../components/BrandedModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
 import { HookContinueModal } from '../components/HookContinueModal';
+import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
@@ -102,6 +103,8 @@ export function ExplorationScreen() {
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
+  const pendingWhisperComplete = useGameStore((s) => s.pendingWhisperComplete);
+  const dismissWhisperComplete = useGameStore((s) => s.dismissWhisperComplete);
   const continueHook = useGameStore((s) => s.continueHook);
   const abandonHook = useGameStore((s) => s.abandonHook);
   const dismissHookContinue = useGameStore((s) => s.dismissHookContinue);
@@ -1087,6 +1090,16 @@ export function ExplorationScreen() {
               }
             : undefined
         }
+      />
+
+      {/* arb120 — side-contract (whisper) completion popup so the payout
+          doesn't scroll off behind the next narration beat. */}
+      <WhisperCompleteModal
+        visible={pendingWhisperComplete !== null}
+        title={pendingWhisperComplete?.title ?? ''}
+        lines={pendingWhisperComplete?.lines ?? []}
+        rewards={pendingWhisperComplete?.rewards ?? []}
+        onClose={dismissWhisperComplete}
       />
 
       <SearchModal

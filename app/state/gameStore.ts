@@ -1969,6 +1969,14 @@ interface GameStore {
     stageHistory: HookContinueStage[];
     completed: boolean;
   } | null;
+  /** arb120 — completion popup for a finished side-contract (whisper). Set when
+   *  a whisper pays out so the reward lands in a modal the player can read,
+   *  instead of scrolling off behind the next narration beat. */
+  pendingWhisperComplete: {
+    title: string;
+    lines: string[];
+    rewards: string[];
+  } | null;
   hydrated: boolean;
   /** OTA 228 — latch for the Arbiter's "you're badly hurt" warning.
    *  Goes true the first time HP crosses below 5% of max in a session,
@@ -2299,6 +2307,8 @@ interface GameStore {
    *  which is the explicit "I'm walking away mid-thread" choice
    *  that ALSO marks the hook resolved so it can't be re-opened. */
   dismissHookContinue: () => void;
+  /** arb120 — dismiss the whisper-complete popup (CLOSE button). */
+  dismissWhisperComplete: () => void;
   /** OTA-263 — explicit walk-away from a mid-thread hook. Player
    *  feedback: "take away the later button, there is no later.
    *  either you continue or abandon it." ABANDON marks the active
@@ -2641,6 +2651,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScene: null,
   pendingRolls: null,
   pendingHookContinue: null,
+  pendingWhisperComplete: null,
   fusionCatalystPrompt: null,
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
@@ -12792,6 +12803,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ pendingHookContinue: null });
   },
 
+  dismissWhisperComplete() {
+    set({ pendingWhisperComplete: null });
+  },
+
   // OTA-263 — ABANDON button on the hook-continue modal. Player
   // explicitly chooses to walk away from a mid-thread hook. Marks
   // the hook resolved in currentScene.hooks (so the noun chip greys
@@ -21680,6 +21695,15 @@ function fireYulkaReturn(
   );
   get().appendLog('reward', `✦ Aetheric Disc × 5.`);
   get().appendLog('reward', `+30 TC.`);
+  // arb120 — surface a completion popup so the payout doesn't scroll off behind
+  // the next narration beat (player report: "I didn't even know I'd finished").
+  set(() => ({
+    pendingWhisperComplete: {
+      title: 'Yulka and the Aetheric Discs',
+      lines: ['You returned Yulka her stolen stock. The debt is square — she told you not to come back.'],
+      rewards: ['✦ Aetheric Disc × 5', '+30 TC'],
+    },
+  }));
   // arb120 — the "someone jumps you for the Discs on the way out" beat still
   // fires (~30%), but NOW — as a clean combat encounter the instant you turn to
   // leave — rather than arming a lingering open contract that confuses a player
