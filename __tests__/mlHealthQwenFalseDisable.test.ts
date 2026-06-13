@@ -134,4 +134,39 @@ describe('arb126 — completion/voice breadcrumb is not a benign-exit false posi
     });
     expect(mockStore[K.qwenCrash]).toBeUndefined();
   });
+
+  it('healStaleGuardState forgives the false-positive disable ONCE, then loadMLHealth reads it enabled', async () => {
+    // Device benched by the pre-fix detector: Qwen disabled + a phantom voice crash.
+    mockStore[K.qwenDisabled] = 'true';
+    mockStore[K.qwenCrash] = '1';
+    mockStore[K.ttsCrash] = '1';
+    mockStore['tartaria.ml.qwenRetryAtBoot'] = '99';
+    let gates: { qwen: boolean } | undefined;
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ml = require('../app/diagnostics/mlHealth');
+      await ml.healStaleGuardState(); // boot amnesty runs BEFORE loadMLHealth
+      await ml.loadMLHealth();
+      gates = { qwen: ml.shouldAttemptQwen() };
+    });
+    expect(mockStore[K.qwenDisabled]).toBeUndefined();
+    expect(mockStore[K.qwenCrash]).toBeUndefined();
+    expect(mockStore[K.ttsCrash]).toBeUndefined();
+    expect(mockStore['tartaria.ml.guardResetVersion']).toBe('arb126-benign-exit-amnesty');
+    expect(gates!.qwen).toBe(true); // Arbiter back this very boot
+  });
+
+  it('healStaleGuardState is a no-op once already migrated (does not wipe a real later disable)', async () => {
+    mockStore['tartaria.ml.guardResetVersion'] = 'arb126-benign-exit-amnesty';
+    // A genuine disable accrued AFTER the amnesty (a real foreground crash).
+    mockStore[K.qwenDisabled] = 'true';
+    mockStore[K.qwenCrash] = '1';
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ml = require('../app/diagnostics/mlHealth');
+      await ml.healStaleGuardState();
+    });
+    expect(mockStore[K.qwenDisabled]).toBe('true'); // preserved — not re-forgiven
+    expect(mockStore[K.qwenCrash]).toBe('1');
+  });
 });

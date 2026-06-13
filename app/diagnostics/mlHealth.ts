@@ -103,6 +103,19 @@ const KEY_QWEN_BACKOFF = 'tartaria.ml.qwenBackoffBoots';
 const QWEN_RETRY_BASE_BOOTS = 5;  // first cooldown after a disable
 const QWEN_RETRY_MAX_BOOTS = 40;  // cap — a bad device retries at most every 40 boots
 
+// arb126 — one-time amnesty marker for the COMPLETION + VOICE guards. Their crash
+// history was gathered by a breadcrumb detector that couldn't tell a real
+// foreground SIGSEGV from a benign app exit (swipe-away / background / OTA reload),
+// so affected devices accrued phantom "crashes" — a Qwen completion-disable AND a
+// Kokoro voice crash logged on the SAME launch on a device that never crashes. Now
+// that the AppState handler clears in-flight breadcrumbs on an orderly exit, that
+// polluted history is meaningless; healStaleGuardState() forgives it ONCE per
+// install (keyed by this version) so a falsely-benched Arbiter recovers on the
+// next boot instead of waiting out the auto-retry cooldown. Bump the version to
+// re-run the amnesty after a future guard change.
+const KEY_GUARD_RESET_VERSION = 'tartaria.ml.guardResetVersion';
+const GUARD_RESET_VERSION = 'arb126-benign-exit-amnesty';
+
 interface MLHealthState {
   lastAttemptAt: string | null;
   lastSuccessAt: string | null;
@@ -448,6 +461,34 @@ export async function clearInFlightBreadcrumbs(): Promise<void> {
   try {
     await AsyncStorage.multiRemove([KEY_COMPLETION_IN_PROGRESS, KEY_TTS_IN_PROGRESS]);
   } catch { /* best effort — a stale breadcrumb at worst counts one benign exit */ }
+}
+
+// arb126 — ONE-TIME amnesty for the completion/voice guard history. Call once at
+// boot BEFORE loadMLHealth so the forgiven state is what this session reads. The
+// counts + disable + retry schedule for those two guards were accrued by the
+// pre-fix detector that mistook benign app exits for crashes, so on the first
+// boot after this fix we wipe them — a device falsely benched (Qwen disabled, a
+// phantom voice crash) comes back immediately rather than waiting out the
+// cooldown. Pinned by KEY_GUARD_RESET_VERSION so it runs exactly once per install.
+// Deliberately does NOT touch the general init guard (already healed in OTA-558)
+// or KEY_BOOT_COUNT. A genuinely-incapable device simply re-trips at its next REAL
+// foreground crash (the breadcrumb survives because no background event fires).
+export async function healStaleGuardState(): Promise<void> {
+  try {
+    const v = await AsyncStorage.getItem(KEY_GUARD_RESET_VERSION);
+    if (v === GUARD_RESET_VERSION) return; // already migrated — leave live state alone
+    await AsyncStorage.multiRemove([
+      KEY_QWEN_CRASH_COUNT,
+      KEY_QWEN_DISABLED,
+      KEY_COMPLETION_IN_PROGRESS,
+      KEY_TTS_CRASH_COUNT,
+      KEY_TTS_IN_PROGRESS,
+      KEY_QWEN_RETRY_AT,
+      KEY_QWEN_RETRY_PENDING,
+      KEY_QWEN_BACKOFF,
+    ]);
+    await AsyncStorage.setItem(KEY_GUARD_RESET_VERSION, GUARD_RESET_VERSION);
+  } catch { /* best effort — the auto-retry cooldown still heals over a few boots */ }
 }
 
 /**

@@ -14549,4 +14549,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // since generation/narration only run foregrounded this never masks a true failure. Also: a clean completion now
 // wipes lingering completion-crash suspicion (symmetric to OTA-558's init self-heal). app/diagnostics/mlHealth.ts,
 // App.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-559';
+// OTA-560 (Unpentpentium Reprieve) — [bugfix] immediately un-bench an Arbiter that the PRE-559 detector falsely
+// disabled, instead of making the player wait out the auto-retry cooldown. The completion + voice guards' crash
+// history was gathered before OTA-559 taught them to ignore benign app exits, so on affected devices it's polluted
+// (e.g. a Qwen completion-disable + a phantom Kokoro voice crash logged on the SAME launch on a device that never
+// crashes). New healStaleGuardState() runs ONCE per install at boot, BEFORE loadMLHealth, and forgives that history:
+// clears the Qwen completion crash count + disable + retry schedule and the voice crash count, pinned by a guard
+// version key so it never repeats. The general init guard (healed in OTA-558) and boot counter are untouched, and a
+// genuinely-incapable device simply re-trips at its next REAL foreground crash (the breadcrumb survives because no
+// background event fires). Net: the falsely-disabled Arbiter is back on the very next boot. app/diagnostics/mlHealth.ts,
+// App.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-560';
