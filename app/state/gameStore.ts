@@ -24165,7 +24165,9 @@ function runAethercraft(
           id: `aether_shard_${Date.now()}`,
           name: 'Shaped Aetheric Shard',
           kind: 'misc',
-          rarity: 'Common',
+          // arb121 — was created as Common, contradicting the Rare catalog row,
+          // so it sold for a pittance. Stamp Rare to match (a 2d20 one-shot).
+          rarity: 'Rare',
           quantity: 1,
           tags: ['throwable', 'aether', 'shaped'],
         });

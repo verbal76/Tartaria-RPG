@@ -803,7 +803,10 @@ const styles = StyleSheet.create({
   sortLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginRight: 4 },
   sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },
   sortTabActive: { borderColor: '#c9a86a' },
-  sortTabText: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
+  // arb121 — text is ALWAYS readable amber; the BORDER (sortTabActive) is the
+  // sole active indicator. Was a dim #7a705c on inactive that the player
+  // couldn't read.
+  sortTabText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   sortTabTextActive: { color: '#c9a86a' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   vendorCard: {

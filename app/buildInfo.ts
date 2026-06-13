@@ -14458,4 +14458,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // vendor/board/building beat) drops a line INVITING a deeper question — about the flood, the Sentinels, the
 // Tartarians, the Aether, the Guardians, the factions — so the player-Arbiter dialogue is prompted in-fiction
 // rather than via a menu button. app/components/InputBox.tsx, app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-548';
+// OTA-549 (Unquadquadium Clarity) — [ux/bugfix] two small fixes from the vendor/throwables report. (1) The SELL
+// screen's three sort tabs (VALUE / RARITY / NAME) rendered inactive text in a dim #7a705c the player couldn't
+// read; text is now always readable amber and the BORDER alone marks the active sort. (2) Shaped Aetheric Shard
+// was CREATED as rarity Common despite its Rare catalog row, so it sold for a pittance; the shape recipe now
+// stamps Rare to match (a 2d20 one-shot). app/screens/VendorScreen.tsx, app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-549';
