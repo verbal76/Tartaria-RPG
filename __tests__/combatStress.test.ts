@@ -9,9 +9,26 @@
 // Metrics tracked + assertion targets are documented inline next to
 // the corresponding telemetry.
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
+// OTA-550 — persist() fires after almost every action and the default jest
+// mock retains each ~full-state JSON write in a module-level object; over the
+// 16k+ actions of this 700-day sim that grows until V8 OOMs at teardown (a
+// pre-existing latent leak). The sim asserts only on its own in-memory
+// counters and never reads persisted state back, so we no-op the writes:
+// setItem/multiSet drop their payloads, keeping the heap flat.
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  __esModule: true,
+  default: {
+    setItem: jest.fn(async () => {}),
+    getItem: jest.fn(async () => null),
+    removeItem: jest.fn(async () => {}),
+    multiSet: jest.fn(async () => {}),
+    multiGet: jest.fn(async () => []),
+    multiRemove: jest.fn(async () => {}),
+    getAllKeys: jest.fn(async () => []),
+    clear: jest.fn(async () => {}),
+    mergeItem: jest.fn(async () => {}),
+  },
+}));
 jest.mock('onnxruntime-react-native', () => ({
   InferenceSession: { create: jest.fn(async () => ({ run: jest.fn(async () => ({})) })) },
   Tensor: class { constructor(_t: string, _d: any, _s: any[]) {} },
@@ -49,7 +66,6 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { findEnemyByName } from '../app/engine/encounter';
@@ -333,16 +349,6 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
       const curLog = store.getState().gameLog;
       if (curLog.length > 80) {
         store.setState({ gameLog: curLog.slice(-40) });
-      }
-      // OTA-550 — the AsyncStorage jest mock retains every persisted save
-      // snapshot in a module-level object; persist() fires after almost every
-      // action, so over 16k+ actions the mock's backing store grows until V8
-      // OOMs (>8 GB) right at the end of the run. The engine re-persists the
-      // full state each turn and never reads stale keys back during this
-      // synthetic sim, so periodically clearing the mock is safe and keeps the
-      // heap flat. (Pre-existing latent OOM, surfaced here.)
-      if (actions % 200 === 0) {
-        try { void (AsyncStorage as { clear?: () => void }).clear?.(); } catch { /* best-effort */ }
       }
       actions++;
 

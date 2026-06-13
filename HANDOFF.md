@@ -378,6 +378,8 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-551 "Unquadhexium Mend" — [ux] golem-heal discoverability** *(element #146)*. A golem heals only from its own fuel parts (Aether Golem ← Aether Crystal + Aetheric Shard), fed via `feed/repair/mend golem <item>`; the panel just said "feed it the parts it's made of" without naming them. Now it names the exact parts + your carry status. `app/screens/CharacterScreen.tsx`.
+
 - **OTA-550 "Unquadpentium Stride" — [feature] 4-band combat range model** *(element #145)*. 3 bands
   (arm/close/far) → FOUR ordered bands **distant → far → mid → close** (`RANGE_ORDER`/`rangeIndex`/`reachBandsFor`
   in types.ts). Reach capped by class: ranged = distant inward; throwables = far inward (not distant); a NEW

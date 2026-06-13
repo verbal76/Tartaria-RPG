@@ -14474,4 +14474,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sub-agent; full combat suite green (combat/reach/bandolier/throwable/combatStress/dotKill/weaponCoating).
 // app/engine/types.ts, app/engine/combatRules.ts, app/state/gameStore.ts, app/components/InputBox.tsx,
 // app/screens/ExplorationScreen.tsx, app/engine/askInventory.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-550';
+// OTA-551 (Unquadhexium Mend) — [ux] golem-heal discoverability. A golem heals ONLY from its own fuel parts
+// (Aether Golem ← Aether Crystal + Aetheric Shard), fed via `feed/repair/mend golem <item>` (OTA-466) — but the
+// Character-screen golem panel just said "feed it the parts it's made of" without NAMING them, so a player
+// holding the right items (and a pack full of other aether loot that does nothing) couldn't tell what worked.
+// The panel now names the exact repair parts AND whether they're in your pack ("Heal: feed it Aether Crystal or
+// Aetheric Shard — you're carrying both."). The wrong-item refusal already names the valid parts. app/screens/
+// CharacterScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-551';

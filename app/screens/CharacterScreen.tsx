@@ -377,6 +377,15 @@ export function CharacterScreen() {
           const gStats = golem.stats ?? { power: 0, resilience: 0 };
           const gProg = golem.statProgress ?? { power: 0, resilience: 0 };
           const typeLabel = golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+          // arb121 — name the EXACT repair parts so "feed it the parts it's made
+          // of" is discoverable. A golem heals only from its own fuel items, so a
+          // pack full of other aether loot reads as unusable until you know which.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { golemRepairParts } = require('../engine/golems');
+          const repairParts = (golemRepairParts(golem.kind) as string[]);
+          const heldRepair = repairParts.filter((p) =>
+            player.inventory.some((i) => i.name.toLowerCase() === p.toLowerCase() && i.quantity > 0),
+          );
           const gBar = (key: 'power' | 'resilience') => {
             const pct = Math.max(0, Math.min(1, (gProg[key] ?? 0) / 100));
             const filled = Math.round(pct * 20);
@@ -418,7 +427,12 @@ export function CharacterScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text style={styles.subline}>Heal by feeding it the parts it's made of.</Text>
+                <Text style={styles.subline}>
+                  Heal: feed it {repairParts.join(' or ')}
+                  {heldRepair.length > 0
+                    ? ` — you're carrying ${heldRepair.join(' & ')}.`
+                    : ' — none in your pack right now.'}
+                </Text>
               </View>
               )}
             </>
