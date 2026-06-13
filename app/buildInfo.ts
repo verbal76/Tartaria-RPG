@@ -14516,4 +14516,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // flavorExhaustedNouns so spent nouns filter out of the chips on rebuild, and (2) marking a noun consumed
 // (productive OR flavor) drops it from the LIVE scene chips immediately, no rebuild needed. app/state/gameStore.ts.
 // JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-556';
+// OTA-557 (Unpentbium Revive) — [bugfix] stop a FALSE-POSITIVE crash counter from permanently disabling on-device
+// AI narration. Qwen has two guards: a reliable COMPLETION-crash counter (breadcrumb tight around the generate
+// call) and a GENERAL ml-init-crash counter. The general one's "attempted, never recorded a success" breadcrumb
+// false-positives every time the OS kills the app mid model-load (backgrounding during the slow load), so it
+// inflated to 74 "crashes" on a Pixel 10 Pro XL that had loaded the model fine and had 0 real Qwen failures —
+// permanently benching the Arbiter to template narration. Now: (1) shouldAttemptQwen ignores the general counter
+// once ML has EVER initialized successfully on this install (device demonstrably CAN load it) — still honoring the
+// real completion guard; (2) markMLInitSucceeded wipes the general crash count + disable on each success, so a
+// working device self-heals and false positives can't accumulate. Boot-resilience preserved for devices that have
+// NEVER succeeded. app/diagnostics/mlHealth.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-557';

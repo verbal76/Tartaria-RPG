@@ -344,8 +344,20 @@ export async function loadMLHealth(): Promise<MLHealthState> {
  * Independent of the classifier / Kokoro, which use a different native lib.
  */
 export function shouldAttemptQwen(): boolean {
-  if (!shouldAttemptMLInit()) return false;
-  return !(cached?.qwenDisabledByCrash ?? false);
+  // Qwen's OWN reliable failure signal — a breadcrumb wrapped tight around the
+  // completion call — is the hard gate. (0 for the reporting device.)
+  if (cached?.qwenDisabledByCrash) return false;
+  // arb124 — the GENERAL ml-init crash guard (MAX_CRASHES_BEFORE_DISABLE) exists
+  // to stop a device that genuinely can't load the model from boot-looping. But
+  // its "attempted, never recorded a success" breadcrumb false-positives every
+  // time the OS kills the app mid-load, so it inflated to 74 on a device that
+  // had ALREADY loaded the model fine and never had a real Qwen failure. If ML
+  // has EVER initialized successfully on this install, the device demonstrably
+  // CAN load it — so don't let the polluted general counter permanently bench
+  // Qwen. (markMLInitSucceeded also resets that counter on each success.)
+  if (cached?.lastSuccessAt) return true;
+  // Never succeeded → honor the general boot-resilience guard.
+  return shouldAttemptMLInit();
 }
 
 /**
@@ -430,10 +442,22 @@ export async function markMLInitSucceeded(): Promise<void> {
   const now = new Date().toISOString();
   try {
     await AsyncStorage.setItem(KEY_SUCCEEDED, now);
+    // arb124 — a successful init PROVES this device can load the model, so wipe
+    // any GENERAL init-crash suspicion. That breadcrumb false-positives whenever
+    // the OS kills the app mid-load (backgrounding during the slow model load),
+    // and was permanently benching Qwen on devices that actually run it fine
+    // (e.g. a Pixel 10 Pro XL sitting at 74 "crashes" with 0 real Qwen failures).
+    // The Qwen-COMPLETION guard (KEY_QWEN_*) is intentionally left intact.
+    await AsyncStorage.removeItem(KEY_CRASH_COUNT);
+    await AsyncStorage.removeItem(KEY_DISABLED);
   } catch {
     // ignore — best effort
   }
-  if (cached) cached.lastSuccessAt = now;
+  if (cached) {
+    cached.lastSuccessAt = now;
+    cached.crashCount = 0;
+    cached.disabledByCrash = false;
+  }
 }
 
 /**

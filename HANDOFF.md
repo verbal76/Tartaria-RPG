@@ -378,6 +378,8 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-557 "Unpentbium Revive" — [bugfix] false-positive crash counter permanently disabled on-device AI** *(element #152)*. The GENERAL ml-init crash guard false-positives on OS app-kills mid model-load, so it hit 74 "crashes" with 0 real Qwen failures and benched the Arbiter to templates. Now shouldAttemptQwen ignores the general counter once ML has EVER succeeded (still honoring the real completion guard), and a successful init wipes the general suspicion (self-heal). Boot-resilience preserved for never-succeeded devices. `app/diagnostics/mlHealth.ts`. Tests: 3 new + 35 ML/Qwen green.
+
 - **OTA-556 "Unpentunium Spent" — [bugfix] flavor-exhausted investigate nouns stayed tappable** *(element #151)*. A noun that gave a dead-end FLAVOR read (fisher's net → nothing) went to flavorExhaustedNouns, but roomConsumedSet only counted searchedAmbientNouns, so the chip never dropped — you could re-investigate forever. Now roomConsumedSet includes flavor-exhausted nouns (filters on rebuild) AND the noun drops from the LIVE scene chips immediately. `app/state/gameStore.ts`.
 
 - **OTA-555 "Unpentnilium Marker" — [ux] inventory flags SUBSTITUTE repair materials for the equipped golem** *(element #150)*. The purple golem stripe + one-tap Heal button used `isGolemRepairPart` (exact fuel only), so OTA-553/554 substitutes had no visual cue. Both now also honor `isGolemSubstitutePart(equipped kind, item)` — every mud/metal/aether material that can mend YOUR golem gets the purple hatch + Heal action, kind-specific. `app/screens/InventoryScreen.tsx`.
