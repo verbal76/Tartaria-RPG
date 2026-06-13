@@ -18,6 +18,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 interface MLHealth {
   qwenDisabledByCrash: boolean;
   qwenCompletionCrashCount: number;
+  qwenPermaDisabled: boolean;
   qwenRetryingThisBoot: boolean;
   qwenRecoveredThisBoot: boolean;
   qwenNextRetryInBoots: number | null;
@@ -51,7 +52,7 @@ beforeEach(() => {
 
 describe('OTA-414 — Qwen auto-retry / backoff', () => {
   it('schedules a retry when first seen disabled (cooldown in the future)', async () => {
-    mockStore[K.crash] = '3';
+    mockStore[K.crash] = '1'; // arb128: below perma ceiling (3) so auto-retry still applies
     mockStore[K.disabled] = 'true';
     const h = await boot();
     expect(h.qwenDisabledByCrash).toBe(true);
@@ -61,7 +62,7 @@ describe('OTA-414 — Qwen auto-retry / backoff', () => {
   });
 
   it('retries the boot the cooldown elapses (Qwen attempts again)', async () => {
-    mockStore[K.crash] = '3';
+    mockStore[K.crash] = '1'; // arb128: below perma ceiling (3) so auto-retry still applies
     mockStore[K.disabled] = 'true';
     mockStore[K.backoff] = '5';
     mockStore[K.boot] = '5';
@@ -73,7 +74,7 @@ describe('OTA-414 — Qwen auto-retry / backoff', () => {
   });
 
   it('RECOVERS when the retry survived a clean run (no completion crash)', async () => {
-    mockStore[K.crash] = '3';
+    mockStore[K.crash] = '1'; // arb128: below perma ceiling (3) so auto-retry still applies
     mockStore[K.disabled] = 'true';
     mockStore[K.pending] = '1'; // last boot was a retry
     // no completionInProgress breadcrumb → the retry session didn't crash
@@ -86,7 +87,7 @@ describe('OTA-414 — Qwen auto-retry / backoff', () => {
   });
 
   it('grows the backoff when the retry crashed again', async () => {
-    mockStore[K.crash] = '3';
+    mockStore[K.crash] = '1'; // arb128: below perma ceiling (3) so auto-retry still applies
     mockStore[K.disabled] = 'true';
     mockStore[K.pending] = '1'; // last boot was a retry…
     mockStore[K.backoff] = '5';
@@ -94,9 +95,24 @@ describe('OTA-414 — Qwen auto-retry / backoff', () => {
     mockStore[K.completionInProgress] = new Date().toISOString(); // …and it crashed
     const h = await boot();
     expect(h.qwenDisabledByCrash).toBe(true); // stays disabled
-    expect(h.qwenCompletionCrashCount).toBe(4); // crash counted
+    expect(h.qwenCompletionCrashCount).toBe(2); // crash counted (1 -> 2, still < perma 3)
     expect(Number(mockStore[K.backoff])).toBe(10); // 5 → 10 (doubled)
     expect(mockStore[K.pending]).toBeUndefined(); // pending cleared
     expect(h.qwenNextRetryInBoots).toBeGreaterThan(0);
+  });
+
+  it('arb128 — at the perma ceiling (3 crashes) auto-retry STOPS; Qwen stays off', async () => {
+    // A genuinely-incapable device (e.g. Pixel 10 Pro XL SVE SIGSEGV on generation):
+    // after QWEN_PERMA_DISABLE_AT total completion crashes it must never auto-retry,
+    // so the player isn't re-crashed every few boots.
+    mockStore[K.crash] = '3';
+    mockStore[K.disabled] = 'true';
+    mockStore[K.pending] = '1'; // even a pending retry must be cancelled
+    const h = await boot();
+    expect(h.qwenPermaDisabled).toBe(true);
+    expect(h.qwenDisabledByCrash).toBe(true);
+    expect(h.qwenRetryingThisBoot).toBe(false);    // does NOT attempt
+    expect(h.qwenNextRetryInBoots).toBeNull();      // no future retry scheduled
+    expect(mockStore[K.pending]).toBeUndefined();   // pending flag cancelled
   });
 });

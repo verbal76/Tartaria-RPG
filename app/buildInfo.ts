@@ -14571,4 +14571,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on a device that never crashes. With OTA-559's success-reset (a clean completion wipes the count) only CONSECUTIVE
 // failures accumulate, so a genuinely-broken device still trips after 3 while a healthy one oscillates 0↔1 and is
 // never falsely disabled. app/diagnostics/mlHealth.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-561';
+// OTA-562 (Unpentseptium Bulwark) — [CRITICAL bugfix] STOP re-enabling Qwen on a device that genuinely can't run it.
+// Hard correction of the whole 557-561 arc: the completion guard was RIGHT. The Pixel 10 Pro XL / Tensor G5 really
+// does SIGSEGV during Qwen token generation — OTA-561's amnesty re-enabled Qwen and the app crash-looped to the home
+// screen AND threw a JS "Maximum update depth exceeded" render loop (narration pipeline thrashing); the player
+// couldn't load any character. "I never crash" was true only because the guard had ALREADY disabled Qwen (Kokoro
+// voice is a separate lib and always worked). Fixes: (1) REMOVED the OTA-560 amnesty (healStaleGuardState) — forgiving
+// a real-crash device just re-crashes it; (2) REMOVED the OTA-559 per-completion success-reset — it let an
+// intermittently-crashing device keep wiping its count and never give up; (3) MAX_QWEN_COMPLETION_CRASHES back to 1
+// (one real crash disables fast); (4) NEW perma give-up: after QWEN_PERMA_DISABLE_AT (3) total completion crashes Qwen
+// is disabled PERMANENTLY (auto-retry stops) so the player isn't re-crashed every few boots — until they manually
+// Reset AI in Settings; (5) re-assert the disable from the STANDING count each boot so a cleared flag can't let Qwen
+// attempt again. Template narration is fully playable; Kokoro voice unaffected. The general init guard (OTA-558) +
+// clearInFlightBreadcrumbs are kept. app/diagnostics/mlHealth.ts, App.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-562';

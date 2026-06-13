@@ -62,20 +62,20 @@ const MAX_CRASHES_BEFORE_DISABLE = 2;
 const KEY_COMPLETION_IN_PROGRESS = 'tartaria.ml.qwenCompletionInProgress';
 const KEY_QWEN_CRASH_COUNT = 'tartaria.ml.qwenCompletionCrashCount';
 const KEY_QWEN_DISABLED = 'tartaria.ml.qwenDisabledByCrash';
-// arb127 — RESTORED to 3 (OTA-457 had lowered it to 1). The completion breadcrumb
-// can't distinguish a real SVE-kernel SIGSEGV from a BENIGN app close mid-generation
-// (swipe-away / OS background / OTA reload), and at threshold 1 a single benign
-// close re-benched the Arbiter over and over on a device that never actually
-// crashes — the user always hears Kokoro and the game never vanishes. Two new
-// safety nets now make 3 the right number: (1) OTA-559's success-reset — a clean
-// completion wipes the count, so a healthy device that keeps generating can NEVER
-// accumulate across sessions (only CONSECUTIVE failures with no success between
-// add up); (2) clearInFlightBreadcrumbs wipes the breadcrumb on an orderly exit.
-// So a genuinely-incapable device (crashes every completion, never reaches a
-// success) still trips after 3 bad boots and falls back to template narration,
-// while a healthy device oscillates 0↔1 and is never falsely disabled. OTA-414
-// auto-retry still re-enables on clean boots.
-const MAX_QWEN_COMPLETION_CRASHES = 3;
+// arb128 — threshold back to 1, PLUS a permanent give-up ceiling. The hard lesson
+// of OTA 557-561: this guard's whole PURPOSE is real — the Pixel 10 Pro XL / Tensor
+// G5 genuinely SIGSEGVs during Qwen token generation and drops to the home screen
+// (and thrashes the JS narration pipeline into a "Maximum update depth exceeded"
+// render loop). "I never crash" was true only because the guard had ALREADY
+// disabled Qwen. So: (1) MAX = 1 again — one real completion crash disables Qwen
+// fast (a benign mid-generation close is rare and clearInFlightBreadcrumbs clears
+// it on an orderly exit; OTA-414 auto-retry still re-tries a flaky-but-capable
+// device). (2) After QWEN_PERMA_DISABLE_AT total completion crashes the device is
+// judged genuinely incapable and Qwen is disabled PERMANENTLY — auto-retry stops,
+// so the player isn't re-crashed every few boots — until they manually Reset AI in
+// Settings. Template narration is fully playable; Kokoro voice is unaffected.
+const MAX_QWEN_COMPLETION_CRASHES = 1;
+const QWEN_PERMA_DISABLE_AT = 3;
 
 // OTA-413 — VOICE (TTS) crash breadcrumb. Same trick as the Qwen completion guard,
 // scoped to the bundled neural TTS (executorch Kokoro/Piper): the native synth +
@@ -109,24 +109,6 @@ const KEY_QWEN_BACKOFF = 'tartaria.ml.qwenBackoffBoots';
 const QWEN_RETRY_BASE_BOOTS = 5;  // first cooldown after a disable
 const QWEN_RETRY_MAX_BOOTS = 40;  // cap — a bad device retries at most every 40 boots
 
-// arb126 — one-time amnesty marker for the COMPLETION + VOICE guards. Their crash
-// history was gathered by a breadcrumb detector that couldn't tell a real
-// foreground SIGSEGV from a benign app exit (swipe-away / background / OTA reload),
-// so affected devices accrued phantom "crashes" — a Qwen completion-disable AND a
-// Kokoro voice crash logged on the SAME launch on a device that never crashes. Now
-// that the AppState handler clears in-flight breadcrumbs on an orderly exit, that
-// polluted history is meaningless; healStaleGuardState() forgives it ONCE per
-// install (keyed by this version) so a falsely-benched Arbiter recovers on the
-// next boot instead of waiting out the auto-retry cooldown. Bump the version to
-// re-run the amnesty after a future guard change.
-const KEY_GUARD_RESET_VERSION = 'tartaria.ml.guardResetVersion';
-// arb127 — bumped from arb126: the OTA-560 amnesty used multiRemove, which
-// silently no-op'd on the device, so it never ran AND may have left the version
-// key set (the setItem ran even though the clear didn't). A fresh version forces
-// the now-working (removeItem-based) amnesty to run once more on every install,
-// recovering devices the broken amnesty left benched.
-const GUARD_RESET_VERSION = 'arb127-benign-exit-amnesty';
-
 interface MLHealthState {
   lastAttemptAt: string | null;
   lastSuccessAt: string | null;
@@ -139,6 +121,10 @@ interface MLHealthState {
   qwenCompletionCrashCount: number;
   qwenDisabledByCrash: boolean;
   detectedQwenCompletionCrashThisBoot: boolean;
+  /** arb128 — total completion crashes reached QWEN_PERMA_DISABLE_AT; the device
+   *  is judged genuinely unable to run on-device generation, so Qwen is disabled
+   *  permanently (auto-retry stops) until a manual Reset AI. */
+  qwenPermaDisabled: boolean;
   // OTA-413 — voice (TTS) crash breadcrumb. OTA-463 wired the auto-disable.
   ttsCrashCount: number;
   detectedTtsCrashThisBoot: boolean;
@@ -256,6 +242,17 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     }
   }
 
+  // arb128 — re-assert the disable from the STANDING count, not only on the boot a
+  // fresh breadcrumb is detected. A device whose count is already at/over the
+  // threshold must stay disabled on EVERY boot (its disable flag may have been
+  // cleared by a prior recovery/amnesty), BEFORE it attempts another crash-prone
+  // completion. And once the count reaches the perma ceiling the device is judged
+  // genuinely incapable — Qwen is disabled permanently and auto-retry is skipped.
+  const qwenPermaDisabled = qwenCompletionCrashCount >= QWEN_PERMA_DISABLE_AT;
+  if (qwenCompletionCrashCount >= MAX_QWEN_COMPLETION_CRASHES) {
+    qwenDisabledByCrash = true;
+  }
+
   // OTA-414 — AUTO-RETRY with backoff. Increment the monotonic boot counter, then
   // drive the disable→retry→recover/relapse state machine (cooldown in cold boots).
   let bootCount = Number.parseInt(bootCountStr ?? '0', 10);
@@ -270,7 +267,14 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let backoff = Number.parseInt(qwenBackoffStr ?? '0', 10);
   if (!Number.isFinite(backoff) || backoff < QWEN_RETRY_BASE_BOOTS) backoff = QWEN_RETRY_BASE_BOOTS;
 
-  if (qwenDisabledByCrash) {
+  if (qwenDisabledByCrash && qwenPermaDisabled) {
+    // arb128 — permanently disabled: never schedule or fire a retry. Clear any
+    // pending-retry flag so it can't fire later, and leave Qwen off until a manual
+    // Reset AI (resetMLHealth) clears the count.
+    if (retryWasPending) {
+      try { await AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING); } catch { /* ignore */ }
+    }
+  } else if (qwenDisabledByCrash) {
     if (retryWasPending && detectedQwenCompletionCrashThisBoot) {
       // The retry session crashed → grow the backoff and push the next retry out.
       backoff = Math.min(backoff * 2, QWEN_RETRY_MAX_BOOTS);
@@ -357,6 +361,7 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     qwenCompletionCrashCount,
     qwenDisabledByCrash,
     detectedQwenCompletionCrashThisBoot,
+    qwenPermaDisabled,
     ttsCrashCount,
     detectedTtsCrashThisBoot,
     ttsDisabledByCrash,
@@ -414,17 +419,14 @@ export async function markQwenCompletionStart(): Promise<void> {
 
 /** OTA-351 — call AFTER a Qwen completion returns (success). Clears the
  *  breadcrumb so a clean completion is never counted as a crash.
- *  arb126 — a clean completion also PROVES this device can generate without
- *  crashing, so wipe any lingering completion-crash suspicion (symmetric to
- *  markMLInitSucceeded wiping the general init suspicion). Guarded on the cached
- *  count so a healthy device doesn't write to AsyncStorage on every narration. */
+ *  arb128 — a single clean completion does NOT wipe the standing crash count (the
+ *  OTA-559 success-reset was removed): a device that crashes INTERMITTENTLY would
+ *  keep resetting and never reach the give-up ceiling, so it would re-crash forever.
+ *  The legitimate recovery signal is a full clean RETRY SESSION (handled in
+ *  loadMLHealth's auto-retry block), not one completion. */
 export async function markQwenCompletionDone(): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS);
-    if (cached && cached.qwenCompletionCrashCount > 0) {
-      await AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT);
-      cached.qwenCompletionCrashCount = 0;
-    }
   } catch { /* ignore — re-detected only if a crash also occurs, which it didn't */ }
 }
 
@@ -482,37 +484,13 @@ export async function clearInFlightBreadcrumbs(): Promise<void> {
   } catch { /* best effort — a stale breadcrumb at worst counts one benign exit */ }
 }
 
-// arb126 — ONE-TIME amnesty for the completion/voice guard history. Call once at
-// boot BEFORE loadMLHealth so the forgiven state is what this session reads. The
-// counts + disable + retry schedule for those two guards were accrued by the
-// pre-fix detector that mistook benign app exits for crashes, so on the first
-// boot after this fix we wipe them — a device falsely benched (Qwen disabled, a
-// phantom voice crash) comes back immediately rather than waiting out the
-// cooldown. Pinned by KEY_GUARD_RESET_VERSION so it runs exactly once per install.
-// Deliberately does NOT touch the general init guard (already healed in OTA-558)
-// or KEY_BOOT_COUNT. A genuinely-incapable device simply re-trips at its next REAL
-// foreground crash (the breadcrumb survives because no background event fires).
-export async function healStaleGuardState(): Promise<void> {
-  try {
-    const v = await AsyncStorage.getItem(KEY_GUARD_RESET_VERSION);
-    if (v === GUARD_RESET_VERSION) return; // already migrated — leave live state alone
-    // arb127 — removeItem, not multiRemove (which silently no-op'd on the device's
-    // AsyncStorage build, so the OTA-560 amnesty never actually ran — the device
-    // stayed benched in its pre-fix state). The version key is set LAST so a
-    // partial clear retries next boot rather than marking a no-op as done.
-    await Promise.all([
-      AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT),
-      AsyncStorage.removeItem(KEY_QWEN_DISABLED),
-      AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS),
-      AsyncStorage.removeItem(KEY_TTS_CRASH_COUNT),
-      AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS),
-      AsyncStorage.removeItem(KEY_QWEN_RETRY_AT),
-      AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING),
-      AsyncStorage.removeItem(KEY_QWEN_BACKOFF),
-    ]);
-    await AsyncStorage.setItem(KEY_GUARD_RESET_VERSION, GUARD_RESET_VERSION);
-  } catch { /* best effort — the auto-retry cooldown still heals over a few boots */ }
-}
+// arb128 — the OTA-560 "amnesty" (healStaleGuardState) was REMOVED. It forgave the
+// completion-crash history once per install, built on the false premise that the
+// counts were benign-close phantoms. They were REAL: this device SIGSEGVs on Qwen
+// generation, and the amnesty re-enabled Qwen → crash-to-home loop + a "Maximum
+// update depth exceeded" render loop. Forgiving a genuinely-incapable device just
+// re-crashes it. The guard's job is to KEEP Qwen off here; the player can still
+// manually re-enable via Settings → Reset AI (resetMLHealth) if they want to retry.
 
 /**
  * Should we attempt ML init this session? Returns false when the
@@ -597,6 +575,7 @@ export async function resetMLHealth(): Promise<void> {
     cached.disabledByCrash = false;
     cached.qwenCompletionCrashCount = 0;
     cached.qwenDisabledByCrash = false;
+    cached.qwenPermaDisabled = false;
     cached.ttsCrashCount = 0;
     cached.detectedTtsCrashThisBoot = false;
     cached.ttsDisabledByCrash = false;
@@ -634,7 +613,9 @@ export function mlHealthSummary(): string {
   }
   // OTA-351/414 — Qwen completion-crash guard line, now with auto-retry/backoff.
   let qwenStatus: string;
-  if (state.qwenRecoveredThisBoot) {
+  if (state.qwenPermaDisabled) {
+    qwenStatus = `permanently disabled after ${state.qwenCompletionCrashCount} completion crashes — this device can't run on-device generation; template narration in use (Settings → Reset AI to retry)`;
+  } else if (state.qwenRecoveredThisBoot) {
     qwenStatus = `RECOVERED — a retry survived a clean run; AI narration re-enabled`;
   } else if (state.qwenRetryingThisBoot) {
     qwenStatus = `retrying this boot (cooldown elapsed after ${state.qwenCompletionCrashCount} completion crashes)`;

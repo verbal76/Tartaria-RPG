@@ -117,28 +117,19 @@ describe('arb126 — completion/voice breadcrumb is not a benign-exit false posi
     expect(Number(mockStore[K.ttsCrash] ?? '0')).toBe(0);
   });
 
-  it('one surviving breadcrumb COUNTS but does not disable (arb127 threshold 3)', async () => {
-    // Process died mid-completion while foregrounded → breadcrumb survives →
-    // counted, but a single one is below the threshold so the Arbiter stays on.
+  it('one surviving foreground-crash breadcrumb disables Qwen (arb128 threshold 1)', async () => {
+    // A real SVE SIGSEGV mid-generation leaves the breadcrumb; threshold 1 disables
+    // fast so the player isn't crashed again next session.
     mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
     const g = await bootAndGates();
     expect(Number(mockStore[K.qwenCrash])).toBe(1);
-    expect(mockStore[K.qwenDisabled]).toBeUndefined();
-    expect(g.qwen).toBe(true);
-  });
-
-  it('a THIRD consecutive foreground crash trips the guard (arb127 threshold 3)', async () => {
-    // A genuinely-incapable device: every completion crashes, no success resets
-    // the count → it climbs to 3 and disables.
-    mockStore[K.qwenCrash] = '2';
-    mockStore[K.qwenInProgress] = '2026-06-13T17:43:00.000Z';
-    const g = await bootAndGates();
-    expect(Number(mockStore[K.qwenCrash])).toBe(3);
     expect(mockStore[K.qwenDisabled]).toBe('true');
     expect(g.qwen).toBe(false);
   });
 
-  it('a clean completion wipes lingering completion-crash suspicion (self-heal)', async () => {
+  it('arb128 — a clean completion does NOT reset the standing crash count (no masking)', async () => {
+    // The OTA-559 success-reset was removed: an intermittently-crashing device must
+    // not keep wiping its count and re-crashing forever.
     mockStore[K.qwenCrash] = '1';
     await jest.isolateModulesAsync(async () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -146,41 +137,14 @@ describe('arb126 — completion/voice breadcrumb is not a benign-exit false posi
       await ml.loadMLHealth();
       await ml.markQwenCompletionDone();
     });
-    expect(mockStore[K.qwenCrash]).toBeUndefined();
+    expect(mockStore[K.qwenCrash]).toBe('1'); // unchanged
   });
 
-  it('healStaleGuardState forgives the false-positive disable ONCE, then loadMLHealth reads it enabled', async () => {
-    // Device benched by the pre-fix detector: Qwen disabled + a phantom voice crash.
-    mockStore[K.qwenDisabled] = 'true';
-    mockStore[K.qwenCrash] = '1';
-    mockStore[K.ttsCrash] = '1';
-    mockStore['tartaria.ml.qwenRetryAtBoot'] = '99';
-    let gates: { qwen: boolean } | undefined;
-    await jest.isolateModulesAsync(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const ml = require('../app/diagnostics/mlHealth');
-      await ml.healStaleGuardState(); // boot amnesty runs BEFORE loadMLHealth
-      await ml.loadMLHealth();
-      gates = { qwen: ml.shouldAttemptQwen() };
-    });
-    expect(mockStore[K.qwenDisabled]).toBeUndefined();
-    expect(mockStore[K.qwenCrash]).toBeUndefined();
-    expect(mockStore[K.ttsCrash]).toBeUndefined();
-    expect(mockStore['tartaria.ml.guardResetVersion']).toBe('arb127-benign-exit-amnesty');
-    expect(gates!.qwen).toBe(true); // Arbiter back this very boot
-  });
-
-  it('healStaleGuardState is a no-op once already migrated (does not wipe a real later disable)', async () => {
-    mockStore['tartaria.ml.guardResetVersion'] = 'arb127-benign-exit-amnesty';
-    // A genuine disable accrued AFTER the amnesty (a real foreground crash).
-    mockStore[K.qwenDisabled] = 'true';
-    mockStore[K.qwenCrash] = '1';
-    await jest.isolateModulesAsync(async () => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const ml = require('../app/diagnostics/mlHealth');
-      await ml.healStaleGuardState();
-    });
-    expect(mockStore[K.qwenDisabled]).toBe('true'); // preserved — not re-forgiven
-    expect(mockStore[K.qwenCrash]).toBe('1');
+  it('arb128 — at the perma ceiling Qwen stays disabled with no retry countdown', async () => {
+    mockStore[K.qwenCrash] = '3';
+    const g = await bootAndGates();
+    expect(g.qwen).toBe(false);
+    // No "auto-retry in N boots" — the device has given up (permanent until reset).
+    expect(mockStore['tartaria.ml.qwenRetryPending']).toBeUndefined();
   });
 });

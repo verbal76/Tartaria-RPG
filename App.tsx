@@ -15,7 +15,6 @@ import {
   markMLInitAttempted,
   markMLInitSucceeded,
   clearInFlightBreadcrumbs,
-  healStaleGuardState,
 } from './app/diagnostics/mlHealth';
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
@@ -266,11 +265,7 @@ export default function App() {
         // playable on template narration; the player never sees
         // the "app keeps stopping" loop.
         setStage('mlhealth:load');
-        // arb126 — forgive the completion/voice guard's pre-fix false-positive
-        // history ONCE (benign app exits were mis-counted as crashes), THEN load
-        // health so this session reads the cleaned state and a falsely-benched
-        // Arbiter recovers immediately. No-op after the first post-fix boot.
-        void healStaleGuardState().then(() => loadMLHealth()).then((health) => {
+        void loadMLHealth().then((health) => {
           setStage('mlhealth:done');
           if (!shouldAttemptMLInit()) {
             // eslint-disable-next-line no-console
