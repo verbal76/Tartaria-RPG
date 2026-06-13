@@ -846,6 +846,28 @@ export function getHookOutcome(kind: HookKind, stage: number): HookOutcome | nul
   return chain[stage] ?? null;
 }
 
+/** arb120 — a CLUE thread's terminal payoff is a MEMO (a lore line / warning),
+ *  nothing lootable. That clue reads the same wherever the prop turns up, so the
+ *  full reveal should play only ONCE per save — a second portrait / ledger in the
+ *  next room shouldn't replay the identical thread. Returns the terminal memo's
+ *  text, or null when the thread carries loot (item / TC / location), which is
+ *  worth repeating per room and must stay repeatable. */
+export function clueThreadMemoText(kind: HookKind): string | null {
+  const chain = CHAINS[kind];
+  if (!chain || chain.length === 0) return null;
+  const terminal = chain[chain.length - 1];
+  const memoEff = terminal?.done
+    ? (terminal.effects ?? []).find((e) => e.type === 'memo')
+    : undefined;
+  if (!memoEff || memoEff.type !== 'memo') return null;
+  for (const st of chain) {
+    for (const e of st.effects ?? []) {
+      if (e.type === 'grant_item' || e.type === 'grant_tc' || e.type === 'unlock_location') return null;
+    }
+  }
+  return memoEff.text;
+}
+
 export const ALL_HOOK_NOUNS: ReadonlySet<string> = new Set(
   Object.values(HOOK_PLANTS).flatMap((arr) => arr.flatMap((p) => p.nouns.map((n) => n.toLowerCase()))),
 );

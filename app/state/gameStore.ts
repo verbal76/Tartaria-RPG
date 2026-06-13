@@ -203,6 +203,7 @@ import {
   type Hook,
   type HookEffect,
   getHookOutcome,
+  clueThreadMemoText,
   matchHookNoun,
   matchAnyHookNoun,
   pickRandomHookKind,
@@ -20821,6 +20822,33 @@ function resolveHookOneStep(
 ): void {
   const outcome = getHookOutcome(hook.kind, hook.stage);
   if (!outcome) return;
+  // arb120 — don't replay a CLUE thread the player already solved elsewhere.
+  // If this is a pure-memo thread (e.g. the watching-portrait warning) and its
+  // clue is already in memory, a second copy of the prop in another room gives a
+  // one-line recognition instead of the full reveal again — and resolves on the
+  // spot so the chip greys out. (Loot threads return null here and stay
+  // repeatable per room.)
+  if (hook.stage === 0) {
+    const clueMemo = clueThreadMemoText(hook.kind);
+    if (clueMemo && (get().worldMemory?.chainMemos ?? []).some((m) => m.text === clueMemo)) {
+      get().appendLog(
+        'world',
+        `You've seen one of these before — the same lead, already copied into your memory. Nothing new here.`,
+      );
+      set((s) => {
+        if (!s.currentScene) return {};
+        return {
+          currentScene: {
+            ...s.currentScene,
+            hooks: (s.currentScene.hooks ?? []).map((h) =>
+              h.id === hook.id ? { ...h, stage: h.stage + 1, resolved: true } : h,
+            ),
+          },
+        };
+      });
+      return;
+    }
+  }
   // Apply every effect first so we can fold the inline rewards INTO the
   // narration line. Damage / enemy spawn / rep changes still log
   // separately (they have their own combat / reward tone).

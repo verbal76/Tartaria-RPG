@@ -1076,6 +1076,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-540': 'Untripentium Clip',
   '2026-06-12-541': 'Untrihexium Gild',
   '2026-06-12-542': 'Untriseptium Closure',
+  '2026-06-12-543': 'Untrioctium Recall',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -14419,4 +14419,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // completedWhisperIds, drops it from active Contracts), and the "someone jumps you for the Discs" beat fires
 // immediately (~30%) as a clean combat encounter instead of a lingering objective. Saves already stuck in
 // `ambush_armed` now retire on the next step. app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-542';
+// OTA-543 (Untrioctium Recall) — [bugfix] CLUE story threads no longer replay the same reveal room-to-room. A
+// memo-only thread (the watching-portrait "do not answer if it knocks" warning, the open-ledger lead, the
+// child's-drawing memo) reads identically wherever the prop appears, so a second copy in the next room used to
+// play the full ★ STORY THREAD reveal again. Now, once its clue is in memory, re-investigating any copy gives a
+// one-line recognition and resolves on the spot. Loot threads (hidden compartment, bricked doorway, stopped
+// clock, etc.) return null from the new clueThreadMemoText() guard and STAY repeatable per room. app/engine/hooks.ts,
+// app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-543';

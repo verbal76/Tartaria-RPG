@@ -378,6 +378,14 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-543 "Untrioctium Recall" — [bugfix] clue story threads stop replaying room-to-room** *(element #138)*.
+  From the same mission report (item c): a memo-only thread (watching-portrait warning, open-ledger lead,
+  child's-drawing memo) reads identically wherever the prop appears, so a second copy in the next room replayed
+  the whole reveal. New `clueThreadMemoText()` flags pure-clue threads; once the clue's in memory, re-investigating
+  any copy gives a one-line recognition and resolves on the spot. Loot threads stay repeatable per room.
+  `app/engine/hooks.ts`, `app/state/gameStore.ts`. (Remaining from the report: a step-counter label, b auto-travel
+  ENTER, d completion popup. A real "if it knocks" payoff for the portrait is a separate larger content task.)
+
 - **OTA-542 "Untriseptium Closure" — [bugfix] Yulka disc whisper lingered in Contracts after payout** *(element
   #137)*. Turn-in paid the reward and Yulka said "we're done," but the whisper stayed in an `ambush_armed`
   epilogue that only retired after a 30%/step ambush fired or 5 steps passed — so a paid-out contract read as
