@@ -14446,4 +14446,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the top objective chip from a title+subtitle (two lines) to a SINGLE line — the SUMMON button stays inline and
 // still only appears when standing at an unrecovered Core capital. app/components/InputBox.tsx,
 // app/screens/ExplorationScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-546';
+// OTA-547 (Unquadbium Safeguard) — [ux] vendor SELL list flags loadout items. Equipped pieces were already
+// filtered out of the sell list, but BANDOLIER throwables and TOOL-POUCH items aren't "equipped" by slot, so
+// they stayed sellable and unmarked — a player report worried about dumping working-loadout gear by accident.
+// Each sellable row now shows a "⚑ in bandolier" / "⚑ in pouch" tag (keyed by instance id, so a spare of the same
+// name stays cleanly sellable). app/screens/VendorScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-547';

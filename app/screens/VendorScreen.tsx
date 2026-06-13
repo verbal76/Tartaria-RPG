@@ -224,6 +224,13 @@ export function VendorScreen() {
   const equippedNames = new Set(
     Object.values(player.equipped ?? {}).filter((n): n is string => !!n),
   );
+  // arb120 — bandolier (quick-throwables) and tool-pouch items aren't "equipped"
+  // by slot, so they DON'T get filtered out of the sell list — but they're part
+  // of the player's working loadout and selling one by accident stings. Flag
+  // them in the row so the player sees what they're about to give up. (Keyed by
+  // instance id, so a spare of the same name stays cleanly sellable.)
+  const bandolierIds = new Set(player.equipped?.bandolierIds ?? []);
+  const toolPouchIds = new Set(player.equipped?.toolPouchIds ?? []);
   // HANDOFF #12 — sell-back UI polish. Sort options so the player can
   // surface the most valuable junk first (default), alphabetize for
   // hunting, or group by rarity for clearing low-tier clutter.
@@ -591,6 +598,11 @@ export function VendorScreen() {
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>
                         {item.name}{item.quantity > 1 ? ` (x${item.quantity})` : ''}
+                        {bandolierIds.has(item.id)
+                          ? <Text style={styles.loadoutTag}>  ⚑ in bandolier</Text>
+                          : toolPouchIds.has(item.id)
+                            ? <Text style={styles.loadoutTag}>  ⚑ in pouch</Text>
+                            : null}
                       </Text>
                       <Text style={styles.sellPrice}>+{price} TC</Text>
                     </View>
@@ -885,6 +897,8 @@ const styles = StyleSheet.create({
   contractAccept: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1, fontStyle: 'italic' },
   offerHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   offerName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
+  // arb120 — loadout warning tag (bandolier / pouch) on a sellable row.
+  loadoutTag: { color: '#e0a85f', fontSize: 11, fontWeight: '700' },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
   offerPriceBroke: { color: '#7a705c' },
   offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 2 },
