@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-538 "Untritrium Fold" — [ux] collapsible Character-sheet sections** *(element #133)*. Every header on the
+  full character breakdown (CORE STATS, DEFENSE, WALLET, FACTION STANDINGS, EQUIPPED, COMPANION, GOLEM, STATUS
+  EFFECTS, RACIAL TRAITS, ACTIVE CONTRACTS, MILESTONES, TITLES) now uses the **inventory header treatment** — a
+  semi-transparent backing plate + gold left bar so the label reads over any background, and a ▾/▴ chevron; tap
+  the bar to fold the section away. Collapse state is per-visit (matches the inventory). `app/screens/CharacterScreen.tsx`.
+
 - **OTA-537 "Untribium Bulwark" — [balance] ARMOR RESISTANCE REWORK** *(element #132)*. Replaces the flat
   "any one matching piece halves the type, once" model (which made a rainbow of mismatched pieces deflect
   everything and stacking pointless). New: **slot-weighted diminishing stacking** — each slot resists at a base

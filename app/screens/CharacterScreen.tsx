@@ -4,7 +4,7 @@
 // show *what you are right now*, with every number broken down into
 // its sources so the player can audit any surprising value.
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import racesData from '../data/races/races.json';
@@ -50,6 +50,8 @@ export function CharacterScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  // arb119 — per-section collapse (hook must precede the early return below).
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   if (!player) {
     return (
@@ -74,6 +76,20 @@ export function CharacterScreen() {
     ? `${barehand.count}d${barehand.sides}`
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
+
+  // arb119 — section header helper, mirroring the inventory headers: each section
+  // title is a tappable plate (semi-transparent backing so the gold label reads
+  // over any background) with a ▾/▴ chevron that folds the section away.
+  const sectionHeader = (key: string, label: string) => (
+    <TouchableOpacity
+      style={styles.sectionHeaderBar}
+      activeOpacity={0.7}
+      onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}
+    >
+      <Text style={styles.sectionChevron}>{collapsed[key] ? '▾' : '▴'}</Text>
+      <Text style={styles.sectionHeaderLabel}>{label}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -116,7 +132,8 @@ export function CharacterScreen() {
         </View>
 
         {/* ── CORE STATS ────────────────────────────────────────── */}
-        <Text style={styles.sectionTitle}>CORE STATS</Text>
+        {sectionHeader('core', 'CORE STATS')}
+        {!collapsed.core && (
         <View style={styles.card}>
           {(Object.keys(STAT_LABEL) as Array<keyof Stats>).map((s) => (
             <StatRow
@@ -129,9 +146,11 @@ export function CharacterScreen() {
             />
           ))}
         </View>
+        )}
 
         {/* ── DEFENSE & BAREHAND ────────────────────────────────── */}
-        <Text style={styles.sectionTitle}>DEFENSE</Text>
+        {sectionHeader('defense', 'DEFENSE')}
+        {!collapsed.defense && (
         <View style={styles.card}>
           <View style={styles.kvRow}>
             <Text style={styles.kvKey}>Armor Class</Text>
@@ -148,9 +167,11 @@ export function CharacterScreen() {
             <Text style={styles.kvSub}>↳ hit only on a {barehand.hitGate} d{barehand.sides}</Text>
           )}
         </View>
+        )}
 
         {/* ── WALLET & CONDITION ────────────────────────────────── */}
-        <Text style={styles.sectionTitle}>WALLET & CONDITION</Text>
+        {sectionHeader('wallet', 'WALLET & CONDITION')}
+        {!collapsed.wallet && (
         <View style={styles.card}>
           <View style={styles.kvRow}>
             <Text style={styles.kvKey}>TC</Text>
@@ -164,6 +185,7 @@ export function CharacterScreen() {
           </View>
           <Text style={styles.kvSub}>↳ {tierDescription(tier)}</Text>
         </View>
+        )}
 
         {/* ── FACTION STANDINGS ─────────────────────────────────── */}
         {/* 2026-05-25 OTA-041 — full faction standing panel. Playtester
@@ -175,7 +197,8 @@ export function CharacterScreen() {
             Each faction's standing gates quest / hunt / mystery /
             storyline visibility via minRep; high standing means more
             contracts surface from that faction's vendors. */}
-        <Text style={styles.sectionTitle}>FACTION STANDINGS</Text>
+        {sectionHeader('factions', 'FACTION STANDINGS')}
+        {!collapsed.factions && (
         <View style={styles.card}>
           {(() => {
             const factionsList = factionsData as Faction[];
@@ -216,9 +239,11 @@ export function CharacterScreen() {
             you meet their vendors.
           </Text>
         </View>
+        )}
 
         {/* ── EQUIPPED ──────────────────────────────────────────── */}
-        <Text style={styles.sectionTitle}>EQUIPPED</Text>
+        {sectionHeader('equipped', 'EQUIPPED')}
+        {!collapsed.equipped && (
         <View style={styles.card}>
           {(() => {
             // 2026-05-26 OTA-056 — two-handed weapon in main hand
@@ -267,6 +292,7 @@ export function CharacterScreen() {
             });
           })()}
         </View>
+        )}
 
         {/* ── COMPANION (dog) ───────────────────────────────────── */}
         {/* OTA-120 Phase 5 — Companion panel. Renders only when an
@@ -288,7 +314,8 @@ export function CharacterScreen() {
           };
           return (
             <>
-              <Text style={styles.sectionTitle}>COMPANION</Text>
+              {sectionHeader('companion', 'COMPANION')}
+              {!collapsed.companion && (
               <TouchableOpacity
                 style={styles.card}
                 onPress={() => useGameStore.getState().openCallDogModal()}
@@ -335,6 +362,7 @@ export function CharacterScreen() {
                 </View>
                 <Text style={styles.contractTap}>tap to call ›</Text>
               </TouchableOpacity>
+              )}
             </>
           );
         })()}
@@ -356,7 +384,8 @@ export function CharacterScreen() {
           };
           return (
             <>
-              <Text style={styles.sectionTitle}>GOLEM</Text>
+              {sectionHeader('golem', 'GOLEM')}
+              {!collapsed.golem && (
               <View style={styles.card}>
                 <Text style={styles.name}>{golem.name}</Text>
                 <Text style={styles.subline}>{typeLabel} · {golem.attackDie} {golem.damageType}</Text>
@@ -391,6 +420,7 @@ export function CharacterScreen() {
                 </View>
                 <Text style={styles.subline}>Heal by feeding it the parts it's made of.</Text>
               </View>
+              )}
             </>
           );
         })()}
@@ -398,7 +428,8 @@ export function CharacterScreen() {
         {/* ── STATUS EFFECTS ────────────────────────────────────── */}
         {(player.statusEffects ?? []).length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>STATUS EFFECTS</Text>
+            {sectionHeader('status', 'STATUS EFFECTS')}
+            {!collapsed.status && (
             <View style={styles.card}>
               {(player.statusEffects ?? []).map((e, i) => {
                 // OTA-357 — (A) "rounds" → "turns": a status duration is just
@@ -419,18 +450,21 @@ export function CharacterScreen() {
                 );
               })}
             </View>
+            )}
           </>
         )}
 
         {/* ── RACIAL TRAITS ─────────────────────────────────────── */}
         {race?.traits && race.traits.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>RACIAL TRAITS</Text>
+            {sectionHeader('racial', 'RACIAL TRAITS')}
+            {!collapsed.racial && (
             <View style={styles.card}>
               {race.traits.map((t, i) => (
                 <Text key={i} style={styles.traitRow}>• {t}</Text>
               ))}
             </View>
+            )}
           </>
         )}
 
@@ -439,7 +473,8 @@ export function CharacterScreen() {
           + (player.activeHunts?.length ?? 0)
           + (player.activeMysteries?.length ?? 0)) > 0 && (
           <>
-            <Text style={styles.sectionTitle}>ACTIVE CONTRACTS</Text>
+            {sectionHeader('contracts', 'ACTIVE CONTRACTS')}
+            {!collapsed.contracts && (
             <TouchableOpacity style={styles.card} onPress={() => setScreen('contracts')} activeOpacity={0.8}>
               {(player.activeFactionQuestIds ?? []).map((id) => {
                 const q = findFactionQuestById(id);
@@ -471,11 +506,13 @@ export function CharacterScreen() {
               })}
               <Text style={styles.contractTap}>tap to open full contract board ›</Text>
             </TouchableOpacity>
+            )}
           </>
         )}
 
         {/* ── MILESTONES & MEMORY ──────────────────────────────── */}
-        <Text style={styles.sectionTitle}>MILESTONES & MEMORY</Text>
+        {sectionHeader('milestones', 'MILESTONES & MEMORY')}
+        {!collapsed.milestones && (
         <View style={styles.card}>
           <View style={styles.kvRow}>
             <Text style={styles.kvKey}>Enemies defeated</Text>
@@ -494,6 +531,7 @@ export function CharacterScreen() {
             <Text style={styles.kvValue}>{worldMemory?.discoveredLocationIds?.length ?? 0}</Text>
           </View>
         </View>
+        )}
 
         {/* ── ARBITER TITLES ───────────────────────────────────── */}
         {/* OTA-236 — surfaces the 20 Arbiter-assigned titles. Earned
@@ -503,7 +541,8 @@ export function CharacterScreen() {
             triggers yet. Future OTAs wire the requirement strings to
             runtime trackers (relic counts, sentinel kills, etc.) and
             populate player.earnedTitles. */}
-        <Text style={styles.sectionTitle}>ARBITER ASSIGNED TITLES</Text>
+        {sectionHeader('titles', 'ARBITER ASSIGNED TITLES')}
+        {!collapsed.titles && (
         <View style={styles.card}>
           {(() => {
             const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
@@ -539,6 +578,7 @@ export function CharacterScreen() {
             );
           })()}
         </View>
+        )}
 
         <Text style={styles.footerHint}>Tap the top-left stats panel any time to return here.</Text>
       </ScrollView>
@@ -632,6 +672,24 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     paddingHorizontal: 4,
   },
+  // arb119 — collapsible section header plate (matches the inventory headers):
+  // a semi-transparent backing + gold left bar so the label never blends into
+  // the page, tappable anywhere to fold the section.
+  sectionHeaderBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(8,6,4,0.55)',
+    borderLeftWidth: 4,
+    borderLeftColor: '#c9a86a',
+    borderRadius: 3,
+    paddingLeft: 8,
+    paddingRight: 10,
+    paddingVertical: 6,
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  sectionChevron: { color: '#c9a86a', fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
+  sectionHeaderLabel: { color: '#c9a86a', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
   card: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',

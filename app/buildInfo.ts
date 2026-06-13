@@ -14385,4 +14385,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // immunity, and a resisted hit always leaves ≥1 damage. Combat log now reports the actual % turned, not "halves".
 // app/engine/crafting.ts (slot weights + armorResistanceFraction + reworked applyArmorResistance),
 // app/state/gameStore.ts (aggregateArmor tracks per-slot resistances; combat passes them). JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-537';
+// OTA-538 (Untritrium Fold) — [ux] collapsible Character-sheet sections. Every header on the full character
+// breakdown (CORE STATS, DEFENSE, WALLET, FACTION STANDINGS, EQUIPPED, COMPANION, GOLEM, STATUS EFFECTS, RACIAL
+// TRAITS, ACTIVE CONTRACTS, MILESTONES, TITLES) now uses the same treatment as the inventory headers: a
+// semi-transparent backing plate + gold left bar so the label reads over any background, and a ▾/▴ chevron —
+// tap anywhere on the bar to fold that section away. Collapse state is per-visit (matches the inventory).
+// app/screens/CharacterScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-538';
