@@ -378,6 +378,19 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-542 "Untriseptium Closure" — [bugfix] Yulka disc whisper lingered in Contracts after payout** *(element
+  #137)*. Turn-in paid the reward and Yulka said "we're done," but the whisper stayed in an `ambush_armed`
+  epilogue that only retired after a 30%/step ambush fired or 5 steps passed — so a paid-out contract read as
+  open work. Now the turn-in COMPLETES the whisper (→ `completedWhisperIds`, dropped from active Contracts), and
+  the "someone jumps you for the Discs" beat fires immediately (~30%) as a clean fight instead of a lingering
+  objective. Saves already stuck in `ambush_armed` retire on the next step. `app/state/gameStore.ts`. Tests
+  `whisperYulka` (11) green. **From a detailed player report of a full auto-travel mission run — other issues
+  from that report still open: (a) step-counter reads as total-distance-to-finish not steps-to-next-objective +
+  doesn't recognise an early random-encounter fetch; (b) auto-travel shows "Tap ENTER" for a discovered POI but
+  no ENTER button (had to type it); (c) the `watching_portrait` story thread replays its full reveal on
+  re-investigate (per-room hook not marked consumed) and its "if it knocks" warning has no payoff; (d) whisper
+  completion needs a popup/summary — the reward scrolled off-screen.**
+
 - **OTA-541 "Untrihexium Gild" — [ux] Settings SESSION tab declutter + AI buttons gold** *(element #136)*.
   Follows OTA-540 on the same screen: the two remaining text walls are cut to one line each (the RESET AI
   explanation → just `Current state: <status>`; the long COPY LOG/CLEAR LOG/COPY INVENTORY/COPY SAVE paragraph →

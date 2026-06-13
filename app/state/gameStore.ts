@@ -21612,9 +21612,14 @@ function fireYulkaReturn(
         ...s.player,
         inventory: newInventory,
         tc: s.player.tc + 30,
-        activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
-          w.id === whisper.id ? { ...w, stage: 'ambush_armed' } : w,
-        ),
+        // arb120 — turn-in COMPLETES the whisper. Yulka pays you and says "we're
+        // done," so the contract closes right here instead of lingering in an
+        // `ambush_armed` epilogue that reads as unfinished work in Contracts.
+        activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+        completedWhisperIds: Array.from(new Set([
+          ...(s.player.completedWhisperIds ?? []),
+          whisper.id,
+        ])),
       },
     };
   });
@@ -21624,6 +21629,31 @@ function fireYulkaReturn(
   );
   get().appendLog('reward', `✦ Aetheric Disc × 5.`);
   get().appendLog('reward', `+30 TC.`);
+  // arb120 — the "someone jumps you for the Discs on the way out" beat still
+  // fires (~30%), but NOW — as a clean combat encounter the instant you turn to
+  // leave — rather than arming a lingering open contract that confuses a player
+  // who's already been paid.
+  if (Math.random() < 0.3) {
+    const proto = spawnChainEnemy('Disc Hijacker');
+    set((s) => (s.currentScene ? {
+      currentScene: {
+        ...s.currentScene,
+        enemies: [...s.currentScene.enemies, proto],
+        enemyHps: [...s.currentScene.enemyHps, proto.hp],
+        activeEnemyIdx: s.currentScene.enemies.length,
+        range: 'close',
+        enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+      },
+    } : s));
+    get().appendLog(
+      'world',
+      `You turn from the fire with the Discs in your pack — and a figure is already there, boots planted across the path home. "Heard you came up on Aetheric Discs. Hand them over and you walk away with your teeth."`,
+    );
+    get().appendLog(
+      'combat',
+      `${proto.name} closes — ${proto.attack} ready, ${proto.damage} damage on a hit. (range: close)`,
+    );
+  }
 }
 
 function fireYulkaAmbush(
@@ -21631,13 +21661,12 @@ function fireYulkaAmbush(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   whisper: WhisperRecord,
 ): void {
-  // 30% chance per qualifying step. If it doesn't fire this step,
-  // leave the status armed for the next one. After firing OR after
-  // the player has taken 5 steps without rolling it, retire the
-  // chain to completedWhisperIds.
-  const ctx = whisper.ctx ?? {};
-  const stepsSinceArmed = ((ctx.stepsSinceArmed as number) ?? 0) + 1;
-  if (Math.random() < 0.30) {
+  // arb120 — BACK-COMPAT path for saves left in the old `ambush_armed` epilogue
+  // (the turn-in now completes the chain outright, so no new whisper lands here).
+  // Roll the hijacker ONCE on the next step, then ALWAYS retire the chain — a
+  // paid-out contract must not linger open in Contracts waiting on a 5-step
+  // countdown the player has no idea about.
+  if (Math.random() < 0.3) {
     const proto = spawnChainEnemy('Disc Hijacker');
     set((s) => {
       if (!s.currentScene) return s;
@@ -21660,7 +21689,9 @@ function fireYulkaAmbush(
       'combat',
       `${proto.name} closes — ${proto.attack} ready, ${proto.damage} damage on a hit. (range: close)`,
     );
-    // Retire the chain after the ambush fires regardless of outcome.
+  }
+  {
+    // Always retire — fired or not.
     set((s) => (s.player ? {
       player: {
         ...s.player,
@@ -21671,31 +21702,7 @@ function fireYulkaAmbush(
         ])),
       },
     } : s));
-    return;
   }
-  if (stepsSinceArmed >= 5) {
-    // Player got home clean. Disarm.
-    set((s) => (s.player ? {
-      player: {
-        ...s.player,
-        activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
-        completedWhisperIds: Array.from(new Set([
-          ...(s.player.completedWhisperIds ?? []),
-          whisper.id,
-        ])),
-      },
-    } : s));
-    return;
-  }
-  // Still armed, just tick the counter.
-  set((s) => (s.player ? {
-    player: {
-      ...s.player,
-      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
-        w.id === whisper.id ? { ...w, ctx: { ...(w.ctx ?? {}), stepsSinceArmed } } : w,
-      ),
-    },
-  } : s));
 }
 
 export function makeRoomKey(

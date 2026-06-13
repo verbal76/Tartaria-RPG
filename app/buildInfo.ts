@@ -14412,4 +14412,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // single "Long-press COPY LOG for the share + chunked-paste view" tip (the buttons are self-labeled). (2) RESET
 // AI NARRATION & RELOAD and COPY AI HEALTH now use the gold primary button style, matching SAVE & EXIT TO TITLE,
 // per the player's ask. app/screens/AboutScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-541';
+// OTA-542 (Untriseptium Closure) — [bugfix] Yulka disc whisper lingered in Contracts after payout. The turn-in
+// paid the reward (5 Discs + 30 TC) and Yulka said "we're done," but the whisper stayed in an `ambush_armed`
+// epilogue that only retired after a 30%/step ambush fired or 5 more steps passed — so a paid-out, narratively-
+// closed contract kept showing as open work. Now the turn-in COMPLETES the whisper outright (moves it to
+// completedWhisperIds, drops it from active Contracts), and the "someone jumps you for the Discs" beat fires
+// immediately (~30%) as a clean combat encounter instead of a lingering objective. Saves already stuck in
+// `ambush_armed` now retire on the next step. app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-542';
