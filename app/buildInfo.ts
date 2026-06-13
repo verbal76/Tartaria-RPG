@@ -14406,4 +14406,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // clipboard via a COPY AI HEALTH button (matching COPY LOG / COPY INVENTORY / COPY SAVE), paired with the
 // device/build summary. A one-line "Current state: <status>" stays inline for the at-a-glance active/disabled
 // signal. app/screens/AboutScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-540';
+// OTA-541 (Untrihexium Gild) — [ux] Settings/About SESSION tab declutter + AI buttons gold. Follows OTA-540:
+// (1) the two remaining text walls are cut to one line each — the RESET AI explanation collapses to just
+// "Current state: <status>", and the long COPY LOG/CLEAR LOG/COPY INVENTORY/COPY SAVE paragraph collapses to a
+// single "Long-press COPY LOG for the share + chunked-paste view" tip (the buttons are self-labeled). (2) RESET
+// AI NARRATION & RELOAD and COPY AI HEALTH now use the gold primary button style, matching SAVE & EXIT TO TITLE,
+// per the player's ask. app/screens/AboutScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-541';

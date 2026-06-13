@@ -753,7 +753,7 @@ export function AboutScreen() {
               a boot-time 'skipped'. No app restart needed — watch the label go to
               "✓ AI NARRATION LOADED". */}
           <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
             onPress={() => {
               setAiReset(true);
               void resetMLHealth().then(() => {
@@ -763,7 +763,7 @@ export function AboutScreen() {
             }}
             activeOpacity={0.7}
           >
-            <Text style={styles.sessionBtnSecondaryText}>
+            <Text style={styles.sessionBtnPrimaryText}>
               {!aiReset ? 'RESET AI NARRATION & RELOAD'
                 : qwenStatus === 'ready' ? '✓ AI NARRATION LOADED'
                 : qwenStatus === 'failed' ? '✗ AI LOAD FAILED — SEE BELOW'
@@ -773,36 +773,23 @@ export function AboutScreen() {
             </Text>
           </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
-            RESET AI NARRATION clears the crash counters that disable the Arbiter's
-            local AI after repeated native crashes, then loads it right now (no restart
-            needed). Once it reads LOADED, trigger some Arbiter narration to test.
+            Current state: {mlHealthSummary().split('\n')[1]?.replace(/^\s*Status:\s*/, '').trim() ?? 'unknown'}
             {qwenStatus === 'failed' && qwenError ? `\nLoad error: ${qwenError}` : ''}
-            {'\n'}Current state: {mlHealthSummary().split('\n')[1]?.replace(/^\s*Status:\s*/, '').trim() ?? 'unknown'}
           </Text>
-          {/* arb119 — the FULL ML/voice diagnostic (crash counters, auto-disable
-              state, Qwen + TTS guards) used to print inline as an 8-line wall of
-              text. It's bug-report material, so it now drops on the clipboard on
-              demand — matching COPY LOG / COPY INVENTORY / COPY SAVE — while the
-              one-line status above keeps the at-a-glance signal. */}
+          {/* arb119 — the FULL ML/voice diagnostic drops on the clipboard on demand
+              (bug-report material) instead of an inline wall of text; gold to match
+              SAVE & EXIT / RESET AI per the player's ask. */}
           <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
             onPress={() => { void handleCopyAiHealth(); }}
             activeOpacity={0.7}
           >
-            <Text style={styles.sessionBtnSecondaryText}>
+            <Text style={styles.sessionBtnPrimaryText}>
               {aiHealthCopied ? `✓ ${aiHealthCharCount.toLocaleString()} CHARS` : 'COPY AI HEALTH'}
             </Text>
           </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
-            COPY LOG drops the full disk log on the clipboard. Long-press it in the
-            in-game menu (or use the LOG screen) for the share + chunked-paste view.
-            CLEAR LOG wipes both the on-disk log and the in-memory feed — the next
-            log paste-back will contain only the play that follows.
-            COPY INVENTORY drops just your pack contents (one line per item,
-            grouped by kind) so recurring-theme analysis doesn't have to scroll a
-            log. COPY SAVE drops the loadable save state (player + world flags,
-            minus the narration log) so a crashing save can be pasted back and
-            reproduced exactly.
+            Long-press COPY LOG for the share + chunked-paste view.
           </Text>
         </View>
         )}

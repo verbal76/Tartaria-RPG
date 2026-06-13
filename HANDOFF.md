@@ -378,6 +378,13 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-541 "Untrihexium Gild" — [ux] Settings SESSION tab declutter + AI buttons gold** *(element #136)*.
+  Follows OTA-540 on the same screen: the two remaining text walls are cut to one line each (the RESET AI
+  explanation → just `Current state: <status>`; the long COPY LOG/CLEAR LOG/COPY INVENTORY/COPY SAVE paragraph →
+  a single "Long-press COPY LOG for the share + chunked-paste view" tip — the buttons are self-labeled). And
+  RESET AI NARRATION & RELOAD + COPY AI HEALTH now use the gold primary button style to match SAVE & EXIT TO
+  TITLE, per the player's ask. `app/screens/AboutScreen.tsx`.
+
 - **OTA-540 "Untripentium Clip" — [ux] COPY AI HEALTH button replaces the inline diagnostic wall** *(element
   #135)*. Under RESET AI NARRATION on the About/Settings screen, the full 8-line ML/voice runtime readout
   (`mlHealthSummary()` — crash counters, auto-disable state, Qwen + TTS guards) printed inline as a wall of text.
