@@ -14481,4 +14481,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The panel now names the exact repair parts AND whether they're in your pack ("Heal: feed it Aether Crystal or
 // Aetheric Shard — you're carrying both."). The wrong-item refusal already names the valid parts. app/screens/
 // CharacterScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-551';
+// OTA-552 (Unquadseptium Assay) — [bugfix] rarity audit: creation rank vs catalog rank (the shard bug,
+// generalized). Scripted every catalog name→rarity (763 entries) against code item-creation sites; found 3
+// mismatches beyond the already-fixed shard. FIXED: Scrap Metal was dug as Uncommon (catalog Common — abundant
+// junk) → Common; one Aetheric-Shard salvage-pool entry stamped Common while catalog + its two sibling entries
+// said Uncommon → Uncommon. FLAGGED, left as-is: Iron Core — a name collision where the Legendary Iron-Worm boss
+// core shares a name with a Rare-tier Pulse-Scanner find (pool typed Common|Uncommon|Rare); forcing Legendary
+// would make a scanner hand out a boss core, so it stays Rare in that pool. app/engine/digging.ts,
+// app/engine/salvagePools.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-552';

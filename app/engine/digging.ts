@@ -151,7 +151,7 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Aetheric Dust', rarity: 'Uncommon', baseWeight: 4 },
   { name: 'Mud Essence', rarity: 'Uncommon', baseWeight: 3 },
   { name: 'Drone Core', rarity: 'Uncommon', baseWeight: 2 },
-  { name: 'Scrap Metal', rarity: 'Uncommon', baseWeight: 4 },
+  { name: 'Scrap Metal', rarity: 'Common', baseWeight: 4 },
   { name: 'Energy Fragment', rarity: 'Uncommon', baseWeight: 2 },
   // OTA 012 — uncommon wild foods.
   { name: 'Speckled Egg', rarity: 'Uncommon', baseWeight: 3 },

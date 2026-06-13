@@ -112,7 +112,7 @@ const POOLS: SalvagePool[] = [
       { name: 'Aether Crystal', rarity: 'Common', weight: 25, min: 1, max: 2 },
       { name: 'Scrap Metal', rarity: 'Common', weight: 25, min: 1, max: 3 },
       { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 3 },
-      { name: 'Aetheric Shard', rarity: 'Common', weight: 10, min: 1, max: 1 },
+      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
     ],
   },
   {

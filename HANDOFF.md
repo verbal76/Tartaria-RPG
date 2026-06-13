@@ -378,6 +378,8 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-552 "Unquadseptium Assay" — [bugfix] item rarity audit (creation rank vs catalog rank)** *(element #147)*. Scripted all 763 catalog rarities vs code creation sites; fixed Scrap Metal (dug Uncommon → catalog Common) and an Aetheric Shard salvage entry (Common → Uncommon, matching its catalog + sibling entries). Flagged but left: Iron Core name-collision (Rare scanner find vs Legendary boss core). `app/engine/digging.ts`, `app/engine/salvagePools.ts`.
+
 - **OTA-551 "Unquadhexium Mend" — [ux] golem-heal discoverability** *(element #146)*. A golem heals only from its own fuel parts (Aether Golem ← Aether Crystal + Aetheric Shard), fed via `feed/repair/mend golem <item>`; the panel just said "feed it the parts it's made of" without naming them. Now it names the exact parts + your carry status. `app/screens/CharacterScreen.tsx`.
 
 - **OTA-550 "Unquadpentium Stride" — [feature] 4-band combat range model** *(element #145)*. 3 bands
