@@ -1749,6 +1749,18 @@ The entries below are retained as the shipped-batch record.
 >    fails again, OTA-490's new diagnostic now prints the REAL cause in the persist log —
 >    `setItem threw …` (full DB) vs `readback mismatch (got N vs M)` (CursorWindow
 >    truncation) — so grab that line to confirm which path it is before acting further.
+> 3. **Investigate + fix the on-device Qwen NATIVE crash that auto-disables AI narration.**
+>    On some devices the local LLM (Qwen via `llama.rn` / executorch) native-crashes
+>    repeatedly, tripping the OTA-457/459 crash guard's auto-disable — e.g. a Pixel 10 Pro XL
+>    sat at **74 crashes → "auto-disabled (template narration in use)"** (2026-06-13,
+>    threshold 2). The OTA layer is doing its job (auto-disable + template fallback + manual
+>    RESET AI), but the **root fix is native** and unknown: candidates are an inference-lib /
+>    model version bump, native memory/threading limits on the model load+completion path, or
+>    gating Qwen off on devices/chipsets that can't run it. **Player-visible impact:** any
+>    NPC beat meant to be model-generated reads thin or empty on affected devices (surfaced
+>    2026-06-13 as "the scout said nothing, it just dropped me into the quest"). Needs an
+>    on-device native debug session (logcat at the crash) to find the actual fault before a
+>    fix can be scoped. (Voice/TTS is separate + working — bundled Kokoro is fine.)
 >
 > ---
 > **ARCHIVED REFERENCE — iOS build → TestFlight (RESOLVED; keep for if a build is ever
