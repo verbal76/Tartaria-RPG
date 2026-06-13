@@ -623,16 +623,14 @@ export function ExplorationScreen() {
             hitSlop={6}
           >
             <View style={styles.objectiveChipRow}>
-              <View style={styles.objectiveChipBody}>
-                <Text style={styles.objectiveChipTitle} numberOfLines={2}>
-                  <Text style={styles.objectiveChipStar}>★ </Text>
-                  <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
-                  {mainLine}
-                </Text>
-                <Text style={styles.objectiveChipSubtitle}>
-                  tap to open — Main Storyline · Contracts · Collectibles ↗
-                </Text>
-              </View>
+              {/* arb120 — slimmed to ONE line (was title + subtitle) to give the
+                  exploration feed more room; the MISSIONS quick-button now carries
+                  the "open Contracts" affordance the subtitle used to spell out. */}
+              <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={1}>
+                <Text style={styles.objectiveChipStar}>★ </Text>
+                <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
+                {mainLine}
+              </Text>
               {atUnrecovered && (
                 <TouchableOpacity
                   style={styles.objectiveChipSummon}
@@ -799,6 +797,7 @@ export function ExplorationScreen() {
               setApproachOpen(true);
             }}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
+            onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
             onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}

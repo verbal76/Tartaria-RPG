@@ -378,6 +378,12 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-546 "Unquadunium Roster" — [ux] MISSIONS quick-button + slimmer main-quest chip** *(element #141)*.
+  Player ask: a "missions" button by "ask arbiter" → the same Contracts screen, so the top main-quest chip can
+  shrink for more exploration room. Added the MISSIONS quick-button (peace row) and slimmed the top objective
+  chip from title+subtitle (two lines) to a single line; SUMMON stays inline and still only shows at an
+  unrecovered Core capital. `app/components/InputBox.tsx`, `app/screens/ExplorationScreen.tsx`.
+
 - **OTA-545 "Unquadnilium Tally" — [ux] side-contract completion popup (report item d)** *(element #140)*. A
   whisper that paid out at the end of a long run dropped its reward into the log, where the next beat scrolled it
   off ("I didn't even know I'd completed the task"). Whisper turn-in now raises a CONTRACT COMPLETE modal (title +

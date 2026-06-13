@@ -54,6 +54,9 @@ interface Props {
   onOpenCrafting: () => void;
   onOpenApproach: () => void;
   onOpenAskArbiter: () => void;
+  /** arb120 — quick-row MISSIONS button → Contracts screen. Lets the top
+   *  main-quest chip slim to a single line for more exploration room. */
+  onOpenMissions: () => void;
   onOpenSalvage: () => void;
   onOpenTake: () => void;
   onOpenClimb: () => void;
@@ -124,7 +127,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
@@ -499,6 +502,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
             <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
             <QuickBtn label="ask arbiter" onPress={onOpenAskArbiter} blocked={tutLock} />
+            <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
           </>
         )}
       </TutorialTarget>

@@ -14440,4 +14440,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // waits for the player. Wired for the Yulka discs whisper; reusable for future whisper turn-ins via
 // pendingWhisperComplete. app/components/WhisperCompleteModal.tsx (new), app/state/gameStore.ts,
 // app/screens/ExplorationScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-545';
+// OTA-546 (Unquadunium Roster) — [ux] MISSIONS quick-button + slimmer main-quest chip. Player ask: a "missions"
+// button by "ask arbiter" that opens the same Contracts screen, so the top main-quest chip can shrink and give
+// the exploration feed more room. Added a MISSIONS quick-button to the peace quick-row (→ Contracts), and slimmed
+// the top objective chip from a title+subtitle (two lines) to a SINGLE line — the SUMMON button stays inline and
+// still only appears when standing at an unrecovered Core capital. app/components/InputBox.tsx,
+// app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-546';
