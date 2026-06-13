@@ -14375,4 +14375,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // compresses Mud Fragment ×3 → Mudstone ×1, so higher-tier mud gear (Mudstone Bulwark, Hardened-Mudstone
 // items) has a craftable path from common mud instead of an RNG wall. No drop-rate changes, no inflation.
 // app/data/items/recipes.json, app/engine/golems.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-536';
+// OTA-537 (Untribium Bulwark) — [balance] ARMOR RESISTANCE REWORK. The old model was flat: any ONE equipped
+// piece resisting a damage type halved it (50%, once), so a "rainbow" of mismatched pieces deflected everything
+// and stacking was pointless. New model is slot-weighted diminishing stacking: each armor slot resists at a base
+// fraction by body coverage — chest 0.35, legs 0.25, head 0.18, hands/feet 0.12, cloak 0.10 (chest-first →
+// cloak-last). Pieces resisting the SAME type STACK multiplicatively (each chips the REMAINING damage), so a
+// FOCUSED build earns strong resistance to its type (e.g. chest+head piercing = 47%) while a RAINBOW gets only
+// one slot's worth against any type. The stack asymptotes and is hard-capped at 0.80 — armor alone NEVER grants
+// immunity, and a resisted hit always leaves ≥1 damage. Combat log now reports the actual % turned, not "halves".
+// app/engine/crafting.ts (slot weights + armorResistanceFraction + reworked applyArmorResistance),
+// app/state/gameStore.ts (aggregateArmor tracks per-slot resistances; combat passes them). JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-537';

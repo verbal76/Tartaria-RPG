@@ -378,6 +378,16 @@ checkout, not a special rollback tool.)
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
 
+- **OTA-537 "Untribium Bulwark" — [balance] ARMOR RESISTANCE REWORK** *(element #132)*. Replaces the flat
+  "any one matching piece halves the type, once" model (which made a rainbow of mismatched pieces deflect
+  everything and stacking pointless). New: **slot-weighted diminishing stacking** — each slot resists at a base
+  fraction by coverage (chest 0.35, legs 0.25, head 0.18, hands/feet 0.12, cloak 0.10 → chest-first/cloak-last);
+  pieces resisting the SAME type stack multiplicatively (each chips the remaining damage). A **focused** build
+  earns strong resistance to its type (chest+head piercing = 47%); a **rainbow** gets only one slot's worth
+  against any type. Hard-capped at 0.80 — armor alone **never** grants immunity, and a resisted hit always
+  leaves ≥1 damage. Combat log now shows the actual % turned. `app/engine/crafting.ts`, `app/state/gameStore.ts`.
+  Tests: `combat` (8 rewritten cases) + integration-verified end-to-end. **This closes out the armor work.**
+
 - **OTA-536 "Untriunium Silt" — [balance] mud-material bottleneck** *(element #131)*. RARE Mudstone gated the
   CHEAPEST mud crafts (Common Mud Scanner + the "cheap to bind" STARTER Mud Golem), so the first scanner/golem
   was effectively unbuildable — and raising Mudstone's drop weight is zero-sum (every other forage item gets

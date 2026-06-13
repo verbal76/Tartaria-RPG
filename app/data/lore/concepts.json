@@ -916,7 +916,7 @@
       "id": "mod_player_armour",
       "keywords": ["player armour modifier", "target armour", "armour reduction"],
       "title": "Target Armour (Modifier)",
-      "answer": "Enemy is armoured. Damage taken is reduced by armour. Wired engine-side: aggregateArmor sums every armor piece's AC bonus and resistance list, applied automatically on every incoming hit."
+      "answer": "Damage taken is reduced by armour. Every equipped piece adds its AC bonus, and pieces resisting the incoming DAMAGE TYPE cut that damage — weighted by slot (chest counts most, the cloak least) and stacked with diminishing returns. Stacking the SAME resistance across pieces (a focused build) far outperforms one piece of each type (a rainbow), but armour alone never grants immunity — a resisted hit always lands for at least 1. Applied automatically on every incoming hit."
     },
     {
       "id": "mod_fire_into_melee",

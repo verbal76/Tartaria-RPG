@@ -787,15 +787,64 @@ export function applyDamageTypeModifier(
   return { damage: rawDamage, match: 'normal' };
 }
 
+// ─── arb119 — slot-weighted diminishing armor resistance ──────────────────
+// Replaces the old flat "any matching piece halves the hit, once" model. Each
+// armor slot resists at a base fraction set by how much of the body it covers:
+// the CHEST plate is the core and counts most; the CLOAK is a thin outer layer
+// and counts least (chest-first → cloak-last). Multiple pieces resisting the
+// SAME damage type STACK with diminishing returns — each piece chips the
+// *remaining* damage — so:
+//   • a FOCUSED build (several pieces all resisting one type) earns strong
+//     resistance to that type, well past the old 50%;
+//   • a RAINBOW build (one piece per type) gets only a single slot's worth
+//     against any given type, so spreading thin is strictly weaker;
+//   • the multiplicative stack asymptotes below 100% and is hard-capped, so
+//     armor ALONE never grants immunity.
+export const ARMOR_SLOT_RESIST_WEIGHT: Readonly<Record<string, number>> = {
+  chest: 0.35,
+  legs: 0.25,
+  head: 0.18,
+  hands: 0.12,
+  feet: 0.12,
+  cloak: 0.1,
+};
+/** Hard ceiling on armor-only resistance — never immunity, even fully focused. */
+export const MAX_ARMOR_RESIST = 0.8;
+
+export interface ArmorSlotResist {
+  /** Lower-cased damage type this slot resists. */
+  type: string;
+  /** Equip slot the resisting piece sits in (drives its weight). */
+  slot: string;
+}
+
+/** Combined resistance fraction (0..MAX_ARMOR_RESIST) against `damageType`:
+ *  stacks every equipped piece that resists it, weighted by slot, with
+ *  diminishing (multiplicative) returns. A given slot counts at most once per
+ *  type even if its piece lists the type twice. */
+export function armorResistanceFraction(
+  damageType: string | null | undefined,
+  slotResists: ReadonlyArray<ArmorSlotResist> | null | undefined,
+): number {
+  if (!damageType || !slotResists || slotResists.length === 0) return 0;
+  const dt = damageType.toLowerCase();
+  let remaining = 1;
+  const countedSlots = new Set<string>();
+  for (const { type, slot } of slotResists) {
+    if (type.toLowerCase() !== dt || countedSlots.has(slot)) continue;
+    countedSlots.add(slot);
+    remaining *= 1 - (ARMOR_SLOT_RESIST_WEIGHT[slot] ?? 0.1);
+  }
+  return Math.min(MAX_ARMOR_RESIST, 1 - remaining);
+}
+
 export function applyArmorResistance(
   incomingDamage: number,
   damageType: string | null | undefined,
-  resistances: readonly string[] | null | undefined,
-): { damage: number; blocked: boolean } {
-  if (!resistances || resistances.length === 0 || !damageType) return { damage: incomingDamage, blocked: false };
-  const dt = damageType.toLowerCase();
-  if (resistances.some((r) => r.toLowerCase() === dt)) {
-    return { damage: Math.max(1, Math.floor(incomingDamage / 2)), blocked: true };
-  }
-  return { damage: incomingDamage, blocked: false };
+  slotResists: ReadonlyArray<ArmorSlotResist> | null | undefined,
+): { damage: number; blocked: boolean; fraction: number } {
+  const fraction = armorResistanceFraction(damageType, slotResists);
+  if (fraction <= 0) return { damage: incomingDamage, blocked: false, fraction: 0 };
+  const reduced = Math.max(1, Math.round(incomingDamage * (1 - fraction)));
+  return { damage: reduced, blocked: reduced < incomingDamage, fraction };
 }

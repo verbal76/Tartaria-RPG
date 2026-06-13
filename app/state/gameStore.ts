@@ -156,6 +156,7 @@ import {
   applyArmorResistance,
   armorResistances,
   fusedArmorResistances,
+  type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
@@ -22147,9 +22148,13 @@ function hasAethericVision(player: PlayerCharacter | null): boolean {
   } catch { return false; }
 }
 
-function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[] } {
+function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[]; resistSlots: ArmorSlotResist[] } {
   let acBonus = 0;
   const resistances: string[] = [];
+  // arb119 — keep each resistance tagged with the SLOT it came from, so combat
+  // can weight the diminishing stack (chest counts most, cloak least). The flat
+  // `resistances` list is preserved for the item-preview / stats display.
+  const resistSlots: ArmorSlotResist[] = [];
   const eq = player.equipped ?? {};
   for (const slot of ARMOR_SLOTS) {
     const name = eq[slot];
@@ -22170,6 +22175,7 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
       // seeded from the synth's single resistance.
       for (const r of fusedArmorResistances(unique.name, unique.uniqueStats.rarity, unique.uniqueStats.resistance)) {
         resistances.push(r);
+        resistSlots.push({ type: r, slot });
       }
       continue;
     }
@@ -22181,9 +22187,12 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     const inst = resolveEquippedItem(player, slot);
     acBonus += inst?.instanceStats?.acBonus ?? piece.acBonus;
     // arb116 — rarity/material resistance ladder (not just the ~20 authored pieces).
-    for (const r of armorResistances(piece)) resistances.push(r);
+    for (const r of armorResistances(piece)) {
+      resistances.push(r);
+      resistSlots.push({ type: r, slot });
+    }
   }
-  return { acBonus, resistances };
+  return { acBonus, resistances, resistSlots };
 }
 
 // Arbiter rolls enemy counter-attack — transparent to player per rulebook
@@ -22456,7 +22465,7 @@ function applyEnemyCounter(
       if (mul > 1) rawDmg = Math.ceil(rawDmg * mul);
     }
 
-    const resisted = applyArmorResistance(rawDmg, enemyDamageType, armorPieces.resistances);
+    const resisted = applyArmorResistance(rawDmg, enemyDamageType, armorPieces.resistSlots);
     let dmg = resisted.damage;
     // arb-fix — title perks now bite in COMBAT, not just against Etheric
     // weather. Aetheric Attuned / Stormcaller passively halve incoming
@@ -22648,7 +22657,7 @@ function applyEnemyCounter(
         : titleHazardShaved > 0
           ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
           : '';
-      const resistTag = (resisted.blocked ? ` (armor halves the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag;
+      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag;
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;
