@@ -1101,6 +1101,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-565': 'Unhexnilium Diction',
   '2026-06-12-566': 'Unhexunium Tell',
   '2026-06-12-567': 'Unhexbium Board',
+  '2026-06-12-568': 'Unhextrium Mend',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

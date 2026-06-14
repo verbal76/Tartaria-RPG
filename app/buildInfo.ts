@@ -14621,4 +14621,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // path the typed command used); availableFactionQuests already filters active/completed, so an accepted posting drops
 // off the list and the modal stays open to take more. Side benefit: kills the board-reprint spam (the chip no longer
 // re-dumps text on each tap). app/components/MissionBoardModal.tsx, app/screens/ExplorationScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-567';
+// OTA-568 (Unhextrium Mend) — [polish · BOTH lines] a batch of non-Qwen narration/feedback fixes surfaced from play
+// logs: (1) the Arbiter no longer double-tags a combat remark (was emitting a "noted" stinger PREPENDED to the enemy
+// remark — now just the remark); (2) the unresolved-hook "still waiting on X" nag is rate-limited (≤ once per ~6
+// qualifying actions, 35% chance, with a cooldown) instead of firing nearly every peaceful beat; (3) crafting that
+// would strip materials from your pack now LOGS a clear line ("would strip … — confirm in the prompt") AND renders the
+// substitution-confirm modal on the Crafting screen too (it was only wired on Exploration, so a craft launched from the
+// Crafting screen silently no-op'd); (4) throw-narration picks the actual thrown weapon noun when the resolved noun is
+// a real inventory weapon, falling back to the equipped main hand instead of narrating a coated-weapon line for a
+// non-weapon. app/engine/narrativeGenerator.ts, app/state/gameStore.ts, app/screens/CraftingScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-568';

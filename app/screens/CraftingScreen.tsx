@@ -6,6 +6,7 @@ import { repairCostMaterials } from '../engine/scrapEngine';
 import { missingIngredientsList } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
+import { BrandedModal } from '../components/BrandedModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -180,6 +181,11 @@ const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  // arb137 — the craft substitution prompt is set by the shared craft path, but
+  // was only rendered in ExplorationScreen — so crafting from THIS screen (when the
+  // recipe needs to strip substitutes) set the flag with nothing on screen, and the
+  // prompt "only appeared after hitting back." Render it here too.
+  const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   const [tab, setTab] = useState<Tab>('craft');
@@ -606,6 +612,29 @@ export function CraftingScreen() {
           setCraftResult(null);
           setScreen('exploration');
         }}
+      />
+
+      {/* arb137 — substitution confirm prompt, also rendered on this screen so a
+          craft started here doesn't silently wait on a modal back in exploration. */}
+      <BrandedModal
+        visible={craftSubstitutionPrompt !== null}
+        title="Strip these for parts?"
+        body={craftSubstitutionPrompt
+          ? `Crafting ${craftSubstitutionPrompt.recipeResult} will consume substitutes from your pack:\n\n${craftSubstitutionPrompt.subsList}\n\nThese stand in for the listed ingredients and will be used up. Proceed?`
+          : undefined}
+        buttons={[
+          {
+            label: 'Keep them',
+            onPress: () => useGameStore.getState().cancelCraftSubstitution(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Craft & strip',
+            onPress: () => useGameStore.getState().confirmCraftSubstitution(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => useGameStore.getState().cancelCraftSubstitution()}
       />
     </View>
   );
