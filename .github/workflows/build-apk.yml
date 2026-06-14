@@ -582,7 +582,13 @@ jobs:
             echo "--- Gradle attempt $attempt of 3 ---"
             if ./gradlew $GRADLE_TASK --no-daemon --stacktrace \
                 -Pandroid.kotlinVersion=1.9.25 \
-                -PkotlinVersion=1.9.25; then
+                -PkotlinVersion=1.9.25 \
+                -PreactNativeArchitectures=arm64-v8a; then
+                # arb156 — arm64-v8a ONLY. x86_64 is emulator/Chromebook-only —
+                # no Android PHONE uses it, yet shipping it doubled every native
+                # lib (RN core + llama.rn's 8 Qwen kernel variants + ONNX). This
+                # one property drops x86_64 across the whole app. Re-add x86_64
+                # here only if we ever need emulator/Chromebook installs.
               echo "✓ Gradle build succeeded on attempt $attempt"
               break
             fi
