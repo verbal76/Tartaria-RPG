@@ -1,5 +1,5 @@
 diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-index 91b2397..77fbb34 100644
+index 91b2397..c310e38 100644
 --- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 +++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 @@ -323,6 +323,14 @@ public class LlamaContext {
@@ -17,7 +17,7 @@ index 91b2397..77fbb34 100644
    static {
      Log.d(NAME, "Primary ABI: " + Build.SUPPORTED_ABIS[0]);
  
-@@ -330,50 +338,105 @@ public class LlamaContext {
+@@ -330,50 +338,115 @@ public class LlamaContext {
      Log.d(NAME, "CPU features: " + cpuFeatures);
      boolean hasFp16 = cpuFeatures.contains("fp16") || cpuFeatures.contains("fphp");
      boolean hasDotProd = cpuFeatures.contains("dotprod") || cpuFeatures.contains("asimddp");
@@ -52,7 +52,17 @@ index 91b2397..77fbb34 100644
 +    // is compiled with -march=armv8.2-a+fp16+dotprod (every instruction
 +    // present on the affected chips).
 +    boolean isBlocklistedChip = LlamaContext.isKnownMisclassifiedChip();
-+    boolean isAtLeastArmV84 = isAtLeastArmV84Raw && !isBlocklistedChip;
++    // Tartaria Realms patch (build 285 / Qwen completion-crash workaround).
++    // On Tensor G5 (Pixel 10 series) the v8.4 i8mm kernels SIGSEGV mid-GENERATION
++    // even with SVE already disabled: the model LOADS clean (sveUsed=false) but
++    // the matmul-heavy completion faults, and the completion guard then benches
++    // Qwen (boot reads qwen:skipped, every Arbiter line falls to template). The
++    // non-SVE i8mm/v8.4 path is the culprit, so for THIS chip we drop all the way
++    // to the conservative v8_2_fp16_dotprod kernel (-march=armv8.2-a+fp16+dotprod;
++    // every instruction in it runs on Tensor G5). Slower, but it doesn't fault
++    // during inference. Narrow chip match so no other device loses i8mm/v8.4 accel.
++    boolean isQwenCrashChip = LlamaContext.isQwenCompletionCrashChip();
++    boolean isAtLeastArmV84 = isAtLeastArmV84Raw && !isBlocklistedChip && !isQwenCrashChip;
      Log.d(NAME, "- hasFp16: " + hasFp16);
      Log.d(NAME, "- hasDotProd: " + hasDotProd);
      Log.d(NAME, "- hasSve: " + hasSve);
@@ -119,14 +129,14 @@ index 91b2397..77fbb34 100644
 +    sTartariaDiag = "variant=" + sSelectedVariant
 +      + " sveRaw=" + hasSveRaw + " sveUsed=" + hasSve + " i8mm=" + hasI8mm
 +      + " v84raw=" + isAtLeastArmV84Raw + " v84used=" + isAtLeastArmV84
-+      + " blocklisted=" + isBlocklistedChip
++      + " blocklisted=" + isBlocklistedChip + " qwenSafeKernel=" + isQwenCrashChip
 +      + " soc=" + socModel + " hw=" + Build.HARDWARE + " model=" + Build.MODEL
 +      + " sdk=" + Build.VERSION.SDK_INT + " kernel=" + System.getProperty("os.version");
 +    Log.d(NAME, "TARTARIA_QWEN_DIAG " + sTartariaDiag);
  }
  
    private static boolean isArm64V8a() {
-@@ -404,6 +467,72 @@ public class LlamaContext {
+@@ -404,6 +477,102 @@ public class LlamaContext {
      }
    }
  
@@ -193,6 +203,36 @@ index 91b2397..77fbb34 100644
 +      return true;
 +    }
 +
++    return false;
++  }
++
++  /**
++   * Tartaria Realms patch (build 285 / Qwen completion-crash workaround).
++   *
++   * Returns true for SoCs/devices whose v8.4 i8mm librnllama kernels SIGSEGV
++   * during GENERATION (the model loads clean, but the completion matmul faults).
++   * Distinct from isKnownMisclassifiedChip() — those chips SIGILL on LOAD because
++   * they aren't really v8.4; THESE chips are genuinely v8.4 but their i8mm
++   * kernels are unstable here. For matched chips the static initializer forces
++   * isAtLeastArmV84 = false, so selection falls all the way through to
++   * rnllama_v8_2_fp16_dotprod, which doesn't crash during inference.
++   *
++   * Currently: Google Tensor G5 (Pixel 10 series — board "mustang",
++   * SOC_MODEL "Tensor G5"). Kept narrow on purpose; broaden only on evidence.
++   */
++  private static boolean isQwenCompletionCrashChip() {
++    if (Build.VERSION.SDK_INT >= 31 && Build.SOC_MODEL != null) {
++      String soc = Build.SOC_MODEL.toUpperCase();
++      if (soc.contains("TENSOR G5")) {
++        Log.d(NAME, "Tartaria Qwen-crash chip hit via Build.SOC_MODEL: " + soc);
++        return true;
++      }
++    }
++    String hardware = Build.HARDWARE == null ? "" : Build.HARDWARE.toLowerCase();
++    if (hardware.equals("mustang")) {
++      Log.d(NAME, "Tartaria Qwen-crash chip hit via Build.HARDWARE: " + hardware);
++      return true;
++    }
 +    return false;
 +  }
 +

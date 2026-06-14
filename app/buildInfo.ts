@@ -14707,4 +14707,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // / hubRoomId but NOT activeBuildingRoomId — and moving between a building's rooms (market stalls etc.) changes only
 // that field, so the key never changed and the dismiss never reset. Added activeBuildingRoomId to the key, so each room
 // gets its own chip and a dismiss only clears the room you closed it in. app/screens/ExplorationScreen.tsx. JS-only OTA.
+// ── NATIVE BUILD 285 (arbiters-line APK · NOT an OTA — OTA_BUILD_ID unchanged) ─────────────────────────────────────
+// Qwen completion-crash fix. The OTA-570 re-warm finally let Qwen actually RUN a completion on-device, and the
+// Tensor G5 (Pixel 10 Pro XL) travel log exposed the next layer: the model LOADS clean (sveUsed=false, the SVE fix
+// holds) but the v8.4 i8mm kernel SIGSEGVs mid-GENERATION — the completion guard then benched it (boot read
+// qwen:skipped, every Arbiter line template). patches/llama.rn+0.4.8.patch now force-drops THIS chip
+// (isQwenCompletionCrashChip → Build.SOC_MODEL "Tensor G5" / Build.HARDWARE "mustang") to the conservative
+// rnllama_v8_2_fp16_dotprod kernel by clearing isAtLeastArmV84 for it — slower, but every instruction in that .so runs
+// on Tensor G5, so the completion shouldn't fault. Narrow match: no other device loses its i8mm/v8.4 acceleration.
+// Diagnostics: TARTARIA_QWEN_DIAG now carries `qwenSafeKernel=true`; the in-app ML health line should read
+// variant=rnllama_v8_2_fp16_dotprod, v84used=false. Requires an EAS APK build (auto-increments to 285) + install;
+// NOT deliverable over OTA. Verify: a long Qwen narration run with no SIGSEGV and `arbiter: qwen ✓` lines on
+// travel/arrival beats. patches/llama.rn+0.4.8.patch.
 export const OTA_BUILD_ID = '2026-06-12-576';
