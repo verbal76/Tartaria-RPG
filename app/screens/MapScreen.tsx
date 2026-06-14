@@ -52,7 +52,7 @@ import {
 } from '../engine/atlasCoords';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
-import { openContractMarkers } from '../engine/contractMarkers';
+import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
@@ -87,6 +87,16 @@ const REGION_DISPLAY: Record<string, string> = {
   subterranean_empire: 'the Subterranean Empire',
   lost_capitals: 'the Lost Capitals',
   aetherstone_deep: 'the Aetherstone Deep',
+};
+
+// arb139 — human "what is this" label for a contract pin's family, shown under the
+// contract's name in the TRAVEL TO list so a "◆N" route row reads what it routes to.
+const CONTRACT_FAMILY_LABEL: Record<ContractFamily, string> = {
+  hunt: 'active hunt',
+  mystery: 'mystery',
+  storyline: 'faction storyline',
+  faction: 'faction quest',
+  lead: 'lead',
 };
 function cardinalBetween(from: { fx: number; fy: number }, to: { fx: number; fy: number }): string {
   const ns = to.fy < from.fy - 0.04 ? 'north' : to.fy > from.fy + 0.04 ? 'south' : '';
@@ -779,6 +789,65 @@ export function MapScreen() {
           style={styles.placesScroll}
           contentContainerStyle={styles.placesContent}
         >
+          {/* arb139 — OPEN-CONTRACT route rows. The atlas plots each open contract as
+              a numbered "◆N" pin, but the player had no way to route to one from the
+              list ("the diamond markers don't have boxes below to autoroute to them").
+              These rows mirror the pins one-for-one — same number, the contract's name,
+              and what it is — and route to the contract's anchor on tap. They're DERIVED
+              live from openContractMarkers, so a row appears when its pin does and clears
+              the instant the contract closes (the "remove it when the complete tag was
+              tripped" behavior). Listed individually (not cell-aggregated like the pins)
+              so each contract carries its own name + type. */}
+          {contractMarkers.length > 0 && (
+            <>
+              <Text style={styles.contractSectionTitle}>◆ OPEN CONTRACTS</Text>
+              {contractMarkers.map((cm) => {
+                const info = placesView.find((p) => p.id === cm.anchorId);
+                const isHere = player?.currentLocationId === cm.anchorId;
+                const anchorName = info?.name ?? cm.label;
+                return (
+                  <TouchableOpacity
+                    key={cm.key}
+                    style={[styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
+                    activeOpacity={isHere ? 1 : 0.7}
+                    disabled={isHere}
+                    onPress={() => {
+                      if (!player) return;
+                      if (player.hubRoomId) {
+                        appendLog(
+                          'arbiter',
+                          `The Arbiter steadies you. "Leave the outpost first — tap LEAVE OUTPOST or type 'leave outpost'. Then we can set course for ${anchorName}."`,
+                        );
+                        return;
+                      }
+                      setTravelCourse(cm.anchorId);
+                      setScreen('exploration');
+                    }}
+                  >
+                    <View style={styles.placeRowLeft}>
+                      <Text style={[styles.placeName, isHere && styles.placeNameHere]}>
+                        <Text style={styles.contractRowNum}>{cm.number}◆  </Text>
+                        {cm.label}
+                      </Text>
+                      <Text style={styles.placeType}>
+                        {CONTRACT_FAMILY_LABEL[cm.family]}
+                        {info && info.name !== cm.label ? ` · ${anchorName}` : ''}
+                      </Text>
+                    </View>
+                    <View style={styles.placeRowRight}>
+                      {isHere ? (
+                        <Text style={styles.placeHereTag}>YOU ARE HERE</Text>
+                      ) : (
+                        <Text style={styles.placeDanger}>Danger {info?.danger ?? 2}/5</Text>
+                      )}
+                      {!isHere && <Text style={styles.placeArrow}>▸</Text>}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+              <Text style={styles.contractSectionTitle}>ALL PLACES</Text>
+            </>
+          )}
           {placesView.map((p) => {
             const isHere = player?.currentLocationId === p.id;
             // OTA-498 — a hidden location reads as "?" (routable) until visited.
@@ -1056,4 +1125,17 @@ const styles = StyleSheet.create({
   placeDanger: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
   placeHereTag: { color: '#e07a5f', fontSize: 9, letterSpacing: 1.5, fontWeight: '700' },
   placeArrow: { color: '#c9a86a', fontSize: 16, fontWeight: '700' },
+  // arb139 — open-contract route rows: a teal accent to tie them to the "◆" map pins,
+  // plus a small section divider above the regular places list.
+  contractSectionTitle: {
+    color: '#54d6c4',
+    fontSize: 10,
+    letterSpacing: 2,
+    fontWeight: '700',
+    paddingHorizontal: 4,
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  contractRow: { borderColor: '#2f5a55', backgroundColor: '#15201e' },
+  contractRowNum: { color: '#54d6c4', fontWeight: '900' },
 });
