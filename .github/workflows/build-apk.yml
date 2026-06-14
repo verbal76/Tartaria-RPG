@@ -1,5 +1,12 @@
 name: Android Build (Tartaria Realms)
 
+# arb157 — trigger-touch to build the fully-trimmed APK (build 290). The
+# preceding commit (audio re-encode, assets/ only) is correctly ignored by this
+# workflow's paths-ignore, so it didn't auto-fire. This non-ignored edit re-fires
+# build-apk from arbiters-line HEAD — arm64-only + SVE strip + Tensor G5 v8_2
+# kernel fix + 128kbps audio, all in one APK. Touches only this file, so iOS and
+# the OTA publishers stay quiet.
+
 # OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
 # build-apk's paths-ignore skips app/**, so an OTA bump alone won't fire the
