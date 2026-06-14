@@ -14696,4 +14696,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (2) The Fusing Crucible chip gets a dismiss (✕): tap it to clear the chip for this visit if you don't need it
 // (nested touchable, so it doesn't fire the fuse; 'fuse' can still be typed; re-entering the location/building reshows
 // it). app/screens/ExplorationScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-574';
+// OTA-575 (Unseptnilium Solo) — [ux · BOTH lines] no double Crucible. A vendor standing in a location that ALREADY
+// surfaces the exploration-screen Fusing Crucible chip (outpost / Hidden Market / a live fusion permit) no longer
+// shows its own paid "★★ USE CRUCIBLE · 25 TC" button — that location's Crucible is right there, so the vendor copy was
+// redundant. The vendor button is mirrored on the SAME gate the exploration chip uses, so the two never both appear.
+// Roadside / wild stalls (no hub, not market, no permit) keep the vendor Crucible — it's the only one there.
+// app/screens/VendorScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-575';

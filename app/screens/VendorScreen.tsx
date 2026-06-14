@@ -31,6 +31,7 @@ type Pending =
 
 export function VendorScreen() {
   const player = useGameStore((s) => s.player);
+  const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const scene = useGameStore((s) => s.currentScene);
   const setScreen = useGameStore((s) => s.setScreen);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
@@ -280,14 +281,24 @@ export function VendorScreen() {
         <Text style={styles.vendorName}>{vendor.name}</Text>
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
-        {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC. */}
-        <TouchableOpacity
-          style={styles.crucibleBtn}
-          onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
-        </TouchableOpacity>
+        {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC.
+            arb153 — …EXCEPT where the LOCATION already has its own Crucible chip
+            (outpost / Hidden Market / a live fusion permit): the exploration
+            screen already offers that Crucible, so the vendor's paid 25 TC copy
+            is redundant. Mirror the exploration chip's own gate so the two never
+            both show. Roadside / wild stalls (no hub, not market) keep it — it's
+            the only Crucible there. */}
+        {!(player?.fusionPending
+          || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
+          || activeBuildingId === 'market') && (
+          <TouchableOpacity
+            style={styles.crucibleBtn}
+            onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {tutorialDemoVendor && (
