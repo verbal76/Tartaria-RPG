@@ -234,6 +234,7 @@ import {
   findFactionQuestById,
   availableFactionQuests,
   fuzzyFindFactionQuest,
+  factionQuestReady,
 } from '../engine/factionQuests';
 import {
   HUNTS,
@@ -14302,6 +14303,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     get().beginScene({ arrivalFromName: fromLocationName });
+    // arb171 — auto-submit any READY faction quest whose turn-in agent/board is
+    // standing here, at FULL reward, with a completion popup (player ask:
+    // "submission should happen as soon as you arrive at the spot it routed").
+    autoSubmitReadyFactionQuests(get, set);
     // v2.4.1 (OTA 035 — Phase 2) — Lost Capital arrival logs the
     // faction's recovery hint; the Core itself only grants after the
     // player performs the faction's gate verb (see canRecoverCore
@@ -17002,11 +17007,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           })
           .filter((i) => (i.quantity ?? 1) > 0);
       }
-      const repResult = applyRepChange(player.factionStanding, def.factionId, def.reward.rep);
+      // arb171 — proximity-gated reward (closes the "COMPLETE pays 100% from
+      // anywhere" exploit the audit flagged). In person at a same-faction vendor
+      // or mission board → FULL; from afar this button couriers it for HALF,
+      // matching turnInFactionQuest's send-word rule. (Travelling to the spot
+      // auto-submits at full — see the arrival handler.)
+      const turnScene = get().currentScene;
+      const turnFaction = turnScene?.vendor?.faction ?? turnScene?.missionBoard?.faction ?? null;
+      const inPerson = turnFaction === def.factionId;
+      const payTc = inPerson ? def.reward.tc : Math.max(1, Math.round(def.reward.tc * 0.5));
+      const payRep = inPerson ? def.reward.rep : Math.max(1, Math.round(def.reward.rep * 0.5));
+      const repResult = applyRepChange(player.factionStanding, def.factionId, payRep);
       set((s) => (s.player ? {
         player: {
           ...s.player,
-          tc: s.player.tc + def.reward.tc,
+          tc: s.player.tc + payTc,
           inventory: fetchConsumed ?? s.player.inventory,
           factionStanding: repResult.standing,
           activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== def.id),
@@ -17016,7 +17031,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } : s));
       get().appendLog(
         'reward',
-        `✦ Quest complete — ${def.title}. +${def.reward.tc} TC, +${def.reward.rep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
+        `✦ Quest complete — ${def.title}.${inPerson ? '' : ' Couriered for HALF (travel to a same-faction agent for full).'} +${payTc} TC, +${payRep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
       );
       applyTrainAndLog(get, set, 'wisdom', '✦ Faction work finished, lessons kept. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -23420,6 +23435,52 @@ const WHILE_AWAY_LINES: ReadonlyArray<{ channel: 'arbiter' | 'world'; line: stri
 // frays at the edges so the player goes to bed thinking about what
 // they were about to start.
 type ContractKind = 'hunt' | 'mystery' | 'storyline' | 'faction_quest';
+/** arb171 — on arrival at a scene where a same-faction vendor or mission board is
+ *  present, auto-turn-in every active faction quest whose WORK is done (staged →
+ *  all stages; fetch → items in hand), at FULL reward, and surface a completion
+ *  popup. This is the "submit on arrival at the routed spot" the player asked for
+ *  — couriering from afar (the Contracts COMPLETE button) stays the HALF option. */
+function autoSubmitReadyFactionQuests(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!player || !scene) return;
+  const turnFaction = scene.vendor?.faction ?? scene.missionBoard?.faction ?? null;
+  if (!turnFaction) return;
+  const countItem = (name: string) =>
+    (player.inventory ?? [])
+      .filter((i) => i.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, i) => n + (i.quantity ?? 1), 0);
+  const ready = (player.activeFactionQuests ?? [])
+    .map((rec) => ({ rec, def: findFactionQuestById(rec.id) }))
+    .filter(({ rec, def }) => !!def && def.factionId === turnFaction && factionQuestReady(def, rec.stage, countItem));
+  if (ready.length === 0) return;
+  const lines: string[] = [];
+  const rewards: string[] = [];
+  for (const { def } of ready) {
+    if (!def) continue;
+    // In-person turn-in → FULL reward, atomic removal, fetch consume — all via
+    // the canonical path so there's a single source of truth.
+    get().turnInFactionQuest(def.id, false);
+    const stillActive = (get().player?.activeFactionQuestIds ?? []).includes(def.id);
+    if (!stillActive) {
+      lines.push(`✓ ${def.title}`);
+      rewards.push(`+${def.reward.tc} TC · +${def.reward.rep} rep`);
+    }
+  }
+  if (lines.length > 0) {
+    set(() => ({
+      pendingWhisperComplete: {
+        title: lines.length === 1 ? 'Contract Turned In' : 'Contracts Turned In',
+        lines,
+        rewards,
+      },
+    }));
+  }
+}
+
 function plantNextContractHint(
   get: () => GameStore,
   factionId: string | null,

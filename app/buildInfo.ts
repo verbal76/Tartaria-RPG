@@ -14876,4 +14876,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // trained levels; feed it to a new golem to graft them on (death = ~half setback + re-summon, not a wipe). Guardrail:
 // resist caps + min-1 damage keep a maxed golem mortal to bosses (preserves OTA-433). JS-only → 290.
 // app/engine/golems.ts, app/engine/types.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-596';
+// OTA-597 (Unnonseptium Handoff) — [feature+fix · arbiters-line] the two parked faction-quest items. #3 ("open" →
+// "ready to submit"): new factionQuestReady() (staged → all stages; FETCH → items in hand; legacy → always) drives the
+// Contracts pill — fetch quests now show `held/needed` then an amber "READY TO SUBMIT", instead of "OPEN" forever, and
+// the COMPLETE button only appears when truly ready. #2 (auto-submit on arrival): travelling to a scene with a same-
+// faction vendor/board now auto-turns-in every READY quest there at FULL reward via the canonical turn-in path, with a
+// completion popup (reuses pendingWhisperComplete). Folded in the audit fix: the Contracts COMPLETE button is the
+// COURIER path now — it pays HALF unless a same-faction agent is present (was 100% from anywhere). JS-only → 290.
+// app/engine/factionQuests.ts, app/state/gameStore.ts, app/screens/ContractsScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-12-597';
