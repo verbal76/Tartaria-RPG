@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
@@ -320,6 +320,11 @@ export function ContractsScreen() {
             {mqExpanded && (
               <View style={styles.mqTracker}>
                 <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
+                {/* arb148 — the Primary Objective card sits in the FIXED region
+                    above the tabs/scroll, so the expanded 9-Capital list pushed
+                    the bottom Capital half off-screen. Cap it and let the rows
+                    scroll internally (nestedScroll) so all nine are reachable. */}
+                <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
                 {LOST_CAPITAL_LOCATIONS.map((capId) => {
                   const def = GUARDIANS_BY_CAPITAL[capId];
                   const recovered = mq.coresRecovered.includes(capId);
@@ -377,6 +382,7 @@ export function ContractsScreen() {
                     </TouchableOpacity>
                   );
                 })}
+                </ScrollView>
                 <Text style={styles.mqTrackerFoot}>
                   Tap any Capital row above to start travel.
                 </Text>
@@ -1295,6 +1301,11 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopColor: '#3a342c',
     borderTopWidth: 1,
+  },
+  // arb148 — cap the expanded Capital list to ~42% of the screen and scroll it
+  // internally so the 9th row never falls off the bottom of the fixed card.
+  mqTrackerScroll: {
+    maxHeight: Math.round(Dimensions.get('window').height * 0.42),
   },
   mqTrackerHead: {
     color: '#cdbf99',

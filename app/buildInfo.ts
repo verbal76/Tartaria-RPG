@@ -14673,4 +14673,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New: app/components/DiscoveryRevealModal.tsx. Touched: app/state/gameStore.ts, App.tsx, app/components/InputBox.tsx,
 // app/components/EnemyPanel.tsx, app/screens/CraftingScreen.tsx, app/engine/sellPrice.ts (unchanged — confirmed),
 // app/engine/itemDefaults.ts (import). JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-571';
+// OTA-572 (Unhexseptium Tally) — [bugfix+balance · BOTH lines] two fixes: (1) the Contracts Primary Objective card's
+// expandable 9-Capital tracker lives in the FIXED region above the tabs/scroll, so opening it pushed the ninth Capital
+// half off the bottom of the screen — the list now caps at ~42% of screen height and scrolls internally (nestedScroll)
+// so all nine rows are reachable. (2) Sell-value re-level: equippable GEAR (weapon/armor/dog_armor/runecaster) now uses
+// a higher base than raw materials of the same rarity — a Common piece (e.g. Titan's Guard Mask) sells for ~11 TC
+// instead of ~5, Uncommon ~26, Rare ~60, Legendary ~128. Still below buy price, and the vendor-offer match still caps
+// same-vendor resale at 40%, so no buy-low/sell-high pump. app/screens/ContractsScreen.tsx, app/engine/sellPrice.ts.
+// JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-572';
