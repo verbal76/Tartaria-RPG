@@ -1077,6 +1077,27 @@ const STAMINA_COSTS = {
 // app session.
 const WELCOME_BACK_MIN_MS = 60_000;
 let lastWelcomeBackAt: number | null = null;
+// arb164 — the save-load greeting is the FIRST thing the Arbiter says when the
+// player returns to a game, and it's a non-negotiable that it ALWAYS names them
+// (not the 1/3 chance arbiterAddress rolls): "every time I load in it should say
+// welcome back, <name>." This is the companion's standing hello — warm, by name,
+// every time. The pool varies the warmth around a constant "Welcome back, {name}"
+// core; {name} is the player's first name, falling back to "friend" only when the
+// character somehow has no name at all.
+const WELCOME_BACK_LINES = [
+  `The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, {name}. The road kept your place."`,
+  `The Arbiter looks up as you return. "Welcome back, {name}. I wondered when you'd take up the thread again."`,
+  `The Arbiter meets your eyes. "Welcome back, {name}. Good — the buried country is no place to walk alone."`,
+  `The Arbiter nods, the way you nod at someone you've missed. "Welcome back, {name}. We've still got ground to cover, you and I."`,
+  `The Arbiter sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
+];
+
+function welcomeBackLine(player: PlayerCharacter | null | undefined): string {
+  const first = player?.name?.split(/\s+/)[0];
+  const name = first && first.length > 0 ? first : 'friend';
+  const line = WELCOME_BACK_LINES[Math.floor(Math.random() * WELCOME_BACK_LINES.length)]!;
+  return line.replace('{name}', name);
+}
 // OTA-350 — throttle the Arbiter's "consider stealth" nudge so it's an
 // occasional suggestion in fitting moments, not a per-scene nag.
 const STEALTH_HINT_MIN_MS = 120_000;
@@ -3582,12 +3603,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the revival line above already greeted the player, and "welcome back"
       // reads wrong right after a death.
       if (!wasInterruptedDeath && (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS)) {
-        // OTA-184 — ~1/3 of welcomes use the player's name instead
-        // of "friend" so the Arbiter occasionally sounds personal.
-        const addr = arbiterAddress(get().player, 'friend');
+        // arb164 — ALWAYS greet by name now (player's non-negotiable). This is
+        // the first beat after character select / on every load — a warm, named
+        // companion hello, not the 1/3 arbiterAddress roll.
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines their head. "Welcome back, ${addr}."`,
+          welcomeBackLine(get().player),
           { skipDedup: true },
         );
         lastWelcomeBackAt = now;

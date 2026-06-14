@@ -14807,4 +14807,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ARBITER_LOOK_LINES 6→16, GENERIC_REMARKS 8→24 (lore musings), COMBAT_REMARKS 15→25. Purely additive string arrays,
 // same voice/format; combat lines keep the {enemy} token. Pairs with 585's ambient Qwen to thin the rotation. JS-only → 290.
 // app/engine/narrativeGenerator.ts.
-export const OTA_BUILD_ID = '2026-06-12-586';
+// OTA-587 (Unoctseptium Homecoming) — [feature · arbiters-line] the save-load greeting ALWAYS names the player now.
+// It's the first thing the Arbiter says after character select / on every load, and the player wants it to be a warm,
+// by-name companion hello every time — not the old 1/3 chance (arbiterAddress) that mostly said "Welcome back, friend".
+// New welcomeBackLine() pulls from a 5-line warm pool, each built around a constant "Welcome back, <first name>" core,
+// falling back to "friend" only if the character has no name. The 60s debounce + skipDedup are unchanged. JS-only → 290.
+// app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-587';
