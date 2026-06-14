@@ -1102,6 +1102,7 @@ const CODENAMES: Record<string, string> = {
   // 566 'Unhexunium Tell' is arbiters-line-only (Qwen-vs-template debug marker); skipped here.
   '2026-06-12-567': 'Unhexbium Board',
   '2026-06-12-568': 'Unhextrium Mend',
+  '2026-06-12-569': 'Unhexquadium Routes',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

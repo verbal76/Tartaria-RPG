@@ -14612,4 +14612,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Crafting screen silently no-op'd); (4) throw-narration picks the actual thrown weapon noun when the resolved noun is
 // a real inventory weapon, falling back to the equipped main hand instead of narrating a coated-weapon line for a
 // non-weapon. app/engine/narrativeGenerator.ts, app/state/gameStore.ts, app/screens/CraftingScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-568';
+// OTA-569 (Unhexquadium Routes) — [ux · BOTH lines] the atlas plots each OPEN contract as a numbered "◆N" pin, but the
+// TRAVEL TO list had no rows for them, so there was no way to one-tap route to a contract from the map ("the diamond
+// markers don't have boxes below to autoroute to them with the name and what they are"). The TRAVEL TO panel now leads
+// with an "◆ OPEN CONTRACTS" section: one routable row per contract pin, carrying the SAME number as the pin, the
+// contract's name, what it is (active hunt / mystery / faction storyline / faction quest / lead), and the anchor's
+// danger. Rows are derived live from openContractMarkers, so a row appears when its pin does and clears the instant the
+// contract closes (the agreed "lives while it has a marker, gone when complete" behavior). app/screens/MapScreen.tsx,
+// app/engine/contractMarkers.ts (type export). JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-569';
