@@ -26271,17 +26271,19 @@ async function narrateViaArbiter(
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
       : 'cooldown';
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
-    // arb162 — CANNED flavor line: shown on-screen, but voiced only ~1 in 3
-    // (the player is tired of hearing the repetitive templates and wants the
-    // fresh Qwen lines spoken instead). `silent` tells TTSController to skip it.
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(33) ? undefined : { silent: true });
+    // arb163 — CANNED flavor line: voiced ~60% of the time. Qwen lines are
+    // ALSO voiced, but during active play (actions every ~2s) a Qwen generation
+    // is cancelled by the next action before it finishes — so it almost never
+    // completes a spoken line, and canned has to carry the voice. 60% keeps it
+    // reliably audible without reading every single beat. `silent` → TTS skips.
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(60) ? undefined : { silent: true });
     return;
   }
   const state = get();
   const player = state.player;
   if (!player || !scene) {
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(33) ? undefined : { silent: true });
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(60) ? undefined : { silent: true });
     return;
   }
   const sceneSlice: SceneSlice = {
@@ -26369,7 +26371,7 @@ async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
       // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
-      if (trimmed) get().appendLog('arbiter', trimmed, chance(33) ? undefined : { silent: true });
+      if (trimmed) get().appendLog('arbiter', trimmed, chance(60) ? undefined : { silent: true });
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the

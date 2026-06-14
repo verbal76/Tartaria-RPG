@@ -14782,4 +14782,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-583 (Unseptoctium Louder) — [tune · arbiters-line] bump the canned-flavor voice rate 25%→33% (chance(25)→chance(33))
 // at all three narrateViaArbiter template sites. With the voice-starvation fixed in 582, the player wants a touch
 // more of the canned lines spoken between the fresh Qwen ones. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-583';
+// OTA-584 (Unoctquadium Carry) — [fix+tune · arbiters-line] two problems from the 583 playtest. (1) Near-silence:
+// the log showed ZERO `qwen ✓` all session — during active play (actions every ~2s) each Qwen gen is CANCELLED by
+// the next action before it finishes (~6-8s), yet the cancelled gen still arms the 10s cooldown, so every beat falls
+// to the canned template and Qwen never contributes a voiced line. Since canned has to carry the voice, raise its
+// rate 33%→60% (chance(33)→chance(60)) at all three narrateViaArbiter sites. (2) A vendor greeting voiced SIX times
+// in a row: the game log only de-dups CONSECUTIVE repeats, so a line re-emitted non-consecutively (re-entering a
+// stall, the Crucible forging the same item 4-6×) reached TTS each time. New "spoken recently" guard in
+// TTSController skips an exact line voiced within the last 30s. JS-only → 290. app/voice/TTSController.ts, gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-584';
