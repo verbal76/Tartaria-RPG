@@ -142,13 +142,14 @@ const queue: QueuedUtterance[] = [];
 // could overlap the next chunk's inference. arb159 — funnel ALL forward() calls
 // through the SHARED native-ML lock (runExclusiveNativeMl) so prefetch-ahead
 // still happens during playback, never two synths run at once, AND a synth
-// never overlaps a Qwen completion (the two together crashed Tensor G5).
+// never overlaps a Qwen completion (the two together crashed Tensor G5 —
+// CONFIRMED: with the lock, a full session ran with zero crashes).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function inferSerial(model: any, text: string, rate: number): Promise<Float32Array | null> {
-  // arb159 — route Kokoro synthesis through the SHARED native-ML lock (not the
-  // voice-only inferenceChain) so a synth never overlaps a Qwen completion. Two
-  // heavy native-ML workloads at once SIGSEGV'd the process on Tensor G5. The
-  // shared lock still serializes voice-vs-voice (it's one global FIFO).
+  // arb159 — route Kokoro synthesis through the SHARED native-ML lock so a synth
+  // never overlaps a Qwen completion. The lock STAYS (it's what stopped the
+  // crash); the arb161 fix is on the Qwen side — a generation cooldown so Qwen
+  // doesn't grab this lock on every beat and starve the voice.
   return runExclusiveNativeMl(() => model.forward(text, rate)) as Promise<Float32Array | null>;
 }
 let currentlySpeaking: QueuedUtterance | null = null;

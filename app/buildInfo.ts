@@ -14751,4 +14751,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the picker presentation is reverted). (2) Raise the dog DISTRACT attack bonus +2 → +4 (matching the dodge's +4), so a
 // successful distract is a strong setup, not a marginal nudge. The +1 initiative is unchanged. Narration + chip hint
 // updated to "+1 init, +4 atk". app/components/InputBox.tsx, app/engine/combatRules.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-579';
+// OTA-580 (Unseptpentium Cadence) — [fix · arbiters-line] un-starve the voice. CONFIRMED GOOD: the OTA-578 native-ML
+// lock killed the Qwen↔Kokoro contention crash — a full 290/579 session ran with `qwen:done`, completion guard clean,
+// voice guard clean, crash count 0. But the lock serializes the two, and OTA-577's intent widening made Qwen fire on
+// nearly every investigate — so it held the lock back-to-back and the voice barely spoke ("a single syllable then an
+// error"). The lock STAYS (it's what stops the crash); the fix is a Qwen generation cooldown (20s) in narrateViaArbiter
+// so generations are spaced out and the shared lock is free for the voice the vast majority of the time. Qwen narration
+// becomes an occasional AI flourish (debug reason `cooldown` on the throttled beats); the voice reads every line — Qwen
+// or template — freely, and the two still never run at once. JS-only; reaches build 290 over OTA.
+// app/state/gameStore.ts, app/voice/PiperTTSManager.ts (lock comment).
+export const OTA_BUILD_ID = '2026-06-12-580';

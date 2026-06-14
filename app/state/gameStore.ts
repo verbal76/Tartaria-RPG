@@ -26155,6 +26155,17 @@ function logRepChanges(
 // fade-epoch pattern.
 let arbiterGenerationEpoch = 0;
 
+// arb161 — Qwen generation cooldown. The OTA-578 native-ML lock (which stopped
+// the Qwen↔Kokoro contention crash — confirmed: a full session ran crash-free)
+// serializes the two, so while Qwen generates the voice WAITS. With the OTA-577
+// intent widening Qwen fired on nearly every investigate, holding the lock
+// back-to-back and STARVING the voice (it barely spoke). This cooldown spaces
+// generations out so the lock is free for the voice the vast majority of the
+// time — Qwen narration stays an occasional AI flourish, the voice reads every
+// line (Qwen or template) freely, and the two never run at once. Tunable.
+const QWEN_GEN_COOLDOWN_MS = 20000;
+let lastQwenGenStartMs = 0;
+
 // Trim Qwen output back to the last sentence-terminating punctuation so we
 // don't display fragments like "...echoing in the". Looks for the final
 // ., !, ?, ", or — followed (optionally) by trailing space/quote and keeps
@@ -26240,14 +26251,20 @@ async function narrateViaArbiter(
   // carry the narration. Random Qwen chatter on attack / rest / dig /
   // equip etc. is gone.
   const intentAllowsQwen = QWEN_ALLOWED_INTENTS.has(intent);
-  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen) {
+  // arb161 — cooldown: don't grab the native-ML lock again until enough time has
+  // passed, so the voice (which shares the lock) isn't starved by back-to-back
+  // generations on every investigate.
+  const cooldownActive = (Date.now() - lastQwenGenStartMs) < QWEN_GEN_COOLDOWN_MS;
+  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive) {
     // arb134 — name WHY this turn took the template path, so a pasted log shows
     // unambiguously which Arbiter lines are AI-generated vs template (and why the
-    // rest weren't). qwen-not-ready / busy / combat / intent-not-allowed:<intent>.
+    // rest weren't). qwen-not-ready / busy / combat / intent-not-allowed:<intent> /
+    // cooldown.
     const reason = !qwen.isReady() ? 'qwen-not-ready'
       : get().isGenerating ? 'busy'
       : inCombat ? 'combat'
-      : `intent-not-allowed:${intent}`;
+      : !intentAllowsQwen ? `intent-not-allowed:${intent}`
+      : 'cooldown';
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
     if (trimmed) get().appendLog('arbiter', trimmed);
     return;
@@ -26284,6 +26301,7 @@ async function narrateViaArbiter(
   const messages = buildSystemPrompt(ctx);
   const myEpoch = ++arbiterGenerationEpoch;
   const t0 = Date.now(); // arb134 — Qwen generation latency for the debug marker
+  lastQwenGenStartMs = t0; // arb161 — start the cooldown so the voice gets the lock back
   set({ isGenerating: true, partialArbiterText: '' });
   try {
     // Token budgets matched to the prompts:
