@@ -14760,4 +14760,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // becomes an occasional AI flourish (debug reason `cooldown` on the throttled beats); the voice reads every line — Qwen
 // or template — freely, and the two still never run at once. JS-only; reaches build 290 over OTA.
 // app/state/gameStore.ts, app/voice/PiperTTSManager.ts (lock comment).
-export const OTA_BUILD_ID = '2026-06-12-580';
+// OTA-581 (Unsepthexium Mixture) — [feature · arbiters-line] mix the Arbiter's voice between FRESH Qwen lines and canned
+// templates the way the player asked. (1) The fresh Qwen lines stay VOICED (they're the unique ones worth hearing).
+// (2) CANNED flavor lines are now read on-screen but voiced only ~1 in 4 (chance(25)) — via a new `silent` meta flag on
+// the log entry that TTSController skips — so the player stops hearing the same "the memory will rot"/"I see how you
+// came at that" templates on every button press; they can glance them in the scroll instead. (3) Must-say lines
+// (combat prompts, warnings, tutorial — they bypass narrateViaArbiter) are unaffected, so they always speak. (4) Qwen's
+// cooldown 20s→10s so the fresh AI lines come more often (canned lines mostly silent now frees lock headroom). Net:
+// you mostly hear unique generated lines + the occasional canned one, voice + Qwen both have room, never overlap.
+// Tunable knobs: QWEN_GEN_COOLDOWN_MS and the chance(25) canned-voice rate. JS-only; reaches build 290 over OTA.
+// app/state/gameStore.ts, app/voice/TTSController.ts.
+export const OTA_BUILD_ID = '2026-06-12-581';

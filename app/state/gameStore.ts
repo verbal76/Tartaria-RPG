@@ -26163,7 +26163,12 @@ let arbiterGenerationEpoch = 0;
 // generations out so the lock is free for the voice the vast majority of the
 // time — Qwen narration stays an occasional AI flourish, the voice reads every
 // line (Qwen or template) freely, and the two never run at once. Tunable.
-const QWEN_GEN_COOLDOWN_MS = 20000;
+// arb162 — Qwen fires at most once per this window (its "AC roll" spacing). With
+// canned flavor lines now mostly SILENT (arb162), the shared native-ML lock has
+// headroom, so Qwen can run a bit more often and — since Qwen lines ARE voiced —
+// the player hears mostly fresh AI lines with the canned ones read sparingly.
+// Tight balance: short enough to feel present, long enough not to starve voice.
+const QWEN_GEN_COOLDOWN_MS = 10000;
 let lastQwenGenStartMs = 0;
 
 // Trim Qwen output back to the last sentence-terminating punctuation so we
@@ -26266,14 +26271,17 @@ async function narrateViaArbiter(
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
       : 'cooldown';
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
-    if (trimmed) get().appendLog('arbiter', trimmed);
+    // arb162 — CANNED flavor line: shown on-screen, but voiced only ~1 in 4
+    // (the player is tired of hearing the repetitive templates and wants the
+    // fresh Qwen lines spoken instead). `silent` tells TTSController to skip it.
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(25) ? undefined : { silent: true });
     return;
   }
   const state = get();
   const player = state.player;
   if (!player || !scene) {
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
-    if (trimmed) get().appendLog('arbiter', trimmed);
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(25) ? undefined : { silent: true });
     return;
   }
   const sceneSlice: SceneSlice = {
@@ -26355,7 +26363,8 @@ async function narrateViaArbiter(
   } catch {
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
-      if (trimmed) get().appendLog('arbiter', trimmed);
+      // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
+      if (trimmed) get().appendLog('arbiter', trimmed, chance(25) ? undefined : { silent: true });
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the

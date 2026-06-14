@@ -211,6 +211,11 @@ function onState(state: GameState): void {
       const entry = log[i] as GameLogEntry | undefined;
       if (!entry) continue;
       if (!SPOKEN_CHANNELS.has(entry.channel)) continue;
+      // arb162 — narrateViaArbiter flags most CANNED flavor lines `silent` so
+      // they're read on-screen but not voiced (the player asked to hear the
+      // fresh Qwen lines, not the repetitive canned ones). Must-say lines and
+      // Qwen-generated lines carry no silent flag, so they still speak.
+      if (entry.meta?.silent === true) continue;
       // Suppress the arbiter follow-up if we already spoke it
       // sentence-by-sentence via the streaming buffer.
       if (entry.channel === 'arbiter' && wasAlreadyStreamed(entry.text)) continue;
