@@ -706,3 +706,6 @@ jobs:
 
 # arb172 trigger-touch — re-fire the production AAB with [build-aab] LEADING the
 # commit first line (the earlier trailing-marker commit fell through to preview).
+
+# arb172 re-trigger #2 — [build-aab] is a contains-check so it works as the
+# second token; this touch re-fires the signed AAB alongside the iOS fix.

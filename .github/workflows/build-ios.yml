@@ -255,3 +255,7 @@ jobs:
 # arb172 trigger-touch — re-fire the production (TestFlight) IPA with [build-ios]
 # LEADING the commit first line. The prior trailing-marker commit selected the
 # preview profile (no internal-distribution creds) and failed; OTA-302 same fix.
+
+# arb172 re-trigger #2 — [build-ios] MUST be the first token (^\[build-ios\]);
+# the prior "[build-aab] [build-ios]" title started with [build-aab] so the iOS
+# regex anchor missed and it fell to preview. Title now leads with [build-ios].
