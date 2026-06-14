@@ -1,5 +1,109 @@
 # Tartaria Realms — Session Handoff
 
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CURRENT SESSION STATE — 2026-06-14 (READ THIS FIRST; it supersedes the older
+     "ONE branch HaL2001" guidance in the §P block below for THIS work phase)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+> ## ⟁ CURRENT WORK PHASE — develop on `arbiters-line`, promote to HAL at the end
+>
+> **Branch policy (per the user, this session):** ALL work happens on
+> **`arbiters-line`**. When the arbiter build is fully perfected it will REPLACE
+> `HaL2001` wholesale (one promotion). **Do NOT push to `HaL2001` unless the user
+> EXPLICITLY says "this is a quality-of-life improvement for HAL."** Everything
+> else — gameplay, CI, size, Qwen — stays on arbiters-line only. (This overrides
+> the older §P "ONE branch HaL2001" model below, which describes the *previous*
+> phase and the eventual promotion mechanics.)
+>
+> **Worktrees:** `/tmp/hal2001` = `arbiters-line` (active); `/tmp/hal-main` =
+> `HaL2001` (touch ONLY on an explicit QoL instruction). `npm ci` already run in
+> `/tmp/hal2001` (node_modules present; `npx tsc`/`jest`/`patch-package` work).
+>
+> ### Build / OTA state
+> - **Latest OTA:** `OTA-576 (Unseptunium Reroom)` — `app/buildInfo.ts`
+>   `OTA_BUILD_ID = '2026-06-12-576'`. OTAs 568→576 shipped this session (see the
+>   per-OTA log near the bottom of `app/buildInfo.ts`). Next OTA = **577**
+>   (codename `Unseptbium <word>`; codename element# = OTA-NNN − 405).
+> - **Native APK build 290 IN PROGRESS** (arbiters-line, triggered via a
+>   trigger-touch push to `.github/workflows/build-apk.yml`). It carries: arm64-v8a
+>   only + 2 SVE kernel variants dropped + Tensor G5 → `v8_2` Qwen kernel fix +
+>   128 kbps re-encoded audio. Build 288 (same minus audio) already went GREEN, so
+>   the pipeline + disk fix + patched Java all compile. **versionCode = GitHub
+>   run_number (auto-increments).**
+>
+> ### Qwen (on-device LLM) — the long thread
+> - Native via `llama.rn` 0.4.8. The Qwen GGUF (~398MB) and Piper/Kokoro voice
+>   models are **downloaded at runtime, NOT bundled** in the APK.
+> - **SVE load-crash:** FIXED. `patches/llama.rn+0.4.8.patch` forces `hasSve=false`
+>   globally (Tensor G5 SVE kernels SIGSEGV). Confirmed `sveUsed=false`, 0 crashes.
+> - **Lifecycle bug** (App.tsx disposed Qwen on transient `inactive`, never
+>   re-warmed): FIXED in **OTA-570** (arbiters only) — dispose only on real
+>   `background`, re-warm on `active`.
+> - **Completion crash (current):** the re-warm let Qwen finally RUN a completion,
+>   and the `v8_4_fp16_dotprod_i8mm` kernel SIGSEGVs mid-GENERATION on Tensor G5
+>   (model LOADS fine; inference faults). Fix (native build 285/290): the patch's
+>   `isQwenCompletionCrashChip()` (matches `SOC_MODEL "Tensor G5"` / `HW "mustang"`)
+>   forces `isAtLeastArmV84=false` → drops to the conservative `v8_2_fp16_dotprod`.
+>   Diag now carries `qwenSafeKernel=true`. **Build 290 verifies this.**
+> - **Verify on device:** ML health line should read
+>   `variant=rnllama_v8_2_fp16_dotprod` / `v84used=false` / `qwenSafeKernel=true`.
+>   Qwen only generates on intents **travel / diplomacy / scene_intro**, out of
+>   combat — so watch ARRIVAL / travel beats for `arbiter: qwen ✓ <ms>ms` (vs
+>   `arbiter: template (reason=…)`). Most investigate/climb/combat staying template
+>   is BY DESIGN (`reason=intent-not-allowed`), not a bug.
+> - **If v8_2 ALSO crashes** → on-device generation likely not viable on this HW
+>   with llama.rn 0.4.8. Decision fork (scoped, not built): **safe-default +
+>   allowlist** (everyone starts on v8_2 = ZERO visible crashes ever; allowlist
+>   known-good chips to unlock i8mm/v8.4 speed) **vs auto-downgrade** (self-heals
+>   any unknown bad chip but costs **1–2 VISIBLE home-screen crashes** per new
+>   device — a native SIGSEGV can't be caught in JS). User leaned toward NOT
+>   crashing players → safe-default+allowlist is the likely call.
+>
+> ### Size trims (build 290) — APK had grown past the ~180MB baseline
+> - arm64-only (drop emulator-only x86_64) — `-PreactNativeArchitectures=arm64-v8a`
+>   in `build-apk.yml`. (This + the CI disk fix below are the ONLY things on HAL.)
+> - Dropped the 2 SVE kernel `.so` variants (never loaded) — patch CMakeLists.
+> - Re-encoded the 12 background-music mp3s to 128 kbps (61MB → 41MB, −19MB).
+>   **ARBITERS ONLY** (user's call — pushing to HAL would force existing players a
+>   ~41MB OTA re-download). Largest remaining lever: move music to
+>   download-on-demand (like the model/voices) to remove it from the APK entirely.
+>
+> ### CI / build mechanics (lessons this session)
+> - `build-apk.yml` `paths-ignore` skips `app/**`, `App.tsx`, `assets/**`, docs,
+>   tests, `**.md`. It FIRES on `.github/workflows/build-apk.yml` and `patches/**`.
+>   So an asset/code/OTA commit does NOT fire a native build — trigger one with a
+>   **trigger-touch** comment in `build-apk.yml` (the GitHub MCP `actions_run_trigger`
+>   dispatch is **403-denied** to this integration; read tools like `actions_list`
+>   work). BATCH commits before pushing — staggered pushes multiplied builds 286–290.
+> - CI disk fix (build 285+): `mv` not `cp` when staging the ~big artifact + free
+>   ~25–30GB of unused toolchains + `timeout-minutes: 60`. (Was: "No space left on
+>   device" staging the APK — runner disk, NOT app size.)
+> - Known waste TODO: `patches/**` also fires `build-ios.yml` (not in its
+>   paths-ignore) — burns a Mac runner for an Android-only patch.
+>
+> ### Shipped gameplay this session (don't re-do)
+> 568 narration polish · 569 contract route-rows in TRAVEL TO · 571 nine-fix batch
+> (golem-summon confirm modal, first-collectible popup, Reclaimer's-Rope exploit
+> gate, dog amber-button no-op + blocking bite/distract modal, enemy-portrait detail
+> popup, looted-gear rarity inference, forged-weapon reveal, capital ★SUMMON nudge)
+> · 572 contracts capital-list scroll + gear sell re-level · 573 vendor sell-stats
+> (instance preview) + vendor contracts mission-board popup · 574 mission-board chip
+> auto-hide + crucible chip dismiss · 575 hide vendor crucible where location has one
+> · 576 crucible dismiss per-room fix.
+>
+> ### Pending / next
+> 1. Watch **build 290** → check APK size, install, verify Qwen on-device (above).
+> 2. If Qwen fires: consider widening `QWEN_ALLOWED_INTENTS`
+>    (`app/engine/narrativeGenerator.ts`). If it still crashes: the
+>    safe-default+allowlist vs auto-downgrade decision.
+> 3. Open (NOT yet fixed): **Hidden Market** arrival shows cardinal directions
+>    instead of the 4 stalls (combat-on-arrival likely clobbers the auto-enter at
+>    `gameStore` ~4726). Optional: music download-on-demand; tighten iOS trigger.
+>
+> **Artifact rules (unchanged):** every commit/PR footer ends with
+> `https://claude.ai/code/session_01LrgRsoDADojqEZmcatLScv`; NEVER put the model
+> ID in any committed artifact (commits, code, buildInfo) — chat only.
+
 > **READ FIRST — how we operate:** §P below is the single source of truth.
 > **ONE branch (`HaL2001`). ONE codename scheme — now `<Element> <Chemical-Process>`
 > (periodic table by atomic number; the old `<word> Anvil` tree scheme ENDED at
@@ -377,8 +481,6 @@ checkout, not a special rollback tool.)
 > and clear this list.
 
 **Staging list (fresh — accumulating toward the next ≥5 push):**
-
-- **OTA-564 "Unpentennium Latch" — [CRITICAL] fix the "Maximum update depth exceeded" crash on NEW-character creation** *(element #159)*. The render loop in OTA-562's note turned out to be its OWN bug (independent of Qwen). Root cause (pinpointed via a component-stack capture shipped on the arbiters test line, OTA-563 "Unpentoctium Lens"): `InputBox`'s bandolier selector `useGameStore((s) => s.player?.equipped?.bandolierIds ?? [])` returns a FRESH `[]` every call when a new character has no `bandolierIds` yet — Zustand's `Object.is` equality sees it as changed every render → InputBox re-renders → selector re-runs → infinite loop, firing the instant the name beat mounts (the exploration screen never paints). NEW players were hard-blocked on BOTH the production build (`com.hotatticgames.tartarprim`, build 281, confirmed) and arbiters. Fix: a frozen `EMPTY_BANDOLIER_IDS` sentinel so the undefined case is referentially stable. Also adds a title-screen build marker (`⟁ HAL BUILD` / `⟁ ARBITER BUILD` by App ID). Shipped to BOTH lines at the same OTA id 564 (563 skipped here — it was arbiters-only). `app/components/InputBox.tsx`, `app/screens/TitleScreen.tsx`. Typecheck clean.
 
 - **OTA-562 "Unpentseptium Bulwark" — [CRITICAL] stop re-enabling Qwen on a device that genuinely can't run it** *(element #157)*. Hard correction of the 557-561 arc: the completion guard was RIGHT all along. The Pixel 10 Pro XL / Tensor G5 really does SIGSEGV during Qwen token generation — OTA-561's amnesty re-enabled Qwen → app crash-looped to the home screen AND threw a JS "Maximum update depth exceeded" render loop; the player couldn't load ANY character. "I never crash" was true only because the guard had already disabled Qwen (Kokoro voice is a separate lib, always worked). Fixes: (1) REMOVED the OTA-560 amnesty `healStaleGuardState` (forgiving a real-crash device just re-crashes it); (2) REMOVED the OTA-559 per-completion success-reset (let an intermittent crasher never give up); (3) `MAX_QWEN_COMPLETION_CRASHES` back to 1; (4) NEW perma give-up at `QWEN_PERMA_DISABLE_AT` (3) — after 3 total completion crashes Qwen is disabled PERMANENTLY (auto-retry stops) until manual Settings → Reset AI; (5) re-assert disable from the STANDING count each boot. Template narration fully playable; Kokoro unaffected; general init guard (OTA-558) + `clearInFlightBreadcrumbs` kept. `app/diagnostics/mlHealth.ts`, `App.tsx`. Tests: 4 ML guard suites / 22 green (retry seeds moved below the perma ceiling; perma + standing-count tests added). **Open follow-up:** confirm the "Maximum update depth exceeded" render loop + empty-slot screen-render crash are gone once Qwen stays off; if not, harden the exploration/narration screen independently.
 
@@ -1749,6 +1851,70 @@ The entries below are retained as the shipped-batch record.
 > **Reminder — `HaL2001` is the conduit because it owns the signed store workflows.** The
 > production AAB step strips `.hal2001` → `com.hotatticgames.tartarprim` for Play; the iOS
 > path is signed for TestFlight. Everything we do lands here and ships from here.
+>
+> ---
+> **🧪 ARBITERS-LINE ISOLATED TEST BUILD (2026-06-13 — user request).** The user
+> asked for a fully isolated build line to validate the native fixes on their own
+> Pixel 10 Pro XL **without any risk to the live HaL2001/preview testers**. What was
+> done:
+> 1. **Clean mirror.** `arbiters-line` was reset to **exactly current HaL2001**
+>    (through OTA-562), discarding its stale 130-commit fork (old Piper voice, a
+>    ~2,200-line-divergent gameStore, parallel assets) per the user's "clean mirror"
+>    choice. The old fork's unique work was deemed superseded.
+> 2. **Isolation overlay re-applied** (the only deltas from HaL2001):
+>    `app.json` → name `Tartaria Realms ARB`, package/bundleId
+>    `com.hotatticgames.tartarprim.arbiters`, `expo-channel-name: arbiters-line`;
+>    `.github/workflows/eas-update-arbiters.yml` (publishes ONLY to the
+>    `arbiters-line` EAS channel, with hard guards: refuses any non-arbiters-line
+>    branch, refuses live channels, refuses if app.json's channel ≠ arbiters-line);
+>    `build-apk.yml` arbiters-line trigger + OTA-workflow path-ignores.
+> 3. **ISOLATION GUARANTEE (verified):** `eas-update.yml` (the LIVE publisher) does
+>    NOT list `arbiters-line`, so a push here can never publish to `hal2001`/`preview`.
+>    OTAs from this line reach ONLY the arbiters APK install. No spillover.
+> 4. **Native fixes baked in** (this IS a native build of the arbiters APK):
+>    - **Qwen SVE-crash fix (queue #3).** Root cause found: `llama.rn` 0.4.8 compiles
+>      7 `-march` variant libs and `LlamaContext.java` picks one from `/proc/cpuinfo`.
+>      The Tensor G5 reports `sve` → loads `rnllama_v8_4_fp16_dotprod_i8mm_sve` whose
+>      SVE/streaming kernels SIGSEGV mid-generation on Android 16. **NOTE: KleidiAI is
+>      NOT compiled in this llama.rn (0 refs), so the generic `GGML_CPU_KLEIDIAI=OFF`
+>      flag is a no-op here — the real lever is the runtime variant selector.** Fix:
+>      `patches/llama.rn+0.4.8.patch` extended to force `hasSve = false`, dropping
+>      selection to the SVE-free `rnllama_v8_4_fp16_dotprod_i8mm` variant (i8mm+dotprod,
+>      stable, marginally slower). Sits alongside the existing OTA-273 v8.4
+>      misclassification fix in the same patch. **Verify on-device:** long Qwen session,
+>      no SIGSEGV; if it still crashes, also drop `hasI8mm`.
+>    - **AsyncStorage DB cap (queue #1).** New `plugins/withAsyncStorageDbSize.js`
+>      config plugin sets `AsyncStorage_db_size_in_MB=50` at prebuild.
+>    - **Kernel-variant diagnostics (debug instrumentation).** The llama.rn patch now
+>      records which `librnllama_*` variant the selector loaded + a CPU/SoC/kernel
+>      signature, exposed to JS via `initContext`. `LlamaRuntime` reports it to
+>      `mlHealth.recordQwenRuntime`, and `mlHealthSummary` surfaces `Qwen kernel variant`
+>      + `Qwen CPU/SoC` in the COPYABLE bug report (plus a one-line `TARTARIA_QWEN_DIAG`
+>      in logcat). `sveRaw=true sveUsed=false` proves the SVE-disable workaround steered
+>      an SVE-reporting chip off the crashing variant — verifiable from a pasted log, no
+>      adb. Persisted, so it names the variant even after a crash.
+> 5. **Build trigger.** Pushed to `arbiters-line` (non-path-ignored files: app.json,
+>    build-apk.yml, patches/, plugins/) → fires `build-apk.yml` → preview/sideload APK.
+>    Commit message kept free of the `[build-aab]` token so the resolver lands on the
+>    APK profile, not a production AAB.
+> 6. **Still queued #2:** confirm the S26 save behaves once the DB cap is on-device.
+> 7. **Build 284 result (2026-06-14 first run):** SVE fix CONFIRMED — `qwen:done`,
+>    `Qwen kernel variant: rnllama_v8_4_fp16_dotprod_i8mm`, `sveRaw=true sveUsed=false`,
+>    completion guard clean, no native crash. Captured device signature for the upstream
+>    PR: `soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=36 kernel=6.6.102-android15-8-…`.
+>    BUT a SEPARATE "Maximum update depth exceeded" render loop still bricks NEW-character
+>    start (JS setState loop caught by ScreenErrorBoundary, correlates with Qwen ENABLED —
+>    NOT the native crash). **OTA-563 "Unpentoctium Lens"** (arbiters-line ONLY) instruments
+>    `ScreenErrorBoundary` to record the React `componentStack` into the CRASHED SAVE report
+>    so the next reproduction names the looping component. Awaiting a paste to scope the fix.
+> 8. **ROOT CAUSE FOUND + FIXED (OTA-564 "Unpentennium Latch", BOTH lines).** The component stack pinned the loop to
+>    `InputBox`: `useGameStore((s) => s.player?.equipped?.bandolierIds ?? [])` returns a FRESH `[]` every call when a
+>    new character has no bandolierIds — Zustand Object.is sees it as changed every render → infinite re-render →
+>    crash the instant the name beat mounts. Fix: frozen `EMPTY_BANDOLIER_IDS` sentinel (referentially stable). The
+>    bug is IDENTICAL on HaL2001 (shared code), and the live production build (`com.hotatticgames.tartarprim`, build
+>    281) was confirmed affected — so per the user this fix ships to **BOTH** `arbiters-line` AND `HaL2001`. Also
+>    added a title-screen build marker (`⟁ HAL BUILD` / `⟁ ARBITER BUILD` by App ID) so the two installs are
+>    distinguishable. `app/components/InputBox.tsx`, `app/screens/TitleScreen.tsx`.
 >
 > ---
 > **🔧 QUEUED FOR THE NEXT NATIVE BUILD (whenever one is fired — NOT OTA-able):**

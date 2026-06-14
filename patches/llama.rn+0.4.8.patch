@@ -1,9 +1,62 @@
+diff --git a/node_modules/llama.rn/android/src/main/CMakeLists.txt b/node_modules/llama.rn/android/src/main/CMakeLists.txt
+index 8a206b3..1166beb 100644
+--- a/node_modules/llama.rn/android/src/main/CMakeLists.txt
++++ b/node_modules/llama.rn/android/src/main/CMakeLists.txt
+@@ -87,8 +87,14 @@ build_library("rnllama" "")
+ 
+ if (${ANDROID_ABI} STREQUAL "arm64-v8a")
+     # ARM64 targets
+-    build_library("rnllama_v8_4_fp16_dotprod_sve" "-march=armv8.4-a+fp16+dotprod+sve")
+-    build_library("rnllama_v8_4_fp16_dotprod_i8mm_sve" "-march=armv8.4-a+fp16+dotprod+i8mm+sve")
++    # Tartaria Realms patch (build 285 / size trim). The two SVE variants are
++    # NEVER loaded — LlamaContext forces hasSve=false on every device (mobile SVE
++    # SIGSEGVs), so the selector can never reach the _sve branches. Don't compile
++    # them: each .so embeds full ggml (several MB), so this drops dead weight from
++    # the APK on every install. The loadLibrary("..._sve") branches stay in the
++    # Java (gated by hasSve, so dead) — safe, since they can't execute.
++    # build_library("rnllama_v8_4_fp16_dotprod_sve" "-march=armv8.4-a+fp16+dotprod+sve")
++    # build_library("rnllama_v8_4_fp16_dotprod_i8mm_sve" "-march=armv8.4-a+fp16+dotprod+i8mm+sve")
+     build_library("rnllama_v8_4_fp16_dotprod_i8mm" "-march=armv8.4-a+fp16+dotprod+i8mm")
+     build_library("rnllama_v8_4_fp16_dotprod" "-march=armv8.4-a+fp16+dotprod")
+     build_library("rnllama_v8_2_fp16_dotprod" "-march=armv8.2-a+fp16+dotprod")
 diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-index 91b2397..d41dd54 100644
+index 91b2397..c310e38 100644
 --- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 +++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-@@ -333,13 +333,34 @@ public class LlamaContext {
-     boolean hasSve = cpuFeatures.contains("sve");
+@@ -323,6 +323,14 @@ public class LlamaContext {
+     freeContext(context);
+   }
+ 
++  // Tartaria diagnostics — captured at native-lib selection time (the static
++  // block below) and exposed to JS via RNLlama.initContext, so the chosen kernel
++  // variant + CPU/SoC signature land in the copyable in-app log (no adb needed).
++  static String sSelectedVariant = "unknown";
++  static String sTartariaDiag = "";
++  public static String getSelectedVariant() { return sSelectedVariant; }
++  public static String getTartariaDiag() { return sTartariaDiag; }
++
+   static {
+     Log.d(NAME, "Primary ABI: " + Build.SUPPORTED_ABIS[0]);
+ 
+@@ -330,50 +338,115 @@ public class LlamaContext {
+     Log.d(NAME, "CPU features: " + cpuFeatures);
+     boolean hasFp16 = cpuFeatures.contains("fp16") || cpuFeatures.contains("fphp");
+     boolean hasDotProd = cpuFeatures.contains("dotprod") || cpuFeatures.contains("asimddp");
+-    boolean hasSve = cpuFeatures.contains("sve");
++    // Tartaria Realms patch (arbiters-line / native Qwen-crash fix).
++    // Force-OFF SVE variant selection. On the Tensor G5 (Pixel 10 Pro XL)
++    // + Android 16, the SVE / streaming-SME kernels in the `+sve` libraries
++    // SIGSEGV mid-generation — the kernel fails to save/restore streaming-mode
++    // vector registers across thread preemption, corrupting state and crashing
++    // the app to the home screen (and thrashing the JS narration pipeline into
++    // a "Maximum update depth exceeded" render loop). Dropping SVE selection
++    // sends this chip to librnllama_v8_4_fp16_dotprod_i8mm (i8mm + dotprod, no
++    // SVE) — stable, still accelerated, marginally slower. SVE on mobile ARM is
++    // bleeding-edge; the non-SVE path is the same one every other device uses
++    // fine, so we opt out of SVE globally for stability. Verify on-device: a
++    // long Qwen narration session with no SIGSEGV.
++    boolean hasSveRaw = cpuFeatures.contains("sve"); // raw cpuinfo flag, for diagnostics only
++    boolean hasSve = false; // was: cpuFeatures.contains("sve"); — SVE-disable workaround (see above)
      boolean hasI8mm = cpuFeatures.contains("i8mm");
      boolean isAtLeastArmV82 = cpuFeatures.contains("asimd") && cpuFeatures.contains("crc32") && cpuFeatures.contains("aes");
 -    boolean isAtLeastArmV84 = cpuFeatures.contains("dcpop") && cpuFeatures.contains("uscat");
@@ -20,7 +73,17 @@ index 91b2397..d41dd54 100644
 +    // is compiled with -march=armv8.2-a+fp16+dotprod (every instruction
 +    // present on the affected chips).
 +    boolean isBlocklistedChip = LlamaContext.isKnownMisclassifiedChip();
-+    boolean isAtLeastArmV84 = isAtLeastArmV84Raw && !isBlocklistedChip;
++    // Tartaria Realms patch (build 285 / Qwen completion-crash workaround).
++    // On Tensor G5 (Pixel 10 series) the v8.4 i8mm kernels SIGSEGV mid-GENERATION
++    // even with SVE already disabled: the model LOADS clean (sveUsed=false) but
++    // the matmul-heavy completion faults, and the completion guard then benches
++    // Qwen (boot reads qwen:skipped, every Arbiter line falls to template). The
++    // non-SVE i8mm/v8.4 path is the culprit, so for THIS chip we drop all the way
++    // to the conservative v8_2_fp16_dotprod kernel (-march=armv8.2-a+fp16+dotprod;
++    // every instruction in it runs on Tensor G5). Slower, but it doesn't fault
++    // during inference. Narrow chip match so no other device loses i8mm/v8.4 accel.
++    boolean isQwenCrashChip = LlamaContext.isQwenCompletionCrashChip();
++    boolean isAtLeastArmV84 = isAtLeastArmV84Raw && !isBlocklistedChip && !isQwenCrashChip;
      Log.d(NAME, "- hasFp16: " + hasFp16);
      Log.d(NAME, "- hasDotProd: " + hasDotProd);
      Log.d(NAME, "- hasSve: " + hasSve);
@@ -39,7 +102,62 @@ index 91b2397..d41dd54 100644
  
      // TODO: Add runtime check for cpu features
      if (LlamaContext.isArm64V8a()) {
-@@ -404,6 +425,72 @@ public class LlamaContext {
+       if (isAtLeastArmV84 && hasSve && hasI8mm && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod_i8mm_sve.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod_i8mm_sve");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod_i8mm_sve";
+       } else if (isAtLeastArmV84 && hasSve && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod_sve.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod_sve");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod_sve";
+       } else if (isAtLeastArmV84 && hasI8mm && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod_i8mm.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod_i8mm");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod_i8mm";
+       } else if (isAtLeastArmV84 && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_4_fp16_dotprod.so");
+         System.loadLibrary("rnllama_v8_4_fp16_dotprod");
++        sSelectedVariant = "rnllama_v8_4_fp16_dotprod";
+       } else if (isAtLeastArmV82 && hasFp16 && hasDotProd) {
+         Log.d(NAME, "Loading librnllama_v8_2_fp16_dotprod.so");
+         System.loadLibrary("rnllama_v8_2_fp16_dotprod");
++        sSelectedVariant = "rnllama_v8_2_fp16_dotprod";
+       } else if (isAtLeastArmV82 && hasFp16) {
+         Log.d(NAME, "Loading librnllama_v8_2_fp16.so");
+         System.loadLibrary("rnllama_v8_2_fp16");
++        sSelectedVariant = "rnllama_v8_2_fp16";
+       } else {
+         Log.d(NAME, "Loading librnllama_v8.so");
+         System.loadLibrary("rnllama_v8");
++        sSelectedVariant = "rnllama_v8";
+       }
+       //  Log.d(NAME, "Loading librnllama_v8_7.so with runtime feature detection");
+       //  System.loadLibrary("rnllama_v8_7");
+     } else if (LlamaContext.isX86_64()) {
+         Log.d(NAME, "Loading librnllama_x86_64.so");
+         System.loadLibrary("rnllama_x86_64");
++        sSelectedVariant = "rnllama_x86_64";
+     } else {
+         Log.d(NAME, "Loading default librnllama.so");
+         System.loadLibrary("rnllama");
++        sSelectedVariant = "rnllama";
+     }
++
++    // Tartaria diagnostics — one greppable line + a static string exposed to JS.
++    // sveRaw=true with sveUsed=false confirms the device reported SVE but the
++    // arbiters SVE-disable workaround steered it to a non-SVE variant.
++    String socModel = (Build.VERSION.SDK_INT >= 31) ? Build.SOC_MODEL : "n/a";
++    sTartariaDiag = "variant=" + sSelectedVariant
++      + " sveRaw=" + hasSveRaw + " sveUsed=" + hasSve + " i8mm=" + hasI8mm
++      + " v84raw=" + isAtLeastArmV84Raw + " v84used=" + isAtLeastArmV84
++      + " blocklisted=" + isBlocklistedChip + " qwenSafeKernel=" + isQwenCrashChip
++      + " soc=" + socModel + " hw=" + Build.HARDWARE + " model=" + Build.MODEL
++      + " sdk=" + Build.VERSION.SDK_INT + " kernel=" + System.getProperty("os.version");
++    Log.d(NAME, "TARTARIA_QWEN_DIAG " + sTartariaDiag);
+ }
+ 
+   private static boolean isArm64V8a() {
+@@ -404,6 +477,102 @@ public class LlamaContext {
      }
    }
  
@@ -109,6 +227,115 @@ index 91b2397..d41dd54 100644
 +    return false;
 +  }
 +
++  /**
++   * Tartaria Realms patch (build 285 / Qwen completion-crash workaround).
++   *
++   * Returns true for SoCs/devices whose v8.4 i8mm librnllama kernels SIGSEGV
++   * during GENERATION (the model loads clean, but the completion matmul faults).
++   * Distinct from isKnownMisclassifiedChip() — those chips SIGILL on LOAD because
++   * they aren't really v8.4; THESE chips are genuinely v8.4 but their i8mm
++   * kernels are unstable here. For matched chips the static initializer forces
++   * isAtLeastArmV84 = false, so selection falls all the way through to
++   * rnllama_v8_2_fp16_dotprod, which doesn't crash during inference.
++   *
++   * Currently: Google Tensor G5 (Pixel 10 series — board "mustang",
++   * SOC_MODEL "Tensor G5"). Kept narrow on purpose; broaden only on evidence.
++   */
++  private static boolean isQwenCompletionCrashChip() {
++    if (Build.VERSION.SDK_INT >= 31 && Build.SOC_MODEL != null) {
++      String soc = Build.SOC_MODEL.toUpperCase();
++      if (soc.contains("TENSOR G5")) {
++        Log.d(NAME, "Tartaria Qwen-crash chip hit via Build.SOC_MODEL: " + soc);
++        return true;
++      }
++    }
++    String hardware = Build.HARDWARE == null ? "" : Build.HARDWARE.toLowerCase();
++    if (hardware.equals("mustang")) {
++      Log.d(NAME, "Tartaria Qwen-crash chip hit via Build.HARDWARE: " + hardware);
++      return true;
++    }
++    return false;
++  }
++
    protected static native WritableMap modelInfo(
      String model,
      String[] skip
+diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java
+index ab98a92..4c23d50 100644
+--- a/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java
++++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/RNLlama.java
+@@ -92,6 +92,10 @@ public class RNLlama implements LifecycleEventListener {
+           result.putBoolean("gpu", false);
+           result.putString("reasonNoGPU", "Currently not supported");
+           result.putMap("model", llamaContext.getModelDetails());
++          // Tartaria diagnostics — surface the chosen native kernel variant + the
++          // CPU/SoC signature to JS, so they land in the copyable in-app log.
++          result.putString("loadedVariant", LlamaContext.getSelectedVariant());
++          result.putString("cpuDiag", LlamaContext.getTartariaDiag());
+           return result;
+         } catch (Exception e) {
+           exception = e;
+diff --git a/node_modules/llama.rn/src/index.ts b/node_modules/llama.rn/src/index.ts
+index 57fa208..f7621f9 100644
+--- a/node_modules/llama.rn/src/index.ts
++++ b/node_modules/llama.rn/src/index.ts
+@@ -121,11 +121,27 @@ export class LlamaContext {
+     isChatTemplateSupported?: boolean
+   } = {}
+ 
+-  constructor({ contextId, gpu, reasonNoGPU, model }: NativeLlamaContext) {
++  // Tartaria diagnostics — the native kernel variant chosen by LlamaContext.java's
++  // CPU selector + the CPU/SoC signature, forwarded so JS can put them in the
++  // copyable in-app log (no adb needed).
++  loadedVariant: string = ''
++
++  cpuDiag: string = ''
++
++  constructor({
++    contextId,
++    gpu,
++    reasonNoGPU,
++    model,
++    loadedVariant,
++    cpuDiag,
++  }: NativeLlamaContext & { loadedVariant?: string; cpuDiag?: string }) {
+     this.id = contextId
+     this.gpu = gpu
+     this.reasonNoGPU = reasonNoGPU
+     this.model = model
++    this.loadedVariant = loadedVariant ?? ''
++    this.cpuDiag = cpuDiag ?? ''
+   }
+ 
+   /**
+@@ -331,11 +347,7 @@ export async function initLlama(
+   }
+ 
+   const poolType = poolTypeMap[poolingType as keyof typeof poolTypeMap]
+-  const {
+-    gpu,
+-    reasonNoGPU,
+-    model: modelDetails,
+-  } = await RNLlama.initContext(contextId, {
++  const initRes: any = await RNLlama.initContext(contextId, {
+     model: path,
+     is_model_asset: !!isModelAsset,
+     use_progress_callback: !!onProgress,
+@@ -347,8 +359,16 @@ export async function initLlama(
+     removeProgressListener?.remove()
+     throw err
+   })
++  const { gpu, reasonNoGPU, model: modelDetails, loadedVariant, cpuDiag } = initRes
+   removeProgressListener?.remove()
+-  return new LlamaContext({ contextId, gpu, reasonNoGPU, model: modelDetails })
++  return new LlamaContext({
++    contextId,
++    gpu,
++    reasonNoGPU,
++    model: modelDetails,
++    loadedVariant,
++    cpuDiag,
++  })
+ }
+ 
+ export async function releaseAllLlama(): Promise<void> {

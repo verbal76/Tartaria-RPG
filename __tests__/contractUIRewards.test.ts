@@ -169,7 +169,10 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
     // Completed, reward paid, and the fetch items consumed.
     expect((after.completedFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(true);
     expect((after.activeFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(false);
-    expect(after.tc).toBe(tcBefore + fetchQuest.reward.tc);
+    // arb171 — the COMPLETE button is the COURIER path: with no same-faction agent
+    // in the scene it pays HALF (closes the "100% from anywhere" exploit). Arriving
+    // at the turn-in spot auto-submits at full (autoSubmitReadyFactionQuests).
+    expect(after.tc).toBe(tcBefore + Math.max(1, Math.round(fetchQuest.reward.tc * 0.5)));
     const held = after.inventory
       .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
       .reduce((n, i) => n + (i.quantity ?? 1), 0);

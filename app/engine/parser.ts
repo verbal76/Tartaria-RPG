@@ -1055,7 +1055,9 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       if (hasTorch) suggestIfAllowed('use torch on');
     }
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
-    if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'hide', 'parley');
+    // arb167 — 'sneak' (not 'hide') so the stealth tactic reads as an offensive
+    // setup: mid-range it's the unseen opener, close-range the initiative gamble.
+    if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'sneak', 'parley');
     if (!suggestions.length) suggestions.push('look around', 'search', 'rest');
     // OTA 204 — even when no verb matched, run the meta-talk regex so
     // feedback-style inputs without a recognized verb still get the

@@ -79,6 +79,22 @@ const STREAM_BUNDLE_CHARS = 180;
 let recentStreamedTexts: string[] = [];
 const RECENT_STREAM_WINDOW = 4;
 
+// arb163 — "spoken recently" guard. The game log only de-dups CONSECUTIVE
+// repeats (suppressed before append), so a line that re-emits non-consecutively
+// — re-entering a vendor stall, or the Crucible forging the same item 4-6× —
+// reaches the voice path each time and Kokoro reads it over and over (a tester
+// heard one stall greeting spoken six times in a row). Track the exact stripped
+// text we've voiced in the last RECENT_SPOKEN_MS and skip an exact repeat. The
+// window is short so a line legitimately reused much later still speaks.
+let recentSpoken: { text: string; at: number }[] = [];
+const RECENT_SPOKEN_MS = 30_000;
+
+function spokenRecently(stripped: string): boolean {
+  const now = Date.now();
+  recentSpoken = recentSpoken.filter((r) => now - r.at < RECENT_SPOKEN_MS);
+  return recentSpoken.some((r) => r.text === stripped);
+}
+
 // stripArbiterFrame + detectArbiterSpeaker live in arbiterFrame.ts so
 // tests can import them without dragging the whole gameStore +
 // AsyncStorage chain in.
@@ -102,6 +118,11 @@ function logVoice(line: string): void {
 function speakArbiter(text: string): void {
   const stripped = stripArbiterFrame(text);
   if (!stripped) return;
+  // arb163 — don't read the exact same line twice within the window (kills the
+  // vendor/Crucible "same line N times in a row" repeat). Record after the skip
+  // check so the first utterance still plays and arms the guard for the rest.
+  if (spokenRecently(stripped)) return;
+  recentSpoken.push({ text: stripped, at: Date.now() });
   // Per-NPC voice assignment for the system TTS engine. The Arbiter's
   // voice resolves to null → falls back to the player-configured
   // setting (am_michael by default). Vendor names ("Irma Ironhand",
@@ -211,6 +232,11 @@ function onState(state: GameState): void {
       const entry = log[i] as GameLogEntry | undefined;
       if (!entry) continue;
       if (!SPOKEN_CHANNELS.has(entry.channel)) continue;
+      // arb162 — narrateViaArbiter flags most CANNED flavor lines `silent` so
+      // they're read on-screen but not voiced (the player asked to hear the
+      // fresh Qwen lines, not the repetitive canned ones). Must-say lines and
+      // Qwen-generated lines carry no silent flag, so they still speak.
+      if (entry.meta?.silent === true) continue;
       // Suppress the arbiter follow-up if we already spoke it
       // sentence-by-sentence via the streaming buffer.
       if (entry.channel === 'arbiter' && wasAlreadyStreamed(entry.text)) continue;

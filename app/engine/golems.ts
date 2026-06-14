@@ -46,6 +46,12 @@ export interface GolemDefinition {
    *  structured, the hardest to seat). Per-race modifiers
    *  (raceMechanics.aethercraftDcModifier) still apply on top. */
   summonDC?: number;
+  /** arb170 — innate % damage resistance (0..1) baked in at summon, scaled to how
+   *  hard the kind is to build. `resistBase` is the floor a fresh golem ships with;
+   *  training resilience raises the effective resist up to `resistCap` (never
+   *  immunity — see golemDamageResist + the retaliation min-1-damage rule). */
+  resistBase: number;
+  resistCap: number;
 }
 
 export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
@@ -62,13 +68,15 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
       { name: 'Mud Fragment', quantity: 2 },
       { name: 'Aether Crystal', quantity: 1 },
     ],
-    hpMax: 16,
+    hpMax: 24, // arb170 — raised from 16 (durability pass)
     attackDie: '1d8',
     attackMod: 1,
     hitBonus: 0,
     damageType: 'bludgeoning',
     blurb: 'Starter anchor. Cheap to bind, modest in every measure.',
     summonDC: 13, // easiest — abundant Aether Mud, low-power binding
+    resistBase: 0.15,
+    resistCap: 0.35,
   },
   iron_golem: {
     kind: 'iron_golem',
@@ -77,13 +85,15 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
       { name: 'Scrap Metal', quantity: 3 },
       { name: 'Golem Core', quantity: 1 },
     ],
-    hpMax: 24,
+    hpMax: 40, // arb170 — raised from 24 (durability pass; the tank build)
     attackDie: '1d8',
     attackMod: 2,
     hitBonus: 1,
     damageType: 'slashing',
     blurb: 'Tank build. Tough frame, steady slashing strikes.',
     summonDC: 15,
+    resistBase: 0.30,
+    resistCap: 0.50,
   },
   aether_golem: {
     kind: 'aether_golem',
@@ -92,13 +102,15 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
       { name: 'Aether Crystal', quantity: 2 },
       { name: 'Aetheric Shard', quantity: 1 },
     ],
-    hpMax: 24,
+    hpMax: 34, // arb170 — raised from 24 (durability pass)
     attackDie: '1d10',
     attackMod: 2,
     hitBonus: 2,
     damageType: 'aetheric',
     blurb: 'Energy striker. Heavy aetheric blows pierce armor.',
     summonDC: 17, // volatile mix, the binding fights you
+    resistBase: 0.20,
+    resistCap: 0.40,
   },
   crystal_golem: {
     kind: 'crystal_golem',
@@ -108,13 +120,15 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
       { name: 'Aetheric Cloth', quantity: 1 },
       { name: 'Aetheric Shard', quantity: 1 },
     ],
-    hpMax: 30,
+    hpMax: 52, // arb170 — raised from 30 (durability pass; apex tank)
     attackDie: '1d12',
     attackMod: 3,
     hitBonus: 3,
     damageType: 'piercing',
     blurb: 'Apex anchor — the hardest to seat and the strongest in every measure.',
     summonDC: 19, // lattice-structured, the hardest to seat
+    resistBase: 0.35,
+    resistCap: 0.55,
   },
 };
 
@@ -191,6 +205,17 @@ export function golemStatBonus(golem: Companion, key: GolemStatKey): number {
   return golem.stats?.[key] ?? 0;
 }
 
+/** arb170 — effective % damage resistance (0..1): the kind's innate floor plus a
+ *  trained bonus from resilience (+2% per level), hard-capped per kind. Never
+ *  reaches 1, and the retaliation path always lands ≥1 damage, so a golem is
+ *  durable but never immune (preserves OTA-433's "doesn't trivialize bosses"). */
+export function golemDamageResist(golem: Companion): number {
+  const def = GOLEM_DEFINITIONS[golem.kind as GolemKind];
+  if (!def) return 0;
+  const trained = (golem.stats?.resilience ?? 0) * 0.02;
+  return Math.min(def.resistCap ?? 0, (def.resistBase ?? 0) + trained);
+}
+
 export interface GolemTrainResult {
   golem: Companion;
   leveled: { stat: GolemStatKey; from: number; to: number } | null;
@@ -218,11 +243,21 @@ export function trainGolemStat(
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next };
   }
+  // arb170 — TRAINABLE HP: a stat level-up also toughens the frame (+3 max HP,
+  // healed to keep the ratio). Power trains on attacking, resilience on surviving
+  // a hit, so this is the "trash/mid fights grow it for the boss" loop the player
+  // asked for — HP and resist both climb through use. (No cap here; the resist
+  // cap + min-1-damage + big boss hits keep a maxed golem mortal — see
+  // golemDamageResist and the retaliation rule.)
+  const HP_PER_LEVEL = 3;
+  const hpBump = leveled ? HP_PER_LEVEL : 0;
   return {
     golem: {
       ...golem,
       stats: { ...stats, [stat]: next },
       statProgress: { ...statProgress, [stat]: progress },
+      hpMax: golem.hpMax + hpBump,
+      hp: golem.hp + hpBump,
     },
     leveled,
   };
@@ -246,7 +281,9 @@ export function isGolemRepairPart(kind: GolemKind, itemName: string): boolean {
  *  golem's size so a few of its own parts mend it: Mud 4, Iron/Aether 6,
  *  Crystal 8 (~3–4 parts for a full repair from near-dead). */
 export function golemRepairHeal(kind: GolemKind): number {
-  return Math.max(3, Math.round(GOLEM_DEFINITIONS[kind].hpMax / 4));
+  // arb170 — bumped /4 → /3 so a top-up takes fewer parts (eases the
+  // material drain), on top of the new out-of-combat self-mend in gameStore.
+  return Math.max(4, Math.round(GOLEM_DEFINITIONS[kind].hpMax / 3));
 }
 
 /** arb121 — the elemental material tags a golem can mend from as a WEAKER

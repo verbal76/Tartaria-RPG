@@ -5,7 +5,7 @@ import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weapon
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
-import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
+import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
@@ -847,19 +847,29 @@ export function ContractsScreen() {
                 const key = `q_${def.id}_${i}`;
                 const open = !!expanded[key];
                 const stageDef = def.stages?.[rec.stage];
-                const readyToTurnIn =
-                  (def.stages && def.stages.length > 0 && rec.stage >= def.stages.length) ||
-                  !def.stages || def.stages.length === 0;
+                // arb171 — real readiness across ALL quest types: staged → all
+                // stages played; FETCH → the items are in hand; legacy → always.
+                // (The old code hard-coded fetch/legacy as ready and the pill as
+                // "OPEN" forever, so a gather quest read "open" even when done.)
+                const countItem = (name: string) =>
+                  (player?.inventory ?? [])
+                    .filter((it) => it.name.toLowerCase() === name.toLowerCase())
+                    .reduce((n, it) => n + (it.quantity ?? 1), 0);
+                const readyToTurnIn = factionQuestReady(def, rec.stage, countItem);
+                const staged = !!(def.stages && def.stages.length > 0);
+                const fetchHeld = def.fetch ? countItem(def.fetch.itemName) : 0;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {def.stages && def.stages.length > 0
-                          ? readyToTurnIn
-                            ? 'READY'
-                            : `stage ${rec.stage + 1} / ${def.stages.length}`
-                          : 'OPEN'}
+                      <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady]}>
+                        {readyToTurnIn
+                          ? 'READY TO SUBMIT'
+                          : staged
+                            ? `stage ${rec.stage + 1} / ${def.stages!.length}`
+                            : def.fetch
+                              ? `${fetchHeld} / ${def.fetch.quantity}`
+                              : 'OPEN'}
                       </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
@@ -904,12 +914,14 @@ export function ContractsScreen() {
                         <Text style={styles.expandedLabel}>How to finish</Text>
                         <Text style={styles.expandedBody}>
                           {readyToTurnIn
-                            ? 'All steps cleared. Tap COMPLETE to claim the reward.'
-                            : stageDef?.advanceOn === 'kill'
-                              ? 'Defeat an enemy to advance the next stage.'
-                              : stageDef?.advanceOn === 'travel'
-                                ? 'Travel to a new location to advance the next stage.'
-                                : 'Continue play — the next stage triggers on the matching event.'}
+                            ? 'Work done. Travel to a same-faction agent or the mission board to hand it in for FULL reward (it submits on arrival), or COMPLETE here to courier it for HALF.'
+                            : def.fetch
+                              ? `Gather ${def.fetch.quantity}× ${def.fetch.itemName} — you have ${fetchHeld}. Then turn it in.`
+                              : stageDef?.advanceOn === 'kill'
+                                ? 'Defeat an enemy to advance the next stage.'
+                                : stageDef?.advanceOn === 'travel'
+                                  ? 'Travel to a new location to advance the next stage.'
+                                  : 'Continue play — the next stage triggers on the matching event.'}
                         </Text>
                       </View>
                     )}
@@ -1433,6 +1445,12 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     paddingHorizontal: 6,
     paddingVertical: 2,
+  },
+  // arb171 — "READY TO SUBMIT" pill: brighter + amber so a finished quest pops.
+  stagePillReady: {
+    color: '#1a1207',
+    backgroundColor: '#d8a43a',
+    borderColor: '#d8a43a',
   },
   cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },

@@ -14584,25 +14584,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Reset AI in Settings; (5) re-assert the disable from the STANDING count each boot so a cleared flag can't let Qwen
 // attempt again. Template narration is fully playable; Kokoro voice unaffected. The general init guard (OTA-558) +
 // clearInFlightBreadcrumbs are kept. app/diagnostics/mlHealth.ts, App.tsx. JS-only OTA.
-// OTA-564 (Unpentennium Latch) — [CRITICAL bugfix] fix the "Maximum update depth exceeded" crash on NEW-character
-// creation that bricked the name beat before the exploration screen ever painted — blocking new players. Root cause
-// (pinpointed via a component-stack capture on the arbiters test line): InputBox's bandolier selector
+// OTA-563 (Unpentoctium Lens) — [ARBITERS-LINE ONLY · diagnostic] capture the React COMPONENT STACK on a screen-render
+// crash so the copyable bug report names the EXACT looping component. Build 284 (SVE fix) confirmed Qwen loads + runs
+// crash-free on the Tensor G5 (sveUsed=false, kernel=v8_4_fp16_dotprod_i8mm, completion guard clean), BUT a separate
+// "Maximum update depth exceeded" render loop still bricks NEW-character start (it correlates with Qwen ENABLED, but is
+// a JS setState loop caught by ScreenErrorBoundary, not the native crash). The crashed-save report showed only
+// "stage: screen-render" with no clue WHICH component. Now ScreenErrorBoundary.componentDidCatch reads the second
+// errorInfo arg and captureActiveCrashSave records error message + componentStack into the same CRASHED SAVE block —
+// so one pasted log pinpoints the faulting component for a targeted fix. Publishes ONLY to the arbiters-line channel.
+// app/diagnostics/crashSave.ts, App.tsx. JS-only OTA. (Numbering is arbiters-line-local; the real fix will get its own
+// HaL2001 OTA on promotion.)
+// OTA-564 (Unpentennium Latch) — [CRITICAL bugfix] fix the "Maximum update depth exceeded" crash on new-character
+// creation, pinpointed by OTA-563's component-stack capture to InputBox. The bandolier selector
 // `useGameStore((s) => s.player?.equipped?.bandolierIds ?? [])` returned a FRESH [] every call when a new character
 // had no bandolierIds yet; Zustand's Object.is equality saw it as changed every render → InputBox re-rendered → the
-// selector re-ran → infinite loop. Fix: a frozen module-level EMPTY_BANDOLIER_IDS sentinel so the undefined case is
-// referentially stable. Also adds a title-screen BUILD MARKER (⟁ HAL BUILD / ⟁ ARBITER BUILD via App ID) above the
-// gem line. Identical fix shipped to BOTH HaL2001 and arbiters-line (same OTA id 564). NOTE: 563 is skipped on this
-// line — it was an arbiters-line-only diagnostic OTA. app/components/InputBox.tsx, app/screens/TitleScreen.tsx. JS-only OTA.
+// selector re-ran → infinite loop, firing the instant the name beat mounted (the exploration screen never painted).
+// Fix: a frozen module-level EMPTY_BANDOLIER_IDS sentinel so the undefined case is referentially stable. Also adds a
+// title-screen BUILD MARKER (⟁ HAL BUILD / ⟁ ARBITER BUILD via App ID) above the gem line so the two side-by-side
+// installs are distinguishable. Affects BOTH lines identically — shipped to arbiters-line AND HaL2001.
+// app/components/InputBox.tsx, app/screens/TitleScreen.tsx. JS-only OTA.
 // OTA-565 (Unhexnilium Diction) — [polish] fix a double-article in the outpost-arrival narration: a location whose
 // name already starts with "The" (e.g. "The Monarch's Waystation") rendered as "...the edge of the The Monarch's
 // Waystation". narrativeGenerator now prepends "the " only when the name doesn't already lead with an article.
-// General narration fix — shipped to BOTH lines at the same OTA id 565. app/engine/narrativeGenerator.ts. JS-only OTA.
+// General narration code — shipped to BOTH lines. app/engine/narrativeGenerator.ts. JS-only OTA.
+// OTA-566 (Unhexunium Tell) — [diagnostic · arbiters-line] make the log say outright which Arbiter lines are
+// Qwen-generated vs template, and why. narrateViaArbiter now logs `[debug] arbiter: template (reason=qwen-not-ready |
+// busy | combat | intent-not-allowed:<intent> | no-scene)` on the template path, and `[debug] arbiter: qwen ✓ <ms>ms
+// (intent=<intent>)` on a real generation (with `, empty→template` if the cleaned output was empty), plus
+// `arbiter: qwen-error <ms>ms → template` on a generation failure. Turns "is this line AI or template?" from a
+// latency/wording guess into an explicit log line. Qwen only ever fires for intents travel/diplomacy/scene_intro,
+// out of combat, model-ready — so most lines correctly read `intent-not-allowed`. app/state/gameStore.ts. JS-only OTA.
 // OTA-567 (Unhexbium Board) — [ux] the outpost MISSION BOARD chip now opens a SCREEN instead of dumping the postings
-// into the log. New MissionBoardModal lists the faction's open postings (title · objective · reward) with a tappable
-// ACCEPT on each (same acceptFactionQuest path the typed command used); accepted postings drop off the list. Also
-// removes the board-reprint spam (the chip no longer re-dumps text on each tap). General UX feature — mirrored to BOTH
-// lines at the same OTA id 567 (566 "Unhexunium Tell" is skipped here — it's the arbiter-only Qwen-vs-template debug
-// marker, which stays on the arbiter line). app/components/MissionBoardModal.tsx, app/screens/ExplorationScreen.tsx. JS-only OTA.
+// into the log. Player feedback: tapping it just printed the missions as text with no way to act on them — you had to
+// know to TYPE `accept <name>`; they expected it to behave like the missions button (a screen). New MissionBoardModal
+// lists the faction's open postings (title · objective · reward) with a tappable ACCEPT on each (same acceptFactionQuest
+// path the typed command used); availableFactionQuests already filters active/completed, so an accepted posting drops
+// off the list and the modal stays open to take more. Side benefit: kills the board-reprint spam (the chip no longer
+// re-dumps text on each tap). app/components/MissionBoardModal.tsx, app/screens/ExplorationScreen.tsx. JS-only OTA.
 // OTA-568 (Unhextrium Mend) — [polish · BOTH lines] a batch of non-Qwen narration/feedback fixes surfaced from play
 // logs: (1) the Arbiter no longer double-tags a combat remark (was emitting a "noted" stinger PREPENDED to the enemy
 // remark — now just the remark); (2) the unresolved-hook "still waiting on X" nag is rate-limited (≤ once per ~6
@@ -14620,25 +14638,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // danger. Rows are derived live from openContractMarkers, so a row appears when its pin does and clears the instant the
 // contract closes (the agreed "lives while it has a marker, gone when complete" behavior). app/screens/MapScreen.tsx,
 // app/engine/contractMarkers.ts (type export). JS-only OTA.
-// (570 "Unhexpentium Rewarm" is arbiters-line-only — a Qwen foreground re-warm lifecycle fix; skipped here.)
+// OTA-570 (Unhexpentium Rewarm) — [bugfix · arbiters-line] Qwen never served narration during play even though the
+// SVE fix held (boot reached qwen:done, init success, sveUsed=false, zero crashes) — every Arbiter line logged
+// `template (reason=qwen-not-ready)` and the Crucible saw `status=idle` for a 20-min travel log. Root cause: the
+// App.tsx AppState handler disposed the ~400MB model on `inactive` AS WELL AS `background`, and `active` deliberately
+// never re-warmed it ("let the user restart from About"). So one transient `inactive` (notification shade, app-switcher
+// peek, a permission/keyboard event — fired seconds after boot) benched the model for the whole session. Fix: (1) only
+// dispose Qwen on a REAL `background` (process-reclaim risk), never on a transient `inactive`; (2) on return to
+// `active`, re-warm Qwen if WE parked a ready model — the GGUF is already on disk so the download step returns
+// instantly (no UI), only the ~1-5s context reload runs in the background. A user who manually disabled Qwen stays
+// disabled (guarded by a parked flag). App.tsx. JS-only OTA.
 // OTA-571 (Unhexhexium Sweep) — [batch · BOTH lines] nine gameplay/UX fixes from a play log, none Qwen-specific:
 // (1) GOLEM SUMMON — tapping a golem in the craft menu opened a confirm modal that dispatches the summon and bounces to
 //     exploration for the live d20+INT roll, instead of copying "summon X golem" to the clipboard to paste back.
 // (2) COLLECTIBLE REVEAL — the first collectible ever found raises a popup (what it is + a button straight to the
 //     Collectibles tab) so the system is discoverable; later finds just log as before.
 // (3) RECLAIMER'S ROPE EXPLOIT — Legacy of Power (giant once-a-day full mend) no longer targets 'rope'-tagged gear; a
-//     climbing rope was always the most-worn item, making the mend an infinite-rope/free-climb engine.
+//     climbing rope was always the most-worn item, making the mend an infinite-rope/free-climb engine. Ropes are a
+//     resource again (wear out → re-splice/re-buy).
 // (4) CLIMB STAMINA — verified already correct (per-tier spend up + down); no change.
-// (5) DOG (ROCKY) — a BLOCKED dog button no longer dispatches an empty 'bite' (no-op with no roll); it explains why. The
-//     bite/distract picker is a BLOCKING modal so a mis-tap on INVENTORY mid-pick can't drop the action.
-// (6) ENEMY DETAIL — tap an enemy portrait → full-detail popup (traits, resist/weak/deals, active effects) → dismiss.
-// (7) SELL GEAR — looted weapons/armor fall back to inferWeapon/inferArmor when the catalog misses, so they carry a real
-//     rarity + durability (were 'rarity: undefined' → flat 1 TC). Selling weapons/armor is otherwise already supported.
-// (8) FORGED-WEAPON NAME — a Crucible fuse raises a reveal naming the exact weapon + rarity and where it landed.
-// (9) CAPITAL MAIN-QUEST NUDGE — first time in a Lost Capital with an unclaimed Core, the Arbiter names the ★ SUMMON
-//     affordance (Contracts → Primary Objective). (Faction outposts like Varakush are NOT capitals.)
+// (5) DOG (ROCKY) — a BLOCKED dog button no longer dispatches an empty 'bite' (it buzzed + ran a no-op with no roll);
+//     it now just explains why. The bite/distract picker is a BLOCKING modal so a mis-tap on INVENTORY mid-pick can't
+//     drop the action ("no other outlet except those two buttons").
+// (6) ENEMY DETAIL — tap an enemy portrait → full-detail popup (traits, resist/weak/deals, all active effects) →
+//     dismiss. Multi-enemy targeting stays on the swipe-pager.
+// (7) SELL GEAR — looted weapons/armor fall back to inferWeapon/inferArmor when the catalog misses, so they carry a
+//     real rarity + durability (were 'rarity: undefined' → flat 1 TC and untiered, why they felt unsellable). The
+//     engine already permits selling weapons/armor — the only block is the "take it off first" equipped guard.
+// (8) FORGED-WEAPON NAME — a Crucible fuse raises a reveal naming the exact weapon + rarity and where it landed (the
+//     reward line scrolled past; the player couldn't find the new item in a huge pack).
+// (9) CAPITAL MAIN-QUEST NUDGE — the first time the player stands in a Lost Capital with an unclaimed Core, the Arbiter
+//     names the ★ SUMMON affordance (Contracts → Primary Objective) and that this is the main road. (Faction outposts
+//     like Varakush are NOT capitals — the same confusion the player hit.)
 // New: app/components/DiscoveryRevealModal.tsx. Touched: app/state/gameStore.ts, App.tsx, app/components/InputBox.tsx,
-// app/components/EnemyPanel.tsx, app/screens/CraftingScreen.tsx, app/engine/itemDefaults.ts (import). JS-only OTA.
+// app/components/EnemyPanel.tsx, app/screens/CraftingScreen.tsx, app/engine/sellPrice.ts (unchanged — confirmed),
+// app/engine/itemDefaults.ts (import). JS-only OTA.
 // OTA-572 (Unhexseptium Tally) — [bugfix+balance · BOTH lines] two fixes: (1) the Contracts Primary Objective card's
 // expandable 9-Capital tracker lives in the FIXED region above the tabs/scroll, so opening it pushed the ninth Capital
 // half off the bottom of the screen — the list now caps at ~42% of screen height and scrolls internally (nestedScroll)
@@ -14673,4 +14707,196 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // / hubRoomId but NOT activeBuildingRoomId — and moving between a building's rooms (market stalls etc.) changes only
 // that field, so the key never changed and the dismiss never reset. Added activeBuildingRoomId to the key, so each room
 // gets its own chip and a dismiss only clears the room you closed it in. app/screens/ExplorationScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-576';
+// ── NATIVE BUILD 285 (arbiters-line APK · NOT an OTA — OTA_BUILD_ID unchanged) ─────────────────────────────────────
+// Qwen completion-crash fix. The OTA-570 re-warm finally let Qwen actually RUN a completion on-device, and the
+// Tensor G5 (Pixel 10 Pro XL) travel log exposed the next layer: the model LOADS clean (sveUsed=false, the SVE fix
+// holds) but the v8.4 i8mm kernel SIGSEGVs mid-GENERATION — the completion guard then benched it (boot read
+// qwen:skipped, every Arbiter line template). patches/llama.rn+0.4.8.patch now force-drops THIS chip
+// (isQwenCompletionCrashChip → Build.SOC_MODEL "Tensor G5" / Build.HARDWARE "mustang") to the conservative
+// rnllama_v8_2_fp16_dotprod kernel by clearing isAtLeastArmV84 for it — slower, but every instruction in that .so runs
+// on Tensor G5, so the completion shouldn't fault. Narrow match: no other device loses its i8mm/v8.4 acceleration.
+// Diagnostics: TARTARIA_QWEN_DIAG now carries `qwenSafeKernel=true`; the in-app ML health line should read
+// variant=rnllama_v8_2_fp16_dotprod, v84used=false. Requires an EAS APK build (auto-increments to 285) + install;
+// NOT deliverable over OTA. Verify: a long Qwen narration run with no SIGSEGV and `arbiter: qwen ✓` lines on
+// travel/arrival beats. patches/llama.rn+0.4.8.patch.
+// SIZE TRIM (same build): the Qwen native kernels grew the APK past the ~180MB baseline. Two cuts, no runtime change:
+// (1) build arm64-v8a ONLY — x86_64 is emulator/Chromebook-only, no phone uses it, yet it doubled every native lib
+// (RN core + llama.rn's kernel variants + ONNX). One Gradle prop (-PreactNativeArchitectures=arm64-v8a) drops it
+// app-wide. (2) Stop compiling the two SVE kernel variants — LlamaContext forces hasSve=false everywhere, so they're
+// never loaded; each .so embeds full ggml (several MB). .github/workflows/build-apk.yml (arm64 prop; also the disk-space
+// "No space left on device" CI fix — mv not cp + free runner disk), patches/llama.rn+0.4.8.patch (CMake drops _sve).
+// (3) Audio re-encode: the 12 background-music tracks were ~175-196kbps stereo (61MB); re-encoded to 128kbps stereo
+// (transparent for ambient/background music) + stripped embedded art/metadata → 41MB, ~19MB off the APK. All 12 verified
+// to decode clean at full duration. assets/audio/*.mp3.
+// OTA-577 (Unseptbium Voice) — [feature · arbiters-line] now that Qwen runs STABLE on-device (Tensor G5 build 290:
+// qwen:done, completion guard clean, no SIGSEGV on the v8_2 kernel), WIDEN where the generative Arbiter voice surfaces.
+// QWEN_ALLOWED_INTENTS gains investigate / search / rest — the dominant peaceful exploration + downtime beats — on top
+// of the existing travel / diplomacy / scene_intro. Only the Arbiter's FLAVOR remark routes through Qwen; the world/
+// reward text is logged instantly and separately, so gameplay feedback is never delayed. Combat Muzzle (no Qwen with a
+// hostile present) + the isGenerating throttle (one generation at a time → rapid actions fall back to template) keep it
+// from spamming or piling up on the slower v8_2 kernel. JS-only — reaches build 290 over OTA, no new APK needed. Look
+// for `arbiter: qwen ✓ <ms>ms` on investigate/travel/rest beats. app/engine/narrativeGenerator.ts.
+// OTA-578 (Unsepttrium Serial) — [fix+diagnostic · arbiters-line] serialize the two heavy native-ML workloads so they
+// never run at once. The OTA-577 widening let Qwen finally run a completion on v8_2 — and it did so CONCURRENTLY with a
+// Kokoro TTS synth for the first time; the process SIGSEGV'd with a Qwen completion crash AND a Kokoro voice crash
+// co-flagged on the SAME launch. New app/ai/nativeMlLock.ts is one global FIFO chain that BOTH the Qwen completion
+// (LlamaRuntime) and the Kokoro forward() (PiperTTSManager) funnel through, so a generation and a synth can never
+// overlap. This FIXES the crash if it was contention; if Qwen STILL crashes with nothing else running, that's the
+// definitive proof v8_2 generation itself faults (voice exonerated). Cost: the spoken line lands after the model
+// finishes generating it (natural order). To test: Settings → Reset AI (Qwen is in a 5-boot cooldown), keep voice ON,
+// play an investigate/travel/rest run, watch for `arbiter: qwen ✓` with no crash. JS-only — reaches build 290 over OTA.
+// app/ai/nativeMlLock.ts (new), app/ai/generation/LlamaRuntime.ts, app/voice/PiperTTSManager.ts.
+// OTA-579 (Unseptquadium Distract) — [revert+balance · arbiters-line] (1) Revert the dog BITE/DISTRACT picker from the
+// OTA-571 blocking popup back to the inline overlay the player preferred (the arb143 amber-blocked-dog fix stays; only
+// the picker presentation is reverted). (2) Raise the dog DISTRACT attack bonus +2 → +4 (matching the dodge's +4), so a
+// successful distract is a strong setup, not a marginal nudge. The +1 initiative is unchanged. Narration + chip hint
+// updated to "+1 init, +4 atk". app/components/InputBox.tsx, app/engine/combatRules.ts, app/state/gameStore.ts.
+// OTA-580 (Unseptpentium Cadence) — [fix · arbiters-line] un-starve the voice. CONFIRMED GOOD: the OTA-578 native-ML
+// lock killed the Qwen↔Kokoro contention crash — a full 290/579 session ran with `qwen:done`, completion guard clean,
+// voice guard clean, crash count 0. But the lock serializes the two, and OTA-577's intent widening made Qwen fire on
+// nearly every investigate — so it held the lock back-to-back and the voice barely spoke ("a single syllable then an
+// error"). The lock STAYS (it's what stops the crash); the fix is a Qwen generation cooldown (20s) in narrateViaArbiter
+// so generations are spaced out and the shared lock is free for the voice the vast majority of the time. Qwen narration
+// becomes an occasional AI flourish (debug reason `cooldown` on the throttled beats); the voice reads every line — Qwen
+// or template — freely, and the two still never run at once. JS-only; reaches build 290 over OTA.
+// app/state/gameStore.ts, app/voice/PiperTTSManager.ts (lock comment).
+// OTA-581 (Unsepthexium Mixture) — [feature · arbiters-line] mix the Arbiter's voice between FRESH Qwen lines and canned
+// templates the way the player asked. (1) The fresh Qwen lines stay VOICED (they're the unique ones worth hearing).
+// (2) CANNED flavor lines are now read on-screen but voiced only ~1 in 4 (chance(25)) — via a new `silent` meta flag on
+// the log entry that TTSController skips — so the player stops hearing the same "the memory will rot"/"I see how you
+// came at that" templates on every button press; they can glance them in the scroll instead. (3) Must-say lines
+// (combat prompts, warnings, tutorial — they bypass narrateViaArbiter) are unaffected, so they always speak. (4) Qwen's
+// cooldown 20s→10s so the fresh AI lines come more often (canned lines mostly silent now frees lock headroom). Net:
+// you mostly hear unique generated lines + the occasional canned one, voice + Qwen both have room, never overlap.
+// Tunable knobs: QWEN_GEN_COOLDOWN_MS and the chance(25) canned-voice rate. JS-only; reaches build 290 over OTA.
+// app/state/gameStore.ts, app/voice/TTSController.ts.
+// OTA-582 (Unseptseptium Quickline) — [fix · arbiters-line] root-cause why the player "only heard Kokoro twice".
+// Qwen and Kokoro share ONE native-ML lock; Qwen's peaceful cap was 90 tokens, which on the Tensor G5 kernel
+// (~256ms/token) meant a single Arbiter remark held the lock for ~23s (log: qwen ✓ 23636ms). During that freeze
+// Kokoro can't synth, and the 2-line voice queue (MAX_QUEUED_ARBITER_LINES) drops everything but the newest two —
+// so most lines never speak, and the survivors play "after the text scrolled off". Fix: slash the token caps so a
+// generation lands in ~6-8s and the line stays one punchy beat — peaceful 90→34, combat 55→30, and the peaceful
+// prompt now asks for ONE ~20-word sentence (was TWO/35 words) so it lands on punctuation instead of truncating.
+// Net: the lock frees fast, voice keeps up, fresh Qwen lines arrive while the action is still on screen. JS-only → 290.
+// app/state/gameStore.ts, app/engine/contextInjector.ts.
+// OTA-583 (Unseptoctium Louder) — [tune · arbiters-line] bump the canned-flavor voice rate 25%→33% (chance(25)→chance(33))
+// at all three narrateViaArbiter template sites. With the voice-starvation fixed in 582, the player wants a touch
+// more of the canned lines spoken between the fresh Qwen ones. JS-only → 290. app/state/gameStore.ts.
+// OTA-584 (Unoctquadium Carry) — [fix+tune · arbiters-line] two problems from the 583 playtest. (1) Near-silence:
+// the log showed ZERO `qwen ✓` all session — during active play (actions every ~2s) each Qwen gen is CANCELLED by
+// the next action before it finishes (~6-8s), yet the cancelled gen still arms the 10s cooldown, so every beat falls
+// to the canned template and Qwen never contributes a voiced line. Since canned has to carry the voice, raise its
+// rate 33%→60% (chance(33)→chance(60)) at all three narrateViaArbiter sites. (2) A vendor greeting voiced SIX times
+// in a row: the game log only de-dups CONSECUTIVE repeats, so a line re-emitted non-consecutively (re-entering a
+// stall, the Crucible forging the same item 4-6×) reached TTS each time. New "spoken recently" guard in
+// TTSController skips an exact line voiced within the last 30s. JS-only → 290. app/voice/TTSController.ts, gameStore.ts.
+// OTA-585 (Unoctpentium Companion) — [feature · arbiters-line] Phase 1 of the player's ambient-Qwen redesign: decouple
+// the AI voice from events so its latency stops mattering. (1) Reactive beats are now canned-only — investigate/search/
+// rest removed from QWEN_ALLOWED_INTENTS, so those land instantly via template (no more 6-8s late reactions that get
+// cancelled by the next action anyway). (2) New maybeGenerateAmbientArbiter(): the Arbiter makes UNPROMPTED, reflective
+// companion asides (growth, the road behind, its changing read of you) via a new AMBIENT_INSTRUCTION + ctx.ambient mode.
+// Because an ambient line answers nothing, it's NEVER cancelled (no epoch check) — it runs to completion in the
+// background and voices whenever ready, however late. Fires on ~35% of peaceful actions, gated by a 45s cooldown and
+// the shared isGenerating lock (muzzled in combat). Always voiced (these are the fresh ones). Next: canned-pool
+// expansion batches (586+) to dilute the repetitive reactive templates. JS-only → 290.
+// app/engine/contextInjector.ts, app/engine/narrativeGenerator.ts, app/state/gameStore.ts.
+// OTA-586 (Unocthexium Repertoire) — [content · arbiters-line] expand the canned reactive pools in ONE OTA (the
+// "70 statements crashed it from weight" fear was a false attribution — the real crash was the native ML lock, long
+// fixed; 65 short strings are ~6KB and carry no runtime weight). +65 lines across the four most-repeated pools so the
+// player stops hearing the same handful on loop: ARBITER_NOTED_LINES 7→25 ("I saw the way you came at that" register),
+// ARBITER_LOOK_LINES 6→16, GENERIC_REMARKS 8→24 (lore musings), COMBAT_REMARKS 15→25. Purely additive string arrays,
+// same voice/format; combat lines keep the {enemy} token. Pairs with 585's ambient Qwen to thin the rotation. JS-only → 290.
+// app/engine/narrativeGenerator.ts.
+// OTA-587 (Unoctseptium Homecoming) — [feature · arbiters-line] the save-load greeting ALWAYS names the player now.
+// It's the first thing the Arbiter says after character select / on every load, and the player wants it to be a warm,
+// by-name companion hello every time — not the old 1/3 chance (arbiterAddress) that mostly said "Welcome back, friend".
+// New welcomeBackLine() pulls from a 5-line warm pool, each built around a constant "Welcome back, <first name>" core,
+// falling back to "friend" only if the character has no name. The 60s debounce + skipDedup are unchanged. JS-only → 290.
+// app/state/gameStore.ts.
+// OTA-588 (Unoctoctium Hail) — [tweak · arbiters-line] the named welcome now fires on EVERY load ("and always fire").
+// Dropped the OTA-008 60s debounce from the Arbiter greeting gate — it's the companion's standing hello and the player
+// wants it guaranteed each time they re-enter, not throttled. Still skipped on an interrupted-death revival (OTA-416:
+// a revival isn't a load and already greeted them). The separate world-cue ("You step back into …") keeps its debounce.
+// app/state/gameStore.ts.
+// OTA-589 (Unoctnonium Breath) — [fix · arbiters-line] "put a slight pause after a '.' — Kokoro runs the sentences
+// together." Two causes: the arb7 merge bundled sentences into one Kokoro read (no internal pause), and the crossfade
+// trimmed the gap between sentence chunks. Now speak() keeps ONE sentence per chunk (only glues terminator-less
+// fragments), each chunk is tagged endsSentence, and the batch joiner (new joinBatch) drops SENTENCE_PAUSE_MS (160ms)
+// of real silence after any sentence — with 6ms edge fades for a click-free join — instead of crossfading the gap away.
+// JS-only → 290. app/voice/PiperTTSManager.ts.
+// OTA-590 (Unnonnilium Cordon) — [fix · arbiters-line] "I just entered a vendors stall during combat, that shouldn't
+// happen." The vendor banner rendered whenever currentScene.vendor existed with NO combat check, so a hostile in the
+// scene didn't stop you tapping into the trade screen. Now the banner is hidden while inCombat (it returns once the
+// enemies are down — the vendor stays in the scene), and buyFromVendor/sellToVendor refuse with a message when an
+// enemy is present (defense-in-depth: the 'buy from X' text command still parses mid-fight). JS-only → 290.
+// app/screens/ExplorationScreen.tsx, app/state/gameStore.ts.
+// OTA-591 (Unnonunium Hush) — [tune+fix · arbiters-line] (1) Kokoro "won't shut up" (~20 spoken canned lines/min):
+// once arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes, so almost every 60% voice-roll spoke.
+// Canned voice rate 60%→30% (chance) at the three narrateViaArbiter sites — lines still appear on-screen, just fewer
+// are voiced. (Frequency is two gates: shouldArbiterSpeak emits the line ~20-50%/action; this chance() voices it.)
+// (2) Faction-quest REMOTE turn-in ("send word") now pays HALF (both TC and rep), down from an 85% TC cut with full
+// rep — travelling to hand it in stays the 100% play. JS-only → 290. app/state/gameStore.ts.
+// OTA-592 (Unnonbium Unseen) — [feature · arbiters-line] STEALTH is a real tactic now (was a free, uncosted +5 nobody
+// found). The combat 'hide' chip is renamed 'sneak', and the stealth action is range-aware: at MID range (unengaged)
+// it's the OPENER — STE check vs the area's awareness; success → `stealthed` (+5 next strike), you have the drop. At
+// CLOSE range (engaged) it's the RESET — an INITIATIVE RACE (STE-tilted): win → dive for cover / throw dust → stealthed
+// (cover holds it 2 rounds, dust 1); lose → caught mid-vanish → `surprised` (enemy's next strike at advantage). Either
+// way you spend your action, so it can't be spammed. STE scales every roll, so the stealth stat finally matters; cover
+// vs dust keys off the room (concealment-rich scenes let you dive). Approach keeps its 'close the distance' job — the
+// unseen opener rides on 'sneak'. JS-only → 290. app/state/gameStore.ts, app/engine/parser.ts.
+// OTA-593 (Unnontrium Patch) — [fix · arbiters-line] close 5 exploits found by the multi-agent audit. (1) `sneak` was
+// a FREE action — the reset path (engaged, or after the one-shot opener) now runs runEnemyGroupCounters so it costs a
+// turn. (2) Ranged sneak→fire loop — the free OPENER is now once-per-encounter (new CurrentScene.stealthOpenerUsed);
+// after that, sneaking at any range is the initiative gamble that provokes a counter. (3) `stealthed` refresh-spam —
+// added an already-stealthed guard (no re-apply while active). (4) Crucible DUPE (your "4 weapons from 4 items") —
+// applyFusion now clears `reservedForFusion` on drained survivors, so a multi-unit stack can't be re-fused at a free
+// Crucible without re-reserving. (5) Equip/unequip HP-pump — unequip now SUBTRACTS the gear's HP bonus from current
+// HP (was only re-clamping → free infinite heal). JS-only → 290. app/state/gameStore.ts, app/engine/itemFusion.ts.
+// OTA-594 (Unnonquadium Wellspring) — [fix · arbiters-line] audit follow-ups #6 + #7. #6 (investigate-ambush farm):
+// (a) one ambush per room VISIT now — new CurrentScene.investigateAmbushUsed gates the 6% spawn, so you can't sit on a
+// tile spamming `investigate` to mint free trivial enemies for stat/loot; (b) the new `sneak` action now TRAINS the
+// stealth stat on a successful opener/reset-win (trainStat 'stealth'), giving stealth builds a legit STE progression
+// path instead of the farm. #7 (water): Water Bottle is now stamina-only (dropped the +2 HP from its effect, per "water
+// should only give stamina"); it already leaves an Empty Water Bottle on drink (reusable) and fills at any scene water
+// source — verified, unchanged. JS-only → 290. app/state/gameStore.ts, app/data/items/gear.json.
+// OTA-595 (Unnonpentium Leash) — [fix · arbiters-line] audit #8 (dog), per player: route companion commands through
+// runEnemyGroupCounters "like a real attack". handleDogCombat's tail rolled ONE watered-down counter split ~40% dog /
+// 60% player, so spamming `bite`/`distract` let the player skip the full group retaliation that attacking yourself
+// provokes (the dog solo-farmed at near-zero risk). Now commanding Rocky runs the FULL enemy volley on the PLAYER — the
+// dog is no longer hit by command-retaliation; the cost lands on the commander, same as a real attack. (GOLEM command
+// left as-is for now — it's a deliberate tank; routing it through player-counters would defeat its purpose. Pending a
+// decision.) JS-only → 290. app/state/gameStore.ts.
+// OTA-596 (Unnonhexium Bulwark) — [feature · arbiters-line] golem durability overhaul (player-designed, option C). Golems
+// were glass cannons (~24 HP, full enemy damage, 2-3 hits then crumble + total loss of trained levels). Now: (1) base HP
+// raised — Mud 16→24, Aether 24→34, Iron 24→40, Crystal 30→52. (2) Innate % DAMAGE RESIST by kind (Mud 15 / Aether 20 /
+// Iron 30 / Crystal 35%), applied to the enemy's real damage roll, min-1 always lands (never immune). (3) TRAINABLE:
+// resist climbs as the golem trains resilience (capped 35/40/50/55%), and a NEW max-HP track grows +3 per stat level-up
+// (baked into trainGolemStat) — trash/mid fights build it toward bosses. (4) Self-mend: ~25% max HP on rest + part-feeds
+// bumped hpMax/4→hpMax/3 (eases the material drain). (5) INERT GOLEM CORE: a crumbled golem drops a core holding HALF its
+// trained levels; feed it to a new golem to graft them on (death = ~half setback + re-summon, not a wipe). Guardrail:
+// resist caps + min-1 damage keep a maxed golem mortal to bosses (preserves OTA-433). JS-only → 290.
+// app/engine/golems.ts, app/engine/types.ts, app/state/gameStore.ts.
+// OTA-597 (Unnonseptium Handoff) — [feature+fix · arbiters-line] the two parked faction-quest items. #3 ("open" →
+// "ready to submit"): new factionQuestReady() (staged → all stages; FETCH → items in hand; legacy → always) drives the
+// Contracts pill — fetch quests now show `held/needed` then an amber "READY TO SUBMIT", instead of "OPEN" forever, and
+// the COMPLETE button only appears when truly ready. #2 (auto-submit on arrival): travelling to a scene with a same-
+// faction vendor/board now auto-turns-in every READY quest there at FULL reward via the canonical turn-in path, with a
+// completion popup (reuses pendingWhisperComplete). Folded in the audit fix: the Contracts COMPLETE button is the
+// COURIER path now — it pays HALF unless a same-faction agent is present (was 100% from anywhere). JS-only → 290.
+// app/engine/factionQuests.ts, app/state/gameStore.ts, app/screens/ContractsScreen.tsx.
+// OTA-598 (Unnonoctium Telltale) — [hardening · arbiters-line] production/internal-test observability. The app already
+// captures the last JS-fatal crash (global ErrorUtils handler + beginScene bail → @tartaria/lastCrash) and the title
+// screen surfaces it — but the LOG export internal testers PASTE only carried ML-runtime + save-load health, so a pure
+// JS crash (logic/render/state, not native ML) showed up in the report with NO cause. New diagnostics/lastCrash.ts caches
+// the record at boot (loadLastCrash, beside loadSaveLoadHealth) and adds a "Last JS crash" block (stage + message + top
+// stack frames) to buildBasicDeviceSummary, so every pasted diagnostic now shows WHY a non-ML crash happened. Closes the
+// internal-test observability gap; remote aggregation (Sentry) still needs a native build + DSN. JS-only → 290.
+// app/diagnostics/lastCrash.ts, app/diagnostics/aboutSummary.ts, app/state/gameStore.ts.
+// OTA-599 (Unnonennium Tidy) — [polish · arbiters-line] declutter the About → Session tab (player: "a ton of buttons").
+// (1) REMOVED COPY AI HEALTH — pure duplicate (it was buildBasicDeviceSummary + mlHealthSummary, and the device summary
+// already contains the ML health, so COPY LOG / REPORT A BUG already carry it). Dropped the button + its handler + state.
+// (2) Tucked the two rarely-needed clipboard dumps — COPY SAVE (brick repro) and COPY INVENTORY — behind a single
+// "▸ ADVANCED EXPORTS" toggle. (3) Relabeled "RESET AI NARRATION & RELOAD" → "RELOAD AI". (4) Added RUN / REPORTING / AI
+// section headers and a shorter intro line. Net: ~9 visible buttons → 7 (2 of those collapsed), one true duplicate gone,
+// everything still reachable. JS-only → 290. app/screens/AboutScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-12-599';

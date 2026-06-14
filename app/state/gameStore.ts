@@ -47,6 +47,7 @@ import {
   clearSlotCrash,
   getCrashedSlotIds,
 } from '../diagnostics/saveLoadHealth';
+import { loadLastCrash } from '../diagnostics/lastCrash';
 import {
   listSlots,
   loadSlot,
@@ -234,6 +235,7 @@ import {
   findFactionQuestById,
   availableFactionQuests,
   fuzzyFindFactionQuest,
+  factionQuestReady,
 } from '../engine/factionQuests';
 import {
   HUNTS,
@@ -453,6 +455,17 @@ interface CurrentScene {
   sceneBuilding?: string | null;
   /** Distance from the player to the enemy group. Null when peaceful. */
   range: CombatRange | null;
+  /** arb168 — set once the player has used (or blown) their one free stealth
+   *  OPENER this encounter. After that, sneaking is the initiative-gambit RESET
+   *  that costs a turn (the enemy group counters), so the opener can't be
+   *  re-triggered every round (the ranged sneak→fire loop). Resets with the
+   *  scene (a fresh encounter = a fresh drop). */
+  stealthOpenerUsed?: boolean;
+  /** arb168 — set once a spontaneous investigate-ambush has sprung in this
+   *  room. Bounds the farm: a room springs at most ONE ambush per visit, so the
+   *  player can't sit on a tile spamming `investigate` to mint free trivial
+   *  enemies for stat-training + loot. Resets with the scene (leave + return). */
+  investigateAmbushUsed?: boolean;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -1077,6 +1090,27 @@ const STAMINA_COSTS = {
 // app session.
 const WELCOME_BACK_MIN_MS = 60_000;
 let lastWelcomeBackAt: number | null = null;
+// arb164 — the save-load greeting is the FIRST thing the Arbiter says when the
+// player returns to a game, and it's a non-negotiable that it ALWAYS names them
+// (not the 1/3 chance arbiterAddress rolls): "every time I load in it should say
+// welcome back, <name>." This is the companion's standing hello — warm, by name,
+// every time. The pool varies the warmth around a constant "Welcome back, {name}"
+// core; {name} is the player's first name, falling back to "friend" only when the
+// character somehow has no name at all.
+const WELCOME_BACK_LINES = [
+  `The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, {name}. The road kept your place."`,
+  `The Arbiter looks up as you return. "Welcome back, {name}. I wondered when you'd take up the thread again."`,
+  `The Arbiter meets your eyes. "Welcome back, {name}. Good — the buried country is no place to walk alone."`,
+  `The Arbiter nods, the way you nod at someone you've missed. "Welcome back, {name}. We've still got ground to cover, you and I."`,
+  `The Arbiter sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
+];
+
+function welcomeBackLine(player: PlayerCharacter | null | undefined): string {
+  const first = player?.name?.split(/\s+/)[0];
+  const name = first && first.length > 0 ? first : 'friend';
+  const line = WELCOME_BACK_LINES[Math.floor(Math.random() * WELCOME_BACK_LINES.length)]!;
+  return line.replace('{name}', name);
+}
 // OTA-350 — throttle the Arbiter's "consider stealth" nudge so it's an
 // occasional suggestion in fitting moments, not a per-scene nag.
 const STEALTH_HINT_MIN_MS = 120_000;
@@ -2755,6 +2789,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let crashedSlotIds: string[] = [];
     try {
       await loadSaveLoadHealth();
+      await loadLastCrash(); // arb172 — cache last JS crash for the diagnostic export
       crashedSlotIds = getCrashedSlotIds();
     } catch { /* health is best-effort — never block boot on it */ }
     const activeId = await loadActiveSlotId();
@@ -3570,24 +3605,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // "you step back into..." line so the Arbiter is responding
       // to the player's return, not pre-announcing the scene.
       //
-      // OTA 008 — debounce. Playtester navigated away + back twice
-      // in 7 seconds and got the welcome line both times, which
-      // reads as the Arbiter cheerfully greeting the player on
-      // every screen flip. Throttle to once per WELCOME_BACK_MIN_MS
-      // (60s). The latch is module-level so it survives across
-      // loadSlotIntoGame calls within the same app session but
-      // resets on JS reload (cold start gets a fresh hello).
+      // OTA 008 had a 60s debounce so rapid screen-flips didn't re-greet.
+      // arb164 — player override: the named welcome is the companion's standing
+      // hello and must fire EVERY time they load in ("and always fire"), so the
+      // time-debounce is gone. We still skip it on an interrupted-death revival
+      // (OTA-416) — that path already greeted the player and "welcome back"
+      // reads wrong right after a death; a revival isn't a load. We still stamp
+      // lastWelcomeBackAt so the separate world-cue debounce above is unchanged.
       const now = Date.now();
-      // OTA-416 — skip the casual "welcome back" on an interrupted-death revival;
-      // the revival line above already greeted the player, and "welcome back"
-      // reads wrong right after a death.
-      if (!wasInterruptedDeath && (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS)) {
-        // OTA-184 — ~1/3 of welcomes use the player's name instead
-        // of "friend" so the Arbiter occasionally sounds personal.
-        const addr = arbiterAddress(get().player, 'friend');
+      if (!wasInterruptedDeath) {
+        // arb164 — ALWAYS greet by name now (player's non-negotiable). This is
+        // the first beat after character select / on every load — a warm, named
+        // companion hello, not the 1/3 arbiterAddress roll.
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines their head. "Welcome back, ${addr}."`,
+          welcomeBackLine(get().player),
           { skipDedup: true },
         );
         lastWelcomeBackAt = now;
@@ -7578,6 +7610,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (
           currentScene.enemies.length === 0
           && !get().pendingRolls
+          && !get().currentScene?.investigateAmbushUsed   // arb168 — one per room visit
           && Math.random() < 0.06
         ) {
           const LOW_TIER = ['Gutter Rat', 'Mudling', 'Aetheric Leech', 'Mud Wasp'];
@@ -7595,6 +7628,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   activeEnemyIdx: s.currentScene.enemies.length,
                   range: 'mid',
                   enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                  investigateAmbushUsed: true, // arb168 — spent this room's one ambush
                 },
                 stepsSinceCombat: 0,
               };
@@ -12743,6 +12777,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
         void narrateViaArbiter(get, set, template, parsed.intent);
       }
+      // arb163 — independently of the reactive line above, occasionally kick off
+      // an AMBIENT companion aside. It's decoupled from this action, runs in the
+      // background, and speaks when ready (its internal guards handle combat /
+      // lock / the wide cooldown). chance() just adds jitter so it doesn't fire
+      // like clockwork the instant the cooldown expires.
+      if (chance(35)) void maybeGenerateAmbientArbiter(get, set);
     }
 
     // Fire-and-forget cognitive enrichment — runs in parallel with the
@@ -12992,6 +13032,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hoursElapsed: newHours,
         },
       });
+      // arb170 — camping also mends the golem ~25% of its max HP, so keeping it
+      // alive doesn't drain your materials between fights (you still feed it for
+      // a fast in-the-field top-up).
+      const restGolem = get().player?.golem;
+      if (restGolem && restGolem.hp > 0 && restGolem.hp < restGolem.hpMax) {
+        const gMend = Math.min(restGolem.hpMax - restGolem.hp, Math.max(3, Math.round(restGolem.hpMax * 0.25)));
+        set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: { ...s.player.golem, hp: s.player.golem.hp + gMend } } } : s));
+      }
       const parts: string[] = [];
       if (heal > 0) parts.push(`+${heal} HP`);
       if (stamGain > 0) parts.push(`+${stamGain} stamina`);
@@ -13127,29 +13175,106 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         switch (intent) {
           case 'stealth': {
-            // v2.4.1 (OTA 034) — stealth success in combat grants
-            // `stealthed`, a one-shot +5 on the player's next melee
-            // or ranged attack (rolled in by rollMods). The status
-            // auto-consumes on use. Outside combat, the success is
-            // still narrated but no buff is applied — there's no
-            // target to land it on.
+            // arb167 — STEALTH is a real tactic now (was a free, uncosted +5).
+            // Two moments, chosen by range:
+            //   • UNENGAGED (mid range, the opener): you have the drop — an
+            //     STE check vs the enemy's awareness; success → `stealthed`
+            //     (+5 your next strike). No initiative needed; they don't know
+            //     you're there yet.
+            //   • ENGAGED (close range, the reset): you must break contact, and
+            //     that's an INITIATIVE RACE (STE-tilted). Win → dive for cover /
+            //     throw dust → `stealthed`. Lose → caught mid-vanish → `surprised`
+            //     (the enemy's next strike has the advantage). Either way you
+            //     spent your action, so it can't be spammed for a free +5.
+            // STE scales every roll, so the stealth stat finally earns its keep.
             if (currentScene.enemies.length > 0) {
-              set((s) => (s.player
-                ? {
-                    player: {
-                      ...s.player,
-                      statusEffects: applyEffect(s.player.statusEffects ?? [], {
-                        kind: 'stealthed',
-                        remainingRounds: 2,
-                        label: 'unseen — next strike at advantage',
-                      }),
-                    },
-                  }
-                : s));
-              get().appendLog(
-                'world',
-                'You move low and quiet, sliding into the angle they cannot watch. Your next strike will land before they know you are there. (+5 next attack)',
+              const livePlayer = get().player;
+              // arb168 — already unseen? Don't let re-sneaking refresh/restack the
+              // buff (the old Math.max refresh meant it never decayed). Strike first.
+              const alreadyStealthed = (livePlayer?.statusEffects ?? []).some(
+                (e) => e.kind === 'stealthed' && e.remainingRounds > 0,
               );
+              if (alreadyStealthed) {
+                get().appendLog('world', `You're already in the shadows — strike before the moment passes.`);
+                break;
+              }
+              const enemy = activeEnemy(currentScene);
+              const ste = livePlayer ? (effectiveStats(livePlayer).stealth ?? 5) : 5;
+              const steMod = Math.round((ste - 10) / 2);
+              // Awareness scales with the area's danger rating (alert country =
+              // harder to slip). Kept small so STE stays the deciding factor.
+              const enemyAware = 2 + Math.floor((currentScene.location?.danger ?? 2) / 2);
+              const engaged = currentScene.range === 'close';
+              // arb168 — the free OPENER is available only when UNENGAGED *and* not
+              // yet used this encounter. Otherwise it's the RESET: an initiative
+              // gamble that COSTS your turn (the enemy group counters), which kills
+              // the ranged sneak→fire loop that kept the player at mid range.
+              const openerAvailable = !engaged && !currentScene.stealthOpenerUsed;
+              // Mark the drop spent either way — they're alert to you now.
+              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, stealthOpenerUsed: true } } : s));
+              // Cover heuristic — concealment-rich rooms let you dive for it; open
+              // ground leaves only a fistful of grit to throw. Cosmetic + a small
+              // mechanical edge (cover holds the buff a round longer).
+              const sceneLabel = `${currentScene.location?.name ?? ''} ${currentScene.location?.type ?? ''} ${(currentScene.location?.tags ?? []).join(' ')}`;
+              const hasCover = /rubble|ruin|pillar|wreck|cathedral|forge|smith|stair|chamber|crate|wall|tunnel|vault|workshop|spire|rock|stone|column|cover|alley|husk|hull|indoor|structure|building/i.test(sceneLabel);
+              const foe = enemy?.name ?? 'them';
+              // arb168 — using stealth successfully TRAINS the stealth stat, so a
+              // stealth build has a legit progression path (instead of the old
+              // investigate-ambush stat farm). Set on the success branches below.
+              let stealthSucceeded = false;
+              if (openerAvailable) {
+                const roll = rollDie(20);
+                const total = roll + steMod + 3; // +3 for the drop (they're unaware)
+                const dc = 10 + enemyAware;
+                if (total >= dc) {
+                  set((s) => (s.player
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'stealthed', remainingRounds: 2, label: 'unseen — next strike +5' }) } }
+                    : s));
+                  get().appendLog('world', hasCover
+                    ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
+                    : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steMod >= 0 ? '+' : ''}${steMod}+3 = ${total} vs DC ${dc} — UNSEEN`);
+                  stealthSucceeded = true;
+                } else {
+                  get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
+                  get().appendLog('debug', `stealth: opener d20=${roll} → ${total} vs DC ${dc} — SPOTTED`);
+                }
+              } else {
+                const pInit = rollDie(20) + steMod + 2; // you chose the moment
+                const eInit = rollDie(20) + enemyAware;
+                if (pInit >= eInit) {
+                  const rounds = hasCover ? 2 : 1;
+                  set((s) => (s.player
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'stealthed', remainingRounds: rounds, label: 'unseen — next strike +5' }) } }
+                    : s));
+                  get().appendLog('world', hasCover
+                    ? `You break away and throw yourself into cover. By the time ${foe} find the angle, you're already gone — the next strike comes from nowhere. (+5 next attack)`
+                    : `You fling a fistful of grit into ${foe}'s eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)`);
+                  get().appendLog('debug', `stealth: reset WIN init ${pInit} vs ${eInit} (${hasCover ? 'cover' : 'dust'}, +5 ${rounds}r)`);
+                  stealthSucceeded = true;
+                } else {
+                  set((s) => (s.player
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'caught mid-vanish' }) } }
+                    : s));
+                  get().appendLog('world', `${foe} reads the move before you finish it — you break contact a beat too slow and leave yourself open. Their next strike has the advantage.`);
+                  get().appendLog('debug', `stealth: reset LOSE init ${pInit} vs ${eInit} — surprised applied`);
+                }
+                // arb168 — the RESET costs your action: the whole enemy group
+                // gets to act (same as any real combat move). This is what stops
+                // sneak from being a free, spammable +5.
+                runEnemyGroupCounters(get, set, get().player ?? player);
+              }
+              // arb168 — train STE on a successful sneak (opener or reset win).
+              if (stealthSucceeded) {
+                const liveSneaker = get().player;
+                if (liveSneaker) {
+                  const tr = trainStat(liveSneaker, 'stealth', true);
+                  set((s) => (s.player ? { player: tr.player } : s));
+                  if (tr.leveled) {
+                    get().appendLog('reward', `✦ Moving unseen sharpens you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`);
+                  }
+                }
+              }
             } else {
               get().appendLog(
                 'world',
@@ -14180,6 +14305,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     get().beginScene({ arrivalFromName: fromLocationName });
+    // arb171 — auto-submit any READY faction quest whose turn-in agent/board is
+    // standing here, at FULL reward, with a completion popup (player ask:
+    // "submission should happen as soon as you arrive at the spot it routed").
+    autoSubmitReadyFactionQuests(get, set);
     // v2.4.1 (OTA 035 — Phase 2) — Lost Capital arrival logs the
     // faction's recovery hint; the Core itself only grants after the
     // player performs the faction's gate verb (see canRecoverCore
@@ -14843,6 +14972,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    // arb166 — no trading mid-fight (defense-in-depth behind the hidden vendor
+    // banner: the 'buy from X' text command still parses during combat).
+    if (scene.enemies.length > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
     // Tour mode — Irma is a demo vendor injected for the intro walkthrough.
     // No transactions: stops the player from cheesing the game by buying
     // out the armory before play actually starts.
@@ -14997,6 +15132,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    // arb166 — no trading mid-fight (see buyFromVendor).
+    if (scene.enemies.length > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
     if (state.tutorialDemoVendor) {
       get().appendLog('system', 'Tour mode — selling is disabled while the tutorial is running.');
       return;
@@ -15773,11 +15913,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((i) => (i.quantity ?? 1) > 0);
       set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
     }
-    // Pay out reward + record completion. OTA-456 — a remote "send word" turn-in
-    // pays a runner to carry the report, so it takes a 15% TC cut (full rep);
-    // turning in face-to-face pays in full.
-    const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.85)) : candidate.reward.tc;
-    const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.reward.rep);
+    // Pay out reward + record completion. arb166 — a remote "send word" turn-in
+    // now pays HALF (both TC and rep): travelling to the agent/board and handing
+    // it over in person is the 100% play; couriering it from afar is the 50%
+    // convenience option. (Was an 85% TC cut with full rep.)
+    const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.5)) : candidate.reward.tc;
+    const payRep = remote ? Math.max(1, Math.round(candidate.reward.rep * 0.5)) : candidate.reward.rep;
+    const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
     set((s) =>
       s.player
         ? {
@@ -15796,8 +15938,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'reward',
       remote
-        ? `✦ Sent word — ${candidate.title} closed by courier. +${payTc} TC (runner's cut taken), +${candidate.reward.rep} rep with ${fLabel}.`
-        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${candidate.reward.rep} rep with ${fLabel}.`,
+        ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}.`
+        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}.`,
     );
     logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
@@ -16867,11 +17009,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           })
           .filter((i) => (i.quantity ?? 1) > 0);
       }
-      const repResult = applyRepChange(player.factionStanding, def.factionId, def.reward.rep);
+      // arb171 — proximity-gated reward (closes the "COMPLETE pays 100% from
+      // anywhere" exploit the audit flagged). In person at a same-faction vendor
+      // or mission board → FULL; from afar this button couriers it for HALF,
+      // matching turnInFactionQuest's send-word rule. (Travelling to the spot
+      // auto-submits at full — see the arrival handler.)
+      const turnScene = get().currentScene;
+      const turnFaction = turnScene?.vendor?.faction ?? turnScene?.missionBoard?.faction ?? null;
+      const inPerson = turnFaction === def.factionId;
+      const payTc = inPerson ? def.reward.tc : Math.max(1, Math.round(def.reward.tc * 0.5));
+      const payRep = inPerson ? def.reward.rep : Math.max(1, Math.round(def.reward.rep * 0.5));
+      const repResult = applyRepChange(player.factionStanding, def.factionId, payRep);
       set((s) => (s.player ? {
         player: {
           ...s.player,
-          tc: s.player.tc + def.reward.tc,
+          tc: s.player.tc + payTc,
           inventory: fetchConsumed ?? s.player.inventory,
           factionStanding: repResult.standing,
           activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== def.id),
@@ -16881,7 +17033,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } : s));
       get().appendLog(
         'reward',
-        `✦ Quest complete — ${def.title}. +${def.reward.tc} TC, +${def.reward.rep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
+        `✦ Quest complete — ${def.title}.${inPerson ? '' : ' Couriered for HALF (travel to a same-faction agent for full).'} +${payTc} TC, +${payRep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
       );
       applyTrainAndLog(get, set, 'wisdom', '✦ Faction work finished, lessons kept. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -19206,7 +19358,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...(hpDelta !== 0
                 ? (() => {
                     const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
-                    return { hpMax: newMax, hp: Math.max(1, Math.min(s.player.hp ?? 1, newMax)) };
+                    // arb168 — actually SUBTRACT the removed gear's HP bonus from
+                    // current HP (hpDelta is negative here), mirroring the equip
+                    // bake-in. The old code only re-clamped `hp` to the new max, so
+                    // equipping +HP gear while wounded then unequipping banked the
+                    // bonus as free current HP — a repeatable infinite heal.
+                    return { hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) };
                   })()
                 : {}),
             },
@@ -23280,6 +23437,52 @@ const WHILE_AWAY_LINES: ReadonlyArray<{ channel: 'arbiter' | 'world'; line: stri
 // frays at the edges so the player goes to bed thinking about what
 // they were about to start.
 type ContractKind = 'hunt' | 'mystery' | 'storyline' | 'faction_quest';
+/** arb171 — on arrival at a scene where a same-faction vendor or mission board is
+ *  present, auto-turn-in every active faction quest whose WORK is done (staged →
+ *  all stages; fetch → items in hand), at FULL reward, and surface a completion
+ *  popup. This is the "submit on arrival at the routed spot" the player asked for
+ *  — couriering from afar (the Contracts COMPLETE button) stays the HALF option. */
+function autoSubmitReadyFactionQuests(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!player || !scene) return;
+  const turnFaction = scene.vendor?.faction ?? scene.missionBoard?.faction ?? null;
+  if (!turnFaction) return;
+  const countItem = (name: string) =>
+    (player.inventory ?? [])
+      .filter((i) => i.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, i) => n + (i.quantity ?? 1), 0);
+  const ready = (player.activeFactionQuests ?? [])
+    .map((rec) => ({ rec, def: findFactionQuestById(rec.id) }))
+    .filter(({ rec, def }) => !!def && def.factionId === turnFaction && factionQuestReady(def, rec.stage, countItem));
+  if (ready.length === 0) return;
+  const lines: string[] = [];
+  const rewards: string[] = [];
+  for (const { def } of ready) {
+    if (!def) continue;
+    // In-person turn-in → FULL reward, atomic removal, fetch consume — all via
+    // the canonical path so there's a single source of truth.
+    get().turnInFactionQuest(def.id, false);
+    const stillActive = (get().player?.activeFactionQuestIds ?? []).includes(def.id);
+    if (!stillActive) {
+      lines.push(`✓ ${def.title}`);
+      rewards.push(`+${def.reward.tc} TC · +${def.reward.rep} rep`);
+    }
+  }
+  if (lines.length > 0) {
+    set(() => ({
+      pendingWhisperComplete: {
+        title: lines.length === 1 ? 'Contract Turned In' : 'Contracts Turned In',
+        lines,
+        rewards,
+      },
+    }));
+  }
+}
+
 function plantNextContractHint(
   get: () => GameStore,
   factionId: string | null,
@@ -24458,7 +24661,7 @@ function handleGolemCommand(
   // like the dog's STR. A working copy carries any stat-training from this turn
   // through to the final state write (incl. the kill-return path).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { golemStatBonus, trainGolemStat } = require('../engine/golems');
+  const { golemStatBonus, trainGolemStat, golemDamageResist, getGolemDefinition } = require('../engine/golems');
   let workingGolem = golem;
   const golemPower: number = golemStatBonus(golem, 'power');
   const atkRoll = rollDie(20);
@@ -24594,20 +24797,52 @@ function handleGolemCommand(
     // boss fights. A tier-appropriate roll makes the golem a real but expendable
     // shield. Falls back to the old flat value if the foe has no parseable damage.
     // OTA-467 — trained RESILIENCE soaks part of the hit (min 1 always lands).
-    const golemRes: number = golemStatBonus(workingGolem, 'resilience');
+    // arb170 — % damage resistance (innate by kind + trained resilience), capped,
+    // applied to the enemy's REAL damage roll. Min 1 always lands (never immune).
+    const resist: number = golemDamageResist(workingGolem);
     const rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
-    const enemyDmg = Math.max(1, rawDmg - golemRes);
+    const enemyDmg = Math.max(1, Math.round(rawDmg * (1 - resist)));
     const newGolemHp = Math.max(0, workingGolem.hp - enemyDmg);
     get().appendLog(
       'combat',
-      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${golemRes > 0 ? ` (−${golemRes} soaked)` : ''}. (${newGolemHp}/${golem.hpMax})`,
+      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${resist > 0 ? ` (${Math.round(resist * 100)}% resisted)` : ''}. (${newGolemHp}/${golem.hpMax})`,
     );
     if (newGolemHp <= 0) {
       get().appendLog(
         'world',
         `The ${golem.name} stills, then crumbles back into ${golem.kind === 'mud_golem' ? 'mud' : golem.kind === 'iron_golem' ? 'iron filings' : golem.kind === 'aether_golem' ? 'a fading aetheric afterimage' : 'a scatter of crystal shards'}.`,
       );
-      set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
+      // arb170 — INERT CORE. If the golem had trained anything, it leaves a core
+      // carrying HALF its levels; feed it to a new golem to graft them on. So a
+      // death costs ~half the investment + a re-summon, not the whole golem.
+      const dG = getGolemDefinition(workingGolem.kind);
+      const core = {
+        power: Math.floor((workingGolem.stats?.power ?? 0) / 2),
+        resilience: Math.floor((workingGolem.stats?.resilience ?? 0) / 2),
+        bonusHp: Math.floor(Math.max(0, (workingGolem.hpMax ?? 0) - (dG?.hpMax ?? 0)) / 2),
+      };
+      const hadTraining = core.power > 0 || core.resilience > 0 || core.bonusHp > 0;
+      set((s) => {
+        if (!s.player) return s;
+        let player = { ...s.player, golem: null };
+        if (hadTraining) {
+          const res = grantItem(player.inventory, {
+            id: `golemcore_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: 'Inert Golem Core',
+            kind: 'misc',
+            rarity: 'Uncommon',
+            quantity: 1,
+            tags: ['golem', 'core', 'salvage'],
+            description: `The settled heart of ${golem.name} — its hard-won memory of fighting, half-intact. Feed it to a newly-summoned golem to graft on +${core.power} power, +${core.resilience} resilience, +${core.bonusHp} max HP.`,
+            golemCore: core,
+          });
+          player = { ...player, inventory: res.inventory };
+        }
+        return { player };
+      });
+      if (hadTraining) {
+        get().appendLog('reward', `✦ Inert Golem Core recovered — feed it to your next golem to pass on half of ${golem.name}'s training.`);
+      }
     } else {
       // OTA-467 — surviving a hit trains RESILIENCE; carry the turn's POWER too.
       let survived: typeof workingGolem = { ...workingGolem, hp: newGolemHp };
@@ -25060,7 +25295,7 @@ function handleDogCombat(
       // happened.
       get().appendLog(
         'world',
-        `${dog.name} pounces at ${target.name}'s flank, barking sharp. ${target.name}'s attention splits — your next swing rides the opening (+1 init, +2 atk).`,
+        `${dog.name} pounces at ${target.name}'s flank, barking sharp. ${target.name}'s attention splits — your next swing rides the opening (+1 init, +4 atk).`,
       );
       if (trained.leveled) {
         get().appendLog(
@@ -25070,112 +25305,18 @@ function handleDogCombat(
       }
     }
   }
-  // Enemy retaliation split: ~40% dog if no golem, ~30% dog + 30% golem + 40% player
-  // otherwise. Skip when this action just killed all enemies.
+  // arb169 — companion commands now provoke the FULL enemy volley, same as a
+  // real attack. Previously this rolled ONE watered-down counter split across
+  // dog/golem/player (~40% dog, ~60% you), so spamming the dog let the player
+  // skip the group retaliation that attacking yourself triggers. Now commanding
+  // a companion costs YOU the whole volley (runEnemyGroupCounters hits the
+  // commander); the dog/golem aren't hit by command-retaliation. Skipped when
+  // this action already cleared the room.
   const liveScene = get().currentScene;
   if (!liveScene || liveScene.enemies.length === 0) return;
   const livePlayer = get().player;
   if (!livePlayer) return;
-  const liveDog = livePlayer.dog;
-  if (!liveDog || liveDog.status !== 'with_player' || liveDog.hp <= 0) return;
-  const liveTarget = liveScene.enemies[Math.min(targetIdx, liveScene.enemies.length - 1)];
-  if (!liveTarget) return;
-  const hasGolem = !!livePlayer.golem && (livePlayer.golem?.hp ?? 0) > 0;
-  const r = Math.random();
-  // Distribution shares as documented in spec.
-  // Without golem: dog 0.40, player 0.60.
-  // With golem: dog 0.30, golem 0.30, player 0.40.
-  let retaliateTarget: 'dog' | 'player' | 'golem' = 'player';
-  if (hasGolem) {
-    if (r < 0.30) retaliateTarget = 'dog';
-    else if (r < 0.60) retaliateTarget = 'golem';
-    else retaliateTarget = 'player';
-  } else {
-    if (r < 0.40) retaliateTarget = 'dog';
-    else retaliateTarget = 'player';
-  }
-  const enemyAtkRoll = rollDie(20);
-  const enemyAtkBonus = parseEnemyAP(liveTarget);
-  const acByTarget = retaliateTarget === 'dog' ? 11 : retaliateTarget === 'golem' ? 11 : (livePlayer.ac ?? 10);
-  const enemyHit = enemyAtkRoll + enemyAtkBonus >= acByTarget;
-  if (enemyHit) {
-    const dmg = rollDie(6) + 1;
-    if (retaliateTarget === 'dog') {
-      const newDogHp = Math.max(0, liveDog.hp - dmg);
-      get().appendLog(
-        'combat',
-        `${liveTarget.name} swings on ${liveDog.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newDogHp}/${liveDog.hpMax})`,
-      );
-      if (newDogHp <= 0) {
-        const downLine = applyDogPronouns(
-          `${liveDog.name} is down. {Pronoun} {isOrAre} bleeding into the dirt.`,
-          liveDog.sex.pronoun,
-        );
-        get().appendLog('world', downLine);
-        // Poplar Anvil — bench the downed dog AND stamp downedAtHour so the
-        // bleed-out clock starts. If it isn't healed above 0 within
-        // DOG_BLEED_OUT_HOURS (tickDogStatus), it dies for real.
-        set((s) => s.player && s.player.dog
-          ? { player: { ...s.player, dog: { ...s.player.dog, hp: 0, status: 'waiting_at_base' as const, downedAtHour: s.player.hoursElapsed ?? 0, bleedWarned: false } } }
-          : s,
-        );
-        // Poplar Anvil — the moment the dog drops, the Arbiter tells the
-        // player straight: heal it or lose it. A downed dog is no longer
-        // permanently safe.
-        get().appendLog(
-          'arbiter',
-          applyDogPronouns(
-            `The Arbiter kneels by the dog. "Feed ${liveDog.name} — or get a poultice in {pronoun}. {Pronoun} won't last a day down like this, and down dogs don't always get back up."`,
-            liveDog.sex.pronoun,
-          ),
-        );
-      } else {
-        set((s) => s.player && s.player.dog
-          ? { player: { ...s.player, dog: { ...s.player.dog, hp: newDogHp } } }
-          : s);
-      }
-    } else if (retaliateTarget === 'golem' && livePlayer.golem) {
-      // OTA-467 — trained RESILIENCE soaks part of the hit here too, and surviving
-      // it trains RESILIENCE (this is the dog-present retaliation-split path).
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { golemStatBonus: gsb, trainGolemStat: tgs } = require('../engine/golems');
-      const gRes: number = gsb(livePlayer.golem, 'resilience');
-      const gDmg = Math.max(1, dmg - gRes);
-      const newGolemHp = Math.max(0, livePlayer.golem.hp - gDmg);
-      get().appendLog(
-        'combat',
-        `${liveTarget.name} pivots to ${livePlayer.golem.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${gDmg}${gRes > 0 ? ` (−${gRes} soaked)` : ''}. (${newGolemHp}/${livePlayer.golem.hpMax})`,
-      );
-      if (newGolemHp <= 0) {
-        set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
-        get().appendLog('world', `The golem crumbles.`);
-      } else {
-        const tr = tgs({ ...livePlayer.golem, hp: newGolemHp }, 'resilience', true);
-        if (tr.leveled) get().appendLog('reward', `✦ ${tr.golem.name}'s Resilience rises to ${tr.leveled.to}.`);
-        set((s) => s.player && s.player.golem
-          ? { player: { ...s.player, golem: tr.golem } }
-          : s);
-      }
-    } else {
-      // player
-      const newHp = Math.max(0, livePlayer.hp - dmg);
-      get().appendLog(
-        'combat',
-        `${liveTarget.name} swings on you — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newHp}/${livePlayer.hpMax})`,
-      );
-      set((s) => s.player
-        ? { player: { ...s.player, hp: newHp } }
-        : s);
-      if (newHp <= 0) {
-        void Promise.resolve().then(() => handlePlayerDeath(get, set));
-      }
-    }
-  } else {
-    get().appendLog(
-      'combat',
-      `${liveTarget.name} swings at ${retaliateTarget === 'dog' ? liveDog.name : retaliateTarget === 'golem' ? livePlayer.golem?.name ?? 'the golem' : 'you'} and misses.`,
-    );
-  }
+  runEnemyGroupCounters(get, set, livePlayer);
 }
 
 // ----- OTA-120 Phase 3 / 4 helpers -------------------------------------
@@ -25399,6 +25540,25 @@ function applyItemToGolem(
   if (!item) {
     get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
     return false;
+  }
+  // arb170 — feeding an INERT GOLEM CORE grafts half a dead golem's training onto
+  // THIS golem (power / resilience / max HP), then consumes the core. Bypasses the
+  // repair-part gate below — a core isn't fuel, it's transferred memory.
+  if (item.golemCore) {
+    const c = item.golemCore;
+    set((s) => {
+      if (!s.player || !s.player.golem) return s;
+      const g = s.player.golem;
+      const stats = g.stats ?? { power: 0, resilience: 0 };
+      const inv = s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      return { player: { ...s.player, inventory: inv, golem: { ...g,
+        stats: { power: stats.power + c.power, resilience: stats.resilience + c.resilience },
+        hpMax: g.hpMax + c.bonusHp, hp: g.hp + c.bonusHp } } };
+    });
+    get().appendLog('reward', `✦ You seat the Inert Golem Core into ${golem.name}'s frame. It remembers old fights — +${c.power} power, +${c.resilience} resilience, +${c.bonusHp} max HP.`);
+    return true;
   }
   // arb121 — a full FUEL PART heals full; an elemental MATERIAL substitute (e.g.
   // any aether loot for an Aether Golem) heals half. Anything else is refused —
@@ -26155,6 +26315,28 @@ function logRepChanges(
 // fade-epoch pattern.
 let arbiterGenerationEpoch = 0;
 
+// arb161 — Qwen generation cooldown. The OTA-578 native-ML lock (which stopped
+// the Qwen↔Kokoro contention crash — confirmed: a full session ran crash-free)
+// serializes the two, so while Qwen generates the voice WAITS. With the OTA-577
+// intent widening Qwen fired on nearly every investigate, holding the lock
+// back-to-back and STARVING the voice (it barely spoke). This cooldown spaces
+// generations out so the lock is free for the voice the vast majority of the
+// time — Qwen narration stays an occasional AI flourish, the voice reads every
+// line (Qwen or template) freely, and the two never run at once. Tunable.
+// arb162 — Qwen fires at most once per this window (its "AC roll" spacing). With
+// canned flavor lines now mostly SILENT (arb162), the shared native-ML lock has
+// headroom, so Qwen can run a bit more often and — since Qwen lines ARE voiced —
+// the player hears mostly fresh AI lines with the canned ones read sparingly.
+// Tight balance: short enough to feel present, long enough not to starve voice.
+const QWEN_GEN_COOLDOWN_MS = 10000;
+let lastQwenGenStartMs = 0;
+// arb163 — ambient companion lines fire at most this often. They're the
+// reflective, unprompted asides (not tied to any action), so they can run to
+// completion in the background and speak whenever ready. Spaced wide so the
+// shared voice lock is mostly free for the instant canned reactions.
+const AMBIENT_GEN_COOLDOWN_MS = 45000;
+let lastAmbientGenStartMs = 0;
+
 // Trim Qwen output back to the last sentence-terminating punctuation so we
 // don't display fragments like "...echoing in the". Looks for the final
 // ., !, ?, ", or — followed (optionally) by trailing space/quote and keeps
@@ -26240,14 +26422,34 @@ async function narrateViaArbiter(
   // carry the narration. Random Qwen chatter on attack / rest / dig /
   // equip etc. is gone.
   const intentAllowsQwen = QWEN_ALLOWED_INTENTS.has(intent);
-  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen) {
-    if (trimmed) get().appendLog('arbiter', trimmed);
+  // arb161 — cooldown: don't grab the native-ML lock again until enough time has
+  // passed, so the voice (which shares the lock) isn't starved by back-to-back
+  // generations on every investigate.
+  const cooldownActive = (Date.now() - lastQwenGenStartMs) < QWEN_GEN_COOLDOWN_MS;
+  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen || cooldownActive) {
+    // arb134 — name WHY this turn took the template path, so a pasted log shows
+    // unambiguously which Arbiter lines are AI-generated vs template (and why the
+    // rest weren't). qwen-not-ready / busy / combat / intent-not-allowed:<intent> /
+    // cooldown.
+    const reason = !qwen.isReady() ? 'qwen-not-ready'
+      : get().isGenerating ? 'busy'
+      : inCombat ? 'combat'
+      : !intentAllowsQwen ? `intent-not-allowed:${intent}`
+      : 'cooldown';
+    get().appendLog('debug', `arbiter: template (reason=${reason})`);
+    // arb166 — CANNED flavor line: voiced ~30% of the time. (Was 60% — but once
+    // arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes,
+    // so nearly every 60% roll actually spoke and Kokoro "wouldn't shut up", ~20
+    // lines/min.) The line still appears on-screen every time; this only thins
+    // how many are SPOKEN. `silent` → TTSController skips voicing it.
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     return;
   }
   const state = get();
   const player = state.player;
   if (!player || !scene) {
-    if (trimmed) get().appendLog('arbiter', trimmed);
+    get().appendLog('debug', 'arbiter: template (reason=no-scene)');
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     return;
   }
   const sceneSlice: SceneSlice = {
@@ -26274,14 +26476,21 @@ async function narrateViaArbiter(
   });
   const messages = buildSystemPrompt(ctx);
   const myEpoch = ++arbiterGenerationEpoch;
+  const t0 = Date.now(); // arb134 — Qwen generation latency for the debug marker
+  lastQwenGenStartMs = t0; // arb161 — start the cooldown so the voice gets the lock back
   set({ isGenerating: true, partialArbiterText: '' });
   try {
-    // Token budgets matched to the prompts:
-    //   combat instruction:  1 short sentence  ≈  35 tokens → cap 55
-    //   peaceful instruction: 2 short sentences ≈  60 tokens → cap 90
-    // Plus headroom so the model has space to land on a terminal punctuation
-    // mark naturally before we hit the cap.
-    const maxTokens = ctx.in_combat ? 55 : 90;
+    // arb162 — Token budgets are kept TIGHT on purpose. Qwen and Kokoro share
+    // one native-ML lock, and on the Tensor G5 kernel each token costs ~256ms,
+    // so the old 90-token cap meant a single remark held the lock for ~23s —
+    // during which Kokoro could not speak and the 2-line voice queue dropped
+    // everything else (the player "only heard Kokoro twice"). A one-line
+    // Arbiter aside does not need 90 tokens. Cap it so a generation lands in
+    // ~6-8s: the lock frees fast, the line is punchy, and — since Qwen lines
+    // are voiced — the player actually hears it before the action scrolls off.
+    //   combat:   1 short sentence ≈ 20 words ≈ 28 tokens → cap 30
+    //   peaceful: 1 short sentence ≈ 20 words ≈ 28 tokens → cap 34
+    const maxTokens = ctx.in_combat ? 30 : 34;
     const text = await qwen.stream(
       messages,
       (token: string) => {
@@ -26317,10 +26526,18 @@ async function narrateViaArbiter(
       .join(' ')
       .trim();
     const finalText = trimToLastSentence(survivors) || trimmed;
+    // arb134 — mark the AI-generated line + its latency so a pasted log shows it
+    // outright (a Qwen line lands hundreds-to-thousands of ms after its trigger;
+    // a template lands in the same millisecond). `usedFallback` flags the rare
+    // case where the cleaned model output was empty and the template carried it.
+    const usedFallback = finalText === trimmed;
     get().appendLog('arbiter', finalText);
+    get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${usedFallback ? ', empty→template' : ''})`);
   } catch {
-    if (myEpoch === arbiterGenerationEpoch && trimmed) {
-      get().appendLog('arbiter', trimmed);
+    if (myEpoch === arbiterGenerationEpoch) {
+      get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
+      // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
+      if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the
@@ -26328,5 +26545,82 @@ async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       set({ isGenerating: false, partialArbiterText: null });
     }
+  }
+}
+
+/**
+ * arb163 — AMBIENT companion narration. The reflective counterpart to
+ * narrateViaArbiter: instead of reacting to an action, the Arbiter makes an
+ * unprompted aside about the journey. Because it answers nothing, its latency
+ * is invisible — it streams + voices whenever it finishes, however late.
+ *
+ * Crucially it is NOT cancelled by the player's next action (no epoch check).
+ * narrateViaArbiter cancels mid-flight because a stale REACTION is wrong; an
+ * ambient reflection is never stale, so we let it complete. The shared
+ * `isGenerating` flag still serialises it against reactive scene-intro
+ * generations and the voice lock — only one native-ML job runs at a time.
+ */
+async function maybeGenerateAmbientArbiter(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): Promise<void> {
+  const scene = get().currentScene;
+  const player = get().player;
+  // Muzzle in combat (no idle musing mid-fight), require the model + a free
+  // lock, and respect the wide ambient spacing.
+  if (!scene || !player || scene.enemies.length > 0) return;
+  if (!qwen.isReady() || get().isGenerating) return;
+  if (Date.now() - lastAmbientGenStartMs < AMBIENT_GEN_COOLDOWN_MS) return;
+
+  const sceneSlice: SceneSlice = {
+    location: scene.location,
+    weather: scene.weather,
+    hazard: scene.hazard,
+    enemies: scene.enemies,
+    enemyHps: scene.enemyHps,
+    vendor: scene.vendor
+      ? { name: scene.vendor.name, affiliation: scene.vendor.faction ?? undefined }
+      : null,
+  };
+  const ladder = scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
+  const ctx = buildLlmContext({
+    player,
+    scene: sceneSlice,
+    gameLog: get().gameLog,
+    ladder,
+    ambient: true,
+  });
+  const messages = buildSystemPrompt(ctx);
+  const t0 = Date.now();
+  lastAmbientGenStartMs = t0;
+  // Arm the reactive cooldown too, so a scene-intro generation doesn't pile on
+  // the lock the instant this one finishes.
+  lastQwenGenStartMs = t0;
+  set({ isGenerating: true, partialArbiterText: '' });
+  try {
+    const text = await qwen.stream(
+      messages,
+      (token: string) => {
+        const current = get().partialArbiterText ?? '';
+        set({ partialArbiterText: current + token });
+      },
+      { maxNewTokens: 32 },
+    );
+    const survivors = clampSentences(stripForeignWords(text), 1)
+      .split(/(?<=[.!?])\s+/)
+      .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
+      .filter((s) => !/^\s*they\s/i.test(s))
+      .join(' ')
+      .trim();
+    const finalText = trimToLastSentence(survivors);
+    // Ambient lines are ALWAYS voiced (no silent flag) — they're the fresh ones
+    // the player wants to hear. An empty result (model produced nothing usable)
+    // just logs and stays silent; there's no template fallback for ambient.
+    if (finalText) get().appendLog('arbiter', finalText);
+    get().appendLog('debug', `arbiter: ambient ${finalText ? '✓' : '∅'} ${Date.now() - t0}ms`);
+  } catch {
+    get().appendLog('debug', `arbiter: ambient-error ${Date.now() - t0}ms`);
+  } finally {
+    set({ isGenerating: false, partialArbiterText: null });
   }
 }

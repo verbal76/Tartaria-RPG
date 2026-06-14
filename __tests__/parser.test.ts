@@ -103,7 +103,8 @@ describe('parseInput — combat-aware fallback suggestions', () => {
   it('offers movement + defense verbs in fallback when enemy is present', () => {
     const r = parseInput('asdfghjkl', { enemyPresent: true });
     expect(r.intent).toBe('unknown');
-    for (const v of ['attack', 'dodge', 'advance', 'retreat', 'hide', 'parley']) {
+    // arb167 — 'hide' chip renamed to 'sneak' (the stealth tactic).
+    for (const v of ['attack', 'dodge', 'advance', 'retreat', 'sneak', 'parley']) {
       expect(r.suggestions).toContain(v);
     }
   });

@@ -114,10 +114,10 @@ export function AboutScreen() {
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
   const [invCharCount, setInvCharCount] = useState(0);
-  // arb119 — COPY AI HEALTH: the full ML/voice diagnostic, on demand (was an
-  // inline wall of text under RESET AI NARRATION).
-  const [aiHealthCopied, setAiHealthCopied] = useState(false);
-  const [aiHealthCharCount, setAiHealthCharCount] = useState(0);
+  // arb172 — Session-tab declutter: the rarely-used clipboard dumps (COPY SAVE,
+  // COPY INVENTORY) hide behind this toggle. (COPY AI HEALTH was removed — its
+  // output is already inside COPY LOG / REPORT A BUG's device summary.)
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
@@ -217,19 +217,6 @@ export function AboutScreen() {
       setInvCharCount(stamped.length);
       setInvCopied(true);
       setTimeout(() => setInvCopied(false), 2500);
-    } catch { /* clipboard rarely fails on Android */ }
-  }
-  // arb119 — COPY AI HEALTH. Drops the full ML/voice runtime diagnostic (crash
-  // counters, auto-disable state, Qwen + TTS guards) on the clipboard, paired
-  // with the device/build summary, so it's bug-report-ready — instead of
-  // printing the whole 8-line readout inline under RESET AI NARRATION.
-  async function handleCopyAiHealth() {
-    try {
-      const body = `${buildBasicDeviceSummary()}\n\n${mlHealthSummary()}`;
-      await Clipboard.setStringAsync(body);
-      setAiHealthCharCount(body.length);
-      setAiHealthCopied(true);
-      setTimeout(() => setAiHealthCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
   }
   // OTA-341 — COPY SAVE. Exports the loadable save state (player +
@@ -639,11 +626,9 @@ export function AboutScreen() {
             first; copy + clear are diagnostic tools below. */}
         {tab === 'session' && (
         <View style={styles.sessionCard}>
-          <Text style={styles.sessionLabel}>RUN CONTROLS</Text>
+          <Text style={styles.sessionLabel}>RUN</Text>
           <Text style={styles.sessionHint}>
-            Save your progress, export the log / your pack / your save for
-            sharing, or wipe the log so the next paste-back contains only
-            fresh activity.
+            Save or leave the run, share a log / bug report, or reload the AI.
           </Text>
 
           {/* SAVE in place — keep playing. Separate from SAVE & EXIT so the
@@ -671,6 +656,7 @@ export function AboutScreen() {
             <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
           </TouchableOpacity>
 
+          <Text style={[styles.sessionLabel, { marginTop: 14 }]}>REPORTING</Text>
           <View style={styles.sessionBtnRow}>
             <TouchableOpacity
               style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
@@ -709,32 +695,6 @@ export function AboutScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-          {/* OTA-203 — dedicated COPY INVENTORY button. Drops just
-              the player's pack snapshot on the clipboard (rarity,
-              durability, equipped slot, ♥reserved flag, unique stats,
-              tags) so recurring-theme analysis can read the pack
-              without scrolling through a giant log. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-            onPress={() => { void handleCopyInventory(); }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.sessionBtnSecondaryText}>
-              {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
-            </Text>
-          </TouchableOpacity>
-          {/* OTA-341 — COPY SAVE. Drops the loadable save state (player +
-              worldMemory, minus the narration log) so a crashing save can be
-              pasted back and reproduced exactly. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-            onPress={() => { void handleCopySave(); }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.sessionBtnSecondaryText}>
-              {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE'}
-            </Text>
-          </TouchableOpacity>
           {/* arb75 — REPORT A BUG. One report bundling voice + device + log
               (no more separate COPY VOICE / COPY LOG). Opens the same
               BugReportModal the Title screen uses. */}
@@ -745,6 +705,42 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
+          {/* arb172 — rarely-needed clipboard dumps tucked behind a toggle so the
+              page isn't a wall of COPY buttons. COPY SAVE = the loadable save for
+              brick-repro; COPY INVENTORY = the pack snapshot for balance reports. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            onPress={() => setAdvancedOpen((v) => !v)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {advancedOpen ? '▾ ADVANCED EXPORTS' : '▸ ADVANCED EXPORTS'}
+            </Text>
+          </TouchableOpacity>
+          {advancedOpen && (
+            <>
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleCopySave(); }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (brick repro)'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleCopyInventory(); }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          <Text style={[styles.sessionLabel, { marginTop: 14 }]}>AI</Text>
           {/* OTA-459/460 — RESET AI NARRATION & RELOAD. Clears the ML crash
               breadcrumbs AND force-loads Qwen in-session, bypassing the boot-time
               skip gate entirely (bootQwen doesn't consult shouldAttemptQwen, it just
@@ -764,8 +760,8 @@ export function AboutScreen() {
             activeOpacity={0.7}
           >
             <Text style={styles.sessionBtnPrimaryText}>
-              {!aiReset ? 'RESET AI NARRATION & RELOAD'
-                : qwenStatus === 'ready' ? '✓ AI NARRATION LOADED'
+              {!aiReset ? 'RELOAD AI'
+                : qwenStatus === 'ready' ? '✓ AI LOADED'
                 : qwenStatus === 'failed' ? '✗ AI LOAD FAILED — SEE BELOW'
                 : qwenStatus === 'downloading' ? `LOADING AI… ${Math.round(qwenFraction * 100)}%`
                 : qwenStatus === 'loading' ? 'LOADING AI…'
@@ -776,18 +772,6 @@ export function AboutScreen() {
             Current state: {mlHealthSummary().split('\n')[1]?.replace(/^\s*Status:\s*/, '').trim() ?? 'unknown'}
             {qwenStatus === 'failed' && qwenError ? `\nLoad error: ${qwenError}` : ''}
           </Text>
-          {/* arb119 — the FULL ML/voice diagnostic drops on the clipboard on demand
-              (bug-report material) instead of an inline wall of text; gold to match
-              SAVE & EXIT / RESET AI per the player's ask. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
-            onPress={() => { void handleCopyAiHealth(); }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.sessionBtnPrimaryText}>
-              {aiHealthCopied ? `✓ ${aiHealthCharCount.toLocaleString()} CHARS` : 'COPY AI HEALTH'}
-            </Text>
-          </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
             Long-press COPY LOG for the share + chunked-paste view.
           </Text>

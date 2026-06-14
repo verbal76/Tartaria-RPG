@@ -66,6 +66,23 @@ export function findFactionQuestById(id: string): FactionQuestDef | null {
   return FACTION_QUESTS.find((q) => q.id === id) ?? null;
 }
 
+/** arb171 — is this quest's WORK finished (only the turn-in remains)?
+ *  Mirrors the gates in turnInFactionQuest so the UI tag, the auto-submit-on-
+ *  arrival path, and the turn-in itself all agree on "ready". `countItem` counts
+ *  the player's held quantity of a name (passed in so this stays store-free).
+ *    • staged  → every stage played (stage >= stages.length)
+ *    • fetch   → the required items are in hand
+ *    • legacy  → single objective, always turn-in-able */
+export function factionQuestReady(
+  def: FactionQuestDef,
+  stage: number,
+  countItem: (name: string) => number,
+): boolean {
+  if (def.stages && def.stages.length > 0) return stage >= def.stages.length;
+  if (def.fetch) return countItem(def.fetch.itemName) >= def.fetch.quantity;
+  return true;
+}
+
 // Quests offered by `factionId` that the player has not yet accepted or
 // completed, and where the player meets the rep requirement.
 export function availableFactionQuests(

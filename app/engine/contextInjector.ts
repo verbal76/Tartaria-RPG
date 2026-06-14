@@ -43,6 +43,13 @@ export interface LlmContext {
    *  'forgotten_order'). Surfaces into the canon-fact picker so the
    *  Arbiter prefers events that involve the player's faction. */
   player_faction_id?: string;
+  /** arb163 — ambient mode. When true, buildSystemPrompt uses the
+   *  AMBIENT_INSTRUCTION: an UNPROMPTED, reflective companion line that does
+   *  NOT react to the last action. Ambient lines are decoupled from events, so
+   *  the slow Qwen latency never reads as "late" (you can't be late to a
+   *  remark that wasn't answering anything). The reactive beats are carried by
+   *  instant canned templates instead. */
+  ambient?: boolean;
 }
 
 /** What buildLlmContext needs from the store. Explicit deps, no store import. */
@@ -55,6 +62,8 @@ export interface ContextInputs {
    *  Micro-Micro node instead of the top-level Location. The biome name
    *  comes from the Macro. */
   ladder?: { macro: MacroLocation; micro: MicroLocation; microMicro: MicroMicroLocation } | null;
+  /** arb163 — request the ambient (reflective companion) instruction. */
+  ambient?: boolean;
 }
 
 export interface SceneSlice {
@@ -99,6 +108,7 @@ export function buildLlmContext(input: ContextInputs): LlmContext {
     recent_history: formatRecentHistory(gameLog),
     in_combat: (scene?.enemies?.length ?? 0) > 0,
     player_faction_id: player?.factionId,
+    ambient: input.ambient ?? false,
   };
 }
 
@@ -162,10 +172,13 @@ const VOICE_RULES =
 
 const PEACEFUL_INSTRUCTION =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
-  'last action and weave the AVAILABLE EXITS naturally into your ' +
-  'description so the player learns the map as they move. You may ' +
-  'subtly reference equipped or carried items if they fit the moment. ' +
-  'Keep it to TWO short sentences — about 35 words. ' +
+  'last action; you may subtly reference an available exit or a carried ' +
+  'item if it fits the moment. ' +
+  // arb162 — ONE short line on purpose. Qwen shares the voice lock and is
+  // slow on this hardware; a longer line freezes Kokoro and arrives after
+  // the action has scrolled away. The map/exits already show in the world
+  // banner, so the Arbiter aside stays a single punchy beat.
+  'Keep it to ONE short sentence — about 20 words, no more. ' +
   VOICE_RULES;
 
 const COMBAT_INSTRUCTION =
@@ -176,8 +189,25 @@ const COMBAT_INSTRUCTION =
   'inventory items only if they are the weapon being used. ' +
   VOICE_RULES;
 
+// arb163 — ambient companion line. UNPROMPTED and reflective: it does not react
+// to the last action (the canned templates own reactions), so its latency never
+// reads as late. Reflective/relational, never advice, one short line. The shared
+// VOICE_RULES still pin it to second-person English with no third-person recap.
+const AMBIENT_INSTRUCTION =
+  'You have walked beside the player a long while. Make ONE short, UNPROMPTED ' +
+  'aside — a passing reflection on how far they have come, their growth, the ' +
+  'road behind you both, or your changing read of them. DO NOT narrate or react ' +
+  'to their last action; this is idle companion talk between moments, not a ' +
+  'response to anything. Warm or wry, never advice or instructions. ' +
+  'ONE short sentence — about 18 words, no more. ' +
+  VOICE_RULES;
+
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
-  const instruction = ctx.in_combat ? COMBAT_INSTRUCTION : PEACEFUL_INSTRUCTION;
+  const instruction = ctx.ambient
+    ? AMBIENT_INSTRUCTION
+    : ctx.in_combat
+    ? COMBAT_INSTRUCTION
+    : PEACEFUL_INSTRUCTION;
   // Strict location anchor — playtest log: Qwen narrated "The Borderlands,
   // a twisted shadowy landscape..." while the player was in Tartarian
   // Outskirts. The model needs an explicit "this is the only place that

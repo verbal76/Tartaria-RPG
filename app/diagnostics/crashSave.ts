@@ -42,6 +42,12 @@ export interface CrashSaveCapture {
    *  (unparseable) save still reaches us exactly as it bricked. */
   raw: string | null;
   capturedAt: number;
+  /** arb130 — for a JS / render crash: the error message + React component stack,
+   *  so the bug report names WHICH component faulted or looped (e.g. a "Maximum
+   *  update depth exceeded" pinned to the exact screen/overlay). Absent for native
+   *  load-crash captures (those have no JS error). */
+  error?: string;
+  componentStack?: string;
 }
 
 async function writeCapture(capture: CrashSaveCapture): Promise<void> {
@@ -68,12 +74,27 @@ export async function captureCrashSaveFromDisk(slotId: string, stage: string): P
  *  JS / render crash where the active slot is the one in play. No-op if no
  *  slot is active (e.g. a crash on the title screen with no character loaded).
  *  Best-effort; never throws. */
-export async function captureActiveCrashSave(stage: string): Promise<void> {
+export async function captureActiveCrashSave(
+  stage: string,
+  detail?: { error?: string; componentStack?: string },
+): Promise<void> {
   try {
     const slotId = await AsyncStorage.getItem(ACTIVE_SLOT_KEY);
-    if (!slotId) return;
-    const raw = await AsyncStorage.getItem(slotSaveKey(slotId));
-    await writeCapture({ stage, slotId, raw, capturedAt: Date.now() });
+    // arb130 — capture even with NO active slot WHEN we have render-crash detail
+    // (error + component stack) — that's the prize regardless of whether a save
+    // was in play. But a bare no-slot, no-detail crash (e.g. on the title screen)
+    // still no-ops, so it doesn't surface an empty/confusing crashed-save report.
+    const hasDetail = !!(detail?.error || detail?.componentStack);
+    if (!slotId && !hasDetail) return;
+    const raw = slotId ? await AsyncStorage.getItem(slotSaveKey(slotId)) : null;
+    await writeCapture({
+      stage,
+      slotId: slotId ?? null,
+      raw,
+      capturedAt: Date.now(),
+      error: detail?.error,
+      componentStack: detail?.componentStack,
+    });
   } catch {
     /* swallow */
   }
@@ -114,6 +135,9 @@ export function buildCrashSaveExport(capture: CrashSaveCapture, deviceSummary: s
   const head = [
     '--- CRASHED SAVE (captured at crash time, previous attempt) ---',
     `stage: ${capture.stage} · slot: ${capture.slotId ?? '?'} · captured: ${new Date(capture.capturedAt).toISOString()}`,
+    // arb130 — name the faulting component for a JS/render crash.
+    ...(capture.error ? [`error: ${capture.error}`] : []),
+    ...(capture.componentStack ? [`component stack:${capture.componentStack}`] : []),
   ].join('\n');
 
   if (!capture.raw) {

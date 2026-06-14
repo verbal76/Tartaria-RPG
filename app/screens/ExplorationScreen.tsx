@@ -688,7 +688,11 @@ export function ExplorationScreen() {
         );
       })()}
 
-      {currentScene?.vendor && (
+      {/* arb166 — no trading mid-fight. The vendor stays in the scene (the
+          banner returns once the enemies are down), but while a hostile is
+          present the banner is hidden so the player can't step into the stall
+          during combat ("I just entered a vendors stall during combat"). */}
+      {currentScene?.vendor && !inCombat && (
         <TouchableOpacity
           style={styles.vendorBanner}
           onPress={() => setScreen('vendor')}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, Image, ImageBackground, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 // expo-navigation-bar is a NATIVE module — only present in APKs built
@@ -162,6 +162,10 @@ export default function App() {
   const resumeCognitive = useGameStore((s) => s.resumeCognitive);
   const bootQwen = useGameStore((s) => s.bootQwen);
   const shutdownQwen = useGameStore((s) => s.shutdownQwen);
+  // arb140 — set when WE parked a READY Qwen on a real `background` so the
+  // `active` handler knows to re-warm it. (Manual disable / failed / skipped
+  // never set this, so we never fight the user's choice.)
+  const qwenParkedRef = useRef(false);
 
   // Android immersive mode — hide the navigation bar (3-button bar at
   // the bottom) and let the status bar overlay-swipe back. Same UX as
@@ -459,7 +463,18 @@ export default function App() {
         // self-guards on no-slot / no-player / invalid record.
         void useGameStore.getState().persist();
         void shutdownCognitive();
-        void shutdownQwen();
+        // arb140 — only DUMP the ~400MB Qwen model on a REAL `background`
+        // (the process may be reclaimed). A transient `inactive` — notification
+        // shade, app-switcher peek, a permission/keyboard event — must NOT kill
+        // it: doing so benched the Arbiter for the WHOLE session, because the
+        // `active` handler never re-warmed it (every line fell back to
+        // template/reason=qwen-not-ready; the long-travel log showed exactly
+        // this — init succeeded at boot, then status=idle for 20 min). Remember
+        // that WE parked a ready model so `active` knows to bring it back.
+        if (status === 'background') {
+          if (useGameStore.getState().qwenStatus === 'ready') qwenParkedRef.current = true;
+          void shutdownQwen();
+        }
         // arb126 — leaving the foreground is an ORDERLY exit, so any Qwen
         // completion / TTS breadcrumb still sitting in storage did NOT crash the
         // process. Wipe it now, before the OS can reclaim us. A breadcrumb that
@@ -478,14 +493,22 @@ export default function App() {
           const NB = loadNavigationBar();
           if (NB) void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
         }
-        // Qwen does not auto-resume — re-bootQwen would re-trigger the
-        // download UI; we leave it dormant and let the user restart it
-        // manually from the About screen if they want it back.
+        // arb140 — re-warm Qwen if WE parked it on `background`. The old
+        // comment feared re-triggering the download UI, but the GGUF is already
+        // on disk after first launch, so bootQwen()'s download step returns
+        // instantly (fraction 0→1, no UI) — only the ~1-5s context reload runs,
+        // in the background. Without this, one transient background killed the
+        // Arbiter's LLM voice for the rest of the session. Guarded by the
+        // parked flag so a user who manually disabled Qwen stays disabled.
+        if (qwenParkedRef.current) {
+          qwenParkedRef.current = false;
+          void bootQwen();
+        }
       }
     };
     const sub = AppState.addEventListener('change', onChange);
     return () => sub.remove();
-  }, [shutdownCognitive, resumeCognitive, shutdownQwen]);
+  }, [shutdownCognitive, resumeCognitive, shutdownQwen, bootQwen]);
 
   // OTA-368 — periodic autosave. persist() fires on every meaningful
   // action, but a player who sits idle (reading, thinking) between
@@ -602,18 +625,24 @@ class ScreenErrorBoundary extends React.Component<
   static getDerivedStateFromError(error: Error) {
     return { error };
   }
-  componentDidCatch(error: Error) {
+  componentDidCatch(error: Error, errorInfo: { componentStack?: string }) {
     // Surface to the JS log so the next bug report COPY ALL captures it.
     // eslint-disable-next-line no-console
-    console.warn('ScreenErrorBoundary caught:', error?.message, error?.stack);
+    console.warn('ScreenErrorBoundary caught:', error?.message, errorInfo?.componentStack);
     // OTA-343 — a screen render crash is also a crash; capture the active
     // save bytes so COPY CRASHED SAVE can export them next launch. The
     // ScreenErrorBoundary shows a recovery card (not a process death), but
     // the save that drove the bad render is exactly what we want for repro.
+    // arb130 — ALSO capture the error message + React component stack, so the
+    // crashed-save report names the EXACT component that faulted/looped (e.g.
+    // pinning "Maximum update depth exceeded" to its screen/overlay) — no adb.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const cs = require('./app/diagnostics/crashSave');
-      void cs.captureActiveCrashSave('screen-render');
+      void cs.captureActiveCrashSave('screen-render', {
+        error: (error?.message ?? String(error)).slice(0, 300),
+        componentStack: (errorInfo?.componentStack ?? '').slice(0, 1800),
+      });
     } catch { /* ignore */ }
   }
   reset = () => this.setState({ error: null });

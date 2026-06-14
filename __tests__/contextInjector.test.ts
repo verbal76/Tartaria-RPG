@@ -381,8 +381,8 @@ describe('buildSystemPrompt', () => {
     // complete sentences.
     expect(system).toContain("SECOND PERSON ONLY");
     expect(system).toMatch(/do not invent.*events/i);
-    // Peaceful instruction sets the length cap.
-    expect(system).toMatch(/35 words/);
+    // Peaceful instruction sets the length cap (arb162 — one ~20-word line).
+    expect(system).toMatch(/20 words/);
   });
 
   it('switches to the combat instruction when in_combat is true', () => {
@@ -411,6 +411,31 @@ describe('buildSystemPrompt', () => {
     expect(system).toContain("SECOND PERSON ONLY");
   });
 
+  it('uses the ambient instruction when ambient is true (arb163)', () => {
+    const ctx: LlmContext = {
+      current_biome: 'Borderlands',
+      room_name: 'Triage Tent',
+      environmental_description: 'A canvas surgery.',
+      available_exits: 'back to the bazaar',
+      active_entities: 'None.',
+      player_stats: 'HP 22/22',
+      full_inventory: 'Bandage',
+      recent_history: 'drink water',
+      in_combat: false,
+      ambient: true,
+    };
+    const system = buildSystemPrompt(ctx)[0]!.content;
+    // Ambient = unprompted reflective aside, explicitly NOT a reaction.
+    expect(system).toMatch(/UNPROMPTED/);
+    expect(system).toMatch(/DO NOT narrate or react/i);
+    expect(system).toMatch(/18 words/);
+    // The reactive peaceful cap must NOT be the active instruction.
+    expect(system).not.toMatch(/20 words/);
+    expect(system).not.toContain('ACTIVE COMBAT');
+    // Voice guardrails still apply.
+    expect(system).toContain('SECOND PERSON ONLY');
+  });
+
   it('stays on the peaceful instruction when in_combat is false', () => {
     const ctx: LlmContext = {
       current_biome: 'Borderlands',
@@ -425,11 +450,11 @@ describe('buildSystemPrompt', () => {
     };
     const system = buildSystemPrompt(ctx)[0]!.content;
     expect(system).toContain('atmospheric tone');
-    expect(system).toMatch(/35 words/);
+    // arb162 — peaceful narration is capped at ONE short ~20-word line so Qwen
+    // frees the shared voice lock fast (see contextInjector PEACEFUL_INSTRUCTION).
+    expect(system).toMatch(/20 words/);
+    expect(system).toMatch(/ONE short sentence/);
     expect(system).not.toContain('ACTIVE COMBAT');
-    // Phase 4 §1.3 — peaceful instruction must tell the model to weave
-    // exits into the description so the player learns the map.
-    expect(system).toMatch(/AVAILABLE EXITS/i);
   });
 
   it('emits the same prompt for the same context (deterministic)', () => {

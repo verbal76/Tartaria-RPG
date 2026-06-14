@@ -11,12 +11,17 @@ describe('QWEN_ALLOWED_INTENTS', () => {
     expect(QWEN_ALLOWED_INTENTS.has('diplomacy')).toBe(true);
   });
 
-  it('excludes investigate — Qwen hallucinated location names on look/search', () => {
-    // Playtest log: typing "look" produced a four-sentence paragraph about
-    // "The Borderlands, a twisted shadowy landscape..." while the player
-    // was in Tartarian Outskirts. Investigate now takes the deterministic
-    // template path so the model can't drift the scene name.
+  it('no longer routes the per-action peaceful beats through reactive Qwen (arb163)', () => {
+    // arb158 widened the allowlist to investigate/search/rest so the player
+    // would hear the AI voice in normal play — but on the slow v8_2 kernel a
+    // reactive line takes ~6-8s and the NEXT action cancels it before it
+    // finishes, so it almost never completed AND felt late. arb163 reverts the
+    // widening: these beats are carried by instant canned templates, and the AI
+    // voice now comes from UNPROMPTED ambient lines (maybeGenerateAmbientArbiter)
+    // that aren't tied to an action, so latency stops mattering.
     expect(QWEN_ALLOWED_INTENTS.has('investigate')).toBe(false);
+    expect(QWEN_ALLOWED_INTENTS.has('search')).toBe(false);
+    expect(QWEN_ALLOWED_INTENTS.has('rest')).toBe(false);
   });
 
   it('includes the synthetic scene_intro intent for new-room narration', () => {
@@ -31,7 +36,6 @@ describe('QWEN_ALLOWED_INTENTS', () => {
     'retreat',
     'stealth',
     'escape',
-    'rest',
     'inventory',
     'use_relic',
     'cast',

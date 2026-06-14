@@ -391,6 +391,10 @@ export interface InventoryItem {
   id: string;
   name: string;
   kind: 'weapon' | 'armor' | 'relic' | 'consumable' | 'misc' | 'runecaster' | 'dog_armor';
+  /** arb170 — Inert Golem Core. Dropped when a trained golem crumbles; carries
+   *  HALF its trained levels. Feeding it to a freshly-summoned golem grafts those
+   *  levels on, so a death costs ~half the investment, never the whole thing. */
+  golemCore?: { power: number; resilience: number; bonusHp: number };
   rarity?: Rarity;
   description?: string;
   quantity: number;

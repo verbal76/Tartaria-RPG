@@ -132,14 +132,16 @@ export function rollMods(
       case 'distracted':
         // OTA-144 — dog distract bonus. OTA-121 set this status on the
         // player but no consumer ever read it (rollMods missed the
-        // case, so "+2 to next attack" was vapor). Now applies +2 to
-        // the next attack roll AND is consumed; the initiative +1
-        // rides on a separate consumer in buildCombatSteps that
-        // peeks at the status without consuming it (so the same
-        // distract pulse covers BOTH bonuses on the same swing).
+        // case, so the bonus was vapor). Now applies to the next attack
+        // roll AND is consumed; the initiative +1 rides on a separate
+        // consumer in buildCombatSteps that peeks at the status without
+        // consuming it (so the same distract pulse covers BOTH bonuses
+        // on the same swing).
+        // arb160 — raised +2 → +4 (matches the dodge's +4) so a dog
+        // distract is a genuinely strong setup, not a marginal nudge.
         if (action === 'attack_ranged' || action === 'attack_melee') {
-          bonus += 2;
-          sources.push('distract +2');
+          bonus += 4;
+          sources.push('distract +4');
           consume.push('distracted');
         }
         break;
@@ -469,12 +471,12 @@ export function buildCombatSteps(
     : forcesBarehand ? ' (bludgeoning)' : '';
 
   // OTA-144 — distract gives +1 to initiative on the next combat
-  // swing per the playtester spec ("+1 for initiative and an
-  // additional +2 to attack power"). Read-only peek; the +2 attack
-  // bonus consumer (rollMods in this same file) is what actually
-  // strips the status. So a single distract pulse covers both
-  // bonuses on the SAME swing — the player's first attack after
-  // the dog distracts gets initiative +1 AND attack +2.
+  // swing ("+1 for initiative and an additional attack bonus").
+  // arb160 — attack bonus raised to +4 (see rollMods 'distracted' case).
+  // Read-only peek; the attack-bonus consumer (rollMods in this same file)
+  // is what actually strips the status. So a single distract pulse covers
+  // both bonuses on the SAME swing — the player's first attack after the
+  // dog distracts gets initiative +1 AND attack +4.
   const distractBonus = (player.statusEffects ?? []).some((e) => e.kind === 'distracted') ? 1 : 0;
   // OTA-403 — manual weapon-coating damage roll. If the swinging weapon
   // instance carries a coating, append a 4th 'coating' step so the player
