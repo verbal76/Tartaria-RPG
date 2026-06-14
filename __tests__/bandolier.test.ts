@@ -48,6 +48,10 @@ const shard = (qty: number): InventoryItem =>
   ({ id: 'shard-1', name: 'Shaped Aetheric Shard', kind: 'misc', rarity: 'Rare', quantity: qty, tags: ['throwable', 'aether', 'shaped'] } as InventoryItem);
 const rock = (): InventoryItem =>
   ({ id: 'rock-1', name: 'Small Rock', kind: 'material', rarity: 'Common', quantity: 3, tags: ['thrown', 'stone', 'improvised'] } as InventoryItem);
+// A javelin: a one-shot throwable (carries 'throwable') but too long to rack —
+// it also carries the 'spear' tag that gates it out of the bandolier.
+const javelin = (): InventoryItem =>
+  ({ id: 'jav-1', name: 'Bone Javelin', kind: 'weapon', rarity: 'Common', quantity: 2, tags: ['throwable', 'weapon', 'ranged', 'thrown', 'spear', 'giants', 'two_handed'] } as InventoryItem);
 
 async function boot() {
   const store = useGameStore;
@@ -64,6 +68,13 @@ describe('bandolier — rack / unrack / eligibility', () => {
     const p = { equipped: {} } as PlayerCharacter;
     expect(isBandolierEligible(shard(3), p).eligible).toBe(true);
     expect(isBandolierEligible(rock(), p).eligible).toBe(false);
+  });
+
+  it('eligibility: javelins/spears are too long to rack (OTA-605)', () => {
+    const p = { equipped: {} } as PlayerCharacter;
+    const res = isBandolierEligible(javelin(), p);
+    expect(res.eligible).toBe(false);
+    expect(res.reason).toMatch(/too long/i);
   });
 
   it('stowInBandolier racks a throwable; removeFromBandolier pulls it back', async () => {

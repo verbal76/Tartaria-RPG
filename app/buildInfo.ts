@@ -14944,4 +14944,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // didn't consume). The existing stack-survival + bandolier-slot-clear logic then fires correctly at 0. Verified the
 // off-hand attack resolves synchronously (no pendingRolls), so the top-up can't race a deferred hit. New
 // bandolierThrowConsumes.test.ts locks it in. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-604';
+// OTA-605 (Binilpentium Reach) — [content fix · arbiters-line] javelins/throwing spears no longer rack on the bandolier
+// (player: "javelins don't go in a bandolier"). The bandolier holds SMALL ordnance (throwing knives, hand axes, shards,
+// vials); long thrown shafts — every throwable javelin/spear carries the `spear` tag — are too long to sit on it. Added a
+// `spear`-tag exclusion to isBandolierEligible with a clear reason. They remain one-shot throwables thrown FROM HAND (the
+// throw-consume path is untouched), just not bandolier-rackable. bandolier.test.ts now asserts a Bone Javelin is
+// ineligible. JS-only → 290. app/engine/bandolierEligibility.ts.
+export const OTA_BUILD_ID = '2026-06-12-605';
