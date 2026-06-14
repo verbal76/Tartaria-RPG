@@ -14836,4 +14836,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // are voiced. (Frequency is two gates: shouldArbiterSpeak emits the line ~20-50%/action; this chance() voices it.)
 // (2) Faction-quest REMOTE turn-in ("send word") now pays HALF (both TC and rep), down from an 85% TC cut with full
 // rep — travelling to hand it in stays the 100% play. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-591';
+// OTA-592 (Unnonbium Unseen) — [feature · arbiters-line] STEALTH is a real tactic now (was a free, uncosted +5 nobody
+// found). The combat 'hide' chip is renamed 'sneak', and the stealth action is range-aware: at MID range (unengaged)
+// it's the OPENER — STE check vs the area's awareness; success → `stealthed` (+5 next strike), you have the drop. At
+// CLOSE range (engaged) it's the RESET — an INITIATIVE RACE (STE-tilted): win → dive for cover / throw dust → stealthed
+// (cover holds it 2 rounds, dust 1); lose → caught mid-vanish → `surprised` (enemy's next strike at advantage). Either
+// way you spend your action, so it can't be spammed. STE scales every roll, so the stealth stat finally matters; cover
+// vs dust keys off the room (concealment-rich scenes let you dive). Approach keeps its 'close the distance' job — the
+// unseen opener rides on 'sneak'. JS-only → 290. app/state/gameStore.ts, app/engine/parser.ts.
+export const OTA_BUILD_ID = '2026-06-12-592';

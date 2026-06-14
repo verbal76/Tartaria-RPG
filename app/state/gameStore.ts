@@ -13151,29 +13151,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         switch (intent) {
           case 'stealth': {
-            // v2.4.1 (OTA 034) — stealth success in combat grants
-            // `stealthed`, a one-shot +5 on the player's next melee
-            // or ranged attack (rolled in by rollMods). The status
-            // auto-consumes on use. Outside combat, the success is
-            // still narrated but no buff is applied — there's no
-            // target to land it on.
+            // arb167 — STEALTH is a real tactic now (was a free, uncosted +5).
+            // Two moments, chosen by range:
+            //   • UNENGAGED (mid range, the opener): you have the drop — an
+            //     STE check vs the enemy's awareness; success → `stealthed`
+            //     (+5 your next strike). No initiative needed; they don't know
+            //     you're there yet.
+            //   • ENGAGED (close range, the reset): you must break contact, and
+            //     that's an INITIATIVE RACE (STE-tilted). Win → dive for cover /
+            //     throw dust → `stealthed`. Lose → caught mid-vanish → `surprised`
+            //     (the enemy's next strike has the advantage). Either way you
+            //     spent your action, so it can't be spammed for a free +5.
+            // STE scales every roll, so the stealth stat finally earns its keep.
             if (currentScene.enemies.length > 0) {
-              set((s) => (s.player
-                ? {
-                    player: {
-                      ...s.player,
-                      statusEffects: applyEffect(s.player.statusEffects ?? [], {
-                        kind: 'stealthed',
-                        remainingRounds: 2,
-                        label: 'unseen — next strike at advantage',
-                      }),
-                    },
-                  }
-                : s));
-              get().appendLog(
-                'world',
-                'You move low and quiet, sliding into the angle they cannot watch. Your next strike will land before they know you are there. (+5 next attack)',
-              );
+              const livePlayer = get().player;
+              const enemy = activeEnemy(currentScene);
+              const ste = livePlayer ? (effectiveStats(livePlayer).stealth ?? 5) : 5;
+              const steMod = Math.round((ste - 10) / 2);
+              // Awareness scales with the area's danger rating (alert country =
+              // harder to slip). Kept small so STE stays the deciding factor.
+              const enemyAware = 2 + Math.floor((currentScene.location?.danger ?? 2) / 2);
+              const engaged = currentScene.range === 'close';
+              // Cover heuristic — concealment-rich rooms let you dive for it; open
+              // ground leaves only a fistful of grit to throw. Cosmetic + a small
+              // mechanical edge (cover holds the buff a round longer).
+              const sceneLabel = `${currentScene.location?.name ?? ''} ${currentScene.location?.type ?? ''} ${(currentScene.location?.tags ?? []).join(' ')}`;
+              const hasCover = /rubble|ruin|pillar|wreck|cathedral|forge|smith|stair|chamber|crate|wall|tunnel|vault|workshop|spire|rock|stone|column|cover|alley|husk|hull|indoor|structure|building/i.test(sceneLabel);
+              const foe = enemy?.name ?? 'them';
+              if (!engaged) {
+                const roll = rollDie(20);
+                const total = roll + steMod + 3; // +3 for the drop (they're unaware)
+                const dc = 10 + enemyAware;
+                if (total >= dc) {
+                  set((s) => (s.player
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'stealthed', remainingRounds: 2, label: 'unseen — next strike +5' }) } }
+                    : s));
+                  get().appendLog('world', hasCover
+                    ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
+                    : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steMod >= 0 ? '+' : ''}${steMod}+3 = ${total} vs DC ${dc} — UNSEEN`);
+                } else {
+                  get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
+                  get().appendLog('debug', `stealth: opener d20=${roll} → ${total} vs DC ${dc} — SPOTTED`);
+                }
+              } else {
+                const pInit = rollDie(20) + steMod + 2; // you chose the moment
+                const eInit = rollDie(20) + enemyAware;
+                if (pInit >= eInit) {
+                  const rounds = hasCover ? 2 : 1;
+                  set((s) => (s.player
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'stealthed', remainingRounds: rounds, label: 'unseen — next strike +5' }) } }
+                    : s));
+                  get().appendLog('world', hasCover
+                    ? `You break away and throw yourself into cover. By the time ${foe} find the angle, you're already gone — the next strike comes from nowhere. (+5 next attack)`
+                    : `You fling a fistful of grit into ${foe}'s eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)`);
+                  get().appendLog('debug', `stealth: reset WIN init ${pInit} vs ${eInit} (${hasCover ? 'cover' : 'dust'}, +5 ${rounds}r)`);
+                } else {
+                  set((s) => (s.player
+                    ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'caught mid-vanish' }) } }
+                    : s));
+                  get().appendLog('world', `${foe} reads the move before you finish it — you break contact a beat too slow and leave yourself open. Their next strike has the advantage.`);
+                  get().appendLog('debug', `stealth: reset LOSE init ${pInit} vs ${eInit} — surprised applied`);
+                }
+              }
             } else {
               get().appendLog(
                 'world',
