@@ -63,6 +63,13 @@ const MERGE_TARGET_CHARS = 200;
 const CROSSFADE_LOOKAHEAD = 2;
 const CROSSFADE_MAX_BATCH = 4;
 const CROSSFADE_MS = 12;
+// arb165 — player ask: "put a slight pause after a '.' — Kokoro runs the
+// sentences together." Each sentence is now its own chunk (see speak()), and at
+// a sentence boundary the batch is joined with SENTENCE_PAUSE_MS of real silence
+// instead of the gap-removing crossfade. EDGE_FADE_MS tapers each chunk into and
+// out of that silence so the join stays click-free.
+const SENTENCE_PAUSE_MS = 160;
+const EDGE_FADE_MS = 6;
 
 interface QueuedUtterance {
   id: number;
@@ -86,6 +93,10 @@ interface QueuedUtterance {
    *  queue cap can drop or keep WHOLE lines instead of truncating one
    *  mid-line. */
   lineId?: number;
+  /** arb165 — true when this chunk's text ends on a sentence terminator
+   *  (. ! ?). drain() inserts a short silence after such a chunk so the
+   *  next sentence doesn't run straight into it. */
+  endsSentence?: boolean;
   /** Prefetched samples + the rate they were inferred at. drain()
    *  pre-runs forward() on the NEXT queued utterance while the
    *  current one is still playing, so the next sentence's audio is
@@ -600,24 +611,30 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   // instead of a string of choppy one-clip-per-sentence reads. (Streamed
   // narration is pre-bundled upstream in TTSController; this also catches
   // the many pre-written multi-sentence lines delivered in one speak().)
+  // arb165 — ONE sentence per chunk. The old arb7 merge bundled sentences up to
+  // MERGE_TARGET_CHARS into a single Kokoro read so they flowed as one breath —
+  // but that's exactly what made them "run together", with no pause at the
+  // periods. Now we only glue a piece onto the previous chunk when that previous
+  // chunk is NOT already a finished sentence (i.e. a stray, terminator-less
+  // fragment), so a real sentence boundary is never buried inside a chunk and
+  // drain() can drop a pause after it.
+  const endsOnTerminator = (s: string) => /[.!?]['")\]]*$/.test(s.trim());
   const chunks: string[] = [];
-  for (let i = 0; i < rawChunks.length; i++) {
-    const piece = rawChunks[i]!;
+  for (const piece of rawChunks) {
     const last = chunks.length > 0 ? chunks[chunks.length - 1]! : null;
-    // Keep the FIRST sentence as its own small chunk so audio starts fast
-    // (bundling the whole line meant Kokoro inferred a big block before any
-    // sound — the "heavy ramp-up delay" report). Bundle from the 2nd
-    // sentence onward, up to MERGE_TARGET_CHARS, for smoothness.
-    if (i === 0 || chunks.length < 2 || last === null
-        || last.length + 1 + piece.length > MERGE_TARGET_CHARS) {
-      chunks.push(piece);
-    } else {
+    if (last !== null && !endsOnTerminator(last)
+        && last.length + 1 + piece.length <= MERGE_TARGET_CHARS) {
       chunks[chunks.length - 1] = `${last} ${piece}`;
+    } else {
+      chunks.push(piece);
     }
   }
   const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
-    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id });
+    queue.push({
+      id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id,
+      endsSentence: endsOnTerminator(chunk),
+    });
   }
   void drain();
   return id;
@@ -673,6 +690,9 @@ async function drain(): Promise<void> {
     // fast; the batch only grows once prefetch has run ahead during the
     // previous chunk's playback.
     const batch: Float32Array[] = [firstSamples];
+    // arb165 — parallel to `batch`: did each member end on a sentence
+    // terminator? Drives the silence-gap-vs-crossfade choice in joinBatch.
+    const batchEndsSentence: boolean[] = [!!next.endsSentence];
     while (batch.length < CROSSFADE_MAX_BATCH) {
       const peek = queue[0];
       if (!peek) break;
@@ -687,7 +707,10 @@ async function drain(): Promise<void> {
       if (peek.resolvedSamples === undefined) break;        // not inferred yet → don't block
       if (peek.prefetchVoiceId !== undefined && peek.prefetchVoiceId !== targetVoice) break; // stale voice
       queue.shift();
-      if (peek.resolvedSamples && peek.resolvedSamples.length) batch.push(peek.resolvedSamples);
+      if (peek.resolvedSamples && peek.resolvedSamples.length) {
+        batch.push(peek.resolvedSamples);
+        batchEndsSentence.push(!!peek.endsSentence);
+      }
     }
     // Prime inference for the next few chunks (same voice only) so future
     // drains can keep forming batches. Switching voices mid-queue would
@@ -699,12 +722,13 @@ async function drain(): Promise<void> {
       // Single chunk — unchanged path; playPcm trims + fades it.
       combined = firstSamples;
     } else {
-      // Trim each member's pad-silence first so the crossfade overlaps
-      // real audio, then join with an equal-power crossfade. Never let the
-      // post-processing break playback — fall back to the first chunk.
+      // Trim each member's pad-silence first, then join: a short silence after
+      // any member that ends a sentence (arb165), an equal-power crossfade
+      // otherwise. Never let post-processing break playback — fall back to the
+      // first chunk.
       try {
         const trimmedBufs = batch.map((b) => trimSilenceLeadTrail(b, KOKORO_SAMPLE_RATE));
-        combined = concatWithCrossfade(trimmedBufs, KOKORO_SAMPLE_RATE);
+        combined = joinBatch(trimmedBufs, batchEndsSentence, KOKORO_SAMPLE_RATE);
       } catch {
         combined = firstSamples;
       }
@@ -944,6 +968,75 @@ function concatWithCrossfade(buffers: Float32Array[], sampleRate: number): Float
     pos += buf.length - ov;
   }
   return out;
+}
+
+/** arb165 — join a same-line batch with a SLIGHT silence after every sentence
+ *  (Kokoro otherwise runs sentences together), crossfading only the rare
+ *  non-terminal join (a stray fragment). `endsSentence[i]` = did member i end
+ *  on a terminator. Members are copied before edge-fading so cached/prefetched
+ *  sample buffers are never mutated. */
+function joinBatch(
+  buffers: Float32Array[],
+  endsSentence: boolean[],
+  sampleRate: number,
+): Float32Array {
+  if (buffers.length === 1) return buffers[0]!;
+  const gapLen = Math.max(0, Math.floor((sampleRate * SENTENCE_PAUSE_MS) / 1000));
+  const xfadeMax = Math.max(1, Math.floor((sampleRate * CROSSFADE_MS) / 1000));
+  const fadeLen = Math.max(1, Math.floor((sampleRate * EDGE_FADE_MS) / 1000));
+  const segs = buffers.map((b) => b.slice());
+  // Per-join plan: gap (after a sentence) or crossfade overlap.
+  const gapJoin: boolean[] = [];
+  const overlaps: number[] = [];
+  let total = segs[0]!.length;
+  for (let i = 1; i < segs.length; i++) {
+    const gap = !!endsSentence[i - 1];
+    gapJoin.push(gap);
+    if (gap) {
+      overlaps.push(0);
+      total += gapLen + segs[i]!.length;
+    } else {
+      const ov = Math.min(xfadeMax, segs[i - 1]!.length, segs[i]!.length);
+      overlaps.push(ov);
+      total += segs[i]!.length - ov;
+    }
+  }
+  // Taper each side of a gap so the silence join is click-free.
+  for (let i = 0; i < segs.length; i++) {
+    if (i < segs.length - 1 && gapJoin[i]) fadeEdge(segs[i]!, fadeLen, false);     // tail → silence
+    if (i > 0 && gapJoin[i - 1]) fadeEdge(segs[i]!, fadeLen, true);                // silence → head
+  }
+  const out = new Float32Array(total);
+  out.set(segs[0]!, 0);
+  let pos = segs[0]!.length;
+  for (let i = 1; i < segs.length; i++) {
+    if (gapJoin[i - 1]) {
+      pos += gapLen;                                  // leave zeros = the pause
+      out.set(segs[i]!, pos);
+      pos += segs[i]!.length;
+    } else {
+      const ov = overlaps[i - 1]!;
+      const start = pos - ov;
+      for (let j = 0; j < ov; j++) {
+        const t = (j + 1) / (ov + 1);
+        out[start + j] = out[start + j]! * Math.cos((t * Math.PI) / 2) + segs[i]![j]! * Math.sin((t * Math.PI) / 2);
+      }
+      out.set(segs[i]!.subarray(ov), pos);
+      pos += segs[i]!.length - ov;
+    }
+  }
+  return out;
+}
+
+/** Linear fade on one end of a buffer (head=true → fade-in, else fade-out).
+ *  Mutates in place; used on the per-batch copies in joinBatch. */
+function fadeEdge(samples: Float32Array, fadeLen: number, head: boolean): void {
+  const n = Math.min(fadeLen, samples.length);
+  for (let i = 0; i < n; i++) {
+    const g = (i + 1) / (n + 1);
+    if (head) samples[i] = samples[i]! * g;
+    else samples[samples.length - 1 - i] = samples[samples.length - 1 - i]! * g;
+  }
 }
 
 /** Apply a linear fade-in to the first `fadeMs` and fade-out to the

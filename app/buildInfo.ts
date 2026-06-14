@@ -14818,4 +14818,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // wants it guaranteed each time they re-enter, not throttled. Still skipped on an interrupted-death revival (OTA-416:
 // a revival isn't a load and already greeted them). The separate world-cue ("You step back into …") keeps its debounce.
 // app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-588';
+// OTA-589 (Unoctnonium Breath) — [fix · arbiters-line] "put a slight pause after a '.' — Kokoro runs the sentences
+// together." Two causes: the arb7 merge bundled sentences into one Kokoro read (no internal pause), and the crossfade
+// trimmed the gap between sentence chunks. Now speak() keeps ONE sentence per chunk (only glues terminator-less
+// fragments), each chunk is tagged endsSentence, and the batch joiner (new joinBatch) drops SENTENCE_PAUSE_MS (160ms)
+// of real silence after any sentence — with 6ms edge fades for a click-free join — instead of crossfading the gap away.
+// JS-only → 290. app/voice/PiperTTSManager.ts.
+export const OTA_BUILD_ID = '2026-06-12-589';
