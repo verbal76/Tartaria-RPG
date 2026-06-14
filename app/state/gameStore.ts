@@ -26569,6 +26569,13 @@ async function maybeGenerateAmbientArbiter(
   // Muzzle in combat (no idle musing mid-fight), require the model + a free
   // lock, and respect the wide ambient spacing.
   if (!scene || !player || scene.enemies.length > 0) return;
+  // Stay silent through the scripted outpost tutorial. A ~10s ambient
+  // musing fired mid-onboarding clutters the feed and backs up the voice
+  // queue between coached beats — that's the "massive gap" a player feels
+  // between climbing down and the INVESTIGATE prompt (which itself already
+  // fires the instant the climb beat completes). Resume once the tutorial
+  // is done (tutorialStep === null).
+  if (get().tutorialStep !== null) return;
   if (!qwen.isReady() || get().isGenerating) return;
   if (Date.now() - lastAmbientGenStartMs < AMBIENT_GEN_COOLDOWN_MS) return;
 

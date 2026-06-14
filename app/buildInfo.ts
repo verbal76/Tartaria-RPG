@@ -14899,4 +14899,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "▸ ADVANCED EXPORTS" toggle. (3) Relabeled "RESET AI NARRATION & RELOAD" → "RELOAD AI". (4) Added RUN / REPORTING / AI
 // section headers and a shorter intro line. Net: ~9 visible buttons → 7 (2 of those collapsed), one true duplicate gone,
 // everything still reachable. JS-only → 290. app/screens/AboutScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-12-599';
+// OTA-600 (Binilnilium Hush) — [tutorial pacing · arbiters-line] kill the "massive gap" a player feels between climbing
+// down and the INVESTIGATE prompt in the outpost tutorial. The investigate beat ALREADY fires the instant the climb beat
+// completes (maybeAdvanceTutorial('climb') runs on climb-down → the Arbiter's "north door is locked" line is appended
+// synchronously) — so the feed text was never late. The gap was the AMBIENT Qwen line: maybeGenerateAmbientArbiter
+// guarded combat/model/cooldown but NOT the tutorial, so a ~10s background musing (the playtest log's `ambient ✓ 10462ms`,
+// "you step back to the old garrison…") fired mid-onboarding and backed up the voice queue between coached beats. Added a
+// `tutorialStep !== null` early-return so ambient generation stays silent through the scripted outpost tutorial and resumes
+// once it's done. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-600';

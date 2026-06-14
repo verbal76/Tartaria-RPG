@@ -1133,6 +1133,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-597': 'Unnonseptium Handoff',
   '2026-06-12-598': 'Unnonoctium Telltale',
   '2026-06-12-599': 'Unnonennium Tidy',
+  '2026-06-12-600': 'Binilnilium Hush',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
