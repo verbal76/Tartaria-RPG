@@ -14681,4 +14681,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // instead of ~5, Uncommon ~26, Rare ~60, Legendary ~128. Still below buy price, and the vendor-offer match still caps
 // same-vendor resale at 40%, so no buy-low/sell-high pump. app/screens/ContractsScreen.tsx, app/engine/sellPrice.ts.
 // JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-572';
+// OTA-573 (Unhexoctium Counter) — [ux · BOTH lines] two vendor improvements. (1) SELL stats: the sell list (and its
+// confirm) showed only name/price/durability via a name-based catalog preview, so you couldn't tell two instances of
+// the same item apart (player had two Bone Shoes, 20 vs 30 durability, and sold blind). It now uses the instance-aware
+// getItemPreviewForInstance — each row shows THIS copy's rolled AC / attribute perks / damage / resists, and the
+// confirm previews the exact instance tapped (threaded by id). (2) Vendor CONTRACTS is now a mission-board-style POPUP
+// (new VendorContractsModal) instead of an inline tab — the player preferred the OTA-567 Mission Board modal. It lists
+// the vendor's faction contracts / bounties / mysteries / storylines, each with a direct tap-to-ACCEPT (availableX
+// filters active/completed so accepted work drops off and the popup stays open). app/screens/VendorScreen.tsx,
+// app/components/VendorContractsModal.tsx (new). JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-573';
