@@ -5629,8 +5629,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Suppress the random Arbiter intros on the opening scene — the
     // openingPrefix already carries an authored Arbiter line; piling
     // another on top creates the "scene built twice" feel the playtest
-    // log flagged.
-    if (!opts?.isOpening) {
+    // log flagged. Also suppressed through the scripted tutorial prefix
+    // (name → investigate) so Qwen stays fully idle there.
+    if (!opts?.isOpening && !inScriptedTutorialPhase(get)) {
       if (chance(45)) {
         void narrateViaArbiter(
           get,
@@ -12700,7 +12701,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    if (!get().pendingRolls) {
+    // During the scripted outpost tutorial (name → investigate) every line
+    // is canned and Kokoro voices it — Qwen has nothing to add. Muzzle ALL
+    // generation paths below (reactive narration, ambient musing, cognitive
+    // enrichment) until the player reaches the post-investigate choice.
+    const scriptedTutorial = inScriptedTutorialPhase(get);
+
+    if (!scriptedTutorial && !get().pendingRolls) {
       const lastCog = get().cognitiveLastResponse;
       const mood = lastCog?.inferredEmotions[0];
       // Filter out player questions / meta-commentary before treating them as
@@ -12786,8 +12793,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     // Fire-and-forget cognitive enrichment — runs in parallel with the
-    // deterministic resolution above, never blocks gameplay.
-    if (get().cognitiveStatus === 'ready') {
+    // deterministic resolution above, never blocks gameplay. Skipped during
+    // the scripted tutorial prefix (nothing should run the model there).
+    if (!scriptedTutorial && get().cognitiveStatus === 'ready') {
       const worldCtx: WorldContext = {
         hp: player.hp,
         maxHp: player.hpMax,
@@ -26560,6 +26568,26 @@ async function narrateViaArbiter(
  * `isGenerating` flag still serialises it against reactive scene-intro
  * generations and the voice lock — only one native-ML job runs at a time.
  */
+
+// Last fully-scripted beat of the outpost tutorial. Everything from the
+// name prompt through INVESTIGATE is canned, so Qwen has nothing to add —
+// only Kokoro voices the scripted Arbiter lines. Qwen switches back on at
+// the explore/leave choice that immediately follows investigate.
+const SCRIPTED_TUTORIAL_LAST_IDX = TUTORIAL_STEPS.findIndex((s) => s.id === 'investigate');
+
+/** True while the player is in the fully-scripted prefix of the outpost
+ *  tutorial (name → investigate). Used to fully muzzle every Qwen path —
+ *  reactive narration, ambient musings, and cognitive enrichment — so the
+ *  scripted onboarding plays clean (Kokoro only). Returns false the moment
+ *  the player reaches the post-investigate explore/leave choice, so normal
+ *  free-roam narration resumes there. (Player: "we don't need qwen doing
+ *  anything … this is all scripted until the player makes their choice
+ *  after investigate.") */
+function inScriptedTutorialPhase(get: () => GameStore): boolean {
+  const step = get().tutorialStep;
+  return step !== null && SCRIPTED_TUTORIAL_LAST_IDX >= 0 && step <= SCRIPTED_TUTORIAL_LAST_IDX;
+}
+
 async function maybeGenerateAmbientArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
@@ -26569,13 +26597,12 @@ async function maybeGenerateAmbientArbiter(
   // Muzzle in combat (no idle musing mid-fight), require the model + a free
   // lock, and respect the wide ambient spacing.
   if (!scene || !player || scene.enemies.length > 0) return;
-  // Stay silent through the scripted outpost tutorial. A ~10s ambient
-  // musing fired mid-onboarding clutters the feed and backs up the voice
-  // queue between coached beats — that's the "massive gap" a player feels
-  // between climbing down and the INVESTIGATE prompt (which itself already
-  // fires the instant the climb beat completes). Resume once the tutorial
-  // is done (tutorialStep === null).
-  if (get().tutorialStep !== null) return;
+  // Stay silent through the scripted prefix of the outpost tutorial. A ~10s
+  // ambient musing fired mid-onboarding clutters the feed and backs up the
+  // voice queue between coached beats — that's the "massive gap" a player
+  // feels between climbing down and the INVESTIGATE prompt. Resumes at the
+  // post-investigate explore/leave choice (see inScriptedTutorialPhase).
+  if (inScriptedTutorialPhase(get)) return;
   if (!qwen.isReady() || get().isGenerating) return;
   if (Date.now() - lastAmbientGenStartMs < AMBIENT_GEN_COOLDOWN_MS) return;
 

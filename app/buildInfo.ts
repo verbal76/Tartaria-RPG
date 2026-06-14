@@ -14907,4 +14907,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "you step back to the old garrison…") fired mid-onboarding and backed up the voice queue between coached beats. Added a
 // `tutorialStep !== null` early-return so ambient generation stays silent through the scripted outpost tutorial and resumes
 // once it's done. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-600';
+// OTA-601 (Biniluninium Idle) — [tutorial pacing · arbiters-line] broaden OTA-600: keep Qwen FULLY idle through the
+// scripted tutorial, not just ambient (player: "we don't need qwen doing anything … this is all scripted until the player
+// makes their choice after investigate"). New inScriptedTutorialPhase(get) predicate = tutorialStep is in the canned
+// prefix (name → investigate); it now muzzles ALL three generation paths in submitPlayerAction — reactive narration
+// (narrateViaArbiter), the ambient aside, and the cognitive-enrichment pass (CognitiveOrchestrator) — plus the 45%
+// scene-intro Qwen line in beginScene. Only Kokoro runs, voicing the scripted Arbiter lines. The predicate flips off at
+// the post-investigate explore/leave choice (index-based on the 'investigate' step), so normal free-roam narration +
+// cognition resume the instant the player takes control. Refines OTA-600's ambient guard to the same predicate so ambient
+// also resumes at the choice rather than waiting for the whole tutorial (main_quest/pick_city) to end. JS-only → 290.
+// app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-601';
