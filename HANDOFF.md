@@ -1803,6 +1803,14 @@ The entries below are retained as the shipped-batch record.
 >    NOT the native crash). **OTA-563 "Unpentoctium Lens"** (arbiters-line ONLY) instruments
 >    `ScreenErrorBoundary` to record the React `componentStack` into the CRASHED SAVE report
 >    so the next reproduction names the looping component. Awaiting a paste to scope the fix.
+> 8. **ROOT CAUSE FOUND + FIXED (OTA-564 "Unpentennium Latch", BOTH lines).** The component stack pinned the loop to
+>    `InputBox`: `useGameStore((s) => s.player?.equipped?.bandolierIds ?? [])` returns a FRESH `[]` every call when a
+>    new character has no bandolierIds — Zustand Object.is sees it as changed every render → infinite re-render →
+>    crash the instant the name beat mounts. Fix: frozen `EMPTY_BANDOLIER_IDS` sentinel (referentially stable). The
+>    bug is IDENTICAL on HaL2001 (shared code), and the live production build (`com.hotatticgames.tartarprim`, build
+>    281) was confirmed affected — so per the user this fix ships to **BOTH** `arbiters-line` AND `HaL2001`. Also
+>    added a title-screen build marker (`⟁ HAL BUILD` / `⟁ ARBITER BUILD` by App ID) so the two installs are
+>    distinguishable. `app/components/InputBox.tsx`, `app/screens/TitleScreen.tsx`.
 >
 > ---
 > **🔧 QUEUED FOR THE NEXT NATIVE BUILD (whenever one is fired — NOT OTA-able):**

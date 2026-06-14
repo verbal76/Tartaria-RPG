@@ -14594,4 +14594,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so one pasted log pinpoints the faulting component for a targeted fix. Publishes ONLY to the arbiters-line channel.
 // app/diagnostics/crashSave.ts, App.tsx. JS-only OTA. (Numbering is arbiters-line-local; the real fix will get its own
 // HaL2001 OTA on promotion.)
-export const OTA_BUILD_ID = '2026-06-12-563';
+// OTA-564 (Unpentennium Latch) — [CRITICAL bugfix] fix the "Maximum update depth exceeded" crash on new-character
+// creation, pinpointed by OTA-563's component-stack capture to InputBox. The bandolier selector
+// `useGameStore((s) => s.player?.equipped?.bandolierIds ?? [])` returned a FRESH [] every call when a new character
+// had no bandolierIds yet; Zustand's Object.is equality saw it as changed every render → InputBox re-rendered → the
+// selector re-ran → infinite loop, firing the instant the name beat mounted (the exploration screen never painted).
+// Fix: a frozen module-level EMPTY_BANDOLIER_IDS sentinel so the undefined case is referentially stable. Also adds a
+// title-screen BUILD MARKER (⟁ HAL BUILD / ⟁ ARBITER BUILD via App ID) above the gem line so the two side-by-side
+// installs are distinguishable. Affects BOTH lines identically — shipped to arbiters-line AND HaL2001.
+// app/components/InputBox.tsx, app/screens/TitleScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-564';
