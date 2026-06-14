@@ -578,6 +578,12 @@ function combatRemark(enemy: Enemy): string {
   return rotatingPick(COMBAT_REMARKS, 'arbiter.combat.remark').replace('{enemy}', enemy.name.toLowerCase());
 }
 
+// arb136 — cooldown counter for the unresolved-hook "nag" callback. Without it the
+// Arbiter chanted "still there, still yours" / "that memory will rot" at 40% on EVERY
+// targetless action about the SAME hook. Now it fires at most once per ~6 qualifying
+// actions. Module-level so it persists across remark calls (like rotatingPick's state).
+let hookNagCooldown = 0;
+
 export function buildArbiterRemark(ctx: ArbiterContext): string {
   const inCombat = !!ctx.enemy;
 
@@ -612,7 +618,10 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
         if (lastAction.trim().toLowerCase() === 'look') {
           return `${rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')} ${combatRemark(ctx.enemy!)}`;
         }
-        return `${rotatingPick(ARBITER_NOTED_LINES, 'arbiter.noted.combat')} ${combatRemark(ctx.enemy!)}`;
+        // arb136 — was the NOTED line + combatRemark CONCATENATED, which double-tagged
+        // the speaker ("The Arbiter watches. '…' The Arbiter watches the aetherbat. '…'").
+        // Use the enemy-aware combat remark alone so it reads as one clean Arbiter line.
+        return combatRemark(ctx.enemy!);
       }
     }
     // Combat color rotates between enemy-aware remarks and the attack
@@ -681,20 +690,27 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // player just did. Stay on-target.
   if (
     !ctx.playerTargetNoun &&
-    ctx.unresolvedHooks && ctx.unresolvedHooks.length > 0 &&
-    Math.random() < 0.4
+    ctx.unresolvedHooks && ctx.unresolvedHooks.length > 0
   ) {
-    const hook = ctx.unresolvedHooks[0]!;
-    const noun = hook.nouns[0] ?? hook.kind;
-    // Plural-safe phrasings only — playtest log caught "The footprints hasn't
-    // gone anywhere." Avoid is/are/has/have around ${noun} entirely.
-    const callbacks = [
-      `"The ${noun} — still waiting," the Arbiter says. "Decide if it matters."`,
-      `"You saw the ${noun}," the Arbiter notes. "That memory will rot if you leave it."`,
-      `"Threads in Tartaria don't wait long," the Arbiter says quietly. "The ${noun} won't either."`,
-      `The Arbiter glances toward the ${noun}. "Still there. Still yours, if you take it."`,
-    ];
-    return pick(callbacks);
+    // arb136 — COOLDOWN the hook-nag (was 40% on EVERY targetless action about the
+    // same hook → the Arbiter nagged every couple seconds). Fire at most once per
+    // ~6 qualifying actions.
+    if (hookNagCooldown > 0) {
+      hookNagCooldown -= 1;
+    } else if (Math.random() < 0.35) {
+      hookNagCooldown = 6;
+      const hook = ctx.unresolvedHooks[0]!;
+      const noun = hook.nouns[0] ?? hook.kind;
+      // Plural-safe phrasings only — playtest log caught "The footprints hasn't
+      // gone anywhere." Avoid is/are/has/have around ${noun} entirely.
+      const callbacks = [
+        `"The ${noun} — still waiting," the Arbiter says. "Decide if it matters."`,
+        `"You saw the ${noun}," the Arbiter notes. "That memory will rot if you leave it."`,
+        `"Threads in Tartaria don't wait long," the Arbiter says quietly. "The ${noun} won't either."`,
+        `The Arbiter glances toward the ${noun}. "Still there. Still yours, if you take it."`,
+      ];
+      return pick(callbacks);
+    }
   }
 
   // Player named a specific noun this turn — keep the Arbiter on-target.

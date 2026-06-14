@@ -7103,7 +7103,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
           }
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
-          get().appendLog('world', attackOpener(targetEnemy.name, coatedWeaponNoun(get().player, parsed.resolvedNoun)));
+          // arb138 — the opener's weapon noun comes from parsed.resolvedNoun, but the
+          // resolver sometimes binds a weapon phrase ("Tartarian Hand Axe (Throw)") to a
+          // SCENE object ("shattered tartarian relay"), so the narration named the wrong
+          // thing ("the shattered tartarian relay is already moving…"). Use resolvedNoun
+          // only when it's actually a weapon the player carries; else fall back to the
+          // equipped main weapon (or bare-hands flavor).
+          const openerP = get().player;
+          const rNoun = parsed.resolvedNoun;
+          const rNounIsWeapon = !!rNoun && (openerP?.inventory ?? []).some(
+            (it) => it.kind === 'weapon' && it.name.toLowerCase() === rNoun.toLowerCase(),
+          );
+          const openerWeapon = rNounIsWeapon ? rNoun : (openerP?.equipped?.main ?? null);
+          get().appendLog('world', attackOpener(targetEnemy.name, coatedWeaponNoun(openerP, openerWeapon)));
         } else {
           // No enemy — the player might have meant "kick the rubble"
           // / "smash the wall" / "punch the ground" as a clumsy way
@@ -12577,6 +12589,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('arbiter', `The Arbiter nods. "Stripped for parts: ${list}."`);
           } else {
             set({ craftSubstitutionPrompt: { recipeResult: recipe.result, subsList: list } });
+            // arb137 — also speak it in the feed so the craft is never a SILENT
+            // no-op. A tester typed `craft X` ~15 times getting nothing back,
+            // because this only set the modal flag (which they didn't see). The
+            // log line makes clear the craft is waiting on a confirm.
+            get().appendLog(
+              'arbiter',
+              `"Crafting ${recipe.result} would strip ${list} from your pack — confirm in the prompt to proceed, or it stays unmade."`,
+            );
             break;
           }
         }
