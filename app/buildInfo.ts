@@ -14779,4 +14779,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // prompt now asks for ONE ~20-word sentence (was TWO/35 words) so it lands on punctuation instead of truncating.
 // Net: the lock frees fast, voice keeps up, fresh Qwen lines arrive while the action is still on screen. JS-only → 290.
 // app/state/gameStore.ts, app/engine/contextInjector.ts.
-export const OTA_BUILD_ID = '2026-06-12-582';
+// OTA-583 (Unseptoctium Louder) — [tune · arbiters-line] bump the canned-flavor voice rate 25%→33% (chance(25)→chance(33))
+// at all three narrateViaArbiter template sites. With the voice-starvation fixed in 582, the player wants a touch
+// more of the canned lines spoken between the fresh Qwen ones. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-583';

@@ -26271,17 +26271,17 @@ async function narrateViaArbiter(
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
       : 'cooldown';
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
-    // arb162 — CANNED flavor line: shown on-screen, but voiced only ~1 in 4
+    // arb162 — CANNED flavor line: shown on-screen, but voiced only ~1 in 3
     // (the player is tired of hearing the repetitive templates and wants the
     // fresh Qwen lines spoken instead). `silent` tells TTSController to skip it.
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(25) ? undefined : { silent: true });
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(33) ? undefined : { silent: true });
     return;
   }
   const state = get();
   const player = state.player;
   if (!player || !scene) {
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(25) ? undefined : { silent: true });
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(33) ? undefined : { silent: true });
     return;
   }
   const sceneSlice: SceneSlice = {
@@ -26369,7 +26369,7 @@ async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
       // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
-      if (trimmed) get().appendLog('arbiter', trimmed, chance(25) ? undefined : { silent: true });
+      if (trimmed) get().appendLog('arbiter', trimmed, chance(33) ? undefined : { silent: true });
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the
