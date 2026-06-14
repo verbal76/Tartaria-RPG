@@ -25202,112 +25202,18 @@ function handleDogCombat(
       }
     }
   }
-  // Enemy retaliation split: ~40% dog if no golem, ~30% dog + 30% golem + 40% player
-  // otherwise. Skip when this action just killed all enemies.
+  // arb169 — companion commands now provoke the FULL enemy volley, same as a
+  // real attack. Previously this rolled ONE watered-down counter split across
+  // dog/golem/player (~40% dog, ~60% you), so spamming the dog let the player
+  // skip the group retaliation that attacking yourself triggers. Now commanding
+  // a companion costs YOU the whole volley (runEnemyGroupCounters hits the
+  // commander); the dog/golem aren't hit by command-retaliation. Skipped when
+  // this action already cleared the room.
   const liveScene = get().currentScene;
   if (!liveScene || liveScene.enemies.length === 0) return;
   const livePlayer = get().player;
   if (!livePlayer) return;
-  const liveDog = livePlayer.dog;
-  if (!liveDog || liveDog.status !== 'with_player' || liveDog.hp <= 0) return;
-  const liveTarget = liveScene.enemies[Math.min(targetIdx, liveScene.enemies.length - 1)];
-  if (!liveTarget) return;
-  const hasGolem = !!livePlayer.golem && (livePlayer.golem?.hp ?? 0) > 0;
-  const r = Math.random();
-  // Distribution shares as documented in spec.
-  // Without golem: dog 0.40, player 0.60.
-  // With golem: dog 0.30, golem 0.30, player 0.40.
-  let retaliateTarget: 'dog' | 'player' | 'golem' = 'player';
-  if (hasGolem) {
-    if (r < 0.30) retaliateTarget = 'dog';
-    else if (r < 0.60) retaliateTarget = 'golem';
-    else retaliateTarget = 'player';
-  } else {
-    if (r < 0.40) retaliateTarget = 'dog';
-    else retaliateTarget = 'player';
-  }
-  const enemyAtkRoll = rollDie(20);
-  const enemyAtkBonus = parseEnemyAP(liveTarget);
-  const acByTarget = retaliateTarget === 'dog' ? 11 : retaliateTarget === 'golem' ? 11 : (livePlayer.ac ?? 10);
-  const enemyHit = enemyAtkRoll + enemyAtkBonus >= acByTarget;
-  if (enemyHit) {
-    const dmg = rollDie(6) + 1;
-    if (retaliateTarget === 'dog') {
-      const newDogHp = Math.max(0, liveDog.hp - dmg);
-      get().appendLog(
-        'combat',
-        `${liveTarget.name} swings on ${liveDog.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newDogHp}/${liveDog.hpMax})`,
-      );
-      if (newDogHp <= 0) {
-        const downLine = applyDogPronouns(
-          `${liveDog.name} is down. {Pronoun} {isOrAre} bleeding into the dirt.`,
-          liveDog.sex.pronoun,
-        );
-        get().appendLog('world', downLine);
-        // Poplar Anvil — bench the downed dog AND stamp downedAtHour so the
-        // bleed-out clock starts. If it isn't healed above 0 within
-        // DOG_BLEED_OUT_HOURS (tickDogStatus), it dies for real.
-        set((s) => s.player && s.player.dog
-          ? { player: { ...s.player, dog: { ...s.player.dog, hp: 0, status: 'waiting_at_base' as const, downedAtHour: s.player.hoursElapsed ?? 0, bleedWarned: false } } }
-          : s,
-        );
-        // Poplar Anvil — the moment the dog drops, the Arbiter tells the
-        // player straight: heal it or lose it. A downed dog is no longer
-        // permanently safe.
-        get().appendLog(
-          'arbiter',
-          applyDogPronouns(
-            `The Arbiter kneels by the dog. "Feed ${liveDog.name} — or get a poultice in {pronoun}. {Pronoun} won't last a day down like this, and down dogs don't always get back up."`,
-            liveDog.sex.pronoun,
-          ),
-        );
-      } else {
-        set((s) => s.player && s.player.dog
-          ? { player: { ...s.player, dog: { ...s.player.dog, hp: newDogHp } } }
-          : s);
-      }
-    } else if (retaliateTarget === 'golem' && livePlayer.golem) {
-      // OTA-467 — trained RESILIENCE soaks part of the hit here too, and surviving
-      // it trains RESILIENCE (this is the dog-present retaliation-split path).
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { golemStatBonus: gsb, trainGolemStat: tgs } = require('../engine/golems');
-      const gRes: number = gsb(livePlayer.golem, 'resilience');
-      const gDmg = Math.max(1, dmg - gRes);
-      const newGolemHp = Math.max(0, livePlayer.golem.hp - gDmg);
-      get().appendLog(
-        'combat',
-        `${liveTarget.name} pivots to ${livePlayer.golem.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${gDmg}${gRes > 0 ? ` (−${gRes} soaked)` : ''}. (${newGolemHp}/${livePlayer.golem.hpMax})`,
-      );
-      if (newGolemHp <= 0) {
-        set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
-        get().appendLog('world', `The golem crumbles.`);
-      } else {
-        const tr = tgs({ ...livePlayer.golem, hp: newGolemHp }, 'resilience', true);
-        if (tr.leveled) get().appendLog('reward', `✦ ${tr.golem.name}'s Resilience rises to ${tr.leveled.to}.`);
-        set((s) => s.player && s.player.golem
-          ? { player: { ...s.player, golem: tr.golem } }
-          : s);
-      }
-    } else {
-      // player
-      const newHp = Math.max(0, livePlayer.hp - dmg);
-      get().appendLog(
-        'combat',
-        `${liveTarget.name} swings on you — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newHp}/${livePlayer.hpMax})`,
-      );
-      set((s) => s.player
-        ? { player: { ...s.player, hp: newHp } }
-        : s);
-      if (newHp <= 0) {
-        void Promise.resolve().then(() => handlePlayerDeath(get, set));
-      }
-    }
-  } else {
-    get().appendLog(
-      'combat',
-      `${liveTarget.name} swings at ${retaliateTarget === 'dog' ? liveDog.name : retaliateTarget === 'golem' ? livePlayer.golem?.name ?? 'the golem' : 'you'} and misses.`,
-    );
-  }
+  runEnemyGroupCounters(get, set, livePlayer);
 }
 
 // ----- OTA-120 Phase 3 / 4 helpers -------------------------------------

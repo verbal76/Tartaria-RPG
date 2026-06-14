@@ -14859,4 +14859,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // path instead of the farm. #7 (water): Water Bottle is now stamina-only (dropped the +2 HP from its effect, per "water
 // should only give stamina"); it already leaves an Empty Water Bottle on drink (reusable) and fills at any scene water
 // source — verified, unchanged. JS-only → 290. app/state/gameStore.ts, app/data/items/gear.json.
-export const OTA_BUILD_ID = '2026-06-12-594';
+// OTA-595 (Unnonpentium Leash) — [fix · arbiters-line] audit #8 (dog), per player: route companion commands through
+// runEnemyGroupCounters "like a real attack". handleDogCombat's tail rolled ONE watered-down counter split ~40% dog /
+// 60% player, so spamming `bite`/`distract` let the player skip the full group retaliation that attacking yourself
+// provokes (the dog solo-farmed at near-zero risk). Now commanding Rocky runs the FULL enemy volley on the PLAYER — the
+// dog is no longer hit by command-retaliation; the cost lands on the commander, same as a real attack. (GOLEM command
+// left as-is for now — it's a deliberate tank; routing it through player-counters would defeat its purpose. Pending a
+// decision.) JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-595';
