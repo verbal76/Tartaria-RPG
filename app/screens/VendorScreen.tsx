@@ -2,17 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
-import { getItemPreview } from '../components/itemPreview';
+import { VendorContractsModal } from '../components/VendorContractsModal';
+import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
-import { availableFactionQuests, FACTION_QUESTS } from '../engine/factionQuests';
-import { availableHunts, HUNTS } from '../engine/hunts';
-import { availableMysteries, MYSTERIES } from '../engine/mysteries';
-import { availableStorylines, STORYLINES } from '../engine/factionStorylines';
-import { getStanding } from '../engine/factions';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
 
 function rarityColor(rarity: string | null | undefined): string {
@@ -27,7 +23,7 @@ function rarityColor(rarity: string | null | undefined): string {
 type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
   | { mode: 'buy'; itemName: string; price: number }
-  | { mode: 'sell'; itemName: string; price: number }
+  | { mode: 'sell'; itemName: string; price: number; itemId?: string }
   | { mode: 'steal'; itemName: string; dc: number }
   | { mode: 'dismiss' }
   | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
@@ -50,6 +46,8 @@ export function VendorScreen() {
   const tutorialDemoVendor = useGameStore((s) => s.tutorialDemoVendor);
 
   const [mode, setMode] = useState<Mode>('buy');
+  // arb151 — vendor CONTRACTS popup (mission-board style) open/closed.
+  const [contractsOpen, setContractsOpen] = useState(false);
   const [pending, setPending] = useState<Pending>(null);
   // v2.4.1 (OTA 022) — sellSort must live ABOVE the early-return guard
   // below. The prior position (line 104) made hook count depend on
@@ -85,7 +83,7 @@ export function VendorScreen() {
   }
 
   const openBuy = (itemName: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName, price }); };
-  const openSell = (itemName: string, price: number) => { setSellQty(1); setPending({ mode: 'sell', itemName, price }); };
+  const openSell = (itemName: string, price: number, itemId?: string) => { setSellQty(1); setPending({ mode: 'sell', itemName, price, itemId }); };
 
   // OTA-178 — gate-loss warning helper. Returns the GateKind label
   // when selling THIS item would leave the player with no other
@@ -211,9 +209,15 @@ export function VendorScreen() {
     setPending(null);
   };
 
-  const preview = pending && (pending.mode === 'buy' || pending.mode === 'sell')
+  // arb150 — the SELL confirm previews the SPECIFIC instance (by id) so its
+  // rolled stats/durability match the row tapped; BUY previews the catalog row.
+  const preview = pending?.mode === 'buy'
     ? getItemPreview(pending.itemName)
-    : null;
+    : pending?.mode === 'sell'
+      ? getItemPreviewForInstance(
+          player.inventory.find((i) => i.id === pending.itemId) ?? { name: pending.itemName },
+        )
+      : null;
   const canAffordPending = pending?.mode === 'buy' ? player.tc >= pending.price : true;
   // OTA 039 — corruption-tier markup. Multiplied into every BUY
   // display price + applied for real in gameStore.buyFromVendor.
@@ -320,167 +324,21 @@ export function VendorScreen() {
           <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
         </TouchableOpacity>
         {vendor.faction && (
+          // arb151 — CONTRACTS now opens a mission-board-style popup instead of
+          // an inline tab (player preferred the Mission Board modal). It's a
+          // button, not a tab, so it never holds the active state.
           <TouchableOpacity
-            style={[styles.tab, mode === 'contracts' && styles.tabActive]}
-            onPress={() => setMode('contracts')}
+            style={styles.tab}
+            onPress={() => setContractsOpen(true)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, mode === 'contracts' && styles.tabTextActive]}>CONTRACTS</Text>
+            <Text style={styles.tabText}>CONTRACTS ▸</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-        {mode === 'contracts' ? (
-          (() => {
-            // OTA 220 — faction-less vendors (Velar Shadowblade etc.)
-            // can still offer "open contracts" — hunts/mysteries
-            // authored with factionId=null. Previously this branch
-            // returned a flat refusal. Faction quests + storylines
-            // remain factional by design (they're authored per
-            // faction) so we only fetch hunts + mysteries for
-            // unaffiliated traders. Playtester: "how come velar
-            // shadowblade doesn't have any quests? was there an
-            // update that took the quests away from the vendors?"
-            const rep = vendor.faction ? getStanding(player.factionStanding, vendor.faction) : 0;
-            const quests = vendor.faction
-              ? availableFactionQuests(
-                  vendor.faction,
-                  rep,
-                  player.activeFactionQuestIds ?? [],
-                  player.completedFactionQuestIds ?? [],
-                )
-              : [];
-            const hunts = availableHunts(
-              vendor.faction,
-              rep,
-              (player.activeHunts ?? []).map((h) => h.id),
-              player.completedHuntIds ?? [],
-            );
-            const mysteries = availableMysteries(
-              vendor.faction,
-              rep,
-              (player.activeMysteries ?? []).map((m) => m.id),
-              player.completedMysteryIds ?? [],
-            );
-            const stories = vendor.faction
-              ? availableStorylines(
-                  vendor.faction,
-                  rep,
-                  (player.activeStorylines ?? []).map((s) => s.id),
-                  player.completedStorylineIds ?? [],
-                )
-              : [];
-            const total = quests.length + hunts.length + mysteries.length + stories.length;
-            if (total === 0) {
-              const tail = vendor.faction
-                ? `Build reputation with the ${vendor.faction.replace(/_/g, ' ')} or finish what you're already carrying.`
-                : `No open contracts pending for this trader right now — check back after the next hunt cycle, or finish what you're already carrying.`;
-              return (
-                <Text style={styles.empty}>
-                  {vendor.name} has no contracts on offer for you right now. {tail}
-                </Text>
-              );
-            }
-            return (
-              <>
-                {quests.length > 0 && (
-                  <View style={styles.contractSection}>
-                    <Text style={styles.contractSectionTitle}>FACTION CONTRACTS</Text>
-                    {quests.map((q) => (
-                      <TouchableOpacity
-                        key={`fq_${q.id}`}
-                        style={styles.contractRow}
-                        onPress={() => setPending({ mode: 'accept', kind: 'faction', title: q.title, reward: `${q.reward.tc} TC, +${q.reward.rep} rep` })}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.offerStripe, { backgroundColor: '#c9a86a' }]} />
-                        <View style={styles.offerBody}>
-                          <View style={styles.offerHead}>
-                            <Text style={styles.offerName} numberOfLines={2}>{q.title}</Text>
-                            <Text style={styles.contractReward}>{q.reward.tc} TC</Text>
-                          </View>
-                          <Text style={styles.contractBody}>{q.objective}</Text>
-                          <Text style={styles.contractDesc} numberOfLines={3}>{q.description}</Text>
-                          <Text style={styles.contractAccept}>tap to accept</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-                {hunts.length > 0 && (
-                  <View style={styles.contractSection}>
-                    <Text style={styles.contractSectionTitle}>BOUNTIES</Text>
-                    {hunts.map((h) => (
-                      <TouchableOpacity
-                        key={`h_${h.id}`}
-                        style={styles.contractRow}
-                        onPress={() => setPending({ mode: 'accept', kind: 'hunt', title: h.title, reward: `${h.rewardTc} TC${h.rewardRep ? `, +${h.rewardRep} rep` : ''}` })}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.offerStripe, { backgroundColor: '#e07a5f' }]} />
-                        <View style={styles.offerBody}>
-                          <View style={styles.offerHead}>
-                            <Text style={styles.offerName} numberOfLines={2}>{h.title}</Text>
-                            <Text style={styles.contractReward}>{h.rewardTc} TC</Text>
-                          </View>
-                          <Text style={styles.contractDesc} numberOfLines={3}>{h.posterText}</Text>
-                          <Text style={styles.contractAccept}>tap to accept</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-                {mysteries.length > 0 && (
-                  <View style={styles.contractSection}>
-                    <Text style={styles.contractSectionTitle}>MYSTERIES</Text>
-                    {mysteries.map((m) => (
-                      <TouchableOpacity
-                        key={`m_${m.id}`}
-                        style={styles.contractRow}
-                        onPress={() => setPending({ mode: 'accept', kind: 'mystery', title: m.title, reward: `${m.rewardTc} TC${m.rewardRep ? `, +${m.rewardRep} rep` : ''}` })}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.offerStripe, { backgroundColor: '#b88ce0' }]} />
-                        <View style={styles.offerBody}>
-                          <View style={styles.offerHead}>
-                            <Text style={styles.offerName} numberOfLines={2}>{m.title}</Text>
-                            <Text style={styles.contractReward}>{m.rewardTc} TC</Text>
-                          </View>
-                          <Text style={styles.contractDesc} numberOfLines={3}>{m.posterText}</Text>
-                          <Text style={styles.contractAccept}>tap to accept</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-                {stories.length > 0 && (
-                  <View style={styles.contractSection}>
-                    <Text style={styles.contractSectionTitle}>STORYLINES</Text>
-                    {stories.map((s) => (
-                      <TouchableOpacity
-                        key={`s_${s.id}`}
-                        style={styles.contractRow}
-                        onPress={() => setPending({ mode: 'accept', kind: 'storyline', title: s.title, reward: `${s.rewardTc} TC, +${s.rewardRep} rep` })}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.offerStripe, { backgroundColor: '#9ec96a' }]} />
-                        <View style={styles.offerBody}>
-                          <View style={styles.offerHead}>
-                            <Text style={styles.offerName} numberOfLines={2}>{s.title}</Text>
-                            <Text style={styles.contractReward}>{s.rewardTc} TC</Text>
-                          </View>
-                          <Text style={styles.contractDesc} numberOfLines={3}>{s.posterText}</Text>
-                          <Text style={styles.contractAccept}>tap to accept</Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </>
-            );
-          })()
-        ) : mode === 'buy' ? (
+        {mode === 'buy' ? (
           vendor.offers.length === 0 ? (
             <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
           ) : (
@@ -585,12 +443,19 @@ export function VendorScreen() {
               </Text>
             ) : (
               sellable.map(({ item, price }) => {
-              const preview = getItemPreview(item.name);
+              // arb150 — instance-aware preview so the row shows THIS copy's
+              // rolled stats (AC / attribute perks / damage / resists), not the
+              // generic catalog row. Two "Bone Shoes" with different rolls now
+              // read differently, so the player can compare before selling one.
+              const preview = getItemPreviewForInstance(item);
+              // Durability shows on its own at the right, so drop it from the
+              // stat line to avoid printing it twice.
+              const statLine = preview.stats.filter((s) => !s.startsWith('Durability:'));
               return (
                 <TouchableOpacity
                   key={`sell_${item.id}`}
                   style={styles.offerRow}
-                  onPress={() => openSell(item.name, price)}
+                  onPress={() => openSell(item.name, price, item.id)}
                   activeOpacity={0.7}
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
@@ -616,6 +481,11 @@ export function VendorScreen() {
                         </Text>
                       )}
                     </View>
+                    {statLine.length > 0 && (
+                      <Text style={styles.offerStats} numberOfLines={2}>
+                        {statLine.join(' · ')}
+                      </Text>
+                    )}
                   </View>
                 </TouchableOpacity>
               );
@@ -741,6 +611,13 @@ export function VendorScreen() {
           })),
         ]}
         onRequestClose={() => setPendingEquip(null)}
+      />
+
+      {/* arb151 — vendor contracts as a mission-board-style popup. */}
+      <VendorContractsModal
+        visible={contractsOpen}
+        onClose={() => setContractsOpen(false)}
+        vendor={vendor}
       />
     </View>
   );
