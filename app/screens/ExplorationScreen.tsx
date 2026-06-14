@@ -31,6 +31,8 @@ import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
+import { availableFactionQuests } from '../engine/factionQuests';
+import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
@@ -133,6 +135,24 @@ export function ExplorationScreen() {
   const [salvageOpen, setSalvageOpen] = useState(false);
   // arb135 — Mission Board as a tappable screen (open postings + ACCEPT), not a text dump.
   const [missionBoardOpen, setMissionBoardOpen] = useState(false);
+  // arb152 — once every posting on this board has been accepted (or completed),
+  // there's nothing left to take, so the chip should come off the screen. Mirror
+  // the modal's filter (availableFactionQuests already drops active/completed).
+  const missionBoardHasPostings = useMemo(() => {
+    const board = currentScene?.missionBoard;
+    if (!board || !player) return false;
+    return availableFactionQuests(
+      board.faction,
+      getStanding(player.factionStanding ?? [], board.faction),
+      player.activeFactionQuestIds ?? [],
+      player.completedFactionQuestIds ?? [],
+    ).length > 0;
+  }, [currentScene?.missionBoard, player]);
+  // arb152 — a per-location dismiss for the Fusing Crucible chip (X on the chip).
+  // Reset whenever the location or building changes (re-entering re-shows it).
+  const [crucibleDismissed, setCrucibleDismissed] = useState(false);
+  const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${player?.hubRoomId ?? ''}`;
+  useEffect(() => { setCrucibleDismissed(false); }, [crucibleViewKey]);
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
@@ -683,7 +703,7 @@ export function ExplorationScreen() {
           of every faction Outpost; tapping reads the board's open postings into
           the feed (the rep-0 starter quests + anything the player qualifies for)
           so a brand-new character has an immediate quest on-ramp. */}
-      {currentScene?.missionBoard && (
+      {currentScene?.missionBoard && missionBoardHasPostings && (
         <TouchableOpacity
           style={styles.missionBoardBanner}
           onPress={() => setMissionBoardOpen(true)}
@@ -716,7 +736,7 @@ export function ExplorationScreen() {
           spawn macro-location). A wild fusion_bench permit (fusionPending)
           still shows it anywhere. This also keeps it off-screen for the whole
           tutorial, which runs before you've ever left. */}
-      {(player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
+      {!crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -745,7 +765,17 @@ export function ExplorationScreen() {
                 : (gate.reason ?? 'tap for details')}
             </Text>
           </View>
-          <Text style={styles.vendorBannerArrow}>›</Text>
+          {/* arb152 — dismiss the Crucible chip for this visit if you don't need
+              it. Nested touchable handles its own tap (doesn't fire the fuse);
+              'fuse' can still be typed, and re-entering re-shows the chip. */}
+          <TouchableOpacity
+            style={styles.crucibleDismiss}
+            onPress={() => setCrucibleDismissed(true)}
+            hitSlop={10}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.crucibleDismissText}>✕</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
         );
       })()}
@@ -1792,6 +1822,9 @@ const styles = StyleSheet.create({
   },
   fusionBannerStripe: { width: 4, backgroundColor: '#b88ce0', alignSelf: 'stretch' },
   fusionBannerName: { color: '#b88ce0', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  // arb152 — dismiss (✕) on the Fusing Crucible chip.
+  crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
+  crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 });
 

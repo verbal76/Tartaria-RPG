@@ -14690,4 +14690,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the vendor's faction contracts / bounties / mysteries / storylines, each with a direct tap-to-ACCEPT (availableX
 // filters active/completed so accepted work drops off and the popup stays open). app/screens/VendorScreen.tsx,
 // app/components/VendorContractsModal.tsx (new). JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-573';
+// OTA-574 (Unhexennium Tidy) — [ux · BOTH lines] two exploration-chip fixes. (1) The MISSION BOARD chip now comes off
+// the screen once every posting has been accepted/completed — it's gated on availableFactionQuests().length > 0 (same
+// filter the board modal uses), so an empty board no longer leaves a dead chip that opens to "the board is clear."
+// (2) The Fusing Crucible chip gets a dismiss (✕): tap it to clear the chip for this visit if you don't need it
+// (nested touchable, so it doesn't fire the fuse; 'fuse' can still be typed; re-entering the location/building reshows
+// it). app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-574';
