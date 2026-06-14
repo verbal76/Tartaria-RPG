@@ -14790,4 +14790,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in a row: the game log only de-dups CONSECUTIVE repeats, so a line re-emitted non-consecutively (re-entering a
 // stall, the Crucible forging the same item 4-6×) reached TTS each time. New "spoken recently" guard in
 // TTSController skips an exact line voiced within the last 30s. JS-only → 290. app/voice/TTSController.ts, gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-584';
+// OTA-585 (Unoctpentium Companion) — [feature · arbiters-line] Phase 1 of the player's ambient-Qwen redesign: decouple
+// the AI voice from events so its latency stops mattering. (1) Reactive beats are now canned-only — investigate/search/
+// rest removed from QWEN_ALLOWED_INTENTS, so those land instantly via template (no more 6-8s late reactions that get
+// cancelled by the next action anyway). (2) New maybeGenerateAmbientArbiter(): the Arbiter makes UNPROMPTED, reflective
+// companion asides (growth, the road behind, its changing read of you) via a new AMBIENT_INSTRUCTION + ctx.ambient mode.
+// Because an ambient line answers nothing, it's NEVER cancelled (no epoch check) — it runs to completion in the
+// background and voices whenever ready, however late. Fires on ~35% of peaceful actions, gated by a 45s cooldown and
+// the shared isGenerating lock (muzzled in combat). Always voiced (these are the fresh ones). Next: canned-pool
+// expansion batches (586+) to dilute the repetitive reactive templates. JS-only → 290.
+// app/engine/contextInjector.ts, app/engine/narrativeGenerator.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-585';

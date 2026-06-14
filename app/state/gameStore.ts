@@ -12743,6 +12743,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
         void narrateViaArbiter(get, set, template, parsed.intent);
       }
+      // arb163 — independently of the reactive line above, occasionally kick off
+      // an AMBIENT companion aside. It's decoupled from this action, runs in the
+      // background, and speaks when ready (its internal guards handle combat /
+      // lock / the wide cooldown). chance() just adds jitter so it doesn't fire
+      // like clockwork the instant the cooldown expires.
+      if (chance(35)) void maybeGenerateAmbientArbiter(get, set);
     }
 
     // Fire-and-forget cognitive enrichment — runs in parallel with the
@@ -26170,6 +26176,12 @@ let arbiterGenerationEpoch = 0;
 // Tight balance: short enough to feel present, long enough not to starve voice.
 const QWEN_GEN_COOLDOWN_MS = 10000;
 let lastQwenGenStartMs = 0;
+// arb163 — ambient companion lines fire at most this often. They're the
+// reflective, unprompted asides (not tied to any action), so they can run to
+// completion in the background and speak whenever ready. Spaced wide so the
+// shared voice lock is mostly free for the instant canned reactions.
+const AMBIENT_GEN_COOLDOWN_MS = 45000;
+let lastAmbientGenStartMs = 0;
 
 // Trim Qwen output back to the last sentence-terminating punctuation so we
 // don't display fragments like "...echoing in the". Looks for the final
@@ -26379,5 +26391,82 @@ async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       set({ isGenerating: false, partialArbiterText: null });
     }
+  }
+}
+
+/**
+ * arb163 — AMBIENT companion narration. The reflective counterpart to
+ * narrateViaArbiter: instead of reacting to an action, the Arbiter makes an
+ * unprompted aside about the journey. Because it answers nothing, its latency
+ * is invisible — it streams + voices whenever it finishes, however late.
+ *
+ * Crucially it is NOT cancelled by the player's next action (no epoch check).
+ * narrateViaArbiter cancels mid-flight because a stale REACTION is wrong; an
+ * ambient reflection is never stale, so we let it complete. The shared
+ * `isGenerating` flag still serialises it against reactive scene-intro
+ * generations and the voice lock — only one native-ML job runs at a time.
+ */
+async function maybeGenerateAmbientArbiter(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): Promise<void> {
+  const scene = get().currentScene;
+  const player = get().player;
+  // Muzzle in combat (no idle musing mid-fight), require the model + a free
+  // lock, and respect the wide ambient spacing.
+  if (!scene || !player || scene.enemies.length > 0) return;
+  if (!qwen.isReady() || get().isGenerating) return;
+  if (Date.now() - lastAmbientGenStartMs < AMBIENT_GEN_COOLDOWN_MS) return;
+
+  const sceneSlice: SceneSlice = {
+    location: scene.location,
+    weather: scene.weather,
+    hazard: scene.hazard,
+    enemies: scene.enemies,
+    enemyHps: scene.enemyHps,
+    vendor: scene.vendor
+      ? { name: scene.vendor.name, affiliation: scene.vendor.faction ?? undefined }
+      : null,
+  };
+  const ladder = scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
+  const ctx = buildLlmContext({
+    player,
+    scene: sceneSlice,
+    gameLog: get().gameLog,
+    ladder,
+    ambient: true,
+  });
+  const messages = buildSystemPrompt(ctx);
+  const t0 = Date.now();
+  lastAmbientGenStartMs = t0;
+  // Arm the reactive cooldown too, so a scene-intro generation doesn't pile on
+  // the lock the instant this one finishes.
+  lastQwenGenStartMs = t0;
+  set({ isGenerating: true, partialArbiterText: '' });
+  try {
+    const text = await qwen.stream(
+      messages,
+      (token: string) => {
+        const current = get().partialArbiterText ?? '';
+        set({ partialArbiterText: current + token });
+      },
+      { maxNewTokens: 32 },
+    );
+    const survivors = clampSentences(stripForeignWords(text), 1)
+      .split(/(?<=[.!?])\s+/)
+      .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
+      .filter((s) => !/^\s*they\s/i.test(s))
+      .join(' ')
+      .trim();
+    const finalText = trimToLastSentence(survivors);
+    // Ambient lines are ALWAYS voiced (no silent flag) — they're the fresh ones
+    // the player wants to hear. An empty result (model produced nothing usable)
+    // just logs and stays silent; there's no template fallback for ambient.
+    if (finalText) get().appendLog('arbiter', finalText);
+    get().appendLog('debug', `arbiter: ambient ${finalText ? '✓' : '∅'} ${Date.now() - t0}ms`);
+  } catch {
+    get().appendLog('debug', `arbiter: ambient-error ${Date.now() - t0}ms`);
+  } finally {
+    set({ isGenerating: false, partialArbiterText: null });
   }
 }

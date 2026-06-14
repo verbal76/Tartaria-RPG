@@ -11,17 +11,17 @@ describe('QWEN_ALLOWED_INTENTS', () => {
     expect(QWEN_ALLOWED_INTENTS.has('diplomacy')).toBe(true);
   });
 
-  it('includes the peaceful exploration/downtime intents (arb158 widening)', () => {
-    // Once Qwen proved STABLE on-device (Tensor G5 build 290: qwen:done,
-    // completion guard clean), the allowlist widened so the player actually
-    // hears the AI voice in normal play. investigate/search/rest are the
-    // dominant peaceful beats. The old reason investigate was muzzled — Qwen
-    // naming the wrong region ("The Borderlands" while in Tartarian Outskirts)
-    // — is now guarded by the hardened VOICE_RULES + Strict location anchor in
-    // buildSystemPrompt ("DO NOT name any location not in SYSTEM FACTS").
-    expect(QWEN_ALLOWED_INTENTS.has('investigate')).toBe(true);
-    expect(QWEN_ALLOWED_INTENTS.has('search')).toBe(true);
-    expect(QWEN_ALLOWED_INTENTS.has('rest')).toBe(true);
+  it('no longer routes the per-action peaceful beats through reactive Qwen (arb163)', () => {
+    // arb158 widened the allowlist to investigate/search/rest so the player
+    // would hear the AI voice in normal play — but on the slow v8_2 kernel a
+    // reactive line takes ~6-8s and the NEXT action cancels it before it
+    // finishes, so it almost never completed AND felt late. arb163 reverts the
+    // widening: these beats are carried by instant canned templates, and the AI
+    // voice now comes from UNPROMPTED ambient lines (maybeGenerateAmbientArbiter)
+    // that aren't tied to an action, so latency stops mattering.
+    expect(QWEN_ALLOWED_INTENTS.has('investigate')).toBe(false);
+    expect(QWEN_ALLOWED_INTENTS.has('search')).toBe(false);
+    expect(QWEN_ALLOWED_INTENTS.has('rest')).toBe(false);
   });
 
   it('includes the synthetic scene_intro intent for new-room narration', () => {

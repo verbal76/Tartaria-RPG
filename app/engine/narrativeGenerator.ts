@@ -864,23 +864,19 @@ export const USE_RELIC_FAILURE_LINES: readonly string[] = [
  * combat, the template fires immediately and no LLM call is made.
  */
 export const QWEN_ALLOWED_INTENTS: ReadonlySet<string> = new Set([
+  // arb163 — REACTIVE Qwen is now limited to scene transitions only. The
+  // dominant per-action beats (investigate / search / rest) were widened into
+  // this set in arb158, but on the slow v8_2 kernel a reactive line takes
+  // ~6-8s and the NEXT action cancels it before it finishes — so it almost
+  // never completes, yet still feels "late" because the player is waiting for
+  // a reaction to THAT action. The fix (player's idea): reactions are carried
+  // by instant canned templates; Qwen instead speaks UNPROMPTED, reflective
+  // AMBIENT lines (see maybeGenerateAmbientArbiter) that aren't tied to any
+  // event, so latency stops mattering. Scene-entry narration stays here because
+  // it fires once per transition (not spammy) and reads as arrival atmosphere.
   'travel',
   'diplomacy',
   'scene_intro',
-  // arb158 — widened once Qwen proved STABLE on-device (Tensor G5 build 290:
-  // qwen:done, completion guard clean, no SIGSEGV). The original set kept Qwen
-  // to arrivals/talk because most play was template anyway and an LLM round-trip
-  // felt slow. Now that it runs, the player wants to actually HEAR the AI voice
-  // in normal play — and the dominant peaceful beats (investigate / search /
-  // rest) are exactly where a paragraph of generated atmosphere lands well.
-  // Only the Arbiter's FLAVOR remark goes through here; the world/reward text is
-  // logged instantly and separately, so gameplay feedback is never delayed. The
-  // Combat Muzzle (no Qwen with a hostile present) and the isGenerating throttle
-  // (one generation at a time → rapid actions fall back to template) keep this
-  // from becoming chatter or piling up on the slower v8_2 kernel.
-  'investigate',
-  'search',
-  'rest',
 ]);
 
 /**
