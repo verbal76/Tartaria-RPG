@@ -14593,4 +14593,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // referentially stable. Also adds a title-screen BUILD MARKER (⟁ HAL BUILD / ⟁ ARBITER BUILD via App ID) above the
 // gem line. Identical fix shipped to BOTH HaL2001 and arbiters-line (same OTA id 564). NOTE: 563 is skipped on this
 // line — it was an arbiters-line-only diagnostic OTA. app/components/InputBox.tsx, app/screens/TitleScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-564';
+// OTA-565 (Unhexnilium Diction) — [polish] fix a double-article in the outpost-arrival narration: a location whose
+// name already starts with "The" (e.g. "The Monarch's Waystation") rendered as "...the edge of the The Monarch's
+// Waystation". narrativeGenerator now prepends "the " only when the name doesn't already lead with an article.
+// General narration fix — shipped to BOTH lines at the same OTA id 565. app/engine/narrativeGenerator.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-565';
