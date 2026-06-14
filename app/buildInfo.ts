@@ -14813,4 +14813,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New welcomeBackLine() pulls from a 5-line warm pool, each built around a constant "Welcome back, <first name>" core,
 // falling back to "friend" only if the character has no name. The 60s debounce + skipDedup are unchanged. JS-only → 290.
 // app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-587';
+// OTA-588 (Unoctoctium Hail) — [tweak · arbiters-line] the named welcome now fires on EVERY load ("and always fire").
+// Dropped the OTA-008 60s debounce from the Arbiter greeting gate — it's the companion's standing hello and the player
+// wants it guaranteed each time they re-enter, not throttled. Still skipped on an interrupted-death revival (OTA-416:
+// a revival isn't a load and already greeted them). The separate world-cue ("You step back into …") keeps its debounce.
+// app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-588';

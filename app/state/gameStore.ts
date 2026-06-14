@@ -3591,18 +3591,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // "you step back into..." line so the Arbiter is responding
       // to the player's return, not pre-announcing the scene.
       //
-      // OTA 008 — debounce. Playtester navigated away + back twice
-      // in 7 seconds and got the welcome line both times, which
-      // reads as the Arbiter cheerfully greeting the player on
-      // every screen flip. Throttle to once per WELCOME_BACK_MIN_MS
-      // (60s). The latch is module-level so it survives across
-      // loadSlotIntoGame calls within the same app session but
-      // resets on JS reload (cold start gets a fresh hello).
+      // OTA 008 had a 60s debounce so rapid screen-flips didn't re-greet.
+      // arb164 — player override: the named welcome is the companion's standing
+      // hello and must fire EVERY time they load in ("and always fire"), so the
+      // time-debounce is gone. We still skip it on an interrupted-death revival
+      // (OTA-416) — that path already greeted the player and "welcome back"
+      // reads wrong right after a death; a revival isn't a load. We still stamp
+      // lastWelcomeBackAt so the separate world-cue debounce above is unchanged.
       const now = Date.now();
-      // OTA-416 — skip the casual "welcome back" on an interrupted-death revival;
-      // the revival line above already greeted the player, and "welcome back"
-      // reads wrong right after a death.
-      if (!wasInterruptedDeath && (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS)) {
+      if (!wasInterruptedDeath) {
         // arb164 — ALWAYS greet by name now (player's non-negotiable). This is
         // the first beat after character select / on every load — a warm, named
         // companion hello, not the 1/3 arbiterAddress roll.
