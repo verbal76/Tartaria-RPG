@@ -459,6 +459,11 @@ interface CurrentScene {
    *  re-triggered every round (the ranged sneak→fire loop). Resets with the
    *  scene (a fresh encounter = a fresh drop). */
   stealthOpenerUsed?: boolean;
+  /** arb168 — set once a spontaneous investigate-ambush has sprung in this
+   *  room. Bounds the farm: a room springs at most ONE ambush per visit, so the
+   *  player can't sit on a tile spamming `investigate` to mint free trivial
+   *  enemies for stat-training + loot. Resets with the scene (leave + return). */
+  investigateAmbushUsed?: boolean;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -7602,6 +7607,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (
           currentScene.enemies.length === 0
           && !get().pendingRolls
+          && !get().currentScene?.investigateAmbushUsed   // arb168 — one per room visit
           && Math.random() < 0.06
         ) {
           const LOW_TIER = ['Gutter Rat', 'Mudling', 'Aetheric Leech', 'Mud Wasp'];
@@ -7619,6 +7625,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   activeEnemyIdx: s.currentScene.enemies.length,
                   range: 'mid',
                   enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                  investigateAmbushUsed: true, // arb168 — spent this room's one ambush
                 },
                 stepsSinceCombat: 0,
               };
@@ -13200,6 +13207,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const sceneLabel = `${currentScene.location?.name ?? ''} ${currentScene.location?.type ?? ''} ${(currentScene.location?.tags ?? []).join(' ')}`;
               const hasCover = /rubble|ruin|pillar|wreck|cathedral|forge|smith|stair|chamber|crate|wall|tunnel|vault|workshop|spire|rock|stone|column|cover|alley|husk|hull|indoor|structure|building/i.test(sceneLabel);
               const foe = enemy?.name ?? 'them';
+              // arb168 — using stealth successfully TRAINS the stealth stat, so a
+              // stealth build has a legit progression path (instead of the old
+              // investigate-ambush stat farm). Set on the success branches below.
+              let stealthSucceeded = false;
               if (openerAvailable) {
                 const roll = rollDie(20);
                 const total = roll + steMod + 3; // +3 for the drop (they're unaware)
@@ -13212,6 +13223,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
                     : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
                   get().appendLog('debug', `stealth: opener d20=${roll}+STE${steMod >= 0 ? '+' : ''}${steMod}+3 = ${total} vs DC ${dc} — UNSEEN`);
+                  stealthSucceeded = true;
                 } else {
                   get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
                   get().appendLog('debug', `stealth: opener d20=${roll} → ${total} vs DC ${dc} — SPOTTED`);
@@ -13228,6 +13240,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     ? `You break away and throw yourself into cover. By the time ${foe} find the angle, you're already gone — the next strike comes from nowhere. (+5 next attack)`
                     : `You fling a fistful of grit into ${foe}'s eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)`);
                   get().appendLog('debug', `stealth: reset WIN init ${pInit} vs ${eInit} (${hasCover ? 'cover' : 'dust'}, +5 ${rounds}r)`);
+                  stealthSucceeded = true;
                 } else {
                   set((s) => (s.player
                     ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: 'caught mid-vanish' }) } }
@@ -13239,6 +13252,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // gets to act (same as any real combat move). This is what stops
                 // sneak from being a free, spammable +5.
                 runEnemyGroupCounters(get, set, get().player ?? player);
+              }
+              // arb168 — train STE on a successful sneak (opener or reset win).
+              if (stealthSucceeded) {
+                const liveSneaker = get().player;
+                if (liveSneaker) {
+                  const tr = trainStat(liveSneaker, 'stealth', true);
+                  set((s) => (s.player ? { player: tr.player } : s));
+                  if (tr.leveled) {
+                    get().appendLog('reward', `✦ Moving unseen sharpens you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`);
+                  }
+                }
               }
             } else {
               get().appendLog(

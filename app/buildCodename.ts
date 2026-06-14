@@ -1127,6 +1127,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-591': 'Unnonunium Hush',
   '2026-06-12-592': 'Unnonbium Unseen',
   '2026-06-12-593': 'Unnontrium Patch',
+  '2026-06-12-594': 'Unnonquadium Wellspring',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

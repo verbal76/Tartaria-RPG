@@ -14852,4 +14852,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // applyFusion now clears `reservedForFusion` on drained survivors, so a multi-unit stack can't be re-fused at a free
 // Crucible without re-reserving. (5) Equip/unequip HP-pump — unequip now SUBTRACTS the gear's HP bonus from current
 // HP (was only re-clamping → free infinite heal). JS-only → 290. app/state/gameStore.ts, app/engine/itemFusion.ts.
-export const OTA_BUILD_ID = '2026-06-12-593';
+// OTA-594 (Unnonquadium Wellspring) — [fix · arbiters-line] audit follow-ups #6 + #7. #6 (investigate-ambush farm):
+// (a) one ambush per room VISIT now — new CurrentScene.investigateAmbushUsed gates the 6% spawn, so you can't sit on a
+// tile spamming `investigate` to mint free trivial enemies for stat/loot; (b) the new `sneak` action now TRAINS the
+// stealth stat on a successful opener/reset-win (trainStat 'stealth'), giving stealth builds a legit STE progression
+// path instead of the farm. #7 (water): Water Bottle is now stamina-only (dropped the +2 HP from its effect, per "water
+// should only give stamina"); it already leaves an Empty Water Bottle on drink (reusable) and fills at any scene water
+// source — verified, unchanged. JS-only → 290. app/state/gameStore.ts, app/data/items/gear.json.
+export const OTA_BUILD_ID = '2026-06-12-594';
