@@ -14725,6 +14725,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // app-wide. (2) Stop compiling the two SVE kernel variants — LlamaContext forces hasSve=false everywhere, so they're
 // never loaded; each .so embeds full ggml (several MB). .github/workflows/build-apk.yml (arm64 prop; also the disk-space
 // "No space left on device" CI fix — mv not cp + free runner disk), patches/llama.rn+0.4.8.patch (CMake drops _sve).
-// Largest remaining bundled chunk is assets/ audio ≈ 98MB (background-music mp3s) — a re-encode to lower bitrate would
-// reclaim ~40-50MB but is a quality call, left for the user.
+// (3) Audio re-encode: the 12 background-music tracks were ~175-196kbps stereo (61MB); re-encoded to 128kbps stereo
+// (transparent for ambient/background music) + stripped embedded art/metadata → 41MB, ~19MB off the APK. All 12 verified
+// to decode clean at full duration. assets/audio/*.mp3.
 export const OTA_BUILD_ID = '2026-06-12-576';
