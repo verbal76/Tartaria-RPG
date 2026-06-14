@@ -14620,4 +14620,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // danger. Rows are derived live from openContractMarkers, so a row appears when its pin does and clears the instant the
 // contract closes (the agreed "lives while it has a marker, gone when complete" behavior). app/screens/MapScreen.tsx,
 // app/engine/contractMarkers.ts (type export). JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-569';
+// (570 "Unhexpentium Rewarm" is arbiters-line-only — a Qwen foreground re-warm lifecycle fix; skipped here.)
+// OTA-571 (Unhexhexium Sweep) — [batch · BOTH lines] nine gameplay/UX fixes from a play log, none Qwen-specific:
+// (1) GOLEM SUMMON — tapping a golem in the craft menu opened a confirm modal that dispatches the summon and bounces to
+//     exploration for the live d20+INT roll, instead of copying "summon X golem" to the clipboard to paste back.
+// (2) COLLECTIBLE REVEAL — the first collectible ever found raises a popup (what it is + a button straight to the
+//     Collectibles tab) so the system is discoverable; later finds just log as before.
+// (3) RECLAIMER'S ROPE EXPLOIT — Legacy of Power (giant once-a-day full mend) no longer targets 'rope'-tagged gear; a
+//     climbing rope was always the most-worn item, making the mend an infinite-rope/free-climb engine.
+// (4) CLIMB STAMINA — verified already correct (per-tier spend up + down); no change.
+// (5) DOG (ROCKY) — a BLOCKED dog button no longer dispatches an empty 'bite' (no-op with no roll); it explains why. The
+//     bite/distract picker is a BLOCKING modal so a mis-tap on INVENTORY mid-pick can't drop the action.
+// (6) ENEMY DETAIL — tap an enemy portrait → full-detail popup (traits, resist/weak/deals, active effects) → dismiss.
+// (7) SELL GEAR — looted weapons/armor fall back to inferWeapon/inferArmor when the catalog misses, so they carry a real
+//     rarity + durability (were 'rarity: undefined' → flat 1 TC). Selling weapons/armor is otherwise already supported.
+// (8) FORGED-WEAPON NAME — a Crucible fuse raises a reveal naming the exact weapon + rarity and where it landed.
+// (9) CAPITAL MAIN-QUEST NUDGE — first time in a Lost Capital with an unclaimed Core, the Arbiter names the ★ SUMMON
+//     affordance (Contracts → Primary Objective). (Faction outposts like Varakush are NOT capitals.)
+// New: app/components/DiscoveryRevealModal.tsx. Touched: app/state/gameStore.ts, App.tsx, app/components/InputBox.tsx,
+// app/components/EnemyPanel.tsx, app/screens/CraftingScreen.tsx, app/engine/itemDefaults.ts (import). JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-571';

@@ -163,6 +163,7 @@ import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } f
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
+import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
@@ -2540,6 +2541,18 @@ interface GameStore {
   confirmCraftSubstitution: () => void;
   /** Dismiss the substitution prompt without crafting. */
   cancelCraftSubstitution: () => void;
+  /** arb142 — a "you just got something notable" reveal overlay. Used for the
+   *  first-time pickup of a collectible (so the player learns the Collectibles
+   *  screen exists) and for a Crucible-forged weapon (so the new item's NAME is
+   *  surfaced front-and-center instead of buried in a 5,000-item pack). `cta`,
+   *  when present, is a button that jumps to a screen (e.g. Contracts). */
+  discoveryReveal: {
+    title: string;
+    body: string;
+    cta?: { label: string; screen: string };
+  } | null;
+  /** Dismiss the discovery reveal overlay. */
+  dismissDiscoveryReveal: () => void;
   /** OTA-211 — pick a stat for the Aether Dust +3 buff, apply it,
    *  consume the pending food + 1 Aether Dust, close the picker. */
   selectAetherStat: (stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma') => void;
@@ -2671,6 +2684,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   fusionCatalystPrompt: null,
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
+  discoveryReveal: null,
+  dismissDiscoveryReveal() {
+    set({ discoveryReveal: null });
+  },
   pendingTravelConfirm: null,
   pendingGolemNaming: false,
   hydrated: false,
@@ -2918,6 +2935,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Found ${frag.title} — ${storyLabel}. (open Contracts → Collectibles to read)`,
     );
+    // arb142 — surface the find as a reveal overlay with a button straight to the
+    // Collectibles screen, so the player learns the system exists (the log line
+    // alone scrolled past unnoticed — "there should be a pop-up… tap to open
+    // collectible screen"). Only the FIRST collectible ever raises the overlay;
+    // after that the player knows where they live and the log line carries it.
+    const totalOwned = (get().player?.collectables ?? []).length;
+    if (totalOwned <= 1) {
+      set({
+        discoveryReveal: {
+          title: 'Collectible found',
+          body: `You found "${frag.title}" — a fragment of ${storyLabel}'s story.\n\nCollectibles are scraps of lost lives scattered across Tartaria. Gather a character's set to read their whole tale. They live on the Collectibles tab of the Contracts screen — you can read them any time, then back out and keep playing.`,
+          cta: { label: 'Open Collectibles', screen: 'contracts' },
+        },
+      });
+    }
     void get().persist();
   },
 
@@ -14179,6 +14211,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!alreadyRecovered) {
           const hint = mq.coreGateHint(playerNow?.factionId ?? '', locationId);
           if (hint) get().appendLog('arbiter', hint);
+          // arb144 — name the SUMMON affordance the FIRST time the player ever
+          // stands in a Lost Capital with an unclaimed Core. The Core Guardian
+          // is challenged via the ★ SUMMON chip on the Contracts → Primary
+          // Objective card — but nothing ever pointed there, so a player wandered
+          // a capital looking for a "summon button" and concluded the main quest
+          // "didn't tie in." (Note: faction outposts like Varakush are NOT
+          // capitals and have no Core — that confusion is the same gap.) `seen`
+          // was read BEFORE this Capital was appended, so length 0 = first ever.
+          if (seen.length === 0) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter's voice drops. "This is one of the nine Lost Capitals — and it holds a Core, the whole reason we walk. Open CONTRACTS, find the Primary Objective, and press ★ SUMMON to call up this place's Guardian. Put it down and the Core is yours. That is the main road; everything else is a detour."`,
+            );
+          }
         }
       }
     }
@@ -14688,8 +14734,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stamp = Date.now();
     let n = 0;
     for (const wName of carries.weapons ?? []) {
-      const w = findWeaponByName(wName);
-      const base = w?.baseDurability ?? 10;
+      // arb145 — fall back to inferWeapon when the looted name isn't in the
+      // catalog, so the drop carries a real rarity (Common/Uncommon) + tags
+      // instead of `rarity: undefined`. Undefined-rarity gear sold for a flat
+      // 1 TC and read as untiered — part of why looted weapons/armor felt
+      // "unsellable" to the player. inferWeapon never returns null.
+      const w = findWeaponByName(wName) ?? inferWeapon(wName);
+      const base = w.baseDurability ?? 10;
       // OTA-363 — a looted blade sometimes comes already coated (the
       // owner was running it dirty).
       const lootCoat = rollLootCoating(wName);
@@ -14697,15 +14748,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         id: `ko_${stamp}_${n++}`,
         name: wName,
         kind: 'weapon',
-        rarity: w?.rarity,
+        rarity: w.rarity,
         quantity: 1,
-        tags: [...(w?.tags ?? []), 'loot'],
+        tags: [...(w.tags ?? []), 'loot'],
         durability: { current: Math.max(1, Math.round(base * durFrac)), max: base },
         ...(lootCoat ? { coating: lootCoat } : {}),
       });
     }
     for (const aName of carries.armor ?? []) {
-      const a = findArmorByName(aName);
+      // arb145 — same fallback for armor. inferArmor CAN return null (a name
+      // with no armor cue at all), so keep the optional chaining as a final
+      // guard, but prefer the inferred row for rarity/durability/tags.
+      const a = findArmorByName(aName) ?? inferArmor(aName);
       const base = a?.baseDurability ?? 10;
       grants.push({
         id: `ko_${stamp}_${n++}`,
@@ -19719,6 +19773,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (result.stats.special) {
       get().appendLog('arbiter', `The Arbiter studies it. "${result.stats.special}"`);
     }
+    // arb142 — name the forged weapon front-and-center. The reward line scrolled
+    // past and the player couldn't find the new item in a huge pack ("it didn't
+    // give me the name… my inventory of 5,000 weapons"). This reveal states the
+    // exact name + rarity and where it landed.
+    set({
+      discoveryReveal: {
+        title: 'Forged at the Crucible',
+        body: `The Crucible hands you a ${fused.rarity ?? 'Rare'} weapon:\n\n${fused.name}\n\nIt's in your pack now — sort Inventory by Newest (or search "${fused.name}") to find and equip it.`,
+      },
+    });
     void get().persist();
   },
 
@@ -19799,13 +19863,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         let worstIdx = -1; let worstFrac = 1;
         player.inventory.forEach((it, i) => {
           const d = it.durability;
+          // arb141 — climbing ropes ('rope'-tagged) are a CONSUMABLE climbing
+          // resource that must wear out and be re-spliced/re-bought. A rope takes
+          // the most beating of anything in the pack (every climb tier), so it was
+          // ALWAYS the most-worn item — making this once-a-day mend an infinite-rope
+          // engine: free, eternal climbing with no stamina/durability cost (the
+          // player flagged the double-gain). Skip ropes so the mend lands on real
+          // gear and the rope stays a resource you actually spend.
+          if ((it.tags ?? []).includes('rope')) return;
           if (d && d.max > 0 && d.current < d.max) {
             const f = d.current / d.max;
             if (f < worstFrac) { worstFrac = f; worstIdx = i; }
           }
         });
         if (worstIdx < 0) {
-          get().appendLog('world', `${def.name}: nothing in your pack needs mending. The Aether has nowhere to go.`);
+          get().appendLog('world', `${def.name}: nothing in your pack needs mending. The Aether has nowhere to go. (Climbing rope can't be channeled — splice or replace it instead.)`);
           applied = false;
         } else {
           const item = player.inventory[worstIdx]!;

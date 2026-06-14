@@ -33,6 +33,7 @@ import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
+import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
@@ -528,6 +529,9 @@ export default function App() {
       </SilentBoundary>
       <SilentBoundary tag="CallDogModal">
         <CallDogModal />
+      </SilentBoundary>
+      <SilentBoundary tag="DiscoveryRevealModal">
+        <DiscoveryRevealModal />
       </SilentBoundary>
       <SilentBoundary tag="AetherStatPickerModal">
         <AetherStatPickerModal />
