@@ -14584,4 +14584,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Reset AI in Settings; (5) re-assert the disable from the STANDING count each boot so a cleared flag can't let Qwen
 // attempt again. Template narration is fully playable; Kokoro voice unaffected. The general init guard (OTA-558) +
 // clearInFlightBreadcrumbs are kept. app/diagnostics/mlHealth.ts, App.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-562';
+// OTA-563 (Unpentoctium Lens) — [ARBITERS-LINE ONLY · diagnostic] capture the React COMPONENT STACK on a screen-render
+// crash so the copyable bug report names the EXACT looping component. Build 284 (SVE fix) confirmed Qwen loads + runs
+// crash-free on the Tensor G5 (sveUsed=false, kernel=v8_4_fp16_dotprod_i8mm, completion guard clean), BUT a separate
+// "Maximum update depth exceeded" render loop still bricks NEW-character start (it correlates with Qwen ENABLED, but is
+// a JS setState loop caught by ScreenErrorBoundary, not the native crash). The crashed-save report showed only
+// "stage: screen-render" with no clue WHICH component. Now ScreenErrorBoundary.componentDidCatch reads the second
+// errorInfo arg and captureActiveCrashSave records error message + componentStack into the same CRASHED SAVE block —
+// so one pasted log pinpoints the faulting component for a targeted fix. Publishes ONLY to the arbiters-line channel.
+// app/diagnostics/crashSave.ts, App.tsx. JS-only OTA. (Numbering is arbiters-line-local; the real fix will get its own
+// HaL2001 OTA on promotion.)
+export const OTA_BUILD_ID = '2026-06-12-563';

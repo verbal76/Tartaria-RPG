@@ -1794,6 +1794,15 @@ The entries below are retained as the shipped-batch record.
 >    Commit message kept free of the `[build-aab]` token so the resolver lands on the
 >    APK profile, not a production AAB.
 > 6. **Still queued #2:** confirm the S26 save behaves once the DB cap is on-device.
+> 7. **Build 284 result (2026-06-14 first run):** SVE fix CONFIRMED — `qwen:done`,
+>    `Qwen kernel variant: rnllama_v8_4_fp16_dotprod_i8mm`, `sveRaw=true sveUsed=false`,
+>    completion guard clean, no native crash. Captured device signature for the upstream
+>    PR: `soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=36 kernel=6.6.102-android15-8-…`.
+>    BUT a SEPARATE "Maximum update depth exceeded" render loop still bricks NEW-character
+>    start (JS setState loop caught by ScreenErrorBoundary, correlates with Qwen ENABLED —
+>    NOT the native crash). **OTA-563 "Unpentoctium Lens"** (arbiters-line ONLY) instruments
+>    `ScreenErrorBoundary` to record the React `componentStack` into the CRASHED SAVE report
+>    so the next reproduction names the looping component. Awaiting a paste to scope the fix.
 >
 > ---
 > **🔧 QUEUED FOR THE NEXT NATIVE BUILD (whenever one is fired — NOT OTA-able):**

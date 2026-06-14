@@ -598,18 +598,24 @@ class ScreenErrorBoundary extends React.Component<
   static getDerivedStateFromError(error: Error) {
     return { error };
   }
-  componentDidCatch(error: Error) {
+  componentDidCatch(error: Error, errorInfo: { componentStack?: string }) {
     // Surface to the JS log so the next bug report COPY ALL captures it.
     // eslint-disable-next-line no-console
-    console.warn('ScreenErrorBoundary caught:', error?.message, error?.stack);
+    console.warn('ScreenErrorBoundary caught:', error?.message, errorInfo?.componentStack);
     // OTA-343 — a screen render crash is also a crash; capture the active
     // save bytes so COPY CRASHED SAVE can export them next launch. The
     // ScreenErrorBoundary shows a recovery card (not a process death), but
     // the save that drove the bad render is exactly what we want for repro.
+    // arb130 — ALSO capture the error message + React component stack, so the
+    // crashed-save report names the EXACT component that faulted/looped (e.g.
+    // pinning "Maximum update depth exceeded" to its screen/overlay) — no adb.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const cs = require('./app/diagnostics/crashSave');
-      void cs.captureActiveCrashSave('screen-render');
+      void cs.captureActiveCrashSave('screen-render', {
+        error: (error?.message ?? String(error)).slice(0, 300),
+        componentStack: (errorInfo?.componentStack ?? '').slice(0, 1800),
+      });
     } catch { /* ignore */ }
   }
   reset = () => this.setState({ error: null });
