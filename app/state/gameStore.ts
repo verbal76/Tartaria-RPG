@@ -453,6 +453,12 @@ interface CurrentScene {
   sceneBuilding?: string | null;
   /** Distance from the player to the enemy group. Null when peaceful. */
   range: CombatRange | null;
+  /** arb168 — set once the player has used (or blown) their one free stealth
+   *  OPENER this encounter. After that, sneaking is the initiative-gambit RESET
+   *  that costs a turn (the enemy group counters), so the opener can't be
+   *  re-triggered every round (the ranged sneak→fire loop). Resets with the
+   *  scene (a fresh encounter = a fresh drop). */
+  stealthOpenerUsed?: boolean;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -13165,6 +13171,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // STE scales every roll, so the stealth stat finally earns its keep.
             if (currentScene.enemies.length > 0) {
               const livePlayer = get().player;
+              // arb168 — already unseen? Don't let re-sneaking refresh/restack the
+              // buff (the old Math.max refresh meant it never decayed). Strike first.
+              const alreadyStealthed = (livePlayer?.statusEffects ?? []).some(
+                (e) => e.kind === 'stealthed' && e.remainingRounds > 0,
+              );
+              if (alreadyStealthed) {
+                get().appendLog('world', `You're already in the shadows — strike before the moment passes.`);
+                break;
+              }
               const enemy = activeEnemy(currentScene);
               const ste = livePlayer ? (effectiveStats(livePlayer).stealth ?? 5) : 5;
               const steMod = Math.round((ste - 10) / 2);
@@ -13172,13 +13187,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // harder to slip). Kept small so STE stays the deciding factor.
               const enemyAware = 2 + Math.floor((currentScene.location?.danger ?? 2) / 2);
               const engaged = currentScene.range === 'close';
+              // arb168 — the free OPENER is available only when UNENGAGED *and* not
+              // yet used this encounter. Otherwise it's the RESET: an initiative
+              // gamble that COSTS your turn (the enemy group counters), which kills
+              // the ranged sneak→fire loop that kept the player at mid range.
+              const openerAvailable = !engaged && !currentScene.stealthOpenerUsed;
+              // Mark the drop spent either way — they're alert to you now.
+              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, stealthOpenerUsed: true } } : s));
               // Cover heuristic — concealment-rich rooms let you dive for it; open
               // ground leaves only a fistful of grit to throw. Cosmetic + a small
               // mechanical edge (cover holds the buff a round longer).
               const sceneLabel = `${currentScene.location?.name ?? ''} ${currentScene.location?.type ?? ''} ${(currentScene.location?.tags ?? []).join(' ')}`;
               const hasCover = /rubble|ruin|pillar|wreck|cathedral|forge|smith|stair|chamber|crate|wall|tunnel|vault|workshop|spire|rock|stone|column|cover|alley|husk|hull|indoor|structure|building/i.test(sceneLabel);
               const foe = enemy?.name ?? 'them';
-              if (!engaged) {
+              if (openerAvailable) {
                 const roll = rollDie(20);
                 const total = roll + steMod + 3; // +3 for the drop (they're unaware)
                 const dc = 10 + enemyAware;
@@ -13213,6 +13235,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('world', `${foe} reads the move before you finish it — you break contact a beat too slow and leave yourself open. Their next strike has the advantage.`);
                   get().appendLog('debug', `stealth: reset LOSE init ${pInit} vs ${eInit} — surprised applied`);
                 }
+                // arb168 — the RESET costs your action: the whole enemy group
+                // gets to act (same as any real combat move). This is what stops
+                // sneak from being a free, spammable +5.
+                runEnemyGroupCounters(get, set, get().player ?? player);
               }
             } else {
               get().appendLog(
@@ -19283,7 +19309,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...(hpDelta !== 0
                 ? (() => {
                     const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
-                    return { hpMax: newMax, hp: Math.max(1, Math.min(s.player.hp ?? 1, newMax)) };
+                    // arb168 — actually SUBTRACT the removed gear's HP bonus from
+                    // current HP (hpDelta is negative here), mirroring the equip
+                    // bake-in. The old code only re-clamped `hp` to the new max, so
+                    // equipping +HP gear while wounded then unequipping banked the
+                    // bonus as free current HP — a repeatable infinite heal.
+                    return { hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) };
                   })()
                 : {}),
             },

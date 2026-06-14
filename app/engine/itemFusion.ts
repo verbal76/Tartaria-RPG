@@ -586,7 +586,12 @@ export function applyFusion(
   const drained = inventory
     .map((i) => {
       if (!inputIds.has(i.id)) return i;
-      return { ...i, quantity: Math.max(0, i.quantity - 1) };
+      // arb168 — clear the reservation on whatever survives the drain. Without
+      // this, a multi-unit reserved stack (e.g. Shrike Claw ×3) stayed flagged
+      // `reservedForFusion`, so pressing fuse again at a free outpost/market
+      // Crucible re-drained the SAME stacks and minted another identical Rare —
+      // the "4 weapons from 4 items" dupe. Forcing a re-reserve per batch closes it.
+      return { ...i, quantity: Math.max(0, i.quantity - 1), reservedForFusion: false };
     })
     .filter((i) => i.quantity > 0);
 

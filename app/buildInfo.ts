@@ -14844,4 +14844,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // way you spend your action, so it can't be spammed. STE scales every roll, so the stealth stat finally matters; cover
 // vs dust keys off the room (concealment-rich scenes let you dive). Approach keeps its 'close the distance' job — the
 // unseen opener rides on 'sneak'. JS-only → 290. app/state/gameStore.ts, app/engine/parser.ts.
-export const OTA_BUILD_ID = '2026-06-12-592';
+// OTA-593 (Unnontrium Patch) — [fix · arbiters-line] close 5 exploits found by the multi-agent audit. (1) `sneak` was
+// a FREE action — the reset path (engaged, or after the one-shot opener) now runs runEnemyGroupCounters so it costs a
+// turn. (2) Ranged sneak→fire loop — the free OPENER is now once-per-encounter (new CurrentScene.stealthOpenerUsed);
+// after that, sneaking at any range is the initiative gamble that provokes a counter. (3) `stealthed` refresh-spam —
+// added an already-stealthed guard (no re-apply while active). (4) Crucible DUPE (your "4 weapons from 4 items") —
+// applyFusion now clears `reservedForFusion` on drained survivors, so a multi-unit stack can't be re-fused at a free
+// Crucible without re-reserving. (5) Equip/unequip HP-pump — unequip now SUBTRACTS the gear's HP bonus from current
+// HP (was only re-clamping → free infinite heal). JS-only → 290. app/state/gameStore.ts, app/engine/itemFusion.ts.
+export const OTA_BUILD_ID = '2026-06-12-593';
