@@ -27,6 +27,7 @@ import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
 import { splitSentences } from './sentenceSplitter';
 import { padSilence } from './audioPad';
 import { setMusicDuck } from '../audio/AudioManager';
+import { runExclusiveNativeMl } from '../ai/nativeMlLock';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -138,16 +139,17 @@ const queue: QueuedUtterance[] = [];
 // (surfaced as "[speak] [object Object]") and the affected chunks get
 // skipped — the "skipping sentences" report. The crossfade look-ahead
 // prefetch fires inference for upcoming chunks while one is playing, which
-// could overlap the next chunk's inference. Funnel ALL forward() calls
-// through this single promise chain so prefetch-ahead still happens (during
-// playback) but never two inferences run simultaneously.
-let inferenceChain: Promise<unknown> = Promise.resolve();
+// could overlap the next chunk's inference. arb159 — funnel ALL forward() calls
+// through the SHARED native-ML lock (runExclusiveNativeMl) so prefetch-ahead
+// still happens during playback, never two synths run at once, AND a synth
+// never overlaps a Qwen completion (the two together crashed Tensor G5).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function inferSerial(model: any, text: string, rate: number): Promise<Float32Array | null> {
-  const run = inferenceChain.then(() => model.forward(text, rate));
-  // Keep the chain alive whether this inference resolves or rejects.
-  inferenceChain = run.then(() => undefined, () => undefined);
-  return run as Promise<Float32Array | null>;
+  // arb159 — route Kokoro synthesis through the SHARED native-ML lock (not the
+  // voice-only inferenceChain) so a synth never overlaps a Qwen completion. Two
+  // heavy native-ML workloads at once SIGSEGV'd the process on Tensor G5. The
+  // shared lock still serializes voice-vs-voice (it's one global FIFO).
+  return runExclusiveNativeMl(() => model.forward(text, rate)) as Promise<Float32Array | null>;
 }
 let currentlySpeaking: QueuedUtterance | null = null;
 let currentSound: Audio.Sound | null = null;

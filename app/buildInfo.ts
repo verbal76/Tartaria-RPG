@@ -14736,4 +14736,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hostile present) + the isGenerating throttle (one generation at a time → rapid actions fall back to template) keep it
 // from spamming or piling up on the slower v8_2 kernel. JS-only — reaches build 290 over OTA, no new APK needed. Look
 // for `arbiter: qwen ✓ <ms>ms` on investigate/travel/rest beats. app/engine/narrativeGenerator.ts.
-export const OTA_BUILD_ID = '2026-06-12-577';
+// OTA-578 (Unsepttrium Serial) — [fix+diagnostic · arbiters-line] serialize the two heavy native-ML workloads so they
+// never run at once. The OTA-577 widening let Qwen finally run a completion on v8_2 — and it did so CONCURRENTLY with a
+// Kokoro TTS synth for the first time; the process SIGSEGV'd with a Qwen completion crash AND a Kokoro voice crash
+// co-flagged on the SAME launch. New app/ai/nativeMlLock.ts is one global FIFO chain that BOTH the Qwen completion
+// (LlamaRuntime) and the Kokoro forward() (PiperTTSManager) funnel through, so a generation and a synth can never
+// overlap. This FIXES the crash if it was contention; if Qwen STILL crashes with nothing else running, that's the
+// definitive proof v8_2 generation itself faults (voice exonerated). Cost: the spoken line lands after the model
+// finishes generating it (natural order). To test: Settings → Reset AI (Qwen is in a 5-boot cooldown), keep voice ON,
+// play an investigate/travel/rest run, watch for `arbiter: qwen ✓` with no crash. JS-only — reaches build 290 over OTA.
+// app/ai/nativeMlLock.ts (new), app/ai/generation/LlamaRuntime.ts, app/voice/PiperTTSManager.ts.
+export const OTA_BUILD_ID = '2026-06-12-578';

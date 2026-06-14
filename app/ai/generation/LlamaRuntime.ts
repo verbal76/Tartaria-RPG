@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import { runExclusiveNativeMl } from '../nativeMlLock';
 
 // ---------------------------------------------------------------------------
 // LlamaRuntime — thin wrapper around the llama.rn native module
@@ -213,7 +214,10 @@ export class LlamaRuntime {
       markDone = ml.markQwenCompletionDone;
     } catch { /* guard module unavailable — proceed without the breadcrumb */ }
     try {
-      const result = await this.context.completion(
+      // arb159 — run the completion through the shared native-ML lock so it
+      // never overlaps a Kokoro TTS synth (the two heavy native workloads
+      // contending crashed the process on Tensor G5).
+      const result = await runExclusiveNativeMl(() => this.context!.completion(
         {
           prompt,
           n_predict: opts.maxTokens ?? 120,
@@ -230,7 +234,7 @@ export class LlamaRuntime {
               }
             }
           : undefined,
-      );
+      ));
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.
       return (assembled || result.text || '').trim();
