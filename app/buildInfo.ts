@@ -14607,4 +14607,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // name already starts with "The" (e.g. "The Monarch's Waystation") rendered as "...the edge of the The Monarch's
 // Waystation". narrativeGenerator now prepends "the " only when the name doesn't already lead with an article.
 // General narration code — shipped to BOTH lines. app/engine/narrativeGenerator.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-565';
+// OTA-566 (Unhexunium Tell) — [diagnostic · arbiters-line] make the log say outright which Arbiter lines are
+// Qwen-generated vs template, and why. narrateViaArbiter now logs `[debug] arbiter: template (reason=qwen-not-ready |
+// busy | combat | intent-not-allowed:<intent> | no-scene)` on the template path, and `[debug] arbiter: qwen ✓ <ms>ms
+// (intent=<intent>)` on a real generation (with `, empty→template` if the cleaned output was empty), plus
+// `arbiter: qwen-error <ms>ms → template` on a generation failure. Turns "is this line AI or template?" from a
+// latency/wording guess into an explicit log line. Qwen only ever fires for intents travel/diplomacy/scene_intro,
+// out of combat, model-ready — so most lines correctly read `intent-not-allowed`. app/state/gameStore.ts. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-566';

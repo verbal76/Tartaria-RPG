@@ -26149,12 +26149,21 @@ async function narrateViaArbiter(
   // equip etc. is gone.
   const intentAllowsQwen = QWEN_ALLOWED_INTENTS.has(intent);
   if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen) {
+    // arb134 — name WHY this turn took the template path, so a pasted log shows
+    // unambiguously which Arbiter lines are AI-generated vs template (and why the
+    // rest weren't). qwen-not-ready / busy / combat / intent-not-allowed:<intent>.
+    const reason = !qwen.isReady() ? 'qwen-not-ready'
+      : get().isGenerating ? 'busy'
+      : inCombat ? 'combat'
+      : `intent-not-allowed:${intent}`;
+    get().appendLog('debug', `arbiter: template (reason=${reason})`);
     if (trimmed) get().appendLog('arbiter', trimmed);
     return;
   }
   const state = get();
   const player = state.player;
   if (!player || !scene) {
+    get().appendLog('debug', 'arbiter: template (reason=no-scene)');
     if (trimmed) get().appendLog('arbiter', trimmed);
     return;
   }
@@ -26182,6 +26191,7 @@ async function narrateViaArbiter(
   });
   const messages = buildSystemPrompt(ctx);
   const myEpoch = ++arbiterGenerationEpoch;
+  const t0 = Date.now(); // arb134 — Qwen generation latency for the debug marker
   set({ isGenerating: true, partialArbiterText: '' });
   try {
     // Token budgets matched to the prompts:
@@ -26225,10 +26235,17 @@ async function narrateViaArbiter(
       .join(' ')
       .trim();
     const finalText = trimToLastSentence(survivors) || trimmed;
+    // arb134 — mark the AI-generated line + its latency so a pasted log shows it
+    // outright (a Qwen line lands hundreds-to-thousands of ms after its trigger;
+    // a template lands in the same millisecond). `usedFallback` flags the rare
+    // case where the cleaned model output was empty and the template carried it.
+    const usedFallback = finalText === trimmed;
     get().appendLog('arbiter', finalText);
+    get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${usedFallback ? ', empty→template' : ''})`);
   } catch {
-    if (myEpoch === arbiterGenerationEpoch && trimmed) {
-      get().appendLog('arbiter', trimmed);
+    if (myEpoch === arbiterGenerationEpoch) {
+      get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
+      if (trimmed) get().appendLog('arbiter', trimmed);
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the
