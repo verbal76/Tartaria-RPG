@@ -703,3 +703,6 @@ jobs:
 
           ### Install
           ${INSTALL_NOTE}"
+
+# arb172 trigger-touch — re-fire the production AAB with [build-aab] LEADING the
+# commit first line (the earlier trailing-marker commit fell through to preview).

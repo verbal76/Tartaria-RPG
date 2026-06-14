@@ -251,3 +251,7 @@ jobs:
             --non-interactive \
             --no-wait \
             $AUTOSUBMIT
+
+# arb172 trigger-touch — re-fire the production (TestFlight) IPA with [build-ios]
+# LEADING the commit first line. The prior trailing-marker commit selected the
+# preview profile (no internal-distribution creds) and failed; OTA-302 same fix.
