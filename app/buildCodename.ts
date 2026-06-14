@@ -1099,6 +1099,8 @@ const CODENAMES: Record<string, string> = {
   // 563 was an arbiters-line-only diagnostic OTA (Unpentoctium Lens); skipped here.
   '2026-06-12-564': 'Unpentennium Latch',
   '2026-06-12-565': 'Unhexnilium Diction',
+  // 566 'Unhexunium Tell' is arbiters-line-only (Qwen-vs-template debug marker); skipped here.
+  '2026-06-12-567': 'Unhexbium Board',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

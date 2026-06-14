@@ -14597,4 +14597,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // name already starts with "The" (e.g. "The Monarch's Waystation") rendered as "...the edge of the The Monarch's
 // Waystation". narrativeGenerator now prepends "the " only when the name doesn't already lead with an article.
 // General narration fix — shipped to BOTH lines at the same OTA id 565. app/engine/narrativeGenerator.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-565';
+// OTA-567 (Unhexbium Board) — [ux] the outpost MISSION BOARD chip now opens a SCREEN instead of dumping the postings
+// into the log. New MissionBoardModal lists the faction's open postings (title · objective · reward) with a tappable
+// ACCEPT on each (same acceptFactionQuest path the typed command used); accepted postings drop off the list. Also
+// removes the board-reprint spam (the chip no longer re-dumps text on each tap). General UX feature — mirrored to BOTH
+// lines at the same OTA id 567 (566 "Unhexunium Tell" is skipped here — it's the arbiter-only Qwen-vs-template debug
+// marker, which stays on the arbiter line). app/components/MissionBoardModal.tsx, app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-567';
