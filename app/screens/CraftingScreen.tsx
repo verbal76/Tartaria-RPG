@@ -209,6 +209,13 @@ export function CraftingScreen() {
   // play. Falls back to the cycled example phrase when nothing
   // variant-specific has been staged yet.
   const [aetherLastStaged, setAetherLastStaged] = useState<Record<string, string>>({});
+  // arb147 — golem summon confirm. Tapping a golem variant used to only copy
+  // "summon X golem" to the clipboard and make the player paste it back in
+  // exploration. Now it opens a confirm → on Summon it dispatches the action and
+  // bounces to exploration, where the d20+INT roll plays out live.
+  const [golemConfirm, setGolemConfirm] = useState<
+    { name: string; phrase: string; stats: string; fuel: string; afford: boolean } | null
+  >(null);
   // OTA-087 — per-tab search + sort state. Each tab keeps its
   // own so switching tabs doesn't clobber the user's filter.
   // Defaults are tuned per category: craft/recipes default to
@@ -481,7 +488,7 @@ export function CraftingScreen() {
                               styles.golemVariantRow,
                               pressed && styles.golemVariantRowPressed,
                             ]}
-                            onPress={() => stageDraft(phrase, null)}
+                            onPress={() => setGolemConfirm({ name: g.name, phrase, stats, fuel, afford: golemAfford })}
                           >
                             <Text style={styles.golemVariantName}>{g.name}</Text>
                             <Text style={styles.golemVariantStats}>{stats}</Text>
@@ -635,6 +642,34 @@ export function CraftingScreen() {
           },
         ]}
         onRequestClose={() => useGameStore.getState().cancelCraftSubstitution()}
+      />
+
+      {/* arb147 — golem summon confirm. Dispatches the summon and returns to
+          exploration so the d20+INT roll plays out live (no clipboard paste). */}
+      <BrandedModal
+        visible={golemConfirm !== null}
+        title="Summon a golem?"
+        body={golemConfirm
+          ? `${golemConfirm.name}\n${golemConfirm.stats}\nNeeds: ${golemConfirm.fuel}\n\n${golemConfirm.afford
+              ? 'You have the materials. Summoning rolls d20 + INT against this golem’s DC — watch the roll play out in the world view.'
+              : 'You’re short on materials — the attempt will name exactly what’s missing.'}\n\nOnly one golem at a time; dismiss the current one first if you already have it out.`
+          : undefined}
+        buttons={[
+          {
+            label: 'Summon',
+            tone: 'primary',
+            onPress: () => {
+              const phrase = golemConfirm?.phrase;
+              setGolemConfirm(null);
+              if (phrase) {
+                useGameStore.getState().submitPlayerAction(phrase);
+                setScreen('exploration');
+              }
+            },
+          },
+          { label: 'Cancel', tone: 'neutral', onPress: () => setGolemConfirm(null) },
+        ]}
+        onRequestClose={() => setGolemConfirm(null)}
       />
     </View>
   );

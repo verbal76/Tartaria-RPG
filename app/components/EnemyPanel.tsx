@@ -16,6 +16,7 @@ import type { Enemy } from '../engine/types';
 import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTraits';
 import { enemyTypeDefenses } from '../engine/crafting';
 import { enemyDamageType } from '../engine/damageTypes';
+import { BrandedModal } from './BrandedModal';
 
 /** OTA-401 — a single active status (coating DOT / infection) on an
  *  enemy, mirrored from `currentScene.enemyStatuses[i]`. Surfaced on the
@@ -127,15 +128,15 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
     [activeIndex, enemies.length, onSelectActive, cardWidth],
   );
 
-  // Tap on the panel cycles to the next enemy when more than one is staged.
-  // This is in addition to horizontal swipe paging.
-  const cycleNext = useCallback(() => {
-    if (enemies.length <= 1) return;
-    onSelectActive((activeIndex + 1) % enemies.length);
-  }, [enemies.length, activeIndex, onSelectActive]);
+  // arb146 — tapping a card opens a full-detail popup (everything the cramped
+  // corner portrait can't fit: full trait descriptions, resist/weak/deals, all
+  // active effects with turns left). Multi-enemy TARGETING stays on the
+  // horizontal swipe-pager, so tap is free to mean "show me this one." Player
+  // ask: "tap the enemy's portrait → full pop-up → dismiss back to a portrait."
+  const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity activeOpacity={enemies.length > 1 ? 0.7 : 1} onPress={cycleNext}>
+    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)}>
       {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
     </TouchableOpacity>
   );
@@ -143,11 +144,15 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   // onLayout must stay mounted even when empty so the measurement is ready the
   // instant combat starts; render the (empty) wrap and bail on the list.
   return (
+    <>
     <View style={styles.wrap} onLayout={onLayout}>
       {enemies.length === 0 ? null : enemies.length === 1 ? (
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
-        scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)
+        // arb146 — tappable to open the full-detail popup.
+        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
+          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
+        </TouchableOpacity>
       ) : (
         <FlatList
           data={enemies}
@@ -169,11 +174,61 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
           {enemies.map((_, i) => (
             <View key={i} style={[styles.dot, i === activeIndex && styles.dotActive]} />
           ))}
-          <Text style={styles.hint}>swipe to target</Text>
+          <Text style={styles.hint}>swipe to target · tap for details</Text>
         </View>
       )}
     </View>
+    {/* arb146 — full enemy detail popup. */}
+    <BrandedModal
+      visible={!!detailView}
+      title={detailView?.enemy.name ?? ''}
+      body={detailView ? enemyDetailBody(detailView) : undefined}
+      buttons={[{ label: 'Close', tone: 'primary', onPress: () => setDetailView(null) }]}
+      onRequestClose={() => setDetailView(null)}
+    />
+    </>
   );
+}
+
+// arb146 — format an enemy into the full-detail popup body. Mirrors EnemyCard's
+// AC/attack math so the popup agrees with the portrait, and adds everything the
+// cramped corner can't fit: full trait descriptions + all active effects.
+function enemyDetailBody(view: EnemyView): string {
+  const e = view.enemy;
+  const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
+  const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
+  const baseAc = isNaN(apNum) ? 8 : Math.max(5, Math.min(18, 5 + apNum));
+  const ac = Math.max(1, baseAc + traitACBonus(e.traits) + (e.boss ? 6 : 0));
+  const attackNum = parseInt(String(e.attack), 10);
+  const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(e.attack);
+  const defenses = defensesFor(e);
+  const dealsType = enemyDamageType(e);
+  const lines: string[] = [];
+  lines.push(`${e.type}${e.boss ? ' · BOSS' : ''} · ${e.rarity}`);
+  if (view.rangeLabel) {
+    lines.push(`Range: ${view.rangeLabel}${(view.inRange ?? true) ? '' : ' (out of range)'}`);
+  }
+  lines.push('');
+  lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
+  lines.push(`Attack ${atkLabel}     Damage ${e.damage}${dealsType ? ` (${cap(dealsType)})` : ''}`);
+  if (defenses.resists.length) lines.push(`Resists: ${defenses.resists.map(cap).join(', ')}`);
+  if (defenses.weaknesses.length) lines.push(`Weak to: ${defenses.weaknesses.map(cap).join(', ')}`);
+  const traits = e.traits ?? [];
+  if (traits.length) {
+    lines.push('');
+    lines.push('Traits:');
+    for (const t of traits) lines.push(`· ${describeTrait(t)}`);
+  }
+  const statuses = view.statuses ?? [];
+  if (statuses.length) {
+    lines.push('');
+    lines.push('Active effects:');
+    for (const s of statuses) {
+      const meta = STATUS_META[s.kind];
+      lines.push(`· ${meta?.label ?? s.kind} — ${s.dmgPerTurn}/turn, ${s.turnsRemaining} turn(s) left`);
+    }
+  }
+  return lines.join('\n');
 }
 
 function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth: number; hpBarWidth: number }) {

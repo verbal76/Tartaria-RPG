@@ -14648,4 +14648,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `active`, re-warm Qwen if WE parked a ready model — the GGUF is already on disk so the download step returns
 // instantly (no UI), only the ~1-5s context reload runs in the background. A user who manually disabled Qwen stays
 // disabled (guarded by a parked flag). App.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-570';
+// OTA-571 (Unhexhexium Sweep) — [batch · BOTH lines] nine gameplay/UX fixes from a play log, none Qwen-specific:
+// (1) GOLEM SUMMON — tapping a golem in the craft menu opened a confirm modal that dispatches the summon and bounces to
+//     exploration for the live d20+INT roll, instead of copying "summon X golem" to the clipboard to paste back.
+// (2) COLLECTIBLE REVEAL — the first collectible ever found raises a popup (what it is + a button straight to the
+//     Collectibles tab) so the system is discoverable; later finds just log as before.
+// (3) RECLAIMER'S ROPE EXPLOIT — Legacy of Power (giant once-a-day full mend) no longer targets 'rope'-tagged gear; a
+//     climbing rope was always the most-worn item, making the mend an infinite-rope/free-climb engine. Ropes are a
+//     resource again (wear out → re-splice/re-buy).
+// (4) CLIMB STAMINA — verified already correct (per-tier spend up + down); no change.
+// (5) DOG (ROCKY) — a BLOCKED dog button no longer dispatches an empty 'bite' (it buzzed + ran a no-op with no roll);
+//     it now just explains why. The bite/distract picker is a BLOCKING modal so a mis-tap on INVENTORY mid-pick can't
+//     drop the action ("no other outlet except those two buttons").
+// (6) ENEMY DETAIL — tap an enemy portrait → full-detail popup (traits, resist/weak/deals, all active effects) →
+//     dismiss. Multi-enemy targeting stays on the swipe-pager.
+// (7) SELL GEAR — looted weapons/armor fall back to inferWeapon/inferArmor when the catalog misses, so they carry a
+//     real rarity + durability (were 'rarity: undefined' → flat 1 TC and untiered, why they felt unsellable). The
+//     engine already permits selling weapons/armor — the only block is the "take it off first" equipped guard.
+// (8) FORGED-WEAPON NAME — a Crucible fuse raises a reveal naming the exact weapon + rarity and where it landed (the
+//     reward line scrolled past; the player couldn't find the new item in a huge pack).
+// (9) CAPITAL MAIN-QUEST NUDGE — the first time the player stands in a Lost Capital with an unclaimed Core, the Arbiter
+//     names the ★ SUMMON affordance (Contracts → Primary Objective) and that this is the main road. (Faction outposts
+//     like Varakush are NOT capitals — the same confusion the player hit.)
+// New: app/components/DiscoveryRevealModal.tsx. Touched: app/state/gameStore.ts, App.tsx, app/components/InputBox.tsx,
+// app/components/EnemyPanel.tsx, app/screens/CraftingScreen.tsx, app/engine/sellPrice.ts (unchanged — confirmed),
+// app/engine/itemDefaults.ts (import). JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-571';
