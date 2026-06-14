@@ -381,8 +381,8 @@ describe('buildSystemPrompt', () => {
     // complete sentences.
     expect(system).toContain("SECOND PERSON ONLY");
     expect(system).toMatch(/do not invent.*events/i);
-    // Peaceful instruction sets the length cap.
-    expect(system).toMatch(/35 words/);
+    // Peaceful instruction sets the length cap (arb162 — one ~20-word line).
+    expect(system).toMatch(/20 words/);
   });
 
   it('switches to the combat instruction when in_combat is true', () => {
@@ -425,11 +425,11 @@ describe('buildSystemPrompt', () => {
     };
     const system = buildSystemPrompt(ctx)[0]!.content;
     expect(system).toContain('atmospheric tone');
-    expect(system).toMatch(/35 words/);
+    // arb162 — peaceful narration is capped at ONE short ~20-word line so Qwen
+    // frees the shared voice lock fast (see contextInjector PEACEFUL_INSTRUCTION).
+    expect(system).toMatch(/20 words/);
+    expect(system).toMatch(/ONE short sentence/);
     expect(system).not.toContain('ACTIVE COMBAT');
-    // Phase 4 §1.3 — peaceful instruction must tell the model to weave
-    // exits into the description so the player learns the map.
-    expect(system).toMatch(/AVAILABLE EXITS/i);
   });
 
   it('emits the same prompt for the same context (deterministic)', () => {

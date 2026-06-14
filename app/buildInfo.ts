@@ -14770,4 +14770,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // you mostly hear unique generated lines + the occasional canned one, voice + Qwen both have room, never overlap.
 // Tunable knobs: QWEN_GEN_COOLDOWN_MS and the chance(25) canned-voice rate. JS-only; reaches build 290 over OTA.
 // app/state/gameStore.ts, app/voice/TTSController.ts.
-export const OTA_BUILD_ID = '2026-06-12-581';
+// OTA-582 (Unseptseptium Quickline) — [fix · arbiters-line] root-cause why the player "only heard Kokoro twice".
+// Qwen and Kokoro share ONE native-ML lock; Qwen's peaceful cap was 90 tokens, which on the Tensor G5 kernel
+// (~256ms/token) meant a single Arbiter remark held the lock for ~23s (log: qwen ✓ 23636ms). During that freeze
+// Kokoro can't synth, and the 2-line voice queue (MAX_QUEUED_ARBITER_LINES) drops everything but the newest two —
+// so most lines never speak, and the survivors play "after the text scrolled off". Fix: slash the token caps so a
+// generation lands in ~6-8s and the line stays one punchy beat — peaceful 90→34, combat 55→30, and the peaceful
+// prompt now asks for ONE ~20-word sentence (was TWO/35 words) so it lands on punctuation instead of truncating.
+// Net: the lock frees fast, voice keeps up, fresh Qwen lines arrive while the action is still on screen. JS-only → 290.
+// app/state/gameStore.ts, app/engine/contextInjector.ts.
+export const OTA_BUILD_ID = '2026-06-12-582';

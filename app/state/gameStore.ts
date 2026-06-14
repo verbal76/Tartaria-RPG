@@ -26312,12 +26312,17 @@ async function narrateViaArbiter(
   lastQwenGenStartMs = t0; // arb161 — start the cooldown so the voice gets the lock back
   set({ isGenerating: true, partialArbiterText: '' });
   try {
-    // Token budgets matched to the prompts:
-    //   combat instruction:  1 short sentence  ≈  35 tokens → cap 55
-    //   peaceful instruction: 2 short sentences ≈  60 tokens → cap 90
-    // Plus headroom so the model has space to land on a terminal punctuation
-    // mark naturally before we hit the cap.
-    const maxTokens = ctx.in_combat ? 55 : 90;
+    // arb162 — Token budgets are kept TIGHT on purpose. Qwen and Kokoro share
+    // one native-ML lock, and on the Tensor G5 kernel each token costs ~256ms,
+    // so the old 90-token cap meant a single remark held the lock for ~23s —
+    // during which Kokoro could not speak and the 2-line voice queue dropped
+    // everything else (the player "only heard Kokoro twice"). A one-line
+    // Arbiter aside does not need 90 tokens. Cap it so a generation lands in
+    // ~6-8s: the lock frees fast, the line is punchy, and — since Qwen lines
+    // are voiced — the player actually hears it before the action scrolls off.
+    //   combat:   1 short sentence ≈ 20 words ≈ 28 tokens → cap 30
+    //   peaceful: 1 short sentence ≈ 20 words ≈ 28 tokens → cap 34
+    const maxTokens = ctx.in_combat ? 30 : 34;
     const text = await qwen.stream(
       messages,
       (token: string) => {

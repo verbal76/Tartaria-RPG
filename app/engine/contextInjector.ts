@@ -162,10 +162,13 @@ const VOICE_RULES =
 
 const PEACEFUL_INSTRUCTION =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
-  'last action and weave the AVAILABLE EXITS naturally into your ' +
-  'description so the player learns the map as they move. You may ' +
-  'subtly reference equipped or carried items if they fit the moment. ' +
-  'Keep it to TWO short sentences — about 35 words. ' +
+  'last action; you may subtly reference an available exit or a carried ' +
+  'item if it fits the moment. ' +
+  // arb162 — ONE short line on purpose. Qwen shares the voice lock and is
+  // slow on this hardware; a longer line freezes Kokoro and arrives after
+  // the action has scrolled away. The map/exits already show in the world
+  // banner, so the Arbiter aside stays a single punchy beat.
+  'Keep it to ONE short sentence — about 20 words, no more. ' +
   VOICE_RULES;
 
 const COMBAT_INSTRUCTION =
