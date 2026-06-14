@@ -99,9 +99,12 @@ export function buildOpeningNarrative(input: {
   // P2 — setting. Hub mode anchors at the authored room; otherwise the
   // procedural location description carries the load. Preserves the
   // hub room's authored casing ("The Gate", not "The gate").
+  // arb133 — don't double-article a location whose name already starts with "The"
+  // ("The Monarch's Waystation" was rendering as "the The Monarch's Waystation").
+  const locWithThe = /^the\s/i.test(location.name) ? location.name : `the ${location.name}`;
   const p2 = hubRoomName && hubRoomDescription
-    ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of the ${location.name}. You arrive at ${hubRoomName}. ${hubRoomDescription}`
-    : `You arrive at the edge of the ${location.name}. ${location.description}`;
+    ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of ${locWithThe}. You arrive at ${hubRoomName}. ${hubRoomDescription}`
+    : `You arrive at the edge of ${locWithThe}. ${location.description}`;
 
   // P3 — atmosphere + agency hand-off. In the hub we use a hub-flavored
   // line (we're indoors at the outpost — no Rust Monks on the road),
