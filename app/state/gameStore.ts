@@ -19549,7 +19549,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => s.player
       ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), off: item.name, offId: item.id } } }
       : s);
+    const beforeThrowQty = item.quantity;
     get().submitPlayerAction(`attack with the off-hand ${item.name}`);
+    // OTA-604 — guarantee a bandolier throw spends EXACTLY ONE unit. The
+    // off-hand attack only consumes the throwable on a HIT (the consume logic
+    // is bundled into the hit-only weapon-wear path), so a MISS left the axe in
+    // hand forever — the player threw a single axe ~50 times. If the attack
+    // didn't already decrement the stack, spend one here; if it did (a hit
+    // already consumed it), don't double-spend.
+    const midItem = get().player?.inventory.find((i) => i.id === item.id);
+    const alreadySpent = !midItem || midItem.quantity < beforeThrowQty;
+    if (!alreadySpent) {
+      set((s) => s.player ? {
+        player: {
+          ...s.player,
+          inventory: s.player.inventory
+            .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+            .filter((i) => i.quantity > 0),
+        },
+      } : s);
+    }
     // Did the stack survive the throw?
     const after = get().player;
     const stillHas = !!after?.inventory.some((i) => i.id === item.id && i.quantity > 0);

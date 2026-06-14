@@ -14935,4 +14935,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog_armor; (4) CRAFT recipes for the three open-market tiers (recipes.json). Reclaimer Pattern stays drop-only (not
 // craftable / not vendor-stocked) to keep its faction-drop identity. JS-only → 290. app/engine/crafting.ts,
 // app/engine/vendors.ts, app/state/gameStore.ts, app/data/items/recipes.json.
-export const OTA_BUILD_ID = '2026-06-12-603';
+// OTA-604 (Binilquadium Spent) — [combat fix · arbiters-line] a bandolier throw now SPENDS the throwable. Player: "I had
+// 1 throwing axe in my bandolier and I threw it about 50 times." throwFromBandolier resolves a throw as an off-hand
+// ATTACK (to use the weapon's real hit/damage roll), but the attack path only consumes a throwable on a HIT — the
+// consume + auto-unequip logic (OTA-208) is bundled into the hit-only weapon-wear block, so every MISS left the axe in
+// hand. Fix: capture the stack size before the throw and, if the attack didn't already decrement it, spend one unit in
+// throwFromBandolier — so each throw costs exactly one (no double-spend on a hit, since we only top up when the attack
+// didn't consume). The existing stack-survival + bandolier-slot-clear logic then fires correctly at 0. Verified the
+// off-hand attack resolves synchronously (no pendingRolls), so the top-up can't race a deferred hit. New
+// bandolierThrowConsumes.test.ts locks it in. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-604';
