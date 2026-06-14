@@ -85,6 +85,7 @@ export function ExplorationScreen() {
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
   // OTA-508 — the Hidden Market offers the Fuse Cauldron at every stall.
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
+  const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
@@ -151,7 +152,10 @@ export function ExplorationScreen() {
   // arb152 — a per-location dismiss for the Fusing Crucible chip (X on the chip).
   // Reset whenever the location or building changes (re-entering re-shows it).
   const [crucibleDismissed, setCrucibleDismissed] = useState(false);
-  const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${player?.hubRoomId ?? ''}`;
+  // arb154 — include activeBuildingRoomId: moving between ROOMS of a building
+  // (market stalls etc.) changes only this, not activeBuildingId — so without it
+  // a dismiss in one room stuck for the whole building ("disabled in all rooms").
+  const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${activeBuildingRoomId ?? ''}|${player?.hubRoomId ?? ''}`;
   useEffect(() => { setCrucibleDismissed(false); }, [crucibleViewKey]);
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
