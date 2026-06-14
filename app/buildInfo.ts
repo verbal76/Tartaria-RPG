@@ -14924,4 +14924,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 3.4.11 → 4.1.0 — the cosmetic title-screen footer ("v4.1.0 · Year 2148") and the About "App version" line both read
 // DISPLAY_VERSION, so both move together. Native version (2.4.1 / runtimeVersion) is untouched. JS-only → 290.
 // app/screens/TitleScreen.tsx, app/buildInfo.ts.
-export const OTA_BUILD_ID = '2026-06-12-602';
+// OTA-603 (Biniltrium Harness) — [content fix · arbiters-line] dog vests were never obtainable. The four vests in
+// dogGear.json (Burlap / Riveted Leather / Aetheric Padded / Reclaimer Pattern, kind 'dog_armor') were authored in the
+// OTA-120 Phase 5 dog-armor work but never wired to ANY source — no recipe, no vendor stock, no loot — so a player
+// could equip one but never find one (orphaned catalog rows). Now sourced via all three channels: (1) lookupCraftedItem
+// resolves DOG_GEAR (construction-only; the fusion/inference guards still exclude it) so loot grants mint a real
+// equippable vest instead of a tagless 'misc'; (2) a rarity-weighted, low-rate bonus vest DROP on kills
+// (rollDogVestLootName) — the Legendary Reclaimer Pattern Vest only drops from Reclaimer-aligned kills per its catalog
+// note; (3) armor STALLS occasionally stock a rarity-weighted buyable vest (vendors.ts), and buyFromVendor mints it as
+// dog_armor; (4) CRAFT recipes for the three open-market tiers (recipes.json). Reclaimer Pattern stays drop-only (not
+// craftable / not vendor-stocked) to keep its faction-drop identity. JS-only → 290. app/engine/crafting.ts,
+// app/engine/vendors.ts, app/state/gameStore.ts, app/data/items/recipes.json.
+export const OTA_BUILD_ID = '2026-06-12-603';

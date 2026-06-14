@@ -5,6 +5,7 @@ import armorData from '../data/items/armor.json';
 import ringsData from '../data/items/rings.json';
 import materialsData from '../data/items/materials.json';
 import gearData from '../data/items/gear.json';
+import dogGearData from '../data/items/dogGear.json';
 import { pickWeighted } from './rng';
 import type { Enemy } from './types';
 import type { StallCategory } from './buildings';
@@ -208,6 +209,25 @@ function stallCatalog(category: StallCategory): StallCatalogItem[] {
   }
 }
 
+// OTA-603 — dog vests (kind 'dog_armor') as vendor stock. The four vests in
+// dogGear.json were never sourced (no recipe / vendor / loot). Armory + armor
+// stalls now occasionally carry one so a dog owner can actually buy armor for
+// the hound. The Reclaimer Pattern Vest is FACTION-gated (drop-only per its
+// catalog note "Only drops from Reclaimer-aligned encounters"), so it's
+// excluded from the open-market pool here.
+interface DogVestRow { name: string; rarity?: string; acBonus?: number; baseDurability?: number; faction?: string; tags?: string[] }
+const BUYABLE_DOG_VESTS: DogVestRow[] = (
+  ((dogGearData as unknown as { dogGear?: DogVestRow[] }).dogGear ?? [])
+).filter((v) => !v.faction);
+function dogVestRarityWeight(rarity?: string): number {
+  switch ((rarity ?? 'Common').toLowerCase()) {
+    case 'common': return 6;
+    case 'uncommon': return 3;
+    case 'rare': return 1;
+    default: return 0.5;
+  }
+}
+
 function rarityPrice(rarity?: string): number {
   const r = (rarity ?? 'Common').toLowerCase();
   if (r === 'legendary') return 140 + Math.floor(Math.random() * 160); // 140-299
@@ -249,6 +269,17 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
     const price = Math.max(2, Math.round(base * (0.8 + Math.random() * 0.45)));
     return { itemName: it.name, price, quantity: rollOfferQuantity(it.name) };
   });
+  // OTA-603 — armor stalls sometimes carry a dog vest (rarity-weighted, so a
+  // Burlap Vest is common and an Aetheric Padded Vest is rare). Priced off its
+  // AC + durability like any armor piece. One per stall, no dupes.
+  if (category === 'armor' && BUYABLE_DOG_VESTS.length > 0 && Math.random() < 0.5) {
+    const vest = pickWeighted(BUYABLE_DOG_VESTS, (v) => dogVestRarityWeight(v.rarity));
+    if (!offers.some((o) => o.itemName === vest.name)) {
+      const vbase = estimatedStallValue(vest as StallCatalogItem, 'armor');
+      const vprice = Math.max(2, Math.round(vbase * (0.8 + Math.random() * 0.45)));
+      offers.push({ itemName: vest.name, price: vprice, quantity: 1 });
+    }
+  }
   return {
     id: `stall_${category}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     name: `${stallName} Trader`,

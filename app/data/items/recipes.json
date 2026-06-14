@@ -506,6 +506,50 @@
       ]
     },
     {
+      "_note": "OTA-603 — dog-vest (kind 'dog_armor') craft recipes. The vests were authored in dogGear.json but had no source; these make the three open-market tiers craftable (the Legendary Reclaimer Pattern Vest stays drop-only from Reclaimer-aligned kills, per its catalog note). Result names match DOG_GEAR; lookupCraftedItem resolves them to kind 'dog_armor' so the crafted item is equippable on the dog.",
+      "result": "Burlap Vest",
+      "ingredients": [
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Riveted Leather Vest",
+      "ingredients": [
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Aetheric Padded Vest",
+      "ingredients": [
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
       "result": "Aether-Wing Cloak",
       "ingredients": [
         {

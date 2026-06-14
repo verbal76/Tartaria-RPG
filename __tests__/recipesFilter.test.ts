@@ -17,7 +17,7 @@ describe('OTA-059 — RecipesView kindFilter', () => {
     for (const r of RECIPES) {
       const cat = lookupCraftedItem(r.result);
       expect(cat.kind).toBeDefined();
-      expect(['weapon', 'armor', 'consumable', 'relic', 'misc']).toContain(cat.kind);
+      expect(['weapon', 'armor', 'consumable', 'relic', 'misc', 'dog_armor']).toContain(cat.kind);
     }
   });
 

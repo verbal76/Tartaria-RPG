@@ -153,6 +153,8 @@ import {
   RECIPES,
   findArmorByName,
   findWeaponByName,
+  findDogGearByName,
+  DOG_GEAR,
   applyDamageTypeModifier,
   applyArmorResistance,
   armorResistances,
@@ -14538,6 +14540,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     for (let i = 0; i < lootRollCount; i++) {
       lootDrops.push(lootPool[Math.floor(Math.random() * lootPool.length)]!);
     }
+    // OTA-603 — occasional dog-vest drop (the vests were authored but never
+    // sourced). Rarity-weighted + low-rate; the Reclaimer Pattern Vest only
+    // drops from Reclaimer-aligned kills. Pushed into the loot list so it
+    // flows through the normal grant + summary below.
+    const vestDrop = rollDogVestLootName(enemy);
+    if (vestDrop) lootDrops.push(vestDrop);
     const lootSummary = (() => {
       const counts: Record<string, number> = {};
       for (const n of lootDrops) counts[n] = (counts[n] ?? 0) + 1;
@@ -15023,8 +15031,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const material = !weapon && !armor && !gear ? MATERIALS.find((m) => m.name === offer.itemName) : null;
     const ring = !weapon && !armor && !gear && !material ? RINGS.find((r) => r.name === offer.itemName) : null;
     const amulet = !weapon && !armor && !gear && !material && !ring ? AMULETS.find((a) => a.name === offer.itemName) : null;
-    const cat = weapon ?? armor ?? gear ?? material ?? ring ?? amulet ?? null;
-    const kind: InventoryItem['kind'] = weapon
+    // OTA-603 — dog vests (kind 'dog_armor') can now be vendor stock. Resolve
+    // them here so a bought vest mints as a real, equippable dog_armor item
+    // (rarity + tags from the catalog) instead of falling through to bare 'misc'.
+    const dogVest = !weapon && !armor && !gear && !material && !ring && !amulet
+      ? findDogGearByName(offer.itemName)
+      : null;
+    const cat = weapon ?? armor ?? gear ?? material ?? ring ?? amulet ?? dogVest ?? null;
+    const kind: InventoryItem['kind'] = dogVest
+      ? 'dog_armor'
+      : weapon
       ? 'misc'
       : armor
         ? 'misc'
@@ -26586,6 +26602,39 @@ const SCRIPTED_TUTORIAL_LAST_IDX = TUTORIAL_STEPS.findIndex((s) => s.id === 'inv
 function inScriptedTutorialPhase(get: () => GameStore): boolean {
   const step = get().tutorialStep;
   return step !== null && SCRIPTED_TUTORIAL_LAST_IDX >= 0 && step <= SCRIPTED_TUTORIAL_LAST_IDX;
+}
+
+// OTA-603 — dog-vest loot drop. The four vests in dogGear.json were authored
+// (OTA-120 Phase 5) but never wired to any source, so a player never saw one.
+// This gives a dog owner an occasional armor find off a kill: rarity-weighted
+// and low-rate so it's a treat, not a flood. The Reclaimer Pattern Vest is
+// faction-gated — it only drops from Reclaimer-aligned kills, matching its
+// catalog note ("Only drops from Reclaimer-aligned encounters").
+function dogVestLootWeight(rarity: string): number {
+  switch (rarity.toLowerCase()) {
+    case 'common': return 6;
+    case 'uncommon': return 3;
+    case 'rare': return 1;
+    case 'legendary': return 0.4;
+    default: return 1;
+  }
+}
+function rollDogVestLootName(enemy: Enemy): string | null {
+  const baseChance = enemy.rarity === 'Legendary' ? 0.16
+    : enemy.rarity === 'Rare' ? 0.11
+    : enemy.rarity === 'Uncommon' ? 0.08
+    : 0.05;
+  if (Math.random() >= baseChance) return null;
+  const reclaimerAligned = /reclaimer/i.test(`${enemy.name} ${enemy.type}`);
+  const pool = DOG_GEAR.filter((v) => !v.faction || reclaimerAligned);
+  if (pool.length === 0) return null;
+  const total = pool.reduce((s, v) => s + dogVestLootWeight(v.rarity), 0);
+  let roll = Math.random() * total;
+  for (const v of pool) {
+    roll -= dogVestLootWeight(v.rarity);
+    if (roll <= 0) return v.name;
+  }
+  return pool[pool.length - 1]!.name;
 }
 
 async function maybeGenerateAmbientArbiter(

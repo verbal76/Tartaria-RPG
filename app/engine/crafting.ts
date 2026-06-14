@@ -190,7 +190,7 @@ export const EXPLORATION = explorationData as CatalogExploration[];
 const DEFAULT_DURABILITY = 25;
 
 export function lookupCraftedItem(resultName: string): {
-  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
+  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
   rarity: Rarity;
   tags: string[];
   baseDurability?: number;
@@ -201,6 +201,13 @@ export function lookupCraftedItem(resultName: string): {
   if (a) return { kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
   const g = GEAR.find((x) => x.name === resultName);
   if (g) return { kind: g.kind, rarity: g.rarity, tags: g.tags };
+  // OTA-603 — dog vests (kind 'dog_armor') were authored in dogGear.json but
+  // never resolved here, so a looted/dropped vest minted as a tagless 'misc'
+  // and couldn't be equipped on the dog. Resolve them to their real kind so
+  // the loot paths grant a proper, wearable vest. (Crafting/fusion still
+  // exclude DOG_GEAR via their own guards — this branch is construction-only.)
+  const dg = DOG_GEAR.find((x) => x.name === resultName);
+  if (dg) return { kind: 'dog_armor', rarity: dg.rarity, tags: dg.tags, baseDurability: dg.baseDurability ?? DEFAULT_DURABILITY };
   const am = AMULETS.find((x) => x.name === resultName);
   if (am) return { kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
   const r = RINGS.find((x) => x.name === resultName);
