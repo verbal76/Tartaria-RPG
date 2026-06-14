@@ -96,9 +96,25 @@ jobs:
   build:
     name: Build & Release Tartaria Realms APK
     runs-on: ubuntu-latest
+    # arb155 — bound the job so a hung/disconnected runner fails fast with a red
+    # X instead of spinning until GitHub's 6-hour default.
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # arb155 — reclaim disk before the build. The release artifact (Qwen GGUF
+      # + 7 native kernel .so variants + ONNX/voice models) is ~2GB, and the
+      # ubuntu-latest runner ran out of space staging it ("No space left on
+      # device"). Remove large toolchains this build never uses (.NET, GHC,
+      # CodeQL, Docker images) — frees ~25-30GB. Never touches Android SDK/NDK,
+      # JDK, or Node. Best-effort (|| true) so a missing path can't fail the job.
+      - name: Free up disk space
+        run: |
+          echo "Before:"; df -h /
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          sudo docker image prune -af || true
+          echo "After:"; df -h /
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -628,7 +644,10 @@ jobs:
             [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
             OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.apk"
           fi
-          cp "$SRC" "$OUT"
+          # arb155 — MOVE, don't copy: SRC and OUT share the workspace
+          # filesystem, so mv is a free rename and avoids keeping two ~2GB
+          # copies on disk at once (the "No space left on device" cause).
+          mv "$SRC" "$OUT"
           echo "path=$OUT" >> "$GITHUB_OUTPUT"
           echo "filename=$(basename "$OUT")" >> "$GITHUB_OUTPUT"
           ls -lh "$OUT"
