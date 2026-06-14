@@ -14892,4 +14892,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stack frames) to buildBasicDeviceSummary, so every pasted diagnostic now shows WHY a non-ML crash happened. Closes the
 // internal-test observability gap; remote aggregation (Sentry) still needs a native build + DSN. JS-only → 290.
 // app/diagnostics/lastCrash.ts, app/diagnostics/aboutSummary.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-598';
+// OTA-599 (Unnonennium Tidy) — [polish · arbiters-line] declutter the About → Session tab (player: "a ton of buttons").
+// (1) REMOVED COPY AI HEALTH — pure duplicate (it was buildBasicDeviceSummary + mlHealthSummary, and the device summary
+// already contains the ML health, so COPY LOG / REPORT A BUG already carry it). Dropped the button + its handler + state.
+// (2) Tucked the two rarely-needed clipboard dumps — COPY SAVE (brick repro) and COPY INVENTORY — behind a single
+// "▸ ADVANCED EXPORTS" toggle. (3) Relabeled "RESET AI NARRATION & RELOAD" → "RELOAD AI". (4) Added RUN / REPORTING / AI
+// section headers and a shorter intro line. Net: ~9 visible buttons → 7 (2 of those collapsed), one true duplicate gone,
+// everything still reachable. JS-only → 290. app/screens/AboutScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-12-599';
