@@ -14824,4 +14824,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fragments), each chunk is tagged endsSentence, and the batch joiner (new joinBatch) drops SENTENCE_PAUSE_MS (160ms)
 // of real silence after any sentence — with 6ms edge fades for a click-free join — instead of crossfading the gap away.
 // JS-only → 290. app/voice/PiperTTSManager.ts.
-export const OTA_BUILD_ID = '2026-06-12-589';
+// OTA-590 (Unnonnilium Cordon) — [fix · arbiters-line] "I just entered a vendors stall during combat, that shouldn't
+// happen." The vendor banner rendered whenever currentScene.vendor existed with NO combat check, so a hostile in the
+// scene didn't stop you tapping into the trade screen. Now the banner is hidden while inCombat (it returns once the
+// enemies are down — the vendor stays in the scene), and buyFromVendor/sellToVendor refuse with a message when an
+// enemy is present (defense-in-depth: the 'buy from X' text command still parses mid-fight). JS-only → 290.
+// app/screens/ExplorationScreen.tsx, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-590';

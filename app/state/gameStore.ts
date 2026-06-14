@@ -14867,6 +14867,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    // arb166 — no trading mid-fight (defense-in-depth behind the hidden vendor
+    // banner: the 'buy from X' text command still parses during combat).
+    if (scene.enemies.length > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
     // Tour mode — Irma is a demo vendor injected for the intro walkthrough.
     // No transactions: stops the player from cheesing the game by buying
     // out the armory before play actually starts.
@@ -15021,6 +15027,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    // arb166 — no trading mid-fight (see buyFromVendor).
+    if (scene.enemies.length > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
     if (state.tutorialDemoVendor) {
       get().appendLog('system', 'Tour mode — selling is disabled while the tutorial is running.');
       return;
