@@ -15808,11 +15808,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((i) => (i.quantity ?? 1) > 0);
       set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
     }
-    // Pay out reward + record completion. OTA-456 — a remote "send word" turn-in
-    // pays a runner to carry the report, so it takes a 15% TC cut (full rep);
-    // turning in face-to-face pays in full.
-    const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.85)) : candidate.reward.tc;
-    const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.reward.rep);
+    // Pay out reward + record completion. arb166 — a remote "send word" turn-in
+    // now pays HALF (both TC and rep): travelling to the agent/board and handing
+    // it over in person is the 100% play; couriering it from afar is the 50%
+    // convenience option. (Was an 85% TC cut with full rep.)
+    const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.5)) : candidate.reward.tc;
+    const payRep = remote ? Math.max(1, Math.round(candidate.reward.rep * 0.5)) : candidate.reward.rep;
+    const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
     set((s) =>
       s.player
         ? {
@@ -15831,8 +15833,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'reward',
       remote
-        ? `✦ Sent word — ${candidate.title} closed by courier. +${payTc} TC (runner's cut taken), +${candidate.reward.rep} rep with ${fLabel}.`
-        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${candidate.reward.rep} rep with ${fLabel}.`,
+        ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}.`
+        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}.`,
     );
     logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
@@ -26312,19 +26314,19 @@ async function narrateViaArbiter(
       : !intentAllowsQwen ? `intent-not-allowed:${intent}`
       : 'cooldown';
     get().appendLog('debug', `arbiter: template (reason=${reason})`);
-    // arb163 — CANNED flavor line: voiced ~60% of the time. Qwen lines are
-    // ALSO voiced, but during active play (actions every ~2s) a Qwen generation
-    // is cancelled by the next action before it finishes — so it almost never
-    // completes a spoken line, and canned has to carry the voice. 60% keeps it
-    // reliably audible without reading every single beat. `silent` → TTS skips.
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(60) ? undefined : { silent: true });
+    // arb166 — CANNED flavor line: voiced ~30% of the time. (Was 60% — but once
+    // arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes,
+    // so nearly every 60% roll actually spoke and Kokoro "wouldn't shut up", ~20
+    // lines/min.) The line still appears on-screen every time; this only thins
+    // how many are SPOKEN. `silent` → TTSController skips voicing it.
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     return;
   }
   const state = get();
   const player = state.player;
   if (!player || !scene) {
     get().appendLog('debug', 'arbiter: template (reason=no-scene)');
-    if (trimmed) get().appendLog('arbiter', trimmed, chance(60) ? undefined : { silent: true });
+    if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     return;
   }
   const sceneSlice: SceneSlice = {
@@ -26412,7 +26414,7 @@ async function narrateViaArbiter(
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
       // arb162 — generation failed → canned fallback; voice it only ~1 in 4.
-      if (trimmed) get().appendLog('arbiter', trimmed, chance(60) ? undefined : { silent: true });
+      if (trimmed) get().appendLog('arbiter', trimmed, chance(30) ? undefined : { silent: true });
     }
   } finally {
     // Only clear flags if we're still the active generation; otherwise the

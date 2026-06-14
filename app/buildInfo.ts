@@ -14830,4 +14830,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enemies are down — the vendor stays in the scene), and buyFromVendor/sellToVendor refuse with a message when an
 // enemy is present (defense-in-depth: the 'buy from X' text command still parses mid-fight). JS-only → 290.
 // app/screens/ExplorationScreen.tsx, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-590';
+// OTA-591 (Unnonunium Hush) — [tune+fix · arbiters-line] (1) Kokoro "won't shut up" (~20 spoken canned lines/min):
+// once arb164 tripled the pools the 30s repeat-guard stopped suppressing dupes, so almost every 60% voice-roll spoke.
+// Canned voice rate 60%→30% (chance) at the three narrateViaArbiter sites — lines still appear on-screen, just fewer
+// are voiced. (Frequency is two gates: shouldArbiterSpeak emits the line ~20-50%/action; this chance() voices it.)
+// (2) Faction-quest REMOTE turn-in ("send word") now pays HALF (both TC and rep), down from an 85% TC cut with full
+// rep — travelling to hand it in stays the 100% play. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-591';
