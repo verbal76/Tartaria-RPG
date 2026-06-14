@@ -1105,6 +1105,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-569': 'Unhexquadium Routes',
   // 570 'Unhexpentium Rewarm' is arbiters-line-only (Qwen foreground re-warm lifecycle fix); skipped here.
   '2026-06-12-571': 'Unhexhexium Sweep',
+  '2026-06-12-572': 'Unhexseptium Tally',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

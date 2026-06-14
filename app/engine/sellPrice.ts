@@ -25,6 +25,21 @@ const RARITY_BASE: Record<Rarity, number> = {
   Legendary: 240,
 };
 
+// arb149 — equippable GEAR (weapons + armor) is worth more than raw materials
+// of the same rarity, but the flat RARITY_BASE priced a Common Titan's Guard Mask
+// the same as a Common scrap of cloth → ~5 TC, which the player (rightly) called
+// too low for a real piece of kit. Gear gets its own higher base so a Common
+// piece nets ~11 TC, an Uncommon ~26, etc. Still below a typical buy price, so
+// it doesn't open a buy-low/sell-high pump (the vendor-offer match below already
+// caps resale to the SAME vendor at 40% of their price).
+const GEAR_RARITY_BASE: Record<Rarity, number> = {
+  Common: 28,
+  Uncommon: 65,
+  Rare: 150,
+  Legendary: 320,
+};
+const GEAR_KINDS = new Set(['weapon', 'armor', 'dog_armor', 'runecaster']);
+
 const SELL_FRACTION = 0.4;
 
 export function sellPriceFor(item: InventoryItem, vendor: VendorInstance | null | undefined): number {
@@ -43,7 +58,10 @@ export function sellPriceFor(item: InventoryItem, vendor: VendorInstance | null 
     if (item.kind === 'misc') return 2;
     return 1;
   }
-  const base = RARITY_BASE[item.rarity] ?? 5;
+  // arb149 — equippable gear uses the higher gear base; everything else (relics,
+  // materials, consumables-with-a-tier) keeps the generic base.
+  const baseTable = GEAR_KINDS.has(item.kind) ? GEAR_RARITY_BASE : RARITY_BASE;
+  const base = baseTable[item.rarity] ?? 5;
   const dur = durabilityFraction(item);
   return Math.max(1, Math.round(base * SELL_FRACTION * dur));
 }
