@@ -14800,4 +14800,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the shared isGenerating lock (muzzled in combat). Always voiced (these are the fresh ones). Next: canned-pool
 // expansion batches (586+) to dilute the repetitive reactive templates. JS-only → 290.
 // app/engine/contextInjector.ts, app/engine/narrativeGenerator.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-585';
+// OTA-586 (Unocthexium Repertoire) — [content · arbiters-line] expand the canned reactive pools in ONE OTA (the
+// "70 statements crashed it from weight" fear was a false attribution — the real crash was the native ML lock, long
+// fixed; 65 short strings are ~6KB and carry no runtime weight). +65 lines across the four most-repeated pools so the
+// player stops hearing the same handful on loop: ARBITER_NOTED_LINES 7→25 ("I saw the way you came at that" register),
+// ARBITER_LOOK_LINES 6→16, GENERIC_REMARKS 8→24 (lore musings), COMBAT_REMARKS 15→25. Purely additive string arrays,
+// same voice/format; combat lines keep the {enemy} token. Pairs with 585's ambient Qwen to thin the rotation. JS-only → 290.
+// app/engine/narrativeGenerator.ts.
+export const OTA_BUILD_ID = '2026-06-12-586';

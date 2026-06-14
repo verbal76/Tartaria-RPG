@@ -468,6 +468,17 @@ const ARBITER_LOOK_LINES = [
   `The Arbiter waits a beat. "Tartaria gives a discount to the patient eye."`,
   `The Arbiter says nothing. The silence is its own commentary.`,
   `The Arbiter half-smiles. "Twice over makes a thing yours. Once over is a guess."`,
+  // arb164 — look-pool expansion (same dilution effort as the noted pool).
+  `The Arbiter lets the quiet stretch. "Look twice. The mud hides its better half."`,
+  `The Arbiter follows your gaze without moving. "Half of what's here only shows itself to the second glance."`,
+  `The Arbiter murmurs, "Eyes are cheap. Attention costs. Spend it well."`,
+  `The Arbiter watches the same shadows. "Something here is worth the staring. Maybe not today."`,
+  `The Arbiter says, "The careful eye leaves Tartaria richer. The careless one leaves it a body."`,
+  `The Arbiter does not blink. "You're looking for it. It's looking back. Fair trade."`,
+  `The Arbiter tips their chin at the dark. "Read the room before the room reads you."`,
+  `The Arbiter says softly, "Look long enough and the buried country starts to look familiar. That's the danger."`,
+  `The Arbiter waits with you. "Patience is a tool here. Most pack everything but that."`,
+  `The Arbiter says, "What you overlook now, you meet again later. It rarely improves."`,
 ];
 
 // OTA-186 — first-person reaction lines that replace the awkward
@@ -491,6 +502,26 @@ const ARBITER_NOTED_LINES = [
   `The Arbiter says, "I caught the read. Good or bad — that was yours."`,
   `The Arbiter watches you finish. "I noted the move."`,
   `The Arbiter says quietly. "I saw it. The world saw it too."`,
+  // arb164 — pool expansion so the reaction line stops repeating every few
+  // actions. Same first-person register, generic enough to follow any deed.
+  `The Arbiter inclines their head. "That'll do. For now."`,
+  `The Arbiter watches your hands. "Steadier than last time. I keep track."`,
+  `The Arbiter says, "Noted. The mud keeps its own ledger too."`,
+  `The Arbiter's gaze lingers a moment. "You move like you've decided something."`,
+  `The Arbiter exhales through the nose. "Not how I'd have done it. Not wrong, either."`,
+  `The Arbiter says, "I've watched a hundred do that. You did it quieter."`,
+  `The Arbiter tilts their head. "Hm. The country noticed that one."`,
+  `The Arbiter says low, "Every move spends something. I'm keeping count."`,
+  `The Arbiter nods, barely. "That's the kind of thing that gets remembered out here."`,
+  `The Arbiter watches you settle. "You're getting a feel for the weight of this place."`,
+  `The Arbiter says, "Good instincts. Tartaria eats the other kind."`,
+  `The Arbiter's mouth twitches. "I'd call that nerve. The mud calls it dinner, sometimes."`,
+  `The Arbiter says, "I saw it land. So did whatever's listening."`,
+  `The Arbiter looks from you to the dark and back. "Fine. Keep that edge."`,
+  `The Arbiter says quietly, "You hesitated less that time. I notice the small things."`,
+  `The Arbiter regards you evenly. "A clean read. The buried country rewards those, rarely."`,
+  `The Arbiter says, "Filed away. I forget nothing down here — it's the one thing I'm good for."`,
+  `The Arbiter watches a breath longer than needed. "You're harder to read than when we started. Good."`,
 ];
 
 const GENERIC_REMARKS = [
@@ -502,6 +533,23 @@ const GENERIC_REMARKS = [
   `"The Forgotten Order won't say what they're rebuilding," the Arbiter notes. "Only that it's older than the flood."`,
   `"True Tartarians walked these roads before the mud came. Some of them still do."`,
   `"Aetherstone is the bedrock of this country," the Arbiter says. "Touch it carefully — it has opinions."`,
+  // arb164 — lore-musing expansion; these are the targetless fallback flavor.
+  `"The towers went down in a day," the Arbiter says. "The mud's been finishing the job for a thousand years."`,
+  `"Everything down here was someone's home once," the Arbiter murmurs. "Mind your boots."`,
+  `"The flood didn't drown Tartaria," the Arbiter says. "It buried it alive. There's a difference."`,
+  `"Maps lie out here," the Arbiter notes. "The ground rearranges itself when no one's watching."`,
+  `"The Giants are gone," the Arbiter says. "Their servants didn't get the message."`,
+  `"Coin spends the same in every camp," the Arbiter says. "Loyalty doesn't. Spend that one slower."`,
+  `"The Aetherstorms remember the old roads," the Arbiter says. "Walk them and they'll walk back."`,
+  `"There are older things than the factions down here," the Arbiter says. "They don't recruit. They collect."`,
+  `"The buried cities still have lights on," the Arbiter says. "No one's asked who's paying the bill."`,
+  `"Tartaria keeps what it takes," the Arbiter says. "Names, mostly. See that you keep yours."`,
+  `"The Conspiracy Architects redraw what fell," the Arbiter says. "Whether it wants redrawing, they don't ask."`,
+  `"Every relic down here was a tool first," the Arbiter says. "Most still remember the job."`,
+  `"The mud's patient," the Arbiter says. "It's outlasted empires. It'll outlast your hurry."`,
+  `"The dead outnumber the living a thousand to one here," the Arbiter says. "Be polite."`,
+  `"Whatever ended this place left in a hurry," the Arbiter says. "The cups are still on the tables."`,
+  `"They say the Aetherstone dreams," the Arbiter says. "On the bad nights, I believe them."`,
 ];
 
 export interface ArbiterContext {
@@ -572,6 +620,17 @@ const COMBAT_REMARKS = [
   `The Arbiter glances at the {enemy} the way you'd glance at weather. "Storm. Pass through it."`,
   `"Don't tell me what the {enemy} is," the Arbiter says, eyes flat. "Show me what it was."`,
   `The Arbiter does not look at you. "Kill it before it gets a name. They're harder once they've earned one."`,
+  // arb164 — combat-pool expansion. {enemy} token replaced at pick time.
+  `The Arbiter watches the {enemy} circle. "It's measuring you. Give it the wrong number."`,
+  `"The {enemy} has done this before," the Arbiter says. "So have you. Prove you remember."`,
+  `The Arbiter's voice stays level. "Breathe. The {enemy} wants you ragged."`,
+  `"Let the {enemy} swing first," the Arbiter says. "Then take everything it leaves open."`,
+  `The Arbiter eyes the {enemy} without concern. "It's bigger. Bigger falls harder."`,
+  `"The {enemy} fights like it's already won," the Arbiter says. "Disagree with it."`,
+  `The Arbiter watches the gap close. "The {enemy} is committed now. Make it regret that."`,
+  `"Strike where the {enemy} is going," the Arbiter says, "not where it's been."`,
+  `The Arbiter does not raise their voice. "The {enemy} can be reasoned with. The reasoning is a blade."`,
+  `"One of you ends this exchange standing," the Arbiter says, eyes on the {enemy}. "Cast the vote."`,
 ];
 
 function combatRemark(enemy: Enemy): string {
