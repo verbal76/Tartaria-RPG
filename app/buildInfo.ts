@@ -14866,4 +14866,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog is no longer hit by command-retaliation; the cost lands on the commander, same as a real attack. (GOLEM command
 // left as-is for now — it's a deliberate tank; routing it through player-counters would defeat its purpose. Pending a
 // decision.) JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-595';
+// OTA-596 (Unnonhexium Bulwark) — [feature · arbiters-line] golem durability overhaul (player-designed, option C). Golems
+// were glass cannons (~24 HP, full enemy damage, 2-3 hits then crumble + total loss of trained levels). Now: (1) base HP
+// raised — Mud 16→24, Aether 24→34, Iron 24→40, Crystal 30→52. (2) Innate % DAMAGE RESIST by kind (Mud 15 / Aether 20 /
+// Iron 30 / Crystal 35%), applied to the enemy's real damage roll, min-1 always lands (never immune). (3) TRAINABLE:
+// resist climbs as the golem trains resilience (capped 35/40/50/55%), and a NEW max-HP track grows +3 per stat level-up
+// (baked into trainGolemStat) — trash/mid fights build it toward bosses. (4) Self-mend: ~25% max HP on rest + part-feeds
+// bumped hpMax/4→hpMax/3 (eases the material drain). (5) INERT GOLEM CORE: a crumbled golem drops a core holding HALF its
+// trained levels; feed it to a new golem to graft them on (death = ~half setback + re-summon, not a wipe). Guardrail:
+// resist caps + min-1 damage keep a maxed golem mortal to bosses (preserves OTA-433). JS-only → 290.
+// app/engine/golems.ts, app/engine/types.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-596';

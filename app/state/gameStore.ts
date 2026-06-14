@@ -13029,6 +13029,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hoursElapsed: newHours,
         },
       });
+      // arb170 — camping also mends the golem ~25% of its max HP, so keeping it
+      // alive doesn't drain your materials between fights (you still feed it for
+      // a fast in-the-field top-up).
+      const restGolem = get().player?.golem;
+      if (restGolem && restGolem.hp > 0 && restGolem.hp < restGolem.hpMax) {
+        const gMend = Math.min(restGolem.hpMax - restGolem.hp, Math.max(3, Math.round(restGolem.hpMax * 0.25)));
+        set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: { ...s.player.golem, hp: s.player.golem.hp + gMend } } } : s));
+      }
       const parts: string[] = [];
       if (heal > 0) parts.push(`+${heal} HP`);
       if (stamGain > 0) parts.push(`+${stamGain} stamina`);
@@ -24590,7 +24598,7 @@ function handleGolemCommand(
   // like the dog's STR. A working copy carries any stat-training from this turn
   // through to the final state write (incl. the kill-return path).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { golemStatBonus, trainGolemStat } = require('../engine/golems');
+  const { golemStatBonus, trainGolemStat, golemDamageResist, getGolemDefinition } = require('../engine/golems');
   let workingGolem = golem;
   const golemPower: number = golemStatBonus(golem, 'power');
   const atkRoll = rollDie(20);
@@ -24726,20 +24734,52 @@ function handleGolemCommand(
     // boss fights. A tier-appropriate roll makes the golem a real but expendable
     // shield. Falls back to the old flat value if the foe has no parseable damage.
     // OTA-467 — trained RESILIENCE soaks part of the hit (min 1 always lands).
-    const golemRes: number = golemStatBonus(workingGolem, 'resilience');
+    // arb170 — % damage resistance (innate by kind + trained resilience), capped,
+    // applied to the enemy's REAL damage roll. Min 1 always lands (never immune).
+    const resist: number = golemDamageResist(workingGolem);
     const rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
-    const enemyDmg = Math.max(1, rawDmg - golemRes);
+    const enemyDmg = Math.max(1, Math.round(rawDmg * (1 - resist)));
     const newGolemHp = Math.max(0, workingGolem.hp - enemyDmg);
     get().appendLog(
       'combat',
-      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${golemRes > 0 ? ` (−${golemRes} soaked)` : ''}. (${newGolemHp}/${golem.hpMax})`,
+      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${resist > 0 ? ` (${Math.round(resist * 100)}% resisted)` : ''}. (${newGolemHp}/${golem.hpMax})`,
     );
     if (newGolemHp <= 0) {
       get().appendLog(
         'world',
         `The ${golem.name} stills, then crumbles back into ${golem.kind === 'mud_golem' ? 'mud' : golem.kind === 'iron_golem' ? 'iron filings' : golem.kind === 'aether_golem' ? 'a fading aetheric afterimage' : 'a scatter of crystal shards'}.`,
       );
-      set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
+      // arb170 — INERT CORE. If the golem had trained anything, it leaves a core
+      // carrying HALF its levels; feed it to a new golem to graft them on. So a
+      // death costs ~half the investment + a re-summon, not the whole golem.
+      const dG = getGolemDefinition(workingGolem.kind);
+      const core = {
+        power: Math.floor((workingGolem.stats?.power ?? 0) / 2),
+        resilience: Math.floor((workingGolem.stats?.resilience ?? 0) / 2),
+        bonusHp: Math.floor(Math.max(0, (workingGolem.hpMax ?? 0) - (dG?.hpMax ?? 0)) / 2),
+      };
+      const hadTraining = core.power > 0 || core.resilience > 0 || core.bonusHp > 0;
+      set((s) => {
+        if (!s.player) return s;
+        let player = { ...s.player, golem: null };
+        if (hadTraining) {
+          const res = grantItem(player.inventory, {
+            id: `golemcore_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: 'Inert Golem Core',
+            kind: 'misc',
+            rarity: 'Uncommon',
+            quantity: 1,
+            tags: ['golem', 'core', 'salvage'],
+            description: `The settled heart of ${golem.name} — its hard-won memory of fighting, half-intact. Feed it to a newly-summoned golem to graft on +${core.power} power, +${core.resilience} resilience, +${core.bonusHp} max HP.`,
+            golemCore: core,
+          });
+          player = { ...player, inventory: res.inventory };
+        }
+        return { player };
+      });
+      if (hadTraining) {
+        get().appendLog('reward', `✦ Inert Golem Core recovered — feed it to your next golem to pass on half of ${golem.name}'s training.`);
+      }
     } else {
       // OTA-467 — surviving a hit trains RESILIENCE; carry the turn's POWER too.
       let survived: typeof workingGolem = { ...workingGolem, hp: newGolemHp };
@@ -25437,6 +25477,25 @@ function applyItemToGolem(
   if (!item) {
     get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
     return false;
+  }
+  // arb170 — feeding an INERT GOLEM CORE grafts half a dead golem's training onto
+  // THIS golem (power / resilience / max HP), then consumes the core. Bypasses the
+  // repair-part gate below — a core isn't fuel, it's transferred memory.
+  if (item.golemCore) {
+    const c = item.golemCore;
+    set((s) => {
+      if (!s.player || !s.player.golem) return s;
+      const g = s.player.golem;
+      const stats = g.stats ?? { power: 0, resilience: 0 };
+      const inv = s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      return { player: { ...s.player, inventory: inv, golem: { ...g,
+        stats: { power: stats.power + c.power, resilience: stats.resilience + c.resilience },
+        hpMax: g.hpMax + c.bonusHp, hp: g.hp + c.bonusHp } } };
+    });
+    get().appendLog('reward', `✦ You seat the Inert Golem Core into ${golem.name}'s frame. It remembers old fights — +${c.power} power, +${c.resilience} resilience, +${c.bonusHp} max HP.`);
+    return true;
   }
   // arb121 — a full FUEL PART heals full; an elemental MATERIAL substitute (e.g.
   // any aether loot for an Aether Golem) heals half. Anything else is refused —

@@ -95,6 +95,9 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
     let prevPower = 0;
     let prevRes = 0;
     let sawPowerGrow = false;
+    let maxPower = 0; // arb170 — track the peak; golems now CYCLE (die→resummon)
+                      // under the immortal-dummy instead of becoming an immortal
+                      // tank (% resist is capped), so final power isn't reliable.
     for (let i = 0; i < 300; i++) {
       await store.getState().submitPlayerAction('golem attack');
       const g = store.getState().player?.golem;
@@ -115,6 +118,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
         expect(pow).toBeGreaterThanOrEqual(prevPower);
         expect(res).toBeGreaterThanOrEqual(prevRes);
         if (pow > prevPower) sawPowerGrow = true;
+        maxPower = Math.max(maxPower, pow);
         prevPower = pow; prevRes = res;
       }
       // Keep the dummy alive + topped up, and TRIM the gameLog so memory stays flat.
@@ -126,7 +130,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
     // Across 300 hits at stat 0 (award 3/hit → +1 every ~34 hits), power must have
     // levelled at least a few times.
     expect(sawPowerGrow).toBe(true);
-    expect((store.getState().player?.golem?.stats?.power ?? 0)).toBeGreaterThanOrEqual(1);
+    expect(maxPower).toBeGreaterThanOrEqual(1);
   });
 
   it('repair sweep: feeding constituent parts mends (capped), non-parts never do', async () => {
