@@ -14668,4 +14668,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // redundant. The vendor button is mirrored on the SAME gate the exploration chip uses, so the two never both appear.
 // Roadside / wild stalls (no hub, not market, no permit) keep the vendor Crucible — it's the only one there.
 // app/screens/VendorScreen.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-575';
+// OTA-576 (Unseptunium Reroom) — [bugfix · BOTH lines] the OTA-574 Crucible-chip dismiss (✕) stuck across an entire
+// building: closing it in one room disabled it in ALL rooms. The per-view reset key keyed off location / activeBuildingId
+// / hubRoomId but NOT activeBuildingRoomId — and moving between a building's rooms (market stalls etc.) changes only
+// that field, so the key never changed and the dismiss never reset. Added activeBuildingRoomId to the key, so each room
+// gets its own chip and a dismiss only clears the room you closed it in. app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-576';
