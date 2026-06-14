@@ -782,14 +782,14 @@ export function TitleScreen() {
       {(() => {
         // arb132 — build-line marker, right above the gem line, so the two
         // side-by-side installs are instantly distinguishable. ARBITER = the
-        // isolated arbiters-line test build (.arbiters package); HAL = the live
-        // HaL2001 / production line. Uses the App ID so it's correct regardless
-        // of OTA-channel state.
+        // isolated arbiters-line test build (.arbiters package); GOLEM = the
+        // live HaL2001 / production line. Uses the App ID so it's correct
+        // regardless of OTA-channel state.
         const appId = Application.applicationId ?? '';
         const isArb = appId.endsWith('.arbiters');
         return (
           <Text style={[styles.buildMarker, { color: isArb ? '#7ec8e3' : '#c9a86a' }]}>
-            {isArb ? '⟁ ARBITER BUILD' : '⟁ HAL BUILD'}
+            {isArb ? '⟁ ARBITER BUILD' : '⟁ GOLEM BUILD'}
           </Text>
         );
       })()}
@@ -1381,7 +1381,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
-  // arb132 — build-line marker (HAL vs ARBITER), shown above the gem line.
+  // arb132 — build-line marker (GOLEM vs ARBITER), shown above the gem line.
   buildMarker: { fontSize: 11, fontWeight: '800', textAlign: 'center', marginBottom: 8, letterSpacing: 3 },
   // v2.4.1 (OTA 043) — completion-badges row styles.
   badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },

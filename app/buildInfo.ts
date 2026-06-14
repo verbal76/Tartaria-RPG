@@ -10612,7 +10612,7 @@
 //     DISPLAY_VERSION and the two are synced again.
 //
 // Bump this for marketing-visible version changes.
-export const DISPLAY_VERSION = '3.4.11';
+export const DISPLAY_VERSION = '4.1.0';
 
 // OTA-271 — Minimum-recommended APK build number. TitleScreen reads
 // Application.nativeBuildVersion and compares it against this; if
@@ -14917,4 +14917,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cognition resume the instant the player takes control. Refines OTA-600's ambient guard to the same predicate so ambient
 // also resumes at the choice rather than waiting for the whole tutorial (main_quest/pick_city) to end. JS-only → 290.
 // app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-601';
+// OTA-602 (Binilbium Brand) — [branding · arbiters-line] title/character-select screen relabel + version bump. (1) The
+// production build-line marker shown above the Resurrection Gem line read "⟁ HAL BUILD"; renamed to "⟁ GOLEM BUILD"
+// (player wants this line called Golem). The ARBITER-build branch (.arbiters package) is unchanged; the marker still keys
+// off Application.applicationId so the two side-by-side installs stay distinguishable. (2) Bumped DISPLAY_VERSION
+// 3.4.11 → 4.1.0 — the cosmetic title-screen footer ("v4.1.0 · Year 2148") and the About "App version" line both read
+// DISPLAY_VERSION, so both move together. Native version (2.4.1 / runtimeVersion) is untouched. JS-only → 290.
+// app/screens/TitleScreen.tsx, app/buildInfo.ts.
+export const OTA_BUILD_ID = '2026-06-12-602';
