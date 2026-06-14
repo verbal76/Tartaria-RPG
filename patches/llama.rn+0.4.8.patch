@@ -1,3 +1,24 @@
+diff --git a/node_modules/llama.rn/android/src/main/CMakeLists.txt b/node_modules/llama.rn/android/src/main/CMakeLists.txt
+index 8a206b3..1166beb 100644
+--- a/node_modules/llama.rn/android/src/main/CMakeLists.txt
++++ b/node_modules/llama.rn/android/src/main/CMakeLists.txt
+@@ -87,8 +87,14 @@ build_library("rnllama" "")
+ 
+ if (${ANDROID_ABI} STREQUAL "arm64-v8a")
+     # ARM64 targets
+-    build_library("rnllama_v8_4_fp16_dotprod_sve" "-march=armv8.4-a+fp16+dotprod+sve")
+-    build_library("rnllama_v8_4_fp16_dotprod_i8mm_sve" "-march=armv8.4-a+fp16+dotprod+i8mm+sve")
++    # Tartaria Realms patch (build 285 / size trim). The two SVE variants are
++    # NEVER loaded — LlamaContext forces hasSve=false on every device (mobile SVE
++    # SIGSEGVs), so the selector can never reach the _sve branches. Don't compile
++    # them: each .so embeds full ggml (several MB), so this drops dead weight from
++    # the APK on every install. The loadLibrary("..._sve") branches stay in the
++    # Java (gated by hasSve, so dead) — safe, since they can't execute.
++    # build_library("rnllama_v8_4_fp16_dotprod_sve" "-march=armv8.4-a+fp16+dotprod+sve")
++    # build_library("rnllama_v8_4_fp16_dotprod_i8mm_sve" "-march=armv8.4-a+fp16+dotprod+i8mm+sve")
+     build_library("rnllama_v8_4_fp16_dotprod_i8mm" "-march=armv8.4-a+fp16+dotprod+i8mm")
+     build_library("rnllama_v8_4_fp16_dotprod" "-march=armv8.4-a+fp16+dotprod")
+     build_library("rnllama_v8_2_fp16_dotprod" "-march=armv8.2-a+fp16+dotprod")
 diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 index 91b2397..c310e38 100644
 --- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java

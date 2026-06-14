@@ -14719,4 +14719,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // variant=rnllama_v8_2_fp16_dotprod, v84used=false. Requires an EAS APK build (auto-increments to 285) + install;
 // NOT deliverable over OTA. Verify: a long Qwen narration run with no SIGSEGV and `arbiter: qwen ✓` lines on
 // travel/arrival beats. patches/llama.rn+0.4.8.patch.
+// SIZE TRIM (same build): the Qwen native kernels grew the APK past the ~180MB baseline. Two cuts, no runtime change:
+// (1) build arm64-v8a ONLY — x86_64 is emulator/Chromebook-only, no phone uses it, yet it doubled every native lib
+// (RN core + llama.rn's kernel variants + ONNX). One Gradle prop (-PreactNativeArchitectures=arm64-v8a) drops it
+// app-wide. (2) Stop compiling the two SVE kernel variants — LlamaContext forces hasSve=false everywhere, so they're
+// never loaded; each .so embeds full ggml (several MB). .github/workflows/build-apk.yml (arm64 prop; also the disk-space
+// "No space left on device" CI fix — mv not cp + free runner disk), patches/llama.rn+0.4.8.patch (CMake drops _sve).
+// Largest remaining bundled chunk is assets/ audio ≈ 98MB (background-music mp3s) — a re-encode to lower bitrate would
+// reclaim ~40-50MB but is a quality call, left for the user.
 export const OTA_BUILD_ID = '2026-06-12-576';
