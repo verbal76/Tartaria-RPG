@@ -14884,4 +14884,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // completion popup (reuses pendingWhisperComplete). Folded in the audit fix: the Contracts COMPLETE button is the
 // COURIER path now — it pays HALF unless a same-faction agent is present (was 100% from anywhere). JS-only → 290.
 // app/engine/factionQuests.ts, app/state/gameStore.ts, app/screens/ContractsScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-12-597';
+// OTA-598 (Unnonoctium Telltale) — [hardening · arbiters-line] production/internal-test observability. The app already
+// captures the last JS-fatal crash (global ErrorUtils handler + beginScene bail → @tartaria/lastCrash) and the title
+// screen surfaces it — but the LOG export internal testers PASTE only carried ML-runtime + save-load health, so a pure
+// JS crash (logic/render/state, not native ML) showed up in the report with NO cause. New diagnostics/lastCrash.ts caches
+// the record at boot (loadLastCrash, beside loadSaveLoadHealth) and adds a "Last JS crash" block (stage + message + top
+// stack frames) to buildBasicDeviceSummary, so every pasted diagnostic now shows WHY a non-ML crash happened. Closes the
+// internal-test observability gap; remote aggregation (Sentry) still needs a native build + DSN. JS-only → 290.
+// app/diagnostics/lastCrash.ts, app/diagnostics/aboutSummary.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-598';

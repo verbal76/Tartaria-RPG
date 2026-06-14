@@ -47,6 +47,7 @@ import {
   clearSlotCrash,
   getCrashedSlotIds,
 } from '../diagnostics/saveLoadHealth';
+import { loadLastCrash } from '../diagnostics/lastCrash';
 import {
   listSlots,
   loadSlot,
@@ -2788,6 +2789,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let crashedSlotIds: string[] = [];
     try {
       await loadSaveLoadHealth();
+      await loadLastCrash(); // arb172 — cache last JS crash for the diagnostic export
       crashedSlotIds = getCrashedSlotIds();
     } catch { /* health is best-effort — never block boot on it */ }
     const activeId = await loadActiveSlotId();

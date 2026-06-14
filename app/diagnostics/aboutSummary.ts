@@ -19,6 +19,7 @@ import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
 import { saveLoadHealthSummary } from './saveLoadHealth';
+import { lastCrashSummary } from './lastCrash';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
@@ -118,6 +119,10 @@ export function buildBasicDeviceSummary(): string {
     // how many times, so an "app crashes when I open my guy" report is
     // diagnosed at a glance instead of guessed.
     saveLoadHealthSummary(),
+    // arb172 — last JS-fatal crash (stage + message + top stack frames). The
+    // global ErrorUtils handler captures non-ML, non-load crashes here; without
+    // this line they never reached the pasted report and we'd be guessing.
+    lastCrashSummary(),
   ];
   return lines.join('\n');
 }
