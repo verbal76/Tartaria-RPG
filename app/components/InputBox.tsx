@@ -19,7 +19,6 @@ import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachClassFor } from '../engine/combatRules';
 import { reachBandsFor } from '../engine/types';
-import { BrandedModal } from './BrandedModal';
 import type { InventoryItem, CombatRange } from '../engine/types';
 
 /** OTA 207 / OTA-550 — do the bands a weapon reaches include the current
@@ -535,32 +534,20 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           </>
         )}
       </TutorialTarget>
-      {/* arb143 — the dog action picker is a BLOCKING modal now, not an inline
-          overlay. The player kept mis-tapping INVENTORY (which sits right below
-          it) mid-pick, which healed the dog and dropped the action — "there
-          should be no other outlet except for those two buttons." A native modal
-          scrim captures every touch, so Bite / Distract / Cancel are the only
-          ways out. */}
-      {dog && dog.hp > 0 ? (
-        <BrandedModal
-          visible={dogPickerOpen}
-          title={`${dog.name} — pick an action`}
-          body={`Choose how ${dog.name} fights this turn. Once you pick, the dog commits.`}
-          buttons={[
-            {
-              label: `Bite — ${dog.name} lunges in`,
-              tone: 'primary',
-              onPress: () => { setDogPickerOpen(false); onSubmit('bite'); },
-            },
-            {
-              label: 'Distract — +1 init, +2 atk next swing',
-              tone: 'primary',
-              onPress: () => { setDogPickerOpen(false); onSubmit('distract'); },
-            },
-            { label: 'Cancel', tone: 'neutral', onPress: () => setDogPickerOpen(false) },
-          ]}
-          onRequestClose={() => setDogPickerOpen(false)}
-        />
+      {/* arb160 — reverted to the inline BITE/DISTRACT overlay (the player
+          preferred it over the OTA-571 blocking popup). The amber-blocked-dog
+          fix from arb143 stays; only the picker presentation is reverted. */}
+      {dog && dog.hp > 0 && dogPickerOpen ? (
+        <View style={styles.dogPicker}>
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('bite'); }} style={styles.dogPickerBtn}>
+            <Text style={styles.dogPickerLabel}>BITE</Text>
+            <Text style={styles.dogPickerHint}>{dog.name} lunges in</Text>
+          </Pressable>
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('distract'); }} style={styles.dogPickerBtn}>
+            <Text style={styles.dogPickerLabel}>DISTRACT</Text>
+            <Text style={styles.dogPickerHint}>pounces + barks · +1 init, +4 atk next swing</Text>
+          </Pressable>
+        </View>
       ) : null}
       {/* arb110 — bandolier throw popup: one button per racked throwable; tap to hurl. */}
       {inCombat && bandolierOpen && bandolierItems.length > 0 ? (

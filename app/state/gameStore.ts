@@ -25060,7 +25060,7 @@ function handleDogCombat(
       // happened.
       get().appendLog(
         'world',
-        `${dog.name} pounces at ${target.name}'s flank, barking sharp. ${target.name}'s attention splits — your next swing rides the opening (+1 init, +2 atk).`,
+        `${dog.name} pounces at ${target.name}'s flank, barking sharp. ${target.name}'s attention splits — your next swing rides the opening (+1 init, +4 atk).`,
       );
       if (trained.leveled) {
         get().appendLog(

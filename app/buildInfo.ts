@@ -14746,4 +14746,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // finishes generating it (natural order). To test: Settings → Reset AI (Qwen is in a 5-boot cooldown), keep voice ON,
 // play an investigate/travel/rest run, watch for `arbiter: qwen ✓` with no crash. JS-only — reaches build 290 over OTA.
 // app/ai/nativeMlLock.ts (new), app/ai/generation/LlamaRuntime.ts, app/voice/PiperTTSManager.ts.
-export const OTA_BUILD_ID = '2026-06-12-578';
+// OTA-579 (Unseptquadium Distract) — [revert+balance · arbiters-line] (1) Revert the dog BITE/DISTRACT picker from the
+// OTA-571 blocking popup back to the inline overlay the player preferred (the arb143 amber-blocked-dog fix stays; only
+// the picker presentation is reverted). (2) Raise the dog DISTRACT attack bonus +2 → +4 (matching the dodge's +4), so a
+// successful distract is a strong setup, not a marginal nudge. The +1 initiative is unchanged. Narration + chip hint
+// updated to "+1 init, +4 atk". app/components/InputBox.tsx, app/engine/combatRules.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-579';
