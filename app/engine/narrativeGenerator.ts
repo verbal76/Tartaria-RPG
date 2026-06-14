@@ -867,6 +867,20 @@ export const QWEN_ALLOWED_INTENTS: ReadonlySet<string> = new Set([
   'travel',
   'diplomacy',
   'scene_intro',
+  // arb158 — widened once Qwen proved STABLE on-device (Tensor G5 build 290:
+  // qwen:done, completion guard clean, no SIGSEGV). The original set kept Qwen
+  // to arrivals/talk because most play was template anyway and an LLM round-trip
+  // felt slow. Now that it runs, the player wants to actually HEAR the AI voice
+  // in normal play — and the dominant peaceful beats (investigate / search /
+  // rest) are exactly where a paragraph of generated atmosphere lands well.
+  // Only the Arbiter's FLAVOR remark goes through here; the world/reward text is
+  // logged instantly and separately, so gameplay feedback is never delayed. The
+  // Combat Muzzle (no Qwen with a hostile present) and the isGenerating throttle
+  // (one generation at a time → rapid actions fall back to template) keep this
+  // from becoming chatter or piling up on the slower v8_2 kernel.
+  'investigate',
+  'search',
+  'rest',
 ]);
 
 /**

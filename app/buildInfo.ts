@@ -14728,4 +14728,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (3) Audio re-encode: the 12 background-music tracks were ~175-196kbps stereo (61MB); re-encoded to 128kbps stereo
 // (transparent for ambient/background music) + stripped embedded art/metadata → 41MB, ~19MB off the APK. All 12 verified
 // to decode clean at full duration. assets/audio/*.mp3.
-export const OTA_BUILD_ID = '2026-06-12-576';
+// OTA-577 (Unseptbium Voice) — [feature · arbiters-line] now that Qwen runs STABLE on-device (Tensor G5 build 290:
+// qwen:done, completion guard clean, no SIGSEGV on the v8_2 kernel), WIDEN where the generative Arbiter voice surfaces.
+// QWEN_ALLOWED_INTENTS gains investigate / search / rest — the dominant peaceful exploration + downtime beats — on top
+// of the existing travel / diplomacy / scene_intro. Only the Arbiter's FLAVOR remark routes through Qwen; the world/
+// reward text is logged instantly and separately, so gameplay feedback is never delayed. Combat Muzzle (no Qwen with a
+// hostile present) + the isGenerating throttle (one generation at a time → rapid actions fall back to template) keep it
+// from spamming or piling up on the slower v8_2 kernel. JS-only — reaches build 290 over OTA, no new APK needed. Look
+// for `arbiter: qwen ✓ <ms>ms` on investigate/travel/rest beats. app/engine/narrativeGenerator.ts.
+export const OTA_BUILD_ID = '2026-06-12-577';
