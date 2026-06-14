@@ -30,6 +30,7 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
+import { MissionBoardModal } from '../components/MissionBoardModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
@@ -130,6 +131,8 @@ export function ExplorationScreen() {
   const [askArbiterOpen, setAskArbiterOpen] = useState(false);
   const [askArbiterInput, setAskArbiterInput] = useState('');
   const [salvageOpen, setSalvageOpen] = useState(false);
+  // arb135 — Mission Board as a tappable screen (open postings + ACCEPT), not a text dump.
+  const [missionBoardOpen, setMissionBoardOpen] = useState(false);
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
@@ -683,13 +686,13 @@ export function ExplorationScreen() {
       {currentScene?.missionBoard && (
         <TouchableOpacity
           style={styles.missionBoardBanner}
-          onPress={() => useGameStore.getState().readMissionBoard()}
+          onPress={() => setMissionBoardOpen(true)}
           activeOpacity={0.7}
         >
           <View style={styles.missionBoardStripe} />
           <View style={styles.vendorBannerBody}>
             <Text style={styles.missionBoardName}>⚑ MISSION BOARD</Text>
-            <Text style={styles.vendorBannerHint}>tap to read the postings</Text>
+            <Text style={styles.vendorBannerHint}>tap to view &amp; accept postings</Text>
           </View>
           <Text style={styles.missionBoardArrow}>›</Text>
         </TouchableOpacity>
@@ -1325,6 +1328,12 @@ export function ExplorationScreen() {
           useGameStore.getState().salvageAllAmbient(nouns);
         }}
         onCancel={() => setSalvageOpen(false)}
+      />
+
+      {/* arb135 — Mission Board screen: open postings with tappable ACCEPT. */}
+      <MissionBoardModal
+        visible={missionBoardOpen}
+        onClose={() => setMissionBoardOpen(false)}
       />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝

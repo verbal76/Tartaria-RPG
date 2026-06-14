@@ -14614,4 +14614,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `arbiter: qwen-error <ms>ms → template` on a generation failure. Turns "is this line AI or template?" from a
 // latency/wording guess into an explicit log line. Qwen only ever fires for intents travel/diplomacy/scene_intro,
 // out of combat, model-ready — so most lines correctly read `intent-not-allowed`. app/state/gameStore.ts. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-566';
+// OTA-567 (Unhexbium Board) — [ux] the outpost MISSION BOARD chip now opens a SCREEN instead of dumping the postings
+// into the log. Player feedback: tapping it just printed the missions as text with no way to act on them — you had to
+// know to TYPE `accept <name>`; they expected it to behave like the missions button (a screen). New MissionBoardModal
+// lists the faction's open postings (title · objective · reward) with a tappable ACCEPT on each (same acceptFactionQuest
+// path the typed command used); availableFactionQuests already filters active/completed, so an accepted posting drops
+// off the list and the modal stays open to take more. Side benefit: kills the board-reprint spam (the chip no longer
+// re-dumps text on each tap). app/components/MissionBoardModal.tsx, app/screens/ExplorationScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-567';
