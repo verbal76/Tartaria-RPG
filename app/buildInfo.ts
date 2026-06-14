@@ -14638,4 +14638,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // danger. Rows are derived live from openContractMarkers, so a row appears when its pin does and clears the instant the
 // contract closes (the agreed "lives while it has a marker, gone when complete" behavior). app/screens/MapScreen.tsx,
 // app/engine/contractMarkers.ts (type export). JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-569';
+// OTA-570 (Unhexpentium Rewarm) — [bugfix · arbiters-line] Qwen never served narration during play even though the
+// SVE fix held (boot reached qwen:done, init success, sveUsed=false, zero crashes) — every Arbiter line logged
+// `template (reason=qwen-not-ready)` and the Crucible saw `status=idle` for a 20-min travel log. Root cause: the
+// App.tsx AppState handler disposed the ~400MB model on `inactive` AS WELL AS `background`, and `active` deliberately
+// never re-warmed it ("let the user restart from About"). So one transient `inactive` (notification shade, app-switcher
+// peek, a permission/keyboard event — fired seconds after boot) benched the model for the whole session. Fix: (1) only
+// dispose Qwen on a REAL `background` (process-reclaim risk), never on a transient `inactive`; (2) on return to
+// `active`, re-warm Qwen if WE parked a ready model — the GGUF is already on disk so the download step returns
+// instantly (no UI), only the ~1-5s context reload runs in the background. A user who manually disabled Qwen stays
+// disabled (guarded by a parked flag). App.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-570';
