@@ -779,6 +779,20 @@ export function TitleScreen() {
       <Text style={styles.title}>TARTARIA</Text>
       <Text style={styles.subtitle}>REALMS</Text>
       <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
+      {(() => {
+        // arb132 — build-line marker, right above the gem line, so the two
+        // side-by-side installs are instantly distinguishable. ARBITER = the
+        // isolated arbiters-line test build (.arbiters package); HAL = the live
+        // HaL2001 / production line. Uses the App ID so it's correct regardless
+        // of OTA-channel state.
+        const appId = Application.applicationId ?? '';
+        const isArb = appId.endsWith('.arbiters');
+        return (
+          <Text style={[styles.buildMarker, { color: isArb ? '#7ec8e3' : '#c9a86a' }]}>
+            {isArb ? '⟁ ARBITER BUILD' : '⟁ HAL BUILD'}
+          </Text>
+        );
+      })()}
       {resurrectionGems > 0 && (
         <Text style={styles.gems}>✦ {resurrectionGems} Resurrection Gem{resurrectionGems === 1 ? '' : 's'} held</Text>
       )}
@@ -1367,6 +1381,8 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
+  // arb132 — build-line marker (HAL vs ARBITER), shown above the gem line.
+  buildMarker: { fontSize: 11, fontWeight: '800', textAlign: 'center', marginBottom: 8, letterSpacing: 3 },
   // v2.4.1 (OTA 043) — completion-badges row styles.
   badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },
   badgesTag: { color: '#7a705c', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },

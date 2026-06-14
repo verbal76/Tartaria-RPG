@@ -1096,6 +1096,8 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-560': 'Unpentpentium Reprieve',
   '2026-06-12-561': 'Unpenthexium Forbearance',
   '2026-06-12-562': 'Unpentseptium Bulwark',
+  // 563 was an arbiters-line-only diagnostic OTA (Unpentoctium Lens); skipped here.
+  '2026-06-12-564': 'Unpentennium Latch',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -14584,4 +14584,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Reset AI in Settings; (5) re-assert the disable from the STANDING count each boot so a cleared flag can't let Qwen
 // attempt again. Template narration is fully playable; Kokoro voice unaffected. The general init guard (OTA-558) +
 // clearInFlightBreadcrumbs are kept. app/diagnostics/mlHealth.ts, App.tsx. JS-only OTA.
-export const OTA_BUILD_ID = '2026-06-12-562';
+// OTA-564 (Unpentennium Latch) — [CRITICAL bugfix] fix the "Maximum update depth exceeded" crash on NEW-character
+// creation that bricked the name beat before the exploration screen ever painted — blocking new players. Root cause
+// (pinpointed via a component-stack capture on the arbiters test line): InputBox's bandolier selector
+// `useGameStore((s) => s.player?.equipped?.bandolierIds ?? [])` returned a FRESH [] every call when a new character
+// had no bandolierIds yet; Zustand's Object.is equality saw it as changed every render → InputBox re-rendered → the
+// selector re-ran → infinite loop. Fix: a frozen module-level EMPTY_BANDOLIER_IDS sentinel so the undefined case is
+// referentially stable. Also adds a title-screen BUILD MARKER (⟁ HAL BUILD / ⟁ ARBITER BUILD via App ID) above the
+// gem line. Identical fix shipped to BOTH HaL2001 and arbiters-line (same OTA id 564). NOTE: 563 is skipped on this
+// line — it was an arbiters-line-only diagnostic OTA. app/components/InputBox.tsx, app/screens/TitleScreen.tsx. JS-only OTA.
+export const OTA_BUILD_ID = '2026-06-12-564';

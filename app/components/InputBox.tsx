@@ -121,6 +121,14 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
 // past explore_or_leave (main_quest / pick_city are post-choice).
 const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
 
+// arb132 — STABLE empty-array sentinel for the bandolier selector. A NEW character
+// has no `player.equipped.bandolierIds` yet, so `?? []` returned a FRESH array on
+// every selector run; Zustand's Object.is equality then saw it as "changed" every
+// render → InputBox re-rendered → selector re-ran → "Maximum update depth exceeded"
+// the instant the name beat mounted (before the exploration screen ever painted).
+// One frozen reference makes the undefined case stable, so the loop can't start.
+const EMPTY_BANDOLIER_IDS: readonly string[] = Object.freeze([]);
+
 // arb109 — "wrong control" haptic. A double-pulse (buzz · pause · buzz) reads
 // unmistakably as an error, unlike the old single 30ms tap that was easy to
 // miss on a Pixel-class device. Wrapped in try/catch since Vibration is a
@@ -140,7 +148,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
   const [bandolierOpen, setBandolierOpen] = useState(false);
-  const bandolierIds = useGameStore((s) => s.player?.equipped?.bandolierIds ?? []);
+  const bandolierIds = useGameStore((s) => s.player?.equipped?.bandolierIds ?? EMPTY_BANDOLIER_IDS);
   const bandolierItems = bandolierIds
     .map((id) => inventory.find((it) => it.id === id))
     .filter((it): it is InventoryItem => !!it && it.quantity > 0);
