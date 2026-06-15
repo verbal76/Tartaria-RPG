@@ -56,6 +56,7 @@ describe('OTA-616 — turn a faction fetch quest in from its map anchor', () => 
           ...(s.player.activeFactionQuests ?? []),
           { id: 'fq_reclaimers_starter', stage: 0, postedByFaction: 'reclaimers_guild', acceptedAt: 0 },
         ],
+        activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), 'fq_reclaimers_starter'],
         inventory: [...s.player.inventory, scrapMetal(3)],
       } : s.player,
     }));
@@ -71,11 +72,41 @@ describe('OTA-616 — turn a faction fetch quest in from its map anchor', () => 
     useGameStore.getState().completeContractFromUI('faction_quest', contractId);
 
     const after = useGameStore.getState().player!;
-    // Reward paid (here couriered → half of 35, since the test scene has no
-    // same-faction vendor/board per arb171's proximity gate) and the quest left
-    // the active list — i.e. the turn-in fired off the marker-derived id.
-    expect(after.tc).toBeGreaterThan(tcBefore);
+    // OTA-617 — the player boots AT the Reclaimers' home outpost, so building-level
+    // proximity makes this an IN-PERSON turn-in → FULL 35 TC (not the couriered
+    // half). And the quest left the active list — the turn-in fired off the
+    // marker-derived id.
+    expect(after.tc).toBe(tcBefore + 35);
     expect((after.activeFactionQuests ?? []).some((q) => q.id === 'fq_reclaimers_starter')).toBe(false);
+  });
+
+  it('OTA-617 — arriving at the faction building auto-submits a ready quest at FULL + shows the completion popup', async () => {
+    await boot(); // boots at the Reclaimers' home
+    // Inject a ready fetch quest + items, and park the player AWAY so the
+    // arrival at the building is what triggers the auto-submit.
+    useGameStore.setState((s) => ({
+      player: s.player ? {
+        ...s.player,
+        currentLocationId: 'voronov',
+        activeFactionQuests: [{ id: 'fq_reclaimers_starter', stage: 0, postedByFaction: 'reclaimers_guild', acceptedAt: 0 }],
+        activeFactionQuestIds: ['fq_reclaimers_starter'],
+        inventory: [...s.player.inventory, scrapMetal(3)],
+      } : s.player,
+      pendingWhisperComplete: null,
+    }));
+    const tcBefore = useGameStore.getState().player!.tc;
+
+    // Autoroute-back arrival routes through travelTo (stepDirection → travelTo).
+    useGameStore.getState().travelTo('reclaimer_stake');
+
+    const after = useGameStore.getState();
+    // Auto-submitted at FULL (35 TC) and cleared from the active list...
+    expect(after.player!.tc).toBe(tcBefore + 35);
+    expect((after.player!.activeFactionQuests ?? []).some((q) => q.id === 'fq_reclaimers_starter')).toBe(false);
+    // ...with a completion popup carrying the mission name + reward total.
+    expect(after.pendingWhisperComplete).toBeTruthy();
+    expect(after.pendingWhisperComplete!.lines.join(' ')).toContain('Scrap Run');
+    expect(after.pendingWhisperComplete!.rewards.join(' ')).toContain('35 TC');
   });
 
   it('does NOT complete (and keeps the quest) when the items are missing', async () => {
@@ -87,6 +118,7 @@ describe('OTA-616 — turn a faction fetch quest in from its map anchor', () => 
           ...(s.player.activeFactionQuests ?? []),
           { id: 'fq_reclaimers_starter', stage: 0, postedByFaction: 'reclaimers_guild', acceptedAt: 0 },
         ],
+        activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), 'fq_reclaimers_starter'],
       } : s.player,
     }));
     const tcBefore = useGameStore.getState().player!.tc;

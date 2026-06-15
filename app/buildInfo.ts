@@ -15046,4 +15046,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // couriered). family→kind mapped ('faction'→'faction_quest'); id parsed from the marker key; leads (which close on the
 // field kill, not at a counter) just hint. Right-side tag shows TURN IN ▸ instead of YOU ARE HERE. JS-only → 290.
 // app/screens/MapScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-12-616';
+// OTA-617 (Biunseptium Hall) — [feature · player-requested] BUILDING-LEVEL faction turn-in + auto-complete on entry.
+// Turning a faction quest in for FULL reward no longer requires standing in the exact mission-board room — being anywhere
+// inside that faction's home OUTPOST counts as in person. New atFactionTurnInBuilding() helper threads through all three
+// turn-in paths so they agree: completeContractFromUI (Contracts COMPLETE), turnInFactionQuest (the canonical path — was
+// the real gate, only resolving the faction from a scene vendor/board; now falls back to the building's owning faction),
+// and autoSubmitReadyFactionQuests. So when you autoroute back and ENTER the building (travelTo arrival), every ready quest
+// for that faction auto-submits at full and the completion popup (pendingWhisperComplete) shows the mission name + total,
+// and the quest is marked complete. Couriering from afar (Contracts COMPLETE / send-word while NOT in the building) still
+// pays HALF, so arb171's "full from anywhere" exploit stays closed. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-617';

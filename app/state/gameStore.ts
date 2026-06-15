@@ -15899,8 +15899,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-451 — turn in to a same-faction VENDOR or the OUTPOST MISSION BOARD.
     // OTA-456 — or REMOTELY by courier ("send word <quest>") from anywhere, for a
     // 15% TC cut (full rep). Travel to claim in full stays the optimal play.
-    const turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
-    const turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
+    let turnFaction = scene?.vendor?.faction ?? scene?.missionBoard?.faction ?? null;
+    let turnSourceName = scene?.vendor?.name ?? (scene?.missionBoard ? 'The mission board' : null);
+    // OTA-617 — BUILDING-LEVEL in-person turn-in. If you're inside a faction's
+    // home outpost (no specific board/vendor needed in this exact room), that
+    // faction's hall takes its own contracts at FULL pay. Keeps the three
+    // turn-in paths (this, completeContractFromUI, autoSubmit) in agreement and
+    // is what makes "auto-complete on entering the building" actually pay out.
+    if (!turnFaction && isHubLocation(player.currentLocationId)) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { startingLocationForFaction } = require('../engine/character');
+      const homeFaction = FACTIONS.find((f) => {
+        try { return startingLocationForFaction(f.id) === player.currentLocationId; } catch { return false; }
+      });
+      if (homeFaction) {
+        turnFaction = homeFaction.id;
+        turnSourceName = `the ${homeFaction.name} hall`;
+      }
+    }
     if (!remote && (!turnFaction || !turnSourceName)) {
       // If the player named a specific contract, fuzzy-match it and tell
       // them the exact faction + sample vendor names. Otherwise fall
@@ -17111,14 +17127,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           })
           .filter((i) => (i.quantity ?? 1) > 0);
       }
-      // arb171 — proximity-gated reward (closes the "COMPLETE pays 100% from
-      // anywhere" exploit the audit flagged). In person at a same-faction vendor
-      // or mission board → FULL; from afar this button couriers it for HALF,
-      // matching turnInFactionQuest's send-word rule. (Travelling to the spot
-      // auto-submits at full — see the arrival handler.)
-      const turnScene = get().currentScene;
-      const turnFaction = turnScene?.vendor?.faction ?? turnScene?.missionBoard?.faction ?? null;
-      const inPerson = turnFaction === def.factionId;
+      // arb171 / OTA-617 — proximity-gated reward (closes the "COMPLETE pays 100%
+      // from anywhere" exploit). In person → FULL; couriered from afar → HALF.
+      // "In person" is now BUILDING-LEVEL: a same-faction vendor/board in scene
+      // OR anywhere inside the faction's home outpost. (Travelling to the
+      // building auto-submits at full — see the arrival handler.)
+      const inPerson = atFactionTurnInBuilding(get, def.factionId);
       const payTc = inPerson ? def.reward.tc : Math.max(1, Math.round(def.reward.tc * 0.5));
       const payRep = inPerson ? def.reward.rep : Math.max(1, Math.round(def.reward.rep * 0.5));
       const repResult = applyRepChange(player.factionStanding, def.factionId, payRep);
@@ -23540,6 +23554,27 @@ const WHILE_AWAY_LINES: ReadonlyArray<{ channel: 'arbiter' | 'world'; line: stri
 // frays at the edges so the player goes to bed thinking about what
 // they were about to start.
 type ContractKind = 'hunt' | 'mystery' | 'storyline' | 'faction_quest';
+/** OTA-617 — BUILDING-LEVEL turn-in proximity. A faction quest counts as "in
+ *  person" (full reward + auto-submit on arrival) when you're EITHER in a scene
+ *  with a same-faction vendor / mission board, OR anywhere inside that faction's
+ *  home OUTPOST building. The player asked not to require the exact board room —
+ *  walking into the building is enough. Couriering from afar (the Contracts
+ *  COMPLETE button while NOT in the building) still pays HALF, so arb171's
+ *  "full reward from anywhere" exploit stays closed. */
+function atFactionTurnInBuilding(get: () => GameStore, factionId: string): boolean {
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!player) return false;
+  if (scene?.vendor?.faction === factionId || scene?.missionBoard?.faction === factionId) return true;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { startingLocationForFaction } = require('../engine/character');
+    return isHubLocation(player.currentLocationId)
+      && startingLocationForFaction(factionId) === player.currentLocationId;
+  } catch {
+    return false;
+  }
+}
 /** arb171 — on arrival at a scene where a same-faction vendor or mission board is
  *  present, auto-turn-in every active faction quest whose WORK is done (staged →
  *  all stages; fetch → items in hand), at FULL reward, and surface a completion
@@ -23552,15 +23587,16 @@ function autoSubmitReadyFactionQuests(
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
-  const turnFaction = scene.vendor?.faction ?? scene.missionBoard?.faction ?? null;
-  if (!turnFaction) return;
   const countItem = (name: string) =>
     (player.inventory ?? [])
       .filter((i) => i.name.toLowerCase() === name.toLowerCase())
       .reduce((n, i) => n + (i.quantity ?? 1), 0);
+  // OTA-617 — fire for every ready faction quest whose turn-in is reachable from
+  // HERE (a same-faction agent/board in scene, OR you're inside that faction's
+  // home building). No longer requires the exact board room.
   const ready = (player.activeFactionQuests ?? [])
     .map((rec) => ({ rec, def: findFactionQuestById(rec.id) }))
-    .filter(({ rec, def }) => !!def && def.factionId === turnFaction && factionQuestReady(def, rec.stage, countItem));
+    .filter(({ rec, def }) => !!def && factionQuestReady(def, rec.stage, countItem) && atFactionTurnInBuilding(get, def.factionId));
   if (ready.length === 0) return;
   const lines: string[] = [];
   const rewards: string[] = [];
