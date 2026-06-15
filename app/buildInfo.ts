@@ -15055,4 +15055,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // for that faction auto-submits at full and the completion popup (pendingWhisperComplete) shows the mission name + total,
 // and the quest is marked complete. Couriering from afar (Contracts COMPLETE / send-word while NOT in the building) still
 // pays HALF, so arb171's "full from anywhere" exploit stays closed. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-617';
+// OTA-618 (Biunoctium Ration) — [clarity · player-reported] "inconsistent health recovery from trail rations". It was
+// never inconsistent: Trail Rations is a FIXED heal (gear.json healHP 6), and both the use_relic and eat paths cap the
+// gain at your missing HP and DISPLAY the actual amount gained. So a "+5" off a 6-HP ration was simply the cap as you
+// neared full — but with no label it read like a random roll. Fix: when the gain is capped below the item's healHP (you
+// were near max), the line now appends "(topped off)" on both paths, so the fixed recovery reads as fixed. No change to
+// the heal amount or the cap. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-618';

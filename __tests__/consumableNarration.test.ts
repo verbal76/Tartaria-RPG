@@ -111,3 +111,28 @@ describe('OTA 23-010 — consumable narration picks the right verb', () => {
     expect(logs).toMatch(/You use one First Aid Kit/);
   });
 });
+
+describe('OTA-618 — a max-HP-capped consumable heal reads as "topped off"', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  it('use Trail Rations with plenty of room heals the full +6 (no "topped off")', async () => {
+    // setupConsumable leaves hp 5 / hpMax 30 → 25 room, so the fixed 6 lands whole.
+    const store = await setupConsumable('Trail Rations');
+    store.getState().submitPlayerAction('use trail rations');
+    const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+    expect(logs).toMatch(/\+6 HP/);
+    expect(logs).not.toMatch(/topped off/);
+  });
+
+  it('use Trail Rations near max caps the gain and labels it "topped off" (not a random roll)', async () => {
+    const store = await setupConsumable('Trail Rations');
+    store.setState((s) => ({ player: { ...s.player!, hp: s.player!.hpMax - 3 } })); // only 3 room
+    store.getState().submitPlayerAction('use trail rations');
+    const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+    expect(logs).toMatch(/\+3 HP \(topped off\)/);
+  });
+});

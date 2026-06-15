@@ -9076,7 +9076,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 const room = Math.max(0, p.hpMax - p.hp);
                 const amt = Math.min(room, fx.healHP);
                 p = { ...p, hp: p.hp + amt };
-                messages.push(amt > 0 ? `+${amt} HP` : 'HP already full');
+                // OTA-618 — when the gain is capped by your max HP (you were near
+                // full), flag it. A "+5" off a 6-HP ration then reads as "topped
+                // off", not an inconsistent/random heal — the recovery is fixed.
+                messages.push(
+                  amt <= 0 ? 'HP already full'
+                    : amt < fx.healHP ? `+${amt} HP (topped off)`
+                    : `+${amt} HP`,
+                );
               }
               if (fx.restoreStamina) {
                 const room = Math.max(0, effectiveStaminaMax(p) - p.stamina);
@@ -9328,7 +9335,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ),
           });
           const tailParts: string[] = [];
-          if (heal > 0) tailParts.push(`+${heal} HP`);
+          // OTA-618 — same as the 'use' path: a max-HP-capped heal reads as
+          // "topped off" instead of looking like an inconsistent roll.
+          if (heal > 0) tailParts.push(heal < (fx?.healHP ?? heal) ? `+${heal} HP (topped off)` : `+${heal} HP`);
           if (stamGain > 0) tailParts.push(`+${stamGain} stamina`);
           if (bleedCured) tailParts.push('bleeding stopped');
           if (poisonCured) tailParts.push('poison neutralized');
