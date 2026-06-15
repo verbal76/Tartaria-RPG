@@ -9151,11 +9151,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set({ player: advanceTime(p, 0.25) });
               get().appendLog('world', `You use one ${used.name}. ${messages.join(', ')}.`);
               void get().persist();
-              // OTA-611 — using a consumable effect (heal/stamina/cleanse) in a
-              // fight is a turn: the enemy group still swings (player ruling).
-              if (currentScene.enemies.length > 0) {
-                runEnemyGroupCounters(get, set, get().player ?? player);
-              }
+              // OTA-619 — combat consumable use is a FAST action (player ruling):
+              // quaffing a heal/cleanse mid-fight no longer hands the enemy a free
+              // swing (Skyrim-style). The OTA-611 counter here is removed.
               break;
             }
             // OTA-200 — explain gate items when the player tries to
@@ -9358,14 +9356,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Heal may push us back over the 5% latch threshold.
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();
-          // OTA-611 — exploit close (player ruling): eating/first-aid/drinking a
-          // consumable mid-fight is a TURN — the enemy group still gets its
-          // swing, so you can't attack→heal→attack for free. Out of combat it's
-          // free. Covers food heals, First Aid Kits, and Water-Bottle drinks
-          // (which route here via the drink→eat re-dispatch).
-          if (currentScene.enemies.length > 0) {
-            runEnemyGroupCounters(get, set, get().player ?? player);
-          }
+          // OTA-619 — combat eating/first-aid/drinking is a FAST action (player
+          // ruling): it no longer hands the enemy group a free swing, so a heal
+          // mid-fight is viable like a Skyrim potion. (The OTA-611 counter here —
+          // food heals, First Aid Kits, and Water-Bottle drinks routed via the
+          // drink→eat re-dispatch — is removed.)
         } else {
           // OTA-155 — eat-without-target refusal. Stress sweep found:
           // "eat ratoin" (typo) and bare "eat" both fall through this
@@ -10877,12 +10872,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
               : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
           );
-          // OTA-611 — exploit close (player ruling): a combat sip is a turn.
-          // Stamina-from-water stays (your only in-combat regen), but the enemy
-          // group swings, so it's no longer free + infinite.
-          if (currentScene.enemies.length > 0) {
-            runEnemyGroupCounters(get, set, get().player ?? player);
-          }
+          // OTA-619 — a combat sip is a FAST action now (player ruling): drinking
+          // from a water source mid-fight no longer draws a free enemy swing,
+          // matching the consumable-heal change above.
           break;
         }
         get().appendLog(

@@ -15061,4 +15061,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // neared full — but with no label it read like a random roll. Fix: when the gain is capped below the item's healHP (you
 // were near max), the line now appends "(topped off)" on both paths, so the fixed recovery reads as fixed. No change to
 // the heal amount or the cap. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-618';
+// OTA-619 (Biununennium Quaff) — [balance · player ruling] combat healing is now a FAST action. OTA-611 had made
+// eating/first-aid/drinking mid-fight provoke the full enemy counter; in play that made a +6 ration cost a ~9 swing —
+// healing was a losing trade and non-viable (the Aetheric Scarab fight). Per the player's revised call (Skyrim-style
+// quaff), the three consumable counters are removed: the eat path (food / First Aid Kit / Water-Bottle drink), the
+// use_relic consumable-effect path (heal/stamina/cleanse vials), and the cup-hands water drink. KEPT: the golem-command
+// player volley and the disengage stamina+counter (those weren't about healing). Heal amounts unchanged. Reopens the
+// heal-instead-of-attack tempo by design — accepted. Locked by combatHealNoCounter (HP moves only by the heal). JS-only →
+// 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-619';
