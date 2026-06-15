@@ -184,6 +184,9 @@ export function MapScreen() {
   // place row calls setTravelCourse + bounces to exploration.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
   const appendLog = useGameStore((s) => s.appendLog);
+  // OTA-616 — turn a contract in directly from the map when you're standing on
+  // its anchor (the route row would otherwise just grey out).
+  const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   // OTA-498 — discovered-location set drives the Hidden Market "?" reveal: the
   // travel-list row + the map overlay both show "?" until the id is in here.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
@@ -809,10 +812,36 @@ export function MapScreen() {
                   <TouchableOpacity
                     key={cm.key}
                     style={[styles.placeRow, styles.contractRow, isHere && styles.placeRowHere]}
-                    activeOpacity={isHere ? 1 : 0.7}
-                    disabled={isHere}
+                    activeOpacity={0.7}
                     onPress={() => {
                       if (!player) return;
+                      // OTA-616 — standing on the contract's anchor (its turn-in
+                      // counter): tapping turns it in if ready. completeContractFromUI
+                      // self-gates — it pays out when complete, or tells you exactly
+                      // what's left (stage / items) when not. Leads have no manual
+                      // turn-in (they close on the kill out in the world), so hint.
+                      if (isHere) {
+                        const TURN_IN_KIND: Record<string, 'hunt' | 'mystery' | 'storyline' | 'faction_quest' | undefined> = {
+                          hunt: 'hunt',
+                          mystery: 'mystery',
+                          storyline: 'storyline',
+                          faction: 'faction_quest',
+                        };
+                        const kind = TURN_IN_KIND[cm.family];
+                        if (kind) {
+                          const contractId = cm.key.slice(cm.family.length + 1);
+                          completeContractFromUI(kind, contractId);
+                          // Flip to exploration so the reward — or the "not ready,
+                          // here's what's left" line — is visible in the feed.
+                          setScreen('exploration');
+                        } else {
+                          appendLog(
+                            'arbiter',
+                            `The Arbiter nods at the lead. "This one closes when the work is done out there — not at a counter."`,
+                          );
+                        }
+                        return;
+                      }
                       if (player.hubRoomId) {
                         appendLog(
                           'arbiter',
@@ -836,7 +865,11 @@ export function MapScreen() {
                     </View>
                     <View style={styles.placeRowRight}>
                       {isHere ? (
-                        <Text style={styles.placeHereTag}>YOU ARE HERE</Text>
+                        // OTA-616 — on the anchor: leads close in the field (no
+                        // counter turn-in), everything else can be turned in here.
+                        <Text style={styles.placeHereTag}>
+                          {cm.family === 'lead' ? 'YOU ARE HERE' : 'TURN IN ▸'}
+                        </Text>
                       ) : (
                         <Text style={styles.placeDanger}>Danger {info?.danger ?? 2}/5</Text>
                       )}

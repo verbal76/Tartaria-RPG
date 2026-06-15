@@ -15038,4 +15038,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // first STEP is gated on stamina now (mirroring continueTravel), so you can plan a route while spent, rest, then tap → to
 // set out. Planning is also free of the old 15-min "fumbling" tick (that was the refusal penalty, which no longer happens).
 // refusedTravelTimeTick + setCourseRepro tests updated/added. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-615';
+// OTA-616 (Biunhexium Counter) — [feature · player-requested] turn a contract in from its MAP ANCHOR row. When you're
+// standing on a contract's anchor, the route row used to grey out (can't route to where you already are) — felt like a
+// dead row, especially for fetch faction quests anchored to your own faction home (e.g. Scrap Run → Reclaimer's Stake).
+// Now tapping that row turns the contract in: completeContractFromUI self-gates (pays out when complete, or tells you the
+// stage/items still owed when not), and arb171's proximity rule still applies (full at a same-faction vendor/board, half
+// couriered). family→kind mapped ('faction'→'faction_quest'); id parsed from the marker key; leads (which close on the
+// field kill, not at a counter) just hint. Right-side tag shows TURN IN ▸ instead of YOU ARE HERE. JS-only → 290.
+// app/screens/MapScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-12-616';

@@ -1149,6 +1149,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-613': 'Biuntrium Sweep',
   '2026-06-12-614': 'Biunquadium Rest',
   '2026-06-12-615': 'Biunpentium Course',
+  '2026-06-12-616': 'Biunhexium Counter',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
