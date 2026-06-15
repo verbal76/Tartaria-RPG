@@ -7690,11 +7690,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ) {
           const tgtLower = rawTarget.toLowerCase();
           const climbedNoun = currentScene.elevatedOn.noun.toLowerCase();
-          const isClimbedNoun = tgtLower.includes(climbedNoun) || climbedNoun.includes(tgtLower);
-          const isGroundNoun = (currentScene.ambientNouns ?? []).some((n) => {
-            const nl = n.toLowerCase();
-            return nl.includes(tgtLower) || tgtLower.includes(nl);
-          });
+          // OTA-608 — head-noun-anchored match (see climbHeight.sameClimbNoun).
+          // The old bidirectional `includes` let "spire" (the climbed noun)
+          // mid-phrase-match a different ground prop like "grand spire
+          // capacitor", so investigating it wrongly fired "you're up — climb
+          // down" when you were on a *different* thing. Anchored matching keeps
+          // legit short↔full forms while killing the cross-prop false-positive.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { sameClimbNoun } = require('../engine/climbHeight') as typeof import('../engine/climbHeight');
+          const isClimbedNoun = sameClimbNoun(tgtLower, climbedNoun);
+          const isGroundNoun = (currentScene.ambientNouns ?? []).some((n) =>
+            sameClimbNoun(n.toLowerCase(), tgtLower),
+          );
           if (isGroundNoun && !isClimbedNoun) {
             get().appendLog(
               'arbiter',

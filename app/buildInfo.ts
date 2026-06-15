@@ -14964,4 +14964,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "Use" is the real hurl-ready affordance) — useIsRealAction = consumable || hasEffect || (offEligible && throwable). Plain
 // weapons now show Equip-only; throwables keep their Use, and effect-bearing items (Torch/Lens/Scanner) are unchanged.
 // JS-only → 290. app/screens/InventoryScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-12-607';
+// OTA-608 (Biniloctium Anchor) — [climb fix · arbiters-line] two climb bugs from one root: loose noun matching on climb
+// state. (1) "skips stages on the way up" — maxClimbedTier matched a climbed: marker via bidirectional `includes`, so a
+// generic head word matched MID-PHRASE in a DIFFERENT prop ("climbed:spire:t4" fuzzy-matched "grand spire capacitor"
+// because it contains "spire"), bleeding one climb's tier progress onto another. (2) "investigate certain items suddenly
+// says climb down when I never climbed" — the elevated-investigate gate used the same loose `includes`, so a stray
+// mid-phrase match misfired the "you're up — climb down" refusal. Fix: new sameClimbNoun() does HEAD-NOUN-ANCHORED
+// matching — the shorter form must be a whole-word SUFFIX of the longer (English climb nouns are head-final: "grand spire
+// capacitor" IS a capacitor). Keeps the legit OTA-086 short<->full case ("spire" <-> "zharak's teeth spire") while killing
+// cross-prop contamination. Applied in maxClimbedTier (+isClimbCleared) and the gameStore gate; 4 regression tests added.
+// JS-only → 290. app/engine/climbHeight.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-608';

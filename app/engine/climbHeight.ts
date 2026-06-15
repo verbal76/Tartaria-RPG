@@ -95,6 +95,28 @@ export function climbTierLabel(tier: number, total: number): string {
 // either holds, the marker is considered to belong to this noun.
 // Same idea as the searchedAmbientNouns / flavorExhaustedNouns
 // fuzzy check; mismatched-resolution forms no longer leak.
+// OTA-608 — head-noun-anchored climb-noun match. The old check was a
+// bidirectional `includes` (markerNoun is a substring of noun OR vice versa),
+// which let a generic head word match MID-PHRASE in a DIFFERENT prop: a
+// "climbed:spire:t4" marker (or an elevatedOn on a "spire") fuzzy-matched
+// "grand spire capacitor" because that string contains "spire" — so one
+// climb's progress/elevation bled onto another (player: climbs "skip stages",
+// and investigating a different prop wrongly demands you "climb down").
+//
+// English climb nouns are head-final: "grand spire capacitor" IS a capacitor,
+// "zharak's teeth spire" IS a spire. So the shorter form is the right match
+// only when it's a whole-word SUFFIX (the head noun) of the longer — that
+// keeps the legit short↔full case ("spire" ↔ "zharak's teeth spire") while
+// rejecting the mid-phrase contamination ("spire" vs "...spire capacitor").
+export function sameClimbNoun(a: string, b: string): boolean {
+  const x = a.toLowerCase().trim();
+  const y = b.toLowerCase().trim();
+  if (!x || !y) return false;
+  if (x === y) return true;
+  const [shorter, longer] = x.length <= y.length ? [x, y] : [y, x];
+  return longer.endsWith(' ' + shorter);
+}
+
 export function maxClimbedTier(noun: string, marks: readonly string[]): number {
   const nounLower = noun.toLowerCase();
   let max = 0;
@@ -105,11 +127,7 @@ export function maxClimbedTier(noun: string, marks: readonly string[]): number {
     // can itself contain colons in pathological cases, so guard.
     if (parts.length < 3) continue;
     const markerNoun = parts.slice(1, parts.length - 1).join(':').toLowerCase();
-    const matches =
-      markerNoun === nounLower
-      || nounLower.includes(markerNoun)
-      || markerNoun.includes(nounLower);
-    if (!matches) continue;
+    if (!sameClimbNoun(markerNoun, nounLower)) continue;
     const seg = parts[parts.length - 1] ?? '';
     const numStr = seg.startsWith('t') ? seg.slice(1) : seg;
     const t = parseInt(numStr, 10);

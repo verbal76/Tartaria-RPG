@@ -1141,6 +1141,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-605': 'Binilpentium Reach',
   '2026-06-12-606': 'Binilhexium Trove',
   '2026-06-12-607': 'Binilseptium Grip',
+  '2026-06-12-608': 'Biniloctium Anchor',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

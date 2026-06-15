@@ -97,6 +97,37 @@ describe('OTA 046 — climb-cleared marker lookup', () => {
         expect(isClimbCleared("zharak's teeth spire", marks)).toBe(true);
       });
     });
+
+    // OTA-608 — head-noun-anchored match. The OTA-086 bidirectional
+    // `includes` let a generic head word match MID-PHRASE in a DIFFERENT
+    // prop, so one climb's progress bled onto another (player: climbs
+    // "skip stages", and investigating a different prop wrongly demands
+    // "climb down"). The shorter form now only matches as a whole-word
+    // SUFFIX (the head noun), so cross-prop contamination is gone while
+    // the legit short<->full case still works.
+    describe('OTA-608 no cross-prop contamination', () => {
+      it('a "spire" marker does NOT advance a different "...spire capacitor"', () => {
+        const marks = ['climbed:spire:t4'];
+        // contains "spire" mid-phrase but IS a capacitor, not a spire
+        expect(maxClimbedTier('grand spire capacitor', marks)).toBe(0);
+        expect(maxClimbedTier('broken grand spire capacitor', marks)).toBe(0);
+        expect(isClimbCleared('broken grand spire capacitor', marks)).toBe(false);
+      });
+
+      it('two distinct full prop names never cross-match', () => {
+        const marks = ['climbed:shattered grand spire capacitor:t4'];
+        expect(maxClimbedTier('broken grand spire capacitor', marks)).toBe(0);
+      });
+
+      it('still matches the legit short<->full head-noun forms (OTA-086 preserved)', () => {
+        expect(maxClimbedTier("zharak's teeth spire", ['climbed:spire:t4'])).toBe(4);
+        expect(maxClimbedTier('spire', ["climbed:zharak's teeth spire:t4"])).toBe(4);
+      });
+
+      it('"tower" marker does not advance "watchtower" (no partial-word match)', () => {
+        expect(maxClimbedTier('ancient watchtower', ['climbed:tower:t4'])).toBe(0);
+      });
+    });
   });
 
   describe('isClimbCleared', () => {
