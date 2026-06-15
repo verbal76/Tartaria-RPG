@@ -1427,6 +1427,12 @@ export interface WorldMemory {
    *  locks the safety-net path so the player can never get a third dog
    *  via this mechanic. */
   puppyVendorUsed?: boolean;
+  /** OTA-613 — names of bosses that have already paid out their GUARANTEED
+   *  Resurrection Gem. A boss kill normally guarantees a gem; if a boss can be
+   *  re-fought (respawn / re-rolled encounter), the guarantee would mint a gem
+   *  every kill and drain death of its stakes. The guarantee fires once per
+   *  distinct boss name; re-kills fall back to the rare organic drop rate. */
+  gemBossDefeatedKeys?: string[];
   /** OTA-120 — set true when the puppy vendor has been queued for the
    *  player's next outdoor scene entry after a Core Guardian victory.
    *  The next outdoor scene-entry consumes this flag and spawns the

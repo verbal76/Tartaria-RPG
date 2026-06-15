@@ -112,6 +112,40 @@ describe('OTA-193 — canCraft accepts tag-substitute misc items', () => {
   });
 });
 
+// OTA-613 — a single misc item carrying two substitute tags must NOT satisfy
+// two different ingredients at once. Pre-fix, canCraft counted each ingredient
+// independently while the drain consumed the item once, so a 2-material recipe
+// crafted for 1.
+const METAL_BONE_RELIC: Recipe = {
+  result: 'Marrow Fetish',
+  ingredients: [
+    { name: 'Scrap Metal', quantity: 1 }, // tags: metal/plate/iron/blade
+    { name: 'Bone Shard', quantity: 1 },  // tags: organic/bone
+  ],
+};
+
+describe('OTA-613 — one item cannot substitute for two ingredients at once', () => {
+  it('a single [metal, bone] misc item does NOT satisfy both Scrap Metal and Bone Shard', () => {
+    const inv: InventoryItem[] = [
+      inferred('Whisper Marrow', 'metal', { tags: ['metal', 'bone'] }),
+    ];
+    expect(canCraft(METAL_BONE_RELIC, inv)).toBe(false);
+    expect(missingIngredients(METAL_BONE_RELIC, inv)).toEqual([
+      { name: 'Bone Shard', quantity: 1 },
+    ]);
+  });
+
+  it('two such items DO satisfy it, and the craft drains BOTH (no underpay)', () => {
+    const inv: InventoryItem[] = [
+      inferred('Whisper Marrow', 'metal', { id: 'wm1', tags: ['metal', 'bone'] }),
+      inferred('Whisper Marrow', 'metal', { id: 'wm2', tags: ['metal', 'bone'] }),
+    ];
+    expect(canCraft(METAL_BONE_RELIC, inv)).toBe(true);
+    const after = consumeIngredients(inv, METAL_BONE_RELIC);
+    expect(after.reduce((n, i) => n + i.quantity, 0)).toBe(0);
+  });
+});
+
 describe('OTA-193 — substitution preview lists what will be consumed', () => {
   it('previews a Brass Sextant as the Scrap Metal substitute', () => {
     const inv: InventoryItem[] = [material('Stick', 1), inferred('Brass Sextant', 'metal')];

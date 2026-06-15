@@ -350,36 +350,10 @@ function isSubstitutable(item: InventoryItem): boolean {
   return true;
 }
 
-/** Count substitute material an ingredient could draw from the
- *  inventory. Each substitutable item contributes 1 unit per stack
- *  count toward the ingredient — a 1-for-1 trade so the player doesn't
- *  get more value out of substitution than scrap-then-craft would
- *  yield. Inferred items mostly stack at 1, which keeps this honest. */
-function substituteQuantityFor(
-  inventory: readonly InventoryItem[],
-  ingredientName: string,
-): number {
-  const tags = MATERIAL_SUBSTITUTE_TAGS[ingredientName.toLowerCase()];
-  if (!tags) return 0;
-  const tagSet = new Set(tags);
-  const targetName = ingredientName.toLowerCase();
-  let total = 0;
-  for (const item of inventory) {
-    if (item.name.toLowerCase() === targetName) continue; // counted by name path
-    if (!isSubstitutable(item)) continue;
-    const has = (item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()));
-    if (has) total += item.quantity;
-  }
-  return total;
-}
-
 export function canCraft(recipe: Recipe, inventory: readonly InventoryItem[]): boolean {
-  return recipe.ingredients.every((ing) => {
-    const named = totalQuantity(inventory, ing.name);
-    if (named >= ing.quantity) return true;
-    const subs = substituteQuantityFor(inventory, ing.name);
-    return named + subs >= ing.quantity;
-  });
+  // OTA-613 — allocation-aware (see ingredientShortfall): a misc item with two
+  // matching tags can satisfy only ONE ingredient, matching the actual drain.
+  return ingredientShortfall(recipe.ingredients, inventory).length === 0;
 }
 
 /** OTA-205 — substitution-aware shortage check for a flat ingredient
@@ -391,16 +365,9 @@ export function missingIngredientsList(
   ingredients: ReadonlyArray<{ name: string; quantity: number }>,
   inventory: readonly InventoryItem[],
 ): Array<{ name: string; quantity: number }> {
-  const out: Array<{ name: string; quantity: number }> = [];
-  for (const ing of ingredients) {
-    const named = totalQuantity(inventory, ing.name);
-    const subs = substituteQuantityFor(inventory, ing.name);
-    const have = named + subs;
-    if (have < ing.quantity) {
-      out.push({ name: ing.name, quantity: ing.quantity - have });
-    }
-  }
-  return out;
+  // OTA-613 — allocation-aware, mirroring the drain (see ingredientShortfall),
+  // so the "you still need X" line matches what the craft would actually pay.
+  return ingredientShortfall(ingredients, inventory);
 }
 
 /** OTA-193 — list ingredients still short after both name + substitute
@@ -493,6 +460,51 @@ export function consumeIngredientsList(
     }
   }
   return next.filter((i) => i.quantity > 0);
+}
+
+/** OTA-613 — allocation-aware ingredient shortfall, mirroring
+ *  consumeIngredientsList's exact-name-then-substitute drain on a mutable
+ *  quantity copy. The availability gates below previously counted each
+ *  ingredient's substitutes INDEPENDENTLY, so a single misc item carrying two
+ *  matching tags (e.g. [metal, bone]) could satisfy BOTH a
+ *  Scrap Metal and a Bone Shard ingredient in the check — but the real drain
+ *  consumed it once, so the craft went through paying one material short. This
+ *  allocates each item to the first ingredient that claims it, exactly as the
+ *  drain does, so canCraft can never approve a craft the drain would underpay. */
+function ingredientShortfall(
+  ingredients: ReadonlyArray<{ name: string; quantity: number }>,
+  inventory: readonly InventoryItem[],
+): Array<{ name: string; quantity: number }> {
+  const pool = inventory.map((i) => ({
+    name: i.name.toLowerCase(),
+    tags: (i.tags ?? []).map((t) => t.toLowerCase()),
+    qty: i.quantity,
+    sub: isSubstitutable(i),
+  }));
+  const out: Array<{ name: string; quantity: number }> = [];
+  for (const ing of ingredients) {
+    let need = ing.quantity;
+    const target = ing.name.toLowerCase();
+    // Pass 1 — exact-name drain.
+    for (const p of pool) {
+      if (need <= 0) break;
+      if (p.qty <= 0 || p.name !== target) continue;
+      const take = Math.min(p.qty, need); p.qty -= take; need -= take;
+    }
+    // Pass 2 — tag substitution drain (only items not already spent above).
+    const tags = MATERIAL_SUBSTITUTE_TAGS[target];
+    if (tags && need > 0) {
+      const tagSet = new Set(tags);
+      for (const p of pool) {
+        if (need <= 0) break;
+        if (p.qty <= 0 || !p.sub || p.name === target) continue;
+        if (!p.tags.some((t) => tagSet.has(t))) continue;
+        const take = Math.min(p.qty, need); p.qty -= take; need -= take;
+      }
+    }
+    if (need > 0) out.push({ name: ing.name, quantity: need });
+  }
+  return out;
 }
 
 export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recipe[] {

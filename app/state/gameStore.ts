@@ -3449,6 +3449,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...saved.worldMemory,
         puppyVendorOwed: saved.worldMemory.puppyVendorOwed ?? false,
         puppyVendorUsed: saved.worldMemory.puppyVendorUsed ?? false,
+        gemBossDefeatedKeys: saved.worldMemory.gemBossDefeatedKeys ?? [],
         puppyVendorQueued: saved.worldMemory.puppyVendorQueued ?? false,
         dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
         dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
@@ -13086,52 +13087,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const attack = steps.find((s) => s.id === 'attack');
     const damage = steps.find((s) => s.id === 'damage');
     const skill = steps.find((s) => s.id === 'skill_check');
-    const restRoll = steps.find((s) => s.id === 'rest_hours');
-
-    // ── REST ──────────────────────────────────────────────────────────────
-    if (restRoll) {
-      const hours = restRoll.total ?? 4;
-      const hpRoom = player.hpMax - player.hp;
-      const stamRoom = effectiveStaminaMax(player) - player.stamina;
-      // Refuse pointless rest. Playtest: rapid-tapping rest at full
-      // HP+stamina was burning game-time hours for no benefit, advancing
-      // from Day 1 evening to Day 2 afternoon in four taps.
-      if (hpRoom === 0 && stamRoom === 0) {
-        get().appendLog(
-          'world',
-          'You are whole, breath steady, HP and stamina topped. No reason to lie down — the day still has road left.',
-        );
-        void get().persist();
-        return;
-      }
-      // Deterministic: 2 HP per hour, 1 stamina per hour, capped.
-      const heal = Math.min(hpRoom, hours * 2);
-      const stamGain = Math.min(stamRoom, hours);
-      const newHours = (player.hoursElapsed ?? 0) + hours;
-      set({
-        player: {
-          ...player,
-          hp: player.hp + heal,
-          stamina: player.stamina + stamGain,
-          hoursElapsed: newHours,
-        },
-      });
-      // arb170 — camping also mends the golem ~25% of its max HP, so keeping it
-      // alive doesn't drain your materials between fights (you still feed it for
-      // a fast in-the-field top-up).
-      const restGolem = get().player?.golem;
-      if (restGolem && restGolem.hp > 0 && restGolem.hp < restGolem.hpMax) {
-        const gMend = Math.min(restGolem.hpMax - restGolem.hp, Math.max(3, Math.round(restGolem.hpMax * 0.25)));
-        set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: { ...s.player.golem, hp: s.player.golem.hp + gMend } } } : s));
-      }
-      const parts: string[] = [];
-      if (heal > 0) parts.push(`+${heal} HP`);
-      if (stamGain > 0) parts.push(`+${stamGain} stamina`);
-      const tail = parts.length > 0 ? parts.join(', ') + ' recovered.' : 'Whole already — the Aetherstone hums steady.';
-      get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
-      void get().persist();
-      return;
-    }
+    // OTA-613 — the REST branch that lived here resolved a `rest_hours` roll
+    // step, but the only producer of that step (combatRules.buildRestSteps) had
+    // no callers, so this block was unreachable. Worse, it healed HP/stamina +
+    // mended the golem WITHOUT the ambush / hunger / weather rolls that the real
+    // rest paths (submitPlayerAction 'rest') enforce — a free, risk-free heal if
+    // anyone ever wired it up. Removed along with buildRestSteps so it can't be
+    // revived by accident.
 
     // ── SKILL CHECK ───────────────────────────────────────────────────────
     if (skill) {
@@ -14912,8 +14874,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // for grinders without flooding the stash.
     const PITY_KILL_INTERVAL = 100;
     const pityHit = !enemy.boss && newKills > 0 && newKills % PITY_KILL_INTERVAL === 0;
-    const gemDropped = enemy.boss || pityHit
+    // OTA-613 — the boss guarantee fires once per distinct boss. If a boss can
+    // be re-fought (respawn / re-rolled encounter), a guaranteed gem every kill
+    // would flood the stash and drain death of stakes (the same concern that
+    // raised the pity interval 50→100). On a repeat boss the guarantee lapses
+    // and the kill falls back to the rare organic roll like any other.
+    const bossGemKey = enemy.boss ? (enemy.name ?? 'boss') : null;
+    const bossAlreadyPaid = bossGemKey != null
+      && (get().worldMemory.gemBossDefeatedKeys ?? []).includes(bossGemKey);
+    const bossGuarantee = !!enemy.boss && !bossAlreadyPaid;
+    const gemDropped = bossGuarantee || pityHit
       || Math.random() < resurrectionGemDropChance(get().player?.raceId);
+    if (bossGuarantee && bossGemKey != null) {
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          gemBossDefeatedKeys: [...(s.worldMemory.gemBossDefeatedKeys ?? []), bossGemKey],
+        },
+      }));
+    }
     if (gemDropped) {
       void addResurrectionGems(1).then((total) => {
         set({ resurrectionGems: total });

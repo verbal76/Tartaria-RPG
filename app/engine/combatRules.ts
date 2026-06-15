@@ -677,21 +677,10 @@ const INTENT_ACTION_VERB: Record<string, string> = {
   use_relic: 'USE RELIC',
 };
 
-// Single roll for rest duration. 1d4+3 = 4-7 hours. The store derives
-// HP + stamina recovery deterministically from the rolled hours, so the
-// player can see "longer rest = more recovery" instead of three opaque
-// random numbers.
-export function buildRestSteps(): RollStep[] {
-  return [{
-    id: 'rest_hours',
-    label: 'Roll for REST HOURS',
-    sides: 4,
-    count: 1,
-    bonus: 3,
-    bonusLabel: '+3',
-    context: 'd4 + 3 — how long you sit. Each hour gives 2 HP and 1 stamina (capped at your max).',
-  }];
-}
+// OTA-613 — buildRestSteps (the only producer of a `rest_hours` roll step) was
+// removed: it had no callers, and its consumer block in concludeRolls was an
+// unreachable, ambush/hunger/weather-free heal. The live rest path is the
+// submitPlayerAction 'rest' case.
 
 export function buildSkillSteps(
   intent: string,

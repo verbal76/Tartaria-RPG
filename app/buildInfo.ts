@@ -15012,4 +15012,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Added a PLAYER-level steal-heat (stealHeat/stealHeatHours) that survives re-entry and decays ~1 per in-game hour; the
 // effective streak is max(vendor attempts, decayed heat), bumped on every attempt (success or caught). JS-only → 290.
 // app/state/gameStore.ts, app/engine/types.ts.
-export const OTA_BUILD_ID = '2026-06-12-612';
+// OTA-613 (Biuntrium Sweep) — [exploit closes + hygiene · arbiters-line] audit batch 3 (the LOW items). (1) Resurrection
+// Gem boss-farm: a boss kill GUARANTEES a gem, so any re-fightable boss minted one every kill and drained death of its
+// stakes. The guarantee now fires once per distinct boss name (worldMemory.gemBossDefeatedKeys); a re-kill falls back to
+// the rare organic roll. (2) Craft substitution under-pay: canCraft / missingIngredients counted each ingredient's
+// substitutes INDEPENDENTLY, so one misc item carrying two matching tags (e.g. [metal,bone]) satisfied BOTH a Scrap Metal
+// and a Bone Shard ingredient in the check while the drain consumed it once → a 2-material recipe crafted for 1. New
+// allocation-aware ingredientShortfall mirrors the actual drain (orphaned substituteQuantityFor removed). (3) Dead-code
+// hygiene: removed the unreachable concludeRolls REST block + its only producer combatRules.buildRestSteps — an
+// ambush/hunger/weather-free heal that was unwired but would've been a free rest if revived. Dog free-heal/auto-replace
+// reviewed and left AS DESIGNED (single-shot puppy/rubble safety net; dog genuinely dies). JS-only → 290.
+// app/engine/crafting.ts, app/engine/combatRules.ts, app/engine/types.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-613';
