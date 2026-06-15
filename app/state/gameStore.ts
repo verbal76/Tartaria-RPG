@@ -9430,12 +9430,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // if there's a dog to recall — otherwise a full-stamina player could
           // never call the dog back down by resting (the restore lives below).
           const dogToRecall = player.dog?.status === 'waiting_at_base';
-          const fullyRested =
-            stamRoom === 0 && (player.corruption ?? 0) === 0 && !dogToRecall;
-          if (fullyRested) {
+          // OTA-614 — stamRoom <= 0 (not just === 0): when hunger has shrunk the
+          // effective cap to at/below current stamina, rest can recover nothing,
+          // so refuse it rather than burn 8 hours + an ambush roll for +0. And
+          // give the RIGHT reason — a hunger-capped player's wind isn't "full",
+          // it's choked; point them at food, not sleep.
+          const nothingToRest =
+            stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall;
+          if (nothingToRest) {
+            const hungerCappedRefuse =
+              (player.hungerStaminaPenalty ?? 0) > 0 && player.stamina < player.staminaMax;
             get().appendLog(
               'arbiter',
-              `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
+              hungerCappedRefuse
+                ? `The Arbiter shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
+                : `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
             );
             break;
           }
@@ -9477,7 +9486,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hours = 8;
           // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
           const heal = 0;
-          const stamGain = Math.min(stamRoom, hours);
+          // OTA-614 — clamp to >= 0. stamRoom = effectiveStaminaMax - stamina,
+          // and effectiveStaminaMax is the raw cap MINUS the hunger penalty. When
+          // hunger has shrunk the effective cap below current stamina, stamRoom
+          // goes NEGATIVE — and the old Math.min(stamRoom, hours) then DRAINED
+          // stamina down to the hunger cap (e.g. 13 → 10 on an 8-hour rest), which
+          // read to the player as "rest restored nothing / took stamina away".
+          // Rest must never reduce stamina; the worst case is +0 (you're too
+          // hungry to recover more — eat to lift the cap, hinted below).
+          const stamGain = Math.max(0, Math.min(stamRoom, hours));
           // Corruption decay — clean rest sheds one point of
           // corruption ONLY when both of:
           //   - the current weather isn't corrupting (Whisper Fog /
@@ -9584,7 +9601,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (heal > 0) parts.push(`+${heal} HP`);
           if (stamGain > 0) parts.push(`+${stamGain} stamina`);
           if (corrDecay > 0) parts.push(`−${corrDecay} corruption`);
-          const tail = parts.length > 0 ? parts.join(', ') + ' recovered.' : 'Whole already — the Aetherstone hums steady.';
+          // OTA-614 — when rest recovers nothing because HUNGER has capped your
+          // usable stamina (effective max < raw max, and you're below the raw
+          // max), say so instead of the misleading "Whole already" — sleep can't
+          // lift the hunger cap, only eating does.
+          const hungerCapped = parts.length === 0
+            && (player.hungerStaminaPenalty ?? 0) > 0
+            && player.stamina < player.staminaMax;
+          const tail = parts.length > 0
+            ? parts.join(', ') + ' recovered.'
+            : hungerCapped
+              ? 'Hunger has capped your wind — sleep can\'t lift it. Eat something to recover the rest.'
+              : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
           // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
           // granted above), then the encounter fires AFTER recovery

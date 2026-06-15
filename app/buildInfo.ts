@@ -15023,4 +15023,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ambush/hunger/weather-free heal that was unwired but would've been a free rest if revived. Dog free-heal/auto-replace
 // reviewed and left AS DESIGNED (single-shot puppy/rubble safety net; dog genuinely dies). JS-only → 290.
 // app/engine/crafting.ts, app/engine/combatRules.ts, app/engine/types.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-613';
+// OTA-614 (Biunquadium Rest) — [bug · player-reported] rest could DRAIN stamina instead of restoring it. The live 8-hour
+// rest computed stamGain = Math.min(stamRoom, hours) where stamRoom = effectiveStaminaMax - stamina, and
+// effectiveStaminaMax is the raw cap MINUS the hunger penalty. When hunger shrank the effective cap below current stamina,
+// stamRoom went negative and rest pulled stamina DOWN to the hunger cap (e.g. 13→10 on one rest) — which read as "rest no
+// longer restores stamina". Fix: (1) clamp stamGain to >= 0 so rest can never reduce stamina; (2) the "nothing to recover"
+// refusal now triggers on stamRoom <= 0 (not just === 0) so a hunger-capped player isn't sent to sleep 8h + an ambush roll
+// for +0; (3) both the refusal and the post-rest line now name HUNGER as the cause ("eat, then rest will mean something")
+// instead of the misleading "your wind is full". Regression test added. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-614';
