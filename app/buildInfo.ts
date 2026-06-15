@@ -15003,4 +15003,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (was a free heal turn); commanding the GOLEM now volleys the enemy group at the PLAYER too (was a risk-free group-kill).
 // golemCompanion test updated for the new player-volley. JS-only → 290. app/engine/itemFusion.ts, app/engine/scrapEngine.ts,
 // app/engine/takeableGearSpawns.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-611';
+// OTA-612 (Biunbium Curb) — [exploit closes · arbiters-line] audit batch 2 (the two MED grinds). (1) Faction-quest /
+// hunt / mystery / storyline ACCEPT trained CHA every time, and abandon→re-accept re-offered the same quest with zero
+// in-game time passing → a free CHA grind. Now gated by trainAcceptCharismaGated(): the accept-CHA train fires at most
+// once per 3 in-game hours, so an instant re-accept (same hoursElapsed) doesn't train; legit accepts over the journey
+// still do (also tames chip-tapping six contracts for +CHA each). (2) Vendor STEAL streak DC reset: the +2-DC-per-attempt
+// counter lived only on the per-scene vendor object and wiped on re-entry, so leave→return→steal farmed gear at base DC.
+// Added a PLAYER-level steal-heat (stealHeat/stealHeatHours) that survives re-entry and decays ~1 per in-game hour; the
+// effective streak is max(vendor attempts, decayed heat), bumped on every attempt (success or caught). JS-only → 290.
+// app/state/gameStore.ts, app/engine/types.ts.
+export const OTA_BUILD_ID = '2026-06-12-612';

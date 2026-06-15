@@ -962,6 +962,13 @@ export interface PlayerCharacter {
   abilityCooldowns?: Record<string, number>;
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
+  /** OTA-612 — persistent vendor-theft "heat". Each steal attempt (success or
+   *  caught) raises it; it adds +2 per point to the steal DC and decays ~1 per
+   *  in-game hour. Unlike the per-vendor stealAttempts it survives scene
+   *  re-entry, so leave→return→steal can't reset the difficulty. */
+  stealHeat?: number;
+  /** In-game hour the steal-heat was last stamped (for decay). */
+  stealHeatHours?: number;
   /** arb107 — monotonic counter bumped each time the player's macro
    *  location changes between scenes (i.e. an actual named-location
    *  travel, not room-to-room movement inside an outpost). Outpost rooms

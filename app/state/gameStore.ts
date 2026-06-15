@@ -15430,13 +15430,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // sequence harder. Now the third attempt is DC 15, the fourth
     // DC 17, etc. Counter clears when the vendor object resets
     // (scene transition, hostility flip, roadside despawn).
-    const prevAttempts = scene.vendor.stealAttempts ?? 0;
+    // OTA-612 — exploit close: the per-vendor stealAttempts reset on scene
+    // re-entry (the vendor re-mints), so leave→return→steal reset the DC and
+    // farmed gear at base difficulty. Add a PLAYER-level steal-heat that
+    // SURVIVES re-entry and decays ~1 per in-game hour; the effective streak is
+    // the max of the vendor's in-session attempts and the decayed player heat.
+    const nowHoursSteal = player.hoursElapsed ?? 0;
+    const decayedStealHeat = Math.max(
+      0,
+      (player.stealHeat ?? 0) - Math.floor(Math.max(0, nowHoursSteal - (player.stealHeatHours ?? nowHoursSteal))),
+    );
+    const prevAttempts = Math.max(scene.vendor.stealAttempts ?? 0, decayedStealHeat);
     const dc = baseDc + prevAttempts * 2;
     // Use effectiveStats so buffs / equipment / weather count.
     const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
     const roll = rollDie(20);
     const total = roll + stats.stealth; // OTA-348 — vendor theft rolls Stealth
     const success = total >= dc;
+    // Every attempt — success OR caught — bumps the persistent heat, so a serial
+    // thief's DC keeps climbing across visits.
+    set((s) => (s.player ? { player: { ...s.player, stealHeat: decayedStealHeat + 1, stealHeatHours: nowHoursSteal } } : s));
     // OTA 035 — only surface the combat-channel roll line on a CAUGHT
     // miss (the player needs to see why the fight is starting).
     // Success goes straight to a clean green reward line below —
@@ -15858,16 +15871,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // convinced the agent you were worth handing the work to.
     // Trains CHA on every accept.
     {
-      const liveAccepter = get().player;
-      if (liveAccepter) {
-        const tr = trainStat(liveAccepter, 'charisma', true);
-        set((s) => (s.player ? { player: tr.player } : s));
-        if (tr.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ They handed you the contract. +1 CHA (now ${tr.leveled.to}).`,
-          );
-        }
+      const chaLeveled = trainAcceptCharismaGated(get, set);
+      if (chaLeveled != null) {
+        get().appendLog(
+          'reward',
+          `✦ They handed you the contract. +1 CHA (now ${chaLeveled}).`,
+        );
       }
       // OTA-057 — accepting a contract is an active CHA push; the
       // matching WIS train fires on the completion path, not on accept.
@@ -16229,16 +16238,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     // OTA 059 — same shape as faction-quest accept: trains CHA.
     {
-      const liveAccepter = get().player;
-      if (liveAccepter) {
-        const tr = trainStat(liveAccepter, 'charisma', true);
-        set((s) => (s.player ? { player: tr.player } : s));
-        if (tr.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ The hunt is yours to take. +1 CHA (now ${tr.leveled.to}).`,
-          );
-        }
+      const chaLeveled = trainAcceptCharismaGated(get, set);
+      if (chaLeveled != null) {
+        get().appendLog(
+          'reward',
+          `✦ The hunt is yours to take. +1 CHA (now ${chaLeveled}).`,
+        );
       }
       // OTA-057 — accepting a hunt is an active CHA push; the matching
       // WIS train fires on completion, not on accept.
@@ -16515,16 +16520,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     // OTA 059 — same shape as faction-quest accept: trains CHA.
     {
-      const liveAccepter = get().player;
-      if (liveAccepter) {
-        const tr = trainStat(liveAccepter, 'charisma', true);
-        set((s) => (s.player ? { player: tr.player } : s));
-        if (tr.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ They confide the mystery to you. +1 CHA (now ${tr.leveled.to}).`,
-          );
-        }
+      const chaLeveled = trainAcceptCharismaGated(get, set);
+      if (chaLeveled != null) {
+        get().appendLog(
+          'reward',
+          `✦ They confide the mystery to you. +1 CHA (now ${chaLeveled}).`,
+        );
       }
       // OTA-057 — accepting a mystery is an active CHA push; the WIS
       // train fires on resolution, not on accept.
@@ -16746,16 +16747,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     // OTA 059 — same shape as faction-quest accept: trains CHA.
     {
-      const liveAccepter = get().player;
-      if (liveAccepter) {
-        const tr = trainStat(liveAccepter, 'charisma', true);
-        set((s) => (s.player ? { player: tr.player } : s));
-        if (tr.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ The storyline opens to you. +1 CHA (now ${tr.leveled.to}).`,
-          );
-        }
+      const chaLeveled = trainAcceptCharismaGated(get, set);
+      if (chaLeveled != null) {
+        get().appendLog(
+          'reward',
+          `✦ The storyline opens to you. +1 CHA (now ${chaLeveled}).`,
+        );
       }
       // OTA-057 — accepting a storyline is an active CHA push; WIS
       // fires on chapter completion, not on accept.
@@ -26453,6 +26450,29 @@ let lastQwenGenStartMs = 0;
 // shared voice lock is mostly free for the instant canned reactions.
 const AMBIENT_GEN_COOLDOWN_MS = 45000;
 let lastAmbientGenStartMs = 0;
+
+// OTA-612 — exploit close: contract/hunt accept trains CHA, but accept→abandon→
+// re-accept happens with ZERO in-game time passing, so it was a free CHA grind.
+// Gate the accept-CHA train behind a short IN-GAME-HOUR cooldown: an instant
+// re-accept (same hoursElapsed) won't train; legit accepts spaced out over the
+// journey still do. Also tames chip-tapping six contracts → +CHA on each.
+const ACCEPT_CHA_COOLDOWN_HOURS = 3;
+let lastAcceptChaTrainAtHours = -1000;
+/** Train CHA for accepting a contract/hunt, once per cooldown window. Returns
+ *  the leveled-to value if it leveled (for the caller's reward line), else null. */
+function trainAcceptCharismaGated(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): number | null {
+  const p = get().player;
+  if (!p) return null;
+  const nowH = p.hoursElapsed ?? 0;
+  if (nowH - lastAcceptChaTrainAtHours < ACCEPT_CHA_COOLDOWN_HOURS) return null;
+  lastAcceptChaTrainAtHours = nowH;
+  const tr = trainStat(p, 'charisma', true);
+  set((s) => (s.player ? { player: tr.player } : s));
+  return tr.leveled ? tr.leveled.to : null;
+}
 
 // Trim Qwen output back to the last sentence-terminating punctuation so we
 // don't display fragments like "...echoing in the". Looks for the final
