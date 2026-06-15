@@ -9125,13 +9125,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   .map((h) => h.nouns[0] ?? h.id);
                 if (visible.length > 0) {
                   messages.push(`pings: ${visible.join(', ')}`);
-                } else {
-                  // Refund: arbiter line + skip the charge consume.
+                } else if (messages.length === 0) {
+                  // OTA-212 — PURE detector/torch (revealScene is its ONLY effect,
+                  // e.g. the Aetheric Torch) with nothing to surface: refund the
+                  // charge and bail, so a scan over an empty room doesn't waste the
+                  // player's stock.
                   get().appendLog(
                     'arbiter',
                     `You hold the ${used.name} up. The room takes the light without resonance — nothing here to reveal. The torch goes back in your pack, unspent.`,
                   );
                   break;
+                } else {
+                  // OTA-620 — the item ALSO did something real (heal/stamina/
+                  // cleanse): it's a food-that-glows like the Bioluminescent Fungus
+                  // ({ healHP: 1, revealScene: true }), not a pure torch. Don't
+                  // refund — eat it normally and just note the room had nothing to
+                  // ping back. The OTA-212 break here was discarding the heal AND
+                  // the consume, so the fungus read as a no-op.
+                  messages.push('nothing to reveal');
                 }
               }
               if (fx.extendLight) {

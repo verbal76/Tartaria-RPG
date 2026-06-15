@@ -15069,4 +15069,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player volley and the disengage stamina+counter (those weren't about healing). Heal amounts unchanged. Reopens the
 // heal-instead-of-attack tempo by design — accepted. Locked by combatHealNoCounter (HP moves only by the heal). JS-only →
 // 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-619';
+// OTA-620 (Bibinilium Glow) — [bug] the Bioluminescent Fungus is shelved as food (beige stripe, healHP:1) but eating it
+// in a room with no hooks gave nothing — "nothing here to reveal, torch unspent", +0 HP, not even consumed. Cause: its
+// effect is { healHP:1, revealScene:true }; the OTA-212 no-hooks REFUND path break'd before the heal/consume committed,
+// discarding both. That refund is right for a PURE detector (Aetheric Torch, revealScene-only) but wrong for a
+// food-that-glows. Fix: only refund when no other effect fired (messages.length===0) — otherwise eat normally and just
+// note "nothing to reveal". Fungus now heals +1 and is consumed even with no hooks; Aetheric Torch still refunds. Locked
+// by fungusFoodReveal. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-620';
