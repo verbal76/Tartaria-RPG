@@ -81,6 +81,27 @@ version before relying on `desktop/main.js`'s call.
 6. Re-add **Qwen** (node-llama-cpp/Ollama), then **Kokoro** (ONNX) as desktop
    runtimes behind the same game hooks.
 
+## Code signing (defer to release — NOT needed for test builds)
+
+Test `.exe` artifacts are unsigned → Windows shows "Windows protected your PC";
+click **More info → Run anyway**. That's fine for our own testing. Add real
+signing only when prepping a standalone release.
+
+- **For Steam specifically, signing is largely optional** — Steam delivers through
+  its own client, which sidesteps the SmartScreen warning. Signing matters most
+  for **direct `.exe` downloads** outside Steam.
+- **Modern constraint:** since 2023, code-signing certs must live on a hardware
+  token or cloud HSM — a `.pfx` on disk / in CI secrets no longer works for new
+  certs. So traditional OV/EV USB-token certs **can't be used in CI**.
+- **Recommended path:** **Azure Trusted Signing** (~$10/mo) — cloud signing, no
+  USB token, integrates with electron-builder, instant SmartScreen trust. Needs an
+  Azure account + identity/business validation. Alternatives: SSL.com eSigner,
+  DigiCert KeyLocker (cloud HSM, pricier).
+- **Wiring (once a cert exists):** store the signing credentials as GitHub Secrets;
+  add the electron-builder signing config to `desktop/package.json` (or an Azure
+  Trusted Signing step in `build-steam-exe.yml`). Then every CI build signs the
+  `.exe` automatically — no per-build work.
+
 ## Files in this scaffold
 
 - `desktop/main.js` — Electron main; loads the web build; optional Steam init.
