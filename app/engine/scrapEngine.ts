@@ -89,10 +89,14 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // with Scrap Metal once mispriced Uncommon, let a 1-Stick Club scrap for more
   // than it cost). Real metal weapons (blade/metal/iron/plate, or a
   // non-improvised weapon) still give it.
-  if (tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade')
-      || (item.kind === 'weapon' && !tags.has('improvised'))) {
+  const isMetalTagged = tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade');
+  if (isMetalTagged || (item.kind === 'weapon' && !tags.has('improvised'))) {
     grants.push({ name: 'Scrap Metal', quantity: 2 + rb });
-    if (rb >= 2) grants.push({ name: 'Golem Core', quantity: 1 });
+    // OTA-611 — the Golem Core (Iron-Golem bottleneck) drops ONLY from a
+    // genuinely metal-tagged piece, never the broad weapon-kind fallback. A
+    // Rare+ non-metal weapon (bone/aether/plasma) — or any fused weapon, which
+    // is now selfCrafted and strip-guarded — no longer mints the scarce Core.
+    if (rb >= 2 && isMetalTagged) grants.push({ name: 'Golem Core', quantity: 1 });
   }
   // Aether content → Aetheric Shard + Aether Crystal (golem fuel), plus
   // Aether Dust (the most-demanded recipe staple, otherwise unforageable) on

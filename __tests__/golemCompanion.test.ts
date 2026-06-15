@@ -222,18 +222,25 @@ describe('MECHANIC-1b — golem sidekick', () => {
       };
       const scene = store.getState().currentScene!;
       store.setState({
-        player: { ...store.getState().player!, golem },
+        // OTA-611 — commanding the golem now ALSO volleys the enemy group at the
+        // PLAYER (closed the risk-free group-grind exploit). This test measures
+        // the GOLEM's retaliation, so give the player enough HP to survive the
+        // Apex Guardian's swing and keep the golem assertion isolated.
+        player: { ...store.getState().player!, golem, hp: 1000000, hpMax: 1000000 },
         currentScene: {
           ...scene, enemies: [enemy as never], enemyHps: [100000], activeEnemyIdx: 0,
           range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
         },
       });
 
+      const golemHpBefore = store.getState().player!.golem!.hp;
       await store.getState().submitPlayerAction('golem attack');
 
       const after = store.getState().player!.golem!;
       // 10d10 is at least 10 — comfortably above the old flat cap of 7.
-      expect(after.hp).toBeLessThanOrEqual(10000 - 8);
+      expect(after.hp).toBeLessThanOrEqual(golemHpBefore - 8);
+      // OTA-611 — and the player took the group's volley too (no longer risk-free).
+      expect(store.getState().player!.hp).toBeLessThan(1000000);
     });
   });
 

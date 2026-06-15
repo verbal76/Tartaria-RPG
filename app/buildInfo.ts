@@ -14990,4 +14990,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // count ARBITER lines directly — scan the last 12 arbiter-channel lines regardless of interleaved noise. Also fixed
 // OTA-609's near-dup window the same way (last 15 arbiter lines, not 30 total entries) so heavy combat can't hide a
 // recent repeat from it either. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-610';
+// OTA-611 (Biununium Seal) — [exploit closes · arbiters-line] 5-agent degenerate-exploit audit, batch 1 (the clear
+// defects + the player-ruled combat ones). (1) FUSION→SCRAP Golem-Core mint: fused gear wasn't selfCrafted, so it scrapped
+// at full yield → free Rare Golem Core from free inputs at a free Crucible; now stamped selfCrafted (itemFusion), and the
+// Golem-Core scrap bonus is gated on a real metal tag, not the kind==='weapon' fallback (scrapEngine). (2) SALVAGE +
+// (3) CLIMB-TOP loot farms: pickSalvageablesForScene / pickClimbablesForScene were unseeded (Math.random), so each visit
+// re-rolled the prop name+adjective and the per-noun / climbed: dedup missed → infinite re-salvage / re-climb. Now seeded
+// by room key (exported hashSeed/mulberry32 from takeableGearSpawns) so a tile always offers the same props. (4) free
+// DISENGAGE DEX farm: it was the only combat action with no stamina + no enemy counter; now costs 1 stamina and provokes
+// the group (the +4 defense just softens it). (5) JUMP DEX grind: only trains when you jump AT a target now. (6) per player
+// rulings: eating/first-aid/using a consumable AND drinking (bottle + cup-hands) mid-fight now provoke the enemy counter
+// (was a free heal turn); commanding the GOLEM now volleys the enemy group at the PLAYER too (was a risk-free group-kill).
+// golemCompanion test updated for the new player-volley. JS-only → 290. app/engine/itemFusion.ts, app/engine/scrapEngine.ts,
+// app/engine/takeableGearSpawns.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-611';

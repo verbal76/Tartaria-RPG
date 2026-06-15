@@ -38,7 +38,10 @@ const COMMON_GEAR: string[] = [...namesOf(weaponsData, 'Common'), ...namesOf(arm
 const UNCOMMON_GEAR: string[] = [...namesOf(weaponsData, 'Uncommon'), ...namesOf(armorData, 'Uncommon')];
 
 // ── tiny seeded PRNG (string → deterministic stream) ────────────────────────
-function hashSeed(s: string): number {
+// OTA-611 — exported so the climbable/salvageable spawn pickers can seed off
+// the same room key (closing the leave-and-return salvage/climb-loot farm the
+// way this take-gear module already does).
+export function hashSeed(s: string): number {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
@@ -46,7 +49,7 @@ function hashSeed(s: string): number {
   }
   return h >>> 0;
 }
-function mulberry32(a: number): () => number {
+export function mulberry32(a: number): () => number {
   return () => {
     a |= 0; a = (a + 0x6d2b79f5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);

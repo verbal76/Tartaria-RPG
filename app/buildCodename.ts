@@ -1144,6 +1144,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-12-608': 'Biniloctium Anchor',
   '2026-06-12-609': 'Binilennium Echo',
   '2026-06-12-610': 'Biunnilium Refrain',
+  '2026-06-12-611': 'Biununium Seal',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

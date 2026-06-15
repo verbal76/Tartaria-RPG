@@ -634,6 +634,12 @@ export function applyFusion(
       : result.description,
     durability: { ...stats.durability },
     uniqueStats: stats,
+    // OTA-611 — exploit close: fused gear is player-made, so flag it
+    // selfCrafted. Without this, scrapEngine's premium-strip/halve guard
+    // (gated on selfCrafted) was skipped and a Rare fused weapon scrapped into
+    // a free Golem Core + Scrap Metal — a renewable mint of the bottleneck
+    // golem material from free inferred loot at a free Crucible.
+    selfCrafted: true,
   };
 
   return { inventory: [...drained, fused], fused };

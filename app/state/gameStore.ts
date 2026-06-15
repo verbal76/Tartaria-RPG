@@ -4447,8 +4447,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // this enforces variety.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { pickClimbablesForScene } = require('../engine/climbableSpawns');
+    // OTA-611 — exploit close: seed the curated picker by the room key (like
+    // pickTakeableGearForScene) so a given tile ALWAYS offers the SAME climbable
+    // prop names+adjectives. Without this the picker re-rolled fresh adjectives
+    // each visit ("ancient pillar" → "jagged pillar"), the climbed: marker no
+    // longer matched, and re-climbing re-granted the ~50% top-of-climb drop —
+    // an unbounded loot farm via leave-and-return.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { hashSeed: _hashSeed, mulberry32: _mulberry32 } = require('../engine/takeableGearSpawns');
     const curatedClimbables: string[] = pickClimbablesForScene(
       hubRoom ?? location,
+      _mulberry32(_hashSeed(`climb-spawn:${candidateKey}`)),
     );
     // 2026-05-24 — same shape for salvageables. Playtester noted that
     // table + gate dominated every scene's salvage chips because the
@@ -4458,8 +4467,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // sure the new variety actually shows.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { pickSalvageablesForScene } = require('../engine/salvageableSpawns');
+    // OTA-611 — exploit close: same room-key seeding for salvageables. The
+    // unseeded picker re-rolled the prop name+adjective each visit, so the
+    // per-noun salvage dedup missed on re-entry and the prop could be
+    // re-salvaged for materials/TC forever.
     const curatedSalvageables: string[] = pickSalvageablesForScene(
       hubRoom ?? location,
+      _mulberry32(_hashSeed(`salvage-spawn:${candidateKey}`)),
     );
     const baseAmbient = (hubRoom && hubNouns.length > 0)
       ? Array.from(new Set([...hubNouns, ...microMicroNouns]))
@@ -6361,6 +6375,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const match = lower.match(/^(use|command|order|attack with)?\s*golem(\s+(?:attack\s+)?(.*))?$/);
           const cmdTarget = (match?.[3] ?? '').trim() || null;
           handleGolemCommand(get, set, cmdTarget);
+          // OTA-611 — exploit close (player ruling): commanding the golem is a
+          // player TURN — the enemy group still swings at YOU (mirrors the dog
+          // command), so a golem is no longer a risk-free group-killer. The
+          // golem soaks its own targeted retaliation inside handleGolemCommand;
+          // this exposes the player to the rest of the group's volley.
+          const sceneAfterGolem = get().currentScene;
+          if (sceneAfterGolem && sceneAfterGolem.enemies.length > 0) {
+            runEnemyGroupCounters(get, set, get().player ?? player);
+          }
         }
         void get().persist();
         return;
@@ -9120,6 +9143,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set({ player: advanceTime(p, 0.25) });
               get().appendLog('world', `You use one ${used.name}. ${messages.join(', ')}.`);
               void get().persist();
+              // OTA-611 — using a consumable effect (heal/stamina/cleanse) in a
+              // fight is a turn: the enemy group still swings (player ruling).
+              if (currentScene.enemies.length > 0) {
+                runEnemyGroupCounters(get, set, get().player ?? player);
+              }
               break;
             }
             // OTA-200 — explain gate items when the player tries to
@@ -9320,6 +9348,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Heal may push us back over the 5% latch threshold.
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();
+          // OTA-611 — exploit close (player ruling): eating/first-aid/drinking a
+          // consumable mid-fight is a TURN — the enemy group still gets its
+          // swing, so you can't attack→heal→attack for free. Out of combat it's
+          // free. Covers food heals, First Aid Kits, and Water-Bottle drinks
+          // (which route here via the drink→eat re-dispatch).
+          if (currentScene.enemies.length > 0) {
+            runEnemyGroupCounters(get, set, get().player ?? player);
+          }
         } else {
           // OTA-155 — eat-without-target refusal. Stress sweep found:
           // "eat ratoin" (typo) and bare "eat" both fall through this
@@ -10803,6 +10839,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
               : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
           );
+          // OTA-611 — exploit close (player ruling): a combat sip is a turn.
+          // Stamina-from-water stays (your only in-combat regen), but the enemy
+          // group swings, so it's no longer free + infinite.
+          if (currentScene.enemies.length > 0) {
+            runEnemyGroupCounters(get, set, get().player ?? player);
+          }
           break;
         }
         get().appendLog(
@@ -11616,9 +11658,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         // OTA-112 — DEX bottleneck fix per stat-growth audit. Jump
         // is a textbook DEX action and was missing from the training
-        // map. Adds ~1 train per jump attempt; rate is naturally
-        // limited by stamina cost + low jump frequency.
-        {
+        // map. OTA-611 — only trains when you jump AT something (a real
+        // target/obstacle); a bare "jump" into empty air no longer trains, so
+        // it can't be spammed as a pure stamina→DEX grind on a safe tile.
+        if (tgt) {
           const liveJumper = get().player;
           if (liveJumper) {
             const tr = trainStat(liveJumper, 'dexterity', true);
@@ -11674,26 +11717,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           remainingRounds: 1,
           label: 'disengaging',
         };
+        // OTA-611 — exploit close: disengage was the ONLY combat action that
+        // spent no stamina and drew no enemy counter, so it could be spammed
+        // for free, risk-free DEX. Now it costs the turn like its siblings
+        // (ready/take_cover/aim): spend 1 stamina, then the enemy group still
+        // takes its turn — the +4 defense (in_cover) just softens the blow, it
+        // doesn't skip the round.
         set((s) =>
           s.player
-            ? {
-                player: {
-                  ...s.player,
-                  statusEffects: applyEffect(s.player.statusEffects ?? [], disengaging),
-                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.1,
-                },
-              }
+            ? { player: advanceTime(spendStamina({ ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], disengaging) }, 1), 0.1) }
             : s,
         );
         get().appendLog(
           'world',
-          `You peel off the line, footwork careful. No opportunity attack as you break contact (+4 defense this round).`,
+          `You peel off the line, footwork careful. No free swing as you break contact (+4 defense this round).`,
         );
-        // OTA-112 — DEX bottleneck fix per stat-growth audit.
-        // Successful disengage from active combat is a clear DEX
-        // moment (the careful footwork denies the opportunity
-        // attack). Only the in-combat branch trains; the no-enemies
-        // early-return above doesn't reach here.
+        // OTA-112 — DEX bottleneck fix per stat-growth audit. A disengage under
+        // pressure is a DEX moment. With the stamina cost + enemy counter above
+        // it's no longer a free farm, so the train stays.
         {
           const liveDisengager = get().player;
           if (liveDisengager) {
@@ -11706,6 +11747,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
             }
           }
+        }
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
         }
         break;
       }
