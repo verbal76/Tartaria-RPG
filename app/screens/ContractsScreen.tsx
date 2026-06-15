@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
@@ -87,6 +87,17 @@ export function ContractsScreen() {
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
+  // OTA-606 — honor a deep-link tab request (e.g. the first-collectible popup
+  // wants the Collectibles tab, not the default Contracts tab). Apply it once
+  // on entry, then clear it so a later normal open lands on the default.
+  const pendingContractsTab = useGameStore((s) => s.pendingContractsTab);
+  const clearPendingContractsTab = useGameStore((s) => s.clearPendingContractsTab);
+  useEffect(() => {
+    if (pendingContractsTab) {
+      setTab(pendingContractsTab);
+      clearPendingContractsTab();
+    }
+  }, [pendingContractsTab, clearPendingContractsTab]);
   // OTA 020 — tap-to-expand. Each card key (kind:id) maps to true
   // when expanded. Tap the card head to toggle; expanded view shows
   // the full step list and the COMPLETE / DISCARD button when

@@ -14,6 +14,7 @@ export function DiscoveryRevealModal() {
   const reveal = useGameStore((s) => s.discoveryReveal);
   const dismiss = useGameStore((s) => s.dismissDiscoveryReveal);
   const setScreen = useGameStore((s) => s.setScreen);
+  const requestContractsTab = useGameStore((s) => s.requestContractsTab);
 
   if (!reveal) return null;
 
@@ -24,6 +25,9 @@ export function DiscoveryRevealModal() {
           tone: 'primary' as const,
           onPress: () => {
             const target = reveal.cta!.screen as ScreenName;
+            // OTA-606 — deep-link to a specific Contracts tab (the first-
+            // collectible popup wants the Collectibles tab, not the default).
+            if (reveal.cta!.contractsTab) requestContractsTab(reveal.cta!.contractsTab);
             dismiss();
             setScreen(target);
           },

@@ -2585,10 +2585,19 @@ interface GameStore {
   discoveryReveal: {
     title: string;
     body: string;
-    cta?: { label: string; screen: string };
+    cta?: { label: string; screen: string; contractsTab?: 'contracts' | 'collectables' };
   } | null;
   /** Dismiss the discovery reveal overlay. */
   dismissDiscoveryReveal: () => void;
+  /** OTA-606 — when a deep-link wants the Contracts screen to open on a
+   *  specific tab (e.g. the first-collectible popup → Collectibles tab),
+   *  this carries the desired tab. ContractsScreen reads it on entry, applies
+   *  it, and clears it. Null = open on the default (contracts) tab. */
+  pendingContractsTab: 'contracts' | 'collectables' | null;
+  /** Request the Contracts screen open on a given tab (set before navigating). */
+  requestContractsTab: (tab: 'contracts' | 'collectables') => void;
+  /** Clear the pending Contracts tab once consumed by the screen. */
+  clearPendingContractsTab: () => void;
   /** OTA-211 — pick a stat for the Aether Dust +3 buff, apply it,
    *  consume the pending food + 1 Aether Dust, close the picker. */
   selectAetherStat: (stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma') => void;
@@ -2723,6 +2732,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   discoveryReveal: null,
   dismissDiscoveryReveal() {
     set({ discoveryReveal: null });
+  },
+  pendingContractsTab: null,
+  requestContractsTab(tab) {
+    set({ pendingContractsTab: tab });
+  },
+  clearPendingContractsTab() {
+    set({ pendingContractsTab: null });
   },
   pendingTravelConfirm: null,
   pendingGolemNaming: false,
@@ -2983,7 +2999,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         discoveryReveal: {
           title: 'Collectible found',
           body: `You found "${frag.title}" — a fragment of ${storyLabel}'s story.\n\nCollectibles are scraps of lost lives scattered across Tartaria. Gather a character's set to read their whole tale. They live on the Collectibles tab of the Contracts screen — you can read them any time, then back out and keep playing.`,
-          cta: { label: 'Open Collectibles', screen: 'contracts' },
+          cta: { label: 'Open Collectibles', screen: 'contracts', contractsTab: 'collectables' },
         },
       });
     }
