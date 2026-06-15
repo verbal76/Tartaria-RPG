@@ -489,6 +489,13 @@ export function InventoryScreen() {
       } catch { return false; }
     })();
     const offEligible = pending.slots.includes('off') && !equippedInSlots.includes('off');
+    // OTA-607 — a THROWABLE's off-hand "Use" is a real, distinct affordance
+    // (ready it to hurl); a plain weapon's off-hand is just an equip, already
+    // covered by the dedicated "Equip (Off hand)" button above. So only let
+    // off-hand eligibility light up the USE button for throwables — otherwise a
+    // regular weapon wrongly showed both "Use (off hand)" AND "Equip (Off hand)"
+    // (player: "you don't use the weapon, you equip it").
+    const isThrowableItem = (pending.item.tags ?? []).some((t) => /^throwable$/i.test(t));
     const anySlotFree = pending.slots.some((s) => !equippedInSlots.includes(s));
     // OTA-214 — fix the redundant USE button on equip-only items.
     // Player ask: "I don't think you can have both equip and use on
@@ -501,7 +508,7 @@ export function InventoryScreen() {
     // an off-hand-eligible item that takes a use-style off-hand
     // equip. Pure-armor / pure-weapon (no effect, equippable) gets
     // the dedicated Equip button only.
-    const useIsRealAction = isConsumable || hasEffect || offEligible;
+    const useIsRealAction = isConsumable || hasEffect || (offEligible && isThrowableItem);
     if (useIsRealAction) {
       // arb106 — show YOUR current HP on the eat/drink button so you can see at a
       // glance whether you actually need it (player ask).

@@ -14957,4 +14957,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sets it before navigating, and ContractsScreen applies it on entry (then clears it so a later normal open still defaults
 // to the contracts tab). JS-only → 290. app/state/gameStore.ts, app/components/DiscoveryRevealModal.tsx,
 // app/screens/ContractsScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-12-606';
+// OTA-607 (Binilseptium Grip) — [UX fix · arbiters-line] the inventory modal showed a redundant "Use (off hand)" button
+// on plain weapons alongside the dedicated "Equip (Main hand)" / "Equip (Off hand)" buttons (player: "you don't use the
+// weapon, you equip it"). OTA-214 had removed the redundant Use on armor, but the off-hand-eligibility clause still lit it
+// up for 1-handed weapons. Fix: off-hand eligibility only counts toward the USE button for THROWABLES (where off-hand
+// "Use" is the real hurl-ready affordance) — useIsRealAction = consumable || hasEffect || (offEligible && throwable). Plain
+// weapons now show Equip-only; throwables keep their Use, and effect-bearing items (Torch/Lens/Scanner) are unchanged.
+// JS-only → 290. app/screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-12-607';
