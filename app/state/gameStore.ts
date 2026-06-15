@@ -3929,9 +3929,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // direct-response Arbiter lines (bearings, concept answers, range
     // refusals) must always reach the player, even on repeat queries.
     if (channel === 'arbiter' && !meta?.skipDedup) {
-      const recent = get().gameLog.slice(-16);
-      for (const prev of recent) {
-        if (prev.channel === 'arbiter' && prev.text === text) {
+      // OTA-610 — scan the last N ARBITER lines, not the last 16 TOTAL entries.
+      // In combat/travel each action emits 4-5 entries (player, parser-debug,
+      // combat rolls, cognitive), so a 16-ENTRY window often didn't reach back
+      // to the prior identical Arbiter line — the SAME line could be spoken
+      // 5-6× in a row within 60s and slip the dedup. Counting arbiter lines
+      // directly makes interleaved noise irrelevant.
+      const recentArbiter = get().gameLog.filter((e) => e.channel === 'arbiter').slice(-12);
+      for (const prev of recentArbiter) {
+        if (prev.text === text) {
           // Log the suppression so a "nothing happened" playtest report
           // can be traced back to dedup eating the line.
           void persistEntry(makeEntry('debug', `dedup: suppressed arbiter repeat — "${text.slice(0, 60)}${text.length > 60 ? '…' : ''}"`));
@@ -26693,7 +26699,9 @@ function rollDogVestLootName(enemy: Enemy): string | null {
 // engine/arbiterDedup.ts). Pulls the recent Arbiter-channel texts and asks the
 // pure helper whether `text` just rewords one of them.
 function generatedLineRepeatsRecent(get: () => GameStore, text: string): boolean {
-  const recent = get().gameLog.slice(-30).filter((e) => e.channel === 'arbiter').map((e) => e.text);
+  // OTA-610 — last N ARBITER lines (not total entries), so interleaved combat/
+  // debug entries can't push a recent repeat out of the comparison window.
+  const recent = get().gameLog.filter((e) => e.channel === 'arbiter').slice(-15).map((e) => e.text);
   return isRepetitiveArbiterLine(text, recent);
 }
 

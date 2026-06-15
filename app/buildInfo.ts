@@ -14983,4 +14983,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // silence, the reactive path falls back to its canned template (which has its own exact dedup). Short lines (<3 content
 // words) are never flagged. 6 unit tests incl. false-positive guards. JS-only → 290. app/engine/arbiterDedup.ts,
 // app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-609';
+// OTA-610 (Biunnilium Refrain) — [narration fix · arbiters-line] the VERBATIM-repeat dedup had a windowing bug: it
+// scanned the last 16 TOTAL log entries, but in combat/travel each action emits 4-5 entries (player, parser-debug, combat
+// rolls, cognitive), so the prior identical Arbiter line was routinely pushed out of the window — the SAME line could be
+// spoken 5-6× IN A ROW within 60s and slip the dedup (player corrected: word-for-word, not over the whole journey). Fix:
+// count ARBITER lines directly — scan the last 12 arbiter-channel lines regardless of interleaved noise. Also fixed
+// OTA-609's near-dup window the same way (last 15 arbiter lines, not 30 total entries) so heavy combat can't hide a
+// recent repeat from it either. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-610';
