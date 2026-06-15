@@ -15,8 +15,8 @@
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0"
   },
+    "comment_optionalDependencies": "Steam is optional so a failed steamworks.js install never blocks the FIRST playable .exe; main.js guards its require. Promote to a hard dependency once achievements are wired.",
   "optionalDependencies": {
-    "_comment": "Steam is optional so a failed steamworks.js install never blocks the FIRST playable .exe; main.js guards its require. Promote to a hard dependency once achievements are wired.",
     "steamworks.js": "^0.4.0"
   },
   "build": {
