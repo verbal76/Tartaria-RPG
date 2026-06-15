@@ -70,4 +70,26 @@ const config = getDefaultConfig(__dirname);
 config.resolver = config.resolver ?? {};
 config.resolver.unstable_enablePackageExports = true;
 
+// PC/Steam (steam_Dev) — WEB-ONLY native-module stubbing. The desktop build runs
+// the game through react-native-web, which has no native AI/voice runtime. Swap
+// the native-ONLY modules to a no-op stub when (and ONLY when) bundling for web,
+// so `expo export --platform web` compiles and the game falls back to template
+// narration. Android/iOS resolution is completely unaffected (platform guard).
+const path = require('path');
+const WEB_NATIVE_STUBS = new Set([
+  'llama.rn',
+  'onnxruntime-react-native',
+  'react-native-executorch',
+  'expo-speech-recognition',
+]);
+const WEB_STUB_FILE = path.resolve(__dirname, 'web-stubs/native-noop.js');
+const __priorResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === 'web' && WEB_NATIVE_STUBS.has(moduleName)) {
+    return { type: 'sourceFile', filePath: WEB_STUB_FILE };
+  }
+  const next = __priorResolveRequest ?? context.resolveRequest;
+  return next(context, moduleName, platform);
+};
+
 module.exports = config;
