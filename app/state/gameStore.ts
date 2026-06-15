@@ -192,6 +192,7 @@ import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
+import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
 import {
@@ -26591,14 +26592,23 @@ async function narrateViaArbiter(
       .filter((s) => !/^\s*they\s/i.test(s))
       .join(' ')
       .trim();
-    const finalText = trimToLastSentence(survivors) || trimmed;
+    let finalText = trimToLastSentence(survivors) || trimmed;
+    // OTA-609 — if the generated line just rewords something the Arbiter said
+    // recently (long-journey travel musings repeating), fall back to the canned
+    // template, which carries its own exact-match dedup. Skip when the model
+    // already fell through to the template (finalText === trimmed).
+    let repDup = false;
+    if (finalText !== trimmed && generatedLineRepeatsRecent(get, finalText)) {
+      finalText = trimmed;
+      repDup = true;
+    }
     // arb134 — mark the AI-generated line + its latency so a pasted log shows it
     // outright (a Qwen line lands hundreds-to-thousands of ms after its trigger;
     // a template lands in the same millisecond). `usedFallback` flags the rare
     // case where the cleaned model output was empty and the template carried it.
     const usedFallback = finalText === trimmed;
     get().appendLog('arbiter', finalText);
-    get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${usedFallback ? ', empty→template' : ''})`);
+    get().appendLog('debug', `arbiter: qwen ✓ ${Date.now() - t0}ms (intent=${intent}${repDup ? ', near-dup→template' : usedFallback ? ', empty→template' : ''})`);
   } catch {
     if (myEpoch === arbiterGenerationEpoch) {
       get().appendLog('debug', `arbiter: qwen-error ${Date.now() - t0}ms → template`);
@@ -26679,6 +26689,14 @@ function rollDogVestLootName(enemy: Enemy): string | null {
   return pool[pool.length - 1]!.name;
 }
 
+// OTA-609 — near-duplicate suppression for GENERATED Arbiter lines (see
+// engine/arbiterDedup.ts). Pulls the recent Arbiter-channel texts and asks the
+// pure helper whether `text` just rewords one of them.
+function generatedLineRepeatsRecent(get: () => GameStore, text: string): boolean {
+  const recent = get().gameLog.slice(-30).filter((e) => e.channel === 'arbiter').map((e) => e.text);
+  return isRepetitiveArbiterLine(text, recent);
+}
+
 async function maybeGenerateAmbientArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
@@ -26741,8 +26759,11 @@ async function maybeGenerateAmbientArbiter(
     // Ambient lines are ALWAYS voiced (no silent flag) — they're the fresh ones
     // the player wants to hear. An empty result (model produced nothing usable)
     // just logs and stays silent; there's no template fallback for ambient.
-    if (finalText) get().appendLog('arbiter', finalText);
-    get().appendLog('debug', `arbiter: ambient ${finalText ? '✓' : '∅'} ${Date.now() - t0}ms`);
+    // OTA-609 — also drop a near-duplicate of a recent Arbiter line (the model
+    // rephrasing the same thought on a long journey) so it can't repeat 5-6×.
+    const ambientUsable = !!finalText && !generatedLineRepeatsRecent(get, finalText);
+    if (ambientUsable) get().appendLog('arbiter', finalText);
+    get().appendLog('debug', `arbiter: ambient ${ambientUsable ? '✓' : finalText ? 'dup-dropped' : '∅'} ${Date.now() - t0}ms`);
   } catch {
     get().appendLog('debug', `arbiter: ambient-error ${Date.now() - t0}ms`);
   } finally {

@@ -14974,4 +14974,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // capacitor" IS a capacitor). Keeps the legit OTA-086 short<->full case ("spire" <-> "zharak's teeth spire") while killing
 // cross-prop contamination. Applied in maxClimbedTier (+isClimbCleared) and the gameStore gate; 4 regression tests added.
 // JS-only → 290. app/engine/climbHeight.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-608';
+// OTA-609 (Binilennium Echo) — [narration fix · arbiters-line] stop the Arbiter repeating a reworded musing (player: "he
+// said 'you have traveled far and wide' 5-6 times" on a long journey). The exact-match dedup in appendLog only catches a
+// VERBATIM repeat in a short window — it can't catch the local model rephrasing the same thought. New pure
+// engine/arbiterDedup.ts isRepetitiveArbiterLine() flags a freshly-generated line as a near-dup of any of the last 30
+// Arbiter lines via two signals: a shared content-word bigram ("far wide" in both — the rephrased-flavor signal) or
+// Jaccard >= 0.6 whole-set overlap (longer restatements). Generated lines fail safe: the ambient path drops the dup to
+// silence, the reactive path falls back to its canned template (which has its own exact dedup). Short lines (<3 content
+// words) are never flagged. 6 unit tests incl. false-positive guards. JS-only → 290. app/engine/arbiterDedup.ts,
+// app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-609';
