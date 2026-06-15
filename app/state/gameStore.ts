@@ -17298,43 +17298,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
       return;
     }
-    // v2.4.1 (OTA 053) — block the course when the player is too
-    // depleted to take even the first step. Same gate as the
-    // single-cardinal walk so the multi-step path matches the
-    // cardinal path's stamina rules.
-    //
-    // 2026-05-27 OTA-082 — skipDedup added. Pre-OTA-082 the
-    // arbiter channel's dedup logic (gameStore.ts:1868)
-    // suppressed repeat lines, so a player tapping the travel
-    // button MULTIPLE TIMES on the destination map with 0
-    // stamina saw the refusal once, then nothing — debug log
-    // confirmed "dedup: suppressed arbiter repeat". Felt like
-    // the button was broken ("fails through without
-    // instruction" per the playtester). The refusal also gets
-    // a clearer travel-specific phrasing: it now mentions
-    // travel + rest explicitly so the player knows what action
-    // they tried and what to do about it.
-    if (player.stamina < STAMINA_COSTS.wander) {
-      const tgtNameForRefusal = (() => {
-        try {
-          // OTA-502 — canon-aware (resolves dynamically-canonized places too).
-          return getLocationById(locationId).name ?? 'that destination';
-        } catch {
-          return 'that destination';
-        }
-      })();
-      // OTA-163 — refused-travel time tick. See `case 'travel':` for
-      // rationale. Setting a course while depleted still costs the
-      // player ~15 minutes of fumbling with the map.
-      set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
-      get().appendLog(
-        'arbiter',
-        `The Arbiter holds out a hand. "You're too tired to set out for ${tgtNameForRefusal}. Rest before making any plans — the road will hold."`,
-        { skipDedup: true },
-      );
-      buzzBlocked(); // arb41 — physical "can't move" signal
-      return;
-    }
+    // OTA-615 — setting a course is PLANNING; it no longer requires stamina.
+    // Previously this returned early when stamina < wander (before travelTarget
+    // was set), so a 0-stamina player tapping a destination on the map flipped to
+    // exploration with NO route planned — just bare cardinals, the button reading
+    // as broken. The course is now always set below; only the first STEP is gated
+    // on stamina (mirroring continueTravel), so you can plan a route while spent,
+    // rest, then tap → to set out.
     // Locate the destination's friendly name for the announcement line.
     // OTA-502 — getLocationById resolves canonized places too (not just static).
     // OTA-507 — a HIDDEN destination (the Hidden Market) stays "?" in the course
@@ -17380,7 +17350,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // absolute grid cell, not the re-centered visual map. Movement and distance
     // now share one frame, so every step provably shortens the canon distance.
     const firstDir = nextCardinalToward(grid.x, grid.y, tgtCell.x, tgtCell.y);
-    if (firstDir) {
+    // OTA-615 — only take the first step if the player has the legs for it. The
+    // COURSE is already set above; a depleted player keeps the planned route (the
+    // travel row shows) and is told to rest, instead of losing the route entirely.
+    if (firstDir && get().player!.stamina >= STAMINA_COSTS.wander) {
       set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
       get().stepDirection(firstDir);
       // arb103 — arrival is cell-based; and ALWAYS re-plot the badge from the new
@@ -17399,6 +17372,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: d } },
         } : s));
       }
+    } else if (firstDir) {
+      // Depleted — the course is planned but there are no legs for the first
+      // step yet. Tell the player to rest, then press on from the travel row.
+      get().appendLog(
+        'arbiter',
+        `The Arbiter nods at the road ahead. "The course to ${tgtName} is set — but you're spent. Rest, then tap → ${tgtName.toUpperCase()} on the travel row to set out."`,
+        { skipDedup: true },
+      );
+      buzzBlocked(); // arb41 — physical "can't move yet" signal
     }
   },
 

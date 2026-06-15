@@ -84,13 +84,22 @@ describe('OTA-163 — depleted travel attempts still advance the clock', () => {
     expect(delta).toBeLessThanOrEqual(0.6);
   });
 
-  it('setTravelCourse refusal ticks ~15 min', async () => {
+  // OTA-615 — setting a course is PLANNING and no longer requires stamina.
+  // (Previously a 0-stamina setTravelCourse was REFUSED and charged ~15 min of
+  // "fumbling with the map"; the player asked to be able to plan a route while
+  // spent and just not move. The first STEP is still stamina-gated, exercised by
+  // the cardinal `go north` refusal tests above + continueTravel's own gate.)
+  it('OTA-615 — setTravelCourse at 0 stamina PLANS the course (no refusal, no time tick, no move)', async () => {
     await bootstrapDrained();
-    const hoursBefore = useGameStore.getState().player!.hoursElapsed ?? 0;
-    // Try setting a course to any Lost Capital — refused for stamina.
+    const before = useGameStore.getState().player!;
+    const hoursBefore = before.hoursElapsed ?? 0;
     useGameStore.getState().setTravelCourse('voronov');
-    const hoursAfter = useGameStore.getState().player!.hoursElapsed ?? 0;
-    expect(hoursAfter - hoursBefore).toBeGreaterThanOrEqual(0.2);
+    const after = useGameStore.getState().player!;
+    // The course is now planned even while depleted.
+    expect(after.travelTarget?.locationId).toBe('voronov');
+    // Planning is free — no fumbling tick — and the player did not move.
+    expect((after.hoursElapsed ?? 0) - hoursBefore).toBe(0);
+    expect({ x: after.mapX, y: after.mapY }).toEqual({ x: before.mapX, y: before.mapY });
   });
 
   it('100 consecutive depleted travel attempts each tick the clock', async () => {

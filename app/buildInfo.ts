@@ -15031,4 +15031,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // refusal now triggers on stamRoom <= 0 (not just === 0) so a hunger-capped player isn't sent to sleep 8h + an ambush roll
 // for +0; (3) both the refusal and the post-rest line now name HUNGER as the cause ("eat, then rest will mean something")
 // instead of the misleading "your wind is full". Regression test added. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-614';
+// OTA-615 (Biunpentium Course) — [bug · player-reported] setting an autoroute at 0 stamina lost the route entirely.
+// setTravelCourse REFUSED (early return before travelTarget was set) when stamina < wander, so a depleted player tapping a
+// destination on the map flipped to the exploration screen with NO route planned — just bare cardinals, the button reading
+// as broken. Fix: setting a course is PLANNING and no longer requires stamina — the travelTarget is always set; only the
+// first STEP is gated on stamina now (mirroring continueTravel), so you can plan a route while spent, rest, then tap → to
+// set out. Planning is also free of the old 15-min "fumbling" tick (that was the refusal penalty, which no longer happens).
+// refusedTravelTimeTick + setCourseRepro tests updated/added. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-615';

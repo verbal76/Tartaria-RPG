@@ -92,6 +92,28 @@ describe('travel — setTravelCourse engine repro', () => {
     }
   });
 
+  it('OTA-615 — sets the course but does NOT move when stamina is 0', async () => {
+    const store = await bootstrapOutsideHub();
+    const before = store.getState().player!;
+    const startId = before.currentLocationId;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const locs = require('../app/data/locations/locations.json') as Array<{ id: string }>;
+    const destId = locs.find((l) => l.id !== startId)?.id;
+    if (!destId) throw new Error('No alternate location found');
+    // Deplete stamina to 0 — should still be allowed to PLAN the route.
+    store.setState({ player: { ...before, stamina: 0 } });
+    const p = store.getState().player!;
+    const posBefore = { x: p.mapX, y: p.mapY, loc: p.currentLocationId };
+
+    store.getState().setTravelCourse(destId);
+
+    const after = store.getState().player!;
+    // The course is planned (the travel row will render) even at 0 stamina...
+    expect(after.travelTarget?.locationId).toBe(destId);
+    // ...but the first step was NOT taken — the player hasn't moved.
+    expect({ x: after.mapX, y: after.mapY, loc: after.currentLocationId }).toEqual(posBefore);
+  });
+
   it('reaches the destination via repeated continueTravel calls', async () => {
     const store = await bootstrapOutsideHub();
     const startId = store.getState().player!.currentLocationId;
