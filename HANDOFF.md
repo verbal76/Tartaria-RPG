@@ -19,29 +19,32 @@ handoff — lives on the feature branches, NOT here.
    step-by-step procedures — read that block first.
 3. **Read `CLAUDE.md`** (also on the branch) for the working rules.
 
-## Current phase (as of 2026-06-15) — THREE lines
+## Current phase (as of 2026-06-16) — FOUR lines
 
 Each line is its **own app id + OTA channel**, so the apps install side-by-side
-on a phone and never cross-publish. The isolation lever is `app.json`
-(`expo-channel-name` + `bundleIdentifier` / `android.package`).
+and never cross-publish. The isolation lever is `app.json` (`expo-channel-name` +
+`bundleIdentifier` / `android.package`).
 
-- **`golem-line`** — **the ACTIVE dev branch; do all work here.** Forked from
-  `HaL2001` at OTA-620 (newest code). App id `…tartarprim.golem`, channel
-  `golem-line`.
-- **`HaL2001`** — the **LIVE line, currently FROZEN** to mature ~1 week and gather
-  player feedback (last shipped = OTA-620). App id `…tartarprim.hal2001`, channel
-  `hal2001`. **Do NOT push to it unless the user explicitly says "QoL for HAL".**
+- **`golem-line`** — **the ACTIVE MOBILE dev branch; do mobile work here.** Forked
+  from `HaL2001` at OTA-620. App id `…tartarprim.golem`, channel `golem-line`.
+- **`steam_Dev`** — **the PC/Steam dev branch** (react-native-web + Electron). App
+  id `…tartarprim.steamdev`, channel `steam-dev`. Full plan in `PC-PORT.md` on that
+  branch; `.exe` built by `.github/workflows/build-steam-exe.yml`.
+- **`HaL2001`** — the **LIVE line**, mostly frozen to mature/gather feedback, but it
+  still takes **live bug-fix OTAs** on an explicit "QoL/bug for HAL" (a push
+  publishes to the live APK + IPA). App id `…tartarprim.hal2001`, channel `hal2001`.
 - **`arbiters-line`** — dormant separate line (app id `…tartarprim.arbiters`,
   channel `arbiters-line`); holds 45 of its own commits (OTA-563→599). Leave alone.
 
 ## Key facts
 
-- **Active dev branch:** `golem-line` — channel `golem-line`, app id `…tartarprim.golem`
-- **Live (frozen) branch:** `HaL2001` — channel `hal2001`, app id `…tartarprim.hal2001`
-- **Latest OTA:** `OTA-620 (Bibinilium Glow)` — `app/buildInfo.ts`
-  `OTA_BUILD_ID = '2026-06-12-620'`. Next OTA on golem-line = **621**.
+- **Active mobile dev:** `golem-line` — channel `golem-line`, app id `…tartarprim.golem`
+- **PC/Steam dev:** `steam_Dev` — channel `steam-dev`, app id `…tartarprim.steamdev`
+- **Live branch:** `HaL2001` — channel `hal2001`, app id `…tartarprim.hal2001`
+- **Latest OTA:** `OTA-622 (Bibibium Echo)` — `app/buildInfo.ts`
+  `OTA_BUILD_ID = '2026-06-12-622'`. **Next OTA = 623.** (All four lines at 622.)
 - **Codename scheme:** systematic IUPAC name of `(OTA-NNN − 400)` + a flavor word
-  (e.g. 620 → 220 "Bibinilium"; next 621 → "Bibiunium"). Full rule is in the top
+  (e.g. 622 → 222 "Bibibium"; next 623 → "Bibitrium"). Full rule is in the top
   block of the `golem-line` `HANDOFF.md`.
 - **App version (rt floor):** `2.4.1` — pinned for OTA delivery (`runtimeVersion`
   policy `appVersion`).
