@@ -1,43 +1,121 @@
 // Electron main process — wraps the Expo web export (react-native-web) into a
-// desktop window and, when the Steamworks runtime is present, initializes Steam
-// for achievements + overlay. Steam is OPTIONAL: if steamworks.js or the Steam
-// client isn't available, the build still runs (handy for local dev), it just
-// skips Steam features. The game code talks to Steam only through the tiny,
-// safe surface exposed in preload.js (window.tartariaDesktop).
+// desktop window for Tartaria Realms (PC / Steam).
+//
+// Two things this does beyond opening a window:
+//
+// 1) SERVES the web bundle over a tiny built-in localhost HTTP server instead of
+//    loading it via file://. Expo's web export references assets with ABSOLUTE
+//    paths (/_expo/static/js/…); under file:// those resolve to the filesystem
+//    root and 404, so nothing mounts and you get a black window. Serving over
+//    http://127.0.0.1:<port>/ makes the absolute paths resolve correctly.
+//
+// 2) Writes a DIAGNOSTIC LOG to the user's Desktop ("Tartaria-Realms-log.txt")
+//    capturing startup, asset load failures, renderer crashes, preload errors,
+//    and renderer console output — so a black-screen launch produces something we
+//    can actually read. DevTools also opens automatically for this dev build.
 
 const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
+const fs = require('fs');
+const http = require('http');
 
-let steam = null; // steamworks.js client handle, or null when unavailable.
+// ───────────────────────── diagnostic log ─────────────────────────
+let LOG_PATH = null;
+function resolveLogPath() {
+  const candidates = [];
+  try { candidates.push(path.join(app.getPath('desktop'), 'Tartaria-Realms-log.txt')); } catch {}
+  try { candidates.push(path.join(app.getPath('userData'), 'Tartaria-Realms-log.txt')); } catch {}
+  candidates.push(path.join(__dirname, 'Tartaria-Realms-log.txt'));
+  for (const c of candidates) {
+    try { fs.writeFileSync(c, ''); return c; } catch {}
+  }
+  return null;
+}
+function logLine(s) {
+  const line = `[${new Date().toISOString()}] ${s}\n`;
+  try { if (LOG_PATH) fs.appendFileSync(LOG_PATH, line); } catch {}
+  // eslint-disable-next-line no-console
+  console.log(s);
+}
 
+// ───────────────────────── static file server ─────────────────────────
+const MIME = {
+  '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript',
+  '.css': 'text/css', '.json': 'application/json', '.map': 'application/json',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif', '.svg': 'image/svg+xml', '.webp': 'image/webp',
+  '.ico': 'image/x-icon', '.ttf': 'font/ttf', '.otf': 'font/otf',
+  '.woff': 'font/woff', '.woff2': 'font/woff2', '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav', '.m4a': 'audio/mp4', '.wasm': 'application/wasm',
+  '.txt': 'text/plain',
+};
+// Start an http server rooted at `dir`; resolves with the chosen port.
+function startStaticServer(dir) {
+  return new Promise((resolve, reject) => {
+    const server = http.createServer((req, res) => {
+      try {
+        let urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
+        if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
+        const filePath = path.normalize(path.join(dir, urlPath));
+        if (!filePath.startsWith(path.normalize(dir))) { res.writeHead(403); res.end('forbidden'); return; }
+        fs.readFile(filePath, (err, data) => {
+          if (err) {
+            // SPA fallback: unknown route with no file extension → index.html.
+            if (!path.extname(filePath)) {
+              fs.readFile(path.join(dir, 'index.html'), (e2, idx) => {
+                if (e2) { logLine(`HTTP 404 ${urlPath}`); res.writeHead(404); res.end('not found'); }
+                else { res.writeHead(200, { 'Content-Type': 'text/html' }); res.end(idx); }
+              });
+              return;
+            }
+            logLine(`HTTP 404 ${urlPath} (${err.code})`);
+            res.writeHead(404); res.end('not found');
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream' });
+          res.end(data);
+        });
+      } catch (e) {
+        logLine(`HTTP server error: ${e && e.message}`);
+        res.writeHead(500); res.end('error');
+      }
+    });
+    server.on('error', reject);
+    server.listen(0, '127.0.0.1', () => resolve(server.address().port));
+  });
+}
+
+// ───────────────────────── steam (optional) ─────────────────────────
+let steam = null;
 function initSteam() {
-  // 480 = Spacewar, Valve's public test app id — lets achievement plumbing be
-  // exercised before our real app id is provisioned. Override with STEAM_APP_ID.
   const appId = parseInt(process.env.STEAM_APP_ID || '480', 10);
   try {
     const steamworks = require('steamworks.js');
     steam = steamworks.init(appId);
-    // eslint-disable-next-line no-console
-    console.log('[steam] ready for app', appId, '— player:', steam.localplayer.getName());
+    logLine(`[steam] ready for app ${appId} — player: ${steam.localplayer.getName()}`);
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.warn('[steam] not available — running without Steam:', e && e.message);
+    logLine(`[steam] not available — running without Steam: ${e && e.message}`);
     steam = null;
   }
 }
 
-function createWindow() {
-  // Resolution-aware: size to whatever display we launch on (laptop panel,
-  // external monitor, or Steam Deck's 1280x800), then maximize to fill it. The
-  // game is react-native-web — it reads window Dimensions and reflows on resize,
-  // so it adapts to any resolution rather than assuming a fixed canvas.
+ipcMain.handle('steam:achievement', (_evt, achievementId) => {
+  if (!steam) return false;
+  try { steam.achievement.activate(achievementId); return true; }
+  catch (e) { logLine(`[steam] achievement failed ${achievementId}: ${e && e.message}`); return false; }
+});
+// Renderer forwards window errors / rejections here (see preload.js).
+ipcMain.on('renderer-error', (_evt, msg) => logLine(`RENDERER ERROR: ${msg}`));
+
+// ───────────────────────── window ─────────────────────────
+async function createWindow() {
   const primary = screen.getPrimaryDisplay();
   const { width: screenW, height: screenH } = primary.workAreaSize;
 
   const win = new BrowserWindow({
     width: Math.min(1280, screenW),
     height: Math.min(800, screenH),
-    minWidth: 640, // Steam Deck-safe floor
+    minWidth: 640,
     minHeight: 480,
     backgroundColor: '#0a0908',
     autoHideMenuBar: true,
@@ -49,53 +127,63 @@ function createWindow() {
     },
   });
 
-  // Fill the current monitor by default; avoids a tiny window on big screens.
   win.maximize();
+  // Show no matter what — even on a failed load — so the window can't get stuck
+  // hidden behind a never-firing ready-to-show.
   win.once('ready-to-show', () => win.show());
+  setTimeout(() => { if (!win.isDestroyed() && !win.isVisible()) win.show(); }, 4000);
 
-  // F11 toggles fullscreen (Steam Deck / big-picture run fullscreen). Launching
-  // with TARTARIA_FULLSCREEN=1 (e.g. the Steam shortcut) starts fullscreen.
-  win.webContents.on('before-input-event', (_evt, input) => {
-    if (input.type === 'keyDown' && input.key === 'F11') {
-      win.setFullScreen(!win.isFullScreen());
-    }
+  // Diagnostics: capture everything that could explain a black screen.
+  const wc = win.webContents;
+  wc.on('did-fail-load', (_e, code, desc, url) => logLine(`LOAD FAIL ${code} ${desc} — ${url}`));
+  wc.on('did-finish-load', () => logLine('load: did-finish-load'));
+  wc.on('dom-ready', () => logLine('load: dom-ready'));
+  wc.on('render-process-gone', (_e, d) => logLine(`RENDERER GONE: reason=${d.reason} exitCode=${d.exitCode}`));
+  wc.on('preload-error', (_e, p, err) => logLine(`PRELOAD ERROR ${p}: ${err && err.message}`));
+  wc.on('unresponsive', () => logLine('window: unresponsive'));
+  wc.on('console-message', (_e, level, message, line, sourceId) =>
+    logLine(`console[${level}] ${message} (${sourceId}:${line})`));
+
+  // Auto-open DevTools for this dev build so console errors are visible on screen.
+  if (process.env.TARTARIA_NO_DEVTOOLS !== '1') wc.openDevTools({ mode: 'detach' });
+
+  // F11 fullscreen (Steam Deck / big-picture).
+  wc.on('before-input-event', (_evt, input) => {
+    if (input.type === 'keyDown' && input.key === 'F11') win.setFullScreen(!win.isFullScreen());
   });
   if (process.env.TARTARIA_FULLSCREEN === '1') win.setFullScreen(true);
 
-  // DEV: point at the live Expo web dev server (`npx expo start --web` → :8081)
-  // so you get hot reload. PROD: load the static export copied to web-build/.
+  // DEV: live Expo web server. PROD: serve the static export over localhost.
   const devUrl = process.env.TARTARIA_DEV_URL;
   if (devUrl) {
+    logLine(`loading dev URL ${devUrl}`);
     win.loadURL(devUrl);
-  } else {
-    win.loadFile(path.join(__dirname, 'web-build', 'index.html'));
+    return;
+  }
+  const webDir = path.join(__dirname, 'web-build');
+  const hasIndex = fs.existsSync(path.join(webDir, 'index.html'));
+  logLine(`web-build dir: ${webDir} (index.html ${hasIndex ? 'FOUND' : 'MISSING'})`);
+  if (!hasIndex) { logLine('FATAL: web-build/index.html missing — the export was not staged into the wrapper.'); win.show(); return; }
+  try {
+    const port = await startStaticServer(webDir);
+    logLine(`static server on http://127.0.0.1:${port}/`);
+    win.loadURL(`http://127.0.0.1:${port}/`);
+  } catch (e) {
+    logLine(`FATAL: static server failed: ${e && e.message}; falling back to file://`);
+    win.loadFile(path.join(webDir, 'index.html'));
   }
 }
 
-// Achievement bridge. The game calls window.tartariaDesktop.unlockAchievement(id)
-// at the SAME trigger points it already uses for quests/titles/bosses.
-// NOTE: verify the exact steamworks.js method name against the installed version
-// (0.x API has shifted: activate vs. setAchievement) before relying on this.
-ipcMain.handle('steam:achievement', (_evt, achievementId) => {
-  if (!steam) return false;
-  try {
-    steam.achievement.activate(achievementId);
-    return true;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.warn('[steam] achievement failed', achievementId, e && e.message);
-    return false;
-  }
-});
+process.on('uncaughtException', (e) => logLine(`MAIN uncaughtException: ${(e && e.stack) || e}`));
 
 app.whenReady().then(() => {
+  LOG_PATH = resolveLogPath();
+  logLine('──────── Tartaria Realms (PC) starting ────────');
+  logLine(`versions: electron ${process.versions.electron}, chrome ${process.versions.chrome}, node ${process.versions.node}`);
+  logLine(`platform ${process.platform} ${process.arch} — log at ${LOG_PATH}`);
   initSteam();
   createWindow();
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+  app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
