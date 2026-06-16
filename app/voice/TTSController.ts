@@ -20,6 +20,7 @@ import { useGameStore } from '../state/gameStore';
 import { speak, stopAndClear } from './TTSManager';
 import { getVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
 import { splitSentences } from './sentenceSplitter';
+import { advanceStream, emptyStreamState } from './streamBundler';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 
 // Re-exported so the test file (and any future caller) can import it
@@ -61,15 +62,14 @@ let controllerStartedAt: number | null = null;
  *  entry (typically the "you step back into..." resume line) should
  *  be voiced. */
 let lastSpokenEntryId: string | null = null;
-let streamBuffer = '';
-// arb7 prosody — streaming-narration bundling. Kokoro reads flat/choppy
-// when every completed sentence is shipped as its own tiny clip. We ship
-// the FIRST sentence of a stream immediately (so audio starts fast), then
-// accumulate subsequent sentences and flush them in ~STREAM_BUNDLE_CHARS
-// batches so the model gets multi-sentence context for natural inflection.
-let streamPending = '';
-let streamShippedFirst = false;
-const STREAM_BUNDLE_CHARS = 180;
+// arb7 prosody — streaming-narration bundling. Kokoro reads flat/choppy when
+// every completed sentence is shipped as its own tiny clip, so the bundler ships
+// the FIRST sentence immediately (audio starts fast) then accumulates and flushes
+// in ~180-char batches for natural inflection. OTA-622 — the incremental
+// (delta-only) logic now lives in streamBundler.ts: it tracks how much of the
+// CUMULATIVE partial has been consumed so a steady partial can't re-read (and
+// Kokoro re-speak) an already-shipped sentence.
+let streamState = emptyStreamState();
 /** Ids of arbiter entries we already voiced via the streaming buffer.
  *  When the matching final entry lands on the arbiter channel via
  *  appendLog, we skip it (already spoken sentence-by-sentence). The
@@ -150,27 +150,11 @@ function wasAlreadyStreamed(text: string): boolean {
   });
 }
 
-function flushStreamBuffer(): void {
-  // Ship any bundled-but-unsent sentences together with the trailing
-  // (terminator-less) remainder as one final chunk, then reset the
-  // per-stream bundling state.
-  const tail = [streamPending, streamBuffer.trim()].filter(Boolean).join(' ').trim();
-  if (tail) {
-    speakArbiter(tail);
-    rememberStreamed(tail);
-  }
-  streamBuffer = '';
-  streamPending = '';
-  streamShippedFirst = false;
-}
-
 function syncToCurrent(state: GameState): void {
   lastLogIndex = state.gameLog.length;
   const last = state.gameLog[state.gameLog.length - 1];
   lastSpokenEntryId = last ? last.id : null;
-  streamBuffer = '';
-  streamPending = '';
-  streamShippedFirst = false;
+  streamState = emptyStreamState();
 }
 
 function onState(state: GameState): void {
@@ -250,43 +234,16 @@ function onState(state: GameState): void {
     if (tail) lastSpokenEntryId = tail.id;
   }
 
-  // 2) Streaming Arbiter narration — accumulate the buffer, ship
-  // completed sentences immediately so TTS doesn't wait for the full
-  // 200-token response.
-  const partial = state.partialArbiterText;
-  if (partial == null) {
-    // Stream ended — flush bundled/remainder text (if any) and reset.
-    if (streamBuffer || streamPending || streamShippedFirst) flushStreamBuffer();
-  } else if (partial.length > streamBuffer.length) {
-    // New tokens arrived — replace the buffer with the latest snapshot.
-    // (gameStore stores the cumulative partial text, not the delta.)
-    streamBuffer = partial;
-    const { sentences, remainder } = splitSentences(streamBuffer);
-    for (const s of sentences) {
-      // Remember every sentence so the final full-line appendLog is
-      // recognised as already-spoken (dedup is substring-based).
-      rememberStreamed(s);
-      if (!streamShippedFirst) {
-        // First sentence ships immediately → audio starts fast.
-        speakArbiter(s);
-        streamShippedFirst = true;
-      } else {
-        // Bundle the rest so Kokoro reads multi-sentence chunks.
-        streamPending = streamPending ? `${streamPending} ${s}` : s;
-        if (streamPending.length >= STREAM_BUNDLE_CHARS) {
-          speakArbiter(streamPending);
-          streamPending = '';
-        }
-      }
-    }
-    streamBuffer = remainder;
-  } else if (partial.length < streamBuffer.length) {
-    // The store reset the partial text (e.g. submitPlayerAction
-    // cancelled the in-flight generation). Drop our buffer + bundle.
-    streamBuffer = partial;
-    streamPending = '';
-    streamShippedFirst = false;
-  }
+  // 2) Streaming Arbiter narration — feed the incremental bundler. It ships
+  // completed sentences (the first immediately, the rest in ~180-char bundles)
+  // and flushes the remainder when the stream ends. Crucially it processes ONLY
+  // new tokens, so a steady (unchanged) partial never re-speaks a shipped line —
+  // the OTA-622 "same thing five times" repeat. `rememberStreamed` still records
+  // each sentence so the final full-line appendLog is recognised as spoken.
+  const adv = advanceStream(streamState, state.partialArbiterText ?? null);
+  streamState = adv.state;
+  for (const s of adv.streamed) rememberStreamed(s);
+  for (const u of adv.utterances) speakArbiter(u);
 }
 
 /** Bind the controller to the game store + settings observer. Call

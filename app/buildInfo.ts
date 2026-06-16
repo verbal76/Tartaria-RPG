@@ -15083,4 +15083,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // per-tile sceneBuilding even while auto-travelling (narration still only fires off-route, so no spam); (2) InputBox
 // renders an ENTER button on the auto-travel row when a structure is on the tile. So "Tap ENTER" always has a button.
 // tsc clean; building/discovery suites green. JS-only → 290. app/components/InputBox.tsx, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-621';
+// OTA-622 (Bibibium Echo) — [bug · playtester] "Kokoro said the same thing five times." The streaming-narration buffer
+// re-read shipped sentences: partialArbiterText is CUMULATIVE, but TTSController reset its working buffer to the FULL
+// partial every store tick and re-split it — so once a sentence shipped, every later tick where the partial hadn't grown
+// re-bundled it, piling copies into ever-longer bundles that evaded the exact-match spoken-recently guard. Kokoro read
+// the line N times. Fix: extracted the bundling into a pure streamBundler.ts that tracks consumedLen and processes ONLY
+// the new token delta — a steady partial is a no-op. Locked by streamBundler.test (each sentence ships exactly once across
+// growing + steady ticks). tsc clean; tts suites green. JS-only → 290. app/voice/streamBundler.ts (new), TTSController.ts.
+export const OTA_BUILD_ID = '2026-06-12-622';
