@@ -6,19 +6,22 @@
      "CURRENT WORK PHASE" / "Current state" / §P branch-policy block below them.
      ═══════════════════════════════════════════════════════════════════════════ -->
 
-> ## ⟁ CURRENT WORK PHASE — 2026-06-15 — THREE LINES; develop on `golem-line`
+> ## ⟁ CURRENT WORK PHASE — 2026-06-15/16 — FOUR LINES; mobile dev on `golem-line`, PC on `steam_Dev`
 >
-> **What changed this phase:** `HaL2001` is now the **stable, live** line and is
-> **frozen for ~1 week to mature and gather player feedback** (last OTA = 620,
-> shipped 2026-06-15). Active development moves to a NEW isolated line,
-> **`golem-line`**, forked from `HaL2001` at OTA-620 (an exact code copy).
+> **What changed this phase:** `HaL2001` is the **stable, live** line, mostly frozen
+> to mature/gather feedback — but it still takes **live bug-fix OTAs** when the user
+> calls a "QoL/bug for HAL" (it shipped 621 + 622 this way, each ported to the dev
+> lines). Active **mobile** development is on **`golem-line`** (forked from `HaL2001`
+> at OTA-620). A NEW **`steam_Dev`** line was forked for the **PC/Steam port**
+> (react-native-web + Electron) — see "PC/Steam port" below.
 >
-> ### The three lines (each = its own app id + OTA channel = separate phones)
+> ### The four lines (each = its own app id + OTA channel = separate install)
 > | Branch | App id | OTA channel | Status | Develop here? |
 > |---|---|---|---|---|
-> | **`HaL2001`** | `…tartarprim.hal2001` | `hal2001` | LIVE, frozen, maturing ~1 wk | NO — only on an explicit "QoL for HAL" |
-> | **`golem-line`** | `…tartarprim.golem` | `golem-line` | **NEW active dev line** | **YES** |
-> | `arbiters-line` | `…tartarprim.arbiters` | `arbiters-line` | dormant; holds 45 of its own commits (OTA-563→599) not on HAL | NO |
+> | **`HaL2001`** | `…tartarprim.hal2001` | `hal2001` | LIVE; frozen EXCEPT an explicit "QoL/bug for HAL" (a push publishes to the live APK + IPA) | bug-fixes only |
+> | **`golem-line`** | `…tartarprim.golem` | `golem-line` | **active MOBILE dev line** | **YES (mobile)** |
+> | **`steam_Dev`** | `…tartarprim.steamdev` | `steam-dev` | **PC/Steam dev line** (Electron + web export; `build-steam-exe.yml` → `.exe`) | **YES (PC)** |
+> | `arbiters-line` | `…tartarprim.arbiters` | `arbiters-line` | dormant; 45 own commits (OTA-563→599) not on HAL | NO |
 >
 > A line's identity lives entirely in **`app.json`**: `expo.name`,
 > `ios.bundleIdentifier`, `android.package`, and
@@ -30,33 +33,42 @@
 > ### Worktree
 > `/tmp/hal2001` is the active worktree, currently checked out on **`golem-line`**
 > (`node_modules` present; `npx tsc` / `npx jest` / patch-package all work).
-> `HaL2001`, `arbiters-line`, and `golem-line` are all branches in this one clone.
+> `HaL2001`, `arbiters-line`, `golem-line`, and `steam_Dev` are all branches in this
+> one clone. (HaL bug-fixes are done in a throwaway worktree off `origin/HaL2001`,
+> e.g. `git worktree add --detach /tmp/hal-fix2 origin/HaL2001` + a temp branch, then
+> `git push origin <temp>:HaL2001` — `/tmp/hal-main` was left stale; don't reuse it.)
 >
 > ### Build / OTA state
-> - **Latest OTA = `OTA-620 (Bibinilium Glow)`** — `app/buildInfo.ts`
->   `OTA_BUILD_ID = '2026-06-12-620'`. (The date stem stays `2026-06-12`; only the
->   numeric suffix advances.) Next OTA on golem-line = **621**.
-> - **golem-line has no native build and no installs yet.** To start using it, build
->   a fresh APK for the `.golem` app id (its own first sideload); after that, JS
->   OTAs flow to the `golem-line` channel normally. There is **no PR-triggered test
->   CI** — run tsc + jest yourself before every push (see "Tests").
+> - **Latest OTA = `OTA-622 (Bibibium Echo)`** — `app/buildInfo.ts`
+>   `OTA_BUILD_ID = '2026-06-12-622'`. (Date stem stays `2026-06-12`; only the numeric
+>   suffix advances.) **Next OTA = 623.** All four lines sit at 622 (621/622 shipped
+>   on HaL and were cherry-picked to golem-line + steam_Dev).
+> - **golem-line / steam_Dev have no native build/installs yet.** golem-line: build a
+>   `.golem` APK to sideload, then JS OTAs flow to the `golem-line` channel. steam_Dev:
+>   the `.exe` is built in CI (see PC/Steam port). There is **no PR-triggered test CI**
+>   — run tsc + jest yourself before every push (see "Tests").
 >
 > ### Codename scheme (CORRECTED — §P's "−405 / stop at 118" text is STALE)
 > Codename = the IUPAC **systematic numeric name of `(OTA-NNN − 400)`** + a fresh
 > one-word flavor noun. Digit roots: 0 nil · 1 un · 2 bi · 3 tri · 4 quad · 5 pent ·
 > 6 hex · 7 sept · 8 oct · 9 enn — concatenate the digits of `(NNN−400)` and add
 > `-ium`. Proven against `app/buildCodename.ts`: 618→218 **Biunoctium**, 619→219
-> **Biununennium**, 620→220 **Bibinilium**. **Next: OTA-621 → 221 → `Bibiunium
-> <word>`.** Don't reuse the immediately prior flavor word.
+> **Biununennium**, 620→220 **Bibinilium**, 621→221 **Bibiunium**, 622→222
+> **Bibibium**. **Next: OTA-623 → 223 → `Bibitrium <word>`.** Don't reuse the
+> immediately prior flavor word.
 >
-> ### Recent OTA log (611→620 — don't redo)
-> 611 golem-command volley now hits the player too + added combat-consumable
-> counters (later revised) · 612–617 combat/balance + UI batch · 618 ration heal
-> copy · **619 (Biununennium Quaff)** combat healing is FREE again — reverted 611's
-> consumable counters (Skyrim-style quaff); the golem-command volley + disengage
-> counters were KEPT · **620 (Bibinilium Glow)** Bioluminescent Fungus now heals its
-> +1 and is consumed even in a hookless room (the OTA-212 no-reveal refund was
-> discarding the heal). Full per-OTA detail tops the comment log in `app/buildInfo.ts`.
+> ### Recent OTA log (611→622 — don't redo)
+> 611 golem-command volley hits the player too + combat-consumable counters (later
+> revised) · 612–617 combat/balance + UI batch · 618 ration heal copy · **619
+> (Biununennium Quaff)** combat healing FREE again (reverted 611's consumable
+> counters; golem-volley + disengage KEPT) · **620 (Bibinilium Glow)** Bioluminescent
+> Fungus heals its +1 / is consumed even hookless (OTA-212 refund was discarding the
+> heal) · **621 (Bibiunium Threshold)** [live bug] ENTER button no longer dangles on a
+> structure tile mid-course — `sceneBuilding` is tracked while travelling + InputBox
+> shows ENTER on the travel row · **622 (Bibibium Echo)** [live bug] Kokoro no longer
+> repeats a line N times — the streaming-TTS buffer re-read the CUMULATIVE
+> partialArbiterText; new `app/voice/streamBundler.ts` processes only new token deltas.
+> Full per-OTA detail tops the comment log in `app/buildInfo.ts`.
 >
 > ### Ship a JS OTA on golem-line
 > 1. Edit `app/`. 2. Bump `OTA_BUILD_ID` in `app/buildInfo.ts` + add a per-OTA
@@ -72,6 +84,27 @@
 > `expo.name` → push + draft PR. Leave the EAS `projectId` / `updates.url` as-is
 > (all channels live inside one EAS project). `TitleScreen` update banners are gated
 > on the `.hal2001` / bare-production app ids, so a new app id shows neither — fine.
+>
+> ### PC/Steam port (`steam_Dev` line)
+> Ports the RN game to desktop via **react-native-web** wrapped in **Electron**, with
+> **Steamworks** for achievements. **Full plan, the native-module web-stub list, and
+> ordered next steps live in `PC-PORT.md` on the `steam_Dev` branch** (NOT on
+> golem-line — check out steam_Dev to read it). What's on steam_Dev:
+> - `desktop/` — Electron wrapper (`main.js` resolution-aware window + F11/Steam-Deck
+>   fullscreen; `preload.js` exposes `window.tartariaDesktop.unlockAchievement`).
+> - `web-stubs/native-noop.js` + a **web-only** Metro `resolveRequest` (metro.config.js)
+>   that stubs the 4 native-only modules (llama.rn, onnxruntime-react-native,
+>   react-native-executorch, expo-speech-recognition) so `expo export --platform web`
+>   compiles. Android/iOS resolution is untouched.
+> - root `package.json` adds web deps (react-dom, react-native-web, @expo/metro-runtime).
+> - `.github/workflows/build-steam-exe.yml` — Windows runner → `expo export web` →
+>   Electron → **portable `.exe`** uploaded as artifact `tartaria-pc-exe`. Fires on
+>   push to `steam_Dev` (+ manual dispatch). The web export COMPILED first try; the
+>   `.exe` is the same web bundle wrapped — also itch.io/HTML5-portable.
+> - **Updates ship via the Steam depot (Steampipe), NOT OTAs.** Qwen + Kokoro are
+>   stubbed on web for now (template narration, silent); desktop runtimes
+>   (node-llama-cpp / ONNX) are a later pass. Code signing deferred (Azure Trusted
+>   Signing) — see PC-PORT.md.
 >
 > ### Git / artifact rules (unchanged)
 > - Develop on the designated branch; never push another line's branch without an
