@@ -18055,16 +18055,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const livePlayer = get().player;
       const outdoorPeaceful = !!liveScene
         && (!liveScene.enemies || liveScene.enemies.length === 0);
-      // Skip while auto-travelling: you're passing through, the travel row
-      // shows travel controls (no ENTER button), so narrating "Tap ENTER"
-      // mid-journey would dangle. Discovery is for on-foot exploration.
-      if (liveScene && livePlayer && outdoorPeaceful && !livePlayer.hubRoomId && !livePlayer.travelTarget && !get().activeBuildingId) {
+      // OTA-621 — TRACK the per-tile enterable structure even while auto-
+      // travelling, so the ENTER button (now carried on the travel row too —
+      // InputBox) always has data and "Tap ENTER" never dangles without a button.
+      // The NARRATION still only fires off-route, so a long course isn't spammed —
+      // but the affordance is there if you want to stop and step inside. (Was:
+      // skipped entirely on a route, which is what left the button missing.)
+      if (liveScene && livePlayer && outdoorPeaceful && !livePlayer.hubRoomId && !get().activeBuildingId) {
         const onAnchor = step.x === WORLD_MAP_CENTER_X && step.y === WORLD_MAP_CENTER_Y;
         const here = onAnchor ? null : buildingForTile(livePlayer.currentLocationId, step.x, step.y);
         const prior = liveScene.sceneBuilding ?? null;
         if (here !== prior) {
           set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sceneBuilding: here } } : s));
-          if (here) get().appendLog('world', buildingApproachLine(here, !!livePlayer.whisperCourse));
+          if (here && !livePlayer.travelTarget) {
+            get().appendLog('world', buildingApproachLine(here, !!livePlayer.whisperCourse));
+          }
         }
       }
     }

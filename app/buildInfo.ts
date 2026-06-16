@@ -15076,4 +15076,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // food-that-glows. Fix: only refund when no other effect fired (messages.length===0) — otherwise eat normally and just
 // note "nothing to reveal". Fungus now heals +1 and is consumed even with no hooks; Aetheric Torch still refunds. Locked
 // by fungusFoodReveal. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-620';
+// OTA-621 (Bibiunium Threshold) — [bug · playtester] "it said hit ENTER to enter a shack and there was no ENTER button."
+// The "(Tap ENTER to step inside.)" narration and the ENTER button used inconsistent conditions: the button only rendered
+// on the plain travel row, while during an active course the row showed → TARGET / STOP TRAVEL and NO ENTER (arb120 even
+// admits the prompt "dangles"), and sceneBuilding wasn't even tracked mid-course. Fix: (1) gameStore now tracks the
+// per-tile sceneBuilding even while auto-travelling (narration still only fires off-route, so no spam); (2) InputBox
+// renders an ENTER button on the auto-travel row when a structure is on the tile. So "Tap ENTER" always has a button.
+// tsc clean; building/discovery suites green. JS-only → 290. app/components/InputBox.tsx, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-621';

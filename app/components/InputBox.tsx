@@ -352,6 +352,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </>
           ) : travelTargetName ? (
             <>
+              {/* OTA-621 — a structure stands on THIS tile even mid-journey. Keep
+                  the ENTER affordance on the travel row so "Tap ENTER to step
+                  inside" never dangles without a button (the arb120 case): you can
+                  step in, then resume the course. */}
+              {sceneBuilding ? (
+                <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
+              ) : null}
               <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
               {typeof movesLeft === 'number' && movesLeft >= 0 ? (
