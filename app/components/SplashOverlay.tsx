@@ -5,7 +5,7 @@
 // Self-contained: owns its timer + Kokoro subscription, returns null when done.
 
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Image, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
 // Splash art native dimensions (assets/splash-art.jpg).
@@ -54,12 +54,17 @@ export function SplashOverlay() {
   const screenW = Dimensions.get('window').width;
   const imgW = Math.round(screenW * SPLASH_SCALE);
   const imgH = Math.round((imgW * SPLASH_H) / SPLASH_W);
+  // PC/web — the portrait phone art doesn't fit a landscape window. Use the
+  // dedicated 16:9 key art (assets/splash-art-pc.png), full-bleed cover.
+  const isWeb = Platform.OS === 'web';
 
   return (
     <View style={styles.overlay} pointerEvents="auto">
       <Image
-        source={require('../../assets/splash-art.jpg')}
-        style={{ position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
+        source={isWeb ? require('../../assets/splash-art-pc.png') : require('../../assets/splash-art.jpg')}
+        style={isWeb
+          ? StyleSheet.absoluteFillObject
+          : { position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
         resizeMode="cover"
       />
       <View style={styles.barWrap}>
