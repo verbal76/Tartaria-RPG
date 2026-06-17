@@ -144,8 +144,10 @@ async function createWindow() {
   wc.on('console-message', (_e, level, message, line, sourceId) =>
     logLine(`console[${level}] ${message} (${sourceId}:${line})`));
 
-  // Auto-open DevTools for this dev build so console errors are visible on screen.
-  if (process.env.TARTARIA_NO_DEVTOOLS !== '1') wc.openDevTools({ mode: 'detach' });
+  // DevTools is OFF by default now that the build renders (an open detached
+  // DevTools adds real overhead and made clicks feel laggy). Opt in with
+  // TARTARIA_DEVTOOLS=1 when you need the console.
+  if (process.env.TARTARIA_DEVTOOLS === '1') wc.openDevTools({ mode: 'detach' });
 
   // F11 fullscreen (Steam Deck / big-picture).
   wc.on('before-input-event', (_evt, input) => {
@@ -175,6 +177,11 @@ async function createWindow() {
 }
 
 process.on('uncaughtException', (e) => logLine(`MAIN uncaughtException: ${(e && e.stack) || e}`));
+
+// Enable WebGPU so the Kokoro voice (onnxruntime-web) can run inference on the
+// GPU instead of blocking the main thread with WASM — the cause of both the
+// gaps between spoken lines and the laggy clicks. Must be set before app ready.
+app.commandLine.appendSwitch('enable-unsafe-webgpu');
 
 app.whenReady().then(() => {
   LOG_PATH = resolveLogPath();
