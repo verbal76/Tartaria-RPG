@@ -1,0 +1,51 @@
+name: Build Web Bundle (HTML)
+
+# The pure browser/HTML build for the html_dev line — the Expo web export with NO
+# Electron wrapper. Produces a static site bundle (index.html + assets) you can
+# host anywhere: GitHub Pages, Netlify, itch.io (HTML project), your own server.
+# Separate from the PC executable lines (steam_Dev/mac_dev/linux_dev), which wrap
+# this same bundle in Electron.
+#
+# Fires on push to html_dev + manual dispatch. Artifact-only.
+#
+# HOSTING NOTE: Expo emits ABSOLUTE asset paths (/_expo/...), which work when the
+# site is served from a domain ROOT (Netlify, a custom domain, GitHub Pages on a
+# user/org root). For a SUBPATH host (itch.io zip, project-pages /repo/), those
+# paths need a base-path rewrite — flag me and I'll add an export base-url step.
+on:
+  push:
+    branches:
+      - html_dev
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install app deps
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Zip the static site
+        run: cd dist && zip -rq ../tartaria-web.zip . && cd ..
+
+      - name: Upload web bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-web
+          path: tartaria-web.zip
+          if-no-files-found: error
