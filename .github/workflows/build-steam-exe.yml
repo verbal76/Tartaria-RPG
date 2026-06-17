@@ -1,4 +1,4 @@
-name: Build Steam EXE (Windows)
+name: Build · Windows (.exe)
 
 # PC/Steam build for the steam_Dev line. Exports the game to a web bundle
 # (react-native-web), wraps it in Electron, and packages a single portable
