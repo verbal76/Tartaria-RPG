@@ -1,4 +1,4 @@
-name: Build Linux AppImage (Steam Deck)
+name: Build · Linux / Steam Deck (AppImage)
 
 # Linux/Steam Deck build for the linux_dev line. Same Expo web export +
 # Electron wrapper as the Windows build, packaged as a single portable
