@@ -1,4 +1,4 @@
-name: EAS Update — arbiters-line ISOLATED (test phone only)
+name: Archived · Publish · OTA (arbiters test)
 
 # Publishes the arbiters-line JS bundle as an OTA to the 'arbiters-line'
 # EAS channel ONLY. The Flint Coil test APK is the only build that listens
