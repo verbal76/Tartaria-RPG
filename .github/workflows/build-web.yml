@@ -1,4 +1,4 @@
-name: Build Web Bundle (HTML)
+name: Build · Web / HTML
 
 # The pure browser/HTML build for the html_dev line — the Expo web export with NO
 # Electron wrapper. Produces a static site bundle (index.html + assets) you can
