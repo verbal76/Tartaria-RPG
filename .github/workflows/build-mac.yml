@@ -1,0 +1,59 @@
+name: Build macOS App (Mac Dev)
+
+# macOS desktop build for the mac_dev line. Same Expo web export + Electron
+# wrapper as Windows/Linux, packaged as an UNSIGNED .dmg on a macОS runner.
+# Fires on push to mac_dev + manual dispatch. Artifact-only; no EAS/store.
+#
+# Unsigned: CSC_IDENTITY_AUTO_DISCOVERY=false tells electron-builder to skip
+# code-signing (no Apple Developer cert needed to BUILD). To RUN it on a Mac the
+# first time: right-click the app → Open (Gatekeeper), or open the .dmg and drag
+# to Applications then right-click → Open. Notarize later for clean distribution.
+on:
+  push:
+    branches:
+      - mac_dev
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install app deps (root)
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Stage web bundle into the Electron wrapper
+        run: |
+          mkdir -p desktop/web-build
+          cp -r dist/* desktop/web-build/
+
+      - name: Install desktop (Electron) deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Package macOS .dmg (unsigned)
+        working-directory: desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --mac dmg --publish never
+
+      - name: Upload .dmg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-mac-dmg
+          path: desktop/release/*.dmg
+          if-no-files-found: error
