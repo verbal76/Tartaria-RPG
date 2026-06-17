@@ -15090,4 +15090,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the line N times. Fix: extracted the bundling into a pure streamBundler.ts that tracks consumedLen and processes ONLY
 // the new token delta — a steady partial is a no-op. Locked by streamBundler.test (each sentence ships exactly once across
 // growing + steady ticks). tsc clean; tts suites green. JS-only → 290. app/voice/streamBundler.ts (new), TTSController.ts.
-export const OTA_BUILD_ID = '2026-06-12-622';
+// OTA-623 (Bibitrium Resume) — [bug] save & exit MID-tutorial, then resume → the SKIP TUTORIAL pill + input locks came
+// back in a broken post-resume state (skip mis-routed to the character screen). Cause: saveAndExitToTitle didn't clear the
+// tutorial state, and loadSlotIntoGame never restored/reset it, so a stale tutorialStep survived into the resumed game. A
+// resumed save is past first-run onboarding. Fix: loadSlotIntoGame now clears tutorialStep/awaitingTutorialName/
+// tutorialExploreChosen and sets hasSeenIntro:true; saveAndExitToTitle clears the same on the way out. Locked by
+// sessionResume tests. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-12-623';
