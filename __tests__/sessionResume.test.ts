@@ -125,3 +125,30 @@ describe('OTA-046 — while-you-were-away beat on slot-load', () => {
     expect(away).toBeUndefined();
   });
 });
+
+describe('OTA-623 — resuming a save never carries a stale mid-tutorial state', () => {
+  beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
+
+  it('loadSlotIntoGame clears a stale tutorialStep (the SKIP-pill-on-resume bug)', async () => {
+    const store = await bootstrapAndSave();
+    const slotId = store.getState().activeSlotId;
+    if (!slotId) return;
+    // Simulate the precondition: the store is left mid-tutorial (the stale step
+    // the old saveAndExit failed to clear). On resume it must be wiped.
+    store.setState({ tutorialStep: 3, awaitingTutorialName: false, tutorialExploreChosen: false });
+    await store.getState().loadSlotIntoGame(slotId);
+    expect(store.getState().tutorialStep).toBeNull();
+    expect(store.getState().currentScreen).toBe('exploration');
+  });
+
+  it('saveAndExitToTitle clears the tutorial state on the way out', async () => {
+    const store = useGameStore;
+    await store.getState().hydrate();
+    await store.getState().startNewGame({ name: 'MidTut', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
+    // startNewGame arms the tutorial; simulate being part-way through it.
+    store.setState({ tutorialStep: 3 });
+    await store.getState().saveAndExitToTitle();
+    expect(store.getState().tutorialStep).toBeNull();
+    expect(store.getState().currentScreen).toBe('title');
+  });
+});
