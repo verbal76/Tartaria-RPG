@@ -1,4 +1,4 @@
-name: iOS Build (native, GitHub Actions macOS fallback)
+name: Build · iOS (macOS runner)
 
 # STUB on main — the real workflow lives on HaL2001 (where the code is).
 # This file exists only to make the workflow visible in the Actions UI's
