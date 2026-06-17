@@ -32,6 +32,7 @@ import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
+import { GamepadNav } from './app/components/GamepadNav';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
 import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
@@ -794,6 +795,9 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           padding + scale transform), so it's full-bleed with no parchment
           margins. Self-dismisses after ~2s on first launch. */}
       <SplashOverlay />
+      {/* PC / Steam Deck controller navigation. Renders nothing on phones
+          (native stub); on web it drives the on-screen-button highlight. */}
+      <GamepadNav />
     </View>
   );
 }
