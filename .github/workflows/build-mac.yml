@@ -1,4 +1,4 @@
-name: Build macOS App (Mac Dev)
+name: Build · macOS (.dmg)
 
 # macOS desktop build for the mac_dev line. Same Expo web export + Electron
 # wrapper as Windows/Linux, packaged as an UNSIGNED .dmg on a macОS runner.
