@@ -3458,10 +3458,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
       };
       set({
-        player,
+        player: { ...player, hasSeenIntro: true },
         worldMemory: migratedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
+        // OTA-623 — a resumed save is past first-run onboarding. saveAndExitToTitle
+        // doesn't clear the tutorial state, and this resume path never restored it,
+        // so a save exited MID-tutorial came back with a STALE tutorialStep — which
+        // re-showed the SKIP TUTORIAL pill + input locks in a broken post-resume
+        // context (the skip button mis-routed to the character screen). Clear the
+        // tutorial state on every resume; hasSeenIntro:true above also blocks any
+        // re-arm. (A save is only writable after the name beat, so the character
+        // always has a name here.)
+        tutorialStep: null,
+        awaitingTutorialName: false,
+        tutorialExploreChosen: false,
         activeSlotId: slotId,
         // arb25 — never resume "inside a building" (building state is transient).
         activeBuildingId: null,
@@ -20749,7 +20760,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Keep the active slot pointer set so resume can pick it back up, but
     // refresh the slot index so the title list reflects the latest summary.
     const slots = await listSlots();
-    set({ slots, currentScreen: 'title' });
+    // OTA-623 — also drop any in-progress tutorial state on the way out, so the
+    // title screen (and the next resume) never inherit a stale mid-tutorial step.
+    set({ slots, currentScreen: 'title', tutorialStep: null, awaitingTutorialName: false, tutorialExploreChosen: false });
     // OTA 014 — reset the welcome-back debounce latch on exit so the
     // next resume gets a fresh Arbiter greeting. Without this, a
     // player who quickly saved-and-exited then resumed wouldn't hear
