@@ -15138,4 +15138,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (persistInFlight / persistTrailingQueued) wrapping the existing body as runPersistOnce; bounded 64-iter drain as a
 // livelock valve. Locked by persistCoalescing.test (maxSaveSlotInFlight==1, 25-call burst → ≤2 writes); 30 existing
 // save/persist tests green. tsc clean. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-18-627';
+// OTA-628 (Bibioctium Crimson) — [polish · playtester] the CLIMB button stayed GREEN while the engine would refuse the
+// climb (e.g. tapped CLIMB 4× on 0 stamina, each a text-only "rest first" with no tactile cue). Now the button's colour +
+// haptics track the engine's actual refusal: a new pure helper climbBlockReason() mirrors the engine's order (no rope →
+// empty stamina → frayed rope) and ExplorationScreen feeds the result to InputBox. RED ('unavailable') now covers EVERY
+// blocked case (was no-rope only); and the recoverable empty-tank case ALSO buzzes on tap (single 40ms pulse, no modal) so
+// mashing CLIMB on an empty tank gives feedback — while broken/frayed/no-rope stays red WITHOUT a buzz (a gear problem the
+// colour + climb-modal explanation already conveys; a nag would be wrong). Frayed-but-not-broken ropes get the same
+// red/no-buzz as fully broken (engine refuses them identically, OTA-625). Locked by climbReadiness.test (10 cases). tsc
+// clean. JS-only → 290. app/engine/climbReadiness.ts, app/screens/ExplorationScreen.tsx, app/components/InputBox.tsx.
+export const OTA_BUILD_ID = '2026-06-18-628';
