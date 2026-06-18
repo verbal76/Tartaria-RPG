@@ -15119,4 +15119,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tick the next WEATHER_TICK_GAP=2 actions are weather-free, so the hazard is periodic, not a per-step tax. Locked by
 // climbWeatherDefeatFixes.test (+ existing climb/weather/race suites green). tsc clean. JS-only → 290.
 // app/state/gameStore.ts, app/engine/types.ts.
-export const OTA_BUILD_ID = '2026-06-18-625';
+// OTA-626 (Bibihexium Verdant) — [polish · playtester] when a recipe is craftable the row + stripe light green, but the
+// "Needs: 2× Broken Rope, 1× Cloth Scrap" ingredient line stayed muted gray, so it wasn't obvious that you actually HOLD
+// every listed item. Now each ingredient in a ready recipe renders green (#9ec96a, the same green as the row), matching
+// the lit block — "the items in the recipe should be highlighted green too." Per-token spans so the "Needs:" label stays
+// gray and only the ingredients are green. Also fixed the long-standing tsc error in this file (RecipeStatus.kind didn't
+// include 'dog_armor', which lookupCraftedItem can return) so the file is clean again. recipesFilter suite green. JS-only
+// → 290. app/components/RecipesView.tsx.
+export const OTA_BUILD_ID = '2026-06-18-626';
