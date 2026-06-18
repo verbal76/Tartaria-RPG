@@ -19,6 +19,7 @@ import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
+import { climbBlockReason } from '../engine/climbReadiness';
 import { isNounConsumed } from '../engine/ambientNounMatch';
 import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -999,15 +1000,49 @@ export function ExplorationScreen() {
             // Alloy Grappler, Mag-Climb Kit. Same gate the engine
             // checks at climb-time (gameStore.ts:7673), so the
             // button color matches the engine's accept/refuse.
-            playerHasRope={
-              player
-                ? inventoryHasGate(
-                    player.inventory.map((i) => i.name),
-                    'climb_steep',
-                    [findGearByName, findMaterialByName, findExplorationItemByName],
-                  )
-                : false
-            }
+            // OTA-628 — drives the CLIMB button's red/green tone AND the
+            // no-stamina haptic. We compute the SAME refusal the engine would
+            // give if you climbed right now (no rope / empty stamina / frayed
+            // rope), so the colour never lies and the buzz only fires on the
+            // recoverable "rest first" case. Mirrors the gate the engine checks
+            // at climb-time (gameStore climb handler).
+            climbBlockedReason={(() => {
+              if (!player) return null;
+              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
+              const roomKey = makeRoomKey(
+                player.currentLocationId,
+                currentScene?.microMicroId,
+                player.mapX,
+                player.mapY,
+                player.hubRoomId,
+              );
+              const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
+              const hasClimbable = sceneNouns.some((n) => isClimbable(n) && !isClimbCleared(n, marks));
+              const hasGate = inventoryHasGate(
+                player.inventory.map((i) => i.name),
+                'climb_steep',
+                [findGearByName, findMaterialByName, findExplorationItemByName],
+              );
+              const hasReclaimersRope = player.inventory.some(
+                (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
+              );
+              const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+              const ropeName = hasReclaimersRope ? "Reclaimer's Rope" : 'Climbing Rope';
+              const ropeInstances = player.inventory.filter(
+                (i) => i.name === ropeName && i.quantity > 0 && i.durability != null,
+              );
+              const activeRopeDurability = ropeInstances.length
+                ? Math.max(...ropeInstances.map((i) => i.durability!.current))
+                : null;
+              return climbBlockReason({
+                hasClimbable,
+                hasGate,
+                hasReclaimersRope,
+                wearsClimbStrap,
+                stamina: player.stamina,
+                activeRopeDurability,
+              });
+            })()}
             golem={player?.golem ? {
               name: player.golem.name,
               hp: player.golem.hp,
