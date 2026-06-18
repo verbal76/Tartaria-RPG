@@ -15126,4 +15126,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // gray and only the ingredients are green. Also fixed the long-standing tsc error in this file (RecipeStatus.kind didn't
 // include 'dog_armor', which lookupCraftedItem can return) so the file is clean again. recipesFilter suite green. JS-only
 // → 290. app/components/RecipesView.tsx.
-export const OTA_BUILD_ID = '2026-06-18-626';
+// OTA-627 (Bibiseptium Anchor) — [crash · playtester] app "dropped to desktop after crafting Spark Strike"; device log
+// showed a persist STORM — `slot … FAILED — staged save did not verify — readback mismatch (got 147484 chars vs 147251)`
+// repeating every ~5ms for hundreds of lines. Root cause: persist() is fired `void`-style from ~120 call sites with NO
+// concurrency control, so several concurrent saveSlot() writes raced on the 8 rotating temp keys (OTA-421's `& 7` window
+// is too small under a burst) — each verify read back a DIFFERENT concurrent writer's bytes → mismatch →
+// emergencyReclaimDiskSpace() (heavy getAllKeys + multiRemove) → retry, in a tight loop that hammered AsyncStorage hard
+// enough to ANR the app. Fix: serialize persist() — only ONE write runs at a time, and a burst coalesces to the in-flight
+// write plus at most one trailing write (which captures the latest state, so nothing is lost). With no concurrent writer,
+// each stage verifies its OWN bytes: the mismatch, the reclaim, and the storm all vanish. New module guard
+// (persistInFlight / persistTrailingQueued) wrapping the existing body as runPersistOnce; bounded 64-iter drain as a
+// livelock valve. Locked by persistCoalescing.test (maxSaveSlotInFlight==1, 25-call burst → ≤2 writes); 30 existing
+// save/persist tests green. tsc clean. JS-only → 290. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-18-627';
