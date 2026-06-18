@@ -2691,6 +2691,22 @@ const MAX_LOG_IN_MEMORY = 500;
 const PERSIST_SIZE_SAMPLE_EVERY = 10;
 let persistSizeSampleCounter = 0;
 
+// OTA-627 — persist concurrency guard. persist() is fired `void`-style from ~120
+// call sites, and a single user action (e.g. crafting) can trip several in one
+// tick. With no serialization, those concurrent saveSlot() writes raced on the 8
+// rotating temp keys: each one's verify read back a DIFFERENT concurrent writer's
+// bytes → "readback mismatch (got N vs M)" → emergencyReclaimDiskSpace() (a heavy
+// getAllKeys + multiRemove) → retry → and the failures kept re-staging in a tight
+// loop that hammered AsyncStorage hard enough to ANR the app (player report: app
+// "dropped to desktop" after crafting Spark Strike). Serializing so only ONE write
+// runs at a time means each stage verifies its OWN bytes (no concurrent writer),
+// which removes the mismatch, the reclaim, and the storm. A burst of calls
+// coalesces to the in-flight write plus at most ONE trailing write (which captures
+// the latest state), so nothing is lost.
+let persistInFlight: Promise<boolean> | null = null;
+let persistTrailingQueued = false;
+
+
 // OTA-440 — [audit #25] proactive save-size warning. trimSaveStateToFit only
 // acts at 100% of SAFE_BLOB_CHARS (and silently sheds data); the player never
 // learns their save is bloating until items start vanishing from the saved
@@ -21014,6 +21030,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async persist() {
+    // OTA-627 — coalescing guard (see persistInFlight note above). If a write is
+    // already running, request ONE trailing write (to capture any state that
+    // changes before it finishes) and return the in-flight promise instead of
+    // starting a racing saveSlot() on the shared rotating temp keys.
+    if (persistInFlight) {
+      persistTrailingQueued = true;
+      return persistInFlight;
+    }
+    const runPersistOnce = async (): Promise<boolean> => {
     const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId, wastelandStepsSinceEncounter } = get();
     if (!activeSlotId) return false; // No active slot — nothing to write to.
     // CRITICAL: refuse to overwrite a save with player=null. This guards
@@ -21129,6 +21154,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('debug', saveSizeBreakdown(trim.state));
     }
     return !saveErr;
+    };
+    // Run serialized: one write at a time. Drain trailing requests that piled up
+    // during the write, but collapse them — at most one extra write per quiescent
+    // gap. The cap is a safety valve against a pathological infinite caller: after
+    // it, release the lock and let the next call restart rather than livelock the
+    // promise forever.
+    persistInFlight = (async () => {
+      let result = await runPersistOnce();
+      let drained = 0;
+      while (persistTrailingQueued && drained < 64) {
+        persistTrailingQueued = false;
+        drained += 1;
+        result = await runPersistOnce();
+      }
+      return result;
+    })();
+    try {
+      return await persistInFlight;
+    } finally {
+      persistInFlight = null;
+    }
   },
 }));
 
