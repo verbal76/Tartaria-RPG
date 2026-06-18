@@ -861,6 +861,12 @@ export interface PlayerCharacter {
    *  Eating any food consumable resets to 0. Absent for legacy saves,
    *  backfilled to 0 in backfillPlayer. */
   hungerStaminaPenalty?: number;
+  /** OTA-625 — weather-damage cooldown. After a damaging weather tick this is
+   *  set to WEATHER_TICK_GAP and counts down one per action; while > 0 the
+   *  per-action weather roll is skipped, so hostile weather can't chip the
+   *  player on back-to-back steps (it reads as periodic pressure, not an
+   *  un-escapable per-step drip). Absent for legacy saves → treated as 0. */
+  weatherTickCooldown?: number;
   ac: number;
   tc: number;
   corruption: number;
