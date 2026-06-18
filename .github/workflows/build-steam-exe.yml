@@ -38,6 +38,14 @@ jobs:
       - name: Export web bundle (react-native-web)
         run: npx expo export --platform web --output-dir dist
 
+      - name: Harden web bundle (strip source maps + level-2 obfuscate)
+        # Strips *.map (no decoder ring ships) and lightly obfuscates the JS so
+        # casual readers / "edit-a-number" tinkerers can't easily modify it.
+        # Native builds skip this — Hermes already ships bytecode. Runs under Git
+        # Bash on the Windows runner (find + bash both available on PATH).
+        shell: bash
+        run: bash scripts/harden-web-bundle.sh dist
+
       - name: Stage web bundle into the Electron wrapper
         shell: pwsh
         run: |
