@@ -19,6 +19,7 @@ import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
+import { isNounConsumed } from '../engine/ambientNounMatch';
 import { getLocationById } from '../engine/encounter';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
@@ -388,26 +389,15 @@ export function ExplorationScreen() {
   // chip consumed; this matches the engine's nonClimbMarkers
   // filter which strips empty + climbed: markers before the same
   // .some() check.
-  const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean => {
-    // arb-fix — apostrophe-insensitive. A possessive scene feature like
-    // "Zharak's Teeth Spire" gets stored consumed as the parser-normalized
-    // "zharak teeth spire" (no 's), but the chip noun keeps the apostrophe —
-    // and "zharak's teeth spire".includes("zharak teeth spire") is FALSE
-    // because of the "'s". So the chip never greyed and the player re-tapped a
-    // live SALVAGE/INVESTIGATE chip getting "already examined" forever. Strip
-    // apostrophes from BOTH sides before the substring compare.
-    const norm = (s: string) => s.toLowerCase().replace(/['’]/g, '');
-    const chipLower = norm(chipNoun);
-    for (const entry of pool) {
-      if (entry.length === 0) continue;
-      const e = norm(entry);
-      if (e.length === 0) continue;
-      if (e === chipLower) return true;
-      if (chipLower.includes(e)) return true;
-      if (e.includes(chipLower)) return true;
-    }
-    return false;
-  };
+  // Phrasing-tolerant consumed check. Extracted to app/engine/ambientNounMatch.ts
+  // (isNounConsumed) so it can be unit-tested. It is insensitive to BOTH the
+  // possessive apostrophe ("Zharak's Teeth Spire" stored as "zharak teeth spire")
+  // AND the connective "of" ("scraps of cloth" stored as "scraps cloth") — either
+  // mismatch used to leave the SALVAGE/INVESTIGATE chip green forever, re-tappable
+  // for an endless "already examined", because the stored consumed/flavor-exhausted
+  // noun never substring-matched the live display noun.
+  const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean =>
+    isNounConsumed(chipNoun, pool);
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
