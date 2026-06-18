@@ -17,7 +17,7 @@ const RECIPE_RARITY_RANK: Record<string, number> = {
 
 interface RecipeStatus {
   recipe: Recipe;
-  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
+  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
   missing: { name: string; short: number }[];
   available: boolean;
 }
@@ -221,7 +221,21 @@ export function RecipesView({
                   {e.available ? (
                     <>
                       <Text style={styles.recipeIng}>
-                        Needs: {e.recipe.ingredients.map((i) => `${i.quantity}× ${i.name}`).join(', ')}
+                        <Text style={styles.recipeIngLabel}>Needs: </Text>
+                        {/* OTA-626 — when a recipe is craftable, the row lights
+                            green but the ingredient line used to stay muted gray,
+                            so it wasn't obvious WHICH items you already hold. Now
+                            every ingredient in a ready recipe renders green (you
+                            have them all — that's why it's craftable), matching the
+                            green row/stripe. */}
+                        {e.recipe.ingredients.map((ing, idx) => (
+                          <Text key={ing.name}>
+                            <Text style={styles.recipeIngHave}>{ing.quantity}× {ing.name}</Text>
+                            {idx < e.recipe.ingredients.length - 1 ? (
+                              <Text style={styles.recipeIngLabel}>, </Text>
+                            ) : null}
+                          </Text>
+                        ))}
                       </Text>
                       <Text style={styles.recipeCta}>tap to craft</Text>
                     </>
@@ -267,6 +281,8 @@ const styles = StyleSheet.create({
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
   recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeIngLabel: { color: '#7a705c' },
+  recipeIngHave: { color: '#9ec96a', fontWeight: '600' },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
