@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms } from '../engine/buildings';
+import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
 import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
@@ -95,7 +96,10 @@ interface Props {
   takeableCount?: number;
   salvageableCount?: number;
   climbableCount?: number;
-  playerHasRope?: boolean;
+  /** OTA-628 — why the engine would refuse a climb right now (or null when it
+   *  wouldn't / nothing to climb). Drives the CLIMB button's red tone for ALL
+   *  blocked cases, and the no-stamina-only haptic buzz. */
+  climbBlockedReason?: ClimbBlockReason;
   investigateCount?: number;
   golem?: { name: string; hp: number; hpMax: number } | null;
   dog?: { name: string; hp: number; hpMax: number } | null;
@@ -143,7 +147,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
@@ -299,15 +303,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // so green points only at the current action; normal count/rope logic
   // applies outside the tutorial.
   // CLIMB only carries a colour when there's actually something to climb:
-  //   • has rope + climbable here  → 'ready'   (green)
-  //   • no rope + climbable here   → 'unavailable' (red — go find a rope)
-  //   • nothing climbable here     → undefined (neutral, same as the rest)
-  // The old code left a 'needs-approach' (amber) fallback for the
-  // nothing-climbable case, so the button stayed amber after you'd climbed
-  // everything / when there was nothing to climb at all.
+  //   • climbable here, engine would allow it → 'ready'   (green)
+  //   • climbable here, engine would refuse    → 'unavailable' (red)
+  //   • nothing climbable here                 → undefined (neutral)
+  // OTA-628 — red now covers EVERY blocked case (no rope / empty stamina /
+  // frayed rope), driven by climbBlockedReason, so a green button never lies.
+  // The old code only reddened the no-rope case (playerHasRope), leaving the
+  // button green while the engine refused an empty-tank or frayed-rope climb —
+  // the playtest where CLIMB was tapped repeatedly on 0 stamina.
   const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
     ? (tutActionBeat === 'climb' ? 'ready' : undefined)
-    : (climbableCount && climbableCount > 0 ? (playerHasRope ? 'ready' : 'unavailable') : undefined);
+    : (climbableCount && climbableCount > 0 ? (climbBlockedReason ? 'unavailable' : 'ready') : undefined);
+  // OTA-628 — the recoverable "rest first" refusal gets a haptic buzz on tap so
+  // mashing CLIMB on an empty tank gives tactile feedback (not a silent no-op).
+  // Broken/frayed/no rope stays red WITHOUT a buzz — a gear problem you fix by
+  // finding/mending a rope, where the colour + climb-modal explanation is enough.
+  const climbBuzzNoStamina = climbBlockedReason === 'no_stamina';
   // arb108 — OUTPOST TUTORIAL LOCKDOWN. Until the player makes the
   // stay/leave choice (explore_or_leave), they're in the tutorial and may do
   // ONLY what the current beat asks; EVERY other control is dimmed + buzzes
@@ -526,6 +537,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 onPress={onOpenClimb}
                 tone={climbTone}
                 blocked={climbBlocked}
+                buzzOnTap={climbBuzzNoStamina}
               />
             ) : (
               <>
@@ -627,6 +639,7 @@ function QuickBtn({
   tone,
   blocked,
   outOfRange,
+  buzzOnTap,
 }: {
   label: string;
   onPress: () => void;
@@ -636,6 +649,10 @@ function QuickBtn({
    *  instead of firing the action — so only the beat's instructed button
    *  actually does anything. */
   blocked?: boolean;
+  /** OTA-628 — KEEP the tone (e.g. red 'unavailable') but a tap buzzes and does
+   *  nothing instead of firing onPress. Used for the CLIMB button's empty-stamina
+   *  state: a tactile "you can't — rest first" without opening a dead-end modal. */
+  buzzOnTap?: boolean;
   /** Combat range gating: the weapon can't reach the target from here.
    *  KEEP the amber 'needs-approach' tone (so the player sees WHY), but a
    *  tap buzzes ("can't do it") instead of firing the attack — the engine
@@ -671,6 +688,13 @@ function QuickBtn({
       // because the old single 30ms buzz was easy to miss and "said" nothing.
       buzzWrong();
       useGameStore.getState().nudgeTutorialBlocked();
+      return;
+    }
+    if (buzzOnTap) {
+      // OTA-628 — empty-tank CLIMB: a single firm buzz ("can't — rest first"),
+      // no modal. Distinct from the tutorial double-pulse so it reads as a soft
+      // refusal, not a "wrong control" error.
+      try { Vibration.vibrate(40); } catch { /* ignore */ }
       return;
     }
     if (outOfRange) {
