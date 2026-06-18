@@ -15106,4 +15106,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // strips the connective "of" and collapses the resulting whitespace on both sides (same shape as the existing apostrophe
 // fix), so an exhausted noun drops its chip and both buttons fall to amber. tsc clean. JS-only → 290.
 // app/screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-18-624';
+// OTA-625 (Bibipentium Respite) — [3 bugs · playtester] (1) FRAYED-ROPE FALL LOOP: a rope at/below the wear-per-tier
+// threshold (durability ≤ 15) is a guaranteed snap, but CLIMB stayed available and every tap dropped the player for ~7
+// fall damage (log: fell tier-2 back-to-back, 23→16→9, with a rope that could never make it). Fix: apply the same
+// ground-rule as the empty-stamina case — on the GROUND (not elevated) the climb now REFUSES + warns (no fall, no damage,
+// rope left intact to mend/replace); only a snap while ALREADY UP (committed mid-climb) actually falls. (2) 0-HP ZOMBIE
+// ENEMY: the Elemental Control (mud_golem) proc set the target to 0 HP but never ran the defeat resolver, so the enemy
+// lingered at 0 HP until the player's NEXT attack tripped the death check (~14s later). Fix: call resolveEnemyDefeat()
+// when the proc is the killing blow (same guard pattern the normal attack paths use). (3) ENDLESS WEATHER CHIP DAMAGE:
+// glass_hail (p=0.5) / etheric_storm could nick the player on back-to-back actions with no breather (log: "mud-glass
+// nicks you" on nearly every step). Fix: a weather-damage cooldown (new player.weatherTickCooldown) — after any damaging
+// tick the next WEATHER_TICK_GAP=2 actions are weather-free, so the hazard is periodic, not a per-step tax. Locked by
+// climbWeatherDefeatFixes.test (+ existing climb/weather/race suites green). tsc clean. JS-only → 290.
+// app/state/gameStore.ts, app/engine/types.ts.
+export const OTA_BUILD_ID = '2026-06-18-625';

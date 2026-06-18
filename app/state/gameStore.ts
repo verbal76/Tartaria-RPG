@@ -6203,7 +6203,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Weather pressure — active weather has a chance to chip HP, drain
     // stamina, or notch corruption on every action. Lore makes weather
     // hostile in this world; the math reflects that.
-    const wtick = tickWeather(get().currentScene?.weather ?? null, player);
+    // OTA-625 — weather-damage COOLDOWN. glass_hail (p=0.5) / etheric_storm
+    // could fire on back-to-back actions, draining the player every single step
+    // with no breather (playtest: "A shard of mud-glass nicks you" on nearly
+    // every action, un-escapable). After any damaging tick we arm a gap so the
+    // next WEATHER_TICK_GAP actions are weather-free → at most one hit per
+    // (GAP+1) actions. The hazard stays felt, but periodic rather than relentless.
+    const WEATHER_TICK_GAP = 2;
+    const weatherCooldown = get().player?.weatherTickCooldown ?? 0;
+    if (weatherCooldown > 0) {
+      set((s) => (s.player ? { player: { ...s.player, weatherTickCooldown: weatherCooldown - 1 } } : s));
+    }
+    const wtick = weatherCooldown > 0
+      ? { hpDelta: 0, staminaDelta: 0, corruptionDelta: 0, line: null as string | null }
+      : tickWeather(get().currentScene?.weather ?? null, player);
     if (wtick.line) {
       // Rate-limit the weather-tick line: don't print the SAME line if
       // it already appeared within the last 30 log entries. The
@@ -6247,7 +6260,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // permadeath checks); anything beyond is decorative.
         const newCorr = Math.max(0, Math.min(CORRUPTION_MAX, s.player.corruption + effCorrDelta));
         weatherKilled = newHp <= 0;
-        return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr } };
+        // OTA-625 — arm the weather cooldown: this tick landed, so hold off the
+        // next WEATHER_TICK_GAP actions before weather can bite again.
+        return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr, weatherTickCooldown: WEATHER_TICK_GAP } };
       });
       // OTA 039 — emit a tier-cross line if the weather just bumped
       // the player across a corruption threshold.
@@ -11328,6 +11343,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // before wear is applied.
         const activeRope = pickActiveRope();
         if (activeRope && activeRope.current <= ROPE_WEAR_PER_TIER) {
+          // OTA-625 — frayed-rope fall LOOP. A rope at/below the wear-per-tier
+          // threshold is a guaranteed snap, but the same ground-rule as the
+          // empty-stamina case above applies: if you're still ON THE GROUND
+          // (not yet elevated), you can't fall off a thing you haven't left.
+          // Pre-fix, CLIMB stayed available and every tap dropped the player for
+          // ~7 (playtest: fell tier-2 back-to-back, 23→16→9, with a rope that
+          // could never make it). Refuse + warn on the ground (no fall, no
+          // damage, rope left intact to mend/replace) so the player isn't farmed
+          // for fall damage. Only a snap while ALREADY UP (committed mid-climb)
+          // actually drops them.
+          const alreadyUpRope = !!get().currentScene?.elevatedOn;
+          if (!alreadyUpRope) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter stops your hand. "That ${activeRope.name.toLowerCase()} is frayed through — it won't take your weight up the ${tgt}. Mend it or find another before you trust it."`,
+            );
+            get().appendLog(
+              'combat',
+              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} too frayed (durability ${activeRope.current} ≤ ${ROPE_WEAR_PER_TIER}). (refused — it would snap; repair or replace first)`,
+            );
+            break;
+          }
           // Convert the rope instance to a Broken Rope artifact. Keep the
           // same id so any saved equipment refs survive; strip durability
           // since the broken artifact is misc and inert.
@@ -20209,6 +20246,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const newHp = Math.max(0, prevHp - dmg);
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => i === idx ? newHp : h) } } : s);
         get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric. (${newHp} HP left)`);
+        // OTA-625 — run the defeat resolver when this proc is the killing blow.
+        // idx is the active enemy, so resolveEnemyDefeat() targets the right one
+        // (same guard pattern the normal attack paths use). Pre-fix the enemy sat
+        // at 0 HP as a "zombie" until the player's NEXT attack happened to trip
+        // the death check (playtest: Aetheric Leech hit 0 here, stayed alive ~14s).
+        if (newHp <= 0) get().resolveEnemyDefeat();
         break;
       }
       case 'latent_powers':
