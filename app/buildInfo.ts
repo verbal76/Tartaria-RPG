@@ -15096,4 +15096,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resumed save is past first-run onboarding. Fix: loadSlotIntoGame now clears tutorialStep/awaitingTutorialName/
 // tutorialExploreChosen and sets hasSeenIntro:true; saveAndExitToTitle clears the same on the way out. Locked by
 // sessionResume tests. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-623';
+// OTA-624 (Bibiquadium Amber) — [bug · playtester] tapped "salvage scraps of cloth" a dozen times; it kept replying
+// "already examined… nothing more to find" while the SALVAGE and INVESTIGATE buttons stayed green ("live") and never
+// dropped to amber, blocking both slots. Cause: the engine records the noun consumed/flavor-exhausted under the
+// parser-normalized "scraps cloth" (the parser drops the connective "of"), but the live chip keeps the display form
+// "scraps of cloth" — and the chip-greying matcher (isFuzzyConsumed) normalized apostrophes but NOT "of", so neither
+// "scraps of cloth".includes("scraps cloth") nor the reverse matched and the chip never registered as consumed. Both the
+// SALVAGE and INVESTIGATE tab-tone counts route through that matcher, so BOTH stayed green. Fix: isFuzzyConsumed now also
+// strips the connective "of" and collapses the resulting whitespace on both sides (same shape as the existing apostrophe
+// fix), so an exhausted noun drops its chip and both buttons fall to amber. tsc clean. JS-only → 290.
+// app/screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-18-624';
