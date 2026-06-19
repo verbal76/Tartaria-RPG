@@ -95,13 +95,15 @@ describe('OTA 043 — Aethercraft verb dispatch + fuel burn', () => {
   });
 
   it('"summon golem" routes to Aether Golem Constructor and burns mud-golem recipe fuel', async () => {
-    // 2026-05-25 — MECHANIC-1b changed the summon fuel from a single
-    // "Aether Crystal" to a recipe set (2 Aether Mud + 1 Mudstone
-    // + 1 Aether Crystal for the default mud golem). Test now stocks
-    // the full recipe + extras and asserts the recipe was consumed.
+    // arb119 — the default (mud) golem recipe is 2 Aether Mud + 2 Mud Fragment
+    // + 1 Aether Crystal. (Mudstone, the old RARE anchor, was swapped for the
+    // COMMON foraged Mud Fragment so the starter golem is actually buildable.)
+    // Stock the full recipe + extras and assert the recipe set was consumed.
+    // NOTE: pre-fix this test stocked the stale Mudstone recipe, so the fuel
+    // gate refused ("Need: Mud Fragment") before the discipline header logged.
     const store = await bootstrap('mud_dweller', [
       stockFuel('Aether Mud', 5),
-      stockFuel('Mudstone', 3),
+      stockFuel('Mud Fragment', 5),
       stockFuel('Aether Crystal', 3),
     ]);
 
@@ -114,10 +116,10 @@ describe('OTA 043 — Aethercraft verb dispatch + fuel burn', () => {
     // the recipe is still consumed per the runAethercraft contract.
     // Assert the deltas match the mud-golem recipe.
     const aetherMud = after.inventory.find((i) => i.name === 'Aether Mud');
-    const mudstone = after.inventory.find((i) => i.name === 'Mudstone');
+    const mudFragment = after.inventory.find((i) => i.name === 'Mud Fragment');
     const aetherCrystal = after.inventory.find((i) => i.name === 'Aether Crystal');
     expect(aetherMud?.quantity ?? 0).toBe(3); // 5 - 2
-    expect(mudstone?.quantity ?? 0).toBe(2);  // 3 - 1
+    expect(mudFragment?.quantity ?? 0).toBe(3); // 5 - 2
     expect(aetherCrystal?.quantity ?? 0).toBe(2); // 3 - 1
   });
 
