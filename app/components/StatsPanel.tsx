@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
@@ -116,11 +116,54 @@ export function healthTextColor(frac: number): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
+// OTA-633 — animation timings (tunable). The steady card colour FADES toward the
+// new HP level; on damage a red overlay PULSES. The pulse is asymmetric on
+// purpose: a fast RISE so a hit registers instantly even mid-combat, then a slower
+// FALL so it lingers long enough to be unmissable (a flat 150ms can flicker by).
+const HP_FADE_MS = 300;          // steady colour slide on heal / bleed
+const HP_PULSE_RISE_MS = 90;     // flash up fast — reads as immediate impact
+const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
+const HP_PULSE_MAX_OPACITY = 0.45;
+const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
+
 export function StatsPanel({ player }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
   const hpFrac = player.hpMax > 0 ? player.hp / player.hpMax : 1;
+
+  // OTA-633 — animate it. `animFrac` slides toward the true HP fraction so the
+  // card colour FADES instead of snapping; `pulse` flashes a red overlay when HP
+  // DROPS so a hit registers instantly. Refs persist across the panel's frequent
+  // re-renders; the effect only fires on an actual HP change.
+  const animFrac = React.useRef(new Animated.Value(hpFrac)).current;
+  const pulse = React.useRef(new Animated.Value(0)).current;
+  const prevHp = React.useRef(player.hp);
+  React.useEffect(() => {
+    Animated.timing(animFrac, { toValue: hpFrac, duration: HP_FADE_MS, useNativeDriver: false }).start();
+    if (player.hp < prevHp.current) {
+      pulse.stopAnimation();
+      pulse.setValue(0);
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: HP_PULSE_RISE_MS, useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 0, duration: HP_PULSE_FALL_MS, useNativeDriver: false }),
+      ]).start();
+    }
+    prevHp.current = player.hp;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player.hp, player.hpMax]);
+  // Card background follows the animated fraction across the full gradient.
+  const animBg = React.useMemo(
+    () => animFrac.interpolate({
+      inputRange: [0, 0.25, 0.5, 0.75, 1],
+      outputRange: [healthCardBg(0), healthCardBg(0.25), healthCardBg(0.5), healthCardBg(0.75), healthCardBg(1)],
+    }),
+    [animFrac],
+  );
+  const pulseOpacity = React.useMemo(
+    () => pulse.interpolate({ inputRange: [0, 1], outputRange: [0, HP_PULSE_MAX_OPACITY] }),
+    [pulse],
+  );
 
   // Effective AC = race base + summed armor bonus across head/chest/legs/feet.
   // OTA-227 — uses resolveDisplayArmorByName so fused armor (uniqueStats,
@@ -175,7 +218,10 @@ export function StatsPanel({ player }: Props) {
   const golemShows = !!player.golem && player.golem.hp > 0;
 
   return (
-    <View style={[styles.container, { backgroundColor: healthCardBg(hpFrac) }]}>
+    <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
+      {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
+          behind the card content so the text stays readable. */}
+      <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
       <View style={styles.nameRow}>
         <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
         {dogShows && player.dog ? (
@@ -238,7 +284,7 @@ export function StatsPanel({ player }: Props) {
           handler lives on the parent TouchableOpacity in
           ExplorationScreen.tsx; this is the visual cue. */}
       <Text style={styles.tapHint}>tap for full sheet ›</Text>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -263,6 +309,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 8,
     borderRadius: 4,
+    overflow: 'hidden', // clip the damage-pulse overlay to the rounded corners
+  },
+  // OTA-633 — full-bleed red wash for the damage pulse; sits behind the card
+  // content (first child) so the stats text stays on top and readable.
+  pulseOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: HP_PULSE_COLOR,
   },
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flexShrink: 1 },
   // OTA-145 — row holds player name (left, growing) + dog name
