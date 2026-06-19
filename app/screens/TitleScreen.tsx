@@ -782,16 +782,20 @@ export function TitleScreen() {
       <Text style={styles.subtitle}>REALMS</Text>
       <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
       {(() => {
-        // arb132 — build-line marker, right above the gem line, so the two
-        // side-by-side installs are instantly distinguishable. ARBITER = the
-        // isolated arbiters-line test build (.arbiters package); GOLEM = the
-        // live HaL2001 / production line. Uses the App ID so it's correct
+        // arb132 — build-line marker, right above the gem line, so the
+        // side-by-side installs are instantly distinguishable. ENGINE = the
+        // lore-agnostic RPG Engine dev app (.engine package); ARBITER = the
+        // isolated arbiters-line test build (.arbiters); GOLEM = the live
+        // HaL2001 / production line. Uses the App ID so it's correct
         // regardless of OTA-channel state.
         const appId = Application.applicationId ?? '';
+        const isEngine = appId.endsWith('.engine');
         const isArb = appId.endsWith('.arbiters');
+        const label = isEngine ? '⟁ DEVELOPMENT BUILD' : isArb ? '⟁ ARBITER BUILD' : '⟁ GOLEM BUILD';
+        const color = isEngine ? '#9ec96a' : isArb ? '#7ec8e3' : '#c9a86a';
         return (
-          <Text style={[styles.buildMarker, { color: isArb ? '#7ec8e3' : '#c9a86a' }]}>
-            {isArb ? '⟁ ARBITER BUILD' : '⟁ GOLEM BUILD'}
+          <Text style={[styles.buildMarker, { color }]}>
+            {label}
           </Text>
         );
       })()}
@@ -1002,14 +1006,14 @@ export function TitleScreen() {
         }
         ListEmptyComponent={
           <Text style={[styles.empty, { color: mutedColor }]}>
-            No Tartarians yet. Swipe down to refresh — or pull a New Expedition below.
+            No players yet. Swipe down to refresh — or tap New Player below to begin.
           </Text>
         }
         ListHeaderComponent={
           slots.length > 0
             ? <Text style={[styles.listLabel, { color: mutedColor }]}>
                 {bootGateOpen
-                  ? 'YOUR TARTARIANS  ·  swipe left to delete'
+                  ? 'YOUR PLAYERS  ·  swipe left to delete'
                   : `⟳ ${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
               </Text>
             : null
@@ -1023,7 +1027,7 @@ export function TitleScreen() {
               disabled={!bootGateOpen}
             >
               <Text style={styles.primaryBtnText}>
-                {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
+                {bootGateOpen ? 'New Player' : `${bootGateReason}`}
               </Text>
             </TouchableOpacity>
             {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
@@ -1226,8 +1230,8 @@ export function TitleScreen() {
       <BrandedModal
         visible={pendingAction !== null}
         title={
-          pendingAction?.kind === 'delete' ? 'Delete Tartarian'
-          : pendingAction?.kind === 'resurrect' ? 'Resurrect Tartarian'
+          pendingAction?.kind === 'delete' ? 'Delete Player'
+          : pendingAction?.kind === 'resurrect' ? 'Resurrect Player'
           : pendingAction?.kind === 'fallen' ? 'Fallen'
           : pendingAction?.kind === 'exit' ? 'Exit Game'
           : ''

@@ -43,15 +43,19 @@ export function SplashOverlay() {
     : kokoro.phase === 'loading' ? 0.92
     : 0.12;
 
-  // Full-bleed poster — the splash art is a complete portrait design, so it fills
-  // the whole overlay with cover (centred, aspect preserved, edges cropped to fit
-  // whatever the device aspect ratio is). SPLASH_W/H document the source aspect.
+  // Full poster — the splash art is a complete portrait design (title, emblem,
+  // tagline, feature row), so it's shown with `contain`: the WHOLE poster scales
+  // to fit the device screen, aspect preserved, nothing cropped or zoomed. The
+  // overlay background is the poster's own near-black, so any letterbox margin
+  // on an odd aspect ratio blends in. (Was `cover`, which zoomed/cropped the art
+  // — read as "massively oversized" on phones whose aspect didn't match.)
+  // SPLASH_W/H document the source aspect.
   return (
     <View style={styles.overlay} pointerEvents="auto">
       <Image
         source={require('../../assets/splash-art.jpg')}
         style={StyleSheet.absoluteFill}
-        resizeMode="cover"
+        resizeMode="contain"
       />
       <View style={styles.barWrap}>
         <View style={styles.barTrack}>

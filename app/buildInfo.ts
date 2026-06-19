@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-638 — engine chrome de-Tartaria'd (JS-only OTA). Title build
+// marker now reads "DEVELOPMENT BUILD" for the .engine package (was "GOLEM
+// BUILD"); character-slot labels say Player not Tartarian ("New Player",
+// "YOUR PLAYERS", "Delete/Resurrect Player", "No players yet"); splash poster
+// switched cover→contain so the whole art fits the screen instead of zooming
+// oversized. Content (lore/world/races) still defaults to Tartaria until the
+// dev uploads overrides — by design.
 // engine_Dev-637 — custom music uploads. Dev console gains a MUSIC section:
 // upload BATTLE (combat+boss) and AMBIENT (explore) tracks from the device via
 // the OS file picker (expo-document-picker), capped at 8 per category with
@@ -15219,4 +15226,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-637';
+export const OTA_BUILD_ID = '2026-06-19-638';
