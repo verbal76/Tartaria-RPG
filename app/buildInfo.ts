@@ -15192,4 +15192,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so it lingers and can't be missed; a flat 150ms can flicker past). Overlay sits behind the card content so the stats
 // text stays readable; interruptible so rapid hits restart cleanly. All timings are tunable constants. tsc clean;
 // healthCardTint.test still green (colour math unchanged). JS-only → 290. app/components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-18-633';
+// OTA-634 (Bitriquadium Cadence) — [perf · playtester] responses felt slow + the voice fell rounds behind ("said welcome
+// back five rounds late"). Root cause: on a slow/thermally-throttled phone the on-device LLM (Qwen, 20-55s/call) and the
+// Kokoro voice share ONE serialized native-ML lock (arb159, to stop them crashing each other), and it was pure FIFO with
+// the voice queue capped on the ARBITER channel only — so world/combat speech piled up uncapped and slow synths sat ahead
+// of interactive narration. Three fixes, exclusivity preserved (still one op at a time, crash guard intact): (1) the lock
+// is now PRIORITY-aware — LLM narration jumps ahead of queued voice synth (FIFO within a priority); (2) the voice queue
+// caps TOTAL queued lines across ALL channels (drop oldest, keep newest 3) so speech can't fall rounds behind; (3) ambient
+// idle musings throttled 45s → 90s to free the shared lock. Locked by nativeMlLockPriority.test (exclusivity / priority
+// order / no-wedge); existing TTS test green; tsc clean. JS-only → 290.
+// app/ai/nativeMlLock.ts, app/voice/PiperTTSManager.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-18-634';
