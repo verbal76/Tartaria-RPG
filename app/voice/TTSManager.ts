@@ -137,7 +137,7 @@ export function isSpeaking(): boolean {
  *  (expo-speech) or the bundled Piper engine based on
  *  voiceSettings.engine. No-op if TTS is disabled in settings.
  *  Returns the queue id (negative when nothing was queued). */
-export function speak(text: string, channel?: string, voiceId?: string | null): number {
+export function speak(text: string, channel?: string, voiceId?: string | null, opts?: { front?: boolean }): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   // Symbol cleanup before either engine — strips arrows so the player
@@ -169,7 +169,7 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
       // beginScene's warm hook keeps the latency invisible. Pool is
       // capped at 2 simultaneous voices (Arbiter sticky + 1 vendor
       // slot, LRU-evicted).
-      return piperSpeak(trimmed, voiceId, channel);
+      return piperSpeak(trimmed, voiceId, channel, opts);
     }
     // else: bundled install failed — fall through to the system queue.
     recordTtsRoute('system-fallback(kokoro-error)', getKokoroState().phase, trimmed);
@@ -177,6 +177,10 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
     recordTtsRoute('system-expo-speech', getKokoroState().phase, trimmed);
   }
   const id = nextId++;
+  // OTA-635 — front: an urgent line (the welcome-back greeting) clears the queued
+  // backlog so it's heard immediately. currentlySpeaking isn't in `queue`, so the
+  // line in progress finishes its chunk (no jarring mid-word cut), then this plays.
+  if (opts?.front) queue.length = 0;
   // OTA 226 + arb5 — Arbiter queue cap. Rapid-tapping a direction can
   // fire many flavor lines; without a bound the player gets lectured
   // for minutes. The original rule dropped EVERY queued arbiter line on
