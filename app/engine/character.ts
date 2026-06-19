@@ -1,5 +1,6 @@
 import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryItem } from './types';
 import { rollDie, rollDice, rollFromNotation } from './rng';
+import { resolveTable } from './contentPack';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
@@ -189,8 +190,12 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
 const races = racesData as Race[];
 const factions = factionsData as Faction[];
 
-export function getRaces(): Race[] { return races; }
-export function getFactions(): Faction[] { return factions; }
+// engine_Dev — resolve through the content-pack registry so uploaded races /
+// factions replace the built-ins at call time (character creation, stats panel,
+// race mechanics, etc. all read these). `races`/`factions` stay the built-in
+// defaults the override falls back to.
+export function getRaces(): Race[] { return resolveTable<Race>('races', races) as Race[]; }
+export function getFactions(): Faction[] { return resolveTable<Faction>('factions', factions) as Faction[]; }
 
 export function rollStats(): Stats {
   return {
@@ -292,8 +297,12 @@ export function startingLocationForFaction(factionId: string): string {
 }
 
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
-  const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
-  const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
+  // engine_Dev — resolve through the content-pack registry so an uploaded races /
+  // factions table drives character creation (lore-agnostic).
+  const allRaces = getRaces();
+  const allFactions = getFactions();
+  const race = allRaces.find((r) => r.id === input.raceId) ?? allRaces[0]!;
+  const faction = allFactions.find((f) => f.id === input.factionId) ?? allFactions[0]!;
   const stats = rollStats();
   // OTA-348 — overwrite the placeholder Stealth with a race-proportional roll
   // (Giants 0, constructs low, Mud Dwellers / Reclaimers high).
@@ -305,7 +314,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   // wider stamina overhaul (rest cost + hunger + combat depth).
   const staminaMax = 12 + Math.floor(stats.strength / 2);
 
-  const factionStanding: FactionStanding[] = factions.map((f) => ({
+  const factionStanding: FactionStanding[] = allFactions.map((f) => ({
     factionId: f.id,
     standing: f.id === faction.id ? Math.max(10, f.startingStanding + 10) : f.startingStanding,
   }));
