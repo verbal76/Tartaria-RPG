@@ -61,6 +61,7 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
+      - 'engine_Dev'
     tags:
       - 'v*'
     paths-ignore:
@@ -96,6 +97,16 @@ jobs:
   build:
     name: Build & Release Tartaria Realms APK
     runs-on: ubuntu-latest
+    # engine_Dev — "push APKs only when asked". engine_Dev is the separate
+    # RPG-Engine app; its routine content/OTA pushes must NOT burn a 30-min
+    # APK build. So for engine_Dev the build only runs when the head commit
+    # message carries the [build-apk] marker (or a manual dispatch). Every
+    # other branch (HaL2001, claude/**, main, release/**) keeps building on
+    # push exactly as before — this gate only narrows engine_Dev.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.ref_name != 'engine_Dev' ||
+      contains(github.event.head_commit.message, '[build-apk]')
     # arb155 — bound the job so a hung/disconnected runner fails fast with a red
     # X instead of spinning until GitHub's 6-hour default.
     timeout-minutes: 60

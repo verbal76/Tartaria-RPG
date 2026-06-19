@@ -1,0 +1,14 @@
+# engine_Dev APK build trigger
+#
+# build-apk.yml's paths-ignore skips app/**, App.tsx, assets/**, __tests__/**,
+# so an OTA/content push to engine_Dev does NOT start the APK workflow. When the
+# author asks for an APK ("kick it"), bump the counter below in a commit whose
+# message contains [build-apk]. That:
+#   1. changes a non-ignored file → the workflow starts, and
+#   2. carries the [build-apk] marker → the build job's engine_Dev gate passes.
+# Result: a preview (debug-signed) APK of the RPG-Engine app, package
+# com.hotatticgames.tartarprim.engine, with no manual dispatch needed.
+#
+# Routine engine_Dev pushes (no marker) never build an APK.
+
+build-count: 1
