@@ -400,6 +400,75 @@ export async function synthesizeFusionViaQwen(
   }
 }
 
+/** OTA-631 — name + description ONLY for an already-stat-balanced fused item.
+ *  The deterministic synth has already decided the kind / rarity / stats; this
+ *  asks Qwen for JUST the flavor (a 2-4 word name + one-line description), which
+ *  is far fewer output tokens than the full stat synth (~64 vs ~200) so it's
+ *  noticeably faster — and it CANNOT affect balance, since the stats are locked.
+ *  Used by the background "materialization" path: the weapon is forged + minted
+ *  instantly with a placeholder name, and this settles its true name when (if)
+ *  it returns. Returns null if Qwen isn't ready / the reply can't be parsed /
+ *  validation rejects it; the caller then keeps the deterministic name. */
+export async function synthesizeFusionNameViaQwen(
+  stats: UniqueItemStats,
+  inputs: readonly InventoryItem[],
+  tagProfile: string[],
+  qwen: FusionSynthEngine,
+): Promise<{ name: string; description: string } | null> {
+  if (!qwen.isReady()) return null;
+  try {
+    const reply = await qwen.generate(buildNamePrompt(stats, inputs, tagProfile), {
+      maxNewTokens: 64,
+      temperature: 0.6,
+    });
+    const json = extractJsonObject(reply);
+    if (!json) return null;
+    let parsed: { name?: unknown; description?: unknown };
+    try {
+      parsed = JSON.parse(json) as { name?: unknown; description?: unknown };
+    } catch {
+      return null;
+    }
+    const name = typeof parsed.name === 'string' ? parsed.name.trim() : '';
+    const description = typeof parsed.description === 'string' ? parsed.description.trim().slice(0, 200) : '';
+    if (!name || name.length > 40 || !description) return null;
+    return { name, description };
+  } catch {
+    return null;
+  }
+}
+
+function buildNamePrompt(
+  stats: UniqueItemStats,
+  inputs: readonly InventoryItem[],
+  tagProfile: string[],
+): ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }> {
+  const kindWord = stats.kind === 'weapon' ? 'weapon' : stats.kind === 'dog_armor' ? 'dog armor' : 'armor';
+  const power = stats.kind === 'weapon'
+    ? `${stats.damageDice ?? ''} ${stats.damageType ?? ''}`.trim()
+    : `+${stats.acBonus ?? 1} AC`;
+  const inputList = inputs.map((i) => i.name).join(', ');
+  return [
+    {
+      role: 'system',
+      content: [
+        'You name forged items for a salvage-wasteland RPG. Output ONLY one JSON object on one line, no markdown, no prose.',
+        'Shape: {"name":"<2-4 word evocative name>","description":"<one short evocative sentence>"}',
+        'World tone: Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization.',
+        'Names are short (2-4 words), evocative, never silly or modern-branded. The description is one line and grounds the item in its materials.',
+      ].join('\n'),
+    },
+    {
+      role: 'user',
+      content: [
+        `A ${stats.rarity} ${kindWord} (${power}) was just forged at an Aetheric Crucible from these scraps: ${inputList || 'assorted salvage'}.`,
+        `Material profile: ${tagProfile.join(', ') || 'mixed'}.`,
+        'Name it and describe it. Return the JSON.',
+      ].join('\n'),
+    },
+  ];
+}
+
 /** Apply a fusion result: consume the input items from the inventory
  *  and mint the fused InventoryItem. Returns the new inventory array
  *  and the fused item that was added. Pure — caller wires into the

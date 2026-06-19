@@ -15168,4 +15168,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logged. Stocked the correct recipe + fixed the consume deltas — dispatch itself was always fine (confirms the OTA-629
 // golem popup works). All 7 aethercraftDispatch + 59 fuse-suite tests green; tsc clean. JS-only → 290.
 // app/state/gameStore.ts, __tests__/aethercraftDispatch.test.ts.
-export const OTA_BUILD_ID = '2026-06-18-630';
+// OTA-631 (Bitrinunium Settling) — [feature · playtester design] the Crucible fuse no longer BLOCKS on Qwen at all. The
+// weapon TYPE + STATS are forged deterministically and the item is minted INSTANTLY (placeholder name "Cooling
+// Crucible-Work", materializing flag) — the player keeps playing with zero wait. A BACKGROUND Qwen call (name +
+// description ONLY — ~64 tokens vs ~200, and it can't touch balance) then "settles" the item's true name, and a reveal
+// pops ("Your forging has formed: <name>") with a View-in-inventory CTA that deep-links to the pack. The whole
+// materialization is now lore ("let the Aether finish it; it announces itself when fully formed"), so the name appearing a
+// beat later reads as intentional, not a glitch. Falls back to the deterministic name on slow/dormant/failed Qwen or after
+// a 120s safety cap; reload-robust — backfillPlayer settles any item left materializing when the app was killed mid-forge
+// (stashed formingName/Desc), so nothing is ever stuck nameless. New synthesizeFusionNameViaQwen() + settleFusion();
+// materializing/formingName/formingDesc on InventoryItem. Locked by fusionMaterialize.test (3) + 80 fuse-suite tests green;
+// tsc clean. JS-only → 290. app/engine/itemFusion.ts, app/engine/types.ts, app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-18-631';
