@@ -1631,6 +1631,7 @@ export type ScreenName =
   | 'vendor'
   | 'actions'
   | 'contracts'
+  | 'developer'
   | 'ending';
 
 export interface SaveState {

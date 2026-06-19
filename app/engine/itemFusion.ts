@@ -24,6 +24,7 @@
 import type { InventoryItem, UniqueItemStats } from './types';
 import { isInferredItem } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
+import { getWorldTone } from './contentPack';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
  *  pass a mock without dragging the full LlamaRuntime stack. */
@@ -227,7 +228,7 @@ function buildPrompt(
       content: [
         'You design a unique fused item for a post-flood salvager RPG. Output ONLY a single JSON object on one line — no markdown, no prose.',
         '',
-        'World tone: Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization. Names should be short (2–4 words), evocative, never silly or modern-branded.',
+        `World tone: ${getWorldTone()} Names should be short (2–4 words), evocative, never silly or modern-branded.`,
         '',
         'Shape (kind === "weapon"):',
         '{ "kind": "weapon", "name": "Marrowsong Cleaver", "description": "<one line>", "rarity": "Rare"|"Legendary", "damageDice": "1d8"|"2d6"|..., "damageType": "slashing"|"piercing"|"bludgeoning"|"aether"|"burn"|"electrical"|"poison", "scalesWith": "strength"|"dexterity"|"intelligence"|"wisdom"|"charisma", "resistance"?: "burn"|"cold"|"poison"|"aetheric"|"electrical"|"degradation", "special": "<one-line flavor>" }',
@@ -454,7 +455,7 @@ function buildNamePrompt(
       content: [
         'You name forged items for a salvage-wasteland RPG. Output ONLY one JSON object on one line, no markdown, no prose.',
         'Shape: {"name":"<2-4 word evocative name>","description":"<one short evocative sentence>"}',
-        'World tone: Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization.',
+        `World tone: ${getWorldTone()}`,
         'Names are short (2-4 words), evocative, never silly or modern-branded. The description is one line and grounds the item in its materials.',
       ].join('\n'),
     },

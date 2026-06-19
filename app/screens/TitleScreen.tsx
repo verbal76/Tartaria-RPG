@@ -1112,6 +1112,16 @@ export function TitleScreen() {
       >
         <Text style={styles.gear}>⚙</Text>
       </TouchableOpacity>
+      {/* engine_Dev — developer content-pack console (table + lore uploads). */}
+      <TouchableOpacity
+        style={styles.devPill}
+        onPress={() => setScreen('developer')}
+        activeOpacity={0.7}
+        hitSlop={8}
+        accessibilityLabel="Content Packs (developer)"
+      >
+        <Text style={styles.devPillText}>DEV ▸ CONTENT</Text>
+      </TouchableOpacity>
       <View style={styles.bottomBar}>
         {/* OTA-068 — playtester thank-you line above the action
             row. Sized between the action buttons and the
@@ -1714,6 +1724,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
+  devPill: {
+    position: 'absolute', top: 66, right: 12, zIndex: 10,
+    backgroundColor: 'rgba(26, 23, 20, 0.85)', borderColor: '#3a342c', borderWidth: 1,
+    borderRadius: 11, paddingHorizontal: 10, paddingVertical: 4,
+  },
+  devPillText: { color: '#9ec96a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-068 — footer now centered (was left-aligned with a
   // small marginLeft) so it sits under the centered action row
   // and thank-you message as the third centered line.

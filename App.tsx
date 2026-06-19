@@ -23,6 +23,8 @@ import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
+import { DeveloperSettingsScreen } from './app/screens/DeveloperSettingsScreen';
+import { useContentPackStore } from './app/state/contentPackStore';
 import { EndingScreen } from './app/screens/EndingScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
 import { CharacterScreen } from './app/screens/CharacterScreen';
@@ -206,6 +208,9 @@ export default function App() {
     const setStage = (s: string) => {
       (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = s;
     };
+    // engine_Dev — load any developer content-pack overrides into the registry
+    // before gameplay so the engine reads them from the first action.
+    void useContentPackStore.getState().hydrate();
     // arb78 — load the player's saved background settings (notifies the
     // AppShell's useDisplaySettings hook once storage resolves).
     void loadDisplaySettings();
@@ -787,6 +792,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'vendor' && <VendorScreen />}
           {screen === 'actions' && <ActionReferenceScreen />}
           {screen === 'contracts' && <ContractsScreen />}
+          {screen === 'developer' && <DeveloperSettingsScreen />}
           {screen === 'ending' && <EndingScreen />}
         </View>
       </View>
