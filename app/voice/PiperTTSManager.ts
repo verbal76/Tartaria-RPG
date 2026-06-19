@@ -567,7 +567,7 @@ export function disposeStickyArbiterVoice(): void {
   prewarmStarted = false;
 }
 
-export function speak(text: string, voiceId?: string | null, channel?: string): number {
+export function speak(text: string, voiceId?: string | null, channel?: string, opts?: { front?: boolean }): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   // Lexicon respellings (Aetheric, Tartarian, etc.) + symbol cleanup
@@ -576,6 +576,10 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
   if (!prepared) return -1;
   const id = nextId++;
+  // OTA-635 — front: the welcome-back greeting jumps the queue. Clear the queued
+  // backlog so it plays immediately; currentlySpeaking isn't in `queue`, so the
+  // chunk in progress finishes (no mid-word cut) and this is next.
+  if (opts?.front) queue.length = 0;
   // OTA 226 + arb5 — Arbiter queue cap. Playtester: "if somebody spams
   // a direction the Arbiter fires off a bunch of flavor lines and talks
   // for 5 minutes afterwards." The original rule dropped EVERY queued
