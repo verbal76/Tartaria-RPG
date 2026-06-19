@@ -69,6 +69,7 @@ import {
 } from '../engine/saveSystem';
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
+import { sanitizePlayerName } from '../engine/playerName';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -1738,7 +1739,10 @@ function spendTravelStamina(player: PlayerCharacter): PlayerCharacter {
 // switch to a hash of (player.name + session-start-ts).
 function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: string): string {
   if (!player?.name) return fallback;
-  if (Math.random() < 0.34) {
+  // OTA-635 — name the player MORE often (was 0.34). Player ask: "I want to hear
+  // the name of the character more often — that brings them in." 0.6 leans into the
+  // name for immersion without it reading robotic (still ~40% the generic address).
+  if (Math.random() < 0.6) {
     // Use the first whitespace-separated token so a long custom
     // name ("Verbal of the Tartarian Giants") doesn't read awkward
     // in a one-line address. Players who type a single name see it
@@ -3691,10 +3695,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // arb164 — ALWAYS greet by name now (player's non-negotiable). This is
         // the first beat after character select / on every load — a warm, named
         // companion hello, not the 1/3 arbiterAddress roll.
+        // OTA-635 — speakFront: the named welcome is the first thing the player
+        // should HEAR on entering the world; it jumps to the front of the voice
+        // queue (clears any backlog) instead of waiting behind it.
         get().appendLog(
           'arbiter',
           welcomeBackLine(get().player),
-          { skipDedup: true },
+          { skipDedup: true, speakFront: true },
         );
         lastWelcomeBackAt = now;
       }
@@ -5805,11 +5812,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     can call themselves whatever).
       if (tState.awaitingTutorialName && tStep?.id === 'name' && trimmed.length >= 2) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
+        // OTA-635 — the name is spoken aloud, so keep it to pronounceable letters
+        // and a sane length (no emoji/number/symbol salad, no "175 J's"). If the
+        // input cleans down to nothing usable, stay on the name beat and re-ask.
+        const cleanName = sanitizePlayerName(trimmed);
+        if (cleanName.length < 2) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter waits. "A name I can actually say — letters, nothing fancier. Try again."`,
+          );
+          return;
+        }
         set((s) => (s.player ? {
-          player: { ...s.player, name: trimmed },
+          player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
-        get().appendLog('arbiter', `"Well met, ${trimmed}. To business."`);
+        get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
         get().maybeAdvanceTutorial('name');
         return;
       }
