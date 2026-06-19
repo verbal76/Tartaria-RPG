@@ -30,6 +30,8 @@
 // across queries via `cachedBank`, so the parse runs at most once
 // per app session, same as today.
 
+import { getNarratorName } from './contentPack';
+
 export type LoreCategory =
   | 'event'
   | 'title'
@@ -116,7 +118,7 @@ export function loadLoreConceptBank(): LoreConcept[] {
       label: t.title,
       definition: `Earned by: ${t.requirement}. Perk: ${t.perk}`,
       category: 'title',
-      searchText: `${t.title} is an Arbiter title earned by ${t.requirement.toLowerCase()}. It grants ${t.perk.toLowerCase()}`,
+      searchText: `${t.title} is an ${getNarratorName()} title earned by ${t.requirement.toLowerCase()}. It grants ${t.perk.toLowerCase()}`,
     });
   }
 
@@ -280,29 +282,29 @@ export function formatArbiterAnswer(concept: LoreConcept): string {
   switch (concept.category) {
     case 'event':
     case 'timeline':
-      return `The Arbiter recalls the ${concept.label}. ${concept.definition}`;
+      return `The ${getNarratorName()} recalls the ${concept.label}. ${concept.definition}`;
     case 'title':
-      return `The Arbiter speaks of the title — ${concept.label}. ${concept.definition}`;
+      return `The ${getNarratorName()} speaks of the title — ${concept.label}. ${concept.definition}`;
     case 'food_drink':
     case 'currency_good':
     case 'loot':
-      return `The Arbiter remembers — ${concept.label}. ${concept.definition}`;
+      return `The ${getNarratorName()} remembers — ${concept.label}. ${concept.definition}`;
     case 'weapon':
-      return `The Arbiter speaks of the weapon — ${concept.label}. ${concept.definition}`;
+      return `The ${getNarratorName()} speaks of the weapon — ${concept.label}. ${concept.definition}`;
     case 'armor':
-      return `The Arbiter speaks of the armor — ${concept.label}. ${concept.definition}`;
+      return `The ${getNarratorName()} speaks of the armor — ${concept.label}. ${concept.definition}`;
     case 'skill':
-      return `The Arbiter explains the skill — ${concept.label}: ${concept.definition}`;
+      return `The ${getNarratorName()} explains the skill — ${concept.label}: ${concept.definition}`;
     case 'mechanic':
     case 'task_tier':
     case 'action_tier':
-      return `The Arbiter explains — ${concept.label}: ${concept.definition}`;
+      return `The ${getNarratorName()} explains — ${concept.label}: ${concept.definition}`;
     case 'lore_term':
     case 'faction':
     case 'person':
     case 'place':
     default:
-      return `The Arbiter says, "${concept.label}: ${concept.definition}"`;
+      return `The ${getNarratorName()} says, "${concept.label}: ${concept.definition}"`;
   }
 }
 

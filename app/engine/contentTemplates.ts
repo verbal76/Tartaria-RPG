@@ -16,10 +16,15 @@ import factionsData from '../data/factions/factions.json';
 import locationsData from '../data/locations/locations.json';
 import {
   DEFAULT_WORLD_TONE,
-  DEFAULT_NARRATOR_PERSONA,
   type ContentTableId,
   type LoreBlockId,
 } from './contentPack';
+
+/** Example narrator persona seeded into the World-lore template — illustrative
+ *  only; the author edits it. (The live default is built from the narrator's
+ *  name via getNarratorPersona(); the narrator's NAME is set separately in the
+ *  dev console's rename block.) */
+const NARRATOR_PERSONA_EXAMPLE = 'You are the Narrator, the voice that tells this story.';
 
 /** Normalize a data file to its row array — some are top-level arrays, others are
  *  wrapped (e.g. { "weapons": [...] }). */
@@ -59,7 +64,7 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
 export function getLoreTemplate(id: LoreBlockId): string {
   if (id === 'world') {
     return JSON.stringify(
-      { narrator: DEFAULT_NARRATOR_PERSONA, tone: DEFAULT_WORLD_TONE, setting: '', terms: [] },
+      { narrator: NARRATOR_PERSONA_EXAMPLE, tone: DEFAULT_WORLD_TONE, setting: '', terms: [] },
       null,
       2,
     );

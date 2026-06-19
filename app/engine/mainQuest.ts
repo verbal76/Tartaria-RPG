@@ -39,6 +39,7 @@ import type {
   PlayerCharacter,
   Intent,
 } from './types';
+import { getNarratorName } from './contentPack';
 
 /** The 5 Lost Capitals canonically house one Aetheric Core each. */
 export const LOST_CAPITAL_LOCATIONS: readonly string[] = [
@@ -96,49 +97,49 @@ function variantIndex(seed: string, length: number): number {
 
 const HOOK_VARIANTS_BY_FACTION: Record<string, string[]> = {
   reclaimers_guild: [
-    'The Arbiter watches you across the firelight. "There is a place under all the others — the Mud Flood Nexus. The Reclaimers have looked for it a long time. None has reached it. The 5 Lost Capitals know the way."',
-    'The Arbiter sets the lantern between you. "Every guild veteran retires before they finish the same conversation: the Mud Flood Nexus. Nine Lost Capitals stand between it and any tomb-thief alive. Including you, if you want it."',
-    'The Arbiter passes you a worn dig-map. "This was carried by a Reclaimer who never came back. The mark at the bottom is the Mud Flood Nexus. The 9 Capitals are how you get there. Decide whether you want to be the one who finishes the map."',
+    `The ${getNarratorName()} watches you across the firelight. "There is a place under all the others — the Mud Flood Nexus. The Reclaimers have looked for it a long time. None has reached it. The 5 Lost Capitals know the way."`,
+    `The ${getNarratorName()} sets the lantern between you. "Every guild veteran retires before they finish the same conversation: the Mud Flood Nexus. Nine Lost Capitals stand between it and any tomb-thief alive. Including you, if you want it."`,
+    `The ${getNarratorName()} passes you a worn dig-map. "This was carried by a Reclaimer who never came back. The mark at the bottom is the Mud Flood Nexus. The 9 Capitals are how you get there. Decide whether you want to be the one who finishes the map."`,
   ],
   forgotten_order: [
-    'The Arbiter sets down a hand-copied page. "Every text the Order has restored points the same direction — the Mud Flood Nexus. The cataclysm did not happen everywhere. It happened HERE. And the 5 Lost Capitals each hold a key."',
-    'The Arbiter turns the lectern toward you. "Read it yourself. Every binding text on the shelf agrees — the Nexus exists, the cataclysm passed through it, the 9 Cores in the 9 Capitals are the regulators. The Order has translated this question. Someone still has to answer it."',
-    'The Arbiter taps a dynastic crest on a margin. "Tartarian scholarship is unanimous on the Mud Flood Nexus. It is in the earth. The 9 Cores open it. The Order has written the question for six generations. You are the only Order brother currently positioned to live the answer."',
+    `The ${getNarratorName()} sets down a hand-copied page. "Every text the Order has restored points the same direction — the Mud Flood Nexus. The cataclysm did not happen everywhere. It happened HERE. And the 5 Lost Capitals each hold a key."`,
+    `The ${getNarratorName()} turns the lectern toward you. "Read it yourself. Every binding text on the shelf agrees — the Nexus exists, the cataclysm passed through it, the 9 Cores in the 9 Capitals are the regulators. The Order has translated this question. Someone still has to answer it."`,
+    `The ${getNarratorName()} taps a dynastic crest on a margin. "Tartarian scholarship is unanimous on the Mud Flood Nexus. It is in the earth. The 9 Cores open it. The Order has written the question for six generations. You are the only Order brother currently positioned to live the answer."`,
   ],
   mud_monarchs: [
-    'The Arbiter speaks low. "Your family has known about the Nexus for three centuries. The 9 Lost Capitals each hold a piece of what bound it. The crown that gathers all nine reopens it."',
-    'The Arbiter pours a small Aetheric brandy. "The dynasty has had this conversation many times. The Mud Flood Nexus. The 9 Cores. The choice that comes after. Most of your ancestors chose not to know. You are choosing to know, which is already an act."',
-    'The Arbiter studies your face. "If you are reading the family ledger correctly, the Mud Flood Nexus is where the line was lost. The 9 Cores are where it can be reclaimed. The Monarchs have been preparing you to fail at this. You may succeed."',
+    `The ${getNarratorName()} speaks low. "Your family has known about the Nexus for three centuries. The 9 Lost Capitals each hold a piece of what bound it. The crown that gathers all nine reopens it."`,
+    `The ${getNarratorName()} pours a small Aetheric brandy. "The dynasty has had this conversation many times. The Mud Flood Nexus. The 9 Cores. The choice that comes after. Most of your ancestors chose not to know. You are choosing to know, which is already an act."`,
+    `The ${getNarratorName()} studies your face. "If you are reading the family ledger correctly, the Mud Flood Nexus is where the line was lost. The 9 Cores are where it can be reclaimed. The Monarchs have been preparing you to fail at this. You may succeed."`,
   ],
   true_tartarians: [
-    'The Arbiter inclines their head. "The Entombed speak of the Mud Flood Nexus — the wound that made the buried country. The 5 Lost Capitals each guard a piece of its old binding."',
-    'The Arbiter lays a clay seal between you. "The Catacomb keepers have whispered the same name across centuries — Mud Flood Nexus. The 9 Cores in the 9 Capitals are not OURS to take; we ask. The Cores either say yes or they do not."',
-    'The Arbiter sets their hand on the bone-shelf. "The True Tartarian tradition has waited for someone to ask the Mud Flood Nexus the right question. The 9 Cores are how you frame it. The Entombed will guide you to each Capital in turn. They are patient."',
+    `The ${getNarratorName()} inclines their head. "The Entombed speak of the Mud Flood Nexus — the wound that made the buried country. The 5 Lost Capitals each guard a piece of its old binding."`,
+    `The ${getNarratorName()} lays a clay seal between you. "The Catacomb keepers have whispered the same name across centuries — Mud Flood Nexus. The 9 Cores in the 9 Capitals are not OURS to take; we ask. The Cores either say yes or they do not."`,
+    `The ${getNarratorName()} sets their hand on the bone-shelf. "The True Tartarian tradition has waited for someone to ask the Mud Flood Nexus the right question. The 9 Cores are how you frame it. The Entombed will guide you to each Capital in turn. They are patient."`,
   ],
   eternal_dynasty: [
-    'The Arbiter folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 9 Cores from the 5 Lost Capitals must be returned to it."',
-    'The Arbiter shows you the genealogical seal stitched into the parchment. "The Dynasty\'s restoration project has waited for an heir who could carry the 9 Cores from 9 Capitals to the Mud Flood Nexus. You are that heir, or you are not. We will know by your seventh travel."',
-    'The Arbiter sets the coronation page in your hands. "The empire ended at the Mud Flood Nexus. The empire can begin again at the same place, with the same 9 Cores in the same hands. The Dynasty has been waiting for hands. Yours are presented."',
+    `The ${getNarratorName()} folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 9 Cores from the 5 Lost Capitals must be returned to it."`,
+    `The ${getNarratorName()} shows you the genealogical seal stitched into the parchment. "The Dynasty's restoration project has waited for an heir who could carry the 9 Cores from 9 Capitals to the Mud Flood Nexus. You are that heir, or you are not. We will know by your seventh travel."`,
+    `The ${getNarratorName()} sets the coronation page in your hands. "The empire ended at the Mud Flood Nexus. The empire can begin again at the same place, with the same 9 Cores in the same hands. The Dynasty has been waiting for hands. Yours are presented."`,
   ],
   conspiracy_architects: [
-    'The Arbiter slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 9 Cores writes the next chapter. We would prefer no one did."',
-    'The Arbiter taps a paragraph that has been blacked out. "The Architects suppress what cannot be allowed to surface. The Mud Flood Nexus and its 9 Cores are at the top of the never-list. You are about to be the first Architect in this office to handle them. The institutions will need to be told something afterwards."',
-    'The Arbiter checks the office door is locked. "Three centuries of cover-up rest on the Mud Flood Nexus staying buried. The 9 Cores in the 9 Capitals are the on-switch. The Architects have decided you will be the one to find out whether we are right or wrong to keep the switch off."',
+    `The ${getNarratorName()} slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 9 Cores writes the next chapter. We would prefer no one did."`,
+    `The ${getNarratorName()} taps a paragraph that has been blacked out. "The Architects suppress what cannot be allowed to surface. The Mud Flood Nexus and its 9 Cores are at the top of the never-list. You are about to be the first Architect in this office to handle them. The institutions will need to be told something afterwards."`,
+    `The ${getNarratorName()} checks the office door is locked. "Three centuries of cover-up rest on the Mud Flood Nexus staying buried. The 9 Cores in the 9 Capitals are the on-switch. The Architects have decided you will be the one to find out whether we are right or wrong to keep the switch off."`,
   ],
   servants_of_giants: [
-    'The Arbiter touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 9 Cores must be returned, each in turn."',
-    'The Arbiter kneels by the tomb-lantern. "Every Servant has dreamed of the Mud Flood Nexus. The 5 Giants — one per Capital — each guard one Core. Bring all 9 to the Nexus and the Giants are properly waked, or properly let go. The vigil chooses you, not the other way around."',
-    'The Arbiter folds their hands in the old Servant posture. "The Mud Flood Nexus is where the Giants fell silent. The 9 Cores are how their silence is broken — gently, or all at once. You will choose which, when the time comes. Until then, you watch."',
+    `The ${getNarratorName()} touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 9 Cores must be returned, each in turn."`,
+    `The ${getNarratorName()} kneels by the tomb-lantern. "Every Servant has dreamed of the Mud Flood Nexus. The 5 Giants — one per Capital — each guard one Core. Bring all 9 to the Nexus and the Giants are properly waked, or properly let go. The vigil chooses you, not the other way around."`,
+    `The ${getNarratorName()} folds their hands in the old Servant posture. "The Mud Flood Nexus is where the Giants fell silent. The 9 Cores are how their silence is broken — gently, or all at once. You will choose which, when the time comes. Until then, you watch."`,
   ],
   stone_builders: [
-    'The Arbiter unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 9 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."',
-    'The Arbiter taps the schematic at the bottom-right corner. "Every Builder learns the Mud Flood Nexus failure case as their first lesson. The 9 Cores are the regulators that were not where they were supposed to be when the cycle ran. Bring them back to the Nexus and the failure becomes a successful test."',
-    'The Arbiter sets a slide-rule across the plan-table. "The Builders\' founding question: can the Engine that failed at the Mud Flood Nexus be made to succeed? The 9 Cores answer it. You are the apprentice we have been waiting on for two generations."',
+    `The ${getNarratorName()} unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 9 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."`,
+    `The ${getNarratorName()} taps the schematic at the bottom-right corner. "Every Builder learns the Mud Flood Nexus failure case as their first lesson. The 9 Cores are the regulators that were not where they were supposed to be when the cycle ran. Bring them back to the Nexus and the failure becomes a successful test."`,
+    `The ${getNarratorName()} sets a slide-rule across the plan-table. "The Builders' founding question: can the Engine that failed at the Mud Flood Nexus be made to succeed? The 9 Cores answer it. You are the apprentice we have been waiting on for two generations."`,
   ],
   tartarian_revivalists: [
-    'The Arbiter looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 9 Cores from the 5 Lost Capitals to open it. Then everyone will know."',
-    'The Arbiter shows you the press kit that has been on hold for forty years. "Every Revivalist generation has tried to publish proof. The 9 Cores are the proof — recoverable, undeniable, photographable. The Mud Flood Nexus is the printing press. The surface world is the readership."',
-    'The Arbiter pulls a manuscript from the locked drawer. "The Revival is not a movement. It is a delivery date. The 9 Cores from the 9 Capitals are the delivery; the Mud Flood Nexus is the address. You are the courier the founder has been waiting on."',
+    `The ${getNarratorName()} looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 9 Cores from the 5 Lost Capitals to open it. Then everyone will know."`,
+    `The ${getNarratorName()} shows you the press kit that has been on hold for forty years. "Every Revivalist generation has tried to publish proof. The 9 Cores are the proof — recoverable, undeniable, photographable. The Mud Flood Nexus is the printing press. The surface world is the readership."`,
+    `The ${getNarratorName()} pulls a manuscript from the locked drawer. "The Revival is not a movement. It is a delivery date. The 9 Cores from the 9 Capitals are the delivery; the Mud Flood Nexus is the address. You are the courier the founder has been waiting on."`,
   ],
 };
 
@@ -244,23 +245,23 @@ const DESCENT_VARIANTS_BY_FACTION: Record<string, string[]> = {
  *  two characters of the same faction get different variants. */
 const HOOK_BY_FACTION: Record<string, string> = {
   reclaimers_guild:
-    'The Arbiter watches you across the firelight. "There is a place under all the others — the Mud Flood Nexus. The Reclaimers have looked for it a long time. None has reached it. The 5 Lost Capitals know the way."',
+    `The ${getNarratorName()} watches you across the firelight. "There is a place under all the others — the Mud Flood Nexus. The Reclaimers have looked for it a long time. None has reached it. The 5 Lost Capitals know the way."`,
   forgotten_order:
-    'The Arbiter sets down a hand-copied page. "Every text the Order has restored points the same direction — the Mud Flood Nexus. The cataclysm did not happen everywhere. It happened HERE. And the 5 Lost Capitals each hold a key."',
+    `The ${getNarratorName()} sets down a hand-copied page. "Every text the Order has restored points the same direction — the Mud Flood Nexus. The cataclysm did not happen everywhere. It happened HERE. And the 5 Lost Capitals each hold a key."`,
   mud_monarchs:
-    'The Arbiter speaks low. "Your family has known about the Nexus for three centuries. The 9 Lost Capitals each hold a piece of what bound it. The crown that gathers all nine reopens it."',
+    `The ${getNarratorName()} speaks low. "Your family has known about the Nexus for three centuries. The 9 Lost Capitals each hold a piece of what bound it. The crown that gathers all nine reopens it."`,
   true_tartarians:
-    'The Arbiter inclines their head. "The Entombed speak of the Mud Flood Nexus — the wound that made the buried country. The 5 Lost Capitals each guard a piece of its old binding."',
+    `The ${getNarratorName()} inclines their head. "The Entombed speak of the Mud Flood Nexus — the wound that made the buried country. The 5 Lost Capitals each guard a piece of its old binding."`,
   eternal_dynasty:
-    'The Arbiter folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 9 Cores from the 5 Lost Capitals must be returned to it."',
+    `The ${getNarratorName()} folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 9 Cores from the 5 Lost Capitals must be returned to it."`,
   conspiracy_architects:
-    'The Arbiter slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 9 Cores writes the next chapter. We would prefer no one did."',
+    `The ${getNarratorName()} slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 9 Cores writes the next chapter. We would prefer no one did."`,
   servants_of_giants:
-    'The Arbiter touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 9 Cores must be returned, each in turn."',
+    `The ${getNarratorName()} touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 9 Cores must be returned, each in turn."`,
   stone_builders:
-    'The Arbiter unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 9 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."',
+    `The ${getNarratorName()} unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 9 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."`,
   tartarian_revivalists:
-    'The Arbiter looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 9 Cores from the 5 Lost Capitals to open it. Then everyone will know."',
+    `The ${getNarratorName()} looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 9 Cores from the 5 Lost Capitals to open it. Then everyone will know."`,
 };
 
 const REVELATION_BY_FACTION: Record<string, string> = {
@@ -740,7 +741,7 @@ export function shouldFireFourCoreForge(state: MainQuestState): boolean {
 /** The narrative beat that unlocks golem-armament crafting at the 4th Core. */
 export function fourCoreForgeLine(): string {
   return (
-    'The Arbiter watches the fourth Core settle into your pack, and something in '
+    `The ${getNarratorName()} watches the fourth Core settle into your pack, and something in `
     + 'the buried country shifts. "Four. The old grid kept a forging from common '
     + 'hands — war-arms a golem can carry into the dark. Bring its Core and the '
     + 'metal, and I will guide your hands. You have earned the schematics." '

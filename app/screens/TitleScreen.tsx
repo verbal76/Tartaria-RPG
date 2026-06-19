@@ -44,6 +44,7 @@ import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
+import { getNarratorName, getGameTitle, getGameTagline } from '../engine/contentPack';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 // OTA-251 — was reading app.json's expo.version. That field is now
 // pinned to the runtimeVersion of the installed APK (2.4.1) so OTAs
@@ -370,7 +371,7 @@ export function TitleScreen() {
   // What's still pending, for the locked-state hint copy.
   const bootGateReason = !otaBootResolved
     ? 'Checking for updates…'
-    : 'Waking the Arbiter…';
+    : `Waking the ${getNarratorName()}…`;
   // v2.4.1 (OTA 023) — chunked copy for dead-character logs. Long
   // sessions easily exceed 25 KB and most chat clients silently
   // truncate larger pastes. Mirror LogScreen's chunking so the
@@ -778,9 +779,8 @@ export function TitleScreen() {
         style={styles.crest}
         resizeMode="contain"
       />
-      <Text style={styles.title}>TARTARIA</Text>
-      <Text style={styles.subtitle}>REALMS</Text>
-      <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
+      <Text style={styles.title}>{getGameTitle().toUpperCase()}</Text>
+      <Text style={[styles.flavor, { color: mutedColor }]}>{getGameTagline()}</Text>
       {(() => {
         // arb132 — build-line marker, right above the gem line, so the
         // side-by-side installs are instantly distinguishable. ENGINE = the
@@ -1244,7 +1244,7 @@ export function TitleScreen() {
           : pendingAction?.kind === 'fallen'
             ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
           : pendingAction?.kind === 'exit'
-            ? 'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.'
+            ? `Close ${getGameTitle()}? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.`
           : undefined
         }
         buttons={
@@ -1283,7 +1283,7 @@ export function TitleScreen() {
             // OTA-267 — codename instead of raw OTA id, plus a fallback
             // ("an older build") for builds before this codename
             // layer existed.
-            ? `Tartaria Realms refreshed itself in the background.\n\nPrevious build: ${getBuildCodenameOrNull(justUpdatedFromBuild) ?? 'an older build'}\nNow running: ${getBuildCodename(OTA_BUILD_ID)}\n\nYour characters and saves are untouched — the sudden reload was the new bundle taking over.`
+            ? `${getGameTitle()} refreshed itself in the background.\n\nPrevious build: ${getBuildCodenameOrNull(justUpdatedFromBuild) ?? 'an older build'}\nNow running: ${getBuildCodename(OTA_BUILD_ID)}\n\nYour characters and saves are untouched — the sudden reload was the new bundle taking over.`
             : undefined
         }
         buttons={[

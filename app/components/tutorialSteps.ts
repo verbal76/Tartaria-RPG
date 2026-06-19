@@ -25,6 +25,7 @@
 // FirstTimeHint. This is just a doc, not the play loop.
 
 import type { ScreenName } from '../engine/types';
+import { getNarratorName } from '../engine/contentPack';
 
 export type HighlightArea =
   // World screen regions (the main exploration view — the player's
@@ -87,7 +88,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Your Name',
     body: 'Speak your name. Type it below, then tap ACT — or hit Enter on the keyboard.',
     arbiter:
-      'The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."',
+      `The ${getNarratorName()} looks up. "Your name, traveler. Type it, then tap ACT."`,
   },
   {
     id: 'cudgel',
@@ -252,7 +253,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     title: 'The world feed',
     body:
       'Every event lands here as a colored line: world description, your actions, combat rolls, ' +
-      'Arbiter remarks, rewards, system hints. Scroll to look back at anything you missed.',
+      `${getNarratorName()} remarks, rewards, system hints. Scroll to look back at anything you missed.`,
   },
   {
     screen: 'exploration',
@@ -313,7 +314,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     body:
       'Tartaria is procedural — every move resolves something, even if it\'s just dust. ' +
       'When in doubt: tap "look around you" for full bearings, then search or approach the ' +
-      'nouns in the chips. Ask the Arbiter ("ask about X"), "what city is north of me", ' +
+      `nouns in the chips. Ask the ${getNarratorName()} ("ask about X"), "what city is north of me", ` +
       '"closest hub", and rest when you need to. Good hunting.',
   },
 ];

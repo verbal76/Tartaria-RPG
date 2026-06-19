@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import {
   View,
   TextInput,
@@ -323,10 +324,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const handleClimbPress = () => {
     if (!climbBlockedReason) { onOpenClimb(); return; }
     const line = climbBlockedReason === 'no_stamina'
-      ? 'The Arbiter catches your arm. "Not on empty — rest or eat, then climb."'
+      ? `The ${getNarratorName()} catches your arm. "Not on empty — rest or eat, then climb."`
       : climbBlockedReason === 'frayed_rope'
-        ? 'The Arbiter eyes your kit. "That rope’s frayed through — it won’t hold your weight. Mend it or find another."'
-        : 'The Arbiter looks up the height. "Not without a rope or climbing gear — you’ll need a grip first."';
+        ? `The ${getNarratorName()} eyes your kit. "That rope’s frayed through — it won’t hold your weight. Mend it or find another."`
+        : `The ${getNarratorName()} looks up the height. "Not without a rope or climbing gear — you’ll need a grip first."`;
     useGameStore.getState().appendLog('arbiter', line);
     if (climbBlockedReason === 'no_stamina') {
       try { Vibration.vibrate(40); } catch { /* ignore */ }
@@ -472,8 +473,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                       useGameStore.getState().appendLog(
                         'arbiter',
                         dogBlocked === 'aerial'
-                          ? `"${dog.name} can't reach what's in the air," the Arbiter says. "Bring it down, or fight it yourself."`
-                          : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
+                          ? `"${dog.name} can't reach what's in the air," the ${getNarratorName()} says. "Bring it down, or fight it yourself."`
+                          : `"${dog.name} is holding the ground below," the ${getNarratorName()} says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
                       );
                       return;
                     }

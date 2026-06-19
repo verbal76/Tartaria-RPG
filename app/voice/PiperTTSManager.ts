@@ -28,6 +28,7 @@ import { splitSentences } from './sentenceSplitter';
 import { padSilence } from './audioPad';
 import { setMusicDuck } from '../audio/AudioManager';
 import { runExclusiveNativeMl, ML_PRIORITY_VOICE } from '../ai/nativeMlLock';
+import { getNarratorName } from '../engine/contentPack';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -492,7 +493,7 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       // most likely OOM site on low-RAM devices.
       const warmRate = getVoiceSettings().rate ?? 1.0;
       try {
-        const samples = await inferSerial(m, 'The Arbiter stirs, and takes a breath.', warmRate);
+        const samples = await inferSerial(m, `The ${getNarratorName()} stirs, and takes a breath.`, warmRate);
         void samples;
       }
       catch (warmupErr) {

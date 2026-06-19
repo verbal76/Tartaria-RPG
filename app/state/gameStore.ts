@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, getNarratorName } from '../engine/contentPack';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -415,13 +415,13 @@ function indoorsForOutdoorHooks(get: () => GameStore): boolean {
 // "what are the Sentinels", "why did the water come" — all route through the
 // `ask` intent), so the prompts read as open doors, not menu items.
 const ARBITER_QUESTION_PROMPTS: readonly string[] = [
-  `The Arbiter watches the horizon a moment. "Ask me about the flood sometime — why the water rose, and what it left buried."`,
-  `The Arbiter trails a hand through the silt. "You could ask me about the Sentinels, if you ever wonder what still walks the deep ruins."`,
-  `The Arbiter glances at you sidelong. "Ask me about the Tartarians when you like. It's their world you're walking through."`,
-  `The Arbiter is quiet, then: "Ask about the Aether sometime. Most who carry it never learn what it costs them."`,
-  `The Arbiter studies a far spire. "Ask me about the Core Guardians before you face one — better to know what waits than meet it blind."`,
-  `The Arbiter tilts their head toward you. "You can just ask me things, you know — a faction, a place, a name you half-remember. I keep more than I offer."`,
-  `The Arbiter thumbs the edge of an old coin. "Ask me about the factions sometime, if you can't tell whose side the dust is on."`,
+  `The ${getNarratorName()} watches the horizon a moment. "Ask me about the flood sometime — why the water rose, and what it left buried."`,
+  `The ${getNarratorName()} trails a hand through the silt. "You could ask me about the Sentinels, if you ever wonder what still walks the deep ruins."`,
+  `The ${getNarratorName()} glances at you sidelong. "Ask me about the Tartarians when you like. It's their world you're walking through."`,
+  `The ${getNarratorName()} is quiet, then: "Ask about the Aether sometime. Most who carry it never learn what it costs them."`,
+  `The ${getNarratorName()} studies a far spire. "Ask me about the Core Guardians before you face one — better to know what waits than meet it blind."`,
+  `The ${getNarratorName()} tilts their head toward you. "You can just ask me things, you know — a faction, a place, a name you half-remember. I keep more than I offer."`,
+  `The ${getNarratorName()} thumbs the edge of an old coin. "Ask me about the factions sometime, if you can't tell whose side the dust is on."`,
 ];
 
 function buildingApproachLine(buildingId: string, autoTraveling = false): string {
@@ -666,14 +666,14 @@ const qwen = new QwenGenerativeEngine();
 // Qwen isn't ready or returns nothing usable, so the caller can fall back to
 // the silent lore line.
 const ARBITER_PERSONA_SYSTEM =
-  "You are the Arbiter: the old, mysterious witness who walks the buried, " +
+  `You are the ${getNarratorName()}: the old, mysterious witness who walks the buried, ` +
   "mud-drowned world of Tartaria beside the traveler. Voice: terse, gruff, " +
   "weathered, a little cryptic — never cheerful, never modern, never chatty. " +
   "Canon you may lean on: you had a name before the flood, but it is buried " +
   "with the city that used it; you do not sleep and do not bleed; you are " +
   "neither god nor ghost nor relic; the buried country appoints witnesses, " +
   "and you are one of them. RULES: reply in 1-3 short sentences, in the " +
-  "Arbiter's voice. Do NOT invent proper names of people, places, factions, " +
+  `${getNarratorName()}'s voice. Do NOT invent proper names of people, places, factions, ` +
   "items, or events, and do NOT state counts or facts you are unsure of — if " +
   "asked something you cannot know, say it is buried or does not surface. " +
   "Never mention games, rules, or AI, and never break character.";
@@ -731,7 +731,7 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
     const honest: string = (TITLE_PASSIVE_PERK as Record<string, string>)[id] ?? meta.perk;
     getStore().appendLog(
       'arbiter',
-      `The Arbiter studies you a long moment. "You have earned a name to carry: ${meta.title}. ${honest}"`,
+      `The ${getNarratorName()} studies you a long moment. "You have earned a name to carry: ${meta.title}. ${honest}"`,
     );
   }
 }
@@ -1103,11 +1103,11 @@ let lastWelcomeBackAt: number | null = null;
 // core; {name} is the player's first name, falling back to "friend" only when the
 // character somehow has no name at all.
 const WELCOME_BACK_LINES = [
-  `The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, {name}. The road kept your place."`,
-  `The Arbiter looks up as you return. "Welcome back, {name}. I wondered when you'd take up the thread again."`,
-  `The Arbiter meets your eyes. "Welcome back, {name}. Good — the buried country is no place to walk alone."`,
-  `The Arbiter nods, the way you nod at someone you've missed. "Welcome back, {name}. We've still got ground to cover, you and I."`,
-  `The Arbiter sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
+  `The ${getNarratorName()} inclines their head, the closest it comes to a smile. "Welcome back, {name}. The road kept your place."`,
+  `The ${getNarratorName()} looks up as you return. "Welcome back, {name}. I wondered when you'd take up the thread again."`,
+  `The ${getNarratorName()} meets your eyes. "Welcome back, {name}. Good — the buried country is no place to walk alone."`,
+  `The ${getNarratorName()} nods, the way you nod at someone you've missed. "Welcome back, {name}. We've still got ground to cover, you and I."`,
+  `The ${getNarratorName()} sets the quiet aside. "Welcome back, {name}. I kept watch while you were gone."`,
 ];
 
 function welcomeBackLine(player: PlayerCharacter | null | undefined): string {
@@ -1154,7 +1154,7 @@ function checkLowHpWarning(
       : `You're badly injured.`;
     get().appendLog(
       'arbiter',
-      `The Arbiter holds your gaze. "${lowHpOpener} Take a moment — eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take."`,
+      `The ${getNarratorName()} holds your gaze. "${lowHpOpener} Take a moment — eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take."`,
       { skipDedup: true },
     );
     set({ lowHpWarned: true });
@@ -3070,7 +3070,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!ambientHit) {
       get().appendLog(
         'arbiter',
-        `The Arbiter looks around. "I don't see ${trimmed} here. Choose words carefully — try one of the visible interactables."`,
+        `The ${getNarratorName()} looks around. "I don't see ${trimmed} here. Choose words carefully — try one of the visible interactables."`,
       );
       return;
     }
@@ -3187,7 +3187,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!ambientHit) {
       get().appendLog(
         'arbiter',
-        `The Arbiter looks around. "I don't see ${trimmed} here to lift."`,
+        `The ${getNarratorName()} looks around. "I don't see ${trimmed} here to lift."`,
       );
       return;
     }
@@ -4945,7 +4945,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tierLabel = ['', 'unsafe', 'edgy', 'dangerous', 'lethal', 'lethal'][danger] ?? 'lethal';
           get().appendLog(
             'arbiter',
-            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country. The things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
+            `The ${getNarratorName()} takes you in. "${loc.name} is ${tierLabel} country. The things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
           );
         }
       }
@@ -5215,7 +5215,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!msNow?.firstQAHintShown && get().tutorialStep === null) {
         get().appendLog(
           'arbiter',
-          `The Arbiter watches you settle. "If you want to know what something is, the Aether, a faction, a place, just ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
+          `The ${getNarratorName()} watches you settle. "If you want to know what something is, the Aether, a faction, a place, just ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -5246,7 +5246,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           || 'the outpost';
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, step outside first. Tap EXIT, or type 'leave outpost'. Until then the room buttons only move you between the rooms of this place."`,
+          `The ${getNarratorName()} inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, step outside first. Tap EXIT, or type 'leave outpost'. Until then the room buttons only move you between the rooms of this place."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -5372,7 +5372,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (toughest >= hpMax * 1.6 || totalHp >= hpMax * 2.5) {
         get().appendLog(
           'arbiter',
-          `The Arbiter's voice drops. "This one's beyond you for now — there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill."`,
+          `The ${getNarratorName()}'s voice drops. "This one's beyond you for now — there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill."`,
         );
       } else {
         // OTA-350 — "consider stealth" nudge. When a fight looks dangerous (but
@@ -5392,8 +5392,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ) {
           lastStealthHintAt = now;
           const line = steGear > 0
-            ? `The Arbiter lowers their voice. "You're carrying shadow with you — use it. Tap APPROACH, flip 'use stealth', and you can be on them before they know it. A clean opening strike, or slip past entirely."`
-            : `The Arbiter lowers their voice. "You move quiet when you choose to. Tap APPROACH, flip 'use stealth', and take them on your terms — strike unseen, or thread past without a fight."`;
+            ? `The ${getNarratorName()} lowers their voice. "You're carrying shadow with you — use it. Tap APPROACH, flip 'use stealth', and you can be on them before they know it. A clean opening strike, or slip past entirely."`
+            : `The ${getNarratorName()} lowers their voice. "You move quiet when you choose to. Tap APPROACH, flip 'use stealth', and take them on your terms — strike unseen, or thread past without a fight."`;
           get().appendLog('arbiter', line);
         }
       }
@@ -5603,7 +5603,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', pick(arrivalLines));
       get().appendLog(
         'arbiter',
-        `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
+        `The ${getNarratorName()} inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
       );
       }
       // Faction vendors may offer a contract the player qualifies for.
@@ -5820,7 +5820,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (cleanName.length < 2) {
           get().appendLog(
             'arbiter',
-            `The Arbiter waits. "A name I can actually say — letters, nothing fancier. Try again."`,
+            `The ${getNarratorName()} waits. "A name I can actually say — letters, nothing fancier. Try again."`,
           );
           return;
         }
@@ -5927,7 +5927,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!_opts?.silent) get().appendLog('player', trimmed);
           get().appendLog(
             'arbiter',
-            `The Arbiter lifts a hand. "Not yet — do what I've asked of you, or tap SKIP TUTORIAL to set out on your own."`,
+            `The ${getNarratorName()} lifts a hand. "Not yet — do what I've asked of you, or tap SKIP TUTORIAL to set out on your own."`,
           );
           return;
         }
@@ -6094,7 +6094,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!_opts?.silent) get().appendLog('player', trimmed);
         get().appendLog(
           'arbiter',
-          `The Arbiter glances at the empty space at your knee. "No dog at your side, friend."`,
+          `The ${getNarratorName()} glances at the empty space at your knee. "No dog at your side, friend."`,
         );
         return;
       }
@@ -6141,7 +6141,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
         'arbiter',
-        `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."`,
+        `The ${getNarratorName()} studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."`,
       );
       get().appendLog('debug', `meta-comment guard: skipped intent parse on ${trimmed.length}-char input`);
       return;
@@ -6510,14 +6510,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({ pendingGolemNaming: false });
       } else if (/^(skip|no|none|nope|leave it|no name|nvm|cancel|n)$/i.test(trimmed)) {
         set({ pendingGolemNaming: false });
-        get().appendLog('arbiter', `"As you like," the Arbiter says. "It answers to its making, then — ${golemNow.name}."`);
+        get().appendLog('arbiter', `"As you like," the ${getNarratorName()} says. "It answers to its making, then — ${golemNow.name}."`);
       } else {
         const name = trimmed.slice(0, 16).trim() || golemNow.name;
         set((s) => (s.player && s.player.golem
           ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
           : { pendingGolemNaming: false }));
         get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
-        get().appendLog('arbiter', `The Arbiter nods. "${name}, then."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} nods. "${name}, then."`);
       }
       void get().persist();
       return;
@@ -6691,7 +6691,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // canonical rephrasing already went through this once).
         get().appendLog(
           'system',
-          'The Arbiter considers your words…',
+          `The ${getNarratorName()} considers your words…`,
         );
         void parseInputViaLLM(trimmed, llmCtx, qwen).then((result) => {
           if (!result) {
@@ -6941,11 +6941,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // player knows why the verb didn't bite.
         const reasonLine =
           res.reason === 'not_at_capital'
-            ? 'The Arbiter shakes their head. "A Core Guardian only answers at a Lost Capital. You are not standing in one."'
+            ? `The ${getNarratorName()} shakes their head. "A Core Guardian only answers at a Lost Capital. You are not standing in one."`
           : res.reason === 'wrong_phase'
-            ? 'The Arbiter folds their hands. "The Guardians are not yet your concern. The Cores will reveal themselves first."'
+            ? `The ${getNarratorName()} folds their hands. "The Guardians are not yet your concern. The Cores will reveal themselves first."`
           : res.reason === 'already_recovered'
-            ? 'The Arbiter inclines their head. "This Capital\'s Core is already yours. The Guardian here is at rest. Travel to a Capital you have not yet broken."'
+            ? `The ${getNarratorName()} inclines their head. "This Capital's Core is already yours. The Guardian here is at rest. Travel to a Capital you have not yet broken."`
           : null;
         if (reasonLine) get().appendLog('arbiter', reasonLine);
         return;
@@ -7076,7 +7076,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const nextAction = mqMod.coreGateNextAction(player.factionId);
           get().appendLog(
             'arbiter',
-            `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
+            `The ${getNarratorName()} holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
           );
           return;
         }
@@ -7231,7 +7231,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (curIdx < nearest) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter nods at the distance. "${reach.label} needs you closer — closing the gap for you."`,
+                `The ${getNarratorName()} nods at the distance. "${reach.label} needs you closer — closing the gap for you."`,
               );
               runMoveCombatRange(get, set, player, currentScene, 'advance');
               break;
@@ -7239,7 +7239,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (curIdx > farthestClose) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter steps back with you. "${reach.label} needs space — pulling you back."`,
+                `The ${getNarratorName()} steps back with you. "${reach.label} needs space — pulling you back."`,
               );
               runMoveCombatRange(get, set, player, currentScene, 'retreat');
               break;
@@ -7251,7 +7251,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : `type 'advance' to close in`;
             get().appendLog(
               'arbiter',
-              `The Arbiter holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
+              `The ${getNarratorName()} holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
               { skipDedup: true },
             );
             break;
@@ -7267,7 +7267,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (currentScene.weatherSwingAnnounced !== weatherName) {
               get().appendLog(
                 'arbiter',
-                `${weatherName} hangs between you. "−${visPenalty} to the swing — see what you can," the Arbiter says.`,
+                `${weatherName} hangs between you. "−${visPenalty} to the swing — see what you can," the ${getNarratorName()} says.`,
                 { skipDedup: true },
               );
               set((s) => (s.currentScene
@@ -7834,7 +7834,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (isGroundNoun && !isClimbedNoun) {
             get().appendLog(
               'arbiter',
-              `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. The ${rawTarget} is down there. Climb down to reach it."`,
+              `The ${getNarratorName()} glances down. "You're up on the ${currentScene.elevatedOn.noun}. The ${rawTarget} is down there. Climb down to reach it."`,
             );
             break;
           }
@@ -8528,7 +8528,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const { playerHasScannerEquipped: hasScanner } = require('../engine/equipment');
             const req = searchRequirementFor(ambient);
             if (req && !hasScanner(player, req.scannerBias)) {
-              get().appendLog('arbiter', `The Arbiter shakes their head. "${req.hint}"`);
+              get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "${req.hint}"`);
               break;
             }
             const narrateResult = narrateAmbientFind(get, set, currentScene, ambient);
@@ -8887,7 +8887,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             get().appendLog(
               'arbiter',
-              `The Arbiter nods slowly. "Travel ${dirWord}, when you're ready. The ${outcome.hintNoun} will still be there."`,
+              `The ${getNarratorName()} nods slowly. "Travel ${dirWord}, when you're ready. The ${outcome.hintNoun} will still be there."`,
             );
             set((s) => s.player
               ? { player: {
@@ -9275,7 +9275,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fx?.kind === 'gate') {
               get().appendLog(
                 'arbiter',
-                `The Arbiter's eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
+                `The ${getNarratorName()}'s eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
               );
               break;
             }
@@ -9483,7 +9483,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (parsed.matchedVerb === 'eat' || parsed.matchedVerb === 'consume' || parsed.matchedVerb === 'devour') {
             get().appendLog(
               'arbiter',
-              `The Arbiter raises a hand. "Eat what? Name the ration, the bread, the fungus — whatever you mean to put in your mouth. Eating without a target is sleeping, and you didn't ask to sleep."`,
+              `The ${getNarratorName()} raises a hand. "Eat what? Name the ration, the bread, the fungus — whatever you mean to put in your mouth. Eating without a target is sleeping, and you didn't ask to sleep."`,
             );
             break;
           }
@@ -9507,7 +9507,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (!hasReclaimersRopeForRest) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                `The ${getNarratorName()} looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
               );
               break;
             }
@@ -9556,8 +9556,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog(
               'arbiter',
               hungerCappedRefuse
-                ? `The Arbiter shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
-                : `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
+                ? `The ${getNarratorName()} shakes their head. "Sleep won't fill you when it's food you're missing — your wind is choked by hunger, not weariness. Eat, then rest will mean something."`
+                : `The ${getNarratorName()} shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
             );
             break;
           }
@@ -9766,7 +9766,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : s);
               get().appendLog(
                 'arbiter',
-                `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+                `The ${getNarratorName()} goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
               );
               get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
               get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
@@ -9774,7 +9774,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // No enemy could be spawned — emit a flavor line so the
               // player knows the world stirred even though no fight
               // landed.
-              get().appendLog('arbiter', `The Arbiter watches the horizon. "Something passed close while you slept. It moved on."`);
+              get().appendLog('arbiter', `The ${getNarratorName()} watches the horizon. "Something passed close while you slept. It moved on."`);
             }
           }
           // 2026-05-26 OTA-050 — fire the OTA-043 "while you slept"
@@ -9974,7 +9974,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             get().appendLog(
               'arbiter',
-              `The Arbiter raises a brow. "Continue which way? You have not pointed yet."`,
+              `The ${getNarratorName()} raises a brow. "Continue which way? You have not pointed yet."`,
             );
           }
           break;
@@ -10032,7 +10032,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s));
               get().appendLog(
                 'arbiter',
-                `The Arbiter nods at the ground. "Silt under your boots now — type 'dig' (or 'search the ground') here to scrape rocks, sticks, and scrap from it. Stock for clubs, spears, the cheap kit."`,
+                `The ${getNarratorName()} nods at the ground. "Silt under your boots now — type 'dig' (or 'search the ground') here to scrape rocks, sticks, and scrap from it. Stock for clubs, spears, the cheap kit."`,
               );
             }
             // beginScene already settled the new wilderness scene;
@@ -10109,7 +10109,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           get().appendLog(
             'arbiter',
-            `The Arbiter shrugs. "Nothing buried opens here. You'd need a vault door, a stairwell, a culvert — and this stretch has none."`,
+            `The ${getNarratorName()} shrugs. "Nothing buried opens here. You'd need a vault door, a stairwell, a culvert — and this stretch has none."`,
           );
           break;
         }
@@ -10181,7 +10181,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Same-location guard: if the player is ALREADY at the
           // candidate, no-op with a quick line.
           if (candidate.id === player.currentLocationId) {
-            get().appendLog('arbiter', `The Arbiter raises a brow. "You are at ${candidate.name}. The road from here is the road forward."`);
+            get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "You are at ${candidate.name}. The road from here is the road forward."`);
             break;
           }
           // 2026-05-25 OTA-035 — outpost-aware confirmation. If the
@@ -10226,7 +10226,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const list = discovered.length >= 3 ? discovered : fallback;
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "I don't know a place called ${target || 'that'}. Try: ${list.join(', ')}. Or open the Lore tab — Places — for the full list."`,
+            `The ${getNarratorName()} shakes their head. "I don't know a place called ${target || 'that'}. Try: ${list.join(', ')}. Or open the Lore tab — Places — for the full list."`,
           );
           break;
         }
@@ -10389,12 +10389,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (near) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter points ${near.direction}. "Nearest is ${near.locationName} — ${near.travelPhrase} ${near.direction}, give or take. Vendors come and go, but that's the closest hub you'll find."`,
+                `The ${getNarratorName()} points ${near.direction}. "Nearest is ${near.locationName} — ${near.travelPhrase} ${near.direction}, give or take. Vendors come and go, but that's the closest hub you'll find."`,
               );
             } else {
               get().appendLog(
                 'arbiter',
-                `The Arbiter scans the horizon. "Nothing named within reach. Walk and one will turn up."`,
+                `The ${getNarratorName()} scans the horizon. "Nothing named within reach. Walk and one will turn up."`,
               );
             }
             break;
@@ -10412,12 +10412,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const travelPhrase = days <= 1 ? 'a day\'s travel' : `${days} days' travel`;
               get().appendLog(
                 'arbiter',
-                `The Arbiter gestures ${dir}. "${hit.name} lies ${travelPhrase} ${dir}."`,
+                `The ${getNarratorName()} gestures ${dir}. "${hit.name} lies ${travelPhrase} ${dir}."`,
               );
             } else {
               get().appendLog(
                 'arbiter',
-                `The Arbiter looks ${dir}. "Empty horizon that way. Nothing named within reach."`,
+                `The ${getNarratorName()} looks ${dir}. "Empty horizon that way. Nothing named within reach."`,
               );
             }
             break;
@@ -10429,13 +10429,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog(
               'arbiter',
               here
-                ? `The Arbiter taps the ground. "You're standing on ${found.locationName}."`
-                : `The Arbiter gestures ${found.direction}. "${found.locationName} lies ${found.travelPhrase} ${found.direction}."`,
+                ? `The ${getNarratorName()} taps the ground. "You're standing on ${found.locationName}."`
+                : `The ${getNarratorName()} gestures ${found.direction}. "${found.locationName} lies ${found.travelPhrase} ${found.direction}."`,
             );
           } else {
             get().appendLog(
               'arbiter',
-              `The Arbiter scans the horizon. "I cannot place '${dirQ.target}'. Try a name I might recognize — Asgardar, Varakush, the Cradle."`,
+              `The ${getNarratorName()} scans the horizon. "I cannot place '${dirQ.target}'. Try a name I might recognize — Asgardar, Varakush, the Cradle."`,
             );
           }
           break;
@@ -10467,13 +10467,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : 'every direction reads open ground';
             get().appendLog(
               'arbiter',
-              `The Arbiter watches you read the compass. "Bearings, then: ${summary}."`,
+              `The ${getNarratorName()} watches you read the compass. "Bearings, then: ${summary}."`,
               { skipDedup: true },
             );
           } else {
             get().appendLog(
               'arbiter',
-              `The Arbiter shrugs. "You have no compass. The mud-flood country looks the same in every direction — find one or guess."`,
+              `The ${getNarratorName()} shrugs. "You have no compass. The mud-flood country looks the same in every direction — find one or guess."`,
               { skipDedup: true },
             );
           }
@@ -10499,7 +10499,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bwhat(?:'s|\s+is)\s+your\s+(purpose|mission|role|job|task)\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter inclines their head. "I was here when the flood came. I am here while you dig. Some agreement between the Aether and the silt put me in this work — I do not remember who signed it, only that the work continues, and that I am the one who watches."`,
+            `The ${getNarratorName()} inclines their head. "I was here when the flood came. I am here while you dig. Some agreement between the Aether and the silt put me in this work — I do not remember who signed it, only that the work continues, and that I am the one who watches."`,
           );
           break;
         }
@@ -10508,7 +10508,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bwhere\s+did\s+you\s+come\s+from\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter looks toward the buried country. "From here. From under it. From whatever was above before the mud came. I have not been somewhere else long enough for it to feel like a place I am from."`,
+            `The ${getNarratorName()} looks toward the buried country. "From here. From under it. From whatever was above before the mud came. I have not been somewhere else long enough for it to feel like a place I am from."`,
           );
           break;
         }
@@ -10516,7 +10516,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (/\bare\s+you\s+(alive|dead|real|human|a\s+(ghost|spirit|god|relic|machine|person|man|woman))\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter answers without inflection. "Not a god. Not a ghost. Not a relic, though I am old enough to be all three. The buried world appoints witnesses. I am one of them."`,
+            `The ${getNarratorName()} answers without inflection. "Not a god. Not a ghost. Not a relic, though I am old enough to be all three. The buried world appoints witnesses. I am one of them."`,
           );
           break;
         }
@@ -10525,7 +10525,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bdo\s+you\s+have\s+a\s+name\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter shrugs slightly. "The Arbiter. I had a name before the flood. It is buried with the city that used it. The title stays. The work stays."`,
+            `The ${getNarratorName()} shrugs slightly. "The ${getNarratorName()}. I had a name before the flood. It is buried with the city that used it. The title stays. The work stays."`,
           );
           break;
         }
@@ -10538,7 +10538,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bdescribe\s+(you|yourself|the\s+arbiter)\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter watches you for a moment. "I am the Arbiter. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the silt did to the seam between them."`,
+            `The ${getNarratorName()} watches you for a moment. "I am the ${getNarratorName()}. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the silt did to the seam between them."`,
           );
           break;
         }
@@ -10555,7 +10555,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const fac = factionsData.find((f) => f.id === player.factionId)?.name ?? player.factionId;
           get().appendLog(
             'arbiter',
-            `The Arbiter studies you. "You are ${player.name}. Your blood is ${race}. Your work belongs to the ${fac}. The buried country knows you well enough to start speaking your name."`,
+            `The ${getNarratorName()} studies you. "You are ${player.name}. Your blood is ${race}. Your work belongs to the ${fac}. The buried country knows you well enough to start speaking your name."`,
           );
           break;
         }
@@ -10573,7 +10573,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : '';
           get().appendLog(
             'arbiter',
-            `The Arbiter looks you over. "${condition}. ${player.hp}/${player.hpMax} HP, ${player.stamina}/${player.staminaMax} stamina, AC ${player.ac}.${corrLine}"`,
+            `The ${getNarratorName()} looks you over. "${condition}. ${player.hp}/${player.hpMax} HP, ${player.stamina}/${player.staminaMax} stamina, AC ${player.ac}.${corrLine}"`,
           );
           break;
         }
@@ -10592,7 +10592,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : ' No contracts on your slate yet; the world will offer some when you let it.';
           get().appendLog(
             'arbiter',
-            `The Arbiter speaks slowly. "Tartaria buried itself before you were born; you walk it because the ${fac?.name ?? player.factionId} asked, and because you said yes. The work is to dig, to remember, to decide what stays.${contractLine}"`,
+            `The ${getNarratorName()} speaks slowly. "Tartaria buried itself before you were born; you walk it because the ${fac?.name ?? player.factionId} asked, and because you said yes. The work is to dig, to remember, to decide what stays.${contractLine}"`,
           );
           break;
         }
@@ -10605,7 +10605,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const traits = race?.traits?.length ? ` Traits: ${race.traits.join(' · ')}.` : '';
           get().appendLog(
             'arbiter',
-            `The Arbiter touches the air near you. "You are ${race?.name ?? player.raceId}. ${race?.description ?? ''}${traits}"`,
+            `The ${getNarratorName()} touches the air near you. "You are ${race?.name ?? player.raceId}. ${race?.description ?? ''}${traits}"`,
           );
           break;
         }
@@ -10617,7 +10617,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const fac = factionsData.find((f) => f.id === player.factionId);
           get().appendLog(
             'arbiter',
-            `The Arbiter glances toward the horizon. "You serve the ${fac?.name ?? player.factionId}. ${fac?.description ?? ''}"`,
+            `The ${getNarratorName()} glances toward the horizon. "You serve the ${fac?.name ?? player.factionId}. ${fac?.description ?? ''}"`,
           );
           break;
         }
@@ -10662,12 +10662,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : '';
               get().appendLog(
                 'arbiter',
-                `The Arbiter glances at your pack. "${category.label.charAt(0).toUpperCase()}${category.label.slice(1)}: ${itemized}.${equippedNote}"`,
+                `The ${getNarratorName()} glances at your pack. "${category.label.charAt(0).toUpperCase()}${category.label.slice(1)}: ${itemized}.${equippedNote}"`,
               );
             } else {
               get().appendLog(
                 'arbiter',
-                `The Arbiter shakes their head. "No ${category.label} on you."`,
+                `The ${getNarratorName()} shakes their head. "No ${category.label} on you."`,
               );
             }
             break;
@@ -10690,7 +10690,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   .join(', ');
                 get().appendLog(
                   'arbiter',
-                  `The Arbiter counts your pack. "${itemized}."`,
+                  `The ${getNarratorName()} counts your pack. "${itemized}."`,
                 );
               } else {
                 const itemized = matches
@@ -10698,7 +10698,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   .join(', ');
                 get().appendLog(
                   'arbiter',
-                  `The Arbiter glances at your pack. "Yes — ${itemized}."`,
+                  `The ${getNarratorName()} glances at your pack. "Yes — ${itemized}."`,
                 );
               }
             } else {
@@ -10707,12 +10707,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (countQuestion) {
                 get().appendLog(
                   'arbiter',
-                  `The Arbiter shakes their head. "Zero ${target}."`,
+                  `The ${getNarratorName()} shakes their head. "Zero ${target}."`,
                 );
               } else {
                 get().appendLog(
                   'arbiter',
-                  `The Arbiter shakes their head. "No ${target} on you."`,
+                  `The ${getNarratorName()} shakes their head. "No ${target} on you."`,
                 );
               }
             }
@@ -10722,7 +10722,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Otherwise normal concept lookup.
         const concept = findConcept(lookup);
         if (concept) {
-          get().appendLog('arbiter', `"${concept.title}." the Arbiter says. "${concept.answer}"`);
+          get().appendLog('arbiter', `"${concept.title}." the ${getNarratorName()} says. "${concept.answer}"`);
           break;
         }
         // OTA-233 — MiniLM lore lookup. The keyword findConcept covers
@@ -10810,7 +10810,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!lookup.trim()) {
           get().appendLog(
             'arbiter',
-            `The Arbiter raises an eyebrow. "Equip what? Open your inventory and tap an item."`,
+            `The ${getNarratorName()} raises an eyebrow. "Equip what? Open your inventory and tap an item."`,
           );
           break;
         }
@@ -10818,13 +10818,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!inInventory) {
           get().appendLog(
             'arbiter',
-            `The Arbiter glances at your pack. "I do not see any ${lookup.toLowerCase()} on you."`,
+            `The ${getNarratorName()} glances at your pack. "I do not see any ${lookup.toLowerCase()} on you."`,
           );
           break;
         }
         const validSlots = validSlotsForItem(inInventory);
         if (validSlots.length === 0) {
-          get().appendLog('arbiter', `The Arbiter frowns. "That is not a thing you can wear or wield."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} frowns. "That is not a thing you can wear or wield."`);
           break;
         }
         const slot: EquipSlot = trimmed.toLowerCase().includes('off') && validSlots.includes('off')
@@ -10836,7 +10836,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'repair': {
         const target = parsed.resolvedNoun ?? parsed.target ?? '';
         if (!target.trim()) {
-          get().appendLog('arbiter', `The Arbiter taps your pack. "Repair what? Name the gear."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} taps your pack. "Repair what? Name the gear."`);
           break;
         }
         get().repairWithVendor(target);
@@ -10848,7 +10848,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!target.trim()) {
           get().appendLog(
             'arbiter',
-            `The Arbiter looks at your pack. "Stow what? Name the tool — a torch, a lens, whatever you want ready on the belt."`,
+            `The ${getNarratorName()} looks at your pack. "Stow what? Name the tool — a torch, a lens, whatever you want ready on the belt."`,
           );
           break;
         }
@@ -10860,7 +10860,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!target.trim()) {
           get().appendLog(
             'arbiter',
-            `The Arbiter looks at the pouch. "Unstow what? Name what comes off the belt."`,
+            `The ${getNarratorName()} looks at the pouch. "Unstow what? Name what comes off the belt."`,
           );
           break;
         }
@@ -10893,7 +10893,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!sourceNoun) {
           get().appendLog(
             'arbiter',
-            `The Arbiter glances around. "No water to draw from here. Try a puddle, lake, waterfall, stream, current, well — anywhere the wet collects."`,
+            `The ${getNarratorName()} glances around. "No water to draw from here. Try a puddle, lake, waterfall, stream, current, well — anywhere the wet collects."`,
           );
           break;
         }
@@ -10903,7 +10903,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!emptyBottle) {
           get().appendLog(
             'arbiter',
-            `The Arbiter taps your pack. "No empty bottle to fill. Find one first — crates and ground-leavings will have them."`,
+            `The ${getNarratorName()} taps your pack. "No empty bottle to fill. Find one first — crates and ground-leavings will have them."`,
           );
           break;
         }
@@ -10988,7 +10988,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         get().appendLog(
           'arbiter',
-          `The Arbiter tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."`,
+          `The ${getNarratorName()} tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."`,
         );
         break;
       }
@@ -11101,7 +11101,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         get().appendLog(
           'arbiter',
-          `The Arbiter raises a brow. "Throw what, where? Name an item from your pack and a target."`,
+          `The ${getNarratorName()} raises a brow. "Throw what, where? Name an item from your pack and a target."`,
         );
         break;
       }
@@ -11206,7 +11206,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (climbTarget && !isClimbable(climbTarget)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter glances at the ${climbTarget}. "Not something hands take to. Pick a pole, ladder, wall, stair, vine — anything with grip."`,
+            `The ${getNarratorName()} glances at the ${climbTarget}. "Not something hands take to. Pick a pole, ladder, wall, stair, vine — anything with grip."`,
           );
           break;
         }
@@ -11282,7 +11282,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!hasRope) {
           get().appendLog(
             'arbiter',
-            `The Arbiter eyes the ${tgt}. "Not without rope. Find some, then come back."`,
+            `The ${getNarratorName()} eyes the ${tgt}. "Not without rope. Find some, then come back."`,
           );
           break;
         }
@@ -11385,7 +11385,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!alreadyUp) {
             get().appendLog(
               'arbiter',
-              `The Arbiter catches your arm. "Not on empty — you'd never leave the ground. Rest, eat, then climb the ${tgt}."`,
+              `The ${getNarratorName()} catches your arm. "Not on empty — you'd never leave the ground. Rest, eat, then climb the ${tgt}."`,
             );
             get().appendLog(
               'combat',
@@ -11429,7 +11429,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!alreadyUpRope) {
             get().appendLog(
               'arbiter',
-              `The Arbiter stops your hand. "That ${activeRope.name.toLowerCase()} is frayed through — it won't take your weight up the ${tgt}. Mend it or find another before you trust it."`,
+              `The ${getNarratorName()} stops your hand. "That ${activeRope.name.toLowerCase()} is frayed through — it won't take your weight up the ${tgt}. Mend it or find another before you trust it."`,
             );
             get().appendLog(
               'combat',
@@ -11796,7 +11796,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (swimTarget && !isSwimmable(swimTarget)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "The ${swimTarget} isn't water. Find a current, a tunnel, a flooded chamber — something that takes a stroke."`,
+            `The ${getNarratorName()} shakes their head. "The ${swimTarget} isn't water. Find a current, a tunnel, a flooded chamber — something that takes a stroke."`,
           );
           break;
         }
@@ -11867,7 +11867,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (currentScene.enemies.length === 0) {
           get().appendLog(
             'arbiter',
-            `The Arbiter tilts their head. "Disengage from what? No one is on you."`,
+            `The ${getNarratorName()} tilts their head. "Disengage from what? No one is on you."`,
           );
           break;
         }
@@ -11953,7 +11953,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({ player: advanceTime(spendStamina(player, 1), 0.1) });
         get().appendLog(
           'arbiter',
-          `The Arbiter shrugs. "Tartaria forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
+          `The ${getNarratorName()} shrugs. "Tartaria forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
         );
         break;
       }
@@ -12001,7 +12001,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
             'arbiter',
-            `The Arbiter waits. "Aim what? You need a ranged weapon — a bow, a bolt-caster, a runecaster — in hand."`,
+            `The ${getNarratorName()} waits. "Aim what? You need a ranged weapon — a bow, a bolt-caster, a runecaster — in hand."`,
           );
           break;
         }
@@ -12036,7 +12036,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
             'arbiter',
-            `The Arbiter watches you fumble. "Nothing to reload — that one bites with its edge, not its magazine."`,
+            `The ${getNarratorName()} watches you fumble. "Nothing to reload — that one bites with its edge, not its magazine."`,
           );
           break;
         }
@@ -12055,7 +12055,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (currentScene.enemies.length === 0) {
           get().appendLog(
             'arbiter',
-            `The Arbiter raises a brow. "Maneuver against whom? Empty ground does not grapple back."`,
+            `The ${getNarratorName()} raises a brow. "Maneuver against whom? Empty ground does not grapple back."`,
           );
           break;
         }
@@ -12066,7 +12066,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (buildDelta >= 3) {
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "${enemy.name} outweighs you by ${buildDelta}. That maneuver is impossible — try violence, distance, or something they don't expect."`,
+            `The ${getNarratorName()} shakes their head. "${enemy.name} outweighs you by ${buildDelta}. That maneuver is impossible — try violence, distance, or something they don't expect."`,
           );
           break;
         }
@@ -12114,7 +12114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "Quick Fire wants a ranged weapon in hand — bolt-caster, bow, runecaster. Equip something that shoots."`,
+            `The ${getNarratorName()} shakes their head. "Quick Fire wants a ranged weapon in hand — bolt-caster, bow, runecaster. Equip something that shoots."`,
           );
           break;
         }
@@ -12146,14 +12146,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // immediately without dice prompts — this is a burst action.
         const targetEnemy = activeEnemy(currentScene);
         if (!targetEnemy) {
-          get().appendLog('arbiter', `The Arbiter waits. "Multi-fire at whom? No target on the line."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} waits. "Multi-fire at whom? No target on the line."`);
           break;
         }
         const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
             'arbiter',
-            `The Arbiter raises a brow. "${equipped?.name ?? 'Bare hands'} doesn't burst-fire. Equip a handgun-class bolt-caster, runecaster, or burst weapon."`,
+            `The ${getNarratorName()} raises a brow. "${equipped?.name ?? 'Bare hands'} doesn't burst-fire. Equip a handgun-class bolt-caster, runecaster, or burst weapon."`,
           );
           break;
         }
@@ -12214,7 +12214,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Apply fighting_back status. The next enemy counter-attack
         // resolves as an opposed Fighting roll instead of a flat dodge.
         if (currentScene.enemies.length === 0) {
-          get().appendLog('arbiter', `The Arbiter shrugs. "Fight back against whom? You're alone."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} shrugs. "Fight back against whom? You're alone."`);
           break;
         }
         const fb: StatusEffect = {
@@ -12247,7 +12247,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const wantsDismiss = /\b(leave|dismiss|part ways|farewell|goodbye)\b/i.test(trimmed) && /\b(companion|follower|ally|friend)\b/i.test(trimmed);
         if (wantsDismiss) {
           if (!player.companion) {
-            get().appendLog('arbiter', `The Arbiter raises a brow. "You're traveling alone. No one to dismiss."`);
+            get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "You're traveling alone. No one to dismiss."`);
             break;
           }
           const name = player.companion.name;
@@ -12258,14 +12258,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (player.companion) {
           get().appendLog(
             'arbiter',
-            `The Arbiter glances at ${player.companion.name}. "You already have a companion. Dismiss them first."`,
+            `The ${getNarratorName()} glances at ${player.companion.name}. "You already have a companion. Dismiss them first."`,
           );
           break;
         }
         if (!currentScene.vendor) {
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "No one here to recruit. Find a vendor scene — a face is needed."`,
+            `The ${getNarratorName()} shakes their head. "No one here to recruit. Find a vendor scene — a face is needed."`,
           );
           break;
         }
@@ -12296,14 +12296,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'drop': {
         const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
         if (!target) {
-          get().appendLog('arbiter', `The Arbiter raises a brow. "Drop what? Name an item from your pack."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "Drop what? Name an item from your pack."`);
           break;
         }
         const item = player.inventory.find(
           (i) => i.name.toLowerCase() === target.toLowerCase() || i.id === target,
         );
         if (!item) {
-          get().appendLog('arbiter', `The Arbiter shakes their head. "${target} isn't in your pack."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "${target} isn't in your pack."`);
           break;
         }
         // Equipped items can't be dropped without unequipping first —
@@ -12312,7 +12312,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const;
         const isEquipped = equippedSlots.some((slot) => eq[slot] === item.name);
         if (isEquipped) {
-          get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
           break;
         }
         // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
@@ -12322,7 +12322,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if ((item.tags ?? []).includes('quest')) {
           get().appendLog(
             'arbiter',
-            `The Arbiter folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
+            `The ${getNarratorName()} folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
           );
           break;
         }
@@ -12470,7 +12470,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : dropped[0];
         if (!pickItem) {
           const names = dropped.map((d) => `"${d.name}"`).join(', ');
-          get().appendLog('arbiter', `The Arbiter scans the ground. "I see ${names} here. Name one."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} scans the ground. "I see ${names} here. Name one."`);
           break;
         }
         const remaining = dropped
@@ -12507,7 +12507,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // JSON edit, not a code edit. See app/engine/containerLoot.ts.
         const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
         if (!target) {
-          get().appendLog('arbiter', `The Arbiter raises a brow. "Open what? Name the chest, crate, or door."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "Open what? Name the chest, crate, or door."`);
           break;
         }
         const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
@@ -12625,7 +12625,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : `${vendor.name} shrugs. "Nothing for you right now — check back after I've travelled."`,
             );
           } else {
-            get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Find a faction vendor and ask what's on offer."`);
+            get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "Accept what? Find a faction vendor and ask what's on offer."`);
           }
           break;
         }
@@ -12653,7 +12653,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!target.trim()) {
           get().appendLog(
             'arbiter',
-            `The Arbiter folds their arms. "Name the contract you mean to turn in."`,
+            `The ${getNarratorName()} folds their arms. "Name the contract you mean to turn in."`,
           );
           break;
         }
@@ -12680,7 +12680,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'gift': {
         if (!currentScene.vendor) {
-          get().appendLog('arbiter', `The Arbiter glances at the empty road. "No one here to gift to."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} glances at the empty road. "No one here to gift to."`);
           break;
         }
         // OTA 205 Phase 2 — if the player named a recipient
@@ -12696,14 +12696,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!match) {
             get().appendLog(
               'arbiter',
-              `The Arbiter glances around. "${currentScene.vendor.name} is here, not ${recipArg.text}. Drop the 'to ${recipArg.text}' if you mean them."`,
+              `The ${getNarratorName()} glances around. "${currentScene.vendor.name} is here, not ${recipArg.text}. Drop the 'to ${recipArg.text}' if you mean them."`,
             );
             break;
           }
         }
         const target = parsed.resolvedNoun ?? parsed.target ?? '';
         if (!target.trim()) {
-          get().appendLog('arbiter', `The Arbiter tilts their head. "Gift what? Name a thing from your pack."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} tilts their head. "Gift what? Name a thing from your pack."`);
           break;
         }
         get().giftToVendor(target);
@@ -12714,7 +12714,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Vendor present → real theft attempt against their inventory.
         if (currentScene.vendor) {
           if (!stealTarget) {
-            get().appendLog('arbiter', `The Arbiter narrows their eyes. "Steal what? Name it precisely."`);
+            get().appendLog('arbiter', `The ${getNarratorName()} narrows their eyes. "Steal what? Name it precisely."`);
             break;
           }
           get().stealFromVendor(stealTarget);
@@ -12760,7 +12760,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           break;
         }
-        get().appendLog('arbiter', `The Arbiter watches the empty path. "Nothing to steal here."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} watches the empty path. "Nothing to steal here."`);
         break;
       }
       case 'join': {
@@ -12769,7 +12769,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!target) {
           get().appendLog(
             'arbiter',
-            `The Arbiter waits. "Which faction? Mud Monarchs, Forgotten Order, Reclaimers Guild, True Tartarians, Eternal Dynasty."`,
+            `The ${getNarratorName()} waits. "Which faction? Mud Monarchs, Forgotten Order, Reclaimers Guild, True Tartarians, Eternal Dynasty."`,
           );
           break;
         }
@@ -12779,7 +12779,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!match) {
           get().appendLog(
             'arbiter',
-            `The Arbiter looks puzzled. "I do not know a faction by that name."`,
+            `The ${getNarratorName()} looks puzzled. "I do not know a faction by that name."`,
           );
           break;
         }
@@ -12813,20 +12813,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } else {
                 get().appendLog(
                   'arbiter',
-                  `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
+                  `The ${getNarratorName()} shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
                 );
               }
             }).catch(() => {
               get().appendLog(
                 'arbiter',
-                `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
+                `The ${getNarratorName()} shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
               );
             });
             break;
           }
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
+            `The ${getNarratorName()} shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
           );
           break;
         }
@@ -12841,7 +12841,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (eff.intelligence < recipe.intRequirement) {
             get().appendLog(
               'arbiter',
-              `The Arbiter studies the schematic. "${recipe.result} is delicate work — INT ${recipe.intRequirement} or better to assemble cleanly. You're at ${eff.intelligence}. Read, study, train — then try again."`,
+              `The ${getNarratorName()} studies the schematic. "${recipe.result} is delicate work — INT ${recipe.intRequirement} or better to assemble cleanly. You're at ${eff.intelligence}. Read, study, train — then try again."`,
             );
             break;
           }
@@ -12855,7 +12855,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (cores < recipe.coresRequired) {
             get().appendLog(
               'arbiter',
-              `The Arbiter sets a hand on the schematic. "${recipe.result} is war-forging from before the flood — I'll guide your hands once you've carried ${recipe.coresRequired} Cores out of the dark. You've recovered ${cores}. Bring more home."`,
+              `The ${getNarratorName()} sets a hand on the schematic. "${recipe.result} is war-forging from before the flood — I'll guide your hands once you've carried ${recipe.coresRequired} Cores out of the dark. You've recovered ${cores}. Bring more home."`,
             );
             break;
           }
@@ -12870,7 +12870,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const list = missing.map((m) => `${m.quantity}× ${m.name}`).join(', ');
           get().appendLog(
             'arbiter',
-            `"Not yet." the Arbiter says. "${recipe.result} needs ${list}."`,
+            `"Not yet." the ${getNarratorName()} says. "${recipe.result} needs ${list}."`,
           );
           break;
         }
@@ -12890,7 +12890,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // synthesized pieces aren't burned without a yes.
           if (get().craftSubConfirmedFor === recipe.result) {
             set({ craftSubConfirmedFor: null });
-            get().appendLog('arbiter', `The Arbiter nods. "Stripped for parts: ${list}."`);
+            get().appendLog('arbiter', `The ${getNarratorName()} nods. "Stripped for parts: ${list}."`);
           } else {
             set({ craftSubstitutionPrompt: { recipeResult: recipe.result, subsList: list } });
             // arb137 — also speak it in the feed so the craft is never a SILENT
@@ -12925,7 +12925,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (craftGrant.accepted <= 0) {
           get().appendLog(
             'arbiter',
-            `The Arbiter raises a brow. "Your pack already holds the limit on ${recipe.result.toLowerCase()}. Free a slot first."`,
+            `The ${getNarratorName()} raises a brow. "Your pack already holds the limit on ${recipe.result.toLowerCase()}. Free a slot first."`,
             { skipDedup: true },
           );
           break;
@@ -12933,7 +12933,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => ({
           player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
         }));
-        get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+        get().appendLog('reward', `✦ Crafted ${recipe.result}. The ${getNarratorName()} watches you set the last piece.`);
         break;
       }
     }
@@ -13542,7 +13542,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fleeGraceSaved) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter lets out a slow breath. "You barely escaped that one. A stumble — a heartbeat's hesitation — and you'd have taken severe damage. The ground this close to where you started does not forgive twice. Get yourself some gear before you press your luck again."`,
+                `The ${getNarratorName()} lets out a slow breath. "You barely escaped that one. A stumble — a heartbeat's hesitation — and you'd have taken severe damage. The ground this close to where you started does not forgive twice. Get yourself some gear before you press your luck again."`,
               );
             }
             break;
@@ -13634,7 +13634,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // captured the thread and where it landed.
               get().appendLog(
                 'arbiter',
-                `The Arbiter nods. "Ah, I see it now. We'll put that in your contracts for later."`,
+                `The ${getNarratorName()} nods. "Ah, I see it now. We'll put that in your contracts for later."`,
               );
               get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
             } else {
@@ -14112,7 +14112,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : `Find another weapon — ${weaponType} isn't biting.`;
               get().appendLog(
                 'arbiter',
-                `The Arbiter watches the ${weaponType} skid off again. "Twice now. ${hint}"`,
+                `The ${getNarratorName()} watches the ${weaponType} skid off again. "Twice now. ${hint}"`,
               );
               set({ weaponResistStreak: null });
             } else {
@@ -14557,7 +14557,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (seen.length === 0) {
             get().appendLog(
               'arbiter',
-              `The Arbiter's voice drops. "This is one of the nine Lost Capitals — and it holds a Core, the whole reason we walk. Open CONTRACTS, find the Primary Objective, and press ★ SUMMON to call up this place's Guardian. Put it down and the Core is yours. That is the main road; everything else is a detour."`,
+              `The ${getNarratorName()}'s voice drops. "This is one of the nine Lost Capitals — and it holds a Core, the whole reason we walk. Open CONTRACTS, find the Primary Objective, and press ★ SUMMON to call up this place's Guardian. Put it down and the Core is yours. That is the main road; everything else is a detour."`,
             );
           }
         }
@@ -14917,7 +14917,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const r = newly[0]!;
       get().appendLog(
         'arbiter',
-        `The Arbiter eyes your new pieces. "You could make a ${r.result} now, if you wanted."`,
+        `The ${getNarratorName()} eyes your new pieces. "You could make a ${r.result} now, if you wanted."`,
       );
     }
 
@@ -15474,7 +15474,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (itemIdx < 0) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "You do not carry any ${itemName}."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "You do not carry any ${itemName}."`);
       return;
     }
     const item = player.inventory[itemIdx]!;
@@ -15487,7 +15487,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if ((item.tags ?? []).includes('quest')) {
       get().appendLog(
         'arbiter',
-        `The Arbiter puts a hand on your wrist. "Not the ${item.name}. The main quest hangs on that piece — it stays with you."`,
+        `The ${getNarratorName()} puts a hand on your wrist. "Not the ${item.name}. The main quest hangs on that piece — it stays with you."`,
       );
       return;
     }
@@ -15546,7 +15546,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!offer) {
       get().appendLog(
         'arbiter',
-        `The Arbiter watches you eye the pack. "They are not carrying a ${itemName}."`,
+        `The ${getNarratorName()} watches you eye the pack. "They are not carrying a ${itemName}."`,
       );
       return;
     }
@@ -15731,18 +15731,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const target = findFaction(factionId);
     if (!target) {
-      get().appendLog('arbiter', `The Arbiter looks puzzled. "I do not know that faction."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks puzzled. "I do not know that faction."`);
       return;
     }
     if (player.factionId === factionId) {
-      get().appendLog('arbiter', `The Arbiter raises a brow. "You are already one of the ${target.name}."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "You are already one of the ${target.name}."`);
       return;
     }
     if (!meetsJoinThreshold(player.factionStanding, factionId)) {
       const current = getStanding(player.factionStanding, factionId);
       get().appendLog(
         'arbiter',
-        `The Arbiter shakes their head. "The ${target.name} do not take strangers. Standing ${current} — they want at least ${JOIN_THRESHOLD}."`,
+        `The ${getNarratorName()} shakes their head. "The ${target.name} do not take strangers. Standing ${current} — they want at least ${JOIN_THRESHOLD}."`,
       );
       return;
     }
@@ -15751,7 +15751,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     get().appendLog(
       'reward',
-      `You are accepted into the ${target.name}. The Arbiter watches you make the pledge in silence.`,
+      `You are accepted into the ${target.name}. The ${getNarratorName()} watches you make the pledge in silence.`,
     );
     recordMemorableEvent(get, set, {
       kind: 'faction_join',
@@ -15845,7 +15845,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     if (!player) return;
     if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "No one here repairs gear. Find a smith."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "No one here repairs gear. Find a smith."`);
       return;
     }
     const target = itemName.toLowerCase();
@@ -15862,7 +15862,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (damagedMatches.length === 0) {
       get().appendLog(
         'arbiter',
-        `The Arbiter glances at your pack. "Nothing in your pack matches that — or it's already in good order."`,
+        `The ${getNarratorName()} glances at your pack. "Nothing in your pack matches that — or it's already in good order."`,
       );
       return;
     }
@@ -15928,17 +15928,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter looks past you. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to pick it up."`,
+          `The ${getNarratorName()} looks past you. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to pick it up."`,
         );
       } else if (hint) {
         get().appendLog(
           'arbiter',
-          `The Arbiter shrugs. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find a ${hint.factionLabel} agent."`,
+          `The ${getNarratorName()} shrugs. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find a ${hint.factionLabel} agent."`,
         );
       } else {
         get().appendLog(
           'arbiter',
-          `The Arbiter shrugs. "Contracts come from wandering faction vendors — keep walking until one shows up at your scene."`,
+          `The ${getNarratorName()} shrugs. "Contracts come from wandering faction vendors — keep walking until one shows up at your scene."`,
         );
       }
       return;
@@ -16058,7 +16058,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = namedHint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — to turn it in for full pay. Or 'send word ${namedHint.contractTitle.toLowerCase()}' to courier it now for a smaller cut."`,
+          `The ${getNarratorName()} waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — to turn it in for full pay. Or 'send word ${namedHint.contractTitle.toLowerCase()}' to courier it now for a smaller cut."`,
         );
         return;
       }
@@ -16086,12 +16086,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : `a vendor from one of: ${lines.join('; ')}`;
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "Find ${list} to turn that contract in for full pay — or 'send word <name>' to courier it now for a smaller cut."`,
+          `The ${getNarratorName()} waves. "Find ${list} to turn that contract in for full pay — or 'send word <name>' to courier it now for a smaller cut."`,
         );
       } else {
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "You have no active contracts. Find a faction vendor first."`,
+          `The ${getNarratorName()} waves. "You have no active contracts. Find a faction vendor first."`,
         );
       }
       return;
@@ -16130,7 +16130,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const fLabel = FACTIONS.find((f) => f.id === candidate.factionId)?.name ?? candidate.factionId.replace(/_/g, ' ');
       get().appendLog(
         'arbiter',
-        `The Arbiter shakes their head. "${candidate.title} is a delivery — ${candidate.fetch.quantity}× ${candidate.fetch.itemName} doesn't travel by word of mouth. Carry it to the board or any ${fLabel} agent yourself."`,
+        `The ${getNarratorName()} shakes their head. "${candidate.title} is a delivery — ${candidate.fetch.quantity}× ${candidate.fetch.itemName} doesn't travel by word of mouth. Carry it to the board or any ${fLabel} agent yourself."`,
       );
       return;
     }
@@ -16214,7 +16214,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const board = scene?.missionBoard;
     if (!board) {
-      get().appendLog('arbiter', `The Arbiter glances around. "No board posted here."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances around. "No board posted here."`);
       return;
     }
     const factionLabel = FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ');
@@ -16234,7 +16234,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     get().appendLog(
       'arbiter',
-      `The Arbiter taps the board. "Type ACCEPT <name> to take one on — e.g. accept ${pool[0]!.title.toLowerCase()}. Bring the work back here, or to any ${factionLabel} agent, to turn it in."`,
+      `The ${getNarratorName()} taps the board. "Type ACCEPT <name> to take one on — e.g. accept ${pool[0]!.title.toLowerCase()}. Bring the work back here, or to any ${factionLabel} agent, to turn it in."`,
     );
     void get().persist();
   },
@@ -16278,7 +16278,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         bumpQuestsAccepted(get, set);
         get().appendLog(
           'arbiter',
-          `The Arbiter nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+          `The ${getNarratorName()} nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
         );
         void get().persist();
         return;
@@ -16288,12 +16288,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter shakes their head. "${hint.contractTitle} is a hunt of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
+          `The ${getNarratorName()} shakes their head. "${hint.contractTitle} is a hunt of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
         );
       } else {
         get().appendLog(
           'arbiter',
-          `The Arbiter shakes their head. "Hunts come from wandering faction vendors. Keep walking until one turns up at your scene."`,
+          `The ${getNarratorName()} shakes their head. "Hunts come from wandering faction vendors. Keep walking until one turns up at your scene."`,
         );
       }
       return;
@@ -16349,7 +16349,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const locLabel = hunt.targetLocationName ?? huntBiomeLabel(hunt.biomeTag);
       get().appendLog(
         'arbiter',
-        `The Arbiter taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
+        `The ${getNarratorName()} taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
       );
       // 2026-05-26 OTA-055 — difficulty warning. If the player is
       // both under-HP and under-weapon, the Arbiter calls it out
@@ -16369,12 +16369,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!hpOk && !weaponOk) {
           get().appendLog(
             'arbiter',
-            `The Arbiter looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
+            `The ${getNarratorName()} looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
           );
         } else if (!hpOk || !weaponOk) {
           get().appendLog(
             'arbiter',
-            `The Arbiter taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
+            `The ${getNarratorName()} taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
           );
         }
       }
@@ -16465,7 +16465,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — a HUNT is a deed (the trophy is the proof), so it can be sent
     // word remotely for a 15% TC cut; in person pays in full.
     if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need someone to pay you. Find a vendor — or 'send word <name>' to courier the trophy in for a smaller cut."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} folds their arms. "Need someone to pay you. Find a vendor — or 'send word <name>' to courier the trophy in for a smaller cut."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -16604,7 +16604,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         bumpQuestsAccepted(get, set);
         get().appendLog(
           'arbiter',
-          `The Arbiter nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+          `The ${getNarratorName()} nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
         );
         void get().persist();
         return;
@@ -16614,10 +16614,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter shakes their head. "${hint.contractTitle} is a mystery the ${hint.factionLabel} pay for. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
+          `The ${getNarratorName()} shakes their head. "${hint.contractTitle} is a mystery the ${hint.factionLabel} pay for. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
         );
       } else {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "Mystery work needs a buyer. Find a vendor."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "Mystery work needs a buyer. Find a vendor."`);
       }
       return;
     }
@@ -16732,7 +16732,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — a mystery is a deed (the artifact is the proof), so it can be
     // sent word remotely for a 15% TC cut; in person pays in full.
     if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor — or 'send word <name>' to courier it in for a smaller cut."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} folds their arms. "Need a buyer. Find a vendor — or 'send word <name>' to courier it in for a smaller cut."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -16841,10 +16841,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter shakes their head. "${hint.contractTitle} is a storyline of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
+          `The ${getNarratorName()} shakes their head. "${hint.contractTitle} is a storyline of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
         );
       } else {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "Storylines come from faction agents. Find one."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "Storylines come from faction agents. Find one."`);
       }
       return;
     }
@@ -16957,7 +16957,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — a storyline is a deed arc, so it can be sent word remotely for a
     // 15% TC cut; in person pays in full.
     if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent — or 'send word <name>' to courier it in for a smaller cut."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} folds their arms. "Find an agent — or 'send word <name>' to courier it in for a smaller cut."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -17046,11 +17046,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const def = findHuntById(id);
       const rec = (player.activeHunts ?? []).find((h) => h.id === id);
       if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That hunt isn't on your slate."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "That hunt isn't on your slate."`);
         return;
       }
       if (rec.stage < def.stages.length) {
-        get().appendLog('arbiter', `The Arbiter eyes the contract. "Not done. The trophy is the proof — you don't have it yet."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} eyes the contract. "Not done. The trophy is the proof — you don't have it yet."`);
         return;
       }
       const trophy: InventoryItem = stampDurability({
@@ -17101,11 +17101,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const def = findMysteryById(id);
       const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
       if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That mystery isn't on your slate."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "That mystery isn't on your slate."`);
         return;
       }
       if (rec.stage < def.stages.length) {
-        get().appendLog('arbiter', `The Arbiter studies you. "Not yet. The answer isn't gathered."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} studies you. "Not yet. The answer isn't gathered."`);
         return;
       }
       const repResult = def.factionId && def.rewardRep
@@ -17160,11 +17160,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const def = findStorylineById(id);
       const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
       if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That storyline isn't on your slate."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "That storyline isn't on your slate."`);
         return;
       }
       if (rec.stage < def.stages.length) {
-        get().appendLog('arbiter', `The Arbiter folds their arms. "Not finished. The chapter isn't closed."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} folds their arms. "Not finished. The chapter isn't closed."`);
         return;
       }
       const repResult = applyRepChange(player.factionStanding, def.factionId, def.rewardRep);
@@ -17222,7 +17222,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Without `!rec`, a COMPLETED fetch quest (no stages) could be re-claimed for
       // its TC + rep over and over — a Scrap-Metal→TC + rep pump.
       if (!def || !rec) {
-        get().appendLog('arbiter', `The Arbiter shakes their head. "That contract isn't on file."`);
+        get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "That contract isn't on file."`);
         return;
       }
       // Stage gate matches the vendor turn-in: staged quests require
@@ -17230,7 +17230,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (def.stages && def.stages.length > 0) {
         const currentStage = rec?.stage ?? 0;
         if (currentStage < def.stages.length) {
-          get().appendLog('arbiter', `The Arbiter eyes the contract. "Step ${currentStage + 1} of ${def.stages.length}. Finish it first."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} eyes the contract. "Step ${currentStage + 1} of ${def.stages.length}. Finish it first."`);
           return;
         }
       }
@@ -17246,7 +17246,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
           .reduce((n, i) => n + (i.quantity ?? 1), 0);
         if (have < quantity) {
-          get().appendLog('arbiter', `The Arbiter checks the slate. "${def.title} needs ${quantity}× ${itemName} — you're carrying ${have}. Gather the rest, then claim it."`);
+          get().appendLog('arbiter', `The ${getNarratorName()} checks the slate. "${def.title} needs ${quantity}× ${itemName} — you're carrying ${have}. Gather the rest, then claim it."`);
           return;
         }
         let toRemove = quantity;
@@ -17296,7 +17296,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const golem = player.golem;
     if (!golem || golem.hp <= 0) {
-      get().appendLog('arbiter', `"No golem at your side to arm," the Arbiter says. "Summon one first."`);
+      get().appendLog('arbiter', `"No golem at your side to arm," the ${getNarratorName()} says. "Summon one first."`);
       return;
     }
     const lower = weaponName.toLowerCase().trim();
@@ -17304,7 +17304,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       i.quantity > 0 && (i.name.toLowerCase() === lower || i.name.toLowerCase().includes(lower)),
     );
     if (!item) {
-      get().appendLog('arbiter', `"No '${weaponName}' in your pack," the Arbiter says.`);
+      get().appendLog('arbiter', `"No '${weaponName}' in your pack," the ${getNarratorName()} says.`);
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -17313,7 +17313,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { findWeaponByName: fwbn } = require('../engine/crafting');
     const cat = fwbn(item.name);
     if (!cat || !isGolemWeapon(cat.tags)) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament — a Sledge, Greatsword, Pike, or Aether-Lance."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament — a Sledge, Greatsword, Pike, or Aether-Lance."`);
       return;
     }
     // Stamp durability + take one instance out of the pack; return any current
@@ -17334,7 +17334,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   disarmGolem() {
     const player = get().player;
     if (!player || !player.golem || !player.golem.weapon) {
-      get().appendLog('arbiter', `"Your golem carries nothing to take back," the Arbiter says.`);
+      get().appendLog('arbiter', `"Your golem carries nothing to take back," the ${getNarratorName()} says.`);
       return;
     }
     const wName = player.golem.weapon.name;
@@ -17356,7 +17356,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         activeQuests: s.player.activeQuests.filter((q) => q.id !== id),
       },
     } : s));
-    get().appendLog('world', `Lead dropped: ${lead.objective.verb} ${lead.objective.target}. The Arbiter doesn't comment.`);
+    get().appendLog('world', `Lead dropped: ${lead.objective.verb} ${lead.objective.target}. The ${getNarratorName()} doesn't comment.`);
     void get().persist();
   },
 
@@ -17400,7 +17400,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
         },
       } : s));
-      get().appendLog('world', `You step away from the ${def.title} chapter. The Arbiter doesn't argue.`);
+      get().appendLog('world', `You step away from the ${def.title} chapter. The ${getNarratorName()} doesn't argue.`);
     } else {
       const def = findFactionQuestById(id);
       const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
@@ -17412,7 +17412,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== id),
         },
       } : s));
-      get().appendLog('world', `You hand the ${def.title} contract back to the wind. The Arbiter shrugs.`);
+      get().appendLog('world', `You hand the ${def.title} contract back to the wind. The ${getNarratorName()} shrugs.`);
     }
     void get().persist();
   },
@@ -17441,7 +17441,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
     const tgtPos = map.positions[locationId];
     if (!tgtPos) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "That destination doesn't sit on any map I can see from here."`);
       return;
     }
     // OTA-615 — setting a course is PLANNING; it no longer requires stamina.
@@ -17523,7 +17523,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // step yet. Tell the player to rest, then press on from the travel row.
       get().appendLog(
         'arbiter',
-        `The Arbiter nods at the road ahead. "The course to ${tgtName} is set — but you're spent. Rest, then tap → ${tgtName.toUpperCase()} on the travel row to set out."`,
+        `The ${getNarratorName()} nods at the road ahead. "The course to ${tgtName} is set — but you're spent. Rest, then tap → ${tgtName.toUpperCase()} on the travel row to set out."`,
         { skipDedup: true },
       );
       buzzBlocked(); // arb41 — physical "can't move yet" signal
@@ -17549,7 +17549,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // night."
       get().appendLog(
         'arbiter',
-        `The Arbiter studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
+        `The ${getNarratorName()} studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
       );
       buzzBlocked(); // arb41 — physical "can't move" signal
       return;
@@ -17604,7 +17604,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     if (!tgtPos) {
-      get().appendLog('arbiter', `The Arbiter looks at the horizon. "I've lost the bearing. Resetting."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks at the horizon. "I've lost the bearing. Resetting."`);
       // OTA-127 — also clear transitArea so the scene bar stops
       // claiming "near X" once the bearing is lost.
       set((s) => (s.player ? {
@@ -17722,7 +17722,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
       get().appendLog(
         'arbiter',
-        `The Arbiter studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
+        `The ${getNarratorName()} studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
       );
       buzzBlocked();
       return;
@@ -18295,7 +18295,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const venue = pick(['a smelter ruin', 'an overturned wagon at a roadside camp', 'a cellar door under a buried structure', 'a snare pit at a trapper camp']);
         get().appendLog(
           'arbiter',
-          `The Arbiter, half to themselves: "Travelers have been speaking of a dog held at ${venue} to the ${dir}. Whoever's keeping it isn't doing right by it. If you ever pass one — there are ways to free a thing like that."`,
+          `The ${getNarratorName()}, half to themselves: "Travelers have been speaking of a dog held at ${venue} to the ${dir}. Whoever's keeping it isn't doing right by it. If you ever pass one — there are ways to free a thing like that."`,
         );
         set((s) => ({
           worldMemory: { ...s.worldMemory, dogRescueTipFired: true },
@@ -18581,7 +18581,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : s);
           get().appendLog(
             'arbiter',
-            `"You have a Crucible debt now," the Arbiter says. "When you're ready — say 'fuse' — set your reserved pieces in the bowl."`,
+            `"You have a Crucible debt now," the ${getNarratorName()} says. "When you're ready — say 'fuse' — set your reserved pieces in the bowl."`,
           );
         }
         void get().persist();
@@ -18769,7 +18769,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
     get().appendLog(
       'arbiter',
-      `The Arbiter raps the slate. "Not that — ${hint[id] ?? "do what I've asked, or tap SKIP TUTORIAL."}"`,
+      `The ${getNarratorName()} raps the slate. "Not that — ${hint[id] ?? "do what I've asked, or tap SKIP TUTORIAL."}"`,
     );
   },
   skipTutorial() {
@@ -18836,7 +18836,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const digBlocker = activeEnemy(scene);
     if (digBlocker) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${digBlocker.name} is on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "Not while ${digBlocker.name} is on you."`);
       return;
     }
     // 2026-05-25 — hub rooms (any building floor: wood, board, stone,
@@ -18973,7 +18973,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!item || score < 2) {
       get().appendLog(
         'arbiter',
-        `The Arbiter shakes their head. "You cannot dig — you have no tool that can. Find a knife, a trowel, or even a sharp scrap to scrape with."`,
+        `The ${getNarratorName()} shakes their head. "You cannot dig — you have no tool that can. Find a knife, a trowel, or even a sharp scrap to scrape with."`,
         { skipDedup: true },
       );
       return;
@@ -19137,7 +19137,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player || !scene) return;
     const blocker = activeEnemy(scene);
     if (blocker) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${blocker.name} is on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "Not while ${blocker.name} is on you."`);
       return;
     }
     const harvestRoomKey = makeRoomKey(
@@ -19406,14 +19406,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
     const valid = validSlotsForItem(item);
     if (!valid.includes(slot)) {
       get().appendLog(
         'arbiter',
-        `The Arbiter shakes their head. "The ${item.name} doesn't go in the ${SLOT_LABEL[slot]} slot."`,
+        `The ${getNarratorName()} shakes their head. "The ${item.name} doesn't go in the ${SLOT_LABEL[slot]} slot."`,
       );
       return;
     }
@@ -19625,7 +19625,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
     // OTA-269 — eligibility check before slot-count check. Lets us
@@ -19635,7 +19635,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!eligibility.eligible) {
       get().appendLog(
         'arbiter',
-        `The Arbiter looks at the ${item.name}. "${eligibility.reason}."`,
+        `The ${getNarratorName()} looks at the ${item.name}. "${eligibility.reason}."`,
       );
       return;
     }
@@ -19643,7 +19643,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (current.length >= POUCH_MAX) {
       get().appendLog(
         'arbiter',
-        `The Arbiter looks at the pouch. "Four is the limit. Take one out before another goes in."`,
+        `The ${getNarratorName()} looks at the pouch. "Four is the limit. Take one out before another goes in."`,
       );
       return;
     }
@@ -19671,7 +19671,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter looks at the pouch. "${itemName} isn't on your belt."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks at the pouch. "${itemName} isn't on your belt."`);
       return;
     }
     set((s) => s.player
@@ -19699,17 +19699,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
     const eligibility = isBandolierEligible(item, player);
     if (!eligibility.eligible) {
-      get().appendLog('arbiter', `The Arbiter looks at the ${item.name}. "${eligibility.reason}."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks at the ${item.name}. "${eligibility.reason}."`);
       return;
     }
     const current = player.equipped?.bandolierIds ?? [];
     if (current.length >= BANDOLIER_MAX) {
-      get().appendLog('arbiter', `The Arbiter taps the bandolier. "Five loops, five throws. Pull one before you rack another."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} taps the bandolier. "Five loops, five throws. Pull one before you rack another."`);
       return;
     }
     set((s) => s.player
@@ -19727,7 +19727,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter looks at the bandolier. "${itemName} isn't racked."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks at the bandolier. "${itemName} isn't racked."`);
       return;
     }
     set((s) => s.player
@@ -19751,7 +19751,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
       return;
     }
     const prevOff = player.equipped?.off;
@@ -19813,7 +19813,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
     // OTA 024 — items with a consumable-shaped effect route through
@@ -19868,7 +19868,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().equipItem(item.name, validSlots[0]!);
       return;
     }
-    get().appendLog('arbiter', `The Arbiter shrugs. "The ${item.name} doesn't have a single obvious 'use' — keep it, gift it, or scrap it."`);
+    get().appendLog('arbiter', `The ${getNarratorName()} shrugs. "The ${item.name} doesn't have a single obvious 'use' — keep it, gift it, or scrap it."`);
   },
 
   canonizeLocation(loc) {
@@ -20025,7 +20025,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         !!player.hubRoomId && !hasLeftOutpost
           ? `The foreman shakes his head. "The Crucible's not for first-timers. Leave the outpost and see something of the world first — travel out to a named place and come back, then I'll fire it for you."`
-          : `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
+          : `"There's no Crucible here," the ${getNarratorName()} says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
       );
       return;
     }
@@ -20246,7 +20246,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const prompt = get().craftSubstitutionPrompt;
     set({ craftSubstitutionPrompt: null, craftSubConfirmedFor: null });
     if (prompt) {
-      get().appendLog('arbiter', `The Arbiter sets the schematic down. "Left them be, then. Your pieces stay in your pack."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} sets the schematic down. "Left them be, then. Your pieces stay in your pack."`);
     }
   },
 
@@ -20262,14 +20262,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const def = ra.RACE_ABILITIES.find((d: { id: string }) => d.id === id);
     if (!def || def.raceId !== player.raceId) { set({ raceAbilityPickerOpen: false }); return; }
     if (!ra.isAbilityReady(player, def)) {
-      get().appendLog('arbiter', `"${def.name} is spent for today," the Arbiter says. "Rest, and it returns."`);
+      get().appendLog('arbiter', `"${def.name} is spent for today," the ${getNarratorName()} says. "Rest, and it returns."`);
       set({ raceAbilityPickerOpen: false });
       return;
     }
     const scene = get().currentScene;
     const inCombat = (scene?.enemies?.length ?? 0) > 0;
     if (def.combatOnly && !inCombat) {
-      get().appendLog('arbiter', `"Nothing here to turn ${def.name} on," the Arbiter says.`);
+      get().appendLog('arbiter', `"Nothing here to turn ${def.name} on," the ${getNarratorName()} says.`);
       set({ raceAbilityPickerOpen: false });
       return;
     }
@@ -20357,14 +20357,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.kind === 'consumable' && i.name.toLowerCase() === foodName.toLowerCase() && i.quantity > 0,
     );
     if (!food) {
-      get().appendLog('arbiter', `The Arbiter looks at your pack. "No ${foodName} on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks at your pack. "No ${foodName} on you."`);
       return;
     }
     const dust = player.inventory.find(
       (i) => i.name.toLowerCase() === 'aether dust' && i.quantity > 0,
     );
     if (!dust) {
-      get().appendLog('arbiter', `The Arbiter raises a brow. "You'd need Aether Dust to lace it. Find some first."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "You'd need Aether Dust to lace it. Find some first."`);
       return;
     }
     // Open the picker — the actual consume + buff happens when
@@ -20385,7 +20385,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const dust = player.inventory.find((i) => i.name.toLowerCase() === 'aether dust' && i.quantity > 0);
     if (!food || !dust) {
       set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
-      get().appendLog('arbiter', `The Arbiter shrugs. "Lost the moment. Try again."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shrugs. "Lost the moment. Try again."`);
       return;
     }
     // Drain 1 Aether Dust + 1 food + apply the +3 buff for 5 real-world
@@ -20430,11 +20430,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
     if (!canScrap(item)) {
-      get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing here to break down — it already IS stock material."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} taps the ${item.name}. "Nothing here to break down — it already IS stock material."`);
       return;
     }
     // OTA-058 — auto-unequip on scrap intent. The pre-OTA refusal
@@ -20579,11 +20579,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const item = player.inventory.find((i) => i.id === itemId);
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see that piece on you anymore."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see that piece on you anymore."`);
       return;
     }
     if (!item.durability) {
-      get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing to repair — this one doesn't wear."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} taps the ${item.name}. "Nothing to repair — this one doesn't wear."`);
       return;
     }
     // Use the coated display name in every line so a repaired coated weapon
@@ -20592,12 +20592,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const display = require('../engine/weaponCoating').coatedDisplayName(item) as string;
     if (item.durability.current >= item.durability.max) {
-      get().appendLog('arbiter', `The Arbiter looks the ${display} over. "Already whole. Don't waste materials."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} looks the ${display} over. "Already whole. Don't waste materials."`);
       return;
     }
     const cost = repairCostMaterials(item);
     if (cost.length === 0) {
-      get().appendLog('arbiter', `The Arbiter taps the ${display}. "No recipe to mend this one. Sell it on or scrap for parts."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} taps the ${display}. "No recipe to mend this one. Sell it on or scrap for parts."`);
       return;
     }
     // OTA-205 — substitution-aware shortage check. Previously the
@@ -20614,7 +20614,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const shortages = missing.map((m) => `${m.name} ${m.quantity} short`);
       get().appendLog(
         'arbiter',
-        `The Arbiter eyes the ${display}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
+        `The ${getNarratorName()} eyes the ${display}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
       );
       return;
     }
@@ -20629,7 +20629,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ).join(', ');
       get().appendLog(
         'arbiter',
-        `The Arbiter nods. "Patched in: ${list}."`,
+        `The ${getNarratorName()} nods. "Patched in: ${list}."`,
       );
     }
     // Consume materials + restore durability.
@@ -20798,7 +20798,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (newHungerPenalty >= 3 && (player.hungerStaminaPenalty ?? 0) < 3) {
       get().appendLog(
         'arbiter',
-        `The Arbiter watches you stand. "You're running on empty. Eat something soon."`,
+        `The ${getNarratorName()} watches you stand. "You're running on empty. Eat something soon."`,
       );
     }
     // Ambush narration + encounter spawn happens AFTER recovery so the
@@ -21643,7 +21643,7 @@ function runMoveCombatRange(
   const moveEnemy = activeEnemy(scene);
   if (!moveEnemy) {
     get().appendLog('debug', 'move: bail — no active enemy');
-    get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
+    get().appendLog('arbiter', `The ${getNarratorName()} shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
     return;
   }
   // OTA-550 — RANGE_ORDER runs farthest → closest (distant,far,mid,close).
@@ -21821,7 +21821,7 @@ function grantQuestHook(
     );
     get().appendLog(
       'arbiter',
-      `The Arbiter holds up a hand. "That hunt is on your slate now. Open Contracts → Hunts to read the steps. Tap ABANDON there if you don't want it."`,
+      `The ${getNarratorName()} holds up a hand. "That hunt is on your slate now. Open Contracts → Hunts to read the steps. Tap ABANDON there if you don't want it."`,
     );
     return;
   }
@@ -21853,7 +21853,7 @@ function grantQuestHook(
   );
   get().appendLog(
     'arbiter',
-    `The Arbiter watches you read it. "That mystery is on your slate. Open Contracts → Mysteries for the trail. Tap ABANDON there if you'd rather not chase it."`,
+    `The ${getNarratorName()} watches you read it. "That mystery is on your slate. Open Contracts → Mysteries for the trail. Tap ABANDON there if you'd rather not chase it."`,
   );
 }
 
@@ -21896,7 +21896,7 @@ function advanceActiveFactionQuests(
       const fname = def.factionId.replace(/_/g, ' ');
       get().appendLog(
         'arbiter',
-        `The Arbiter glances at you. "${def.title} is done. Bring word to any ${fname} agent."`,
+        `The ${getNarratorName()} glances at you. "${def.title} is done. Bring word to any ${fname} agent."`,
       );
     }
     return { ...rec, stage: nextStage };
@@ -21919,23 +21919,23 @@ let _burstCount = 0;
 const BURST_WINDOW_MS = 5000;
 
 const BURST_START_LINES = [
-  `The Arbiter watches you sign. "Another for the slate."`,
-  `The Arbiter nods. "On the board it goes."`,
-  `"Adding another," the Arbiter says, dry. "Make good on it."`,
-  `The Arbiter glances at the page. "Promise made. Hold yourself to it."`,
-  `"Another contract," the Arbiter says. "Tartaria notes."`,
+  `The ${getNarratorName()} watches you sign. "Another for the slate."`,
+  `The ${getNarratorName()} nods. "On the board it goes."`,
+  `"Adding another," the ${getNarratorName()} says, dry. "Make good on it."`,
+  `The ${getNarratorName()} glances at the page. "Promise made. Hold yourself to it."`,
+  `"Another contract," the ${getNarratorName()} says. "Tartaria notes."`,
 ];
 const BURST_STACKING_LINES = [
-  `The Arbiter raises an eyebrow. "You're stacking promises. They don't pay until the work does."`,
-  `"That's three now," the Arbiter says. "Make sure you remember what you owe whom."`,
-  `The Arbiter's mouth twitches. "Collecting contracts is the easy part. Try finishing one."`,
-  `"You like having debts to the factions, do you?" the Arbiter says.`,
+  `The ${getNarratorName()} raises an eyebrow. "You're stacking promises. They don't pay until the work does."`,
+  `"That's three now," the ${getNarratorName()} says. "Make sure you remember what you owe whom."`,
+  `The ${getNarratorName()}'s mouth twitches. "Collecting contracts is the easy part. Try finishing one."`,
+  `"You like having debts to the factions, do you?" the ${getNarratorName()} says.`,
 ];
 const BURST_SLOW_DOWN_LINES = [
-  `The Arbiter's voice cools. "Slow down. The work is real. You can only walk one road at a time."`,
-  `"Five on the slate," the Arbiter says. "Tartaria does not negotiate down a list you over-bought."`,
-  `The Arbiter sighs. "Every contract is a debt. You're stacking debts faster than legs to walk them."`,
-  `"That's a lot of promises," the Arbiter says quietly. "Plan your route, or you'll forget half."`,
+  `The ${getNarratorName()}'s voice cools. "Slow down. The work is real. You can only walk one road at a time."`,
+  `"Five on the slate," the ${getNarratorName()} says. "Tartaria does not negotiate down a list you over-bought."`,
+  `The ${getNarratorName()} sighs. "Every contract is a debt. You're stacking debts faster than legs to walk them."`,
+  `"That's a lot of promises," the ${getNarratorName()} says quietly. "Plan your route, or you'll forget half."`,
 ];
 
 function bumpQuestsAccepted(
@@ -21965,7 +21965,7 @@ function bumpQuestsAccepted(
   if (prev === 0) {
     get().appendLog(
       'arbiter',
-      `The Arbiter watches you take the contract. "First one. The work begins now — not when you finish it, not when you cash it in. Now."`,
+      `The ${getNarratorName()} watches you take the contract. "First one. The work begins now — not when you finish it, not when you cash it in. Now."`,
     );
     _burstLastAt = Date.now();
     _burstCount = 1;
@@ -23487,7 +23487,7 @@ function handlePlayerDeath(
     `${player.name} falls in ${locName}. The Aetherstone grows dim and does not lift.`,
     `The buried world claims ${player.name}. Tartaria keeps the body count.`,
     `${player.name}'s breath leaves. The dust settles back into its old patterns.`,
-    `An end at ${locName}. The Arbiter watches and says nothing.`,
+    `An end at ${locName}. The ${getNarratorName()} watches and says nothing.`,
     `${player.name} does not rise. The ruins remember another.`,
   ]);
   state.appendLog('combat', epitaph);
@@ -23892,9 +23892,9 @@ type RestPull =
   | { kind: 'world'; line: string }
   | { kind: 'trinket'; line: string };
 const REST_PULL_LINES: RestPull[] = [
-  { kind: 'arbiter', line: `The Arbiter wakes before you do. "I chewed on something while you slept. Worth telling, when you've shaken the dust."` },
-  { kind: 'arbiter', line: `The Arbiter, near the embers: "I remembered a name in the night. It'll come back to me when the road needs it."` },
-  { kind: 'arbiter', line: `The Arbiter is quiet a long moment after you stir. "I was wrong about something earlier. I'll say so when the moment's right."` },
+  { kind: 'arbiter', line: `The ${getNarratorName()} wakes before you do. "I chewed on something while you slept. Worth telling, when you've shaken the dust."` },
+  { kind: 'arbiter', line: `The ${getNarratorName()}, near the embers: "I remembered a name in the night. It'll come back to me when the road needs it."` },
+  { kind: 'arbiter', line: `The ${getNarratorName()} is quiet a long moment after you stir. "I was wrong about something earlier. I'll say so when the moment's right."` },
   { kind: 'world', line: `You dream the same dream three times in the night — a corridor, a door, your own hand reaching for the handle.` },
   { kind: 'world', line: `Half-asleep, you hear voices somewhere down the road. By the time you sit up they're gone.` },
   { kind: 'world', line: `A bird you can't name lands a foot from where you slept, looks at you, takes off again.` },
@@ -23914,21 +23914,21 @@ const REST_PULL_LINES: RestPull[] = [
 // type 'what is X'. Rate kept low so it doesn't spam over a long
 // walk; one beat every ~20 steps on average.
 const TRAVEL_LORE_BEATS = [
-  `The Arbiter, walking with you: "Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."`,
-  `The Arbiter, half to themselves: "The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back."`,
-  `The Arbiter: "The Reclaimers tag, recover, return. The Forgotten Order kneels. The Mud Monarchs collect. The Aetherborn watch. Five answers to one buried country."`,
-  `The Arbiter glances at the horizon. "Buried cities under us. The flood didn't bury them all at once — some sank slowly enough that the people inside knew."`,
-  `The Arbiter: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
-  `The Arbiter: "Mud-glass is silt fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
-  `The Arbiter, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
-  `The Arbiter: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
-  `The Arbiter: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
-  `The Arbiter: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
-  `The Arbiter: "The Mud Seas are not seas. They are silt over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
-  `The Arbiter: "Reclaimer code: salvage the relic, return the body, leave the place better than you found it. Most of them keep two of three."`,
-  `The Arbiter: "Aetherstone Sentinels — the architectural ones — patrol the buried passes. Some have been awake for a thousand years. You will know them when they speak."`,
-  `The Arbiter: "Tartary above and Tartaria below — same name, different country. We are walking on the one most maps refuse to name."`,
-  `The Arbiter, half-amused: "The Monarchs say the buried world is theirs by right. The buried world hasn't responded yet."`,
+  `The ${getNarratorName()}, walking with you: "Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."`,
+  `The ${getNarratorName()}, half to themselves: "The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back."`,
+  `The ${getNarratorName()}: "The Reclaimers tag, recover, return. The Forgotten Order kneels. The Mud Monarchs collect. The Aetherborn watch. Five answers to one buried country."`,
+  `The ${getNarratorName()} glances at the horizon. "Buried cities under us. The flood didn't bury them all at once — some sank slowly enough that the people inside knew."`,
+  `The ${getNarratorName()}: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
+  `The ${getNarratorName()}: "Mud-glass is silt fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
+  `The ${getNarratorName()}, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
+  `The ${getNarratorName()}: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
+  `The ${getNarratorName()}: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
+  `The ${getNarratorName()}: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
+  `The ${getNarratorName()}: "The Mud Seas are not seas. They are silt over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
+  `The ${getNarratorName()}: "Reclaimer code: salvage the relic, return the body, leave the place better than you found it. Most of them keep two of three."`,
+  `The ${getNarratorName()}: "Aetherstone Sentinels — the architectural ones — patrol the buried passes. Some have been awake for a thousand years. You will know them when they speak."`,
+  `The ${getNarratorName()}: "Tartary above and Tartaria below — same name, different country. We are walking on the one most maps refuse to name."`,
+  `The ${getNarratorName()}, half-amused: "The Monarchs say the buried world is theirs by right. The buried world hasn't responded yet."`,
 ];
 
 // Ambient lore pool — surfaced on a 25% chance from every search,
@@ -24203,7 +24203,7 @@ function repromptUnknownTarget(
   const list = all.length > 0 ? all.join(', ') : 'the mud, the haze, the dust';
   get().appendLog(
     'arbiter',
-    `The Arbiter tilts their head. "I do not see a '${attempted}' here. Choose words carefully — try: ${list}."`,
+    `The ${getNarratorName()} tilts their head. "I do not see a '${attempted}' here. Choose words carefully — try: ${list}."`,
   );
 }
 
@@ -24610,7 +24610,7 @@ function narratePossibleDirections(
   if (second && second.id !== first.id) {
     fragments.push(`a ${humanizeType(second.type)} toward ${second.name}`);
   }
-  get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
+  get().appendLog('world', `You look for a way forward. The ${getNarratorName()} notes ${fragments.join(' and ')}.`);
   markPathExhausted();
 }
 
@@ -24656,7 +24656,7 @@ function runAethercraft(
     if (player.golem) {
       get().appendLog(
         'arbiter',
-        `"Only one golem can wear the same Aetheric tether," the Arbiter says. "Dismiss the ${player.golem.name} first."`,
+        `"Only one golem can wear the same Aetheric tether," the ${getNarratorName()} says. "Dismiss the ${player.golem.name} first."`,
       );
       return;
     }
@@ -24666,7 +24666,7 @@ function runAethercraft(
     if (missing.length > 0) {
       get().appendLog(
         'arbiter',
-        `"The Aether asks for what you don't carry," the Arbiter says. "Need: ${missing.join(', ')}."`,
+        `"The Aether asks for what you don't carry," the ${getNarratorName()} says. "Need: ${missing.join(', ')}."`,
       );
       return;
     }
@@ -24685,7 +24685,7 @@ function runAethercraft(
     if (!fuelItem) {
       get().appendLog(
         'arbiter',
-        `"The Aether reaches for you," the Arbiter says, "finds nothing to pull on, and returns to itself."`,
+        `"The Aether reaches for you," the ${getNarratorName()} says, "finds nothing to pull on, and returns to itself."`,
       );
       return;
     }
@@ -24848,7 +24848,7 @@ function runAethercraft(
     // input is captured as the golem's name (or "skip" to keep the type label).
     get().appendLog(
       'arbiter',
-      `The Arbiter studies the standing shape. "You gave it life. You might as well give it a name." (Type a name, or "skip".)`,
+      `The ${getNarratorName()} studies the standing shape. "You gave it life. You might as well give it a name." (Type a name, or "skip".)`,
     );
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;
@@ -24936,7 +24936,7 @@ function handleGolemCommand(
   if (!golem || golem.hp <= 0) {
     get().appendLog(
       'arbiter',
-      `"You have no golem to send," the Arbiter says. "Summon one first."`,
+      `"You have no golem to send," the ${getNarratorName()} says. "Summon one first."`,
     );
     return;
   }
@@ -25194,7 +25194,7 @@ function handleGolemDismiss(
   if (!player.golem) {
     get().appendLog(
       'arbiter',
-      `"Nothing to dismiss," the Arbiter says. "The Aether is quiet here."`,
+      `"Nothing to dismiss," the ${getNarratorName()} says. "The Aether is quiet here."`,
     );
     return;
   }
@@ -25337,7 +25337,7 @@ function completeRescueScenario(
   get().appendLog('dog_quest', scenario.victoryLine);
   get().appendLog(
     'dog_quest',
-    `The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The Arbiter steps in. "What kind of dog is that?"`,
+    `The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The ${getNarratorName()} steps in. "What kind of dog is that?"`,
   );
 }
 
@@ -25378,7 +25378,7 @@ function handleDogOnboardingInput(
     // OTA-177 — Arbiter prompts during dog onboarding go on the
     // dog_quest channel (purple) so each step of the rescue
     // sequence stays visually grouped.
-    get().appendLog('dog_quest', `The Arbiter nods. "What will you name them?"`);
+    get().appendLog('dog_quest', `The ${getNarratorName()} nods. "What will you name them?"`);
     return;
   }
   if (pending.stage === 'name') {
@@ -25390,7 +25390,7 @@ function handleDogOnboardingInput(
       },
     }));
     get().appendLog('world', `${name}. The name settles on the dog like a coat.`);
-    get().appendLog('dog_quest', `The Arbiter nods again. "Boy or girl?"`);
+    get().appendLog('dog_quest', `The ${getNarratorName()} nods again. "Boy or girl?"`);
     return;
   }
   // pending.stage === 'sex'
@@ -25420,7 +25420,7 @@ function handleDogOnboardingInput(
   // from confrontation through naming.
   get().appendLog(
     'dog_quest',
-    `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
+    `The ${getNarratorName()} studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
   );
 }
 
@@ -25439,7 +25439,7 @@ function handleDogCombat(
   const dog = player.dog;
   // Truly no companion to command (never had one, abandoned, or dead).
   if (!dog || dog.status === 'abandoned' || dog.status === 'dead') {
-    get().appendLog('arbiter', `"No dog at your side," the Arbiter says.`);
+    get().appendLog('arbiter', `"No dog at your side," the ${getNarratorName()} says.`);
     return;
   }
   // arb-fix — benched at the base of a climb: the dog is real and at your
@@ -25449,13 +25449,13 @@ function handleDogCombat(
   // that reads as "still down, let it rest" instead of the climb joke.)
   if (dog.status === 'waiting_at_base') {
     if (dog.hp <= 0) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
     } else {
       if (!get().worldMemory.dogClimbNoticeShown) {
         get().appendLog(
           'arbiter',
           applyDogPronouns(
-            `The Arbiter peers over the edge. "I don't think ${dog.name} has learned to climb. {Pronoun} {isOrAre} holding the ground below."`,
+            `The ${getNarratorName()} peers over the edge. "I don't think ${dog.name} has learned to climb. {Pronoun} {isOrAre} holding the ground below."`,
             dog.sex.pronoun,
           ),
         );
@@ -25465,7 +25465,7 @@ function handleDogCombat(
     return;
   }
   if (dog.hp <= 0) {
-    get().appendLog('arbiter', `The Arbiter shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
+    get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
     return;
   }
   if (scene.enemies.length === 0) {
@@ -25504,7 +25504,7 @@ function handleDogCombat(
     if (!told.includes(target.name)) {
       get().appendLog(
         'arbiter',
-        `"${dog.name}!" The Arbiter catches your dog mid-crouch. "${dog.name} can't jump that high — the ${target.name} stays out of reach. Bring it down with something that flies."`,
+        `"${dog.name}!" The ${getNarratorName()} catches your dog mid-crouch. "${dog.name} can't jump that high — the ${target.name} stays out of reach. Bring it down with something that flies."`,
       );
       set((s) => ({
         worldMemory: { ...s.worldMemory, dogAerialNoticeShown: [...told, target.name] },
@@ -25702,7 +25702,7 @@ function dogThresholdCheck(
         get().appendLog(
           'arbiter',
           applyDogPronouns(
-            `The Arbiter glances at ${dog.name}. "{Pronoun} {hasOrHave} ribs showing. Feed {object}, soon."`,
+            `The ${getNarratorName()} glances at ${dog.name}. "{Pronoun} {hasOrHave} ribs showing. Feed {object}, soon."`,
             dog.sex.pronoun,
           ),
         );
@@ -25748,11 +25748,11 @@ function applyItemToDog(
   if (!player) return false;
   const dog = player.dog;
   if (!dog) {
-    get().appendLog('arbiter', `"No dog at your side," the Arbiter says.`);
+    get().appendLog('arbiter', `"No dog at your side," the ${getNarratorName()} says.`);
     return false;
   }
   if (dog.status === 'abandoned' || dog.status === 'dead') {
-    get().appendLog('arbiter', `"That dog is gone," the Arbiter says.`);
+    get().appendLog('arbiter', `"That dog is gone," the ${getNarratorName()} says.`);
     return false;
   }
   // Resolve item from inventory by name (case-insensitive substring).
@@ -25764,7 +25764,7 @@ function applyItemToDog(
     ),
   );
   if (!item) {
-    get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
+    get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the ${getNarratorName()} says.`);
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -25845,7 +25845,7 @@ function applyItemToGolem(
   if (!player) return false;
   const golem = player.golem;
   if (!golem || golem.hp <= 0) {
-    get().appendLog('arbiter', `"You have no golem at your side to mend," the Arbiter says. "Summon one first."`);
+    get().appendLog('arbiter', `"You have no golem at your side to mend," the ${getNarratorName()} says. "Summon one first."`);
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -25857,7 +25857,7 @@ function applyItemToGolem(
     i.quantity > 0 && (i.name.toLowerCase() === lower || i.name.toLowerCase().includes(lower)),
   );
   if (!item) {
-    get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
+    get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the ${getNarratorName()} says.`);
     return false;
   }
   // arb170 — feeding an INERT GOLEM CORE grafts half a dead golem's training onto
@@ -25886,7 +25886,7 @@ function applyItemToGolem(
   const isSub = !isPart && isGolemSubstitutePart(golem.kind, item);
   if (!isPart && !isSub) {
     const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
-    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
+    get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
     return false;
   }
   if (golem.hp >= golem.hpMax) {
@@ -26044,7 +26044,7 @@ function tryPryBar(
     (i) => /\b(?:pry\s?bar|crowbar)\b/i.test(i.name) && i.quantity > 0,
   );
   if (!hasBar) {
-    get().appendLog('arbiter', `"You'd need a lever for that," the Arbiter says. "A pry bar. You're not carrying one."`);
+    get().appendLog('arbiter', `"You'd need a lever for that," the ${getNarratorName()} says. "A pry bar. You're not carrying one."`);
     return true;
   }
 
@@ -26310,7 +26310,7 @@ export function tickDogStatus(
       get().appendLog(
         'arbiter',
         applyDogPronouns(
-          `The Arbiter's voice drops. "${dog.name} is fading. Feed {pronoun} or work a poultice now — wait much longer and {pronoun} is gone forever."`,
+          `The ${getNarratorName()}'s voice drops. "${dog.name} is fading. Feed {pronoun} or work a poultice now — wait much longer and {pronoun} is gone forever."`,
           dog.sex.pronoun,
         ),
       );
@@ -26385,7 +26385,7 @@ export function tickDogStatus(
       set((s) => s.player?.dog
         ? { player: { ...s.player, dog: { ...s.player.dog, loyaltyBeatFloor: b.at } } }
         : s);
-      get().appendLog('arbiter', applyDogPronouns(`The Arbiter nods at the dog. "${b.line}"`, dog.sex.pronoun));
+      get().appendLog('arbiter', applyDogPronouns(`The ${getNarratorName()} nods at the dog. "${b.line}"`, dog.sex.pronoun));
       break; // one beat per tick
     }
   }
@@ -26517,7 +26517,7 @@ function tryFireRubblePuppy(
   );
   get().appendLog(
     'dog_quest',
-    `The Arbiter looks at the pup, then at you. "Some debts the world settles itself. What kind of dog is that?"`,
+    `The ${getNarratorName()} looks at the pup, then at you. "Some debts the world settles itself. What kind of dog is that?"`,
   );
   return true;
 }

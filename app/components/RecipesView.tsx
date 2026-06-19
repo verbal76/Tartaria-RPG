@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
@@ -165,10 +166,10 @@ export function RecipesView({
   }
 
   const arbiterLine = kindFilter === 'consumable'
-    ? 'The Arbiter eyes your pantry. "Food and tonics — what the body remembers."'
+    ? `The ${getNarratorName()} eyes your pantry. "Food and tonics — what the body remembers."`
     : kindFilter === 'non-consumable'
-      ? 'The Arbiter looks over your pack. "Every blueprint you carry. The lit ones you can build right now."'
-      : 'The Arbiter looks over your pack. "These are the things you can — or nearly can — set together."';
+      ? `The ${getNarratorName()} looks over your pack. "Every blueprint you carry. The lit ones you can build right now."`
+      : `The ${getNarratorName()} looks over your pack. "These are the things you can — or nearly can — set together."`;
 
   return (
     <>

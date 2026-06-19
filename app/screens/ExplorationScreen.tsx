@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
@@ -783,7 +784,7 @@ export function ExplorationScreen() {
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
-            <Text style={styles.streamingPrefix}>The Arbiter:</Text>
+            <Text style={styles.streamingPrefix}>The {getNarratorName()}:</Text>
             <Text style={styles.streamingText}>
               {partialArbiterText}
               <Text style={styles.streamingCursor}>▍</Text>
@@ -1468,8 +1469,8 @@ export function ExplorationScreen() {
           bank → Arbiter dialogue line lands in the feed. */}
       <BrandedModal
         visible={askArbiterOpen}
-        title="ASK THE ARBITER"
-        body="What is the Aether? Who are the Reclaimers? Tell me about the Berlin Betrayal. The Arbiter keeps what they remember of the buried world."
+        title={`ASK THE ${getNarratorName().toUpperCase()}`}
+        body={`What is the Aether? Who are the Reclaimers? Tell me about the Berlin Betrayal. The ${getNarratorName()} keeps what they remember of the buried world.`}
         textInput={{
           value: askArbiterInput,
           onChangeText: setAskArbiterInput,

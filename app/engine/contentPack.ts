@@ -35,7 +35,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
 
 /** Lore blocks, split the way the game uses them. */
 export const LORE_BLOCKS: LoreBlockDef[] = [
-  { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the LLM narrates in>", "setting": "...", "terms": ["..."] }' },
+  { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the LLM narrates in>", "tagline": "<shown under the title>", "setting": "...", "terms": ["..."] }' },
   { id: 'faction', label: 'Faction lore', hint: 'JSON: free-form faction lore (object or array)' },
   { id: 'race', label: 'Race lore', hint: 'JSON: free-form race lore (object or array)' },
 ];
@@ -44,12 +44,67 @@ export const LORE_BLOCKS: LoreBlockDef[] = [
  *  no World-lore override is loaded. Replace it via an uploaded World lore block. */
 export const DEFAULT_WORLD_TONE =
   'Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization.';
-/** Built-in default narrator persona — the first line of the main LLM prompt. */
-export const DEFAULT_NARRATOR_PERSONA = 'You are the Arbiter, the ancient narrator of Tartaria.';
+
+/** Default game title shown on the start screen (under the icon). Lore-agnostic;
+ *  renamable in the dev console. */
+export const DEFAULT_GAME_TITLE = 'Text RPG Engine';
+/** Default tagline under the title. Overridden manually in the dev console, or
+ *  auto-filled from an uploaded World-lore block's "tagline" field. */
+export const DEFAULT_GAME_TAGLINE = 'A procedural text RPG — your world, their story.';
+
+/** The default name for the narrator voice — the entity that talks to the player
+ *  and whose voice the TTS speaks. Lore-agnostic: "Narrator" by default, renamable
+ *  in the dev console to anything the author wants (e.g. "The Arbiter", "Eldridge",
+ *  "DM"). Player-facing UI and the LLM persona read getNarratorName() so a rename
+ *  flows everywhere at once. */
+export const DEFAULT_NARRATOR_NAME = 'Narrator';
 
 // --- active overrides (module-level; mirrored from the content-pack store) ------
 const tableOverrides: Partial<Record<ContentTableId, readonly unknown[]>> = {};
 const loreOverrides: Partial<Record<LoreBlockId, unknown>> = {};
+let narratorNameOverride: string | null = null;
+let gameTitleOverride: string | null = null;
+let gameTaglineOverride: string | null = null;
+
+/** Rename the game (or null to fall back to "Text RPG Engine"). */
+export function setGameTitleOverride(name: string | null): void {
+  const t = typeof name === 'string' ? name.trim() : '';
+  gameTitleOverride = t.length > 0 ? t : null;
+}
+export function hasGameTitleOverride(): boolean { return gameTitleOverride != null; }
+/** The game's display title — shown under the icon on the start screen. */
+export function getGameTitle(): string { return gameTitleOverride ?? DEFAULT_GAME_TITLE; }
+
+/** Set the tagline manually (or null to fall back to lore / the default). */
+export function setGameTaglineOverride(text: string | null): void {
+  const t = typeof text === 'string' ? text.trim() : '';
+  gameTaglineOverride = t.length > 0 ? t : null;
+}
+export function hasGameTaglineOverride(): boolean { return gameTaglineOverride != null; }
+/** The tagline under the title. Priority: manual override → the uploaded World
+ *  lore's "tagline" field (so it auto-updates once a world is described) →
+ *  the built-in default. */
+export function getGameTagline(): string {
+  if (gameTaglineOverride) return gameTaglineOverride;
+  const w = loreOverrides.world as { tagline?: unknown } | undefined;
+  if (w && typeof w.tagline === 'string' && w.tagline.trim().length > 0) return w.tagline.trim();
+  return DEFAULT_GAME_TAGLINE;
+}
+
+/** Rename the narrator (or pass null to fall back to "Narrator"). Mirrored from
+ *  the content-pack store; persisted so the name survives restarts. */
+export function setNarratorNameOverride(name: string | null): void {
+  const trimmed = typeof name === 'string' ? name.trim() : '';
+  narratorNameOverride = trimmed.length > 0 ? trimmed : null;
+}
+export function hasNarratorNameOverride(): boolean {
+  return narratorNameOverride != null;
+}
+/** The narrator's display name — "Narrator" by default, or whatever the author
+ *  set in the dev console. Read by player-facing UI and the LLM persona. */
+export function getNarratorName(): string {
+  return narratorNameOverride ?? DEFAULT_NARRATOR_NAME;
+}
 
 export function setTableOverride(id: ContentTableId, rows: readonly unknown[] | null): void {
   if (rows && rows.length > 0) tableOverrides[id] = rows;
@@ -85,16 +140,21 @@ export function getWorldTone(): string {
   return w && typeof w.tone === 'string' && w.tone.trim().length > 0 ? w.tone.trim() : DEFAULT_WORLD_TONE;
 }
 /** The narrator persona — first line of the main LLM narration prompt. Override
- *  with a World lore block ({ "narrator": "..." }); defaults to the Arbiter. */
+ *  with a World lore block ({ "narrator": "..." }); otherwise built from the
+ *  narrator's name so a rename flows into the narration the model generates. */
 export function getNarratorPersona(): string {
   const w = loreOverrides.world as { narrator?: unknown } | undefined;
-  return w && typeof w.narrator === 'string' && w.narrator.trim().length > 0 ? w.narrator.trim() : DEFAULT_NARRATOR_PERSONA;
+  if (w && typeof w.narrator === 'string' && w.narrator.trim().length > 0) return w.narrator.trim();
+  return `You are ${getNarratorName()}, the narrator of this world.`;
 }
 
 /** Reset everything back to the built-in Tartaria pack. */
 export function clearAllOverrides(): void {
   for (const k of Object.keys(tableOverrides)) delete tableOverrides[k as ContentTableId];
   for (const k of Object.keys(loreOverrides)) delete loreOverrides[k as LoreBlockId];
+  narratorNameOverride = null;
+  gameTitleOverride = null;
+  gameTaglineOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

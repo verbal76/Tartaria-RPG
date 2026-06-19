@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-639 — Arbiter→Narrator + game identity (JS-only OTA). "Arbiter"
+// renamed to a dynamic narrator name (default "Narrator") across the player-
+// facing voice/UI and the LLM persona; new dev-console blocks rename the
+// NARRATOR, the GAME name (default "Text RPG Engine", replaces "TARTARIA
+// REALMS" on the start screen), and the TAGLINE (auto-fills from World lore's
+// "tagline" field, or set manually). TTS frame/speaker detection tracks the
+// live name (legacy "Arbiter" still recognized).
 // engine_Dev-638 — engine chrome de-Tartaria'd (JS-only OTA). Title build
 // marker now reads "DEVELOPMENT BUILD" for the .engine package (was "GOLEM
 // BUILD"); character-slot labels say Player not Tartarian ("New Player",
@@ -15226,4 +15233,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-638';
+export const OTA_BUILD_ID = '2026-06-19-639';

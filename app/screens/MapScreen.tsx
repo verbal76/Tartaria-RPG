@@ -26,6 +26,7 @@
 //   eventually reach the canonically-east named location.
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import {
   View,
   Text,
@@ -837,7 +838,7 @@ export function MapScreen() {
                         } else {
                           appendLog(
                             'arbiter',
-                            `The Arbiter nods at the lead. "This one closes when the work is done out there — not at a counter."`,
+                            `The ${getNarratorName()} nods at the lead. "This one closes when the work is done out there — not at a counter."`,
                           );
                         }
                         return;
@@ -845,7 +846,7 @@ export function MapScreen() {
                       if (player.hubRoomId) {
                         appendLog(
                           'arbiter',
-                          `The Arbiter steadies you. "Leave the outpost first — tap LEAVE OUTPOST or type 'leave outpost'. Then we can set course for ${anchorName}."`,
+                          `The ${getNarratorName()} steadies you. "Leave the outpost first — tap LEAVE OUTPOST or type 'leave outpost'. Then we can set course for ${anchorName}."`,
                         );
                         return;
                       }
@@ -904,7 +905,7 @@ export function MapScreen() {
                   if (player.hubRoomId) {
                     appendLog(
                       'arbiter',
-                      `The Arbiter steadies you. "Leave the outpost first — tap LEAVE OUTPOST or type 'leave outpost'. Then we can set course for ${p.name}."`,
+                      `The ${getNarratorName()} steadies you. "Leave the outpost first — tap LEAVE OUTPOST or type 'leave outpost'. Then we can set course for ${p.name}."`,
                     );
                     return;
                   }

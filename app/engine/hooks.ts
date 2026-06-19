@@ -3,6 +3,8 @@
 // Hooks are drawn from canonical Tartaria Prima lore — half-buried spires,
 // Etheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
 
+import { getNarratorName } from './contentPack';
+
 export type HookKind =
   // Tier-1: atmospheric finds (the originals)
   | 'smoke'
@@ -275,7 +277,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   smoke: [
     {
       line: 'You creep toward the smoke. A small camp resolves out of the mist — a single firepit, a tarpaulin lean-to, a figure crouched over the coals.',
-      arbiterLine: '"Approach openly or not at all," the Arbiter says quietly. "This one is watching the road."',
+      arbiterLine: `"Approach openly or not at all," the ${getNarratorName()} says quietly. "This one is watching the road."`,
       effects: [],
       done: false,
       addNouns: ['figure', 'camp', 'firepit', 'fire', 'coals', 'person', 'stranger', 'lean-to'],
@@ -331,7 +333,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'Behind the column, a body. Reclaimer kit, cold for days. Their pack is mostly intact.',
-      arbiterLine: '"Tartaria takes them like this," the Arbiter says. "No drama. Just the next set of tracks that stop."',
+      arbiterLine: `"Tartaria takes them like this," the ${getNarratorName()} says. "No drama. Just the next set of tracks that stop."`,
       effects: [
         { type: 'grant_item', name: 'Trail Rations' },
         { type: 'grant_item', name: 'Aetheric Compass' },
@@ -349,7 +351,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'You press your palm to the glyph. A shock runs up your arm — not painful, just decisive. The stone has marked you.',
-      arbiterLine: '"That is older than the Mud Monarchs," the Arbiter murmurs. "It will know you again."',
+      arbiterLine: `"That is older than the Mud Monarchs," the ${getNarratorName()} murmurs. "It will know you again."`,
       effects: [
         { type: 'damage', amount: 2, cause: 'the rune\'s recognition' },
         { type: 'rep_change', factionId: 'true_tartarians', amount: 2 },
@@ -382,7 +384,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'Set into the back wall, behind a curtain of dried mud, you find a small cache. Whoever told you of this place was telling the truth.',
-      arbiterLine: '"This is what they sell information for," the Arbiter says.',
+      arbiterLine: `"This is what they sell information for," the ${getNarratorName()} says.`,
       effects: [
         { type: 'grant_item', name: 'Aetheric Shard' },
         { type: 'grant_item', name: 'Aether Crystal' },
@@ -400,7 +402,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'You turn the pendant over. Whoever wore it last bled out clutching it — a faint rust-brown line still runs along the inside of the chain.',
-      arbiterLine: '"That sigil belongs to someone," the Arbiter says. "Someone who is going to want it back."',
+      arbiterLine: `"That sigil belongs to someone," the ${getNarratorName()} says. "Someone who is going to want it back."`,
       effects: [{ type: 'memo', text: 'A bloodstained pendant marks an old debt you have not yet collected.' }],
       done: true,
     },
@@ -444,7 +446,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'A shape unfolds itself out of the haze — something the size of a person, made of nothing the eye can hold. It moves toward you.',
-      arbiterLine: '"This is what comes of pulling at threads," the Arbiter says. "Do not pull lightly."',
+      arbiterLine: `"This is what comes of pulling at threads," the ${getNarratorName()} says. "Do not pull lightly."`,
       effects: [{ type: 'spawn_enemy_tag', tag: 'Aetheric Mutation' }],
       done: true,
     },
@@ -458,7 +460,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'You haul yourself through the window. Inside: a hall once-rich, now stripped, the Aetheric grid in the walls still warm to the touch.',
-      arbiterLine: '"This was a noble house," the Arbiter says. "Mud Monarch stock. Take what is here before its owners remember to come back."',
+      arbiterLine: `"This was a noble house," the ${getNarratorName()} says. "Mud Monarch stock. Take what is here before its owners remember to come back."`,
       effects: [],
       done: false,
       nextChain: { kind: 'sealed_vault_door', chainId: 'monarch_spire_vault' },
@@ -480,7 +482,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'A bolt strikes a few paces from you — the Aetherstone in the soil holds the charge, and a hand-sized shard of stormglass crystallises around the impact.',
-      arbiterLine: '"That does not happen for everyone," the Arbiter says.',
+      arbiterLine: `"That does not happen for everyone," the ${getNarratorName()} says.`,
       effects: [
         { type: 'damage', amount: 3, cause: 'an Etheric backlash' },
         { type: 'grant_item', name: 'Energy Fragment' },
@@ -514,7 +516,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'You chip the satchel free without disturbing the body. Inside: a sealed scroll case and a small purse of pre-flood coin.',
-      arbiterLine: '"Treat them like the dead," the Arbiter says. "Not the museum piece."',
+      arbiterLine: `"Treat them like the dead," the ${getNarratorName()} says. "Not the museum piece."`,
       effects: [
         { type: 'grant_tc', amount: 30 },
         { type: 'grant_item', name: 'Aether Residue' },
@@ -547,7 +549,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'The Golem turns toward your scent. It has decided.',
-      arbiterLine: '"Aether Golems do not negotiate," the Arbiter says.',
+      arbiterLine: `"Aether Golems do not negotiate," the ${getNarratorName()} says.`,
       effects: [{ type: 'spawn_enemy_tag', tag: 'Construct' }],
       done: true,
     },
@@ -571,7 +573,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       // canonical arbiter narration, so the player has a concrete
       // name + objective to chase rather than poetic placeholder.
       line: 'Hours pass in what felt like a step — and a single clear thought lands in your head that wasn\'t there before. A name and a place. The eddy paid in directions.',
-      arbiterLine: '"The Aetheric eddies sometimes pay in knowledge instead of coin," the Arbiter says. "Check your contracts board — the eddy added one."',
+      arbiterLine: `"The Aetheric eddies sometimes pay in knowledge instead of coin," the ${getNarratorName()} says. "Check your contracts board — the eddy added one."`,
       effects: [
         { type: 'advance_time', hours: 6 },
         { type: 'grant_random_quest_hook', pool: 'any' },
@@ -624,7 +626,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   black_cloak: [
     {
       line: 'You double back through a fold in the ground. The Black Cloak passes you, scanning the path you should have been on, and does not see you.',
-      arbiterLine: '"Mud Monarch enforcement," the Arbiter says quietly. "Do not let them see what you carry."',
+      arbiterLine: `"Mud Monarch enforcement," the ${getNarratorName()} says quietly. "Do not let them see what you carry."`,
       effects: [],
       done: false,
     },
@@ -647,7 +649,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'A single object sits where the print is deepest — a carved stone token, mark of a watching elder. Lore says a Giant leaves these for the few they decide to remember.',
-      arbiterLine: '"Sasquatch, Yeti, Bigfoot — every age gives them a different name," the Arbiter says. "They are watching you. Try to be worth it."',
+      arbiterLine: `"Sasquatch, Yeti, Bigfoot — every age gives them a different name," the ${getNarratorName()} says. "They are watching you. Try to be worth it."`,
       effects: [
         { type: 'grant_item', name: 'Tartarian Stoneband' },
         { type: 'memo', text: 'A Tartarian Giant left you a token. You are being watched.' },
@@ -663,7 +665,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'A bowl of mud-stew, still warm. A folded cot. A sigil scratched into the doorway — passage granted. You take only what is offered, and leave.',
-      arbiterLine: '"You showed restraint," the Arbiter says. "They will know."',
+      arbiterLine: `"You showed restraint," the ${getNarratorName()} says. "They will know."`,
       effects: [
         { type: 'grant_item', name: 'Trail Rations' },
         { type: 'grant_item', name: 'Mud Essence' },
@@ -692,7 +694,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   submerged_steeple: [
     {
       line: 'You wade out to the steeple. The window-slits at the top open onto a flooded nave — Aetherstone shimmer in the water below.',
-      arbiterLine: '"Explorers have gone in," the Arbiter says, "and the water keeps them."',
+      arbiterLine: `"Explorers have gone in," the ${getNarratorName()} says, "and the water keeps them."`,
       effects: [],
       done: false,
     },
@@ -731,7 +733,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'You touch the node. It accepts you — or doesn\'t see you as a threat, which here is close enough. A small charge runs through your pack: every Aetheric thing you carry is faintly steadier now.',
-      arbiterLine: '"That is older than every faction," the Arbiter says. "It does not have politics."',
+      arbiterLine: `"That is older than every faction," the ${getNarratorName()} says. "It does not have politics."`,
       effects: [
         { type: 'grant_item', name: 'Aetheric Dust' },
         { type: 'heal', amount: 5 },
@@ -766,7 +768,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'You take the satchel — they would have wanted a scholar to have it. Inside: a research scroll, a small purse, and a runecaster casing.',
-      arbiterLine: '"The Order will know you took it from one of theirs," the Arbiter says. "They will count that in your favour."',
+      arbiterLine: `"The Order will know you took it from one of theirs," the ${getNarratorName()} says. "They will count that in your favour."`,
       effects: [
         { type: 'grant_tc', amount: 40 },
         { type: 'grant_item', name: 'Aetheric Shard' },
@@ -780,7 +782,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   // modest interior payoff (a stash, a memo, a coin or scrap, a small heal).
   loose_floorboard: [
     { line: 'You work the board up. Beneath it, a shallow void packed with oilcloth — a hidden stash, undisturbed since whoever stowed it stopped coming back.', effects: [], done: false, addNouns: ['stash', 'void', 'oilcloth', 'cache', 'bundle'] },
-    { line: 'Inside the oilcloth: a fistful of old coin and a coil of salvageable wire.', arbiterLine: '"The buried world keeps its secrets under the floor as often as under the mud," the Arbiter says.', effects: [{ type: 'grant_tc', amount: 22 }, { type: 'grant_item', name: 'Scrap Metal' }], done: true },
+    { line: 'Inside the oilcloth: a fistful of old coin and a coil of salvageable wire.', arbiterLine: `"The buried world keeps its secrets under the floor as often as under the mud," the ${getNarratorName()} says.`, effects: [{ type: 'grant_tc', amount: 22 }, { type: 'grant_item', name: 'Scrap Metal' }], done: true },
   ],
   hidden_compartment: [
     { line: 'You press the panel and it gives with a soft click, swinging back on a hidden hinge.', effects: [], done: false, addNouns: ['hinge', 'cavity', 'recess', 'hollow'] },
@@ -788,7 +790,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   watching_portrait: [
     { line: 'You lift the portrait off its hook. The wall behind it is bare but for a single line of Tartarian script, scratched into the plaster by hand.', effects: [], done: false, addNouns: ['script', 'plaster', 'wall', 'writing'] },
-    { line: 'The script is a name and a warning: do not answer if it knocks from inside. You copy it into memory — it may matter later.', arbiterLine: '"Someone was afraid of this house," the Arbiter notes. "Or of what they kept in it."', effects: [{ type: 'memo', text: 'A scratched warning behind a portrait: "do not answer if it knocks from inside."' }], done: true },
+    { line: 'The script is a name and a warning: do not answer if it knocks from inside. You copy it into memory — it may matter later.', arbiterLine: `"Someone was afraid of this house," the ${getNarratorName()} notes. "Or of what they kept in it."`, effects: [{ type: 'memo', text: 'A scratched warning behind a portrait: "do not answer if it knocks from inside."' }], done: true },
   ],
   bricked_doorway: [
     { line: 'You knock a few loose bricks free. The mortar is newer than the wall — and behind it, cold air moves. The sealed room still breathes.', effects: [], done: false, addNouns: ['bricks', 'gap', 'hole', 'opening', 'breach'] },
@@ -800,7 +802,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   open_ledger: [
     { line: 'You read down the ledger. The struck-through names share a column heading you recognise — a debt-list, and the unstruck names are still owed.', effects: [], done: false, addNouns: ['column', 'entry', 'debt', 'list'] },
-    { line: 'The last wet entry names a place you can find. You commit it to memory; a lead like this pays out later.', arbiterLine: '"Names and numbers," the Arbiter murmurs. "The most dangerous lore there is."', effects: [{ type: 'memo', text: 'A debt-ledger named an unsettled account — a lead worth following.' }], done: true },
+    { line: 'The last wet entry names a place you can find. You commit it to memory; a lead like this pays out later.', arbiterLine: `"Names and numbers," the ${getNarratorName()} murmurs. "The most dangerous lore there is."`, effects: [{ type: 'memo', text: 'A debt-ledger named an unsettled account — a lead worth following.' }], done: true },
   ],
   childs_drawing: [
     { line: 'You take the drawing down. On the back, in the same crayon, a single shaky word: HOME — with an arrow, pointing down.', effects: [], done: false, addNouns: ['arrow', 'word', 'back', 'crayon'] },
@@ -816,7 +818,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   warm_chair: [
     { line: 'You set a hand on the seat. Still warm — but the room is empty, the dust unbroken. Whatever rose from this chair left no tracks at all.', effects: [], done: false, addNouns: ['cushion', 'seat', 'armrest'] },
-    { line: 'Down the side of the cushion your fingers find what was left behind — a few coins, still warm from a body that is no longer here. You take them and do not look back.', arbiterLine: '"Don\'t wait for the host," the Arbiter says. "This one doesn\'t keep to the hours of the living."', effects: [{ type: 'grant_tc', amount: 18 }], done: true },
+    { line: 'Down the side of the cushion your fingers find what was left behind — a few coins, still warm from a body that is no longer here. You take them and do not look back.', arbiterLine: `"Don't wait for the host," the ${getNarratorName()} says. "This one doesn't keep to the hours of the living."`, effects: [{ type: 'grant_tc', amount: 18 }], done: true },
   ],
   crooked_shelf: [
     { line: 'You pull at the mismatched shelf. It swings outward on a concealed pivot — behind it, a crawlspace, barely wide enough, breathing cold.', effects: [], done: false, addNouns: ['crawlspace', 'pivot', 'passage', 'opening'] },
@@ -836,7 +838,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   barefoot_prints: [
     { line: 'You follow the prints to where they stop. The dust there is pressed flat in a circle — something stood here a long while, then was simply gone.', effects: [], done: false, addNouns: ['circle', 'mark', 'dust', 'spot'] },
-    { line: 'In the centre of the circle, set down as if placed, lies a small coin-purse. You take it. The house holds its breath; you let it.', arbiterLine: '"Take it and go," the Arbiter says, very quietly. "Some debts you do not want to be present to collect."', effects: [{ type: 'grant_tc', amount: 20 }], done: true },
+    { line: 'In the centre of the circle, set down as if placed, lies a small coin-purse. You take it. The house holds its breath; you let it.', arbiterLine: `"Take it and go," the ${getNarratorName()} says, very quietly. "Some debts you do not want to be present to collect."`, effects: [{ type: 'grant_tc', amount: 20 }], done: true },
   ],
 };
 

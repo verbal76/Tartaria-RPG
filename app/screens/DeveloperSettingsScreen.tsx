@@ -14,7 +14,15 @@ import {
   LORE_BLOCKS,
   tableOverrideCount,
   hasLoreOverride,
+  hasNarratorNameOverride,
+  hasGameTitleOverride,
+  hasGameTaglineOverride,
   getWorldTone,
+  getNarratorName,
+  getGameTitle,
+  getGameTagline,
+  DEFAULT_NARRATOR_NAME,
+  DEFAULT_GAME_TITLE,
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
@@ -23,6 +31,126 @@ import { useCustomMusicStore } from '../state/customMusicStore';
 import { MAX_TRACKS_PER_CATEGORY, RECOMMENDED_AUDIO_SPECS, type MusicCategory } from '../audio/customMusic';
 
 type Status = { kind: 'ok' | 'err'; msg: string } | null;
+
+/** Generic single-line rename card (narrator name, game title, tagline). */
+function RenameBox({
+  title, hint, defaultLabel, active, isCustom, initial, placeholder, multiline, autoCapitalize, maxLength, onSave,
+}: {
+  title: string;
+  hint: string;
+  /** Shown in the badge + RESET copy as the fallback name. */
+  defaultLabel: string;
+  /** The currently-resolved value (after fallbacks). */
+  active: string;
+  isCustom: boolean;
+  /** The raw stored override text to seed the input. */
+  initial: string;
+  placeholder: string;
+  multiline?: boolean;
+  autoCapitalize?: 'none' | 'words' | 'sentences';
+  maxLength?: number;
+  onSave: (text: string) => void;
+}) {
+  const [text, setText] = useState(initial);
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={isCustom ? styles.badgeOn : styles.badgeOff}>
+          {isCustom ? '● custom' : '○ default'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <Text style={styles.toneLine}>Currently: “{active}”</Text>
+      <TextInput
+        style={[styles.input, !multiline && { minHeight: 0 }]}
+        value={text}
+        onChangeText={setText}
+        placeholder={placeholder}
+        placeholderTextColor="#5c5446"
+        autoCapitalize={autoCapitalize ?? 'sentences'}
+        autoCorrect={false}
+        maxLength={maxLength ?? 60}
+        multiline={multiline}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            onSave(text);
+            const finalName = text.trim().length > 0 ? text.trim() : defaultLabel;
+            setStatus({ kind: 'ok', msg: `Saved — now “${finalName}”.` });
+          }}
+        >
+          <Text style={styles.loadBtnText}>SAVE</Text>
+        </TouchableOpacity>
+        {isCustom && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { onSave(''); setText(''); setStatus({ kind: 'ok', msg: 'Reset to default.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+function GameIdentitySection() {
+  const gameTitle = useContentPackStore((s) => s.gameTitle);
+  const gameTagline = useContentPackStore((s) => s.gameTagline);
+  const narratorName = useContentPackStore((s) => s.narratorName);
+  const setGameTitle = useContentPackStore((s) => s.setGameTitle);
+  const setGameTagline = useContentPackStore((s) => s.setGameTagline);
+  const setNarratorName = useContentPackStore((s) => s.setNarratorName);
+  return (
+    <>
+      <Text style={styles.sectionLabel}>GAME</Text>
+      <RenameBox
+        title="Game name"
+        hint="Shown big under the icon on the start screen. Leave blank for the default."
+        defaultLabel={DEFAULT_GAME_TITLE}
+        active={getGameTitle()}
+        isCustom={hasGameTitleOverride()}
+        initial={gameTitle}
+        placeholder={DEFAULT_GAME_TITLE}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setGameTitle}
+      />
+      <RenameBox
+        title="Tagline"
+        hint="The line under the title. Auto-fills from your World lore’s “tagline” field once you upload one; set it here to override."
+        defaultLabel="the default"
+        active={getGameTagline()}
+        isCustom={hasGameTaglineOverride()}
+        initial={gameTagline}
+        placeholder={getGameTagline()}
+        autoCapitalize="sentences"
+        maxLength={120}
+        multiline
+        onSave={setGameTagline}
+      />
+
+      <Text style={styles.sectionLabel}>NARRATOR</Text>
+      <RenameBox
+        title="Narrator name"
+        hint="The voice that narrates the game — renamed everywhere the player sees or hears it, and in how the storyteller refers to itself."
+        defaultLabel={DEFAULT_NARRATOR_NAME}
+        active={getNarratorName()}
+        isCustom={hasNarratorNameOverride()}
+        initial={narratorName}
+        placeholder={DEFAULT_NARRATOR_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setNarratorName}
+      />
+    </>
+  );
+}
 
 function MusicBox({ category, label, hint }: { category: MusicCategory; label: string; hint: string }) {
   const tracks = useCustomMusicStore((s) => (category === 'battle' ? s.battle : s.ambient));
@@ -225,6 +353,8 @@ export function DeveloperSettingsScreen() {
           then LOAD to override at runtime — reskin the engine with no code changes. Empty boxes
           use the built-in defaults.
         </Text>
+
+        <GameIdentitySection />
 
         <Text style={styles.sectionLabel}>LORE</Text>
         {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}

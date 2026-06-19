@@ -5,6 +5,7 @@
 // its sources so the player can audit any surprising value.
 
 import React, { useState } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import racesData from '../data/races/races.json';
@@ -557,7 +558,7 @@ export function CharacterScreen() {
             triggers yet. Future OTAs wire the requirement strings to
             runtime trackers (relic counts, sentinel kills, etc.) and
             populate player.earnedTitles. */}
-        {sectionHeader('titles', 'ARBITER ASSIGNED TITLES')}
+        {sectionHeader('titles', `${getNarratorName().toUpperCase()} ASSIGNED TITLES`)}
         {!collapsed.titles && (
         <View style={styles.card}>
           {(() => {
@@ -574,7 +575,7 @@ export function CharacterScreen() {
               <>
                 <Text style={styles.titlesSummary}>
                   {earnedCount === 0
-                    ? 'No titles earned yet. The Arbiter watches your deeds.'
+                    ? `No titles earned yet. The ${getNarratorName()} watches your deeds.`
                     : `${earnedCount} of ${allTitles.length} titles earned.`}
                 </Text>
                 {sorted.map((t) => {

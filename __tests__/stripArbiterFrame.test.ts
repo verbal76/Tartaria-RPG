@@ -54,9 +54,9 @@ describe('stripArbiterFrame', () => {
 });
 
 describe('detectArbiterSpeaker', () => {
-  it('returns "the Arbiter" for arbiter framing', () => {
-    expect(detectArbiterSpeaker('The Arbiter inclines their head. "X."')).toBe('the Arbiter');
-    expect(detectArbiterSpeaker('"X," the Arbiter notes.')).toBe('the Arbiter');
+  it('returns the narrator name for narrator framing (legacy "Arbiter" still recognized)', () => {
+    expect(detectArbiterSpeaker('The Arbiter inclines their head. "X."')).toBe('the Narrator');
+    expect(detectArbiterSpeaker('"X," the Arbiter notes.')).toBe('the Narrator');
   });
 
   it('detects a vendor speaker from leading-name framing', () => {
@@ -73,9 +73,9 @@ describe('detectArbiterSpeaker', () => {
       .toBe('Tarek');
   });
 
-  it('falls back to "the Arbiter" when no framing is detectable', () => {
-    expect(detectArbiterSpeaker('Some plain narration text.')).toBe('the Arbiter');
-    expect(detectArbiterSpeaker('')).toBe('the Arbiter');
+  it('falls back to the narrator name when no framing is detectable', () => {
+    expect(detectArbiterSpeaker('Some plain narration text.')).toBe('the Narrator');
+    expect(detectArbiterSpeaker('')).toBe('the Narrator');
   });
 
   it('handles multi-word NPC names up to 3 tokens', () => {

@@ -12,6 +12,7 @@
 // arb43 — pairs with the Qwen persona fallback + introspection bug-fix in
 // gameStore's `case 'ask'`. All three data files are top-level ARRAYS.
 
+import { getNarratorName } from './contentPack';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -101,9 +102,9 @@ function joinList(items: string[]): string {
 function open(q: string, real: number, nounPlural: string): string {
   const asked = assertedCount(q);
   if (asked !== null && asked !== real) {
-    return `The Arbiter's eyes narrow. "There are not ${numberWord(asked)} ${nounPlural}. There are ${numberWord(real)}. `;
+    return `The ${getNarratorName()}'s eyes narrow. "There are not ${numberWord(asked)} ${nounPlural}. There are ${numberWord(real)}. `;
   }
-  return `The Arbiter answers, flat and certain. "`;
+  return `The ${getNarratorName()} answers, flat and certain. "`;
 }
 
 /** Free-text → a deterministic, data-grounded Arbiter answer, or null. */
@@ -123,15 +124,15 @@ export function answerWorldKnowledge(query: string, player: KnowledgePlayer): st
       const dist = typeof tiles === 'number' && tiles > 0
         ? (tiles <= 1 ? ' A day out, no more.' : ` Some ${tiles} days of road remain.`)
         : '';
-      return `The Arbiter looks to the horizon. "You are bound for ${name}.${dist} Keep your legs under you."`;
+      return `The ${getNarratorName()} looks to the horizon. "You are bound for ${name}.${dist} Keep your legs under you."`;
     }
-    return `The Arbiter shrugs. "You are bound nowhere. You hold where you stand — name a place and we walk."`;
+    return `The ${getNarratorName()} shrugs. "You are bound nowhere. You hold where you stand — name a place and we walk."`;
   }
 
   // 2) Current location — "where am I" (not a heading question).
   if (/\bwhere\s+(am\s+i|i\s+am)\b/.test(q) && !headingCue) {
     const here = locName(player.currentLocationId);
-    if (here) return `The Arbiter taps the ground. "You stand in ${here}."`;
+    if (here) return `The ${getNarratorName()} taps the ground. "You stand in ${here}."`;
   }
 
   const wantsList = /\b(list|name|all|every|each|how\s+many|which|what\s+are|who\s+are|count)\b/.test(q)
@@ -158,8 +159,8 @@ export function answerWorldKnowledge(query: string, player: KnowledgePlayer): st
     const total = VISITABLE_SITE_COUNT;
     const asked = assertedCount(q);
     const lead = (asked !== null && asked !== total)
-      ? `The Arbiter's eyes narrow. "Not ${numberWord(asked)}. There are ${numberWord(total)} places in the buried country worth your boots`
-      : `The Arbiter sweeps a hand at the dark. "There are ${numberWord(total)} places in the buried country worth your boots`;
+      ? `The ${getNarratorName()}'s eyes narrow. "Not ${numberWord(asked)}. There are ${numberWord(total)} places in the buried country worth your boots`
+      : `The ${getNarratorName()} sweeps a hand at the dark. "There are ${numberWord(total)} places in the buried country worth your boots`;
     const found = player.discoveredSiteCount;
     const tail = (typeof found === 'number' && found >= 0)
       ? ` — you have set foot in ${numberWord(found)}. The rest still wait."`

@@ -7,12 +7,13 @@ import {
   setTableOverride,
   getWorldTone,
   getNarratorPersona,
+  getNarratorName,
   setLoreOverride,
   clearAllOverrides,
   hasTableOverride,
   tableOverrideCount,
   DEFAULT_WORLD_TONE,
-  DEFAULT_NARRATOR_PERSONA,
+  DEFAULT_NARRATOR_NAME,
 } from '../app/engine/contentPack';
 
 describe('engine_Dev — content-pack registry', () => {
@@ -40,9 +41,10 @@ describe('engine_Dev — content-pack registry', () => {
     expect(resolveTable('weapons', builtin)).toBe(builtin);
   });
 
-  it('world tone + narrator default to Tartaria, and swap with a world-lore override', () => {
+  it('world tone defaults to Tartaria + narrator persona is built from the name; both swap with a world-lore override', () => {
     expect(getWorldTone()).toBe(DEFAULT_WORLD_TONE);
-    expect(getNarratorPersona()).toBe(DEFAULT_NARRATOR_PERSONA);
+    expect(getNarratorName()).toBe(DEFAULT_NARRATOR_NAME);
+    expect(getNarratorPersona()).toContain(DEFAULT_NARRATOR_NAME);
 
     setLoreOverride('world', {
       narrator: 'You are the Operator, a clipped voice on a 1943 naval radio.',
@@ -55,7 +57,7 @@ describe('engine_Dev — content-pack registry', () => {
   it('a world-lore block without narrator/tone keeps the defaults', () => {
     setLoreOverride('world', { setting: 'Philadelphia, 1943' });
     expect(getWorldTone()).toBe(DEFAULT_WORLD_TONE);
-    expect(getNarratorPersona()).toBe(DEFAULT_NARRATOR_PERSONA);
+    expect(getNarratorPersona()).toContain(DEFAULT_NARRATOR_NAME);
   });
 
   it('clearAllOverrides resets everything to built-in', () => {

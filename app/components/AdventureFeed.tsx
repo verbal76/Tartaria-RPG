@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
+import { getNarratorName } from '../engine/contentPack';
 
 interface Props {
   entries: GameLogEntry[];
@@ -58,7 +59,7 @@ const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug'])
 // is rendered as voiceless prose — colored, but without a SYSTEM /
 // WORLD / REWARD chip on top.
 function tagForChannel(channel: LogChannel): string | null {
-  if (channel === 'arbiter') return 'ARBITER';
+  if (channel === 'arbiter') return getNarratorName().toUpperCase();
   if (channel === 'feedback') return 'NOTE';
   // OTA-177 — DOG QUEST tag so the purple beats also carry a
   // chip-label header, matching how ARBITER / NOTE lines render.
