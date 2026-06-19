@@ -1168,6 +1168,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-18-632': 'Bitribium Vitals',
   '2026-06-18-633': 'Bitritrium Pulse',
   '2026-06-18-634': 'Bitriquadium Cadence',
+  '2026-06-18-635': 'Bitripentium Namesake',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

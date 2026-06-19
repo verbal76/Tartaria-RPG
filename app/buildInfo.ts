@@ -15202,4 +15202,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // idle musings throttled 45s → 90s to free the shared lock. Locked by nativeMlLockPriority.test (exclusivity / priority
 // order / no-wedge); existing TTS test green; tsc clean. JS-only → 290.
 // app/ai/nativeMlLock.ts, app/voice/PiperTTSManager.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-18-634';
+// OTA-635 (Bitripentium Namesake) — [housekeeping · playtester] name + voice polish. (1) NAME HYGIENE: the in-game name
+// prompt now sanitizes the typed name — letters (any script) + space / hyphen / apostrophe only, emoji/digits/symbols
+// stripped, whitespace collapsed, hard-capped at 24 chars — because the name is SPOKEN by Kokoro (no more emoji-salad
+// mispronunciations or "175 J's" read for half an hour). All-junk input re-prompts. (2) NAME SPOKEN MORE: arbiterAddress
+// names the player 0.34 → 0.6 of the time ("I want to hear the name more — it brings them in"). (3) WELCOME-BACK JUMPS THE
+// QUEUE: the named greeting carries meta.speakFront, threaded TTSController → TTSManager → PiperTTSManager, which clears the
+// queued voice backlog so "Welcome back, <name>" is heard immediately on entering the world (not 5 rounds late). Side
+// benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
+// already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
+// green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+export const OTA_BUILD_ID = '2026-06-18-635';
