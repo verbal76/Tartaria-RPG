@@ -15158,4 +15158,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // climbReadiness suite green; tsc clean. (Pre-existing, unrelated: aethercraftDispatch "summon golem" test is red on the
 // live branch — a harness artifact; bare 'summon golem' works in-app.) JS-only → 290.
 // app/components/InputBox.tsx, app/screens/CraftingScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-18-629';
+// OTA-630 (Bitrinilium Quench) — [perf+test] (1) FUSE took >1 min. fuseAtCrucible AWAITED the on-device Qwen synth with no
+// timeout; on slow phones a 200-token completion runs 30-55s (playtest: Crucible "took a long breath in" ~37s before the
+// INSTANT deterministic fallback ran). Now the Qwen synth is raced against FUSE_QWEN_TIMEOUT_MS (6s) — if it doesn't land,
+// forge deterministically NOW; the abandoned Qwen promise settles + is discarded in the background (it never rejects and
+// writes no cache, so no side effect). Fast phones still get LLM-flavored loot inside the window. (2) Repaired the stale
+// aethercraftDispatch "summon golem" test (the sweep): the mud-golem recipe changed (arb119: Mudstone → 2 Aether Mud + 2
+// Mud Fragment + 1 Aether Crystal), so the test stocked the wrong fuel and the gate refused before the discipline header
+// logged. Stocked the correct recipe + fixed the consume deltas — dispatch itself was always fine (confirms the OTA-629
+// golem popup works). All 7 aethercraftDispatch + 59 fuse-suite tests green; tsc clean. JS-only → 290.
+// app/state/gameStore.ts, __tests__/aethercraftDispatch.test.ts.
+export const OTA_BUILD_ID = '2026-06-18-630';
