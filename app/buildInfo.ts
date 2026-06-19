@@ -15147,4 +15147,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // colour + climb-modal explanation already conveys; a nag would be wrong). Frayed-but-not-broken ropes get the same
 // red/no-buzz as fully broken (engine refuses them identically, OTA-625). Locked by climbReadiness.test (10 cases). tsc
 // clean. JS-only → 290. app/engine/climbReadiness.ts, app/screens/ExplorationScreen.tsx, app/components/InputBox.tsx.
-export const OTA_BUILD_ID = '2026-06-18-628';
+// OTA-629 (Bibiennium Tether) — [polish · playtester] two things. (1) CLIMB nudge: tapping a RED (blocked) CLIMB now drops
+// a one-line Arbiter nudge saying WHY (no rope / frayed rope / empty stamina) instead of opening a dead-end modal; the
+// empty-tank case still buzzes (40ms) on top of the nudge, gear problems are nudge-only. Arbiter dedup keeps repeat taps
+// from spamming. (2) Golem summon: tapping a golem went card→copy "summon golem" into the input→hit ACT. The per-golem
+// VARIANT rows already opened a confirm (OTA-571), but the big SUMMON CARD tap still did the copy. Now BOTH the card tap
+// (defaults to the first golem you can afford, else Mud) and each variant row open the same "Summon a golem?" confirm →
+// Summon dispatches and jumps straight to exploration where the d20+INT roll plays out. No clipboard/input step anywhere
+// in the golem flow; shared buildGolemConfirm() builds the popup payload; misleading 'tap → "phrase"' hints corrected.
+// climbReadiness suite green; tsc clean. (Pre-existing, unrelated: aethercraftDispatch "summon golem" test is red on the
+// live branch — a harness artifact; bare 'summon golem' works in-app.) JS-only → 290.
+// app/components/InputBox.tsx, app/screens/CraftingScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-18-629';
