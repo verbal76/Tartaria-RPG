@@ -1314,6 +1314,20 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // After upgrade, re-run stampDurability so newly-relic items pick up
   // baseDurability they didn't qualify for under their old kind.
   const inventory = (p.inventory ?? []).map((i) => {
+    // OTA-631 — settle any fused item still "materializing" when the app was last
+    // killed. After a process restart the background namer is gone and the fusion
+    // inputs are already consumed, so settle to the stashed deterministic name
+    // (formingName) rather than leaving a weapon stuck as "Cooling Crucible-Work".
+    if (i.materializing) {
+      i = {
+        ...i,
+        name: i.formingName ?? i.name,
+        description: i.formingDesc ?? i.description,
+        materializing: undefined,
+        formingName: undefined,
+        formingDesc: undefined,
+      };
+    }
     let item = stampDurability(i);
     const lookup = lookupCraftedItem(item.name);
     if (lookup.kind !== 'misc' && item.kind !== lookup.kind) {
@@ -2529,6 +2543,11 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
+  /** OTA-631 — settle a materializing fused item with its final name +
+   *  description (from the background Qwen namer, or the deterministic fallback)
+   *  and raise the "your forging has formed" reveal. No-op if the item was
+   *  scrapped/sold before it formed. */
+  settleFusion: (itemId: string, name: string, description: string) => void;
   /** OTA-211 — infuse Aether Dust into a food and eat it. Opens the
    *  AetherStatPickerModal so the player chooses which stat gets the
    *  +3 buff for 5 real-world minutes. Consumes 1 Aether Dust and 1
@@ -2672,11 +2691,13 @@ interface GameStore {
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
 
-// OTA-630 — max time the Crucible waits on a Qwen-synthesized fusion before
-// forging deterministically instead. Keeps the fuse snappy on slow devices
-// (the on-device LLM can take 30-55s) while still giving fast devices a window
-// to produce LLM-flavored loot. The deterministic fallback is always serviceable.
-const FUSE_QWEN_TIMEOUT_MS = 6000;
+// OTA-631 — the Crucible no longer BLOCKS on Qwen at all: stats are forged
+// deterministically and the item is minted instantly, then a BACKGROUND Qwen call
+// names it ("the Aether settling its name") and a reveal pops when it forms. This
+// is the safety cap on that background namer — if the on-device LLM truly hangs
+// (vs. just being slow), settle to the deterministic name after it so a forging
+// can never be stuck nameless. Generous, because the player isn't waiting on it.
+const FUSE_NAME_TIMEOUT_MS = 120000;
 
 // OTA-397 — save-size telemetry. persist() logs the per-part byte breakdown on
 // failure, on a trim, AND every Nth persist as a heartbeat, so the slot blob's
@@ -19881,140 +19902,127 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // synthesized but always serviceable.
     get().appendLog(
       'world',
-      `You set your reserved pieces on the three pedestals. The Crucible takes a long breath in.`,
+      `You set your reserved pieces on the three pedestals. The Crucible takes them in.`,
     );
-    let result;
-    if (qwen.isReady()) {
-      try {
-        // OTA-630 — cap the Qwen synth wait. On slow devices the on-device LLM
-        // can take 30-55s for a 200-token completion (playtest: a fuse "took a
-        // long breath in" for ~37s before the INSTANT deterministic fallback
-        // ran — the Crucible felt like it hung for over a minute). Race the Qwen
-        // call against a short timeout; if it doesn't land in time, forge
-        // deterministically NOW. The Qwen promise is left to settle and be
-        // discarded in the background — synthesizeFusionViaQwen never rejects
-        // (it try/catches to null) and doesn't write any cache, so there's no
-        // side effect from abandoning it.
-        result = await Promise.race([
-          fusion.synthesizeFusionViaQwen(gate.inputs, gate.tagProfile, qwen),
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), FUSE_QWEN_TIMEOUT_MS)),
-        ]);
-        if (!result) {
-          get().appendLog(
-            'debug',
-            `fuseAtCrucible: Qwen synth didn't land within ${FUSE_QWEN_TIMEOUT_MS}ms (or returned null); forging deterministically.`,
-          );
-        }
-      } catch (err) {
-        get().appendLog('debug', `fuseAtCrucible Qwen path threw: ${String(err)}`);
-        result = null;
-      }
-    } else {
-      get().appendLog(
-        'debug',
-        `fuseAtCrucible: Qwen not ready (status=${qwen.getStatus?.() ?? 'unknown'}); falling back to deterministic synth.`,
-      );
-      // OTA-222 — kick a re-init when Qwen is dormant (Android killed
-      // the LlamaContext, status still says 'ready' but the runtime
-      // is gone). Fire-and-forget; the deterministic synth covers
-      // THIS fuse, and the kick warms Qwen back up for the next
-      // interaction so the player gets LLM-quality narration on the
-      // next Arbiter beat / fusion / etc.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const q = qwen as any;
-      if (typeof q.isDormant === 'function' && q.isDormant() && typeof q.forceReinitialize === 'function') {
-        get().appendLog(
-          'debug',
-          `fuseAtCrucible: Qwen runtime is dormant — kicking forceReinitialize() in background.`,
-        );
-        void q.forceReinitialize().catch((err: unknown) => {
-          get().appendLog('debug', `Qwen reinit threw: ${String(err)}`);
-        });
-      }
-    }
-    if (!result) {
-      // Qwen unavailable or rejected — fall back to the deterministic
-      // synthesizer. Always returns a valid clamped row from the
-      // input tag profile.
-      result = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
-      get().appendLog(
-        'debug',
-        `fuseAtCrucible: deterministic synth produced ${result.name}.`,
-      );
-    }
-    if (!result) {
-      // Fail-closed — the permit IS spent. Don't let the player keep
-      // re-rolling until they get a result they like.
-      set((s) => s.player
-        ? { player: { ...s.player, fusionPending: false } }
-        : s);
-      get().appendLog(
-        'arbiter',
-        `The Crucible's resonance scatters mid-pull. Whatever was forming falls apart. "Crucibles," the Arbiter says quietly, "are not patient."`,
-      );
-      void get().persist();
-      return;
-    }
+    // OTA-631 — DETERMINISTIC-FIRST forge. Stats are decided and the weapon is
+    // minted INSTANTLY — no blocking on Qwen (that await was the ~37s "long breath
+    // in" on slow phones). The Aether "still settling its name" is now lore: the
+    // item enters the pack as a placeholder-named "materializing" weapon, a
+    // BACKGROUND Qwen call names + describes it, and a reveal pops when it forms.
+    // If Qwen is slow / dormant / unavailable, the deterministic name settles
+    // instead. The loot is mechanically identical either way — Qwen only adds
+    // bespoke flavor, so nothing of value is lost when it doesn't land.
+    const det = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
+
     const livePlayer = get().player;
     if (!livePlayer) return;
     const seed = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    // arb105 — optional faction catalyst. If the player reserved a
-    // faction-gear item alongside their 3 scraps, resolve its faction
-    // (the factionId is one of its tags) and theme the output as a unique
-    // faction item; the catalyst is consumed by applyFusion.
+    // arb105 — optional faction catalyst. If the player reserved a faction-gear
+    // item alongside their scraps, theme the output as a unique faction item; the
+    // catalyst is consumed by applyFusion. arb107 — catalyst bumps rarity to
+    // Legendary at 4+ material tags, else Rare.
     const catalyst = fusion.findFactionCatalyst(livePlayer.inventory, equippedIdSet) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
       const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
       if (fac) {
-        // arb107 — the catalyst bumps rarity ONE tier above the inputs'
-        // natural fusion rarity (capped at Legendary), instead of an
-        // unconditional Legendary. Natural fusion is Rare below 5 material
-        // tags and Legendary at 5+; one tier up means a 4+-tag profile
-        // reaches Legendary while the minimum 3-tag set stays Rare. This
-        // keeps the faction item special without making top-tier gear a
-        // ~50-TC firehose.
         const facRarity: 'Rare' | 'Legendary' = gate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
       }
     }
+    // Deterministic fallback name/description — used if Qwen never names it, AND
+    // stashed on the item so a reload mid-forge (background namer gone, inputs
+    // already consumed) can still settle it instead of leaving it nameless.
+    const detName = factionTheme ? `${factionTheme.label} ${det.name}`.slice(0, 48) : det.name;
+    const detDesc = factionTheme ? `${det.description} It bears the mark of ${factionTheme.label}.` : det.description;
+    // Mint NOW with a "forming" placeholder name; settleFusion stamps the real
+    // name (Qwen's, or the deterministic fallback) when the Aether finishes.
+    const formingResult = {
+      name: 'Cooling Crucible-Work',
+      description: 'Still cooling on the pedestal — the Aether has not settled its name. It will announce itself when fully formed.',
+      stats: det.stats,
+    };
     const { inventory: newInv, fused } = fusion.applyFusion(
       livePlayer.inventory,
       gate.inputs,
-      result,
+      formingResult,
       seed,
       factionTheme,
     );
+    const newInvForming = (newInv as InventoryItem[]).map((i) =>
+      i.id === fused.id
+        ? { ...i, materializing: true, formingName: detName, formingDesc: detDesc }
+        : i,
+    );
     set((s) => s.player
+      ? { player: { ...s.player, inventory: newInvForming, fusionPending: false } }
+      : s);
+    // arb45 — Master of Aethercraft: the fusion IS complete mechanically.
+    recordTitleProgress(get, set, { fusionsCompleted: 1 });
+    get().appendLog(
+      'reward',
+      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} weapon from your reserved pieces — and it's in your pack, still cooling.`,
+    );
+    get().appendLog(
+      'world',
+      `The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.`,
+    );
+    void get().persist();
+
+    // Background namer — NON-BLOCKING. The player already holds the weapon; this
+    // just settles its true name when (if) Qwen returns. Falls back to the
+    // deterministic name on slow / dormant / failed Qwen, or after the safety cap.
+    const fusedId = fused.id;
+    void (async () => {
+      let finalName = detName;
+      let finalDesc = detDesc;
+      try {
+        if (qwen.isReady()) {
+          const named = await Promise.race([
+            fusion.synthesizeFusionNameViaQwen(det.stats, gate.inputs, gate.tagProfile, qwen),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), FUSE_NAME_TIMEOUT_MS)),
+          ]);
+          if (named) {
+            finalName = factionTheme ? `${factionTheme.label} ${named.name}`.slice(0, 48) : named.name;
+            finalDesc = factionTheme ? `${named.description} It bears the mark of ${factionTheme.label}.` : named.description;
+          }
+        }
+      } catch {
+        /* deterministic name stands */
+      }
+      get().settleFusion(fusedId, finalName, finalDesc);
+    })();
+  },
+
+  settleFusion(itemId, name, description) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    // The forging may have been scrapped / sold / consumed before it formed — if
+    // it's gone, don't resurrect it; just skip the reveal.
+    if (!item) return;
+    set((s) => (s.player
       ? {
           player: {
             ...s.player,
-            inventory: newInv,
-            fusionPending: false,
+            inventory: s.player.inventory.map((i) =>
+              i.id === itemId
+                ? { ...i, name, description, materializing: undefined, formingName: undefined, formingDesc: undefined }
+                : i,
+            ),
           },
         }
-      : s);
+      : s));
+    const rarity = item.rarity ?? 'Rare';
     get().appendLog(
       'reward',
-      `✦ Forged at the Crucible: ${fused.name} (${fused.rarity ?? 'Rare'}).`,
+      `✦ The forging finishes — the Aether names it ${name} (${rarity}).`,
     );
-    // arb45 — Master of Aethercraft: a completed fusion is Aethercraft.
-    recordTitleProgress(get, set, { fusionsCompleted: 1 });
-    get().appendLog(
-      'world',
-      `The Crucible exhales. ${fused.description}`,
-    );
-    if (result.stats.special) {
-      get().appendLog('arbiter', `The Arbiter studies it. "${result.stats.special}"`);
-    }
-    // arb142 — name the forged weapon front-and-center. The reward line scrolled
-    // past and the player couldn't find the new item in a huge pack ("it didn't
-    // give me the name… my inventory of 5,000 weapons"). This reveal states the
-    // exact name + rarity and where it landed.
     set({
       discoveryReveal: {
-        title: 'Forged at the Crucible',
-        body: `The Crucible hands you a ${fused.rarity ?? 'Rare'} weapon:\n\n${fused.name}\n\nIt's in your pack now — sort Inventory by Newest (or search "${fused.name}") to find and equip it.`,
+        title: 'Your forging has formed',
+        body: `The Aether settles, and the Crucible's work takes its name:\n\n${name}\n\n${rarity} · it's in your pack now, fully formed.`,
+        cta: { label: 'View in inventory', screen: 'inventory' },
       },
     });
     void get().persist();

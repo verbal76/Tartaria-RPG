@@ -416,6 +416,17 @@ export interface InventoryItem {
    *  ingredients → sell). LOOTED gear carries no flag and scraps in full, so
    *  the intended loot→scrap→golem-feed loop is untouched. */
   selfCrafted?: boolean;
+  /** OTA-631 — a Crucible fusion forges stats INSTANTLY but the Aether "settles
+   *  its name" a beat later (a background Qwen call). While true, this item is a
+   *  fully-real, equippable weapon carrying a placeholder name; settleFusion
+   *  clears the flag and stamps the final name/description when it forms. */
+  materializing?: boolean;
+  /** OTA-631 — deterministic fallback name/description stashed on a materializing
+   *  fused item, so a reload mid-forge (the live background namer is gone after a
+   *  process restart, and the fusion inputs are already consumed) can still settle
+   *  it to a proper name instead of leaving it as "Cooling Crucible-Work". */
+  formingName?: string;
+  formingDesc?: string;
   /** OTA-194 — player-tapped heart marker that locks an inferred
    *  item out of OTA-193's auto-substitute crafting drain. Only
    *  inferred items (no hand-authored catalog row) can carry this
