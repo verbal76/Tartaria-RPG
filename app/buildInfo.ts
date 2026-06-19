@@ -15179,4 +15179,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (stashed formingName/Desc), so nothing is ever stuck nameless. New synthesizeFusionNameViaQwen() + settleFusion();
 // materializing/formingName/formingDesc on InventoryItem. Locked by fusionMaterialize.test (3) + 80 fuse-suite tests green;
 // tsc clean. JS-only → 290. app/engine/itemFusion.ts, app/engine/types.ts, app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-18-631';
+// OTA-632 (Bitribium Vitals) — [polish · playtester] HP is a tiny number in the top-left card and easy to miss (it
+// contributed to a broken-ladder fall death — player didn't register how low they were). The player card BACKGROUND now
+// tints by HP fraction: a subtle dark green at full → amber at half → a strong (still text-legible) dark red as you bleed
+// out, so the card visibly "fills with red" — and the HP number itself takes a matching brighter colour so it pops. Pure
+// presentational; cream text stays readable at every level (tint blended over the dark base, capped). Locked by
+// healthCardTint.test (5 — gradient direction, darkness/legibility cap, clamping). tsc clean. JS-only → 290.
+// app/components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-18-632';
