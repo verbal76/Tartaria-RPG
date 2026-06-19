@@ -27,7 +27,7 @@ import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
 import { splitSentences } from './sentenceSplitter';
 import { padSilence } from './audioPad';
 import { setMusicDuck } from '../audio/AudioManager';
-import { runExclusiveNativeMl } from '../ai/nativeMlLock';
+import { runExclusiveNativeMl, ML_PRIORITY_VOICE } from '../ai/nativeMlLock';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -131,11 +131,14 @@ interface LoadedVoice {
   sticky: boolean;
 }
 const POOL_MAX = 2;
-// arb5 — most queued Arbiter lines kept at once (see the cap in speak()).
-// Keyed by lineId so whole lines are dropped, never truncated mid-line.
-// arb15 — lowered 3 → 2 so the voice can't lag as far behind a fast-tapping
-// player (drops the oldest queued line, keeps the newest two).
-const MAX_QUEUED_ARBITER_LINES = 2;
+// arb5/arb15/OTA-634 — most queued spoken lines kept at once (see the cap in
+// speak()). Keyed by lineId so whole lines are dropped, never truncated mid-line.
+// OTA-634 — this cap was arbiter-ONLY, so world/combat speech accumulated
+// uncapped and the voice fell rounds behind a fast player / verbose fight (the
+// "said welcome back five rounds late" symptom). Now it caps the TOTAL queued
+// lines across ALL channels: keep the newest few, drop the oldest queued line
+// (never the currently-speaking one), so the voice stays current.
+const MAX_QUEUED_TOTAL_LINES = 3;
 const VOICE_POOL: Map<string, LoadedVoice> = new Map();
 // In-flight loads keyed by voiceId so concurrent ensureLoaded() calls
 // (e.g. beginScene's warm + the vendor's first line both hitting at
@@ -161,7 +164,10 @@ function inferSerial(model: any, text: string, rate: number): Promise<Float32Arr
   // never overlaps a Qwen completion. The lock STAYS (it's what stopped the
   // crash); the arb161 fix is on the Qwen side — a generation cooldown so Qwen
   // doesn't grab this lock on every beat and starve the voice.
-  return runExclusiveNativeMl(() => model.forward(text, rate)) as Promise<Float32Array | null>;
+  // OTA-634 — voice runs at LOW priority so an interactive LLM narration jumps
+  // ahead of queued speech synth (the words land promptly; the voice fills in
+  // behind). The lock still guarantees one-at-a-time, so the crash guard holds.
+  return runExclusiveNativeMl(() => model.forward(text, rate), ML_PRIORITY_VOICE) as Promise<Float32Array | null>;
 }
 let currentlySpeaking: QueuedUtterance | null = null;
 let currentSound: Audio.Sound | null = null;
@@ -580,18 +586,20 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   // (oldest dropped first), keyed by lineId so a multi-chunk line is
   // never truncated mid-sentence. currentlySpeaking is never touched;
   // orphaned prefetch promises on dropped chunks GC harmlessly.
-  if (channel === 'arbiter') {
+  // OTA-634 — global cap across ALL channels (was arbiter-only). Drop the oldest
+  // QUEUED lines so the voice can't fall more than MAX_QUEUED_TOTAL_LINES behind.
+  // currentlySpeaking is never in `queue`, so it's never cut off; orphaned
+  // prefetch promises on dropped chunks GC harmlessly.
+  {
     const queuedLineIds: number[] = [];
     for (const q of queue) {
-      if (q.channel === 'arbiter' && q.lineId != null && !queuedLineIds.includes(q.lineId)) {
-        queuedLineIds.push(q.lineId);
-      }
+      if (q.lineId != null && !queuedLineIds.includes(q.lineId)) queuedLineIds.push(q.lineId);
     }
-    // We're about to add one more line, so drop until there's room.
-    while (queuedLineIds.length >= MAX_QUEUED_ARBITER_LINES) {
+    // We're about to add one more line, so drop until there's room for it.
+    while (queuedLineIds.length >= MAX_QUEUED_TOTAL_LINES) {
       const dropId = queuedLineIds.shift()!;
       for (let i = queue.length - 1; i >= 0; i--) {
-        if (queue[i]!.channel === 'arbiter' && queue[i]!.lineId === dropId) queue.splice(i, 1);
+        if (queue[i]!.lineId === dropId) queue.splice(i, 1);
       }
     }
   }
