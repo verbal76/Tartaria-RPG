@@ -96,3 +96,15 @@ export function clearAllOverrides(): void {
   for (const k of Object.keys(tableOverrides)) delete tableOverrides[k as ContentTableId];
   for (const k of Object.keys(loreOverrides)) delete loreOverrides[k as LoreBlockId];
 }
+
+// --- publish lock --------------------------------------------------------------
+// Once a game is PUBLISHED, the developer door (the "Verbal" character-name access
+// and the title DEV pill) is closed and uploads are locked — it ships as a normal
+// game to play-test. Mirrored from the content-pack store; non-React engine code
+// (e.g. the name-capture gate in gameStore) reads it through isPublished().
+let published = false;
+export function isPublished(): boolean { return published; }
+export function setPublishedFlag(v: boolean): void { published = v; }
+
+/** The exact character name that opens the developer console (while unpublished). */
+export const DEV_ACCESS_NAME = 'Verbal';

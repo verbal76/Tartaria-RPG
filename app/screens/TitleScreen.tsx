@@ -31,6 +31,7 @@ import {
 // case a future build wants to try it again, but the Title screen
 // no longer surfaces it.
 import { useGameStore } from '../state/gameStore';
+import { useContentPackStore } from '../state/contentPackStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
 import { BugReportModal } from '../components/BugReportModal';
@@ -96,6 +97,7 @@ export function TitleScreen() {
   const mutedColor = useReadableMuted();
   const slots = useGameStore((s) => s.slots);
   const setScreen = useGameStore((s) => s.setScreen);
+  const devPublished = useContentPackStore((s) => s.published);
   const refreshSlots = useGameStore((s) => s.refreshSlots);
   const loadSlotIntoGame = useGameStore((s) => s.loadSlotIntoGame);
   const slotLoadError = useGameStore((s) => s.slotLoadError);
@@ -1112,16 +1114,19 @@ export function TitleScreen() {
       >
         <Text style={styles.gear}>⚙</Text>
       </TouchableOpacity>
-      {/* engine_Dev — developer content-pack console (table + lore uploads). */}
-      <TouchableOpacity
-        style={styles.devPill}
-        onPress={() => setScreen('developer')}
-        activeOpacity={0.7}
-        hitSlop={8}
-        accessibilityLabel="Content Packs (developer)"
-      >
-        <Text style={styles.devPillText}>DEV ▸ CONTENT</Text>
-      </TouchableOpacity>
+      {/* engine_Dev — developer content-pack console. Hidden once the game is
+          PUBLISHED, so a shipped game shows no developer affordance. */}
+      {!devPublished && (
+        <TouchableOpacity
+          style={styles.devPill}
+          onPress={() => setScreen('developer')}
+          activeOpacity={0.7}
+          hitSlop={8}
+          accessibilityLabel="Content Packs (developer)"
+        >
+          <Text style={styles.devPillText}>DEV ▸ CONTENT</Text>
+        </TouchableOpacity>
+      )}
       <View style={styles.bottomBar}>
         {/* OTA-068 — playtester thank-you line above the action
             row. Sized between the action buttons and the

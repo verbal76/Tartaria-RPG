@@ -70,6 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
+import { isPublished, DEV_ACCESS_NAME } from '../engine/contentPack';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -5823,12 +5824,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           return;
         }
+        // engine_Dev — DEVELOPER DOOR. While the game is unpublished, naming your
+        // character exactly DEV_ACCESS_NAME ("Verbal") drops into the content
+        // console instead of starting a normal game — the secret way for the
+        // author to load their data. A published game ignores this (just a name).
         set((s) => (s.player ? {
           player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
-        get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
         get().maybeAdvanceTutorial('name');
+        if (cleanName === DEV_ACCESS_NAME && !isPublished()) {
+          set({ currentScreen: 'developer' });
+          return;
+        }
+        get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);
         return;
       }
 

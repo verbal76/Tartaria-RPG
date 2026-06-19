@@ -9,6 +9,7 @@ import {
   setTableOverride,
   setLoreOverride,
   clearAllOverrides,
+  setPublishedFlag,
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
@@ -24,12 +25,18 @@ export interface LoadResult {
 interface PersistShape {
   tables: Partial<Record<ContentTableId, unknown[]>>;
   lore: Partial<Record<LoreBlockId, unknown>>;
+  published?: boolean;
 }
 
 interface ContentPackState {
   tables: Partial<Record<ContentTableId, unknown[]>>;
   lore: Partial<Record<LoreBlockId, unknown>>;
+  /** Once true, the developer door is closed + uploads are locked — ships as a
+   *  normal game. */
+  published: boolean;
   hydrated: boolean;
+  /** Close the developer door and lock uploads — permanent (until a full reset). */
+  publish: () => void;
   /** Parse + validate a table JSON (must be a non-empty array), apply, persist. */
   loadTableJson: (id: ContentTableId, json: string) => LoadResult;
   /** Parse + validate a lore JSON (object or array), apply, persist. */
@@ -41,15 +48,22 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore'>): void {
-  const shape: PersistShape = { tables: state.tables, lore: state.lore };
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'published'>): void {
+  const shape: PersistShape = { tables: state.tables, lore: state.lore, published: state.published };
   void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shape)).catch(() => { /* best effort */ });
 }
 
 export const useContentPackStore = create<ContentPackState>((set, get) => ({
   tables: {},
   lore: {},
+  published: false,
   hydrated: false,
+
+  publish() {
+    setPublishedFlag(true);
+    set({ published: true });
+    persist({ tables: get().tables, lore: get().lore, published: true });
+  },
 
   loadTableJson(id, json) {
     let parsed: unknown;
@@ -67,7 +81,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setTableOverride(id, parsed);
     const tables = { ...get().tables, [id]: parsed };
     set({ tables });
-    persist({ tables, lore: get().lore });
+    persist({ tables, lore: get().lore, published: get().published });
     return { ok: true, count: parsed.length };
   },
 
@@ -84,7 +98,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setLoreOverride(id, parsed);
     const lore = { ...get().lore, [id]: parsed };
     set({ lore });
-    persist({ tables: get().tables, lore });
+    persist({ tables: get().tables, lore, published: get().published });
     return { ok: true };
   },
 
@@ -93,7 +107,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     const tables = { ...get().tables };
     delete tables[id];
     set({ tables });
-    persist({ tables, lore: get().lore });
+    persist({ tables, lore: get().lore, published: get().published });
   },
 
   clearLore(id) {
@@ -101,12 +115,13 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     const lore = { ...get().lore };
     delete lore[id];
     set({ lore });
-    persist({ tables: get().tables, lore });
+    persist({ tables: get().tables, lore, published: get().published });
   },
 
   clearAll() {
     clearAllOverrides();
-    set({ tables: {}, lore: {} });
+    setPublishedFlag(false);
+    set({ tables: {}, lore: {}, published: false });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -124,7 +139,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         for (const [id, value] of Object.entries(lore)) {
           setLoreOverride(id as LoreBlockId, value);
         }
-        set({ tables, lore });
+        const published = shape.published === true;
+        setPublishedFlag(published);
+        set({ tables, lore, published });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

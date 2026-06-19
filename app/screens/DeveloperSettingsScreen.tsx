@@ -150,6 +150,29 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
 export function DeveloperSettingsScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const clearAll = useContentPackStore((s) => s.clearAll);
+  const published = useContentPackStore((s) => s.published);
+  const publish = useContentPackStore((s) => s.publish);
+  const [confirmPub, setConfirmPub] = useState(false);
+
+  // Once published the door is closed — if somehow reached, show a locked notice.
+  if (published) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => setScreen('title')}>
+            <Text style={styles.backText}>‹ BACK</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>PUBLISHED</Text>
+          <View style={{ width: 70 }} />
+        </View>
+        <Text style={styles.lockedNote}>
+          This game is published — the content is locked and the developer console is closed. It
+          now plays as a normal game. (A full “Reset everything” is the only way back to authoring.)
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -172,6 +195,24 @@ export function DeveloperSettingsScreen() {
 
         <Text style={styles.sectionLabel}>TABLES</Text>
         {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
+
+        <Text style={styles.sectionLabel}>SHIP IT</Text>
+        <TouchableOpacity
+          style={styles.publishBtn}
+          onPress={() => {
+            if (!confirmPub) { setConfirmPub(true); return; }
+            publish();
+            setScreen('title');
+          }}
+        >
+          <Text style={styles.publishBtnText}>
+            {confirmPub ? 'TAP AGAIN TO CONFIRM — THIS LOCKS THE GAME' : '★ PUBLISH GAME'}
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.publishNote}>
+          Publishing closes the developer door (the “Verbal” character access + this console) and
+          locks your content. The build then plays as a normal game.
+        </Text>
 
         <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
           <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
@@ -214,6 +255,10 @@ const styles = StyleSheet.create({
   resetBtnText: { color: '#a89a7a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
   err: { color: '#e07a5f', fontSize: 11, marginTop: 6 },
+  publishBtn: { marginTop: 6, backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
+  publishBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
+  publishNote: { color: '#7a705c', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
+  lockedNote: { color: '#cdbf99', fontSize: 13, lineHeight: 20, marginTop: 24, fontStyle: 'italic' },
   resetAll: { marginTop: 18, borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   resetAllText: { color: '#e07a5f', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
 });
