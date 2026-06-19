@@ -2684,6 +2684,12 @@ interface GameStore {
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
 
+// OTA-630 — max time the Crucible waits on a Qwen-synthesized fusion before
+// forging deterministically instead. Keeps the fuse snappy on slow devices
+// (the on-device LLM can take 30-55s) while still giving fast devices a window
+// to produce LLM-flavored loot. The deterministic fallback is always serviceable.
+const FUSE_QWEN_TIMEOUT_MS = 6000;
+
 // OTA-397 — save-size telemetry. persist() logs the per-part byte breakdown on
 // failure, on a trim, AND every Nth persist as a heartbeat, so the slot blob's
 // size is VISIBLE in the log as it grows (instead of only surfacing once it's
@@ -20025,7 +20031,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let result;
     if (qwen.isReady()) {
       try {
-        result = await fusion.synthesizeFusionViaQwen(gate.inputs, gate.tagProfile, qwen);
+        // OTA-630 — cap the Qwen synth wait. On slow devices the on-device LLM
+        // can take 30-55s for a 200-token completion (playtest: a fuse "took a
+        // long breath in" for ~37s before the INSTANT deterministic fallback
+        // ran — the Crucible felt like it hung for over a minute). Race the Qwen
+        // call against a short timeout; if it doesn't land in time, forge
+        // deterministically NOW. The Qwen promise is left to settle and be
+        // discarded in the background — synthesizeFusionViaQwen never rejects
+        // (it try/catches to null) and doesn't write any cache, so there's no
+        // side effect from abandoning it.
+        result = await Promise.race([
+          fusion.synthesizeFusionViaQwen(gate.inputs, gate.tagProfile, qwen),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), FUSE_QWEN_TIMEOUT_MS)),
+        ]);
+        if (!result) {
+          get().appendLog(
+            'debug',
+            `fuseAtCrucible: Qwen synth didn't land within ${FUSE_QWEN_TIMEOUT_MS}ms (or returned null); forging deterministically.`,
+          );
+        }
       } catch (err) {
         get().appendLog('debug', `fuseAtCrucible Qwen path threw: ${String(err)}`);
         result = null;
