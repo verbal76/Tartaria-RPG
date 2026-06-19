@@ -142,7 +142,7 @@ export function isSpeaking(): boolean {
  *  (expo-speech) or the bundled Piper engine based on
  *  voiceSettings.engine. No-op if TTS is disabled in settings.
  *  Returns the queue id (negative when nothing was queued). */
-export function speak(text: string, channel?: string, voiceId?: string | null): number {
+export function speak(text: string, channel?: string, voiceId?: string | null, opts?: { front?: boolean }): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   // Symbol cleanup before either engine — strips arrows so the player
@@ -181,7 +181,7 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
         kokoroSpeakWeb(trimmed, voiceId);
         return nextId++;
       }
-      return piperSpeak(trimmed, voiceId, channel);
+      return piperSpeak(trimmed, voiceId, channel, opts);
     }
     // else: bundled install failed — fall through to the system queue.
     recordTtsRoute('system-fallback(kokoro-error)', getKokoroState().phase, trimmed);
@@ -198,6 +198,7 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
   // the queue, cap it: keep at most MAX_QUEUED_ARBITER queued arbiter
   // lines (oldest dropped first). Short sequences survive; genuine spam
   // stays bounded. currentlySpeaking is never touched.
+  if (opts?.front) queue.length = 0; // OTA-635 — welcome-back jumps the voice queue
   if (channel === 'arbiter') {
     let arbCount = queue.reduce((n, q) => (q.channel === 'arbiter' ? n + 1 : n), 0);
     // We're about to push one more, so drop until there's room for it.
