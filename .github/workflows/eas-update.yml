@@ -7,6 +7,7 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
+      - 'engine_Dev'
     paths-ignore:
       - 'package.json'
       - 'package-lock.json'
@@ -296,6 +297,16 @@ jobs:
               ;;
             iOS-initial)
               publish_channel "ios-preview" "ios" true
+              ;;
+            engine_Dev)
+              # engine_Dev is a separate app (the lore-agnostic RPG
+              # Engine, package com.hotatticgames.tartarprim.engine). Its
+              # OTAs MUST stay on the isolated 'engine_Dev' channel and
+              # never reach the live Tartaria game's testers. The preview
+              # APK for this app is built with expo-channel-name:engine_Dev
+              # (app.json), so it polls only this channel. Android only —
+              # no iOS build of the engine exists yet.
+              publish_channel "engine_Dev" "android" false
               ;;
             *)
               echo "::notice::Branch '$BRANCH' is not mapped to an OTA channel — skipping publish (no cross-branch broadcast)."
