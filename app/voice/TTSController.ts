@@ -115,7 +115,7 @@ function logVoice(line: string): void {
   try { useGameStore.getState().appendLog('debug', line); } catch { /* log not ready */ }
 }
 
-function speakArbiter(text: string): void {
+function speakArbiter(text: string, front: boolean = false): void {
   const stripped = stripArbiterFrame(text);
   if (!stripped) return;
   // arb163 — don't read the exact same line twice within the window (kills the
@@ -132,7 +132,7 @@ function speakArbiter(text: string): void {
   // per model instance and can't switch per utterance.
   const speaker = detectArbiterSpeaker(text);
   const voiceId = voiceForSpeaker(speaker);
-  speak(stripped, 'arbiter', voiceId);
+  speak(stripped, 'arbiter', voiceId, { front });
 }
 
 function rememberStreamed(text: string): void {
@@ -227,7 +227,9 @@ function onState(state: GameState): void {
       // arbiter-only channel (per OTA 123 player request) — frame
       // strip + speak. The SPOKEN_CHANNELS set is now {'arbiter'}
       // so this is always the arbiter path.
-      speakArbiter(entry.text);
+      // OTA-635 — meta.speakFront (the welcome-back greeting) jumps the voice
+      // queue so it's heard immediately instead of behind a backlog.
+      speakArbiter(entry.text, entry.meta?.speakFront === true);
     }
     lastLogIndex = log.length;
     const tail = log[log.length - 1];
