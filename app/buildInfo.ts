@@ -15186,4 +15186,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // presentational; cream text stays readable at every level (tint blended over the dark base, capped). Locked by
 // healthCardTint.test (5 — gradient direction, darkness/legibility cap, clamping). tsc clean. JS-only → 290.
 // app/components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-18-632';
+// OTA-633 (Bitritrium Pulse) — [polish · playtester] animate the OTA-632 health tint. (1) FADE: the card colour now slides
+// toward the new HP level over 300ms (an Animated fraction following the gradient) instead of snapping. (2) PULSE: on
+// damage a red overlay flashes — asymmetric on purpose (rise 90ms so a hit registers instantly even mid-combat, fall 320ms
+// so it lingers and can't be missed; a flat 150ms can flicker past). Overlay sits behind the card content so the stats
+// text stays readable; interruptible so rapid hits restart cleanly. All timings are tunable constants. tsc clean;
+// healthCardTint.test still green (colour math unchanged). JS-only → 290. app/components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-18-633';
