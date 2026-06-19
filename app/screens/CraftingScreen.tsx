@@ -91,6 +91,20 @@ const GOLEM_VARIANTS: GolemDefinition[] = [
   GOLEM_DEFINITIONS.crystal_golem,
 ];
 
+// OTA-629 — payload for the summon-confirm popup. Built once here so the summon
+// card tap AND each per-golem variant row produce the SAME confirm (no copy-to-
+// input / clipboard step anywhere in the golem flow).
+type GolemConfirm = { name: string; phrase: string; stats: string; fuel: string; afford: boolean };
+function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): GolemConfirm {
+  const phrase = GOLEM_VARIANT_PHRASE[g.kind];
+  const afford = missingIngredientsList(g.fuel, inventory).length === 0;
+  const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
+  const modSign = g.attackMod >= 0 ? '+' : '';
+  const hitTxt = g.hitBonus !== 0 ? `, +${g.hitBonus} hit` : '';
+  const stats = `HP ${g.hpMax} · ${g.attackDie}${modSign}${g.attackMod} ${g.damageType}${hitTxt}`;
+  return { name: g.name, phrase, stats, fuel, afford };
+}
+
 // OTA-087 — sort axes for the REPAIR tab. 'durability' sorts
 // by current/max ratio so most-damaged-first when desc.
 // 'available' floats items the player can fix RIGHT NOW (all
@@ -213,9 +227,7 @@ export function CraftingScreen() {
   // "summon X golem" to the clipboard and make the player paste it back in
   // exploration. Now it opens a confirm → on Summon it dispatches the action and
   // bounces to exploration, where the d20+INT roll plays out live.
-  const [golemConfirm, setGolemConfirm] = useState<
-    { name: string; phrase: string; stats: string; fuel: string; afford: boolean } | null
-  >(null);
+  const [golemConfirm, setGolemConfirm] = useState<GolemConfirm | null>(null);
   // OTA-087 — per-tab search + sort state. Each tab keeps its
   // own so switching tabs doesn't clobber the user's filter.
   // Defaults are tuned per category: craft/recipes default to
@@ -410,7 +422,7 @@ export function CraftingScreen() {
               clipboard. Player then hits BACK and the phrase is
               already staged in the input — they just submit. */}
           <Text style={styles.arbiterLine}>
-            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a card to stage the phrase; hit BACK and the input box has it ready."
+            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a golem to summon it on the spot; shape and mend stage their phrase for the input box."
           </Text>
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {AETHERCRAFT_DISCIPLINES.map((d) => {
@@ -442,6 +454,17 @@ export function CraftingScreen() {
                     queued && styles.aetherCardQueued,
                   ]}
                   onPress={() => {
+                    // OTA-629 — the SUMMON card now opens the confirm popup
+                    // (default: first golem you can afford, else Mud) instead of
+                    // copying a phrase into the input. Shape/mend keep the
+                    // tap-to-stage cycling — they have no per-variant confirm.
+                    if (d.showGolemVariants) {
+                      const pick = GOLEM_VARIANTS.find(
+                        (g) => missingIngredientsList(g.fuel, player.inventory).length === 0,
+                      ) ?? GOLEM_VARIANTS[0]!;
+                      setGolemConfirm(buildGolemConfirm(pick, player.inventory));
+                      return;
+                    }
                     if (d.examples.length === 0) return;
                     const nextIdx = ((aetherCycleIdx[d.id] ?? -1) + 1) % d.examples.length;
                     const phrase = d.examples[nextIdx]!;
@@ -473,14 +496,10 @@ export function CraftingScreen() {
                     <View style={styles.golemVariants}>
                       <Text style={styles.golemVariantsHeader}>Golem variants — tap to stage that summon:</Text>
                       {GOLEM_VARIANTS.map((g) => {
-                        const phrase = GOLEM_VARIANT_PHRASE[g.kind];
-                        // OTA-401 — affordable when every fuel line is in stock
-                        // (substitute-aware, mirroring the craft/repair drains).
-                        const golemAfford = missingIngredientsList(g.fuel, player.inventory).length === 0;
-                        const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
-                        const modSign = g.attackMod >= 0 ? '+' : '';
-                        const hitTxt = g.hitBonus !== 0 ? `, +${g.hitBonus} hit` : '';
-                        const stats = `HP ${g.hpMax} · ${g.attackDie}${modSign}${g.attackMod} ${g.damageType}${hitTxt}`;
+                        // OTA-629 — same payload the summon card uses; tapping a
+                        // row opens the confirm popup (→ Summon dispatches and
+                        // jumps to exploration), no copy-to-input step.
+                        const c = buildGolemConfirm(g, player.inventory);
                         return (
                           <Pressable
                             key={g.kind}
@@ -488,16 +507,16 @@ export function CraftingScreen() {
                               styles.golemVariantRow,
                               pressed && styles.golemVariantRowPressed,
                             ]}
-                            onPress={() => setGolemConfirm({ name: g.name, phrase, stats, fuel, afford: golemAfford })}
+                            onPress={() => setGolemConfirm(c)}
                           >
                             <Text style={styles.golemVariantName}>{g.name}</Text>
-                            <Text style={styles.golemVariantStats}>{stats}</Text>
+                            <Text style={styles.golemVariantStats}>{c.stats}</Text>
                             <Text style={styles.golemVariantBlurb}>{g.blurb}</Text>
                             <Text style={styles.golemVariantFuel}>
                               <Text style={styles.golemVariantFuelLabel}>Needs: </Text>
-                              <Text style={golemAfford ? styles.fuelHave : undefined}>{fuel}</Text>
+                              <Text style={c.afford ? styles.fuelHave : undefined}>{c.fuel}</Text>
                             </Text>
-                            <Text style={styles.golemVariantPhrase}>tap → "{phrase}"</Text>
+                            <Text style={styles.golemVariantPhrase}>tap to summon →</Text>
                           </Pressable>
                         );
                       })}
@@ -507,7 +526,12 @@ export function CraftingScreen() {
                     </View>
                   )}
                   <Text style={styles.aetherCardExamples}>
-                    <Text style={styles.aetherCardExamplesLabel}>Tap card to queue: </Text>
+                    {/* OTA-629 — the summon card opens the confirm popup on tap,
+                        so it doesn't "queue" a phrase; the phrasings are shown as
+                        type-it alternatives. Shape/mend still queue on tap. */}
+                    <Text style={styles.aetherCardExamplesLabel}>
+                      {d.showGolemVariants ? 'Or type: ' : 'Tap card to queue: '}
+                    </Text>
                     {d.examples.map((ex, i) =>
                       i === queuedIdx ? `[${ex}]` : `"${ex}"`,
                     ).join(' · ')}
