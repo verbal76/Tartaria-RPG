@@ -5,21 +5,15 @@
 // Self-contained: owns its timer + Kokoro subscription, returns null when done.
 
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
-// Splash art native dimensions (assets/splash-art.jpg).
-const SPLASH_W = 941;
-const SPLASH_H = 1672;
-// OTA-475/476 — top-left-anchored splash scale (fraction of screen width). Full
-// "too big", 2/3 "too far", 0.85 "getting there", 0.92 "just a touch more" → 0.97.
-// OTA-484 — REVERTS OTA-483. The 483 offset (top/left = 40dp) read as the art moving
-// DOWN-AND-LEFT — it just exposed a black top/left margin, not what the player wanted.
-// The image is anchored by its TOP-LEFT corner, so enlarging ALONE grows it down-right
-// from that corner; no offset is needed. Re-anchored at (0,0) and enlarged ~15% over
-// the 0.97 baseline → 1.12. Width grows, height follows the same ratio (aspect
-// preserved — no stretch).
-const SPLASH_SCALE = 1.12;
+// Splash art native dimensions (assets/splash-art.jpg). The RPG Engine splash is a
+// complete full-screen portrait poster (gear + terminal + book + d20 emblem, title,
+// tagline, feature row), so it's rendered full-bleed with cover — not the old
+// top-left-anchored emblem treatment.
+const SPLASH_W = 853;
+const SPLASH_H = 1844;
 
 // Module-scoped so it survives remounts within the same JS process; resets on a
 // fresh process / OTA reload.
@@ -49,17 +43,14 @@ export function SplashOverlay() {
     : kokoro.phase === 'loading' ? 0.92
     : 0.12;
 
-  // OTA-473/474 — top-left anchored, scaled to SPLASH_SCALE of full-width. Explicit
-  // pixel dimensions from the screen width — deterministic, no aspectRatio guesswork.
-  const screenW = Dimensions.get('window').width;
-  const imgW = Math.round(screenW * SPLASH_SCALE);
-  const imgH = Math.round((imgW * SPLASH_H) / SPLASH_W);
-
+  // Full-bleed poster — the splash art is a complete portrait design, so it fills
+  // the whole overlay with cover (centred, aspect preserved, edges cropped to fit
+  // whatever the device aspect ratio is). SPLASH_W/H document the source aspect.
   return (
     <View style={styles.overlay} pointerEvents="auto">
       <Image
         source={require('../../assets/splash-art.jpg')}
-        style={{ position: 'absolute', top: 0, left: 0, width: imgW, height: imgH }}
+        style={StyleSheet.absoluteFill}
         resizeMode="cover"
       />
       <View style={styles.barWrap}>
@@ -67,7 +58,7 @@ export function SplashOverlay() {
           <View style={[styles.barFill, { width: `${Math.round(progress * 100)}%` }]} />
         </View>
         <Text style={styles.barLabel}>
-          {settled ? 'Entering the buried world…' : 'Waking the Arbiter — keep the app open'}
+          {settled ? 'Entering your world…' : 'Warming up — keep the app open'}
         </Text>
       </View>
     </View>

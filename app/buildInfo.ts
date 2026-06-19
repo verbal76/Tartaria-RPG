@@ -15212,4 +15212,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
-export const OTA_BUILD_ID = '2026-06-18-635';
+// engine_Dev-636 — RPG Engine app identity. New full-bleed splash poster
+// (gear + terminal + open book + d20 emblem, "TEXT RPG ENGINE" title) replaces
+// the Tartaria emblem splash; SplashOverlay now renders the art full-screen
+// (cover) instead of the old top-left-anchored emblem scaling. Pairs with the
+// engine app icon and the engine_Dev-isolated OTA channel.
+export const OTA_BUILD_ID = '2026-06-19-636';
