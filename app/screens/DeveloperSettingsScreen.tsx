@@ -17,6 +17,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
+import { getTableTemplate, getLoreTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 
 type Status = { kind: 'ok' | 'err'; msg: string } | null;
 
@@ -55,6 +56,12 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
           }}
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => { setText(getTableTemplate(id)); setStatus({ kind: 'ok', msg: `Loaded the first ${TEMPLATE_SAMPLE_ROWS} built-in rows as a template — edit, then LOAD.` }); }}
+        >
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {tableOverrideCount(id) > 0 && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { clearTable(id); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
@@ -102,6 +109,12 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => { setText(getLoreTemplate(id)); setStatus({ kind: 'ok', msg: 'Loaded a template — edit, then LOAD.' }); }}
+        >
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
         {hasLoreOverride(id) && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { clearLore(id); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
             <Text style={styles.resetBtnText}>RESET</Text>
@@ -127,9 +140,10 @@ export function DeveloperSettingsScreen() {
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.blurb}>
-          This is the engine's developer console. Paste a JSON table or lore block to override the
-          built-in Tartaria content at runtime — reskin the engine into a different game with no
-          code changes. Empty boxes use the built-in defaults.
+          This is the engine's developer console. Hit TEMPLATE on any box to drop in the first
+          couple of built-in (Tartaria) rows as a starter schema, edit them into your own game,
+          then LOAD to override at runtime — reskin the engine with no code changes. Empty boxes
+          use the built-in defaults.
         </Text>
 
         <Text style={styles.sectionLabel}>LORE</Text>
@@ -171,6 +185,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8, marginTop: 8 },
   loadBtn: { backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 18 },
   loadBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  tmplBtn: { backgroundColor: '#1a1714', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  tmplBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   resetBtn: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
   resetBtnText: { color: '#a89a7a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
