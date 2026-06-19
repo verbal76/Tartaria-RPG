@@ -19,8 +19,62 @@ import {
   type LoreBlockId,
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { useCustomMusicStore } from '../state/customMusicStore';
+import { MAX_TRACKS_PER_CATEGORY, RECOMMENDED_AUDIO_SPECS, type MusicCategory } from '../audio/customMusic';
 
 type Status = { kind: 'ok' | 'err'; msg: string } | null;
+
+function MusicBox({ category, label, hint }: { category: MusicCategory; label: string; hint: string }) {
+  const tracks = useCustomMusicStore((s) => (category === 'battle' ? s.battle : s.ambient));
+  const addFromPicker = useCustomMusicStore((s) => s.addFromPicker);
+  const removeTrack = useCustomMusicStore((s) => s.remove);
+  const clearCategory = useCustomMusicStore((s) => s.clearCategory);
+  const [status, setStatus] = useState<Status>(null);
+  const [busy, setBusy] = useState(false);
+  const full = tracks.length >= MAX_TRACKS_PER_CATEGORY;
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{label}</Text>
+        <Text style={tracks.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {tracks.length} / {MAX_TRACKS_PER_CATEGORY}
+        </Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <Text style={styles.specLine}>{RECOMMENDED_AUDIO_SPECS}</Text>
+      {tracks.map((t) => (
+        <View key={t.id} style={styles.trackRow}>
+          <Text style={styles.trackName} numberOfLines={1}>♪ {t.name}</Text>
+          <TouchableOpacity style={styles.trackRemove} onPress={() => { removeTrack(category, t.id); setStatus({ kind: 'ok', msg: `Removed “${t.name}”.` }); }}>
+            <Text style={styles.trackRemoveText}>REMOVE</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+      {tracks.length === 0 && <Text style={styles.emptyLine}>No uploads — the built-in score plays here.</Text>}
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.loadBtn, (full || busy) && styles.btnDisabled]}
+          disabled={full || busy}
+          onPress={async () => {
+            setBusy(true);
+            const r = await addFromPicker(category);
+            setBusy(false);
+            if (r.canceled) return;
+            setStatus(r.ok ? { kind: 'ok', msg: 'Track added.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>{busy ? 'ADDING…' : full ? 'LIMIT REACHED' : '＋ ADD TRACK'}</Text>
+        </TouchableOpacity>
+        {tracks.length > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { clearCategory(category); setStatus({ kind: 'ok', msg: 'Cleared — built-in score restored.' }); }}>
+            <Text style={styles.resetBtnText}>CLEAR ALL</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
 
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
@@ -178,6 +232,18 @@ export function DeveloperSettingsScreen() {
         <Text style={styles.sectionLabel}>TABLES</Text>
         {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
 
+        <Text style={styles.sectionLabel}>MUSIC</Text>
+        <MusicBox
+          category="battle"
+          label="Battle Music"
+          hint="Plays during combat and boss fights. Uploads replace the built-in battle score."
+        />
+        <MusicBox
+          category="ambient"
+          label="Ambient Music"
+          hint="Plays while exploring. Uploads replace the built-in exploration score."
+        />
+
         <Text style={styles.sectionLabel}>FAMILY BUILD</Text>
         {!published ? (
           <>
@@ -237,7 +303,14 @@ const styles = StyleSheet.create({
   badgeOn: { color: '#9ec96a', fontSize: 10, fontWeight: '700' },
   badgeOff: { color: '#7a705c', fontSize: 10 },
   hint: { color: '#7a705c', fontSize: 10, marginTop: 3, lineHeight: 14 },
+  specLine: { color: '#6a9bbf', fontSize: 10, marginTop: 5, lineHeight: 14, fontStyle: 'italic' },
   toneLine: { color: '#b88ce0', fontSize: 11, marginTop: 5, fontStyle: 'italic', lineHeight: 15 },
+  trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, backgroundColor: '#0a0908', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 8 },
+  trackName: { color: '#e6d8b3', fontSize: 12, flex: 1, marginRight: 8 },
+  trackRemove: { borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 4, paddingHorizontal: 8 },
+  trackRemoveText: { color: '#e07a5f', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  emptyLine: { color: '#5c5446', fontSize: 11, marginTop: 6, fontStyle: 'italic' },
+  btnDisabled: { opacity: 0.4 },
   input: {
     color: '#e6d8b3', backgroundColor: '#0a0908', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
     padding: 8, marginTop: 6, minHeight: 70, maxHeight: 160, fontSize: 11, fontFamily: 'monospace', textAlignVertical: 'top',

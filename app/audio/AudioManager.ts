@@ -19,11 +19,12 @@
 import { Audio } from 'expo-av';
 import { getAudioSettings, loadAudioSettings, onAudioSettingsChange } from './audioSettings';
 
-type Context = 'boss' | 'combat' | 'shop' | 'menu' | 'explore';
+export type Context = 'boss' | 'combat' | 'shop' | 'menu' | 'explore';
 
-interface TrackEntry {
+export interface TrackEntry {
   id: string;
-  source: number;
+  /** require()'d bundled asset (number) OR an uploaded file `{ uri }`. */
+  source: number | { uri: string };
   /** Authored mix volume — multiplied by master settings volume. */
   baseVolume: number;
 }
@@ -66,6 +67,27 @@ const POOLS: Record<Context, TrackEntry[]> = {
     { id: 'explore-catacomb-overture', source: require('../../assets/audio/explore-catacomb-overture.mp3'), baseVolume: 0.4 },
   ],
 };
+
+// engine_Dev — developer-uploaded pools. When a context has a non-empty custom
+// pool it REPLACES the built-in POOLS entry for that context, so a re-skinned
+// game plays the author's own score instead of the bundled Tartaria tracks.
+// Populated by customMusicStore (battle → combat+boss, ambient → explore);
+// empty/absent falls back to the built-ins. Read live via resolvePool so an
+// upload takes effect on the next track pick.
+const customPools: Partial<Record<Context, TrackEntry[]>> = {};
+
+export function setCustomPool(context: Context, entries: TrackEntry[] | null): void {
+  if (entries && entries.length > 0) {
+    customPools[context] = entries;
+  } else {
+    delete customPools[context];
+  }
+}
+
+function resolvePool(context: Context): TrackEntry[] {
+  const custom = customPools[context];
+  return custom && custom.length > 0 ? custom : POOLS[context];
+}
 
 const sounds: Record<string, Audio.Sound> = {};
 const loading: Record<string, Promise<void>> = {};
@@ -131,6 +153,10 @@ function effectiveVolume(entry: TrackEntry): number {
 }
 
 function findEntry(id: string): TrackEntry | null {
+  for (const pool of Object.values(customPools)) {
+    const e = pool?.find((x) => x.id === id);
+    if (e) return e;
+  }
   for (const pool of Object.values(POOLS)) {
     const e = pool.find((x) => x.id === id);
     if (e) return e;
@@ -235,7 +261,7 @@ export async function setActiveContext(desired: Context | null): Promise<void> {
   const prevId = activeTrackId;
   activeContext = desired;
   if (desired) {
-    const pick = pickFromPool(POOLS[desired], prevId);
+    const pick = pickFromPool(resolvePool(desired), prevId);
     activeTrackId = pick.id;
     // Hard-stop the previous track BEFORE starting the new one — no
     // crossfade overlap. The new track fades IN from 0; the old goes
@@ -260,7 +286,7 @@ async function applySettings(): Promise<void> {
     return;
   }
   if (activeContext && !activeTrackId) {
-    const pick = pickFromPool(POOLS[activeContext], null);
+    const pick = pickFromPool(resolvePool(activeContext), null);
     activeTrackId = pick.id;
     await playWithFade(pick, epoch);
     return;

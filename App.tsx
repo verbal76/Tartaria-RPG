@@ -25,6 +25,7 @@ import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
 import { DeveloperSettingsScreen } from './app/screens/DeveloperSettingsScreen';
 import { useContentPackStore } from './app/state/contentPackStore';
+import { useCustomMusicStore } from './app/state/customMusicStore';
 import { EndingScreen } from './app/screens/EndingScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
 import { CharacterScreen } from './app/screens/CharacterScreen';
@@ -211,6 +212,9 @@ export default function App() {
     // engine_Dev — load any developer content-pack overrides into the registry
     // before gameplay so the engine reads them from the first action.
     void useContentPackStore.getState().hydrate();
+    // engine_Dev — load any uploaded battle/ambient music into AudioManager so
+    // the author's score replaces the built-in pools from the first track pick.
+    void useCustomMusicStore.getState().hydrate();
     // arb78 — load the player's saved background settings (notifies the
     // AppShell's useDisplaySettings hook once storage resolves).
     void loadDisplaySettings();
