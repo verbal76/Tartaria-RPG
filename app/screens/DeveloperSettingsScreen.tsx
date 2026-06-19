@@ -152,26 +152,8 @@ export function DeveloperSettingsScreen() {
   const clearAll = useContentPackStore((s) => s.clearAll);
   const published = useContentPackStore((s) => s.published);
   const publish = useContentPackStore((s) => s.publish);
+  const unpublish = useContentPackStore((s) => s.unpublish);
   const [confirmPub, setConfirmPub] = useState(false);
-
-  // Once published the door is closed — if somehow reached, show a locked notice.
-  if (published) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => setScreen('title')}>
-            <Text style={styles.backText}>‹ BACK</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>PUBLISHED</Text>
-          <View style={{ width: 70 }} />
-        </View>
-        <Text style={styles.lockedNote}>
-          This game is published — the content is locked and the developer console is closed. It
-          now plays as a normal game. (A full “Reset everything” is the only way back to authoring.)
-        </Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -196,23 +178,39 @@ export function DeveloperSettingsScreen() {
         <Text style={styles.sectionLabel}>TABLES</Text>
         {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
 
-        <Text style={styles.sectionLabel}>SHIP IT</Text>
-        <TouchableOpacity
-          style={styles.publishBtn}
-          onPress={() => {
-            if (!confirmPub) { setConfirmPub(true); return; }
-            publish();
-            setScreen('title');
-          }}
-        >
-          <Text style={styles.publishBtnText}>
-            {confirmPub ? 'TAP AGAIN TO CONFIRM — THIS LOCKS THE GAME' : '★ PUBLISH GAME'}
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.publishNote}>
-          Publishing closes the developer door (the “Verbal” character access + this console) and
-          locks your content. The build then plays as a normal game.
-        </Text>
+        <Text style={styles.sectionLabel}>FAMILY BUILD</Text>
+        {!published ? (
+          <>
+            <TouchableOpacity
+              style={styles.publishBtn}
+              onPress={() => {
+                if (!confirmPub) { setConfirmPub(true); return; }
+                publish();
+                setScreen('title');
+              }}
+            >
+              <Text style={styles.publishBtnText}>
+                {confirmPub ? 'TAP AGAIN — HIDE THE DEV PILL FOR A FAMILY BUILD' : '★ PUBLISH (hide dev for testers)'}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.publishNote}>
+              Hides the title DEV pill so testers see a clean game. You keep your way back in —
+              name a character “Verbal” to return here anytime — so you can keep editing after
+              their feedback. (This only hides the pill; full removal happens at the signed
+              go-live build.)
+            </Text>
+          </>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.unpublishBtn} onPress={() => { unpublish(); setConfirmPub(false); }}>
+              <Text style={styles.unpublishBtnText}>↺ UN-PUBLISH — show the DEV pill again</Text>
+            </TouchableOpacity>
+            <Text style={styles.publishNote}>
+              The DEV pill is hidden (family build). You're still in via the “Verbal” backdoor.
+              Tap above to bring the pill back while you keep iterating.
+            </Text>
+          </>
+        )}
 
         <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
           <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
@@ -258,7 +256,8 @@ const styles = StyleSheet.create({
   publishBtn: { marginTop: 6, backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   publishBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
   publishNote: { color: '#7a705c', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
-  lockedNote: { color: '#cdbf99', fontSize: 13, lineHeight: 20, marginTop: 24, fontStyle: 'italic' },
+  unpublishBtn: { marginTop: 6, backgroundColor: '#1a1714', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
+  unpublishBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
   resetAll: { marginTop: 18, borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   resetAllText: { color: '#e07a5f', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
 });

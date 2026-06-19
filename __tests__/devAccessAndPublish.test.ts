@@ -65,18 +65,25 @@ describe('engine_Dev — developer door + publish lock', () => {
     expect(store.getState().player!.name).toBe('Sarah');
   });
 
-  it('publish() closes the door — "Verbal" then plays as a normal game', async () => {
+  it('publish() only hides the DEV pill — "Verbal" backdoor still opens the console', async () => {
     useContentPackStore.getState().publish();
-    expect(isPublished()).toBe(true);
+    expect(isPublished()).toBe(true); // pill hidden (TitleScreen reads this)
     const store = await freshGameAtNameBeat();
     store.getState().submitPlayerAction('Verbal');
-    expect(store.getState().currentScreen).not.toBe('developer');
-    expect(store.getState().player!.name).toBe('Verbal'); // just a normal character now
+    // The author can still get back in to keep editing on a published family build.
+    expect(store.getState().currentScreen).toBe('developer');
   });
 
-  it('a full reset re-opens authoring (un-publishes)', () => {
+  it('unpublish() brings the pill back (non-destructive — content untouched)', () => {
     useContentPackStore.getState().publish();
     expect(isPublished()).toBe(true);
+    useContentPackStore.getState().unpublish();
+    expect(isPublished()).toBe(false);
+    expect(useContentPackStore.getState().published).toBe(false);
+  });
+
+  it('a full reset also un-publishes (the nuke escape hatch)', () => {
+    useContentPackStore.getState().publish();
     useContentPackStore.getState().clearAll();
     expect(isPublished()).toBe(false);
     expect(useContentPackStore.getState().published).toBe(false);

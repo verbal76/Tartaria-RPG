@@ -31,12 +31,14 @@ interface PersistShape {
 interface ContentPackState {
   tables: Partial<Record<ContentTableId, unknown[]>>;
   lore: Partial<Record<LoreBlockId, unknown>>;
-  /** Once true, the developer door is closed + uploads are locked — ships as a
-   *  normal game. */
+  /** When true the title DEV pill is hidden (clean family build). The "Verbal"
+   *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
   hydrated: boolean;
-  /** Close the developer door and lock uploads — permanent (until a full reset). */
+  /** Hide the title DEV pill for a family build (reversible; Verbal still works). */
   publish: () => void;
+  /** Bring the DEV pill back (keep editing after a family build). */
+  unpublish: () => void;
   /** Parse + validate a table JSON (must be a non-empty array), apply, persist. */
   loadTableJson: (id: ContentTableId, json: string) => LoadResult;
   /** Parse + validate a lore JSON (object or array), apply, persist. */
@@ -63,6 +65,12 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setPublishedFlag(true);
     set({ published: true });
     persist({ tables: get().tables, lore: get().lore, published: true });
+  },
+
+  unpublish() {
+    setPublishedFlag(false);
+    set({ published: false });
+    persist({ tables: get().tables, lore: get().lore, published: false });
   },
 
   loadTableJson(id, json) {
