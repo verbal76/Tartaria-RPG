@@ -314,11 +314,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
     ? (tutActionBeat === 'climb' ? 'ready' : undefined)
     : (climbableCount && climbableCount > 0 ? (climbBlockedReason ? 'unavailable' : 'ready') : undefined);
-  // OTA-628 — the recoverable "rest first" refusal gets a haptic buzz on tap so
-  // mashing CLIMB on an empty tank gives tactile feedback (not a silent no-op).
-  // Broken/frayed/no rope stays red WITHOUT a buzz — a gear problem you fix by
-  // finding/mending a rope, where the colour + climb-modal explanation is enough.
-  const climbBuzzNoStamina = climbBlockedReason === 'no_stamina';
+  // OTA-629 — tapping a blocked (red) CLIMB now drops a one-line Arbiter nudge
+  // explaining WHY, instead of opening a dead-end modal. The recoverable
+  // empty-tank case ALSO buzzes (single 40ms pulse) so mashing CLIMB on 0 stamina
+  // gives tactile feedback; gear problems (no/frayed rope) are red + nudge, no
+  // buzz — a fix-your-kit message, not a scold. Arbiter dedup keeps repeat taps
+  // from spamming the feed (line shows once; the buzz still fires each tap).
+  const handleClimbPress = () => {
+    if (!climbBlockedReason) { onOpenClimb(); return; }
+    const line = climbBlockedReason === 'no_stamina'
+      ? 'The Arbiter catches your arm. "Not on empty — rest or eat, then climb."'
+      : climbBlockedReason === 'frayed_rope'
+        ? 'The Arbiter eyes your kit. "That rope’s frayed through — it won’t hold your weight. Mend it or find another."'
+        : 'The Arbiter looks up the height. "Not without a rope or climbing gear — you’ll need a grip first."';
+    useGameStore.getState().appendLog('arbiter', line);
+    if (climbBlockedReason === 'no_stamina') {
+      try { Vibration.vibrate(40); } catch { /* ignore */ }
+    }
+  };
   // arb108 — OUTPOST TUTORIAL LOCKDOWN. Until the player makes the
   // stay/leave choice (explore_or_leave), they're in the tutorial and may do
   // ONLY what the current beat asks; EVERY other control is dimmed + buzzes
@@ -527,10 +540,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {!elevatedOn ? (
               <QuickBtn
                 label="climb"
-                onPress={onOpenClimb}
+                onPress={handleClimbPress}
                 tone={climbTone}
                 blocked={climbBlocked}
-                buzzOnTap={climbBuzzNoStamina}
               />
             ) : (
               <>
@@ -632,7 +644,6 @@ function QuickBtn({
   tone,
   blocked,
   outOfRange,
-  buzzOnTap,
 }: {
   label: string;
   onPress: () => void;
@@ -642,10 +653,6 @@ function QuickBtn({
    *  instead of firing the action — so only the beat's instructed button
    *  actually does anything. */
   blocked?: boolean;
-  /** OTA-628 — KEEP the tone (e.g. red 'unavailable') but a tap buzzes and does
-   *  nothing instead of firing onPress. Used for the CLIMB button's empty-stamina
-   *  state: a tactile "you can't — rest first" without opening a dead-end modal. */
-  buzzOnTap?: boolean;
   /** Combat range gating: the weapon can't reach the target from here.
    *  KEEP the amber 'needs-approach' tone (so the player sees WHY), but a
    *  tap buzzes ("can't do it") instead of firing the attack — the engine
@@ -681,13 +688,6 @@ function QuickBtn({
       // because the old single 30ms buzz was easy to miss and "said" nothing.
       buzzWrong();
       useGameStore.getState().nudgeTutorialBlocked();
-      return;
-    }
-    if (buzzOnTap) {
-      // OTA-628 — empty-tank CLIMB: a single firm buzz ("can't — rest first"),
-      // no modal. Distinct from the tutorial double-pulse so it reads as a soft
-      // refusal, not a "wrong control" error.
-      try { Vibration.vibrate(40); } catch { /* ignore */ }
       return;
     }
     if (outOfRange) {
