@@ -81,9 +81,46 @@ const coresBadgeStyle = StyleSheet.create({
 
 interface Props { player: PlayerCharacter; }
 
+// OTA-632 — health-tinted player card. The HP readout is a tiny number in the
+// top-left card; a playtester died (broken-ladder fall) partly because it's so
+// easy to miss how low you are. The card BACKGROUND now fades from a subtle dark
+// green at full HP → amber at half → a strong dark red as you bleed out, and the
+// HP number itself takes the matching colour, so your health reads at a glance
+// without parsing digits. Both stay dark enough to keep the cream text legible.
+const HP_GREEN: readonly [number, number, number] = [88, 168, 96];
+const HP_AMBER: readonly [number, number, number] = [200, 158, 64];
+const HP_RED: readonly [number, number, number] = [196, 64, 52];
+const CARD_BASE: readonly [number, number, number] = [0x13, 0x11, 0x0f];
+
+function lerp(a: number, b: number, t: number): number {
+  return Math.round(a + (b - a) * t);
+}
+function mix(a: readonly [number, number, number], b: readonly [number, number, number], t: number): [number, number, number] {
+  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+}
+/** Health hue for `frac` (0..1): red → amber → green. */
+export function healthHue(frac: number): [number, number, number] {
+  const f = Math.max(0, Math.min(1, frac));
+  return f >= 0.5 ? mix(HP_AMBER, HP_GREEN, (f - 0.5) / 0.5) : mix(HP_RED, HP_AMBER, f / 0.5);
+}
+/** Card background: the health hue blended over the dark base, intensifying as
+ *  HP drops (subtle green when full, the card "fills" red near death). */
+export function healthCardBg(frac: number): string {
+  const f = Math.max(0, Math.min(1, frac));
+  const [r, g, b] = mix(CARD_BASE, healthHue(f), 0.20 + (1 - f) * 0.55);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+/** Brighter health hue for the HP number itself, so it pops off the dark card. */
+export function healthTextColor(frac: number): string {
+  const [r, g, b] = mix(healthHue(frac), [255, 255, 255], 0.45);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 export function StatsPanel({ player }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
+  // OTA-632 — HP fraction drives the card tint + HP-number colour.
+  const hpFrac = player.hpMax > 0 ? player.hp / player.hpMax : 1;
 
   // Effective AC = race base + summed armor bonus across head/chest/legs/feet.
   // OTA-227 — uses resolveDisplayArmorByName so fused armor (uniqueStats,
@@ -138,7 +175,7 @@ export function StatsPanel({ player }: Props) {
   const golemShows = !!player.golem && player.golem.hp > 0;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: healthCardBg(hpFrac) }]}>
       <View style={styles.nameRow}>
         <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
         {dogShows && player.dog ? (
@@ -156,7 +193,7 @@ export function StatsPanel({ player }: Props) {
       ) : null}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
-        <Stat label="HP" value={`${player.hp}/${player.hpMax}`} />
+        <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
         <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
@@ -210,11 +247,11 @@ function formatStat(base: number, effective: number): string {
   return effective > base ? `${effective} (+${effective - base})` : `${base}`;
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
   return (
     <View style={styles.stat}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
+      <Text style={[styles.value, valueColor ? { color: valueColor } : null]}>{value}</Text>
     </View>
   );
 }
