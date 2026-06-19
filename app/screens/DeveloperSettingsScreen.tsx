@@ -329,14 +329,112 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
   );
 }
 
-export function DeveloperSettingsScreen() {
+export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const setScreen = useGameStore((s) => s.setScreen);
   const clearAll = useContentPackStore((s) => s.clearAll);
   const published = useContentPackStore((s) => s.published);
   const publish = useContentPackStore((s) => s.publish);
   const unpublish = useContentPackStore((s) => s.unpublish);
+  const setDevMode = useContentPackStore((s) => s.setDevMode);
   const [confirmPub, setConfirmPub] = useState(false);
+  const [confirmDevOff, setConfirmDevOff] = useState(false);
 
+  return (
+    <>
+      {!embedded && (
+        <Text style={styles.blurb}>
+          This is the engine's developer console. Hit TEMPLATE on any box to drop in the first
+          couple of built-in (Tartaria) rows as a starter schema, edit them into your own game,
+          then LOAD to override at runtime — reskin the engine with no code changes. Empty boxes
+          use the built-in defaults.
+        </Text>
+      )}
+
+      <GameIdentitySection />
+
+      <Text style={styles.sectionLabel}>LORE</Text>
+      {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
+
+      <Text style={styles.sectionLabel}>TABLES</Text>
+      {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
+
+      <Text style={styles.sectionLabel}>MUSIC</Text>
+      <MusicBox
+        category="battle"
+        label="Battle Music"
+        hint="Plays during combat and boss fights. Uploads replace the built-in battle score."
+      />
+      <MusicBox
+        category="ambient"
+        label="Ambient Music"
+        hint="Plays while exploring. Uploads replace the built-in exploration score."
+      />
+
+      <Text style={styles.sectionLabel}>FAMILY BUILD</Text>
+      {!published ? (
+        <>
+          <TouchableOpacity
+            style={styles.publishBtn}
+            onPress={() => {
+              if (!confirmPub) { setConfirmPub(true); return; }
+              publish();
+              setConfirmPub(false);
+              if (!embedded) setScreen('title');
+            }}
+          >
+            <Text style={styles.publishBtnText}>
+              {confirmPub ? 'TAP AGAIN — HIDE THE DEV PILL FOR A FAMILY BUILD' : '★ PUBLISH (hide dev for testers)'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.publishNote}>
+            Hides the title DEV pill so testers see a clean game. You keep your way back in —
+            name a character “Verbal” to return here anytime — so you can keep editing after
+            their feedback. (This only hides the pill; full removal happens at the signed
+            go-live build.)
+          </Text>
+        </>
+      ) : (
+        <>
+          <TouchableOpacity style={styles.unpublishBtn} onPress={() => { unpublish(); setConfirmPub(false); }}>
+            <Text style={styles.unpublishBtnText}>↺ UN-PUBLISH — show the DEV pill again</Text>
+          </TouchableOpacity>
+          <Text style={styles.publishNote}>
+            The DEV pill is hidden (family build). You're still in via the “Verbal” backdoor.
+            Tap above to bring the pill back while you keep iterating.
+          </Text>
+        </>
+      )}
+
+      <Text style={styles.sectionLabel}>DEV MODE</Text>
+      <TouchableOpacity
+        style={styles.unpublishBtn}
+        onPress={() => {
+          if (!confirmDevOff) { setConfirmDevOff(true); return; }
+          setDevMode(false);
+          setConfirmDevOff(false);
+          if (!embedded) setScreen('title');
+        }}
+      >
+        <Text style={styles.unpublishBtnText}>
+          {confirmDevOff ? 'TAP AGAIN — TURN OFF DEV MODE' : '⏻ TURN OFF DEV MODE'}
+        </Text>
+      </TouchableOpacity>
+      <Text style={styles.publishNote}>
+        While dev mode is on, this console is the first tab in Settings and opens by default.
+        Turn it off for a clean Settings screen. To get back in any time, create a character
+        named “Verbal”.
+      </Text>
+
+      <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
+        <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
+      </TouchableOpacity>
+      <View style={{ height: 40 }} />
+    </>
+  );
+}
+
+export function DeveloperSettingsScreen() {
+  const setScreen = useGameStore((s) => s.setScreen);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -347,71 +445,7 @@ export function DeveloperSettingsScreen() {
         <View style={{ width: 70 }} />
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.blurb}>
-          This is the engine's developer console. Hit TEMPLATE on any box to drop in the first
-          couple of built-in (Tartaria) rows as a starter schema, edit them into your own game,
-          then LOAD to override at runtime — reskin the engine with no code changes. Empty boxes
-          use the built-in defaults.
-        </Text>
-
-        <GameIdentitySection />
-
-        <Text style={styles.sectionLabel}>LORE</Text>
-        {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
-
-        <Text style={styles.sectionLabel}>TABLES</Text>
-        {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
-
-        <Text style={styles.sectionLabel}>MUSIC</Text>
-        <MusicBox
-          category="battle"
-          label="Battle Music"
-          hint="Plays during combat and boss fights. Uploads replace the built-in battle score."
-        />
-        <MusicBox
-          category="ambient"
-          label="Ambient Music"
-          hint="Plays while exploring. Uploads replace the built-in exploration score."
-        />
-
-        <Text style={styles.sectionLabel}>FAMILY BUILD</Text>
-        {!published ? (
-          <>
-            <TouchableOpacity
-              style={styles.publishBtn}
-              onPress={() => {
-                if (!confirmPub) { setConfirmPub(true); return; }
-                publish();
-                setScreen('title');
-              }}
-            >
-              <Text style={styles.publishBtnText}>
-                {confirmPub ? 'TAP AGAIN — HIDE THE DEV PILL FOR A FAMILY BUILD' : '★ PUBLISH (hide dev for testers)'}
-              </Text>
-            </TouchableOpacity>
-            <Text style={styles.publishNote}>
-              Hides the title DEV pill so testers see a clean game. You keep your way back in —
-              name a character “Verbal” to return here anytime — so you can keep editing after
-              their feedback. (This only hides the pill; full removal happens at the signed
-              go-live build.)
-            </Text>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity style={styles.unpublishBtn} onPress={() => { unpublish(); setConfirmPub(false); }}>
-              <Text style={styles.unpublishBtnText}>↺ UN-PUBLISH — show the DEV pill again</Text>
-            </TouchableOpacity>
-            <Text style={styles.publishNote}>
-              The DEV pill is hidden (family build). You're still in via the “Verbal” backdoor.
-              Tap above to bring the pill back while you keep iterating.
-            </Text>
-          </>
-        )}
-
-        <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
-          <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
-        </TouchableOpacity>
-        <View style={{ height: 40 }} />
+        <DeveloperConsole />
       </ScrollView>
     </View>
   );

@@ -71,6 +71,7 @@ import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
 import { DEV_ACCESS_NAME, getNarratorName } from '../engine/contentPack';
+import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
@@ -5836,7 +5837,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } : { awaitingTutorialName: false }));
         get().maybeAdvanceTutorial('name');
         if (cleanName === DEV_ACCESS_NAME) {
-          set({ currentScreen: 'developer' });
+          // Re-enable dev mode and open Settings, which (with dev mode on) lands
+          // on the DEV console as its first/default tab.
+          useContentPackStore.getState().setDevMode(true);
+          set({ currentScreen: 'about' });
           return;
         }
         get().appendLog('arbiter', `"Well met, ${cleanName}. To business."`);

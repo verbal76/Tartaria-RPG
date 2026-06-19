@@ -36,6 +36,9 @@ interface PersistShape {
   gameTitle?: string;
   /** Custom tagline; '' / absent → world-lore tagline or the default. */
   gameTagline?: string;
+  /** Dev mode: while true, the dev console is the first/default Settings tab.
+   *  Absent → treated as true (engine dev build default). */
+  devMode?: boolean;
 }
 
 interface ContentPackState {
@@ -50,6 +53,8 @@ interface ContentPackState {
   gameTitle: string;
   /** The author's custom tagline ('' = world-lore tagline or the default). */
   gameTagline: string;
+  /** While true, Settings opens to the dev console as its first/default tab. */
+  devMode: boolean;
   hydrated: boolean;
   /** Hide the title DEV pill for a family build (reversible; Verbal still works). */
   publish: () => void;
@@ -61,6 +66,8 @@ interface ContentPackState {
   setGameTitle: (name: string) => void;
   /** Set the tagline (pass '' to fall back to world lore / the default). */
   setGameTagline: (text: string) => void;
+  /** Turn dev mode on/off (controls the Settings dev tab + default tab). */
+  setDevMode: (on: boolean) => void;
   /** Parse + validate a table JSON (must be a non-empty array), apply, persist. */
   loadTableJson: (id: ContentTableId, json: string) => LoadResult;
   /** Parse + validate a lore JSON (object or array), apply, persist. */
@@ -72,7 +79,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -80,6 +87,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'published' |
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
     gameTagline: state.gameTagline || undefined,
+    devMode: state.devMode,
   };
   void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shape)).catch(() => { /* best effort */ });
 }
@@ -91,18 +99,26 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   narratorName: '',
   gameTitle: '',
   gameTagline: '',
+  devMode: true,
   hydrated: false,
 
   publish() {
+    // A family build hides the dev pill AND drops out of dev mode so testers
+    // get a clean Settings screen. The "Verbal" backdoor re-enables both.
     setPublishedFlag(true);
-    set({ published: true });
-    persist({ ...get(), published: true });
+    set({ published: true, devMode: false });
+    persist({ ...get(), published: true, devMode: false });
   },
 
   unpublish() {
     setPublishedFlag(false);
-    set({ published: false });
-    persist({ ...get(), published: false });
+    set({ published: false, devMode: true });
+    persist({ ...get(), published: false, devMode: true });
+  },
+
+  setDevMode(on) {
+    set({ devMode: on });
+    persist({ ...get(), devMode: on });
   },
 
   setNarratorName(name) {
@@ -182,7 +198,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   clearAll() {
     clearAllOverrides();
     setPublishedFlag(false);
-    set({ tables: {}, lore: {}, published: false, narratorName: '', gameTitle: '', gameTagline: '' });
+    set({ tables: {}, lore: {}, published: false, narratorName: '', gameTitle: '', gameTagline: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -208,7 +224,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setGameTitleOverride(gameTitle.length > 0 ? gameTitle : null);
         const gameTagline = typeof shape.gameTagline === 'string' ? shape.gameTagline : '';
         setGameTaglineOverride(gameTagline.length > 0 ? gameTagline : null);
-        set({ tables, lore, published, narratorName, gameTitle, gameTagline });
+        // Absent → true (engine dev build defaults to dev mode on).
+        const devMode = shape.devMode !== false;
+        set({ tables, lore, published, narratorName, gameTitle, gameTagline, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

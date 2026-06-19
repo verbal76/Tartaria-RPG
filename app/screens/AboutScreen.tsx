@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
+import { useContentPackStore } from '../state/contentPackStore';
+import { DeveloperConsole } from './DeveloperSettingsScreen';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
@@ -96,7 +98,16 @@ export function AboutScreen() {
   // clear log — the three actions that previously cluttered the
   // bottom of the ExplorationScreen menu row. save & exit is the
   // most-pressed action, so it's the default tab on open.
-  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
+  // engine_Dev — while dev mode is on, the DEV console is the first tab and the
+  // default on open. Turned off from inside the console (or by publishing).
+  const devMode = useContentPackStore((s) => s.devMode);
+  const [tab, setTab] = useState<'dev' | 'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>(
+    () => (useContentPackStore.getState().devMode ? 'dev' : 'session'),
+  );
+  // If dev mode is switched off while the DEV tab is showing, fall back to SESSION.
+  useEffect(() => {
+    if (!devMode && tab === 'dev') setTab('session');
+  }, [devMode, tab]);
   // arb78 — player-tunable background settings (live).
   const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
   useEffect(() => {
@@ -599,7 +610,10 @@ export function AboutScreen() {
           ABOUT / diagnostic block stays its own tab. Music card
           renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['session', 'sfx', 'display', 'lore', 'about', 'notices'] as const).map((id) => (
+        {(devMode
+          ? (['dev', 'session', 'sfx', 'display', 'lore', 'about', 'notices'] as const)
+          : (['session', 'sfx', 'display', 'lore', 'about', 'notices'] as const)
+        ).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -619,6 +633,8 @@ export function AboutScreen() {
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        {/* engine_Dev — DEV console as the first tab (dev mode only). */}
+        {tab === 'dev' && <DeveloperConsole embedded />}
         {/* v2.4.1 (OTA 047) — SESSION tab. The three run-control
             actions that used to clutter the in-game menu row
             (save & exit, copy log, clear log) live here as proper

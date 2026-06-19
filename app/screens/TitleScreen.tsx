@@ -99,6 +99,7 @@ export function TitleScreen() {
   const slots = useGameStore((s) => s.slots);
   const setScreen = useGameStore((s) => s.setScreen);
   const devPublished = useContentPackStore((s) => s.published);
+  const setDevMode = useContentPackStore((s) => s.setDevMode);
   const refreshSlots = useGameStore((s) => s.refreshSlots);
   const loadSlotIntoGame = useGameStore((s) => s.loadSlotIntoGame);
   const slotLoadError = useGameStore((s) => s.slotLoadError);
@@ -1123,7 +1124,7 @@ export function TitleScreen() {
       {!devPublished && (
         <TouchableOpacity
           style={styles.devPill}
-          onPress={() => setScreen('developer')}
+          onPress={() => { setDevMode(true); setScreen('about'); }}
           activeOpacity={0.7}
           hitSlop={8}
           accessibilityLabel="Content Packs (developer)"

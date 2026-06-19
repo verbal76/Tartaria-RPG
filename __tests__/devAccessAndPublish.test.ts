@@ -51,27 +51,31 @@ describe('engine_Dev — developer door + publish lock', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
   beforeEach(() => { useContentPackStore.getState().clearAll(); }); // unpublished, clean
 
-  it('naming a character "Verbal" (unpublished) opens the developer console', async () => {
+  it('naming a character "Verbal" (unpublished) opens Settings on the DEV tab', async () => {
     const store = await freshGameAtNameBeat();
     store.getState().submitPlayerAction('Verbal');
-    expect(store.getState().currentScreen).toBe('developer');
+    // Routes to Settings, which (dev mode on) defaults to the DEV console tab.
+    expect(store.getState().currentScreen).toBe('about');
+    expect(useContentPackStore.getState().devMode).toBe(true);
     expect(isPublished()).toBe(false);
   });
 
   it('a normal name starts a normal game (not the console)', async () => {
     const store = await freshGameAtNameBeat();
     store.getState().submitPlayerAction('Sarah');
-    expect(store.getState().currentScreen).not.toBe('developer');
+    expect(store.getState().currentScreen).not.toBe('about');
     expect(store.getState().player!.name).toBe('Sarah');
   });
 
-  it('publish() only hides the DEV pill — "Verbal" backdoor still opens the console', async () => {
+  it('publish() hides the DEV pill + drops dev mode — "Verbal" backdoor re-enables both', async () => {
     useContentPackStore.getState().publish();
     expect(isPublished()).toBe(true); // pill hidden (TitleScreen reads this)
+    expect(useContentPackStore.getState().devMode).toBe(false); // clean Settings for testers
     const store = await freshGameAtNameBeat();
     store.getState().submitPlayerAction('Verbal');
-    // The author can still get back in to keep editing on a published family build.
-    expect(store.getState().currentScreen).toBe('developer');
+    // The author gets back in: dev mode on + Settings open on the DEV tab.
+    expect(store.getState().currentScreen).toBe('about');
+    expect(useContentPackStore.getState().devMode).toBe(true);
   });
 
   it('unpublish() brings the pill back (non-destructive — content untouched)', () => {

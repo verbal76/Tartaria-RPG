@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-640 — dev console as Settings tab (JS-only OTA). The developer
+// console is now the FIRST tab in Settings and the default tab while "dev mode"
+// is on (persisted, default on). A "turn off dev mode" toggle gives testers a
+// clean Settings screen; publishing also drops dev mode. Naming a character
+// "Verbal" (or the title DEV pill) re-enables dev mode and opens Settings on the
+// DEV tab. The console body is shared (DeveloperConsole) between the tab and the
+// standalone screen.
 // engine_Dev-639 — Arbiter→Narrator + game identity (JS-only OTA). "Arbiter"
 // renamed to a dynamic narrator name (default "Narrator") across the player-
 // facing voice/UI and the LLM persona; new dev-console blocks rename the
@@ -15233,4 +15240,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-639';
+export const OTA_BUILD_ID = '2026-06-19-640';
