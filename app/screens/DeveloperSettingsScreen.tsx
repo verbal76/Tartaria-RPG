@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
 import {
@@ -63,6 +64,16 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
         >
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : getTableTemplate(id);
+            void Clipboard.setStringAsync(out);
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard — paste into an editor, fill it out, paste it back, then LOAD.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
         {tableOverrideCount(id) > 0 && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { clearTable(id); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
             <Text style={styles.resetBtnText}>RESET</Text>
@@ -114,6 +125,16 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
           onPress={() => { setText(getLoreTemplate(id)); setStatus({ kind: 'ok', msg: 'Loaded a template — edit, then LOAD.' }); }}
         >
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : getLoreTemplate(id);
+            void Clipboard.setStringAsync(out);
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard — paste into an editor, fill it out, paste it back, then LOAD.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
         {hasLoreOverride(id) && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { clearLore(id); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
@@ -187,6 +208,8 @@ const styles = StyleSheet.create({
   loadBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   tmplBtn: { backgroundColor: '#1a1714', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
   tmplBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  copyBtn: { backgroundColor: '#1a1714', borderColor: '#cdbf99', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  copyBtnText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   resetBtn: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
   resetBtnText: { color: '#a89a7a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },

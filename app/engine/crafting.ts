@@ -1,6 +1,7 @@
 import type { InventoryItem, Rarity, DamageType } from './types';
 import type { ItemEffect } from './itemEffect';
 import { levenshtein } from './editDistance';
+import { resolveTable } from './contentPack';
 import { resolveItemAlias } from './itemAliases';
 import materialsData from '../data/items/materials.json';
 import weaponsData from '../data/items/weapons.json';
@@ -187,6 +188,16 @@ export function findDogGearByName(name: string): CatalogDogGear | undefined {
 // etc. Don't try to unwrap.
 export const EXPLORATION = explorationData as CatalogExploration[];
 
+// engine_Dev — resolve each table through the content-pack registry so an uploaded
+// override REPLACES the built-in at lookup time (call-time; no module reload). The
+// exported consts above stay the built-in defaults (other modules import them);
+// these getters honor a loaded override, else return the same built-in array.
+const rWeapons = (): readonly CatalogWeapon[] => resolveTable('weapons', WEAPONS);
+const rArmor = (): readonly CatalogArmor[] => resolveTable('armor', ARMOR);
+const rMaterials = (): readonly CatalogMaterial[] => resolveTable('materials', MATERIALS);
+const rGear = (): readonly CatalogGear[] => resolveTable('gear', GEAR);
+const rExploration = (): readonly CatalogExploration[] => resolveTable('exploration', EXPLORATION);
+
 const DEFAULT_DURABILITY = 25;
 
 export function lookupCraftedItem(resultName: string): {
@@ -195,11 +206,11 @@ export function lookupCraftedItem(resultName: string): {
   tags: string[];
   baseDurability?: number;
 } {
-  const w = WEAPONS.find((x) => x.name === resultName);
+  const w = rWeapons().find((x) => x.name === resultName);
   if (w) return { kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
-  const a = ARMOR.find((x) => x.name === resultName);
+  const a = rArmor().find((x) => x.name === resultName);
   if (a) return { kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
-  const g = GEAR.find((x) => x.name === resultName);
+  const g = rGear().find((x) => x.name === resultName);
   if (g) return { kind: g.kind, rarity: g.rarity, tags: g.tags };
   // OTA-603 — dog vests (kind 'dog_armor') were authored in dogGear.json but
   // never resolved here, so a looted/dropped vest minted as a tagless 'misc'
@@ -212,7 +223,7 @@ export function lookupCraftedItem(resultName: string): {
   if (am) return { kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
   const r = RINGS.find((x) => x.name === resultName);
   if (r) return { kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
-  const m = MATERIALS.find((x) => x.name === resultName);
+  const m = rMaterials().find((x) => x.name === resultName);
   if (m) return { kind: 'misc', rarity: m.rarity, tags: m.tags };
   // 2026-05-25 — exploration catalog lookup. Without this branch the
   // MECHANIC-2 Pulse Scanner recipe (added 2026-05-25, OTA-006)
@@ -220,7 +231,7 @@ export function lookupCraftedItem(resultName: string): {
   // Scanner with its effect/faction/tcBuy. Any future exploration
   // recipe (compass, lantern variants, scanner variants) would hit
   // the same fallback.
-  const exp = EXPLORATION.find((x) => x.name === resultName);
+  const exp = rExploration().find((x) => x.name === resultName);
   if (exp) return { kind: 'relic', rarity: exp.rarity, tags: exp.tags };
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
@@ -597,7 +608,7 @@ function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amul
 export function findWeaponByName(name: string): CatalogWeapon | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  const direct = rWeapons().find((w) => w.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'weapon')) return null;
   // Inference fallback — only fires for names that READ as a weapon,
@@ -734,7 +745,7 @@ export function findRingByName(name: string): CatalogAccessory | null {
 export function findExplorationItemByName(name: string): CatalogExploration | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return EXPLORATION.find((e) => e.name.toLowerCase() === t) ?? null;
+  return rExploration().find((e) => e.name.toLowerCase() === t) ?? null;
 }
 
 /** Same for materials. The 13 orphan materials from the OTA 192
@@ -743,7 +754,7 @@ export function findExplorationItemByName(name: string): CatalogExploration | nu
 export function findMaterialByName(name: string): CatalogMaterial | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return MATERIALS.find((m) => m.name.toLowerCase() === t) ?? null;
+  return rMaterials().find((m) => m.name.toLowerCase() === t) ?? null;
 }
 
 /** Same for gear — small catalog (6 items as of OTA 192) but the
@@ -751,7 +762,7 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
 export function findGearByName(name: string): CatalogGear | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return GEAR.find((g) => g.name.toLowerCase() === t) ?? null;
+  return rGear().find((g) => g.name.toLowerCase() === t) ?? null;
 }
 
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
