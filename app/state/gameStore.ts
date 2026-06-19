@@ -26624,7 +26624,10 @@ let lastQwenGenStartMs = 0;
 // reflective, unprompted asides (not tied to any action), so they can run to
 // completion in the background and speak whenever ready. Spaced wide so the
 // shared voice lock is mostly free for the instant canned reactions.
-const AMBIENT_GEN_COOLDOWN_MS = 45000;
+// OTA-634 — widened 45s → 90s. On a slow / thermally-throttled phone each musing
+// is a 20-55s LLM call on the shared native-ML lock; halving how often they fire
+// frees that lock for interactive narration + voice. (Still muzzled in combat.)
+const AMBIENT_GEN_COOLDOWN_MS = 90000;
 let lastAmbientGenStartMs = 0;
 
 // OTA-612 — exploit close: contract/hunt accept trains CHA, but accept→abandon→
