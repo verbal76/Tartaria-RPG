@@ -112,6 +112,22 @@ export function getNarratorName(): string {
   return narratorNameOverride ?? DEFAULT_NARRATOR_NAME;
 }
 
+/** Fix the grammar when the narrator carries a PROPER NAME instead of a role.
+ *  Built-in narration is written for role-words ("the Narrator looks up", "the
+ *  Arbiter's voice"), which read wrong once the author renames the narrator to a
+ *  person ("the Bob looks up"). When a name override is active, strip the leading
+ *  article off occurrences of the name — "The Bob" → "Bob", "the Bob's" → "Bob's"
+ *  — and leave the default role-word narrator untouched. No-op when no override is
+ *  set or the text doesn't mention the name. */
+export function dressNarratorArticles(text: string): string {
+  if (!text || !hasNarratorNameOverride()) return text;
+  const name = getNarratorName();
+  if (!name || /^(the\s)/i.test(name)) return text; // author kept an article in the name
+  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // "The Bob" / "the Bob" (followed by 's, whitespace, or punctuation) → "Bob"
+  return text.replace(new RegExp(`\\b[Tt]he\\s+(${esc})\\b`, 'g'), '$1');
+}
+
 export function setTableOverride(id: ContentTableId, rows: readonly unknown[] | null): void {
   if (rows && rows.length > 0) tableOverrides[id] = rows;
   else delete tableOverrides[id];

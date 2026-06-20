@@ -11,7 +11,7 @@ import type {
   WorldMemory,
 } from './types';
 import { pick, chance, rotatingPick } from './rng';
-import { getNarratorName, resolveFlavor } from './contentPack';
+import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride } from './contentPack';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
 // lazy-loaded via require() inside getter functions below. Combined
@@ -86,6 +86,10 @@ export function buildOpeningNarrative(input: {
   // is . Your blood is …" — a stray bare clause. Drop the name clause entirely
   // when the name isn't set yet; the Arbiter asks for it moments later.
   const named = (playerName ?? '').trim().length > 0;
+  // engine_Dev — P1 (the opening grounding) is data-driven. With a custom World
+  // lore block loaded, ground the intro in the author's own `setting` instead of
+  // the built-in Tartaria cataclysm ("the Aetherstone flood drowned Tartaria").
+  // No custom world → the Tartaria default openings below.
   const p1Variants = named ? [
     `You are ${playerName} of the ${raceName}, walking under the colors of the ${factionName}. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
     `Your name is ${playerName}. Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
@@ -95,7 +99,16 @@ export function buildOpeningNarrative(input: {
     `Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
     `Of the ${raceName}, sworn to the ${factionName}: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.`,
   ];
-  const p1 = pick(p1Variants);
+  let p1: string;
+  if (hasLoreOverride('world')) {
+    const lead = named
+      ? `You are ${playerName} of the ${raceName}, under the colors of the ${factionName}.`
+      : `You walk under the colors of the ${factionName}, ${raceName} blood in your veins.`;
+    const setting = getWorldSetting();
+    p1 = setting ? `${lead} ${setting}` : lead;
+  } else {
+    p1 = pick(p1Variants);
+  }
 
   // P2 — setting. Hub mode anchors at the authored room; otherwise the
   // procedural location description carries the load. Preserves the

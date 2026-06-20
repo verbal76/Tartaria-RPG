@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, getNarratorName } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -3936,6 +3936,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   appendLog(channel, text, meta) {
+    // engine_Dev — proper-name narrator grammar fix. Built-in narration is
+    // written for a ROLE-word narrator ("the Narrator looks up", "the Arbiter's
+    // voice"). Once the author renames the narrator to a person ("Bob"), those
+    // beats read "the Bob looks up". dressNarratorArticles strips the stray
+    // article only when a name override is active; it's a no-op for the default
+    // role-word narrator and for text that never mentions the name.
+    text = dressNarratorArticles(text);
     // 2026-05-25 OTA-034 — narration-channel invariant. The authored
     // vendor caught-stealing line ("Thief! — steel comes out.") is
     // emitted ONCE in this file inside stealFromVendor. A first-time
