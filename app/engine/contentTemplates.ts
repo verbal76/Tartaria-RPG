@@ -19,6 +19,8 @@ import locationsData from '../data/locations/locations.json';
 import weatherData from '../data/weather/weather.json';
 import {
   DEFAULT_WORLD_TONE,
+  CONTENT_TABLES,
+  LORE_BLOCKS,
   type ContentTableId,
   type LoreBlockId,
 } from './contentPack';
@@ -147,4 +149,59 @@ export function getLoreTemplate(id: LoreBlockId): string {
   }
   const src = id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races;
   return JSON.stringify(src.slice(0, TEMPLATE_SAMPLE_ROWS), null, 2);
+}
+
+/** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
+ *  template stays readable. */
+function commentBlock(hint: string, width = 90): string {
+  const words = hint.split(/\s+/);
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    if (cur && (cur.length + 1 + w.length) > width) { lines.push(cur); cur = w; }
+    else cur = cur ? `${cur} ${w}` : w;
+  }
+  if (cur) lines.push(cur);
+  return lines.map((l) => `  // ${l}`).join('\n');
+}
+
+/** One `"key": <content>` block, nested one level (2-space indent) and prefixed
+ *  with its reference comment. */
+function bundleSection(key: string, hint: string, content: string): string {
+  const indented = content.split('\n').map((l, i) => (i === 0 ? l : `  ${l}`)).join('\n');
+  return `${commentBlock(hint)}\n  "${key}": ${indented}`;
+}
+
+/** The WHOLE-GAME template: a single JSONC object holding every section (title /
+ *  tagline / narrator, the four lore blocks, then every content table), each with
+ *  an inline `//` reference comment describing what it needs. Comments are legal
+ *  here because loadGameBundle strips them before parsing. Upload this one file to
+ *  build the entire game at once; the per-section boxes then show what loaded. */
+export function buildGameBundleTemplate(): string {
+  // Each entry is a complete `"key": value` block (with its own reference
+  // comment). They're joined with commas, so every section is comma-separated and
+  // the file parses as JSON once the comments are stripped.
+  const header = [
+    '  // ============================================================',
+    '  // WHOLE-GAME FILE. Edit every section, delete what you don\'t need,',
+    '  // then upload under "UPLOAD ENTIRE GAME". // and block comments are OK.',
+    '  // Any section you omit keeps the built-in (Tartaria) default.',
+    '  // ============================================================',
+  ].join('\n');
+
+  const sections: string[] = [
+    // The header sits above the first real key (comments need no comma).
+    `${header}\n${bundleSection('title', 'The game title shown on the start screen.', JSON.stringify('My Game'))}`,
+    bundleSection('tagline', 'One-line tagline under the title.', JSON.stringify('A world of your making.')),
+    bundleSection('narrator', 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', JSON.stringify('Narrator')),
+  ];
+
+  for (const b of LORE_BLOCKS) {
+    sections.push(bundleSection(b.id, b.hint, getLoreTemplate(b.id)));
+  }
+  for (const t of CONTENT_TABLES) {
+    sections.push(bundleSection(t.id, t.hint, getTableTemplate(t.id)));
+  }
+
+  return `{\n${sections.join(',\n\n')}\n}\n`;
 }

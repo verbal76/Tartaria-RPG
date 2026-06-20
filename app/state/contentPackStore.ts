@@ -14,6 +14,8 @@ import {
   getNarratorName,
   clearAllOverrides,
   setPublishedFlag,
+  CONTENT_TABLES,
+  LORE_BLOCKS,
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
@@ -24,6 +26,47 @@ export interface LoadResult {
   ok: boolean;
   error?: string;
   count?: number;
+}
+
+export interface BundleLoadResult {
+  ok: boolean;
+  error?: string;
+  /** Human-readable per-section summary of what the bundle applied. */
+  summary?: string;
+}
+
+/** Strip // line comments and block comments from a JSONC string so the
+ *  whole-game template can carry inline reference descriptions and still parse.
+ *  String literals are respected (a // inside a "string" is preserved). */
+export function stripJsonComments(src: string): string {
+  let out = '';
+  let inStr = false;
+  let quote = '';
+  let inLine = false;
+  let inBlock = false;
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    const next = src[i + 1];
+    if (inLine) {
+      if (c === '\n') { inLine = false; out += c; }
+      continue;
+    }
+    if (inBlock) {
+      if (c === '*' && next === '/') { inBlock = false; i++; }
+      continue;
+    }
+    if (inStr) {
+      out += c;
+      if (c === '\\') { out += next ?? ''; i++; continue; }
+      if (c === quote) { inStr = false; }
+      continue;
+    }
+    if (c === '"' || c === "'") { inStr = true; quote = c; out += c; continue; }
+    if (c === '/' && next === '/') { inLine = true; i++; continue; }
+    if (c === '/' && next === '*') { inBlock = true; i++; continue; }
+    out += c;
+  }
+  return out;
 }
 
 interface PersistShape {
@@ -77,6 +120,10 @@ interface ContentPackState {
   loadTableJson: (id: ContentTableId, json: string) => LoadResult;
   /** Parse + validate a lore JSON (object or array), apply, persist. */
   loadLoreJson: (id: LoreBlockId, json: string) => LoadResult;
+  /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
+   *  table ids / lore block ids / title / tagline / narrator, and apply every
+   *  recognised section at once. One upload builds the whole game. */
+  loadGameBundle: (json: string) => BundleLoadResult;
   clearTable: (id: ContentTableId) => void;
   clearLore: (id: LoreBlockId) => void;
   clearAll: () => void;
@@ -220,6 +267,84 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     set({ lore, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), lore });
     return { ok: true };
+  },
+
+  loadGameBundle(json) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonComments(json));
+    } catch (e) {
+      return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { ok: false, error: 'A whole-game file must be a JSON OBJECT whose keys are the section names (weapons, races, factions, locations, world, lore, …).' };
+    }
+    const obj = parsed as Record<string, unknown>;
+    const tableIds = new Set<string>(CONTENT_TABLES.map((t) => t.id));
+    const loreIds = new Set<string>(LORE_BLOCKS.map((b) => b.id));
+
+    const nextTables: Partial<Record<ContentTableId, unknown[]>> = { ...get().tables };
+    const nextLore: Partial<Record<LoreBlockId, unknown>> = { ...get().lore };
+    let nextNarrator = get().narratorName;
+    let nextTitle = get().gameTitle;
+    let nextTagline = get().gameTagline;
+    const applied: string[] = [];
+    const skipped: string[] = [];
+
+    for (const [key, value] of Object.entries(obj)) {
+      // Comment / readme keys in the template are ignored, not errors.
+      if (key.startsWith('_') || key.startsWith('//')) continue;
+      if (tableIds.has(key)) {
+        // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
+        let rows: unknown = value;
+        if (!Array.isArray(rows) && rows && typeof rows === 'object') {
+          const arrays = Object.values(rows as Record<string, unknown>).filter(Array.isArray);
+          if (arrays.length === 1) rows = arrays[0];
+        }
+        if (Array.isArray(rows) && rows.length > 0) {
+          setTableOverride(key as ContentTableId, rows);
+          nextTables[key as ContentTableId] = rows;
+          applied.push(`${key} (${rows.length})`);
+        } else {
+          skipped.push(`${key} (empty/not an array)`);
+        }
+      } else if (loreIds.has(key)) {
+        if (value != null && typeof value === 'object') {
+          setLoreOverride(key as LoreBlockId, value);
+          nextLore[key as LoreBlockId] = value;
+          applied.push(key);
+        } else {
+          skipped.push(`${key} (not an object)`);
+        }
+      } else if (key === 'narrator' || key === 'narratorName') {
+        if (typeof value === 'string') { nextNarrator = value.trim(); applied.push('narrator name'); }
+      } else if (key === 'title' || key === 'gameTitle') {
+        if (typeof value === 'string') { nextTitle = value.trim(); applied.push('title'); }
+      } else if (key === 'tagline' || key === 'gameTagline') {
+        if (typeof value === 'string') { nextTagline = value.trim(); applied.push('tagline'); }
+      } else {
+        skipped.push(`${key} (unknown section)`);
+      }
+    }
+
+    if (applied.length === 0) {
+      return { ok: false, error: `No recognised sections found. Keys must be section names like: ${[...tableIds, ...loreIds, 'title', 'tagline', 'narrator'].join(', ')}.` };
+    }
+
+    setNarratorNameOverride(nextNarrator || null);
+    setGameTitleOverride(nextTitle || null);
+    setGameTaglineOverride(nextTagline || null);
+    set({
+      tables: nextTables,
+      lore: nextLore,
+      narratorName: nextNarrator,
+      gameTitle: nextTitle,
+      gameTagline: nextTagline,
+      contentVersion: get().contentVersion + 1,
+    });
+    persist({ ...get(), tables: nextTables, lore: nextLore, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline });
+    const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
+    return { ok: true, summary };
   },
 
   clearTable(id) {

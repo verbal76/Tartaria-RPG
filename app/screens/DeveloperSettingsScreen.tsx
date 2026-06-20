@@ -28,7 +28,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -231,6 +231,74 @@ function MusicBox({ category, label, hint }: { category: MusicCategory; label: s
             <Text style={styles.resetBtnText}>CLEAR ALL</Text>
           </TouchableOpacity>
         )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — WHOLE-GAME upload. One JSONC file holding every section (tables +
+// lore + title/tagline/narrator). Build the entire game in a single upload; the
+// per-section boxes below then show what loaded. GAME TEMPLATE emits the combined
+// file with an inline reference comment on every section.
+function GameBundleBox() {
+  const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Whole-game file</Text>
+        <Text style={styles.badgeOff}>one upload builds everything</Text>
+      </View>
+      <Text style={styles.hint}>
+        A single JSON object whose keys are section names — weapons, armor, races, factions,
+        locations, weather, enemies, recipes, powers, the lore document, the four lore blocks
+        (world / faction / race / flavor), plus title / tagline / narrator. // and /* */ comments
+        are allowed (the GAME TEMPLATE has a description on every section). Any section you omit
+        keeps its built-in default. Loading this is the same as filling each box below by hand.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your whole-game JSON here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadGameBundle(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD ENTIRE GAME</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(buildGameBundleTemplate());
+            setStatus({ kind: 'ok', msg: 'Loaded the whole-game template (every section + reference comments) — edit, then UPLOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>GAME TEMPLATE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : buildGameBundleTemplate();
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box — fill it in, paste back, then UPLOAD.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
       </View>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
     </View>
@@ -461,6 +529,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
       </TouchableOpacity>
 
       <GameIdentitySection />
+
+      <Text style={styles.sectionLabel}>WHOLE GAME (build it all at once)</Text>
+      <GameBundleBox />
 
       <Text style={styles.sectionLabel}>LORE</Text>
       {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
