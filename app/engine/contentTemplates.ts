@@ -16,6 +16,7 @@ import enemiesData from '../data/enemies/enemies.json';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import locationsData from '../data/locations/locations.json';
+import weatherData from '../data/weather/weather.json';
 import {
   DEFAULT_WORLD_TONE,
   type ContentTableId,
@@ -107,6 +108,7 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   races: rows(racesData),
   factions: rows(factionsData),
   locations: rows(locationsData),
+  weather: rows(weatherData),
   // engine_Dev — the Lore document has no built-in file of its own shape; this is
   // a GENERIC, section-organized scaffold (no Tartaria / no specific setting) the
   // author fills in for any game. Each block is one passage; the narrator injects

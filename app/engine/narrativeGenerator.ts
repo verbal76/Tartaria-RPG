@@ -104,7 +104,12 @@ export function buildOpeningNarrative(input: {
     const lead = named
       ? `You are ${playerName} of the ${raceName}, under the colors of the ${factionName}.`
       : `You walk under the colors of the ${factionName}, ${raceName} blood in your veins.`;
-    const setting = getWorldSetting();
+    // engine_Dev — the opening grounds the scene in a SHORT lead of the world
+    // setting, not the whole bible. A book-length `setting` belongs in the Lore
+    // document (keyworded passages the narrator surfaces page-by-page per scene);
+    // dumping it here walls the creation screen. Take the first ~45 words / first
+    // sentence so the intro stays a hook, and the book reads throughout play.
+    const setting = openingLead(getWorldSetting());
     p1 = setting ? `${lead} ${setting}` : lead;
   } else {
     p1 = pick(p1Variants);
@@ -125,13 +130,38 @@ export function buildOpeningNarrative(input: {
   // otherwise pick from the surface openings pool. Weather clause uses
   // "A / An" properly so we don't print "A etheric storm".
   const isHubScene = !!(hubRoomName && hubRoomDescription);
-  const arbiterLine = isHubScene ? pick(resolveFlavor('hubOpening', HUB_OPENING_LINES)) : pick(openingsList);
+  // engine_Dev — the surface opening flavor pool is overridable via the 'opening'
+  // flavor key, so a re-skinned game replaces the Tartaria atmosphere lines (Rust
+  // Monks, Aetheric Torch, Mud Monarch crows) with its own. Built-in pool is the
+  // default when no flavor override is uploaded.
+  const arbiterLine = isHubScene
+    ? pick(resolveFlavor('hubOpening', HUB_OPENING_LINES))
+    : pick(resolveFlavor('opening', openingsList));
   const weatherClause = weatherDescriptor
     ? ` ${aOrAn(weather.name)} ${weather.name.toLowerCase()} presses on the world — ${weatherDescriptor}.`
     : '';
   const p3 = `${arbiterLine}${weatherClause} What you do here is yours to choose.`;
 
   return [p1, p2, p3];
+}
+
+// engine_Dev — trim a world setting to a SHORT opening lead. A book-length
+// setting is meant to live in the Lore document (surfaced per scene); the opening
+// only needs a hook. Take whole sentences up to ~45 words, so we never cut a
+// sentence mid-clause; empty in → empty out.
+function openingLead(setting: string, maxWords = 45): string {
+  const s = (setting ?? '').trim();
+  if (!s) return '';
+  if (s.split(/\s+/).length <= maxWords) return s;
+  const sentences = s.match(/[^.!?]+[.!?]+|\S[^.!?]*$/g) ?? [s];
+  let out = '';
+  for (const sentence of sentences) {
+    const next = (out ? `${out} ${sentence.trim()}` : sentence.trim());
+    if (next.split(/\s+/).length > maxWords && out) break;
+    out = next;
+    if (out.split(/\s+/).length >= maxWords) break;
+  }
+  return out.trim();
 }
 
 // "A" / "An" based on whether the next word starts with a vowel sound.
@@ -1390,6 +1420,7 @@ const ARBITER_PERSONAL_BEATS = [
 // above honors an uploaded 'flavor' lore block per key. Exported so the dev
 // console can hand the author a starter TEMPLATE of the real keys + lines.
 export const BUILTIN_FLAVOR_POOLS = {
+  opening: openingsList,
   hubOpening: HUB_OPENING_LINES,
   moodRemarks: BASE_MOOD_REMARKS,
   intentRemarks: BASE_INTENT_REMARKS,

@@ -13,7 +13,7 @@
 export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
   | 'amulets' | 'rings'
-  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore' | 'powers';
+  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore' | 'powers' | 'weather';
 
 export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
 
@@ -34,6 +34,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'races', label: 'Races (playable — character creation)', hint: 'JSON array of race rows. THIS is what the race-selection screen shows. (Not the "Race lore" box up in LORE — that\'s freeform story text.)' },
   { id: 'factions', label: 'Factions (playable — character creation)', hint: 'JSON array of faction rows. THIS is what the faction-selection screen shows. (Not the "Faction lore" box up in LORE.)' },
   { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json)' },
+  { id: 'weather', label: 'Weather / atmosphere', hint: 'JSON array of weather rows (data/weather/weather.json). Drives the "<name> presses on the world" atmosphere line + travel/visibility effects. Each: { "id", "name", "description", "visibility", "travelPenalty", "corruptionChance", "tags": [...] }.' },
   { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
   { id: 'powers', label: 'Powers (magic / abilities)', hint: 'Your castable powers. Each: { "discipline": "shape|summon|mend" (the engine effect it runs), "name", "title", "body", "stat": "intelligence|wisdom", "dcBase", "fuels": ["item names"], "examples": ["cast phrases"] }. Replaces Aethercraft. Hit TEMPLATE for the shape.' },
 ];
@@ -43,7 +44,7 @@ export const LORE_BLOCKS: LoreBlockDef[] = [
   { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the narrator uses>", "tagline": "<shown under the title>", "setting": "<a paragraph the narrator knows>", "terms": ["place/faction nouns"], "vocabulary": ["verbs the narrator favors"] }' },
   { id: 'faction', label: 'Faction lore (story notes — NOT playable)', hint: 'Free-form faction backstory for the narrator. The PLAYABLE factions (character creation) go in the "Factions" box under TABLES, not here.' },
   { id: 'race', label: 'Race lore (story notes — NOT playable)', hint: 'Free-form race backstory for the narrator. The PLAYABLE races (character creation) go in the "Races" box under TABLES, not here.' },
-  { id: 'flavor', label: 'Narration flavor', hint: 'JSON object of the narrator’s canned line-pools by key (genericRemarks, combatRemarks, lookLines, notedLines, sceneIntros, combatIntros, hubOpening, personalBeats, moodRemarks, intentRemarks, raceRemarks, factionRemarks). Hit TEMPLATE to see the keys; any key you omit keeps the built-in lines.' },
+  { id: 'flavor', label: 'Narration flavor', hint: 'JSON object of the narrator’s canned line-pools by key (opening, genericRemarks, combatRemarks, lookLines, notedLines, sceneIntros, combatIntros, hubOpening, personalBeats, moodRemarks, intentRemarks, raceRemarks, factionRemarks). Also "starterItems": an array of starting-inventory item rows (keep each row\'s "tags" to keep its behavior — light/drink/food/detection). Hit TEMPLATE to see the keys; any key you omit keeps the built-in lines.' },
 ];
 
 /** Built-in default world tone (Tartaria). The LLM prompt falls back to this when

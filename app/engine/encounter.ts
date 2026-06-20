@@ -17,6 +17,7 @@ const locations = locationsData as Location[];
 // so an uploaded override drives encounters and the world the player traverses.
 const getEnemies = (): readonly Enemy[] => resolveTable('enemies', enemies);
 const getLocations = (): readonly Location[] => resolveTable('locations', locations);
+const getWeather = (): readonly WeatherEntry[] => resolveTable('weather', weather);
 
 /** Lookup an enemy by name. Used by the wasteland-encounter skirmish
  *  spawner to convert a name in the encounter pool into a real Enemy
@@ -41,7 +42,7 @@ const rarityWeights: Record<Rarity, number> = {
 };
 
 export function pickWeather(memory: WorldMemory): WeatherEntry {
-  return pickWeighted(weather, (w) => {
+  return pickWeighted(getWeather(), (w) => {
     const seen = memory.tagCounts[w.id] ?? 0;
     return Math.max(1, 5 - seen);
   });

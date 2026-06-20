@@ -1,6 +1,6 @@
 import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryItem } from './types';
 import { rollDie, rollDice, rollFromNotation } from './rng';
-import { resolveTable } from './contentPack';
+import { resolveTable, resolveFlavor } from './contentPack';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
@@ -120,16 +120,27 @@ function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem
   return 'misc';
 }
 
+// engine_Dev — the shared starter kit every character begins with. The TAGS carry
+// the mechanics (light reveals hooks, drink restores stamina, detection finds
+// relics, food feeds), so a re-skinned game can rename these to its own props
+// (Flashlight / K-Rations / Canteen / Geiger Counter) by uploading a 'starterItems'
+// flavor array — keep the tags to keep the behavior. Built-in Tartaria kit is the
+// default when no override is uploaded.
+const DEFAULT_STARTER_ITEMS: InventoryItem[] = [
+  { id: 'aetheric_torch', name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+  { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
+  // OTA-375 — every character starts with a Water Bottle (the cheap,
+  // refillable stamina recovery item) so exhaustion in an early fight
+  // is never a dead end. Drink it for +10 stamina; refill free at water.
+  { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
+  { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
+];
+
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
-  const items: InventoryItem[] = [
-    { id: 'aetheric_torch', name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
-    { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
-    // OTA-375 — every character starts with a Water Bottle (the cheap,
-    // refillable stamina recovery item) so exhaustion in an early fight
-    // is never a dead end. Drink it for +10 stamina; refill free at water.
-    { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
-    { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
-  ];
+  // Clone so per-character inventory never shares object refs with the template.
+  const items: InventoryItem[] = resolveFlavor('starterItems', DEFAULT_STARTER_ITEMS).map(
+    (it) => ({ ...it }),
+  );
   const primaryName = starterWeaponName(race);
   items.push(stampDurability({
     id: `starter_primary_${Date.now()}`,
