@@ -13,7 +13,7 @@ import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
 import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
 import { describeTraits } from './enemyTraits';
 import { buildCanonFactsParagraph } from './canonFacts';
-import { getNarratorPersona } from './contentPack';
+import { getNarratorPersona, getWorldTone, getWorldSetting, getWorldTerms, getWorldVocabulary, hasLoreOverride } from './contentPack';
 
 /**
  * The strict, comma-light fact sheet that gets injected into the Qwen
@@ -148,28 +148,35 @@ function buildLadderEnvironment(
 //   - "triggered the Tartarian Trap, energy lance strikes began..." →
 //     hallucinated events that never happened
 //   - Mid-sentence trailing cutoffs
-const VOICE_RULES =
-  "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
-  "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
-  "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
-  'third-person stand-in for the player. Sentences must START with ' +
-  '"You" or "Your" or with a direct action verb in second person. ' +
-  'If a draft sentence begins with "The player" or "They", rewrite it. ' +
-  'Do not invent emotions, motivations, traps, mechanics, events, or ' +
-  'outcomes that are not listed in the SYSTEM FACTS above. Only narrate ' +
-  "the player's last action and the static facts already present. " +
-  'DO NOT name any location, room, weather, or NPC that is not in the ' +
-  'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
-  'no sarcophagi or vaulted ceilings unless they appear in Environment. ' +
-  'If you would have to invent scenery to fill a sentence, end early. ' +
-  'AVAILABLE PLAYER ACTIONS the engine resolves mechanically: attack, ' +
-  'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
-  'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
-  'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
-  '(relic / item / torch / locket), dig, craft, steal, gift, ask, rest. ' +
-  'Aetheric verbs: cast, channel, weave, incant. Use these vocabulary ' +
-  'choices in narration so the player learns the system. ' +
-  'End on a complete sentence.';
+// engine_Dev — VOICE_RULES is now a function, with all Tartaria-specific
+// vocabulary / place-name examples removed. Anti-hallucination is enforced
+// generically ("nothing not in SYSTEM FACTS"); the only world-flavored verbs
+// the model is told to favor come from the World-lore "vocabulary" field, so a
+// re-skinned game teaches ITS verbs, not Tartaria's.
+function voiceRules(): string {
+  const base =
+    "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
+    "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
+    "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
+    'third-person stand-in for the player. Sentences must START with ' +
+    '"You" or "Your" or with a direct action verb in second person. ' +
+    'If a draft sentence begins with "The player" or "They", rewrite it. ' +
+    'Do not invent emotions, motivations, traps, mechanics, events, or ' +
+    'outcomes that are not listed in the SYSTEM FACTS above. Only narrate ' +
+    "the player's last action and the static facts already present. " +
+    'DO NOT name any location, room, weather, or NPC that is not in the ' +
+    'SYSTEM FACTS, and do not invent scenery (no sarcophagi, vaulted ' +
+    'ceilings, etc.) unless it appears in Environment. ' +
+    'If you would have to invent scenery to fill a sentence, end early. ' +
+    'AVAILABLE PLAYER ACTIONS the engine resolves mechanically: attack, ' +
+    'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
+    'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
+    'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
+    '(relic / item / torch), dig, craft, steal, gift, ask, rest. ';
+  const vocab = getWorldVocabulary();
+  const vocabLine = vocab ? `Favor this world's vocabulary in narration: ${vocab}. ` : '';
+  return base + vocabLine + 'End on a complete sentence.';
+}
 
 const PEACEFUL_INSTRUCTION =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
@@ -179,16 +186,14 @@ const PEACEFUL_INSTRUCTION =
   // slow on this hardware; a longer line freezes Kokoro and arrives after
   // the action has scrolled away. The map/exits already show in the world
   // banner, so the Arbiter aside stays a single punchy beat.
-  'Keep it to ONE short sentence — about 20 words, no more. ' +
-  VOICE_RULES;
+  'Keep it to ONE short sentence — about 20 words, no more. ';
 
 const COMBAT_INSTRUCTION =
   'The player is in ACTIVE COMBAT. Narrate the tension of the last ' +
   'action against the entities listed above. Brief, violent, grim — ' +
   'ONE short sentence, no more than 20 words. DO NOT describe the room ' +
   'or its scenery; the player has no time for atmosphere. Reference ' +
-  'inventory items only if they are the weapon being used. ' +
-  VOICE_RULES;
+  'inventory items only if they are the weapon being used. ';
 
 // arb163 — ambient companion line. UNPROMPTED and reflective: it does not react
 // to the last action (the canned templates own reactions), so its latency never
@@ -200,8 +205,7 @@ const AMBIENT_INSTRUCTION =
   'road behind you both, or your changing read of them. DO NOT narrate or react ' +
   'to their last action; this is idle companion talk between moments, not a ' +
   'response to anything. Warm or wry, never advice or instructions. ' +
-  'ONE short sentence — about 18 words, no more. ' +
-  VOICE_RULES;
+  'ONE short sentence — about 18 words, no more. ';
 
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   const instruction = ctx.ambient
@@ -219,17 +223,32 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   // canon item when the scene's location / tags match. Token-budget
   // tight (~50 words max) so it doesn't eat the narration cap. Null
   // when nothing matches — the section is omitted entirely.
-  const canonLine = buildCanonFactsParagraph({
-    sceneKeywords: deriveCanonKeywords(ctx),
-    hasVendor: /vendor/i.test(ctx.active_entities ?? ''),
-    playerFactionId: ctx.player_faction_id,
-  });
+  // engine_Dev — the canon-facts corpus is still the built-in Tartaria bible, so
+  // suppress it entirely once the author has loaded a custom World lore block
+  // (otherwise Tartaria canon could leak into a re-skinned world). When no World
+  // override is loaded we're running the default Tartaria pack, so it injects.
+  const canonLine = hasLoreOverride('world')
+    ? null
+    : buildCanonFactsParagraph({
+        sceneKeywords: deriveCanonKeywords(ctx),
+        hasVendor: /vendor/i.test(ctx.active_entities ?? ''),
+        playerFactionId: ctx.player_faction_id,
+      });
+  // engine_Dev — world flavor is content-pack driven. Tone always injects (the
+  // default pack's tone, or the author's); setting / terms inject only when the
+  // World-lore block provides them. This is the seam that makes the NARRATION
+  // lore-agnostic instead of hardcoded Tartaria.
+  const worldSetting = getWorldSetting();
+  const worldTerms = getWorldTerms();
   const parts = [
-    // engine_Dev — persona is content-pack driven (default: the Arbiter of Tartaria).
     getNarratorPersona(),
+    `[WORLD]`,
+    `Tone: ${getWorldTone()}`,
+    ...(worldSetting ? [`Setting: ${worldSetting}`] : []),
+    ...(worldTerms ? [`Key terms (use these nouns): ${worldTerms}`] : []),
     `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
     `Location: ${ctx.current_biome} - ${ctx.room_name}`,
-    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}". NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other location not listed.**`,
+    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}". NEVER name any location that is not listed here.**`,
     `Environment: ${ctx.environmental_description}`,
     `Exits: ${ctx.available_exits}`,
     `Entities Present: ${ctx.active_entities}`,
@@ -245,6 +264,7 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     `Player's Last Action: ${ctx.recent_history}`,
     '',
     instruction,
+    voiceRules(),
   );
   const system = parts.join('\n');
   return [

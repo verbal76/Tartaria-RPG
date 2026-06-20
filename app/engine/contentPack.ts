@@ -35,7 +35,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
 
 /** Lore blocks, split the way the game uses them. */
 export const LORE_BLOCKS: LoreBlockDef[] = [
-  { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the LLM narrates in>", "tagline": "<shown under the title>", "setting": "...", "terms": ["..."] }' },
+  { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the narrator uses>", "tagline": "<shown under the title>", "setting": "<a paragraph the narrator knows>", "terms": ["place/faction nouns"], "vocabulary": ["verbs the narrator favors"] }' },
   { id: 'faction', label: 'Faction lore', hint: 'JSON: free-form faction lore (object or array)' },
   { id: 'race', label: 'Race lore', hint: 'JSON: free-form race lore (object or array)' },
 ];
@@ -138,6 +138,30 @@ export function getLoreOverride(id: LoreBlockId): unknown | null {
 export function getWorldTone(): string {
   const w = loreOverrides.world as { tone?: unknown } | undefined;
   return w && typeof w.tone === 'string' && w.tone.trim().length > 0 ? w.tone.trim() : DEFAULT_WORLD_TONE;
+}
+/** Optional one-paragraph setting blurb from the World lore block ({ "setting":
+ *  "..." }). Injected into the narration prompt when present; '' when absent. */
+export function getWorldSetting(): string {
+  const w = loreOverrides.world as { setting?: unknown } | undefined;
+  return w && typeof w.setting === 'string' ? w.setting.trim() : '';
+}
+/** Optional key-terms list from the World lore block ({ "terms": ["...","..."] }
+ *  or a plain string). Helps the model use the world's nouns. '' when absent. */
+export function getWorldTerms(): string {
+  const w = loreOverrides.world as { terms?: unknown } | undefined;
+  if (!w) return '';
+  if (Array.isArray(w.terms)) return w.terms.filter((t) => typeof t === 'string').join(', ').trim();
+  return typeof w.terms === 'string' ? w.terms.trim() : '';
+}
+/** Optional narration vocabulary from the World lore block ({ "vocabulary":
+ *  ["cast","channel"] or a string }). Replaces the old hardcoded "Aetheric
+ *  verbs" line so the engine teaches the AUTHOR'S verbs, not Tartaria's. '' when
+ *  absent → no vocabulary line is injected at all. */
+export function getWorldVocabulary(): string {
+  const w = loreOverrides.world as { vocabulary?: unknown } | undefined;
+  if (!w) return '';
+  if (Array.isArray(w.vocabulary)) return w.vocabulary.filter((t) => typeof t === 'string').join(', ').trim();
+  return typeof w.vocabulary === 'string' ? w.vocabulary.trim() : '';
 }
 /** The narrator persona — first line of the main LLM narration prompt. Override
  *  with a World lore block ({ "narrator": "..." }); otherwise built from the

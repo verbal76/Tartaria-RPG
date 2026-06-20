@@ -15212,6 +15212,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-643 — de-Tartaria the narration prompt (JS-only OTA). The LLM
+// system prompt now injects the content-pack World TONE (+ optional setting /
+// key-terms / vocabulary) every turn, and the hardcoded Tartaria bits are gone:
+// the "Aetheric verbs" vocabulary line and the "Borderlands/Aetheric Deep/Grand
+// Hall/Aetherstone Deep" place-name examples are replaced with generic,
+// data-driven guards. The Tartaria canon-facts injection is suppressed whenever
+// a custom World lore block is loaded, so no Tartaria canon leaks into a
+// re-skinned world. New World-lore fields: setting, terms, vocabulary.
 // engine_Dev-642 — wire item + race/faction overrides into the rest of the
 // engine (JS-only OTA). Uploaded weapons/armor/materials/gear/exploration now
 // reach: ambient loot pickup (findCatalogItem), armor equip/durability/AC
@@ -15252,4 +15260,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-642';
+export const OTA_BUILD_ID = '2026-06-19-643';
