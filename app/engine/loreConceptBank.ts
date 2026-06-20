@@ -30,7 +30,7 @@
 // across queries via `cachedBank`, so the parse runs at most once
 // per app session, same as today.
 
-import { getNarratorName } from './contentPack';
+import { getNarratorName, resolveTable } from './contentPack';
 
 export type LoreCategory =
   | 'event'
@@ -48,7 +48,8 @@ export type LoreCategory =
   | 'currency_good'
   | 'loot'
   | 'task_tier'
-  | 'action_tier';
+  | 'action_tier'
+  | 'lore_doc';
 
 export interface LoreConcept {
   id: string;
@@ -81,11 +82,64 @@ interface GlossaryEntry { id: string; term: string; definition: string; }
 interface GlossaryTimeline { id: string; year: number; name: string; summary: string; }
 
 let cachedBank: LoreConcept[] | null = null;
+let cachedLoreRef: unknown = Symbol('uninit');
+
+// engine_Dev — author "Lore document" passages → queryable concepts. When a
+// 'lore' override is loaded, the "ask the narrator" corpus is built from the
+// author's passages INSTEAD of the built-in Tartaria lore, so questions answer
+// from the uploaded world. Ids are content-hashed so a re-upload never collides
+// with a stale embedding cache (askArbiter caches vectors by concept id).
+interface LorePassage { tags?: unknown; keywords?: unknown; text?: unknown }
+const EMPTY_LORE: readonly LorePassage[] = [];
+
+function hashStr(s: string): string {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
+function passageTags(p: LorePassage): string[] {
+  const raw = Array.isArray(p.tags) ? p.tags : Array.isArray(p.keywords) ? p.keywords : [];
+  return raw.filter((t): t is string => typeof t === 'string');
+}
+
+function loreDocConcepts(passages: readonly LorePassage[]): LoreConcept[] {
+  const out: LoreConcept[] = [];
+  for (const p of passages) {
+    if (!p || typeof p.text !== 'string' || !p.text.trim()) continue;
+    const text = p.text.trim();
+    const tags = passageTags(p);
+    const label = (tags[0] ?? 'Lore').replace(/\b\w/g, (c) => c.toUpperCase());
+    out.push({
+      id: `lore_${hashStr(tags.join('|') + '::' + text)}`,
+      label,
+      definition: text,
+      category: 'lore_doc',
+      // tags + text gives MiniLM both the topic words and the prose to match on.
+      searchText: `${tags.join(', ')}. ${text}`,
+    });
+  }
+  return out;
+}
 
 export function loadLoreConceptBank(): LoreConcept[] {
-  if (cachedBank) return cachedBank;
-  // OTA-298 — lazy require() so the ~120 KB of canon-*.json + glossary
-  // is parsed on first Arbiter query rather than at cold-start.
+  const loreDoc = resolveTable<LorePassage>('lore', EMPTY_LORE);
+  // Cache by the lore-doc reference: a fresh upload swaps the array identity and
+  // rebuilds; the built-in bank caches against the stable EMPTY reference.
+  if (cachedBank && cachedLoreRef === loreDoc) return cachedBank;
+
+  if (loreDoc.length > 0) {
+    cachedBank = loreDocConcepts(loreDoc);
+    cachedLoreRef = loreDoc;
+    return cachedBank;
+  }
+
+  cachedLoreRef = loreDoc;
+  cachedBank = buildBuiltinConceptBank();
+  return cachedBank;
+}
+
+function buildBuiltinConceptBank(): LoreConcept[] {
   const canonEventsData = require('../data/lore/canon-events.json');
   const canonFoodDrinkData = require('../data/lore/canon-food-drink.json');
   const arbiterTitlesData = require('../data/lore/arbiter-titles.json');
@@ -271,7 +325,6 @@ export function loadLoreConceptBank(): LoreConcept[] {
     });
   }
 
-  cachedBank = concepts;
   return concepts;
 }
 
@@ -280,6 +333,8 @@ export function loadLoreConceptBank(): LoreConcept[] {
  *  future button-driven query surface. */
 export function formatArbiterAnswer(concept: LoreConcept): string {
   switch (concept.category) {
+    case 'lore_doc':
+      return `The ${getNarratorName()} recalls: ${concept.definition}`;
     case 'event':
     case 'timeline':
       return `The ${getNarratorName()} recalls the ${concept.label}. ${concept.definition}`;
@@ -311,4 +366,5 @@ export function formatArbiterAnswer(concept: LoreConcept): string {
 /** Reset the cache. Test-only — production code never calls this. */
 export function _resetConceptBankCache(): void {
   cachedBank = null;
+  cachedLoreRef = Symbol('reset');
 }
