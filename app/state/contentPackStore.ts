@@ -124,6 +124,11 @@ interface ContentPackState {
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
   loadGameBundle: (json: string) => BundleLoadResult;
+  /** Serialize the CURRENT game (every uploaded table + lore block + title /
+   *  tagline / narrator) into one whole-game JSON string — the exact shape
+   *  loadGameBundle reads. This is the file you send back to have the game baked
+   *  into a standalone APK. */
+  exportGameBundle: () => string;
   clearTable: (id: ContentTableId) => void;
   clearLore: (id: LoreBlockId) => void;
   clearAll: () => void;
@@ -345,6 +350,26 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), tables: nextTables, lore: nextLore, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline });
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
+  },
+
+  exportGameBundle() {
+    const s = get();
+    const out: Record<string, unknown> = {};
+    // Identity scalars first (only when set).
+    if (s.gameTitle) out.title = s.gameTitle;
+    if (s.gameTagline) out.tagline = s.gameTagline;
+    if (s.narratorName) out.narrator = s.narratorName;
+    // Lore blocks (world / faction / race / flavor), in the registry's order.
+    for (const b of LORE_BLOCKS) {
+      const v = s.lore[b.id];
+      if (v != null) out[b.id] = v;
+    }
+    // Every uploaded content table, in display order.
+    for (const t of CONTENT_TABLES) {
+      const rows = s.tables[t.id];
+      if (Array.isArray(rows) && rows.length > 0) out[t.id] = rows;
+    }
+    return JSON.stringify(out, null, 2);
   },
 
   clearTable(id) {

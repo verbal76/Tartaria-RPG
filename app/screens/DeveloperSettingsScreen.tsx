@@ -5,8 +5,9 @@
 // dependency; a real file picker can be layered on the web/desktop builds later.)
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
@@ -245,6 +246,34 @@ function GameBundleBox() {
   const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
+  // engine_Dev — EXPORT the finished game to a file you can hand off for an APK
+  // bake. Clipboard works everywhere; on Android we also offer a Save-to-folder
+  // (Downloads) via the Storage Access Framework so you can attach the file
+  // instead of pasting a large blob.
+  const exportToClipboard = () => {
+    const out = useContentPackStore.getState().exportGameBundle();
+    void Clipboard.setStringAsync(out);
+    setStatus({ kind: 'ok', msg: `Copied your whole game to the clipboard (${(out.length / 1024).toFixed(0)} KB). Paste it back to have it baked into an APK.` });
+  };
+  const exportToFile = async () => {
+    const out = useContentPackStore.getState().exportGameBundle();
+    const filename = 'my-game.json';
+    try {
+      if (Platform.OS === 'android') {
+        const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (!perm.granted) { setStatus({ kind: 'err', msg: 'Save cancelled — no folder chosen.' }); return; }
+        const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, filename, 'application/json');
+        await FileSystem.writeAsStringAsync(uri, out);
+        setStatus({ kind: 'ok', msg: `Saved ${filename} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Find it in Files and attach it back to me.` });
+      } else {
+        const uri = `${FileSystem.documentDirectory}${filename}`;
+        await FileSystem.writeAsStringAsync(uri, out);
+        setStatus({ kind: 'ok', msg: `Saved to ${uri}` });
+      }
+    } catch (e) {
+      setStatus({ kind: 'err', msg: `Save failed: ${e instanceof Error ? e.message : String(e)}. Use EXPORT (COPY) instead.` });
+    }
+  };
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
@@ -289,17 +318,30 @@ function GameBundleBox() {
           <Text style={styles.tmplBtnText}>GAME TEMPLATE</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.copyBtn}
+          style={styles.tmplBtn}
           onPress={() => {
             const out = text.trim().length > 0 ? text : buildGameBundleTemplate();
             void Clipboard.setStringAsync(out);
             setText('');
-            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box — fill it in, paste back, then UPLOAD.' });
+            setStatus({ kind: 'ok', msg: 'Copied the template to clipboard and cleared the box — fill it in, paste back, then UPLOAD.' });
           }}
         >
-          <Text style={styles.copyBtnText}>COPY</Text>
+          <Text style={styles.tmplBtnText}>COPY TEMPLATE</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.copyBtn} onPress={exportToClipboard}>
+          <Text style={styles.copyBtnText}>⬇ EXPORT MY GAME (COPY)</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void exportToFile(); }}>
+          <Text style={styles.copyBtnText}>⬇ EXPORT (SAVE FILE)</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.hint}>
+        EXPORT serialises your CURRENT game — every table you’ve loaded, the four lore blocks, and
+        the title / tagline / narrator — into one whole-game JSON. That’s the file you hand back to
+        have your game baked into its own standalone APK.
+      </Text>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
     </View>
   );
