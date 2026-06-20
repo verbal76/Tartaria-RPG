@@ -497,6 +497,12 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         </Text>
       )}
 
+      {/* engine_Dev — WHOLE-GAME upload sits at the very top so it's the first
+          thing you see: build everything in one file, or skip it and use the
+          per-section boxes below. */}
+      <Text style={styles.sectionLabel}>★ WHOLE GAME — build it all in one file</Text>
+      <GameBundleBox />
+
       {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine. */}
       <TouchableOpacity
         style={styles.applyBtn}
@@ -529,9 +535,6 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
       </TouchableOpacity>
 
       <GameIdentitySection />
-
-      <Text style={styles.sectionLabel}>WHOLE GAME (build it all at once)</Text>
-      <GameBundleBox />
 
       <Text style={styles.sectionLabel}>LORE</Text>
       {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
