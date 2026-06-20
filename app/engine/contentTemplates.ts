@@ -49,6 +49,12 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   races: rows(racesData),
   factions: rows(factionsData),
   locations: rows(locationsData),
+  // engine_Dev — the Lore document has no built-in file of its own shape; this is
+  // a hand-authored example of the keyworded-passage format the narrator reads.
+  lore: [
+    { tags: ['uss eldridge', 'fog', 'green haze'], text: 'In October 1943 the destroyer escort USS Eldridge vanished from the Philadelphia Navy Yard in a wall of green haze. Sailors who returned spoke of being unable to tell the deck from the dark water.' },
+    { tags: ['navy yard', 'philadelphia', 'pier'], text: 'The Navy Yard runs on rumor and rationed coffee. Officers do not discuss the experiment; the men who loaded the coils have already been reassigned, or simply are not spoken of.' },
+  ],
 };
 
 /** How many sample rows to export per table — enough to show the shape, not the

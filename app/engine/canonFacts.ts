@@ -20,6 +20,7 @@
 import canonEventsData from '../data/lore/canon-events.json';
 import canonFoodDrinkData from '../data/lore/canon-food-drink.json';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
+import { resolveTable } from './contentPack';
 
 interface CanonEvent {
   id: string;
@@ -66,7 +67,42 @@ export interface CanonFactQuery {
 /** Build the compact CANON FACTS paragraph for Qwen system prompt
  *  injection. Returns null when no facts apply — the caller skips
  *  the section entirely rather than print a stub. */
+// engine_Dev — author "Lore document" passages. When the dev has uploaded a
+// 'lore' table, it REPLACES the built-in Tartaria canon entirely: the narrator
+// surfaces the passage whose tags best match the scene (or nothing if none do).
+interface LorePassage { tags?: unknown; keywords?: unknown; text?: unknown }
+const EMPTY_LORE: readonly LorePassage[] = [];
+
+function passageTags(p: LorePassage): string[] {
+  const raw = Array.isArray(p.tags) ? p.tags : Array.isArray(p.keywords) ? p.keywords : [];
+  return raw.filter((t): t is string => typeof t === 'string').map((t) => t.toLowerCase());
+}
+
+function truncateWords(s: string, n: number): string {
+  const w = s.trim().split(/\s+/);
+  return w.length <= n ? s.trim() : `${w.slice(0, n).join(' ')}…`;
+}
+
+function pickLorePassage(passages: readonly LorePassage[], q: CanonFactQuery): string | null {
+  let best: { text: string; score: number } | null = null;
+  for (const p of passages) {
+    if (!p || typeof p.text !== 'string' || !p.text.trim()) continue;
+    let score = 0;
+    for (const tag of passageTags(p)) {
+      for (const k of q.sceneKeywords) {
+        if (k.includes(tag) || tag.includes(k)) score += 1;
+      }
+    }
+    if (score > 0 && (!best || score > best.score)) best = { text: p.text, score };
+  }
+  return best ? truncateWords(best.text, 60) : null;
+}
+
 export function buildCanonFactsParagraph(q: CanonFactQuery): string | null {
+  // Author lore document wins outright when present.
+  const loreDoc = resolveTable<LorePassage>('lore', EMPTY_LORE);
+  if (loreDoc.length > 0) return pickLorePassage(loreDoc, q);
+
   const lines: string[] = [];
 
   const event = pickCanonEvent(q);

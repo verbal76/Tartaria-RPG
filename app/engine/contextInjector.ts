@@ -13,7 +13,9 @@ import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
 import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
 import { describeTraits } from './enemyTraits';
 import { buildCanonFactsParagraph } from './canonFacts';
-import { getNarratorPersona, getWorldTone, getWorldSetting, getWorldTerms, getWorldVocabulary, hasLoreOverride } from './contentPack';
+import { getNarratorPersona, getWorldTone, getWorldSetting, getWorldTerms, getWorldVocabulary, hasLoreOverride, resolveTable } from './contentPack';
+
+const EMPTY_LORE_DOC: readonly unknown[] = [];
 
 /**
  * The strict, comma-light fact sheet that gets injected into the Qwen
@@ -223,17 +225,19 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   // canon item when the scene's location / tags match. Token-budget
   // tight (~50 words max) so it doesn't eat the narration cap. Null
   // when nothing matches — the section is omitted entirely.
-  // engine_Dev — the canon-facts corpus is still the built-in Tartaria bible, so
-  // suppress it entirely once the author has loaded a custom World lore block
-  // (otherwise Tartaria canon could leak into a re-skinned world). When no World
-  // override is loaded we're running the default Tartaria pack, so it injects.
-  const canonLine = hasLoreOverride('world')
-    ? null
-    : buildCanonFactsParagraph({
+  // engine_Dev — canon line sourcing:
+  //  • author "Lore document" uploaded → always inject the matching passage
+  //    (buildCanonFactsParagraph returns it; it replaces Tartaria canon).
+  //  • no lore doc, default pack (no custom World) → built-in Tartaria canon.
+  //  • no lore doc but a custom World loaded → null (no Tartaria leak).
+  const hasLoreDoc = resolveTable('lore', EMPTY_LORE_DOC).length > 0;
+  const canonLine = (hasLoreDoc || !hasLoreOverride('world'))
+    ? buildCanonFactsParagraph({
         sceneKeywords: deriveCanonKeywords(ctx),
         hasVendor: /vendor/i.test(ctx.active_entities ?? ''),
         playerFactionId: ctx.player_faction_id,
-      });
+      })
+    : null;
   // engine_Dev — world flavor is content-pack driven. Tone always injects (the
   // default pack's tone, or the author's); setting / terms inject only when the
   // World-lore block provides them. This is the seam that makes the NARRATION

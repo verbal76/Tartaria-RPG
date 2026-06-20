@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-647 — Lore document box (JS-only OTA). New 'lore' upload table:
+// your world bible as keyworded passages [{tags:[...], text:"..."}]. The narrator
+// surfaces the passage whose tags match the current scene (truncated to the token
+// budget), REPLACING the built-in Tartaria canon entirely when loaded — and it
+// injects even alongside a custom World block. Write the big dump once; the engine
+// pulls the right slice per scene. (The "ask the narrator" corpus still uses the
+// built-in concepts — wiring the lore doc into "ask" is the next step.)
 // engine_Dev-646 — TEMPLATE shows your CURRENT upload (JS-only OTA). In every
 // table + lore upload box, when an override is loaded the button becomes "EDIT
 // CURRENT" and loads your full uploaded JSON back into the box (not the built-in
@@ -15285,4 +15292,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-646';
+export const OTA_BUILD_ID = '2026-06-19-647';

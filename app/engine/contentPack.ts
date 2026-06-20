@@ -12,7 +12,7 @@
 
 export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
-  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations';
+  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore';
 
 export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
 
@@ -31,6 +31,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'races', label: 'Races', hint: 'JSON array of race rows (data/races/…)' },
   { id: 'factions', label: 'Factions', hint: 'JSON array of faction rows (data/factions/…)' },
   { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json)' },
+  { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
 ];
 
 /** Lore blocks, split the way the game uses them. */
