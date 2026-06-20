@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-646 — TEMPLATE shows your CURRENT upload (JS-only OTA). In every
+// table + lore upload box, when an override is loaded the button becomes "EDIT
+// CURRENT" and loads your full uploaded JSON back into the box (not the built-in
+// Tartaria sample), so you can tweak and re-LOAD without losing or retyping your
+// work. COPY likewise copies your current upload. No override loaded → built-in
+// sample as before. Your uploads are persisted (AsyncStorage) and survive
+// restarts/OTAs regardless.
 // engine_Dev-645 — wire enemies/locations/recipes + APPLY ALL button (JS-only
 // OTA). The enemies, locations, and recipes upload boxes now actually take
 // effect: encounter.ts (enemy + location lookups), questGenerator.ts + worldMap.ts
@@ -15278,4 +15285,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-645';
+export const OTA_BUILD_ID = '2026-06-19-646';

@@ -208,8 +208,14 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
   const count = useContentPackStore((s) => s.tables[id]?.length ?? 0);
+  const current = useContentPackStore((s) => s.tables[id]);
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
+  // engine_Dev — TEMPLATE shows YOUR current upload (full, editable) when one is
+  // loaded so you never lose work or have to retype it; otherwise the built-in
+  // sample. The button relabels to EDIT CURRENT so it's obvious which you'll get.
+  const hasUpload = Array.isArray(current) && current.length > 0;
+  const templateText = () => (hasUpload ? JSON.stringify(current, null, 2) : getTableTemplate(id));
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
@@ -242,17 +248,24 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tmplBtn}
-          onPress={() => { setText(getTableTemplate(id)); setStatus({ kind: 'ok', msg: `Loaded the first ${TEMPLATE_SAMPLE_ROWS} built-in rows as a template — edit, then LOAD.` }); }}
+          onPress={() => {
+            setText(templateText());
+            setStatus({ kind: 'ok', msg: hasUpload
+              ? `Loaded your current ${count} uploaded rows — edit, then LOAD to save changes.`
+              : `Loaded the first ${TEMPLATE_SAMPLE_ROWS} built-in rows as a template — edit, then LOAD.` });
+          }}
         >
-          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+          <Text style={styles.tmplBtnText}>{hasUpload ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
-            const out = text.trim().length > 0 ? text : getTableTemplate(id);
+            const out = text.trim().length > 0 ? text : templateText();
             void Clipboard.setStringAsync(out);
             setText('');
-            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
+            setStatus({ kind: 'ok', msg: hasUpload
+              ? 'Copied your current upload to the clipboard and cleared the box.'
+              : 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
           }}
         >
           <Text style={styles.copyBtnText}>COPY</Text>
@@ -271,9 +284,12 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
 function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: string }) {
   const loadLoreJson = useContentPackStore((s) => s.loadLoreJson);
   const clearLore = useContentPackStore((s) => s.clearLore);
-  const on = useContentPackStore((s) => s.lore[id] != null);
+  const current = useContentPackStore((s) => s.lore[id]);
+  const on = current != null;
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
+  // engine_Dev — show YOUR current upload (full, editable) when one is loaded.
+  const templateText = () => (on ? JSON.stringify(current, null, 2) : getLoreTemplate(id));
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
@@ -305,17 +321,24 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tmplBtn}
-          onPress={() => { setText(getLoreTemplate(id)); setStatus({ kind: 'ok', msg: 'Loaded a template — edit, then LOAD.' }); }}
+          onPress={() => {
+            setText(templateText());
+            setStatus({ kind: 'ok', msg: on
+              ? 'Loaded your current upload — edit, then LOAD to save changes.'
+              : 'Loaded a template — edit, then LOAD.' });
+          }}
         >
-          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+          <Text style={styles.tmplBtnText}>{on ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
-            const out = text.trim().length > 0 ? text : getLoreTemplate(id);
+            const out = text.trim().length > 0 ? text : templateText();
             void Clipboard.setStringAsync(out);
             setText('');
-            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
+            setStatus({ kind: 'ok', msg: on
+              ? 'Copied your current upload to the clipboard and cleared the box.'
+              : 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
           }}
         >
           <Text style={styles.copyBtnText}>COPY</Text>
