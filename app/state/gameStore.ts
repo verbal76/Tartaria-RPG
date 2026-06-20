@@ -1852,43 +1852,50 @@ function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacte
 type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note';
 
 function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
+  // engine_Dev — the props resolve from the live tables, so the tutorial teaches
+  // with the author's own items (a .38 Revolver instead of a Cudgel, etc.).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getTutorialProps } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findWeaponByName, findArmorByName } = require('../engine/crafting');
+  const props = getTutorialProps();
   switch (id) {
-    case 'cudgel':
-      // Catalog row already exists in weapons.json — stampDurability
-      // pulls the right baseDurability from there. The auto-equip
-      // happens at grant time in tutorialPath below.
+    case 'cudgel': {
+      const cat = findWeaponByName(props.weapon) as { rarity?: InventoryItem['rarity']; tags?: string[]; description?: string } | null;
       return stampDurability({
-        id: `tutorial_cudgel_${Date.now()}`,
-        name: 'Cudgel',
+        id: `tutorial_weapon_${Date.now()}`,
+        name: props.weapon,
         kind: 'weapon',
-        rarity: 'Common',
+        rarity: cat?.rarity ?? 'Common',
         quantity: 1,
-        tags: ['weapon', 'club', 'melee', 'improvised', 'weighted', 'emergency'],
-        description: 'A stick with a fat stone lashed to its head with rag. Slow swing, heavy landing. The lashing loosens.',
+        tags: cat?.tags ?? ['weapon'],
+        description: cat?.description ?? 'A reliable weapon, ready at your feet.',
       });
+    }
     case 'rope':
       return {
         id: `tutorial_rope_${Date.now()}`,
-        name: "Reclaimer's Rope",
+        name: props.rope,
         kind: 'misc',
         rarity: 'Common',
         quantity: 1,
+        // Always carries climb/rope tags so the climb beat works regardless of
+        // which item the tables resolved to.
         tags: ['climb', 'rope', 'fiber'],
-        description: 'Reinforced rope woven with Aetheric fibers. Withstands Aetheric anomalies and high tension.',
+        description: 'Reinforced line that withstands high tension — good for a climb.',
       };
-    case 'chestPlate':
-      // Pure prop — only ever shows up in the outpost during the
-      // scrap beat; grants nothing useful, exists only so the
-      // SCRAP flow has a target.
+    case 'chestPlate': {
+      const cat = findArmorByName(props.armor) as { rarity?: InventoryItem['rarity']; tags?: string[]; description?: string } | null;
       return stampDurability({
-        id: `tutorial_chest_plate_${Date.now()}`,
-        name: 'Broken Chest Plate',
+        id: `tutorial_armor_${Date.now()}`,
+        name: props.armor,
         kind: 'armor',
-        rarity: 'Common',
+        rarity: cat?.rarity ?? 'Common',
         quantity: 1,
-        tags: ['armor', 'broken', 'plate', 'metal', 'fiber'],
-        description: 'A rusted breastplate, snapped across the shoulder strap. The plate itself is salvageable for the metal.',
+        tags: cat?.tags ?? ['armor'],
+        description: cat?.description ?? 'An armor piece — salvageable for parts.',
       });
+    }
     case 'note':
       return {
         id: `tutorial_note_${Date.now()}`,
@@ -1920,7 +1927,7 @@ function grantTutorialItem(
     // Auto-equip the cudgel to weapon slot if the player has nothing
     // better there. Keeps the post-tutorial player combat-ready.
     if (id === 'cudgel' && (!equipped?.main || equipped.main.includes('barehand'))) {
-      equipped = { ...(equipped ?? {}), main: 'Cudgel' };
+      equipped = { ...(equipped ?? {}), main: item.name };
     }
     return {
       player: { ...s.player, inventory, equipped },
@@ -5852,23 +5859,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     handle them directly so the tutorial works end-to-end
       //     from a single typed verb OR a chip tap that submits the
       //     same verb under the hood.
-      if (tStep?.id === 'cudgel' && /\btake\s+.*cudgel\b/i.test(trimmed)) {
+      if (tStep?.id === 'cudgel' && /\btake\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { getTutorialProps: gtp } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');
+        const wName = gtp().weapon;
         grantTutorialItem(get, set, 'cudgel');
-        get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
-        get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        get().appendLog('world', `You stoop and lift the ${wName}. Solid in the hand. You equip it without thinking.`);
+        get().appendLog('reward', `✦ ${wName}. [equipped]`);
         // Acknowledge the pickup before the next instruction — a beat of
-        // pacing so the Arbiter doesn't snap straight into "now salvage".
+        // pacing so the narrator doesn't snap straight into "now salvage".
         get().appendLog('arbiter', '"Good. Keep it close."');
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
-      if (tStep?.id === 'rope' && /\btake\s+.*rope\b/i.test(trimmed)) {
+      if (tStep?.id === 'rope' && /\btake\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { getTutorialProps: gtp } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');
+        const rName = gtp().rope;
         grantTutorialItem(get, set, 'rope');
-        get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");
-        get().appendLog('reward', "✦ Reclaimer's Rope (Common).");
-        get().appendLog('arbiter', '"Good. That rope earns its keep."');
+        get().appendLog('world', `You take up the ${rName}. It goes into your pack.`);
+        get().appendLog('reward', `✦ ${rName}.`);
+        get().appendLog('arbiter', '"Good. That earns its keep."');
         get().maybeAdvanceTutorial('rope');
         return;
       }
@@ -5877,13 +5890,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     we don't need the random roll, just the verb teach. The
       //     player learns the SCRAP/SALVAGE chip lights up at the
       //     end of each scene; the broken plate is the demonstrator.
-      if (tStep?.id === 'scrap' && /\b(scrap|salvage|break)\s+.*(chest\s+plate|plate|breastplate)\b/i.test(trimmed)) {
+      if (tStep?.id === 'scrap' && /\b(scrap|salvage|break)\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { getTutorialProps: gtp } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');
+        const aName = gtp().armor;
         set((s) => ({
           tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true },
         }));
-        get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
-        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
+        get().appendLog('world', `You break the ${aName} down. It comes apart into usable parts.`);
+        get().appendLog('reward', '✦ Salvaged parts. [scrapped]');
         get().appendLog('arbiter', '"There. Ruins always pay out."');
         get().maybeAdvanceTutorial('scrap');
         return;
@@ -18685,7 +18701,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialStep: 0, awaitingTutorialName: true });
     const firstStep = TUTORIAL_STEPS[0];
     if (firstStep?.arbiter) {
-      get().appendLog('arbiter', firstStep.arbiter);
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { fillTutorialPlaceholders } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');
+      get().appendLog('arbiter', fillTutorialPlaceholders(firstStep.arbiter));
     }
   },
   advanceTutorial() {
@@ -18712,14 +18730,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tutorialExploreChosen: false,
       currentScreen: nextScreen,
     });
-    // Speak the next Arbiter line in the feed.
+    // Speak the next narrator line in the feed (placeholders → resolved items).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { fillTutorialPlaceholders } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');
     if (nextStep.arbiter) {
-      get().appendLog('arbiter', nextStep.arbiter);
+      get().appendLog('arbiter', fillTutorialPlaceholders(nextStep.arbiter));
     }
     // Pre-fill the input with the draft text (the rope beat uses
     // this to demo typed input).
     if (nextStep.draftText) {
-      get().queueInputDraft(nextStep.draftText);
+      get().queueInputDraft(fillTutorialPlaceholders(nextStep.draftText));
     }
   },
   maybeAdvanceTutorial(beatId) {

@@ -15212,6 +15212,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-654 — data-driven tutorial props (JS-only OTA). The opening tutorial
+// teaches verbs with items pulled from the LIVE tables instead of hardcoded
+// Tartaria props: new app/engine/tutorialProps.ts getTutorialProps() resolves a
+// starter weapon / climbing rope / salvageable armor from the weapons/gear/armor
+// tables (fallbacks to the built-ins). makeTutorialItem grants the resolved items
+// (real catalog stats), the TAKE/SALVAGE pickers + the cudgel/rope/scrap beats and
+// their narration use the resolved names, and the beat copy uses {weapon}/{rope}/
+// {armor} placeholders filled at runtime. So a re-skin teaches with a .38 Revolver,
+// not a Cudgel. (Climb beat's climbable noun stays scene-driven — later pass.)
 // engine_Dev-653 — powers stage 2 + upload robustness (JS-only OTA). Powers can
 // now carry a custom `effect`: 'coat_enemies' (a damaging fog/DOT over enemies,
 // reusing the combat coating tick) or 'heal_self' — so authors define NEW powers,
@@ -15336,4 +15345,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-653';
+export const OTA_BUILD_ID = '2026-06-19-654';

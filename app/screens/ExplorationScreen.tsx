@@ -27,6 +27,7 @@ import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
+import { getTutorialProps } from '../engine/tutorialProps';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
@@ -1316,7 +1317,7 @@ export function ExplorationScreen() {
         // present the prop alone; the normal scene nouns return after.
         takeable={
           tutBeat === 'cudgel'
-            ? [{ noun: 'cudgel', consumed: false }]
+            ? [{ noun: getTutorialProps().weapon, consumed: false }]
             : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
                 .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
                 .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
@@ -1326,8 +1327,10 @@ export function ExplorationScreen() {
           // focus to the underlying command field and re-raise it.
           Keyboard.dismiss();
           setTakeOpen(false);
-          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
-            submit('take cudgel');
+          if (tutBeat === 'cudgel') {
+            // The cudgel beat only offers the resolved tutorial weapon; any tap
+            // here is THAT take (the gameStore beat grants the resolved weapon).
+            submit(`take ${noun}`);
             return;
           }
           takeAmbientNoun(noun);
@@ -1357,7 +1360,7 @@ export function ExplorationScreen() {
         // same confusion fix as the TAKE picker above.
         chips={
           tutBeat === 'scrap'
-            ? [{ noun: 'broken chest plate', consumed: false }]
+            ? [{ noun: getTutorialProps().armor, consumed: false }]
             : buildChipPool(currentScene).map((n) => ({
                 noun: n,
                 // OTA-167 — salvage chip greys on the engine's per-room
