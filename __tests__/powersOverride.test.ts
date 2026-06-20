@@ -2,7 +2,7 @@
 // disciplines are DEFAULT_POWERS; an uploaded 'powers' table replaces them, so a
 // power's name / fuel / DC / stat reskin (the effect primitive stays coded).
 
-import { getPowers, powerForDiscipline, DEFAULT_POWERS } from '../app/engine/powers';
+import { getPowers, powerForDiscipline, matchPower, DEFAULT_POWERS, POWERS_TEMPLATE } from '../app/engine/powers';
 import { setTableOverride, clearAllOverrides } from '../app/engine/contentPack';
 
 describe('engine_Dev — data-driven powers', () => {
@@ -26,5 +26,23 @@ describe('engine_Dev — data-driven powers', () => {
     expect(powerForDiscipline('mend')?.name).toBe('Field Medic');
     // A discipline the author omitted (summon) simply has no power.
     expect(powerForDiscipline('summon')).toBeUndefined();
+  });
+
+  it('matchPower routes a typed cast to a custom power by its examples', () => {
+    setTableOverride('powers', [
+      { id: 'fog', discipline: 'shape', name: 'Eldridge Fog', title: 't', body: 'b', stat: 'intelligence', dcBase: 12, fuels: ['Residue'], examples: ['call the fog', 'choking fog'], effect: { kind: 'coat_enemies', coating: 'corruption_coat', dmgPerTurn: 3, turns: 3, target: 'all' } },
+    ]);
+    expect(matchPower('call the fog')?.name).toBe('Eldridge Fog');
+    expect(matchPower('i want to call the fog on them')?.id).toBe('fog');
+    expect(matchPower('summon golem')).toBeNull(); // not in this set
+  });
+
+  it('the TEMPLATE carries custom-effect examples (fog = coat_enemies, heal = heal_self)', () => {
+    const fog = POWERS_TEMPLATE.find((p) => p.effect?.kind === 'coat_enemies');
+    const heal = POWERS_TEMPLATE.find((p) => p.effect?.kind === 'heal_self');
+    expect(fog).toBeTruthy();
+    expect(heal).toBeTruthy();
+    // The built-in disciplines are still there to edit.
+    expect(POWERS_TEMPLATE.some((p) => p.id === 'aether_summon')).toBe(true);
   });
 });

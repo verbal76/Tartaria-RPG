@@ -15212,6 +15212,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-653 — powers stage 2 + upload robustness (JS-only OTA). Powers can
+// now carry a custom `effect`: 'coat_enemies' (a damaging fog/DOT over enemies,
+// reusing the combat coating tick) or 'heal_self' — so authors define NEW powers,
+// not just reskin the 3 disciplines. The parser routes a typed cast through
+// matchPower() (matches the active powers' example phrases) before the built-in
+// keyword fallback, so a custom "call the fog" power fires its own effect. Powers
+// TEMPLATE gains fog + heal examples. Also: table uploads now tolerate the common
+// wrapped shape { "races":[...] } by unwrapping the single array.
 // engine_Dev-652 — data-driven POWERS, stage 1 (JS-only OTA). The magic/ability
 // system's DEFINITIONS are now data: app/engine/powers.ts holds DEFAULT_POWERS
 // (the built-in Aethercraft disciplines) + getPowers() via resolveTable('powers',
@@ -15328,4 +15336,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-652';
+export const OTA_BUILD_ID = '2026-06-19-653';

@@ -172,8 +172,15 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     } catch (e) {
       return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
     }
+    // engine_Dev — tolerate the common wrapped shape the built-in data files use,
+    // e.g. { "weapons": [...] } or { "races": [...] } or { "items": [...] }: if the
+    // upload is an object with exactly one array property, unwrap it to the array.
+    if (!Array.isArray(parsed) && parsed && typeof parsed === 'object') {
+      const arrays = Object.values(parsed as Record<string, unknown>).filter(Array.isArray);
+      if (arrays.length === 1) parsed = arrays[0];
+    }
     if (!Array.isArray(parsed)) {
-      return { ok: false, error: 'A table must be a JSON array of rows.' };
+      return { ok: false, error: 'A table must be a JSON array of rows (or an object wrapping one array, e.g. { "races": [...] }).' };
     }
     if (parsed.length === 0) {
       return { ok: false, error: 'The array is empty.' };

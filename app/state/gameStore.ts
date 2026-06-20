@@ -9134,6 +9134,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (parsed.intent === 'cast') {
           const verbLow = trimmed.toLowerCase();
           const tgtLow = (parsed.target ?? '').toLowerCase();
+          // engine_Dev — data-driven power routing: match the typed cast against
+          // the active powers' example phrases first, so custom powers (e.g. a
+          // "call the fog" coat-enemies power) route to their own effect. Falls
+          // through to the built-in shape/summon/mend keyword logic below.
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { matchPower } = require('../engine/powers');
+            const matchedPower = (matchPower(`${verbLow} ${tgtLow}`.trim()) ?? matchPower(verbLow)) as import('../engine/powers').Power | null;
+            if (matchedPower) {
+              let mGolemHint: import('../engine/types').GolemKind | null = null;
+              if (matchedPower.discipline === 'summon') {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { parseGolemKind } = require('../engine/golems');
+                mGolemHint = parseGolemKind(`${verbLow} ${tgtLow}`);
+              }
+              runAethercraft(matchedPower.discipline, get, set, player, currentScene, mGolemHint, matchedPower);
+              break;
+            }
+          }
           const wantShape = (/\b(shape|mold|manipulate)\b/.test(verbLow) && /\bstone\b/.test(tgtLow + ' ' + verbLow))
             || /\baetherstone manipulation\b/.test(verbLow);
           const wantSummon = (/\bsummon\b/.test(verbLow) && /\bgolem\b/.test(tgtLow + ' ' + verbLow))
@@ -24642,6 +24661,7 @@ function runAethercraft(
   player: PlayerCharacter,
   scene: CurrentScene,
   golemKindHint?: import('../engine/types').GolemKind | null,
+  powerOverride?: import('../engine/powers').Power,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { aethercraftDcModifier, aethercraftStatBonus } = require('../engine/raceMechanics');
@@ -24654,7 +24674,7 @@ function runAethercraft(
   // so a re-skinned game's powers cast with their own fuel and difficulty.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { powerForDiscipline } = require('../engine/powers');
-  const power = powerForDiscipline(discipline) as import('../engine/powers').Power | undefined;
+  const power = (powerOverride ?? powerForDiscipline(discipline)) as import('../engine/powers').Power | undefined;
 
   // 2026-05-25 [MECHANIC-1b] — summon discipline now consumes a
   // golem-specific RECIPE (multiple items) instead of a single
@@ -24793,6 +24813,49 @@ function runAethercraft(
         );
       }
     }
+  }
+
+  // engine_Dev — Stage 2: a power with a custom `effect` runs THAT instead of the
+  // built-in shape/summon/mend outcome. Reuses the fuel + skill-check + time logic
+  // above; here we just apply the data-defined effect.
+  if (power?.effect) {
+    const eff = power.effect;
+    if (eff.kind === 'coat_enemies') {
+      const sceneNow = get().currentScene;
+      if (!sceneNow || sceneNow.enemies.length === 0) {
+        get().appendLog('world', `${disciplineLabel} gathers, but there is nothing here to settle on.`);
+      } else {
+        const base = sceneNow.enemyStatuses ?? sceneNow.enemies.map(() => [] as NonNullable<CurrentScene['enemyStatuses']>[number]);
+        const statuses = base.map((a) => [...a]);
+        const idxs = eff.target === 'active'
+          ? [sceneNow.activeEnemyIdx]
+          : sceneNow.enemies.map((_, i) => i);
+        let hit = 0;
+        for (const i of idxs) {
+          if ((sceneNow.enemyHps[i] ?? 0) <= 0) continue;
+          statuses[i] = [
+            ...(statuses[i] ?? []),
+            { kind: eff.coating, turnsRemaining: Math.max(1, eff.turns), dmgPerTurn: Math.max(1, eff.dmgPerTurn), sourceName: power.name },
+          ];
+          hit++;
+        }
+        set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyStatuses: statuses } } : s);
+        get().appendLog('reward', `${disciplineLabel} settles over ${hit === 1 ? 'your foe' : `${hit} foes`} — ${eff.dmgPerTurn} damage/turn for ${eff.turns} turns.`);
+      }
+    } else if (eff.kind === 'heal_self') {
+      const m = /(\d+)\s*d\s*(\d+)/i.exec(eff.dice ?? '');
+      let healed = 0;
+      if (m) { const n = Math.min(10, +m[1]!), d = Math.max(2, +m[2]!); for (let k = 0; k < n; k++) healed += rollDie(d); }
+      else healed = 4;
+      const liveHeal = get().player;
+      if (liveHeal) {
+        const newHp = Math.min(liveHeal.hpMax ?? liveHeal.hp, liveHeal.hp + healed);
+        set((s) => s.player ? { player: { ...s.player, hp: newHp } } : s);
+        get().appendLog('reward', `${disciplineLabel} knits you back together. +${healed} HP (${newHp}/${liveHeal.hpMax ?? newHp}).`);
+      }
+    }
+    set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
+    return;
   }
 
   // 4. Success path — discipline-specific outcome.

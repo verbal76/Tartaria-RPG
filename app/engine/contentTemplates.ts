@@ -22,7 +22,7 @@ import {
   type LoreBlockId,
 } from './contentPack';
 import { buildFlavorTemplate } from './narrativeGenerator';
-import { DEFAULT_POWERS } from './powers';
+import { POWERS_TEMPLATE } from './powers';
 
 /** Example narrator persona seeded into the World-lore template — illustrative
  *  only; the author edits it. (The live default is built from the narrator's
@@ -114,8 +114,8 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   // ignores; the `always` tag marks the default block used when nothing else
   // matches. Replace every REPLACE and add as many blocks as you want.
   lore: LORE_DOCUMENT_SCAFFOLD,
-  // The built-in power set (Aethercraft) is the template — edit names/fuel/DC.
-  powers: DEFAULT_POWERS as unknown[],
+  // The built-in power set + custom-effect examples (fog / heal) — edit/replace.
+  powers: POWERS_TEMPLATE as unknown[],
 };
 
 /** How many sample rows to export per table — enough to show the shape, not the
