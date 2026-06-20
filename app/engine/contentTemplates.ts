@@ -19,6 +19,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from './contentPack';
+import { buildFlavorTemplate } from './narrativeGenerator';
 
 /** Example narrator persona seeded into the World-lore template — illustrative
  *  only; the author edits it. (The live default is built from the narrator's
@@ -64,10 +65,13 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
 export function getLoreTemplate(id: LoreBlockId): string {
   if (id === 'world') {
     return JSON.stringify(
-      { narrator: NARRATOR_PERSONA_EXAMPLE, tone: DEFAULT_WORLD_TONE, setting: '', terms: [] },
+      { narrator: NARRATOR_PERSONA_EXAMPLE, tone: DEFAULT_WORLD_TONE, setting: '', terms: [], vocabulary: [] },
       null,
       2,
     );
+  }
+  if (id === 'flavor') {
+    return JSON.stringify(buildFlavorTemplate(TEMPLATE_SAMPLE_ROWS), null, 2);
   }
   const src = id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races;
   return JSON.stringify(src.slice(0, TEMPLATE_SAMPLE_ROWS), null, 2);

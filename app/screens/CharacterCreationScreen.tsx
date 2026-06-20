@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { useContentPackStore } from '../state/contentPackStore';
 import { getRaces, getFactions } from '../engine/character';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
@@ -21,12 +22,28 @@ export function CharacterCreationScreen() {
   const startNewGame = useGameStore((s) => s.startNewGame);
   const setScreen = useGameStore((s) => s.setScreen);
 
+  // engine_Dev — re-read the race/faction lists whenever the content pack
+  // changes (an upload, or the persisted pack finishing its boot hydrate), so
+  // creation always shows the CURRENT pack instead of whatever was loaded the
+  // instant this screen first mounted. Subscribing to these store fields forces
+  // the re-render; getRaces()/getFactions() then pull the live override.
+  useContentPackStore((s) => s.tables);
+  useContentPackStore((s) => s.hydrated);
   const races = getRaces();
   const factions = getFactions();
 
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
+
+  // If the pack changed (upload / late hydrate) and the previously-selected id
+  // is no longer in the list, snap to the first entry of the current pack.
+  useEffect(() => {
+    if (!races.some((r) => r.id === raceId)) setRaceId(races[0]!.id);
+  }, [races, raceId]);
+  useEffect(() => {
+    if (!factions.some((f) => f.id === factionId)) setFactionId(factions[0]!.id);
+  }, [factions, factionId]);
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;

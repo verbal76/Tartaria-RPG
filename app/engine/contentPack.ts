@@ -14,7 +14,7 @@ export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
   | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations';
 
-export type LoreBlockId = 'world' | 'faction' | 'race';
+export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
 
 export interface ContentTableDef { id: ContentTableId; label: string; hint: string; }
 export interface LoreBlockDef { id: LoreBlockId; label: string; hint: string; }
@@ -38,6 +38,7 @@ export const LORE_BLOCKS: LoreBlockDef[] = [
   { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the narrator uses>", "tagline": "<shown under the title>", "setting": "<a paragraph the narrator knows>", "terms": ["place/faction nouns"], "vocabulary": ["verbs the narrator favors"] }' },
   { id: 'faction', label: 'Faction lore', hint: 'JSON: free-form faction lore (object or array)' },
   { id: 'race', label: 'Race lore', hint: 'JSON: free-form race lore (object or array)' },
+  { id: 'flavor', label: 'Narration flavor', hint: 'JSON object of the narrator’s canned line-pools by key (genericRemarks, combatRemarks, lookLines, notedLines, sceneIntros, combatIntros, hubOpening, personalBeats, moodRemarks, intentRemarks, raceRemarks, factionRemarks). Hit TEMPLATE to see the keys; any key you omit keeps the built-in lines.' },
 ];
 
 /** Built-in default world tone (Tartaria). The LLM prompt falls back to this when
@@ -170,6 +171,18 @@ export function getNarratorPersona(): string {
   const w = loreOverrides.world as { narrator?: unknown } | undefined;
   if (w && typeof w.narrator === 'string' && w.narrator.trim().length > 0) return w.narrator.trim();
   return `You are ${getNarratorName()}, the narrator of this world.`;
+}
+
+/** Resolve a narrator canned-line pool by key through the 'flavor' lore override.
+ *  Returns the author's pool when they've uploaded one for that key, else the
+ *  built-in default — so a partial flavor upload only replaces the keys it
+ *  defines (expand/contract friendly). */
+export function resolveFlavor<T>(key: string, builtin: T): T {
+  const f = loreOverrides.flavor as Record<string, unknown> | undefined;
+  const v = f ? f[key] : undefined;
+  if (v == null) return builtin;
+  if (Array.isArray(v) && v.length === 0) return builtin;
+  return v as T;
 }
 
 /** Reset everything back to the built-in Tartaria pack. */

@@ -11,7 +11,7 @@ import type {
   WorldMemory,
 } from './types';
 import { pick, chance, rotatingPick } from './rng';
-import { getNarratorName } from './contentPack';
+import { getNarratorName, resolveFlavor } from './contentPack';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
 // lazy-loaded via require() inside getter functions below. Combined
@@ -31,13 +31,13 @@ export function buildOpening(): string {
 // confirm a race / faction id resolves to an authored Arbiter line.
 // Returns null when the id has no pool entries.
 export function pickArbiterRaceRemark(raceId: string): string | null {
-  const pool = ARBITER_RACE_REMARKS[raceId];
+  const pool = resolveFlavor('raceRemarks', ARBITER_RACE_REMARKS)[raceId];
   if (!pool || pool.length === 0) return null;
   return pick(pool);
 }
 
 export function pickArbiterFactionRemark(factionId: string): string | null {
-  const pool = ARBITER_FACTION_REMARKS[factionId];
+  const pool = resolveFlavor('factionRemarks', ARBITER_FACTION_REMARKS)[factionId];
   if (!pool || pool.length === 0) return null;
   return pick(pool);
 }
@@ -112,7 +112,7 @@ export function buildOpeningNarrative(input: {
   // otherwise pick from the surface openings pool. Weather clause uses
   // "A / An" properly so we don't print "A etheric storm".
   const isHubScene = !!(hubRoomName && hubRoomDescription);
-  const arbiterLine = isHubScene ? pick(HUB_OPENING_LINES) : pick(openingsList);
+  const arbiterLine = isHubScene ? pick(resolveFlavor('hubOpening', HUB_OPENING_LINES)) : pick(openingsList);
   const weatherClause = weatherDescriptor
     ? ` ${aOrAn(weather.name)} ${weather.name.toLowerCase()} presses on the world — ${weatherDescriptor}.`
     : '';
@@ -357,7 +357,7 @@ let _moodRemarks: Record<string, string[]> | null = null;
 function getMoodRemarks(): Record<string, string[]> {
   if (_moodRemarks) return _moodRemarks;
   const moodQuotes = require('../data/lore/arbiter-mood-quotes.json');
-  _moodRemarks = mergePools(BASE_MOOD_REMARKS, moodQuotes as Record<string, string[]>);
+  _moodRemarks = mergePools(resolveFlavor('moodRemarks', BASE_MOOD_REMARKS), moodQuotes as Record<string, string[]>);
   return _moodRemarks!;
 }
 
@@ -366,7 +366,7 @@ function getIntentRemarks(): Partial<Record<Intent, string[]>> {
   if (_intentRemarks) return _intentRemarks;
   const intentQuotes = require('../data/lore/arbiter-intent-quotes.json');
   _intentRemarks = mergePools<Intent>(
-    BASE_INTENT_REMARKS,
+    resolveFlavor('intentRemarks', BASE_INTENT_REMARKS),
     intentQuotes as Partial<Record<Intent, string[]>>,
   );
   return _intentRemarks!;
@@ -637,7 +637,7 @@ const COMBAT_REMARKS = [
 ];
 
 function combatRemark(enemy: Enemy): string {
-  return rotatingPick(COMBAT_REMARKS, 'arbiter.combat.remark').replace('{enemy}', enemy.name.toLowerCase());
+  return rotatingPick(resolveFlavor('combatRemarks', COMBAT_REMARKS), 'arbiter.combat.remark').replace('{enemy}', enemy.name.toLowerCase());
 }
 
 // arb136 — cooldown counter for the unresolved-hook "nag" callback. Without it the
@@ -678,7 +678,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
         // first-person voice instead of the third-person template
         // that echoed the raw verb verbatim.
         if (lastAction.trim().toLowerCase() === 'look') {
-          return `${rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')} ${combatRemark(ctx.enemy!)}`;
+          return `${rotatingPick(resolveFlavor('lookLines', ARBITER_LOOK_LINES), 'arbiter.look')} ${combatRemark(ctx.enemy!)}`;
         }
         // arb136 — was the NOTED line + combatRemark CONCATENATED, which double-tagged
         // the speaker ("The Arbiter watches. '…' The Arbiter watches the aetherbat. '…'").
@@ -852,8 +852,8 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       // you ${verb}" template that echoed the raw verb verbatim
       // is gone.
       const noted = lastAction.trim().toLowerCase() === 'look'
-        ? rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')
-        : rotatingPick(ARBITER_NOTED_LINES, 'arbiter.noted.peace');
+        ? rotatingPick(resolveFlavor('lookLines', ARBITER_LOOK_LINES), 'arbiter.look')
+        : rotatingPick(resolveFlavor('notedLines', ARBITER_NOTED_LINES), 'arbiter.noted.peace');
       return flavor ? `${noted} ${flavor}` : noted;
     }
   }
@@ -889,7 +889,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     return `The ${getNarratorName()} eyes the ${ctx.hazard.name.toLowerCase()}. "Tartaria's older hazards are the ones you can't see coming. This one you can."`;
   }
   // Last resort — lore-grounded setting remarks (no Yoda mantras).
-  return rotatingPick(GENERIC_REMARKS, 'arbiter.generic');
+  return rotatingPick(resolveFlavor('genericRemarks', GENERIC_REMARKS), 'arbiter.generic');
 }
 
 /**
@@ -1119,7 +1119,7 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
   // Combat scenes stay tight on the threat — no identity / timeline drift
   // while a hostile is staged.
   if (enemy) {
-    return pick(ARBITER_COMBAT_INTROS).replace('{enemyName}', enemy.name.toLowerCase());
+    return pick(resolveFlavor('combatIntros', ARBITER_COMBAT_INTROS)).replace('{enemyName}', enemy.name.toLowerCase());
   }
 
   // ~12% — timeline callback. Builds dynamically from milestones and the
@@ -1133,24 +1133,24 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
   // ~12% — race-specific remark. The Arbiter acknowledges the heritage
   // the player picked at character creation.
   if (player && Math.random() < 0.12) {
-    const pool = ARBITER_RACE_REMARKS[player.raceId];
+    const pool = resolveFlavor('raceRemarks', ARBITER_RACE_REMARKS)[player.raceId];
     if (pool && pool.length > 0) return pick(pool);
   }
 
   // ~12% — faction-specific remark. The Arbiter acknowledges the faction
   // the player aligned with at start.
   if (player && Math.random() < 0.12) {
-    const pool = ARBITER_FACTION_REMARKS[player.factionId];
+    const pool = resolveFlavor('factionRemarks', ARBITER_FACTION_REMARKS)[player.factionId];
     if (pool && pool.length > 0) return pick(pool);
   }
 
   // ~15% — personal beat (who the Arbiter is, in passing).
   if (Math.random() < 0.15) {
-    return pick(ARBITER_PERSONAL_BEATS);
+    return pick(resolveFlavor('personalBeats', ARBITER_PERSONAL_BEATS));
   }
 
   // Default — generic scene intro from earlier work.
-  return pick(ARBITER_SCENE_INTROS).replace('{locationName}', location.name);
+  return pick(resolveFlavor('sceneIntros', ARBITER_SCENE_INTROS)).replace('{locationName}', location.name);
 }
 
 // Race-specific remarks. Conversational acknowledgments of the heritage
@@ -1371,3 +1371,41 @@ const ARBITER_PERSONAL_BEATS = [
   `"There is a name I have not used in a long time," the ${getNarratorName()} says. "Not even to myself. Not yet to you."`,
   `"The Aetherstone hummed differently before the Flood," the ${getNarratorName()} says. "I am one of the few who can still hear the difference."`,
 ];
+
+// engine_Dev — the narrator's built-in canned line-pools, keyed for the content
+// pack. resolveFlavor('<key>', BUILTIN_FLAVOR_POOLS.<key>) at every use site
+// above honors an uploaded 'flavor' lore block per key. Exported so the dev
+// console can hand the author a starter TEMPLATE of the real keys + lines.
+export const BUILTIN_FLAVOR_POOLS = {
+  hubOpening: HUB_OPENING_LINES,
+  moodRemarks: BASE_MOOD_REMARKS,
+  intentRemarks: BASE_INTENT_REMARKS,
+  lookLines: ARBITER_LOOK_LINES,
+  notedLines: ARBITER_NOTED_LINES,
+  genericRemarks: GENERIC_REMARKS,
+  combatRemarks: COMBAT_REMARKS,
+  sceneIntros: ARBITER_SCENE_INTROS,
+  combatIntros: ARBITER_COMBAT_INTROS,
+  raceRemarks: ARBITER_RACE_REMARKS,
+  factionRemarks: ARBITER_FACTION_REMARKS,
+  personalBeats: ARBITER_PERSONAL_BEATS,
+} as const;
+
+/** A trimmed starter object for the Narration-flavor upload box: every pool key,
+ *  with the first `n` example lines (arrays) or first couple of sub-keys
+ *  (records). The author edits/expands and uploads; omitted keys keep built-ins. */
+export function buildFlavorTemplate(n = 2): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(BUILTIN_FLAVOR_POOLS)) {
+    if (Array.isArray(val)) {
+      out[key] = (val as string[]).slice(0, n);
+    } else {
+      const rec: Record<string, string[]> = {};
+      for (const [k, lines] of Object.entries(val as Record<string, string[]>).slice(0, n)) {
+        rec[k] = (lines as string[]).slice(0, n);
+      }
+      out[key] = rec;
+    }
+  }
+  return out;
+}
