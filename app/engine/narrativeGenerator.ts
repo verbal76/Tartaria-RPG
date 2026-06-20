@@ -58,6 +58,10 @@ export function buildOpeningNarrative(input: {
   playerName: string;
   raceName: string;
   factionName: string;
+  /** The player faction's own second-person backstory blurb (Faction.flavor) —
+   *  appended to P1 so the opening tells the player what THEIR faction is walking
+   *  into, not just the world at large. Empty/absent → skipped. */
+  factionFlavor?: string | null;
   weather: WeatherEntry;
   weatherDescriptor: string;
   location: Location;
@@ -69,6 +73,7 @@ export function buildOpeningNarrative(input: {
     playerName,
     raceName,
     factionName,
+    factionFlavor,
     weather,
     weatherDescriptor,
     location,
@@ -114,6 +119,12 @@ export function buildOpeningNarrative(input: {
   } else {
     p1 = pick(p1Variants);
   }
+  // engine_Dev — faction-specific backstory. Append the player faction's own
+  // second-person blurb (Faction.flavor) so the opening tells them what THEIR
+  // banner is walking into — the Soviet character hears the Soviet stance, not
+  // just the world at large. Skipped when the faction has no flavor blurb.
+  const factionLead = (factionFlavor ?? '').trim();
+  if (factionLead) p1 = `${p1} ${factionLead}`;
 
   // P2 — setting. Hub mode anchors at the authored room; otherwise the
   // procedural location description carries the load. Preserves the

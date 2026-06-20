@@ -5206,11 +5206,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The Paths: line below stays as its own utility entry.
     if (opts?.isOpening) {
       const raceName = getRaces().find((r) => r.id === player.raceId)?.name ?? 'Unknown';
-      const factionName = getFactions().find((f) => f.id === player.factionId)?.name ?? 'no banner';
+      const playerFaction = getFactions().find((f) => f.id === player.factionId);
+      const factionName = playerFaction?.name ?? 'no banner';
       const [p1, p2, p3] = buildOpeningNarrative({
         playerName: player.name,
         raceName,
         factionName,
+        factionFlavor: playerFaction?.flavor ?? null,
         weather,
         weatherDescriptor: describeWeatherStatModifiers(weather),
         location,
@@ -5228,9 +5230,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // milestones.firstQAHintShown.
       const msNow = get().player?.milestones;
       if (!msNow?.firstQAHintShown && get().tutorialStep === null) {
+        // engine_Dev — examples pulled from the LIVE faction + location names so
+        // the hint teaches the affordance with the player's own world ("Who are
+        // the United States (ONR)", "What is Drydock 4") instead of hardcoded
+        // Tartaria nouns ("the Aether", "the Reclaimers", "Drakova").
         get().appendLog(
           'arbiter',
-          `The ${getNarratorName()} watches you settle. "If you want to know what something is, the Aether, a faction, a place, just ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
+          `The ${getNarratorName()} watches you settle. "If you want to know what something is — a faction, a place, a thing — just ask. 'Who are the ${factionName}.' 'What is ${location.name}.' I keep what I remember of this world."`,
         );
         set((s) => (s.player ? {
           player: {
