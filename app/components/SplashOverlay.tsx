@@ -43,18 +43,20 @@ export function SplashOverlay() {
     : kokoro.phase === 'loading' ? 0.92
     : 0.12;
 
-  // Full poster — the splash art is a complete portrait design (title, emblem,
-  // tagline, feature row), so it's shown with `contain`: the WHOLE poster scales
-  // to fit the device screen, aspect preserved, nothing cropped or zoomed. The
-  // overlay background is the poster's own near-black, so any letterbox margin
-  // on an odd aspect ratio blends in. (Was `cover`, which zoomed/cropped the art
-  // — read as "massively oversized" on phones whose aspect didn't match.)
-  // SPLASH_W/H document the source aspect.
+  // Full poster — the splash art is a complete portrait design with its OWN
+  // decorative border + corner brackets running to the art's edges. Rendered with
+  // `contain` (whole poster, aspect preserved, nothing zoomed) AND inset from the
+  // screen edges so that framed border can't sit flush against — and be clipped by
+  // — the phone's rounded corners / curved glass / status + nav bars. Previously
+  // the image was absoluteFill, so `contain` fit it to WIDTH (flush left/right) and
+  // the frame's edges + corner brackets got eaten by the rounded display corners —
+  // which read as "too big / edges cut off". The inset gives the whole poster
+  // breathing room; the near-black overlay behind it hides the margin.
   return (
     <View style={styles.overlay} pointerEvents="auto">
       <Image
         source={require('../../assets/splash-art.jpg')}
-        style={StyleSheet.absoluteFill}
+        style={styles.poster}
         resizeMode="contain"
       />
       <View style={styles.barWrap}>
@@ -71,6 +73,10 @@ export function SplashOverlay() {
 
 const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#0b0a09', zIndex: 1000, elevation: 1000 },
+  // Inset the framed poster off the physical edges: clears the status bar +
+  // rounded top corners, the gesture/nav bar + rounded bottom corners, and the
+  // curved side glass. Generous bottom so the framed art clears the loading bar.
+  poster: { position: 'absolute', top: 40, bottom: 96, left: 18, right: 18 },
   barWrap: { position: 'absolute', left: 28, right: 28, bottom: 56, alignItems: 'center' },
   barTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },
