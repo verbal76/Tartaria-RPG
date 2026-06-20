@@ -251,7 +251,8 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
           onPress={() => {
             const out = text.trim().length > 0 ? text : getTableTemplate(id);
             void Clipboard.setStringAsync(out);
-            setStatus({ kind: 'ok', msg: 'Copied to clipboard — paste into an editor, fill it out, paste it back, then LOAD.' });
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
           }}
         >
           <Text style={styles.copyBtnText}>COPY</Text>
@@ -313,7 +314,8 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
           onPress={() => {
             const out = text.trim().length > 0 ? text : getLoreTemplate(id);
             void Clipboard.setStringAsync(out);
-            setStatus({ kind: 'ok', msg: 'Copied to clipboard — paste into an editor, fill it out, paste it back, then LOAD.' });
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
           }}
         >
           <Text style={styles.copyBtnText}>COPY</Text>
