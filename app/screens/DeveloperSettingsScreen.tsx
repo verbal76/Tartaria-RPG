@@ -29,7 +29,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -431,6 +431,88 @@ function MissionsBox() {
   );
 }
 
+// engine_Dev — HOOKS upload. One object { plants, chains, weights?, indoor? } of
+// atmospheric multi-stage leads, using the effect-verb language.
+function HooksBox() {
+  const loadHooksJson = useContentPackStore((s) => s.loadHooksJson);
+  const hooks = useContentPackStore((s) => s.hooks);
+  const loaded = hooks.plants ? Object.keys(hooks.plants).length : (hooks.chains ? Object.keys(hooks.chains).length : 0);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Hooks (atmospheric leads)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} hooks` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Multi-stage leads the player stumbles on while exploring (a column of smoke, a half-buried
+        spire). One object: <Text style={{ fontWeight: 'bold' }}>plants</Text> (the discovery line +
+        matchable nouns per hook id) and <Text style={{ fontWeight: 'bold' }}>chains</Text> (the
+        staged outcomes; each stage carries a list of effects). Effect verbs: grant_tc, grant_item,
+        spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor.
+        Optional weights + indoor list. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your hooks JSON object here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadHooksJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(loaded > 0 ? JSON.stringify(hooks, null, 2) : buildHooksTemplate());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current hooks — edit, then LOAD.' : 'Loaded the hooks template — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(hooks, null, 2) : buildHooksTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearHooks();
+              setStatus({ kind: 'ok', msg: 'Reset hooks to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
@@ -670,6 +752,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>MISSIONS</Text>
       <MissionsBox />
+
+      <Text style={styles.sectionLabel}>HOOKS</Text>
+      <HooksBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox

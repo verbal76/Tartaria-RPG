@@ -3,7 +3,7 @@
 // Hooks are drawn from canonical Tartaria Prima lore — half-buried spires,
 // Etheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
 
-import { getNarratorName } from './contentPack';
+import { getNarratorName, getHooksOverride } from './contentPack';
 
 export type HookKind =
   // Tier-1: atmospheric finds (the originals)
@@ -842,8 +842,41 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
 };
 
+// engine_Dev — the live hook tables. An uploaded 'hooks' override replaces the
+// built-in Tartaria plants/chains wholesale; resolved at runtime (not module load)
+// so an upload mirrored after boot is honored. Kinds are opaque strings here so a
+// re-skin can define its own hook ids.
+type PlantMap = Record<string, { line: string; nouns: string[] }[]>;
+type ChainMap = Record<string, HookOutcome[]>;
+function getPlants(): PlantMap {
+  const o = getHooksOverride();
+  return o?.plants && Object.keys(o.plants).length > 0 ? o.plants : (HOOK_PLANTS as PlantMap);
+}
+function getChainMap(): ChainMap {
+  const o = getHooksOverride();
+  return o?.chains && Object.keys(o.chains).length > 0 ? (o.chains as ChainMap) : (CHAINS as ChainMap);
+}
+function getHookWeights(): Record<string, number> {
+  const o = getHooksOverride();
+  if (o?.weights && Object.keys(o.weights).length > 0) return o.weights;
+  // Custom plants with no declared weights → even weight over the authored kinds.
+  if (o?.plants && Object.keys(o.plants).length > 0) {
+    const w: Record<string, number> = {};
+    for (const k of Object.keys(o.plants)) w[k] = 1;
+    return w;
+  }
+  return HOOK_WEIGHTS as Record<string, number>;
+}
+function getIndoorKinds(): ReadonlySet<string> {
+  const o = getHooksOverride();
+  if (o?.indoor) return new Set(o.indoor);
+  // Custom hook set with no indoor declaration → treat all as outdoor.
+  if (o?.plants && Object.keys(o.plants).length > 0) return new Set<string>();
+  return INDOOR_HOOK_KINDS as ReadonlySet<string>;
+}
+
 export function getHookOutcome(kind: HookKind, stage: number): HookOutcome | null {
-  const chain = CHAINS[kind];
+  const chain = getChainMap()[kind];
   if (!chain || stage >= chain.length) return null;
   return chain[stage] ?? null;
 }
@@ -855,7 +888,7 @@ export function getHookOutcome(kind: HookKind, stage: number): HookOutcome | nul
  *  text, or null when the thread carries loot (item / TC / location), which is
  *  worth repeating per room and must stay repeatable. */
 export function clueThreadMemoText(kind: HookKind): string | null {
-  const chain = CHAINS[kind];
+  const chain = getChainMap()[kind];
   if (!chain || chain.length === 0) return null;
   const terminal = chain[chain.length - 1];
   const memoEff = terminal?.done
@@ -988,31 +1021,38 @@ export const INDOOR_HOOK_KINDS: ReadonlySet<HookKind> = new Set<HookKind>([
   'barefoot_prints',
 ]);
 
-/** Weighted pick over a subset of HOOK_WEIGHTS (the kinds passing `include`). */
-function pickWeightedHookKind(include: (k: HookKind) => boolean, fallback: HookKind): HookKind {
-  const entries = (Object.entries(HOOK_WEIGHTS) as [HookKind, number][]).filter(([k]) => include(k));
+/** Weighted pick over the live weights (the kinds passing `include`). Falls back
+ *  to any available kind, then the given fallback, so a custom hook set that lacks
+ *  the built-in fallback kind still returns one of its own. */
+function pickWeightedHookKind(include: (k: string) => boolean, fallback: HookKind): HookKind {
+  const entries = (Object.entries(getHookWeights()) as [string, number][]).filter(([k]) => include(k));
   const total = entries.reduce((a, [, w]) => a + w, 0);
-  if (total <= 0) return fallback;
+  if (total <= 0) return (entries[0]?.[0] as HookKind) ?? fallback;
   let roll = Math.random() * total;
   for (const [kind, weight] of entries) {
     roll -= weight;
-    if (roll <= 0) return kind;
+    if (roll <= 0) return kind as HookKind;
   }
-  return fallback;
+  return (entries[0]?.[0] as HookKind) ?? fallback;
 }
 
 /** OUTDOOR random hook — excludes the interior kinds. */
 export function pickRandomHookKind(): HookKind {
-  return pickWeightedHookKind((k) => !INDOOR_HOOK_KINDS.has(k), 'glint');
+  const indoor = getIndoorKinds();
+  return pickWeightedHookKind((k) => !indoor.has(k), 'glint');
 }
 
 /** OTA-418 — INDOOR random hook — only the interior kinds. */
 export function pickRandomIndoorHookKind(): HookKind {
-  return pickWeightedHookKind((k) => INDOOR_HOOK_KINDS.has(k), 'loose_floorboard');
+  const indoor = getIndoorKinds();
+  return pickWeightedHookKind((k) => indoor.has(k), 'loose_floorboard');
 }
 
 export function plantHookByKind(kind: HookKind, chainId?: string): Hook {
-  const options = HOOK_PLANTS[kind];
+  const plants = getPlants();
+  // Guard a missing kind (e.g. a nextChain reference an override didn't define):
+  // fall back to any authored plant so a hook is never planted noun-less.
+  const options = plants[kind] ?? Object.values(plants)[0] ?? [{ line: 'Something here catches your eye.', nouns: ['it'] }];
   const choice = options[Math.floor(Math.random() * options.length)] ?? options[0]!;
   return {
     id: `hook_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,

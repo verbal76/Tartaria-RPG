@@ -178,6 +178,32 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
   }, null, 2);
 }
 
+/** The Hooks template — an illustrative example of the atmospheric-lead format.
+ *  `plants` are the discovery line(s) + matchable nouns per hook id; `chains` are
+ *  the staged outcomes, each stage carrying a list of effect verbs. The example is
+ *  kept small (the built-in set is ~50 hooks); the author replaces it wholesale.
+ *  Effect verbs: grant_tc {amount} · grant_item {name} · spawn_enemy_tag {tag} ·
+ *  heal {amount} · damage {amount,cause} · unlock_location {locationId} ·
+ *  rep_change {factionId,amount} · advance_time {hours} · memo {text} ·
+ *  spawn_vendor {vendor} . */
+export function buildHooksTemplate(): string {
+  return JSON.stringify({
+    plants: {
+      green_fog_vent: [
+        { line: 'A vent in the seam breathes a slow coil of green fog.', nouns: ['vent', 'fog', 'seam', 'grate'] },
+      ],
+    },
+    chains: {
+      green_fog_vent: [
+        { line: 'You step closer. The ozone stings; something metallic is wedged in the grate.', effects: [], done: false, addNouns: ['grate'] },
+        { line: 'You pry the grate loose. A ticking brass device tumbles into your hand.', effects: [{ type: 'grant_item', name: 'Doomsday Chronometer' }, { type: 'grant_tc', amount: 40 }], done: true },
+      ],
+    },
+    weights: { green_fog_vent: 6 },
+    indoor: [],
+  }, null, 2);
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -233,6 +259,11 @@ export function buildGameBundleTemplate(): string {
     'missions',
     'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Omit any sub-table to keep its built-in default.',
     buildMissionsTemplate(),
+  ));
+  sections.push(bundleSection(
+    'hooks',
+    'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.',
+    buildHooksTemplate(),
   ));
 
   return `{\n${sections.join(',\n\n')}\n}\n`;

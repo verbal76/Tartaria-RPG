@@ -189,6 +189,29 @@ export function resolveMissions<T>(id: MissionTableId, builtin: readonly T[]): r
   return ov && ov.length > 0 ? (ov as readonly T[]) : builtin;
 }
 
+// --- hooks override -------------------------------------------------------------
+// engine_Dev — HOOKS (atmospheric multi-stage leads) are uploaded as ONE object:
+//   { plants: { <kind>: [{ line, nouns }] }, chains: { <kind>: [HookOutcome] },
+//     weights?: { <kind>: number }, indoor?: [<kind>] }
+// `plants` are the discovery lines + matchable nouns; `chains` are the staged
+// outcomes (each stage a list of effect verbs). An uploaded set replaces the
+// built-in Tartaria hooks wholesale.
+export interface HooksOverride {
+  plants?: Record<string, { line: string; nouns: string[] }[]>;
+  chains?: Record<string, unknown[]>;
+  weights?: Record<string, number>;
+  indoor?: string[];
+}
+let hooksOverride: HooksOverride | null = null;
+export function setHooksOverride(obj: HooksOverride | null): void {
+  const hasPlants = obj?.plants && Object.keys(obj.plants).length > 0;
+  const hasChains = obj?.chains && Object.keys(obj.chains).length > 0;
+  hooksOverride = (hasPlants || hasChains) ? obj : null;
+}
+export function hasHooksOverride(): boolean { return hooksOverride != null; }
+export function getHooksOverride(): HooksOverride | null { return hooksOverride; }
+
+
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
 export function getWorldTone(): string {
@@ -245,6 +268,7 @@ export function clearAllOverrides(): void {
   for (const k of Object.keys(tableOverrides)) delete tableOverrides[k as ContentTableId];
   for (const k of Object.keys(loreOverrides)) delete loreOverrides[k as LoreBlockId];
   setMissionsOverride(null);
+  setHooksOverride(null);
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;

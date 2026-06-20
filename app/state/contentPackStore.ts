@@ -15,11 +15,13 @@ import {
   clearAllOverrides,
   setPublishedFlag,
   setMissionsOverride,
+  setHooksOverride,
   CONTENT_TABLES,
   LORE_BLOCKS,
   type ContentTableId,
   type LoreBlockId,
   type MissionTableId,
+  type HooksOverride,
 } from '../engine/contentPack';
 
 /** The mission sub-tables an uploaded Missions object may carry. */
@@ -78,6 +80,7 @@ interface PersistShape {
   tables: Partial<Record<ContentTableId, unknown[]>>;
   lore: Partial<Record<LoreBlockId, unknown>>;
   missions?: Partial<Record<MissionTableId, unknown[]>>;
+  hooks?: HooksOverride;
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -96,6 +99,9 @@ interface ContentPackState {
   /** Uploaded missions (hunts / mysteries / faction quests / storylines + the
    *  procedural-lead seeds), authored as one object. */
   missions: Partial<Record<MissionTableId, unknown[]>>;
+  /** Uploaded hooks (atmospheric multi-stage leads): { plants, chains, weights?,
+   *  indoor? }. Empty object = built-in Tartaria hooks. */
+  hooks: HooksOverride;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -133,6 +139,9 @@ interface ContentPackState {
    *  (hunts / mysteries / factionQuests / storylines / objectives / complications
    *  / rewards), validate + apply + persist. */
   loadMissionsJson: (json: string) => BundleLoadResult;
+  /** Parse a Hooks object (JSONC): { plants, chains, weights?, indoor? }, validate
+   *  + apply + persist. Replaces the built-in atmospheric leads. */
+  loadHooksJson: (json: string) => BundleLoadResult;
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
@@ -146,16 +155,19 @@ interface ContentPackState {
   clearLore: (id: LoreBlockId) => void;
   /** Drop the uploaded missions back to the built-in set. */
   clearMissions: () => void;
+  /** Drop the uploaded hooks back to the built-in set. */
+  clearHooks: () => void;
   clearAll: () => void;
   /** Load any persisted pack on boot and mirror it into the registry. */
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
     missions: Object.keys(state.missions).length > 0 ? state.missions : undefined,
+    hooks: Object.keys(state.hooks).length > 0 ? state.hooks : undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
@@ -169,6 +181,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   tables: {},
   lore: {},
   missions: {},
+  hooks: {},
   published: false,
   narratorName: '',
   gameTitle: '',
@@ -188,6 +201,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
     for (const [id, value] of Object.entries(s.lore)) setLoreOverride(id as LoreBlockId, value);
     setMissionsOverride(Object.keys(s.missions).length > 0 ? s.missions : null);
+    setHooksOverride(Object.keys(s.hooks).length > 0 ? s.hooks : null);
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
     setGameTaglineOverride(s.gameTagline || null);
@@ -323,6 +337,36 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     return { ok: true, summary };
   },
 
+  loadHooksJson(json) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonComments(json));
+    } catch (e) {
+      return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { ok: false, error: 'Hooks must be a JSON OBJECT: { "plants": {…}, "chains": {…}, "weights"?: {…}, "indoor"?: [...] }.' };
+    }
+    const obj = parsed as Record<string, unknown>;
+    const plants = obj.plants;
+    const chains = obj.chains;
+    const plantKinds = plants && typeof plants === 'object' && !Array.isArray(plants) ? Object.keys(plants) : [];
+    const chainKinds = chains && typeof chains === 'object' && !Array.isArray(chains) ? Object.keys(chains) : [];
+    if (plantKinds.length === 0 && chainKinds.length === 0) {
+      return { ok: false, error: 'Provide at least a "plants" or "chains" object keyed by hook id.' };
+    }
+    const hooks: HooksOverride = {
+      plants: plants as HooksOverride['plants'],
+      chains: chains as HooksOverride['chains'],
+      weights: (obj.weights && typeof obj.weights === 'object' && !Array.isArray(obj.weights)) ? obj.weights as Record<string, number> : undefined,
+      indoor: Array.isArray(obj.indoor) ? (obj.indoor as unknown[]).filter((x) => typeof x === 'string') as string[] : undefined,
+    };
+    setHooksOverride(hooks);
+    set({ hooks, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), hooks });
+    return { ok: true, summary: `Loaded hooks: ${plantKinds.length} plant kind(s), ${chainKinds.length} chain(s).` };
+  },
+
   loadGameBundle(json) {
     let parsed: unknown;
     try {
@@ -340,6 +384,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     const nextTables: Partial<Record<ContentTableId, unknown[]>> = { ...get().tables };
     const nextLore: Partial<Record<LoreBlockId, unknown>> = { ...get().lore };
     const nextMissions: Partial<Record<MissionTableId, unknown[]>> = { ...get().missions };
+    let nextHooks: HooksOverride = get().hooks;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -360,6 +405,16 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
           if (any) applied.push('missions'); else skipped.push('missions (no recognised sub-tables)');
         } else {
           skipped.push('missions (not an object)');
+        }
+      } else if (key === 'hooks') {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          const v = value as Record<string, unknown>;
+          const hasPlants = v.plants && typeof v.plants === 'object';
+          const hasChains = v.chains && typeof v.chains === 'object';
+          if (hasPlants || hasChains) { nextHooks = v as HooksOverride; applied.push('hooks'); }
+          else skipped.push('hooks (no plants/chains)');
+        } else {
+          skipped.push('hooks (not an object)');
         }
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
@@ -399,6 +454,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
 
     setMissionsOverride(Object.keys(nextMissions).length > 0 ? nextMissions : null);
+    setHooksOverride(Object.keys(nextHooks).length > 0 ? nextHooks : null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
@@ -406,12 +462,13 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       tables: nextTables,
       lore: nextLore,
       missions: nextMissions,
+      hooks: nextHooks,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline });
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
   },
@@ -435,6 +492,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
     // The mission set, nested under one "missions" key.
     if (Object.keys(s.missions).length > 0) out.missions = s.missions;
+    // The hook set, nested under one "hooks" key.
+    if (Object.keys(s.hooks).length > 0) out.hooks = s.hooks;
     return JSON.stringify(out, null, 2);
   },
 
@@ -461,10 +520,17 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), missions });
   },
 
+  clearHooks() {
+    setHooksOverride(null);
+    const hooks = {};
+    set({ hooks, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), hooks });
+  },
+
   clearAll() {
     clearAllOverrides();
     setPublishedFlag(false);
-    set({ tables: {}, lore: {}, missions: {}, published: false, narratorName: '', gameTitle: '', gameTagline: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, published: false, narratorName: '', gameTitle: '', gameTagline: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -484,6 +550,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         }
         const missions = shape.missions ?? {};
         setMissionsOverride(Object.keys(missions).length > 0 ? missions : null);
+        const hooks = shape.hooks ?? {};
+        setHooksOverride(Object.keys(hooks).length > 0 ? hooks : null);
         const published = shape.published === true;
         setPublishedFlag(published);
         const narratorName = typeof shape.narratorName === 'string' ? shape.narratorName : '';
@@ -494,7 +562,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setGameTaglineOverride(gameTagline.length > 0 ? gameTagline : null);
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
-        set({ tables, lore, missions, published, narratorName, gameTitle, gameTagline, devMode });
+        set({ tables, lore, missions, hooks, published, narratorName, gameTitle, gameTagline, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
