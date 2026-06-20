@@ -5,7 +5,7 @@
 // Self-contained: owns its timer + Kokoro subscription, returns null when done.
 
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, useWindowDimensions, StatusBar, Platform } from 'react-native';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
 // Splash art native dimensions (assets/splash-art.jpg). The RPG Engine splash is a
@@ -22,6 +22,18 @@ let splashShownThisLaunch = false;
 export function SplashOverlay() {
   const [kokoro, setKokoro] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoro), []);
+  // Reactive to the live screen resolution: re-runs on rotation / split-screen /
+  // any device size. Insets are PROPORTIONAL to the screen (not fixed px) so the
+  // framed poster keeps the same relative breathing room on a small phone and a
+  // tablet alike, plus the Android status-bar height so the top frame clears it.
+  const { width: winW, height: winH } = useWindowDimensions();
+  const statusTop = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0;
+  const posterInset = {
+    top: Math.round(winH * 0.05) + statusTop,
+    bottom: Math.round(winH * 0.10), // leaves room for the loading bar + nav gesture area
+    left: Math.round(winW * 0.05),
+    right: Math.round(winW * 0.05),
+  };
   const [minElapsed, setMinElapsed] = useState(false);
   const [capReached, setCapReached] = useState(false);
   const [skip] = useState(() => splashShownThisLaunch);
@@ -56,7 +68,7 @@ export function SplashOverlay() {
     <View style={styles.overlay} pointerEvents="auto">
       <Image
         source={require('../../assets/splash-art.jpg')}
-        style={styles.poster}
+        style={[styles.poster, posterInset]}
         resizeMode="contain"
       />
       <View style={styles.barWrap}>
@@ -73,10 +85,11 @@ export function SplashOverlay() {
 
 const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#0b0a09', zIndex: 1000, elevation: 1000 },
-  // Inset the framed poster off the physical edges: clears the status bar +
-  // rounded top corners, the gesture/nav bar + rounded bottom corners, and the
-  // curved side glass. Generous bottom so the framed art clears the loading bar.
-  poster: { position: 'absolute', top: 40, bottom: 96, left: 18, right: 18 },
+  // Position only; the actual top/bottom/left/right insets are computed live from
+  // the screen size in the component (posterInset) so the poster is reactive to
+  // the device's real resolution. `contain` then fits the framed art inside that
+  // proportional box — no zoom, no clipped edges, on any screen.
+  poster: { position: 'absolute' },
   barWrap: { position: 'absolute', left: 28, right: 28, bottom: 56, alignItems: 'center' },
   barTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },
