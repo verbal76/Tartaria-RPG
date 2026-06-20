@@ -228,6 +228,7 @@ import {
   AMULETS,
   RINGS,
   findCatalogItem,
+  synthesizeItemFromName,
 } from '../engine/crafting';
 import {
   FACTIONS,
@@ -21340,15 +21341,38 @@ function applyHookEffect(
       return { inlineSummary: amt >= 0 ? `+${amt} TC` : `${amt} TC`, fatal: false };
     }
     case 'grant_item': {
-      const catEntry = lookupCraftedItem(effect.name);
-      const item: InventoryItem = stampDurability({
-        id: `hook_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: effect.name,
-        kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
-        rarity: catEntry.rarity,
-        quantity: 1,
-        tags: catEntry.tags,
-      });
+      // engine_Dev — STAT BACKFILL. If the granted name is a real catalog item,
+      // mint it normally (equip-time stats come from the catalog). If it's an
+      // author name with no table row, synthesize a sensible item from the name
+      // (inferred kind/rarity/tags/durability + an equip-time stat bonus carried
+      // on the instance) instead of a bare, stat-less misc.
+      const known = findCatalogItem(effect.name);
+      let item: InventoryItem;
+      if (known) {
+        const catEntry = lookupCraftedItem(effect.name);
+        item = stampDurability({
+          id: `hook_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: effect.name,
+          kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
+          rarity: catEntry.rarity,
+          quantity: 1,
+          tags: catEntry.tags,
+        });
+      } else {
+        const syn = synthesizeItemFromName(effect.name);
+        item = stampDurability({
+          id: `hook_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: effect.name,
+          kind: syn.kind,
+          rarity: syn.rarity,
+          quantity: 1,
+          tags: syn.tags,
+          description: syn.description,
+          ...(syn.statBonuses && syn.statBonuses.length > 0
+            ? { instanceStats: { statBonuses: syn.statBonuses } }
+            : {}),
+        });
+      }
       set((s) =>
         s.player
           ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, item) } }

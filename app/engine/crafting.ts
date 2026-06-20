@@ -239,6 +239,67 @@ export function lookupCraftedItem(resultName: string): {
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
+// engine_Dev — STAT BACKFILL. When a hook / whisper / mission grants an item by a
+// name the author never put in a table, the engine shouldn't hand over a bare,
+// stat-less misc. synthesizeItemFromName infers a sensible item from the NAME:
+// kind (weapon / armor / relic / consumable / misc) by keyword, a default
+// Uncommon rarity, durability for gear, and a modest equip-time stat bonus carried
+// on the instance (instanceStats.statBonuses — honored by aggregateEquippedStatBonuses
+// even with no catalog row). Real catalog items are unaffected; this only fires for
+// off-table names.
+const RARITY_RANK_BF: Record<Rarity, number> = { Common: 1, Uncommon: 2, Rare: 3, Legendary: 4 };
+const RARITY_DURA_BF: Record<Rarity, number> = { Common: 20, Uncommon: 30, Rare: 45, Legendary: 70 };
+
+export interface SynthesizedItem {
+  kind: 'weapon' | 'armor' | 'relic' | 'consumable' | 'misc';
+  rarity: Rarity;
+  tags: string[];
+  baseDurability?: number;
+  statBonuses?: { stat: string; amount: number }[];
+  description: string;
+}
+
+export function synthesizeItemFromName(name: string): SynthesizedItem {
+  const n = name.toLowerCase();
+  // Rarity: a notch above common for authored rewards; "prime/ace/imperial/…" reads rarer.
+  const rarity: Rarity = /\b(legendary|mythic|prime|ace|emperor|imperial|royal|relic|signature)\b/.test(n)
+    ? 'Rare' : 'Uncommon';
+  const rank = RARITY_RANK_BF[rarity];
+  const has = (re: RegExp) => re.test(n);
+
+  // Kind by keyword.
+  if (has(/\b(blade|sword|rifle|gun|pistol|revolver|knife|knuckle|knuckles|bat|slugger|crowbar|axe|hammer|mace|club|spear|bayonet|launcher|cannon|smg|carbine|mp\d|garand|luger|thompson)\b/)) {
+    const ranged = has(/\b(rifle|gun|pistol|revolver|smg|carbine|launcher|cannon|mp\d|garand|luger|thompson)\b/);
+    return {
+      kind: 'weapon', rarity, tags: ['weapon', ranged ? 'ranged' : 'melee'],
+      baseDurability: RARITY_DURA_BF[rarity],
+      statBonuses: [{ stat: ranged ? 'dexterity' : 'strength', amount: rank }],
+      description: `A field-recovered ${ranged ? 'firearm' : 'weapon'}. Worn, but it'll fight.`,
+    };
+  }
+  if (has(/\b(vest|plate|armor|armour|helm|helmet|mask|jacket|coat|padding|guard|kevlar|flak|gauntlet|gauntlets|boots|greaves|shield|cuirass|harness)\b/)) {
+    return {
+      kind: 'armor', rarity, tags: ['armor'],
+      baseDurability: RARITY_DURA_BF[rarity],
+      statBonuses: [{ stat: 'constitution', amount: rank }],
+      description: `A piece of salvaged protective gear. Scuffed, but solid.`,
+    };
+  }
+  if (has(/\b(coil|device|chronometer|compass|locket|amulet|ring|talisman|lens|core|orb|relic|scanner|battery|emitter|gem|charm|sigil|idol|slag|dust)\b/)) {
+    // Relic-ish fringe-tech / occult trinket: an Intelligence edge.
+    return {
+      kind: 'relic', rarity, tags: ['relic', 'detection'],
+      statBonuses: [{ stat: 'intelligence', amount: rank }],
+      description: `An anomalous trinket. It hums faintly when you're not looking at it.`,
+    };
+  }
+  if (has(/\b(ration|kit|medkit|bandage|syrette|morphine|food|drink|water|pill|stim|tonic|serum|canteen|jerky|meal)\b/)) {
+    return { kind: 'consumable', rarity: 'Common', tags: ['consumable'], description: `Field supplies. Use them when you need them.` };
+  }
+  // Default: a material / intel scrap — no stats, but a real description + tag.
+  return { kind: 'misc', rarity, tags: ['material', 'salvage'], description: `Recovered salvage — worth something to the right buyer, or a crafting input.` };
+}
+
 /** Case-insensitive catalog match. Returns the canonical (title-case)
  *  name + kind + rarity + tags when the input maps to a REAL catalog
  *  item — weapon, armor, gear, amulet, ring, or material. Returns
