@@ -202,6 +202,19 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (parsed == null || typeof parsed !== 'object') {
       return { ok: false, error: 'Lore must be a JSON object or array.' };
     }
+    // engine_Dev — guard the common mix-up: an array of {id,name,…} rows pasted
+    // into the Race/Faction LORE box is really the PLAYABLE table and belongs in
+    // the "Races"/"Factions" box under TABLES (this lore box is free-form story
+    // text and does NOT drive character creation).
+    if ((id === 'race' || id === 'faction') && Array.isArray(parsed)) {
+      const looksLikeTable = parsed.length > 0 && parsed.every(
+        (r) => r && typeof r === 'object' && typeof (r as { id?: unknown }).id === 'string' && typeof (r as { name?: unknown }).name === 'string',
+      );
+      if (looksLikeTable) {
+        const box = id === 'race' ? 'Races' : 'Factions';
+        return { ok: false, error: `This looks like the playable ${box} table. Load it in the "${box}" box under TABLES (down below) — not this lore box. That table is what character creation reads.` };
+      }
+    }
     setLoreOverride(id, parsed);
     const lore = { ...get().lore, [id]: parsed };
     set({ lore, contentVersion: get().contentVersion + 1 });

@@ -31,8 +31,8 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'rings', label: 'Rings', hint: 'JSON array of ring rows (data/items/rings.json)' },
   { id: 'recipes', label: 'Crafting recipes', hint: 'JSON array (data/items/recipes.json)' },
   { id: 'enemies', label: 'Enemies', hint: 'JSON array of enemy rows (data/enemies/…)' },
-  { id: 'races', label: 'Races', hint: 'JSON array of race rows (data/races/…)' },
-  { id: 'factions', label: 'Factions', hint: 'JSON array of faction rows (data/factions/…)' },
+  { id: 'races', label: 'Races (playable — character creation)', hint: 'JSON array of race rows. THIS is what the race-selection screen shows. (Not the "Race lore" box up in LORE — that\'s freeform story text.)' },
+  { id: 'factions', label: 'Factions (playable — character creation)', hint: 'JSON array of faction rows. THIS is what the faction-selection screen shows. (Not the "Faction lore" box up in LORE.)' },
   { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json)' },
   { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
   { id: 'powers', label: 'Powers (magic / abilities)', hint: 'Your castable powers. Each: { "discipline": "shape|summon|mend" (the engine effect it runs), "name", "title", "body", "stat": "intelligence|wisdom", "dcBase", "fuels": ["item names"], "examples": ["cast phrases"] }. Replaces Aethercraft. Hit TEMPLATE for the shape.' },
@@ -41,8 +41,8 @@ export const CONTENT_TABLES: ContentTableDef[] = [
 /** Lore blocks, split the way the game uses them. */
 export const LORE_BLOCKS: LoreBlockDef[] = [
   { id: 'world', label: 'World lore', hint: 'JSON: { "narrator": "You are <persona>…", "tone": "<one-line world tone the narrator uses>", "tagline": "<shown under the title>", "setting": "<a paragraph the narrator knows>", "terms": ["place/faction nouns"], "vocabulary": ["verbs the narrator favors"] }' },
-  { id: 'faction', label: 'Faction lore', hint: 'JSON: free-form faction lore (object or array)' },
-  { id: 'race', label: 'Race lore', hint: 'JSON: free-form race lore (object or array)' },
+  { id: 'faction', label: 'Faction lore (story notes — NOT playable)', hint: 'Free-form faction backstory for the narrator. The PLAYABLE factions (character creation) go in the "Factions" box under TABLES, not here.' },
+  { id: 'race', label: 'Race lore (story notes — NOT playable)', hint: 'Free-form race backstory for the narrator. The PLAYABLE races (character creation) go in the "Races" box under TABLES, not here.' },
   { id: 'flavor', label: 'Narration flavor', hint: 'JSON object of the narrator’s canned line-pools by key (genericRemarks, combatRemarks, lookLines, notedLines, sceneIntros, combatIntros, hubOpening, personalBeats, moodRemarks, intentRemarks, raceRemarks, factionRemarks). Hit TEMPLATE to see the keys; any key you omit keeps the built-in lines.' },
 ];
 
