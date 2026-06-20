@@ -1355,6 +1355,11 @@ export function ExplorationScreen() {
 
       <SalvageModal
         visible={salvageOpen}
+        // engine_Dev — during the scrap beat the demo armor prop is resolved from
+        // the author's own armor table; bypass the Tartaria-tuned isSalvageable
+        // name filter so a custom armor name (e.g. "Flak Vest") still shows.
+        // Otherwise the picker counted the prop but rendered empty.
+        bypassFilter={tutBeat === 'scrap'}
         // During the scrap beat, show ONLY the demo prop (the broken chest
         // plate) so the picker can't surface the room's real salvageables —
         // same confusion fix as the TAKE picker above.

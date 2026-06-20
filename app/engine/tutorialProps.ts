@@ -39,8 +39,11 @@ export function getTutorialProps(): TutorialProps {
   const ropeRow = [...gear, ...expl].find(
     (r) => (r.tags ?? []).some((t) => /rope|climb/i.test(String(t))) || /rope/i.test(r.name as string),
   );
-  const rope = ropeRow?.name ?? "Reclaimer's Rope";
-  const armor = pickCommon(armors)?.name ?? 'Broken Chest Plate';
+  // engine_Dev — generic fallbacks (NOT the Tartaria "Reclaimer's Rope" /
+  // "Broken Chest Plate") so a re-skin whose tables don't include a rope or armor
+  // item still teaches with a neutral prop instead of leaking Tartaria names.
+  const rope = ropeRow?.name ?? 'Climbing Rope';
+  const armor = pickCommon(armors)?.name ?? 'Worn Armor Plate';
 
   return { weapon, rope, armor };
 }

@@ -37,6 +37,11 @@ interface Props {
    *  iterates and closes the modal. Skipped when only 0-1 salvage
    *  targets are present (button hidden). */
   onSalvageAll?: (nouns: string[]) => void;
+  /** engine_Dev — when true, the supplied chips are shown AS-IS without the
+   *  isSalvageable() name filter. Used by the tutorial scrap beat, whose injected
+   *  demo armor prop is resolved from the author's own table and may not match the
+   *  Tartaria-tuned salvage pattern (otherwise the picker opened empty). */
+  bypassFilter?: boolean;
 }
 
 // Salvage chip filter — matches nouns the engine will actually salvage
@@ -152,7 +157,7 @@ function prioritizeSalvageChips(matches: readonly string[]): string[] {
   return [...curated, ...stock.slice(0, 1), ...other];
 }
 
-export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalvageAll }: Props) {
+export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalvageAll, bypassFilter }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // Modal phase. 'select' shows the input + chip row; 'results' shows
@@ -215,9 +220,9 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
   const rawSceneHints = chips
     ? chips
         .filter((c) => !c.consumed) // hide consumed scene nouns entirely
-        .filter((c) => isSalvageable(c.noun))
+        .filter((c) => bypassFilter || isSalvageable(c.noun))
         .map((c) => c.noun)
-    : (hints ?? []).filter(isSalvageable);
+    : (hints ?? []).filter((h) => bypassFilter || isSalvageable(h));
   // OTA-262 — no slice. The full list passes through, so SALVAGE ALL
   // operates on every salvageable noun in the scene (not just the
   // first 8) and the modal's chip row shows everything up to the
