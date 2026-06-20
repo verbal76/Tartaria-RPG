@@ -4307,7 +4307,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (priorVisit.enemiesCleared?.length ?? 0) > 0 &&
       hoursSinceLastVisit < RESPAWN_QUIET_HOURS;
     // Hub is universally peaceful — never roll encounters here.
-    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom;
+    // engine_Dev — the opening scene and the whole tutorial are ALSO peaceful,
+    // regardless of where the player spawns. The built-in Tartaria game spawns the
+    // player inside a faction OUTPOST (a hub room), so combat was suppressed by the
+    // `hubRoom` clause alone; a re-skinned game that spawns at a normal location
+    // (e.g. "Drydock 4") has no hub, so `rollEncounter` was firing mid-tutorial and
+    // dropping the player into combat before they'd learned the verbs. Gate it on
+    // the opening flag + an active tutorialStep so the teaching sequence is safe in
+    // any world, then encounters resume normally once the tutorial completes.
+    const inTutorial = get().tutorialStep !== null;
+    const suppressEncounter =
+      enforcePeace || recentlyCleared || !!hubRoom || !!opts?.isOpening || inTutorial;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
