@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-657 — character-creation registry RE-SYNC + raw diagnostic (JS-only
+// OTA). Suspected root cause of "5 OTAs, still Tartaria": the engine registry that
+// getRaces()/getFactions() read drifted out of sync with the persisted/store packs
+// (an OTA reload reset module state and the boot mirror didn't re-apply). Fix:
+// CharacterCreationScreen now calls reapply() on mount, re-mirroring every stored
+// override into the registry. Plus a raw on-screen diagnostic line ("engine: <first
+// race> (N) · store rN/fN · hydrated Y/N") so the actual source of truth is visible.
 // engine_Dev-656 — starter weapon is data-driven (JS-only OTA). A custom-race
 // character no longer falls back to the Tartaria "Rusted Blade": starterWeaponName
 // resolves the equipped + inventory starter weapon from a race's own
@@ -15360,4 +15367,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-656';
+export const OTA_BUILD_ID = '2026-06-19-657';

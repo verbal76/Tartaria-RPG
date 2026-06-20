@@ -31,8 +31,18 @@ export function CharacterCreationScreen() {
   useContentPackStore((s) => s.tables);
   useContentPackStore((s) => s.hydrated);
   useContentPackStore((s) => s.contentVersion);
+  // engine_Dev — DEFENSIVE RE-SYNC. If the engine registry (what getRaces() reads)
+  // ever drifts out of sync with the persisted/store packs — e.g. an OTA reload
+  // reset module state and a race meant the mirror didn't re-apply — re-mirror
+  // every override from the store into the registry the moment this screen opens.
+  useEffect(() => { useContentPackStore.getState().reapply(); }, []);
   const races = getRaces();
   const factions = getFactions();
+  // engine_Dev — raw diagnostic so the source of truth is visible: what the
+  // engine returns vs. what the store/persistence holds.
+  const storeRaceCount = useContentPackStore((s) => (s.tables.races?.length ?? 0));
+  const storeFactionCount = useContentPackStore((s) => (s.tables.factions?.length ?? 0));
+  const hydratedFlag = useContentPackStore((s) => s.hydrated);
 
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
@@ -90,6 +100,9 @@ export function CharacterCreationScreen() {
       <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
       <Text style={[styles.packLine, (step === 'race' ? racesCustom : factionsCustom) ? styles.packLineOn : styles.packLineOff]}>
         {packLine}
+      </Text>
+      <Text style={styles.debugLine}>
+        engine: {races[0]?.name ?? '?'} ({races.length}) · store r{storeRaceCount}/f{storeFactionCount} · hydrated {hydratedFlag ? 'Y' : 'N'}
       </Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -208,9 +221,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
   },
-  packLine: { fontSize: 10, letterSpacing: 0.5, marginBottom: 8 },
+  packLine: { fontSize: 10, letterSpacing: 0.5, marginBottom: 2 },
   packLineOn: { color: '#9ec96a' },
   packLineOff: { color: '#7a705c', fontStyle: 'italic' },
+  debugLine: { fontSize: 9, color: '#6a9bbf', marginBottom: 8, fontFamily: 'monospace' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
   contextLine: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, marginBottom: 8, fontStyle: 'italic' },
