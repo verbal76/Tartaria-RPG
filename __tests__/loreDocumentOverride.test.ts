@@ -24,6 +24,17 @@ describe('engine_Dev — lore document override', () => {
     expect(buildCanonFactsParagraph(Q(['a quiet meadow', 'sunshine']))).toBeNull();
   });
 
+  it('an "always" passage is the baseline when nothing scene-specific matches', () => {
+    setTableOverride('lore', [
+      { tags: ['always'], text: 'The world is a drowned wasteland under a green sky.' },
+      { tags: ['pier'], text: 'The yard runs on rumor.' },
+    ]);
+    // No scene match → the "always" baseline.
+    expect(buildCanonFactsParagraph(Q(['a quiet meadow']))).toContain('drowned wasteland');
+    // Scene-specific still wins over the baseline.
+    expect(buildCanonFactsParagraph(Q(['pier 4']))).toContain('rumor');
+  });
+
   it('long passages are truncated for the token budget', () => {
     const long = Array.from({ length: 200 }, (_, i) => `word${i}`).join(' ');
     setTableOverride('lore', [{ tags: ['fog'], text: long }]);

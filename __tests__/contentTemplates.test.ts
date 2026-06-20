@@ -6,14 +6,22 @@ import { getTableTemplate, getLoreTemplate, TEMPLATE_SAMPLE_ROWS } from '../app/
 import { CONTENT_TABLES, LORE_BLOCKS } from '../app/engine/contentPack';
 
 describe('engine_Dev — content templates', () => {
-  it('every table template is valid JSON, an array, and capped at the sample size', () => {
+  it('every table template is valid JSON and a non-empty array', () => {
     for (const t of CONTENT_TABLES) {
       const json = getTableTemplate(t.id);
       const parsed = JSON.parse(json);
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBeGreaterThan(0);
-      expect(parsed.length).toBeLessThanOrEqual(TEMPLATE_SAMPLE_ROWS);
+      // 'lore' ships the FULL section scaffold; every other table is a small sample.
+      if (t.id !== 'lore') expect(parsed.length).toBeLessThanOrEqual(TEMPLATE_SAMPLE_ROWS);
     }
+  });
+
+  it('the lore-document template is the full multi-section scaffold', () => {
+    const parsed = JSON.parse(getTableTemplate('lore')) as Array<Record<string, unknown>>;
+    expect(parsed.length).toBeGreaterThan(TEMPLATE_SAMPLE_ROWS);
+    expect(parsed[0]).toHaveProperty('section');
+    expect(parsed.some((p) => Array.isArray(p.tags) && (p.tags as string[]).includes('always'))).toBe(true);
   });
 
   it('the weapons template carries a real built-in row (shows the schema)', () => {
@@ -33,11 +41,15 @@ describe('engine_Dev — content templates', () => {
     expect(typeof w.tone).toBe('string');
   });
 
-  it('faction / race lore templates are small arrays of built-in rows', () => {
-    for (const b of LORE_BLOCKS.filter((l) => l.id !== 'world')) {
+  it('faction / race lore templates are small arrays; flavor is the pool object', () => {
+    for (const b of LORE_BLOCKS.filter((l) => l.id === 'faction' || l.id === 'race')) {
       const parsed = JSON.parse(getLoreTemplate(b.id));
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBeLessThanOrEqual(TEMPLATE_SAMPLE_ROWS);
     }
+    // The narration-flavor template is an OBJECT of pools, not an array.
+    const flavor = JSON.parse(getLoreTemplate('flavor')) as Record<string, unknown>;
+    expect(Array.isArray(flavor)).toBe(false);
+    expect(flavor).toHaveProperty('genericRemarks');
   });
 });

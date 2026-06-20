@@ -85,17 +85,23 @@ function truncateWords(s: string, n: number): string {
 
 function pickLorePassage(passages: readonly LorePassage[], q: CanonFactQuery): string | null {
   let best: { text: string; score: number } | null = null;
+  let fallback: string | null = null; // first passage tagged "always"
   for (const p of passages) {
     if (!p || typeof p.text !== 'string' || !p.text.trim()) continue;
+    const tags = passageTags(p);
+    if (tags.includes('always') && fallback === null) fallback = p.text;
     let score = 0;
-    for (const tag of passageTags(p)) {
+    for (const tag of tags) {
+      if (tag === 'always') continue; // a routing flag, not a scene keyword
       for (const k of q.sceneKeywords) {
         if (k.includes(tag) || tag.includes(k)) score += 1;
       }
     }
     if (score > 0 && (!best || score > best.score)) best = { text: p.text, score };
   }
-  return best ? truncateWords(best.text, 60) : null;
+  // Scene-specific passage wins; else the "always" baseline; else nothing.
+  const chosen = best?.text ?? fallback;
+  return chosen ? truncateWords(chosen, 60) : null;
 }
 
 export function buildCanonFactsParagraph(q: CanonFactQuery): string | null {

@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-648 — generic Lore-document scaffold + "always" baseline (JS-only
+// OTA). The Lore-document TEMPLATE is now a generic, setting-neutral, section-
+// organized scaffold (READ ME + World overview + History / Environment / Faction
+// / Race / Location / Key figure / Artifact sections, each with REPLACE guidance)
+// instead of the WWII example, and it ships the WHOLE scaffold (not a 2-row
+// sample). New routing: a passage tagged "always" is injected as the baseline
+// when no scene-specific passage matches, so the world overview is always present.
 // engine_Dev-647 — Lore document box (JS-only OTA). New 'lore' upload table:
 // your world bible as keyworded passages [{tags:[...], text:"..."}]. The narrator
 // surfaces the passage whose tags match the current scene (truncated to the token
@@ -15292,4 +15299,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-647';
+export const OTA_BUILD_ID = '2026-06-19-648';

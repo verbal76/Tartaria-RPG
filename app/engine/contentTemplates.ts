@@ -38,6 +38,59 @@ function rows(data: unknown, key?: string): unknown[] {
   return [];
 }
 
+// engine_Dev — generic, section-organized starter for the Lore document box.
+// No specific setting: the author replaces each REPLACE and fills sections out as
+// they build a world. `section` = a human label (engine ignores it). `tags` =
+// the scene words that make a passage fire (place/faction/race names from your
+// other tables). `["always"]` = the default passage when nothing else matches.
+const LORE_DOCUMENT_SCAFFOLD: unknown[] = [
+  {
+    section: 'READ ME — how this works (delete before you publish)',
+    tags: [],
+    text: 'Each block below is one lore passage. The narrator pulls in the block whose "tags" appear in the current scene — its location name, biome, and surroundings — so tag every block with the place / faction / race words it should fire near (use the same names as your Locations, Factions, and Races tables). "section" is just a label for you; the engine ignores it. Tag a block "always" to use it as the baseline when nothing scene-specific matches. Empty tags (like this block) never fire. Keep each block a few sentences; add as many as you want.',
+  },
+  {
+    section: 'World overview — the baseline the narrator always leans on',
+    tags: ['always'],
+    text: 'REPLACE: one short paragraph on your world — where and when it is, the central conflict, and the overall mood. This is the catch-all the narrator falls back on when no scene-specific lore matches.',
+  },
+  {
+    section: 'History — a defining past event',
+    tags: ['REPLACE-with-an-event-keyword'],
+    text: 'REPLACE: a pivotal event in your world’s past and why it still matters. Tag it with words that appear where its weight is felt (a place name, a faction).',
+  },
+  {
+    section: 'Environment — a region or biome',
+    tags: ['REPLACE-with-a-region-or-biome-name'],
+    text: 'REPLACE: describe a key region/biome — what it looks, sounds, and feels like. Tag it with the region/biome name you used in your Locations so it surfaces when the player is there.',
+  },
+  {
+    section: 'Faction — who they are',
+    tags: ['REPLACE-with-a-faction-id-or-name'],
+    text: 'REPLACE: who this faction is, what they want, and how they treat outsiders. Tag with the faction’s id/name from your Factions table.',
+  },
+  {
+    section: 'Race / people — culture and traits',
+    tags: ['REPLACE-with-a-race-id-or-name'],
+    text: 'REPLACE: who these people are — their culture, strengths, and how others regard them. Tag with the race id/name from your Races table.',
+  },
+  {
+    section: 'Location — a place’s deeper story',
+    tags: ['REPLACE-with-a-location-name'],
+    text: 'REPLACE: the story behind a specific place — what happened here, what’s hidden, who holds it. Tag with the location name from your Locations table.',
+  },
+  {
+    section: 'Key figure — a leader or legend',
+    tags: ['REPLACE-with-a-character-name'],
+    text: 'REPLACE: an important person, leader, or legend — who they are and why they matter. Tag with their name so it fires near their home or when they’re referenced.',
+  },
+  {
+    section: 'Artifact — the lore of a notable item',
+    tags: ['REPLACE-with-an-item-name'],
+    text: 'REPLACE: the story behind a notable item or relic. Tag with the item’s name (match your Weapons/Gear tables).',
+  },
+];
+
 const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   weapons: rows(weaponsData, 'weapons'),
   armor: rows(armorData, 'armor'),
@@ -50,11 +103,12 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   factions: rows(factionsData),
   locations: rows(locationsData),
   // engine_Dev — the Lore document has no built-in file of its own shape; this is
-  // a hand-authored example of the keyworded-passage format the narrator reads.
-  lore: [
-    { tags: ['uss eldridge', 'fog', 'green haze'], text: 'In October 1943 the destroyer escort USS Eldridge vanished from the Philadelphia Navy Yard in a wall of green haze. Sailors who returned spoke of being unable to tell the deck from the dark water.' },
-    { tags: ['navy yard', 'philadelphia', 'pier'], text: 'The Navy Yard runs on rumor and rationed coffee. Officers do not discuss the experiment; the men who loaded the coils have already been reassigned, or simply are not spoken of.' },
-  ],
+  // a GENERIC, section-organized scaffold (no Tartaria / no specific setting) the
+  // author fills in for any game. Each block is one passage; the narrator injects
+  // the block whose `tags` match the scene. `section` is a human label the engine
+  // ignores; the `always` tag marks the default block used when nothing else
+  // matches. Replace every REPLACE and add as many blocks as you want.
+  lore: LORE_DOCUMENT_SCAFFOLD,
 };
 
 /** How many sample rows to export per table — enough to show the shape, not the
@@ -63,6 +117,9 @@ export const TEMPLATE_SAMPLE_ROWS = 2;
 
 /** First `n` rows of a built-in table as a pretty JSON string (a starter schema). */
 export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS): string {
+  // The Lore document ships the FULL section scaffold (not a 2-row sample) so the
+  // author sees every section to fill in.
+  if (id === 'lore') return JSON.stringify(TABLE_ROWS.lore, null, 2);
   return JSON.stringify(TABLE_ROWS[id].slice(0, n), null, 2);
 }
 
