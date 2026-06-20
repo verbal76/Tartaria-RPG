@@ -12,6 +12,7 @@
 
 export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
+  | 'amulets' | 'rings'
   | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore';
 
 export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
@@ -26,6 +27,8 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'materials', label: 'Materials', hint: 'JSON array of material rows (data/items/materials.json)' },
   { id: 'gear', label: 'Gear / equipment', hint: 'JSON array (data/items/gear.json)' },
   { id: 'exploration', label: 'Exploration items', hint: 'JSON array (data/items/exploration.json)' },
+  { id: 'amulets', label: 'Amulets', hint: 'JSON array of amulet/relic rows (data/items/amulets.json)' },
+  { id: 'rings', label: 'Rings', hint: 'JSON array of ring rows (data/items/rings.json)' },
   { id: 'recipes', label: 'Crafting recipes', hint: 'JSON array (data/items/recipes.json)' },
   { id: 'enemies', label: 'Enemies', hint: 'JSON array of enemy rows (data/enemies/…)' },
   { id: 'races', label: 'Races', hint: 'JSON array of race rows (data/races/…)' },

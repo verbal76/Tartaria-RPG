@@ -60,7 +60,7 @@ function factionGear(): FactionGearRow[] {
     ...resolveTable('weapons', BUILTIN_WEAPONS),
     ...resolveTable('armor', BUILTIN_ARMOR),
     // OTA-497 — faction-issue RINGS (perk-only, one per faction) stock alongside.
-    ...BUILTIN_RINGS,
+    ...resolveTable('rings', BUILTIN_RINGS),
   ].filter((it) => (it.tags ?? []).includes('faction_gear'));
 }
 export function factionGearOffers(factionId: string): VendorOffer[] {

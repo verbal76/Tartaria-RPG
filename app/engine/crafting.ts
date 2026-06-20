@@ -197,6 +197,8 @@ const rArmor = (): readonly CatalogArmor[] => resolveTable('armor', ARMOR);
 const rMaterials = (): readonly CatalogMaterial[] => resolveTable('materials', MATERIALS);
 const rGear = (): readonly CatalogGear[] => resolveTable('gear', GEAR);
 const rExploration = (): readonly CatalogExploration[] => resolveTable('exploration', EXPLORATION);
+const rAmulets = (): readonly CatalogAccessory[] => resolveTable('amulets', AMULETS);
+const rRings = (): readonly CatalogAccessory[] => resolveTable('rings', RINGS);
 const rRecipes = (): readonly Recipe[] => resolveTable('recipes', RECIPES);
 
 const DEFAULT_DURABILITY = 25;
@@ -220,9 +222,9 @@ export function lookupCraftedItem(resultName: string): {
   // exclude DOG_GEAR via their own guards — this branch is construction-only.)
   const dg = DOG_GEAR.find((x) => x.name === resultName);
   if (dg) return { kind: 'dog_armor', rarity: dg.rarity, tags: dg.tags, baseDurability: dg.baseDurability ?? DEFAULT_DURABILITY };
-  const am = AMULETS.find((x) => x.name === resultName);
+  const am = rAmulets().find((x) => x.name === resultName);
   if (am) return { kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
-  const r = RINGS.find((x) => x.name === resultName);
+  const r = rRings().find((x) => x.name === resultName);
   if (r) return { kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
   const m = rMaterials().find((x) => x.name === resultName);
   if (m) return { kind: 'misc', rarity: m.rarity, tags: m.tags };
@@ -265,9 +267,9 @@ export function findCatalogItem(name: string): {
   if (a) return { name: a.name, kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
   const g = rGear().find((x) => x.name.toLowerCase() === q);
   if (g) return { name: g.name, kind: g.kind, rarity: g.rarity, tags: g.tags };
-  const am = AMULETS.find((x) => x.name.toLowerCase() === q);
+  const am = rAmulets().find((x) => x.name.toLowerCase() === q);
   if (am) return { name: am.name, kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
-  const r = RINGS.find((x) => x.name.toLowerCase() === q);
+  const r = rRings().find((x) => x.name.toLowerCase() === q);
   if (r) return { name: r.name, kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
   const m = rMaterials().find((x) => x.name.toLowerCase() === q);
   if (m) return { name: m.name, kind: 'misc', rarity: m.rarity, tags: m.tags };
@@ -591,8 +593,8 @@ function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amul
   if (!t) return false;
   if (exclude !== 'weapon' && rWeapons().some((w) => w.name.toLowerCase() === t)) return true;
   if (exclude !== 'armor' && rArmor().some((a) => a.name.toLowerCase() === t)) return true;
-  if (exclude !== 'amulet' && AMULETS.some((a) => a.name.toLowerCase() === t)) return true;
-  if (exclude !== 'ring' && RINGS.some((r) => r.name.toLowerCase() === t)) return true;
+  if (exclude !== 'amulet' && rAmulets().some((a) => a.name.toLowerCase() === t)) return true;
+  if (exclude !== 'ring' && rRings().some((r) => r.name.toLowerCase() === t)) return true;
   if (rMaterials().some((m) => m.name.toLowerCase() === t)) return true;
   if (rExploration().some((x) => x.name.toLowerCase() === t)) return true;
   if (rGear().some((g) => g.name.toLowerCase() === t)) return true;
@@ -716,7 +718,7 @@ export function findArmorByName(name: string): CatalogArmor | null {
 export function findAmuletByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = AMULETS.find((a) => a.name.toLowerCase() === t);
+  const direct = rAmulets().find((a) => a.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'amulet')) return null;
   if (/\b(amulet|locket|necklace|pendant|medallion|charm|talisman|brooch)\b/i.test(name)) {
@@ -728,7 +730,7 @@ export function findAmuletByName(name: string): CatalogAccessory | null {
 export function findRingByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = RINGS.find((r) => r.name.toLowerCase() === t);
+  const direct = rRings().find((r) => r.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'ring')) return null;
   if (/\b(ring|band|signet)\b/i.test(name)) {

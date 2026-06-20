@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-651 — rings + amulets are now overridable tables (JS-only OTA).
+// Two new upload boxes ('amulets', 'rings'); crafting.ts resolves them through
+// resolveTable() everywhere (lookupCraftedItem, findCatalogItem, the catalog
+// guard, findAmuletByName/findRingByName) and vendors faction-gear honors an
+// uploaded rings table. So uploading rings/amulets replaces the built-in set for
+// NEW content. (Items already in an existing save persist by name — a new
+// character is still needed to clear old equipped gear.)
 // engine_Dev-650 — UI de-Tartaria, pass 1 (JS-only OTA). Player-facing flavor
 // strings in menus/screens swapped to the game name or genericized: the voice
 // test + log-share titles now use getGameTitle(); "buried world" / "Tartaria has
@@ -15312,4 +15319,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-650';
+export const OTA_BUILD_ID = '2026-06-19-651';

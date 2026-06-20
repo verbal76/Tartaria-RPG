@@ -9,6 +9,8 @@ import armorData from '../data/items/armor.json';
 import materialsData from '../data/items/materials.json';
 import gearData from '../data/items/gear.json';
 import explorationData from '../data/items/exploration.json';
+import amuletsData from '../data/items/amulets.json';
+import ringsData from '../data/items/rings.json';
 import recipesData from '../data/items/recipes.json';
 import enemiesData from '../data/enemies/enemies.json';
 import racesData from '../data/races/races.json';
@@ -97,6 +99,8 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   materials: rows(materialsData, 'materials'),
   gear: rows(gearData, 'gear'),
   exploration: rows(explorationData),
+  amulets: rows(amuletsData, 'amulets'),
+  rings: rows(ringsData, 'rings'),
   recipes: rows(recipesData, 'recipes'),
   enemies: rows(enemiesData),
   races: rows(racesData),

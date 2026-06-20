@@ -24,6 +24,15 @@ describe('engine_Dev — uploads reach loot / equip / salvage / spawns / vendors
     expect(findCatalogItem('Rusted Blade')).toBeNull();
   });
 
+  it('ambient loot resolves uploaded amulets and rings', () => {
+    expect(findCatalogItem('Signal Pendant')).toBeNull();
+    expect(findCatalogItem('Brass Signet')).toBeNull();
+    setTableOverride('amulets', [{ name: 'Signal Pendant', rarity: 'Uncommon', tags: ['amulet'], description: 'x' }]);
+    setTableOverride('rings', [{ name: 'Brass Signet', rarity: 'Common', tags: ['ring'], description: 'x' }]);
+    expect(findCatalogItem('Signal Pendant')?.kind).toBe('relic');
+    expect(findCatalogItem('Brass Signet')?.kind).toBe('relic');
+  });
+
   it('armor equip lookup (findArmorByName) resolves uploaded armor', () => {
     setTableOverride('armor', [
       { name: 'Flak Vest', slot: 'torso', ac: 2, rarity: 'Common', tags: ['armor'], baseDurability: 30, description: 'x' },
