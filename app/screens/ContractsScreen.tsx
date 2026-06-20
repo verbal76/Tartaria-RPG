@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
+import { findHuntById, getHunts, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
-import { findMysteryById, MYSTERIES } from '../engine/mysteries';
-import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
-import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
+import { findMysteryById, getMysteries } from '../engine/mysteries';
+import { findStorylineById, getStorylines } from '../engine/factionStorylines';
+import { findFactionQuestById, getFactionQuests, factionQuestReady } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
@@ -568,8 +568,8 @@ export function ContractsScreen() {
               mystery / storyline / quest to pick one up.
             </Text>
             <Text style={styles.emptySub}>
-              {HUNTS.length} hunts · {MYSTERIES.length} mysteries ·
-              {' '}{STORYLINES.length} storylines · {FACTION_QUESTS.length} faction quests
+              {getHunts().length} hunts · {getMysteries().length} mysteries ·
+              {' '}{getStorylines().length} storylines · {getFactionQuests().length} faction quests
               available in the world.
             </Text>
           </View>

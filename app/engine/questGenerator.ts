@@ -4,14 +4,19 @@ import objectivesData from '../data/quests/objectives.json';
 import complicationsData from '../data/quests/complications.json';
 import rewardsData from '../data/quests/rewards.json';
 import locationsData from '../data/locations/locations.json';
-import { resolveTable } from './contentPack';
+import { resolveTable, resolveMissions } from './contentPack';
 
 const objectives = objectivesData as QuestObjective[];
 const complications = complicationsData as QuestComplication[];
 const rewards = rewardsData as QuestReward[];
 const locations = locationsData as Location[];
-// engine_Dev — uploaded locations drive quest siting too.
+// engine_Dev — uploaded locations drive quest siting too, and the procedural-lead
+// seeds (objectives / complications / rewards) come from the uploaded mission set
+// when present so authored games generate their own filler quests.
 const getLocations = (): readonly Location[] => resolveTable('locations', locations);
+const getObjectives = (): readonly QuestObjective[] => resolveMissions('objectives', objectives);
+const getComplications = (): readonly QuestComplication[] => resolveMissions('complications', complications);
+const getRewards = (): readonly QuestReward[] => resolveMissions('rewards', rewards);
 
 function weightByMemory(tags: readonly string[], memory: WorldMemory, baseWeight = 1): number {
   let weight = baseWeight;
@@ -23,9 +28,9 @@ function weightByMemory(tags: readonly string[], memory: WorldMemory, baseWeight
 }
 
 export function generateQuest(memory: WorldMemory, preferredLocationId?: string): Quest {
-  const objective = pickWeighted(objectives, (o) => weightByMemory(o.tags, memory));
-  const complication = pickWeighted(complications, (c) => weightByMemory(c.tags, memory));
-  const reward = pickWeighted(rewards, (r) => weightByMemory(r.tags, memory));
+  const objective = pickWeighted(getObjectives(), (o) => weightByMemory(o.tags, memory));
+  const complication = pickWeighted(getComplications(), (c) => weightByMemory(c.tags, memory));
+  const reward = pickWeighted(getRewards(), (r) => weightByMemory(r.tags, memory));
 
   let location: Location;
   if (preferredLocationId) {

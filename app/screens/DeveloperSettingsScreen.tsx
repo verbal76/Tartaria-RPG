@@ -29,7 +29,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -347,6 +347,90 @@ function GameBundleBox() {
   );
 }
 
+// engine_Dev — MISSIONS upload. One object holding hunts / mysteries / faction
+// quests / storylines (designed multi-stage missions) + objectives / complications
+// / rewards (procedural-lead seeds). Replaces the built-in Tartaria quests.
+function MissionsBox() {
+  const loadMissionsJson = useContentPackStore((s) => s.loadMissionsJson);
+  const missions = useContentPackStore((s) => s.missions);
+  const loaded = Object.keys(missions).length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Missions</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} types` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        One JSON object holding your missions: <Text style={{ fontWeight: 'bold' }}>hunts</Text>,
+        <Text style={{ fontWeight: 'bold' }}> mysteries</Text>,
+        <Text style={{ fontWeight: 'bold' }}> factionQuests</Text>,
+        <Text style={{ fontWeight: 'bold' }}> storylines</Text> (designed multi-stage quests accepted
+        from vendors), plus <Text style={{ fontWeight: 'bold' }}>objectives / complications / rewards</Text>
+        {' '}(the seeds the engine mixes into procedural lead quests). Each is an array. Any sub-table you
+        omit keeps its built-in default. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your missions JSON object here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadMissionsJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(loaded > 0 ? JSON.stringify(missions, null, 2) : buildMissionsTemplate());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current missions — edit, then LOAD.' : 'Loaded the missions template — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(missions, null, 2) : buildMissionsTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearMissions();
+              setStatus({ kind: 'ok', msg: 'Reset missions to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
@@ -583,6 +667,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>TABLES</Text>
       {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
+
+      <Text style={styles.sectionLabel}>MISSIONS</Text>
+      <MissionsBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox

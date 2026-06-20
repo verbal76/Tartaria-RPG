@@ -156,6 +156,39 @@ export function hasLoreOverride(id: LoreBlockId): boolean {
 export function getLoreOverride(id: LoreBlockId): unknown | null {
   return loreOverrides[id] ?? null;
 }
+
+// --- missions override ----------------------------------------------------------
+// engine_Dev — MISSIONS are uploaded as ONE object whose keys are the mission sub-
+// tables (hunts / mysteries / factionQuests / storylines + the procedural-lead
+// seeds objectives / complications / rewards). Stored together because they're
+// authored as one set; resolved per sub-table at the engine's consumption sites so
+// an uploaded set replaces the built-in Tartaria quests.
+export type MissionTableId =
+  | 'hunts' | 'mysteries' | 'factionQuests' | 'storylines'
+  | 'objectives' | 'complications' | 'rewards';
+const missionOverrides: Partial<Record<MissionTableId, readonly unknown[]>> = {};
+/** Replace the whole mission set (pass null to clear). Only non-empty arrays win;
+ *  any sub-table the author omits keeps its built-in default. */
+export function setMissionsOverride(obj: Partial<Record<MissionTableId, readonly unknown[]>> | null): void {
+  for (const k of Object.keys(missionOverrides)) delete missionOverrides[k as MissionTableId];
+  if (obj) {
+    for (const [k, v] of Object.entries(obj)) {
+      if (Array.isArray(v) && v.length > 0) missionOverrides[k as MissionTableId] = v;
+    }
+  }
+}
+export function hasMissionsOverride(): boolean {
+  return Object.keys(missionOverrides).length > 0;
+}
+export function missionOverrideCount(id: MissionTableId): number {
+  return missionOverrides[id]?.length ?? 0;
+}
+/** Engine mission modules pass their built-in array; an uploaded sub-table wins. */
+export function resolveMissions<T>(id: MissionTableId, builtin: readonly T[]): readonly T[] {
+  const ov = missionOverrides[id];
+  return ov && ov.length > 0 ? (ov as readonly T[]) : builtin;
+}
+
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
 export function getWorldTone(): string {
@@ -211,6 +244,7 @@ export function resolveFlavor<T>(key: string, builtin: T): T {
 export function clearAllOverrides(): void {
   for (const k of Object.keys(tableOverrides)) delete tableOverrides[k as ContentTableId];
   for (const k of Object.keys(loreOverrides)) delete loreOverrides[k as LoreBlockId];
+  setMissionsOverride(null);
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;

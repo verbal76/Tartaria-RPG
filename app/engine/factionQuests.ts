@@ -1,4 +1,5 @@
 import factionQuestsData from '../data/quests/faction-quests.json';
+import { resolveMissions } from './contentPack';
 
 /** What kind of player action advances this stage.
  *   - 'kill'   — only enemy defeats trigger progress (the quest is
@@ -60,10 +61,16 @@ export interface ActiveFactionQuest {
   acceptedAt: number;
 }
 
-export const FACTION_QUESTS = (factionQuestsData as { quests: FactionQuestDef[] }).quests;
+const FACTION_QUESTS_BUILTIN = (factionQuestsData as { quests: FactionQuestDef[] }).quests;
+/** Live faction-quest list — uploaded 'missions.factionQuests' override or built-in. */
+export function getFactionQuests(): FactionQuestDef[] {
+  return resolveMissions('factionQuests', FACTION_QUESTS_BUILTIN) as FactionQuestDef[];
+}
+/** Built-in faction quests only — dev-console template. */
+export const FACTION_QUESTS = FACTION_QUESTS_BUILTIN;
 
 export function findFactionQuestById(id: string): FactionQuestDef | null {
-  return FACTION_QUESTS.find((q) => q.id === id) ?? null;
+  return getFactionQuests().find((q) => q.id === id) ?? null;
 }
 
 /** arb171 — is this quest's WORK finished (only the turn-in remains)?
@@ -91,7 +98,7 @@ export function availableFactionQuests(
   active: readonly string[],
   completed: readonly string[],
 ): FactionQuestDef[] {
-  return FACTION_QUESTS.filter(
+  return getFactionQuests().filter(
     (q) =>
       q.factionId === factionId &&
       playerRep >= q.requirement.rep &&

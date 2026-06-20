@@ -244,20 +244,20 @@ import {
   factionQuestReady,
 } from '../engine/factionQuests';
 import {
-  HUNTS,
+  getHunts,
   findHuntById,
   availableHunts,
   fuzzyFindHunt,
   scaleHuntBoss,
 } from '../engine/hunts';
 import {
-  MYSTERIES,
+  getMysteries,
   findMysteryById,
   availableMysteries,
   fuzzyFindMystery,
 } from '../engine/mysteries';
 import {
-  STORYLINES,
+  getStorylines,
   findStorylineById,
   availableStorylines,
   fuzzyFindStoryline,
@@ -12707,11 +12707,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // refused. The fuzzy-finders below already do substring
         // matching against their own pools and return null cleanly
         // when nothing matches — just try them in priority order.
-        if (fuzzyFindStoryline(target, STORYLINES)) {
+        if (fuzzyFindStoryline(target, getStorylines())) {
           get().acceptStoryline(target);
-        } else if (fuzzyFindMystery(target, MYSTERIES)) {
+        } else if (fuzzyFindMystery(target, getMysteries())) {
           get().acceptMystery(target);
-        } else if (fuzzyFindHunt(target, HUNTS)) {
+        } else if (fuzzyFindHunt(target, getHunts())) {
           get().acceptHunt(target);
         } else {
           get().acceptFactionQuest(target);
@@ -12737,11 +12737,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
         const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
         const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path/.test(lower);
-        if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
+        if (storyHint && fuzzyFindStoryline(target, getStorylines())) {
           get().turnInStoryline(target, remote);
-        } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
+        } else if (mysteryHint && fuzzyFindMystery(target, getMysteries())) {
           get().turnInMystery(target, remote);
-        } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
+        } else if (huntHint && fuzzyFindHunt(target, getHunts())) {
           get().turnInHunt(target, remote);
         } else {
           get().turnInFactionQuest(target, remote);
@@ -16330,7 +16330,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const direct = findHuntById(titleOrId);
       const neutralMatch = direct && direct.factionId === null
         ? direct
-        : fuzzyFindHunt(titleOrId, HUNTS.filter((h) => h.factionId === null));
+        : fuzzyFindHunt(titleOrId, getHunts().filter((h) => h.factionId === null));
       const alreadyActive = neutralMatch
         && (player.activeHunts ?? []).some((h) => h.id === neutralMatch.id);
       const alreadyDone = neutralMatch
@@ -16656,7 +16656,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const directMatch = findMysteryById(titleOrId);
       const neutralMatch = directMatch && directMatch.factionId === null
         ? directMatch
-        : fuzzyFindMystery(titleOrId, MYSTERIES.filter((m) => m.factionId === null));
+        : fuzzyFindMystery(titleOrId, getMysteries().filter((m) => m.factionId === null));
       const alreadyActive = neutralMatch
         && (player.activeMysteries ?? []).some((m) => m.id === neutralMatch.id);
       const alreadyDone = neutralMatch

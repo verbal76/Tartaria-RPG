@@ -17,6 +17,13 @@ import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import locationsData from '../data/locations/locations.json';
 import weatherData from '../data/weather/weather.json';
+import huntsData from '../data/quests/hunts.json';
+import mysteriesData from '../data/quests/mysteries.json';
+import factionQuestsData from '../data/quests/faction-quests.json';
+import storylinesData from '../data/quests/faction-storylines.json';
+import objectivesData from '../data/quests/objectives.json';
+import complicationsData from '../data/quests/complications.json';
+import rewardsData from '../data/quests/rewards.json';
 import {
   DEFAULT_WORLD_TONE,
   CONTENT_TABLES,
@@ -151,6 +158,26 @@ export function getLoreTemplate(id: LoreBlockId): string {
   return JSON.stringify(src.slice(0, TEMPLATE_SAMPLE_ROWS), null, 2);
 }
 
+/** The Missions template — one object whose keys are the mission sub-tables.
+ *  Hunts/mysteries/faction-quests/storylines are the designed multi-stage
+ *  missions; objectives/complications/rewards are the seeds the engine mixes into
+ *  procedural "lead" quests. A few sample rows of each, from the built-ins. */
+export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string {
+  const arr = (data: unknown, key: string): unknown[] => {
+    const v = (data as Record<string, unknown>)[key];
+    return Array.isArray(v) ? v : Array.isArray(data) ? (data as unknown[]) : [];
+  };
+  return JSON.stringify({
+    hunts: arr(huntsData, 'hunts').slice(0, n),
+    mysteries: arr(mysteriesData, 'mysteries').slice(0, n),
+    factionQuests: arr(factionQuestsData, 'quests').slice(0, n),
+    storylines: arr(storylinesData, 'storylines').slice(0, 1),
+    objectives: (objectivesData as unknown[]).slice(0, 3),
+    complications: (complicationsData as unknown[]).slice(0, 3),
+    rewards: (rewardsData as unknown[]).slice(0, 3),
+  }, null, 2);
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -202,6 +229,11 @@ export function buildGameBundleTemplate(): string {
   for (const t of CONTENT_TABLES) {
     sections.push(bundleSection(t.id, t.hint, getTableTemplate(t.id)));
   }
+  sections.push(bundleSection(
+    'missions',
+    'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Omit any sub-table to keep its built-in default.',
+    buildMissionsTemplate(),
+  ));
 
   return `{\n${sections.join(',\n\n')}\n}\n`;
 }
