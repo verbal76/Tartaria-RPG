@@ -32,6 +32,22 @@ const RACE_PRIMARY: Record<string, string> = {
   aetherborn: 'Pyric Wand',
 };
 
+// engine_Dev — the starter weapon. Priority: a race's own `startingWeapon`
+// field (authors can set it on the uploaded race row) → the built-in
+// per-Tartaria-race map → the first Common weapon from the LIVE weapons table
+// (so a custom race without a mapping starts with a real weapon from the
+// uploaded pack, e.g. an M1 Garand, not the Tartaria "Rusted Blade").
+function starterWeaponName(race: Race): string {
+  const explicit = (race as unknown as { startingWeapon?: unknown }).startingWeapon;
+  if (typeof explicit === 'string' && explicit.trim().length > 0) return explicit.trim();
+  if (RACE_PRIMARY[race.id]) return RACE_PRIMARY[race.id]!;
+  const builtin = ((weaponsData as unknown as { weapons?: { name?: string; rarity?: string }[] }).weapons ?? []);
+  const live = resolveTable('weapons', builtin) as { name?: string; rarity?: string }[];
+  const pick = live.find((w) => w && typeof w.name === 'string' && w.rarity === 'Common')
+    ?? live.find((w) => w && typeof w.name === 'string');
+  return pick?.name ?? 'Rusted Blade';
+}
+
 const FACTION_KNIFE: Record<string, string> = {
   reclaimers_guild: "Reclaimer's Trowel",
   forgotten_order: 'Order Letter-Opener',
@@ -114,7 +130,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
     { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
   ];
-  const primaryName = RACE_PRIMARY[race.id] ?? 'Rusted Blade';
+  const primaryName = starterWeaponName(race);
   items.push(stampDurability({
     id: `starter_primary_${Date.now()}`,
     name: primaryName,
@@ -329,8 +345,9 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     stamina: staminaMax,
     staminaMax,
     milestones: { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
-    // Auto-equip the race primary so the player starts combat-ready.
-    equipped: { main: RACE_PRIMARY[race.id] ?? 'Rusted Blade' },
+    // Auto-equip the starter weapon (resolved from the live weapons table for
+    // custom races) so the player starts combat-ready holding a real weapon.
+    equipped: { main: starterWeaponName(race) },
     ac: race.baseAC,
     tc: rollFromTCFormula(race.startingTCFormula),
     corruption: 0,

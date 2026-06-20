@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-656 — starter weapon is data-driven (JS-only OTA). A custom-race
+// character no longer falls back to the Tartaria "Rusted Blade": starterWeaponName
+// resolves the equipped + inventory starter weapon from a race's own
+// `startingWeapon` field → the built-in per-race map → the first Common weapon in
+// the LIVE weapons table. So an "Unaltered Human" with a Philadelphia weapons pack
+// starts holding an M1 Garand, not a Rusted Blade. (The shared starter items —
+// torch / rations / locket — and the faction knife are still built-in; next pass.)
 // engine_Dev-655 — character-creation pack indicator (JS-only OTA). The race /
 // faction creation screen (already 100% data-driven via getRaces()/getFactions())
 // now shows a live source line: "● custom races — N loaded" vs "○ built-in races
@@ -15353,4 +15360,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-655';
+export const OTA_BUILD_ID = '2026-06-19-656';
