@@ -21,17 +21,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { endingLine, LOST_CAPITAL_LOCATIONS } from '../engine/mainQuest';
-import racesData from '../data/races/races.json';
-import factionsData from '../data/factions/factions.json';
-
-const races = racesData as { id: string; name: string }[];
-const factions = factionsData as { id: string; name: string }[];
+import { getRaces, getFactions } from '../engine/character';
 
 function raceName(id: string): string {
-  return races.find((r) => r.id === id)?.name ?? id;
+  return getRaces().find((r) => r.id === id)?.name ?? id;
 }
 function factionName(id: string): string {
-  return factions.find((f) => f.id === id)?.name ?? id;
+  return getFactions().find((f) => f.id === id)?.name ?? id;
 }
 function capitalLabel(id: string): string {
   const map: Record<string, string> = {

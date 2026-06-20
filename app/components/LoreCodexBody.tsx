@@ -23,9 +23,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { BrandedModal } from './BrandedModal';
-import factionsData from '../data/factions/factions.json';
-import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
+import { getRaces, getFactions } from '../engine/character';
 import timelineData from '../data/events/timeline.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
@@ -86,7 +85,7 @@ export function LoreCodexBody() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 24 }}>
-        {section === 'races' && (racesData as Race[]).map((r) => {
+        {section === 'races' && (getRaces() as Race[]).map((r) => {
           const statBumps = r.racialStatBonuses ?? {};
           const statBumpStrs = Object.entries(statBumps)
             .filter(([, v]) => (v ?? 0) !== 0)
@@ -107,7 +106,7 @@ export function LoreCodexBody() {
             </View>
           );
         })}
-        {section === 'factions' && (factionsData as Faction[]).map((f) => (
+        {section === 'factions' && (getFactions() as Faction[]).map((f) => (
           <View key={f.id} style={styles.entry}>
             <Text style={styles.name}>{f.name}</Text>
             <Text style={styles.subtitle}>{f.subtitle}</Text>

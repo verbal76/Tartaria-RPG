@@ -258,23 +258,23 @@ export function findCatalogItem(name: string): {
   const aliased = resolveItemAlias(name);
   const q = (aliased ?? name).trim().toLowerCase();
   if (!q) return null;
-  const w = WEAPONS.find((x) => x.name.toLowerCase() === q);
+  const w = rWeapons().find((x) => x.name.toLowerCase() === q);
   if (w) return { name: w.name, kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
-  const a = ARMOR.find((x) => x.name.toLowerCase() === q);
+  const a = rArmor().find((x) => x.name.toLowerCase() === q);
   if (a) return { name: a.name, kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
-  const g = GEAR.find((x) => x.name.toLowerCase() === q);
+  const g = rGear().find((x) => x.name.toLowerCase() === q);
   if (g) return { name: g.name, kind: g.kind, rarity: g.rarity, tags: g.tags };
   const am = AMULETS.find((x) => x.name.toLowerCase() === q);
   if (am) return { name: am.name, kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
   const r = RINGS.find((x) => x.name.toLowerCase() === q);
   if (r) return { name: r.name, kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
-  const m = MATERIALS.find((x) => x.name.toLowerCase() === q);
+  const m = rMaterials().find((x) => x.name.toLowerCase() === q);
   if (m) return { name: m.name, kind: 'misc', rarity: m.rarity, tags: m.tags };
   // 2026-05-25 — exploration catalog also reachable through
   // findCatalogItem so ambient TAKE of a scanner / compass / etc.
   // grants the real catalog entry with effect + tags instead of
   // redirecting through the "scene feature" fallback.
-  const exp = EXPLORATION.find((x) => x.name.toLowerCase() === q);
+  const exp = rExploration().find((x) => x.name.toLowerCase() === q);
   if (exp) return { name: exp.name, kind: 'relic', rarity: exp.rarity, tags: exp.tags };
   return null;
 }
@@ -290,7 +290,7 @@ export function isInferredItem(name: string): boolean {
   if (!name) return false;
   if (findCatalogItem(name)) return false;
   const q = name.toLowerCase().trim();
-  if (EXPLORATION.some((x) => x.name.toLowerCase() === q)) return false;
+  if (rExploration().some((x) => x.name.toLowerCase() === q)) return false;
   if (DOG_GEAR.some((x) => x.name.toLowerCase() === q)) return false;
   return true;
 }
@@ -588,13 +588,13 @@ export function consumeIngredients(
 function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amulet' | 'ring'): boolean {
   const t = name.toLowerCase().trim();
   if (!t) return false;
-  if (exclude !== 'weapon' && WEAPONS.some((w) => w.name.toLowerCase() === t)) return true;
-  if (exclude !== 'armor' && ARMOR.some((a) => a.name.toLowerCase() === t)) return true;
+  if (exclude !== 'weapon' && rWeapons().some((w) => w.name.toLowerCase() === t)) return true;
+  if (exclude !== 'armor' && rArmor().some((a) => a.name.toLowerCase() === t)) return true;
   if (exclude !== 'amulet' && AMULETS.some((a) => a.name.toLowerCase() === t)) return true;
   if (exclude !== 'ring' && RINGS.some((r) => r.name.toLowerCase() === t)) return true;
-  if (MATERIALS.some((m) => m.name.toLowerCase() === t)) return true;
-  if (EXPLORATION.some((x) => x.name.toLowerCase() === t)) return true;
-  if (GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  if (rMaterials().some((m) => m.name.toLowerCase() === t)) return true;
+  if (rExploration().some((x) => x.name.toLowerCase() === t)) return true;
+  if (rGear().some((g) => g.name.toLowerCase() === t)) return true;
   // OTA-133 — defensive add: DOG_GEAR is a separate catalog (4 vests
   // in OTA-122). Current vest names (Burlap / Riveted Leather /
   // Aetheric Padded / Reclaimer Pattern) don't trip the weapon/
@@ -706,7 +706,7 @@ export function fusedArmorResistances(name: string, rarity: Rarity, resistance?:
 export function findArmorByName(name: string): CatalogArmor | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = ARMOR.find((a) => a.name.toLowerCase() === t);
+  const direct = rArmor().find((a) => a.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'armor')) return null;
   return inferArmor(name);
@@ -768,17 +768,17 @@ export function findGearByName(name: string): CatalogGear | null {
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  const exact = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  const exact = rWeapons().find((w) => w.name.toLowerCase() === t);
   if (exact) return exact;
-  return WEAPONS.find((w) => w.name.toLowerCase().includes(t) || t.includes(w.name.toLowerCase())) ?? null;
+  return rWeapons().find((w) => w.name.toLowerCase().includes(t) || t.includes(w.name.toLowerCase())) ?? null;
 }
 
 export function fuzzyFindArmor(text: string): CatalogArmor | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  const exact = ARMOR.find((a) => a.name.toLowerCase() === t);
+  const exact = rArmor().find((a) => a.name.toLowerCase() === t);
   if (exact) return exact;
-  return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
+  return rArmor().find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
-import racesData from '../data/races/races.json';
+import { getRaces } from '../engine/character';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
 import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
@@ -127,7 +127,7 @@ const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
 export function StatsPanel({ player }: Props) {
-  const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
+  const race = getRaces().find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
   const hpFrac = player.hpMax > 0 ? player.hp / player.hpMax : 1;

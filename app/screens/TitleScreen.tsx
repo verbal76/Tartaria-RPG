@@ -39,7 +39,7 @@ import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
-import racesData from '../data/races/races.json';
+import { getRaces } from '../engine/character';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
@@ -57,11 +57,10 @@ import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import { useReadableMuted } from '../ui/displaySettings';
 
-const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
 
 function raceLabel(id: string): string {
-  return races.find((r) => r.id === id)?.name ?? id;
+  return getRaces().find((r) => r.id === id)?.name ?? id;
 }
 function locationLabel(id: string): string {
   return locations.find((l) => l.id === id)?.name ?? id;

@@ -8,8 +8,7 @@ import React, { useState } from 'react';
 import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import racesData from '../data/races/races.json';
-import factionsData from '../data/factions/factions.json';
+import { getRaces, getFactions } from '../engine/character';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
@@ -62,8 +61,8 @@ export function CharacterScreen() {
     );
   }
 
-  const race = (racesData as Race[]).find((r) => r.id === player.raceId);
-  const faction = (factionsData as Faction[]).find((f) => f.id === player.factionId);
+  const race = getRaces().find((r) => r.id === player.raceId);
+  const faction = getFactions().find((f) => f.id === player.factionId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   const hpPct = player.hpMax > 0 ? player.hp / player.hpMax : 0;
   const stamPct = player.staminaMax > 0 ? player.stamina / player.staminaMax : 0;
@@ -202,7 +201,7 @@ export function CharacterScreen() {
         {!collapsed.factions && (
         <View style={styles.card}>
           {(() => {
-            const factionsList = factionsData as Faction[];
+            const factionsList = getFactions();
             const rows = (player.factionStanding ?? [])
               .map((row) => ({
                 row,

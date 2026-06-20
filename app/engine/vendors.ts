@@ -7,6 +7,7 @@ import materialsData from '../data/items/materials.json';
 import gearData from '../data/items/gear.json';
 import dogGearData from '../data/items/dogGear.json';
 import { pickWeighted } from './rng';
+import { resolveTable } from './contentPack';
 import type { Enemy } from './types';
 import type { StallCategory } from './buildings';
 
@@ -23,35 +24,47 @@ export interface VendorOffer {
 // arb92 — food / material stocking. Traders carry multiples of perishables
 // and crafting stock so the player can buy a handful at once; weapons /
 // armor / relics stay one-of. Caps per the player's spec: ≤5 food, ≤10
-// material. Lookup sets are built once from the catalogs.
-const FOOD_NAMES = new Set(
-  (((gearData as unknown as { gear?: { name: string; tags?: string[] }[] }).gear ?? []))
-    .filter((g) => (g.tags ?? []).includes('food'))
-    .map((g) => g.name.toLowerCase()),
-);
-const MATERIAL_NAMES = new Set(
-  (((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []))
-    .map((m) => m.name.toLowerCase()),
-);
+// material.
+// engine_Dev — these read through resolveTable() at CALL time (not import time),
+// so an uploaded gear/material/weapon/armor override actually reaches vendor
+// stocking instead of the built-in Tartaria catalog. Built-in arrays below are
+// the defaults handed to resolveTable.
+const BUILTIN_GEAR = ((gearData as unknown as { gear?: { name: string; tags?: string[] }[] }).gear ?? []);
+const BUILTIN_MATERIALS = ((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []);
+function foodNames(): Set<string> {
+  return new Set(
+    resolveTable('gear', BUILTIN_GEAR)
+      .filter((g) => (g.tags ?? []).includes('food'))
+      .map((g) => g.name.toLowerCase()),
+  );
+}
+function materialNames(): Set<string> {
+  return new Set(resolveTable('materials', BUILTIN_MATERIALS).map((m) => m.name.toLowerCase()));
+}
 export function rollOfferQuantity(itemName: string): number {
   const n = itemName.toLowerCase();
-  if (FOOD_NAMES.has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
-  if (MATERIAL_NAMES.has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
+  if (foodNames().has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
+  if (materialNames().has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
   return 1;
 }
 
 // arb104 — faction-issue armor + weapons (tagged `faction_gear` + faction)
 // stocked by the outpost Armory for the player's own faction.
 interface FactionGearRow { name: string; faction?: string; tc?: number; rarity?: string; tags?: string[] }
-const FACTION_GEAR: FactionGearRow[] = [
-  ...(((weaponsData as unknown as { weapons?: FactionGearRow[] }).weapons ?? [])),
-  ...(((armorData as unknown as { armor?: FactionGearRow[] }).armor ?? [])),
-  // OTA-497 — faction-issue RINGS (perk-only, one per faction) now stock at the
-  // player's own faction armory alongside its weapons + armor.
-  ...(((ringsData as unknown as { rings?: FactionGearRow[] }).rings ?? [])),
-].filter((it) => (it.tags ?? []).includes('faction_gear'));
+const BUILTIN_WEAPONS = ((weaponsData as unknown as { weapons?: FactionGearRow[] }).weapons ?? []);
+const BUILTIN_ARMOR = ((armorData as unknown as { armor?: FactionGearRow[] }).armor ?? []);
+// Rings aren't an overridable table; keep the built-in list.
+const BUILTIN_RINGS = ((ringsData as unknown as { rings?: FactionGearRow[] }).rings ?? []);
+function factionGear(): FactionGearRow[] {
+  return [
+    ...resolveTable('weapons', BUILTIN_WEAPONS),
+    ...resolveTable('armor', BUILTIN_ARMOR),
+    // OTA-497 — faction-issue RINGS (perk-only, one per faction) stock alongside.
+    ...BUILTIN_RINGS,
+  ].filter((it) => (it.tags ?? []).includes('faction_gear'));
+}
 export function factionGearOffers(factionId: string): VendorOffer[] {
-  return FACTION_GEAR
+  return factionGear()
     .filter((it) => it.faction === factionId)
     .map((it) => ({ itemName: it.name, price: Math.max(2, Math.round(it.tc ?? 50)), quantity: 1 }));
 }

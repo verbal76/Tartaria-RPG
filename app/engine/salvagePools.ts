@@ -11,6 +11,7 @@
 
 import type { Rarity } from './types';
 import materialsData from '../data/items/materials.json';
+import { resolveTable } from './contentPack';
 
 // arb61 — salvage yields MATERIALS ONLY (player verb-economy: take = gear,
 // salvage = materials, investigate = clues/hooks). The hand-authored pools
@@ -20,16 +21,21 @@ import materialsData from '../data/items/materials.json';
 // (present in materials.json — which includes Worn Tartarian Coin, a fine
 // salvage byproduct). Weight redistributes naturally among the survivors; if a
 // pool has no material entries we fall back to the all-material JUNK_POOL.
-const MATERIAL_NAMES: ReadonlySet<string> = new Set(
-  (() => {
-    const v = materialsData as unknown as Array<string | { name?: string }> | { materials?: unknown[]; items?: unknown[] };
-    const arr: Array<string | { name?: string }> = Array.isArray(v)
-      ? v
-      : ((v.materials as Array<string | { name?: string }>) ?? (v.items as Array<string | { name?: string }>) ?? []);
-    return arr.map((m) => (typeof m === 'string' ? m : m?.name)).filter((n): n is string => !!n);
-  })(),
-);
-export const isSalvageMaterial = (name: string): boolean => MATERIAL_NAMES.has(name);
+// engine_Dev — built-in default materials, normalized to a name array. The
+// salvage-material set resolves through resolveTable() at CALL time so an
+// uploaded materials override actually drives what salvage can yield.
+const BUILTIN_MATERIAL_NAMES: string[] = (() => {
+  const v = materialsData as unknown as Array<string | { name?: string }> | { materials?: unknown[]; items?: unknown[] };
+  const arr: Array<string | { name?: string }> = Array.isArray(v)
+    ? v
+    : ((v.materials as Array<string | { name?: string }>) ?? (v.items as Array<string | { name?: string }>) ?? []);
+  return arr.map((m) => (typeof m === 'string' ? m : m?.name)).filter((n): n is string => !!n);
+})();
+function materialNameSet(): ReadonlySet<string> {
+  const rows = resolveTable<string | { name?: string }>('materials', BUILTIN_MATERIAL_NAMES);
+  return new Set(rows.map((m) => (typeof m === 'string' ? m : m?.name)).filter((n): n is string => !!n));
+}
+export const isSalvageMaterial = (name: string): boolean => materialNameSet().has(name);
 
 interface PoolEntry {
   name: string;

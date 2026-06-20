@@ -15212,6 +15212,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-642 — wire item + race/faction overrides into the rest of the
+// engine (JS-only OTA). Uploaded weapons/armor/materials/gear/exploration now
+// reach: ambient loot pickup (findCatalogItem), armor equip/durability/AC
+// (findArmorByName + catalog guards), vendor stock (vendors.ts), takeable scene
+// gear (takeableGearSpawns), and salvage yields (salvagePools) — all read
+// through resolveTable() at call time instead of import-time constants. Uploaded
+// races/factions now show on the Character/Stats/Codex/Ending/Title screens.
+// NOTE: overrides apply to a NEW game (existing saves are baked); the LLM
+// narration LORE (canon/glossary/locations/enemies) is still built-in — next.
 // engine_Dev-641 — COPY now clears the upload box after copying the template
 // to the clipboard, so you can paste your filled-in JSON straight back in
 // without hitting LOAD first to clear it. (JS-only OTA.)
@@ -15243,4 +15252,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-641';
+export const OTA_BUILD_ID = '2026-06-19-642';
