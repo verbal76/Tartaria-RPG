@@ -6,6 +6,7 @@ import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
 import armorData from '../data/items/armor.json';
 import weaponsData from '../data/items/weapons.json';
+import locationsData from '../data/locations/locations.json';
 import { stampDurability } from './durability';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, canonicalCellOf } from './worldMap';
 import { initMainQuest } from './mainQuest';
@@ -320,7 +321,20 @@ export const FACTION_STARTING_LOCATION: Record<string, string> = {
 };
 
 export function startingLocationForFaction(factionId: string): string {
-  return FACTION_STARTING_LOCATION[factionId] ?? 'tartarian_outskirts';
+  // engine_Dev — resolve to a REAL location in the live (possibly uploaded) world.
+  const locs = resolveTable<{ id?: string }>('locations', locationsData as { id?: string }[]);
+  const exists = (id: string | undefined | null): id is string =>
+    !!id && locs.some((l) => l.id === id);
+  // 1. The faction's own declared starter complex (data-driven).
+  const faction = getFactions().find((f) => f.id === factionId);
+  if (exists(faction?.baseLocationId)) return faction!.baseLocationId!;
+  // 2. The built-in Tartaria per-faction outpost.
+  if (exists(FACTION_STARTING_LOCATION[factionId])) return FACTION_STARTING_LOCATION[factionId]!;
+  // 3. Any valid location — first row of the table — so a re-skin that hasn't
+  //    declared a base still spawns at a REAL place in ITS world instead of the
+  //    missing Tartaria fallback (which silently bounced to locations[0] and left
+  //    currentLocationId pointing at a non-existent tile).
+  return locs[0]?.id ?? 'tartarian_outskirts';
 }
 
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
@@ -346,6 +360,11 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     standing: f.id === faction.id ? Math.max(10, f.startingStanding + 10) : f.startingStanding,
   }));
 
+  // engine_Dev — the starter complex (faction base) the character spawns in.
+  // Resolved once so currentLocationId, the safe-zone marker (startLocationId),
+  // and the canon grid cell all agree.
+  const startLocationId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
+
   return {
     name: input.name,
     raceId: race.id,
@@ -366,7 +385,10 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     factionStanding,
     // v2.4.1 (OTA 029) — explicit startingLocationId wins; otherwise
     // fall back to the canonical per-faction start tile.
-    currentLocationId: input.startingLocationId ?? startingLocationForFaction(input.factionId),
+    currentLocationId: startLocationId,
+    // engine_Dev — remember the spawn so the starter-complex peace zone knows
+    // when the player has left it (combat resumes on first exit).
+    startLocationId,
     activeQuests: [],
     // Procedural map seed — combines name + race + faction + a timestamp
     // so two characters with identical names still get different maps.
@@ -379,8 +401,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     // arb47 — the authoritative ABSOLUTE position: the starting location's fixed
     // canon cell. Cardinal steps + routing move this directly; it never warps.
     ...(() => {
-      const startId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
-      const cell = canonicalCellOf(startId);
+      const cell = canonicalCellOf(startLocationId);
       return { gridX: cell.x, gridY: cell.y };
     })(),
     // OTA-510 — a freshly created character is born at their start cell and must

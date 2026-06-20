@@ -214,6 +214,15 @@ export interface Faction {
    *  screen under the faction goal. 2-3 sentences max. Voice: what it
    *  feels like to wear this colors. */
   flavor?: string;
+  /** engine_Dev — the faction's STARTER COMPLEX (Tartaria calls these
+   *  "outposts"; a re-skin's could be a military base, a corporate HQ, a
+   *  compound). `baseName` is its display title in the opening + minimap;
+   *  `baseLocationId` is the location id (from your Locations table) the member
+   *  spawns at and is safe inside until they leave; `baseDescription` is optional
+   *  flavor. All optional — omit and the engine spawns at the first location. */
+  baseName?: string;
+  baseLocationId?: string;
+  baseDescription?: string;
 }
 
 export interface Enemy {
@@ -884,6 +893,11 @@ export interface PlayerCharacter {
   inventory: InventoryItem[];
   factionStanding: FactionStanding[];
   currentLocationId: string;
+  /** engine_Dev — the location id of the STARTER COMPLEX this character spawned
+   *  in (their faction's base). Encounters stay suppressed while the player is
+   *  still here (and through the tutorial); combat begins once they leave it for
+   *  the first time. Captured at character creation; absent on legacy saves. */
+  startLocationId?: string;
   activeQuests: Quest[];
   /** Set when HP hits 0; the character is barred from play until a Resurrection Gem revives them. */
   dead?: boolean;

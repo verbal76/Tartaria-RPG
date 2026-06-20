@@ -4316,8 +4316,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the opening flag + an active tutorialStep so the teaching sequence is safe in
     // any world, then encounters resume normally once the tutorial completes.
     const inTutorial = get().tutorialStep !== null;
+    // engine_Dev — the STARTER COMPLEX (faction base) is a safe zone. The player
+    // stays peaceful while standing in their spawn location and only meets combat
+    // once they LEAVE it for the first time — so "no combat until you've exited
+    // the tutorial AND the starter complex" holds in any re-skinned world, not
+    // just Tartaria (whose bases happened to be hub rooms). Legacy saves without
+    // startLocationId fall back to the hub/tutorial rules above.
+    const atStarterComplex =
+      !!player.startLocationId && player.currentLocationId === player.startLocationId;
     const suppressEncounter =
-      enforcePeace || recentlyCleared || !!hubRoom || !!opts?.isOpening || inTutorial;
+      enforcePeace || recentlyCleared || !!hubRoom || !!opts?.isOpening || inTutorial || atStarterComplex;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer

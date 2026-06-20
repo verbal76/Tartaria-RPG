@@ -16,6 +16,8 @@
 
 import staticHubData from '../data/world/static_hub.json';
 import variantsData from '../data/world/hub_faction_variants.json';
+import factionsData from '../data/factions/factions.json';
+import { resolveTable } from './contentPack';
 
 export interface HubRoom {
   id: string;
@@ -73,6 +75,15 @@ export function isHubLocation(locationId: string | null | undefined): boolean {
 export function hubNameForFaction(factionId: string | null | undefined): string {
   const fallback = HUB.hubName;
   if (!factionId) return fallback;
+  // engine_Dev — the faction's own `baseName` (from the live Factions table) is
+  // the lore-agnostic starter-complex title. A re-skin sets "Drydock 4 Command",
+  // "Forward Base", etc.; falls through to the built-in Tartaria per-faction
+  // outpost names, then the generic hub name.
+  const faction = resolveTable<{ id?: string; baseName?: string }>(
+    'factions',
+    factionsData as { id?: string; baseName?: string }[],
+  ).find((f) => f.id === factionId);
+  if (faction?.baseName && faction.baseName.trim()) return faction.baseName.trim();
   const map = HUB.factionHubNames ?? {};
   return map[factionId] ?? fallback;
 }
