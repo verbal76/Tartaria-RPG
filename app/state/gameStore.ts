@@ -302,7 +302,9 @@ import {
 import { enemyDamageType as resolveEnemyDamageType, parseDamageTypeKeyword } from '../engine/damageTypes';
 import type { StatusEffect, MemorableEvent, WhisperRecord } from '../engine/types';
 import {
-  CHAINS,
+  getWhispers,
+  findChain,
+  isGenericWhisper,
   pickTargetTile,
   findReadyMeetWhisper,
   findReadyFetchWhisper,
@@ -4837,7 +4839,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (hubRoom && hubRoom.id) {
       const livePlayer = get().player;
       if (livePlayer) {
-        const eligibleChains = CHAINS.filter((c) =>
+        const eligibleChains = getWhispers().filter((c) =>
           c.plantLocations.includes(hubRoom.id)
           && !(livePlayer.completedWhisperIds ?? []).includes(c.id)
           && !(livePlayer.activeWhispers ?? []).some((w) => w.id === c.id),
@@ -22095,6 +22097,13 @@ function resolveWhispersForTile(
     fireYulkaMeet(get, set, meet);
     return;
   }
+  // engine_Dev — generic authored whisper: one-hop payoff (narration + effects),
+  // then the chain completes. Lets a re-skin add its own overheard-tip leads
+  // without the bespoke yulka fetch/fight machinery.
+  if (meet && isGenericWhisper(findChain(meet.id))) {
+    fireGenericWhisperMeet(get, set, meet);
+    return;
+  }
 
   // 3) Fetch combat — player arrived at the thief's tile.
   const fetch = findReadyFetchWhisper(p.activeWhispers, mapX, mapY);
@@ -22116,6 +22125,36 @@ function resolveWhispersForTile(
   if (ambushers.length > 0) {
     fireYulkaAmbush(get, set, ambushers[0]!);
   }
+}
+
+// engine_Dev — generic authored-whisper payoff. Narrates the chain's meetLine,
+// applies its meetEffects (reusing the hook effect dispatcher), then completes the
+// whisper. Used for any uploaded chain that declares meetLine/meetEffects.
+function fireGenericWhisperMeet(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  const chain = findChain(whisper.id);
+  if (chain?.meetLine) get().appendLog('world', chain.meetLine);
+  const summaries: string[] = [];
+  let fatal = false;
+  for (const eff of chain?.meetEffects ?? []) {
+    const r = applyHookEffect(eff, get, set);
+    if (r.inlineSummary) summaries.push(r.inlineSummary);
+    if (r.fatal) fatal = true;
+  }
+  if (summaries.length > 0) get().appendLog('reward', `✦ ${summaries.join(' · ')}.`);
+  // Complete the chain: drop it from active, record it done.
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+      completedWhisperIds: [...(s.player.completedWhisperIds ?? []), whisper.id],
+    },
+  } : s));
+  // A spawn_enemy_tag effect already staged combat; nothing else to do here.
+  void fatal;
 }
 
 function fireYulkaMeet(

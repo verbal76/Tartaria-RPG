@@ -19,8 +19,10 @@
 // CHAINS + an entry to applyChainStage's switch.
 
 import type { WhisperRecord, Enemy, InventoryItem } from './types';
+import type { HookEffect } from './hooks';
 import { rollDie } from './rng';
 import { findEnemyByName } from './encounter';
+import { resolveWhispers } from './contentPack';
 
 /** Time window check that handles midnight wraparound. */
 export function isHourInWindow(hour: number, from: number | undefined, to: number | undefined): boolean {
@@ -50,6 +52,14 @@ export interface ChainDef {
   /** Tile-time gate on the rendezvous (when the spawn fires).
    *  When omitted, any time-of-day works. */
   activeHours?: [number, number];
+  /** engine_Dev — GENERIC payoff. An authored chain that sets meetLine/meetEffects
+   *  resolves in one hop: when the player reaches the target tile in the active
+   *  window, meetLine narrates, meetEffects fire (the same verbs hooks use:
+   *  grant_item, grant_tc, spawn_enemy_tag, rep_change, heal, damage, …), and the
+   *  whisper completes. The built-in yulka chain leaves these unset and keeps its
+   *  bespoke multi-stage fetch/fight/return logic. */
+  meetLine?: string;
+  meetEffects?: HookEffect[];
 }
 
 export const CHAINS: ChainDef[] = [
@@ -68,8 +78,18 @@ export const CHAINS: ChainDef[] = [
   },
 ];
 
+/** The live whisper chains — uploaded override if present, else built-in. */
+export function getWhispers(): ChainDef[] {
+  return resolveWhispers(CHAINS) as ChainDef[];
+}
+/** True when an authored chain has a one-hop generic payoff (vs the built-in
+ *  yulka chain's bespoke multi-stage logic). */
+export function isGenericWhisper(chain: ChainDef | undefined): boolean {
+  return !!chain && (!!chain.meetLine || (chain.meetEffects != null && chain.meetEffects.length > 0));
+}
+
 export function findChain(id: string): ChainDef | undefined {
-  return CHAINS.find((c) => c.id === id);
+  return getWhispers().find((c) => c.id === id);
 }
 
 /** Compute the rendezvous tile for a freshly-planted whisper. Uses

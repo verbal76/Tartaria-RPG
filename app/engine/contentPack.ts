@@ -211,6 +211,20 @@ export function setHooksOverride(obj: HooksOverride | null): void {
 export function hasHooksOverride(): boolean { return hooksOverride != null; }
 export function getHooksOverride(): HooksOverride | null { return hooksOverride; }
 
+// --- whispers override ----------------------------------------------------------
+// engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
+// ARRAY of chain definitions. An authored chain plants at a hub room, points to a
+// nearby tile in a time window, and pays off (meetLine + meetEffects) when the
+// player arrives. An uploaded set replaces the built-in Tartaria whispers.
+let whispersOverride: readonly unknown[] | null = null;
+export function setWhispersOverride(rows: readonly unknown[] | null): void {
+  whispersOverride = rows && rows.length > 0 ? rows : null;
+}
+export function hasWhispersOverride(): boolean { return whispersOverride != null; }
+export function resolveWhispers<T>(builtin: readonly T[]): readonly T[] {
+  return whispersOverride && whispersOverride.length > 0 ? (whispersOverride as readonly T[]) : builtin;
+}
+
 
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
@@ -269,6 +283,7 @@ export function clearAllOverrides(): void {
   for (const k of Object.keys(loreOverrides)) delete loreOverrides[k as LoreBlockId];
   setMissionsOverride(null);
   setHooksOverride(null);
+  setWhispersOverride(null);
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;

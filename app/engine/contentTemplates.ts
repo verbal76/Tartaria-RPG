@@ -204,6 +204,33 @@ export function buildHooksTemplate(): string {
   }, null, 2);
 }
 
+/** The Whispers template — an array of overheard-tip chains. An authored chain
+ *  plants at a hub room (plantLocations), points to a nearby tile in a time
+ *  window, and pays off in one hop via meetLine + meetEffects (the same effect
+ *  verbs hooks use). NOTE: whispers plant inside hub rooms (faction bases); until
+ *  hub-room interiors are authorable, plantLocations must reference a built-in
+ *  hub-room id (e.g. "outpost_messhall"). */
+export function buildWhispersTemplate(): string {
+  return JSON.stringify([
+    {
+      id: 'cache_rumor',
+      title: 'The Ace’s Cache',
+      plantLocations: ['outpost_messhall'],
+      plantChance: 0.15,
+      plantLines: [
+        'A sailor at the corner table leans in. "Word is there’s a stash in a wreck two, three tiles south. Go after dark. Don’t ask who told you."',
+      ],
+      targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
+      activeHours: [20, 4],
+      meetLine: 'You find the half-sunk wreck. Wedged behind a buckled bulkhead: a brass device, still ticking.',
+      meetEffects: [
+        { type: 'grant_item', name: 'Doomsday Chronometer' },
+        { type: 'grant_tc', amount: 60 },
+      ],
+    },
+  ], null, 2);
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -264,6 +291,11 @@ export function buildGameBundleTemplate(): string {
     'hooks',
     'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.',
     buildHooksTemplate(),
+  ));
+  sections.push(bundleSection(
+    'whispers',
+    'Overheard-tip leads (array). Each: plants at a hub room (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. NOTE: whispers plant inside hub rooms — plantLocations must reference a built-in hub-room id until hub interiors are authorable.',
+    buildWhispersTemplate(),
   ));
 
   return `{\n${sections.join(',\n\n')}\n}\n`;
