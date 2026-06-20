@@ -15212,6 +15212,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-658 — COPY DIAGNOSTICS button (JS-only OTA). The dev console can now
+// dump a full content-pack snapshot to the clipboard — store table counts vs the
+// engine registry counts vs the engine reads (getRaces/getFactions names) vs the
+// raw persisted AsyncStorage blob (head + length) + hydrated/contentVersion/build.
+// Paste it back to pinpoint exactly where a races/factions pack is or isn't live.
 // engine_Dev-657 — character-creation registry RE-SYNC + raw diagnostic (JS-only
 // OTA). Suspected root cause of "5 OTAs, still Tartaria": the engine registry that
 // getRaces()/getFactions() read drifted out of sync with the persisted/store packs
@@ -15367,4 +15372,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-657';
+export const OTA_BUILD_ID = '2026-06-19-658';

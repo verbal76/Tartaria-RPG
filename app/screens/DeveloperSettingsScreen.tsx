@@ -7,12 +7,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
 import {
   CONTENT_TABLES,
   LORE_BLOCKS,
   tableOverrideCount,
+  hasTableOverride,
   hasLoreOverride,
   hasNarratorNameOverride,
   hasGameTitleOverride,
@@ -27,8 +29,39 @@ import {
   type LoreBlockId,
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getRaces, getFactions } from '../engine/character';
+import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
 import { MAX_TRACKS_PER_CATEGORY, RECOMMENDED_AUDIO_SPECS, type MusicCategory } from '../audio/customMusic';
+
+/** Build a full content-pack diagnostic snapshot (store vs engine registry vs the
+ *  raw persisted blob) so a paste can pinpoint any desync. */
+async function buildContentDiagnostics(): Promise<string> {
+  const s = useContentPackStore.getState();
+  let rawPersisted = '(read failed)';
+  try { rawPersisted = (await AsyncStorage.getItem('tartaria.contentPack.v1')) ?? '(none)'; } catch { /* ignore */ }
+  const registry: Record<string, number> = {};
+  for (const t of CONTENT_TABLES) registry[t.id] = hasTableOverride(t.id) ? tableOverrideCount(t.id) : 0;
+  const diag = {
+    build: OTA_BUILD_ID,
+    hydrated: s.hydrated,
+    contentVersion: s.contentVersion,
+    devMode: s.devMode,
+    published: s.published,
+    store_tables: Object.fromEntries(Object.entries(s.tables).map(([k, v]) => [k, Array.isArray(v) ? v.length : `NON-ARRAY:${typeof v}`])),
+    store_lore: Object.keys(s.lore),
+    registry_counts: registry,
+    engine_reads: {
+      races: getRaces().map((r) => r.name),
+      factions: getFactions().map((f) => f.name),
+      narrator: getNarratorName(),
+      gameTitle: getGameTitle(),
+    },
+    persisted_blob_length: rawPersisted.length,
+    persisted_blob_head: rawPersisted.slice(0, 400),
+  };
+  return JSON.stringify(diag, null, 2);
+}
 
 type Status = { kind: 'ok' | 'err'; msg: string } | null;
 
@@ -394,6 +427,19 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         race/faction, enemy, and location changes.
       </Text>
       {applyMsg && <Text style={styles.ok}>{applyMsg}</Text>}
+
+      {/* engine_Dev — COPY DIAGNOSTICS: dumps store vs registry vs persisted blob
+          to the clipboard so the dev can paste it for analysis. */}
+      <TouchableOpacity
+        style={styles.copyBtn}
+        onPress={async () => {
+          const dump = await buildContentDiagnostics();
+          await Clipboard.setStringAsync(dump);
+          setApplyMsg('Diagnostics copied to clipboard — paste them back to share the exact engine state.');
+        }}
+      >
+        <Text style={styles.copyBtnText}>⧉ COPY DIAGNOSTICS</Text>
+      </TouchableOpacity>
 
       <GameIdentitySection />
 
