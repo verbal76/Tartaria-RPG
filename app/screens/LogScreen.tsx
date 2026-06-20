@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { stampLogExport } from '../diagnostics/aboutSummary';
+import { getGameTitle } from '../engine/contentPack';
 
 // OTA 024 — chunk size for the chunked-copy path. 25 KB is well
 // under the silent-truncation limit of the strictest common chat
@@ -104,7 +105,7 @@ export function LogScreen() {
     // OTA-101 — appends buildBasicDeviceSummary via stampLogExport.
     const stamped = stampLogExport(fresh);
     try {
-      await Share.share({ message: stamped, title: 'Tartaria-RPG game log' });
+      await Share.share({ message: stamped, title: `${getGameTitle()} game log` });
       setShared(true);
       setTimeout(() => setShared(false), 1500);
     } catch {

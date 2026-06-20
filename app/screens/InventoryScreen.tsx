@@ -910,7 +910,7 @@ export function InventoryScreen() {
           );
         })}
         {player.inventory.length === 0 && (
-          <Text style={styles.empty}>Your pack is empty. Tartaria has not given you anything yet.</Text>
+          <Text style={styles.empty}>Your pack is empty. You haven’t picked anything up yet.</Text>
         )}
         {/* arb-fix — distinct empty copy when the FUSABLE filter hides
             everything, so it doesn't read as a totally empty pack. */}

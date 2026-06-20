@@ -107,7 +107,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     inputPulse: true,
     draftText: 'take rope',
     title: 'Take the Rope',
-    body: 'Tartaria takes typed input too. The input below is pre-filled with "take rope". Tap Act to grab it.',
+    body: 'This game takes typed input too. The input below is pre-filled with "take rope". Tap Act to grab it.',
     arbiter:
       '"Now the rope, on the shelf. This time, type it. I\'ve written the command. Tap ACT."',
   },
@@ -186,7 +186,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
   {
     screen: 'exploration',
     area: 'fullscreen',
-    title: 'Welcome to Tartaria',
+    title: 'Welcome',
     body:
       'Your character is set. Before you dive in — would you like a quick tour of the screens? ' +
       'Two minutes; you can skip any time.',

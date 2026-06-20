@@ -15212,6 +15212,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-650 — UI de-Tartaria, pass 1 (JS-only OTA). Player-facing flavor
+// strings in menus/screens swapped to the game name or genericized: the voice
+// test + log-share titles now use getGameTitle(); "buried world" / "Tartaria has
+// not given you anything" / "the buried world waits" / "Welcome to Tartaria"
+// genericized. Mechanic-bound text (the Aethercraft system, the Capitals /
+// Guardians / Aetheric Cores main quest) is intentionally left — it describes the
+// built-in game's actual systems, which the default Tartaria pack uses.
 // engine_Dev-649 — "ask the narrator" reads your Lore document (JS-only OTA).
 // When a 'lore' override is loaded, the ask-corpus (loreConceptBank) is built
 // from the author's passages (category lore_doc) INSTEAD of the built-in Tartaria
@@ -15305,4 +15312,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-649';
+export const OTA_BUILD_ID = '2026-06-19-650';

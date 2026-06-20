@@ -5,6 +5,7 @@ import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
 import { DeveloperConsole } from './DeveloperSettingsScreen';
+import { getGameTitle } from '../engine/contentPack';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
@@ -302,7 +303,7 @@ export function AboutScreen() {
   }, []);
 
   const testKokoro = () => {
-    kokoroSpeak('Welcome to Tartaria. This is the bundled neural voice — Kokoro.');
+    kokoroSpeak(`Welcome to ${getGameTitle()}. This is the bundled neural voice.`);
   };
   const handleEngineThirdBtn = () => {
     // When ready, the third button means UPDATE — wipe cache + dispose

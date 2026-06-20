@@ -772,7 +772,7 @@ export function MapScreen() {
               marker is drawn on it (removed OTA-182). The footer text above
               carries your location/bearings; this line is just the gesture
               hint. */}
-          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : 'A reference map of the buried world.'}
+          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : 'A reference map of the world.'}
         </Text>
       </View>
 

@@ -500,7 +500,7 @@ export function ContractsScreen() {
                 FIRST KILLS  ·  {(worldMemory.defeatedEnemies ?? []).length} unique
               </Text>
               {(worldMemory.defeatedEnemies ?? []).length === 0 ? (
-                <Text style={styles.milestoneDetailEmpty}>No kills yet. The buried world waits.</Text>
+                <Text style={styles.milestoneDetailEmpty}>No kills yet.</Text>
               ) : (
                 (worldMemory.defeatedEnemies ?? []).map((name) => (
                   <Text key={name} style={styles.milestoneDetailRow}>· {name}</Text>
