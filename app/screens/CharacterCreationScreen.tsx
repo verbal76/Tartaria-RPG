@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
 import { getRaces, getFactions } from '../engine/character';
+import { hasTableOverride, tableOverrideCount } from '../engine/contentPack';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -29,12 +30,21 @@ export function CharacterCreationScreen() {
   // the re-render; getRaces()/getFactions() then pull the live override.
   useContentPackStore((s) => s.tables);
   useContentPackStore((s) => s.hydrated);
+  useContentPackStore((s) => s.contentVersion);
   const races = getRaces();
   const factions = getFactions();
 
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
+
+  // engine_Dev — visible source indicator so it's obvious whether the screen is
+  // showing an uploaded pack or the built-in default (and whether an upload took).
+  const racesCustom = hasTableOverride('races');
+  const factionsCustom = hasTableOverride('factions');
+  const packLine = step === 'race'
+    ? (racesCustom ? `● custom races — ${tableOverrideCount('races')} loaded` : '○ built-in races (upload a Races pack in the dev console to replace these)')
+    : (factionsCustom ? `● custom factions — ${tableOverrideCount('factions')} loaded` : '○ built-in factions (upload a Factions pack in the dev console)');
 
   // If the pack changed (upload / late hydrate) and the previously-selected id
   // is no longer in the list, snap to the first entry of the current pack.
@@ -78,6 +88,9 @@ export function CharacterCreationScreen() {
         <Text style={styles.headerStep}>Step {stepIndex + 1} of {STEP_ORDER.length}</Text>
       </View>
       <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
+      <Text style={[styles.packLine, (step === 'race' ? racesCustom : factionsCustom) ? styles.packLineOn : styles.packLineOff]}>
+        {packLine}
+      </Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {step === 'race' && races.map((r) => {
@@ -195,6 +208,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
   },
+  packLine: { fontSize: 10, letterSpacing: 0.5, marginBottom: 8 },
+  packLineOn: { color: '#9ec96a' },
+  packLineOff: { color: '#7a705c', fontStyle: 'italic' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
   contextLine: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, marginBottom: 8, fontStyle: 'italic' },

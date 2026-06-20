@@ -15212,6 +15212,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-655 — character-creation pack indicator (JS-only OTA). The race /
+// faction creation screen (already 100% data-driven via getRaces()/getFactions())
+// now shows a live source line: "● custom races — N loaded" vs "○ built-in races
+// (upload a Races pack…)". Makes it unmistakable whether an uploaded pack is
+// actually live — if it says built-in, the upload didn't take (re-upload); if it
+// says custom but still looks Tartaria, the uploaded content is Tartaria-derived
+// (you loaded the TEMPLATE without changing it). Also subscribes to contentVersion
+// so APPLY ALL / any content change refreshes the screen.
 // engine_Dev-654 — data-driven tutorial props (JS-only OTA). The opening tutorial
 // teaches verbs with items pulled from the LIVE tables instead of hardcoded
 // Tartaria props: new app/engine/tutorialProps.ts getTutorialProps() resolves a
@@ -15345,4 +15353,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-654';
+export const OTA_BUILD_ID = '2026-06-19-655';
