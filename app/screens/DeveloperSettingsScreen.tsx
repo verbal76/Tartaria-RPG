@@ -398,9 +398,28 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const [confirmPub, setConfirmPub] = useState(false);
   const [confirmDevOff, setConfirmDevOff] = useState(false);
   const [applyMsg, setApplyMsg] = useState<string | null>(null);
+  // engine_Dev — re-read when the pack changes so the banner stays accurate.
+  useContentPackStore((s) => s.contentVersion);
+  const racesLoaded = hasTableOverride('races');
+  const factionsLoaded = hasTableOverride('factions');
 
   return (
     <>
+      {(!racesLoaded || !factionsLoaded) && (
+        <View style={styles.warnBanner}>
+          <Text style={styles.warnBannerTitle}>⚠ PLAYABLE TABLES (character creation)</Text>
+          <Text style={styles.warnBannerLine}>
+            Races: {racesLoaded ? `● ${tableOverrideCount('races')} loaded` : '○ built-in (Tartaria) — load yours in the “Races (playable…)” box under TABLES'}
+          </Text>
+          <Text style={styles.warnBannerLine}>
+            Factions: {factionsLoaded ? `● ${tableOverrideCount('factions')} loaded` : '○ built-in (Tartaria) — load yours in the “Factions (playable…)” box under TABLES'}
+          </Text>
+          <Text style={styles.warnBannerNote}>
+            These are TABLE boxes, not the “Race lore / Faction lore” boxes. Until they’re loaded,
+            character creation shows the built-in races/factions.
+          </Text>
+        </View>
+      )}
       {!embedded && (
         <Text style={styles.blurb}>
           This is the engine's developer console. Hit TEMPLATE on any box to drop in the first
@@ -582,6 +601,10 @@ const styles = StyleSheet.create({
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
   err: { color: '#e07a5f', fontSize: 11, marginTop: 6 },
   applyBtn: { marginTop: 4, marginBottom: 2, backgroundColor: '#243a3f', borderColor: '#6ad0c9', borderWidth: 1, borderRadius: 4, paddingVertical: 13, alignItems: 'center' },
+  warnBanner: { backgroundColor: '#2a2410', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
+  warnBannerTitle: { color: '#e6c96a', fontSize: 12, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
+  warnBannerLine: { color: '#e6d8b3', fontSize: 11, lineHeight: 16, marginTop: 2 },
+  warnBannerNote: { color: '#a89776', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
   applyBtnText: { color: '#7fe3da', fontSize: 13, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
   publishBtn: { marginTop: 6, backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   publishBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },

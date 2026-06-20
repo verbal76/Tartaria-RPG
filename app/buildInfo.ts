@@ -15212,6 +15212,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-660 — "PLAYABLE TABLES" warning banner (JS-only OTA). The dev
+// console now shows a banner at the very top whenever the Races or Factions TABLE
+// is still built-in: "⚠ PLAYABLE TABLES — Races: ○ built-in (load yours in the
+// Races box under TABLES)…". Makes the empty-playable-table state (the reason
+// character creation still shows Tartaria) impossible to miss, and points to the
+// right TABLE box (not the Race/Faction LORE boxes).
 // engine_Dev-659 — fix the Race/Faction box mix-up (JS-only OTA). Diagnostics
 // showed the author's races/factions were loaded into the "Race lore"/"Faction
 // lore" LORE boxes (freeform story) instead of the "Races"/"Factions" TABLE boxes
@@ -15379,4 +15385,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-659';
+export const OTA_BUILD_ID = '2026-06-19-660';
