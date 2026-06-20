@@ -12,10 +12,15 @@ import locationsData from '../data/locations/locations.json';
 import type { Location } from './types';
 import { LOCATION_ATLAS_COORDS, OUTPOST_ATLAS_COORD } from './atlasCoords';
 import { HIDDEN_LOCATIONS } from './hiddenLocations';
+import { resolveTable } from './contentPack';
 
 export type Direction = 'north' | 'east' | 'south' | 'west';
 
-const ALL_LOCATIONS = locationsData as Location[];
+const BUILTIN_LOCATIONS = locationsData as Location[];
+// engine_Dev — the canonical location set resolves through the content pack, so
+// an uploaded 'locations' override changes the places the player can travel to.
+const ALL_LOCATIONS_BUILTIN = BUILTIN_LOCATIONS;
+const getAllLocations = (): readonly Location[] => resolveTable('locations', ALL_LOCATIONS_BUILTIN);
 
 // OTA-500 — dynamically-canonized locations the store keeps in sync via
 // setCanonExtraLocations. Merged into BOTH the visual map and the canonical grid
@@ -29,7 +34,7 @@ let _explicitCells: Record<string, { x: number; y: number }> = {};
 export function setCanonExtraLocations(
   locs: ReadonlyArray<{ id: string; name: string; type?: string; danger?: number; gx?: number; gy?: number }>,
 ): void {
-  const known = new Set(ALL_LOCATIONS.map((l) => l.id));
+  const known = new Set(getAllLocations().map((l) => l.id));
   const next: Location[] = [];
   const cells: Record<string, { x: number; y: number }> = {};
   for (const l of locs) {
@@ -50,7 +55,7 @@ export function setCanonExtraLocations(
 /** All locations the world knows about = static (locations.json) + dynamically
  *  canonized. Used by the visual map, the canonical grid, and the travel list. */
 export function allKnownLocations(): Location[] {
-  return _extraLocations.length === 0 ? ALL_LOCATIONS : [...ALL_LOCATIONS, ..._extraLocations];
+  return _extraLocations.length === 0 ? [...getAllLocations()] : [...getAllLocations(), ..._extraLocations];
 }
 
 // A pure deterministic PRNG. xmur3 hash → mulberry32. Identical seed always
@@ -163,7 +168,7 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   const positions: Record<string, { x: number; y: number }> = {};
 
   // Center the start.
-  const startLoc = allKnownLocations().find((l) => l.id === startingLocationId) ?? ALL_LOCATIONS[0]!;
+  const startLoc = allKnownLocations().find((l) => l.id === startingLocationId) ?? getAllLocations()[0]!;
   tiles[CENTER_Y]![CENTER_X] = {
     x: CENTER_X,
     y: CENTER_Y,

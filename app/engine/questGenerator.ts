@@ -4,11 +4,14 @@ import objectivesData from '../data/quests/objectives.json';
 import complicationsData from '../data/quests/complications.json';
 import rewardsData from '../data/quests/rewards.json';
 import locationsData from '../data/locations/locations.json';
+import { resolveTable } from './contentPack';
 
 const objectives = objectivesData as QuestObjective[];
 const complications = complicationsData as QuestComplication[];
 const rewards = rewardsData as QuestReward[];
 const locations = locationsData as Location[];
+// engine_Dev — uploaded locations drive quest siting too.
+const getLocations = (): readonly Location[] => resolveTable('locations', locations);
 
 function weightByMemory(tags: readonly string[], memory: WorldMemory, baseWeight = 1): number {
   let weight = baseWeight;
@@ -26,11 +29,11 @@ export function generateQuest(memory: WorldMemory, preferredLocationId?: string)
 
   let location: Location;
   if (preferredLocationId) {
-    const found = locations.find((l) => l.id === preferredLocationId);
-    location = found ?? pick(locations.filter((l) => l.discoverable));
+    const found = getLocations().find((l) => l.id === preferredLocationId);
+    location = found ?? pick(getLocations().filter((l) => l.discoverable));
   } else {
     location = pickWeighted(
-      locations.filter((l) => l.discoverable),
+      getLocations().filter((l) => l.discoverable),
       (l) => weightByMemory(l.tags, memory) + (memory.discoveredLocationIds.includes(l.id) ? 0 : 2),
     );
   }

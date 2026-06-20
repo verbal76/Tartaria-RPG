@@ -338,8 +338,10 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const publish = useContentPackStore((s) => s.publish);
   const unpublish = useContentPackStore((s) => s.unpublish);
   const setDevMode = useContentPackStore((s) => s.setDevMode);
+  const reapply = useContentPackStore((s) => s.reapply);
   const [confirmPub, setConfirmPub] = useState(false);
   const [confirmDevOff, setConfirmDevOff] = useState(false);
+  const [applyMsg, setApplyMsg] = useState<string | null>(null);
 
   return (
     <>
@@ -351,6 +353,24 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
           use the built-in defaults.
         </Text>
       )}
+
+      {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine. */}
+      <TouchableOpacity
+        style={styles.applyBtn}
+        onPress={() => {
+          reapply();
+          setApplyMsg('Applied — the engine re-read every uploaded JSON. Start a NEW game to see world/character/enemy changes.');
+        }}
+      >
+        <Text style={styles.applyBtnText}>↻ APPLY ALL — re-read every JSON</Text>
+      </TouchableOpacity>
+      <Text style={styles.publishNote}>
+        Forces the engine to re-read every uploaded pack right now. Uploads already apply as you
+        LOAD them; this is the “make sure everything’s live” switch. A game already in progress
+        keeps the content it was created with — start a NEW game (or new character) to see world,
+        race/faction, enemy, and location changes.
+      </Text>
+      {applyMsg && <Text style={styles.ok}>{applyMsg}</Text>}
 
       <GameIdentitySection />
 
@@ -492,6 +512,8 @@ const styles = StyleSheet.create({
   resetBtnText: { color: '#a89a7a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
   err: { color: '#e07a5f', fontSize: 11, marginTop: 6 },
+  applyBtn: { marginTop: 4, marginBottom: 2, backgroundColor: '#243a3f', borderColor: '#6ad0c9', borderWidth: 1, borderRadius: 4, paddingVertical: 13, alignItems: 'center' },
+  applyBtnText: { color: '#7fe3da', fontSize: 13, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
   publishBtn: { marginTop: 6, backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   publishBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
   publishNote: { color: '#7a705c', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },

@@ -197,6 +197,7 @@ const rArmor = (): readonly CatalogArmor[] => resolveTable('armor', ARMOR);
 const rMaterials = (): readonly CatalogMaterial[] => resolveTable('materials', MATERIALS);
 const rGear = (): readonly CatalogGear[] => resolveTable('gear', GEAR);
 const rExploration = (): readonly CatalogExploration[] => resolveTable('exploration', EXPLORATION);
+const rRecipes = (): readonly Recipe[] => resolveTable('recipes', RECIPES);
 
 const DEFAULT_DURABILITY = 25;
 
@@ -519,14 +520,14 @@ function ingredientShortfall(
 }
 
 export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recipe[] {
-  return RECIPES.filter((r) => canCraft(r, inventory));
+  return rRecipes().filter((r) => canCraft(r, inventory));
 }
 
 export function findRecipeByResult(target: string): Recipe | null {
   const t = target.toLowerCase().trim();
   if (!t) return null;
   // Pass 1 — substring match either direction. Cheap, covers most cases.
-  for (const r of RECIPES) {
+  for (const r of rRecipes()) {
     if (r.result.toLowerCase().includes(t) || t.includes(r.result.toLowerCase())) return r;
   }
   // Pass 2 — Levenshtein fuzzy match per word, so single-letter typos
@@ -537,7 +538,7 @@ export function findRecipeByResult(target: string): Recipe | null {
   const tTokens = t.split(/\s+/).filter(Boolean);
   if (tTokens.length === 0) return null;
   let best: { recipe: Recipe; totalDistance: number } | null = null;
-  for (const r of RECIPES) {
+  for (const r of rRecipes()) {
     const rTokens = r.result.toLowerCase().split(/\s+/).filter(Boolean);
     let totalDistance = 0;
     let allMatched = true;

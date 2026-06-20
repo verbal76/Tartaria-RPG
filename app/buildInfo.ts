@@ -15212,6 +15212,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-645 — wire enemies/locations/recipes + APPLY ALL button (JS-only
+// OTA). The enemies, locations, and recipes upload boxes now actually take
+// effect: encounter.ts (enemy + location lookups), questGenerator.ts + worldMap.ts
+// (the places the player travels), and crafting.ts (recipe lookups) all resolve
+// through resolveTable() at call time. New dev-console "↻ APPLY ALL" button:
+// re-mirrors every uploaded pack into the live engine and bumps a contentVersion
+// so screens refresh — the explicit "make it all live" switch (a new game is
+// still needed to re-generate a baked save's world/character).
 // engine_Dev-644 — Narration flavor box + char-creation reactivity (JS-only OTA).
 // New "Narration flavor" upload (a 'flavor' lore block): a JSON object of the
 // narrator's canned line-pools by key (genericRemarks, combatRemarks, lookLines,
@@ -15270,4 +15278,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-644';
+export const OTA_BUILD_ID = '2026-06-19-645';

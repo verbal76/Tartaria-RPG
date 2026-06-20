@@ -55,6 +55,8 @@ interface ContentPackState {
   gameTagline: string;
   /** While true, Settings opens to the dev console as its first/default tab. */
   devMode: boolean;
+  /** Bumped by reapply() (and uploads) so content-reading screens re-render. */
+  contentVersion: number;
   hydrated: boolean;
   /** Hide the title DEV pill for a family build (reversible; Verbal still works). */
   publish: () => void;
@@ -68,6 +70,9 @@ interface ContentPackState {
   setGameTagline: (text: string) => void;
   /** Turn dev mode on/off (controls the Settings dev tab + default tab). */
   setDevMode: (on: boolean) => void;
+  /** Force the engine to re-read every uploaded pack: re-mirror all overrides
+   *  into the registry and bump contentVersion so screens refresh. */
+  reapply: () => void;
   /** Parse + validate a table JSON (must be a non-empty array), apply, persist. */
   loadTableJson: (id: ContentTableId, json: string) => LoadResult;
   /** Parse + validate a lore JSON (object or array), apply, persist. */
@@ -100,7 +105,25 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   gameTitle: '',
   gameTagline: '',
   devMode: true,
+  contentVersion: 0,
   hydrated: false,
+
+  reapply() {
+    const s = get();
+    // Re-mirror every override from the store into the engine registry. The
+    // registry is normally kept in sync on each upload, but this is the explicit
+    // "APPLY ALL" the author hits after editing — it guarantees the live engine
+    // matches every uploaded JSON (e.g. after an OTA reload reset module state).
+    for (const [id, rows] of Object.entries(s.tables)) {
+      if (Array.isArray(rows)) setTableOverride(id as ContentTableId, rows);
+    }
+    for (const [id, value] of Object.entries(s.lore)) setLoreOverride(id as LoreBlockId, value);
+    setNarratorNameOverride(s.narratorName || null);
+    setGameTitleOverride(s.gameTitle || null);
+    setGameTaglineOverride(s.gameTagline || null);
+    setPublishedFlag(s.published);
+    set({ contentVersion: s.contentVersion + 1 });
+  },
 
   publish() {
     // A family build hides the dev pill AND drops out of dev mode so testers
@@ -157,7 +180,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
     setTableOverride(id, parsed);
     const tables = { ...get().tables, [id]: parsed };
-    set({ tables });
+    set({ tables, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), tables });
     return { ok: true, count: parsed.length };
   },
@@ -174,7 +197,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
     setLoreOverride(id, parsed);
     const lore = { ...get().lore, [id]: parsed };
-    set({ lore });
+    set({ lore, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), lore });
     return { ok: true };
   },
@@ -183,7 +206,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setTableOverride(id, null);
     const tables = { ...get().tables };
     delete tables[id];
-    set({ tables });
+    set({ tables, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), tables });
   },
 
@@ -191,7 +214,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setLoreOverride(id, null);
     const lore = { ...get().lore };
     delete lore[id];
-    set({ lore });
+    set({ lore, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), lore });
   },
 

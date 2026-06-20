@@ -5,12 +5,18 @@ import weatherData from '../data/weather/weather.json';
 import hazardsData from '../data/hazards/hazards.json';
 import locationsData from '../data/locations/locations.json';
 import lootData from '../data/relics/loot_tables.json';
+import { resolveTable } from './contentPack';
 import type { LadderTriple } from './worldLadder';
 
 const enemies = enemiesData as Enemy[];
 const weather = weatherData as WeatherEntry[];
 const hazards = hazardsData as Hazard[];
 const locations = locationsData as Location[];
+
+// engine_Dev — resolve enemies + locations through the content pack at call time
+// so an uploaded override drives encounters and the world the player traverses.
+const getEnemies = (): readonly Enemy[] => resolveTable('enemies', enemies);
+const getLocations = (): readonly Location[] => resolveTable('locations', locations);
 
 /** Lookup an enemy by name. Used by the wasteland-encounter skirmish
  *  spawner to convert a name in the encounter pool into a real Enemy
@@ -19,7 +25,7 @@ const locations = locationsData as Location[];
 export function findEnemyByName(name: string): Enemy | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const match = enemies.find((e) => e.name.toLowerCase() === t);
+  const match = getEnemies().find((e) => e.name.toLowerCase() === t);
   if (!match) return null;
   return JSON.parse(JSON.stringify(match)) as Enemy;
 }
@@ -54,7 +60,7 @@ export function pickEnemyForLocation(location: Location): Enemy | null {
   // already capped at 80% before, now 90%.
   if (!chance(50 + location.danger * 8)) return null;
   const dangerCap: Rarity = location.danger >= 4 ? 'Legendary' : location.danger >= 3 ? 'Rare' : location.danger >= 2 ? 'Uncommon' : 'Common';
-  const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(dangerCap));
+  const allowed = getEnemies().filter((e) => rarityRank(e.rarity) <= rarityRank(dangerCap));
   if (allowed.length === 0) return null;
   return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
 }
@@ -80,7 +86,7 @@ export function pickEnemyForLocationGuaranteed(location: Location, playerHpMax?:
       : 'Legendary';
     effectiveCap = rarityRank(playerCap) < rarityRank(dangerCap) ? playerCap : dangerCap;
   }
-  const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(effectiveCap));
+  const allowed = getEnemies().filter((e) => rarityRank(e.rarity) <= rarityRank(effectiveCap));
   if (allowed.length === 0) return null;
   return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
 }
@@ -119,7 +125,7 @@ export function pickGroupForLocation(location: Location): Enemy[] | null {
   const eligible = GROUP_TEMPLATES.filter((g) => g.minDanger <= location.danger);
   if (eligible.length === 0) return null;
   const tpl = pickWeighted(eligible, (g) => g.weight);
-  const proto = enemies.find((e) => e.name === tpl.enemyName);
+  const proto = getEnemies().find((e) => e.name === tpl.enemyName);
   if (!proto) return null;
   // Spawn `count` copies, each with a small HP wobble so they feel
   // individual rather than cloned. ±20% HP variance.
@@ -145,14 +151,14 @@ function rarityRank(r: Rarity): number {
 }
 
 export function getLocationById(id: string): Location {
-  const stat = locations.find((l) => l.id === id);
+  const stat = getLocations().find((l) => l.id === id);
   if (stat) return stat;
   // OTA-502 — resolve install-canonized locations (whisper/contract/mission
   // mentions) too, so they get their real name + a minimal scene instead of
   // silently falling back to locations[0].
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { allKnownLocations } = require('./worldMap') as typeof import('./worldMap');
-  return allKnownLocations().find((l) => l.id === id) ?? locations[0]!;
+  return allKnownLocations().find((l) => l.id === id) ?? getLocations()[0]!;
 }
 
 // ---------------------------------------------------------------------------
@@ -171,7 +177,7 @@ export function getLocationById(id: string): Location {
 // spawn comes from the room's allowed list. Same for loot.
 
 const enemiesByName = new Map<string, Enemy>();
-for (const e of enemies) enemiesByName.set(e.name, e);
+for (const e of getEnemies()) enemiesByName.set(e.name, e);
 const lootByName = new Map<string, LootEntry>();
 for (const l of loot) lootByName.set(l.name, l);
 
