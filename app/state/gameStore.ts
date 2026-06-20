@@ -4830,17 +4830,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // from currentScene replacement to merge.
       elevatedOn: null,
     };
-    // Whisper plant — hub-room entry can drop a tip into the
-    // player's Whispers panel. Pittsburgh loop: walk into the
-    // Mess, a Reclaimer at the next table mentions Yulka sells
-    // Aetheric Discs cheap south after dark, that becomes a
-    // traceable Whisper. See app/engine/whispers.ts for chain
-    // definitions + rate.
-    if (hubRoom && hubRoom.id) {
+    // Whisper plant — entering a scene can drop a tip into the player's Whispers
+    // panel. The built-in Tartaria loop plants inside a hub ROOM (walk into the
+    // Mess, overhear Yulka); engine_Dev also plants at the current MACRO LOCATION
+    // so a re-skinned game (which spawns at macro locations, not hub rooms) can
+    // author whispers whose plantLocations are location ids. A chain plants when
+    // its plantLocations include EITHER the hub-room id OR the current location id.
+    {
       const livePlayer = get().player;
-      if (livePlayer) {
+      const plantKeys = [hubRoom?.id, livePlayer?.currentLocationId].filter((k): k is string => !!k);
+      if (livePlayer && plantKeys.length > 0) {
         const eligibleChains = getWhispers().filter((c) =>
-          c.plantLocations.includes(hubRoom.id)
+          c.plantLocations.some((loc) => plantKeys.includes(loc))
           && !(livePlayer.completedWhisperIds ?? []).includes(c.id)
           && !(livePlayer.activeWhispers ?? []).some((w) => w.id === c.id),
         );
