@@ -15212,6 +15212,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// engine_Dev-652 — data-driven POWERS, stage 1 (JS-only OTA). The magic/ability
+// system's DEFINITIONS are now data: app/engine/powers.ts holds DEFAULT_POWERS
+// (the built-in Aethercraft disciplines) + getPowers() via resolveTable('powers',
+// …). New 'powers' upload box + full template. The Crafting "aetheric" tab reads
+// getPowers(), and runAethercraft() sources each power's fuel / DC / stat / name
+// from the data — so a re-skinned game renames/refuels/retunes its powers. The
+// effect each runs is still the coded primitive (shape/summon/mend) selected by
+// `discipline`. STAGE 2 (next): new effect primitives (damage/status/debuff) so
+// powers can do things like a fog blind; STAGE 3: de-Aether the strings.
 // engine_Dev-651 — rings + amulets are now overridable tables (JS-only OTA).
 // Two new upload boxes ('amulets', 'rings'); crafting.ts resolves them through
 // resolveTable() everywhere (lookupCraftedItem, findCatalogItem, the catalog
@@ -15319,4 +15328,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-19-651';
+export const OTA_BUILD_ID = '2026-06-19-652';

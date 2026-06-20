@@ -13,7 +13,7 @@
 export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
   | 'amulets' | 'rings'
-  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore';
+  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore' | 'powers';
 
 export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
 
@@ -35,6 +35,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'factions', label: 'Factions', hint: 'JSON array of faction rows (data/factions/…)' },
   { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json)' },
   { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
+  { id: 'powers', label: 'Powers (magic / abilities)', hint: 'Your castable powers. Each: { "discipline": "shape|summon|mend" (the engine effect it runs), "name", "title", "body", "stat": "intelligence|wisdom", "dcBase", "fuels": ["item names"], "examples": ["cast phrases"] }. Replaces Aethercraft. Hit TEMPLATE for the shape.' },
 ];
 
 /** Lore blocks, split the way the game uses them. */

@@ -24649,6 +24649,12 @@ function runAethercraft(
   const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { getGolemDefinition, makeCompanion, missingFuelFor, consumeFuel } = require('../engine/golems');
+  // engine_Dev — the power's fuel / DC / stat / name come from the data-driven
+  // power set (uploaded 'powers' override, or the built-in Aethercraft default),
+  // so a re-skinned game's powers cast with their own fuel and difficulty.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { powerForDiscipline } = require('../engine/powers');
+  const power = powerForDiscipline(discipline) as import('../engine/powers').Power | undefined;
 
   // 2026-05-25 [MECHANIC-1b] — summon discipline now consumes a
   // golem-specific RECIPE (multiple items) instead of a single
@@ -24680,9 +24686,9 @@ function runAethercraft(
       'Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue',
       'Golem Core', 'Aetheric Locket',
     ];
-    const allowed: string[] = discipline === 'shape'
-      ? AETHER_FUEL_NAMES
-      : ['Aetheric Shard', 'Aether Crystal']; // mend
+    const allowed: string[] = (power?.fuels && power.fuels.length > 0)
+      ? power.fuels
+      : (discipline === 'shape' ? AETHER_FUEL_NAMES : ['Aetheric Shard', 'Aether Crystal']); // mend
     fuelItem = player.inventory.find(
       (i) => i.quantity > 0 && allowed.some((name) => name.toLowerCase() === i.name.toLowerCase()),
     ) ?? null;
@@ -24707,7 +24713,7 @@ function runAethercraft(
     const def = getGolemDefinition(golemKindHint);
     dcBase = def.summonDC ?? 15;
   } else {
-    dcBase = discipline === 'summon' ? 15 : 12;
+    dcBase = discipline === 'summon' ? (power?.dcBase ?? 15) : (power?.dcBase ?? 12);
   }
   const dc = dcBase + aethercraftDcModifier(player.raceId);
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -24716,17 +24722,17 @@ function runAethercraft(
   const { weatherStatModifiers } = require('../engine/weatherEffects');
   const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
   const racialBonus = aethercraftStatBonus(player.raceId);
-  const stat: keyof PlayerCharacter['stats'] = discipline === 'mend' ? 'wisdom' : 'intelligence';
+  const stat: keyof PlayerCharacter['stats'] = (power?.stat ?? (discipline === 'mend' ? 'wisdom' : 'intelligence')) as keyof PlayerCharacter['stats'];
   const statValue = stats[stat] + (racialBonus[stat] ?? 0);
   const statLabel = stat === 'wisdom' ? 'WIS' : 'INT';
   const racialNote = (racialBonus[stat] ?? 0) > 0 ? ` (+${racialBonus[stat]} Aethercraft Mastery)` : '';
   const roll = rollDie(20);
   const total = roll + statValue;
   const success = total >= dc;
-  const disciplineLabel =
+  const disciplineLabel = power?.name ?? (
     discipline === 'shape' ? 'Aetherstone Manipulation' :
     discipline === 'summon' ? 'Aether Golem Constructor' :
-    'Aetheric Healing';
+    'Aetheric Healing');
   // OTA-145 — channel split. Pre-fix, both success and failure rolls
   // emitted to 'combat' which paints uniformly red (warning color).
   // Playtester: "Why did a successful golem.summon come up red?"

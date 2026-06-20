@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { missingIngredientsList } from '../engine/crafting';
+import { getPowers } from '../engine/powers';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
 import { BrandedModal } from '../components/BrandedModal';
@@ -37,39 +38,10 @@ interface AethercraftDiscipline {
   showGolemVariants?: boolean;
 }
 
-const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
-  {
-    id: 'aether_shape',
-    title: 'Aetherstone Manipulation (shape)',
-    body:
-      'INT check, DC 12. In combat: +4 AC for one turn (shaped-stone ward). Out of combat: ' +
-      'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],
-    examples: ['shape stone', 'mold the aetherstone', 'manipulate stone'],
-  },
-  {
-    id: 'aether_summon',
-    title: 'Aether Golem Constructor (summon)',
-    body:
-      'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
-      'a golem ally that fights for you for the rest of the scene. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
-    examples: ['summon golem', 'summon an aether golem', 'call a golem'],
-    showGolemVariants: true,
-  },
-  {
-    id: 'aether_mend',
-    title: 'Aetheric Healing (mend)',
-    body:
-      'WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption ' +
-      'when they cast this — racial trait. Mud Dwellers and Aetherborn cast at the base DC; ' +
-      'every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal'],
-    examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
-  },
-];
+// engine_Dev — the power set is data-driven (app/engine/powers.ts). getPowers()
+// returns the built-in Aethercraft default OR the author's uploaded 'powers'
+// table, so this tab reskins automatically. AethercraftDiscipline is a structural
+// subset of Power, so the render below is unchanged.
 
 // OTA-111 — phrasing that ROUTES to each golem kind via
 // parseGolemKind in app/engine/golems.ts. The keyword each phrase
@@ -425,7 +397,7 @@ export function CraftingScreen() {
             The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a golem to summon it on the spot; shape and mend stage their phrase for the input box."
           </Text>
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-            {AETHERCRAFT_DISCIPLINES.map((d) => {
+            {getPowers().map((d) => {
               const queuedIdx = aetherCycleIdx[d.id];
               const queuedPhrase = aetherLastStaged[d.id]
                 ?? (queuedIdx !== undefined ? d.examples[queuedIdx] : null);

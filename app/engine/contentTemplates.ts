@@ -22,6 +22,7 @@ import {
   type LoreBlockId,
 } from './contentPack';
 import { buildFlavorTemplate } from './narrativeGenerator';
+import { DEFAULT_POWERS } from './powers';
 
 /** Example narrator persona seeded into the World-lore template — illustrative
  *  only; the author edits it. (The live default is built from the narrator's
@@ -113,6 +114,8 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   // ignores; the `always` tag marks the default block used when nothing else
   // matches. Replace every REPLACE and add as many blocks as you want.
   lore: LORE_DOCUMENT_SCAFFOLD,
+  // The built-in power set (Aethercraft) is the template — edit names/fuel/DC.
+  powers: DEFAULT_POWERS as unknown[],
 };
 
 /** How many sample rows to export per table — enough to show the shape, not the
@@ -121,9 +124,9 @@ export const TEMPLATE_SAMPLE_ROWS = 2;
 
 /** First `n` rows of a built-in table as a pretty JSON string (a starter schema). */
 export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS): string {
-  // The Lore document ships the FULL section scaffold (not a 2-row sample) so the
-  // author sees every section to fill in.
-  if (id === 'lore') return JSON.stringify(TABLE_ROWS.lore, null, 2);
+  // The Lore document + Powers ship their FULL set (not a 2-row sample) so the
+  // author sees every section / power to edit.
+  if (id === 'lore' || id === 'powers') return JSON.stringify(TABLE_ROWS[id], null, 2);
   return JSON.stringify(TABLE_ROWS[id].slice(0, n), null, 2);
 }
 

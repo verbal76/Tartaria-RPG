@@ -12,8 +12,8 @@ describe('engine_Dev — content templates', () => {
       const parsed = JSON.parse(json);
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBeGreaterThan(0);
-      // 'lore' ships the FULL section scaffold; every other table is a small sample.
-      if (t.id !== 'lore') expect(parsed.length).toBeLessThanOrEqual(TEMPLATE_SAMPLE_ROWS);
+      // 'lore' + 'powers' ship their FULL set; every other table is a small sample.
+      if (t.id !== 'lore' && t.id !== 'powers') expect(parsed.length).toBeLessThanOrEqual(TEMPLATE_SAMPLE_ROWS);
     }
   });
 
