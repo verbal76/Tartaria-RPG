@@ -88,7 +88,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Your Name',
     body: 'Speak your name. Type it below, then tap ACT — or hit Enter on the keyboard.',
     arbiter:
-      `The ${getNarratorName()} looks up. "Your name, traveler. Type it, then tap ACT."`,
+      'The {narrator} looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
     id: 'cudgel',

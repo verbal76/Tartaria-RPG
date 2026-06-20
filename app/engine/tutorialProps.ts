@@ -5,7 +5,7 @@
 // re-skinned game teaches with its own items (e.g. take a .38 Revolver, salvage
 // a flak vest). Falls back to the built-in names when nothing suitable exists.
 
-import { resolveTable } from './contentPack';
+import { resolveTable, getNarratorName } from './contentPack';
 import { WEAPONS, ARMOR, GEAR, EXPLORATION } from './crafting';
 import { isOversized } from './portability';
 
@@ -53,5 +53,6 @@ export function fillTutorialPlaceholders(text: string): string {
   return text
     .replace(/\{weapon\}/g, p.weapon)
     .replace(/\{rope\}/g, p.rope)
-    .replace(/\{armor\}/g, p.armor);
+    .replace(/\{armor\}/g, p.armor)
+    .replace(/\{narrator\}/g, getNarratorName());
 }
