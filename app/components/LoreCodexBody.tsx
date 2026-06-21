@@ -25,6 +25,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'rea
 import { BrandedModal } from './BrandedModal';
 import locationsData from '../data/locations/locations.json';
 import { getRaces, getFactions } from '../engine/character';
+import { resolveTable, hasTableOverride } from '../engine/contentPack';
 import timelineData from '../data/events/timeline.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
@@ -33,6 +34,11 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../e
 type Section = 'races' | 'factions' | 'places' | 'timeline';
 
 export function LoreCodexBody() {
+  // engine_Dev — drop the built-in-only Timeline tab once a custom game is loaded.
+  const customGame = hasTableOverride('locations') || hasTableOverride('factions');
+  const SECTIONS: Section[] = customGame
+    ? ['races', 'factions', 'places']
+    : ['races', 'factions', 'places', 'timeline'];
   const [section, setSection] = useState<Section>('races');
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
@@ -73,7 +79,11 @@ export function LoreCodexBody() {
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.tabs}>
-        {(['races', 'factions', 'places', 'timeline'] as Section[]).map((s) => (
+        {/* engine_Dev — the Timeline is the one section with no upload path yet, so
+            it still holds built-in (Tartaria) events. Hide it once a custom game is
+            loaded (locations/factions overridden) so a re-skin never shows the
+            built-in timeline. Races/factions/places are all data-driven. */}
+        {SECTIONS.map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
@@ -116,7 +126,7 @@ export function LoreCodexBody() {
             <Text style={styles.meta}>Join: {f.joinRequirements}</Text>
           </View>
         ))}
-        {section === 'places' && (locationsData as Location[]).map((l) => {
+        {section === 'places' && (resolveTable('locations', locationsData as Location[]) as Location[]).map((l) => {
           const atHere = canPlanRoute && l.id === here;
           const hidden = isHiddenLocation(l.id) && !isLocationRevealed(l.id, discoveredIds);
           const content = (
