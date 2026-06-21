@@ -9,7 +9,7 @@ import { findFactionQuestById, getFactionQuests, factionQuestReady } from '../en
 import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
-import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
+import { computeAllProgress, getCharacterStories, allFragments } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
@@ -237,7 +237,7 @@ export function ContractsScreen() {
 
   const progress = computeAllProgress(player.collectables ?? []);
   const totalFragmentsFound = progress.reduce((acc, p) => acc + p.found.length, 0);
-  const totalFragments = ALL_FRAGMENTS.length;
+  const totalFragments = allFragments().length;
 
   return (
     <View style={styles.container}>
@@ -1162,7 +1162,7 @@ function cap(s: string): string {
 // the discovery hint as a teaser.
 function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
   const [openId, setOpenId] = useState<string | null>(null);
-  if (CHARACTER_STORIES.length === 0) {
+  if (getCharacterStories().length === 0) {
     return (
       <View style={styles.emptyInline}>
         <Text style={styles.emptyTitle}>No collectibles authored yet.</Text>

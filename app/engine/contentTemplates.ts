@@ -455,6 +455,69 @@ export function buildWhispersTemplate(includeTokenNote = true): string {
   ], null, 2), includeTokenNote);
 }
 
+/** The Collectables template — an array of CHARACTER STORIES. Each story is one
+ *  named character whose tale the player pieces together by finding fragments
+ *  (notes / letters / journal pages / fragments) as loot. The Contracts screen's
+ *  Collectables tab renders per-character completion. A fragment drops in place of
+ *  normal loot when the scene's biome tags overlap the fragment's biomeTags. The
+ *  uploaded array REPLACES the built-in story set wholesale. */
+export function buildCollectablesTemplate(): string {
+  const body = JSON.stringify({
+    stories: [
+      {
+        id: 'story_example_one',
+        characterName: 'A. Whitcombe',
+        characterBlurb: 'A field researcher who vanished chasing the anomaly. Their scattered notes trace the descent from curiosity to dread.',
+        fragments: [
+          {
+            id: 'whitcombe_01',
+            title: 'First Field Note',
+            kind: 'note',
+            body: 'The readings spike near the old substation every night at the same hour. Coincidence does not keep a schedule. Tomorrow I bring the better instruments.',
+            discoveryHint: 'Tucked in a rusted locker near the substation ruins',
+            biomeTags: ['ruin', 'urban'],
+          },
+          {
+            id: 'whitcombe_02',
+            title: 'Torn Letter Home',
+            kind: 'letter',
+            body: 'If you are reading this I did not come back. Do not look for me near the water. Whatever is down there, it knows my name now.',
+            discoveryHint: 'Half-buried in the silt along the waterfront',
+            biomeTags: ['water', 'wreck'],
+          },
+        ],
+      },
+      {
+        id: 'story_example_two',
+        characterName: 'Sgt. Devlin',
+        characterBlurb: 'A soldier left behind when the cordon fell. His journal is a countdown.',
+        fragments: [
+          {
+            id: 'devlin_01',
+            title: 'Journal — Day 3',
+            kind: 'journal',
+            body: 'Rations holding. Radio dead. I keep the door barred and the lamp low. They move when the lamp is bright.',
+            discoveryHint: 'Inside a barricaded room in a collapsed bunker',
+            biomeTags: ['ruin', 'underground'],
+          },
+        ],
+      },
+    ],
+  }, null, 2);
+  return [
+    '// IMPORTABLE COLLECTABLES — character stories the player reassembles from loot.',
+    '// Top level: { "stories": [ ... ] } (a bare array of stories is also accepted).',
+    '// Each story: { id, characterName, characterBlurb, fragments: [...] }.',
+    '// Each fragment: { id, title, kind, body, discoveryHint, biomeTags: [..] }.',
+    '//   kind     — "note" | "letter" | "journal" | "fragment".',
+    '//   body     — the text the player reads once the fragment is found.',
+    '//   hint     — shown for an undiscovered fragment; name the biome/place to look.',
+    '//   biomeTags — a fragment can drop where the scene\'s location.tags overlap these.',
+    '// The uploaded set REPLACES the built-in stories wholesale.',
+    body,
+  ].join('\n');
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -524,6 +587,7 @@ granular edits. Recommended order:
   - Missions (hunts / mysteries / faction quests / storylines + procedural seeds)
   - Hooks (atmospheric leads) · Whispers (overheard tips) · Travel encounters
   - Interaction tags (which verbs each noun accepts) · Titles (achievements)
+  - Collectables (character stories the player reassembles from loot fragments)
 
 ## 8 · Assets (not JSON — their own uploads)
   - World map image · Per-faction maps · Music (battle + ambient, multi-select)
@@ -609,6 +673,11 @@ export function buildGameBundleTemplate(): string {
     'interactionTags',
     'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.',
     interactionTagsKeywordSample(),
+  ));
+  sections.push(bundleSection(
+    'collectables',
+    'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.',
+    buildCollectablesTemplate(),
   ));
   sections.push(bundleSection(
     'whispers',

@@ -10,6 +10,7 @@
 // so it's safe to call from any loot path without dedupe checks.
 
 import data from '../data/collectables/character_stories.json';
+import { getCollectablesOverride } from './contentPack';
 
 export interface CollectableFragment {
   id: string;
@@ -40,38 +41,35 @@ interface RawData {
   stories: CharacterStory[];
 }
 
-export const CHARACTER_STORIES: readonly CharacterStory[] = (data as RawData).stories;
+const BUILTIN_STORIES: readonly CharacterStory[] = (data as RawData).stories;
 
-/** Every fragment, flattened across all characters. Useful for the
- *  loot-roll path when picking a random unfound fragment to drop. */
-export const ALL_FRAGMENTS: readonly CollectableFragment[] =
-  CHARACTER_STORIES.flatMap((s) => s.fragments);
+/** engine_Dev — the live story set: an uploaded `collectables` override (an array
+ *  of stories) replaces the built-in set wholesale; else the built-in Tartaria
+ *  stories. Resolved at call time so an upload after boot is honored. */
+export function getCharacterStories(): readonly CharacterStory[] {
+  const ov = getCollectablesOverride();
+  return Array.isArray(ov) && ov.length > 0 ? (ov as CharacterStory[]) : BUILTIN_STORIES;
+}
 
-/** Map of fragment id → owning character story id, built once at load. */
-const FRAGMENT_TO_STORY: ReadonlyMap<string, string> = (() => {
-  const m = new Map<string, string>();
-  for (const s of CHARACTER_STORIES) {
-    for (const f of s.fragments) m.set(f.id, s.id);
-  }
-  return m;
-})();
+/** Every fragment, flattened across all stories (for the loot-roll path). */
+export function allFragments(): readonly CollectableFragment[] {
+  return getCharacterStories().flatMap((s) => s.fragments ?? []);
+}
 
 export function findFragmentById(id: string): CollectableFragment | undefined {
-  for (const story of CHARACTER_STORIES) {
-    const f = story.fragments.find((frag) => frag.id === id);
+  for (const story of getCharacterStories()) {
+    const f = (story.fragments ?? []).find((frag) => frag.id === id);
     if (f) return f;
   }
   return undefined;
 }
 
 export function findStoryByFragmentId(fragmentId: string): CharacterStory | undefined {
-  const storyId = FRAGMENT_TO_STORY.get(fragmentId);
-  if (!storyId) return undefined;
-  return CHARACTER_STORIES.find((s) => s.id === storyId);
+  return getCharacterStories().find((s) => (s.fragments ?? []).some((f) => f.id === fragmentId));
 }
 
 export function findStoryById(id: string): CharacterStory | undefined {
-  return CHARACTER_STORIES.find((s) => s.id === id);
+  return getCharacterStories().find((s) => s.id === id);
 }
 
 export interface CharacterProgress {
@@ -114,7 +112,7 @@ export function pickFragmentForBiome(
   const owned = new Set(playerCollectables);
   const tagSet = new Set(sceneTags.map((t) => t.toLowerCase()));
   const eligible: CollectableFragment[] = [];
-  for (const frag of ALL_FRAGMENTS) {
+  for (const frag of allFragments()) {
     if (owned.has(frag.id)) continue;
     if (frag.biomeTags.some((t) => tagSet.has(t.toLowerCase()))) {
       eligible.push(frag);
@@ -131,7 +129,7 @@ export function pickFragmentForBiome(
  *  hasn't found anything for yet. */
 export function computeAllProgress(playerCollectables: readonly string[]): CharacterProgress[] {
   const owned = new Set(playerCollectables);
-  return CHARACTER_STORIES.map((story) => {
+  return getCharacterStories().map((story) => {
     const found: CollectableFragment[] = [];
     const missing: CollectableFragment[] = [];
     for (const frag of story.fragments) {

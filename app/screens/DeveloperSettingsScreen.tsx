@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1321,6 +1321,98 @@ function TitlesBox() {
   );
 }
 
+// engine_Dev — COLLECTABLES upload. Character stories the player reassembles from
+// loot fragments; the uploaded set replaces the built-in stories wholesale.
+function CollectablesBox() {
+  const loadCollectablesJson = useContentPackStore((s) => s.loadCollectablesJson);
+  const collectables = useContentPackStore((s) => s.collectables) as Array<{ id: string; characterName?: string; fragments?: unknown[] }>;
+  const loaded = collectables.length;
+  const fragCount = collectables.reduce((n, s) => n + (Array.isArray(s.fragments) ? s.fragments.length : 0), 0);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Collectables (character stories)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} stories / ${fragCount} fragments` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Character stories the player reassembles from loot. Each story is one named character
+        with a chain of <Text style={{ fontWeight: 'bold' }}>fragments</Text> (note / letter /
+        journal / fragment). A fragment drops in place of normal loot where the scene's location
+        tags overlap its <Text style={{ fontWeight: 'bold' }}>biomeTags</Text>. The Contracts screen's
+        Collectables tab shows per-character completion. Top level is{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{ "stories": [ … ] }'}</Text> (a bare array also works).
+        The uploaded set replaces the built-in stories. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your collectables JSON here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadCollectablesJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} character stor${r.count === 1 ? 'y' : 'ies'}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current stories — edit, then LOAD.' : 'Loaded the collectables template — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate());
+            const r = await saveJsonToFile('collectables.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadCollectablesJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} character stor${res.count === 1 ? 'y' : 'ies'} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearCollectables(); setStatus({ kind: 'ok', msg: 'Reset collectables to built-in.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — BOSSES builder. Named, faction-affiliated bosses with stats, loot,
 // a quest item, and spawn rules — referenced by main-quest "kill" steps.
 function BossesBox() {
@@ -1904,6 +1996,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
       <Text style={styles.sectionLabel}>STARTING AREAS</Text>
       <StartingAreasBox />
       <TitlesBox />
+
+      <Text style={styles.sectionLabel}>COLLECTABLES</Text>
+      <CollectablesBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox

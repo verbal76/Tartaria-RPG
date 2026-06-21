@@ -463,6 +463,16 @@ export function setCustomBossesOverride(rows: readonly unknown[] | null): void {
 export function hasCustomBossesOverride(): boolean { return customBossesOverride != null; }
 export function getCustomBosses(): unknown[] { return customBossesOverride ?? []; }
 
+// --- collectables override -------------------------------------------------------
+// engine_Dev — character-story COLLECTABLES (note/letter/journal fragments the
+// player finds as loot). Uploaded as an array of stories; null = built-in.
+let collectablesOverride: unknown[] | null = null;
+export function setCollectablesOverride(rows: readonly unknown[] | null): void {
+  collectablesOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
+}
+export function hasCollectablesOverride(): boolean { return collectablesOverride != null; }
+export function getCollectablesOverride(): unknown[] | null { return collectablesOverride; }
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -624,6 +634,7 @@ export function clearAllOverrides(): void {
   customTitlesOverride = null;
   customMainQuestOverride = null;
   customBossesOverride = null;
+  collectablesOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------
