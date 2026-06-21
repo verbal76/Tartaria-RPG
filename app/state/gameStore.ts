@@ -4245,7 +4245,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const passingThrough = !!player.travelTarget
       && player.travelTarget.locationId !== player.currentLocationId;
     if (inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough) {
-      hubRoomId = hubEntryRoomId();
+      hubRoomId = hubEntryRoomId(player.factionId);
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
     const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, player.factionId) : null;
@@ -9950,7 +9950,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // and falls through to the gated/charged path.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
           const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited, player.factionId);
+          if (interiorMove && interiorMove.via === 'world') {
+            // engine_Dev — the room's "world" exit leaves the instance back onto
+            // the world map (uploaded starting areas). Same effect as an explicit
+            // leave command: clear the room, spend a travel beat, resume overland.
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
+            get().appendLog(
+              'world',
+              `You step out of ${hubNameForFaction(player.factionId)} and into the open ground. The complex falls away behind you.`,
+            );
+            get().beginScene({ skipHubEntry: true });
+            get().maybeAdvanceTutorial('move_north');
+            break;
+          }
           if (interiorMove) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
             const dest = hubRoomFor(interiorMove.roomId, player.factionId);

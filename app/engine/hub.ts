@@ -17,7 +17,13 @@
 import staticHubData from '../data/world/static_hub.json';
 import variantsData from '../data/world/hub_faction_variants.json';
 import factionsData from '../data/factions/factions.json';
-import { resolveTable } from './contentPack';
+import {
+  resolveTable,
+  startingAreaForFaction,
+  startingAreaAtLocation,
+  STARTING_AREA_WORLD_EXIT,
+  type StartingAreaRoom,
+} from './contentPack';
 
 export interface HubRoom {
   id: string;
@@ -60,12 +66,50 @@ const HUB_LOCATION_SET: ReadonlySet<string> = new Set(
   HUB.hubLocationIds ?? [HUB.hubLocationId],
 );
 
+// engine_Dev — uploaded STARTING-AREA interiors. When a re-skin uploads a
+// per-faction starting area, its rooms render as the walkable interior for that
+// faction's base INSTEAD of the built-in Tartaria hub layout. We map the lighter
+// StartingAreaRoom shape onto HubRoom so every hub consumer (rendering, travel,
+// search nouns, anchor NPC) works unchanged. The "world" exit sentinel is carried
+// through verbatim; resolveHubTravel surfaces it as a leave-the-instance signal.
+function mapStartingRoom(r: StartingAreaRoom): HubRoom {
+  const ex = r.exits ?? {};
+  return {
+    id: r.id,
+    name: r.name,
+    shortName: r.shortName ?? r.name,
+    description: r.description,
+    exits: {
+      north: ex.north ?? null,
+      south: ex.south ?? null,
+      east: ex.east ?? null,
+      west: ex.west ?? null,
+    },
+    anchorNpc: r.anchorNpc ?? null,
+    tags: [],
+    interactables: r.interactables,
+  };
+}
+
+/** The active room set for a faction: the uploaded starting-area rooms when one is
+ *  loaded for that faction, else the built-in hub layout. */
+function activeRooms(factionId: string | null | undefined): HubRoom[] {
+  const area = startingAreaForFaction(factionId);
+  if (area && Array.isArray(area.rooms) && area.rooms.length > 0) {
+    return area.rooms.map(mapStartingRoom);
+  }
+  return HUB.rooms;
+}
+
 /** True when the given location id is any faction's hub macro location.
  *  v2.4.1 (OTA 030) — was single-location (tartarian_outskirts only);
  *  now any of the 9 faction-start tiles renders the hub interior. */
 export function isHubLocation(locationId: string | null | undefined): boolean {
   if (!locationId) return false;
-  return HUB_LOCATION_SET.has(locationId);
+  if (HUB_LOCATION_SET.has(locationId)) return true;
+  // engine_Dev — a tile that an uploaded starting area is placed at is also a hub
+  // (interior) location, so the player drops into its rooms when standing there.
+  return startingAreaAtLocation(locationId) != null;
 }
 
 /** Display title for the hub minimap + opening narrative, scoped to
@@ -74,6 +118,9 @@ export function isHubLocation(locationId: string | null | undefined): boolean {
  *  faction hubs). */
 export function hubNameForFaction(factionId: string | null | undefined): string {
   const fallback = HUB.hubName;
+  // engine_Dev — an uploaded starting area names the base directly.
+  const area = startingAreaForFaction(factionId);
+  if (area?.name && area.name.trim()) return area.name.trim();
   if (!factionId) return fallback;
   // engine_Dev — the faction's own `baseName` (from the live Factions table) is
   // the lore-agnostic starter-complex title. A re-skin sets "Drydock 4 Command",
@@ -88,9 +135,12 @@ export function hubNameForFaction(factionId: string | null | undefined): string 
   return map[factionId] ?? fallback;
 }
 
-export function findHubRoom(roomId: string | null | undefined): HubRoom | null {
+export function findHubRoom(
+  roomId: string | null | undefined,
+  factionId?: string | null,
+): HubRoom | null {
   if (!roomId) return null;
-  return HUB.rooms.find((r) => r.id === roomId) ?? null;
+  return activeRooms(factionId).find((r) => r.id === roomId) ?? null;
 }
 
 // v2.4.1 (OTA 031) — per-faction room name + description overrides.
@@ -112,6 +162,10 @@ export function hubRoomFor(
   roomId: string | null | undefined,
   factionId: string | null | undefined,
 ): HubRoom | null {
+  // engine_Dev — an uploaded starting area is ground truth: its rooms already
+  // carry the author's strings, so the built-in faction-variant re-skin below
+  // doesn't apply.
+  if (startingAreaForFaction(factionId)) return findHubRoom(roomId, factionId);
   const base = findHubRoom(roomId);
   if (!base || !factionId) return base;
   const factionRooms = VARIANTS.factions?.[factionId];
@@ -131,8 +185,8 @@ export function hubRoomFor(
 
 /** Default entry-room id for the hub — the first room in the rooms[]
  *  list. By convention that's the Gate. */
-export function hubEntryRoomId(): string {
-  return HUB.rooms[0]?.id ?? '';
+export function hubEntryRoomId(factionId?: string | null): string {
+  return activeRooms(factionId)[0]?.id ?? '';
 }
 
 /** Resolve a player input against the current hub room's exits. Returns
@@ -147,22 +201,26 @@ export function resolveHubTravel(
   fromRoomId: string,
   rawInput: string,
   visitedRoomIds: ReadonlySet<string>,
-): { roomId: string; via: 'cardinal' | 'adjacent' | 'fast_travel' } | null {
-  const here = findHubRoom(fromRoomId);
+  factionId?: string | null,
+): { roomId: string; via: 'cardinal' | 'adjacent' | 'fast_travel' | 'world' } | null {
+  const rooms = activeRooms(factionId);
+  const here = findHubRoom(fromRoomId, factionId);
   if (!here) return null;
   const text = rawInput.toLowerCase();
-  // Cardinal first.
+  // Cardinal first. engine_Dev — a "world" exit value means leave the instance;
+  // surface it as a dedicated signal the caller turns into a leave.
   for (const dir of ['north', 'south', 'east', 'west'] as const) {
     if (new RegExp(`\\b${dir}\\b`).test(text)) {
       const target = here.exits[dir];
+      if (target === STARTING_AREA_WORLD_EXIT) return { roomId: STARTING_AREA_WORLD_EXIT, via: 'world' };
       if (target) return { roomId: target, via: 'cardinal' };
     }
   }
   // Adjacent named room (any exit).
   for (const dir of ['north', 'south', 'east', 'west'] as const) {
     const targetId = here.exits[dir];
-    if (!targetId) continue;
-    const room = findHubRoom(targetId);
+    if (!targetId || targetId === STARTING_AREA_WORLD_EXIT) continue;
+    const room = findHubRoom(targetId, factionId);
     if (!room) continue;
     if (
       text.includes(room.shortName.toLowerCase()) ||
@@ -173,7 +231,7 @@ export function resolveHubTravel(
     }
   }
   // Fast-travel — any room the player has already visited.
-  for (const room of HUB.rooms) {
+  for (const room of rooms) {
     if (room.id === fromRoomId) continue;
     if (!visitedRoomIds.has(room.id)) continue;
     if (

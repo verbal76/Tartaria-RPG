@@ -1021,9 +1021,10 @@ function StartingAreasBox() {
         <Text style={{ fontWeight: 'bold' }}>name</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>locationId</Text> (WHERE on the map to place it), and{' '}
         <Text style={{ fontWeight: 'bold' }}>rooms</Text> (a tiny graph — each exit points to another
-        room’s id or null; the first room is the entry). A member of that faction spawns inside it.
-        Note: placement + the list work now; the in-game room rendering for uploaded areas is being
-        wired. Hit TEMPLATE for a 4-room example, then SAVE/UPLOAD FILE if it gets long.
+        room’s id, null, or <Text style={{ fontWeight: 'bold' }}>"world"</Text> to leave to the map;
+        the first room is the entry). A member of that faction spawns inside it and walks room-to-room;
+        a "world" exit steps back out onto the map. Whispers can plant in a room by naming its room id.
+        Hit TEMPLATE for a 4-room example, then SAVE/UPLOAD FILE if it gets long.
       </Text>
       <TextInput
         style={styles.input}
