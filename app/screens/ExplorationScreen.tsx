@@ -1024,7 +1024,13 @@ export function ExplorationScreen() {
                 player.inventory.map((i) => i.name),
                 'climb_steep',
                 [findGearByName, findMaterialByName, findExplorationItemByName],
-              );
+              )
+                // engine_Dev — also count an item whose own tags mark it as rope/
+                // climbing gear (the generic tutorial/synth "Climbing Rope" isn't a
+                // catalog row), so the CLIMB button isn't falsely reddened.
+                || player.inventory.some(
+                  (i) => i.quantity > 0 && (i.tags ?? []).some((t) => /\b(rope|climb)\b/i.test(String(t))),
+                );
               const hasReclaimersRope = player.inventory.some(
                 (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
               );

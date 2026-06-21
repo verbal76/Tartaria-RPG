@@ -11348,7 +11348,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player.inventory.map((i: { name: string }) => i.name),
           'climb_steep',
           [fgbnC, fmbnC, feibC],
-        );
+        )
+          // engine_Dev — also accept any held item whose OWN tags mark it as
+          // rope/climbing gear, so a tutorial/synthesized/re-skin rope that isn't a
+          // catalog row (e.g. the generic "Climbing Rope") still enables the climb.
+          || player.inventory.some(
+            (i) => i.quantity > 0 && (i.tags ?? []).some((t) => /\b(rope|climb)\b/i.test(String(t))),
+          );
         // OTA 23-007 — rope is now HARD-REQUIRED for climbing. The
         // old DEX vs DC 12 fallback branch is gone: no rope = no
         // climb attempt at all, no stamina spent. The Arbiter

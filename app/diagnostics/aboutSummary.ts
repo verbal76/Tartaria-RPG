@@ -20,6 +20,7 @@ import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
+import { getGameTitle } from '../engine/contentPack';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
@@ -166,12 +167,16 @@ export interface StampLogOptions {
 
 export function stampLogExport(logBody: string, opts: StampLogOptions = {}): string {
   const { chunk, playerName } = opts;
+  // engine_Dev — the export is labeled with the GAME's name (renamed in the dev
+  // console), not the hardcoded "Tartaria". e.g. "THE PHILADELPHIA EXPERIMENT LOG".
+  const title = getGameTitle();
+  const logLabel = `${title.toUpperCase()} LOG`;
   const begin = chunk
-    ? `=== TARTARIA LOG · PART ${chunk.index} of ${chunk.total} · ${logBody.length} CHARS · BEGIN ===`
-    : `=== TARTARIA LOG · ${logBody.length} CHARS · BEGIN ===`;
+    ? `=== ${logLabel} · PART ${chunk.index} of ${chunk.total} · ${logBody.length} CHARS · BEGIN ===`
+    : `=== ${logLabel} · ${logBody.length} CHARS · BEGIN ===`;
   const end = chunk
     ? `=== END PART ${chunk.index} of ${chunk.total} ===`
     : `=== END LOG · ${logBody.length} CHARS ===`;
-  const header = playerName ? `Tartaria Realms · ${playerName}` : 'Tartaria Realms';
+  const header = playerName ? `${title} · ${playerName}` : title;
   return `${begin}\n${logBody}\n${end}\n\n${header}\n\n${buildBasicDeviceSummary()}\n`;
 }
