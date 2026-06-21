@@ -494,6 +494,7 @@ export function buildGameBundleTemplate(): string {
     '  //   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
     '  //   {title} / {game}                  -> your game title',
     '  //   {world} / {setting}               -> your world name (replaces "Tartaria")',
+    '  //   {corruption} / {plague}           -> your affliction name (replaces "Corruption")',
     '  // ============================================================',
   ].join('\n');
 
@@ -503,6 +504,7 @@ export function buildGameBundleTemplate(): string {
     bundleSection('tagline', 'One-line tagline under the title.', JSON.stringify('A world of your making.')),
     bundleSection('narrator', 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', JSON.stringify('Narrator')),
     bundleSection('worldName', 'Your world\'s proper noun. The built-in narration uses "Tartaria" in dozens of lines; set this and the engine swaps it everywhere the player reads it (also callable as the {world} token).', JSON.stringify('My World')),
+    bundleSection('corruptionName', 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', JSON.stringify('Corruption')),
   ];
 
   for (const b of LORE_BLOCKS) {

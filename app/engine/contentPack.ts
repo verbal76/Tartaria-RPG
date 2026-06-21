@@ -81,6 +81,9 @@ let crucibleEnabled = true;
 // swaps the literal so the leak never reaches the player. Default keeps the
 // built-in word so the Tartaria game itself is unchanged.
 let worldNameOverride: string | null = null;
+// engine_Dev — the CORRUPTION / affliction concept. Tartaria's "plague" is named
+// Corruption; a re-skin renames it (Phase-Sickness, Chronal Decay, Static-burn …).
+let corruptionNameOverride: string | null = null;
 
 /** Rename the game (or null to fall back to "Text RPG Engine"). */
 export function setGameTitleOverride(name: string | null): void {
@@ -147,6 +150,17 @@ export function setWorldNameOverride(name: string | null): void {
 }
 export function hasWorldNameOverride(): boolean { return worldNameOverride != null; }
 export function getWorldName(): string { return worldNameOverride ?? DEFAULT_WORLD_NAME; }
+
+/** engine_Dev — the CORRUPTION / affliction noun (default "Corruption"). A re-skin
+ *  renames the plague; appendLog swaps the word everywhere the player reads it. The
+ *  tier names (Tainted / Corrupted / Hollowed) can be remapped via world.termMap. */
+export const DEFAULT_CORRUPTION_NAME = 'Corruption';
+export function setCorruptionNameOverride(name: string | null): void {
+  const trimmed = typeof name === 'string' ? name.trim() : '';
+  corruptionNameOverride = trimmed.length > 0 ? trimmed : null;
+}
+export function hasCorruptionNameOverride(): boolean { return corruptionNameOverride != null; }
+export function getCorruptionName(): string { return corruptionNameOverride ?? DEFAULT_CORRUPTION_NAME; }
 
 /** engine_Dev — the ENERGY / "magic" concept of the world. The engine's built-in
  *  setting calls it "Aether" (energy), "Aetheric" (adjective), "Aetherstone"
@@ -241,6 +255,13 @@ export function dressBuiltInLeaks(text: string): string {
       .replace(/\bAetheric\b/g, e.adjective)
       .replace(/\bAether\b/g, e.name);
   }
+  // engine_Dev — the affliction noun. "corruption" / "Corruption" → the re-skin's
+  // name for its plague (Phase-Sickness, Chronal Decay, …). Case-preserving so a
+  // sentence-start "Corruption" stays capitalized.
+  if (hasCorruptionNameOverride()) {
+    const c = getCorruptionName();
+    out = out.replace(/\bCorruption\b/g, c).replace(/\bcorruption\b/g, c.toLowerCase());
+  }
   // engine_Dev — the CATCHALL term map. The author supplies world.termMap in the
   // World-lore block: { "Reclaimers": "operatives", "Aetherstone": "the Anomaly", … }.
   // Every key is rewritten to its value across ALL feed text (pools, one-off
@@ -312,7 +333,8 @@ export function fillContentPlaceholders(text: string): string {
     .replace(/\{(?:world|setting)\}/gi, getWorldName())
     .replace(/\{(?:energy|aether)\}/gi, getEnergyName())
     .replace(/\{(?:energy_adj|aetheric)\}/gi, getEnergyAdjective())
-    .replace(/\{(?:energy_material|aetherstone)\}/gi, getEnergyMaterial());
+    .replace(/\{(?:energy_material|aetherstone)\}/gi, getEnergyMaterial())
+    .replace(/\{(?:corruption|affliction|plague)\}/gi, getCorruptionName());
 }
 
 export function setTableOverride(id: ContentTableId, rows: readonly unknown[] | null): void {
@@ -530,7 +552,10 @@ export function getWorldVocabulary(): string {
  *  narrator's name so a rename flows into the narration the model generates. */
 export function getNarratorPersona(): string {
   const w = loreOverrides.world as { narrator?: unknown } | undefined;
-  if (w && typeof w.narrator === 'string' && w.narrator.trim().length > 0) return w.narrator.trim();
+  // engine_Dev — run the authored persona through the token filler so an author can
+  // write {narrator}/{world}/{energy}/{crucible} in it instead of hard-coding the
+  // chosen names (e.g. "You are {narrator}, a weary guide…").
+  if (w && typeof w.narrator === 'string' && w.narrator.trim().length > 0) return fillContentPlaceholders(w.narrator.trim());
   return `You are ${getNarratorName()}, the narrator of this world.`;
 }
 
@@ -562,6 +587,7 @@ export function clearAllOverrides(): void {
   crucibleNameOverride = null;
   crucibleEnabled = true;
   worldNameOverride = null;
+  corruptionNameOverride = null;
   customTitlesOverride = null;
 }
 

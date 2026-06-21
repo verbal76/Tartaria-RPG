@@ -29,10 +29,13 @@ import {
   hasCrucibleNameOverride,
   getWorldName,
   hasWorldNameOverride,
+  getCorruptionName,
+  hasCorruptionNameOverride,
   DEFAULT_NARRATOR_NAME,
   DEFAULT_GAME_TITLE,
   DEFAULT_CRUCIBLE_NAME,
   DEFAULT_WORLD_NAME,
+  DEFAULT_CORRUPTION_NAME,
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
@@ -155,6 +158,8 @@ function GameIdentitySection() {
   const setCrucibleEnabledFn = useContentPackStore((s) => s.setCrucibleEnabled);
   const worldName = useContentPackStore((s) => s.worldName);
   const setWorldName = useContentPackStore((s) => s.setWorldName);
+  const corruptionName = useContentPackStore((s) => s.corruptionName);
+  const setCorruptionName = useContentPackStore((s) => s.setCorruptionName);
   return (
     <>
       <Text style={styles.sectionLabel}>GAME</Text>
@@ -196,6 +201,18 @@ function GameIdentitySection() {
         autoCapitalize="words"
         maxLength={40}
         onSave={setWorldName}
+      />
+      <RenameBox
+        title="Corruption / affliction name"
+        hint="The plague mechanic the engine calls “Corruption” (the stat that builds up and penalizes you). Rename it for your world — Phase-Sickness, Chronal Decay, Static-burn — and the word is swapped everywhere the player reads it. In your JSON, write {corruption}. The tier names (Tainted / Corrupted / Hollowed) can be remapped in the World-lore termMap."
+        defaultLabel={DEFAULT_CORRUPTION_NAME}
+        active={getCorruptionName()}
+        isCustom={hasCorruptionNameOverride()}
+        initial={corruptionName}
+        placeholder={DEFAULT_CORRUPTION_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setCorruptionName}
       />
 
       <Text style={styles.sectionLabel}>NARRATOR</Text>
