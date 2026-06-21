@@ -186,6 +186,19 @@ export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): strin
         // still names gets rewritten to your word everywhere the player reads it
         // (pools, one-off lines, and dynamic text). Add a pair per residual term.
         termMap: { 'Reclaimers': 'REPLACE-with-your-faction-noun', 'Aetherstone': 'REPLACE-with-your-material' },
+        // engine_Dev — the ENERGY / "magic" concept. The engine calls it Aether /
+        // Aetheric / Aetherstone; set yours and the whole family is swapped
+        // everywhere (also the {energy} / {energy_adj} / {energy_material} tokens).
+        // slang + factionTerms let each faction name the SAME force differently.
+        energy: {
+          name: 'REPLACE-with-your-energy (e.g. The Fold)',
+          adjective: 'REPLACE (e.g. folded / anomalous)',
+          material: 'REPLACE (e.g. Fold-matter / Vril dust)',
+          verb: 'weave',
+          caster: 'Resonator',
+          slang: ['the Static', 'Vril', 'the Red Shift', 'Green Fog', 'Slip'],
+          factionTerms: { 'REPLACE-faction-id': 'Unified-Field Resonance' },
+        },
       },
       null,
       2,

@@ -148,6 +148,63 @@ export function setWorldNameOverride(name: string | null): void {
 export function hasWorldNameOverride(): boolean { return worldNameOverride != null; }
 export function getWorldName(): string { return worldNameOverride ?? DEFAULT_WORLD_NAME; }
 
+/** engine_Dev — the ENERGY / "magic" concept of the world. The engine's built-in
+ *  setting calls it "Aether" (energy), "Aetheric" (adjective), "Aetherstone"
+ *  (material). A re-skin defines its own in the World-lore block under `energy`:
+ *    "energy": {
+ *      "name": "The Fold",            // the energy itself (replaces "Aether")
+ *      "adjective": "folded",         // descriptor (replaces "Aetheric")
+ *      "material": "Fold-matter",     // its physical source (replaces "Aetherstone")
+ *      "verb": "weave",               // how a caster uses it ("weave the Fog")
+ *      "caster": "Resonator",         // what a caster is called (vs "mage")
+ *      "slang": ["the Static", "Vril", "the Red Shift", "Green Fog", "Slip"],
+ *      "factionTerms": { "onr": "Unified-Field Resonance", "ahnenerbe": "Vril" }
+ *    }
+ *  Lets different factions name the SAME anomalous energy differently. In a crime
+ *  game `name` could be "respect" or "power" with street slang in `slang`. */
+export interface EnergyConfig {
+  name: string;
+  adjective: string;
+  material: string;
+  verb?: string;
+  caster?: string;
+  slang: string[];
+  factionTerms: Record<string, string>;
+}
+const DEFAULT_ENERGY: EnergyConfig = {
+  name: 'Aether', adjective: 'Aetheric', material: 'Aetherstone', slang: [], factionTerms: {},
+};
+export function hasEnergyOverride(): boolean {
+  const w = loreOverrides.world as { energy?: unknown } | undefined;
+  return !!w && typeof w.energy === 'object' && w.energy !== null;
+}
+export function getEnergy(): EnergyConfig {
+  const w = loreOverrides.world as { energy?: Partial<EnergyConfig> } | undefined;
+  const e = w?.energy;
+  if (!e || typeof e !== 'object') return DEFAULT_ENERGY;
+  const str = (v: unknown, d: string): string => (typeof v === 'string' && v.trim() ? v.trim() : d);
+  return {
+    name: str(e.name, DEFAULT_ENERGY.name),
+    adjective: str(e.adjective, DEFAULT_ENERGY.adjective),
+    material: str(e.material, DEFAULT_ENERGY.material),
+    verb: typeof e.verb === 'string' ? e.verb.trim() : undefined,
+    caster: typeof e.caster === 'string' ? e.caster.trim() : undefined,
+    slang: Array.isArray(e.slang) ? e.slang.filter((s): s is string => typeof s === 'string' && s.trim().length > 0) : [],
+    factionTerms: e.factionTerms && typeof e.factionTerms === 'object' ? (e.factionTerms as Record<string, string>) : {},
+  };
+}
+export function getEnergyName(): string { return getEnergy().name; }
+export function getEnergyAdjective(): string { return getEnergy().adjective; }
+export function getEnergyMaterial(): string { return getEnergy().material; }
+export function getEnergySlang(): string[] { return getEnergy().slang; }
+/** The faction's own word for the energy → its factionTerms entry, else the
+ *  canonical name. Lets narration scoped to a faction use that faction's term. */
+export function energyTermForFaction(factionId?: string | null): string {
+  const e = getEnergy();
+  const t = factionId ? e.factionTerms[factionId] : undefined;
+  return t && t.trim() ? t : e.name;
+}
+
 /** engine_Dev — scrub built-in Tartaria leaks from a feed line. Runs in appendLog
  *  (every line passes through it) so the dozens of hard-coded template strings that
  *  name "Tartaria" or the role-words "the Arbiter" / "the Narrator" are rewritten
@@ -172,6 +229,18 @@ export function dressBuiltInLeaks(text: string): string {
     const w = getWorldName();
     out = out.replace(/\bTartarians\b/g, w).replace(/\bTartarian\b/g, w).replace(/\bTartaria\b/g, w);
   }
+  // engine_Dev — the ENERGY / "magic" concept. Built-in narration names it "Aether"
+  // (the energy), "Aetheric" (adjective) and "Aetherstone" (its material). A re-skin
+  // sets world.energy and the whole family is rewritten — so "the magic" reads as
+  // The Fold / Vril / the Static / broken physics instead of fantasy Aether. Gated
+  // on an override so the built-in game is unchanged; a re-skin that uploads its own
+  // materials won't have "Aetherstone <X>" items to desync against.
+  if (hasEnergyOverride()) {
+    const e = getEnergy();
+    out = out.replace(/\bAetherstone\b/g, e.material)
+      .replace(/\bAetheric\b/g, e.adjective)
+      .replace(/\bAether\b/g, e.name);
+  }
   // engine_Dev — the CATCHALL term map. The author supplies world.termMap in the
   // World-lore block: { "Reclaimers": "operatives", "Aetherstone": "the Anomaly", … }.
   // Every key is rewritten to its value across ALL feed text (pools, one-off
@@ -179,6 +248,9 @@ export function dressBuiltInLeaks(text: string): string {
   // flavor still names can be re-skinned from JSON without touching engine code.
   // Applied longest-key-first so multi-word terms win over their substrings.
   out = applyTermMap(out);
+  // engine_Dev — collapse a doubled article left by swapping a word into a name that
+  // itself starts with "the" (e.g. "the Aether" → "the The Fold" → "the Fold").
+  out = out.replace(/\b([Tt]he)\s+[Tt]he\b/g, '$1');
   return out;
 }
 
@@ -237,7 +309,10 @@ export function fillContentPlaceholders(text: string): string {
     .replace(/\{(?:narrator|arbiter|guide)\}/gi, getNarratorName())
     .replace(/\{(?:crucible|fuse|forge)\}/gi, getCrucibleName())
     .replace(/\{(?:title|game)\}/gi, getGameTitle())
-    .replace(/\{(?:world|setting)\}/gi, getWorldName());
+    .replace(/\{(?:world|setting)\}/gi, getWorldName())
+    .replace(/\{(?:energy|aether)\}/gi, getEnergyName())
+    .replace(/\{(?:energy_adj|aetheric)\}/gi, getEnergyAdjective())
+    .replace(/\{(?:energy_material|aetherstone)\}/gi, getEnergyMaterial());
 }
 
 export function setTableOverride(id: ContentTableId, rows: readonly unknown[] | null): void {
