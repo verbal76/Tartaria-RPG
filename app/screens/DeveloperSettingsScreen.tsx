@@ -853,21 +853,22 @@ function InteractionTagsBox() {
         </Text>
       </View>
       <Text style={styles.hint}>
-        Which interactable nouns each verb accepts. One object with keyword lists:{' '}
+        Tag each interactable in YOUR world with the verbs it accepts —{' '}
         <Text style={{ fontWeight: 'bold' }}>climbable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>swimmable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>breakable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>searchable</Text>,{' '}
-        <Text style={{ fontWeight: 'bold' }}>salvageable</Text>. Your words are ADDED to the built-in
-        generic set. Match is whole-word, so add the exact forms you use (e.g. both “scaffold” and
-        “scaffolding”). This is how you make “tank / u-boat / fuselage / pillbox” climbable. Hit
-        TEMPLATE for a WWII-flavored starter.
+        <Text style={{ fontWeight: 'bold' }}>salvageable</Text>. Tap{' '}
+        <Text style={{ fontWeight: 'bold' }}>↻ FROM LOCATIONS</Text> to pull every interactable from
+        your loaded Locations into a list, each pre-filled with a best-guess tag — edit the arrays
+        (e.g. add "climbable" to "rusted t-34 tank"), then LOAD. Hit ↻ again after changing your
+        locations to pull in new items (your existing tags are kept).
       </Text>
       <TextInput
         style={styles.input}
         value={text}
         onChangeText={setText}
-        placeholder="Paste your interaction-tags JSON object here…"
+        placeholder="Tap ↻ FROM LOCATIONS to build the taggable list…"
         placeholderTextColor="#5c5446"
         multiline
         autoCapitalize="none"
@@ -887,11 +888,18 @@ function InteractionTagsBox() {
         <TouchableOpacity
           style={styles.tmplBtn}
           onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(interactionTags, null, 2) : buildInteractionTagsTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current keywords — edit, then LOAD.' : 'Loaded the starter keywords — edit, then LOAD.' });
+            // Merge the author's existing tags (whatever's in the box, else the
+            // loaded override) with a fresh pull of all current interactables.
+            let current: Record<string, string[]> | undefined;
+            try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
+            if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
+            const built = buildInteractionTagsTemplate(current);
+            const count = Object.keys(JSON.parse(built)).length;
+            setText(built);
+            setStatus({ kind: 'ok', msg: `Pulled ${count} interactables from your locations — edit the tags, then LOAD.` });
           }}
         >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+          <Text style={styles.tmplBtnText}>↻ FROM LOCATIONS</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}

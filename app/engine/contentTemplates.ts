@@ -29,9 +29,11 @@ import {
   DEFAULT_WORLD_TONE,
   CONTENT_TABLES,
   LORE_BLOCKS,
+  resolveTable,
   type ContentTableId,
   type LoreBlockId,
 } from './contentPack';
+import { getInteractionTags } from './interactionTags';
 import { buildFlavorTemplate } from './narrativeGenerator';
 import { POWERS_TEMPLATE } from './powers';
 
@@ -206,18 +208,38 @@ export function buildWastelandTemplate(n = 3): string {
   return JSON.stringify(out, null, 2);
 }
 
-/** The Interaction-tags template — keyword lists that decide which interactable
- *  nouns each verb accepts. Your words are ADDED to the built-in generic set, so
- *  list the structures/surfaces specific to your world. A noun matches by whole
- *  word (so add the exact forms you use, e.g. both "scaffold" and "scaffolding"). */
-export function buildInteractionTagsTemplate(): string {
+/** A small keyword-form example of interaction tags, used inside the whole-game
+ *  template (so the bundle doesn't dump every noun). */
+export function interactionTagsKeywordSample(): string {
   return JSON.stringify({
-    climbable: ['tower', 'wall', 'ladder', 'scaffold', 'scaffolding', 'skyscraper', 'tank', 'u-boat', 'sub', 'hull', 'fuselage', 'wing', 'pillbox', 'dome', 'statue', 'antenna', 'dish', 'fence', 'railing', 'mast', 'crane', 'rigging', 'mound', 'rubble', 'deck', 'periscope', 'hedgehog', 'crater'],
-    swimmable: ['water', 'pool', 'sea', 'flood', 'canal', 'harbor', 'column'],
-    breakable: ['window', 'door', 'crate', 'glass', 'panel', 'hatch', 'lock'],
-    searchable: ['desk', 'cabinet', 'locker', 'crate', 'body', 'corpse', 'console', 'file', 'logbook', 'cabinet'],
-    salvageable: ['wreck', 'wreckage', 'tank', 'u-boat', 'engine', 'generator', 'machine', 'fuselage', 'hull', 'console'],
+    climbable: ['tower', 'wall', 'ladder', 'scaffolding', 'tank', 'u-boat', 'fuselage', 'pillbox', 'statue'],
+    swimmable: ['water', 'pool', 'sea', 'flood'],
+    breakable: ['window', 'door', 'crate', 'glass'],
+    searchable: ['desk', 'cabinet', 'body', 'logbook'],
+    salvageable: ['wreck', 'engine', 'generator', 'machine'],
   }, null, 2);
+}
+
+/** The Interaction-tags template — built from the LIVE locations' interactables.
+ *  Lists every unique interactable noun mapped to its tags, so the author tags
+ *  exactly the items in their world. Each noun is pre-filled with the engine's
+ *  current best guess (from the keyword matcher); the author edits the arrays.
+ *  Pass `current` (a prior per-noun map) to PRESERVE the author's edits while
+ *  pulling in any newly-added nouns — that's the "refresh" path. */
+export function buildInteractionTagsTemplate(current?: Record<string, string[]>): string {
+  const locs = resolveTable('locations', TABLE_ROWS.locations as unknown[]) as Array<{ interactables?: unknown }>;
+  const nouns = new Set<string>();
+  for (const l of locs) {
+    const list = (l as { interactables?: unknown }).interactables;
+    if (Array.isArray(list)) for (const n of list) if (typeof n === 'string' && n.trim()) nouns.add(n.trim());
+  }
+  const out: Record<string, string[]> = {};
+  for (const noun of [...nouns].sort((a, b) => a.localeCompare(b))) {
+    // Preserve the author's prior tags for this noun; else the engine's guess.
+    const prior = current?.[noun];
+    out[noun] = Array.isArray(prior) ? prior : [...getInteractionTags(noun)];
+  }
+  return JSON.stringify(out, null, 2);
 }
 
 /** The Hooks template — an illustrative example of the atmospheric-lead format.
@@ -341,8 +363,8 @@ export function buildGameBundleTemplate(): string {
   ));
   sections.push(bundleSection(
     'interactionTags',
-    'Keyword lists deciding which interactable nouns each verb accepts: { climbable, swimmable, breakable, searchable, salvageable }. Your words are ADDED to the built-in generic set; match is by whole word, so add the exact forms you use (e.g. "scaffold" AND "scaffolding"). This is how a re-skin makes "tank"/"u-boat"/"fuselage" climbable.',
-    buildInteractionTagsTemplate(),
+    'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.',
+    interactionTagsKeywordSample(),
   ));
   sections.push(bundleSection(
     'whispers',

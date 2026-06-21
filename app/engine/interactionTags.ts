@@ -156,12 +156,25 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
   const cached = TAG_CACHE.get(lower);
   if (cached) return cached;
   const tags = new Set<InteractionTag>();
-  // engine_Dev — merge the author's uploaded keyword additions with the built-in
-  // generic set per tag, so a re-skin's words (tank, u-boat, scaffolding…) classify.
+  // engine_Dev — uploaded interaction-tag override. The override object may carry
+  // BOTH forms: the 5 tag-name keys → keyword lists (added to the built-in set),
+  // and any OTHER key → an EXPLICIT per-noun tag list (exact match wins). The
+  // per-noun form is what the "tag your interactables" template produces.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ov = (require('./contentPack') as typeof import('./contentPack')).getInteractionTagsOverride();
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getInteractionTagsOverride() as Record<string, unknown> | null;
+  const TAG_NAMES = new Set<string>(['climbable', 'swimmable', 'breakable', 'searchable', 'salvageable']);
+  if (ov) {
+    // Explicit per-noun tags: a key equal to this noun that isn't a tag-name.
+    const explicit = ov[lower] ?? ov[noun.trim()];
+    if (Array.isArray(explicit)) {
+      for (const t of explicit) if (typeof t === 'string' && TAG_NAMES.has(t)) tags.add(t as InteractionTag);
+      TAG_CACHE.set(lower, tags);
+      return tags;
+    }
+  }
   for (const rule of TAG_RULES) {
-    const extra = ov?.[rule.tag as keyof typeof ov] ?? [];
+    const ovList = ov?.[rule.tag];
+    const extra: string[] = Array.isArray(ovList) ? ovList.filter((x): x is string => typeof x === 'string') : [];
     const patterns = extra.length > 0 ? [...rule.patterns, ...extra] : rule.patterns;
     for (const pat of patterns) {
       if (patternMatches(lower, pat)) {
