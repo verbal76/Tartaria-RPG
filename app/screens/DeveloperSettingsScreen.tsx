@@ -444,6 +444,9 @@ function GameBundleBox() {
         (world / faction / race / flavor), plus title / tagline / narrator. // and /* */ comments
         are allowed (the GAME TEMPLATE has a description on every section). Any section you omit
         keeps its built-in default. Loading this is the same as filling each box below by hand.
+        {' '}Use <Text style={{ fontWeight: 'bold' }}>UPLOAD FILE</Text> to pick a .json straight from
+        your device, or paste into the box and hit <Text style={{ fontWeight: 'bold' }}>UPLOAD ENTIRE
+        GAME (PASTE)</Text>.
       </Text>
       <TextInput
         style={styles.input}
@@ -464,7 +467,20 @@ function GameBundleBox() {
             if (r.ok) setText('');
           }}
         >
-          <Text style={styles.loadBtnText}>⬆ UPLOAD ENTIRE GAME</Text>
+          <Text style={styles.loadBtnText}>⬆ UPLOAD ENTIRE GAME (PASTE)</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => { void (async () => {
+            const picked = await pickJsonFile();
+            if (picked.canceled) { setStatus({ kind: 'err', msg: 'Upload cancelled — no file chosen.' }); return; }
+            if (!picked.ok || !picked.content) { setStatus({ kind: 'err', msg: picked.msg ?? 'Could not read that file.' }); return; }
+            const r = loadGameBundle(picked.content);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          })(); }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tmplBtn}
