@@ -206,7 +206,7 @@ function GameIdentitySection() {
       />
       <RenameBox
         title="Corruption / affliction name"
-        hint="The plague mechanic the engine calls “Corruption” (the stat that builds up and penalizes you). Rename it for your world — Phase-Sickness, Chronal Decay, Static-burn — and the word is swapped everywhere the player reads it. In your JSON, write {corruption}. The tier names (Tainted / Corrupted / Hollowed) can be remapped in the World-lore termMap."
+        hint="The plague mechanic the engine calls “Corruption” (the stat that builds up and penalizes you). Rename it for your world — Phase-Sickness, Chronal Decay, Static-burn — and the word + the player-sheet label + the threshold lines all use it. In your JSON, write {corruption}. Rename the three tiers in the World-lore block: corruptionTiers: { tainted, corrupted, hollowed }."
         defaultLabel={DEFAULT_CORRUPTION_NAME}
         active={getCorruptionName()}
         isCustom={hasCorruptionNameOverride()}

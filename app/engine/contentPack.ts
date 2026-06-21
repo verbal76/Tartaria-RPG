@@ -162,6 +162,18 @@ export function setCorruptionNameOverride(name: string | null): void {
 export function hasCorruptionNameOverride(): boolean { return corruptionNameOverride != null; }
 export function getCorruptionName(): string { return corruptionNameOverride ?? DEFAULT_CORRUPTION_NAME; }
 
+/** engine_Dev — the affliction TIER names. Built-in are Tainted / Corrupted /
+ *  Hollowed; a re-skin sets world.corruptionTiers: { tainted, corrupted, hollowed }
+ *  to its own (Phase-touched / Phase-sick / Phase-lost). Falls back to the
+ *  capitalized built-in id. */
+const DEFAULT_TIER_NAMES: Record<string, string> = { clean: 'Clean', tainted: 'Tainted', corrupted: 'Corrupted', hollowed: 'Hollowed' };
+export function getCorruptionTierName(tier: string): string {
+  const w = loreOverrides.world as { corruptionTiers?: Record<string, unknown> } | undefined;
+  const v = w?.corruptionTiers?.[tier];
+  if (typeof v === 'string' && v.trim()) return v.trim();
+  return DEFAULT_TIER_NAMES[tier] ?? (tier.charAt(0).toUpperCase() + tier.slice(1));
+}
+
 /** engine_Dev — the ENERGY / "magic" concept of the world. The engine's built-in
  *  setting calls it "Aether" (energy), "Aetheric" (adjective), "Aetherstone"
  *  (material). A re-skin defines its own in the World-lore block under `energy`:

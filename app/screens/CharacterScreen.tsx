@@ -5,7 +5,7 @@
 // its sources so the player can audit any surprising value.
 
 import React, { useState } from 'react';
-import { getNarratorName, hasCustomTitlesOverride } from '../engine/contentPack';
+import { getNarratorName, getCorruptionName, hasCustomTitlesOverride } from '../engine/contentPack';
 import { liveCustomTitles, TRACKABLE_VARS } from '../engine/customTitles';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
@@ -179,7 +179,7 @@ export function CharacterScreen() {
             <Text style={styles.kvValue}>{player.tc}</Text>
           </View>
           <View style={styles.kvRow}>
-            <Text style={styles.kvKey}>Corruption</Text>
+            <Text style={styles.kvKey}>{getCorruptionName()}</Text>
             <Text style={[styles.kvValue, tier === 'hollowed' && styles.danger, tier === 'corrupted' && styles.warning]}>
               {player.corruption} · {tierLabel(tier)}
             </Text>

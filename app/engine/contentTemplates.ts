@@ -188,6 +188,9 @@ export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): strin
         // still names gets rewritten to your word everywhere the player reads it
         // (pools, one-off lines, and dynamic text). Add a pair per residual term.
         termMap: { 'Reclaimers': 'REPLACE-with-your-faction-noun', 'Aetherstone': 'REPLACE-with-your-material' },
+        // engine_Dev — rename the CORRUPTION/affliction tiers (the noun itself is the
+        // top-level corruptionName / {corruption}). Built-in: Tainted/Corrupted/Hollowed.
+        corruptionTiers: { tainted: 'Phase-touched', corrupted: 'Phase-sick', hollowed: 'Phase-lost' },
         // engine_Dev — the ENERGY / "magic" concept. The engine calls it Aether /
         // Aetheric / Aetherstone; set yours and the whole family is swapped
         // everywhere (also the {energy} / {energy_adj} / {energy_material} tokens).

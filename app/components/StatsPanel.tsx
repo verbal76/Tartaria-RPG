@@ -6,6 +6,7 @@ import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
 import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
+import { getCorruptionName } from '../engine/contentPack';
 import { findFactionQuestById } from '../engine/factionQuests';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
@@ -243,7 +244,7 @@ export function StatsPanel({ player }: Props) {
         <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
-        <Stat label="Corr" value={`${player.corruption}`} />
+        <Stat label={getCorruptionName().slice(0, 4)} value={`${player.corruption}`} />
       </View>
       <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
