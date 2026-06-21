@@ -199,7 +199,8 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
  *  from your Enemies table. */
 export function buildWastelandTemplate(): string {
   return JSON.stringify({
-    _comment: "Travel encounters keyed by archetype id. type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in. Replace the REPLACE-... placeholders.",
+    _comment: "Travel encounters. This is a GROWABLE LIST: each top-level key is ONE encounter — add as many as you want (copy a block, give it a new key). type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in. weight = how often it's picked vs the others. Replace the REPLACE-... placeholders.",
+
     roadside_cache: {
       type: 'treasure',
       weight: 12,
@@ -212,6 +213,22 @@ export function buildWastelandTemplate(): string {
       ],
       lore_note: 'A note, half-legible: a direction, a warning, a name.',
     },
+
+    "_comment_2": "↑ encounter #1.  ↓ a SECOND encounter — same type is fine, just a different key, matchers, and loot.",
+
+    sunken_cache: {
+      type: 'treasure',
+      weight: 8,
+      matchers: ['REPLACE-with-a-different-region-tag', 'water', 'wreck'],
+      narration: 'A half-submerged wreck breaks the surface {direction} of you, cargo still strapped to the deck.',
+      loot: [
+        { name: 'Sealed Field Kit', weight: 30, min: 1, max: 1, kind: 'consumable', tags: ['medical', 'heal'], rarity: 'Uncommon', description: 'A watertight medical kit. Closes wounds the hard way.' },
+        { name: 'Pressure Plate', weight: 12, min: 1, max: 1, kind: 'armor', tags: ['armor'], rarity: 'Uncommon', description: 'A salvaged hull plate, barnacled but sound.', statBonuses: [{ stat: 'constitution', amount: 2 }], baseDurability: 40 },
+        { name: 'Tangled Wiring', weight: 28, min: 1, max: 3, kind: 'misc', tags: ['scrap'], rarity: 'Common', description: 'Copper worth pulling for the forge.' },
+      ],
+      lore_note: 'The water here refuses to lie flat.',
+    },
+
     wandering_stranger: {
       type: 'npc',
       weight: 10,
@@ -223,6 +240,7 @@ export function buildWastelandTemplate(): string {
       ],
       lore_note: "They won't say where they're headed.",
     },
+
     ambush: {
       type: 'skirmish',
       weight: 8,
