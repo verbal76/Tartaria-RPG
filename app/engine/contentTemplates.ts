@@ -139,6 +139,16 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
   // The Lore document + Powers ship their FULL set (not a 2-row sample) so the
   // author sees every section / power to edit.
   if (id === 'lore' || id === 'powers') return JSON.stringify(TABLE_ROWS[id], null, 2);
+  // engine_Dev — the Locations sample shows the optional map x / y (grid column /
+  // row) so authors know they can plot each place on the uploaded world map.
+  if (id === 'locations') {
+    const rows = TABLE_ROWS.locations.slice(0, n).map((row, i) => ({
+      ...(row as Record<string, unknown>),
+      x: (row as { x?: number }).x ?? (i + 1) * 3,
+      y: (row as { y?: number }).y ?? (i + 1) * 2,
+    }));
+    return JSON.stringify(rows, null, 2);
+  }
   return JSON.stringify(TABLE_ROWS[id].slice(0, n), null, 2);
 }
 
