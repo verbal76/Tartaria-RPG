@@ -43,7 +43,7 @@ import { useGameStore } from '../state/gameStore';
 // the existing LOCATIONS const; reused here for the Places list
 // panel so a player can tap any known location and start travel
 // without digging through Lore.
-import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor } from '../engine/worldMap';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, cellToAtlasFraction, canonicalCellFor, allKnownLocations } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
   cardinalOffsetFromAnchor,
@@ -110,10 +110,12 @@ function describeWhereabouts(locId: string, locs: Location[]): string {
   if (!here) return '';
   const region = REGION_DISPLAY[LOCATION_TO_MACRO[locId] ?? ''] ?? '';
   const near = locs
-    .filter((l) => l.id !== locId && l.discoverable !== false && LOCATION_ATLAS_COORDS[l.id])
-    .map((l) => {
-      const c = LOCATION_ATLAS_COORDS[l.id]!;
-      return { name: l.name, d: Math.hypot(c.fx - here.fx, c.fy - here.fy), dir: cardinalBetween(here, c) };
+    // engine_Dev — use the position fallback (atlasCoordForLocation), not just the
+    // Tartaria atlas table, so a re-skin's locations are eligible as neighbors.
+    .map((l) => ({ l, c: LOCATION_ATLAS_COORDS[l.id] ?? atlasCoordForLocation(l.id) }))
+    .filter(({ l, c }) => l.id !== locId && l.discoverable !== false && !!c)
+    .map(({ l, c }) => {
+      return { name: l.name, d: Math.hypot(c!.fx - here.fx, c!.fy - here.fy), dir: cardinalBetween(here, c!) };
     })
     .sort((a, b) => a.d - b.d)
     .slice(0, 3);
@@ -199,11 +201,14 @@ export function MapScreen() {
   // by danger ascending (safer trips first) so the easiest
   // destinations are visible without scrolling.
   const placesView = useMemo(() => {
-    const known = new Set(LOCATIONS.map((l) => l.id));
+    // engine_Dev — read the LIVE locations (uploaded override or built-in), not the
+    // hardcoded Tartaria locations.json, so the TRAVEL TO list shows the author's world.
+    const liveLocations = allKnownLocations();
+    const known = new Set(liveLocations.map((l) => l.id));
     const extras = (canonLocations ?? [])
       .filter((c) => !known.has(c.id))
       .map((c) => ({ id: c.id, name: c.name, type: c.type ?? 'site', danger: c.danger ?? 2 } as typeof LOCATIONS[number]));
-    const all = [...LOCATIONS, ...extras];
+    const all = [...liveLocations, ...extras];
     const here = player?.currentLocationId;
     return [...all].sort((a, b) => {
       if (a.id === here && b.id !== here) return -1;
@@ -518,7 +523,7 @@ export function MapScreen() {
   // hoisted safe* values are stable.
   const atlasPos = safeAtlasPos;
 
-  const currentLocation = LOCATIONS.find((l) => l.id === player.currentLocationId) ?? null;
+  const currentLocation = allKnownLocations().find((l) => l.id === player.currentLocationId) ?? null;
   const onDepictedTile = !!atlasCoordForLocation(player.currentLocationId);
 
   let dotStyle: { left: number; top: number } | null = null;
@@ -654,7 +659,7 @@ export function MapScreen() {
   // we describe the region + the nearest drawn landmarks.
   const whereaboutsLine = inHub
     ? `Inside the ${hubNameForFaction(player?.factionId)} — a fixed outpost interior.`
-    : describeWhereabouts(player.currentLocationId, LOCATIONS);
+    : describeWhereabouts(player.currentLocationId, allKnownLocations());
 
   return (
     <View style={styles.container}>
