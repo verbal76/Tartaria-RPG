@@ -12,7 +12,15 @@ import type {
 } from './types';
 import { pick, chance, rotatingPick } from './rng';
 import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride } from './contentPack';
-import { GENERIC_VARIANTS as INVESTIGATE_GENERIC, CREEPY_VARIANTS as INVESTIGATE_CREEPY } from './investigationTable';
+import { GENERIC_VARIANTS as INVESTIGATE_GENERIC, CREEPY_VARIANTS as INVESTIGATE_CREEPY, INVESTIGATE_LORE_DEFAULT } from './investigationTable';
+import {
+  NOTHING_LINES as SEARCH_NOTHING,
+  MATERIAL_LINES as SEARCH_MATERIAL,
+  TC_LINES as SEARCH_TC,
+  HOOK_LINES as SEARCH_HOOK,
+  COOL_STORIES,
+  DIRECTIONAL_FINDS,
+} from './areaSearch';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
 // lazy-loaded via require() inside getter functions below. Combined
@@ -1449,6 +1457,14 @@ export const BUILTIN_FLAVOR_POOLS = {
   // what the player reads when they investigate an object and it yields nothing).
   investigateGeneric: INVESTIGATE_GENERIC,
   investigateCreepy: INVESTIGATE_CREEPY,
+  investigateLore: INVESTIGATE_LORE_DEFAULT,
+  // engine_Dev — area-search / investigate ambience (lore-neutral defaults).
+  searchNothing: SEARCH_NOTHING,
+  searchMaterial: SEARCH_MATERIAL,
+  searchTc: SEARCH_TC,
+  searchHook: SEARCH_HOOK,
+  coolStories: COOL_STORIES,
+  directionalFinds: DIRECTIONAL_FINDS,
 } as const;
 
 /** A trimmed starter object for the Narration-flavor upload box: every pool key,
@@ -1457,15 +1473,25 @@ export const BUILTIN_FLAVOR_POOLS = {
 export function buildFlavorTemplate(n = 2): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, val] of Object.entries(BUILTIN_FLAVOR_POOLS)) {
-    if (Array.isArray(val)) {
-      out[key] = (val as string[]).slice(0, n);
-    } else {
-      const rec: Record<string, string[]> = {};
-      for (const [k, lines] of Object.entries(val as Record<string, string[]>).slice(0, n)) {
-        rec[k] = (lines as string[]).slice(0, n);
-      }
-      out[key] = rec;
-    }
+    out[key] = trimFlavorValue(val, n);
   }
   return out;
+}
+
+/** engine_Dev — shape-agnostic trim for the flavor template. A pool value can be
+ *  a string, a string[] (line pool), or a record of category -> string | string[].
+ *  Every shape is handled so EVERY pool key surfaces in the template (no orphan
+ *  pools the author can't see/override), and strings are never sliced into
+ *  fragments. */
+function trimFlavorValue(val: unknown, n: number): unknown {
+  if (typeof val === 'string') return val;
+  if (Array.isArray(val)) return (val as string[]).slice(0, n);
+  if (val && typeof val === 'object') {
+    const rec: Record<string, unknown> = {};
+    for (const [k, sub] of Object.entries(val as Record<string, unknown>).slice(0, n)) {
+      rec[k] = trimFlavorValue(sub, n);
+    }
+    return rec;
+  }
+  return val;
 }
