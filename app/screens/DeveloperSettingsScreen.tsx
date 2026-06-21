@@ -42,7 +42,7 @@ import {
 import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
-import { BOSS_SPAWN_CONDITIONS, type CustomBoss } from '../engine/customBosses';
+import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -1330,7 +1330,7 @@ function BossesBox() {
   const locations = mainQuestLocations();
   const [status, setStatus] = useState<Status>(null);
   const [text, setText] = useState('');
-  const [f, setF] = useState({ name: '', factionId: '', hp: '', attack: '', damage: '', ac: '', abilityPoint: '', drops: '', questItem: '', spawnLocationId: '', spawnCondition: 'main_quest' });
+  const [f, setF] = useState({ name: '', factionId: '', hp: '', attack: '', damage: '', ac: '', abilityPoint: '', drops: '', questItem: '', spawnLocationId: '', spawnCondition: 'main_quest', spawnChance: '' });
   const up = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
 
   const add = () => {
@@ -1345,9 +1345,11 @@ function BossesBox() {
       ...(f.factionId ? { factionId: f.factionId } : {}),
       ...(f.drops.trim() ? { drops: f.drops.split(',').map((d) => d.trim()).filter(Boolean) } : {}),
       ...(f.questItem.trim() ? { questItem: f.questItem.trim() } : {}),
-      ...(f.spawnLocationId ? { spawnLocationId: f.spawnLocationId } : {}),
+      ...(f.spawnCondition !== 'random' && f.spawnLocationId ? { spawnLocationId: f.spawnLocationId } : {}),
+      ...(f.spawnCondition === 'random' && Number(f.spawnChance) ? { spawnChance: Number(f.spawnChance) } : {}),
       spawnCondition: f.spawnCondition,
     };
+    if (f.spawnCondition !== 'random' && !f.spawnLocationId) { setStatus({ kind: 'err', msg: 'Pick a spawn location (or switch to Random spawn).' }); return; }
     const next = [...customBosses.filter((b) => b.id !== id), boss];
     setBosses(next);
     setStatus({ kind: 'ok', msg: `Boss saved: ${boss.name} (${next.length} total).` });
@@ -1402,8 +1404,11 @@ function BossesBox() {
         <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.drops} onChangeText={(v) => up('drops', v)} placeholder="Other drops (comma-sep)" placeholderTextColor="#5c5446" />
       </View>
       {factions.length > 0 && chipRow('Faction affiliation:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))}
-      {chipRow('Spawn location:', locations, f.spawnLocationId, (id) => up('spawnLocationId', id))}
-      {chipRow('Spawn condition:', BOSS_SPAWN_CONDITIONS.map((c) => ({ id: c.id, name: c.label })), f.spawnCondition, (id) => up('spawnCondition', id))}
+      {chipRow('Spawn mode:', BOSS_SPAWN_CONDITIONS.map((c) => ({ id: c.id, name: c.label })), f.spawnCondition, (id) => up('spawnCondition', id))}
+      {f.spawnCondition !== 'random' && chipRow('Spawn location:', locations, f.spawnLocationId, (id) => up('spawnLocationId', id))}
+      {f.spawnCondition === 'random' && (
+        <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.spawnChance} onChangeText={(v) => up('spawnChance', v)} placeholder="Random spawn chance % (e.g. 8)" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      )}
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={add}><Text style={styles.loadBtnText}>+ SAVE BOSS</Text></TouchableOpacity>
       </View>
@@ -1433,14 +1438,25 @@ function MainQuestBox() {
   const [bTarget, setBTarget] = useState('');
   const [bLoc, setBLoc] = useState<string>('');
   const [bReward, setBReward] = useState('');
+  const [bBoss, setBBoss] = useState<string>('');
   const [text, setText] = useState('');
+  const questBosses = mainQuestBosses();
 
   const actionDef = MAIN_QUEST_ACTIONS.find((a) => a.id === bAction);
+  const isKill = bAction === 'kill';
+  // Picking a boss auto-fills the target (its name), the location (its spawn tile),
+  // and the reward (its quest item) so a kill step lines up with the boss.
+  const pickBoss = (id: string) => {
+    const b = questBosses.find((x) => x.id === id);
+    setBBoss(id);
+    if (b) { setBTarget(b.name); if (b.spawnLocationId) setBLoc(b.spawnLocationId); if (b.questItem) setBReward(b.questItem); }
+  };
   const save = (next: { title?: string; steps: MainQuestStep[] }, msg: string) => {
     setMainQuest(next.steps.length > 0 ? next : null);
     setStatus({ kind: 'ok', msg });
   };
   const addStep = () => {
+    if (isKill && !bBoss) { setStatus({ kind: 'err', msg: 'Pick the boss this step requires (add one in the BOSSES box first).' }); return; }
     if (actionDef?.needsTarget && !bTarget.trim()) { setStatus({ kind: 'err', msg: `“${actionDef.label}” needs a target.` }); return; }
     if (!bLoc) { setStatus({ kind: 'err', msg: 'Pick a location.' }); return; }
     const step: MainQuestStep = {
@@ -1449,9 +1465,10 @@ function MainQuestBox() {
       ...(actionDef?.needsTarget ? { target: bTarget.trim() } : {}),
       locationId: bLoc,
       ...(bReward.trim() ? { reward: bReward.trim() } : {}),
+      ...(isKill && bBoss ? { bossId: bBoss } : {}),
     };
     save({ title: qTitle.trim() || undefined, steps: [...steps, step] }, `Step added: ${describeStep(step)}`);
-    setBTarget(''); setBReward('');
+    setBTarget(''); setBReward(''); setBBoss('');
   };
 
   return (
@@ -1496,12 +1513,28 @@ function MainQuestBox() {
           </TouchableOpacity>
         ))}
       </View>
-      {actionDef?.needsTarget && (
+      {isKill && (
+        questBosses.length === 0 ? (
+          <Text style={styles.err}>Add a main-quest boss in the BOSSES box first — a kill step has to point at one.</Text>
+        ) : (
+          <>
+            <Text style={styles.hint}>Boss (main-quest bosses only):</Text>
+            <View style={[styles.row, { flexWrap: 'wrap' }]}>
+              {questBosses.map((b) => (
+                <TouchableOpacity key={b.id} style={[styles.tmplBtn, bBoss === b.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => pickBoss(b.id)}>
+                  <Text style={bBoss === b.id ? styles.loadBtnText : styles.tmplBtnText}>{bBoss === b.id ? '☑ ' : '☐ '}{b.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )
+      )}
+      {actionDef?.needsTarget && !isKill && (
         <TextInput
           style={[styles.input, { minHeight: 0, height: 40 }]}
           value={bTarget}
           onChangeText={setBTarget}
-          placeholder="Target (e.g. a boss, the dog tags, an officer)"
+          placeholder="Target (e.g. the dog tags, an officer)"
           placeholderTextColor="#5c5446"
         />
       )}

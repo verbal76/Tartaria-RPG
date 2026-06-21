@@ -4409,11 +4409,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // boss at THIS location, the boss takes the encounter slot (overrides the random
     // roll) so the objective and the fight line up. Suppressed scenes (hub interior,
     // tutorial) don't spawn it. The boss's loot already carries the quest item.
-    {
+    if (!suppressEncounter) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { questBossEnemyAt } = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
-      const questBoss = !suppressEncounter ? questBossEnemyAt(player, location.id) : null;
-      if (questBoss) encounter = [questBoss];
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { fixedLocationBossEnemyAt, rollRandomBoss } = require('../engine/customBosses') as typeof import('../engine/customBosses');
+      const questBoss = questBossEnemyAt(player, location.id);          // main_quest mode
+      const fixedBoss = !questBoss ? fixedLocationBossEnemyAt(location.id) : null; // location mode
+      const randomBoss = (!questBoss && !fixedBoss && encounter.length === 0) ? rollRandomBoss() : null; // random mode
+      const boss = questBoss ?? fixedBoss ?? randomBoss;
+      if (boss) encounter = [boss as unknown as Enemy];
     }
     const enemies: Enemy[] = encounter;
     const enemyHps: number[] = enemies.map((e) => e.hp);

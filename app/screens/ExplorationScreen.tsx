@@ -609,6 +609,31 @@ export function ExplorationScreen() {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { phaseHint, LOST_CAPITAL_LOCATIONS: capitals, coreGateNextAction } = require('../engine/mainQuest');
         let mainLine: string;
+        // engine_Dev — a DATA-DRIVEN main quest (uploaded) takes the chip when one
+        // is loaded, showing its current objective the same way Tartaria's does.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { liveMainQuest } = require('../engine/customMainQuest');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { currentObjectiveLine, questIsComplete } = require('../engine/customMainQuestEngine');
+        const customQ = liveMainQuest();
+        if (customQ) {
+          const objLine = questIsComplete(player)
+            ? `${customQ.title ?? 'Main quest'} — complete.`
+            : (currentObjectiveLine(player) ?? 'No active objective.');
+          return (
+            <TutorialTarget area="objective-chip">
+              <View style={styles.objectiveChip}>
+                <View style={styles.objectiveChipRow}>
+                  <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={2}>
+                    <Text style={styles.objectiveChipStar}>★ </Text>
+                    <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
+                    {objLine}
+                  </Text>
+                </View>
+              </View>
+            </TutorialTarget>
+          );
+        }
         // OTA-154 — atUnrecovered flag also drives the SUMMON chip on
         // the right edge of the home-screen MAIN QUEST card. Player
         // asked to skip the bounce through Contracts: "I want to be
