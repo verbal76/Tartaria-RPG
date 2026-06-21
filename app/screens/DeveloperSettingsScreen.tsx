@@ -277,28 +277,36 @@ function MapsSection() {
         )}
       </View>
 
-      {/* World size */}
+      {/* World grid size */}
       <Text style={[styles.hint, { marginTop: 10 }]}>
-        World size (width × height). Plot each location by adding "x" and "y" fields to its row in
-        the Locations table, in this coordinate space (0,0 = top-left).
+        Grid size. WIDTH = number of columns (left→right), HEIGHT = number of rows (top→bottom). The
+        map screen draws this grid (over your map if one is uploaded, or on its own if not) and
+        plots each location’s number in its square. Give each location a "x" (column, 1…width) and
+        "y" (row, 1…height) field in the Locations table; (1,1) is the top-left square.
       </Text>
       <View style={styles.row}>
-        <TextInput
-          style={[styles.input, { flex: 1, minHeight: 0 }]}
-          value={w}
-          onChangeText={setW}
-          placeholder="width"
-          placeholderTextColor="#5c5446"
-          keyboardType="number-pad"
-        />
-        <TextInput
-          style={[styles.input, { flex: 1, minHeight: 0 }]}
-          value={h}
-          onChangeText={setH}
-          placeholder="height"
-          placeholderTextColor="#5c5446"
-          keyboardType="number-pad"
-        />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.specLine}>WIDTH (columns)</Text>
+          <TextInput
+            style={[styles.input, { minHeight: 0 }]}
+            value={w}
+            onChangeText={setW}
+            placeholder="columns"
+            placeholderTextColor="#5c5446"
+            keyboardType="number-pad"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.specLine}>HEIGHT (rows)</Text>
+          <TextInput
+            style={[styles.input, { minHeight: 0 }]}
+            value={h}
+            onChangeText={setH}
+            placeholder="rows"
+            placeholderTextColor="#5c5446"
+            keyboardType="number-pad"
+          />
+        </View>
         <TouchableOpacity
           style={styles.tmplBtn}
           onPress={() => {

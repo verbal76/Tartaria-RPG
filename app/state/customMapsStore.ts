@@ -16,8 +16,8 @@ const MAPS_DIR = (FileSystem.documentDirectory ?? '') + 'engine-maps/';
 
 /** Default coordinate space when the author hasn't set one. Location pins are
  *  plotted at (location.x / worldWidth, location.y / worldHeight). */
-export const DEFAULT_WORLD_W = 100;
-export const DEFAULT_WORLD_H = 100;
+export const DEFAULT_WORLD_W = 20;
+export const DEFAULT_WORLD_H = 20;
 
 export interface MapAddResult {
   ok: boolean;

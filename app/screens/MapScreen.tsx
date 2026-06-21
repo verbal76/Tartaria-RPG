@@ -212,6 +212,15 @@ export function MapScreen() {
     });
   }, [player?.currentLocationId, canonLocations]);
 
+  // engine_Dev — a STABLE number per named location (sorted by name, so the number
+  // never shifts as the travel list re-sorts). The map plots this number in the
+  // location's grid square, and the TRAVEL TO rows show "N. <name>" to match.
+  const locNumberById = useMemo(() => {
+    const m = new Map<string, number>();
+    [...placesView].sort((a, b) => a.name.localeCompare(b.name)).forEach((l, i) => m.set(l.id, i + 1));
+    return m;
+  }, [placesView]);
+
   // arb99 — ascending numbers for the "?" places (unrevealed hidden locations +
   // pending grid events). Only assigned when more than one "?" exists, so a single
   // unknown stays a plain "?". The map overlay AND the travel rows read this map,
@@ -330,7 +339,9 @@ export function MapScreen() {
   const mapUri = factionMapUri ?? uploadedWorldMap ?? null;
   const showingOutpost = !!factionMapUri;
   const mapSource = mapUri ? { uri: mapUri } : null;
-  const mapAspect = uploadedAspect ?? (ATLAS_W / ATLAS_H);
+  // With a map: its natural aspect. Without: the GRID's aspect (cols/rows) so the
+  // standalone grid is the right shape.
+  const mapAspect = mapUri ? (uploadedAspect ?? (ATLAS_W / ATLAS_H)) : (worldW / Math.max(1, worldH));
   // Re-measure the natural aspect whenever the shown image changes.
   useEffect(() => {
     setUploadedAspect(null);
@@ -558,7 +569,9 @@ export function MapScreen() {
   // engine_Dev — author-plotted location pins. Any location whose row carries
   // numeric x/y (in the world's coordinate size) is dotted on the uploaded map at
   // (x/worldW, y/worldH). The current location is highlighted.
-  const locationPinStyles: { id: string; name: string; left: number; top: number; here: boolean }[] = [];
+  const locationPinStyles: { id: string; num: number; left: number; top: number; here: boolean }[] = [];
+  // engine_Dev — grid line rects (vertical + horizontal) across the map rect.
+  const gridLineStyles: { key: string; left: number; top: number; width: number; height: number }[] = [];
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -601,19 +614,30 @@ export function MapScreen() {
       left: offsetX + renderedW * atlasPos.fx - MARKER_W / 2,
       top: offsetY + renderedH * atlasPos.fy - MARKER_H / 2,
     };
-    // engine_Dev — plot author-coord location pins on the (uploaded) world map.
-    // Only on the world view (a faction's interior map uses its own space). A
-    // location needs numeric x/y in the world size to be plotted.
+    // engine_Dev — GRID lines across the map rect (cols = worldW, rows = worldH).
+    // Drawn over the uploaded map, or on its own as the backdrop when none. Capped
+    // so a huge grid doesn't spawn thousands of line views.
+    if (!showingOutpost && worldW <= 60 && worldH <= 60) {
+      for (let c = 0; c <= worldW; c++) {
+        gridLineStyles.push({ key: `v${c}`, left: offsetX + (renderedW * c) / worldW, top: offsetY, width: 1, height: renderedH });
+      }
+      for (let r = 0; r <= worldH; r++) {
+        gridLineStyles.push({ key: `h${r}`, left: offsetX, top: offsetY + (renderedH * r) / worldH, width: renderedW, height: 1 });
+      }
+    }
+    // engine_Dev — plot each location's NUMBER in its grid square. A location needs
+    // x (column, 1…worldW) and y (row, 1…worldH); the number sits at the cell centre.
     if (!showingOutpost) {
       for (const loc of placesView) {
         const lx = (loc as { x?: number }).x;
         const ly = (loc as { y?: number }).y;
         if (typeof lx !== 'number' || typeof ly !== 'number') continue;
-        const fx = Math.max(0, Math.min(1, lx / worldW));
-        const fy = Math.max(0, Math.min(1, ly / worldH));
+        // 1-based cell → centre fraction.
+        const fx = Math.max(0, Math.min(1, (lx - 0.5) / worldW));
+        const fy = Math.max(0, Math.min(1, (ly - 0.5) / worldH));
         locationPinStyles.push({
           id: loc.id,
-          name: loc.name,
+          num: locNumberById.get(loc.id) ?? 0,
           left: offsetX + renderedW * fx,
           top: offsetY + renderedH * fy,
           here: loc.id === player?.currentLocationId,
@@ -698,6 +722,31 @@ export function MapScreen() {
     ? `Inside the ${hubNameForFaction(player?.factionId)} — a fixed outpost interior.`
     : describeWhereabouts(player.currentLocationId, allKnownLocations());
 
+  // engine_Dev — current location's number + the nearest OTHER named location by
+  // grid distance (uses the authored x/y), so "where you are" reads relative to a
+  // landmark on the grid.
+  const currentNum = currentLocation ? locNumberById.get(currentLocation.id) : undefined;
+  const hereLabel = currentLocation
+    ? `${currentNum ? `${currentNum}. ` : ''}${currentLocation.name}`
+    : whereLine;
+  let nearestRef: string | null = null;
+  {
+    const cx = (currentLocation as { x?: number } | null)?.x;
+    const cy = (currentLocation as { y?: number } | null)?.y;
+    if (typeof cx === 'number' && typeof cy === 'number') {
+      let best: { name: string; num?: number; d: number } | null = null;
+      for (const l of placesView) {
+        if (l.id === currentLocation?.id) continue;
+        const lx = (l as { x?: number }).x;
+        const ly = (l as { y?: number }).y;
+        if (typeof lx !== 'number' || typeof ly !== 'number') continue;
+        const d = Math.hypot(lx - cx, ly - cy);
+        if (!best || d < best.d) best = { name: l.name, num: locNumberById.get(l.id), d };
+      }
+      if (best) nearestRef = `Nearest landmark: ${best.num ? `${best.num}. ` : ''}${best.name} (${best.d.toFixed(1)} squares away).`;
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -734,16 +783,18 @@ export function MapScreen() {
             { transform: [{ translateX }, { translateY }, { scale }] },
           ]}
         >
-          {mapSource ? (
+          {mapSource && (
             <Image
               source={mapSource}
               style={styles.atlas}
               resizeMode="contain"
             />
-          ) : (
-            // engine_Dev — no uploaded map → neutral grid backdrop.
-            <View style={[styles.atlas, styles.neutralMap]} />
           )}
+          {/* engine_Dev — coordinate grid: drawn over the map, or on its own (on the
+              dark image box) when no map is uploaded. */}
+          {gridLineStyles.map((g) => (
+            <View key={g.key} pointerEvents="none" style={[styles.gridLine, { left: g.left, top: g.top, width: g.width, height: g.height }]} />
+          ))}
           {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
               art, so this overlay both marks it and explains the blank: a
               stylized "?" pinned to its fixed coord (right of the frontier camps,
@@ -789,12 +840,14 @@ export function MapScreen() {
               <Text style={[styles.contractPin, markerFont]}>{m.label}</Text>
             </View>
           ))}
-          {/* engine_Dev — author-coord location pins (a dot + name; the current
-              location glows). Plotted from each location's x/y in the world size. */}
+          {/* engine_Dev — numbered location pins: each location's stable number sits
+              in its grid square; the current location glows. The number matches the
+              "N. <name>" row in the TRAVEL TO list below. */}
           {locationPinStyles.map((p) => (
             <View key={p.id} pointerEvents="none" style={[styles.locPinWrap, { left: p.left, top: p.top }]}>
-              <View style={[styles.locPinDot, p.here && styles.locPinDotHere]} />
-              <Text style={[styles.locPinLabel, markerFont, p.here && styles.locPinLabelHere]} numberOfLines={1}>{p.name}</Text>
+              <View style={[styles.locNumBadge, p.here && styles.locNumBadgeHere]}>
+                <Text style={[styles.locNumText, markerFont, p.here && styles.locNumTextHere]}>{p.num}</Text>
+              </View>
             </View>
           ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
@@ -811,8 +864,10 @@ export function MapScreen() {
 
       <View style={styles.footer}>
         <Text style={styles.footerHere}>WHERE YOU ARE</Text>
-        <Text style={styles.footerWhere}>{whereLine}</Text>
-        {whereaboutsLine ? (
+        <Text style={styles.footerWhere}>{hereLabel}</Text>
+        {nearestRef ? (
+          <Text style={styles.footerNear}>{nearestRef}</Text>
+        ) : whereaboutsLine ? (
           <Text style={styles.footerNear}>{whereaboutsLine}</Text>
         ) : null}
         <Text style={styles.footerDist}>
@@ -946,9 +1001,12 @@ export function MapScreen() {
             // matching number so the route block reads the same mark as the atlas
             // ("2?" on the map → "2?" / "2?  Label" in the list).
             const qNum = questionNumbers[p.id];
+            // engine_Dev — lead the row with the location's stable map number so the
+            // list matches the numbered pin on the grid.
+            const locNum = locNumberById.get(p.id);
             const numberedName = qNum
               ? (rowName === '?' ? `${qNum}?` : `${qNum}?  ${rowName}`)
-              : rowName;
+              : (locNum ? `${locNum}. ${rowName}` : rowName);
             return (
               <TouchableOpacity
                 key={p.id}
@@ -1070,44 +1128,38 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  // engine_Dev — neutral backdrop when no map is uploaded.
-  neutralMap: {
-    backgroundColor: '#14110d',
-    borderWidth: 1,
-    borderColor: '#2a241b',
+  // engine_Dev — coordinate grid line (thin, semi-transparent).
+  gridLine: {
+    position: 'absolute',
+    backgroundColor: 'rgba(201,168,106,0.28)',
   },
-  // engine_Dev — author-coord location pin (dot + label), centered on the point.
+  // engine_Dev — numbered location pin, centered on its grid-square centre.
   locPinWrap: {
     position: 'absolute',
-    alignItems: 'center',
-    marginLeft: -4,
-    marginTop: -4,
+    marginLeft: -7,
+    marginTop: -7,
   },
-  locPinDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  locNumBadge: {
+    minWidth: 14,
+    height: 14,
+    paddingHorizontal: 2,
+    borderRadius: 7,
     backgroundColor: '#c9a86a',
     borderWidth: 1,
     borderColor: '#0b0a09',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  locPinDotHere: {
+  locNumBadgeHere: {
     backgroundColor: '#7fd1ff',
-    width: 11,
-    height: 11,
-    borderRadius: 6,
   },
-  locPinLabel: {
-    color: '#e6dcc2',
-    fontSize: 7,
-    marginTop: 1,
-    textShadowColor: 'rgba(0,0,0,0.95)',
-    textShadowRadius: 3,
-    maxWidth: 80,
-  },
-  locPinLabelHere: {
-    color: '#bfe6ff',
+  locNumText: {
+    color: '#0b0a09',
+    fontSize: 8,
     fontWeight: '700',
+  },
+  locNumTextHere: {
+    color: '#04223a',
   },
   // OTA 057 — silhouette player marker. The wrapper handles the
   // inverse-scale; the image inside fills the wrapper. Marker size
