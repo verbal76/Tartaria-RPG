@@ -11,7 +11,7 @@
 
 import type { Rarity } from './types';
 import materialsData from '../data/items/materials.json';
-import { resolveTable, hasTableOverride } from './contentPack';
+import { resolveTable, hasTableOverride, getWastelandOverride, getCustomBosses, getCustomMainQuest } from './contentPack';
 
 // arb61 — salvage yields MATERIALS ONLY (player verb-economy: take = gear,
 // salvage = materials, investigate = clues/hooks). The hand-authored pools
@@ -63,6 +63,46 @@ function finalizeMaterial(name: string, rarity: Rarity, rng: () => number): { na
     if (sub) return sub;
   }
   return { name, rarity };
+}
+
+/** CENTRAL material-leak guard (called from grantItem). Returns a re-skin material
+ *  to grant INSTEAD of `name`, or null to keep `name`. Only fires when: a materials
+ *  override is loaded, `name` is a BUILT-IN (Tartaria) material, and it isn't in the
+ *  re-skin catalog — so quest items / encounter loot / weapons / armor are never
+ *  touched, only built-in materials leaking through dig / forage / loot / dog / etc. */
+// Names the AUTHOR intends — their encounter loot, boss drops/quest items, and
+// main-quest rewards. These must NEVER be substituted even though they're off the
+// item-table catalog (they're authored, on-purpose drops). Rebuilt cheaply per call.
+function authoredItemNames(): Set<string> {
+  const s = new Set<string>();
+  const add = (n?: unknown) => { if (typeof n === 'string' && n.trim()) s.add(n.trim()); };
+  const wl = getWastelandOverride();
+  if (wl) for (const a of Object.values(wl)) for (const L of ((a as { loot?: Array<{ name?: string }> })?.loot ?? [])) add(L.name);
+  for (const b of (getCustomBosses() as Array<{ questItem?: string; drops?: string[] }>)) { add(b.questItem); for (const d of (b.drops ?? [])) add(d); }
+  const mq = getCustomMainQuest();
+  if (mq) for (const st of ((mq.steps as Array<{ reward?: string; target?: string }>) ?? [])) { add(st.reward); }
+  return s;
+}
+
+/** CENTRAL material-leak guard. Substitute ONLY a built-in (Tartaria) CRAFTING
+ *  MATERIAL (a name from materials.json) when: a materials override is loaded, the
+ *  grant is a material-ish kind, the name isn't in the re-skin catalog, and it isn't
+ *  an authored drop. So the built-in materials that flood a re-skin's pack (Bent
+ *  Nail, Aether Crystal, Smooth Stone, Spider Silk, …) become the author's
+ *  materials — while quest items, collectables, food, weapons and armor are never
+ *  touched (they aren't materials). */
+export function substituteLeakedMaterial(
+  name: string,
+  rarity: Rarity = 'Common',
+  rng: () => number = Math.random,
+  kind?: string,
+): { name: string; rarity: Rarity } | null {
+  if (!name || !hasTableOverride('materials')) return null;
+  if (kind && kind !== 'misc' && kind !== 'material') return null; // material-ish only
+  if (!BUILTIN_MATERIAL_NAMES.includes(name)) return null; // only built-in materials
+  if (materialNameSet().has(name)) return null;            // already one of theirs
+  if (authoredItemNames().has(name)) return null;          // intentional authored drop
+  return pickCatalogMaterial(rarity, rng);
 }
 
 interface PoolEntry {

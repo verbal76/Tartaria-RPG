@@ -88,6 +88,17 @@ export function grantItem(
   inventory: readonly InventoryItem[],
   newItem: InventoryItem,
 ): { inventory: InventoryItem[]; accepted: number; dropped: number; cap: number } {
+  // engine_Dev — CENTRAL material-leak guard. Any system that grants a BUILT-IN
+  // (Tartaria) material the re-skin doesn't have (dig / forage / investigation /
+  // dog finds / loot) gets the substitute swapped in here, so the player's pack
+  // fills with THEIR materials, not ours. No-op for the built-in game (no override)
+  // and for non-material grants (quest items, weapons, armor, encounter loot).
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { substituteLeakedMaterial } = require('./salvagePools') as typeof import('./salvagePools');
+    const sub = substituteLeakedMaterial(newItem.name, newItem.rarity, undefined, newItem.kind);
+    if (sub) newItem = { ...newItem, name: sub.name, rarity: sub.rarity };
+  }
   const cap = capacityFor(newItem.name);
   if (newItem.quantity <= 0) return { inventory: [...inventory], accepted: 0, dropped: 0, cap };
   const stackable = alwaysStackable(newItem.kind);
