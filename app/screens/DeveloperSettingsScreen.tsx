@@ -27,9 +27,12 @@ import {
   getGameTagline,
   getCrucibleName,
   hasCrucibleNameOverride,
+  getWorldName,
+  hasWorldNameOverride,
   DEFAULT_NARRATOR_NAME,
   DEFAULT_GAME_TITLE,
   DEFAULT_CRUCIBLE_NAME,
+  DEFAULT_WORLD_NAME,
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
@@ -149,6 +152,8 @@ function GameIdentitySection() {
   const crucibleEnabled = useContentPackStore((s) => s.crucibleEnabled);
   const setCrucibleName = useContentPackStore((s) => s.setCrucibleName);
   const setCrucibleEnabledFn = useContentPackStore((s) => s.setCrucibleEnabled);
+  const worldName = useContentPackStore((s) => s.worldName);
+  const setWorldName = useContentPackStore((s) => s.setWorldName);
   return (
     <>
       <Text style={styles.sectionLabel}>GAME</Text>
@@ -176,6 +181,20 @@ function GameIdentitySection() {
         maxLength={120}
         multiline
         onSave={setGameTagline}
+      />
+
+      <Text style={styles.sectionLabel}>WORLD</Text>
+      <RenameBox
+        title="World name"
+        hint="The setting's proper noun. The built-in narration says “Tartaria” in dozens of lines (“…full of objects waiting to be remembered”); set yours and the engine swaps it everywhere the player reads it. In your JSON you can also write {world}. Leave blank to keep Tartaria."
+        defaultLabel={DEFAULT_WORLD_NAME}
+        active={getWorldName()}
+        isCustom={hasWorldNameOverride()}
+        initial={worldName}
+        placeholder={DEFAULT_WORLD_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setWorldName}
       />
 
       <Text style={styles.sectionLabel}>NARRATOR</Text>

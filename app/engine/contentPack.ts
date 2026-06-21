@@ -76,6 +76,11 @@ let gameTaglineOverride: string | null = null;
 // entirely, from the dev console. Default name + enabled.
 let crucibleNameOverride: string | null = null;
 let crucibleEnabled = true;
+// engine_Dev — the WORLD NOUN. Built-in narration templates use "Tartaria" as the
+// setting's proper noun in dozens of places; a re-skin sets this and appendLog
+// swaps the literal so the leak never reaches the player. Default keeps the
+// built-in word so the Tartaria game itself is unchanged.
+let worldNameOverride: string | null = null;
 
 /** Rename the game (or null to fall back to "Text RPG Engine"). */
 export function setGameTitleOverride(name: string | null): void {
@@ -132,6 +137,40 @@ export function getCrucibleName(): string { return crucibleNameOverride ?? DEFAU
 export function setCrucibleEnabled(on: boolean): void { crucibleEnabled = on; }
 export function isCrucibleEnabled(): boolean { return crucibleEnabled; }
 
+/** engine_Dev — the WORLD NOUN used in built-in narration (default "Tartaria").
+ *  A re-skin sets its own (e.g. "the Void", "the Zenith"); appendLog swaps the
+ *  literal so no Tartaria leaks into the player's feed. */
+export const DEFAULT_WORLD_NAME = 'Tartaria';
+export function setWorldNameOverride(name: string | null): void {
+  const trimmed = typeof name === 'string' ? name.trim() : '';
+  worldNameOverride = trimmed.length > 0 ? trimmed : null;
+}
+export function hasWorldNameOverride(): boolean { return worldNameOverride != null; }
+export function getWorldName(): string { return worldNameOverride ?? DEFAULT_WORLD_NAME; }
+
+/** engine_Dev — scrub built-in Tartaria leaks from a feed line. Runs in appendLog
+ *  (every line passes through it) so the dozens of hard-coded template strings that
+ *  name "Tartaria" or the role-words "the Arbiter" / "the Narrator" are rewritten
+ *  to the author's world name and narrator name. Both halves are gated on an
+ *  override being set, so the built-in Tartaria game is untouched. */
+export function dressBuiltInLeaks(text: string): string {
+  if (!text) return text;
+  let out = text;
+  // Role-word narrator → the chosen name. Built-in combat/ambient templates print
+  // "The Narrator" / "the Arbiter" literally instead of the configured name.
+  if (hasNarratorNameOverride()) {
+    const name = getNarratorName();
+    if (name && !/^the\s/i.test(name)) {
+      out = out.replace(/\b[Tt]he (?:Arbiter|Narrator)\b/g, name);
+    }
+  }
+  // World noun → the chosen world name.
+  if (hasWorldNameOverride()) {
+    out = out.replace(/\bTartaria\b/g, getWorldName());
+  }
+  return out;
+}
+
 /** Fix the grammar when the narrator carries a PROPER NAME instead of a role.
  *  Built-in narration is written for role-words ("the Narrator looks up", "the
  *  Arbiter's voice"), which read wrong once the author renames the narrator to a
@@ -164,7 +203,8 @@ export function fillContentPlaceholders(text: string): string {
   return text
     .replace(/\{(?:narrator|arbiter|guide)\}/gi, getNarratorName())
     .replace(/\{(?:crucible|fuse|forge)\}/gi, getCrucibleName())
-    .replace(/\{(?:title|game)\}/gi, getGameTitle());
+    .replace(/\{(?:title|game)\}/gi, getGameTitle())
+    .replace(/\{(?:world|setting)\}/gi, getWorldName());
 }
 
 export function setTableOverride(id: ContentTableId, rows: readonly unknown[] | null): void {
@@ -402,6 +442,7 @@ export function clearAllOverrides(): void {
   gameTaglineOverride = null;
   crucibleNameOverride = null;
   crucibleEnabled = true;
+  worldNameOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

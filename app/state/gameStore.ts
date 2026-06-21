@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -3949,6 +3949,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // {crucible}/{fuse}, {title}) BEFORE the article-dressing pass so the resolved
     // names flow through the same grammar fix. No-op when the text has no `{`.
     text = fillContentPlaceholders(text);
+    // engine_Dev — scrub built-in Tartaria leaks (world noun + role-word narrator)
+    // so a re-skin never sees "Tartaria" / "the Arbiter" bleed through the dozens
+    // of hard-coded narration templates. No-op unless a world/narrator override set.
+    text = dressBuiltInLeaks(text);
     text = dressNarratorArticles(text);
     // 2026-05-25 OTA-034 — narration-channel invariant. The authored
     // vendor caught-stealing line ("Thief! — steel comes out.") is
@@ -5564,7 +5568,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         })
         .filter(Boolean) as string[];
       if (labels.length > 0) {
-        get().appendLog('world', `Paths: ${labels.join(' · ')}. (Type 'leave outpost' to head into the wilds.)`);
+        get().appendLog('world', `Paths: ${labels.join(' · ')}. (Tap EXIT to head outside.)`);
       }
     }
     // Surface the active weather's stat modifiers so the player can see
@@ -10036,7 +10040,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(
               'world',
-              `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
+              `You step out of ${hubNameForFaction(player.factionId)} and into the open ground. The complex falls away behind you.`,
             );
             // skipHubEntry — otherwise beginScene re-enters the gate
             // because the player's currentLocationId is still the
@@ -10100,7 +10104,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({ player: advanceTime(spendTravelStamina(currentPlayer), 1) });
             get().appendLog(
               'world',
-              `You walk ${dir} past the gate. The outpost falls away behind you.`,
+              `You head ${dir} and step out. ${hubNameForFaction(player.factionId)} falls away behind you.`,
             );
             get().beginScene({ skipHubEntry: true });
             // Door-open branch: leaving the outpost via a cardinal step
@@ -17877,7 +17881,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
-        `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
+        `You step out of ${hubNameForFaction(player.factionId)} and into the open ground. The complex falls away behind you.`,
       );
       get().beginScene({ skipHubEntry: true });
     }
@@ -18855,7 +18859,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
-        `You step out through the gate. Open ground, open sky — the outpost falls away behind you. The road starts here.`,
+        `You step out of ${hubNameForFaction(player.factionId)}. Open ground, open sky — the complex falls away behind you. The road starts here.`,
       );
       get().beginScene({ skipHubEntry: true });
     }
@@ -24620,7 +24624,7 @@ function narrateCasualLook(
       if (r) labels.push(`${dir} to ${r.shortName}`);
     }
     if (labels.length > 0) parts.push(`Exits: ${labels.join(' · ')}.`);
-    parts.push(`(Type 'leave outpost' to head into the wilds.)`);
+    parts.push(`(Tap EXIT to head outside.)`);
   } else {
     const exitLine: string[] = [];
     if (ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
