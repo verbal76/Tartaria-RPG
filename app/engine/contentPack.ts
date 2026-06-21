@@ -148,6 +148,25 @@ export function dressNarratorArticles(text: string): string {
   return text.replace(new RegExp(`\\b[Tt]he\\s+(${esc})\\b`, 'g'), '$1');
 }
 
+/** engine_Dev — author-callable placeholders. So a re-skinned game never has to
+ *  hard-code the narrator/guide name or the fusion-feature name into its uploaded
+ *  JSON, the author drops a token into ANY content string (mission `arbiter`/
+ *  `narration` lines, whisper plant/meet lines, hook lines, wasteland narration,
+ *  flavor pools, lore, …) and the engine substitutes the chosen name at render
+ *  time. Tokens (case-insensitive):
+ *    {narrator} / {arbiter} / {guide}  → the narrator name (getNarratorName)
+ *    {crucible} / {fuse} / {forge}     → the fusion-feature name (getCrucibleName)
+ *    {title} / {game}                  → the game title (getGameTitle)
+ *  Applied centrally in appendLog (every feed line passes through it), so a token
+ *  works anywhere authored text reaches the player. No-op for strings with no `{`. */
+export function fillContentPlaceholders(text: string): string {
+  if (!text || text.indexOf('{') === -1) return text;
+  return text
+    .replace(/\{(?:narrator|arbiter|guide)\}/gi, getNarratorName())
+    .replace(/\{(?:crucible|fuse|forge)\}/gi, getCrucibleName())
+    .replace(/\{(?:title|game)\}/gi, getGameTitle());
+}
+
 export function setTableOverride(id: ContentTableId, rows: readonly unknown[] | null): void {
   if (rows && rows.length > 0) tableOverrides[id] = rows;
   else delete tableOverrides[id];

@@ -181,7 +181,7 @@ function GameIdentitySection() {
       <Text style={styles.sectionLabel}>NARRATOR</Text>
       <RenameBox
         title="Narrator name"
-        hint="The voice that narrates the game — renamed everywhere the player sees or hears it, and in how the storyteller refers to itself."
+        hint="The voice that narrates the game — renamed everywhere the player sees or hears it, and in how the storyteller refers to itself. In your JSON, write {narrator} (or {arbiter}) in any line and it fills in this name."
         defaultLabel={DEFAULT_NARRATOR_NAME}
         active={getNarratorName()}
         isCustom={hasNarratorNameOverride()}
@@ -217,7 +217,7 @@ function GameIdentitySection() {
       </View>
       <RenameBox
         title="Fusion feature name"
-        hint="What the fusion station is called everywhere the player sees it (chip, vendor offer, narration). Leave blank for “Crucible”."
+        hint="What the fusion station is called everywhere the player sees it (chip, vendor offer, narration). In your JSON, write {crucible} (or {fuse}) in any line and it fills in this name. Leave blank for “Crucible”."
         defaultLabel={DEFAULT_CRUCIBLE_NAME}
         active={getCrucibleName()}
         isCustom={hasCrucibleNameOverride()}

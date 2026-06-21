@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -3945,6 +3945,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // beats read "the Bob looks up". dressNarratorArticles strips the stray
     // article only when a name override is active; it's a no-op for the default
     // role-word narrator and for text that never mentions the name.
+    // engine_Dev — substitute author-callable tokens ({narrator}/{arbiter},
+    // {crucible}/{fuse}, {title}) BEFORE the article-dressing pass so the resolved
+    // names flow through the same grammar fix. No-op when the text has no `{`.
+    text = fillContentPlaceholders(text);
     text = dressNarratorArticles(text);
     // 2026-05-25 OTA-034 — narration-channel invariant. The authored
     // vendor caught-stealing line ("Thief! — steel comes out.") is
@@ -18556,7 +18560,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // matches the OTA-213 STORY THREAD convention so the row
         // sticks out.
         if (enc.type === 'fusion_bench') {
-          get().appendLog('world', `★★ FUSING CRUCIBLE — ${enc.narration}`);
+          get().appendLog('world', `★★ ${getCrucibleName().toUpperCase()} — ${enc.narration}`);
         } else {
           get().appendLog('world', enc.narration);
         }

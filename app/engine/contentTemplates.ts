@@ -408,6 +408,13 @@ export function buildGameBundleTemplate(): string {
     '  // WHOLE-GAME FILE. Edit every section, delete what you don\'t need,',
     '  // then upload under "UPLOAD ENTIRE GAME". // and block comments are OK.',
     '  // Any section you omit keeps the built-in (Tartaria) default.',
+    '  // ------------------------------------------------------------',
+    '  // CALLABLE TOKENS — drop these in ANY text string (mission arbiter/',
+    '  // narration lines, whispers, hooks, wasteland narration, flavor, lore)',
+    '  // and the engine fills in the name YOU chose, so you never hard-code it:',
+    '  //   {narrator} / {arbiter} / {guide}  -> your narrator name',
+    '  //   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
+    '  //   {title} / {game}                  -> your game title',
     '  // ============================================================',
   ].join('\n');
 
