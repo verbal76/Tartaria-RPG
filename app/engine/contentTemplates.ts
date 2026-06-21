@@ -176,7 +176,17 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
 export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): string {
   if (id === 'world') {
     return JSON.stringify(
-      { narrator: NARRATOR_PERSONA_EXAMPLE, tone: DEFAULT_WORLD_TONE, setting: '', terms: [], vocabulary: [] },
+      {
+        narrator: NARRATOR_PERSONA_EXAMPLE,
+        tone: DEFAULT_WORLD_TONE,
+        setting: '',
+        terms: [],
+        vocabulary: [],
+        // engine_Dev — CATCHALL term map. Any built-in narration noun the engine
+        // still names gets rewritten to your word everywhere the player reads it
+        // (pools, one-off lines, and dynamic text). Add a pair per residual term.
+        termMap: { 'Reclaimers': 'REPLACE-with-your-faction-noun', 'Aetherstone': 'REPLACE-with-your-material' },
+      },
       null,
       2,
     );

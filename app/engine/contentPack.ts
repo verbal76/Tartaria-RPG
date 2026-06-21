@@ -164,10 +164,43 @@ export function dressBuiltInLeaks(text: string): string {
       out = out.replace(/\b[Tt]he (?:Arbiter|Narrator)\b/g, name);
     }
   }
-  // World noun → the chosen world name.
+  // World noun → the chosen world name. Covers the whole word family — the proper
+  // noun "Tartaria" AND the adjective "Tartarian"/"Tartarians" (the OTA-705 version
+  // missed the adjective). The adjective maps to "<world> " so "Tartarian stone" →
+  // "the Void stone"; tidy enough, and the term map below can refine it.
   if (hasWorldNameOverride()) {
-    out = out.replace(/\bTartaria\b/g, getWorldName());
+    const w = getWorldName();
+    out = out.replace(/\bTartarians\b/g, w).replace(/\bTartarian\b/g, w).replace(/\bTartaria\b/g, w);
   }
+  // engine_Dev — the CATCHALL term map. The author supplies world.termMap in the
+  // World-lore block: { "Reclaimers": "operatives", "Aetherstone": "the Anomaly", … }.
+  // Every key is rewritten to its value across ALL feed text (pools, one-off
+  // narration, and dynamic/LLM lines) so any setting-specific noun the built-in
+  // flavor still names can be re-skinned from JSON without touching engine code.
+  // Applied longest-key-first so multi-word terms win over their substrings.
+  out = applyTermMap(out);
+  return out;
+}
+
+/** Read the author's term map from the World-lore block (world.termMap) and apply
+ *  it, longest key first, on word boundaries. No-op when unset. Cached by identity
+ *  of the world override object so we don't rebuild the sorted list every call. */
+let _termMapSrc: unknown = undefined;
+let _termMapEntries: Array<[RegExp, string]> = [];
+function applyTermMap(text: string): string {
+  const world = loreOverrides.world as { termMap?: Record<string, string> } | undefined;
+  const map = world?.termMap;
+  if (!map || typeof map !== 'object') return text;
+  if (map !== _termMapSrc) {
+    _termMapSrc = map;
+    _termMapEntries = Object.entries(map)
+      .filter(([k, v]) => k && typeof v === 'string')
+      .sort((a, b) => b[0].length - a[0].length)
+      .map(([k, v]) => [new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'), v] as [RegExp, string]);
+  }
+  if (_termMapEntries.length === 0) return text;
+  let out = text;
+  for (const [re, v] of _termMapEntries) out = out.replace(re, v);
   return out;
 }
 

@@ -104,14 +104,17 @@ export function buildOpeningNarrative(input: {
   // lore block loaded, ground the intro in the author's own `setting` instead of
   // the built-in Tartaria cataclysm ("the Aetherstone flood drowned Tartaria").
   // No custom world → the Tartaria default openings below.
+  // engine_Dev — NEUTRAL fallback openings (no setting-specific nouns). These only
+  // fire when NO World-lore block is uploaded; a re-skin grounds the intro in its
+  // own `setting`. Overridable via the `opening` flavor key.
   const p1Variants = named ? [
-    `You are ${playerName} of the ${raceName}, walking under the colors of the ${factionName}. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
-    `Your name is ${playerName}. Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
-    `${playerName}, of the ${raceName}, sworn to the ${factionName}: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.`,
+    `You are ${playerName} of the ${raceName}, walking under the colors of the ${factionName}. A thousand years ago a great cataclysm drowned this country and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
+    `Your name is ${playerName}. Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
+    `${playerName}, of the ${raceName}, sworn to the ${factionName}: you have crossed into the buried country. The cataclysm that made it ended a thousand years ago — yet here, at ground level, it never quite stopped. The ground still moves. The air still hums.`,
   ] : [
-    `You walk under the colors of the ${factionName}, ${raceName} blood in your veins. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
-    `Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
-    `Of the ${raceName}, sworn to the ${factionName}: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.`,
+    `You walk under the colors of the ${factionName}, ${raceName} blood in your veins. A thousand years ago a great cataclysm drowned this country and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
+    `Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
+    `Of the ${raceName}, sworn to the ${factionName}: you have crossed into the buried country. The cataclysm that made it ended a thousand years ago — yet here, at ground level, it never quite stopped. The ground still moves. The air still hums.`,
   ];
   let p1: string;
   if (hasLoreOverride('world')) {
