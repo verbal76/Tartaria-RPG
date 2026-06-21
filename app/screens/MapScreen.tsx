@@ -572,6 +572,8 @@ export function MapScreen() {
   const locationPinStyles: { id: string; num: number; left: number; top: number; here: boolean }[] = [];
   // engine_Dev — grid line rects (vertical + horizontal) across the map rect.
   const gridLineStyles: { key: string; left: number; top: number; width: number; height: number }[] = [];
+  // engine_Dev — the filled grid SQUARE the player is currently in.
+  let currentCellStyle: { left: number; top: number; width: number; height: number } | null = null;
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -623,6 +625,21 @@ export function MapScreen() {
       }
       for (let r = 0; r <= worldH; r++) {
         gridLineStyles.push({ key: `h${r}`, left: offsetX, top: offsetY + (renderedH * r) / worldH, width: renderedW, height: 1 });
+      }
+    }
+    // engine_Dev — fill the grid square the player is currently in.
+    if (!showingOutpost && currentLocation) {
+      const ccx = (currentLocation as { x?: number }).x;
+      const ccy = (currentLocation as { y?: number }).y;
+      if (typeof ccx === 'number' && typeof ccy === 'number') {
+        const col = Math.max(0, Math.min(worldW - 1, Math.floor(ccx - 1)));
+        const row = Math.max(0, Math.min(worldH - 1, Math.floor(ccy - 1)));
+        currentCellStyle = {
+          left: offsetX + (renderedW * col) / worldW,
+          top: offsetY + (renderedH * row) / worldH,
+          width: renderedW / worldW,
+          height: renderedH / worldH,
+        };
       }
     }
     // engine_Dev — plot each location's NUMBER in its grid square. A location needs
@@ -789,6 +806,10 @@ export function MapScreen() {
               style={styles.atlas}
               resizeMode="contain"
             />
+          )}
+          {/* engine_Dev — fill the player's current grid square (under the lines). */}
+          {currentCellStyle && (
+            <View pointerEvents="none" style={[styles.currentCell, currentCellStyle]} />
           )}
           {/* engine_Dev — coordinate grid: drawn over the map, or on its own (on the
               dark image box) when no map is uploaded. */}
@@ -1132,6 +1153,13 @@ const styles = StyleSheet.create({
   gridLine: {
     position: 'absolute',
     backgroundColor: 'rgba(201,168,106,0.28)',
+  },
+  // engine_Dev — the player's current grid square, filled + outlined.
+  currentCell: {
+    position: 'absolute',
+    backgroundColor: 'rgba(127,209,255,0.30)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(127,209,255,0.9)',
   },
   // engine_Dev — numbered location pin, centered on its grid-square centre.
   locPinWrap: {
