@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -5888,18 +5888,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           return;
         }
-        // engine_Dev — DEVELOPER BACKDOOR. Naming your character exactly
-        // DEV_ACCESS_NAME ("Verbal") always drops into the content console instead
-        // of starting a normal game — the author's secret way back in to keep
-        // editing, even on a "published" family build (the title DEV pill is the
-        // only thing publish hides; the backdoor stays open for the author).
-        // Real removal happens at the signed go-live build (build-time strip).
+        // engine_Dev — DEVELOPER BACKDOOR (Ghostbusters Easter egg). Naming your
+        // character the dev key ("iamthekeymaster" — case/space-insensitive) always
+        // drops into the content console instead of starting a normal game — the
+        // author's secret way back in to keep editing, even on a "published" family
+        // build (the title DEV pill is the only thing publish hides; the backdoor
+        // stays open for the author). Real removal happens at the signed go-live
+        // build (build-time strip).
         set((s) => (s.player ? {
           player: { ...s.player, name: cleanName },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
         get().maybeAdvanceTutorial('name');
-        if (cleanName === DEV_ACCESS_NAME) {
+        if (isDevAccessName(cleanName)) {
           // Re-enable dev mode and open Settings, which (with dev mode on) lands
           // on the DEV console as its first/default tab.
           useContentPackStore.getState().setDevMode(true);

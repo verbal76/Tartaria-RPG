@@ -1011,11 +1011,20 @@ export function TitleScreen() {
         }
         ListHeaderComponent={
           slots.length > 0
-            ? <Text style={[styles.listLabel, { color: mutedColor }]}>
-                {bootGateOpen
-                  ? 'YOUR PLAYERS  ·  swipe left to delete'
-                  : `⟳ ${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
-              </Text>
+            ? <>
+                <Text style={[styles.listLabel, { color: mutedColor }]}>
+                  {bootGateOpen
+                    ? 'YOUR PLAYERS  ·  swipe left to delete'
+                    : `⟳ ${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
+                </Text>
+                {/* Ghostbusters Easter egg — naming a character "iamthekeymaster"
+                    (any capitalization) opens the dev console. */}
+                {bootGateOpen && (
+                  <Text style={[styles.listLabel, { color: mutedColor }]}>
+                    I am the gate keeper, are you the key master?
+                  </Text>
+                )}
+              </>
             : null
         }
         ListFooterComponent={

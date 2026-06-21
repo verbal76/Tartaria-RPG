@@ -600,5 +600,14 @@ let published = false;
 export function isPublished(): boolean { return published; }
 export function setPublishedFlag(v: boolean): void { published = v; }
 
-/** The exact character name that opens the developer console (while unpublished). */
-export const DEV_ACCESS_NAME = 'Verbal';
+/** The character name that opens the developer console (while unpublished).
+ *  Ghostbusters Easter egg — matched case- and space-insensitively (see
+ *  isDevAccessName), so "iamthekeymaster", "I Am The Key Master", etc. all work. */
+export const DEV_ACCESS_NAME = 'iamthekeymaster';
+/** Normalize a name (lowercase, strip non-alphanumerics) for loose matching. */
+function normalizeName(s: string): string { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
+/** True when the entered name is the dev-console key — capitalization and spaces
+ *  don't matter, only the spelling. */
+export function isDevAccessName(name: string): boolean {
+  return normalizeName(name) === DEV_ACCESS_NAME;
+}
