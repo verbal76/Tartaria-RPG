@@ -277,6 +277,10 @@ export function getInteractionTagsOverride(): Partial<Record<InteractionTagKey, 
 //      interactables?, exits: {north,south,east,west}, anchorNpc? }] }]
 // The faction's member spawns inside this instance (their starter complex), which
 // sits at `locationId`.
+// An exit value is another room's `id`, or `null` for no exit that way, or the
+// sentinel "world" — a "world" exit leaves the instance and drops the player back
+// onto the world map at this area's `locationId`. At least one room (the entry)
+// should carry a "world" exit so the player can leave.
 export interface StartingAreaRoom {
   id: string;
   name: string;
@@ -286,6 +290,9 @@ export interface StartingAreaRoom {
   exits?: { north?: string | null; south?: string | null; east?: string | null; west?: string | null };
   anchorNpc?: string | null;
 }
+
+/** Sentinel exit value meaning "leave the instance back onto the world map". */
+export const STARTING_AREA_WORLD_EXIT = 'world';
 export interface StartingArea {
   factionId: string;
   name: string;

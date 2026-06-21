@@ -303,8 +303,10 @@ export function buildStartingAreasTemplate(): string {
   const list = factions.length > 0 ? factions : [{ id: 'REPLACE-with-a-faction-id', name: 'Faction' }];
   // The shared generic layout. Entry is "operations"; the four rooms form a small
   // connected graph (operations ↔ armory, operations ↔ mess, operations ↔ supply).
+  // The entry room's free exit uses the sentinel "world" — that exit leaves the
+  // instance and drops the player back onto the world map at `locationId`.
   const genericRooms = () => [
-    { id: 'operations', name: 'Operations', shortName: 'Ops', description: 'The nerve center — a map table, comms gear, and a duty roster pinned to the wall. The way in and out.', interactables: ['map table', 'radio', 'duty roster', 'door'], exits: { north: 'armory', south: 'supply', east: 'mess', west: null }, anchorNpc: null },
+    { id: 'operations', name: 'Operations', shortName: 'Ops', description: 'The nerve center — a map table, comms gear, and a duty roster pinned to the wall. The way in and out.', interactables: ['map table', 'radio', 'duty roster', 'door'], exits: { north: 'armory', south: 'supply', east: 'mess', west: 'world' }, anchorNpc: null },
     { id: 'armory', name: 'Armory', shortName: 'Armory', description: 'Racks of weapons and gear, locked behind a steel cage. The smell of oil and cold metal.', interactables: ['weapon rack', 'gun cage', 'workbench', 'ammo crate'], exits: { north: null, south: 'operations', east: null, west: null }, anchorNpc: 'Quartermaster' },
     { id: 'mess', name: 'Mess Hall', shortName: 'Mess', description: 'Long tables, a steaming pot, and the low murmur of off-duty talk. Rumors trade hands here.', interactables: ['pot', 'long table', 'coffee urn', 'noticeboard'], exits: { north: null, south: null, east: null, west: 'operations' }, anchorNpc: null },
     { id: 'supply', name: 'Supply', shortName: 'Supply', description: 'Shelves of crates and footlockers — rations, spare kit, and whatever the unit hoards.', interactables: ['supply crate', 'footlocker', 'shelving', 'ledger'], exits: { north: 'operations', south: null, east: null, west: null }, anchorNpc: null },
