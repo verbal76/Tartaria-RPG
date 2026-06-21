@@ -22,6 +22,7 @@ import {
   setStartingAreasOverride,
   setCustomTitlesOverride,
   setCustomMainQuestOverride,
+  setCustomBossesOverride,
   setCrucibleNameOverride,
   setCrucibleEnabled,
   setWorldNameOverride,
@@ -102,6 +103,7 @@ interface PersistShape {
   startingAreas?: unknown[];
   customTitles?: unknown[];
   customMainQuest?: { title?: string; steps?: unknown[] } | null;
+  customBosses?: unknown[];
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -141,6 +143,7 @@ interface ContentPackState {
   startingAreas: unknown[];
   customTitles: unknown[];
   customMainQuest: { title?: string; steps?: unknown[] } | null;
+  customBosses: unknown[];
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -214,6 +217,9 @@ interface ContentPackState {
   loadMainQuestJson: (json: string) => LoadResult;
   setMainQuest: (q: { title?: string; steps?: unknown[] } | null) => void;
   clearMainQuest: () => void;
+  loadBossesJson: (json: string) => LoadResult;
+  setBosses: (rows: unknown[]) => void;
+  clearBosses: () => void;
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
@@ -242,7 +248,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -254,6 +260,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     startingAreas: state.startingAreas.length > 0 ? state.startingAreas : undefined,
     customTitles: state.customTitles.length > 0 ? state.customTitles : undefined,
     customMainQuest: state.customMainQuest ?? undefined,
+    customBosses: state.customBosses.length > 0 ? state.customBosses : undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
@@ -278,6 +285,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   startingAreas: [],
   customTitles: [],
   customMainQuest: null,
+  customBosses: [],
   published: false,
   narratorName: '',
   gameTitle: '',
@@ -309,6 +317,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setStartingAreasOverride(s.startingAreas.length > 0 ? s.startingAreas : null);
     setCustomTitlesOverride(s.customTitles.length > 0 ? s.customTitles : null);
     setCustomMainQuestOverride(s.customMainQuest ?? null);
+    setCustomBossesOverride(s.customBosses.length > 0 ? s.customBosses : null);
     invalidateLocationCaches();
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
@@ -675,6 +684,31 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), customMainQuest: null });
   },
 
+  loadBossesJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); }
+    catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    if (!Array.isArray(parsed)) return { ok: false, error: 'Bosses must be a JSON ARRAY of { id, name, hp, attack, damage, ... }.' };
+    if (parsed.length === 0) return { ok: false, error: 'The array is empty.' };
+    const bad = parsed.find((b) => { if (!b || typeof b !== 'object') return true; const c = b as Record<string, unknown>; return typeof c.id !== 'string' || !c.id || typeof c.name !== 'string' || !c.name || typeof c.hp !== 'number'; });
+    if (bad) return { ok: false, error: 'Every boss needs id, name, and a numeric hp.' };
+    get().setBosses(parsed);
+    return { ok: true, count: parsed.length };
+  },
+
+  setBosses(rows) {
+    const valid = Array.isArray(rows) && rows.length > 0 ? rows : [];
+    setCustomBossesOverride(valid.length > 0 ? valid : null);
+    set({ customBosses: valid, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), customBosses: valid });
+  },
+
+  clearBosses() {
+    setCustomBossesOverride(null);
+    set({ customBosses: [], contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), customBosses: [] });
+  },
+
   loadGameBundle(json) {
     let parsed: unknown;
     try {
@@ -699,6 +733,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextStartingAreas: unknown[] = get().startingAreas;
     let nextCustomTitles: unknown[] = get().customTitles;
     let nextMainQuest: { title?: string; steps?: unknown[] } | null = get().customMainQuest;
+    let nextBosses: unknown[] = get().customBosses;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -752,6 +787,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'mainQuest' || key === 'customMainQuest') {
         if (value && typeof value === 'object' && Array.isArray((value as { steps?: unknown[] }).steps)) { nextMainQuest = value as { title?: string; steps?: unknown[] }; applied.push(`mainQuest (${((value as { steps?: unknown[] }).steps ?? []).length} steps)`); }
         else skipped.push('mainQuest (no steps[])');
+      } else if (key === 'bosses' || key === 'customBosses') {
+        if (Array.isArray(value) && value.length > 0) { nextBosses = value; applied.push(`bosses (${value.length})`); }
+        else skipped.push('bosses (empty/not an array)');
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
         let rows: unknown = value;
@@ -806,6 +844,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setStartingAreasOverride(nextStartingAreas.length > 0 ? nextStartingAreas : null);
     setCustomTitlesOverride(nextCustomTitles.length > 0 ? nextCustomTitles : null);
     setCustomMainQuestOverride(nextMainQuest);
+    setCustomBossesOverride(nextBosses.length > 0 ? nextBosses : null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
@@ -824,6 +863,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       startingAreas: nextStartingAreas,
       customTitles: nextCustomTitles,
       customMainQuest: nextMainQuest,
+      customBosses: nextBosses,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
@@ -833,7 +873,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       corruptionName: nextCorruptionName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -874,6 +914,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.startingAreas.length > 0) out.startingAreas = s.startingAreas;
     if (s.customTitles.length > 0) out.titles = s.customTitles;
     if (s.customMainQuest) out.mainQuest = s.customMainQuest;
+    if (s.customBosses.length > 0) out.bosses = s.customBosses;
     return JSON.stringify(out, null, 2);
   },
 
@@ -942,7 +983,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -977,6 +1018,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setCustomTitlesOverride(customTitles.length > 0 ? customTitles : null);
         const customMainQuest = (shape.customMainQuest && typeof shape.customMainQuest === 'object') ? shape.customMainQuest : null;
         setCustomMainQuestOverride(customMainQuest);
+        const customBosses = Array.isArray(shape.customBosses) ? shape.customBosses : [];
+        setCustomBossesOverride(customBosses.length > 0 ? customBosses : null);
         const published = shape.published === true;
         setPublishedFlag(published);
         const narratorName = typeof shape.narratorName === 'string' ? shape.narratorName : '';
@@ -996,7 +1039,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

@@ -42,6 +42,7 @@ import {
 import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
+import { BOSS_SPAWN_CONDITIONS, type CustomBoss } from '../engine/customBosses';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -1319,6 +1320,105 @@ function TitlesBox() {
   );
 }
 
+// engine_Dev — BOSSES builder. Named, faction-affiliated bosses with stats, loot,
+// a quest item, and spawn rules — referenced by main-quest "kill" steps.
+function BossesBox() {
+  const customBosses = useContentPackStore((s) => s.customBosses) as CustomBoss[];
+  const setBosses = useContentPackStore((s) => s.setBosses);
+  const loadBossesJson = useContentPackStore((s) => s.loadBossesJson);
+  const factions = (getFactions() as Array<{ id: string; name: string }>);
+  const locations = mainQuestLocations();
+  const [status, setStatus] = useState<Status>(null);
+  const [text, setText] = useState('');
+  const [f, setF] = useState({ name: '', factionId: '', hp: '', attack: '', damage: '', ac: '', abilityPoint: '', drops: '', questItem: '', spawnLocationId: '', spawnCondition: 'main_quest' });
+  const up = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
+
+  const add = () => {
+    if (!f.name.trim()) { setStatus({ kind: 'err', msg: 'Boss needs a name.' }); return; }
+    if (!Number(f.hp)) { setStatus({ kind: 'err', msg: 'Boss needs HP.' }); return; }
+    const id = f.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || `boss_${Date.now()}`;
+    const boss: CustomBoss = {
+      id, name: f.name.trim(), hp: Number(f.hp),
+      attack: Number(f.attack) || 5, damage: f.damage.trim() || '2d8+3',
+      ...(Number(f.ac) ? { ac: Number(f.ac) } : {}),
+      ...(Number(f.abilityPoint) ? { abilityPoint: Number(f.abilityPoint) } : {}),
+      ...(f.factionId ? { factionId: f.factionId } : {}),
+      ...(f.drops.trim() ? { drops: f.drops.split(',').map((d) => d.trim()).filter(Boolean) } : {}),
+      ...(f.questItem.trim() ? { questItem: f.questItem.trim() } : {}),
+      ...(f.spawnLocationId ? { spawnLocationId: f.spawnLocationId } : {}),
+      spawnCondition: f.spawnCondition,
+    };
+    const next = [...customBosses.filter((b) => b.id !== id), boss];
+    setBosses(next);
+    setStatus({ kind: 'ok', msg: `Boss saved: ${boss.name} (${next.length} total).` });
+    setF((p) => ({ ...p, name: '', hp: '', damage: '', drops: '', questItem: '' }));
+  };
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Bosses</Text>
+        <Text style={customBosses.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {customBosses.length > 0 ? `● ${customBosses.length}` : '○ none'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Named bosses with stats, loot, a quest item they drop (e.g. dog tags) and spawn rules.
+        A main-quest “Kill the boss at …” step points at one of these.
+      </Text>
+      {customBosses.map((b) => (
+        <View key={b.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{b.name}</Text> — HP {b.hp}{b.questItem ? ` · drops ${b.questItem}` : ''}{b.spawnLocationId ? ` @ ${locations.find((l) => l.id === b.spawnLocationId)?.name ?? b.spawnLocationId}` : ''}</Text>
+          <TouchableOpacity onPress={() => { setBosses(customBosses.filter((x) => x.id !== b.id)); setStatus({ kind: 'ok', msg: `Removed ${b.name}.` }); }}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Boss name" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.hp} onChangeText={(v) => up('hp', v)} placeholder="HP" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.attack} onChangeText={(v) => up('attack', v)} placeholder="ATK" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.damage} onChangeText={(v) => up('damage', v)} placeholder="dmg (2d8+3)" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.ac} onChangeText={(v) => up('ac', v)} placeholder="AC" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.abilityPoint} onChangeText={(v) => up('abilityPoint', v)} placeholder="tier" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.questItem} onChangeText={(v) => up('questItem', v)} placeholder="Quest item drop (dog tags)" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.drops} onChangeText={(v) => up('drops', v)} placeholder="Other drops (comma-sep)" placeholderTextColor="#5c5446" />
+      </View>
+      {factions.length > 0 && chipRow('Faction affiliation:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))}
+      {chipRow('Spawn location:', locations, f.spawnLocationId, (id) => up('spawnLocationId', id))}
+      {chipRow('Spawn condition:', BOSS_SPAWN_CONDITIONS.map((c) => ({ id: c.id, name: c.label })), f.spawnCondition, (id) => up('spawnCondition', id))}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={add}><Text style={styles.loadBtnText}>+ SAVE BOSS</Text></TouchableOpacity>
+      </View>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a bosses JSON array" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadBossesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} boss(es).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2); const r = await saveJsonToFile('bosses.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.loadBtn} onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadBossesJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} boss(es) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}><Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text></TouchableOpacity>
+        {customBosses.length > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearBosses(); setStatus({ kind: 'ok', msg: 'Cleared bosses.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — MAIN QUEST builder. Compose the win-condition objective list line by
 // line: pick an action, a target, a location (+ optional reward to collect), ADD.
 function MainQuestBox() {
@@ -1672,6 +1772,7 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>MAIN QUEST</Text>
       <MainQuestBox />
+      <BossesBox />
 
       {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine. */}
       <TouchableOpacity

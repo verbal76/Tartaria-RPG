@@ -441,6 +441,16 @@ export function setCustomMainQuestOverride(obj: { title?: string; steps?: unknow
 export function hasCustomMainQuestOverride(): boolean { return customMainQuestOverride != null; }
 export function getCustomMainQuest(): { title?: string; steps?: unknown[] } | null { return customMainQuestOverride; }
 
+// --- custom bosses override -----------------------------------------------------
+// engine_Dev — named, faction-affiliated bosses with stats / loot / quest item /
+// spawn rules. Shape lives in customBosses.ts. null = none.
+let customBossesOverride: unknown[] | null = null;
+export function setCustomBossesOverride(rows: readonly unknown[] | null): void {
+  customBossesOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
+}
+export function hasCustomBossesOverride(): boolean { return customBossesOverride != null; }
+export function getCustomBosses(): unknown[] { return customBossesOverride ?? []; }
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -601,6 +611,7 @@ export function clearAllOverrides(): void {
   corruptionNameOverride = null;
   customTitlesOverride = null;
   customMainQuestOverride = null;
+  customBossesOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

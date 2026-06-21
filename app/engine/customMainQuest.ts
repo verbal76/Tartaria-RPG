@@ -23,6 +23,8 @@ export interface MainQuestStep {
   locationId?: string;
   /** Optional item to collect after the step completes ("...and collect dog tags"). */
   reward?: string;
+  /** For kill steps — the boss id (from the BOSSES box) to spawn/require here. */
+  bossId?: string;
 }
 
 export interface MainQuestDef {
@@ -42,13 +44,16 @@ export interface MainQuestAction {
 const tgt = (s: MainQuestStep) => (s.target && s.target.trim() ? s.target.trim() : 'the objective');
 
 export const MAIN_QUEST_ACTIONS: readonly MainQuestAction[] = [
-  { id: 'kill', label: 'Kill', needsTarget: true, phrase: (s, l) => `Kill ${tgt(s)} at ${l}` },
+  { id: 'kill', label: 'Kill the boss at', needsTarget: true, phrase: (s, l) => `Kill ${tgt(s)} at ${l}` },
   { id: 'clear', label: 'Clear all enemies at', needsTarget: false, phrase: (_s, l) => `Clear all enemies at ${l}` },
   { id: 'reach', label: 'Reach / enter', needsTarget: false, phrase: (_s, l) => `Reach ${l}` },
   { id: 'collect', label: 'Collect', needsTarget: true, phrase: (s, l) => `Collect ${tgt(s)} at ${l}` },
   { id: 'talk_to', label: 'Talk to', needsTarget: true, phrase: (s, l) => `Talk to ${tgt(s)} at ${l}` },
   { id: 'deliver', label: 'Deliver', needsTarget: true, phrase: (s, l) => `Deliver ${tgt(s)} to ${l}` },
   { id: 'return_to', label: 'Return to', needsTarget: false, phrase: (_s, l) => `Return to ${l}` },
+  // the "hand in to a boss and claim" closing beats
+  { id: 'hand_in', label: 'Hand in', needsTarget: true, phrase: (s, l) => `Hand in ${tgt(s)} at ${l}` },
+  { id: 'claim', label: 'Claim victory at', needsTarget: false, phrase: (_s, l) => `Claim victory at ${l} — you win and are sent home` },
 ];
 
 const ACTION_BY_ID: ReadonlyMap<string, MainQuestAction> = new Map(MAIN_QUEST_ACTIONS.map((a) => [a.id, a]));

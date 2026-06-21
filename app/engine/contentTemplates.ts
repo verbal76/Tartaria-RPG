@@ -535,8 +535,13 @@ export function buildGameBundleTemplate(): string {
   ));
   sections.push(bundleSection(
     'mainQuest',
-    'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to), target?, locationId, reward? }] }. Steps run in order; the last completes the quest.',
-    JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'a boss', locationId: 'REPLACE-with-a-location-id', reward: 'dog tags' }, { id: 'step_2', action: 'return_to', locationId: 'REPLACE-with-a-location-id' }] }, null, 2),
+    'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId? }] }. Steps run in order; the last completes the quest.',
+    JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'the ONR Director', bossId: 'REPLACE-with-a-boss-id', locationId: 'REPLACE-with-a-location-id', reward: 'ONR Dog Tags' }, { id: 'step_2', action: 'hand_in', target: 'the dog tags', locationId: 'REPLACE-with-your-base-location-id' }, { id: 'step_3', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' }] }, null, 2),
+  ));
+  sections.push(bundleSection(
+    'bosses',
+    'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest|always|once) }. Build them in the BOSSES box.',
+    JSON.stringify([{ id: 'onr_director', name: 'The ONR Director', factionId: 'REPLACE-with-a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'ONR Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' }], null, 2),
   ));
   sections.push(bundleSection(
     'startingAreas',
