@@ -32,6 +32,10 @@ export interface AddResult {
   /** Set on real failures; left undefined on a silent user-cancel. */
   error?: string;
   canceled?: boolean;
+  /** How many tracks were added (multi-select). */
+  added?: number;
+  /** Names skipped (non-audio / category full). */
+  skipped?: string[];
 }
 
 interface PersistShape {
@@ -95,49 +99,54 @@ export const useCustomMusicStore = create<CustomMusicState>((set, get) => ({
   hydrated: false,
 
   async addFromPicker(category) {
-    const current = listFor(get(), category);
-    if (!canAddTrack(current)) {
+    if (!canAddTrack(listFor(get(), category))) {
       return { ok: false, error: `That's the limit (${MAX_TRACKS_PER_CATEGORY}). Remove one first.` };
     }
-    let picked: { uri: string; name: string; mimeType?: string | null } | null = null;
+    // engine_Dev — multi-select: pick several audio files at once, add each up to
+    // the per-category cap (so you build a playlist, not one-at-a-time).
+    let assets: Array<{ uri: string; name?: string | null; mimeType?: string | null }>;
     try {
       const res = await DocumentPicker.getDocumentAsync({
         type: 'audio/*',
         copyToCacheDirectory: true,
-        multiple: false,
+        multiple: true,
       });
       if (res.canceled) return { ok: false, canceled: true };
-      const asset = res.assets?.[0];
-      if (!asset) return { ok: false, error: 'No file was returned by the picker.' };
-      picked = { uri: asset.uri, name: asset.name ?? 'track', mimeType: asset.mimeType };
+      assets = res.assets ?? [];
+      if (assets.length === 0) return { ok: false, error: 'No files were returned by the picker.' };
     } catch (e) {
       return { ok: false, error: `Picker failed: ${e instanceof Error ? e.message : String(e)}` };
     }
 
-    if (!isAcceptableAudio(picked.mimeType, picked.name)) {
-      return { ok: false, error: 'That doesn’t look like an audio file. Use MP3 / M4A / AAC / WAV / OGG.' };
-    }
-
+    let added = 0;
+    const skipped: string[] = [];
     try {
       await ensureDir();
-      const id = newId();
-      const ext = extensionOf(picked.name) || 'mp3';
-      const destUri = `${MUSIC_DIR}${category}-${id}.${ext}`;
-      await FileSystem.copyAsync({ from: picked.uri, to: destUri });
-      const track: CustomTrack = {
-        id,
-        name: sanitizeTrackName(picked.name),
-        uri: destUri,
-        baseVolume: DEFAULT_BASE_VOLUME[category],
-      };
-      const nextList = addTrack(listFor(get(), category), track);
-      set(category === 'battle' ? { battle: nextList } : { ambient: nextList });
+      for (const asset of assets) {
+        if (!canAddTrack(listFor(get(), category))) { skipped.push('(category full)'); break; }
+        const name = asset.name ?? 'track';
+        if (!isAcceptableAudio(asset.mimeType, name)) { skipped.push(name); continue; }
+        const id = newId();
+        const ext = extensionOf(name) || 'mp3';
+        const destUri = `${MUSIC_DIR}${category}-${id}.${ext}`;
+        await FileSystem.copyAsync({ from: asset.uri, to: destUri });
+        const track: CustomTrack = {
+          id,
+          name: sanitizeTrackName(name),
+          uri: destUri,
+          baseVolume: DEFAULT_BASE_VOLUME[category],
+        };
+        const nextList = addTrack(listFor(get(), category), track);
+        set(category === 'battle' ? { battle: nextList } : { ambient: nextList });
+        syncToAudio(category, nextList);
+        added++;
+      }
       persist(get());
-      syncToAudio(category, nextList);
-      return { ok: true };
     } catch (e) {
-      return { ok: false, error: `Couldn’t save the file: ${e instanceof Error ? e.message : String(e)}` };
+      return { ok: false, error: `Couldn’t save a file: ${e instanceof Error ? e.message : String(e)}` };
     }
+    if (added === 0) return { ok: false, error: 'None were audio files. Use MP3 / M4A / AAC / WAV / OGG.' };
+    return { ok: true, added, skipped: skipped.length > 0 ? skipped : undefined };
   },
 
   remove(category, id) {

@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -419,10 +419,11 @@ function MusicBox({ category, label, hint }: { category: MusicCategory; label: s
             const r = await addFromPicker(category);
             setBusy(false);
             if (r.canceled) return;
-            setStatus(r.ok ? { kind: 'ok', msg: 'Track added.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            const skip = r.skipped && r.skipped.length > 0 ? ` (skipped ${r.skipped.length})` : '';
+            setStatus(r.ok ? { kind: 'ok', msg: `Added ${r.added ?? 1} track${(r.added ?? 1) === 1 ? '' : 's'}${skip}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
           }}
         >
-          <Text style={styles.loadBtnText}>{busy ? 'ADDING…' : full ? 'LIMIT REACHED' : '＋ ADD TRACK'}</Text>
+          <Text style={styles.loadBtnText}>{busy ? 'ADDING…' : full ? 'LIMIT REACHED' : '＋ ADD TRACKS'}</Text>
         </TouchableOpacity>
         {tracks.length > 0 && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { clearCategory(category); setStatus({ kind: 'ok', msg: 'Cleared — built-in score restored.' }); }}>
@@ -1778,6 +1779,7 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const [confirmPub, setConfirmPub] = useState(false);
   const [confirmDevOff, setConfirmDevOff] = useState(false);
   const [applyMsg, setApplyMsg] = useState<string | null>(null);
+  const [guideMsg, setGuideMsg] = useState<string | null>(null);
   // engine_Dev — re-read when the pack changes so the banner stays accurate.
   useContentPackStore((s) => s.contentVersion);
   const racesLoaded = hasTableOverride('races');
@@ -1812,6 +1814,32 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
       {/* engine_Dev — WHOLE-GAME upload sits at the very top so it's the first
           thing you see: build everything in one file, or skip it and use the
           per-section boxes below. */}
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Build guide</Text>
+          <Text style={styles.badgeOff}>start here</Text>
+        </View>
+        <Text style={styles.hint}>
+          New here? This explains every section and the order to fill them so a game comes together
+          cleanly. Save it and read it on the side, or just follow the sections top to bottom.
+        </Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.copyBtn}
+            onPress={async () => { const r = await saveJsonToFile('build-guide.md', buildDevGuide()); setGuideMsg(r.msg); }}
+          >
+            <Text style={styles.copyBtnText}>⬇ SAVE BUILD GUIDE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => { void Clipboard.setStringAsync(buildDevGuide()); setGuideMsg('Build guide copied to clipboard.'); }}
+          >
+            <Text style={styles.tmplBtnText}>COPY</Text>
+          </TouchableOpacity>
+        </View>
+        {guideMsg && <Text style={styles.ok}>{guideMsg}</Text>}
+      </View>
+
       <Text style={styles.sectionLabel}>★ WHOLE GAME — build it all in one file</Text>
       <GameBundleBox />
 

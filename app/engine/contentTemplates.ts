@@ -26,6 +26,7 @@ import complicationsData from '../data/quests/complications.json';
 import rewardsData from '../data/quests/rewards.json';
 import {
   DEFAULT_WORLD_TONE,
+  getGameTitle,
   CONTENT_TABLES,
   LORE_BLOCKS,
   resolveTable,
@@ -477,6 +478,59 @@ function bundleSection(key: string, hint: string, content: string): string {
  *  an inline `//` reference comment describing what it needs. Comments are legal
  *  here because loadGameBundle strips them before parsing. Upload this one file to
  *  build the entire game at once; the per-section boxes then show what loaded. */
+/** engine_Dev — the downloadable BUILD GUIDE: what each section is + the order to
+ *  fill them so a game comes together cleanly. Saved from the dev console's top
+ *  "DEV GUIDE" button. */
+export function buildDevGuide(): string {
+  return `# ${getGameTitle()} — Engine Build Guide
+
+This engine is lore-agnostic: a game is just the JSON you upload. The fastest path
+is the WHOLE-GAME file (one file holds every section); the per-section boxes are for
+granular edits. Recommended order:
+
+## 1 · Identity & World (do first — everything else reads these)
+  - Game name / Tagline / Narrator name / Fusion-feature name
+  - World name (replaces "Tartaria" everywhere) · Corruption/affliction name
+  - World lore: narrator persona ({narrator}/{world}/{energy} tokens work here),
+    tone, setting, terms, vocabulary, and:
+      • energy: name + adjective + material + slang + per-faction terms (your "magic")
+      • termMap: { "any leftover noun": "your word" } — the catch-all swap
+
+## 2 · Character creation
+  - Races (playable) · Factions (playable) — what the creation screen shows
+  - Race lore / Faction lore — story notes the narrator knows
+
+## 3 · The world
+  - Locations (give each x/y to plot on your map) — needed before quests/areas
+  - Weather · Enemies · Weapons / Armor / Materials / Gear / Exploration / Amulets
+    / Rings · Recipes · Powers · Lore document
+
+## 4 · Narration flavor
+  - Flavor pools (opening, combat/look/noted/generic remarks, investigation, etc.)
+    + starterItems. Anything you omit keeps a neutral built-in line.
+
+## 5 · Faction bases
+  - Starting areas: one walkable instance per faction, placed at a locationId.
+
+## 6 · Main quest (bosses FIRST)
+  - Bosses: name, faction, stats, loot, quest item, spawn mode (main_quest /
+    location / random). Build these BEFORE the quest.
+  - Main quest: line-by-line objective list; "kill" steps pick a main-quest boss.
+
+## 7 · Side content
+  - Missions (hunts / mysteries / faction quests / storylines + procedural seeds)
+  - Hooks (atmospheric leads) · Whispers (overheard tips) · Travel encounters
+  - Interaction tags (which verbs each noun accepts) · Titles (achievements)
+
+## 8 · Assets (not JSON — their own uploads)
+  - World map image · Per-faction maps · Music (battle + ambient, multi-select)
+
+Tip: EXPORT MY GAME pulls everything you've loaded back into one whole-game file —
+edit it anywhere, re-upload via UPLOAD FILE. Every box shows a ● badge when loaded
+and has a TEMPLATE button with an example to edit.
+`;
+}
+
 export function buildGameBundleTemplate(): string {
   // Each entry is a complete `"key": value` block (with its own reference
   // comment). They're joined with commas, so every section is comma-separated and
