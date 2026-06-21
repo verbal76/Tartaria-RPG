@@ -293,23 +293,23 @@ export function buildInteractionTagsTemplate(current?: Record<string, string[]>)
  *  null). The first room is the entry. Uses the first live faction/location id so
  *  the example is plottable; edit to taste. */
 export function buildStartingAreasTemplate(): string {
-  const factions = TABLE_ROWS.factions as Array<{ id?: string; name?: string }>;
-  const locs = resolveTable('locations', TABLE_ROWS.locations as unknown[]) as Array<{ id?: string }>;
-  const fid = factions[0]?.id ?? 'REPLACE-with-a-faction-id';
-  const lid = locs[0]?.id ?? 'REPLACE-with-a-location-id';
-  return JSON.stringify([
-    {
-      factionId: fid,
-      name: 'Drydock 4 Command',
-      locationId: lid,
-      rooms: [
-        { id: 'gate', name: 'The Drydock Gate', shortName: 'Gate', description: 'Floodlit chain-link and a sandbagged checkpoint. A sentry waves you through the moment they see your colors.', interactables: ['checkpoint', 'sandbags', 'floodlight', 'duty roster'], exits: { north: 'yard', south: null, east: 'barracks', west: null }, anchorNpc: null },
-        { id: 'yard', name: 'The Yard', shortName: 'Yard', description: 'A scorched concrete apron under a half-shattered crane. Crates and fuel drums line the walls.', interactables: ['crane', 'fuel drum', 'supply crate', 'noticeboard'], exits: { north: 'command', south: 'gate', east: null, west: 'armory' } },
-        { id: 'barracks', name: 'The Barracks', shortName: 'Barracks', description: 'Rows of cots, a cold stove, the smell of wet wool and gun oil.', interactables: ['cot', 'footlocker', 'stove', 'letters home'], exits: { north: null, south: null, east: null, west: 'gate' } },
-        { id: 'armory', name: 'The Armory', shortName: 'Armory', description: 'Weapon racks behind a steel cage. A quartermaster eyes you over a ledger.', interactables: ['weapon rack', 'ammunition crate', 'ledger', 'steel cage'], exits: { north: null, south: null, east: 'yard', west: null }, anchorNpc: 'Quartermaster' },
-      ],
-    },
-  ], null, 2);
+  // engine_Dev — one stub per LIVE faction (uploaded factions win over built-in),
+  // each placed at the faction's baseLocationId when set, so the ids are correct
+  // and you get an entry for every faction to flesh out.
+  const factions = resolveTable('factions', TABLE_ROWS.factions as unknown[]) as Array<{ id?: string; name?: string; baseLocationId?: string }>;
+  const list = factions.length > 0 ? factions : [{ id: 'REPLACE-with-a-faction-id', name: 'Faction' }];
+  const stub = (f: { id?: string; name?: string; baseLocationId?: string }) => ({
+    factionId: f.id ?? 'REPLACE-with-a-faction-id',
+    name: `${f.name ?? 'Faction'} HQ`,
+    locationId: f.baseLocationId ?? 'REPLACE-with-this-faction-s-location-id',
+    rooms: [
+      { id: 'gate', name: 'The Gate', shortName: 'Gate', description: 'The way in. A sentry, a checkpoint, the smell of the world outside.', interactables: ['checkpoint', 'sentry', 'noticeboard'], exits: { north: 'hub', south: null, east: 'quarters', west: null }, anchorNpc: null },
+      { id: 'hub', name: 'The Yard', shortName: 'Yard', description: 'The heart of the complex — crates, comms, people moving on errands.', interactables: ['supply crate', 'radio', 'map table'], exits: { north: 'special', south: 'gate', east: null, west: 'quarters' } },
+      { id: 'quarters', name: 'The Quarters', shortName: 'Quarters', description: 'Where the unit sleeps, eats, and waits.', interactables: ['cot', 'footlocker', 'stove'], exits: { north: null, south: null, east: 'hub', west: 'gate' } },
+      { id: 'special', name: 'The Inner Room', shortName: 'Inner', description: "The faction's signature space — armory, lab, shrine, or war room.", interactables: ['weapon rack', 'ledger'], exits: { north: null, south: 'hub', east: null, west: null }, anchorNpc: 'Quartermaster' },
+    ],
+  });
+  return JSON.stringify(list.map(stub), null, 2);
 }
 
 /** The Hooks template — an illustrative example of the atmospheric-lead format.
