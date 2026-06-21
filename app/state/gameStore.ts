@@ -420,10 +420,10 @@ function indoorsForOutdoorHooks(get: () => GameStore): boolean {
 // `ask` intent), so the prompts read as open doors, not menu items.
 const ARBITER_QUESTION_PROMPTS: readonly string[] = [
   `The ${getNarratorName()} watches the horizon a moment. "Ask me about the flood sometime — why the water rose, and what it left buried."`,
-  `The ${getNarratorName()} trails a hand through the silt. "You could ask me about the Sentinels, if you ever wonder what still walks the deep ruins."`,
-  `The ${getNarratorName()} glances at you sidelong. "Ask me about the Tartarians when you like. It's their world you're walking through."`,
-  `The ${getNarratorName()} is quiet, then: "Ask about the Aether sometime. Most who carry it never learn what it costs them."`,
-  `The ${getNarratorName()} studies a far spire. "Ask me about the Core Guardians before you face one — better to know what waits than meet it blind."`,
+  `The ${getNarratorName()} trails a hand through the dust. "You could ask me what still walks the deep ruins, if you ever wonder."`,
+  `The ${getNarratorName()} glances at you sidelong. "Ask me about the people who came before, when you like. It's their world you're walking through."`,
+  `The ${getNarratorName()} is quiet, then: "Ask about the strange power sometime. Most who carry it never learn what it costs them."`,
+  `The ${getNarratorName()} studies a far spire. "Ask me about the Guardians before you face one — better to know what waits than meet it blind."`,
   `The ${getNarratorName()} tilts their head toward you. "You can just ask me things, you know — a faction, a place, a name you half-remember. I keep more than I offer."`,
   `The ${getNarratorName()} thumbs the edge of an old coin. "Ask me about the factions sometime, if you can't tell whose side the dust is on."`,
 ];
@@ -1040,7 +1040,7 @@ function startQwenWatchdog(get: () => GameStore): void {
 // distance the player can pursue.
 const WANDERING_LEADS = [
   'After a while you set down on the next stretch of ground.',
-  'You walk. Tartaria walks beside you.',
+  'You walk. The world walks beside you.',
   'Your boots find the next stretch of ground.',
   'You set out on foot. The weather closes around you.',
 ];
@@ -10350,7 +10350,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'wait':
-        get().appendLog('world', 'You hold still. Tartaria holds still longer.');
+        get().appendLog('world', 'You hold still. The world holds still longer.');
         break;
       case 'inventory':
         get().setScreen('inventory');
@@ -23909,14 +23909,14 @@ const WHILE_AWAY_LINES: ReadonlyArray<{ channel: 'arbiter' | 'world'; line: stri
   { channel: 'arbiter', line: `"A name came back to me in the night-of-your-absence. I'll know it when we meet whoever wears it."` },
   { channel: 'arbiter', line: `"I'm glad you're back. The buried country was patient, but it wasn't quiet."` },
   { channel: 'arbiter', line: `"Word travelled while you were gone. People know you've done what you've done."` },
-  { channel: 'world', line: `The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.` },
-  { channel: 'world', line: `Reclaimers have passed through this stretch since you last stood here. Their wheel-marks are fresh in the silt.` },
-  { channel: 'world', line: `Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.` },
+  { channel: 'world', line: `The wind has shifted while you were away. The haze sits a little thicker on the horizon now.` },
+  { channel: 'world', line: `Travellers have passed through this stretch since you last stood here. Their wheel-marks are fresh in the dirt.` },
+  { channel: 'world', line: `Someone left a sigil-mark on a stone you don't remember being marked. A faction is paying attention.` },
   { channel: 'world', line: `Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.` },
   { channel: 'world', line: `Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.` },
-  { channel: 'world', line: `A Forgotten Order pilgrim is said to have asked after you in your absence. They left without saying where they were headed.` },
-  { channel: 'world', line: `The Reclaimers' Guild updated its standing-board while you were gone. Your name is on it.` },
-  { channel: 'world', line: `The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.` },
+  { channel: 'world', line: `A pilgrim is said to have asked after you in your absence. They left without saying where they were headed.` },
+  { channel: 'world', line: `A faction updated its standing-board while you were gone. Your name is on it.` },
+  { channel: 'world', line: `The hum from below is louder than you remember. Something has woken or shifted while you were elsewhere.` },
 ];
 
 // 2026-05-25 OTA-044 — chained narrative helper. Called at the end of

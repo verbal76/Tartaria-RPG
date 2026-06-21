@@ -15390,4 +15390,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-21-710';
+export const OTA_BUILD_ID = '2026-06-21-711';

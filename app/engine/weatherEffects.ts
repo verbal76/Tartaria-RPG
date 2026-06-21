@@ -39,7 +39,7 @@ const WEATHER_EFFECTS: Record<
       hpDelta: -(1 + Math.floor(Math.random() * 4)),
       staminaDelta: 0,
       corruptionDelta: 0,
-      line: 'An Aetheric arc finds you — copper taste, blue afterimage, and a bite of damage.',
+      line: 'A charged arc finds you — copper taste, blue afterimage, and a bite of damage.',
     }),
   },
   aether_lightning: {
@@ -84,7 +84,7 @@ const WEATHER_EFFECTS: Record<
       hpDelta: -1,
       staminaDelta: 0,
       corruptionDelta: 0,
-      line: 'A shard of mud-glass nicks you. Small wound, steady reminder.',
+      line: 'A shard of hardened glass nicks you. Small wound, steady reminder.',
     }),
   },
   whisper_fog: {
@@ -93,7 +93,7 @@ const WEATHER_EFFECTS: Record<
       hpDelta: 0,
       staminaDelta: 0,
       corruptionDelta: 1,
-      line: 'The fog whispers your name in old Tartarian. You forget, for a moment, why you came.',
+      line: 'The fog whispers your name in a language you almost know. You forget, for a moment, why you came.',
     }),
   },
   silent_blizzard: {
