@@ -79,15 +79,15 @@ export interface Hook {
 export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> = {
   smoke: [
     { line: 'A column of smoke or steam rises in the distance, thin and straight.', nouns: ['smoke', 'steam', 'column', 'plume'] },
-    { line: 'A faint smell of burning Aetherstone drifts from somewhere north.', nouns: ['smoke', 'fire', 'burning', 'smell'] },
+    { line: 'A faint smell of burning old bedrock drifts from somewhere north.', nouns: ['smoke', 'fire', 'burning', 'smell'] },
   ],
   footprints: [
     { line: 'A thread of footprints, not yours, crosses your path and trails off.', nouns: ['footprints', 'tracks', 'prints', 'trail'] },
-    { line: 'Boot impressions press deep into the silt, heading toward the rise.', nouns: ['footprints', 'boots', 'tracks', 'prints'] },
+    { line: 'Boot impressions press deep into the dirt, heading toward the rise.', nouns: ['footprints', 'boots', 'tracks', 'prints'] },
   ],
   obelisk: [
     { line: 'A toppled obelisk lies on its side, runes faded but not yet silent.', nouns: ['obelisk', 'pillar', 'runes', 'stone'] },
-    { line: 'A standing stone juts from the mud, its face cut with old Tartarian glyphs.', nouns: ['stone', 'glyphs', 'pillar', 'obelisk'] },
+    { line: 'A standing stone juts from the mud, its face cut with old old glyphs.', nouns: ['stone', 'glyphs', 'pillar', 'obelisk'] },
   ],
   wagon: [
     { line: 'A wagon, abandoned and broken-axled, leans into the mud ahead.', nouns: ['wagon', 'cart', 'wreck', 'caravan'] },
@@ -105,37 +105,37 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: 'A glint of metal — too small to name yet — lies in the rubble.', nouns: ['glint', 'metal', 'shine', 'rubble'] },
   ],
   handprint: [
-    { line: 'A handprint pressed into Aetherstone dust, recent enough to still hold shape.', nouns: ['handprint', 'print', 'mark', 'dust'] },
+    { line: 'A handprint pressed into old bedrock dust, recent enough to still hold shape.', nouns: ['handprint', 'print', 'mark', 'dust'] },
   ],
   thread: [
     { line: 'A thread of cold air leaks from somewhere behind the rubble.', nouns: ['cold', 'air', 'draft', 'breeze'] },
   ],
   resonance: [
     { line: 'A faint resonance pulses from the south. Something there is awake.', nouns: ['resonance', 'pulse', 'hum', 'vibration'] },
-    { line: 'The Aetheric haze thickens around one specific spot. You cannot tell why.', nouns: ['haze', 'thickening', 'spot', 'aether'] },
+    { line: 'The strange haze thickens around one specific spot. You cannot tell why.', nouns: ['haze', 'thickening', 'spot', 'aether'] },
   ],
   half_buried_spire: [
-    { line: 'Half a Tartarian spire juts from the mud like the bone of a long-dead beast, the top three storeys still defiant.', nouns: ['spire', 'tower', 'top', 'building'] },
-    { line: "A buried dome's apex breaks the surface ahead, Aetherstone-glazed and humming faintly.", nouns: ['dome', 'apex', 'roof', 'building'] },
+    { line: 'Half an old spire juts from the mud like the bone of a long-dead beast, the top three storeys still defiant.', nouns: ['spire', 'tower', 'top', 'building'] },
+    { line: "A buried dome's apex breaks the surface ahead, glass-glazed and humming faintly.", nouns: ['dome', 'apex', 'roof', 'building'] },
   ],
   etheric_storm: [
-    { line: 'The horizon cracks — blue and purple lightning, an Etheric storm walking on long legs across the plain.', nouns: ['storm', 'lightning', 'sky', 'horizon'] },
-    { line: 'Static gathers in your hair. The Aether is about to break weather on this ridge.', nouns: ['storm', 'static', 'sky', 'aether'] },
+    { line: 'The horizon cracks — blue and purple lightning, an charged storm walking on long legs across the plain.', nouns: ['storm', 'lightning', 'sky', 'horizon'] },
+    { line: 'Static gathers in your hair. The strangeness is about to break weather on this ridge.', nouns: ['storm', 'static', 'sky', 'aether'] },
   ],
   pulsing_mud: [
     { line: 'A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.', nouns: ['mud', 'glow', 'patch', 'aetherstone'] },
   ],
   frozen_statue: [
-    { line: 'A figure stands ahead, perfectly still — until you realise the mud-glass froze them mid-step, generations ago.', nouns: ['statue', 'figure', 'frozen', 'body'] },
+    { line: 'A figure stands ahead, perfectly still — until you realise the hardened glass froze them mid-step, generations ago.', nouns: ['statue', 'figure', 'frozen', 'body'] },
   ],
   sentinel_patrol: [
-    { line: 'Far to the east, an Architectural Sentinel paces a ruined wall — patrol pattern, by the book, never deviating.', nouns: ['sentinel', 'machine', 'patrol', 'automaton'] },
+    { line: 'Far to the east, a patrol construct paces a ruined wall — patrol pattern, by the book, never deviating.', nouns: ['sentinel', 'machine', 'patrol', 'automaton'] },
   ],
   mud_golem_stir: [
     { line: 'The mud over there is bulging in a way mud does not bulge unaided. Something is reforming itself.', nouns: ['mud', 'bulge', 'golem', 'mound'] },
   ],
   temporal_eddy: [
-    { line: 'For a half-second the light shifts — sunset, then dawn, then now. A temporal eddy, the kind Reclaimers warn about.', nouns: ['eddy', 'time', 'light', 'distortion'] },
+    { line: 'For a half-second the light shifts — sunset, then dawn, then now. A temporal eddy, the kind scavengers warn about.', nouns: ['eddy', 'time', 'light', 'distortion'] },
   ],
   spatial_warp: [
     { line: 'The way you came is not where it should be. The landscape has folded slightly while your back was turned.', nouns: ['warp', 'fold', 'landscape', 'distance', 'path'] },
@@ -150,25 +150,25 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: "On the far ridge — for the space of a held breath — a figure too tall to be human watches you. Then it isn't there.", nouns: ['giant', 'silhouette', 'figure', 'ridge', 'shadow'] },
   ],
   bioluminescent_path: [
-    { line: 'A line of pale-blue fungus blooms across the ground ahead — the True Tartarians grow this where they walk often.', nouns: ['fungus', 'mushroom', 'glow', 'path', 'fungi'] },
+    { line: 'A line of pale-blue fungus blooms across the ground ahead — the first walkers grow this where they walk often.', nouns: ['fungus', 'mushroom', 'glow', 'path', 'fungi'] },
   ],
   wreck_construct: [
-    { line: 'An Aetheric construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.', nouns: ['construct', 'automaton', 'machine', 'wreck', 'arm'] },
+    { line: 'An strange construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.', nouns: ['construct', 'automaton', 'machine', 'wreck', 'arm'] },
   ],
   submerged_steeple: [
-    { line: 'The top of a flooded Tartarian cathedral pierces the standing water ahead — steeple intact, the rest drowned.', nouns: ['steeple', 'cathedral', 'spire', 'water', 'church'] },
+    { line: 'The top of a flooded old cathedral pierces the standing water ahead — steeple intact, the rest drowned.', nouns: ['steeple', 'cathedral', 'spire', 'water', 'church'] },
   ],
   black_market_lantern: [
-    { line: 'A green lantern hangs at the mouth of a culvert — the Mud Dwellers mark their hidden markets with that exact green.', nouns: ['lantern', 'culvert', 'market', 'green', 'sign'] },
+    { line: 'A green lantern hangs at the mouth of a culvert — the marsh-folk mark their hidden markets with that exact green.', nouns: ['lantern', 'culvert', 'market', 'green', 'sign'] },
   ],
   aether_grid_hum: [
-    { line: "Under your boots the ground hums steadily — an old Aetheric grid line, still alive, running east.", nouns: ['grid', 'hum', 'line', 'ley', 'ground'] },
+    { line: "Under your boots the ground hums steadily — an old strange grid line, still alive, running east.", nouns: ['grid', 'hum', 'line', 'ley', 'ground'] },
   ],
   sealed_vault_door: [
-    { line: 'A circular Tartarian vault door, mud-pasted but intact, lies recessed into the slope. The locking glyphs are dim — but not gone.', nouns: ['vault', 'door', 'gate', 'seal', 'glyphs'] },
+    { line: 'A circular old vault door, mud-pasted but intact, lies recessed into the slope. The locking glyphs are dim — but not gone.', nouns: ['vault', 'door', 'gate', 'seal', 'glyphs'] },
   ],
   preserved_corpse: [
-    { line: 'A Tartarian body lies in the silt, the mud-glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.', nouns: ['body', 'corpse', 'robes', 'satchel', 'tartarian'] },
+    { line: 'An old body lies in the dirt, the hardened glass having frozen them at the moment they fell — robes still pristine, satchel still buckled.', nouns: ['body', 'corpse', 'robes', 'satchel', 'tartarian'] },
   ],
   // OTA-418 — INTERIOR finds. Each plants something you'd notice INSIDE a room.
   loose_floorboard: [
@@ -208,10 +208,10 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: 'Water beads and falls from one spot in the ceiling, steady, though no storm has touched this place in years. Above is meant to be sealed.', nouns: ['ceiling', 'drip', 'water', 'leak', 'rafters'] },
   ],
   bolted_strongbox: [
-    { line: 'A strongbox sits bolted to the floor in the corner, its lock a Tartarian tumbler — dim, but not dead.', nouns: ['strongbox', 'box', 'lock', 'chest', 'tumbler'] },
+    { line: 'A strongbox sits bolted to the floor in the corner, its lock an old tumbler — dim, but not dead.', nouns: ['strongbox', 'box', 'lock', 'chest', 'tumbler'] },
   ],
   aether_tang: [
-    { line: 'The air in this room tastes of Aether — sharp, metallic, the way it does near a working core. Nothing here should hum, and yet.', nouns: ['air', 'aether', 'smell', 'hum', 'tang'] },
+    { line: 'The air in this room tastes of the strangeness — sharp, metallic, the way it does near a working core. Nothing here should hum, and yet.', nouns: ['air', 'aether', 'smell', 'hum', 'tang'] },
   ],
   barefoot_prints: [
     { line: 'A set of footprints crosses the dust on the floor — small, bare — and they stop dead in the middle of the room. They do not come back.', nouns: ['footprints', 'prints', 'dust', 'tracks', 'steps'] },
@@ -283,7 +283,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       addNouns: ['figure', 'camp', 'firepit', 'fire', 'coals', 'person', 'stranger', 'lean-to'],
     },
     {
-      line: 'The figure looks up. A Reclaimer, mud to the knees, pack half-emptied. They wave you in. "Sit. Trade if you want. I have heard of a hollow two ridges over — old Tartarian work, no Sentinels."',
+      line: 'The figure looks up. A scavenger, mud to the knees, pack half-emptied. They wave you in. "Sit. Trade if you want. I have heard of a hollow two ridges over — old old work, no constructs."',
       // OTA-185 — Reclaimer now spawns as a real roadside vendor so
       // the "Sit. Trade if you want." line isn't a broken promise.
       // Player ask after a playtest of this beat: "thought I was
@@ -320,7 +320,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       nextChain: { kind: 'arch', chainId: 'reclaimer_hollow' },
     },
     {
-      line: 'You and the Reclaimer part ways. They press a few coins into your palm "for the directions, when you find what is left of the place."',
+      line: 'You and the scavenger part ways. They press a few coins into your palm "for the directions, when you find what is left of the place."',
       effects: [{ type: 'grant_tc', amount: 25 }],
       done: true,
     },
@@ -332,7 +332,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: false,
     },
     {
-      line: 'Behind the column, a body. Reclaimer kit, cold for days. Their pack is mostly intact.',
+      line: 'Behind the column, a body. Scavenger kit, cold for days. Their pack is mostly intact.',
       arbiterLine: `"Tartaria takes them like this," the ${getNarratorName()} says. "No drama. Just the next set of tracks that stop."`,
       effects: [
         { type: 'grant_item', name: 'Trail Rations' },
@@ -345,7 +345,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   obelisk: [
     {
-      line: 'You crouch beside the stone. The runes are old Tartarian — half-faded, but readable if you trace them. A coiled glyph in the centre still throws a faint glow when your hand passes over it.',
+      line: 'You crouch beside the stone. The runes are old old — half-faded, but readable if you trace them. A coiled glyph in the centre still throws a faint glow when your hand passes over it.',
       effects: [],
       done: false,
     },
@@ -378,7 +378,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   arch: [
     {
-      line: 'You duck under the half-buried arch. The passage opens into a hollow — a Tartarian work-room, equipment long since hauled away, but the walls still hum.',
+      line: 'You duck under the half-buried arch. The passage opens into a hollow — an old work-room, equipment long since hauled away, but the walls still hum.',
       effects: [],
       done: false,
     },
@@ -396,7 +396,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   glint: [
     {
-      line: 'You pick the metal out of the rubble. A pendant — Tartarian make, hammered thin, etched with a sigil you do not recognise.',
+      line: 'You pick the metal out of the rubble. A pendant — old make, hammered thin, etched with a sigil you do not recognise.',
       effects: [{ type: 'grant_item', name: 'Aetheric Locket' }],
       done: false,
     },
@@ -414,7 +414,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: false,
     },
     {
-      line: 'You follow the prints to a low ridge. A True Tartarian scout, hooded and watching, dips their head once when you crest the hill — acknowledgement, not greeting — and is gone before you reach the ground.',
+      line: 'You follow the prints to a low ridge. A True old scout, hooded and watching, dips their head once when you crest the hill — acknowledgement, not greeting — and is gone before you reach the ground.',
       effects: [
         { type: 'rep_change', factionId: 'true_tartarians', amount: 1 },
         { type: 'memo', text: 'A True Tartarian scout marked you and let you pass. They are aware of you now.' },
@@ -454,12 +454,12 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
 
   half_buried_spire: [
     {
-      line: 'You cross the broken ground toward the spire. The bottom storeys are mud-glassed shut, but a window two heights up gapes open. A coil of old rope tells you someone else has tried.',
+      line: 'You cross the broken ground toward the spire. The bottom storeys are hardened glassed shut, but a window two heights up gapes open. A coil of old rope tells you someone else has tried.',
       effects: [],
       done: false,
     },
     {
-      line: 'You haul yourself through the window. Inside: a hall once-rich, now stripped, the Aetheric grid in the walls still warm to the touch.',
+      line: 'You haul yourself through the window. Inside: a hall once-rich, now stripped, the strange grid in the walls still warm to the touch.',
       arbiterLine: `"This was a noble house," the ${getNarratorName()} says. "Mud Monarch stock. Take what is here before its owners remember to come back."`,
       effects: [],
       done: false,
@@ -476,12 +476,12 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   etheric_storm: [
     {
-      line: 'You shelter against a tilted column as the storm rolls over. Blue and purple lightning sheets the plain. The Aetheric pressure climbs.',
+      line: 'You shelter against a tilted column as the storm rolls over. Blue and purple lightning sheets the plain. The strange pressure climbs.',
       effects: [],
       done: false,
     },
     {
-      line: 'A bolt strikes a few paces from you — the Aetherstone in the soil holds the charge, and a hand-sized shard of stormglass crystallises around the impact.',
+      line: 'A bolt strikes a few paces from you — the old bedrock in the soil holds the charge, and a hand-sized shard of stormglass crystallises around the impact.',
       arbiterLine: `"That does not happen for everyone," the ${getNarratorName()} says.`,
       effects: [
         { type: 'damage', amount: 3, cause: 'an Etheric backlash' },
@@ -493,12 +493,12 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   pulsing_mud: [
     {
-      line: 'You step toward the glow. The mud is warm against your boot — an Aetherstone deposit, surface-thin but real.',
+      line: 'You step toward the glow. The mud is warm against your boot — an old bedrock deposit, surface-thin but real.',
       effects: [],
       done: false,
     },
     {
-      line: 'You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.',
+      line: 'You pry the deposit out of the dirt. A few good shards, dense and humming, plus a thumb-sized core.',
       effects: [
         { type: 'grant_item', name: 'Aetheric Shard' },
         { type: 'grant_item', name: 'Aetheric Shard' },
@@ -510,7 +510,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   frozen_statue: [
     {
-      line: 'You circle the figure. A Tartarian functionary by the cut of their robes, perfectly preserved inside a casing of Aetheric mud-glass — even their satchel still hangs from the shoulder.',
+      line: 'You circle the figure. An old functionary by the cut of their robes, perfectly preserved inside a casing of strange hardened glass — even their satchel still hangs from the shoulder.',
       effects: [],
       done: false,
     },
@@ -527,7 +527,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   sentinel_patrol: [
     {
-      line: 'You lay flat and watch. The Sentinel runs a perfect loop — twelve paces east, pause, twelve paces back. Old programming, never updated.',
+      line: 'You lay flat and watch. The construct runs a perfect loop — twelve paces east, pause, twelve paces back. Old programming, never updated.',
       effects: [],
       done: false,
     },
@@ -543,7 +543,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   mud_golem_stir: [
     {
-      line: 'You back off to the treeline and watch. The mud reforms itself — slow, deliberate — into a hulking shape of stone and silt. It does not see you yet.',
+      line: 'You back off to the treeline and watch. The mud reforms itself — slow, deliberate — into a hulking shape of stone and dirt. It does not see you yet.',
       effects: [],
       done: false,
     },
@@ -597,14 +597,14 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       nextChain: { kind: 'half_buried_spire', chainId: 'warped_spire' },
     },
     {
-      line: 'The new vantage clears your head. You knew Tartaria bent space — now you know what it feels like.',
+      line: 'The new vantage clears your head. You knew This country bent space — now you know what it feels like.',
       effects: [],
       done: true,
     },
   ],
   whisper_crystal: [
     {
-      line: "You lean toward the crystal. The whispering shapes itself — Tartarian, you think, though no language you can name. It is saying a location.",
+      line: "You lean toward the crystal. The whispering shapes itself — old, you think, though no language you can name. It is saying a location.",
       effects: [],
       done: false,
     },
@@ -631,7 +631,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: false,
     },
     {
-      line: 'When the Cloak is past, you check what they dropped — a sealed dispatch slip, smudged with Aetheric ink. Worth something, to the right buyer.',
+      line: 'When the Cloak is past, you check what they dropped — a sealed dispatch slip, smudged with strange ink. Worth something, to the right buyer.',
       effects: [
         { type: 'grant_item', name: 'Aether Residue' },
         { type: 'rep_change', factionId: 'mud_monarchs', amount: -2 },
@@ -659,7 +659,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   bioluminescent_path: [
     {
-      line: 'You follow the fungi. The trail leads down through a slumped wall into a low chamber — a True Tartarian way-station, currently unstaffed, but lived-in.',
+      line: 'You follow the fungi. The trail leads down through a slumped wall into a low chamber — a True old way-station, currently unstaffed, but lived-in.',
       effects: [],
       done: false,
     },
@@ -681,7 +681,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: false,
     },
     {
-      line: 'You pry the core free and strip the workable plating. A Reclaimer would weep at this haul.',
+      line: 'You pry the core free and strip the workable plating. A scavenger would weep at this haul.',
       effects: [
         { type: 'grant_item', name: 'Drone Core' },
         { type: 'grant_item', name: 'Scrap Metal' },
@@ -693,13 +693,13 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   submerged_steeple: [
     {
-      line: 'You wade out to the steeple. The window-slits at the top open onto a flooded nave — Aetherstone shimmer in the water below.',
+      line: 'You wade out to the steeple. The window-slits at the top open onto a flooded nave — old bedrock shimmer in the water below.',
       arbiterLine: `"Explorers have gone in," the ${getNarratorName()} says, "and the water keeps them."`,
       effects: [],
       done: false,
     },
     {
-      line: 'You dive. The Aetherstone gives you a half-minute of breathable air. You grab what you can — a heavy reliquary off the altar — and break back to the surface, lungs burning.',
+      line: 'You dive. The old bedrock gives you a half-minute of breathable air. You grab what you can — a heavy reliquary off the altar — and break back to the surface, lungs burning.',
       effects: [
         { type: 'damage', amount: 4, cause: 'the flooded nave' },
         { type: 'grant_item', name: 'Golem Core' },
@@ -716,7 +716,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: false,
     },
     {
-      line: 'You haggle into a fair price for a single item — Mud Dweller stock you do not usually see above ground.',
+      line: 'You haggle into a fair price for a single item — marsh-folk stock you do not usually see above ground.',
       effects: [
         { type: 'grant_item', name: 'Echoing Steps Boots' },
         { type: 'grant_tc', amount: -40 },
@@ -727,12 +727,12 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   aether_grid_hum: [
     {
-      line: "You follow the grid line east. The hum strengthens. You crest a low rise and look down at a Tartarian node — half-buried, partially active.",
+      line: "You follow the grid line east. The hum strengthens. You crest a low rise and look down at an old node — half-buried, partially active.",
       effects: [],
       done: false,
     },
     {
-      line: 'You touch the node. It accepts you — or doesn\'t see you as a threat, which here is close enough. A small charge runs through your pack: every Aetheric thing you carry is faintly steadier now.',
+      line: 'You touch the node. It accepts you — or doesn\'t see you as a threat, which here is close enough. A small charge runs through your pack: every strange thing you carry is faintly steadier now.',
       arbiterLine: `"That is older than every faction," the ${getNarratorName()} says. "It does not have politics."`,
       effects: [
         { type: 'grant_item', name: 'Aetheric Dust' },
@@ -744,7 +744,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   sealed_vault_door: [
     {
-      line: 'You scrape the mud off the locking ring. The glyphs are a Tartarian tumbler — three rotations, in the right order. The faint markings tell you which.',
+      line: 'You scrape the mud off the locking ring. The glyphs are an old tumbler — three rotations, in the right order. The faint markings tell you which.',
       effects: [],
       done: false,
     },
@@ -762,7 +762,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   preserved_corpse: [
     {
-      line: 'You kneel beside the body. The mud-glass froze them mid-fall — robes intact, satchel intact. The seal on the satchel is Forgotten Order.',
+      line: 'You kneel beside the body. The hardened glass froze them mid-fall — robes intact, satchel intact. The seal on the satchel is old orders.',
       effects: [],
       done: false,
     },
@@ -789,7 +789,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     { line: 'Folded in the cavity: a strip of cured cloth and a few coins someone meant to come back for.', effects: [{ type: 'grant_item', name: 'Cloth Scrap' }, { type: 'grant_tc', amount: 14 }], done: true },
   ],
   watching_portrait: [
-    { line: 'You lift the portrait off its hook. The wall behind it is bare but for a single line of Tartarian script, scratched into the plaster by hand.', effects: [], done: false, addNouns: ['script', 'plaster', 'wall', 'writing'] },
+    { line: 'You lift the portrait off its hook. The wall behind it is bare but for a single line of old script, scratched into the plaster by hand.', effects: [], done: false, addNouns: ['script', 'plaster', 'wall', 'writing'] },
     { line: 'The script is a name and a warning: do not answer if it knocks from inside. You copy it into memory — it may matter later.', arbiterLine: `"Someone was afraid of this house," the ${getNarratorName()} notes. "Or of what they kept in it."`, effects: [{ type: 'memo', text: 'A scratched warning behind a portrait: "do not answer if it knocks from inside."' }], done: true },
   ],
   bricked_doorway: [
@@ -809,7 +809,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     { line: 'A child drew what they saw, and what they saw was true. The image stays with you — the buried world remembers its giants, even through a child.', effects: [{ type: 'memo', text: "A child's drawing of a giant figure, marked HOME with an arrow pointing down." }], done: true },
   ],
   stopped_clock: [
-    { line: 'You open the clock case. The mechanism is whole — no broken spring, no jam. It simply stopped, all at once, the way clocks do where the Aether ran wild.', effects: [], done: false, addNouns: ['case', 'mechanism', 'gears', 'spring'] },
+    { line: 'You open the clock case. The mechanism is whole — no broken spring, no jam. It simply stopped, all at once, the way clocks do where the strangeness ran wild.', effects: [], done: false, addNouns: ['case', 'mechanism', 'gears', 'spring'] },
     { line: 'Tucked behind the face, a thin disc of Aether-glass, still faintly warm. You pry it loose.', effects: [{ type: 'grant_item', name: 'Aether Residue' }], done: true },
   ],
   scratched_door: [
@@ -833,7 +833,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     { line: 'The strongbox holds what a careful household saves for a bad year: coin, and metal worth more than coin.', effects: [{ type: 'grant_tc', amount: 34 }, { type: 'grant_item', name: 'Scrap Metal' }], done: true },
   ],
   aether_tang: [
-    { line: 'You follow the taste to its source — a hairline crack in the wall, and behind it a thread of Aether-glass laid into the house\'s bones, still live.', effects: [], done: false, addNouns: ['crack', 'thread', 'wall', 'vein'] },
+    { line: 'You follow the taste to its source — a hairline crack in the wall, and behind it a thread of the strangeness-glass laid into the house\'s bones, still live.', effects: [], done: false, addNouns: ['crack', 'thread', 'wall', 'vein'] },
     { line: 'You ease a length of the glass free. It hums faintly in your palm before it dims — raw Aether residue, the good kind.', effects: [{ type: 'grant_item', name: 'Aether Residue' }, { type: 'heal', amount: 4 }], done: true },
   ],
   barefoot_prints: [
