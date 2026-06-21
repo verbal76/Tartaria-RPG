@@ -289,25 +289,31 @@ export function buildInteractionTagsTemplate(current?: Record<string, string[]>)
 
 /** The Starting-areas template — a SEPARATE list of per-faction 4-room instances,
  *  each PLACED at a location on the map (locationId). The faction's member spawns
- *  inside it. Rooms are a tiny graph: each exit points to another room's id (or
- *  null). The first room is the entry. Uses the first live faction/location id so
- *  the example is plottable; edit to taste. */
+ *  inside it. Every starting area is the SAME generic 4-room layout — armory,
+ *  mess hall, operations, supply — so any faction (any name, any number) gets a
+ *  consistent base. Rooms are a tiny graph: each exit points to another room's id
+ *  (or null). The first room (operations) is the entry. Edit room copy to taste;
+ *  the layout is intentionally faction-neutral. */
 export function buildStartingAreasTemplate(): string {
   // engine_Dev — one stub per LIVE faction (uploaded factions win over built-in),
-  // each placed at the faction's baseLocationId when set, so the ids are correct
-  // and you get an entry for every faction to flesh out.
+  // each placed at the faction's baseLocationId when set. The four rooms are
+  // GENERIC and identical across every faction so the template scales to any
+  // faction list of any length; only factionId / name / locationId differ.
   const factions = resolveTable('factions', TABLE_ROWS.factions as unknown[]) as Array<{ id?: string; name?: string; baseLocationId?: string }>;
   const list = factions.length > 0 ? factions : [{ id: 'REPLACE-with-a-faction-id', name: 'Faction' }];
+  // The shared generic layout. Entry is "operations"; the four rooms form a small
+  // connected graph (operations ↔ armory, operations ↔ mess, operations ↔ supply).
+  const genericRooms = () => [
+    { id: 'operations', name: 'Operations', shortName: 'Ops', description: 'The nerve center — a map table, comms gear, and a duty roster pinned to the wall. The way in and out.', interactables: ['map table', 'radio', 'duty roster', 'door'], exits: { north: 'armory', south: 'supply', east: 'mess', west: null }, anchorNpc: null },
+    { id: 'armory', name: 'Armory', shortName: 'Armory', description: 'Racks of weapons and gear, locked behind a steel cage. The smell of oil and cold metal.', interactables: ['weapon rack', 'gun cage', 'workbench', 'ammo crate'], exits: { north: null, south: 'operations', east: null, west: null }, anchorNpc: 'Quartermaster' },
+    { id: 'mess', name: 'Mess Hall', shortName: 'Mess', description: 'Long tables, a steaming pot, and the low murmur of off-duty talk. Rumors trade hands here.', interactables: ['pot', 'long table', 'coffee urn', 'noticeboard'], exits: { north: null, south: null, east: null, west: 'operations' }, anchorNpc: null },
+    { id: 'supply', name: 'Supply', shortName: 'Supply', description: 'Shelves of crates and footlockers — rations, spare kit, and whatever the unit hoards.', interactables: ['supply crate', 'footlocker', 'shelving', 'ledger'], exits: { north: 'operations', south: null, east: null, west: null }, anchorNpc: null },
+  ];
   const stub = (f: { id?: string; name?: string; baseLocationId?: string }) => ({
     factionId: f.id ?? 'REPLACE-with-a-faction-id',
     name: `${f.name ?? 'Faction'} HQ`,
     locationId: f.baseLocationId ?? 'REPLACE-with-this-faction-s-location-id',
-    rooms: [
-      { id: 'gate', name: 'The Gate', shortName: 'Gate', description: 'The way in. A sentry, a checkpoint, the smell of the world outside.', interactables: ['checkpoint', 'sentry', 'noticeboard'], exits: { north: 'hub', south: null, east: 'quarters', west: null }, anchorNpc: null },
-      { id: 'hub', name: 'The Yard', shortName: 'Yard', description: 'The heart of the complex — crates, comms, people moving on errands.', interactables: ['supply crate', 'radio', 'map table'], exits: { north: 'special', south: 'gate', east: null, west: 'quarters' } },
-      { id: 'quarters', name: 'The Quarters', shortName: 'Quarters', description: 'Where the unit sleeps, eats, and waits.', interactables: ['cot', 'footlocker', 'stove'], exits: { north: null, south: null, east: 'hub', west: 'gate' } },
-      { id: 'special', name: 'The Inner Room', shortName: 'Inner', description: "The faction's signature space — armory, lab, shrine, or war room.", interactables: ['weapon rack', 'ledger'], exits: { north: null, south: 'hub', east: null, west: null }, anchorNpc: 'Quartermaster' },
-    ],
+    rooms: genericRooms(),
   });
   return JSON.stringify(list.map(stub), null, 2);
 }
