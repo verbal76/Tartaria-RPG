@@ -27,7 +27,9 @@ import { getWastelandOverride } from './contentPack';
  *  optional stat fields give them real stats inline instead of relying on the
  *  name-based backfill: rarity, a description, equip-time statBonuses, and a
  *  baseDurability for gear. kind broadened to weapon/armor/relic. */
-export type WastelandLootKind = 'consumable' | 'misc' | 'relic' | 'weapon' | 'armor';
+// engine_Dev — 'currency' grants TC instead of an item (the rolled min..max is the
+// amount). All other kinds grant an inventory item.
+export type WastelandLootKind = 'consumable' | 'misc' | 'relic' | 'weapon' | 'armor' | 'currency';
 export interface WastelandLootEntry {
   name: string;
   weight: number;

@@ -18575,6 +18575,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             if (fragId) {
               get().grantCollectableFragment(fragId);
+            } else if (enc.loot.kind === 'currency') {
+              // engine_Dev — currency loot grants TC (the rolled min..max amount),
+              // NOT an inventory item.
+              const amt = Math.max(0, enc.loot.quantity);
+              set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + amt } } : s));
+              if (amt > 0) get().appendLog('reward', `✦ Recovered ${amt} TC.`);
             } else {
               // engine_Dev — honor inline stats on encounter-only loot (rarity /
               // description / equip-time statBonuses / durability) so an item that
@@ -18586,7 +18592,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const lootItem: InventoryItem = {
                 id: freshInstanceId(L.name),
                 name: L.name,
-                kind: L.kind,
+                // 'currency' is handled in the branch above; here kind is an item kind.
+                kind: L.kind as InventoryItem['kind'],
                 quantity: L.quantity,
                 tags: L.tags,
                 ...(L.rarity ? { rarity: L.rarity } : {}),

@@ -210,6 +210,7 @@ export function buildWastelandTemplate(): string {
         { name: 'Field Rations', weight: 35, min: 1, max: 2, kind: 'consumable', tags: ['food'], rarity: 'Common', description: 'Enough to keep you walking another day.' },
         { name: 'Scavenged Blade', weight: 12, min: 1, max: 1, kind: 'weapon', tags: ['weapon', 'melee'], rarity: 'Uncommon', description: "Worn, but it'll fight.", statBonuses: [{ stat: 'strength', amount: 2 }], baseDurability: 35 },
         { name: 'Salvage Scrap', weight: 30, min: 1, max: 3, kind: 'misc', tags: ['metal', 'scrap'], rarity: 'Common', description: 'Worth something to the right buyer, or a crafting input.' },
+        { name: 'Loose Coins', weight: 20, min: 10, max: 40, kind: 'currency', tags: ['currency'], description: 'kind:"currency" grants TC (the rolled min..max), NOT an item.' },
       ],
       lore_note: 'A note, half-legible: a direction, a warning, a name.',
     },
