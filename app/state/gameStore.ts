@@ -4534,7 +4534,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // contradiction: the Arbiter says outpost floors are "board and
     // brick" (correct for a hub room interior), the look narration
     // mentions "floorboards" (also interior), but the salvage
-    // refusal suggested "mud, silt, wagon, rubble" — wasteland nouns
+    // refusal suggested "mud, dust, wagon, rubble" — wasteland nouns
     // that don't belong inside the Armory. Root cause: scene noun
     // pool merged the macro location's wasteland nouns with the hub
     // room's interior interactables, so both leaked into the same
@@ -5530,7 +5530,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ("take the stairwell", "out the broken window"). This is the room-
     // level navigation the macro-tier cardinal radar doesn't cover.
     //
-    // Skip when the scene is wilderness — open silt with no hub room.
+    // Skip when the scene is wilderness — open dust with no hub room.
     // Playtest 2026-05-21 caught the dispatch_board microMicro (authored
     // for borderlands → culvert_markets) bleeding into an Outskirts
     // encounter: "A Swamp Crab emerges. Exits from this room: out to
@@ -5612,7 +5612,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (vendor) {
       // Return-visit gate: when this is an anchor NPC the player has
       // already met in this room, don't re-narrate the dramatic
-      // "Hoofbeats on the silt — Irma draws up beside you" arrival on
+      // "Hoofbeats on the dust — Irma draws up beside you" arrival on
       // every revisit. Playtest log caught this — Irma kept "arriving"
       // every time the player walked back to the Armory, which broke
       // the room's continuity. First visit gets the full arrival; later
@@ -5647,7 +5647,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const arrivalLines = [
         `A figure crests the rise — ${vendor.name}, ${vendor.title}, pack heavy across the shoulders. They set down to trade.`,
         `${vendor.name} (${vendor.title}) is already here when you arrive, stall half-unpacked. They look up and nod once.`,
-        `Hoofbeats on the silt. ${vendor.name} draws up beside you, ${vendor.title}'s mark on the pack. "Trade?" they ask.`,
+        `Hoofbeats on the dust. ${vendor.name} draws up beside you, ${vendor.title}'s mark on the pack. "Trade?" they ask.`,
         `${vendor.name}, ${vendor.title}, sits at a folding table at the edge of the ground, wares laid out neat. They beckon.`,
         `You hear a kettle whistling before you see them. ${vendor.name}, ${vendor.title}, has made camp here.`,
       ];
@@ -10095,7 +10095,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // through the gate). Earlier in this file we only patched
             // ambientNouns and left vendor / hooks / displayedAmbient /
             // microMicroId in place. Result: Irma followed the player
-            // out of the Armory into open silt — the look-around line
+            // out of the Armory into open dust — the look-around line
             // read "Irma Ironhand is here" after the gate fell away.
             // Same applies to leftover hooks and chip pools. beginScene
             // is the canonical scene-rebuild path; use it.
@@ -10111,10 +10111,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // during the explore_or_leave beat advances to main_quest.
             // No-op outside that beat.
             get().finishOutpostTutorial();
-            // First-silt hint — playtest 2026-05-21: player asked
+            // First-dust hint — playtest 2026-05-21: player asked
             // "where are the rocks and sticks?" The dig refusal inside
             // the outpost already says "leave outpost ... once on the
-            // silt you can dig for rocks, sticks, scraps" but only
+            // dust you can dig for rocks, sticks, scraps" but only
             // fires when the player tries `dig` inside the hub. Plenty
             // of players never try. Surface the same info proactively
             // the first time they leave a hub onto open ground.
@@ -10595,7 +10595,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bwhat(?:'s|\s+is)\s+your\s+(purpose|mission|role|job|task)\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} inclines their head. "I was here when the flood came. I am here while you dig. Some agreement between the Aether and the silt put me in this work — I do not remember who signed it, only that the work continues, and that I am the one who watches."`,
+            `The ${getNarratorName()} inclines their head. "I was here when the flood came. I am here while you dig. Some agreement between the Aether and the dust put me in this work — I do not remember who signed it, only that the work continues, and that I am the one who watches."`,
           );
           break;
         }
@@ -10634,7 +10634,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bdescribe\s+(you|yourself|the\s+arbiter)\b/.test(introQ)) {
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} watches you for a moment. "I am the ${getNarratorName()}. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the silt did to the seam between them."`,
+            `The ${getNarratorName()} watches you for a moment. "I am the ${getNarratorName()}. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the dust did to the seam between them."`,
           );
           break;
         }
@@ -11166,7 +11166,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
-            get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
+            get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the dust.`);
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
           break;
@@ -12420,7 +12420,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
         // bound to the player until the final act. The Order would
         // hunt the player to the ends of Tartaria for leaving one
-        // in the silt. Refuse the drop with an in-character line.
+        // in the dust. Refuse the drop with an in-character line.
         if ((item.tags ?? []).includes('quest')) {
           get().appendLog(
             'arbiter',
@@ -12869,9 +12869,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Resolve the player's target text to a faction id.
         const target = (parsed.target ?? '').toLowerCase().trim();
         if (!target) {
+          const factionNames = getFactions().map((f) => f.name).filter(Boolean);
+          const list = factionNames.length > 0 ? factionNames.join(', ') : 'one of the factions you know';
           get().appendLog(
             'arbiter',
-            `The ${getNarratorName()} waits. "Which faction? Mud Monarchs, Forgotten Order, Reclaimers Guild, True Tartarians, Eternal Dynasty."`,
+            `The ${getNarratorName()} waits. "Which faction? ${list}."`,
           );
           break;
         }
@@ -14705,7 +14707,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } : s));
         get().appendLog(
           'world',
-          `The Silt Thief drops. Under their cloak, wrapped in oilcloth, half-stamped Aetheric Discs spill across the silt. You scoop them into your own pack. Yulka's stock, recovered.`,
+          `The Silt Thief drops. Under their cloak, wrapped in oilcloth, half-stamped Aetheric Discs spill across the dust. You scoop them into your own pack. Yulka's stock, recovered.`,
         );
         get().appendLog('reward', `✦ Stolen Aetheric Discs (12).`);
         // arb120 — the fetch is DONE the instant the Discs are in hand (even from
@@ -14889,7 +14891,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (before the Silt-Thief disc grant ran its own earlier set). That stale spread
     // CLOBBERED the disc grant — the stolen Aetheric Discs were added then wiped, and
     // the yulka_discs whisper reverted from 'fetch_returned' back to 'fetch_active'
-    // (the player "defeated the silt thief but didn't get the discs"). Reading from
+    // (the player "defeated the dust thief but didn't get the discs"). Reading from
     // the live state (s.player / s.worldMemory) preserves any earlier mutation —
     // discs, whisper advance — and starts the loot reduce from the current inventory.
     set((s) => {
@@ -18268,7 +18270,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // roadside stall even with beginScene's 25% spawn rate. Roll here on
     // every peaceful outdoor step, gated on no current vendor, no
     // enemies, no hub-room. Stalls "materialize" as the player crests
-    // the next stretch of silt.
+    // the next stretch of dust.
     // OTA-409 — rate bumped 0.08 → 0.20. It was 0.15 originally, halved to
     // 0.08 at OTA-302's branch promotion (the comment was never updated and
     // still claimed 15%). Playtester crossed entire courses without meeting a
@@ -18441,7 +18443,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const hint = ahead
         ? `The compass tells you ${ahead.name} lies ${ahead.distance} stretch${ahead.distance > 1 ? 'es' : ''} further ${dir}.`
         : `The compass points ${dir} into open ground.`;
-      get().appendLog('world', `You walk ${dir} through open silt. ${hint}`);
+      get().appendLog('world', `You walk ${dir} through open ground. ${hint}`);
     } else {
       // Cardinal-travel narration pool. Previous 4-variant set hit
       // 100% Jaccard repetition by the 9th visit in the literary
@@ -18454,13 +18456,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         [
           // Footing / ground
           `You walk ${dir}. The ground here looks much like the ground behind you. You have lost track of distance.`,
-          `You push ${dir}. The silt is heavy underfoot, the horizon unchanged.`,
+          `You push ${dir}. The dust is heavy underfoot, the horizon unchanged.`,
           `You set out ${dir}. Your boots sink half an inch into the mud-flats and pull free with each step.`,
           `You strike out ${dir}. The country resists you with sameness more than distance.`,
           // Sky / weather memory
           `You head ${dir}. Mud-flats stretch the same in every direction — only the wind tells you you've moved.`,
           `You move ${dir} under a sky the color of rust. Whatever sun there was has been wrung out by the haze.`,
-          `You press ${dir}. Clouds drag along the horizon like silt in still water, slow and indifferent.`,
+          `You press ${dir}. Clouds drag along the horizon like dust in still water, slow and indifferent.`,
           // Sound / silence
           `You walk ${dir}. The silence has the weight of old metal. Your breath is the only thing that disagrees.`,
           `You step ${dir}. Somewhere distant, something settles — a stone giving up, or a structure remembering it once stood.`,
@@ -19158,7 +19160,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (result.nothing) {
       get().appendLog(
         'world',
-        `You scrape at the silt with ${toolLabel}. ${item ? '' : 'Hard going. '}Nothing of worth.`,
+        `You scrape at the dust with ${toolLabel}. ${item ? '' : 'Hard going. '}Nothing of worth.`,
       );
       // Failed dig still wears the tool, but less.
       if (item) {
@@ -19181,7 +19183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!isStackableCommodity && roomLootAlreadyGrabbed(get().worldMemory, dugRoomKey, found.name)) {
       get().appendLog(
         'world',
-        `You scrape at the silt with ${toolLabel}. The patch is picked clean — you've already taken what was here.`,
+        `You scrape at the dust with ${toolLabel}. The patch is picked clean — you've already taken what was here.`,
       );
       if (item) {
         // Tool still wears a little — you swung it.
@@ -19246,13 +19248,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (grantResult.accepted > 0) {
       get().appendLog(
         'reward',
-        `You scrape at the silt with ${toolLabel}. ✦ Recovered ${found.name} (${found.rarity}).`,
+        `You scrape at the dust with ${toolLabel}. ✦ Recovered ${found.name} (${found.rarity}).`,
       );
     } else {
       // Cap hit before any unit landed — already at the maximum.
       get().appendLog(
         'world',
-        `You scrape at the silt with ${toolLabel}. You turn up another ${found.name}, but your pack already holds as many as it can carry. You leave it in the silt.`,
+        `You scrape at the dust with ${toolLabel}. You turn up another ${found.name}, but your pack already holds as many as it can carry. You leave it in the dust.`,
       );
     }
     if (grantResult.dropped > 0 && grantResult.accepted > 0) {
@@ -20183,7 +20185,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         !!player.hubRoomId && !hasLeftOutpost
           ? `The foreman shakes his head. "The Crucible's not for first-timers. Leave the outpost and see something of the world first — travel out to a named place and come back, then I'll fire it for you."`
-          : `"There's no Crucible here," the ${getNarratorName()} says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
+          : `"There's no Crucible here," the ${getNarratorName()} says. "Find one — they wait in the dust and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
       );
       return;
     }
@@ -22427,7 +22429,7 @@ function fireYulkaFetch(
   });
   get().appendLog(
     'world',
-    `A figure rises out of the silt ahead, hands inside a slick mud-cloak. The cloak's lining glints — Aetheric Discs, more than they should be carrying. The Silt Thief sees you, and decides you saw too much.`,
+    `A figure rises out of the dust ahead, hands inside a slick mud-cloak. The cloak's lining glints — Aetheric Discs, more than they should be carrying. The Silt Thief sees you, and decides you saw too much.`,
   );
   get().appendLog(
     'combat',
@@ -22565,7 +22567,7 @@ function fireYulkaAmbush(
     });
     get().appendLog(
       'world',
-      `A figure steps out of the silt-haze ahead of you and plants their feet across your path. "Heard you came up on Aetheric Discs. Hand them over and you walk away with your teeth."`,
+      `A figure steps out of the dust-haze ahead of you and plants their feet across your path. "Heard you came up on Aetheric Discs. Hand them over and you walk away with your teeth."`,
     );
     get().appendLog(
       'combat',
@@ -23847,7 +23849,7 @@ function shuffleSliceSeeded<T>(arr: readonly T[], n: number, seed: number): T[] 
 // no inventory grant — but lands the "search wall for secret writing"
 // promise from the design call.
 const HIDDEN_TEXT_LINES = [
-  `You run a hand along the ${`{noun}`}. Etched faint under the silt: old Tartarian, three lines, the first word a name you do not know.`,
+  `You run a hand along the ${`{noun}`}. Etched faint under the dust: old Tartarian, three lines, the first word a name you do not know.`,
   `You crouch low. A symbol surfaces under the dust on the ${`{noun}`} — the Aetheric eye, open. Whoever marked it left in a hurry.`,
   `You feel the ${`{noun}`} with the flat of your palm. Carved into it, fine as a knife-cut: a date older than every kingdom on every honest map.`,
   `You catch a glint on the ${`{noun}`}. A single character pressed deep, then crossed out by a second hand. Someone disagreed with the first one.`,
@@ -23857,11 +23859,11 @@ const HIDDEN_TEXT_LINES = [
   // recycle the same six lines. Each line is one beat: a scrap of
   // history, a glimpse of who passed through, a clue the world
   // never bothered to clean up.
-  `You brush silt off the ${`{noun}`}. Tally marks — fourteen of them. The fifteenth scratch starts but doesn't finish.`,
+  `You brush dust off the ${`{noun}`}. Tally marks — fourteen of them. The fifteenth scratch starts but doesn't finish.`,
   `You squint at the ${`{noun}`}. Two faction sigils overlap — Reclaimer and Forgotten Order — and someone's hammered a third on top, blunting both.`,
   `You press your thumb to the ${`{noun}`}. Warm. Aetheric, faint, the way old crystal stays warm long after the field around it dies.`,
   `You read the ${`{noun}`} slowly. "Buried but listening." The hand that wrote it pressed hard enough to crack the underlay.`,
-  `You find a maker's mark on the ${`{noun}`} — a stylised crown over an open hand. Mud Monarch, but the older kind. Pre-flood, before they fell to the silt.`,
+  `You find a maker's mark on the ${`{noun}`} — a stylised crown over an open hand. Mud Monarch, but the older kind. Pre-flood, before they fell to the dust.`,
   `You lift dust off the ${`{noun}`}. Underneath, a price: '3 TC, no haggling.' The shop it belonged to is buried under whatever stands here now.`,
   `You catch the ${`{noun}`} at the right angle. Aetheric residue clings to it in a pattern — a hand-print, slightly larger than yours, fingers spread.`,
   `You trace the ${`{noun}`}. Numbers run along its edge: coordinates, in the old Tartarian grid the Reclaimers stopped using two centuries back.`,
@@ -23884,7 +23886,7 @@ const HIDDEN_TEXT_LINES = [
 // player breaks something apart and finds a paper / leather / journal
 // fragment tucked inside it.
 const FRAGMENT_SALVAGE_LINES = [
-  `You work the {noun} apart. Tucked inside, sealed against the silt: a folded note.`,
+  `You work the {noun} apart. Tucked inside, sealed against the dust: a folded note.`,
   `You crack the {noun} open. A page slides out — paper somehow dry, ink somehow still legible.`,
   `Something papery rustles as you strip the {noun}. You pull free a journal leaf.`,
   `Wedged into the {noun}, half-hidden by the dust: a sealed letter. You pocket it carefully.`,
@@ -24089,10 +24091,10 @@ function plantNextContractHint(
 // cardinal walking into a slot pull.
 const STEP_TRINKET_LINES = [
   `You catch the glint of something half-buried as your boot lands. You free it.`,
-  `Your foot snags on the silt. You crouch, look — and find something worth keeping.`,
+  `Your foot snags on the dust. You crouch, look — and find something worth keeping.`,
   `The wind shifts a crust of mud aside ahead of you. Underneath, a small object.`,
   `Your shadow falls across a glimmer in the ground. You stoop to lift it.`,
-  `Something nudges your boot. The silt grudgingly gives it up.`,
+  `Something nudges your boot. The dust grudgingly gives it up.`,
 ];
 
 // 2026-05-25 OTA-043 — "while you slept" pull. On every rest that
@@ -24117,9 +24119,9 @@ const REST_PULL_LINES: RestPull[] = [
   { kind: 'world', line: `Half-asleep, you hear voices somewhere down the road. By the time you sit up they're gone.` },
   { kind: 'world', line: `A bird you can't name lands a foot from where you slept, looks at you, takes off again.` },
   { kind: 'world', line: `You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.` },
-  { kind: 'world', line: `Wind in the silt overnight. Patterns in the mud around your camp — boot prints not yours, walked around you and away.` },
+  { kind: 'world', line: `Wind in the dust overnight. Patterns in the mud around your camp — boot prints not yours, walked around you and away.` },
   { kind: 'trinket', line: `You shake out your cloak in the morning. Something small falls free that you don't remember picking up.` },
-  { kind: 'trinket', line: `Pre-dawn light catches a glint near your boots. The silt offered you something while you weren't looking.` },
+  { kind: 'trinket', line: `Pre-dawn light catches a glint near your boots. The dust offered you something while you weren't looking.` },
   { kind: 'trinket', line: `You roll up your bedroll and find a small object beneath it — a gift from the ground, in the buried country's way.` },
   { kind: 'trinket', line: `Brushing yourself off, you find something tucked into the seam of your pack. Yours now, however it got there.` },
 ];
@@ -24137,12 +24139,12 @@ const TRAVEL_LORE_BEATS = [
   `The ${getNarratorName()}: "The Reclaimers tag, recover, return. The Forgotten Order kneels. The Mud Monarchs collect. The Aetherborn watch. Five answers to one buried country."`,
   `The ${getNarratorName()} glances at the horizon. "Buried cities under us. The flood didn't bury them all at once — some sank slowly enough that the people inside knew."`,
   `The ${getNarratorName()}: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
-  `The ${getNarratorName()}: "Mud-glass is silt fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
+  `The ${getNarratorName()}: "Mud-glass is dust fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
   `The ${getNarratorName()}, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
   `The ${getNarratorName()}: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
   `The ${getNarratorName()}: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
   `The ${getNarratorName()}: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
-  `The ${getNarratorName()}: "The Mud Seas are not seas. They are silt over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
+  `The ${getNarratorName()}: "The Mud Seas are not seas. They are dust over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
   `The ${getNarratorName()}: "Reclaimer code: salvage the relic, return the body, leave the place better than you found it. Most of them keep two of three."`,
   `The ${getNarratorName()}: "Aetherstone Sentinels — the architectural ones — patrol the buried passes. Some have been awake for a thousand years. You will know them when they speak."`,
   `The ${getNarratorName()}: "Tartary above and Tartaria below — same name, different country. We are walking on the one most maps refuse to name."`,
@@ -24201,7 +24203,7 @@ function narrateAmbientFind(
   const wilderness = [
     ...neutral,
     `You look closer at the ${noun}. Mud-glazed, undisturbed for a long while.`,
-    `You crouch beside the ${noun}. The silt has half-swallowed ${pronoun}.`,
+    `You crouch beside the ${noun}. The dust has half-swallowed ${pronoun}.`,
   ];
   const indoor = [
     ...neutral,
@@ -24282,7 +24284,7 @@ function narrateAmbientFind(
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     // 2026-05-25 OTA-041 — tie the hook plant to the noun the player
     // searched. Was bare hook.plantedLine, which read as a non-sequitur
-    // ("study the sign → A Tartarian body lies in the silt"). The
+    // ("study the sign → A Tartarian body lies in the dust"). The
     // connector line names the noun that drew their attention to the
     // hook target, so the discovery feels caused, not adjacent.
     get().appendLog(
