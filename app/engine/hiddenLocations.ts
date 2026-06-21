@@ -31,30 +31,54 @@ export const HIDDEN_LOCATIONS: Record<string, { placeholder: string; fx: number;
   hidden_market: { placeholder: '?', fx: 0.66, fy: 0.275 },
 };
 
-// Cache the active location-id set keyed on the resolved array's identity, so the
-// per-location reveal checks (called a lot during a map render) don't rebuild a Set
-// every call. resolveTable returns a stable reference until the locations table is
+// Cache the resolved hidden-locations map keyed on the locations array's identity,
+// so the per-location reveal checks (called a lot during a map render) don't rebuild
+// it every call. resolveTable returns a stable reference until the locations table is
 // re-uploaded, at which point the ref changes and the cache rebuilds on its own.
-let _activeIdCache: { ref: unknown; ids: Set<string> } | null = null;
-function activeLocationIds(): Set<string> {
-  const locs = resolveTable('locations', locationsJson as unknown as Location[]);
-  if (_activeIdCache && _activeIdCache.ref === locs) return _activeIdCache.ids;
-  const ids = new Set(locs.map((l) => l.id));
-  _activeIdCache = { ref: locs, ids };
-  return ids;
-}
+let _hiddenCache: { ref: unknown; map: Record<string, { placeholder: string; fx: number; fy: number }> } | null = null;
 
-/** The hidden locations that apply to the LIVE game: the built-in set filtered to
- *  ids that actually exist in the active location catalog. A re-skin whose uploaded
- *  locations don't include `hidden_market` gets an empty map here — so no phantom
- *  "?" for a place its game doesn't have. */
+/** The hidden locations that apply to the LIVE game:
+ *   1. the built-in set (HIDDEN_LOCATIONS) filtered to ids present in the active
+ *      catalog — so a re-skin without `hidden_market` gets no phantom "?"; plus
+ *   2. EVERY active location flagged `hidden: true` by the author — flag any
+ *      uploaded place to make it a discoverable "?" (still routable; reveals its
+ *      real name once visited).
+ *  A flagged location renders as a normal map pin/travel row whose NAME is gated
+ *  through revealedLocationName, so it needs no fx/fy of its own — those fields are
+ *  only used by the built-in Hidden Market's bespoke atlas overlay. */
 export function getHiddenLocations(): Record<string, { placeholder: string; fx: number; fy: number }> {
-  const ids = activeLocationIds();
+  const locs = resolveTable('locations', locationsJson as unknown as Location[]);
+  if (_hiddenCache && _hiddenCache.ref === locs) return _hiddenCache.map;
   const out: Record<string, { placeholder: string; fx: number; fy: number }> = {};
+  const ids = new Set(locs.map((l) => l.id));
   for (const [id, h] of Object.entries(HIDDEN_LOCATIONS)) {
     if (ids.has(id)) out[id] = h;
   }
+  for (const l of locs) {
+    if ((l as Location).hidden) out[l.id] = { placeholder: '?', fx: 0.5, fy: 0.5 };
+  }
+  _hiddenCache = { ref: locs, map: out };
   return out;
+}
+
+// 32-bit string hash (xmur3-lite) for a stable per-id color.
+function hashId(s: string): number {
+  let h = 1779033703 ^ s.length;
+  for (let i = 0; i < s.length; i++) {
+    h = Math.imul(h ^ s.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return (h ^= h >>> 16) >>> 0;
+}
+
+/** A stable, vivid "?" color for a hidden place, derived from its id so each
+ *  mystery reads as its own marker (the author asked for "a random color"). HSL
+ *  with a fixed high saturation + mid lightness keeps every result legible on the
+ *  dark atlas. Non-hidden / unknown ids fall back to the classic amber. */
+export function hiddenMarkerColor(id: string | null | undefined): string {
+  if (!id) return '#e6c96a';
+  const hue = hashId(id) % 360;
+  return `hsl(${hue}, 85%, 62%)`;
 }
 
 export function isHiddenLocation(id: string | null | undefined): boolean {

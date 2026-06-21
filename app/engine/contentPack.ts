@@ -33,7 +33,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'enemies', label: 'Enemies', hint: 'JSON array of enemy rows (data/enemies/…)' },
   { id: 'races', label: 'Races (playable — character creation)', hint: 'JSON array of race rows. THIS is what the race-selection screen shows. (Not the "Race lore" box up in LORE — that\'s freeform story text.)' },
   { id: 'factions', label: 'Factions (playable — character creation)', hint: 'JSON array of faction rows. THIS is what the faction-selection screen shows. (Not the "Faction lore" box up in LORE.) Optional per faction: "flavor" (2-3 sentence what-you-are blurb shown in the opening), "baseName" (their STARTER COMPLEX title — Tartaria\'s outpost equivalent, e.g. "Drydock 4 Command"), "baseLocationId" (the Locations-table id the member spawns at and is safe inside until they leave).' },
-  { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json). Optional per row: "x" / "y" — the spot to plot this location on your uploaded world map, in the world size set under MAPS (0,0 = top-left).' },
+  { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json). Optional per row: "x" / "y" — the spot to plot this location on your uploaded world map, in the world size set under MAPS (0,0 = top-left). Optional "hidden": true — the place shows as a colored "?" on the map and in the travel list (still fully routable) and reveals its real name only after the player travels there once.' },
   { id: 'weather', label: 'Weather / atmosphere', hint: 'JSON array of weather rows (data/weather/weather.json). Drives the "<name> presses on the world" atmosphere line + travel/visibility effects. Each: { "id", "name", "description", "visibility", "travelPenalty", "corruptionChance", "tags": [...] }.' },
   { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
   { id: 'powers', label: 'Powers (magic / abilities)', hint: 'Your castable powers. Each: { "discipline": "shape|summon|mend" (the engine effect it runs), "name", "title", "body", "stat": "intelligence|wisdom", "dcBase", "fuels": ["item names"], "examples": ["cast phrases"] }. Replaces Aethercraft. Hit TEMPLATE for the shape.' },
@@ -150,6 +150,15 @@ export function setWorldNameOverride(name: string | null): void {
 }
 export function hasWorldNameOverride(): boolean { return worldNameOverride != null; }
 export function getWorldName(): string { return worldNameOverride ?? DEFAULT_WORLD_NAME; }
+
+/** engine_Dev — true when the world has been re-skinned in a way that makes the
+ *  BUILT-IN Tartaria main quest (cores / Lost Capitals / phase hints) meaningless:
+ *  the locations table was replaced, or the world was renamed. The objective chip
+ *  uses this to suppress the hard-coded Tartaria caption when a re-skin has no
+ *  custom main quest of its own (it shows a neutral line instead). */
+export function isReskinActive(): boolean {
+  return hasTableOverride('locations') || worldNameOverride != null;
+}
 
 /** engine_Dev — the CORRUPTION / affliction noun (default "Corruption"). A re-skin
  *  renames the plague; appendLog swaps the word everywhere the player reads it. The

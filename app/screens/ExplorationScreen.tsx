@@ -642,7 +642,15 @@ export function ExplorationScreen() {
         // uses — both stay live so the secondary path remains as a
         // backup.
         let atUnrecovered = false;
-        if (!mq || mq.phase === 'ended') {
+        // engine_Dev — the built-in caption below (cores / Lost Capitals / phase
+        // hints) is Tartaria content. When the world is re-skinned but no custom
+        // main quest was uploaded, don't leak it — show a neutral line pointing the
+        // author at the dev console instead.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const reskinNoQuest = (require('../engine/contentPack') as typeof import('../engine/contentPack')).isReskinActive();
+        if (reskinNoQuest) {
+          mainLine = 'No main quest set — build one in the dev console.';
+        } else if (!mq || mq.phase === 'ended') {
           // No active main quest — chip still serves as the menu
           // entry but doesn't pretend to point anywhere.
           mainLine = 'No active objective.';

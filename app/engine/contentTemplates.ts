@@ -167,6 +167,9 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
       ...(row as Record<string, unknown>),
       x: (row as { x?: number }).x ?? (i + 1) * 3,
       y: (row as { y?: number }).y ?? (i + 1) * 2,
+      // engine_Dev — show the optional "hidden" flag on the last sample row so
+      // authors see the shape: a colored "?" on the map until the player visits it.
+      ...(i === Math.min(n, TABLE_ROWS.locations.length) - 1 ? { hidden: false } : {}),
     }));
     return JSON.stringify(rows, null, 2);
   }

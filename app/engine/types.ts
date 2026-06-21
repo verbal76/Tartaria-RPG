@@ -345,6 +345,12 @@ export interface Location {
    *  location at (x / worldWidth, y / worldHeight) on the uploaded world map. */
   x?: number;
   y?: number;
+  /** engine_Dev — when true, this place shows as a colored "?" on the atlas and in
+   *  the travel list (still fully routable) and reveals its real name only after
+   *  the player has TRAVELED there once. The "?" color is derived from the id so it
+   *  stays stable per place. Mirrors the built-in Hidden Market, but author-driven:
+   *  flag any uploaded location to make it a discoverable mystery. */
+  hidden?: boolean;
 }
 
 export interface QuestObjective { id: string; verb: string; target: string; tags: string[]; }

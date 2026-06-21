@@ -52,7 +52,7 @@ import {
   OUTPOST_ATLAS_COORD,
   LOCATION_ATLAS_COORDS,
 } from '../engine/atlasCoords';
-import { revealedLocationName, isLocationRevealed, isHiddenLocation, getHiddenLocations } from '../engine/hiddenLocations';
+import { revealedLocationName, isLocationRevealed, isHiddenLocation, getHiddenLocations, hiddenMarkerColor } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
@@ -569,7 +569,7 @@ export function MapScreen() {
   // engine_Dev — author-plotted location pins. Any location whose row carries
   // numeric x/y (in the world's coordinate size) is dotted on the uploaded map at
   // (x/worldW, y/worldH). The current location is highlighted.
-  const locationPinStyles: { id: string; num: number; left: number; top: number; here: boolean }[] = [];
+  const locationPinStyles: { id: string; num: number; left: number; top: number; here: boolean; hiddenQ: boolean; qColor: string }[] = [];
   // engine_Dev — grid line rects (vertical + horizontal) across the map rect.
   const gridLineStyles: { key: string; left: number; top: number; width: number; height: number }[] = [];
   // engine_Dev — the filled grid SQUARE the player is currently in.
@@ -656,12 +656,17 @@ export function MapScreen() {
         // 1-based cell → centre fraction.
         const fx = Math.max(0, Math.min(1, (lx - 0.5) / worldW));
         const fy = Math.max(0, Math.min(1, (ly - 0.5) / worldH));
+        // engine_Dev — a hidden location not yet discovered shows as a colored "?"
+        // (color stable per id) instead of its number, until the player travels there.
+        const hiddenQ = isHiddenLocation(loc.id) && !isLocationRevealed(loc.id, discoveredIds);
         locationPinStyles.push({
           id: loc.id,
           num: locNumberById.get(loc.id) ?? 0,
           left: offsetX + renderedW * fx,
           top: offsetY + renderedH * fy,
           here: loc.id === player?.currentLocationId,
+          hiddenQ,
+          qColor: hiddenMarkerColor(loc.id),
         });
       }
     }
@@ -872,9 +877,15 @@ export function MapScreen() {
               "N. <name>" row in the TRAVEL TO list below. */}
           {locationPinStyles.map((p) => (
             <View key={p.id} pointerEvents="none" style={[styles.locPinWrap, { left: p.left, top: p.top }]}>
-              <View style={[styles.locNumBadge, p.here && styles.locNumBadgeHere]}>
-                <Text style={[styles.locNumText, markerFont, p.here && styles.locNumTextHere]}>{p.num}</Text>
-              </View>
+              {p.hiddenQ ? (
+                <View style={[styles.locNumBadge, { borderColor: p.qColor }]}>
+                  <Text style={[styles.locNumText, markerFont, { color: p.qColor }]}>?</Text>
+                </View>
+              ) : (
+                <View style={[styles.locNumBadge, p.here && styles.locNumBadgeHere]}>
+                  <Text style={[styles.locNumText, markerFont, p.here && styles.locNumTextHere]}>{p.num}</Text>
+                </View>
+              )}
             </View>
           ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
@@ -1054,7 +1065,7 @@ export function MapScreen() {
                 }}
               >
                 <View style={styles.placeRowLeft}>
-                  <Text style={[styles.placeName, isHere && styles.placeNameHere]}>
+                  <Text style={[styles.placeName, isHere && styles.placeNameHere, hidden && { color: hiddenMarkerColor(p.id) }]}>
                     {numberedName}
                     {!hidden && OUTPOST_NAME_BY_LOCATION[p.id]
                       ? `  (${OUTPOST_NAME_BY_LOCATION[p.id]})`
