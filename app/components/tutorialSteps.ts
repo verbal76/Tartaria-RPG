@@ -154,7 +154,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'exploration',
     area: 'fullscreen',
     title: 'The Door Is Open',
-    body: 'The outpost door stands open. Explore what remains, or head out and begin your journey.',
+    body: 'The door stands open. Explore what remains, or head out and begin your journey.',
     arbiter:
       '"The way\'s open. Pick this place over, or step out and begin. Your call."',
   },

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { getNarratorName, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { hubNameForFaction } from '../engine/hub';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
@@ -1522,10 +1523,10 @@ export function ExplorationScreen() {
         visible={doorModalVisible}
         inline={Platform.OS === 'ios'}
         title="The Door Is Open"
-        body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap EXIT."
+        body={`The door of ${hubNameForFaction(player?.factionId)} stands open. Pick through what's left of this place, or step out and begin your journey. You can always come back later — just tap EXIT to step outside.`}
         buttons={[
           {
-            label: 'Explore the Outpost',
+            label: 'Stay & Explore',
             onPress: () => chooseTutorialExplore(),
             tone: 'neutral',
           },
