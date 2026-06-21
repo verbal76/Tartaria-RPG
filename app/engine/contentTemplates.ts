@@ -206,6 +206,20 @@ export function buildWastelandTemplate(n = 3): string {
   return JSON.stringify(out, null, 2);
 }
 
+/** The Interaction-tags template — keyword lists that decide which interactable
+ *  nouns each verb accepts. Your words are ADDED to the built-in generic set, so
+ *  list the structures/surfaces specific to your world. A noun matches by whole
+ *  word (so add the exact forms you use, e.g. both "scaffold" and "scaffolding"). */
+export function buildInteractionTagsTemplate(): string {
+  return JSON.stringify({
+    climbable: ['tower', 'wall', 'ladder', 'scaffold', 'scaffolding', 'skyscraper', 'tank', 'u-boat', 'sub', 'hull', 'fuselage', 'wing', 'pillbox', 'dome', 'statue', 'antenna', 'dish', 'fence', 'railing', 'mast', 'crane', 'rigging', 'mound', 'rubble', 'deck', 'periscope', 'hedgehog', 'crater'],
+    swimmable: ['water', 'pool', 'sea', 'flood', 'canal', 'harbor', 'column'],
+    breakable: ['window', 'door', 'crate', 'glass', 'panel', 'hatch', 'lock'],
+    searchable: ['desk', 'cabinet', 'locker', 'crate', 'body', 'corpse', 'console', 'file', 'logbook', 'cabinet'],
+    salvageable: ['wreck', 'wreckage', 'tank', 'u-boat', 'engine', 'generator', 'machine', 'fuselage', 'hull', 'console'],
+  }, null, 2);
+}
+
 /** The Hooks template — an illustrative example of the atmospheric-lead format.
  *  `plants` are the discovery line(s) + matchable nouns per hook id; `chains` are
  *  the staged outcomes, each stage carrying a list of effect verbs. The example is
@@ -324,6 +338,11 @@ export function buildGameBundleTemplate(): string {
     'wasteland',
     'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. Replaces the built-in travel encounters.',
     buildWastelandTemplate(),
+  ));
+  sections.push(bundleSection(
+    'interactionTags',
+    'Keyword lists deciding which interactable nouns each verb accepts: { climbable, swimmable, breakable, searchable, salvageable }. Your words are ADDED to the built-in generic set; match is by whole word, so add the exact forms you use (e.g. "scaffold" AND "scaffolding"). This is how a re-skin makes "tank"/"u-boat"/"fuselage" climbable.',
+    buildInteractionTagsTemplate(),
   ));
   sections.push(bundleSection(
     'whispers',

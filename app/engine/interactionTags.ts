@@ -116,6 +116,12 @@ const TAG_RULES: TagRule[] = [
 
 const TAG_CACHE = new Map<string, Set<InteractionTag>>();
 
+// engine_Dev — drop the per-noun tag cache when the uploaded interaction-tag
+// keyword override changes, so re-skin keyword additions take effect immediately.
+export function invalidateInteractionTagCache(): void {
+  TAG_CACHE.clear();
+}
+
 // v2.4.1 (OTA 023) — word-boundary match.
 //
 // The prior `lower.includes(pat)` was too greedy: short patterns
@@ -150,8 +156,14 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
   const cached = TAG_CACHE.get(lower);
   if (cached) return cached;
   const tags = new Set<InteractionTag>();
+  // engine_Dev — merge the author's uploaded keyword additions with the built-in
+  // generic set per tag, so a re-skin's words (tank, u-boat, scaffolding…) classify.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getInteractionTagsOverride();
   for (const rule of TAG_RULES) {
-    for (const pat of rule.patterns) {
+    const extra = ov?.[rule.tag as keyof typeof ov] ?? [];
+    const patterns = extra.length > 0 ? [...rule.patterns, ...extra] : rule.patterns;
+    for (const pat of patterns) {
       if (patternMatches(lower, pat)) {
         tags.add(rule.tag);
         break;

@@ -255,6 +255,21 @@ export function setWastelandOverride(obj: Record<string, unknown> | null): void 
 export function hasWastelandOverride(): boolean { return wastelandOverride != null; }
 export function getWastelandOverride(): Record<string, unknown> | null { return wastelandOverride; }
 
+// --- interaction tags override --------------------------------------------------
+// engine_Dev — the keyword lists that decide which interactable nouns are
+// climbable / swimmable / breakable / searchable / salvageable. Uploaded as
+// { climbable: [...], swimmable: [...], ... }; the author's words are ADDED to the
+// built-in generic set (so "tank", "u-boat", "scaffolding" become climbable without
+// losing "wall", "ladder").
+export type InteractionTagKey = 'climbable' | 'swimmable' | 'breakable' | 'searchable' | 'salvageable';
+let interactionTagsOverride: Partial<Record<InteractionTagKey, string[]>> | null = null;
+export function setInteractionTagsOverride(obj: Partial<Record<InteractionTagKey, string[]>> | null): void {
+  const has = obj && Object.values(obj).some((v) => Array.isArray(v) && v.length > 0);
+  interactionTagsOverride = has ? obj : null;
+}
+export function hasInteractionTagsOverride(): boolean { return interactionTagsOverride != null; }
+export function getInteractionTagsOverride(): Partial<Record<InteractionTagKey, string[]>> | null { return interactionTagsOverride; }
+
 
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
@@ -315,6 +330,7 @@ export function clearAllOverrides(): void {
   setHooksOverride(null);
   setWhispersOverride(null);
   setWastelandOverride(null);
+  setInteractionTagsOverride(null);
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;

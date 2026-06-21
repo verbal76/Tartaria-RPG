@@ -32,7 +32,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -835,6 +835,92 @@ function WastelandBox() {
   );
 }
 
+// engine_Dev — INTERACTION TAGS upload. Keyword lists per verb (climbable /
+// swimmable / breakable / searchable / salvageable); the author's words add to the
+// built-in generic set.
+function InteractionTagsBox() {
+  const loadInteractionTagsJson = useContentPackStore((s) => s.loadInteractionTagsJson);
+  const interactionTags = useContentPackStore((s) => s.interactionTags);
+  const loaded = Object.values(interactionTags).reduce((a, v) => a + (Array.isArray(v) ? v.length : 0), 0);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Interaction tags</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● +${loaded} words` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Which interactable nouns each verb accepts. One object with keyword lists:{' '}
+        <Text style={{ fontWeight: 'bold' }}>climbable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>swimmable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>breakable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>searchable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>salvageable</Text>. Your words are ADDED to the built-in
+        generic set. Match is whole-word, so add the exact forms you use (e.g. both “scaffold” and
+        “scaffolding”). This is how you make “tank / u-boat / fuselage / pillbox” climbable. Hit
+        TEMPLATE for a WWII-flavored starter.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your interaction-tags JSON object here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadInteractionTagsJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(loaded > 0 ? JSON.stringify(interactionTags, null, 2) : buildInteractionTagsTemplate());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current keywords — edit, then LOAD.' : 'Loaded the starter keywords — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(interactionTags, null, 2) : buildInteractionTagsTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearInteractionTags();
+              setStatus({ kind: 'ok', msg: 'Reset to built-in keywords.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
@@ -1083,6 +1169,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>TRAVEL ENCOUNTERS</Text>
       <WastelandBox />
+
+      <Text style={styles.sectionLabel}>INTERACTION TAGS</Text>
+      <InteractionTagsBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox
