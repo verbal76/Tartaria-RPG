@@ -495,23 +495,33 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       return { ok: false, error: `Interaction tags must be a JSON OBJECT with keyword arrays: { ${INTERACTION_TAG_KEYS.join(', ')} }.` };
     }
     const obj = parsed as Record<string, unknown>;
+    const tagSet = new Set<string>(INTERACTION_TAG_KEYS);
     const next: Record<string, string[]> = {};
-    const applied: string[] = [];
-    for (const key of INTERACTION_TAG_KEYS) {
-      const v = obj[key];
-      if (Array.isArray(v)) {
-        const words = v.filter((x): x is string => typeof x === 'string' && x.trim().length > 0).map((x) => x.trim());
-        if (words.length > 0) { next[key] = words; applied.push(`${key} (+${words.length})`); }
+    let kwCount = 0;
+    let nounCount = 0;
+    for (const [key, v] of Object.entries(obj)) {
+      if (key.startsWith('_') || !Array.isArray(v)) continue;
+      const arr = v.filter((x): x is string => typeof x === 'string' && x.trim().length > 0).map((x) => x.trim());
+      if (tagSet.has(key)) {
+        // Keyword list for a verb.
+        if (arr.length > 0) { next[key] = arr; kwCount += arr.length; }
+      } else {
+        // Explicit per-noun tags: keep only valid tag names (empty = "no verbs").
+        next[key] = arr.filter((t) => tagSet.has(t));
+        nounCount++;
       }
     }
-    if (applied.length === 0) {
-      return { ok: false, error: `No keyword lists found. Keys must be: ${INTERACTION_TAG_KEYS.join(', ')}.` };
+    if (kwCount === 0 && nounCount === 0) {
+      return { ok: false, error: `Nothing recognised. Use per-noun entries ("rusted tank": ["climbable"]) and/or keyword lists (${INTERACTION_TAG_KEYS.join(', ')}).` };
     }
     setInteractionTagsOverride(next);
     invalidateInteractionTagCache();
     set({ interactionTags: next, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), interactionTags: next });
-    return { ok: true, summary: `Added keywords: ${applied.join(', ')}.` };
+    const parts: string[] = [];
+    if (nounCount > 0) parts.push(`${nounCount} tagged noun(s)`);
+    if (kwCount > 0) parts.push(`${kwCount} keyword(s)`);
+    return { ok: true, summary: `Loaded ${parts.join(' + ')}.` };
   },
 
   loadGameBundle(json) {

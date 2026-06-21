@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
@@ -835,6 +836,38 @@ function WastelandBox() {
   );
 }
 
+// engine_Dev — shared file save / pick helpers for big lists that are painful to
+// paste (e.g. the per-noun interaction tags). Save writes JSON to a folder you pick
+// (Downloads) via SAF on Android; pick reads a chosen .json back in.
+async function saveJsonToFile(filename: string, content: string): Promise<{ ok: boolean; msg: string }> {
+  try {
+    if (Platform.OS === 'android') {
+      const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (!perm.granted) return { ok: false, msg: 'Save cancelled — no folder chosen.' };
+      const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, filename, 'application/json');
+      await FileSystem.writeAsStringAsync(uri, content);
+      return { ok: true, msg: `Saved ${filename} (${(content.length / 1024).toFixed(0)} KB) to the folder you picked. Edit it in Files, then UPLOAD FILE.` };
+    }
+    const uri = `${FileSystem.documentDirectory}${filename}`;
+    await FileSystem.writeAsStringAsync(uri, content);
+    return { ok: true, msg: `Saved to ${uri}` };
+  } catch (e) {
+    return { ok: false, msg: `Save failed: ${e instanceof Error ? e.message : String(e)}` };
+  }
+}
+async function pickJsonFile(): Promise<{ ok: boolean; content?: string; canceled?: boolean; msg?: string }> {
+  try {
+    const res = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/plain', '*/*'], copyToCacheDirectory: true, multiple: false });
+    if (res.canceled) return { ok: false, canceled: true };
+    const asset = res.assets?.[0];
+    if (!asset) return { ok: false, msg: 'No file was returned by the picker.' };
+    const content = await FileSystem.readAsStringAsync(asset.uri);
+    return { ok: true, content };
+  } catch (e) {
+    return { ok: false, msg: `Pick failed: ${e instanceof Error ? e.message : String(e)}` };
+  }
+}
+
 // engine_Dev — INTERACTION TAGS upload. Keyword lists per verb (climbable /
 // swimmable / breakable / searchable / salvageable); the author's words add to the
 // built-in generic set.
@@ -923,6 +956,36 @@ function InteractionTagsBox() {
             <Text style={styles.resetBtnText}>RESET</Text>
           </TouchableOpacity>
         )}
+      </View>
+      {/* engine_Dev — file path: the per-noun list is long; save it to a file, edit
+          in a real editor, and upload the file back (no giant paste). */}
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            // Save the FROM-LOCATIONS list (or current edits) to a file.
+            let current: Record<string, string[]> | undefined;
+            try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
+            if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
+            const content = buildInteractionTagsTemplate(current);
+            const r = await saveJsonToFile('interaction-tags.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadInteractionTagsJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: res.summary ?? 'Loaded from file.' } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
       </View>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
     </View>
