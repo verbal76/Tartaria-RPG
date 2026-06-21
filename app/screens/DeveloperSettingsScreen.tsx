@@ -441,16 +441,6 @@ function GameBundleBox() {
   const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
-  // engine_Dev — bundled PRESET (ships in the OTA, no file juggling). A partial
-  // whole-game bundle: loading it MERGES the Philadelphia Experiment identity +
-  // world lore + titles into whatever's already loaded (factions/locations/etc.
-  // stay). The engine default is still agnostic — this is opt-in, one tap.
-  const loadPhillyPreset = () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const preset = require('../data/presets/philadelphia-experiment.json');
-    const r = loadGameBundle(JSON.stringify(preset));
-    setStatus(r.ok ? { kind: 'ok', msg: `Loaded Philadelphia Experiment preset. ${r.summary ?? ''}` } : { kind: 'err', msg: r.error ?? 'Failed.' });
-  };
   // engine_Dev — EXPORT the finished game to a file you can hand off for an APK
   // bake. Clipboard works everywhere; on Android we also offer a Save-to-folder
   // (Downloads) via the Storage Access Framework so you can attach the file
@@ -556,16 +546,6 @@ function GameBundleBox() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void exportToFile(); }}>
           <Text style={styles.copyBtnText}>⬇ EXPORT (SAVE FILE)</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.hint}>
-        Bundled preset (ships in the app, no file upload needed) — loads the Philadelphia Experiment
-        identity, world lore, energy ("the Static"), corruption rename (Phase-Sickness), and 12 titles.
-        It MERGES into whatever you've already loaded (your factions / locations / etc. stay).
-      </Text>
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.loadBtn} onPress={loadPhillyPreset}>
-          <Text style={styles.loadBtnText}>★ LOAD PHILADELPHIA EXPERIMENT</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.hint}>
