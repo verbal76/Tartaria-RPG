@@ -52,6 +52,14 @@ export interface GolemDefinition {
    *  immunity — see golemDamageResist + the retaliation min-1-damage rule). */
   resistBase: number;
   resistCap: number;
+  /** engine_Dev — words the player can type after "summon" to call THIS sidekick
+   *  (e.g. ['phase', 'phase automaton']). parseGolemKind matches the longest alias
+   *  first. When omitted, the kind's own name words are used. */
+  aliases?: string[];
+  /** engine_Dev — raw-material tags this sidekick can mend from as a weaker
+   *  substitute when its exact fuel parts are out (replaces the built-in
+   *  GOLEM_ELEMENT_TAGS for uploaded summons). */
+  elementTags?: string[];
 }
 
 export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
@@ -77,6 +85,8 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     summonDC: 13, // easiest — abundant Aether Mud, low-power binding
     resistBase: 0.15,
     resistCap: 0.35,
+    aliases: ['mud'],
+    elementTags: ['mud'],
   },
   iron_golem: {
     kind: 'iron_golem',
@@ -94,6 +104,8 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     summonDC: 15,
     resistBase: 0.30,
     resistCap: 0.50,
+    aliases: ['iron'],
+    elementTags: ['metal', 'iron'],
   },
   aether_golem: {
     kind: 'aether_golem',
@@ -111,6 +123,8 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     summonDC: 17, // volatile mix, the binding fights you
     resistBase: 0.20,
     resistCap: 0.40,
+    aliases: ['aether'],
+    elementTags: ['aether', 'aetheric'],
   },
   crystal_golem: {
     kind: 'crystal_golem',
@@ -129,12 +143,49 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     summonDC: 19, // lattice-structured, the hardest to seat
     resistBase: 0.35,
     resistCap: 0.55,
+    aliases: ['crystal'],
+    elementTags: ['aether', 'crystal'],
   },
 };
 
-/** Lookup a golem definition by kind. */
+// engine_Dev — DATA-DRIVEN summon set. An uploaded "summons" pack (via the dev
+// console's SUMMONED SIDEKICKS box) replaces the built-in golems wholesale; the
+// built-in four are the default (Tartaria's golems — never used by a reskin that
+// uploads its own). Resolved at call time so an upload after boot is honored.
+//
+// The override is read through contentPack.getSummonsOverride(). Importing it
+// lazily (require) avoids a static import cycle (contentPack → … → golems).
+function readSummonsOverride(): { noun?: string; defs: GolemDefinition[] } | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const cp = require('./contentPack') as typeof import('./contentPack');
+    return cp.getSummonsOverride?.() ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** The active sidekick definitions — uploaded set if present, else the built-in four. */
+export function resolveGolemDefs(): GolemDefinition[] {
+  const ov = readSummonsOverride();
+  if (ov && Array.isArray(ov.defs) && ov.defs.length > 0) return ov.defs;
+  return Object.values(GOLEM_DEFINITIONS);
+}
+
+/** The category noun the player types after "summon" and reads in summon lines
+ *  ("golem" by default; an uploaded pack can set "automaton", "construct", …). */
+export function getSummonNoun(): string {
+  const ov = readSummonsOverride();
+  const n = ov?.noun?.trim();
+  return n && n.length > 0 ? n : 'golem';
+}
+
+/** Lookup a sidekick definition by kind, resolving against the active set. Falls
+ *  back to the first active def (never undefined) so a stale saved kind still
+ *  renders rather than crashing. */
 export function getGolemDefinition(kind: GolemKind): GolemDefinition {
-  return GOLEM_DEFINITIONS[kind];
+  const defs = resolveGolemDefs();
+  return defs.find((d) => d.kind === kind) ?? defs[0]!;
 }
 
 // ----- OTA-481: golem armaments ----------------------------------------------
@@ -149,17 +200,30 @@ export function isGolemWeapon(weaponTags: readonly string[] | undefined): boolea
   return (weaponTags ?? []).includes('golem_weapon');
 }
 
-/** Parse player input like "summon iron golem" / "summon mud" /
- *  "summon golem" → GolemKind. Defaults to mud_golem when only
- *  "golem" is named (backward-compat with the pre-existing
- *  one-type summon path). Returns null when the input doesn't
- *  reference any known golem. */
+/** Parse player input like "summon iron golem" / "summon mud" / "summon phase
+ *  automaton" → the matching sidekick kind, resolved against the ACTIVE summon set
+ *  (uploaded or built-in). Each def's aliases (longest first) + its kind token + its
+ *  name words are matched. When only the bare category noun is named (e.g. "summon
+ *  golem" / "summon automaton"), defaults to the FIRST active def — backward-compat
+ *  with the pre-existing one-type path. Returns null when nothing matches. */
 export function parseGolemKind(text: string): GolemKind | null {
   const t = text.toLowerCase();
-  if (t.includes('iron')) return 'iron_golem';
-  if (t.includes('aether') && t.includes('golem')) return 'aether_golem';
-  if (t.includes('crystal')) return 'crystal_golem';
-  if (t.includes('mud') || t.includes('golem')) return 'mud_golem';
+  const defs = resolveGolemDefs();
+  // Build (alias → kind) candidates, longest alias first so "iron golem" beats "iron".
+  const cands: { needle: string; kind: GolemKind }[] = [];
+  for (const d of defs) {
+    for (const a of d.aliases ?? []) cands.push({ needle: a.toLowerCase(), kind: d.kind });
+    cands.push({ needle: d.kind.toLowerCase().replace(/_/g, ' '), kind: d.kind });
+    for (const w of d.name.toLowerCase().split(/\s+/)) {
+      if (w && w !== getSummonNoun().toLowerCase()) cands.push({ needle: w, kind: d.kind });
+    }
+  }
+  cands.sort((a, b) => b.needle.length - a.needle.length);
+  for (const c of cands) {
+    if (c.needle && t.includes(c.needle)) return c.kind;
+  }
+  // Bare category noun ("summon golem" / "summon automaton") → first active def.
+  if (t.includes(getSummonNoun().toLowerCase()) || t.includes('golem')) return defs[0]?.kind ?? null;
   return null;
 }
 
@@ -210,7 +274,7 @@ export function golemStatBonus(golem: Companion, key: GolemStatKey): number {
  *  reaches 1, and the retaliation path always lands ≥1 damage, so a golem is
  *  durable but never immune (preserves OTA-433's "doesn't trivialize bosses"). */
 export function golemDamageResist(golem: Companion): number {
-  const def = GOLEM_DEFINITIONS[golem.kind as GolemKind];
+  const def = getGolemDefinition(golem.kind);
   if (!def) return 0;
   const trained = (golem.stats?.resilience ?? 0) * 0.02;
   return Math.min(def.resistCap ?? 0, (def.resistBase ?? 0) + trained);
@@ -267,7 +331,7 @@ export function trainGolemStat(
  *  A golem is repaired by feeding it these same parts. Returns the distinct
  *  part names for the kind. */
 export function golemRepairParts(kind: GolemKind): string[] {
-  return Array.from(new Set(GOLEM_DEFINITIONS[kind].fuel.map((f) => f.name)));
+  return Array.from(new Set(getGolemDefinition(kind).fuel.map((f) => f.name)));
 }
 
 /** OTA-466 — true if `itemName` is one of the parts this golem is made of
@@ -283,18 +347,28 @@ export function isGolemRepairPart(kind: GolemKind, itemName: string): boolean {
 export function golemRepairHeal(kind: GolemKind): number {
   // arb170 — bumped /4 → /3 so a top-up takes fewer parts (eases the
   // material drain), on top of the new out-of-combat self-mend in gameStore.
-  return Math.max(4, Math.round(GOLEM_DEFINITIONS[kind].hpMax / 3));
+  return Math.max(4, Math.round(getGolemDefinition(kind).hpMax / 3));
 }
 
 /** arb121 — the elemental material tags a golem can mend from as a WEAKER
  *  SUBSTITUTE when you're out of its exact fuel parts. A pack of aether loot can
- *  top up an Aether Golem; mud sludge an mud golem; scrap an iron golem. */
-export const GOLEM_ELEMENT_TAGS: Record<GolemKind, readonly string[]> = {
+ *  top up an Aether Golem; mud sludge an mud golem; scrap an iron golem.
+ *  engine_Dev — built-in fallback only; uploaded summons carry their own
+ *  `elementTags`. Read via golemElementTags(kind), not this map directly. */
+export const GOLEM_ELEMENT_TAGS: Record<string, readonly string[]> = {
   mud_golem: ['mud'],
   iron_golem: ['metal', 'iron'],
   aether_golem: ['aether', 'aetheric'],
   crystal_golem: ['aether', 'crystal'],
 };
+
+/** engine_Dev — the substitute-mend material tags for a kind, resolving the
+ *  active def's `elementTags` first (uploaded summons), then the built-in map. */
+export function golemElementTags(kind: GolemKind): readonly string[] {
+  const def = getGolemDefinition(kind);
+  if (def?.elementTags && def.elementTags.length > 0) return def.elementTags;
+  return GOLEM_ELEMENT_TAGS[kind] ?? [];
+}
 
 /** arb121 — true if `item` is a raw MATERIAL sharing the golem's element (but
  *  not one of its exact fuel parts). Such items mend the golem at a reduced
@@ -306,7 +380,7 @@ export function isGolemSubstitutePart(
 ): boolean {
   if (item.kind && item.kind !== 'misc') return false; // materials/loot only
   if (isGolemRepairPart(kind, item.name)) return false; // exact fuel → full-heal path
-  const el = GOLEM_ELEMENT_TAGS[kind] ?? [];
+  const el = golemElementTags(kind);
   return (item.tags ?? []).some((t) => el.includes(t.toLowerCase()));
 }
 

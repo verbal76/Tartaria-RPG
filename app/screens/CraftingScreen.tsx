@@ -13,7 +13,7 @@ import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
-import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
+import { resolveGolemDefs, getSummonNoun, type GolemDefinition } from '../engine/golems';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -56,19 +56,14 @@ const GOLEM_VARIANT_PHRASE: Record<GolemDefinition['kind'], string> = {
   crystal_golem: 'summon crystal golem',
 };
 
-const GOLEM_VARIANTS: GolemDefinition[] = [
-  GOLEM_DEFINITIONS.mud_golem,
-  GOLEM_DEFINITIONS.iron_golem,
-  GOLEM_DEFINITIONS.aether_golem,
-  GOLEM_DEFINITIONS.crystal_golem,
-];
-
 // OTA-629 — payload for the summon-confirm popup. Built once here so the summon
 // card tap AND each per-golem variant row produce the SAME confirm (no copy-to-
 // input / clipboard step anywhere in the golem flow).
 type GolemConfirm = { name: string; phrase: string; stats: string; fuel: string; afford: boolean };
 function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): GolemConfirm {
-  const phrase = GOLEM_VARIANT_PHRASE[g.kind];
+  // engine_Dev — built-ins carry a curated phrase; an uploaded summon falls back
+  // to "summon <first alias or name>" (parseGolemKind matches either).
+  const phrase = GOLEM_VARIANT_PHRASE[g.kind] ?? `summon ${(g.aliases?.[0] ?? g.name).toLowerCase()}`;
   const afford = missingIngredientsList(g.fuel, inventory).length === 0;
   const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
   const modSign = g.attackMod >= 0 ? '+' : '';
@@ -431,9 +426,11 @@ export function CraftingScreen() {
                     // copying a phrase into the input. Shape/mend keep the
                     // tap-to-stage cycling — they have no per-variant confirm.
                     if (d.showGolemVariants) {
-                      const pick = GOLEM_VARIANTS.find(
+                      // engine_Dev — live set: uploaded summons or the built-in golems.
+                      const variants = resolveGolemDefs();
+                      const pick = variants.find(
                         (g) => missingIngredientsList(g.fuel, player.inventory).length === 0,
-                      ) ?? GOLEM_VARIANTS[0]!;
+                      ) ?? variants[0]!;
                       setGolemConfirm(buildGolemConfirm(pick, player.inventory));
                       return;
                     }
@@ -466,8 +463,8 @@ export function CraftingScreen() {
                       mud_golem on a bare `summon golem`. */}
                   {d.showGolemVariants && (
                     <View style={styles.golemVariants}>
-                      <Text style={styles.golemVariantsHeader}>Golem variants — tap to stage that summon:</Text>
-                      {GOLEM_VARIANTS.map((g) => {
+                      <Text style={styles.golemVariantsHeader}>{getSummonNoun().replace(/^\w/, (c) => c.toUpperCase())} variants — tap to stage that summon:</Text>
+                      {resolveGolemDefs().map((g) => {
                         // OTA-629 — same payload the summon card uses; tapping a
                         // row opens the confirm popup (→ Summon dispatches and
                         // jumps to exploration), no copy-to-input step.

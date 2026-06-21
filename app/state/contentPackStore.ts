@@ -24,6 +24,8 @@ import {
   setCustomMainQuestOverride,
   setCustomBossesOverride,
   setCollectablesOverride,
+  setSummonsOverride,
+  setDogEnabled,
   setCrucibleNameOverride,
   setCrucibleEnabled,
   setWorldNameOverride,
@@ -106,6 +108,10 @@ interface PersistShape {
   customMainQuest?: { title?: string; steps?: unknown[] } | null;
   customBosses?: unknown[];
   collectables?: unknown[];
+  /** Uploaded summoned-sidekick pack: { noun?, defs: [...] }. Absent → built-in golems. */
+  summons?: { noun?: string; defs: unknown[] } | null;
+  /** Dog companion on/off. Absent → on (the built-in default). */
+  dogEnabled?: boolean;
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -147,6 +153,10 @@ interface ContentPackState {
   customMainQuest: { title?: string; steps?: unknown[] } | null;
   customBosses: unknown[];
   collectables: unknown[];
+  /** Uploaded summoned-sidekick pack ({ noun?, defs }) or null = built-in golems. */
+  summons: { noun?: string; defs: unknown[] } | null;
+  /** Dog companion on/off (default true). */
+  dogEnabled: boolean;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -225,6 +235,12 @@ interface ContentPackState {
   clearBosses: () => void;
   loadCollectablesJson: (json: string) => LoadResult;
   clearCollectables: () => void;
+  /** Load a summoned-sidekick pack: a bare array of summon defs, or
+   *  { noun?, summons | defs: [...] }. Replaces the built-in golems. */
+  loadSummonsJson: (json: string) => LoadResult;
+  clearSummons: () => void;
+  /** Toggle the rescuable dog companion on/off for this game. */
+  setDogCompanionEnabled: (on: boolean) => void;
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
@@ -253,7 +269,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -267,6 +283,8 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     customMainQuest: state.customMainQuest ?? undefined,
     customBosses: state.customBosses.length > 0 ? state.customBosses : undefined,
     collectables: state.collectables.length > 0 ? state.collectables : undefined,
+    summons: state.summons ?? undefined,
+    dogEnabled: state.dogEnabled === false ? false : undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
@@ -293,6 +311,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   customMainQuest: null,
   customBosses: [],
   collectables: [],
+  summons: null,
+  dogEnabled: true,
   published: false,
   narratorName: '',
   gameTitle: '',
@@ -326,6 +346,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCustomMainQuestOverride(s.customMainQuest ?? null);
     setCustomBossesOverride(s.customBosses.length > 0 ? s.customBosses : null);
     setCollectablesOverride(s.collectables.length > 0 ? s.collectables : null);
+    setSummonsOverride(s.summons ?? null);
+    setDogEnabled(s.dogEnabled !== false);
     invalidateLocationCaches();
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
@@ -739,6 +761,59 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), collectables: [] });
   },
 
+  loadSummonsJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); }
+    catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    // accept a bare array of defs, or { noun?, summons | defs: [...] }
+    let noun: string | undefined;
+    let defs: unknown = parsed;
+    if (!Array.isArray(defs) && defs && typeof defs === 'object') {
+      const o = defs as { noun?: unknown; summons?: unknown; defs?: unknown };
+      if (typeof o.noun === 'string') noun = o.noun;
+      defs = Array.isArray(o.summons) ? o.summons : o.defs;
+    }
+    if (!Array.isArray(defs) || defs.length === 0) {
+      return { ok: false, error: 'Summons must be a JSON ARRAY of sidekick defs (or { noun?, summons: [...] }). Each def needs id/kind, name, fuel[], hpMax, attackDie.' };
+    }
+    // Validate + normalize each def. `id` is accepted as an alias for `kind`.
+    const normalized: Record<string, unknown>[] = [];
+    for (const raw of defs) {
+      if (!raw || typeof raw !== 'object') return { ok: false, error: 'Every summon must be an object.' };
+      const d = { ...(raw as Record<string, unknown>) };
+      if (typeof d.kind !== 'string' && typeof d.id === 'string') d.kind = d.id;
+      if (typeof d.kind !== 'string' || !d.kind) return { ok: false, error: 'Every summon needs a string id/kind.' };
+      if (typeof d.name !== 'string' || !d.name) return { ok: false, error: `Summon "${String(d.kind)}" needs a name.` };
+      if (!Array.isArray(d.fuel)) return { ok: false, error: `Summon "${String(d.kind)}" needs a fuel[] array of { name, quantity }.` };
+      if (typeof d.hpMax !== 'number' || typeof d.attackDie !== 'string') return { ok: false, error: `Summon "${String(d.kind)}" needs numeric hpMax and a string attackDie (e.g. "1d10").` };
+      // sane defaults so a minimal upload still works in combat
+      if (typeof d.attackMod !== 'number') d.attackMod = 0;
+      if (typeof d.hitBonus !== 'number') d.hitBonus = 0;
+      if (typeof d.damageType !== 'string') d.damageType = 'bludgeoning';
+      if (typeof d.resistBase !== 'number') d.resistBase = 0.15;
+      if (typeof d.resistCap !== 'number') d.resistCap = 0.4;
+      if (typeof d.blurb !== 'string') d.blurb = '';
+      normalized.push(d);
+    }
+    const payload = { noun, defs: normalized };
+    setSummonsOverride(payload as { noun?: string; defs: never[] });
+    set({ summons: payload, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), summons: payload });
+    return { ok: true, count: normalized.length };
+  },
+
+  clearSummons() {
+    setSummonsOverride(null);
+    set({ summons: null, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), summons: null });
+  },
+
+  setDogCompanionEnabled(on) {
+    setDogEnabled(on);
+    set({ dogEnabled: on, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), dogEnabled: on });
+  },
+
   loadGameBundle(json) {
     let parsed: unknown;
     try {
@@ -765,6 +840,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextMainQuest: { title?: string; steps?: unknown[] } | null = get().customMainQuest;
     let nextBosses: unknown[] = get().customBosses;
     let nextCollectables: unknown[] = get().collectables;
+    let nextSummons: { noun?: string; defs: unknown[] } | null = get().summons;
+    let nextDogEnabled = get().dogEnabled;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -824,6 +901,19 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'collectables' || key === 'collectibles') {
         if (Array.isArray(value) && value.length > 0) { nextCollectables = value; applied.push(`collectables (${value.length})`); }
         else skipped.push('collectables (empty/not an array)');
+      } else if (key === 'summons' || key === 'sidekicks') {
+        // Bundle value may be a bare array of defs, or { noun?, summons|defs: [...] }.
+        let noun: string | undefined; let defsV: unknown = value;
+        if (!Array.isArray(defsV) && defsV && typeof defsV === 'object') {
+          const o = defsV as { noun?: unknown; summons?: unknown; defs?: unknown };
+          if (typeof o.noun === 'string') noun = o.noun;
+          defsV = Array.isArray(o.summons) ? o.summons : o.defs;
+        }
+        if (Array.isArray(defsV) && defsV.length > 0) { nextSummons = { noun, defs: defsV }; applied.push(`summons (${defsV.length})`); }
+        else skipped.push('summons (empty/not an array)');
+      } else if (key === 'dogEnabled' || key === 'dogCompanion') {
+        if (typeof value === 'boolean') { nextDogEnabled = value; applied.push(`dogEnabled (${value})`); }
+        else skipped.push('dogEnabled (not a boolean)');
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
         let rows: unknown = value;
@@ -880,6 +970,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCustomMainQuestOverride(nextMainQuest);
     setCustomBossesOverride(nextBosses.length > 0 ? nextBosses : null);
     setCollectablesOverride(nextCollectables.length > 0 ? nextCollectables : null);
+    setSummonsOverride(nextSummons ?? null);
+    setDogEnabled(nextDogEnabled !== false);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
@@ -900,6 +992,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       customMainQuest: nextMainQuest,
       customBosses: nextBosses,
       collectables: nextCollectables,
+      summons: nextSummons,
+      dogEnabled: nextDogEnabled,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
@@ -909,7 +1003,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       corruptionName: nextCorruptionName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -952,6 +1046,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.customMainQuest) out.mainQuest = s.customMainQuest;
     if (s.customBosses.length > 0) out.bosses = s.customBosses;
     if (s.collectables.length > 0) out.collectables = s.collectables;
+    if (s.summons && Array.isArray(s.summons.defs) && s.summons.defs.length > 0) out.summons = s.summons;
+    if (s.dogEnabled === false) out.dogEnabled = false;
     return JSON.stringify(out, null, 2);
   },
 
@@ -1020,7 +1116,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1059,6 +1155,11 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setCustomBossesOverride(customBosses.length > 0 ? customBosses : null);
         const collectables = Array.isArray(shape.collectables) ? shape.collectables : [];
         setCollectablesOverride(collectables.length > 0 ? collectables : null);
+        const summons = shape.summons && typeof shape.summons === 'object' && Array.isArray((shape.summons as { defs?: unknown[] }).defs) && (shape.summons as { defs: unknown[] }).defs.length > 0
+          ? (shape.summons as { noun?: string; defs: unknown[] }) : null;
+        setSummonsOverride(summons as { noun?: string; defs: never[] } | null);
+        const dogEnabled = shape.dogEnabled !== false;
+        setDogEnabled(dogEnabled);
         const published = shape.published === true;
         setPublishedFlag(published);
         const narratorName = typeof shape.narratorName === 'string' ? shape.narratorName : '';
@@ -1078,7 +1179,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

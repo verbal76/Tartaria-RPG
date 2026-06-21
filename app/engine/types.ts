@@ -1242,7 +1242,12 @@ export interface PendingDogOnboarding {
  *  via the Aethercraft `summon <type> golem` path, commanded via a
  *  golem QuickBtn in combat. Survives until HP ≤ 0 or until the
  *  player dismisses. */
-export type GolemKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem';
+// engine_Dev — widened so an uploaded "summons" pack can define its OWN sidekick
+// ids (e.g. 'phase_automaton'). The four built-in literals stay for autocomplete;
+// `(string & {})` lets any custom id flow through every kind-keyed lookup without
+// touching the call sites. resolveGolemDefs()/getGolemDefinition() resolve a kind
+// against the active (uploaded or built-in) definition set.
+export type GolemKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem' | (string & {});
 /** OTA-467 — trainable golem stats, mirroring the dog's progression. POWER
  *  boosts the golem's to-hit (full) and damage (half); RESILIENCE reduces the
  *  damage it takes from retaliation. */

@@ -473,6 +473,30 @@ export function setCollectablesOverride(rows: readonly unknown[] | null): void {
 export function hasCollectablesOverride(): boolean { return collectablesOverride != null; }
 export function getCollectablesOverride(): unknown[] | null { return collectablesOverride; }
 
+// --- summons override ----------------------------------------------------------
+// engine_Dev — SUMMONED SIDEKICKS (the golem family). An uploaded pack replaces
+// the built-in golems wholesale and may rename the category noun ("automaton",
+// "construct", …). Shape: { noun?: string, defs: GolemDefinition[] }. null =
+// built-in golems. Resolved by golems.ts resolveGolemDefs()/getSummonNoun().
+import type { GolemDefinition } from './golems';
+let summonsOverride: { noun?: string; defs: GolemDefinition[] } | null = null;
+export function setSummonsOverride(payload: { noun?: string; defs: readonly unknown[] } | null): void {
+  // The store validates/normalizes each def before this point; we trust the shape.
+  summonsOverride = payload && Array.isArray(payload.defs) && payload.defs.length > 0
+    ? { noun: payload.noun, defs: payload.defs as GolemDefinition[] }
+    : null;
+}
+export function hasSummonsOverride(): boolean { return summonsOverride != null; }
+export function getSummonsOverride(): { noun?: string; defs: GolemDefinition[] } | null { return summonsOverride; }
+
+// --- dog companion toggle ------------------------------------------------------
+// engine_Dev — the rescuable DOG sidekick is on by default (Tartaria keeps it).
+// A reskin can switch it OFF in the dev console; when off, dog-rescue scenarios
+// never fire and the dog never enters play. Existing saved dogs are untouched.
+let dogEnabled = true;
+export function setDogEnabled(on: boolean): void { dogEnabled = on !== false; }
+export function isDogEnabled(): boolean { return dogEnabled; }
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -635,6 +659,8 @@ export function clearAllOverrides(): void {
   customMainQuestOverride = null;
   customBossesOverride = null;
   collectablesOverride = null;
+  summonsOverride = null;
+  dogEnabled = true;
 }
 
 // --- publish lock --------------------------------------------------------------

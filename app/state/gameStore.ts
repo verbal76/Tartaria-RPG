@@ -9282,8 +9282,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           const wantShape = (/\b(shape|mold|manipulate)\b/.test(verbLow) && /\bstone\b/.test(tgtLow + ' ' + verbLow))
             || /\baetherstone manipulation\b/.test(verbLow);
-          const wantSummon = (/\bsummon\b/.test(verbLow) && /\bgolem\b/.test(tgtLow + ' ' + verbLow))
-            || /\baether golem\b/.test(verbLow);
+          // engine_Dev — "summon <X>" fires when X is the category noun ("golem",
+          // or an uploaded pack's noun like "automaton") OR any uploaded summon's
+          // alias/name (e.g. "summon phase"). parseGolemKind resolves all of these.
+          const wantSummon = /\bsummon\b/.test(verbLow) && (
+            /\bgolem\b/.test(tgtLow + ' ' + verbLow)
+            || /\baether golem\b/.test(verbLow)
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            || (require('../engine/golems') as typeof import('../engine/golems')).parseGolemKind(`${verbLow} ${tgtLow}`) != null
+          );
           const wantMend = (/\b(mend|heal)\b/.test(verbLow) && /\b(wounds?|self|me|aetheric)\b/.test(tgtLow + ' ' + verbLow))
             || /\baetheric healing\b/.test(verbLow);
           if (wantShape || wantSummon || wantMend) {
@@ -24943,7 +24950,7 @@ function runAethercraft(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getGolemDefinition, makeCompanion, missingFuelFor, consumeFuel } = require('../engine/golems');
+  const { getGolemDefinition, makeCompanion, missingFuelFor, consumeFuel, getSummonNoun } = require('../engine/golems') as typeof import('../engine/golems');
   // engine_Dev — the power's fuel / DC / stat / name come from the data-driven
   // power set (uploaded 'powers' override, or the built-in Aethercraft default),
   // so a re-skinned game's powers cast with their own fuel and difficulty.
@@ -24961,7 +24968,7 @@ function runAethercraft(
     if (player.golem) {
       get().appendLog(
         'arbiter',
-        `"Only one golem can wear the same Aetheric tether," the ${getNarratorName()} says. "Dismiss the ${player.golem.name} first."`,
+        `"Only one ${getSummonNoun()} can wear the same tether," the ${getNarratorName()} says. "Dismiss the ${player.golem.name} first."`,
       );
       return;
     }
@@ -25026,7 +25033,7 @@ function runAethercraft(
   const success = total >= dc;
   const disciplineLabel = power?.name ?? (
     discipline === 'shape' ? 'Aetherstone Manipulation' :
-    discipline === 'summon' ? 'Aether Golem Constructor' :
+    discipline === 'summon' ? `${getSummonNoun().replace(/^\w/, (c) => c.toUpperCase())} Constructor` :
     'Aetheric Healing');
   // OTA-145 — channel split. Pre-fix, both success and failure rolls
   // emitted to 'combat' which paints uniformly red (warning color).
@@ -25612,6 +25619,10 @@ function tryFireRescueScenario(
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
+  // engine_Dev — the dog companion can be switched OFF for a reskin in the dev
+  // console. When off, no rescue captor spawns and the dog never enters play.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  if (!(require('../engine/contentPack') as typeof import('../engine/contentPack')).isDogEnabled()) return;
   const scenario = RESCUE_SCENARIOS[scenarioId];
   const captor = spawnRescueCaptor(scenarioId, player.factionId);
   const introLines: Record<RescueScenarioId, string> = {
@@ -26198,7 +26209,7 @@ function applyItemToGolem(
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { getGolemDefinition, isGolemRepairPart, golemRepairParts, golemRepairHeal,
-    isGolemSubstitutePart, golemSubstituteHeal, GOLEM_ELEMENT_TAGS } = require('../engine/golems');
+    isGolemSubstitutePart, golemSubstituteHeal, golemElementTags } = require('../engine/golems');
   const def = getGolemDefinition(golem.kind);
   const lower = itemName.toLowerCase().trim();
   const item = player.inventory.find((i) =>
@@ -26234,7 +26245,7 @@ function applyItemToGolem(
   const isSub = !isPart && isGolemSubstitutePart(golem.kind, item);
   if (!isPart && !isSub) {
     const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
-    get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
+    get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(golemElementTags(golem.kind)?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
     return false;
   }
   if (golem.hp >= golem.hpMax) {

@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1413,6 +1413,116 @@ function CollectablesBox() {
   );
 }
 
+// engine_Dev — SUMMONED SIDEKICKS builder. The buildable companion family (the
+// engine's "golems", reskinnable). An uploaded pack replaces the built-in golems
+// wholesale and can rename the category ("automaton", "construct", …). Also holds
+// the rescuable DOG companion on/off toggle.
+function SummonsBox() {
+  const loadSummonsJson = useContentPackStore((s) => s.loadSummonsJson);
+  const summons = useContentPackStore((s) => s.summons) as { noun?: string; defs: unknown[] } | null;
+  const dogEnabled = useContentPackStore((s) => s.dogEnabled);
+  const setDogCompanionEnabled = useContentPackStore((s) => s.setDogCompanionEnabled);
+  const loaded = summons?.defs?.length ?? 0;
+  const noun = summons?.noun?.trim() || 'golem';
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  const current = () => loaded > 0 ? JSON.stringify(summons, null, 2) : buildSummonsTemplate();
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Summoned Sidekicks</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} ${noun}${loaded === 1 ? '' : 's'}` : '○ built-in golems'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        The buildable companion family — the engine's “golems”, fully reskinnable. Set a{' '}
+        <Text style={{ fontWeight: 'bold' }}>noun</Text> (what the player types after “summon”, e.g.
+        “automaton”) and a list of <Text style={{ fontWeight: 'bold' }}>summons</Text>, each with its
+        fuel, combat profile, summon DC, and aliases. The player summons by typing “summon &lt;alias&gt;”.
+        Fuel names must exist in your materials/gear catalog. The uploaded pack replaces the built-in
+        golems. Hit TEMPLATE for the shape.
+      </Text>
+
+      {/* DOG TOGGLE — independent of the summon pack. */}
+      <View style={[styles.row, { alignItems: 'center', marginBottom: 6 }]}>
+        <Text style={[styles.hint, { flex: 1, marginBottom: 0 }]}>
+          Rescuable <Text style={{ fontWeight: 'bold' }}>dog companion</Text> — {dogEnabled ? 'ON (players can rescue & keep a dog)' : 'OFF (no dog in this game)'}.
+        </Text>
+        <TouchableOpacity
+          style={dogEnabled ? styles.loadBtn : styles.tmplBtn}
+          onPress={() => { setDogCompanionEnabled(!dogEnabled); setStatus({ kind: 'ok', msg: !dogEnabled ? 'Dog companion ON.' : 'Dog companion OFF — no rescue scenarios will fire.' }); }}
+        >
+          <Text style={dogEnabled ? styles.loadBtnText : styles.tmplBtnText}>{dogEnabled ? '☑ DOG ON' : '☐ DOG OFF'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your summons JSON here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadSummonsJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} summon${r.count === 1 ? '' : 's'}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(current());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current summons — edit, then LOAD.' : 'Loaded the summons template — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : current();
+            const r = await saveJsonToFile('summons.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadSummonsJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} summon${res.count === 1 ? '' : 's'} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearSummons(); setStatus({ kind: 'ok', msg: 'Reset summons to built-in golems.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — BOSSES builder. Named, faction-affiliated bosses with stats, loot,
 // a quest item, and spawn rules — referenced by main-quest "kill" steps.
 function BossesBox() {
@@ -1999,6 +2109,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>COLLECTABLES</Text>
       <CollectablesBox />
+
+      <Text style={styles.sectionLabel}>SUMMONED SIDEKICKS</Text>
+      <SummonsBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox

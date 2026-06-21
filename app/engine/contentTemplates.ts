@@ -518,6 +518,79 @@ export function buildCollectablesTemplate(): string {
   ].join('\n');
 }
 
+/** The Summons template — the SUMMONED-SIDEKICK pack (the engine's "golem"
+ *  family, reskinnable). `noun` renames the category the player types after
+ *  "summon" and reads in the summon lines ("golem" by default). Each entry in
+ *  `summons` is one buildable sidekick: what it's made of (fuel), its combat
+ *  profile, how hard it is to summon, and the words the player types to call it.
+ *  The uploaded pack REPLACES the built-in golems wholesale. */
+export function buildSummonsTemplate(): string {
+  const body = JSON.stringify({
+    noun: 'automaton',
+    summons: [
+      {
+        kind: 'phase_automaton',
+        name: 'Phase Automaton',
+        aliases: ['phase', 'phase automaton', 'phase bot'],
+        fuel: [
+          { name: 'Phase Capacitor', quantity: 2 },
+          { name: 'Brass Frame', quantity: 1 },
+        ],
+        hpMax: 24,
+        attackDie: '1d10',
+        attackMod: 1,
+        hitBonus: 2,
+        damageType: 'piercing',
+        summonDC: 14,
+        resistBase: 0.20,
+        resistCap: 0.40,
+        elementTags: ['phase'],
+        blurb: 'Nimble striker. Phase-charged limbs hit hard but the frame is light.',
+      },
+      {
+        kind: 'fold_automaton',
+        name: 'Fold Automaton',
+        aliases: ['fold', 'fold automaton', 'fold bot'],
+        fuel: [
+          { name: 'Fold Cell', quantity: 2 },
+          { name: 'Riveted Plating', quantity: 2 },
+          { name: 'Brass Frame', quantity: 1 },
+        ],
+        hpMax: 44,
+        attackDie: '1d8',
+        attackMod: 2,
+        hitBonus: 1,
+        damageType: 'bludgeoning',
+        summonDC: 17,
+        resistBase: 0.32,
+        resistCap: 0.52,
+        elementTags: ['fold'],
+        blurb: 'Heavy guardian. Fold-core armor soaks punishment; slow but relentless.',
+      },
+    ],
+  }, null, 2);
+  return [
+    '// SUMMONED SIDEKICKS — the buildable companion family (replaces the built-in',
+    '// "golems"). Top level: { "noun"?: "automaton", "summons": [ ... ] }.',
+    '//   noun     — what the player types after "summon" and reads in the summon',
+    '//              lines (default "golem"). Each summon can also be called by its',
+    '//              own aliases below.',
+    '// Each summon:',
+    '//   kind     — a unique id (also "id" is accepted).',
+    '//   name     — display name ("Phase Automaton").',
+    '//   aliases  — words the player can type, e.g. "summon phase".',
+    '//   fuel     — [{ name, quantity }] consumed on a successful summon. Use item',
+    '//              names that EXIST in your materials/gear catalog.',
+    '//   hpMax / attackDie ("1d10") / attackMod / hitBonus / damageType',
+    '//              (bludgeoning|slashing|piercing|aetheric) — its combat profile.',
+    '//   summonDC — d20 + INT must meet this to bind it (harder = stronger).',
+    '//   resistBase/resistCap — innate damage resistance (0..1), grows with training.',
+    '//   elementTags — raw-material tags it can mend from when its exact parts run out.',
+    '// The uploaded pack REPLACES the built-in golems.',
+    body,
+  ].join('\n');
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -588,6 +661,8 @@ granular edits. Recommended order:
   - Hooks (atmospheric leads) · Whispers (overheard tips) · Travel encounters
   - Interaction tags (which verbs each noun accepts) · Titles (achievements)
   - Collectables (character stories the player reassembles from loot fragments)
+  - Summoned sidekicks (the buildable companion family — replaces "golems") +
+    the dog companion on/off toggle
 
 ## 8 · Assets (not JSON — their own uploads)
   - World map image · Per-faction maps · Music (battle + ambient, multi-select)
@@ -673,6 +748,16 @@ export function buildGameBundleTemplate(): string {
     'interactionTags',
     'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.',
     interactionTagsKeywordSample(),
+  ));
+  sections.push(bundleSection(
+    'summons',
+    'Summoned-sidekick pack (replaces the built-in "golems"), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.',
+    buildSummonsTemplate(),
+  ));
+  sections.push(bundleSection(
+    'dogEnabled',
+    'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.',
+    JSON.stringify(true),
   ));
   sections.push(bundleSection(
     'collectables',
