@@ -18198,12 +18198,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => {
       if (!s.currentScene) return s;
       const pool = s.currentScene.ambientNouns ?? [];
-      if (pool.length <= AMBIENT_DISPLAY_CAP) return s;
-      // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
-      // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
+      // engine_Dev — fresh takeable GEAR per travel tile. beginScene reliably
+      // spawns 1-3 takeable weapons/armor, but it only runs on a LOCATION change;
+      // cardinal steps WITHIN a macro location used to just re-shuffle the existing
+      // pool and never re-spawned gear, so on long legs the player's main beginner
+      // weapon/armor source dried up. Spawn gear for THIS tile (seeded by its room
+      // key → stable per tile, not farmable) and SWAP it in for the previous tile's
+      // gear (filter out prior catalog weapon/armor names first) so the pool never
+      // accumulates stale gear the player could `take` again from a later tile.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { pickTakeableGearForScene } = require('../engine/takeableGearSpawns');
+      const gearTileKey = makeRoomKey(player.currentLocationId, scene.microMicroId, step.x, step.y, player.hubRoomId);
+      const gearConsumed = roomConsumedSet(get().worldMemory, gearTileKey);
+      const tileGear: string[] = pickTakeableGearForScene(gearTileKey)
+        .filter((n: string) => !isConsumedNoun(gearConsumed, n));
+      const tileGearLower = new Set(tileGear.map((n) => n.toLowerCase()));
+      // Keep every non-gear noun (flavor / climb / salvage / water); drop the
+      // previous tile's gear (catalog weapon/armor) unless it's also this tile's.
+      const baseNonGear = pool.filter((n) => {
+        if (tileGearLower.has(n.toLowerCase())) return false; // re-added below, deduped
+        const c = findCatalogItem(n);
+        return !c || (c.kind !== 'weapon' && c.kind !== 'armor');
+      });
+      const nextPool = Array.from(new Set([...tileGear, ...baseNonGear]));
+      // Re-shuffle the DISPLAYED subset for the new tile, then prepend this tile's
+      // gear so it always shows under TAKE (mirrors beginScene's additive prepend).
       const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
-      const next = shuffleSliceSeeded(pool, AMBIENT_DISPLAY_CAP, seed);
-      return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
+      const flavorShown = baseNonGear.length > AMBIENT_DISPLAY_CAP
+        ? shuffleSliceSeeded(baseNonGear, AMBIENT_DISPLAY_CAP, seed)
+        : baseNonGear;
+      const nextDisplayed = Array.from(new Set([...tileGear, ...flavorShown]));
+      return { currentScene: { ...s.currentScene, ambientNouns: nextPool, displayedAmbientNouns: nextDisplayed } };
     });
     // Re-entry narration — when a cardinal step lands on a tile the
     // player has been to before AND that tile has persisted
