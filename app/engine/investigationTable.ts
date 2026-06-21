@@ -172,7 +172,7 @@ const TEMPLATES: Record<NounCategory, Template> = {
   },
   machinery: {
     category: 'machinery',
-    fallbackLore: 'The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.',
+    fallbackLore: 'The metal is cold and unresponsive. A faint residual hum, fading, says the mechanism was alive within the last decade.',
     yield: { itemName: 'Bent Nail', qty: 1, chance: 0.15 },
     hookKind: null,
   },
@@ -249,7 +249,7 @@ const TEMPLATES: Record<NounCategory, Template> = {
   },
   stone: {
     category: 'stone',
-    fallbackLore: 'Tartarian stone. Granular, slightly warm where the Aether saturated the matrix decades ago — not enough to be useful, just enough to remind you the Aether is everywhere.',
+    fallbackLore: 'Old stone. Granular, slightly warm where something once saturated the matrix decades ago — not enough to be useful, just enough to remind you the strangeness here runs deep.',
     yield: { itemName: 'Small Rock', qty: 1, chance: 0.25 },
     hookKind: null,
   },
@@ -260,7 +260,7 @@ const TEMPLATES: Record<NounCategory, Template> = {
   // scene.
   landmark: {
     category: 'landmark',
-    fallbackLore: 'The {noun} rises out of the silt like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks — names, prayers, accounts no one closed.',
+    fallbackLore: 'The {noun} rises out of the ground like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks — names, prayers, accounts no one closed.',
     yield: { itemName: 'Aether Residue', qty: 1, chance: 0.10 },
     hookKind: null,
   },
@@ -270,11 +270,19 @@ const TEMPLATES: Record<NounCategory, Template> = {
     // over" which made every generic-category investigate
     // look identical in the log, hiding which noun the IIFE
     // was actually resolving when async lines interleaved.
-    fallbackLore: 'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.',
+    fallbackLore: 'You look the {noun} over. Nothing about it sings, nothing about it warns — the world is full of objects waiting to be remembered.',
     yield: null,
     hookKind: null,
   },
 };
+
+/** engine_Dev — per-category default lore (neutral), exported so the flavor system
+ *  can document/override it. Overridable from the uploaded `flavor` block under the
+ *  key `investigateLore` (a record of category -> single lore line). */
+export const INVESTIGATE_LORE_DEFAULT: Partial<Record<NounCategory, string>> =
+  Object.fromEntries(
+    Object.entries(TEMPLATES).map(([k, t]) => [k, (t as Template).fallbackLore]),
+  ) as Partial<Record<NounCategory, string>>;
 
 /** Map a noun string to the category whose template applies.
  *  Falls back to 'generic' if no keyword matches. */
@@ -343,7 +351,10 @@ export function seedInvestigationTable(
 // hash on entry.noun) so the same bench in the same room
 // consistently resolves to the same line within a session
 // — not a re-roll each render.
-const CREEPY_VARIANTS: Partial<Record<NounCategory, readonly string[]>> = {
+// engine_Dev — already lore-neutral (uncanny, no proper nouns). Overridable from
+// the uploaded `flavor` block under the key `investigateCreepy` (a record of
+// category -> lines).
+export const CREEPY_VARIANTS: Partial<Record<NounCategory, readonly string[]>> = {
   furniture: [
     'The bench has someone\'s last meal still on it — a tin plate, untouched, the food perfectly preserved. The fork is laid down mid-bite.',
     'The chair faces the wall. Long scratches in the floor show it was dragged there from across the room, by someone who wanted to sit very still.',
@@ -423,15 +434,18 @@ function pickCreepyVariant(pool: readonly string[], category: NounCategory): str
 // per noun via nounSeed. Same noun always resolves to the same
 // line (player sanity), different nouns get different beats
 // (immersion).
-const GENERIC_VARIANTS: readonly string[] = [
-  'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.',
+// engine_Dev — NEUTRAL defaults (no setting-specific proper nouns). Overridable
+// from the uploaded `flavor` block under the key `investigateGeneric`; the engine
+// keeps the ambience but a re-skin replaces the lines wholesale.
+export const GENERIC_VARIANTS: readonly string[] = [
+  'You look the {noun} over. Nothing about it sings, nothing about it warns — the world is full of objects waiting to be remembered.',
   'You turn the {noun} in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
-  'The {noun} reads as ordinary, which in Tartaria is a small kind of relief. You let it go.',
-  'You weigh the {noun} and consider it. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.',
+  'The {noun} reads as ordinary, which out here is a small kind of relief. You let it go.',
+  'You weigh the {noun} and consider it. The haze does not gather; the dust does not stir. Just a thing, in a place.',
   'You give the {noun} your full attention. It returns the gesture by being exactly what it appears to be.',
-  'The {noun} resists your reading. Not hostile — just closed. Some things in the buried world don\'t open for the curious.',
-  'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.',
-  'The {noun} sits the way ordinary things sit. The Arbiter does not lean in. You move on.',
+  'The {noun} resists your reading. Not hostile — just closed. Some things don\'t open for the curious.',
+  'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace worth cataloguing.',
+  'The {noun} sits the way ordinary things sit. Nothing leans in. You move on.',
 ];
 
 /** Resolve the lore line for an entry. Returns the cached
@@ -443,27 +457,37 @@ const GENERIC_VARIANTS: readonly string[] = [
 export function resolveLore(entry: InvestigationEntry): string {
   if (entry.loreLine && entry.loreLine.length > 0) return entry.loreLine;
   const tmpl = templateFor(entry.category);
+  // engine_Dev — every pool below is overridable from the uploaded `flavor` block,
+  // so a re-skin replaces the investigation ambience wholesale (the in-code
+  // defaults are lore-neutral). Keys: investigateGeneric (string[]),
+  // investigateCreepy (category -> string[]), investigateLore (category -> string).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { resolveFlavor } = require('./contentPack') as typeof import('./contentPack');
+  const genericPool = resolveFlavor('investigateGeneric', GENERIC_VARIANTS) as readonly string[];
+  const creepyAll = resolveFlavor('investigateCreepy', CREEPY_VARIANTS) as Partial<Record<NounCategory, readonly string[]>>;
+  const loreOverrides = resolveFlavor('investigateLore', {} as Partial<Record<NounCategory, string>>);
+  const fallbackLore = loreOverrides[entry.category] ?? tmpl.fallbackLore;
   // OTA-080 — creepy variant roll. Bounded to ≈17% via
   // CREEPY_RATE, deterministic per noun so the same entry
   // resolves to the same line each render. Falls back to the
   // standard fallbackLore when the category has no creepy
   // pool or the deterministic roll missed.
-  const creepyPool = CREEPY_VARIANTS[entry.category];
+  const creepyPool = creepyAll[entry.category];
   let line: string;
   if (creepyPool && creepyPool.length > 0) {
     const roll = (nounSeed(entry.noun.toLowerCase()) % 1000) / 1000;
     if (roll < CREEPY_RATE) {
       line = pickCreepyVariant(creepyPool, entry.category);
     } else {
-      line = tmpl.fallbackLore;
+      line = fallbackLore;
     }
   } else if (entry.category === 'generic') {
     // OTA-125 — generic-category variant pool. Deterministic per
     // noun so the same noun stays consistent across re-reads.
-    const idx = nounSeed(entry.noun.toLowerCase()) % GENERIC_VARIANTS.length;
-    line = GENERIC_VARIANTS[idx]!;
+    const idx = nounSeed(entry.noun.toLowerCase()) % genericPool.length;
+    line = genericPool[idx]!;
   } else {
-    line = tmpl.fallbackLore;
+    line = fallbackLore;
   }
   return line.replace(/\{noun\}/g, entry.noun);
 }

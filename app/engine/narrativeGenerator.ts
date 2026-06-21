@@ -12,6 +12,7 @@ import type {
 } from './types';
 import { pick, chance, rotatingPick } from './rng';
 import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride } from './contentPack';
+import { GENERIC_VARIANTS as INVESTIGATE_GENERIC, CREEPY_VARIANTS as INVESTIGATE_CREEPY } from './investigationTable';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
 // lazy-loaded via require() inside getter functions below. Combined
@@ -1444,6 +1445,10 @@ export const BUILTIN_FLAVOR_POOLS = {
   raceRemarks: ARBITER_RACE_REMARKS,
   factionRemarks: ARBITER_FACTION_REMARKS,
   personalBeats: ARBITER_PERSONAL_BEATS,
+  // engine_Dev — investigation ambience (lore-neutral defaults; override to re-skin
+  // what the player reads when they investigate an object and it yields nothing).
+  investigateGeneric: INVESTIGATE_GENERIC,
+  investigateCreepy: INVESTIGATE_CREEPY,
 } as const;
 
 /** A trimmed starter object for the Narration-flavor upload box: every pool key,
