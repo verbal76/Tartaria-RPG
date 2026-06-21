@@ -18576,13 +18576,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fragId) {
               get().grantCollectableFragment(fragId);
             } else {
-              const grantResult = grantItem(livePlayer.inventory, {
-                id: freshInstanceId(enc.loot.name),
-                name: enc.loot.name,
-                kind: enc.loot.kind,
-                quantity: enc.loot.quantity,
-                tags: enc.loot.tags,
-              });
+              // engine_Dev — honor inline stats on encounter-only loot (rarity /
+              // description / equip-time statBonuses / durability) so an item that
+              // exists ONLY in this encounter still has real stats. Set durability
+              // directly from baseDurability for gear (NOT via stampDurability, which
+              // looks up by catalog name and would re-roll perks over our stats).
+              const L = enc.loot;
+              const isGear = L.kind === 'weapon' || L.kind === 'armor';
+              const lootItem: InventoryItem = {
+                id: freshInstanceId(L.name),
+                name: L.name,
+                kind: L.kind,
+                quantity: L.quantity,
+                tags: L.tags,
+                ...(L.rarity ? { rarity: L.rarity } : {}),
+                ...(L.description ? { description: L.description } : {}),
+                ...(L.statBonuses && L.statBonuses.length > 0 ? { instanceStats: { statBonuses: L.statBonuses } } : {}),
+                ...(isGear && L.baseDurability ? { durability: { current: L.baseDurability, max: L.baseDurability } } : {}),
+              };
+              const grantResult = grantItem(livePlayer.inventory, lootItem);
               set((s) => (s.player
                 ? { player: { ...s.player, inventory: grantResult.inventory } }
                 : s));

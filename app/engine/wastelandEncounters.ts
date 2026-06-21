@@ -20,16 +20,35 @@
 // average, dense enough to be interesting without becoming theme-park.
 
 import data from '../data/world/wasteland_encounters.json';
-import type { Location } from './types';
+import type { Location, Rarity } from './types';
 import { getWastelandOverride } from './contentPack';
 
+/** engine_Dev — wasteland loot. For encounter-ONLY items (not in any table), the
+ *  optional stat fields give them real stats inline instead of relying on the
+ *  name-based backfill: rarity, a description, equip-time statBonuses, and a
+ *  baseDurability for gear. kind broadened to weapon/armor/relic. */
+export type WastelandLootKind = 'consumable' | 'misc' | 'relic' | 'weapon' | 'armor';
 export interface WastelandLootEntry {
   name: string;
   weight: number;
   min: number;
   max: number;
-  kind: 'consumable' | 'misc';
+  kind: WastelandLootKind;
   tags: string[];
+  rarity?: Rarity;
+  description?: string;
+  statBonuses?: { stat: string; amount: number }[];
+  baseDurability?: number;
+}
+export interface ResolvedWastelandLoot {
+  name: string;
+  quantity: number;
+  kind: WastelandLootKind;
+  tags: string[];
+  rarity?: Rarity;
+  description?: string;
+  statBonuses?: { stat: string; amount: number }[];
+  baseDurability?: number;
 }
 
 export type WastelandEncounterType = 'treasure' | 'npc' | 'skirmish' | 'mini_dungeon' | 'fusion_bench';
@@ -94,7 +113,7 @@ export interface WastelandEncounter {
   type: WastelandEncounterType;
   narration: string;
   /** Resolved loot entry (rolled) — null when no loot pool. */
-  loot: { name: string; quantity: number; kind: 'consumable' | 'misc'; tags: string[] } | null;
+  loot: ResolvedWastelandLoot | null;
   /** Resolved NPC line (rolled) — null when no dialogue pool. */
   npcLine: string | null;
   /** Optional follow-up narration appended on a separate log entry. */
@@ -291,7 +310,7 @@ export function pickWastelandEncounter(
 function rollLoot(
   pool: WastelandLootEntry[],
   rng: () => number,
-): { name: string; quantity: number; kind: 'consumable' | 'misc'; tags: string[] } | null {
+): ResolvedWastelandLoot | null {
   if (pool.length === 0) return null;
   const totalWeight = pool.reduce((acc, p) => acc + p.weight, 0);
   if (totalWeight <= 0) return null;
@@ -304,7 +323,11 @@ function rollLoot(
   }
   const span = picked.max - picked.min;
   const quantity = picked.min + (span > 0 ? Math.floor(rng() * (span + 1)) : 0);
-  return { name: picked.name, quantity, kind: picked.kind, tags: picked.tags };
+  return {
+    name: picked.name, quantity, kind: picked.kind, tags: picked.tags,
+    rarity: picked.rarity, description: picked.description,
+    statBonuses: picked.statBonuses, baseDurability: picked.baseDurability,
+  };
 }
 
 /** Exposed for tests. */
