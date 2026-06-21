@@ -70,7 +70,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, getNarratorName, dressNarratorArticles, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -15856,6 +15856,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    if (!isCrucibleEnabled()) return; // fusion disabled for this game
     if (state.tutorialDemoVendor) {
       get().appendLog('system', 'Tour mode — the crucible is offline while the tutorial is running.');
       return;
@@ -20087,6 +20088,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async fuseAtCrucible() {
     const player = get().player;
     if (!player) return;
+    // engine_Dev — fusion can be turned OFF entirely for games that don't want it.
+    // Single chokepoint: every entry (typed 'fuse', the chip, the vendor offer,
+    // the catalyst-confirm path) flows through here, so one guard covers them all.
+    if (!isCrucibleEnabled()) {
+      get().appendLog('world', `There's no ${getCrucibleName().toLowerCase()} here — item fusion isn't part of this world.`);
+      return;
+    }
     // Gate 1 — permit. A wild fusion_bench encounter sets fusionPending;
     // additionally (arb103) EVERY outpost has its own Crucible, so being
     // inside your outpost grants access without the flag.

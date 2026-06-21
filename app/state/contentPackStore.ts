@@ -17,6 +17,8 @@ import {
   setMissionsOverride,
   setHooksOverride,
   setWhispersOverride,
+  setCrucibleNameOverride,
+  setCrucibleEnabled,
   CONTENT_TABLES,
   LORE_BLOCKS,
   type ContentTableId,
@@ -90,6 +92,10 @@ interface PersistShape {
   gameTitle?: string;
   /** Custom tagline; '' / absent → world-lore tagline or the default. */
   gameTagline?: string;
+  /** Custom name for the item-fusion feature; '' / absent → "Crucible". */
+  crucibleName?: string;
+  /** When false, the fusion feature is disabled. Absent → enabled. */
+  crucibleEnabled?: boolean;
   /** Dev mode: while true, the dev console is the first/default Settings tab.
    *  Absent → treated as true (engine dev build default). */
   devMode?: boolean;
@@ -115,6 +121,10 @@ interface ContentPackState {
   gameTitle: string;
   /** The author's custom tagline ('' = world-lore tagline or the default). */
   gameTagline: string;
+  /** Custom name for the fusion feature ('' = "Crucible"). */
+  crucibleName: string;
+  /** When false, the fusion feature is disabled (no chip / vendor offer / fuse). */
+  crucibleEnabled: boolean;
   /** While true, Settings opens to the dev console as its first/default tab. */
   devMode: boolean;
   /** Bumped by reapply() (and uploads) so content-reading screens re-render. */
@@ -130,6 +140,10 @@ interface ContentPackState {
   setGameTitle: (name: string) => void;
   /** Set the tagline (pass '' to fall back to world lore / the default). */
   setGameTagline: (text: string) => void;
+  /** Rename the fusion feature (pass '' to reset to "Crucible"). */
+  setCrucibleName: (name: string) => void;
+  /** Enable / disable the fusion feature entirely. */
+  setCrucibleEnabled: (on: boolean) => void;
   /** Turn dev mode on/off (controls the Settings dev tab + default tab). */
   setDevMode: (on: boolean) => void;
   /** Force the engine to re-read every uploaded pack: re-mirror all overrides
@@ -170,7 +184,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -181,6 +195,8 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
     gameTagline: state.gameTagline || undefined,
+    crucibleName: state.crucibleName || undefined,
+    crucibleEnabled: state.crucibleEnabled === false ? false : undefined,
     devMode: state.devMode,
   };
   void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shape)).catch(() => { /* best effort */ });
@@ -196,6 +212,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   narratorName: '',
   gameTitle: '',
   gameTagline: '',
+  crucibleName: '',
+  crucibleEnabled: true,
   devMode: true,
   contentVersion: 0,
   hydrated: false,
@@ -216,6 +234,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
     setGameTaglineOverride(s.gameTagline || null);
+    setCrucibleNameOverride(s.crucibleName || null);
+    setCrucibleEnabled(s.crucibleEnabled);
     setPublishedFlag(s.published);
     set({ contentVersion: s.contentVersion + 1 });
   },
@@ -258,6 +278,19 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setGameTaglineOverride(clean.length > 0 ? clean : null);
     set({ gameTagline: clean });
     persist({ ...get(), gameTagline: clean });
+  },
+
+  setCrucibleName(name) {
+    const clean = name.trim();
+    setCrucibleNameOverride(clean.length > 0 ? clean : null);
+    set({ crucibleName: clean, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), crucibleName: clean });
+  },
+
+  setCrucibleEnabled(on) {
+    setCrucibleEnabled(on);
+    set({ crucibleEnabled: on, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), crucibleEnabled: on });
   },
 
   loadTableJson(id, json) {
@@ -418,6 +451,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
+    let nextCrucibleName = get().crucibleName;
+    let nextCrucibleEnabled = get().crucibleEnabled;
     const applied: string[] = [];
     const skipped: string[] = [];
 
@@ -477,6 +512,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         if (typeof value === 'string') { nextTitle = value.trim(); applied.push('title'); }
       } else if (key === 'tagline' || key === 'gameTagline') {
         if (typeof value === 'string') { nextTagline = value.trim(); applied.push('tagline'); }
+      } else if (key === 'crucibleName') {
+        if (typeof value === 'string') { nextCrucibleName = value.trim(); applied.push('crucible name'); }
+      } else if (key === 'crucibleEnabled') {
+        if (typeof value === 'boolean') { nextCrucibleEnabled = value; applied.push(`crucible ${value ? 'enabled' : 'disabled'}`); }
       } else {
         skipped.push(`${key} (unknown section)`);
       }
@@ -492,6 +531,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
+    setCrucibleNameOverride(nextCrucibleName || null);
+    setCrucibleEnabled(nextCrucibleEnabled);
     set({
       tables: nextTables,
       lore: nextLore,
@@ -501,9 +542,11 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
+      crucibleName: nextCrucibleName,
+      crucibleEnabled: nextCrucibleEnabled,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled });
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
   },
@@ -515,6 +558,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.gameTitle) out.title = s.gameTitle;
     if (s.gameTagline) out.tagline = s.gameTagline;
     if (s.narratorName) out.narrator = s.narratorName;
+    if (s.crucibleName) out.crucibleName = s.crucibleName;
+    if (s.crucibleEnabled === false) out.crucibleEnabled = false;
     // Lore blocks (world / faction / race / flavor), in the registry's order.
     for (const b of LORE_BLOCKS) {
       const v = s.lore[b.id];
@@ -574,7 +619,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   clearAll() {
     clearAllOverrides();
     setPublishedFlag(false);
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -606,9 +651,13 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setGameTitleOverride(gameTitle.length > 0 ? gameTitle : null);
         const gameTagline = typeof shape.gameTagline === 'string' ? shape.gameTagline : '';
         setGameTaglineOverride(gameTagline.length > 0 ? gameTagline : null);
+        const crucibleName = typeof shape.crucibleName === 'string' ? shape.crucibleName : '';
+        setCrucibleNameOverride(crucibleName.length > 0 ? crucibleName : null);
+        const crucibleEnabled = shape.crucibleEnabled !== false;
+        setCrucibleEnabled(crucibleEnabled);
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
-        set({ tables, lore, missions, hooks, whispers, published, narratorName, gameTitle, gameTagline, devMode });
+        set({ tables, lore, missions, hooks, whispers, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

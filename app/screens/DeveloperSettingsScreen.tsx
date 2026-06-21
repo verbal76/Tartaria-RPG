@@ -24,8 +24,11 @@ import {
   getNarratorName,
   getGameTitle,
   getGameTagline,
+  getCrucibleName,
+  hasCrucibleNameOverride,
   DEFAULT_NARRATOR_NAME,
   DEFAULT_GAME_TITLE,
+  DEFAULT_CRUCIBLE_NAME,
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
@@ -140,6 +143,10 @@ function GameIdentitySection() {
   const setGameTitle = useContentPackStore((s) => s.setGameTitle);
   const setGameTagline = useContentPackStore((s) => s.setGameTagline);
   const setNarratorName = useContentPackStore((s) => s.setNarratorName);
+  const crucibleName = useContentPackStore((s) => s.crucibleName);
+  const crucibleEnabled = useContentPackStore((s) => s.crucibleEnabled);
+  const setCrucibleName = useContentPackStore((s) => s.setCrucibleName);
+  const setCrucibleEnabledFn = useContentPackStore((s) => s.setCrucibleEnabled);
   return (
     <>
       <Text style={styles.sectionLabel}>GAME</Text>
@@ -181,6 +188,42 @@ function GameIdentitySection() {
         autoCapitalize="words"
         maxLength={40}
         onSave={setNarratorName}
+      />
+
+      <Text style={styles.sectionLabel}>FEATURES</Text>
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Item fusion ({getCrucibleName()})</Text>
+          <Text style={crucibleEnabled ? styles.badgeOn : styles.badgeOff}>
+            {crucibleEnabled ? '● on' : '○ disabled'}
+          </Text>
+        </View>
+        <Text style={styles.hint}>
+          The fusion feature lets players reserve items and forge them into a unique piece — the
+          built-in “{DEFAULT_CRUCIBLE_NAME}”. Rename it for your world, or turn it off entirely if
+          your game has no item fusion (the chip, the vendor offer, and the fuse action all
+          disappear).
+        </Text>
+        <TouchableOpacity
+          style={[styles.applyBtn, !crucibleEnabled && styles.resetBtn]}
+          onPress={() => setCrucibleEnabledFn(!crucibleEnabled)}
+        >
+          <Text style={crucibleEnabled ? styles.applyBtnText : styles.resetBtnText}>
+            {crucibleEnabled ? `✓ ${getCrucibleName()} ENABLED — tap to DISABLE` : `✕ DISABLED — tap to ENABLE`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <RenameBox
+        title="Fusion feature name"
+        hint="What the fusion station is called everywhere the player sees it (chip, vendor offer, narration). Leave blank for “Crucible”."
+        defaultLabel={DEFAULT_CRUCIBLE_NAME}
+        active={getCrucibleName()}
+        isCustom={hasCrucibleNameOverride()}
+        initial={crucibleName}
+        placeholder={DEFAULT_CRUCIBLE_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setCrucibleName}
       />
     </>
   );

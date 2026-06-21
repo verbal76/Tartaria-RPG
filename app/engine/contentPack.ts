@@ -72,6 +72,10 @@ const loreOverrides: Partial<Record<LoreBlockId, unknown>> = {};
 let narratorNameOverride: string | null = null;
 let gameTitleOverride: string | null = null;
 let gameTaglineOverride: string | null = null;
+// engine_Dev — the item-fusion feature ("Crucible"). Renamable, or disabled
+// entirely, from the dev console. Default name + enabled.
+let crucibleNameOverride: string | null = null;
+let crucibleEnabled = true;
 
 /** Rename the game (or null to fall back to "Text RPG Engine"). */
 export function setGameTitleOverride(name: string | null): void {
@@ -112,6 +116,21 @@ export function hasNarratorNameOverride(): boolean {
 export function getNarratorName(): string {
   return narratorNameOverride ?? DEFAULT_NARRATOR_NAME;
 }
+
+/** The item-fusion feature's display name — "Crucible" by default, renamable in
+ *  the dev console (e.g. "Reality Welder", "The Fold-Forge"). Read by every
+ *  player-facing fusion label + narration. */
+export const DEFAULT_CRUCIBLE_NAME = 'Crucible';
+export function setCrucibleNameOverride(name: string | null): void {
+  const trimmed = typeof name === 'string' ? name.trim() : '';
+  crucibleNameOverride = trimmed.length > 0 ? trimmed : null;
+}
+export function hasCrucibleNameOverride(): boolean { return crucibleNameOverride != null; }
+export function getCrucibleName(): string { return crucibleNameOverride ?? DEFAULT_CRUCIBLE_NAME; }
+/** When false, the fusion feature is OFF: no Crucible chip, no vendor offer, and
+ *  the fuse action refuses — for games that don't want item fusion at all. */
+export function setCrucibleEnabled(on: boolean): void { crucibleEnabled = on; }
+export function isCrucibleEnabled(): boolean { return crucibleEnabled; }
 
 /** Fix the grammar when the narrator carries a PROPER NAME instead of a role.
  *  Built-in narration is written for role-words ("the Narrator looks up", "the
@@ -287,6 +306,8 @@ export function clearAllOverrides(): void {
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;
+  crucibleNameOverride = null;
+  crucibleEnabled = true;
 }
 
 // --- publish lock --------------------------------------------------------------

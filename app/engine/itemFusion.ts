@@ -24,6 +24,7 @@
 import type { InventoryItem, UniqueItemStats } from './types';
 import { isInferredItem } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
+import { getCrucibleName } from './contentPack';
 import { getWorldTone } from './contentPack';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
@@ -462,7 +463,7 @@ function buildNamePrompt(
     {
       role: 'user',
       content: [
-        `A ${stats.rarity} ${kindWord} (${power}) was just forged at an Aetheric Crucible from these scraps: ${inputList || 'assorted salvage'}.`,
+        `A ${stats.rarity} ${kindWord} (${power}) was just forged at a ${getCrucibleName()} from these scraps: ${inputList || 'assorted salvage'}.`,
         `Material profile: ${tagProfile.join(', ') || 'mixed'}.`,
         'Name it and describe it. Return the JSON.',
       ].join('\n'),
@@ -635,8 +636,8 @@ export function synthesizeFusionDeterministic(
   if (tagSet.has('stealth')) {
     baseStats.statBonus = { stat: 'stealth', amount: rarity === 'Legendary' ? 2 : 1 };
   }
-  baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
-  const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
+  baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The ${getCrucibleName()} answered.`;
+  const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the ${getCrucibleName()}'s last breath.`;
   return { name, description, stats: baseStats };
 }
 

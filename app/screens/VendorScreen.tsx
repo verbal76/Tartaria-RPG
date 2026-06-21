@@ -5,6 +5,7 @@ import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
@@ -288,7 +289,7 @@ export function VendorScreen() {
             is redundant. Mirror the exploration chip's own gate so the two never
             both show. Roadside / wild stalls (no hub, not market) keep it — it's
             the only Crucible there. */}
-        {!(player?.fusionPending
+        {isCrucibleEnabled() && !(player?.fusionPending
           || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market') && (
           <TouchableOpacity
@@ -296,7 +297,7 @@ export function VendorScreen() {
             onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
             activeOpacity={0.7}
           >
-            <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
+            <Text style={styles.crucibleBtnText}>★★ USE {getCrucibleName().toUpperCase()} · 25 TC</Text>
           </TouchableOpacity>
         )}
       </View>

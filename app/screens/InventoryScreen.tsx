@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { getCrucibleName } from '../engine/contentPack';
 import {
   CATEGORY_COLORS,
   CATEGORY_LABEL,
@@ -915,7 +916,7 @@ export function InventoryScreen() {
         {/* arb-fix — distinct empty copy when the FUSABLE filter hides
             everything, so it doesn't read as a totally empty pack. */}
         {player.inventory.length > 0 && sortKey === 'fusionable' && sorted.length === 0 && (
-          <Text style={styles.empty}>Nothing in your pack qualifies for the Crucible yet. Salvage-grade engine-named items and faction gear can be fused.</Text>
+          <Text style={styles.empty}>Nothing in your pack qualifies for the {getCrucibleName()} yet. Salvage-grade engine-named items and faction gear can be fused.</Text>
         )}
       </ScrollView>
 

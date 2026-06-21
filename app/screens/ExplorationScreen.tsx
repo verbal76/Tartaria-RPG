@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { getNarratorName } from '../engine/contentPack';
+import { getNarratorName, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
@@ -737,7 +737,7 @@ export function ExplorationScreen() {
           spawn macro-location). A wild fusion_bench permit (fusionPending)
           still shows it anywhere. This also keeps it off-screen for the whole
           tutorial, which runs before you've ever left. */}
-      {!crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
+      {isCrucibleEnabled() && !crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -758,7 +758,7 @@ export function ExplorationScreen() {
           <View style={styles.fusionBannerStripe} />
           <View style={styles.vendorBannerBody}>
             <Text style={styles.fusionBannerName}>
-              {gate.ok ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}
+              {gate.ok ? `★★ ${getCrucibleName()} ready` : `★★ ${getCrucibleName()} · needs prep`}
             </Text>
             <Text style={styles.vendorBannerHint}>
               {gate.ok
