@@ -52,7 +52,7 @@ import {
   OUTPOST_ATLAS_COORD,
   LOCATION_ATLAS_COORDS,
 } from '../engine/atlasCoords';
-import { revealedLocationName, isLocationRevealed, isHiddenLocation, HIDDEN_LOCATIONS } from '../engine/hiddenLocations';
+import { revealedLocationName, isLocationRevealed, isHiddenLocation, getHiddenLocations } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { openContractMarkers, type ContractFamily } from '../engine/contractMarkers';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
@@ -667,7 +667,9 @@ export function MapScreen() {
     }
     // OTA-498 — pin the Hidden Market overlay to its fixed atlas fraction (world
     // atlas only). Centered on the point via the fixed wrap size.
-    const hm = showingOutpost ? null : HIDDEN_LOCATIONS.hidden_market;
+    // engine_Dev — only the live game's hidden locations (existence-filtered); a
+    // re-skin without `hidden_market` gets undefined here → no phantom overlay.
+    const hm = showingOutpost ? null : getHiddenLocations().hidden_market;
     if (hm) {
       hiddenMarketStyle = {
         left: offsetX + renderedW * hm.fx - HM_LABEL_W / 2,
