@@ -199,7 +199,7 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
  *  from your Enemies table. */
 export function buildWastelandTemplate(): string {
   return JSON.stringify({
-    _comment: "Travel encounters. This is a GROWABLE LIST: each top-level key is ONE encounter — add as many as you want (copy a block, give it a new key). type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in. weight = how often it's picked vs the others. Replace the REPLACE-... placeholders.",
+    _comment: "Travel encounters. This is a GROWABLE LIST: each top-level key is ONE encounter — add as many as you want (copy a block, give it a new key). type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in. weight = how often it's picked vs the others. loot kind: consumable|misc|relic|weapon|armor|currency (currency grants TC = the rolled min..max). statBonuses use ONLY these stats: strength, dexterity, intelligence, wisdom, charisma, stealth. Replace the REPLACE-... placeholders.",
 
     roadside_cache: {
       type: 'treasure',
@@ -224,7 +224,7 @@ export function buildWastelandTemplate(): string {
       narration: 'A half-submerged wreck breaks the surface {direction} of you, cargo still strapped to the deck.',
       loot: [
         { name: 'Sealed Field Kit', weight: 30, min: 1, max: 1, kind: 'consumable', tags: ['medical', 'heal'], rarity: 'Uncommon', description: 'A watertight medical kit. Closes wounds the hard way.' },
-        { name: 'Pressure Plate', weight: 12, min: 1, max: 1, kind: 'armor', tags: ['armor'], rarity: 'Uncommon', description: 'A salvaged hull plate, barnacled but sound.', statBonuses: [{ stat: 'constitution', amount: 2 }], baseDurability: 40 },
+        { name: 'Pressure Plate', weight: 12, min: 1, max: 1, kind: 'armor', tags: ['armor'], rarity: 'Uncommon', description: 'A salvaged hull plate, barnacled but sound. Bracing it builds the shoulders.', statBonuses: [{ stat: 'strength', amount: 2 }], baseDurability: 40 },
         { name: 'Tangled Wiring', weight: 28, min: 1, max: 3, kind: 'misc', tags: ['scrap'], rarity: 'Common', description: 'Copper worth pulling for the forge.' },
       ],
       lore_note: 'The water here refuses to lie flat.',
