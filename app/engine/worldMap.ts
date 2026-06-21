@@ -237,6 +237,17 @@ const CANON_REF_FX = 0.5;
 const CANON_REF_FY = 0.5;
 let _canonCache: Record<string, { x: number; y: number }> | null = null;
 
+/** engine_Dev — drop the canonical-position caches so they rebuild from the LIVE
+ *  locations list. Must be called whenever the uploaded locations table changes
+ *  (upload / clear / APPLY ALL / bundle load / hydrate); otherwise routing,
+ *  distance estimates, and the travel list keep using the positions computed from
+ *  whatever locations were active when the cache first warmed (e.g. built-in
+ *  Tartaria), so a re-skin's locations wouldn't be routable. */
+export function invalidateLocationCaches(): void {
+  _canonCache = null;
+  _canonCellIndex = null;
+}
+
 function atlasFractionFor(id: string): { fx: number; fy: number } | null {
   const a = LOCATION_ATLAS_COORDS[id];
   if (a) return a;

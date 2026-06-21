@@ -30,6 +30,8 @@ import {
 /** The mission sub-tables an uploaded Missions object may carry. */
 const MISSION_KEYS: MissionTableId[] = ['hunts', 'mysteries', 'factionQuests', 'storylines', 'objectives', 'complications', 'rewards'];
 
+import { invalidateLocationCaches } from '../engine/worldMap';
+
 const STORAGE_KEY = 'tartaria.contentPack.v1';
 
 export interface LoadResult {
@@ -237,6 +239,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCrucibleNameOverride(s.crucibleName || null);
     setCrucibleEnabled(s.crucibleEnabled);
     setPublishedFlag(s.published);
+    invalidateLocationCaches(); // rebuild routing positions from the live locations
     set({ contentVersion: s.contentVersion + 1 });
   },
 
@@ -314,6 +317,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       return { ok: false, error: 'The array is empty.' };
     }
     setTableOverride(id, parsed);
+    if (id === 'locations') invalidateLocationCaches();
     const tables = { ...get().tables, [id]: parsed };
     set({ tables, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), tables });
@@ -547,6 +551,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       contentVersion: get().contentVersion + 1,
     });
     persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled });
+    invalidateLocationCaches(); // a bundle may have replaced the locations table
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
   },
@@ -581,6 +586,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
 
   clearTable(id) {
     setTableOverride(id, null);
+    if (id === 'locations') invalidateLocationCaches();
     const tables = { ...get().tables };
     delete tables[id];
     set({ tables, contentVersion: get().contentVersion + 1 });
@@ -619,6 +625,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   clearAll() {
     clearAllOverrides();
     setPublishedFlag(false);
+    invalidateLocationCaches();
     set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
@@ -657,6 +664,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setCrucibleEnabled(crucibleEnabled);
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
+        invalidateLocationCaches(); // routing positions must reflect the hydrated locations
         set({ tables, lore, missions, hooks, whispers, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, devMode });
       }
     } catch {
