@@ -430,6 +430,17 @@ export function setCustomTitlesOverride(rows: readonly unknown[] | null): void {
 export function hasCustomTitlesOverride(): boolean { return customTitlesOverride != null; }
 export function getCustomTitles(): unknown[] { return customTitlesOverride ?? []; }
 
+// --- custom main quest override -------------------------------------------------
+// engine_Dev — a DATA-DRIVEN main quest: an ordered list of objective steps, each
+// { action, target, locationId, reward? }, built line-by-line in the dev console.
+// null = the built-in main quest. Shape lives in customMainQuest.ts.
+let customMainQuestOverride: { title?: string; steps?: unknown[] } | null = null;
+export function setCustomMainQuestOverride(obj: { title?: string; steps?: unknown[] } | null): void {
+  customMainQuestOverride = obj && Array.isArray(obj.steps) && obj.steps.length > 0 ? obj : null;
+}
+export function hasCustomMainQuestOverride(): boolean { return customMainQuestOverride != null; }
+export function getCustomMainQuest(): { title?: string; steps?: unknown[] } | null { return customMainQuestOverride; }
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -589,6 +600,7 @@ export function clearAllOverrides(): void {
   worldNameOverride = null;
   corruptionNameOverride = null;
   customTitlesOverride = null;
+  customMainQuestOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

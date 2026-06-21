@@ -534,6 +534,11 @@ export function buildGameBundleTemplate(): string {
     buildTitlesTemplate(),
   ));
   sections.push(bundleSection(
+    'mainQuest',
+    'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to), target?, locationId, reward? }] }. Steps run in order; the last completes the quest.',
+    JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'a boss', locationId: 'REPLACE-with-a-location-id', reward: 'dog tags' }, { id: 'step_2', action: 'return_to', locationId: 'REPLACE-with-a-location-id' }] }, null, 2),
+  ));
+  sections.push(bundleSection(
     'startingAreas',
     'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). The faction member spawns inside it and can walk room-to-room; an exit of "world" steps back out onto the world map. Whispers can plant in a room by naming its room id in plantLocations.',
     buildStartingAreasTemplate(),

@@ -41,6 +41,7 @@ import {
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
+import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -1318,6 +1319,159 @@ function TitlesBox() {
   );
 }
 
+// engine_Dev — MAIN QUEST builder. Compose the win-condition objective list line by
+// line: pick an action, a target, a location (+ optional reward to collect), ADD.
+function MainQuestBox() {
+  const customMainQuest = useContentPackStore((s) => s.customMainQuest) as { title?: string; steps?: MainQuestStep[] } | null;
+  const setMainQuest = useContentPackStore((s) => s.setMainQuest);
+  const loadMainQuestJson = useContentPackStore((s) => s.loadMainQuestJson);
+  const steps: MainQuestStep[] = customMainQuest?.steps ?? [];
+  const locations = mainQuestLocations();
+  const [status, setStatus] = useState<Status>(null);
+  const [qTitle, setQTitle] = useState(customMainQuest?.title ?? '');
+  const [bAction, setBAction] = useState<string>(MAIN_QUEST_ACTIONS[0]?.id ?? 'kill');
+  const [bTarget, setBTarget] = useState('');
+  const [bLoc, setBLoc] = useState<string>('');
+  const [bReward, setBReward] = useState('');
+  const [text, setText] = useState('');
+
+  const actionDef = MAIN_QUEST_ACTIONS.find((a) => a.id === bAction);
+  const save = (next: { title?: string; steps: MainQuestStep[] }, msg: string) => {
+    setMainQuest(next.steps.length > 0 ? next : null);
+    setStatus({ kind: 'ok', msg });
+  };
+  const addStep = () => {
+    if (actionDef?.needsTarget && !bTarget.trim()) { setStatus({ kind: 'err', msg: `“${actionDef.label}” needs a target.` }); return; }
+    if (!bLoc) { setStatus({ kind: 'err', msg: 'Pick a location.' }); return; }
+    const step: MainQuestStep = {
+      id: `step_${Date.now()}`,
+      action: bAction,
+      ...(actionDef?.needsTarget ? { target: bTarget.trim() } : {}),
+      locationId: bLoc,
+      ...(bReward.trim() ? { reward: bReward.trim() } : {}),
+    };
+    save({ title: qTitle.trim() || undefined, steps: [...steps, step] }, `Step added: ${describeStep(step)}`);
+    setBTarget(''); setBReward('');
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Main quest</Text>
+        <Text style={steps.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {steps.length > 0 ? `● ${steps.length} step(s)` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Build your win condition line by line. Each step: pick an <Text style={{ fontWeight: 'bold' }}>action</Text>,
+        a <Text style={{ fontWeight: 'bold' }}>target</Text>, a <Text style={{ fontWeight: 'bold' }}>location</Text>,
+        and optionally something to <Text style={{ fontWeight: 'bold' }}>collect</Text>. Add as many as you want —
+        they run in order, the last completes the quest.
+      </Text>
+
+      <TextInput
+        style={[styles.input, { minHeight: 0, height: 40 }]}
+        value={qTitle}
+        onChangeText={(t) => { setQTitle(t); if (steps.length > 0) save({ title: t.trim() || undefined, steps }, 'Title updated.'); }}
+        placeholder="Quest title (e.g. Take the Fold)"
+        placeholderTextColor="#5c5446"
+      />
+
+      {/* current steps */}
+      {steps.map((s, i) => (
+        <View key={s.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>{i + 1}. {describeStep(s)}</Text>
+          <TouchableOpacity onPress={() => save({ title: qTitle.trim() || undefined, steps: steps.filter((x) => x.id !== s.id) }, 'Step removed.')}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {/* builder */}
+      <Text style={styles.hint}>Action:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {MAIN_QUEST_ACTIONS.map((a) => (
+          <TouchableOpacity key={a.id} style={[styles.tmplBtn, bAction === a.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => setBAction(a.id)}>
+            <Text style={bAction === a.id ? styles.loadBtnText : styles.tmplBtnText}>{bAction === a.id ? '☑ ' : '☐ '}{a.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      {actionDef?.needsTarget && (
+        <TextInput
+          style={[styles.input, { minHeight: 0, height: 40 }]}
+          value={bTarget}
+          onChangeText={setBTarget}
+          placeholder="Target (e.g. a boss, the dog tags, an officer)"
+          placeholderTextColor="#5c5446"
+        />
+      )}
+      <Text style={styles.hint}>Location:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {locations.map((l) => (
+          <TouchableOpacity key={l.id} style={[styles.tmplBtn, bLoc === l.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => setBLoc(l.id)}>
+            <Text style={bLoc === l.id ? styles.loadBtnText : styles.tmplBtnText}>{bLoc === l.id ? '☑ ' : '☐ '}{l.name}</Text>
+          </TouchableOpacity>
+        ))}
+        {locations.length === 0 && <Text style={styles.hint}>Upload your Locations table first.</Text>}
+      </View>
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]}
+          value={bReward}
+          onChangeText={setBReward}
+          placeholder="…and collect (optional item)"
+          placeholderTextColor="#5c5446"
+        />
+        <TouchableOpacity style={styles.loadBtn} onPress={addStep}>
+          <Text style={styles.loadBtnText}>+ ADD STEP</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* JSON path */}
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="…or paste a main-quest JSON ({ title, steps: [...] })"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => { const r = loadMainQuestJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} step(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : JSON.stringify(customMainQuest ?? { title: 'My Main Quest', steps: [] }, null, 2);
+            const r = await saveJsonToFile('main-quest.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadMainQuestJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} step(s) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {steps.length > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearMainQuest(); setStatus({ kind: 'ok', msg: 'Cleared main quest.' }); }}>
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
@@ -1515,6 +1669,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
           per-section boxes below. */}
       <Text style={styles.sectionLabel}>★ WHOLE GAME — build it all in one file</Text>
       <GameBundleBox />
+
+      <Text style={styles.sectionLabel}>MAIN QUEST</Text>
+      <MainQuestBox />
 
       {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine. */}
       <TouchableOpacity
