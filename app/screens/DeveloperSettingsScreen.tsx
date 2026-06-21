@@ -1415,6 +1415,7 @@ function BossesBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a bosses JSON array" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadBossesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} boss(es).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(customBosses.length > 0 ? JSON.stringify(customBosses, null, 2) : JSON.stringify([{ id: 'a_boss', name: 'The Warlord', factionId: 'a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'a-location-id', spawnCondition: 'main_quest' }], null, 2)); setStatus({ kind: 'ok', msg: customBosses.length > 0 ? 'Loaded your bosses — edit, then LOAD.' : 'Loaded an example boss — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>{customBosses.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2); const r = await saveJsonToFile('bosses.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.loadBtn} onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadBossesJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} boss(es) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}><Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text></TouchableOpacity>
         {customBosses.length > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearBosses(); setStatus({ kind: 'ok', msg: 'Cleared bosses.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
@@ -1577,6 +1578,17 @@ function MainQuestBox() {
           onPress={() => { const r = loadMainQuestJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} step(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(steps.length > 0
+              ? JSON.stringify(customMainQuest, null, 2)
+              : JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'the boss', bossId: 'a-boss-id', locationId: 'a-location-id', reward: 'dog tags' }, { id: 'step_2', action: 'return_to', locationId: 'your-base-id' }, { id: 'step_3', action: 'claim', locationId: 'your-base-id' }] }, null, 2));
+            setStatus({ kind: 'ok', msg: steps.length > 0 ? 'Loaded your quest — edit, then LOAD.' : 'Loaded an example quest — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{steps.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
