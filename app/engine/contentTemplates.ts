@@ -42,6 +42,23 @@ import { POWERS_TEMPLATE } from './powers';
  *  dev console's rename block.) */
 const NARRATOR_PERSONA_EXAMPLE = 'You are the Narrator, the voice that tells this story.';
 
+/** engine_Dev — the rename-token reference, prepended to every prose template so
+ *  authors know they can drop the chosen names into ANY text. Every per-section
+ *  loader (and the whole-game loader) runs stripJsonComments, so these `//` lines
+ *  are removed on upload. The whole-game template documents the same tokens in its
+ *  header, so bundle sections pass `includeTokenNote = false` to avoid repetition. */
+const TOKEN_NOTE = [
+  '// TOKENS — usable in ANY text string below; the engine fills in the name you set:',
+  '//   {narrator} / {arbiter} / {guide}  -> your narrator name',
+  '//   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
+  '//   {title} / {game}                  -> your game title',
+].join('\n');
+
+/** Prepend the token note to a template body unless suppressed (bundle sections). */
+function tokenNote(json: string, include: boolean): string {
+  return include ? `${TOKEN_NOTE}\n${json}` : json;
+}
+
 /** Normalize a data file to its row array — some are top-level arrays, others are
  *  wrapped (e.g. { "weapons": [...] }). */
 function rows(data: unknown, key?: string): unknown[] {
@@ -136,10 +153,11 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
 export const TEMPLATE_SAMPLE_ROWS = 2;
 
 /** First `n` rows of a built-in table as a pretty JSON string (a starter schema). */
-export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS): string {
+export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
   // The Lore document + Powers ship their FULL set (not a 2-row sample) so the
-  // author sees every section / power to edit.
-  if (id === 'lore' || id === 'powers') return JSON.stringify(TABLE_ROWS[id], null, 2);
+  // author sees every section / power to edit. Both carry author prose, so they
+  // get the rename-token note.
+  if (id === 'lore' || id === 'powers') return tokenNote(JSON.stringify(TABLE_ROWS[id], null, 2), includeTokenNote);
   // engine_Dev — the Locations sample shows the optional map x / y (grid column /
   // row) so authors know they can plot each place on the uploaded world map.
   if (id === 'locations') {
@@ -155,7 +173,7 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
 
 /** A lore-block starter. World shows the CURRENT defaults to edit; faction/race
  *  show the first couple of built-in rows so the shape is obvious. */
-export function getLoreTemplate(id: LoreBlockId): string {
+export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): string {
   if (id === 'world') {
     return JSON.stringify(
       { narrator: NARRATOR_PERSONA_EXAMPLE, tone: DEFAULT_WORLD_TONE, setting: '', terms: [], vocabulary: [] },
@@ -164,7 +182,7 @@ export function getLoreTemplate(id: LoreBlockId): string {
     );
   }
   if (id === 'flavor') {
-    return JSON.stringify(buildFlavorTemplate(TEMPLATE_SAMPLE_ROWS), null, 2);
+    return tokenNote(JSON.stringify(buildFlavorTemplate(TEMPLATE_SAMPLE_ROWS), null, 2), includeTokenNote);
   }
   const src = id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races;
   return JSON.stringify(src.slice(0, TEMPLATE_SAMPLE_ROWS), null, 2);
@@ -174,12 +192,12 @@ export function getLoreTemplate(id: LoreBlockId): string {
  *  Hunts/mysteries/faction-quests/storylines are the designed multi-stage
  *  missions; objectives/complications/rewards are the seeds the engine mixes into
  *  procedural "lead" quests. A few sample rows of each, from the built-ins. */
-export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string {
+export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
   const arr = (data: unknown, key: string): unknown[] => {
     const v = (data as Record<string, unknown>)[key];
     return Array.isArray(v) ? v : Array.isArray(data) ? (data as unknown[]) : [];
   };
-  return JSON.stringify({
+  return tokenNote(JSON.stringify({
     hunts: arr(huntsData, 'hunts').slice(0, n),
     mysteries: arr(mysteriesData, 'mysteries').slice(0, n),
     factionQuests: arr(factionQuestsData, 'quests').slice(0, n),
@@ -187,7 +205,7 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
     objectives: (objectivesData as unknown[]).slice(0, 3),
     complications: (complicationsData as unknown[]).slice(0, 3),
     rewards: (rewardsData as unknown[]).slice(0, 3),
-  }, null, 2);
+  }, null, 2), includeTokenNote);
 }
 
 /** The Wasteland-encounters template — between-locations travel encounters keyed by
@@ -197,9 +215,9 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
  *  description / statBonuses / baseDurability give encounter-ONLY items real stats
  *  inline. Replace the matchers with YOUR location tags and the enemy with a name
  *  from your Enemies table. */
-export function buildWastelandTemplate(): string {
-  return JSON.stringify({
-    _comment: "Travel encounters. This is a GROWABLE LIST: each top-level key is ONE encounter — add as many as you want (copy a block, give it a new key). type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in. weight = how often it's picked vs the others. loot kind: consumable|misc|relic|weapon|armor|currency (currency grants TC = the rolled min..max). statBonuses use ONLY these stats: strength, dexterity, intelligence, wisdom, charisma, stealth. Replace the REPLACE-... placeholders.",
+export function buildWastelandTemplate(includeTokenNote = true): string {
+  return tokenNote(JSON.stringify({
+    _comment: "Travel encounters. This is a GROWABLE LIST: each top-level key is ONE encounter — add as many as you want (copy a block, give it a new key). type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in (it fires at ANY location whose tags include one of these). weight = how often it's picked vs the others. WILDCARD: a matcher of \"any\" (or \"*\") makes the encounter eligible at EVERY location during travel — use it for encounters that can hit anywhere, alongside ones targeted to specific tags. loot kind: consumable|misc|relic|weapon|armor|currency (currency grants TC = the rolled min..max). statBonuses use ONLY these stats: strength, dexterity, intelligence, wisdom, charisma, stealth. Replace the REPLACE-... placeholders.",
 
     roadside_cache: {
       type: 'treasure',
@@ -250,7 +268,21 @@ export function buildWastelandTemplate(): string {
       enemyPool: ['REPLACE-with-an-enemy-name-from-your-Enemies-table'],
       lore_note: 'Out here, loyalty lasts as long as the ammunition.',
     },
-  }, null, 2);
+
+    "_comment_3": "↓ a WILDCARD encounter — matchers: [\"any\"] means it can fire at ANY location during travel, not just tagged ones. Keep a few of these so travel anywhere stays alive.",
+
+    lone_drifter: {
+      type: 'npc',
+      weight: 6,
+      matchers: ['any'],
+      narration: 'Somewhere {direction} of the path, a drifter falls into step beside you for a while.',
+      npc_lines: [
+        '"Everyone out here is going somewhere. Few of them arrive."',
+        '"Heard {narrator} talks to folks like you. Lucky you."',
+      ],
+      lore_note: 'They leave the road as quietly as they joined it.',
+    },
+  }, null, 2), includeTokenNote);
 }
 
 /** A small keyword-form example of interaction tags, used inside the whole-game
@@ -328,8 +360,8 @@ export function buildStartingAreasTemplate(): string {
  *  heal {amount} · damage {amount,cause} · unlock_location {locationId} ·
  *  rep_change {factionId,amount} · advance_time {hours} · memo {text} ·
  *  spawn_vendor {vendor} . */
-export function buildHooksTemplate(): string {
-  return JSON.stringify({
+export function buildHooksTemplate(includeTokenNote = true): string {
+  return tokenNote(JSON.stringify({
     plants: {
       green_fog_vent: [
         { line: 'A vent in the seam breathes a slow coil of green fog.', nouns: ['vent', 'fog', 'seam', 'grate'] },
@@ -343,21 +375,21 @@ export function buildHooksTemplate(): string {
     },
     weights: { green_fog_vent: 6 },
     indoor: [],
-  }, null, 2);
+  }, null, 2), includeTokenNote);
 }
 
 /** The Whispers template — an array of overheard-tip chains. An authored chain
- *  plants at a hub room (plantLocations), points to a nearby tile in a time
+ *  plants at a plant location (plantLocations), points to a nearby tile in a time
  *  window, and pays off in one hop via meetLine + meetEffects (the same effect
- *  verbs hooks use). NOTE: whispers plant inside hub rooms (faction bases); until
- *  hub-room interiors are authorable, plantLocations must reference a built-in
- *  hub-room id (e.g. "outpost_messhall"). */
-export function buildWhispersTemplate(): string {
-  return JSON.stringify([
+ *  verbs hooks use). plantLocations may be a built-in hub-room id (e.g.
+ *  "outpost_messhall") OR one of YOUR location ids — engine_Dev plants the chain
+ *  when the player is in the hub room OR standing at that macro location. */
+export function buildWhispersTemplate(includeTokenNote = true): string {
+  return tokenNote(JSON.stringify([
     {
       id: 'cache_rumor',
       title: 'The Ace’s Cache',
-      plantLocations: ['outpost_messhall'],
+      plantLocations: ['outpost_messhall', 'REPLACE-with-one-of-your-location-ids'],
       plantChance: 0.15,
       plantLines: [
         'A sailor at the corner table leans in. "Word is there’s a stash in a wreck two, three tiles south. Go after dark. Don’t ask who told you."',
@@ -370,7 +402,7 @@ export function buildWhispersTemplate(): string {
         { type: 'grant_tc', amount: 60 },
       ],
     },
-  ], null, 2);
+  ], null, 2), includeTokenNote);
 }
 
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
@@ -426,25 +458,25 @@ export function buildGameBundleTemplate(): string {
   ];
 
   for (const b of LORE_BLOCKS) {
-    sections.push(bundleSection(b.id, b.hint, getLoreTemplate(b.id)));
+    sections.push(bundleSection(b.id, b.hint, getLoreTemplate(b.id, false)));
   }
   for (const t of CONTENT_TABLES) {
-    sections.push(bundleSection(t.id, t.hint, getTableTemplate(t.id)));
+    sections.push(bundleSection(t.id, t.hint, getTableTemplate(t.id, TEMPLATE_SAMPLE_ROWS, false)));
   }
   sections.push(bundleSection(
     'missions',
     'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Omit any sub-table to keep its built-in default.',
-    buildMissionsTemplate(),
+    buildMissionsTemplate(TEMPLATE_SAMPLE_ROWS, false),
   ));
   sections.push(bundleSection(
     'hooks',
     'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.',
-    buildHooksTemplate(),
+    buildHooksTemplate(false),
   ));
   sections.push(bundleSection(
     'wasteland',
-    'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. Replaces the built-in travel encounters.',
-    buildWastelandTemplate(),
+    'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.',
+    buildWastelandTemplate(false),
   ));
   sections.push(bundleSection(
     'startingAreas',
@@ -458,8 +490,8 @@ export function buildGameBundleTemplate(): string {
   ));
   sections.push(bundleSection(
     'whispers',
-    'Overheard-tip leads (array). Each: plants at a hub room (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. NOTE: whispers plant inside hub rooms — plantLocations must reference a built-in hub-room id until hub interiors are authorable.',
-    buildWhispersTemplate(),
+    'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.',
+    buildWhispersTemplate(false),
   ));
 
   return `{\n${sections.join(',\n\n')}\n}\n`;

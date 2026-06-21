@@ -688,12 +688,15 @@ function WhispersBox() {
         </Text>
       </View>
       <Text style={styles.hint}>
-        An array of overheard-tip chains. Each plants at a hub room (plantLocations), points to a
-        nearby tile (targetOffset) in a time window (activeHours), and pays off via{' '}
+        An array of overheard-tip chains. Each plants at a plant location (plantLocations), points to
+        a nearby tile (targetOffset) in a time window (activeHours), and pays off via{' '}
         <Text style={{ fontWeight: 'bold' }}>meetLine</Text> +{' '}
         <Text style={{ fontWeight: 'bold' }}>meetEffects</Text> (same effect verbs as hooks) when the
-        player arrives. Note: whispers plant inside hub rooms — plantLocations must reference a
-        built-in hub-room id for now. Hit TEMPLATE for the shape.
+        player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one
+        of your own location ids — it plants in that hub room or at that location. You can use{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{narrator}'}</Text> /{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{crucible}'}</Text> tokens in any line. Hit TEMPLATE for
+        the shape.
       </Text>
       <TextInput
         style={styles.input}
@@ -774,9 +777,14 @@ function WastelandBox() {
         keyed by archetype id; each: <Text style={{ fontWeight: 'bold' }}>type</Text>{' '}
         (treasure / npc / skirmish / mini_dungeon / fusion_bench),{' '}
         <Text style={{ fontWeight: 'bold' }}>weight</Text>,{' '}
-        <Text style={{ fontWeight: 'bold' }}>matchers</Text> (location tags it can fire in),{' '}
+        <Text style={{ fontWeight: 'bold' }}>matchers</Text> (location tags it can fire in — a
+        matcher of <Text style={{ fontWeight: 'bold' }}>"any"</Text> / "*" fires it at ANY location
+        during travel, alongside tag-targeted ones),{' '}
         <Text style={{ fontWeight: 'bold' }}>narration</Text>, plus optional loot / npc_lines /
-        lore_note / enemyPool. An encounter fires roughly every 7-8 travel steps. Hit TEMPLATE for the shape.
+        lore_note / enemyPool. An encounter fires roughly every 7-8 travel steps. You can use{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{narrator}'}</Text> /{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{crucible}'}</Text> tokens in any line. Hit TEMPLATE for
+        the shape.
       </Text>
       <TextInput
         style={styles.input}

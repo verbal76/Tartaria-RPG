@@ -60,7 +60,11 @@ export interface WastelandArchetype {
   /** Selection weight among archetypes that match the current biome. */
   weight: number;
   /** Location tags the archetype is valid in. ANY-match — if a single
-   *  tag is in the location's tags array, the archetype is eligible. */
+   *  tag is in the location's tags array, the archetype is eligible.
+   *  engine_Dev — a wildcard matcher ("any" or "*") makes the archetype
+   *  eligible at EVERY location during travel (in addition to any tagged
+   *  ones), so an author can have encounters that hit anywhere on the map
+   *  as well as ones targeted to specific biomes/sectors. */
   matchers: string[];
   /** Scene narration template. `{enemy}` substitution for skirmishes. */
   narration: string;
@@ -222,9 +226,12 @@ export function pickWastelandEncounter(
 
   // Filter archetypes whose matchers overlap with the location's tags.
   const locTags = new Set((location.tags ?? []).map((t) => t.toLowerCase()));
+  // engine_Dev — a matcher of "any" / "*" is a wildcard: the archetype is eligible
+  // at every location (random-anywhere), on top of the tag-targeted archetypes.
+  const isWildcard = (m: string): boolean => m === '*' || m.toLowerCase() === 'any';
   const eligible: Array<{ id: string; archetype: WastelandArchetype }> = [];
   for (const [id, archetype] of Object.entries(getArchetypes())) {
-    if (archetype.matchers.some((m) => locTags.has(m.toLowerCase()))) {
+    if (archetype.matchers.some((m) => isWildcard(m) || locTags.has(m.toLowerCase()))) {
       eligible.push({ id, archetype });
     }
   }
