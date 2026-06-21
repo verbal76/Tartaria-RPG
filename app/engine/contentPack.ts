@@ -244,6 +244,17 @@ export function resolveWhispers<T>(builtin: readonly T[]): readonly T[] {
   return whispersOverride && whispersOverride.length > 0 ? (whispersOverride as readonly T[]) : builtin;
 }
 
+// --- wasteland encounters override ----------------------------------------------
+// engine_Dev — the between-locations travel encounters (an OBJECT keyed by
+// archetype id: { type, weight, matchers, narration, loot?, npc_lines?, … }). An
+// uploaded set replaces the built-in Tartaria archetypes wholesale.
+let wastelandOverride: Record<string, unknown> | null = null;
+export function setWastelandOverride(obj: Record<string, unknown> | null): void {
+  wastelandOverride = obj && Object.keys(obj).length > 0 ? obj : null;
+}
+export function hasWastelandOverride(): boolean { return wastelandOverride != null; }
+export function getWastelandOverride(): Record<string, unknown> | null { return wastelandOverride; }
+
 
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
@@ -303,6 +314,7 @@ export function clearAllOverrides(): void {
   setMissionsOverride(null);
   setHooksOverride(null);
   setWhispersOverride(null);
+  setWastelandOverride(null);
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;

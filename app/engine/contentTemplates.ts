@@ -24,6 +24,7 @@ import storylinesData from '../data/quests/faction-storylines.json';
 import objectivesData from '../data/quests/objectives.json';
 import complicationsData from '../data/quests/complications.json';
 import rewardsData from '../data/quests/rewards.json';
+import wastelandData from '../data/world/wasteland_encounters.json';
 import {
   DEFAULT_WORLD_TONE,
   CONTENT_TABLES,
@@ -178,6 +179,23 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
   }, null, 2);
 }
 
+/** The Wasteland-encounters template — the between-locations travel encounters,
+ *  keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|
+ *  fusion_bench), weight, matchers: [location tags it fires in], narration, and
+ *  optional loot / npc_lines / lore_note / enemyPool }. A few built-in samples; the
+ *  author replaces them wholesale. */
+export function buildWastelandTemplate(n = 3): string {
+  const raw = wastelandData as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  let count = 0;
+  for (const [k, v] of Object.entries(raw)) {
+    if (k.startsWith('_') || !v || typeof v !== 'object' || !('type' in (v as object))) continue;
+    out[k] = v;
+    if (++count >= n) break;
+  }
+  return JSON.stringify(out, null, 2);
+}
+
 /** The Hooks template — an illustrative example of the atmospheric-lead format.
  *  `plants` are the discovery line(s) + matchable nouns per hook id; `chains` are
  *  the staged outcomes, each stage carrying a list of effect verbs. The example is
@@ -291,6 +309,11 @@ export function buildGameBundleTemplate(): string {
     'hooks',
     'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.',
     buildHooksTemplate(),
+  ));
+  sections.push(bundleSection(
+    'wasteland',
+    'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. Replaces the built-in travel encounters.',
+    buildWastelandTemplate(),
   ));
   sections.push(bundleSection(
     'whispers',

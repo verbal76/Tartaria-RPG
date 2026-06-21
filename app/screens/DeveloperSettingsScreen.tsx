@@ -32,7 +32,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -744,6 +744,89 @@ function WhispersBox() {
   );
 }
 
+// engine_Dev — WASTELAND upload. Object of between-locations travel encounters
+// keyed by archetype id.
+function WastelandBox() {
+  const loadWastelandJson = useContentPackStore((s) => s.loadWastelandJson);
+  const wasteland = useContentPackStore((s) => s.wasteland);
+  const loaded = Object.keys(wasteland).filter((k) => !k.startsWith('_')).length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Travel encounters</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded}` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Random encounters while traveling long-distance between named locations. One JSON object
+        keyed by archetype id; each: <Text style={{ fontWeight: 'bold' }}>type</Text>{' '}
+        (treasure / npc / skirmish / mini_dungeon / fusion_bench),{' '}
+        <Text style={{ fontWeight: 'bold' }}>weight</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>matchers</Text> (location tags it can fire in),{' '}
+        <Text style={{ fontWeight: 'bold' }}>narration</Text>, plus optional loot / npc_lines /
+        lore_note / enemyPool. An encounter fires roughly every 7-8 travel steps. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your wasteland encounters JSON object here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadWastelandJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(loaded > 0 ? JSON.stringify(wasteland, null, 2) : buildWastelandTemplate());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current encounters — edit, then LOAD.' : 'Loaded the encounters template — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(wasteland, null, 2) : buildWastelandTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearWasteland();
+              setStatus({ kind: 'ok', msg: 'Reset encounters to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
@@ -989,6 +1072,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>WHISPERS</Text>
       <WhispersBox />
+
+      <Text style={styles.sectionLabel}>TRAVEL ENCOUNTERS</Text>
+      <WastelandBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox

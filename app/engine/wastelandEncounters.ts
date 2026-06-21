@@ -21,6 +21,7 @@
 
 import data from '../data/world/wasteland_encounters.json';
 import type { Location } from './types';
+import { getWastelandOverride } from './contentPack';
 
 export interface WastelandLootEntry {
   name: string;
@@ -67,12 +68,26 @@ export interface WastelandArchetype {
 
 // Filter out the "_description" key from the JSON.
 const RAW = data as Record<string, unknown>;
-const ARCHETYPES: Record<string, WastelandArchetype> = Object.fromEntries(
-  Object.entries(RAW).filter(
-    (entry): entry is [string, WastelandArchetype] =>
-      typeof entry[1] === 'object' && entry[1] !== null && 'type' in (entry[1] as object),
-  ),
-);
+function archetypesFrom(raw: Record<string, unknown>): Record<string, WastelandArchetype> {
+  return Object.fromEntries(
+    Object.entries(raw).filter(
+      (entry): entry is [string, WastelandArchetype] =>
+        typeof entry[1] === 'object' && entry[1] !== null && 'type' in (entry[1] as object),
+    ),
+  );
+}
+const ARCHETYPES: Record<string, WastelandArchetype> = archetypesFrom(RAW);
+// engine_Dev — the LIVE archetypes: an uploaded 'wasteland' override replaces the
+// built-in Tartaria set wholesale. Resolved at runtime (not module load) so an
+// upload mirrored after boot is honored.
+function getArchetypes(): Record<string, WastelandArchetype> {
+  const ov = getWastelandOverride();
+  if (ov) {
+    const built = archetypesFrom(ov);
+    if (Object.keys(built).length > 0) return built;
+  }
+  return ARCHETYPES;
+}
 
 export interface WastelandEncounter {
   archetypeId: string;
@@ -151,7 +166,7 @@ export function pickWastelandEncounter(
   // The player was PROMISED this; we deliver it on the first travel
   // step, not the next eligible roll.
   if (opts.forceArchetype) {
-    const archetype = ARCHETYPES[opts.forceArchetype];
+    const archetype = getArchetypes()[opts.forceArchetype];
     if (archetype) {
       const enemyName = archetype.type === 'skirmish' && archetype.enemyPool && archetype.enemyPool.length > 0
         ? archetype.enemyPool[Math.floor(rng() * archetype.enemyPool.length)] ?? null
@@ -187,7 +202,7 @@ export function pickWastelandEncounter(
   // Filter archetypes whose matchers overlap with the location's tags.
   const locTags = new Set((location.tags ?? []).map((t) => t.toLowerCase()));
   const eligible: Array<{ id: string; archetype: WastelandArchetype }> = [];
-  for (const [id, archetype] of Object.entries(ARCHETYPES)) {
+  for (const [id, archetype] of Object.entries(getArchetypes())) {
     if (archetype.matchers.some((m) => locTags.has(m.toLowerCase()))) {
       eligible.push({ id, archetype });
     }

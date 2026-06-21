@@ -17,6 +17,7 @@ import {
   setMissionsOverride,
   setHooksOverride,
   setWhispersOverride,
+  setWastelandOverride,
   setCrucibleNameOverride,
   setCrucibleEnabled,
   CONTENT_TABLES,
@@ -87,6 +88,7 @@ interface PersistShape {
   missions?: Partial<Record<MissionTableId, unknown[]>>;
   hooks?: HooksOverride;
   whispers?: unknown[];
+  wasteland?: Record<string, unknown>;
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -114,6 +116,8 @@ interface ContentPackState {
   hooks: HooksOverride;
   /** Uploaded whispers (overheard-tip chains, an array). Empty = built-in. */
   whispers: unknown[];
+  /** Uploaded wasteland encounters (object keyed by archetype id). Empty = built-in. */
+  wasteland: Record<string, unknown>;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -164,6 +168,9 @@ interface ContentPackState {
   loadHooksJson: (json: string) => BundleLoadResult;
   /** Parse a Whispers array (JSONC) of overheard-tip chain defs, apply + persist. */
   loadWhispersJson: (json: string) => LoadResult;
+  /** Parse a Wasteland encounters object (JSONC) keyed by archetype id, apply +
+   *  persist. Replaces the built-in between-locations travel encounters. */
+  loadWastelandJson: (json: string) => BundleLoadResult;
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
@@ -181,18 +188,21 @@ interface ContentPackState {
   clearHooks: () => void;
   /** Drop the uploaded whispers back to the built-in set. */
   clearWhispers: () => void;
+  /** Drop the uploaded wasteland encounters back to the built-in set. */
+  clearWasteland: () => void;
   clearAll: () => void;
   /** Load any persisted pack on boot and mirror it into the registry. */
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
     missions: Object.keys(state.missions).length > 0 ? state.missions : undefined,
     hooks: Object.keys(state.hooks).length > 0 ? state.hooks : undefined,
     whispers: state.whispers.length > 0 ? state.whispers : undefined,
+    wasteland: Object.keys(state.wasteland).length > 0 ? state.wasteland : undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
@@ -210,6 +220,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   missions: {},
   hooks: {},
   whispers: [],
+  wasteland: {},
   published: false,
   narratorName: '',
   gameTitle: '',
@@ -233,6 +244,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setMissionsOverride(Object.keys(s.missions).length > 0 ? s.missions : null);
     setHooksOverride(Object.keys(s.hooks).length > 0 ? s.hooks : null);
     setWhispersOverride(s.whispers.length > 0 ? s.whispers : null);
+    setWastelandOverride(Object.keys(s.wasteland).length > 0 ? s.wasteland : null);
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
     setGameTaglineOverride(s.gameTagline || null);
@@ -433,6 +445,28 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     return { ok: true, count: parsed.length };
   },
 
+  loadWastelandJson(json) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonComments(json));
+    } catch (e) {
+      return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { ok: false, error: 'Wasteland encounters must be a JSON OBJECT keyed by archetype id (each value has a "type" + "matchers" + "narration").' };
+    }
+    const obj = parsed as Record<string, unknown>;
+    const valid = Object.entries(obj).filter(([k, v]) => !k.startsWith('_') && v && typeof v === 'object' && 'type' in (v as object));
+    if (valid.length === 0) {
+      return { ok: false, error: 'No archetypes found. Each entry needs at least { "type", "matchers", "narration" }.' };
+    }
+    setWastelandOverride(obj);
+    const wasteland = obj;
+    set({ wasteland, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), wasteland });
+    return { ok: true, summary: `Loaded ${valid.length} wasteland encounter archetype(s).` };
+  },
+
   loadGameBundle(json) {
     let parsed: unknown;
     try {
@@ -452,6 +486,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     const nextMissions: Partial<Record<MissionTableId, unknown[]>> = { ...get().missions };
     let nextHooks: HooksOverride = get().hooks;
     let nextWhispers: unknown[] = get().whispers;
+    let nextWasteland: Record<string, unknown> = get().wasteland;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -488,6 +523,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'whispers') {
         if (Array.isArray(value) && value.length > 0) { nextWhispers = value; applied.push(`whispers (${value.length})`); }
         else skipped.push('whispers (empty/not an array)');
+      } else if (key === 'wasteland') {
+        if (value && typeof value === 'object' && !Array.isArray(value)) { nextWasteland = value as Record<string, unknown>; applied.push('wasteland'); }
+        else skipped.push('wasteland (not an object)');
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
         let rows: unknown = value;
@@ -532,6 +570,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setMissionsOverride(Object.keys(nextMissions).length > 0 ? nextMissions : null);
     setHooksOverride(Object.keys(nextHooks).length > 0 ? nextHooks : null);
     setWhispersOverride(nextWhispers.length > 0 ? nextWhispers : null);
+    setWastelandOverride(Object.keys(nextWasteland).length > 0 ? nextWasteland : null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
@@ -543,6 +582,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       missions: nextMissions,
       hooks: nextHooks,
       whispers: nextWhispers,
+      wasteland: nextWasteland,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
@@ -550,7 +590,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       crucibleEnabled: nextCrucibleEnabled,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled });
     invalidateLocationCaches(); // a bundle may have replaced the locations table
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -581,6 +621,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (Object.keys(s.hooks).length > 0) out.hooks = s.hooks;
     // The whisper chains array.
     if (s.whispers.length > 0) out.whispers = s.whispers;
+    // The wasteland encounters object.
+    if (Object.keys(s.wasteland).length > 0) out.wasteland = s.wasteland;
     return JSON.stringify(out, null, 2);
   },
 
@@ -622,11 +664,18 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), whispers });
   },
 
+  clearWasteland() {
+    setWastelandOverride(null);
+    const wasteland = {};
+    set({ wasteland, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), wasteland });
+  },
+
   clearAll() {
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -650,6 +699,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setHooksOverride(Object.keys(hooks).length > 0 ? hooks : null);
         const whispers = shape.whispers ?? [];
         setWhispersOverride(whispers.length > 0 ? whispers : null);
+        const wasteland = shape.wasteland && typeof shape.wasteland === 'object' ? shape.wasteland : {};
+        setWastelandOverride(Object.keys(wasteland).length > 0 ? wasteland : null);
         const published = shape.published === true;
         setPublishedFlag(published);
         const narratorName = typeof shape.narratorName === 'string' ? shape.narratorName : '';
@@ -665,7 +716,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
