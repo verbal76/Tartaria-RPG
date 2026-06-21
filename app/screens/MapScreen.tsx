@@ -39,6 +39,7 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { useCustomMapsStore } from '../state/customMapsStore';
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
 // panel so a player can tap any known location and start travel
@@ -148,18 +149,11 @@ const insetGroundFx = (fx: number): number => ATLAS_LEGEND_FRAC + fx * (1 - ATLA
 // of the Giants map ("Tomb Vigil") was the last one; its room names already
 // matched the artist's labels (hub_faction_variants.json), so wiring the PNG
 // completes the set.
-const WORLD_ATLAS = require('../../assets/world-atlas.png');
-const OUTPOST_MAPS: Record<string, number> = {
-  mud_monarchs: require('../../assets/outposts/mud_monarchs.png'),
-  eternal_dynasty: require('../../assets/outposts/eternal_dynasty.png'),
-  forgotten_order: require('../../assets/outposts/forgotten_order.png'),
-  reclaimers_guild: require('../../assets/outposts/reclaimers_guild.png'),
-  true_tartarians: require('../../assets/outposts/true_tartarians.png'),
-  tartarian_revivalists: require('../../assets/outposts/tartarian_revivalists.png'),
-  conspiracy_architects: require('../../assets/outposts/conspiracy_architects.png'),
-  stone_builders: require('../../assets/outposts/stone_builders.png'),
-  servants_of_giants: require('../../assets/outposts/servants_of_giants.png'),
-};
+// engine_Dev — the built-in Tartaria map art (world-atlas.png + outposts/*.png)
+// has been REMOVED from the engine. The backdrop now comes from the author's
+// uploaded maps (useCustomMapsStore): the world map, or a faction's starting-area
+// map when the player is in their base. With nothing uploaded, the Map screen
+// shows a neutral grid and plots location pins by their authored x/y coordinates.
 
 // Gesture clamps.
 const MIN_SCALE = 0.8;
@@ -230,6 +224,14 @@ export function MapScreen() {
   // from the player's open-contract lists, so they back-populate + clear on their
   // own). Numbered in Contracts-screen order; the cards carry the same number.
   const contractMarkers = useMemo(() => openContractMarkers(player), [player]);
+
+  // engine_Dev — uploaded maps + the world coordinate size (for plotting pins).
+  const uploadedWorldMap = useCustomMapsStore((s) => s.worldMap);
+  const uploadedFactionMaps = useCustomMapsStore((s) => s.factionMaps);
+  const worldW = useCustomMapsStore((s) => s.worldWidth);
+  const worldH = useCustomMapsStore((s) => s.worldHeight);
+  // Natural aspect of the currently-shown uploaded image (w/h), captured onLoad.
+  const [uploadedAspect, setUploadedAspect] = useState<number | null>(null);
 
   // Rendered image-box layout, captured via onLayout.
   const [imgBox, setImgBox] = useState<{ width: number; height: number } | null>(null);
@@ -321,10 +323,22 @@ export function MapScreen() {
   // arb99 — pick the map for where you are. Inside an outpost whose interior
   // art exists → that faction's outpost map (square); otherwise the world
   // atlas (2:1). mapAspect drives the fill/letterbox math below.
-  const outpostMapSource = inHub && player?.factionId ? OUTPOST_MAPS[player.factionId] : undefined;
-  const showingOutpost = !!outpostMapSource;
-  const mapSource = outpostMapSource ?? WORLD_ATLAS;
-  const mapAspect = showingOutpost ? 1 : ATLAS_W / ATLAS_H;
+  // engine_Dev — backdrop from uploaded maps: the faction's starting-area map while
+  // inside their base, else the world map. Null when nothing's uploaded → a neutral
+  // grid. mapAspect comes from the loaded image (default 2:1 until known).
+  const factionMapUri = inHub && player?.factionId ? uploadedFactionMaps[player.factionId] : undefined;
+  const mapUri = factionMapUri ?? uploadedWorldMap ?? null;
+  const showingOutpost = !!factionMapUri;
+  const mapSource = mapUri ? { uri: mapUri } : null;
+  const mapAspect = uploadedAspect ?? (ATLAS_W / ATLAS_H);
+  // Re-measure the natural aspect whenever the shown image changes.
+  useEffect(() => {
+    setUploadedAspect(null);
+    if (!mapUri) return;
+    let alive = true;
+    Image.getSize(mapUri, (wpx, hpx) => { if (alive && hpx > 0) setUploadedAspect(wpx / hpx); }, () => { /* leave default */ });
+    return () => { alive = false; };
+  }, [mapUri]);
   const currentAnchor =
     atlasCoordForLocation(player?.currentLocationId) ?? OUTPOST_ATLAS_COORD;
   const atCenter =
@@ -541,6 +555,10 @@ export function MapScreen() {
   // shows its number ("3◆"). Keeps the map uncluttered — the per-contract numbers
   // live on the Contracts cards.
   const contractMarkerStyles: { key: string; label: string; left: number; top: number }[] = [];
+  // engine_Dev — author-plotted location pins. Any location whose row carries
+  // numeric x/y (in the world's coordinate size) is dotted on the uploaded map at
+  // (x/worldW, y/worldH). The current location is highlighted.
+  const locationPinStyles: { id: string; name: string; left: number; top: number; here: boolean }[] = [];
   // arb101 — overlay-label scale. The atlas's own painted labels shrink with the
   // contain-fit; a constant-size overlay would dwarf them. labelScale = rendered
   // width ÷ atlas natural width keeps overlay text proportional to the art at the
@@ -583,6 +601,25 @@ export function MapScreen() {
       left: offsetX + renderedW * atlasPos.fx - MARKER_W / 2,
       top: offsetY + renderedH * atlasPos.fy - MARKER_H / 2,
     };
+    // engine_Dev — plot author-coord location pins on the (uploaded) world map.
+    // Only on the world view (a faction's interior map uses its own space). A
+    // location needs numeric x/y in the world size to be plotted.
+    if (!showingOutpost) {
+      for (const loc of placesView) {
+        const lx = (loc as { x?: number }).x;
+        const ly = (loc as { y?: number }).y;
+        if (typeof lx !== 'number' || typeof ly !== 'number') continue;
+        const fx = Math.max(0, Math.min(1, lx / worldW));
+        const fy = Math.max(0, Math.min(1, ly / worldH));
+        locationPinStyles.push({
+          id: loc.id,
+          name: loc.name,
+          left: offsetX + renderedW * fx,
+          top: offsetY + renderedH * fy,
+          here: loc.id === player?.currentLocationId,
+        });
+      }
+    }
     // OTA-498 — pin the Hidden Market overlay to its fixed atlas fraction (world
     // atlas only). Centered on the point via the fixed wrap size.
     const hm = showingOutpost ? null : HIDDEN_LOCATIONS.hidden_market;
@@ -697,11 +734,16 @@ export function MapScreen() {
             { transform: [{ translateX }, { translateY }, { scale }] },
           ]}
         >
-          <Image
-            source={mapSource}
-            style={styles.atlas}
-            resizeMode="contain"
-          />
+          {mapSource ? (
+            <Image
+              source={mapSource}
+              style={styles.atlas}
+              resizeMode="contain"
+            />
+          ) : (
+            // engine_Dev — no uploaded map → neutral grid backdrop.
+            <View style={[styles.atlas, styles.neutralMap]} />
+          )}
           {/* OTA-498 — the Hidden Market. It has no icon painted into the atlas
               art, so this overlay both marks it and explains the blank: a
               stylized "?" pinned to its fixed coord (right of the frontier camps,
@@ -745,6 +787,14 @@ export function MapScreen() {
           {contractMarkerStyles.map((m) => (
             <View key={m.key} pointerEvents="none" style={[styles.hiddenMarketWrap, { left: m.left, top: m.top }]}>
               <Text style={[styles.contractPin, markerFont]}>{m.label}</Text>
+            </View>
+          ))}
+          {/* engine_Dev — author-coord location pins (a dot + name; the current
+              location glows). Plotted from each location's x/y in the world size. */}
+          {locationPinStyles.map((p) => (
+            <View key={p.id} pointerEvents="none" style={[styles.locPinWrap, { left: p.left, top: p.top }]}>
+              <View style={[styles.locPinDot, p.here && styles.locPinDotHere]} />
+              <Text style={[styles.locPinLabel, markerFont, p.here && styles.locPinLabelHere]} numberOfLines={1}>{p.name}</Text>
             </View>
           ))}
           {/* OTA-182 — player marker (silhouette + halo) removed.
@@ -1019,6 +1069,45 @@ const styles = StyleSheet.create({
   atlas: {
     width: '100%',
     height: '100%',
+  },
+  // engine_Dev — neutral backdrop when no map is uploaded.
+  neutralMap: {
+    backgroundColor: '#14110d',
+    borderWidth: 1,
+    borderColor: '#2a241b',
+  },
+  // engine_Dev — author-coord location pin (dot + label), centered on the point.
+  locPinWrap: {
+    position: 'absolute',
+    alignItems: 'center',
+    marginLeft: -4,
+    marginTop: -4,
+  },
+  locPinDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#c9a86a',
+    borderWidth: 1,
+    borderColor: '#0b0a09',
+  },
+  locPinDotHere: {
+    backgroundColor: '#7fd1ff',
+    width: 11,
+    height: 11,
+    borderRadius: 6,
+  },
+  locPinLabel: {
+    color: '#e6dcc2',
+    fontSize: 7,
+    marginTop: 1,
+    textShadowColor: 'rgba(0,0,0,0.95)',
+    textShadowRadius: 3,
+    maxWidth: 80,
+  },
+  locPinLabelHere: {
+    color: '#bfe6ff',
+    fontWeight: '700',
   },
   // OTA 057 — silhouette player marker. The wrapper handles the
   // inverse-scale; the image inside fills the wrapper. Marker size

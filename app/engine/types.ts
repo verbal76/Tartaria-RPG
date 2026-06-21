@@ -340,6 +340,11 @@ export interface Location {
    *  nouns, no verbs / abstractions / measurements. Lowercase,
    *  no punctuation, singular preferred. */
   interactables?: string[];
+  /** engine_Dev — optional map plot position, in the world coordinate size set in
+   *  the dev console (0,0 = top-left). When present, the Map screen dots this
+   *  location at (x / worldWidth, y / worldHeight) on the uploaded world map. */
+  x?: number;
+  y?: number;
 }
 
 export interface QuestObjective { id: string; verb: string; target: string; tags: string[]; }

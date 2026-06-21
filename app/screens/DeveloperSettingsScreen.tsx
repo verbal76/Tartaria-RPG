@@ -36,6 +36,7 @@ import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissio
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
+import { useCustomMapsStore } from '../state/customMapsStore';
 import { MAX_TRACKS_PER_CATEGORY, RECOMMENDED_AUDIO_SPECS, type MusicCategory } from '../audio/customMusic';
 
 /** Build a full content-pack diagnostic snapshot (store vs engine registry vs the
@@ -226,6 +227,111 @@ function GameIdentitySection() {
         onSave={setCrucibleName}
       />
     </>
+  );
+}
+
+// engine_Dev — MAPS upload. A world map image (the overworld backdrop) + an
+// optional per-faction starting-area map, plus the world's coordinate size so
+// location pins can be plotted on the uploaded image.
+function MapsSection() {
+  const worldMap = useCustomMapsStore((s) => s.worldMap);
+  const factionMaps = useCustomMapsStore((s) => s.factionMaps);
+  const worldWidth = useCustomMapsStore((s) => s.worldWidth);
+  const worldHeight = useCustomMapsStore((s) => s.worldHeight);
+  const pickWorldMap = useCustomMapsStore((s) => s.pickWorldMap);
+  const pickFactionMap = useCustomMapsStore((s) => s.pickFactionMap);
+  const clearWorldMap = useCustomMapsStore((s) => s.clearWorldMap);
+  const clearFactionMap = useCustomMapsStore((s) => s.clearFactionMap);
+  const setWorldSize = useCustomMapsStore((s) => s.setWorldSize);
+  const [w, setW] = useState(String(worldWidth));
+  const [h, setH] = useState(String(worldHeight));
+  const [status, setStatus] = useState<Status>(null);
+  const factions = getFactions();
+  const onPick = async (fn: () => Promise<{ ok: boolean; error?: string; canceled?: boolean }>, label: string) => {
+    const r = await fn();
+    if (r.canceled) return;
+    setStatus(r.ok ? { kind: 'ok', msg: `${label} uploaded.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  return (
+    <View style={styles.card}>
+      <Text style={styles.hint}>
+        Upload your own map art. The world map is the overworld backdrop; each faction can have its
+        own starting-area map (shown while a member is in their base). The Tartaria map art has been
+        removed — with nothing uploaded, the map shows a neutral grid. Set the world size (the
+        coordinate space your location x/y values are in) so pins plot correctly. PNG / JPG / WEBP.
+      </Text>
+
+      {/* World map */}
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>World map</Text>
+        <Text style={worldMap ? styles.badgeOn : styles.badgeOff}>{worldMap ? '● uploaded' : '○ none'}</Text>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => void onPick(pickWorldMap, 'World map')}>
+          <Text style={styles.loadBtnText}>{worldMap ? 'REPLACE IMAGE' : '⬆ UPLOAD WORLD MAP'}</Text>
+        </TouchableOpacity>
+        {worldMap && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { clearWorldMap(); setStatus({ kind: 'ok', msg: 'World map removed.' }); }}>
+            <Text style={styles.resetBtnText}>REMOVE</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* World size */}
+      <Text style={[styles.hint, { marginTop: 10 }]}>
+        World size (width × height). Plot each location by adding "x" and "y" fields to its row in
+        the Locations table, in this coordinate space (0,0 = top-left).
+      </Text>
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 1, minHeight: 0 }]}
+          value={w}
+          onChangeText={setW}
+          placeholder="width"
+          placeholderTextColor="#5c5446"
+          keyboardType="number-pad"
+        />
+        <TextInput
+          style={[styles.input, { flex: 1, minHeight: 0 }]}
+          value={h}
+          onChangeText={setH}
+          placeholder="height"
+          placeholderTextColor="#5c5446"
+          keyboardType="number-pad"
+        />
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            const nw = parseInt(w, 10); const nh = parseInt(h, 10);
+            if (!nw || !nh || nw < 1 || nh < 1) { setStatus({ kind: 'err', msg: 'Enter positive width and height.' }); return; }
+            setWorldSize(nw, nh);
+            setStatus({ kind: 'ok', msg: `World size set to ${nw} × ${nh}.` });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>SET SIZE</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Per-faction starting-area maps */}
+      <Text style={[styles.sectionLabel, { marginTop: 14 }]}>FACTION STARTING-AREA MAPS</Text>
+      {factions.map((f) => {
+        const has = !!factionMaps[f.id];
+        return (
+          <View key={f.id} style={styles.trackRow}>
+            <Text style={styles.trackName} numberOfLines={1}>{has ? '🗺 ' : '○ '}{f.name}</Text>
+            <TouchableOpacity style={styles.copyBtn} onPress={() => void onPick(() => pickFactionMap(f.id), `${f.name} map`)}>
+              <Text style={styles.copyBtnText}>{has ? 'REPLACE' : 'UPLOAD'}</Text>
+            </TouchableOpacity>
+            {has && (
+              <TouchableOpacity style={styles.trackRemove} onPress={() => { clearFactionMap(f.id); setStatus({ kind: 'ok', msg: `${f.name} map removed.` }); }}>
+                <Text style={styles.resetBtnText}>✕</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      })}
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
   );
 }
 
@@ -895,6 +1001,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         label="Ambient Music"
         hint="Plays while exploring. Uploads replace the built-in exploration score."
       />
+
+      <Text style={styles.sectionLabel}>MAPS</Text>
+      <MapsSection />
 
       <Text style={styles.sectionLabel}>FAMILY BUILD</Text>
       {!published ? (
