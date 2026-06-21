@@ -102,8 +102,8 @@ export function buildOpeningNarrative(input: {
   const named = (playerName ?? '').trim().length > 0;
   // engine_Dev — P1 (the opening grounding) is data-driven. With a custom World
   // lore block loaded, ground the intro in the author's own `setting` instead of
-  // the built-in Tartaria cataclysm ("the Aetherstone flood drowned Tartaria").
-  // No custom world → the Tartaria default openings below.
+  // the built-in this country cataclysm ("the old bedrock flood drowned this country").
+  // No custom world → the this country default openings below.
   // engine_Dev — NEUTRAL fallback openings (no setting-specific nouns). These only
   // fire when NO World-lore block is uploaded; a re-skin grounds the intro in its
   // own `setting`. Overridable via the `opening` flavor key.
@@ -145,7 +145,7 @@ export function buildOpeningNarrative(input: {
   // ("The Monarch's Waystation" was rendering as "the The Monarch's Waystation").
   const locWithThe = /^the\s/i.test(location.name) ? location.name : `the ${location.name}`;
   const p2 = hubRoomName && hubRoomDescription
-    ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of ${locWithThe}. You arrive at ${hubRoomName}. ${hubRoomDescription}`
+    ? `${hubName ?? "The scavengers' Outpost"} rises out of the silt at the edge of ${locWithThe}. You arrive at ${hubRoomName}. ${hubRoomDescription}`
     : `You arrive at the edge of ${locWithThe}. ${location.description}`;
 
   // P3 — atmosphere + agency hand-off. In the hub we use a hub-flavored
@@ -154,8 +154,8 @@ export function buildOpeningNarrative(input: {
   // "A / An" properly so we don't print "A etheric storm".
   const isHubScene = !!(hubRoomName && hubRoomDescription);
   // engine_Dev — the surface opening flavor pool is overridable via the 'opening'
-  // flavor key, so a re-skinned game replaces the Tartaria atmosphere lines (Rust
-  // Monks, Aetheric Torch, Mud Monarch crows) with its own. Built-in pool is the
+  // flavor key, so a re-skinned game replaces the this country atmosphere lines (Rust
+  // Monks, strange Torch, Mud Monarch crows) with its own. Built-in pool is the
   // default when no flavor override is uploaded.
   const arbiterLine = isHubScene
     ? pick(resolveFlavor('hubOpening', HUB_OPENING_LINES))
@@ -195,20 +195,22 @@ function aOrAn(nextWord: string): string {
 }
 
 // Hub-flavored opening lines — used in P3 of the opening narrative when
-// the player spawns inside the Reclaimers' Outpost. Generic Tartaria-
+// the player spawns inside the scavengers' Outpost. Generic this country-
 // world openings (Rust Monks on the road, footprints in the silt, etc.)
 // read as out-of-place when the player is standing in an authored room.
+// engine_Dev — NEUTRAL hub-opening ambience (proper nouns stripped). Overridable
+// via the `hubOpening` flavor key.
 const HUB_OPENING_LINES = [
-  `The outpost's lanterns sway in a draft that should not reach this far inside.`,
-  `Reclaimers move past you on small errands — checking ropes, counting beads, pretending not to study the new arrival.`,
+  `The hall's lanterns sway in a draft that should not reach this far inside.`,
+  `Figures move past you on small errands — checking gear, counting stores, pretending not to study the new arrival.`,
   `Somewhere behind the back wall, a kettle whistles itself empty and no one moves to take it off.`,
   // OTA 203 — Arbiter intro updated for the new vibe. Old line was
   // narrator-mystical ("they were here before the outpost"); new
   // line plants the cloak + the I-don't-care + the watching-you
   // beat so first impressions land closer to the actual character.
   `The ${getNarratorName()} is already here, slouched against a post under a cloak that has seen more weather than most people. He looks asleep. He isn't. His eyes track you for one quiet beat before he goes back to looking at nothing.`,
-  `A map-stone hums softly at the center of the camp — old enough to remember roads the Flood erased.`,
-  `Smoke from the cook-fires turns blue where the Aether crosses it. No one comments.`,
+  `A worn map-table sits at the center of the room — old enough to remember roads the cataclysm erased.`,
+  `Smoke from the cook-fires turns blue where something in the air crosses it. No one comments.`,
 ];
 
 export interface SceneInput {
@@ -229,7 +231,7 @@ export interface SceneInput {
 // desert walks with you" = you're being followed). Casual, terse,
 // slightly bored on the surface. Under the cloak he carries dual
 // bolt-casters; he's killed more out here than he's ever said. He
-// knows the Aether, the old machinery, the old ways — he just
+// knows the strangeness, the old machinery, the old ways — he just
 // doesn't care to flaunt it. He sees something in YOU, watches you
 // for reasons he won't explain. He likes you. Don't read that as
 // benevolence — cross him and he'll snap your neck, bury you where
@@ -265,18 +267,18 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `"The buried world rewards a careful eye," the ${getNarratorName()} says. "Look longer."`,
     `"Something here is older than its name," the ${getNarratorName()} murmurs. "Find what called it that."`,
     `The ${getNarratorName()} watches your hands. "What you don't understand isn't empty. It's waiting."`,
-    `"Half of Tartaria is what was never written down," the ${getNarratorName()} says. "You're reading the rest."`,
+    `"Half of this country is what was never written down," the ${getNarratorName()} says. "You're reading the rest."`,
     `"Curiosity buys nothing in the market," the ${getNarratorName()} says, "but it buys you the next door."`,
     // OTA 203 — sees something in you
     `The ${getNarratorName()} studies you a beat too long. "Hm." He doesn't elaborate.`,
-    `"Tartaria's been quiet about you," the ${getNarratorName()} says. "That usually means it's paying attention."`,
+    `"This country's been quiet about you," the ${getNarratorName()} says. "That usually means it's paying attention."`,
   ],
   AGGRESSION: [
     `"A blade is a question," the ${getNarratorName()} says. "Be sure you want the answer."`,
     `The ${getNarratorName()} watches the air settle. "Some things bleed loudly. Others bleed last."`,
     `"Strike like you mean to walk away," the ${getNarratorName()} says. "Anything less is wasted."`,
     `The ${getNarratorName()}'s gaze stays level. "Violence here is older than language. It will outlast yours."`,
-    `"Don't celebrate," the ${getNarratorName()} says quietly. "Tartaria keeps the body count."`,
+    `"Don't celebrate," the ${getNarratorName()} says quietly. "This country keeps the body count."`,
     // OTA 203 — lethality undercurrent
     `The ${getNarratorName()} loosens something inside the cloak. "If it comes for both of us, mind the angle."`,
     `"There are two killers in this room right now," the ${getNarratorName()} says. "One of them is calmer about it."`,
@@ -294,10 +296,10 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `The ${getNarratorName()} watches your shadow. "More of it than the sun explains."`,
   ],
   RESOLVE: [
-    `"Resolve is the only relic Tartaria does not corrupt," the ${getNarratorName()} says.`,
+    `"Resolve is the only relic this country does not corrupt," the ${getNarratorName()} says.`,
     `The ${getNarratorName()} inclines their head. "Then keep walking. The road remembers feet that don't stop."`,
     `"Good," the ${getNarratorName()} says simply. "The next part is harder."`,
-    `"Tartaria buries the wavering," the ${getNarratorName()} says. "It does not bury you yet."`,
+    `"This country buries the wavering," the ${getNarratorName()} says. "It does not bury you yet."`,
     // OTA 203 — terse approval, sees something in you
     `The ${getNarratorName()} nods, once. "That's the first useful thing I've seen you do."`,
     `"Good," the ${getNarratorName()} says. The cloak settles. He says nothing else.`,
@@ -306,7 +308,7 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `"Sit if you must," the ${getNarratorName()} says. "The ruins will still be here. So will you, if you choose."`,
     `The ${getNarratorName()} does not look at you. "Despair is fast. Resolve is slow. Pick your speed."`,
     `"Many before you found this same wall," the ${getNarratorName()} says. "A few walked around it."`,
-    `"Rest the body, not the watch," the ${getNarratorName()} says. "Tartaria does not stop watching."`,
+    `"Rest the body, not the watch," the ${getNarratorName()} says. "This country does not stop watching."`,
     // OTA 203 — don't-give-a-shit register
     `"Pull yourself together," the ${getNarratorName()} says, voice flat. "Or don't. I've buried both."`,
     `The ${getNarratorName()} watches you fold. "I'm not in the business of carrying anyone. Decide which of us walks out."`,
@@ -318,28 +320,28 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
 const BASE_INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
   attack: [
     `The ${getNarratorName()} watches the blow land or fail. "Both are answers."`,
-    `"Make the next strike count for two," the ${getNarratorName()} says. "Tartaria taxes the first."`,
+    `"Make the next strike count for two," the ${getNarratorName()} says. "This country taxes the first."`,
     `"You attack as if you mean to leave," the ${getNarratorName()} murmurs. "Good."`,
     // OTA 203 — casual / lethal
     `The ${getNarratorName()} does not look up. "Hit it before it hits you. That's the entire trick."`,
     `"Either you walk away or it does," the ${getNarratorName()} says. "I'm not particular."`,
   ],
   stealth: [
-    `"The Aetherstone hears breath before it hears footsteps," the ${getNarratorName()} says quietly. "Mind both."`,
+    `"The old bedrock hears breath before it hears footsteps," the ${getNarratorName()} says quietly. "Mind both."`,
     `The ${getNarratorName()}'s eyes drift across the room. "Quiet is a kind of armour. Wear it well."`,
     `"The watchers here have patience," the ${getNarratorName()} murmurs. "Match theirs."`,
     // OTA 203 — first-person flicker, lethality
     `"I learned to walk this country quiet," the ${getNarratorName()} says. "It still kills the loud ones first."`,
   ],
   diplomacy: [
-    `"Tartaria has more old voices than living ones," the ${getNarratorName()} says. "Address the right one."`,
+    `"This country has more old voices than living ones," the ${getNarratorName()} says. "Address the right one."`,
     `The ${getNarratorName()} tilts their head. "Words here cost something. Spend wisely."`,
     `"You can talk to the buried world," the ${getNarratorName()} says. "It rarely talks back the way you expect."`,
   ],
   escape: [
     `"Retreat is a relic too," the ${getNarratorName()} says. "Almost no one carries it."`,
     `The ${getNarratorName()} steps aside. "Better feet than blood. Go."`,
-    `"You can leave and come back," the ${getNarratorName()} says. "Tartaria will recognise you."`,
+    `"You can leave and come back," the ${getNarratorName()} says. "This country will recognise you."`,
     // OTA 203 — dry
     `The ${getNarratorName()} shrugs under the cloak. "Living is a strategy. Pick it more often."`,
   ],
@@ -349,19 +351,19 @@ const BASE_INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
     `"Search the room a second time once you've left it once," the ${getNarratorName()} says. "Different things will be visible."`,
     `"A relic does not announce itself," the ${getNarratorName()} murmurs. "It corrects the shape of the room around it."`,
     // OTA 203 — terse, slightly bored
-    `"Look twice," the ${getNarratorName()} says. "Tartaria hides the second thing under the first."`,
+    `"Look twice," the ${getNarratorName()} says. "This country hides the second thing under the first."`,
     `The ${getNarratorName()} sips at nothing. "A real find changes the shape of the room. The rest is dust."`,
   ],
   rest: [
     `The ${getNarratorName()} inclines their head. "Sleep watched is still sleep."`,
-    `"Tartaria does not forget the wounded," the ${getNarratorName()} says. "But it will wait for them."`,
+    `"This country does not forget the wounded," the ${getNarratorName()} says. "But it will wait for them."`,
     `"Drink something," the ${getNarratorName()} says. "The stones drink whatever you don't."`,
     // OTA 203 — he's watching while you sleep
     `"Sleep," the ${getNarratorName()} says. "I'll wake one of us if anything comes. Probably."`,
     `The ${getNarratorName()} does not sit. "Rest if you must. I keep my eyes open by habit."`,
   ],
   travel: [
-    `"Every road in Tartaria leads down," the ${getNarratorName()} says, "even when it climbs."`,
+    `"Every road in this country leads down," the ${getNarratorName()} says, "even when it climbs."`,
     `The ${getNarratorName()} watches you go. "Mark the way back. Few here remember how to retrace."`,
     `"The buried world is wide," the ${getNarratorName()} says. "Walk it like it knows you."`,
     // OTA 203 — cryptic / dry
@@ -369,18 +371,18 @@ const BASE_INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
     `The ${getNarratorName()} watches you walk. "Light feet. The silt is reading you, whether you noticed."`,
   ],
   cast: [
-    `"Aether bends to want, not need," the ${getNarratorName()} says. "Choose carefully."`,
+    `"The strangeness bends to want, not need," the ${getNarratorName()} says. "Choose carefully."`,
     `"Every channel costs the channeller something," the ${getNarratorName()} murmurs. "Notice what is gone."`,
-    // OTA 203 — he knows the Aether, just doesn't talk about it
+    // OTA 203 — he knows the strangeness, just doesn't talk about it
     `The ${getNarratorName()} watches the channel without comment. He has seen better. He has seen worse.`,
   ],
   use_relic: [
     `"Relics remember their first hand," the ${getNarratorName()} says. "You are not it."`,
-    `"Wake it slowly," the ${getNarratorName()} says. "Tartaria's old things bite when surprised."`,
+    `"Wake it slowly," the ${getNarratorName()} says. "This country's old things bite when surprised."`,
   ],
   wait: [
     `"Stillness is a question too," the ${getNarratorName()} says. "Listen for the answer."`,
-    `The ${getNarratorName()} does not move. "Tartaria fills silence with itself. Hear what arrives."`,
+    `The ${getNarratorName()} does not move. "This country fills silence with itself. Hear what arrives."`,
   ],
 };
 
@@ -523,7 +525,7 @@ export function buildScene(input: SceneInput): string {
 // hold meaningless Yoda-mantras ("Decide", "Patient hands, patient
 // hands", "Either it gives or it doesn't") — the player called those
 // out as nonsense narration that surfaces without context. Replaced
-// with short lore-grounded statements about Tartaria as a setting so
+// with short lore-grounded statements about this country as a setting so
 // even the bottom of the fallback chain teaches the player something
 // about the world.
 // OTA 027 — replacement for the bland "The Arbiter notes how you look."
@@ -534,7 +536,7 @@ const ARBITER_LOOK_LINES = [
   `The ${getNarratorName()} does not look up. "What you see is more than what is here."`,
   `The ${getNarratorName()}'s eyes track yours. "Looking is the cheap action. Knowing is the one with teeth."`,
   `The ${getNarratorName()} scans the same arc you did, slower. "What you miss is what comes back later."`,
-  `The ${getNarratorName()} waits a beat. "Tartaria gives a discount to the patient eye."`,
+  `The ${getNarratorName()} waits a beat. "This country gives a discount to the patient eye."`,
   `The ${getNarratorName()} says nothing. The silence is its own commentary.`,
   `The ${getNarratorName()} half-smiles. "Twice over makes a thing yours. Once over is a guess."`,
   // arb164 — look-pool expansion (same dilution effort as the noted pool).
@@ -542,7 +544,7 @@ const ARBITER_LOOK_LINES = [
   `The ${getNarratorName()} follows your gaze without moving. "Half of what's here only shows itself to the second glance."`,
   `The ${getNarratorName()} murmurs, "Eyes are cheap. Attention costs. Spend it well."`,
   `The ${getNarratorName()} watches the same shadows. "Something here is worth the staring. Maybe not today."`,
-  `The ${getNarratorName()} says, "The careful eye leaves Tartaria richer. The careless one leaves it a body."`,
+  `The ${getNarratorName()} says, "The careful eye leaves this country richer. The careless one leaves it a body."`,
   `The ${getNarratorName()} does not blink. "You're looking for it. It's looking back. Fair trade."`,
   `The ${getNarratorName()} tips their chin at the dark. "Read the room before the room reads you."`,
   `The ${getNarratorName()} says softly, "Look long enough and the buried country starts to look familiar. That's the danger."`,
@@ -583,7 +585,7 @@ const ARBITER_NOTED_LINES = [
   `The ${getNarratorName()} says low, "Every move spends something. I'm keeping count."`,
   `The ${getNarratorName()} nods, barely. "That's the kind of thing that gets remembered out here."`,
   `The ${getNarratorName()} watches you settle. "You're getting a feel for the weight of this place."`,
-  `The ${getNarratorName()} says, "Good instincts. Tartaria eats the other kind."`,
+  `The ${getNarratorName()} says, "Good instincts. This country eats the other kind."`,
   `The ${getNarratorName()}'s mouth twitches. "I'd call that nerve. The mud calls it dinner, sometimes."`,
   `The ${getNarratorName()} says, "I saw it land. So did whatever's listening."`,
   `The ${getNarratorName()} looks from you to the dark and back. "Fine. Keep that edge."`,
@@ -594,31 +596,31 @@ const ARBITER_NOTED_LINES = [
 ];
 
 const GENERIC_REMARKS = [
-  `"Tartaria was a place of life and power once," the ${getNarratorName()} says. "Now mostly whispers."`,
-  `"The Aetherstone Flood ended a thousand years ago," the ${getNarratorName()} says, "but at ground level it never quite stopped moving."`,
+  `"This country was a place of life and power once," the ${getNarratorName()} says. "Now mostly whispers."`,
+  `"The Great Collapse ended a thousand years ago," the ${getNarratorName()} says, "but at ground level it never quite stopped moving."`,
   `"Every faction down here is hunting the same thing," the ${getNarratorName()} says. "They just call it different names."`,
   `"The mud remembers what the surface forgot," the ${getNarratorName()} murmurs.`,
-  `"The Reclaimers Guild maps what they can," the ${getNarratorName()} says. "What they can't, they pay you to chart."`,
-  `"The Forgotten Order won't say what they're rebuilding," the ${getNarratorName()} notes. "Only that it's older than the flood."`,
-  `"True Tartarians walked these roads before the mud came. Some of them still do."`,
-  `"Aetherstone is the bedrock of this country," the ${getNarratorName()} says. "Touch it carefully — it has opinions."`,
+  `"The cartographers' guild maps what they can," the ${getNarratorName()} says. "What they can't, they pay you to chart."`,
+  `"The old orders won't say what they're rebuilding," the ${getNarratorName()} notes. "Only that it's older than the flood."`,
+  `"The first walkers walked these roads before the mud came. Some of them still do."`,
+  `"Old bedrock is the bedrock of this country," the ${getNarratorName()} says. "Touch it carefully — it has opinions."`,
   // arb164 — lore-musing expansion; these are the targetless fallback flavor.
   `"The towers went down in a day," the ${getNarratorName()} says. "The mud's been finishing the job for a thousand years."`,
   `"Everything down here was someone's home once," the ${getNarratorName()} murmurs. "Mind your boots."`,
-  `"The flood didn't drown Tartaria," the ${getNarratorName()} says. "It buried it alive. There's a difference."`,
+  `"The flood didn't drown this country," the ${getNarratorName()} says. "It buried it alive. There's a difference."`,
   `"Maps lie out here," the ${getNarratorName()} notes. "The ground rearranges itself when no one's watching."`,
   `"The Giants are gone," the ${getNarratorName()} says. "Their servants didn't get the message."`,
   `"Coin spends the same in every camp," the ${getNarratorName()} says. "Loyalty doesn't. Spend that one slower."`,
-  `"The Aetherstorms remember the old roads," the ${getNarratorName()} says. "Walk them and they'll walk back."`,
+  `"The the strangenessstorms remember the old roads," the ${getNarratorName()} says. "Walk them and they'll walk back."`,
   `"There are older things than the factions down here," the ${getNarratorName()} says. "They don't recruit. They collect."`,
   `"The buried cities still have lights on," the ${getNarratorName()} says. "No one's asked who's paying the bill."`,
-  `"Tartaria keeps what it takes," the ${getNarratorName()} says. "Names, mostly. See that you keep yours."`,
+  `"This country keeps what it takes," the ${getNarratorName()} says. "Names, mostly. See that you keep yours."`,
   `"The Conspiracy Architects redraw what fell," the ${getNarratorName()} says. "Whether it wants redrawing, they don't ask."`,
   `"Every relic down here was a tool first," the ${getNarratorName()} says. "Most still remember the job."`,
   `"The mud's patient," the ${getNarratorName()} says. "It's outlasted empires. It'll outlast your hurry."`,
   `"The dead outnumber the living a thousand to one here," the ${getNarratorName()} says. "Be polite."`,
   `"Whatever ended this place left in a hurry," the ${getNarratorName()} says. "The cups are still on the tables."`,
-  `"They say the Aetherstone dreams," the ${getNarratorName()} says. "On the bad nights, I believe them."`,
+  `"They say the old bedrock dreams," the ${getNarratorName()} says. "On the bad nights, I believe them."`,
 ];
 
 export interface ArbiterContext {
@@ -677,7 +679,7 @@ const COMBAT_REMARKS = [
   `"Footwork over fury," the ${getNarratorName()} says quietly. "The {enemy} is patient. Be patienter."`,
   `The ${getNarratorName()} does not look away from the {enemy}. "Decide quickly. It already has."`,
   `"You hit what you commit to," the ${getNarratorName()} says. "The {enemy} hears the difference."`,
-  `"Tartaria does not award style points," the ${getNarratorName()} says, eyes on the {enemy}. "End it."`,
+  `"This country does not award style points," the ${getNarratorName()} says, eyes on the {enemy}. "End it."`,
   `The ${getNarratorName()}'s hand drifts to nothing in particular. "The {enemy} will not tire before you do. Spend wisely."`,
   `"That one bleeds slow," the ${getNarratorName()} says. "Make the hit count."`,
   `"You can fight, hide, or speak," the ${getNarratorName()} says low. "The {enemy} is already deciding for itself."`,
@@ -716,7 +718,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   const inCombat = !!ctx.enemy;
 
   // When an enemy is present, the Arbiter stays on combat. No location
-  // tourism mid-fight ("the borderlands. Where Tartaria thins" was firing
+  // tourism mid-fight ("the borderlands. Where this country thins" was firing
   // while the player was mid-swing).
   if (inCombat) {
     // ~20% chance to ack the player's most recent action even in combat —
@@ -787,7 +789,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     if (stamFrac < 0.35 && ctx.hasFood) {
       wellnessLines.push(
         `"Eat something," the ${getNarratorName()} says, almost gentle. "Stamina doesn't refill on grit. You've got rations."`,
-        `The ${getNarratorName()} taps the air near your pack. "Rations. Now. Tartaria does not forgive an empty stomach."`,
+        `The ${getNarratorName()} taps the air near your pack. "Rations. Now. This country does not forgive an empty stomach."`,
       );
     } else if (stamFrac < 0.35) {
       wellnessLines.push(
@@ -800,7 +802,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       // present in the rotation instead of only firing on damage.
       wellnessLines.push(
         `"You're carrying yourself well today," the ${getNarratorName()} says, almost casual.`,
-        `The ${getNarratorName()} glances at you. "Steady. Good. Tartaria rewards steady."`,
+        `The ${getNarratorName()} glances at you. "Steady. Good. This country rewards steady."`,
       );
     }
     if (wellnessLines.length > 0) {
@@ -834,7 +836,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       const callbacks = [
         `"The ${noun} — still waiting," the ${getNarratorName()} says. "Decide if it matters."`,
         `"You saw the ${noun}," the ${getNarratorName()} notes. "That memory will rot if you leave it."`,
-        `"Threads in Tartaria don't wait long," the ${getNarratorName()} says quietly. "The ${noun} won't either."`,
+        `"Threads in this country don't wait long," the ${getNarratorName()} says quietly. "The ${noun} won't either."`,
         `The ${getNarratorName()} glances toward the ${noun}. "Still there. Still yours, if you take it."`,
       ];
       return pick(callbacks);
@@ -952,7 +954,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   }
   // Hazard fallback — names the active hazard, useful bearing.
   if (ctx.hazard && Math.random() < 0.4) {
-    return `The ${getNarratorName()} eyes the ${ctx.hazard.name.toLowerCase()}. "Tartaria's older hazards are the ones you can't see coming. This one you can."`;
+    return `The ${getNarratorName()} eyes the ${ctx.hazard.name.toLowerCase()}. "This country's older hazards are the ones you can't see coming. This one you can."`;
   }
   // Last resort — lore-grounded setting remarks (no Yoda mantras).
   return rotatingPick(resolveFlavor('genericRemarks', GENERIC_REMARKS), 'arbiter.generic');
@@ -969,7 +971,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
  * "refuse", or any other word that frames the relic as the problem.
  */
 export const USE_RELIC_FAILURE_LINES: readonly string[] = [
-  'You focus on the relic, but the Aether slips through your grasp. The connection wavers and breaks.',
+  'You focus on the relic, but the strangeness slips through your grasp. The connection wavers and breaks.',
   'You press the relic harder than it wants. The hum dies under your hand.',
   'You try to coax the relic to life — it answers only with a thin, faltering pulse, then nothing.',
 ];
@@ -1157,10 +1159,10 @@ export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
 const ARBITER_SCENE_INTROS = [
   `The ${getNarratorName()} steps to the edge of {locationName} and watches. "Worth a careful look before the dust settles."`,
   `"This place has changed since I last passed through," the ${getNarratorName()} says. "Or perhaps it has not, and I have."`,
-  `The ${getNarratorName()} inhales the air of {locationName}. "Tartaria is louder here than it was an hour ago. Move carefully."`,
+  `The ${getNarratorName()} inhales the air of {locationName}. "This country is louder here than it was an hour ago. Move carefully."`,
   `"There are paths from this place," the ${getNarratorName()} murmurs. "Ask, and I will tell you what I know."`,
   `The ${getNarratorName()} eyes one corner of {locationName}. "Begin there, if you must begin somewhere."`,
-  `"You could rest here," the ${getNarratorName()} says. "Or push on. Tartaria does not insist."`,
+  `"You could rest here," the ${getNarratorName()} says. "Or push on. This country does not insist."`,
   `The ${getNarratorName()} watches the dust hang. "The room has not been disturbed in some time. Or it has, and you should look closer."`,
   `"Three things in this place would reward attention," the ${getNarratorName()} says, without naming them. "I would start with the one you cannot quite see."`,
 ];
@@ -1223,24 +1225,24 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
 // the player picked at character creation. Each pool is 4–5 lines.
 const ARBITER_RACE_REMARKS: Record<string, string[]> = {
   tartarian_giant: [
-    `The ${getNarratorName()} looks up at you, briefly. "A Tartarian Giant in the open. The dust feels something it has not in a long time."`,
+    `The ${getNarratorName()} looks up at you, briefly. "A this country Giant in the open. The dust feels something it has not in a long time."`,
     `"Your size opens doors that closed when the cities fell," the ${getNarratorName()} says. "Some of them should have stayed shut."`,
     `"The first builders stood as tall as you do," the ${getNarratorName()} murmurs. "I have wondered what they saw, looking down."`,
     `"Be careful in the low caves," the ${getNarratorName()} warns. "Your ancestors made them, then forgot why."`,
-    `"Aether knows your kind," the ${getNarratorName()} says. "It always has."`,
+    `"The strangeness knows your kind," the ${getNarratorName()} says. "It always has."`,
   ],
   mud_dweller: [
     `"A Mud Dweller above ground," the ${getNarratorName()} notes. "The surface feels different up here, doesn't it."`,
-    `"Your people remember Tartaria as it was," the ${getNarratorName()} says. "You do not need me to describe what's buried — you have walked it."`,
-    `"Aethercraft sits in your hands the way breath sits in mine," the ${getNarratorName()} says. "Use it without flinching."`,
-    `"The True Tartarians watch you," the ${getNarratorName()} says. "Whether they approve depends on the day."`,
+    `"Your people remember this country as it was," the ${getNarratorName()} says. "You do not need me to describe what's buried — you have walked it."`,
+    `"The strangenesscraft sits in your hands the way breath sits in mine," the ${getNarratorName()} says. "Use it without flinching."`,
+    `"The the first walkers watch you," the ${getNarratorName()} says. "Whether they approve depends on the day."`,
     `"Subterranean eyes adjust quickly to surface light," the ${getNarratorName()} observes. "Slower the other way around."`,
   ],
   reclaimer: [
-    `The ${getNarratorName()} watches you read the room. "A Reclaimer through and through. You see a ledger where most see ruins."`,
+    `The ${getNarratorName()} watches you read the room. "A scavenger through and through. You see a ledger where most see ruins."`,
     `"Profit before ideology," the ${getNarratorName()} says. "There is an honesty in that, at least."`,
-    `"I have walked with Reclaimers before," the ${getNarratorName()} says. "The careful ones survive. The greedy ones decorate the floor."`,
-    `"Aetherstone signatures bend to your attention," the ${getNarratorName()} says. "Trust the sense."`,
+    `"I have walked with the scavengers before," the ${getNarratorName()} says. "The careful ones survive. The greedy ones decorate the floor."`,
+    `"Old bedrock signatures bend to your attention," the ${getNarratorName()} says. "Trust the sense."`,
     `"Locks unmake themselves around your fingers," the ${getNarratorName()} says. "A small magic. Use it well."`,
   ],
   architectural_sentinel: [
@@ -1250,21 +1252,21 @@ const ARBITER_RACE_REMARKS: Record<string, string[]> = {
     `"I have wondered, sometimes, what an Architectural Sentinel dreams of," the ${getNarratorName()} says. "I have not yet asked."`,
   ],
   mud_golem: [
-    `"A Mud Golem walking the Outskirts," the ${getNarratorName()} says. "Tartaria made your kind in fear. Use that."`,
-    `"Aetherstone fills you when it is near," the ${getNarratorName()} says. "Save the recharge for when it matters."`,
+    `"A Mud Golem walking the Outskirts," the ${getNarratorName()} says. "This country made your kind in fear. Use that."`,
+    `"Old bedrock fills you when it is near," the ${getNarratorName()} says. "Save the recharge for when it matters."`,
     `"Your makers cast you for a purpose," the ${getNarratorName()} says. "Some Golems still hold theirs. Others forget. Which one are you today?"`,
     `"The stones whisper to you in a language I do not have," the ${getNarratorName()} admits. "Listen for both of us."`,
   ],
   unknowing_mass: [
-    `"Surface-born, walking Tartaria," the ${getNarratorName()} says. "The first time is always the worst time."`,
+    `"Surface-born, walking this country," the ${getNarratorName()} says. "The first time is always the worst time."`,
     `"You did not grow up knowing about any of this," the ${getNarratorName()} says. "Some advantage in that — fewer assumptions to unmake."`,
     `"Your kind learns fast or dies fast," the ${getNarratorName()} says. "Few stop in the middle."`,
     `"Beginner's luck has a half-life," the ${getNarratorName()} warns. "Use the early grace well."`,
   ],
   aetherborn: [
-    `"Aetherborn," the ${getNarratorName()} says, slowly. "Your bloodline survived the Flood because Aetherstone chose it. Do not waste the favour."`,
-    `"The Aether reads your pulse like a page," the ${getNarratorName()} notes. "Whatever you intend, it will know first."`,
-    `"Few Aetherborn walk far from their houses," the ${getNarratorName()} says. "Fewer still come back the same as they left."`,
+    `"The strangenessborn," the ${getNarratorName()} says, slowly. "Your bloodline survived the Flood because old bedrock chose it. Do not waste the favour."`,
+    `"The the strangeness reads your pulse like a page," the ${getNarratorName()} notes. "Whatever you intend, it will know first."`,
+    `"Few the strangenessborn walk far from their houses," the ${getNarratorName()} says. "Fewer still come back the same as they left."`,
     `"Your kind opens locks no other race can hear," the ${getNarratorName()} says. "Some of those doors were locked for a reason."`,
   ],
 };
@@ -1274,31 +1276,31 @@ const ARBITER_RACE_REMARKS: Record<string, string[]> = {
 const ARBITER_FACTION_REMARKS: Record<string, string[]> = {
   mud_monarchs: [
     `"A Monarch's mark, even faint," the ${getNarratorName()} says. "You did not come here to discover, did you."`,
-    `"The Mud Monarchs would prefer Tartaria stayed forgotten," the ${getNarratorName()} says. "Standing here, you are already disobeying."`,
+    `"The Mud Monarchs would prefer this country stayed forgotten," the ${getNarratorName()} says. "Standing here, you are already disobeying."`,
     `"You serve people who would rather burn the past than read it," the ${getNarratorName()} says. "I know the type."`,
     `"The Monarchs reach further than they admit," the ${getNarratorName()} says quietly. "Be careful who you talk to."`,
   ],
   forgotten_order: [
-    `"Forgotten Order," the ${getNarratorName()} says, with something like approval. "The buried world owes you a hearing, and you owe it the listening."`,
+    `"Old orders," the ${getNarratorName()} says, with something like approval. "The buried world owes you a hearing, and you owe it the listening."`,
     `"Varakush sends scholars into places like this and expects them to come back changed," the ${getNarratorName()} says. "So far you are still intact."`,
     `"Your Order names me, sometimes," the ${getNarratorName()} says. "I do not return the favor."`,
-    `"Aether is humanity's birthright, your charter says," the ${getNarratorName()} says. "Tartaria has opinions on inheritance."`,
+    `"The strangeness is humanity's birthright, your charter says," the ${getNarratorName()} says. "This country has opinions on inheritance."`,
   ],
   reclaimers_guild: [
-    `"Reclaimers Guild," the ${getNarratorName()} says. "The buyer gets what they pay for, and you get what's left."`,
+    `"Cartographers' guild," the ${getNarratorName()} says. "The buyer gets what they pay for, and you get what's left."`,
     `"The Guild's brokers count their cuts before the relic is even dug out," the ${getNarratorName()} notes. "You are one of them, now."`,
     `"A clean transaction is its own ethic," the ${getNarratorName()} says. "Some of your peers forget that."`,
     `"The Guild has no rivals, only invoices," the ${getNarratorName()} says drily.`,
   ],
   true_tartarians: [
-    `"A True Tartarian, on the surface," the ${getNarratorName()} says. "The empire was your inheritance long before it was your destination."`,
+    `"A True this country, on the surface," the ${getNarratorName()} says. "The empire was your inheritance long before it was your destination."`,
     `"Your enclave will want to know what you find here," the ${getNarratorName()} says. "They will not always be patient about the wait."`,
     `"The Giants are watching," the ${getNarratorName()} says. "Or they are not. Hard to tell with them."`,
     `"Your people remember the old kingdoms by their names," the ${getNarratorName()} says. "Use the right ones."`,
   ],
   eternal_dynasty: [
-    `"Aetherborn blood," the ${getNarratorName()} says, gaze steady. "I have known some of your kind. Few of them well."`,
-    `"The Dynasty would have the Aether for themselves," the ${getNarratorName()} says. "You may want it for less."`,
+    `"The strangenessborn blood," the ${getNarratorName()} says, gaze steady. "I have known some of your kind. Few of them well."`,
+    `"The Dynasty would have the strangeness for themselves," the ${getNarratorName()} says. "You may want it for less."`,
     `"Your house's patience is older than most empires," the ${getNarratorName()} notes. "Try not to confuse patience with permission."`,
   ],
   conspiracy_architects: [
@@ -1320,7 +1322,7 @@ const ARBITER_FACTION_REMARKS: Record<string, string[]> = {
     `"The Stone Builders work where most have given up the ground," the ${getNarratorName()} says. "It shows in their hands. And eventually in yours."`,
   ],
   tartarian_revivalists: [
-    `"A Revivalist," the ${getNarratorName()} says. "You believe Tartaria can come back. The country itself has not yet voted."`,
+    `"A Revivalist," the ${getNarratorName()} says. "You believe this country can come back. The country itself has not yet voted."`,
     `"The Revivalists are loud," the ${getNarratorName()} notes. "Loud is sometimes brave and sometimes loud. Time will sort it."`,
     `"Restoring an empire is the kind of work that becomes the work of generations," the ${getNarratorName()} says. "Do not expect to finish."`,
     `"Some Revivalists forget that what they revive will not be quite the same," the ${getNarratorName()} warns. "Watch for that, in others. And in yourself."`,
@@ -1352,7 +1354,7 @@ function pickTimelineCallback(
       } else if (recent.kind === 'faction_join') {
         options.push(`"You ${recent.text}," the ${getNarratorName()} notes. "They will remember you in their own way."`);
       } else if (recent.kind === 'death_revive') {
-        options.push(`"You ${recent.text}," the ${getNarratorName()} says quietly. "Few things in Tartaria come back from the buried side. The Aetherstone marks the ones that do."`);
+        options.push(`"You ${recent.text}," the ${getNarratorName()} says quietly. "Few things in this country come back from the buried side. The old bedrock marks the ones that do."`);
       } else if (recent.kind === 'first_kill') {
         options.push(`"You ${recent.text}," the ${getNarratorName()} says. "I remember the way you stood after. Tell me — has the way you stand changed?"`);
       } else if (recent.kind === 'first_travel') {
@@ -1366,7 +1368,7 @@ function pickTimelineCallback(
   if (ms) {
     if (ms.enemiesDefeated >= 3) {
       options.push(
-        `"You have put down ${ms.enemiesDefeated} things in Tartaria so far," the ${getNarratorName()} says. "None of them got up. That counts for something."`,
+        `"You have put down ${ms.enemiesDefeated} things in this country so far," the ${getNarratorName()} says. "None of them got up. That counts for something."`,
       );
     }
     if (ms.enemiesDefeated >= 10) {
@@ -1381,7 +1383,7 @@ function pickTimelineCallback(
     }
     if (ms.travelsCompleted >= 10) {
       options.push(
-        `"You have walked more of Tartaria than most who claim to know it," the ${getNarratorName()} murmurs. "Stop sometimes. Listen for what you have passed."`,
+        `"You have walked more of this country than most who claim to know it," the ${getNarratorName()} murmurs. "Stop sometimes. Listen for what you have passed."`,
       );
     }
     if (ms.checksSucceeded >= 5) {
@@ -1402,7 +1404,7 @@ function pickTimelineCallback(
     const recent = defeated[defeated.length - 1];
     if (recent) {
       options.push(
-        `"You have a way of attracting the wrong company," the ${getNarratorName()} says. "Lately the ${recent.toLowerCase()}, before that something with more legs. Tartaria keeps an inventory."`,
+        `"You have a way of attracting the wrong company," the ${getNarratorName()} says. "Lately the ${recent.toLowerCase()}, before that something with more legs. This country keeps an inventory."`,
       );
     }
   }
@@ -1410,7 +1412,7 @@ function pickTimelineCallback(
   const discovered = worldMemory?.discoveredLocationIds ?? [];
   if (discovered.length >= 3) {
     options.push(
-      `"Three places now you have stood and not left," the ${getNarratorName()} says. "Tartaria notices the ones who keep coming back."`,
+      `"Three places now you have stood and not left," the ${getNarratorName()} says. "This country notices the ones who keep coming back."`,
     );
   }
 
@@ -1424,18 +1426,18 @@ function pickTimelineCallback(
 // the Arbiter as a person over many sessions.
 const ARBITER_PERSONAL_BEATS = [
   `"When I used to walk these ruins, there were three more towers," the ${getNarratorName()} says, almost to themselves. "I do not remember which fell first."`,
-  `"I knew a Reclaimer once who collected Aetherstone the way some collect coins," the ${getNarratorName()} says. "It did not end the way they expected."`,
-  `"There was a time I would have eaten the food before answering," the ${getNarratorName()} says. "Tartaria taught me to listen first."`,
+  `"I knew a scavenger once who collected old bedrock the way some collect coins," the ${getNarratorName()} says. "It did not end the way they expected."`,
+  `"There was a time I would have eaten the food before answering," the ${getNarratorName()} says. "This country taught me to listen first."`,
   `The ${getNarratorName()} glances at their own hand for a moment. "I carried a relic, once. I no longer do."`,
   `"Three things I have stopped believing in," the ${getNarratorName()} says quietly. "The buried world is no longer one of them."`,
   `"My last guide carried only a length of wire and a worn knife," the ${getNarratorName()} says. "They lasted longer than most."`,
   `"You are not the first I have walked with through this stretch," the ${getNarratorName()} says. "I will not say how many of them I remember by name."`,
-  `The ${getNarratorName()} touches a faint mark at their temple. "I forget what gave me this. Tartaria forgets nothing, which is the trade."`,
+  `The ${getNarratorName()} touches a faint mark at their temple. "I forget what gave me this. This country forgets nothing, which is the trade."`,
   `"I was younger when I last saw a sentinel wake," the ${getNarratorName()} murmurs. "I do not want to be younger again."`,
-  `"The Reclaimers offered me a place," the ${getNarratorName()} says, after a pause. "I gave them a reason. We were both polite about it."`,
-  `"I came up through the Forgotten Order, before there was much to forget," the ${getNarratorName()} says. "The order is what changed, not the forgetting."`,
+  `"The scavengers offered me a place," the ${getNarratorName()} says, after a pause. "I gave them a reason. We were both polite about it."`,
+  `"I came up through the old orders, before there was much to forget," the ${getNarratorName()} says. "The order is what changed, not the forgetting."`,
   `"There is a name I have not used in a long time," the ${getNarratorName()} says. "Not even to myself. Not yet to you."`,
-  `"The Aetherstone hummed differently before the Flood," the ${getNarratorName()} says. "I am one of the few who can still hear the difference."`,
+  `"The old bedrock hummed differently before the Flood," the ${getNarratorName()} says. "I am one of the few who can still hear the difference."`,
 ];
 
 // engine_Dev — the narrator's built-in canned line-pools, keyed for the content
