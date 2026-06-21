@@ -11,7 +11,7 @@
 
 import type { Rarity } from './types';
 import materialsData from '../data/items/materials.json';
-import { resolveTable } from './contentPack';
+import { resolveTable, hasTableOverride } from './contentPack';
 
 // arb61 — salvage yields MATERIALS ONLY (player verb-economy: take = gear,
 // salvage = materials, investigate = clues/hooks). The hand-authored pools
@@ -36,6 +36,34 @@ function materialNameSet(): ReadonlySet<string> {
   return new Set(rows.map((m) => (typeof m === 'string' ? m : m?.name)).filter((n): n is string => !!n));
 }
 export const isSalvageMaterial = (name: string): boolean => materialNameSet().has(name);
+
+// engine_Dev — keep salvage data-driven: the built-in POOLS / JUNK_POOL hold
+// Tartaria material names, so a re-skin that uploads its OWN materials would still
+// get Mud Cloth / Bent Nail / Aether Crystal. When a materials override is loaded
+// AND the rolled name isn't in it, substitute a material FROM the re-skin catalog
+// (preferring the same rarity) so salvage yields the author's materials, not ours.
+interface MatRow { name?: string; rarity?: Rarity; tags?: string[] }
+const BUILTIN_MATERIAL_ROWS: MatRow[] = (() => {
+  const v = materialsData as unknown as MatRow[] | { materials?: MatRow[]; items?: MatRow[] };
+  return Array.isArray(v) ? v : (v.materials ?? v.items ?? []);
+})();
+function pickCatalogMaterial(pref: Rarity, rng: () => number): { name: string; rarity: Rarity } | null {
+  const rows = (resolveTable<MatRow>('materials', BUILTIN_MATERIAL_ROWS)).filter((m) => m && m.name);
+  if (rows.length === 0) return null;
+  const same = rows.filter((m) => (m.rarity ?? 'Common') === pref);
+  const pool = same.length > 0 ? same : rows;
+  const m = pool[Math.floor(rng() * pool.length)]!;
+  return { name: m.name!, rarity: (m.rarity as Rarity) ?? 'Common' };
+}
+/** Swap a built-in (Tartaria) material name for one from the re-skin catalog when
+ *  the author has uploaded materials and the rolled name isn't one of theirs. */
+function finalizeMaterial(name: string, rarity: Rarity, rng: () => number): { name: string; rarity: Rarity } {
+  if (hasTableOverride('materials') && !materialNameSet().has(name)) {
+    const sub = pickCatalogMaterial(rarity, rng);
+    if (sub) return sub;
+  }
+  return { name, rarity };
+}
 
 interface PoolEntry {
   name: string;
@@ -406,12 +434,13 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
   if (!pool) return null;
   if (rng() < NOTHING_CHANCE) {
     const junk = pickWeighted(JUNK_POOL, rng);
-    const line = format(JUNK_LINES, noun, rng).replace(/\{item\}/g, junk.name);
+    const fin = finalizeMaterial(junk.name, junk.rarity, rng);
+    const line = format(JUNK_LINES, noun, rng).replace(/\{item\}/g, fin.name);
     return {
       kind: 'material',
       poolId: pool.id,
-      itemName: junk.name,
-      rarity: junk.rarity,
+      itemName: fin.name,
+      rarity: fin.rarity,
       quantity: 1,
       line,
     };
@@ -421,19 +450,21 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
   const materialItems = pool.items.filter((e) => isSalvageMaterial(e.name));
   if (materialItems.length === 0) {
     const junk = pickWeighted(JUNK_POOL, rng);
+    const fin = finalizeMaterial(junk.name, junk.rarity, rng);
     return {
-      kind: 'material', poolId: pool.id, itemName: junk.name, rarity: junk.rarity,
+      kind: 'material', poolId: pool.id, itemName: fin.name, rarity: fin.rarity,
       quantity: 1, line: format(MATERIAL_LINES, noun, rng),
     };
   }
   const entry = pickWeighted(materialItems, rng);
   const span = entry.max - entry.min;
   const quantity = entry.min + (span > 0 ? Math.floor(rng() * (span + 1)) : 0);
+  const fin = finalizeMaterial(entry.name, entry.rarity, rng);
   return {
     kind: 'material',
     poolId: pool.id,
-    itemName: entry.name,
-    rarity: entry.rarity,
+    itemName: fin.name,
+    rarity: fin.rarity,
     quantity,
     line: format(MATERIAL_LINES, noun, rng),
   };
