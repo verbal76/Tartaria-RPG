@@ -721,9 +721,22 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   if (!player) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { newlyEarnedTitles, TITLE_PASSIVE_PERK } = require('../engine/titles');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { newlyEarnedCustomTitles } = require('../engine/customTitles') as typeof import('../engine/customTitles');
   const fresh: string[] = newlyEarnedTitles(player);
-  if (fresh.length === 0) return;
-  setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh] } } : s));
+  // engine_Dev — IMPORTABLE TITLES. Award uploaded custom titles whose tracked
+  // variable has reached its threshold, alongside the built-in wired titles.
+  const freshCustom = newlyEarnedCustomTitles(player);
+  if (fresh.length === 0 && freshCustom.length === 0) return;
+  const freshCustomIds = freshCustom.map((t) => t.id);
+  setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh, ...freshCustomIds] } } : s));
+  for (const t of freshCustom) {
+    const tail = t.description && t.description.trim() ? ` ${t.description.trim()}` : '';
+    getStore().appendLog(
+      'arbiter',
+      `The ${getNarratorName()} studies you a long moment. "You have earned a name to carry: ${t.name}.${tail}"`,
+    );
+  }
   for (const id of fresh) {
     const meta = ARBITER_TITLE_META[id];
     if (!meta) continue;

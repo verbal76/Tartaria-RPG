@@ -397,6 +397,17 @@ export function setHooksOverride(obj: HooksOverride | null): void {
 export function hasHooksOverride(): boolean { return hooksOverride != null; }
 export function getHooksOverride(): HooksOverride | null { return hooksOverride; }
 
+// --- custom titles override -----------------------------------------------------
+// engine_Dev — IMPORTABLE TITLES. An uploaded array of title defs, each tying a
+// trackable variable + threshold to a display name (see customTitles.ts). null when
+// no override is loaded (the built-in WIRED_TITLES still apply alongside).
+let customTitlesOverride: unknown[] | null = null;
+export function setCustomTitlesOverride(rows: readonly unknown[] | null): void {
+  customTitlesOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
+}
+export function hasCustomTitlesOverride(): boolean { return customTitlesOverride != null; }
+export function getCustomTitles(): unknown[] { return customTitlesOverride ?? []; }
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -551,6 +562,7 @@ export function clearAllOverrides(): void {
   crucibleNameOverride = null;
   crucibleEnabled = true;
   worldNameOverride = null;
+  customTitlesOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

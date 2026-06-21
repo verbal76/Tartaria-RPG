@@ -35,6 +35,7 @@ import {
 import { getInteractionTags } from './interactionTags';
 import { buildFlavorTemplate } from './narrativeGenerator';
 import { POWERS_TEMPLATE } from './powers';
+import { TRACKABLE_VARS } from './customTitles';
 
 /** Example narrator persona seeded into the World-lore template — illustrative
  *  only; the author edits it. (The live default is built from the narrator's
@@ -375,6 +376,28 @@ export function buildStartingAreasTemplate(): string {
   return JSON.stringify(list.map(stub), null, 2);
 }
 
+/** The Titles template — IMPORTABLE achievements. Each title ties a trackable
+ *  variable + threshold to a display name. The leading comment lists every
+ *  trackable variable id (stripped on load), so an author can pick one and set a
+ *  number — the same list the dev console's TITLES box shows as checkboxes. */
+export function buildTitlesTemplate(): string {
+  const varList = TRACKABLE_VARS.map((v) => `//   "${v.id}"  —  ${v.label}`).join('\n');
+  const body = JSON.stringify([
+    { id: 'veteran', name: 'Veteran of the Fold', description: 'Hardened by too many firefights. +1 STR.', track: 'enemiesDefeated', threshold: 25, perk: { stat: 'strength', amount: 1 } },
+    { id: 'wayfarer', name: 'Wayfarer', description: 'You have crossed more ground than most see in a lifetime.', track: 'travelsCompleted', threshold: 10 },
+    { id: 'war_profiteer', name: 'War Profiteer', track: 'tc', threshold: 1000 },
+  ], null, 2);
+  return [
+    '// IMPORTABLE TITLES — an array of achievements. A title is earned the moment',
+    '// its TRACKABLE VARIABLE reaches the threshold. Pick a "track" from this list:',
+    varList,
+    '// Each title: { id, name, description?, track, threshold, perk?: { stat, amount } }.',
+    '// Optional perk applies a flat attribute bonus while held; valid stats:',
+    '// strength, dexterity, intelligence, wisdom, charisma, stealth.',
+    body,
+  ].join('\n');
+}
+
 /** The Hooks template — an illustrative example of the atmospheric-lead format.
  *  `plants` are the discovery line(s) + matchable nouns per hook id; `chains` are
  *  the staged outcomes, each stage carrying a list of effect verbs. The example is
@@ -502,6 +525,11 @@ export function buildGameBundleTemplate(): string {
     'wasteland',
     'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.',
     buildWastelandTemplate(false),
+  ));
+  sections.push(bundleSection(
+    'titles',
+    'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.',
+    buildTitlesTemplate(),
   ));
   sections.push(bundleSection(
     'startingAreas',

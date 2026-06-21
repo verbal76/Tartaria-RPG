@@ -36,7 +36,8 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { TRACKABLE_VARS } from '../engine/customTitles';
 import { getRaces, getFactions } from '../engine/character';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { useCustomMusicStore } from '../state/customMusicStore';
@@ -1140,6 +1141,166 @@ function StartingAreasBox() {
   );
 }
 
+// engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
+// variable, naming the title, and setting a threshold — or upload/paste the JSON.
+function TitlesBox() {
+  const loadTitlesJson = useContentPackStore((s) => s.loadTitlesJson);
+  const customTitles = useContentPackStore((s) => s.customTitles) as Array<{ id: string; name: string; track: string; threshold: number; description?: string }>;
+  const loaded = customTitles.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  // Builder state.
+  const [bVar, setBVar] = useState<string>(TRACKABLE_VARS[0]?.id ?? '');
+  const [bName, setBName] = useState('');
+  const [bThresh, setBThresh] = useState('');
+
+  const applyList = (list: unknown[], okMsg: string) => {
+    const r = loadTitlesJson(JSON.stringify(list));
+    setStatus(r.ok ? { kind: 'ok', msg: okMsg } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  const addBuilderTitle = () => {
+    const name = bName.trim();
+    const threshold = Number(bThresh);
+    if (!name) { setStatus({ kind: 'err', msg: 'Give the title a name.' }); return; }
+    if (!bVar || !Number.isFinite(threshold)) { setStatus({ kind: 'err', msg: 'Pick a variable and a numeric threshold.' }); return; }
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || `title_${Date.now()}`;
+    const next = [...customTitles.filter((t) => t.id !== id), { id, name, track: bVar, threshold }];
+    applyList(next, `Added “${name}” — ${TRACKABLE_VARS.find((v) => v.id === bVar)?.label} ≥ ${threshold}. (${next.length} total)`);
+    setBName(''); setBThresh('');
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Titles (achievements)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded}` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Importable titles. Each is earned when a <Text style={{ fontWeight: 'bold' }}>trackable variable</Text>{' '}
+        reaches a <Text style={{ fontWeight: 'bold' }}>threshold</Text>. Build one below — pick a variable, name
+        it, set the number — or hit TEMPLATE / UPLOAD FILE to author the JSON directly.
+      </Text>
+
+      {/* BUILDER — pick a trackable variable (checkbox), name + threshold, ADD. */}
+      <Text style={styles.hint}>1 · Pick a variable to track:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {TRACKABLE_VARS.map((v) => (
+          <TouchableOpacity
+            key={v.id}
+            style={[styles.tmplBtn, bVar === v.id && styles.loadBtn, { marginBottom: 4 }]}
+            onPress={() => setBVar(v.id)}
+          >
+            <Text style={bVar === v.id ? styles.loadBtnText : styles.tmplBtnText}>
+              {bVar === v.id ? '☑ ' : '☐ '}{v.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]}
+          value={bName}
+          onChangeText={setBName}
+          placeholder="Title name (e.g. Veteran of the Fold)"
+          placeholderTextColor="#5c5446"
+          autoCapitalize="words"
+        />
+        <TextInput
+          style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]}
+          value={bThresh}
+          onChangeText={setBThresh}
+          placeholder="threshold"
+          placeholderTextColor="#5c5446"
+          keyboardType="number-pad"
+        />
+        <TouchableOpacity style={styles.loadBtn} onPress={addBuilderTitle}>
+          <Text style={styles.loadBtnText}>+ ADD</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Current titles list with remove. */}
+      {loaded > 0 && customTitles.map((t) => (
+        <View key={t.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>
+            ◆ <Text style={{ fontWeight: 'bold' }}>{t.name}</Text> — {TRACKABLE_VARS.find((v) => v.id === t.track)?.label ?? t.track} ≥ {t.threshold}
+          </Text>
+          <TouchableOpacity
+            onPress={() => applyList(customTitles.filter((x) => x.id !== t.id), `Removed “${t.name}”.`)}
+          >
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {/* JSON path. */}
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="…or paste a titles JSON array here"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadTitlesJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} title(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate());
+            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your titles — edit, then LOAD.' : 'Loaded the template (lists every trackable variable).' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate());
+            const r = await saveJsonToFile('titles.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadTitlesJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} title(s) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearTitles(); setStatus({ kind: 'ok', msg: 'Cleared custom titles.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
@@ -1394,6 +1555,7 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>STARTING AREAS</Text>
       <StartingAreasBox />
+      <TitlesBox />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox
@@ -1528,6 +1690,7 @@ const styles = StyleSheet.create({
   copyBtnText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
   resetBtn: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
   resetBtnText: { color: '#a89a7a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  titleRowDev: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 2 },
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
   err: { color: '#e07a5f', fontSize: 11, marginTop: 6 },
   applyBtn: { marginTop: 4, marginBottom: 2, backgroundColor: '#243a3f', borderColor: '#6ad0c9', borderWidth: 1, borderRadius: 4, paddingVertical: 13, alignItems: 'center' },

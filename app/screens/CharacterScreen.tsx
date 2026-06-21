@@ -5,7 +5,8 @@
 // its sources so the player can audit any surprising value.
 
 import React, { useState } from 'react';
-import { getNarratorName } from '../engine/contentPack';
+import { getNarratorName, hasCustomTitlesOverride } from '../engine/contentPack';
+import { liveCustomTitles, TRACKABLE_VARS } from '../engine/customTitles';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
@@ -561,7 +562,18 @@ export function CharacterScreen() {
         {!collapsed.titles && (
         <View style={styles.card}>
           {(() => {
-            const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
+            // engine_Dev — IMPORTABLE TITLES. When the author has uploaded a custom
+            // title set, show THAT (their achievements) instead of the built-in list.
+            const varLabel = (id: string): string => TRACKABLE_VARS.find((v) => v.id === id)?.label ?? id;
+            const builtinTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
+            const allTitles = hasCustomTitlesOverride()
+              ? liveCustomTitles().map((t) => ({
+                  id: t.id,
+                  title: t.name,
+                  requirement: `${varLabel(t.track)} ≥ ${t.threshold}`,
+                  perk: t.description ?? '◆ earned',
+                }))
+              : builtinTitles;
             const earned = new Set(player.earnedTitles ?? []);
             const sorted = [...allTitles].sort((a, b) => {
               const ea = earned.has(a.id) ? 0 : 1;
