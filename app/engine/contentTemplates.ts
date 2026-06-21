@@ -24,7 +24,6 @@ import storylinesData from '../data/quests/faction-storylines.json';
 import objectivesData from '../data/quests/objectives.json';
 import complicationsData from '../data/quests/complications.json';
 import rewardsData from '../data/quests/rewards.json';
-import wastelandData from '../data/world/wasteland_encounters.json';
 import {
   DEFAULT_WORLD_TONE,
   CONTENT_TABLES,
@@ -191,21 +190,48 @@ export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS): string 
   }, null, 2);
 }
 
-/** The Wasteland-encounters template — the between-locations travel encounters,
- *  keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|
- *  fusion_bench), weight, matchers: [location tags it fires in], narration, and
- *  optional loot / npc_lines / lore_note / enemyPool }. A few built-in samples; the
- *  author replaces them wholesale. */
-export function buildWastelandTemplate(n = 3): string {
-  const raw = wastelandData as Record<string, unknown>;
-  const out: Record<string, unknown> = {};
-  let count = 0;
-  for (const [k, v] of Object.entries(raw)) {
-    if (k.startsWith('_') || !v || typeof v !== 'object' || !('type' in (v as object))) continue;
-    out[k] = v;
-    if (++count >= n) break;
-  }
-  return JSON.stringify(out, null, 2);
+/** The Wasteland-encounters template — between-locations travel encounters keyed by
+ *  archetype id. A neutral, representative example (NOT the built-in Tartaria set):
+ *  a treasure with statted loot (a consumable, a weapon with statBonuses +
+ *  baseDurability, a material), an npc, and a skirmish. Loot fields rarity /
+ *  description / statBonuses / baseDurability give encounter-ONLY items real stats
+ *  inline. Replace the matchers with YOUR location tags and the enemy with a name
+ *  from your Enemies table. */
+export function buildWastelandTemplate(): string {
+  return JSON.stringify({
+    _comment: "Travel encounters keyed by archetype id. type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in. Replace the REPLACE-... placeholders.",
+    roadside_cache: {
+      type: 'treasure',
+      weight: 12,
+      matchers: ['REPLACE-with-your-location-tags', 'open', 'ruin'],
+      narration: "Something's been left behind {direction} of here — a pack, a body, a story that ended badly.",
+      loot: [
+        { name: 'Field Rations', weight: 35, min: 1, max: 2, kind: 'consumable', tags: ['food'], rarity: 'Common', description: 'Enough to keep you walking another day.' },
+        { name: 'Scavenged Blade', weight: 12, min: 1, max: 1, kind: 'weapon', tags: ['weapon', 'melee'], rarity: 'Uncommon', description: "Worn, but it'll fight.", statBonuses: [{ stat: 'strength', amount: 2 }], baseDurability: 35 },
+        { name: 'Salvage Scrap', weight: 30, min: 1, max: 3, kind: 'misc', tags: ['metal', 'scrap'], rarity: 'Common', description: 'Worth something to the right buyer, or a crafting input.' },
+      ],
+      lore_note: 'A note, half-legible: a direction, a warning, a name.',
+    },
+    wandering_stranger: {
+      type: 'npc',
+      weight: 10,
+      matchers: ['REPLACE-with-your-location-tags', 'open', 'road'],
+      narration: 'A figure crosses toward you {direction}, hands kept where you can see them.',
+      npc_lines: [
+        '"Don\'t go where it\'s loud. I wouldn\'t."',
+        '"You\'re newer than the last one I passed. They didn\'t make it either."',
+      ],
+      lore_note: "They won't say where they're headed.",
+    },
+    ambush: {
+      type: 'skirmish',
+      weight: 8,
+      matchers: ['REPLACE-with-your-location-tags', 'ruin', 'hostile'],
+      narration: 'A {enemy} rises from the wreck {direction} of here with your name on it.',
+      enemyPool: ['REPLACE-with-an-enemy-name-from-your-Enemies-table'],
+      lore_note: 'Out here, loyalty lasts as long as the ammunition.',
+    },
+  }, null, 2);
 }
 
 /** A small keyword-form example of interaction tags, used inside the whole-game
