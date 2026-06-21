@@ -242,6 +242,31 @@ export function buildInteractionTagsTemplate(current?: Record<string, string[]>)
   return JSON.stringify(out, null, 2);
 }
 
+/** The Starting-areas template — a SEPARATE list of per-faction 4-room instances,
+ *  each PLACED at a location on the map (locationId). The faction's member spawns
+ *  inside it. Rooms are a tiny graph: each exit points to another room's id (or
+ *  null). The first room is the entry. Uses the first live faction/location id so
+ *  the example is plottable; edit to taste. */
+export function buildStartingAreasTemplate(): string {
+  const factions = TABLE_ROWS.factions as Array<{ id?: string; name?: string }>;
+  const locs = resolveTable('locations', TABLE_ROWS.locations as unknown[]) as Array<{ id?: string }>;
+  const fid = factions[0]?.id ?? 'REPLACE-with-a-faction-id';
+  const lid = locs[0]?.id ?? 'REPLACE-with-a-location-id';
+  return JSON.stringify([
+    {
+      factionId: fid,
+      name: 'Drydock 4 Command',
+      locationId: lid,
+      rooms: [
+        { id: 'gate', name: 'The Drydock Gate', shortName: 'Gate', description: 'Floodlit chain-link and a sandbagged checkpoint. A sentry waves you through the moment they see your colors.', interactables: ['checkpoint', 'sandbags', 'floodlight', 'duty roster'], exits: { north: 'yard', south: null, east: 'barracks', west: null }, anchorNpc: null },
+        { id: 'yard', name: 'The Yard', shortName: 'Yard', description: 'A scorched concrete apron under a half-shattered crane. Crates and fuel drums line the walls.', interactables: ['crane', 'fuel drum', 'supply crate', 'noticeboard'], exits: { north: 'command', south: 'gate', east: null, west: 'armory' } },
+        { id: 'barracks', name: 'The Barracks', shortName: 'Barracks', description: 'Rows of cots, a cold stove, the smell of wet wool and gun oil.', interactables: ['cot', 'footlocker', 'stove', 'letters home'], exits: { north: null, south: null, east: null, west: 'gate' } },
+        { id: 'armory', name: 'The Armory', shortName: 'Armory', description: 'Weapon racks behind a steel cage. A quartermaster eyes you over a ledger.', interactables: ['weapon rack', 'ammunition crate', 'ledger', 'steel cage'], exits: { north: null, south: null, east: 'yard', west: null }, anchorNpc: 'Quartermaster' },
+      ],
+    },
+  ], null, 2);
+}
+
 /** The Hooks template — an illustrative example of the atmospheric-lead format.
  *  `plants` are the discovery line(s) + matchable nouns per hook id; `chains` are
  *  the staged outcomes, each stage carrying a list of effect verbs. The example is
@@ -360,6 +385,11 @@ export function buildGameBundleTemplate(): string {
     'wasteland',
     'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. Replaces the built-in travel encounters.',
     buildWastelandTemplate(),
+  ));
+  sections.push(bundleSection(
+    'startingAreas',
+    'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), and rooms[] (a tiny graph; each exit points to another room id or null; the first room is the entry). The faction member spawns inside it. NOTE: the in-game room rendering for uploaded areas is being wired — placement + the list work now.',
+    buildStartingAreasTemplate(),
   ));
   sections.push(bundleSection(
     'interactionTags',

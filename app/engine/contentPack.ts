@@ -270,6 +270,45 @@ export function setInteractionTagsOverride(obj: Partial<Record<InteractionTagKey
 export function hasInteractionTagsOverride(): boolean { return interactionTagsOverride != null; }
 export function getInteractionTagsOverride(): Partial<Record<InteractionTagKey, string[]>> | null { return interactionTagsOverride; }
 
+// --- starting areas override ----------------------------------------------------
+// engine_Dev — per-faction STARTING AREAS: a separate list of small (e.g. 4-room)
+// instances, each PLACED at a location on the map. Uploaded as an array:
+//   [{ factionId, name, locationId, rooms: [{ id, name, shortName?, description,
+//      interactables?, exits: {north,south,east,west}, anchorNpc? }] }]
+// The faction's member spawns inside this instance (their starter complex), which
+// sits at `locationId`.
+export interface StartingAreaRoom {
+  id: string;
+  name: string;
+  shortName?: string;
+  description: string;
+  interactables?: string[];
+  exits?: { north?: string | null; south?: string | null; east?: string | null; west?: string | null };
+  anchorNpc?: string | null;
+}
+export interface StartingArea {
+  factionId: string;
+  name: string;
+  locationId: string;
+  rooms: StartingAreaRoom[];
+}
+let startingAreasOverride: StartingArea[] | null = null;
+export function setStartingAreasOverride(rows: readonly unknown[] | null): void {
+  const valid = Array.isArray(rows) && rows.some((r) => r && typeof r === 'object' && (r as { factionId?: unknown }).factionId);
+  startingAreasOverride = valid ? (rows as StartingArea[]) : null;
+}
+export function hasStartingAreasOverride(): boolean { return startingAreasOverride != null; }
+export function getStartingAreas(): StartingArea[] { return startingAreasOverride ?? []; }
+export function startingAreaForFaction(factionId: string | null | undefined): StartingArea | null {
+  if (!factionId || !startingAreasOverride) return null;
+  return startingAreasOverride.find((a) => a.factionId === factionId) ?? null;
+}
+/** Map a placement location id → the starting area sitting there (any faction). */
+export function startingAreaAtLocation(locationId: string | null | undefined): StartingArea | null {
+  if (!locationId || !startingAreasOverride) return null;
+  return startingAreasOverride.find((a) => a.locationId === locationId) ?? null;
+}
+
 
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
@@ -331,6 +370,7 @@ export function clearAllOverrides(): void {
   setWhispersOverride(null);
   setWastelandOverride(null);
   setInteractionTagsOverride(null);
+  setStartingAreasOverride(null);
   narratorNameOverride = null;
   gameTitleOverride = null;
   gameTaglineOverride = null;

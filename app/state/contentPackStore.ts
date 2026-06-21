@@ -19,6 +19,7 @@ import {
   setWhispersOverride,
   setWastelandOverride,
   setInteractionTagsOverride,
+  setStartingAreasOverride,
   setCrucibleNameOverride,
   setCrucibleEnabled,
   CONTENT_TABLES,
@@ -94,6 +95,7 @@ interface PersistShape {
   whispers?: unknown[];
   wasteland?: Record<string, unknown>;
   interactionTags?: Record<string, string[]>;
+  startingAreas?: unknown[];
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -125,6 +127,8 @@ interface ContentPackState {
   wasteland: Record<string, unknown>;
   /** Uploaded interaction-tag keyword additions ({ climbable: [...], … }). Empty = built-in. */
   interactionTags: Record<string, string[]>;
+  /** Uploaded per-faction starting areas (array of 4-room instances + placement). */
+  startingAreas: unknown[];
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -182,6 +186,9 @@ interface ContentPackState {
    *  searchable, salvageable } keyword lists; the author's words are added to the
    *  built-in generic set. */
   loadInteractionTagsJson: (json: string) => BundleLoadResult;
+  /** Parse a starting-areas array (JSONC): per-faction 4-room instances + the
+   *  location each is placed at. */
+  loadStartingAreasJson: (json: string) => LoadResult;
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
@@ -203,12 +210,14 @@ interface ContentPackState {
   clearWasteland: () => void;
   /** Drop the uploaded interaction-tag keywords back to the built-in set. */
   clearInteractionTags: () => void;
+  /** Drop the uploaded starting areas. */
+  clearStartingAreas: () => void;
   clearAll: () => void;
   /** Load any persisted pack on boot and mirror it into the registry. */
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -217,6 +226,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     whispers: state.whispers.length > 0 ? state.whispers : undefined,
     wasteland: Object.keys(state.wasteland).length > 0 ? state.wasteland : undefined,
     interactionTags: Object.keys(state.interactionTags).length > 0 ? state.interactionTags : undefined,
+    startingAreas: state.startingAreas.length > 0 ? state.startingAreas : undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
@@ -236,6 +246,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   whispers: [],
   wasteland: {},
   interactionTags: {},
+  startingAreas: [],
   published: false,
   narratorName: '',
   gameTitle: '',
@@ -262,6 +273,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setWastelandOverride(Object.keys(s.wasteland).length > 0 ? s.wasteland : null);
     setInteractionTagsOverride(Object.keys(s.interactionTags).length > 0 ? s.interactionTags : null);
     invalidateInteractionTagCache();
+    setStartingAreasOverride(s.startingAreas.length > 0 ? s.startingAreas : null);
+    invalidateLocationCaches();
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
     setGameTaglineOverride(s.gameTagline || null);
@@ -524,6 +537,27 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     return { ok: true, summary: `Loaded ${parts.join(' + ')}.` };
   },
 
+  loadStartingAreasJson(json) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonComments(json));
+    } catch (e) {
+      return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
+    }
+    if (!Array.isArray(parsed)) {
+      return { ok: false, error: 'Starting areas must be a JSON ARRAY of { factionId, name, locationId, rooms: [...] }.' };
+    }
+    const bad = parsed.find((a) => !a || typeof a !== 'object' || !(a as { factionId?: unknown }).factionId || !(a as { locationId?: unknown }).locationId);
+    if (parsed.length === 0) return { ok: false, error: 'The array is empty.' };
+    if (bad) return { ok: false, error: 'Every entry needs at least "factionId" and "locationId" (where to place it).' };
+    setStartingAreasOverride(parsed);
+    invalidateLocationCaches();
+    const startingAreas = parsed;
+    set({ startingAreas, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), startingAreas });
+    return { ok: true, count: parsed.length };
+  },
+
   loadGameBundle(json) {
     let parsed: unknown;
     try {
@@ -545,6 +579,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextWhispers: unknown[] = get().whispers;
     let nextWasteland: Record<string, unknown> = get().wasteland;
     let nextInteractionTags: Record<string, string[]> = get().interactionTags;
+    let nextStartingAreas: unknown[] = get().startingAreas;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -587,6 +622,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'interactionTags') {
         if (value && typeof value === 'object' && !Array.isArray(value)) { nextInteractionTags = value as Record<string, string[]>; applied.push('interaction tags'); }
         else skipped.push('interactionTags (not an object)');
+      } else if (key === 'startingAreas') {
+        if (Array.isArray(value) && value.length > 0) { nextStartingAreas = value; applied.push(`startingAreas (${value.length})`); }
+        else skipped.push('startingAreas (empty/not an array)');
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
         let rows: unknown = value;
@@ -634,6 +672,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setWastelandOverride(Object.keys(nextWasteland).length > 0 ? nextWasteland : null);
     setInteractionTagsOverride(Object.keys(nextInteractionTags).length > 0 ? nextInteractionTags : null);
     invalidateInteractionTagCache();
+    setStartingAreasOverride(nextStartingAreas.length > 0 ? nextStartingAreas : null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
@@ -647,6 +686,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       whispers: nextWhispers,
       wasteland: nextWasteland,
       interactionTags: nextInteractionTags,
+      startingAreas: nextStartingAreas,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
@@ -654,8 +694,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       crucibleEnabled: nextCrucibleEnabled,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled });
-    invalidateLocationCaches(); // a bundle may have replaced the locations table
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled });
+    invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
   },
@@ -689,6 +729,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (Object.keys(s.wasteland).length > 0) out.wasteland = s.wasteland;
     // The interaction-tag keyword additions.
     if (Object.keys(s.interactionTags).length > 0) out.interactionTags = s.interactionTags;
+    // The per-faction starting areas.
+    if (s.startingAreas.length > 0) out.startingAreas = s.startingAreas;
     return JSON.stringify(out, null, 2);
   },
 
@@ -745,11 +787,19 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), interactionTags });
   },
 
+  clearStartingAreas() {
+    setStartingAreasOverride(null);
+    invalidateLocationCaches();
+    const startingAreas: unknown[] = [];
+    set({ startingAreas, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), startingAreas });
+  },
+
   clearAll() {
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -778,6 +828,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         const interactionTags = shape.interactionTags && typeof shape.interactionTags === 'object' ? shape.interactionTags : {};
         setInteractionTagsOverride(Object.keys(interactionTags).length > 0 ? interactionTags : null);
         invalidateInteractionTagCache();
+        const startingAreas = Array.isArray(shape.startingAreas) ? shape.startingAreas : [];
+        setStartingAreasOverride(startingAreas.length > 0 ? startingAreas : null);
         const published = shape.published === true;
         setPublishedFlag(published);
         const narratorName = typeof shape.narratorName === 'string' ? shape.narratorName : '';
@@ -793,7 +845,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

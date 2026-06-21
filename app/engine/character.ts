@@ -1,6 +1,6 @@
 import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryItem } from './types';
 import { rollDie, rollDice, rollFromNotation } from './rng';
-import { resolveTable, resolveFlavor } from './contentPack';
+import { resolveTable, resolveFlavor, startingAreaForFaction } from './contentPack';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
@@ -325,6 +325,9 @@ export function startingLocationForFaction(factionId: string): string {
   const locs = resolveTable<{ id?: string }>('locations', locationsData as { id?: string }[]);
   const exists = (id: string | undefined | null): id is string =>
     !!id && locs.some((l) => l.id === id);
+  // 0. An uploaded STARTING AREA's placement wins — the faction spawns inside it.
+  const area = startingAreaForFaction(factionId);
+  if (exists(area?.locationId)) return area!.locationId;
   // 1. The faction's own declared starter complex (data-driven).
   const faction = getFactions().find((f) => f.id === factionId);
   if (exists(faction?.baseLocationId)) return faction!.baseLocationId!;
