@@ -966,6 +966,10 @@ export interface PlayerCharacter {
   /** v2.4.1 (OTA 033) — Mud Flood Nexus main quest progress. Optional
    *  because legacy saves predate the arc; backfilled on hydrate. */
   mainQuest?: MainQuestState;
+  /** engine_Dev — progress index into the uploaded DATA-DRIVEN main quest
+   *  (customMainQuest). The current (not-yet-completed) step; >= steps.length means
+   *  the quest is won. Absent = step 0. */
+  customQuestStep?: number;
   /** HANDOFF #13 — first-cut companion system. A single NPC follower
    *  the player recruits from a vendor scene. Persists across scenes.
    *  Currently narrative-only; mechanical effects (advantage dice on

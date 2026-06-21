@@ -771,6 +771,41 @@ function recordTitleProgress(
   awardNewTitles(getStore, setStore);
 }
 
+// engine_Dev — DATA-DRIVEN MAIN QUEST execution. Advance one step + announce; fire
+// the win line on completion.
+function advanceCustomQuest(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { advanceQuest } = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+  const adv = advanceQuest(player);
+  if (!adv) return;
+  setStore((s) => (s.player ? { player: { ...s.player, customQuestStep: adv.nextStep } } : s));
+  getStore().appendLog(adv.won ? 'reward' : 'arbiter', adv.line);
+}
+
+// Location-based steps (reach / return_to / hand_in / claim) complete on arrival;
+// several can chain at the same tile (reach → hand in → claim at your base), so loop.
+function checkCustomQuestLocation(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { activeQuestStep, locationStepSatisfied } = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+  for (let guard = 0; guard < 8; guard++) {
+    const live = getStore().player;
+    if (!live) break;
+    const step = activeQuestStep(live);
+    if (!step) break;
+    const owns = (name: string) => (live.inventory ?? []).some((i) => i.name.trim().toLowerCase() === name.trim().toLowerCase() && (i.quantity ?? 1) > 0);
+    if (!locationStepSatisfied(live, live.currentLocationId, owns)) break;
+    advanceCustomQuest(getStore, setStore);
+  }
+}
+
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
 // store-driving wrappers around the pure engine in engine/labyrinth.ts.
 type StoreGet = () => GameStore;
@@ -4356,6 +4391,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Ambushers, etc., not random global enemies). Falls back to the
     // legacy global roll when no ladder or when the curated pool returns
     // nothing (data drift safety).
+    // engine_Dev — DATA-DRIVEN MAIN QUEST: arriving here may complete a location
+    // step (reach / return_to / hand_in / claim). Runs before the boss-injection
+    // below so a satisfied step advances first (and a claim fires the win).
+    checkCustomQuestLocation(get, set);
     let encounter: Enemy[] = [];
     if (!suppressEncounter) {
       if (ladderTriple && chance(40 + location.danger * 8)) {
@@ -4365,6 +4404,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (encounter.length === 0) {
         encounter = rollEncounter(location);
       }
+    }
+    // engine_Dev — DATA-DRIVEN MAIN QUEST: when the active "kill" step targets a
+    // boss at THIS location, the boss takes the encounter slot (overrides the random
+    // roll) so the objective and the fight line up. Suppressed scenes (hub interior,
+    // tutorial) don't spawn it. The boss's loot already carries the quest item.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { questBossEnemyAt } = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+      const questBoss = !suppressEncounter ? questBossEnemyAt(player, location.id) : null;
+      if (questBoss) encounter = [questBoss];
     }
     const enemies: Enemy[] = encounter;
     const enemyHps: number[] = enemies.map((e) => e.hp);
@@ -14703,6 +14752,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
     const activeIdx = currentScene.activeEnemyIdx;
+    // engine_Dev — DATA-DRIVEN MAIN QUEST: if the fallen enemy is the active kill-
+    // step boss, advance the quest after this defeat resolves (its loot — incl. the
+    // quest item — is granted by the normal defeat flow below).
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { isActiveQuestBoss } = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+      if (isActiveQuestBoss(player, enemy.name)) {
+        queueMicrotask(() => advanceCustomQuest(get, set));
+      }
+    }
     // Whisper-chain hook — Silt Thief death grants Stolen Aetheric
     // Discs and advances the Yulka chain to its return stage.
     // Other chains can plug in here when they get authored.
