@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
 import { getRaces, getFactions } from '../engine/character';
-import { hasTableOverride, tableOverrideCount } from '../engine/contentPack';
+import { hasTableOverride, tableOverrideCount, getNarratorName, dressNarratorArticles } from '../engine/contentPack';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -174,7 +174,7 @@ export function CharacterCreationScreen() {
                 {selectedRace.name} · {selectedFaction.name}
               </Text>
               <Text style={styles.beginHint}>
-                Tap BEGIN below. The Arbiter will greet you in the outpost and ask your name.
+                Tap BEGIN below. {dressNarratorArticles(`The ${getNarratorName()}`)} will greet you and ask your name.
               </Text>
             </View>
           </>

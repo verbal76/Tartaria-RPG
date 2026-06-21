@@ -617,13 +617,17 @@ export function MapScreen() {
       top: offsetY + renderedH * atlasPos.fy - MARKER_H / 2,
     };
     // engine_Dev — GRID lines across the map rect (cols = worldW, rows = worldH).
-    // Drawn over the uploaded map, or on its own as the backdrop when none. Capped
-    // so a huge grid doesn't spawn thousands of line views.
-    if (!showingOutpost && worldW <= 60 && worldH <= 60) {
-      for (let c = 0; c <= worldW; c++) {
+    // Drawn over the uploaded map, or on its own as the backdrop when none. For a
+    // very large grid we draw at most ~150 lines per axis (stepped) so a huge size
+    // still shows structure without spawning thousands of views — but the cells
+    // (and location plotting) still use the full worldW × worldH.
+    if (!showingOutpost) {
+      const stepC = Math.max(1, Math.ceil(worldW / 150));
+      const stepR = Math.max(1, Math.ceil(worldH / 150));
+      for (let c = 0; c <= worldW; c += stepC) {
         gridLineStyles.push({ key: `v${c}`, left: offsetX + (renderedW * c) / worldW, top: offsetY, width: 1, height: renderedH });
       }
-      for (let r = 0; r <= worldH; r++) {
+      for (let r = 0; r <= worldH; r += stepR) {
         gridLineStyles.push({ key: `h${r}`, left: offsetX, top: offsetY + (renderedH * r) / worldH, width: renderedW, height: 1 });
       }
     }
@@ -1152,7 +1156,7 @@ const styles = StyleSheet.create({
   // engine_Dev — coordinate grid line (thin, semi-transparent).
   gridLine: {
     position: 'absolute',
-    backgroundColor: 'rgba(201,168,106,0.28)',
+    backgroundColor: 'rgba(201,168,106,0.45)',
   },
   // engine_Dev — the player's current grid square, filled + outlined.
   currentCell: {

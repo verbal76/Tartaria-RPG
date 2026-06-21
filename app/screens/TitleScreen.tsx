@@ -44,7 +44,7 @@ import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
-import { getNarratorName, getGameTitle, getGameTagline } from '../engine/contentPack';
+import { getNarratorName, getGameTitle, getGameTagline, dressNarratorArticles } from '../engine/contentPack';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 // OTA-251 — was reading app.json's expo.version. That field is now
 // pinned to the runtimeVersion of the installed APK (2.4.1) so OTAs
@@ -834,7 +834,7 @@ export function TitleScreen() {
               <View style={[styles.splashBarFill, { width: `${pct}%` }]} />
             </View>
             <Text style={styles.compactLoadLabel}>
-              Preparing the Arbiter ({pct}%) — first-time setup, keep the app open
+              {dressNarratorArticles(`Preparing the ${getNarratorName()}`)} ({pct}%) — first-time setup, keep the app open
             </Text>
           </View>
         );
@@ -2006,10 +2006,10 @@ function KokoroDownloadBanner(): React.ReactElement | null {
     return (
       <View style={styles.kokoroBanner}>
         <Text style={styles.kokoroBannerText}>
-          ⚠  The Arbiter's voice couldn't load
+          ⚠  {dressNarratorArticles(`The ${getNarratorName()}'s voice couldn't load`)}
         </Text>
         <Text style={styles.kokoroBannerProgress}>
-          The Arbiter still narrates — the system voice will speak instead.
+          {dressNarratorArticles(`The ${getNarratorName()} still narrates`)} — the system voice will speak instead.
           Pull-to-refresh from Settings to retry.
         </Text>
       </View>
@@ -2041,7 +2041,7 @@ function ReadyFlash(): React.ReactElement | null {
   return (
     <View style={[styles.kokoroBanner, { borderColor: '#9ec96a' }]}>
       <Text style={[styles.kokoroBannerText, { color: '#9ec96a' }]}>
-        ✓  The Arbiter finds their voice — choose your character
+        ✓  {dressNarratorArticles(`The ${getNarratorName()} finds their voice`)} — choose your character
       </Text>
     </View>
   );
