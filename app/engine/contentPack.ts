@@ -272,9 +272,12 @@ export function dressBuiltInLeaks(text: string): string {
   // materials won't have "Aetherstone <X>" items to desync against.
   if (hasEnergyOverride()) {
     const e = getEnergy();
-    out = out.replace(/\bAetherstone\b/g, e.material)
-      .replace(/\bAetheric\b/g, e.adjective)
-      .replace(/\bAether\b/g, e.name);
+    // Case-preserving (like the corruption swap below) so the family is caught in
+    // BOTH proper-noun text AND lowercase mechanical lines — e.g. a weapon's
+    // "aetheric damage" reads as your energy adjective, not a leaked "aetheric".
+    out = out.replace(/\bAetherstone\b/g, e.material).replace(/\baetherstone\b/g, e.material.toLowerCase())
+      .replace(/\bAetheric\b/g, e.adjective).replace(/\baetheric\b/g, e.adjective.toLowerCase())
+      .replace(/\bAether\b/g, e.name).replace(/\baether\b/g, e.name.toLowerCase());
   }
   // engine_Dev — the affliction noun. "corruption" / "Corruption" → the re-skin's
   // name for its plague (Phase-Sickness, Chronal Decay, …). Case-preserving so a
