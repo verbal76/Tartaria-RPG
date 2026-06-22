@@ -1477,7 +1477,7 @@ export const BUILTIN_FLAVOR_POOLS = {
 // every pool to edit — but the example lines name no setting. Narrator name stays
 // dynamic via getNarratorName(). Record pools (mood/intent keyed by functional ids;
 // race/faction keyed by YOUR ids → REPLACE placeholders) show a couple of examples.
-function genericFlavorPools(): Record<string, unknown> {
+export function genericFlavorPools(): Record<string, unknown> {
   const N = () => getNarratorName();
   return {
     opening: [

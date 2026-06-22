@@ -25,6 +25,8 @@ import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
 import { DeveloperSettingsScreen } from './app/screens/DeveloperSettingsScreen';
 import { useContentPackStore } from './app/state/contentPackStore';
+import { installGenericDefaults } from './app/engine/contentPack';
+import { GENERIC_GAME } from './app/engine/genericGame';
 import { useCustomMusicStore } from './app/state/customMusicStore';
 import { useCustomMapsStore } from './app/state/customMapsStore';
 import { EndingScreen } from './app/screens/EndingScreen';
@@ -210,6 +212,12 @@ export default function App() {
     const setStage = (s: string) => {
       (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = s;
     };
+    // engine_Dev — install the GENERIC default game FIRST, so any section the author
+    // hasn't uploaded (skipped) or has RESET falls back to bland generic content
+    // instead of the built-in Tartaria data. Author overrides (loaded by hydrate
+    // below) still win over this; this only fills the gaps. Unit tests never run this
+    // boot path, so they keep resolving to the Tartaria builtins they assert against.
+    installGenericDefaults(GENERIC_GAME);
     // engine_Dev — load any developer content-pack overrides into the registry
     // before gameplay so the engine reads them from the first action.
     void useContentPackStore.getState().hydrate();
