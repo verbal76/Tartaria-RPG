@@ -1,7 +1,7 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
-import { racialStatBonusesFor } from './raceMechanics';
+import { racialStatBonusesFor, factionStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
 
 /**
@@ -459,6 +459,8 @@ export function effectiveStats(
   const w = weatherMod ?? {};
   // OTA 038 — race-derived always-on stat bonuses.
   const racial = racialStatBonusesFor(player.raceId);
+  // engine_Dev — faction-derived always-on stat bonuses (factionStatBonuses).
+  const fac = factionStatBonusesFor(player.factionId);
   // OTA 039 — corruption tier penalty. Tainted=-1 CHA, Corrupted=-1
   // all, Hollowed=-2 all. Subtracts at every skill-check site so the
   // aether under your skin actually costs you something.
@@ -468,13 +470,13 @@ export function effectiveStats(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ttl = (require('./customTitles') as typeof import('./customTitles')).customTitleStatBonuses(player) as Partial<Record<keyof Stats, number>>;
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0) + (ttl.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0) + (ttl.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0) + (ttl.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0) + (ttl.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0) + (ttl.charisma ?? 0),
+    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (fac.strength ?? 0) + (corrPen.strength ?? 0) + (ttl.strength ?? 0),
+    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (fac.dexterity ?? 0) + (corrPen.dexterity ?? 0) + (ttl.dexterity ?? 0),
+    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (fac.intelligence ?? 0) + (corrPen.intelligence ?? 0) + (ttl.intelligence ?? 0),
+    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (fac.wisdom ?? 0) + (corrPen.wisdom ?? 0) + (ttl.wisdom ?? 0),
+    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (fac.charisma ?? 0) + (corrPen.charisma ?? 0) + (ttl.charisma ?? 0),
     // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player.
-    stealth: (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0) + (ttl.stealth ?? 0),
+    stealth: (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (fac.stealth ?? 0) + (corrPen.stealth ?? 0) + (ttl.stealth ?? 0),
   };
 }
 
@@ -509,6 +511,7 @@ export function effectiveStatsBreakdown(
     });
   }
   const racial = racialStatBonusesFor(player.raceId);
+  const fac = factionStatBonusesFor(player.factionId);
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
   const w = weatherMod ?? {};
@@ -517,6 +520,7 @@ export function effectiveStatsBreakdown(
     const base = player.stats[stat] ?? 0; // OTA-348 — guard pre-backfill stealth
     const sources: StatSource[] = [];
     if ((racial[stat] ?? 0) !== 0) sources.push({ label: 'race', delta: racial[stat]! });
+    if ((fac[stat] ?? 0) !== 0) sources.push({ label: 'faction', delta: fac[stat]! });
     if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
     if ((inv[stat] ?? 0) !== 0) sources.push({ label: 'pack passive', delta: inv[stat]! });
     for (const fb of foodBuffs) {

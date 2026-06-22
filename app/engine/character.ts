@@ -6,6 +6,10 @@ import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
 import armorData from '../data/items/armor.json';
 import weaponsData from '../data/items/weapons.json';
+import amuletsData from '../data/items/amulets.json';
+import ringsData from '../data/items/rings.json';
+import materialsData from '../data/items/materials.json';
+import gearData from '../data/items/gear.json';
 import locationsData from '../data/locations/locations.json';
 import { stampDurability } from './durability';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, canonicalCellOf } from './worldMap';
@@ -137,6 +141,49 @@ const DEFAULT_STARTER_ITEMS: InventoryItem[] = [
   { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
 ];
 
+// engine_Dev — rows of a LIVE item catalog (uploaded override, else built-in). The
+// per-table JSON is either a bare array or wrapped under its own key.
+function liveRows(id: 'weapons' | 'armor' | 'amulets' | 'rings' | 'materials' | 'gear' | 'exploration', raw: unknown): Array<Record<string, unknown>> {
+  const wrapped = (raw && typeof raw === 'object' && !Array.isArray(raw)) ? (raw as Record<string, unknown>)[id] : raw;
+  const builtin = Array.isArray(wrapped) ? (wrapped as Array<Record<string, unknown>>) : [];
+  return resolveTable(id, builtin as never) as Array<Record<string, unknown>>;
+}
+
+// engine_Dev — resolve an author's starting-gear ITEM NAME against the live
+// catalogs (weapons → armor → amulets/rings → exploration → gear → materials), and
+// build a creation InventoryItem with the right kind/tags/desc. Unknown names still
+// grant a generic misc item (never silently dropped) so a typo is visible in-pack.
+function resolveStarterByName(name: string, id: string): InventoryItem | null {
+  const lc = name.trim().toLowerCase();
+  if (!lc) return null;
+  const find = (rows: Array<Record<string, unknown>>) => rows.find((r) => typeof r.name === 'string' && (r.name as string).toLowerCase() === lc);
+  const mk = (r: Record<string, unknown>, kind: InventoryItem['kind'], dflt: string, dur: boolean): InventoryItem => {
+    const item: InventoryItem = {
+      id, name: r.name as string, kind,
+      rarity: ((r.rarity as InventoryItem['rarity']) ?? 'Common'),
+      quantity: 1,
+      tags: Array.isArray(r.tags) ? [...(r.tags as string[]), 'starter'] : ['starter'],
+      description: (typeof r.description === 'string' ? r.description : dflt),
+    };
+    return dur ? stampDurability(item) : item;
+  };
+  let r = find(liveRows('weapons', weaponsData));
+  if (r) return mk(r, 'weapon', 'A starter weapon.', true);
+  r = find(liveRows('armor', armorData));
+  if (r) return mk(r, 'armor', 'Starter armor.', true);
+  r = find(liveRows('amulets', amuletsData)) ?? find(liveRows('rings', ringsData));
+  // amulets/rings are categorized + equipped by NAME lookup against their catalogs,
+  // not by item kind, so 'misc' is the correct inventory kind for them.
+  if (r) return mk(r, 'misc', 'A starter accessory.', false);
+  r = find(liveRows('exploration', explorationData));
+  if (r) { const kind = explorationToInventoryKind(r as unknown as CatalogExplorationItem); return mk(r, kind, 'A starter tool.', kind === 'weapon'); }
+  r = find(liveRows('gear', gearData));
+  if (r) { const k = (r.kind as InventoryItem['kind']) ?? 'misc'; return mk(r, k, 'Starter gear.', k === 'weapon' || k === 'armor'); }
+  r = find(liveRows('materials', materialsData));
+  if (r) return mk(r, 'misc', 'A starter material.', false);
+  return { id, name: name.trim(), kind: 'misc', rarity: 'Common', quantity: 1, tags: ['starter'], description: 'A starter item.' };
+}
+
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   // Clone so per-character inventory never shares object refs with the template.
   const items: InventoryItem[] = resolveFlavor('starterItems', DEFAULT_STARTER_ITEMS).map(
@@ -152,16 +199,36 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     tags: ['weapon', 'starter'],
     description: 'Your starter primary — given to you by your race tradition.',
   }));
-  const knifeName = FACTION_KNIFE[faction.id] ?? 'Pocket Knife';
-  items.push(stampDurability({
-    id: `starter_knife_${Date.now()}`,
-    name: knifeName,
-    kind: 'weapon',
-    rarity: 'Common',
-    quantity: 1,
-    tags: ['weapon', 'starter', 'knife', 'tool'],
-    description: 'Your faction starter knife — primarily a dig tool, sharp enough in a pinch.',
-  }));
+  // engine_Dev — FACTION starting gear: the author's uploaded faction.startingGear
+  // (resolved against the live catalogs) replaces the built-in faction "knife" map.
+  const factionGear = Array.isArray(faction.startingGear) ? faction.startingGear : null;
+  if (factionGear && factionGear.length > 0) {
+    factionGear.forEach((nm, i) => {
+      const it = resolveStarterByName(nm, `starter_fac_${i}_${Date.now()}`);
+      if (it) items.push(it);
+    });
+  } else {
+    const knifeName = FACTION_KNIFE[faction.id] ?? 'Pocket Knife';
+    items.push(stampDurability({
+      id: `starter_knife_${Date.now()}`,
+      name: knifeName,
+      kind: 'weapon',
+      rarity: 'Common',
+      quantity: 1,
+      tags: ['weapon', 'starter', 'knife', 'tool'],
+      description: 'Your faction starter knife — primarily a dig tool, sharp enough in a pinch.',
+    }));
+  }
+  // engine_Dev — RACE starting gear: the author's uploaded race.startingGear
+  // (resolved against the live catalogs) replaces the built-in per-race map.
+  const raceGear = Array.isArray(race.startingGear) ? race.startingGear : null;
+  if (raceGear && raceGear.length > 0) {
+    raceGear.forEach((nm, i) => {
+      const it = resolveStarterByName(nm, `starter_race_${i}_${Date.now()}`);
+      if (it) items.push(it);
+    });
+    return items;
+  }
   // Race-themed exploration items from the rulebook starter table.
   const raceStarterNames = RACE_STARTER_EXPLORATION[race.id] ?? [];
   for (let i = 0; i < raceStarterNames.length; i++) {

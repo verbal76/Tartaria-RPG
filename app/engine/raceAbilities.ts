@@ -4,7 +4,10 @@
 // live in gameStore.useRaceAbility (they need get/set); this module is the
 // registry + availability/cooldown logic.
 
-import type { PlayerCharacter } from './types';
+import type { PlayerCharacter, Race, Faction, ActivatableAbility } from './types';
+import { resolveTable } from './contentPack';
+import racesData from '../data/races/races.json';
+import factionsData from '../data/factions/factions.json';
 
 export interface RaceAbilityDef {
   id: string;
@@ -17,6 +20,19 @@ export interface RaceAbilityDef {
   /** Needs a live enemy (e.g. the elemental strike). */
   combatOnly?: boolean;
 }
+
+/** The unified shape the ability picker + executor consume: a built-in race ability
+ *  (no `effect` — runs the legacy hard-coded path) OR a data-driven race/faction
+ *  ability (carries an `effect` the executor dispatches on). */
+export type OwnedAbility = {
+  id: string;
+  name: string;
+  description: string;
+  cooldown?: 'day';
+  combatOnly?: boolean;
+  effect?: ActivatableAbility['effect'];
+  source: 'race' | 'faction';
+};
 
 export const RACE_ABILITIES: RaceAbilityDef[] = [
   {
@@ -76,22 +92,39 @@ export function currentDayOf(player: PlayerCharacter): number {
 }
 
 /** A daily ability is ready when it hasn't been used yet TODAY. */
-export function isAbilityReady(player: PlayerCharacter, def: RaceAbilityDef): boolean {
+export function isAbilityReady(player: PlayerCharacter, def: { id: string }): boolean {
   const used = player.abilityCooldowns?.[def.id];
   return used === undefined || used < currentDayOf(player);
 }
 
-/** Race abilities the player owns. */
-export function ownedRaceAbilities(player: PlayerCharacter | null | undefined): RaceAbilityDef[] {
+const RACES = racesData as Race[];
+const FACTIONS = factionsData as Faction[];
+
+/** Abilities the player owns: the author's data-driven abilities on their resolved
+ *  RACE row + FACTION row, PLUS the built-in race abilities (for the built-in
+ *  Tartaria races). De-duped by id (data-driven wins). A re-skin's custom races /
+ *  factions carry their own `abilities` and drive everything. */
+export function ownedRaceAbilities(player: PlayerCharacter | null | undefined): OwnedAbility[] {
   if (!player) return [];
-  return RACE_ABILITIES.filter((d) => d.raceId === player.raceId);
+  const out: OwnedAbility[] = [];
+  const seen = new Set<string>();
+  const push = (a: OwnedAbility) => { if (!seen.has(a.id)) { seen.add(a.id); out.push(a); } };
+  const race = (resolveTable('races', RACES) as Race[]).find((r) => r.id === player.raceId);
+  for (const a of race?.abilities ?? []) push({ id: a.id, name: a.name, description: a.description, cooldown: a.cooldown ?? 'day', combatOnly: a.combatOnly, effect: a.effect, source: 'race' });
+  const faction = (resolveTable('factions', FACTIONS) as Faction[]).find((f) => f.id === player.factionId);
+  for (const a of faction?.abilities ?? []) push({ id: a.id, name: a.name, description: a.description, cooldown: a.cooldown ?? 'day', combatOnly: a.combatOnly, effect: a.effect, source: 'faction' });
+  // Built-in race abilities (legacy, no `effect` → run the hard-coded path).
+  for (const d of RACE_ABILITIES.filter((d) => d.raceId === player.raceId)) {
+    push({ id: d.id, name: d.name, description: d.description, cooldown: d.cooldown, combatOnly: d.combatOnly, source: 'race' });
+  }
+  return out;
 }
 
-/** Race abilities usable RIGHT NOW (owned, off cooldown, combat-gate satisfied). */
+/** Abilities usable RIGHT NOW (owned, off cooldown, combat-gate satisfied). */
 export function availableRaceAbilities(
   player: PlayerCharacter | null | undefined,
   inCombat: boolean,
-): RaceAbilityDef[] {
+): OwnedAbility[] {
   if (!player) return [];
   return ownedRaceAbilities(player).filter(
     (d) => isAbilityReady(player, d) && (!d.combatOnly || inCombat),

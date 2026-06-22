@@ -195,6 +195,46 @@ export interface Race {
    *  screen under the mechanical description. 2-3 sentences max. Voice:
    *  what it feels like to wake up as this race. */
   flavor?: string;
+  /** engine_Dev — the item name granted as this race's starter primary weapon
+   *  (resolved against the live weapons catalog). Omit → the built-in per-race map,
+   *  then the first Common weapon in your pack. */
+  startingWeapon?: string;
+  /** engine_Dev — extra item names granted at creation for this race (resolved
+   *  against your weapons/armor/amulets/rings/gear/exploration/materials catalogs).
+   *  Replaces the built-in per-race starter-gear map. */
+  startingGear?: string[];
+  /** engine_Dev — once-a-day activatable abilities this race grants (data-driven;
+   *  see ActivatableAbility). Replaces the hard-coded built-in race abilities. */
+  abilities?: ActivatableAbility[];
+}
+
+/** engine_Dev — a data-driven, once-a-day activatable ability granted by a race or
+ *  faction. The `effect` maps to one of the built-in effect engines; the name/blurb
+ *  are the author's. Surfaced in the ✦ ABILITY picker. */
+export interface ActivatableAbility {
+  id: string;
+  name: string;
+  description: string;
+  /** Daily cooldown (resets when the in-game day advances). Default 'day'. */
+  cooldown?: 'day';
+  /** Requires a live enemy (e.g. a strike). */
+  combatOnly?: boolean;
+  effect: {
+    /** heal = restore HP · stat_buff = +amount to a stat for N rounds · shield =
+     *  halve incoming damage for N rounds · repair = mend your most-worn item ·
+     *  strike = deal damage to the active enemy (combatOnly). */
+    type: 'heal' | 'stat_buff' | 'shield' | 'repair' | 'strike';
+    /** Flat amount (heal HP / strike damage / buff size). `dice` overrides it. */
+    amount?: number;
+    /** Dice rolled instead of a flat amount, e.g. "1d10" (heal/strike). */
+    dice?: string;
+    /** stat_buff target stat. */
+    stat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
+    /** shield / stat_buff duration in rounds (default 3). */
+    rounds?: number;
+    /** strike damage type (default bludgeoning). */
+    damageType?: string;
+  };
 }
 
 export interface Faction {
@@ -223,6 +263,28 @@ export interface Faction {
   baseName?: string;
   baseLocationId?: string;
   baseDescription?: string;
+  /** engine_Dev — item names granted at creation to a member of this faction
+   *  (resolved against your catalogs). Replaces the built-in faction "knife" map. */
+  startingGear?: string[];
+  /** engine_Dev — always-on stat bumps applied while the player belongs to this
+   *  faction (mirrors a race's racialStatBonuses). */
+  factionStatBonuses?: {
+    strength?: number;
+    dexterity?: number;
+    intelligence?: number;
+    wisdom?: number;
+    charisma?: number;
+    stealth?: number;
+  };
+  /** engine_Dev — conditional AC bonuses for faction members (same shape + scene
+   *  conditions as a race's racialACBonusRules). */
+  factionACBonusRules?: Array<{
+    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'aether_powers' | 'constructed_environment' | 'relic_armor';
+    delta: number;
+  }>;
+  /** engine_Dev — once-a-day activatable abilities this faction grants its members
+   *  (data-driven; see ActivatableAbility). */
+  abilities?: ActivatableAbility[];
 }
 
 export interface Enemy {

@@ -20503,9 +20503,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     if (!player) return;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const ra = require('../engine/raceAbilities');
-    const def = ra.RACE_ABILITIES.find((d: { id: string }) => d.id === id);
-    if (!def || def.raceId !== player.raceId) { set({ raceAbilityPickerOpen: false }); return; }
+    const ra = require('../engine/raceAbilities') as typeof import('../engine/raceAbilities');
+    // engine_Dev — owned abilities = data-driven race/faction abilities + built-in.
+    const def = ra.ownedRaceAbilities(player).find((d) => d.id === id);
+    if (!def) { set({ raceAbilityPickerOpen: false }); return; }
     if (!ra.isAbilityReady(player, def)) {
       get().appendLog('arbiter', `"${def.name} is spent for today," the ${getNarratorName()} says. "Rest, and it returns."`);
       set({ raceAbilityPickerOpen: false });
@@ -20519,6 +20520,73 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     let applied = true;
+    // engine_Dev — DATA-DRIVEN ability: dispatch on the author's effect.type. The
+    // five effect engines mirror the built-in race abilities (heal / stat_buff /
+    // shield / repair / strike). Built-in abilities have no `effect` and fall to the
+    // legacy id-switch below.
+    if (def.effect) {
+      const e = def.effect;
+      const rounds = Math.max(1, e.rounds ?? 3);
+      const rollAmt = (): number => {
+        if (typeof e.dice === 'string' && /^\d*d\d+/i.test(e.dice.trim())) return rollFromNotation(e.dice);
+        return Math.max(0, Math.floor(e.amount ?? 0));
+      };
+      switch (e.type) {
+        case 'heal': {
+          const heal = Math.max(1, rollAmt());
+          set((s) => s.player ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + heal) } } : s);
+          get().appendLog('reward', `✦ ${def.name} — +${heal} HP.`);
+          break;
+        }
+        case 'stat_buff': {
+          const stat = (e.stat ?? 'strength');
+          const amt = Math.max(1, Math.floor(e.amount ?? 2));
+          set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: rounds, buffStat: stat, buffBonus: amt, label: def.name }] } } : s);
+          get().appendLog('reward', `✦ ${def.name} — +${amt} ${stat.slice(0, 3).toUpperCase()} for ${rounds} rounds.`);
+          break;
+        }
+        case 'shield': {
+          set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []).filter((x) => x.kind !== 'shielded'), { kind: 'shielded' as const, remainingRounds: rounds, label: def.name }] } } : s);
+          get().appendLog('reward', `✦ ${def.name} — a shield flares around you. Incoming damage halved for ${rounds} rounds.`);
+          break;
+        }
+        case 'repair': {
+          let worstIdx = -1; let worstFrac = 1;
+          player.inventory.forEach((it, i) => {
+            if ((it.tags ?? []).includes('rope')) return;
+            const d = it.durability;
+            if (d && d.max > 0 && d.current < d.max) { const f = d.current / d.max; if (f < worstFrac) { worstFrac = f; worstIdx = i; } }
+          });
+          if (worstIdx < 0) { get().appendLog('world', `${def.name}: nothing in your pack needs mending.`); applied = false; }
+          else {
+            const item = player.inventory[worstIdx]!;
+            set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the ${item.name} mends to full.`);
+          }
+          break;
+        }
+        case 'strike': {
+          const liveScene = get().currentScene;
+          if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
+          const idx = Math.max(0, Math.min(liveScene.activeEnemyIdx ?? 0, liveScene.enemies.length - 1));
+          const target = liveScene.enemies[idx]!;
+          const dmg = Math.max(1, rollAmt());
+          const prevHp = liveScene.enemyHps[idx] ?? target.hp;
+          const newHp = Math.max(0, prevHp - dmg);
+          set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => i === idx ? newHp : h) } } : s);
+          get().appendLog('reward', `✦ ${def.name} — strikes ${target.name} for ${dmg} ${e.damageType ?? 'damage'}. (${newHp} HP left)`);
+          if (newHp <= 0) get().resolveEnemyDefeat();
+          break;
+        }
+        default: applied = false;
+      }
+      if (applied) {
+        set((s) => s.player ? { player: { ...s.player, abilityCooldowns: { ...(s.player.abilityCooldowns ?? {}), [id]: ra.currentDayOf(s.player) } } } : s);
+      }
+      set({ raceAbilityPickerOpen: false });
+      void get().persist();
+      return;
+    }
     switch (id) {
       case 'legacy_of_power': {
         let worstIdx = -1; let worstFrac = 1;

@@ -9,7 +9,9 @@
 // on creation-time logic; this module is queried per-action.
 
 import racesData from '../data/races/races.json';
-import type { PlayerCharacter, Race, Stats } from './types';
+import factionsData from '../data/factions/factions.json';
+import type { PlayerCharacter, Race, Faction, Stats } from './types';
+import { resolveTable } from './contentPack';
 
 // Structural-typed scene snapshot. CurrentScene lives inline in
 // gameStore.ts and isn't exported; we accept any object with the
@@ -20,10 +22,26 @@ interface SceneContext {
 }
 
 const RACES = racesData as Race[];
+const FACTIONS = factionsData as Faction[];
 
+// engine_Dev — resolve through the content pack so a re-skin's UPLOADED races /
+// factions drive every mechanic (stat bonuses, AC, abilities), not just the
+// built-in Tartaria rows. No override → the built-in data.
 function getRace(raceId: string | undefined): Race | undefined {
   if (!raceId) return undefined;
-  return RACES.find((r) => r.id === raceId);
+  return (resolveTable('races', RACES) as Race[]).find((r) => r.id === raceId);
+}
+
+function getFaction(factionId: string | undefined): Faction | undefined {
+  if (!factionId) return undefined;
+  return (resolveTable('factions', FACTIONS) as Faction[]).find((f) => f.id === factionId);
+}
+
+/** engine_Dev — always-on stat bumps from the player's FACTION (mirrors
+ *  racialStatBonusesFor). Empty when the faction has no factionStatBonuses. */
+export function factionStatBonusesFor(factionId: string | undefined): RacialStatBonuses {
+  const faction = getFaction(factionId);
+  return (faction?.factionStatBonuses as RacialStatBonuses | undefined) ?? {};
 }
 
 // ─── Barehand damage ────────────────────────────────────────────────
@@ -164,7 +182,9 @@ export function effectiveAC(
 ): number {
   const base = player.ac ?? 10;
   const race = getRace(player.raceId);
-  const rules = getACBonusRules(race);
+  const faction = getFaction(player.factionId);
+  const factionRules = (faction?.factionACBonusRules as ACBonusRule[] | undefined) ?? [];
+  const rules = [...getACBonusRules(race), ...factionRules];
   if (rules.length === 0) return base;
   const contexts = detectACContexts(player, scene);
   let delta = 0;

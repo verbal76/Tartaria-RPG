@@ -639,7 +639,12 @@ granular edits. Recommended order:
       • termMap: { "any leftover noun": "your word" } — the catch-all swap
 
 ## 2 · Character creation
-  - Races (playable) · Factions (playable) — what the creation screen shows
+  - Races (playable) · Factions (playable) — what the creation screen shows.
+    Each race/faction row can carry PERKS + STARTING GEAR + ABILITIES:
+      • racialStatBonuses / factionStatBonuses — always-on stat bumps
+      • racialACBonusRules / factionACBonusRules — conditional AC
+      • startingWeapon (race) + startingGear[] (race & faction) — creation items
+      • abilities[] — once-a-day powers (effect: heal/stat_buff/shield/repair/strike)
   - Race lore / Faction lore — story notes the narrator knows
 
 ## 3 · The world
