@@ -111,11 +111,32 @@ export const DEFAULT_POWERS: Power[] = [
   },
 ];
 
-/** The dev-console TEMPLATE: the built-in set PLUS two example custom-effect
+/** engine_Dev — GENERIC, setting-neutral versions of the three disciplines for the
+ *  TEMPLATE only (the live DEFAULT_POWERS above stay the built-in game). Same
+ *  disciplines / stats / DCs / showGolemVariants — bland names, fuels, and prose. */
+const GENERIC_POWERS: Power[] = [
+  {
+    id: 'shape_power', discipline: 'shape', name: 'Stone Shaping', title: 'Stone Shaping (shape)',
+    body: 'INT check, DC 12. In combat: +4 AC for one turn (a shaped ward). Out of combat: binds a crystal shard to a small rock, producing a throwable shaped shard. Some races cast at the base DC; every other race rolls +4 harder.',
+    stat: 'intelligence', dcBase: 12, fuels: ['Raw Crystal', 'Worked Crystal', 'Common Residue'], examples: ['shape stone', 'mold the stone', 'manipulate stone'],
+  },
+  {
+    id: 'summon_power', discipline: 'summon', name: 'Construct Summoning', title: 'Construct Summoning (summon)',
+    body: 'INT check, DC 15 (harder than the others — constructs take stronger anchors). Summons a construct ally that fights for you for the rest of the scene. Some races cast at the base DC; every other race rolls +4 harder.',
+    stat: 'intelligence', dcBase: 15, fuels: ['Raw Crystal', 'Worked Crystal'], examples: ['summon construct', 'summon a construct', 'call a construct'], showGolemVariants: true,
+  },
+  {
+    id: 'mend_power', discipline: 'mend', name: 'Mending', title: 'Mending (mend)',
+    body: 'WIS check, DC 12. Restores HP to you or an ally. Some races cast at the base DC; every other race rolls +4 harder.',
+    stat: 'wisdom', dcBase: 12, fuels: ['Raw Crystal', 'Worked Crystal'], examples: ['mend wounds', 'heal me', 'mend self'],
+  },
+];
+
+/** The dev-console TEMPLATE: a GENERIC discipline set PLUS two example custom-effect
  *  powers (a damaging "fog" over all enemies, and a self-heal) so the author sees
  *  how to define new powers. Not part of the live default — only the template. */
 export const POWERS_TEMPLATE: Power[] = [
-  ...DEFAULT_POWERS,
+  ...GENERIC_POWERS,
   {
     id: 'example_fog',
     discipline: 'shape',
