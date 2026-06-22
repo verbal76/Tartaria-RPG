@@ -614,23 +614,34 @@ export function ExplorationScreen() {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { liveMainQuest } = require('../engine/customMainQuest');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { currentObjectiveLine, questIsComplete } = require('../engine/customMainQuestEngine');
+        const { currentObjectiveLine, questIsComplete, questStepIndex } = require('../engine/customMainQuestEngine');
         const customQ = liveMainQuest();
         if (customQ) {
-          const objLine = questIsComplete(player)
-            ? `${customQ.title ?? 'Main quest'} — complete.`
-            : (currentObjectiveLine(player) ?? 'No active objective.');
+          // engine_Dev — the chip leads with the QUEST TITLE (the author's name for
+          // the campaign) and carries a small parts-completed progress count, so the
+          // player sees both what they're chasing and how far along they are.
+          const complete = questIsComplete(player);
+          const total = customQ.steps.length;
+          const done = Math.max(0, Math.min(questStepIndex(player), total));
+          const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
+          const objLine = complete ? 'Complete.' : (currentObjectiveLine(player) ?? 'No active objective.');
           return (
             <TutorialTarget area="objective-chip">
-              <View style={styles.objectiveChip}>
+              <TouchableOpacity
+                style={styles.objectiveChip}
+                onPress={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
+                activeOpacity={0.7}
+                hitSlop={6}
+              >
                 <View style={styles.objectiveChipRow}>
                   <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={2}>
                     <Text style={styles.objectiveChipStar}>★ </Text>
-                    <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
+                    <Text style={styles.objectiveChipLabel}>{title.toUpperCase()} · </Text>
                     {objLine}
+                    <Text style={styles.objectiveChipProgress}>{`   ${done}/${total} parts`}</Text>
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </TutorialTarget>
           );
         }
@@ -1822,6 +1833,12 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontWeight: '700',
     letterSpacing: 1,
+  },
+  // engine_Dev — dim parts-completed counter trailing the custom-quest objective.
+  objectiveChipProgress: {
+    color: '#7a705c',
+    fontStyle: 'normal',
+    fontWeight: '700',
   },
   objectiveChipSubtitle: {
     color: '#7a705c',
