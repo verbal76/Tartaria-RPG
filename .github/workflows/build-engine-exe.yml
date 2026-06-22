@@ -1,0 +1,68 @@
+name: Build · Windows (.exe) · Engine Dev PC
+
+# PC build for the Dev_engine_PC line. Exports the dev engine to a web bundle
+# (react-native-web), wraps it in Electron, and packages a single portable
+# Windows .exe — uploaded as a downloadable artifact. Fires on push to
+# Dev_engine_PC (so a normal push builds it) and via the manual Run-workflow button.
+#
+# This is ISOLATED: it only runs on Dev_engine_PC, builds a .exe artifact, and
+# touches no EAS channel / OTA channel / store listing. It cannot affect the mobile
+# engine_Dev line or the live-Tartaria lines. Mirrors live-Tartaria build-steam-exe.yml.
+on:
+  push:
+    branches:
+      - Dev_engine_PC
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install app deps (root)
+        # --legacy-peer-deps mirrors the repo's existing install convention
+        # (react-native-executorch peer ranges). Not `npm ci` — package-lock
+        # isn't regenerated for the new web deps; install resolves them.
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Harden web bundle (strip source maps + level-2 obfuscate)
+        # Strips *.map (no decoder ring ships) and lightly obfuscates the JS so
+        # casual readers / "edit-a-number" tinkerers can't easily modify it. Runs
+        # under Git Bash on the Windows runner (find + bash both on PATH).
+        shell: bash
+        run: bash scripts/harden-web-bundle.sh dist
+
+      - name: Stage web bundle into the Electron wrapper
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path desktop/web-build | Out-Null
+          Copy-Item -Recurse -Force dist/* desktop/web-build/
+
+      - name: Install desktop (Electron) deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Package portable Windows .exe (electron-builder)
+        working-directory: desktop
+        run: npx electron-builder --win portable --publish never
+
+      - name: Upload .exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-dev-pc-exe
+          path: desktop/release/*.exe
+          if-no-files-found: error

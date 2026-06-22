@@ -70,4 +70,28 @@ const config = getDefaultConfig(__dirname);
 config.resolver = config.resolver ?? {};
 config.resolver.unstable_enablePackageExports = true;
 
+// ── Dev_engine_PC (desktop) ────────────────────────────────────────────────
+// On the WEB/Electron target, native-ONLY modules have no browser build, so
+// swap them to a no-op stub (web-stubs/native-noop.js) at resolve time. The
+// desktop narrator runs through HttpLlamaRuntime (runtimeFactory.web.ts) against
+// a local LLM server instead of on-device llama.rn. This block is platform-gated
+// (`platform === 'web'`) so it is inert on the Android/iOS builds and merges from
+// engine_Dev never conflict. Mirrors the live-Tartaria steam_Dev build pattern.
+const path = require('path');
+const WEB_NATIVE_STUBS = new Set([
+  'llama.rn',
+  'onnxruntime-react-native',
+  'react-native-executorch',
+  'expo-speech-recognition',
+]);
+const WEB_STUB_FILE = path.resolve(__dirname, 'web-stubs/native-noop.js');
+const __priorResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (platform === 'web' && WEB_NATIVE_STUBS.has(moduleName)) {
+    return { type: 'sourceFile', filePath: WEB_STUB_FILE };
+  }
+  const next = __priorResolveRequest ?? context.resolveRequest;
+  return next(context, moduleName, platform);
+};
+
 module.exports = config;
