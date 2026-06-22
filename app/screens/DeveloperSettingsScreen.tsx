@@ -1716,7 +1716,7 @@ function DamageTypesBuilder() {
 const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2);
 const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
 const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2);
-const INVENTORY_TEMPLATE = JSON.stringify({ labels: { loot: 'Salvage', material: 'Components', weapon: 'Arsenal' }, toolTags: ['multitool', 'spanner'] }, null, 2);
+const INVENTORY_TEMPLATE = JSON.stringify({ labels: { loot: 'Salvage', material: 'Components', weapon: 'Arsenal' }, toolTags: ['multitool', 'spanner'], repairMaterialPct: 200 }, null, 2);
 
 const BUILTIN_DAMAGE_TYPES = ['bludgeoning', 'slashing', 'piercing', 'burn', 'electrical', 'poison', 'radiation', 'stun', 'degradation', 'aetheric'];
 
@@ -1870,7 +1870,7 @@ function AdvancedRulesBoxes() {
         template={INVENTORY_TEMPLATE}
         onLoad={(j) => store.getState().loadInventoryJson(j)}
         onClear={() => store.getState().clearInventory()}
-        hint={<>Rename the inventory category sections (<Text style={{ fontWeight: 'bold' }}>labels</Text>: weapon/armor/accessory/consumable/tool/relic/material/loot/quest → your names) and add <Text style={{ fontWeight: 'bold' }}>toolTags</Text> that read as Tools. Category ids + order stay fixed.</>}
+        hint={<>Rename the inventory category sections (<Text style={{ fontWeight: 'bold' }}>labels</Text>: weapon/armor/accessory/consumable/tool/relic/material/loot/quest → your names), add <Text style={{ fontWeight: 'bold' }}>toolTags</Text> that read as Tools, and set <Text style={{ fontWeight: 'bold' }}>repairMaterialPct</Text> (repair material cost as a % of an item's scrap yield; 200 = built-in). Category ids + order stay fixed.</>}
       />
     </>
   );

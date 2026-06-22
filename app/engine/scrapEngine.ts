@@ -184,7 +184,12 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
  *  such items. */
 export function repairCostMaterials(item: InventoryItem): Array<{ name: string; quantity: number }> {
   const out = scrapOutputFor(item);
-  return out.grants.map((g) => ({ name: g.name, quantity: g.quantity * 2 }));
+  // engine_Dev — repair material cost = scrap yield × the configurable factor
+  // (default 2.0 = 200%). A re-skin can make repairs cheaper/dearer via the
+  // inventory override's repairMaterialPct.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factor = (require('./contentPack') as typeof import('./contentPack')).getRepairMaterialFactor();
+  return out.grants.map((g) => ({ name: g.name, quantity: Math.max(1, Math.round(g.quantity * factor)) }));
 }
 
 // OTA 23-014 — salvage isn't a free repeatable click anymore.

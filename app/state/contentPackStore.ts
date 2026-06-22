@@ -126,7 +126,7 @@ interface PersistShape {
   /** Coating renames keyed by mechanic (replaces built-in names). */
   coatings?: Record<string, unknown> | null;
   /** Inventory presentation: category label renames + extra tool tags. */
-  inventory?: { labels?: Record<string, string>; toolTags?: string[] } | null;
+  inventory?: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null;
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -181,7 +181,7 @@ interface ContentPackState {
   /** Coating renames keyed by mechanic, or null = built-in. */
   coatings: Record<string, unknown> | null;
   /** Inventory category-label renames + extra tool tags, or null = built-in. */
-  inventory: { labels?: Record<string, string>; toolTags?: string[] } | null;
+  inventory: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -961,11 +961,12 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     try { parsed = JSON.parse(stripJsonComments(json)); }
     catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return { ok: false, error: 'Inventory presentation must be a JSON OBJECT: { "labels": { "weapon": "Arsenal", … }, "toolTags": ["multitool", …] }.' };
-    const o = parsed as { labels?: unknown; toolTags?: unknown };
+    const o = parsed as { labels?: unknown; toolTags?: unknown; repairMaterialPct?: unknown };
     const labels = o.labels && typeof o.labels === 'object' && !Array.isArray(o.labels) ? (o.labels as Record<string, string>) : undefined;
     const toolTags = Array.isArray(o.toolTags) ? o.toolTags.map((t) => String(t)) : undefined;
-    if (!labels && !toolTags) return { ok: false, error: 'Provide "labels" (category renames) and/or "toolTags" (extra tool tags).' };
-    const next = { ...(labels ? { labels } : {}), ...(toolTags ? { toolTags } : {}) };
+    const repairMaterialPct = typeof o.repairMaterialPct === 'number' && o.repairMaterialPct >= 0 ? o.repairMaterialPct : undefined;
+    if (!labels && !toolTags && repairMaterialPct === undefined) return { ok: false, error: 'Provide "labels" (category renames), "toolTags" (extra tool tags), and/or "repairMaterialPct" (repair material cost %).' };
+    const next = { ...(labels ? { labels } : {}), ...(toolTags ? { toolTags } : {}), ...(repairMaterialPct !== undefined ? { repairMaterialPct } : {}) };
     setInventoryOverride(next);
     set({ inventory: next, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), inventory: next });
@@ -1009,7 +1010,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextDamageResistances: Record<string, unknown> | null = get().damageResistances;
     let nextFusionTags: string[] = get().fusionTags;
     let nextCoatings: Record<string, unknown> | null = get().coatings;
-    let nextInventory: { labels?: Record<string, string>; toolTags?: string[] } | null = get().inventory;
+    let nextInventory: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null = get().inventory;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -1099,7 +1100,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         if (value && typeof value === 'object' && !Array.isArray(value)) { nextCoatings = value as Record<string, unknown>; applied.push('coatings'); }
         else skipped.push('coatings (not an object)');
       } else if (key === 'inventory') {
-        if (value && typeof value === 'object' && !Array.isArray(value)) { nextInventory = value as { labels?: Record<string, string>; toolTags?: string[] }; applied.push('inventory'); }
+        if (value && typeof value === 'object' && !Array.isArray(value)) { nextInventory = value as { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }; applied.push('inventory'); }
         else skipped.push('inventory (not an object)');
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
@@ -1249,7 +1250,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.damageResistances && Object.keys(s.damageResistances).length > 0) out.damageResistances = s.damageResistances;
     if (s.fusionTags.length > 0) out.fusionTags = s.fusionTags;
     if (s.coatings && Object.keys(s.coatings).length > 0) out.coatings = s.coatings;
-    if (s.inventory && ((s.inventory.labels && Object.keys(s.inventory.labels).length > 0) || (s.inventory.toolTags && s.inventory.toolTags.length > 0))) out.inventory = s.inventory;
+    if (s.inventory && ((s.inventory.labels && Object.keys(s.inventory.labels).length > 0) || (s.inventory.toolTags && s.inventory.toolTags.length > 0) || typeof s.inventory.repairMaterialPct === 'number')) out.inventory = s.inventory;
     return JSON.stringify(out, null, 2);
   },
 
@@ -1370,7 +1371,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setFusionTagsOverride(fusionTags.length > 0 ? fusionTags : null);
         const coatings = shape.coatings && typeof shape.coatings === 'object' ? (shape.coatings as Record<string, unknown>) : null;
         setCoatingsOverride(coatings && Object.keys(coatings).length > 0 ? (coatings as Parameters<typeof setCoatingsOverride>[0]) : null);
-        const inventory = shape.inventory && typeof shape.inventory === 'object' && !Array.isArray(shape.inventory) ? (shape.inventory as { labels?: Record<string, string>; toolTags?: string[] }) : null;
+        const inventory = shape.inventory && typeof shape.inventory === 'object' && !Array.isArray(shape.inventory) ? (shape.inventory as { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }) : null;
         setInventoryOverride(inventory);
         const published = shape.published === true;
         setPublishedFlag(published);

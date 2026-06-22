@@ -609,10 +609,10 @@ export function getCoatingsOverride(): CoatingSkinMap | null { return coatingsOv
 // Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
 // category IDS and order stay engine-fixed (they map to item kinds); only the
 // player-facing labels + the tool-tag membership are data-driven. null = built-in.
-export interface InventoryOverride { labels?: Record<string, string>; toolTags?: string[] }
+export interface InventoryOverride { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }
 let inventoryOverride: InventoryOverride | null = null;
 export function setInventoryOverride(o: InventoryOverride | null): void {
-  inventoryOverride = o && ((o.labels && Object.keys(o.labels).length > 0) || (o.toolTags && o.toolTags.length > 0)) ? o : null;
+  inventoryOverride = o && ((o.labels && Object.keys(o.labels).length > 0) || (o.toolTags && o.toolTags.length > 0) || typeof o.repairMaterialPct === 'number') ? o : null;
 }
 export function hasInventoryOverride(): boolean { return inventoryOverride != null; }
 export function getInventoryOverride(): InventoryOverride | null { return inventoryOverride; }
@@ -625,6 +625,13 @@ export function getInventoryLabel(categoryId: string, dflt: string): string {
 /** Author-added tool tags (lowercased), extending the built-in tool-tag list. */
 export function getExtraToolTags(): string[] {
   return (inventoryOverride?.toolTags ?? []).map((t) => String(t).toLowerCase());
+}
+/** The repair MATERIAL cost as a fraction of the item's scrap yield. Built-in is
+ *  2.0 (200% — repair costs twice what breaking it down returns). Author sets
+ *  repairMaterialPct (a percent, e.g. 150) to make repairs cheaper/dearer. */
+export function getRepairMaterialFactor(): number {
+  const pct = inventoryOverride?.repairMaterialPct;
+  return typeof pct === 'number' && pct >= 0 ? pct / 100 : 2;
 }
 
 // --- whispers override ----------------------------------------------------------
