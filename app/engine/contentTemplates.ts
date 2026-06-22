@@ -4,19 +4,6 @@
 // wade through) the entire existing game. The export format matches what the
 // upload boxes expect: a JSON ARRAY of rows.
 
-import weaponsData from '../data/items/weapons.json';
-import armorData from '../data/items/armor.json';
-import materialsData from '../data/items/materials.json';
-import gearData from '../data/items/gear.json';
-import explorationData from '../data/items/exploration.json';
-import amuletsData from '../data/items/amulets.json';
-import ringsData from '../data/items/rings.json';
-import recipesData from '../data/items/recipes.json';
-import enemiesData from '../data/enemies/enemies.json';
-import racesData from '../data/races/races.json';
-import factionsData from '../data/factions/factions.json';
-import locationsData from '../data/locations/locations.json';
-import weatherData from '../data/weather/weather.json';
 import huntsData from '../data/quests/hunts.json';
 import mysteriesData from '../data/quests/mysteries.json';
 import factionQuestsData from '../data/quests/faction-quests.json';
@@ -37,6 +24,7 @@ import { getInteractionTags } from './interactionTags';
 import { buildFlavorTemplate } from './narrativeGenerator';
 import { POWERS_TEMPLATE } from './powers';
 import { TRACKABLE_VARS } from './customTitles';
+import { GENERIC_TABLE_ROWS } from './genericTemplateData';
 
 /** Example narrator persona seeded into the World-lore template — illustrative
  *  only; the author edits it. (The live default is built from the narrator's
@@ -59,17 +47,6 @@ const TOKEN_NOTE = [
 /** Prepend the token note to a template body unless suppressed (bundle sections). */
 function tokenNote(json: string, include: boolean): string {
   return include ? `${TOKEN_NOTE}\n${json}` : json;
-}
-
-/** Normalize a data file to its row array — some are top-level arrays, others are
- *  wrapped (e.g. { "weapons": [...] }). */
-function rows(data: unknown, key?: string): unknown[] {
-  if (Array.isArray(data)) return data;
-  if (key && data && typeof data === 'object') {
-    const v = (data as Record<string, unknown>)[key];
-    if (Array.isArray(v)) return v;
-  }
-  return [];
 }
 
 // engine_Dev — generic, section-organized starter for the Lore document box.
@@ -126,19 +103,22 @@ const LORE_DOCUMENT_SCAFFOLD: unknown[] = [
 ];
 
 const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
-  weapons: rows(weaponsData, 'weapons'),
-  armor: rows(armorData, 'armor'),
-  materials: rows(materialsData, 'materials'),
-  gear: rows(gearData, 'gear'),
-  exploration: rows(explorationData),
-  amulets: rows(amuletsData, 'amulets'),
-  rings: rows(ringsData, 'rings'),
-  recipes: rows(recipesData, 'recipes'),
-  enemies: rows(enemiesData),
-  races: rows(racesData),
-  factions: rows(factionsData),
-  locations: rows(locationsData),
-  weather: rows(weatherData),
+  // engine_Dev — GENERIC, setting-neutral sample rows (NOT the built-in Tartaria
+  // tables). Same shapes + optional fields, bland "light fantasy" flavor, so an
+  // author's TEMPLATE never seeds another game's proper nouns. See genericTemplateData.ts.
+  weapons: GENERIC_TABLE_ROWS.weapons,
+  armor: GENERIC_TABLE_ROWS.armor,
+  materials: GENERIC_TABLE_ROWS.materials,
+  gear: GENERIC_TABLE_ROWS.gear,
+  exploration: GENERIC_TABLE_ROWS.exploration,
+  amulets: GENERIC_TABLE_ROWS.amulets,
+  rings: GENERIC_TABLE_ROWS.rings,
+  recipes: GENERIC_TABLE_ROWS.recipes,
+  enemies: GENERIC_TABLE_ROWS.enemies,
+  races: GENERIC_TABLE_ROWS.races,
+  factions: GENERIC_TABLE_ROWS.factions,
+  locations: GENERIC_TABLE_ROWS.locations,
+  weather: GENERIC_TABLE_ROWS.weather,
   // engine_Dev — the Lore document has no built-in file of its own shape; this is
   // a GENERIC, section-organized scaffold (no Tartaria / no specific setting) the
   // author fills in for any game. Each block is one passage; the narrator injects
