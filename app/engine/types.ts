@@ -900,7 +900,11 @@ export type StatusEffectKind =
   // engine_Dev — drinking a coating vial grants RESIST to its damage type for the
   // rest of the fight (cleared at combat end). `resistType` carries the type; the
   // combat site halves that type's damage + lowers its on-hit-effect chance.
-  | 'resist_buff';
+  | 'resist_buff'
+  // engine_Dev — a generic damage-type DOT applied TO THE PLAYER when an enemy hits
+  // with a custom damage type configured as 'dot' (symmetry with the enemy-side
+  // dt_dot). Ticks perRoundDamage each round; label carries the type name.
+  | 'dt_dot';
 
 export interface StatusEffect {
   kind: StatusEffectKind;

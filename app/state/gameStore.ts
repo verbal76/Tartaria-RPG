@@ -23888,6 +23888,35 @@ function applyEnemyCounter(
     }
     // Roll for a status effect to apply based on the damage type.
     const newEffect = rollIncomingStatusEffect(explicitDamageType, player.statusEffects ?? [], incChanceMult);
+    // engine_Dev — SYMMETRY: if the enemy's damage type carries an author combat
+    // config (a custom on-hit / DOT type), it procs on the PLAYER too — gated by the
+    // PLAYER's weak/strong to that type (resist = much lower chance, weak = higher),
+    // exactly mirroring how our weapons proc on enemies. on_hit folds immediate
+    // damage into this hit; dot seeds a player DOT applied with the other effects.
+    let dtcDotEffect: import('../engine/types').StatusEffect | null = null;
+    {
+      const et = (enemyDamageType ?? '').toLowerCase();
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const cpMod = require('../engine/contentPack') as typeof import('../engine/contentPack');
+      const dtc = cpMod.getDamageTypeCombat(et);
+      if (dtc) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const rf2 = (require('../engine/raceMechanics') as typeof import('../engine/raceMechanics')).playerRaceFactionResists(player);
+        const match: 'weak' | 'resist' | 'normal' =
+          (resisted.blocked || drinkResists || rf2.resist.includes(et)) ? 'resist'
+          : rf2.weak.includes(et) ? 'weak'
+          : 'normal';
+        if (Math.random() < cpMod.damageTypeApplyChance(dtc, match)) {
+          const roll = Math.max(1, rollFromNotation(dtc.dice ?? '1d4'));
+          if (dtc.mode === 'on_hit') {
+            dmg += roll;
+            void Promise.resolve().then(() => get().appendLog('combat', `The ${enemyDamageType} flares — +${roll} as it lands${match === 'weak' ? ' (you have no guard against it)' : ''}.`));
+          } else {
+            dtcDotEffect = { kind: 'dt_dot', remainingRounds: Math.max(1, dtc.rounds ?? 3), perRoundDamage: roll, label: enemyDamageType ?? 'damage' };
+          }
+        }
+      }
+    }
     // Per-enemy trait effects on a successful hit (bleeder / corrupting /
     // concussive). Independent of the damage-type roll so a trait can
     // stack with a type-based status.
@@ -23956,6 +23985,8 @@ function applyEnemyCounter(
           });
         }
       }
+      // engine_Dev — seed the symmetric damage-type DOT on the player if one procced.
+      if (dtcDotEffect) effects = applyEffect(effects ?? [], dtcDotEffect);
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
