@@ -20063,6 +20063,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The ${getNarratorName()} looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
       return;
     }
+    // engine_Dev — THROWN COATING VIAL. A coating vial isn't a weapon, so it gets a
+    // dedicated throw: it splashes the active enemy for the coating's dice as its
+    // damage type (weak/strong-scaled) and seeds the type's DOT, then is spent. One
+    // toss = one use (the vial is consumed whether or not it kills).
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolveItemEffect } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findGearByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+      const fx = resolveItemEffect(item.name, [findGearByName]);
+      const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+      if (spec) {
+        const idx = Math.max(0, Math.min(scene.activeEnemyIdx ?? 0, scene.enemies.length - 1));
+        const target = scene.enemies[idx];
+        if (!target) { get().appendLog('world', 'Nothing to throw it at.'); return; }
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { applyDamageTypeModifier } = require('../engine/crafting') as typeof import('../engine/crafting');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { traitDamageMultiplier } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
+        const raw = Math.max(1, rollFromNotation(spec.dice));
+        const typed = Math.max(1, Math.round(applyDamageTypeModifier(raw, spec.kind, target.type).damage * traitDamageMultiplier(target.traits, spec.kind).multiplier));
+        const prevHp = scene.enemyHps[idx] ?? target.hp;
+        const newHp = Math.max(0, prevHp - typed);
+        set((s) => {
+          if (!s.player || !s.currentScene) return s;
+          const hps = [...s.currentScene.enemyHps]; hps[idx] = newHp;
+          const statuses = (s.currentScene.enemyStatuses ?? []).map((a) => [...a]);
+          while (statuses.length < s.currentScene.enemies.length) statuses.push([]);
+          const list = (statuses[idx] ?? []).filter((st) => !(st.kind === 'dt_dot' && st.sourceName === spec.kind));
+          list.push({ kind: 'dt_dot', turnsRemaining: 3, dmgPerTurn: Math.max(1, rollFromNotation(spec.dice)), sourceName: spec.kind });
+          statuses[idx] = list;
+          const inv = s.player.inventory
+            .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+            .filter((i) => i.quantity > 0);
+          const eq = { ...(s.player.equipped ?? {}) };
+          if (!inv.some((i) => i.id === item.id)) eq.bandolierIds = (eq.bandolierIds ?? []).filter((id) => id !== item.id);
+          return { player: { ...s.player, inventory: inv, equipped: eq }, currentScene: { ...s.currentScene, enemyHps: hps, enemyStatuses: statuses } };
+        });
+        get().appendLog('combat', `You hurl the ${item.name.toLowerCase()} — it bursts over ${target.name} for ${typed} ${spec.kind}, and the ${spec.kind} keeps eating (3 turns).`, { combatOutcome: 'player_dmg' });
+        if (newHp <= 0) get().resolveEnemyDefeat();
+        void get().persist();
+        return;
+      }
+    }
     const prevOff = player.equipped?.off;
     const prevOffId = player.equipped?.offId;
     // Rack the throwable in the off hand and hurl it.
