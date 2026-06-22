@@ -1570,7 +1570,10 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
   );
 }
 
-const DAMAGE_TYPES_TEMPLATE = JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3 }], null, 2);
+const DAMAGE_TYPES_TEMPLATE = JSON.stringify([
+  { name: 'fire', keywords: ['fire', 'flame', 'burn', 'scorch'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } },
+  { name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.7, weakBonus: 0.25, strongPenalty: 0.25 } },
+], null, 2);
 const DT_STATS: Array<'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma' | 'stealth'> = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
 
 // engine_Dev — DAMAGE TYPES builder. Name + keyword aliases + an optional ON-HIT
@@ -1579,12 +1582,19 @@ const DT_STATS: Array<'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'ch
 // in the list, edit/add here, it rewrites the file. These names then populate the
 // enemy Weak / Strong / Delivers pickers below.
 function DamageTypesBuilder() {
-  const damageTypes = useContentPackStore((s) => s.damageTypes) as Array<{ name: string; keywords?: string[]; onHit?: Array<{ stat: string; amount: number }>; onHitRounds?: number }>;
+  const damageTypes = useContentPackStore((s) => s.damageTypes) as Array<{ name: string; keywords?: string[]; onHit?: Array<{ stat: string; amount: number }>; onHitRounds?: number; combat?: { mode: string; dice?: string; rounds?: number } }>;
   const loadDamageTypesJson = useContentPackStore((s) => s.loadDamageTypesJson);
   const [name, setName] = useState('');
   const [keywords, setKeywords] = useState('');
   const [rounds, setRounds] = useState('3');
   const [mods, setMods] = useState<Record<string, string>>({});
+  // combat effect config
+  const [cMode, setCMode] = useState<'none' | 'on_hit' | 'dot'>('none');
+  const [cDice, setCDice] = useState('1d6');
+  const [cRounds, setCRounds] = useState('3');
+  const [cChance, setCChance] = useState('70');
+  const [cWeak, setCWeak] = useState('25');
+  const [cStrong, setCStrong] = useState('25');
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
 
@@ -1602,9 +1612,20 @@ function DamageTypesBuilder() {
     const kw = keywords.split(',').map((k) => k.trim()).filter(Boolean);
     if (kw.length > 0) def.keywords = kw;
     if (onHit.length > 0) { def.onHit = onHit; def.onHitRounds = Math.max(1, Math.trunc(Number(rounds) || 3)); }
+    if (cMode !== 'none') {
+      const combat: Record<string, unknown> = {
+        mode: cMode,
+        dice: cDice.trim() || '1d6',
+        baseChance: Math.max(0, Math.min(1, (Number(cChance) || 70) / 100)),
+        weakBonus: Math.max(0, Math.min(1, (Number(cWeak) || 0) / 100)),
+        strongPenalty: Math.max(0, Math.min(1, (Number(cStrong) || 0) / 100)),
+      };
+      if (cMode === 'dot') combat.rounds = Math.max(1, Math.trunc(Number(cRounds) || 3));
+      def.combat = combat;
+    }
     const next = [...damageTypes.filter((d) => d.name.toLowerCase() !== nm.toLowerCase()), def];
-    apply(next, `Added “${nm}”${onHit.length ? ` (${onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')} on hit)` : ''}. (${next.length} total)`);
-    setName(''); setKeywords(''); setMods({});
+    apply(next, `Added “${nm}”${cMode !== 'none' ? ` (${cMode === 'on_hit' ? 'on-hit' : 'DOT'} ${cDice})` : ''}${onHit.length ? ` (${onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')} on hit)` : ''}. (${next.length} total)`);
+    setName(''); setKeywords(''); setMods({}); setCMode('none');
   };
 
   return (
@@ -1643,14 +1664,34 @@ function DamageTypesBuilder() {
           <Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text>
           <TextInput style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]} value={rounds} onChangeText={setRounds} placeholder="3" placeholderTextColor="#5c5446" keyboardType="number-pad" />
         </View>
-        <TouchableOpacity style={[styles.loadBtn, { alignSelf: 'flex-end', marginBottom: 4 }]} onPress={addType}><Text style={styles.loadBtnText}>+ ADD</Text></TouchableOpacity>
+      </View>
+      <Text style={styles.hint}>Combat effect when a weapon DEALS this type (optional):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+        {(['none', 'on_hit', 'dot'] as const).map((m) => (
+          <TouchableOpacity key={m} style={[styles.tmplBtn, cMode === m && styles.loadBtn, { marginBottom: 4, paddingVertical: 4, paddingHorizontal: 8 }]} onPress={() => setCMode(m)}>
+            <Text style={cMode === m ? styles.loadBtnText : styles.tmplBtnText}>{cMode === m ? '☑ ' : '☐ '}{m === 'none' ? 'none' : m === 'on_hit' ? 'on-hit (immediate)' : 'DOT (ticks)'}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      {cMode !== 'none' && (
+        <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>DICE</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cDice} onChangeText={setCDice} placeholder="1d6" placeholderTextColor="#5c5446" autoCapitalize="none" /></View>
+          {cMode === 'dot' && <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text><TextInput style={[styles.input, { width: 44, minHeight: 0, height: 36, textAlign: 'center' }]} value={cRounds} onChangeText={setCRounds} placeholder="3" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>}
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>CHANCE%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cChance} onChangeText={setCChance} placeholder="70" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>+WEAK%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cWeak} onChangeText={setCWeak} placeholder="25" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>−STRONG%</Text><TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={cStrong} onChangeText={setCStrong} placeholder="25" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>
+        </View>
+      )}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={addType}><Text style={styles.loadBtnText}>+ ADD DAMAGE TYPE</Text></TouchableOpacity>
       </View>
 
       {damageTypes.map((d) => (
         <View key={d.name} style={styles.titleRowDev}>
           <Text style={styles.hint}>
             ◆ <Text style={{ fontWeight: 'bold' }}>{d.name}</Text>
-            {Array.isArray(d.onHit) && d.onHit.length > 0 ? ` — ${d.onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')} / ${d.onHitRounds ?? 3}r` : ''}
+            {d.combat ? ` — ${d.combat.mode === 'on_hit' ? 'on-hit' : 'DOT'} ${d.combat.dice ?? '1d6'}${d.combat.mode === 'dot' ? `/${d.combat.rounds ?? 3}r` : ''}` : ''}
+            {Array.isArray(d.onHit) && d.onHit.length > 0 ? ` · ${d.onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')}/${d.onHitRounds ?? 3}r` : ''}
           </Text>
           <TouchableOpacity onPress={() => apply(damageTypes.filter((x) => x.name !== d.name), `Removed “${d.name}”.`)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
         </View>

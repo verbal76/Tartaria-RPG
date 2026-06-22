@@ -518,7 +518,37 @@ export function isDogEnabled(): boolean { return dogEnabled; }
 // listed stat mods apply to the VICTIM for `onHitRounds` rounds (e.g. "cucumber"
 // -> target −2 INT for 3 rounds). Extends (never removes) the built-ins.
 export interface DamageStatMod { stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma' | 'stealth'; amount: number }
-export interface ExtraDamageType { name: string; keywords?: string[]; onHit?: DamageStatMod[]; onHitRounds?: number }
+/** engine_Dev — a damage type's COMBAT effect when a weapon deals it (mirrors how
+ *  Tartaria's coatings behave, but configurable). `mode` = 'on_hit' (immediate bonus
+ *  damage) or 'dot' (ticks `dice` per round for `rounds`). The proc is GATED by an
+ *  apply chance: baseChance, raised by weakBonus when the target is weak to the type,
+ *  lowered by strongPenalty when strong. Defaults: base 0.7, weak +0.25, strong −0.25. */
+export interface DamageCombatEffect {
+  mode: 'on_hit' | 'dot';
+  dice?: string;
+  rounds?: number;
+  baseChance?: number;
+  weakBonus?: number;
+  strongPenalty?: number;
+}
+export interface ExtraDamageType { name: string; keywords?: string[]; onHit?: DamageStatMod[]; onHitRounds?: number; combat?: DamageCombatEffect }
+/** The combat effect for a damage type (author-defined), or null when none. */
+export function getDamageTypeCombat(typeName: string | null | undefined): DamageCombatEffect | null {
+  if (!typeName) return null;
+  const lc = typeName.toLowerCase();
+  const t = getExtraDamageTypes().find((e) => e.name.toLowerCase() === lc);
+  return t?.combat ?? null;
+}
+/** The apply chance (0..1) for a combat effect against a target with the given
+ *  weak/strong relationship to the type. `match`: 'weak' raises it, 'resist' lowers
+ *  it, 'normal' leaves the base. Author values override the defaults. */
+export function damageTypeApplyChance(cfg: DamageCombatEffect, match: 'weak' | 'resist' | 'normal'): number {
+  const base = cfg.baseChance ?? 0.7;
+  const weak = cfg.weakBonus ?? 0.25;
+  const strong = cfg.strongPenalty ?? 0.25;
+  const c = base + (match === 'weak' ? weak : match === 'resist' ? -strong : 0);
+  return Math.max(0, Math.min(1, c));
+}
 /** The on-hit stat effect for a damage type, or null when none (built-in types
  *  carry no stat effect). Resolved against the author's uploaded damage types. */
 export function getDamageTypeOnHit(typeName: string | null | undefined): { mods: DamageStatMod[]; rounds: number } | null {

@@ -533,7 +533,10 @@ interface CurrentScene {
    *  status list; ticks each combat round. Empty array when no
    *  status is active. Initialized empty by beginScene. */
   enemyStatuses?: Array<Array<{
-    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+    // engine_Dev — 'dt_dot' is a generic, author-configured damage-type DOT (a
+    // weapon whose damage type is set to 'dot' mode). Ticks dmgPerTurn like the
+    // coating DOTs; sourceName carries the damage-type name for its lines.
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'dt_dot';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
@@ -7243,7 +7246,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   || st.kind === 'acid_coat'
                   || st.kind === 'corruption_coat'
                   || st.kind === 'electrical_coat'
-                  || st.kind === 'burn_coat';
+                  || st.kind === 'burn_coat'
+                  || st.kind === 'dt_dot';
                 if (isDot && st.turnsRemaining > 0) {
                   const dmg = st.dmgPerTurn;
                   const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
@@ -7259,7 +7263,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                           ? `${enemyName} convulses — arcing current bites ${dmg}.`
                           : st.kind === 'burn_coat'
                             ? `${enemyName} blisters — clinging fire sears ${dmg}.`
-                            : `${enemyName} convulses — infection bleeds ${dmg}.`;
+                            : st.kind === 'dt_dot'
+                              ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
+                              : `${enemyName} convulses — infection bleeds ${dmg}.`;
                   get().appendLog(
                     'combat',
                     `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
@@ -14219,6 +14225,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // type — both the macro type map AND the enemy's own resist:/vulnerable:
           // traits — even when the base weapon isn't that type. Poison/acid/
           // corruption deal flat typeless bonus damage (their bite is the DOT).
+          // engine_Dev — UNIFIED apply-chance: if the author configured a combat
+          // effect for this coating's matching damage type, the coating now lands on
+          // a weak/strong-gated roll (more likely vs weak foes, less vs strong) just
+          // like a damage-type proc. No config → applies every hit as before (the
+          // built-in behavior is unchanged).
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const cpc = require('../engine/contentPack') as typeof import('../engine/contentPack');
+          const coatCombat = cpc.getDamageTypeCombat(coating.kind);
+          let coatingLands = true;
+          if (coatCombat) {
+            const cMatch: 'weak' | 'resist' | 'normal' =
+              (applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'weak' || traitDamageMultiplier(enemy.traits, coating.kind).match === 'vulnerable') ? 'weak'
+              : (applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'resist' || traitDamageMultiplier(enemy.traits, coating.kind).match === 'resist') ? 'resist'
+              : 'normal';
+            coatingLands = Math.random() < cpc.damageTypeApplyChance(coatCombat, cMatch);
+          }
+          if (!coatingLands) {
+            get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}${'.'}`);
+          } else {
           const isElemental = coating.kind === 'electrical' || coating.kind === 'burn';
           const rolled = isElemental
             ? Math.max(
@@ -14231,10 +14256,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : rawRolled;
           coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
           dmg += rolled;
+          }
         }
       }
       if (surgeBonus > 0) {
         get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
+      }
+      // engine_Dev — DAMAGE-TYPE COMBAT PROC. If the weapon's damage type has an
+      // author-configured combat effect, roll its apply-chance (raised when the
+      // target is WEAK to the type, lowered when STRONG). On success: on_hit folds
+      // immediate bonus damage into this strike; dot stages a ticking effect seeded
+      // below if the enemy survives. Additive — no effect unless the type is set up.
+      const dtMatch: 'weak' | 'resist' | 'normal' =
+        (mod.match === 'weak' || traitMod.match === 'vulnerable') ? 'weak'
+        : (mod.match === 'resist' || traitMod.match === 'resist') ? 'resist'
+        : 'normal';
+      let dtDotProc: { dmgPerTurn: number; rounds: number; source: string } | null = null;
+      if (weaponType) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const cpMod = require('../engine/contentPack') as typeof import('../engine/contentPack');
+        const dtc = cpMod.getDamageTypeCombat(weaponType);
+        if (dtc && Math.random() < cpMod.damageTypeApplyChance(dtc, dtMatch)) {
+          const roll = Math.max(1, rollFromNotation(dtc.dice ?? '1d4'));
+          if (dtc.mode === 'on_hit') {
+            dmg += roll;
+            get().appendLog('combat', `${weaponType} flares — +${roll} on hit${dtMatch === 'weak' ? ' (weak — it bites deep!)' : ''}.`);
+          } else {
+            dtDotProc = { dmgPerTurn: roll, rounds: Math.max(1, dtc.rounds ?? 3), source: weaponType };
+          }
+        }
       }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       let newEnemyHp = prevHp - dmg;
@@ -14517,6 +14567,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
             { combatOutcome: 'player_dmg' },
           );
+        }
+        // engine_Dev — seed the configured damage-type DOT (dt_dot) if one procced.
+        if (dtDotProc) {
+          const p = dtDotProc;
+          set((s) => {
+            if (!s.currentScene) return s;
+            const n = s.currentScene.enemies.length;
+            const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
+            while (statuses.length < n) statuses.push([]);
+            const list = (statuses[activeIdx] ?? []).filter((st) => !(st.kind === 'dt_dot' && st.sourceName === p.source));
+            list.push({ kind: 'dt_dot', turnsRemaining: p.rounds, dmgPerTurn: p.dmgPerTurn, sourceName: p.source });
+            statuses[activeIdx] = list;
+            return { currentScene: { ...s.currentScene, enemyStatuses: statuses } };
+          });
+          get().appendLog('combat', `${p.source} sets in — ${p.dmgPerTurn}/turn for ${p.rounds} turns.`, { combatOutcome: 'player_dmg' });
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
