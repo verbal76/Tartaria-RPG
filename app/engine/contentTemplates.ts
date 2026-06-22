@@ -215,8 +215,17 @@ export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): strin
   if (id === 'flavor') {
     return tokenNote(JSON.stringify(buildFlavorTemplate(TEMPLATE_SAMPLE_ROWS), null, 2), includeTokenNote);
   }
-  const src = id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races;
-  return JSON.stringify(src.slice(0, TEMPLATE_SAMPLE_ROWS), null, 2);
+  // engine_Dev — faction/race LORE is FREE-FORM story text the narrator knows, NOT
+  // the playable rows (those live in the Factions/Races TABLE boxes — and the lore
+  // loader rejects table-shaped arrays). Emit an object of id → a story paragraph so
+  // Template → edit → Load round-trips cleanly.
+  const src = (id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races) as Array<{ id: string; name: string; description?: string; flavor?: string; philosophy?: string; goal?: string }>;
+  const out: Record<string, string> = {};
+  for (const r of src.slice(0, TEMPLATE_SAMPLE_ROWS)) {
+    const blurb = (r.flavor || r.description || r.philosophy || r.goal || `Story the narrator knows about ${r.name}.`).trim();
+    out[r.id] = blurb;
+  }
+  return JSON.stringify(out, null, 2);
 }
 
 /** The Missions template — one object whose keys are the mission sub-tables.
