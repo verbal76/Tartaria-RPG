@@ -14,15 +14,45 @@ import { bossById, bossAtLocation, bossToEnemy } from './customBosses';
 
 export function questStepIndex(p: PlayerCharacter): number { return p.customQuestStep ?? 0; }
 
+/** engine_Dev — does this step apply to the player's FACTION? A step is skipped when
+ *  the player's faction is in `skipForFactions` (e.g. a German player never gets the
+ *  kill-the-German-boss step), or when `onlyForFactions` is set and excludes them.
+ *  Steps with no gate apply to everyone. */
+export function stepApplies(step: MainQuestStep, p: PlayerCharacter): boolean {
+  const f = (p.factionId ?? '').toLowerCase();
+  const only = (step.onlyForFactions ?? []).map((x) => String(x).toLowerCase());
+  if (only.length > 0 && !only.includes(f)) return false;
+  const skip = (step.skipForFactions ?? []).map((x) => String(x).toLowerCase());
+  if (skip.includes(f)) return false;
+  return true;
+}
+
+/** The first index >= `from` whose step applies to this player (skipping gated-out
+ *  steps), or steps.length when none remain. */
+function nextApplicableIndex(steps: MainQuestStep[], from: number, p: PlayerCharacter): number {
+  let i = Math.max(0, from);
+  while (i < steps.length && !stepApplies(steps[i]!, p)) i++;
+  return i;
+}
+
+/** The EFFECTIVE current step index — the stored index advanced past any steps gated
+ *  out for the player's faction. All the readers below key off this so gated steps
+ *  are invisible to the player (never spawn, never gate a hand-in). */
+export function effectiveStepIndex(p: PlayerCharacter): number {
+  const q = liveMainQuest();
+  if (!q) return 0;
+  return nextApplicableIndex(q.steps, questStepIndex(p), p);
+}
+
 export function activeQuestStep(p: PlayerCharacter): MainQuestStep | null {
   const q = liveMainQuest();
   if (!q) return null;
-  return q.steps[questStepIndex(p)] ?? null;
+  return q.steps[effectiveStepIndex(p)] ?? null;
 }
 
 export function questIsComplete(p: PlayerCharacter): boolean {
   const q = liveMainQuest();
-  return !!q && questStepIndex(p) >= q.steps.length;
+  return !!q && effectiveStepIndex(p) >= q.steps.length;
 }
 
 /** The boss the active KILL step wants at this location, if any. */
@@ -60,9 +90,10 @@ export interface QuestAdvance {
 export function advanceQuest(p: PlayerCharacter): QuestAdvance | null {
   const q = liveMainQuest();
   if (!q) return null;
-  const i = questStepIndex(p);
-  if (i >= q.steps.length) return null;
-  const next = i + 1;
+  const cur = effectiveStepIndex(p);
+  if (cur >= q.steps.length) return null;
+  // Advance to the next step that APPLIES to this player's faction (skip gated ones).
+  const next = nextApplicableIndex(q.steps, cur + 1, p);
   const won = next >= q.steps.length;
   if (won) {
     return { nextStep: next, line: `★ MAIN QUEST COMPLETE — ${q.title ?? 'your quest'} is won. You are sent home.`, won: true };
@@ -70,12 +101,14 @@ export function advanceQuest(p: PlayerCharacter): QuestAdvance | null {
   return { nextStep: next, line: `★ Objective complete. Next: ${describeStep(q.steps[next]!)}`, won: false };
 }
 
-/** The quest items the player should be carrying by now (rewards from completed
- *  kill/collect steps) — used to gate a hand_in step. */
+/** The quest items the player should be carrying by now (rewards from completed,
+ *  APPLICABLE kill/collect steps) — used to gate a hand_in step. Rewards from steps
+ *  skipped for the player's faction are never required. */
 export function questItemsSoFar(p: PlayerCharacter): string[] {
   const q = liveMainQuest();
   if (!q) return [];
-  return q.steps.slice(0, questStepIndex(p))
+  return q.steps.slice(0, effectiveStepIndex(p))
+    .filter((s) => stepApplies(s, p))
     .map((s) => (s.reward ?? '').trim())
     .filter((r): r is string => r.length > 0);
 }

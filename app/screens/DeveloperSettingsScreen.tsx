@@ -1989,6 +1989,8 @@ function MainQuestBox() {
   const loadMainQuestJson = useContentPackStore((s) => s.loadMainQuestJson);
   const steps: MainQuestStep[] = customMainQuest?.steps ?? [];
   const locations = mainQuestLocations();
+  const factions = getFactions() as Array<{ id: string; name: string }>;
+  const [bSkip, setBSkip] = useState<string[]>([]);
   const [status, setStatus] = useState<Status>(null);
   const [qTitle, setQTitle] = useState(customMainQuest?.title ?? '');
   const [bAction, setBAction] = useState<string>(MAIN_QUEST_ACTIONS[0]?.id ?? 'kill');
@@ -2023,9 +2025,10 @@ function MainQuestBox() {
       locationId: bLoc,
       ...(bReward.trim() ? { reward: bReward.trim() } : {}),
       ...(isKill && bBoss ? { bossId: bBoss } : {}),
+      ...(bSkip.length > 0 ? { skipForFactions: bSkip } : {}),
     };
     save({ title: qTitle.trim() || undefined, steps: [...steps, step] }, `Step added: ${describeStep(step)}`);
-    setBTarget(''); setBReward(''); setBBoss('');
+    setBTarget(''); setBReward(''); setBBoss(''); setBSkip([]);
   };
 
   return (
@@ -2054,7 +2057,7 @@ function MainQuestBox() {
       {/* current steps */}
       {steps.map((s, i) => (
         <View key={s.id} style={styles.titleRowDev}>
-          <Text style={styles.hint}>{i + 1}. {describeStep(s)}</Text>
+          <Text style={styles.hint}>{i + 1}. {describeStep(s)}{(s.skipForFactions ?? []).length > 0 ? `  (skipped for: ${(s.skipForFactions ?? []).map((id) => factions.find((f) => f.id === id)?.name ?? id).join(', ')})` : ''}</Text>
           <TouchableOpacity onPress={() => save({ title: qTitle.trim() || undefined, steps: steps.filter((x) => x.id !== s.id) }, 'Step removed.')}>
             <Text style={styles.resetBtnText}> ✕</Text>
           </TouchableOpacity>
@@ -2104,6 +2107,21 @@ function MainQuestBox() {
         ))}
         {locations.length === 0 && <Text style={styles.hint}>Upload your Locations table first.</Text>}
       </View>
+      {factions.length > 0 && (
+        <>
+          <Text style={styles.hint}>Skip this step for (factions) — e.g. a German won't be sent to kill the German boss:</Text>
+          <View style={[styles.row, { flexWrap: 'wrap' }]}>
+            {factions.map((fac) => {
+              const on = bSkip.includes(fac.id);
+              return (
+                <TouchableOpacity key={fac.id} style={[styles.tmplBtn, on && styles.loadBtn, { marginBottom: 4 }]} onPress={() => setBSkip((p) => on ? p.filter((x) => x !== fac.id) : [...p, fac.id])}>
+                  <Text style={on ? styles.loadBtnText : styles.tmplBtnText}>{on ? '☑ ' : '☐ '}{fac.name}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </>
+      )}
       <View style={styles.row}>
         <TextInput
           style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]}

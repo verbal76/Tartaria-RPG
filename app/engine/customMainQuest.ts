@@ -25,6 +25,12 @@ export interface MainQuestStep {
   reward?: string;
   /** For kill steps — the boss id (from the BOSSES box) to spawn/require here. */
   bossId?: string;
+  /** engine_Dev — FACTION GATE. If the player's faction is in `skipForFactions`, the
+   *  step is skipped entirely (e.g. a German player isn't tasked with killing the
+   *  German boss — the quest jumps to the next applicable step). If `onlyForFactions`
+   *  is set, the step runs ONLY for those factions. Both optional; omit = everyone. */
+  skipForFactions?: string[];
+  onlyForFactions?: string[];
 }
 
 export interface MainQuestDef {
