@@ -753,6 +753,10 @@ export interface PlayerEquipped {
   armor?: string;
 }
 
+// engine_Dev — the 10 built-in literals stay for autocomplete; `(string & {})` lets
+// an author add their OWN damage types (e.g. "frost") via the damage-types override
+// without touching engine code. The resist/weak math is plain string comparison, so
+// a custom type flows through combat once declared on a weapon/enemy + a resistance.
 export type DamageType =
   | 'degradation'
   | 'bludgeoning'
@@ -763,7 +767,8 @@ export type DamageType =
   | 'poison'
   | 'radiation'
   | 'slashing'
-  | 'stun';
+  | 'stun'
+  | (string & {});
 
 export type StatusEffectKind =
   | 'bleed'

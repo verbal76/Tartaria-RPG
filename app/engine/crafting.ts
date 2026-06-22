@@ -856,13 +856,21 @@ const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> 
 
 export type DamageMatch = 'normal' | 'weak' | 'resist';
 
-/** Macro type-resistance for an enemy type (the `TYPE_RESISTANCE_MAP` row).
+/** engine_Dev — the active enemy-type → resist/weak map: an uploaded one (keyed by
+ *  the re-skin's own enemy types) REPLACES the built-in Tartaria map; else built-in. */
+function resolveTypeResistances(): Record<string, { resist: string[]; weak: string[] }> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getDamageResistancesOverride();
+  return ov ?? TYPE_RESISTANCE_MAP;
+}
+
+/** Macro type-resistance for an enemy type (a `resolveTypeResistances()` row).
  *  Returns the resisted + weak-to damage-type lists, or empty arrays when the
  *  type has no entry. Used by the EnemyPanel to surface defenses to the player. */
 export function enemyTypeDefenses(
   enemyType: string | null | undefined,
 ): { resist: string[]; weak: string[] } {
-  const map = enemyType ? TYPE_RESISTANCE_MAP[enemyType] : undefined;
+  const map = enemyType ? resolveTypeResistances()[enemyType] : undefined;
   return { resist: map?.resist ?? [], weak: map?.weak ?? [] };
 }
 
@@ -873,7 +881,7 @@ export function applyDamageTypeModifier(
   enemyType: string | null | undefined,
 ): { damage: number; match: DamageMatch } {
   if (!weaponDamageType || !enemyType) return { damage: rawDamage, match: 'normal' };
-  const map = TYPE_RESISTANCE_MAP[enemyType];
+  const map = resolveTypeResistances()[enemyType];
   if (!map) return { damage: rawDamage, match: 'normal' };
   const wt = weaponDamageType.toLowerCase();
   if (map.weak.includes(wt)) return { damage: Math.ceil(rawDamage * 1.5), match: 'weak' };

@@ -666,6 +666,8 @@ granular edits. Recommended order:
   - Collectables (character stories the player reassembles from loot fragments)
   - Summoned sidekicks (the buildable companion family — replaces "golems") +
     the dog companion on/off toggle
+  - Advanced rules: add damage types, set enemy resist/weak by type, extend the
+    fusion material tags, rename the weapon coatings
 
 ## 8 · Assets (not JSON — their own uploads)
   - World map image · Per-faction maps · Music (battle + ambient, multi-select)
@@ -761,6 +763,26 @@ export function buildGameBundleTemplate(): string {
     'dogEnabled',
     'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.',
     JSON.stringify(true),
+  ));
+  sections.push(bundleSection(
+    'damageTypes',
+    'Author-ADDED damage types beyond the built-in 10 (bludgeoning/slashing/piercing/burn/electrical/poison/radiation/stun/degradation/aetheric). Array of { name, keywords?: [..] }. keywords let the engine infer the type from a bare attack string (e.g. "frost" from "ice"/"freeze"). Declare a type on a weapon/enemy and give it resistances below.',
+    JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'] }], null, 2),
+  ));
+  sections.push(bundleSection(
+    'damageResistances',
+    'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Ghost Crew": { "resist": ["aetheric"], "weak": ["frost"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in Tartaria map.',
+    JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2),
+  ));
+  sections.push(bundleSection(
+    'fusionTags',
+    'EXTRA material tags that count toward the Crucible fusion diversity gate, on top of the built-in set (metal/cloth/wood/stone/bone/crystal/…). Array of tag words your items use, e.g. ["servo", "fold-core", "bakelite"].',
+    JSON.stringify(['servo', 'fold-core'], null, 2),
+  ));
+  sections.push(bundleSection(
+    'coatings',
+    'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Phase-rot".',
+    JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2),
   ));
   sections.push(bundleSection(
     'collectables',

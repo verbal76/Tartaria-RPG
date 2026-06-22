@@ -65,6 +65,25 @@ const MATERIAL_TAG_SET = new Set([
   'aether', 'crystal',
 ]);
 
+/** engine_Dev — the live fusion material-tag whitelist: the built-in set PLUS any
+ *  author-added tags (so a re-skin's own material tags count toward the diversity
+ *  gate). Resolved at call time so an upload after boot is honored. */
+function materialTagSet(): Set<string> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const extra = (require('./contentPack') as typeof import('./contentPack')).getFusionTagsOverride();
+  if (extra.length === 0) return MATERIAL_TAG_SET;
+  return new Set([...MATERIAL_TAG_SET, ...extra]);
+}
+
+/** engine_Dev — valid fused-weapon damage types: the built-in set plus any
+ *  author-added damage types, so the LLM may theme a fused weapon around a custom
+ *  type the re-skin defined. */
+function validDamageTypes(): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const extra = (require('./contentPack') as typeof import('./contentPack')).getExtraDamageTypes();
+  return [...VALID_DAMAGE_TYPES, ...extra.map((e) => e.name.toLowerCase())];
+}
+
 /** Result of gating a potential fusion. Used by the encounter / verb
  *  to decide whether to offer the crucible interaction. */
 export interface FusionGate {
@@ -134,12 +153,13 @@ export function gateFusion(
     };
   }
   const tagSet = new Set<string>();
+  const tagWhitelist = materialTagSet(); // built-in tags + any author-added tags
   const tagSources = hasCatalyst ? [...inputs, factionCatalyst] : inputs;
   for (const inp of tagSources) {
     if (!inp) continue;
     for (const t of inp.tags ?? []) {
       const k = t.toLowerCase();
-      if (MATERIAL_TAG_SET.has(k)) tagSet.add(k);
+      if (tagWhitelist.has(k)) tagSet.add(k);
     }
     // arb112 — ALSO re-derive material tags from the item's NAME. Inferred loot
     // (and inferred weapons like "Shrike Claw") often persist sparse tags — a vial
@@ -148,7 +168,7 @@ export function gateFusion(
     // blood/feather/moss/claw → organic) restores that diversity for items already
     // in old saves, with no migration.
     for (const t of inferGearTagPack(inp.name)) {
-      if (MATERIAL_TAG_SET.has(t)) tagSet.add(t);
+      if (tagWhitelist.has(t)) tagSet.add(t);
     }
   }
   const tagProfile = Array.from(tagSet);
@@ -346,7 +366,7 @@ export function validateFusionResponse(raw: RawFusionResponse): { name: string; 
     if (!(FUSION_CLAMPS.damageDieCounts as readonly number[]).includes(count)) return null;
     if (!(FUSION_CLAMPS.damageDieSides as readonly number[]).includes(sides)) return null;
     const damageType = typeof raw.damageType === 'string' ? raw.damageType.toLowerCase() : '';
-    if (!(VALID_DAMAGE_TYPES as readonly string[]).includes(damageType)) return null;
+    if (!validDamageTypes().includes(damageType)) return null;
     const scalesWith = typeof raw.scalesWith === 'string' ? raw.scalesWith.toLowerCase() : '';
     if (!(VALID_STATS as readonly string[]).includes(scalesWith)) return null;
     stats.damageDice = `${count}d${sides}`;

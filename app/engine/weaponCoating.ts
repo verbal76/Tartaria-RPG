@@ -67,21 +67,35 @@ export function coatedDisplayName(item: Pick<InventoryItem, 'name' | 'coating'>)
   return item.name;
 }
 
+// engine_Dev — built-in coating names + blurbs. The five MECHANICS stay wired into
+// combat (poison=DOT, acid=DOT+shred, corruption=DOT+stacks, electrical, burn); a
+// re-skin can RENAME them (label/blurb/loot label) via the coatings override so the
+// player reads "Brine" / "Phase-rot" instead of "Acid" / "Corruption".
+const BUILTIN_COATING_BLURB: Record<WeaponCoating['kind'], string> = {
+  poison: 'leaks poison into the wound (pure damage over time)',
+  acid: 'burns and eats the target\'s armor (damage over time + armor shred)',
+  corruption: 'pushes corruption into the target (damage over time + sickening stacks)',
+  electrical: 'arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)',
+  burn: 'sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)',
+};
+
+function coatingSkin(kind: WeaponCoating['kind']): { label?: string; blurb?: string; lootLabel?: string } {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getCoatingsOverride();
+  return ov?.[kind] ?? {};
+}
+
+/** The author-facing ADJECTIVE for a coating ("Poisoned" / "Brine-soaked"). Used
+ *  when stamping a coating so coatedDisplayName reads the re-skin's word. */
+export function coatingLabel(kind: WeaponCoating['kind']): string {
+  return coatingSkin(kind).label ?? LOOT_COATING_LABELS[kind];
+}
+
 /** Short combat/log description of what a coating does, keyed by
- *  kind. Used by the apply confirmation and the inventory detail. */
+ *  kind. Used by the apply confirmation and the inventory detail.
+ *  engine_Dev — an uploaded coatings override can replace the wording. */
 export function coatingBlurb(kind: WeaponCoating['kind']): string {
-  switch (kind) {
-    case 'poison':
-      return 'leaks poison into the wound (pure damage over time)';
-    case 'acid':
-      return 'burns and eats the target\'s armor (damage over time + armor shred)';
-    case 'corruption':
-      return 'pushes corruption into the target (damage over time + sickening stacks)';
-    case 'electrical':
-      return 'arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)';
-    case 'burn':
-      return 'sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)';
-  }
+  return coatingSkin(kind).blurb ?? BUILTIN_COATING_BLURB[kind];
 }
 
 // ─── OTA-362 — coating combat tuning + on-hit math ──────────────────
@@ -171,7 +185,10 @@ export function rollLootCoating(
   if (rng() >= (opts?.chance ?? LOOT_COATING_CHANCE)) return null;
   const kinds: WeaponCoating['kind'][] = ['poison', 'acid', 'corruption'];
   const kind = kinds[Math.min(kinds.length - 1, Math.floor(rng() * kinds.length))]!;
-  return { kind, dice: '1d4', label: LOOT_COATING_LABELS[kind] };
+  // engine_Dev — re-skin loot label (lootLabel) wins, else the renamed apply label,
+  // else the built-in.
+  const skin = coatingSkin(kind);
+  return { kind, dice: '1d4', label: skin.lootLabel ?? skin.label ?? LOOT_COATING_LABELS[kind] };
 }
 
 /** DOT damage-per-turn for a coating proc. Poison / acid tick the

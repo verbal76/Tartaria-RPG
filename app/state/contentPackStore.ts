@@ -26,6 +26,10 @@ import {
   setCollectablesOverride,
   setSummonsOverride,
   setDogEnabled,
+  setDamageTypesOverride,
+  setDamageResistancesOverride,
+  setFusionTagsOverride,
+  setCoatingsOverride,
   setCrucibleNameOverride,
   setCrucibleEnabled,
   setWorldNameOverride,
@@ -112,6 +116,14 @@ interface PersistShape {
   summons?: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off. Absent → on (the built-in default). */
   dogEnabled?: boolean;
+  /** Author-added damage types (extend the built-in 10). */
+  damageTypes?: unknown[];
+  /** Enemy-type → resist/weak map (replaces the built-in). */
+  damageResistances?: Record<string, unknown> | null;
+  /** Extra fusion material tags (extend the built-in whitelist). */
+  fusionTags?: string[];
+  /** Coating renames keyed by mechanic (replaces built-in names). */
+  coatings?: Record<string, unknown> | null;
   published?: boolean;
   /** Custom narrator name; '' / absent → the default "Narrator". */
   narratorName?: string;
@@ -157,6 +169,14 @@ interface ContentPackState {
   summons: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off (default true). */
   dogEnabled: boolean;
+  /** Author-added damage types (extend the built-in set). */
+  damageTypes: unknown[];
+  /** Enemy-type → resist/weak map, or null = built-in. */
+  damageResistances: Record<string, unknown> | null;
+  /** Extra fusion material tags. */
+  fusionTags: string[];
+  /** Coating renames keyed by mechanic, or null = built-in. */
+  coatings: Record<string, unknown> | null;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
    *  backdoor stays open for the author; reversible via unpublish(). */
   published: boolean;
@@ -241,6 +261,18 @@ interface ContentPackState {
   clearSummons: () => void;
   /** Toggle the rescuable dog companion on/off for this game. */
   setDogCompanionEnabled: (on: boolean) => void;
+  /** Load author-added damage types: array of { name, keywords? }. */
+  loadDamageTypesJson: (json: string) => LoadResult;
+  clearDamageTypes: () => void;
+  /** Load the enemy-type → { resist, weak } map. */
+  loadDamageResistancesJson: (json: string) => LoadResult;
+  clearDamageResistances: () => void;
+  /** Load extra fusion material tags (array of strings). */
+  loadFusionTagsJson: (json: string) => LoadResult;
+  clearFusionTags: () => void;
+  /** Load coating renames: map of mechanic → { label?, blurb?, lootLabel? }. */
+  loadCoatingsJson: (json: string) => LoadResult;
+  clearCoatings: () => void;
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
@@ -269,7 +301,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -285,6 +317,10 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     collectables: state.collectables.length > 0 ? state.collectables : undefined,
     summons: state.summons ?? undefined,
     dogEnabled: state.dogEnabled === false ? false : undefined,
+    damageTypes: state.damageTypes.length > 0 ? state.damageTypes : undefined,
+    damageResistances: state.damageResistances && Object.keys(state.damageResistances).length > 0 ? state.damageResistances : undefined,
+    fusionTags: state.fusionTags.length > 0 ? state.fusionTags : undefined,
+    coatings: state.coatings && Object.keys(state.coatings).length > 0 ? state.coatings : undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
     gameTitle: state.gameTitle || undefined,
@@ -313,6 +349,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   collectables: [],
   summons: null,
   dogEnabled: true,
+  damageTypes: [],
+  damageResistances: null,
+  fusionTags: [],
+  coatings: null,
   published: false,
   narratorName: '',
   gameTitle: '',
@@ -348,6 +388,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCollectablesOverride(s.collectables.length > 0 ? s.collectables : null);
     setSummonsOverride(s.summons ?? null);
     setDogEnabled(s.dogEnabled !== false);
+    setDamageTypesOverride(s.damageTypes.length > 0 ? (s.damageTypes as { name: string; keywords?: string[] }[]) : null);
+    setDamageResistancesOverride(s.damageResistances && Object.keys(s.damageResistances).length > 0 ? (s.damageResistances as Record<string, { resist: string[]; weak: string[] }>) : null);
+    setFusionTagsOverride(s.fusionTags.length > 0 ? s.fusionTags : null);
+    setCoatingsOverride(s.coatings && Object.keys(s.coatings).length > 0 ? (s.coatings as Parameters<typeof setCoatingsOverride>[0]) : null);
     invalidateLocationCaches();
     setNarratorNameOverride(s.narratorName || null);
     setGameTitleOverride(s.gameTitle || null);
@@ -814,6 +858,93 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), dogEnabled: on });
   },
 
+  loadDamageTypesJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); }
+    catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    let rows: unknown = parsed;
+    if (!Array.isArray(rows) && rows && typeof rows === 'object' && Array.isArray((rows as { types?: unknown[] }).types)) rows = (rows as { types: unknown[] }).types;
+    if (!Array.isArray(rows) || rows.length === 0) return { ok: false, error: 'Damage types must be a JSON ARRAY of { name, keywords? } (or { types: [...] }).' };
+    const bad = rows.find((r) => !r || typeof r !== 'object' || typeof (r as { name?: unknown }).name !== 'string' || !(r as { name: string }).name);
+    if (bad) return { ok: false, error: 'Every damage type needs a string "name". Optional "keywords": [..] for attack-string inference.' };
+    setDamageTypesOverride(rows as { name: string; keywords?: string[] }[]);
+    set({ damageTypes: rows, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), damageTypes: rows });
+    return { ok: true, count: rows.length };
+  },
+  clearDamageTypes() {
+    setDamageTypesOverride(null);
+    set({ damageTypes: [], contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), damageTypes: [] });
+  },
+
+  loadDamageResistancesJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); }
+    catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return { ok: false, error: 'Resistances must be a JSON OBJECT keyed by enemy type: { "Ghost Crew": { "resist": [..], "weak": [..] }, … }.' };
+    const map = parsed as Record<string, unknown>;
+    const keys = Object.keys(map);
+    if (keys.length === 0) return { ok: false, error: 'No enemy types found.' };
+    for (const k of keys) {
+      const v = map[k];
+      if (!v || typeof v !== 'object' || !Array.isArray((v as { resist?: unknown }).resist) || !Array.isArray((v as { weak?: unknown }).weak)) {
+        return { ok: false, error: `"${k}" must be { "resist": [..], "weak": [..] } (both arrays).` };
+      }
+    }
+    setDamageResistancesOverride(map as Record<string, { resist: string[]; weak: string[] }>);
+    set({ damageResistances: map, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), damageResistances: map });
+    return { ok: true, count: keys.length };
+  },
+  clearDamageResistances() {
+    setDamageResistancesOverride(null);
+    set({ damageResistances: null, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), damageResistances: null });
+  },
+
+  loadFusionTagsJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); }
+    catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    let rows: unknown = parsed;
+    if (!Array.isArray(rows) && rows && typeof rows === 'object' && Array.isArray((rows as { tags?: unknown[] }).tags)) rows = (rows as { tags: unknown[] }).tags;
+    if (!Array.isArray(rows) || rows.length === 0) return { ok: false, error: 'Fusion tags must be a JSON ARRAY of tag strings (or { tags: [...] }).' };
+    const tags = rows.map((t) => String(t).toLowerCase().trim()).filter((t) => t.length > 0);
+    if (tags.length === 0) return { ok: false, error: 'No usable tag strings.' };
+    setFusionTagsOverride(tags);
+    set({ fusionTags: tags, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), fusionTags: tags });
+    return { ok: true, count: tags.length };
+  },
+  clearFusionTags() {
+    setFusionTagsOverride(null);
+    set({ fusionTags: [], contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), fusionTags: [] });
+  },
+
+  loadCoatingsJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); }
+    catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return { ok: false, error: 'Coatings must be a JSON OBJECT keyed by mechanic: { "corruption": { "label": "Phase-rot" }, … }.' };
+    const map = parsed as Record<string, unknown>;
+    const allowed = ['poison', 'acid', 'corruption', 'electrical', 'burn'];
+    const keys = Object.keys(map);
+    const badKey = keys.find((k) => !allowed.includes(k));
+    if (badKey) return { ok: false, error: `"${badKey}" is not a coating mechanic. Keys must be one of: ${allowed.join(', ')}.` };
+    if (keys.length === 0) return { ok: false, error: 'No coatings found.' };
+    setCoatingsOverride(map as Parameters<typeof setCoatingsOverride>[0]);
+    set({ coatings: map, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), coatings: map });
+    return { ok: true, count: keys.length };
+  },
+  clearCoatings() {
+    setCoatingsOverride(null);
+    set({ coatings: null, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), coatings: null });
+  },
+
   loadGameBundle(json) {
     let parsed: unknown;
     try {
@@ -842,6 +973,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextCollectables: unknown[] = get().collectables;
     let nextSummons: { noun?: string; defs: unknown[] } | null = get().summons;
     let nextDogEnabled = get().dogEnabled;
+    let nextDamageTypes: unknown[] = get().damageTypes;
+    let nextDamageResistances: Record<string, unknown> | null = get().damageResistances;
+    let nextFusionTags: string[] = get().fusionTags;
+    let nextCoatings: Record<string, unknown> | null = get().coatings;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
     let nextTagline = get().gameTagline;
@@ -914,6 +1049,22 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'dogEnabled' || key === 'dogCompanion') {
         if (typeof value === 'boolean') { nextDogEnabled = value; applied.push(`dogEnabled (${value})`); }
         else skipped.push('dogEnabled (not a boolean)');
+      } else if (key === 'damageTypes') {
+        let arr: unknown = value;
+        if (!Array.isArray(arr) && arr && typeof arr === 'object' && Array.isArray((arr as { types?: unknown[] }).types)) arr = (arr as { types: unknown[] }).types;
+        if (Array.isArray(arr) && arr.length > 0) { nextDamageTypes = arr; applied.push(`damageTypes (${arr.length})`); }
+        else skipped.push('damageTypes (empty/not an array)');
+      } else if (key === 'damageResistances' || key === 'resistances') {
+        if (value && typeof value === 'object' && !Array.isArray(value)) { nextDamageResistances = value as Record<string, unknown>; applied.push('damageResistances'); }
+        else skipped.push('damageResistances (not an object)');
+      } else if (key === 'fusionTags') {
+        let arr: unknown = value;
+        if (!Array.isArray(arr) && arr && typeof arr === 'object' && Array.isArray((arr as { tags?: unknown[] }).tags)) arr = (arr as { tags: unknown[] }).tags;
+        if (Array.isArray(arr) && arr.length > 0) { nextFusionTags = arr.map((t) => String(t).toLowerCase()); applied.push(`fusionTags (${nextFusionTags.length})`); }
+        else skipped.push('fusionTags (empty/not an array)');
+      } else if (key === 'coatings') {
+        if (value && typeof value === 'object' && !Array.isArray(value)) { nextCoatings = value as Record<string, unknown>; applied.push('coatings'); }
+        else skipped.push('coatings (not an object)');
       } else if (tableIds.has(key)) {
         // Tolerate the wrapped shape { "weapons": [...] } nested under the key.
         let rows: unknown = value;
@@ -972,6 +1123,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCollectablesOverride(nextCollectables.length > 0 ? nextCollectables : null);
     setSummonsOverride(nextSummons ?? null);
     setDogEnabled(nextDogEnabled !== false);
+    setDamageTypesOverride(nextDamageTypes.length > 0 ? (nextDamageTypes as { name: string; keywords?: string[] }[]) : null);
+    setDamageResistancesOverride(nextDamageResistances && Object.keys(nextDamageResistances).length > 0 ? (nextDamageResistances as Record<string, { resist: string[]; weak: string[] }>) : null);
+    setFusionTagsOverride(nextFusionTags.length > 0 ? nextFusionTags : null);
+    setCoatingsOverride(nextCoatings && Object.keys(nextCoatings).length > 0 ? (nextCoatings as Parameters<typeof setCoatingsOverride>[0]) : null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
     setGameTaglineOverride(nextTagline || null);
@@ -994,6 +1149,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       collectables: nextCollectables,
       summons: nextSummons,
       dogEnabled: nextDogEnabled,
+      damageTypes: nextDamageTypes,
+      damageResistances: nextDamageResistances,
+      fusionTags: nextFusionTags,
+      coatings: nextCoatings,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
       gameTagline: nextTagline,
@@ -1003,7 +1162,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       corruptionName: nextCorruptionName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -1048,6 +1207,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.collectables.length > 0) out.collectables = s.collectables;
     if (s.summons && Array.isArray(s.summons.defs) && s.summons.defs.length > 0) out.summons = s.summons;
     if (s.dogEnabled === false) out.dogEnabled = false;
+    if (s.damageTypes.length > 0) out.damageTypes = s.damageTypes;
+    if (s.damageResistances && Object.keys(s.damageResistances).length > 0) out.damageResistances = s.damageResistances;
+    if (s.fusionTags.length > 0) out.fusionTags = s.fusionTags;
+    if (s.coatings && Object.keys(s.coatings).length > 0) out.coatings = s.coatings;
     return JSON.stringify(out, null, 2);
   },
 
@@ -1116,7 +1279,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1160,6 +1323,14 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setSummonsOverride(summons as { noun?: string; defs: never[] } | null);
         const dogEnabled = shape.dogEnabled !== false;
         setDogEnabled(dogEnabled);
+        const damageTypes = Array.isArray(shape.damageTypes) ? shape.damageTypes : [];
+        setDamageTypesOverride(damageTypes.length > 0 ? (damageTypes as { name: string; keywords?: string[] }[]) : null);
+        const damageResistances = shape.damageResistances && typeof shape.damageResistances === 'object' ? (shape.damageResistances as Record<string, { resist: string[]; weak: string[] }>) : null;
+        setDamageResistancesOverride(damageResistances && Object.keys(damageResistances).length > 0 ? damageResistances : null);
+        const fusionTags = Array.isArray(shape.fusionTags) ? (shape.fusionTags as string[]) : [];
+        setFusionTagsOverride(fusionTags.length > 0 ? fusionTags : null);
+        const coatings = shape.coatings && typeof shape.coatings === 'object' ? (shape.coatings as Record<string, unknown>) : null;
+        setCoatingsOverride(coatings && Object.keys(coatings).length > 0 ? (coatings as Parameters<typeof setCoatingsOverride>[0]) : null);
         const published = shape.published === true;
         setPublishedFlag(published);
         const narratorName = typeof shape.narratorName === 'string' ? shape.narratorName : '';
@@ -1179,7 +1350,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

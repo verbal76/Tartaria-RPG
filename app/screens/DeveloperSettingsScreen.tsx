@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../state/gameStore';
-import { useContentPackStore } from '../state/contentPackStore';
+import { useContentPackStore, type LoadResult } from '../state/contentPackStore';
 import {
   CONTENT_TABLES,
   LORE_BLOCKS,
@@ -1489,6 +1489,143 @@ function SummonsBox() {
   );
 }
 
+// engine_Dev — generic JSON-rules uploader for the advanced combat/crafting tables
+// (damage types, enemy resistances, fusion tags, coatings). Same LOAD / TEMPLATE /
+// SAVE FILE / UPLOAD FILE / RESET contract as the other boxes, parameterised by the
+// store loader/clearer so each rule set is one short declaration below.
+function RulesBox({ title, hint, badge, hasData, currentJson, template, filename, onLoad, onClear }: {
+  title: string;
+  hint: React.ReactNode;
+  badge: string | null;
+  hasData: boolean;
+  currentJson: () => string;
+  template: string;
+  filename: string;
+  onLoad: (json: string) => LoadResult;
+  onClear: () => void;
+}) {
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  const editOrTemplate = () => (hasData ? currentJson() : template);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={hasData ? styles.badgeOn : styles.badgeOff}>{hasData ? (badge ?? '● override') : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste JSON here…"
+        placeholderTextColor="#5c5446"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => {
+          const r = onLoad(text);
+          setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} entr${r.count === 1 ? 'y' : 'ies'}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+          if (r.ok) setText('');
+        }}>
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => {
+          setText(editOrTemplate());
+          setStatus({ kind: 'ok', msg: hasData ? 'Loaded your current entries — edit, then LOAD.' : 'Loaded the template — edit, then LOAD.' });
+        }}>
+          <Text style={styles.tmplBtnText}>{hasData ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={async () => {
+          const content = text.trim().length > 0 ? text : editOrTemplate();
+          const r = await saveJsonToFile(filename, content);
+          setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+        }}>
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.loadBtn} onPress={async () => {
+          const r = await pickJsonFile();
+          if (r.canceled) return;
+          if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+          const res = onLoad(r.content);
+          setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} entr${res.count === 1 ? 'y' : 'ies'} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+        }}>
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {hasData && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { onClear(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+const DAMAGE_TYPES_TEMPLATE = JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'] }], null, 2);
+const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2);
+const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
+const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2);
+
+function AdvancedRulesBoxes() {
+  const damageTypes = useContentPackStore((s) => s.damageTypes);
+  const damageResistances = useContentPackStore((s) => s.damageResistances);
+  const fusionTags = useContentPackStore((s) => s.fusionTags);
+  const coatings = useContentPackStore((s) => s.coatings);
+  const store = useContentPackStore;
+  return (
+    <>
+      <RulesBox
+        title="Damage types (extra)"
+        badge={`● ${damageTypes.length} added`}
+        hasData={damageTypes.length > 0}
+        filename="damage-types.json"
+        currentJson={() => JSON.stringify(damageTypes, null, 2)}
+        template={DAMAGE_TYPES_TEMPLATE}
+        onLoad={(j) => store.getState().loadDamageTypesJson(j)}
+        onClear={() => store.getState().clearDamageTypes()}
+        hint={<>Add damage types beyond the built-in 10 (e.g. <Text style={{ fontWeight: 'bold' }}>frost</Text>, sonic). Array of {'{ name, keywords? }'}; keywords let the engine infer the type from a bare attack string. Then give enemies resistances to it below.</>}
+      />
+      <RulesBox
+        title="Enemy resistances"
+        badge={`● ${damageResistances ? Object.keys(damageResistances).length : 0} types`}
+        hasData={!!damageResistances && Object.keys(damageResistances).length > 0}
+        filename="enemy-resistances.json"
+        currentJson={() => JSON.stringify(damageResistances ?? {}, null, 2)}
+        template={RESISTANCES_TEMPLATE}
+        onLoad={(j) => store.getState().loadDamageResistancesJson(j)}
+        onClear={() => store.getState().clearDamageResistances()}
+        hint={<>Which damage types each <Text style={{ fontWeight: 'bold' }}>enemy type</Text> resists (½ damage) or is weak to (1.5×). Object keyed by YOUR enemy types. Replaces the built-in Tartaria map.</>}
+      />
+      <RulesBox
+        title="Fusion material tags (extra)"
+        badge={`● ${fusionTags.length} added`}
+        hasData={fusionTags.length > 0}
+        filename="fusion-tags.json"
+        currentJson={() => JSON.stringify(fusionTags, null, 2)}
+        template={FUSION_TAGS_TEMPLATE}
+        onLoad={(j) => store.getState().loadFusionTagsJson(j)}
+        onClear={() => store.getState().clearFusionTags()}
+        hint={<>Extra material tag words that count toward the Crucible’s fusion-diversity gate, on top of the built-ins (metal/cloth/wood/stone/bone/crystal/…). Array of strings.</>}
+      />
+      <RulesBox
+        title="Weapon coatings (rename)"
+        badge={`● ${coatings ? Object.keys(coatings).length : 0} renamed`}
+        hasData={!!coatings && Object.keys(coatings).length > 0}
+        filename="coatings.json"
+        currentJson={() => JSON.stringify(coatings ?? {}, null, 2)}
+        template={COATINGS_TEMPLATE}
+        onLoad={(j) => store.getState().loadCoatingsJson(j)}
+        onClear={() => store.getState().clearCoatings()}
+        hint={<>Rename the five coating mechanics (the combat effects stay). Object keyed by mechanic — <Text style={{ fontWeight: 'bold' }}>poison / acid / corruption / electrical / burn</Text> — each {'{ label?, blurb?, lootLabel? }'}.</>}
+      />
+    </>
+  );
+}
+
 // engine_Dev — BOSSES builder. Named, faction-affiliated bosses with stats, loot,
 // a quest item, and spawn rules — referenced by main-quest "kill" steps.
 function BossesBox() {
@@ -2078,6 +2215,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>SUMMONED SIDEKICKS</Text>
       <SummonsBox />
+
+      <Text style={styles.sectionLabel}>ADVANCED COMBAT &amp; CRAFTING RULES</Text>
+      <AdvancedRulesBoxes />
 
       <Text style={styles.sectionLabel}>MUSIC</Text>
       <MusicBox

@@ -509,6 +509,59 @@ let dogEnabled = true;
 export function setDogEnabled(on: boolean): void { dogEnabled = on !== false; }
 export function isDogEnabled(): boolean { return dogEnabled; }
 
+// --- damage types (EXTRA, author-added) ----------------------------------------
+// engine_Dev — the engine ships 10 built-in damage types (bludgeoning, slashing,
+// piercing, burn, electrical, poison, radiation, stun, degradation, aetheric). An
+// author can ADD their own (e.g. "frost", "sonic") here; each extra type carries
+// optional keyword aliases so the engine can infer it from a bare attack string.
+// Extends (never removes) the built-ins. Read via damageTypes.ts.
+export interface ExtraDamageType { name: string; keywords?: string[] }
+let damageTypesOverride: ExtraDamageType[] | null = null;
+export function setDamageTypesOverride(rows: readonly ExtraDamageType[] | null): void {
+  damageTypesOverride = rows && rows.length > 0 ? (rows as ExtraDamageType[]) : null;
+}
+export function hasDamageTypesOverride(): boolean { return damageTypesOverride != null; }
+export function getExtraDamageTypes(): ExtraDamageType[] { return damageTypesOverride ?? []; }
+
+// --- enemy type resistances (REPLACES the built-in map) ------------------------
+// engine_Dev — which damage types each ENEMY TYPE resists / is weak to. Built-in
+// keys are Tartaria enemy types (Mud Creature, Automation, …) — meaningless for a
+// re-skin, whose enemies have their own type strings. Upload a map keyed by YOUR
+// enemy types; null = built-in. Read via crafting.ts resolveTypeResistances().
+export type ResistanceMap = Record<string, { resist: string[]; weak: string[] }>;
+let damageResistancesOverride: ResistanceMap | null = null;
+export function setDamageResistancesOverride(map: ResistanceMap | null): void {
+  damageResistancesOverride = map && Object.keys(map).length > 0 ? map : null;
+}
+export function hasDamageResistancesOverride(): boolean { return damageResistancesOverride != null; }
+export function getDamageResistancesOverride(): ResistanceMap | null { return damageResistancesOverride; }
+
+// --- fusion material tags (EXTENDS the built-in whitelist) ----------------------
+// engine_Dev — the Crucible needs inputs spanning ≥3 DIFFERENT material tags. The
+// built-in whitelist is Tartaria-flavored (metal/aether/mudstone/…). An author adds
+// their own tag words so their items' tags count toward fusion diversity. Extends
+// the built-in set. Read via itemFusion.ts.
+let fusionTagsOverride: string[] | null = null;
+export function setFusionTagsOverride(tags: readonly string[] | null): void {
+  fusionTagsOverride = tags && tags.length > 0 ? tags.map((t) => String(t).toLowerCase()) : null;
+}
+export function hasFusionTagsOverride(): boolean { return fusionTagsOverride != null; }
+export function getFusionTagsOverride(): string[] { return fusionTagsOverride ?? []; }
+
+// --- weapon coatings (RENAME the built-in five) --------------------------------
+// engine_Dev — the five coating MECHANICS (poison=DOT, acid=DOT+armor-shred,
+// corruption=DOT+stacks, electrical, burn) stay wired into combat; this override
+// only RENAMES them (label/blurb/loot label) so a re-skin reads "Brine" / "Phase-
+// rot" instead of "Acid" / "Corruption". Keyed by mechanic; null = built-in names.
+export interface CoatingSkin { label?: string; blurb?: string; lootLabel?: string }
+export type CoatingSkinMap = Partial<Record<'poison' | 'acid' | 'corruption' | 'electrical' | 'burn', CoatingSkin>>;
+let coatingsOverride: CoatingSkinMap | null = null;
+export function setCoatingsOverride(map: CoatingSkinMap | null): void {
+  coatingsOverride = map && Object.keys(map).length > 0 ? map : null;
+}
+export function hasCoatingsOverride(): boolean { return coatingsOverride != null; }
+export function getCoatingsOverride(): CoatingSkinMap | null { return coatingsOverride; }
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -673,6 +726,10 @@ export function clearAllOverrides(): void {
   collectablesOverride = null;
   summonsOverride = null;
   dogEnabled = true;
+  damageTypesOverride = null;
+  damageResistancesOverride = null;
+  fusionTagsOverride = null;
+  coatingsOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------
