@@ -1032,13 +1032,104 @@ function InteractionTagsBox() {
   );
 }
 
-// engine_Dev — STARTING AREAS upload. Per-faction 4-room instances + placement.
+// engine_Dev — STARTING AREAS. A form builder (pick faction → name it → drop it on
+// the map → add 3-5 rooms, flag one as the Mission Board) PLUS the raw-JSON box for
+// power users / file ops. The structure is always a small walkable instance; the
+// form auto-generates room ids and wires a linear corridor of exits (the entry room
+// gets the "world" door out to the map).
 function StartingAreasBox() {
   const loadStartingAreasJson = useContentPackStore((s) => s.loadStartingAreasJson);
-  const startingAreas = useContentPackStore((s) => s.startingAreas);
+  const startingAreas = useContentPackStore((s) => s.startingAreas) as Array<{ factionId: string; name: string; locationId: string; rooms: unknown[] }>;
   const loaded = startingAreas.length;
+  const factions = getFactions() as Array<{ id: string; name: string }>;
+  const locations = mainQuestLocations();
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
+
+  // ── form state ─────────────────────────────────────────────────────────────
+  const [f, setF] = useState({ factionId: '', name: '', locationId: '', x: '', y: '', returnable: true });
+  const up = (k: keyof typeof f, v: string | boolean) => setF((p) => ({ ...p, [k]: v }));
+  const [rooms, setRooms] = useState<Array<{ name: string; missionBoard: boolean }>>([]);
+  const [roomName, setRoomName] = useState('');
+
+  const slug = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+  const addRoom = () => {
+    const nm = roomName.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Type a room name first.' }); return; }
+    if (rooms.length >= 5) { setStatus({ kind: 'err', msg: 'A starter area holds at most 5 rooms.' }); return; }
+    setRooms((p) => [...p, { name: nm, missionBoard: p.length === 0 }]); // first room defaults to the board
+    setRoomName('');
+  };
+  const removeRoom = (i: number) => setRooms((p) => p.filter((_, j) => j !== i));
+  // Exactly one board room: checking one clears the others.
+  const toggleBoard = (i: number) => setRooms((p) => p.map((rm, j) => ({ ...rm, missionBoard: j === i ? !rm.missionBoard : false })));
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+
+  const saveArea = () => {
+    if (!f.factionId) { setStatus({ kind: 'err', msg: 'Pick which faction this area belongs to.' }); return; }
+    if (!f.name.trim()) { setStatus({ kind: 'err', msg: 'Give the area a name.' }); return; }
+    if (!f.locationId) { setStatus({ kind: 'err', msg: 'Pick where on the map it sits.' }); return; }
+    if (rooms.length < 3) { setStatus({ kind: 'err', msg: 'Add at least 3 rooms.' }); return; }
+    // Unique room ids from names.
+    const ids: string[] = [];
+    rooms.forEach((rm) => {
+      const base = slug(rm.name) || `room_${ids.length + 1}`;
+      let id = base; let n = 2;
+      while (ids.includes(id)) id = `${base}_${n++}`;
+      ids.push(id);
+    });
+    // Linear corridor: each room links to its neighbours; the entry (room 0) gets the
+    // "world" door out to the map. Every room ends up with at least one exit.
+    const last = rooms.length - 1;
+    const roomDefs = rooms.map((rm, i) => {
+      const exits: { north?: string | null; south?: string | null; east?: string | null; west?: string | null } = {};
+      if (i > 0) exits.west = ids[i - 1];
+      if (i < last) exits.east = ids[i + 1];
+      if (i === 0) exits.north = 'world';
+      return {
+        id: ids[i],
+        name: rm.name.trim(),
+        shortName: rm.name.trim(),
+        description: `${rm.name.trim()} — part of ${f.name.trim()}.`,
+        exits,
+        anchorNpc: null,
+        ...(rm.missionBoard ? { missionBoard: true } : {}),
+      };
+    });
+    const area = {
+      factionId: f.factionId,
+      name: f.name.trim(),
+      locationId: f.locationId,
+      ...(Number.isFinite(Number(f.x)) && f.x !== '' && Number.isFinite(Number(f.y)) && f.y !== ''
+        ? { coords: { x: Number(f.x), y: Number(f.y) } } : {}),
+      returnable: f.returnable,
+      rooms: roomDefs,
+    };
+    // Replace any existing area for this faction, keep the rest, reload the whole list.
+    const merged = [...startingAreas.filter((a) => a.factionId !== f.factionId), area];
+    const r = loadStartingAreasJson(JSON.stringify(merged));
+    if (!r.ok) { setStatus({ kind: 'err', msg: r.error ?? 'Failed to save.' }); return; }
+    setStatus({ kind: 'ok', msg: `Saved ${area.name} (${rooms.length} rooms) for ${factions.find((x) => x.id === f.factionId)?.name ?? f.factionId}.` });
+    setF((p) => ({ ...p, name: '', x: '', y: '' }));
+    setRooms([]);
+    setRoomName('');
+  };
+
+  const boardRoomName = rooms.find((rm) => rm.missionBoard)?.name;
+
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
@@ -1048,16 +1139,56 @@ function StartingAreasBox() {
         </Text>
       </View>
       <Text style={styles.hint}>
-        Per-faction starting areas — a SEPARATE list, one small instance per faction. Each:{' '}
-        <Text style={{ fontWeight: 'bold' }}>factionId</Text>,{' '}
-        <Text style={{ fontWeight: 'bold' }}>name</Text>,{' '}
-        <Text style={{ fontWeight: 'bold' }}>locationId</Text> (WHERE on the map to place it), and{' '}
-        <Text style={{ fontWeight: 'bold' }}>rooms</Text> (a tiny graph — each exit points to another
-        room’s id, null, or <Text style={{ fontWeight: 'bold' }}>"world"</Text> to leave to the map;
-        the first room is the entry). A member of that faction spawns inside it and walks room-to-room;
-        a "world" exit steps back out onto the map. Whispers can plant in a room by naming its room id.
-        Hit TEMPLATE for a 4-room example, then SAVE/UPLOAD FILE if it gets long.
+        Build a faction’s starter complex: pick the faction, name it, drop it on a map tile, then add
+        3–5 rooms and tick which one holds the <Text style={{ fontWeight: 'bold' }}>Mission Board</Text>.
+        Exits and room ids are generated for you (the first room is the entry and gets the door out to
+        the map). “Returnable” off = a one-way prologue that vanishes once you leave (its missions then
+        turn in remotely). The raw-JSON box below still works for power edits / files.
       </Text>
+
+      {/* existing areas */}
+      {startingAreas.map((a) => (
+        <View key={a.factionId} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{a.name}</Text> — {factions.find((x) => x.id === a.factionId)?.name ?? a.factionId} · {Array.isArray(a.rooms) ? a.rooms.length : 0} rooms</Text>
+          <TouchableOpacity onPress={() => { const next = startingAreas.filter((x) => x.factionId !== a.factionId); const r = loadStartingAreasJson(JSON.stringify(next)); setStatus(r.ok || next.length === 0 ? { kind: 'ok', msg: `Removed ${a.name}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (next.length === 0) useContentPackStore.getState().clearStartingAreas(); }}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {/* ── form ── */}
+      {factions.length > 0
+        ? chipRow('Faction:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))
+        : <Text style={styles.err}>Load a Factions table first — areas attach to a faction.</Text>}
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Area name (e.g. Drydock 4 Command)" placeholderTextColor="#5c5446" />
+      {locations.length > 0 && chipRow('Place it at:', locations, f.locationId, (id) => up('locationId', id === f.locationId ? '' : id))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.x} onChangeText={(v) => up('x', v)} placeholder="grid X" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.y} onChangeText={(v) => up('y', v)} placeholder="grid Y" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TouchableOpacity style={[styles.tmplBtn, f.returnable && styles.loadBtn]} onPress={() => up('returnable', !f.returnable)}>
+          <Text style={f.returnable ? styles.loadBtnText : styles.tmplBtnText}>{f.returnable ? '☑' : '☐'} Returnable</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>Rooms ({rooms.length}/5){boardRoomName ? ` · ⚑ board in ${boardRoomName}` : ' · no board room ticked'}:</Text>
+      {rooms.map((rm, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>{i + 1}. <Text style={{ fontWeight: 'bold' }}>{rm.name}</Text>{i === 0 ? ' (entry)' : ''}</Text>
+          <TouchableOpacity style={[styles.tmplBtn, rm.missionBoard && styles.loadBtn, { marginLeft: 6 }]} onPress={() => toggleBoard(i)}>
+            <Text style={rm.missionBoard ? styles.loadBtnText : styles.tmplBtnText}>{rm.missionBoard ? '☑ board' : '☐ board'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => removeRoom(i)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={roomName} onChangeText={setRoomName} placeholder="Room name → add" placeholderTextColor="#5c5446" onSubmitEditing={addRoom} />
+        <TouchableOpacity style={styles.tmplBtn} onPress={addRoom}><Text style={styles.tmplBtnText}>+ ADD ROOM</Text></TouchableOpacity>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={saveArea}><Text style={styles.loadBtnText}>+ SAVE AREA</Text></TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>Or edit raw JSON (template / file ops):</Text>
       <TextInput
         style={styles.input}
         value={text}
