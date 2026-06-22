@@ -1716,6 +1716,7 @@ function DamageTypesBuilder() {
 const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2);
 const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
 const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2);
+const INVENTORY_TEMPLATE = JSON.stringify({ labels: { loot: 'Salvage', material: 'Components', weapon: 'Arsenal' }, toolTags: ['multitool', 'spanner'] }, null, 2);
 
 const BUILTIN_DAMAGE_TYPES = ['bludgeoning', 'slashing', 'piercing', 'burn', 'electrical', 'poison', 'radiation', 'stun', 'degradation', 'aetheric'];
 
@@ -1821,6 +1822,7 @@ function AdvancedRulesBoxes() {
   const damageResistances = useContentPackStore((s) => s.damageResistances);
   const fusionTags = useContentPackStore((s) => s.fusionTags);
   const coatings = useContentPackStore((s) => s.coatings);
+  const inventory = useContentPackStore((s) => s.inventory);
   const store = useContentPackStore;
   return (
     <>
@@ -1858,6 +1860,17 @@ function AdvancedRulesBoxes() {
         onLoad={(j) => store.getState().loadCoatingsJson(j)}
         onClear={() => store.getState().clearCoatings()}
         hint={<>Rename the five coating mechanics (the combat effects stay). Object keyed by mechanic — <Text style={{ fontWeight: 'bold' }}>poison / acid / corruption / electrical / burn</Text> — each {'{ label?, blurb?, lootLabel? }'}.</>}
+      />
+      <RulesBox
+        title="Inventory (labels + tool tags)"
+        badge={`● ${inventory ? ((inventory.labels ? Object.keys(inventory.labels).length : 0) + (inventory.toolTags ? inventory.toolTags.length : 0)) : 0}`}
+        hasData={!!inventory && !!((inventory.labels && Object.keys(inventory.labels).length > 0) || (inventory.toolTags && inventory.toolTags.length > 0))}
+        filename="inventory.json"
+        currentJson={() => JSON.stringify(inventory ?? {}, null, 2)}
+        template={INVENTORY_TEMPLATE}
+        onLoad={(j) => store.getState().loadInventoryJson(j)}
+        onClear={() => store.getState().clearInventory()}
+        hint={<>Rename the inventory category sections (<Text style={{ fontWeight: 'bold' }}>labels</Text>: weapon/armor/accessory/consumable/tool/relic/material/loot/quest → your names) and add <Text style={{ fontWeight: 'bold' }}>toolTags</Text> that read as Tools. Category ids + order stay fixed.</>}
       />
     </>
   );

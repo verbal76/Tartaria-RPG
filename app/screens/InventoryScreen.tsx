@@ -4,7 +4,7 @@ import { useGameStore } from '../state/gameStore';
 import { getCrucibleName } from '../engine/contentPack';
 import {
   CATEGORY_COLORS,
-  CATEGORY_LABEL,
+  getCategoryLabel,
   CATEGORY_ORDER,
   groupInventoryByCategory,
 } from '../components/InventoryCategorize';
@@ -937,7 +937,7 @@ export function InventoryScreen() {
                     {collapsed ? '▾' : '▴'}
                   </Text>
                   <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>
-                    {CATEGORY_LABEL[cat].toUpperCase()}
+                    {getCategoryLabel(cat).toUpperCase()}
                   </Text>
                 </View>
                 <Text style={styles.sectionCount}>
@@ -979,7 +979,7 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => (
           <View key={cat} style={styles.legendItem}>
             <View style={[styles.legendSwatch, { backgroundColor: CATEGORY_COLORS[cat] }]} />
-            <Text style={[styles.legendText, { color: legendTextColor }]}>{CATEGORY_LABEL[cat]}</Text>
+            <Text style={[styles.legendText, { color: legendTextColor }]}>{getCategoryLabel(cat)}</Text>
           </View>
         ))}
       </View>

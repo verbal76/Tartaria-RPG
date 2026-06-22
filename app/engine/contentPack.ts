@@ -604,6 +604,29 @@ export function setCoatingsOverride(map: CoatingSkinMap | null): void {
 export function hasCoatingsOverride(): boolean { return coatingsOverride != null; }
 export function getCoatingsOverride(): CoatingSkinMap | null { return coatingsOverride; }
 
+// --- inventory presentation (category labels + tool tags) ----------------------
+// engine_Dev — RENAME the inventory category sections (Weapons -> Arsenal, Loot ->
+// Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
+// category IDS and order stay engine-fixed (they map to item kinds); only the
+// player-facing labels + the tool-tag membership are data-driven. null = built-in.
+export interface InventoryOverride { labels?: Record<string, string>; toolTags?: string[] }
+let inventoryOverride: InventoryOverride | null = null;
+export function setInventoryOverride(o: InventoryOverride | null): void {
+  inventoryOverride = o && ((o.labels && Object.keys(o.labels).length > 0) || (o.toolTags && o.toolTags.length > 0)) ? o : null;
+}
+export function hasInventoryOverride(): boolean { return inventoryOverride != null; }
+export function getInventoryOverride(): InventoryOverride | null { return inventoryOverride; }
+/** The display label for an inventory category — the author's rename if set, else
+ *  the built-in default. */
+export function getInventoryLabel(categoryId: string, dflt: string): string {
+  const l = inventoryOverride?.labels?.[categoryId];
+  return typeof l === 'string' && l.trim() ? l : dflt;
+}
+/** Author-added tool tags (lowercased), extending the built-in tool-tag list. */
+export function getExtraToolTags(): string[] {
+  return (inventoryOverride?.toolTags ?? []).map((t) => String(t).toLowerCase());
+}
+
 // --- whispers override ----------------------------------------------------------
 // engine_Dev — WHISPERS (overheard NPC tips that plant a lead) are uploaded as an
 // ARRAY of chain definitions. An authored chain plants at a hub room, points to a
@@ -772,6 +795,7 @@ export function clearAllOverrides(): void {
   damageResistancesOverride = null;
   fusionTagsOverride = null;
   coatingsOverride = null;
+  inventoryOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------
