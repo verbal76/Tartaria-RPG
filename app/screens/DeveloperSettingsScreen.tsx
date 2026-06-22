@@ -494,12 +494,12 @@ function GameBundleBox() {
         comments are allowed. <Text style={{ fontWeight: 'bold' }}>RESET</Text> wipes all uploaded
         content back to the built-in defaults if you need a clean slate.
       </Text>
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.copyBtn} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
+      <View style={styles.stackCol}>
+        <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
           <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.loadBtn}
+          style={[styles.loadBtn, styles.stackBtn]}
           onPress={() => { setConfirmReset(false); void (async () => {
             const picked = await pickJsonFile();
             if (picked.canceled) { setStatus({ kind: 'err', msg: 'Upload cancelled — no file chosen.' }); return; }
@@ -511,7 +511,7 @@ function GameBundleBox() {
           <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.resetBtn}
+          style={[styles.resetBtn, styles.stackBtn]}
           onPress={() => {
             if (!confirmReset) { setConfirmReset(true); setStatus({ kind: 'err', msg: 'Tap RESET again to wipe ALL uploaded content back to the built-in defaults.' }); return; }
             useContentPackStore.getState().clearAll();
@@ -2344,6 +2344,10 @@ const styles = StyleSheet.create({
     padding: 8, marginTop: 6, minHeight: 70, maxHeight: 160, fontSize: 11, fontFamily: 'monospace', textAlignVertical: 'top',
   },
   row: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  // engine_Dev — full-width stacked buttons (the whole-game actions are too wide to
+  // sit side by side). Column container + centered, stretched buttons.
+  stackCol: { flexDirection: 'column', gap: 8, marginTop: 8 },
+  stackBtn: { alignItems: 'center', alignSelf: 'stretch' },
   loadBtn: { backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 18 },
   loadBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   tmplBtn: { backgroundColor: '#1a1714', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
