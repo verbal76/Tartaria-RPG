@@ -110,10 +110,20 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     ['summons', () => buildSummonsTemplate()],
     ['powers', () => getTableTemplate('powers', undefined, false)],
     ['world lore', () => getLoreTemplate('world')],
+    ['flavor', () => getLoreTemplate('flavor')],
+    ['faction lore', () => getLoreTemplate('faction')],
+    ['race lore', () => getLoreTemplate('race')],
   ];
   test.each(genericSpecials)('special template is generic (no Tartaria nouns): %s', (_name, build) => {
     const hit = build().match(TARTARIA_NOUNS);
     expect(hit ? `leaks "${hit[0]}"` : 'clean').toBe('clean');
+  });
+
+  // With Phase 1-3 done, the ENTIRE whole-game file must read generic — no setting
+  // proper nouns anywhere an author might leave a section at its template default.
+  test('whole-game template is free of Tartaria nouns', () => {
+    const hit = buildGameBundleTemplate().match(TARTARIA_NOUNS);
+    expect(hit ? `whole-game leaks "${hit[0]}"` : 'clean').toBe('clean');
   });
 
   test('whole-game bundle includes every loader-supported section key', () => {

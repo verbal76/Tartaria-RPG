@@ -1472,12 +1472,134 @@ export const BUILTIN_FLAVOR_POOLS = {
   directionalFinds: DIRECTIONAL_FINDS,
 } as const;
 
+// engine_Dev — GENERIC, setting-neutral flavor for the TEMPLATE only. Same keys +
+// shapes as BUILTIN_FLAVOR_POOLS (which stays the live default), so the author sees
+// every pool to edit — but the example lines name no setting. Narrator name stays
+// dynamic via getNarratorName(). Record pools (mood/intent keyed by functional ids;
+// race/faction keyed by YOUR ids → REPLACE placeholders) show a couple of examples.
+function genericFlavorPools(): Record<string, unknown> {
+  const N = () => getNarratorName();
+  return {
+    opening: [
+      `The road gives out and the country opens up ahead. "Walk like you mean to leave," the ${N()} says.`,
+      `You crest the rise. "Somewhere out here is what you came for," the ${N()} says. "And plenty you didn't."`,
+    ],
+    hubOpening: [
+      `The gate closes behind you. For a moment, no one out here is trying to kill you.`,
+      `"Rest while you can," the ${N()} says. "The walls only hold so long as someone watches them."`,
+    ],
+    moodRemarks: {
+      FEAR: [
+        `"Whatever watches has not yet decided," the ${N()} says, very quietly.`,
+        `The ${N()} does not turn their head. "It knows you are here. Move as if it does."`,
+      ],
+      CURIOSITY: [
+        `"You want to know what that is," the ${N()} says. "So do I. Carefully."`,
+        `The ${N()} tilts their head. "Some doors are worth the risk of opening. Some aren't. Guess which."`,
+      ],
+    },
+    intentRemarks: {
+      attack: [
+        `"Commit or don't," the ${N()} says. "Half a swing gets you killed."`,
+        `The ${N()} watches your grip. "Make the first one count."`,
+      ],
+      stealth: [
+        `"Slow is smooth," the ${N()} breathes. "Smooth is alive."`,
+        `The ${N()} goes still. "Let it look the other way first."`,
+      ],
+    },
+    lookLines: [
+      `The ${N()} follows your gaze. "Look longer. The land tells on itself if you let it."`,
+      `"Nothing here is only what it looks like," the ${N()} says.`,
+    ],
+    notedLines: [
+      `The ${N()} marks it without a word. You'll want to remember this spot.`,
+      `"Worth noting," the ${N()} says. "Things out here move when your back is turned."`,
+    ],
+    genericRemarks: [
+      `"This country was a place of life once," the ${N()} says. "Now mostly whispers."`,
+      `"Every faction out here is hunting the same thing," the ${N()} says. "They just call it different names."`,
+    ],
+    combatRemarks: [
+      `"Footing," the ${N()} snaps. "Mind your footing."`,
+      `The ${N()} reads the fight a beat ahead of you. "It's tiring. Outlast it."`,
+    ],
+    sceneIntros: [
+      `The light changes as you arrive, and the place takes your measure.`,
+      `You step in. Whatever happened here, it happened a long time ago — and not all of it left.`,
+    ],
+    combatIntros: [
+      `Steel and breath. The talking is over.`,
+      `It comes for you before the ${N()} finishes the warning.`,
+    ],
+    raceRemarks: {
+      'REPLACE-with-a-race-id': [
+        `"Your kind has walked this ground before," the ${N()} says. "It remembers the weight of you."`,
+        `The ${N()} studies you. "Your people learned to survive out here. Don't waste the lesson."`,
+      ],
+      'REPLACE-with-another-race-id': [
+        `"Not everyone could make it this far," the ${N()} says. "You did."`,
+      ],
+    },
+    factionRemarks: {
+      'REPLACE-with-a-faction-id': [
+        `"Your people would have an opinion about this," the ${N()} says. "Loudly."`,
+        `The ${N()} nods toward the horizon. "Your faction wants what's out there. So does everyone else."`,
+      ],
+      'REPLACE-with-another-faction-id': [
+        `"You wear the colors," the ${N()} says. "Out here that's a promise and a target both."`,
+      ],
+    },
+    personalBeats: [
+      `For a moment the ${N()} says nothing at all, and lets you have it.`,
+      `"You've come a long way from where you started," the ${N()} says. "Further than you think."`,
+    ],
+    investigateGeneric: [
+      `You turn it over and learn nothing you didn't already fear.`,
+      `Whatever it was meant to say, the years have rubbed it blank.`,
+    ],
+    investigateCreepy: [
+      `The closer you look, the less you want to. Something here was wrong before you arrived.`,
+      `It's cold where it shouldn't be. You step back without deciding to.`,
+    ],
+    investigateLore: [
+      `An old mark, half-worn — a name, a warning, or both. Someone wanted this remembered.`,
+      `Fragments of a story you can almost read. The rest went with whoever left it.`,
+    ],
+    searchNothing: [
+      `Nothing worth the bending. You straighten up empty-handed.`,
+      `Picked clean, long before you got here.`,
+    ],
+    searchMaterial: [
+      `Tucked in the rubble — something a careful hand can still use.`,
+      `Not treasure, but it'll feed the forge.`,
+    ],
+    searchTc: [
+      `Coins, dull with age, spilled where someone dropped them in a hurry.`,
+      `A small purse, forgotten. Their loss, your gain.`,
+    ],
+    searchHook: [
+      `Wedged out of sight — a note, a marker, the start of a thread worth pulling.`,
+      `Something here points somewhere else. The ${N()} watches you find it.`,
+    ],
+    coolStories: [
+      `"They say someone crossed the whole country on foot once," the ${N()} muses. "No one says they arrived."`,
+      `"There's a place out past the maps," the ${N()} says, "where the old power still runs. Or so the drunks swear."`,
+    ],
+    directionalFinds: [
+      `Something catches the light {direction} of here — worth a look, or a trap.`,
+      `{direction} of you, the ground's been disturbed. Recently.`,
+    ],
+  };
+}
+
 /** A trimmed starter object for the Narration-flavor upload box: every pool key,
  *  with the first `n` example lines (arrays) or first couple of sub-keys
- *  (records). The author edits/expands and uploads; omitted keys keep built-ins. */
+ *  (records). GENERIC (no setting); the author edits/expands and uploads; omitted
+ *  keys keep the built-in defaults. */
 export function buildFlavorTemplate(n = 2): Record<string, unknown> {
   const out: Record<string, unknown> = {};
-  for (const [key, val] of Object.entries(BUILTIN_FLAVOR_POOLS)) {
+  for (const [key, val] of Object.entries(genericFlavorPools())) {
     out[key] = trimFlavorValue(val, n);
   }
   return out;
