@@ -1674,6 +1674,105 @@ const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { 
 const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
 const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2);
 
+const BUILTIN_DAMAGE_TYPES = ['bludgeoning', 'slashing', 'piercing', 'burn', 'electrical', 'poison', 'radiation', 'stun', 'degradation', 'aetheric'];
+
+// engine_Dev — ENEMY damage-relations builder. Pulls the live damage-type list
+// (built-in + the ones you defined above) and lets you set, per enemy, what it
+// DELIVERS and what it's WEAK / STRONG against — via checkboxes that write the
+// enemies content table (weak → "vulnerable:<type>" traits, strong → "resist:<type>"
+// traits, delivers → the damage string). Round-trips with an uploaded enemies file.
+function EnemyRelationsBuilder() {
+  const damageTypes = useContentPackStore((s) => s.damageTypes) as Array<{ name: string }>;
+  const tables = useContentPackStore((s) => s.tables) as Record<string, Array<Record<string, unknown>>>;
+  const loadTableJson = useContentPackStore((s) => s.loadTableJson);
+  const enemies = (Array.isArray(tables.enemies) ? tables.enemies : []) as Array<Record<string, unknown>>;
+  const types = [...BUILTIN_DAMAGE_TYPES, ...damageTypes.map((d) => d.name)].filter((t, i, a) => a.indexOf(t) === i);
+
+  const [name, setName] = useState('');
+  const [hp, setHp] = useState('');
+  const [dice, setDice] = useState('1d6');
+  const [delivers, setDelivers] = useState('bludgeoning');
+  const [weak, setWeak] = useState<string[]>([]);
+  const [strong, setStrong] = useState<string[]>([]);
+  const [status, setStatus] = useState<Status>(null);
+
+  const toggle = (arr: string[], set: (v: string[]) => void, t: string) => set(arr.includes(t) ? arr.filter((x) => x !== t) : [...arr, t]);
+  const save = (rows: Array<Record<string, unknown>>, msg: string) => {
+    const r = loadTableJson('enemies', JSON.stringify(rows));
+    setStatus(r.ok ? { kind: 'ok', msg } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  const addOrUpdate = () => {
+    const nm = name.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Name the enemy.' }); return; }
+    const relTraits = [...weak.map((t) => `vulnerable:${t}`), ...strong.map((t) => `resist:${t}`)];
+    const rows = [...enemies];
+    const idx = rows.findIndex((r) => typeof r.name === 'string' && (r.name as string).toLowerCase() === nm.toLowerCase());
+    if (idx >= 0) {
+      const ex = rows[idx]!;
+      const keep = (Array.isArray(ex.traits) ? ex.traits as string[] : []).filter((t) => !/^(vulnerable|resist):/i.test(t));
+      const exDice = typeof ex.damage === 'string' ? (ex.damage.match(/^\d*d\d+/i)?.[0] ?? dice) : dice;
+      rows[idx] = { ...ex, traits: [...keep, ...relTraits], damage: `${exDice} ${delivers}` };
+      save(rows, `Updated “${nm}” — delivers ${delivers}${weak.length ? `, weak ${weak.join('/')}` : ''}${strong.length ? `, strong ${strong.join('/')}` : ''}.`);
+    } else {
+      rows.push({ name: nm, type: 'Custom', abilityPoint: '1d6', attack: nm, damage: `${dice || '1d6'} ${delivers}`, hp: Number(hp) || 10, rarity: 'Common', loot: [], traits: relTraits });
+      save(rows, `Added “${nm}” (${rows.length} enemies). Fill its other fields in the ENEMIES table if needed.`);
+    }
+    setName(''); setHp(''); setWeak([]); setStrong([]);
+  };
+
+  const chip = (t: string, on: boolean, onPress: () => void) => (
+    <TouchableOpacity key={t} style={[styles.tmplBtn, on && styles.loadBtn, { marginBottom: 4, paddingVertical: 4, paddingHorizontal: 8 }]} onPress={onPress}>
+      <Text style={on ? styles.loadBtnText : styles.tmplBtnText}>{on ? '☑ ' : '☐ '}{t}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Enemy damage relations</Text>
+        <Text style={enemies.length > 0 ? styles.badgeOn : styles.badgeOff}>{enemies.length > 0 ? `● ${enemies.length} enemies` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        Set what an enemy DELIVERS and what it’s WEAK / STRONG against, from the damage types defined
+        above. Writes the ENEMIES table (weak → 1.5× taken, strong → ½ taken). Naming an enemy that’s
+        already in your uploaded enemies UPDATES it; a new name adds a minimal row (flesh out its
+        stats/loot in the ENEMIES table).
+      </Text>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Enemy name (e.g. Stone Crab)" placeholderTextColor="#5c5446" autoCapitalize="words" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={hp} onChangeText={setHp} placeholder="HP" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+      <Text style={[styles.hint, { marginBottom: 2 }]}>Delivers (dice + type):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+        <TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={dice} onChangeText={setDice} placeholder="1d6" placeholderTextColor="#5c5446" autoCapitalize="none" />
+        {types.map((t) => chip(t, delivers === t, () => setDelivers(t)))}
+      </View>
+      <Text style={[styles.hint, { marginBottom: 2 }]}>Weak against (takes more):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>{types.map((t) => chip(t, weak.includes(t), () => toggle(weak, setWeak, t)))}</View>
+      <Text style={[styles.hint, { marginBottom: 2 }]}>Strong against (takes less):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>{types.map((t) => chip(t, strong.includes(t), () => toggle(strong, setStrong, t)))}</View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={addOrUpdate}><Text style={styles.loadBtnText}>+ ADD / UPDATE ENEMY</Text></TouchableOpacity>
+      </View>
+
+      {enemies.map((e) => {
+        const traits = Array.isArray(e.traits) ? e.traits as string[] : [];
+        const w = traits.filter((t) => /^vulnerable:/i.test(t)).map((t) => t.split(':')[1]).filter((x): x is string => !!x);
+        const s = traits.filter((t) => /^resist:/i.test(t)).map((t) => t.split(':')[1]).filter((x): x is string => !!x);
+        return (
+          <View key={String(e.name)} style={styles.titleRowDev}>
+            <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{String(e.name)}</Text>{typeof e.damage === 'string' ? ` — ${e.damage}` : ''}{w.length ? ` · weak ${w.join('/')}` : ''}{s.length ? ` · strong ${s.join('/')}` : ''}</Text>
+            <TouchableOpacity onPress={() => { setName(String(e.name)); setWeak(w); setStrong(s); setDelivers((typeof e.damage === 'string' && e.damage.replace(/^\d*d\d+\s*/i, '').trim()) || 'bludgeoning'); }}>
+              <Text style={styles.tmplBtnText}> edit</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      })}
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 function AdvancedRulesBoxes() {
   const damageTypes = useContentPackStore((s) => s.damageTypes);
   const damageResistances = useContentPackStore((s) => s.damageResistances);
@@ -1683,8 +1782,9 @@ function AdvancedRulesBoxes() {
   return (
     <>
       <DamageTypesBuilder />
+      <EnemyRelationsBuilder />
       <RulesBox
-        title="Enemy resistances"
+        title="Enemy resistances (by type)"
         badge={`● ${damageResistances ? Object.keys(damageResistances).length : 0} types`}
         hasData={!!damageResistances && Object.keys(damageResistances).length > 0}
         filename="enemy-resistances.json"
