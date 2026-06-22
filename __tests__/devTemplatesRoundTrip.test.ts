@@ -41,6 +41,7 @@ import {
   buildGameBundleTemplate,
 } from '../app/engine/contentTemplates';
 import { CONTENT_TABLES, LORE_BLOCKS, clearAllOverrides } from '../app/engine/contentPack';
+import { GENERIC_TABLE_ROWS } from '../app/engine/genericTemplateData';
 import { useContentPackStore } from '../app/state/contentPackStore';
 
 const store = () => useContentPackStore.getState();
@@ -86,6 +87,20 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
   // The whole-game file must carry EVERY loader-supported section, so an export is
   // never missing a section the engine can load (anything absent from the bundle is
   // silently dropped on export). This locks identity + every content section in.
+  // engine_Dev — the TEMPLATE scaffolds must read GENERIC, not Tartaria. They used to
+  // emit slices of the real game tables, leaking setting nouns (Aether/Mud Monarchs/
+  // Tartary) into a blank author's file. This locks the genericized table templates
+  // free of those proper nouns so they can't regress back to built-in data.
+  const TARTARIA_NOUNS = /tartar|aether|etheric|reclaimer|mud monarch|forgotten order|mudstone|aetherstone/i;
+  test.each(Object.keys(GENERIC_TABLE_ROWS))('table template is generic (no Tartaria nouns): %s', (id) => {
+    // Row CONTENT only (includeTokenNote=false). The optional-field NOTES legitimately
+    // document real engine condition ids (e.g. aether_powers) which are functional, not
+    // flavor, and stay per "templates' scripting only, not the coding/usage".
+    const t = getTableTemplate(id as (typeof CONTENT_TABLES)[number]['id'], undefined, false);
+    const hit = t.match(TARTARIA_NOUNS);
+    expect(hit ? `${id} leaks "${hit[0]}"` : 'clean').toBe('clean');
+  });
+
   test('whole-game bundle includes every loader-supported section key', () => {
     const t = buildGameBundleTemplate();
     const required = [
