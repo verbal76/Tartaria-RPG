@@ -721,8 +721,12 @@ This engine is lore-agnostic: a game is just the JSON you upload. The fastest pa
 is the WHOLE-GAME file (one file holds every section); the per-section boxes are for
 granular edits. Recommended order:
 
+The console is organized into collapsible sections — tap a header bar to open it.
+Most sections are form builders (text boxes + checkboxes that save to JSON); each
+also keeps a raw-JSON/file strip for power edits.
+
 ## 1 · Identity & World (do first — everything else reads these)
-  - Game name / Tagline / Narrator name / Fusion-feature name
+  - Game name / Tagline / Narrator name / Fusion-feature (Crucible) name + on-off
   - World name (replaces "Tartaria" everywhere) · Corruption/affliction name
   - World lore: narrator persona ({narrator}/{world}/{energy} tokens work here),
     tone, setting, terms, vocabulary, and:
@@ -750,15 +754,24 @@ granular edits. Recommended order:
     + starterItems. Anything you omit keeps a neutral built-in line.
 
 ## 5 · Faction bases
-  - Starting areas: one walkable instance per faction, placed at a locationId.
+  - Starting areas (form): one walkable instance per faction. Pick the faction,
+    name it, drop it on a map tile (+ optional grid X/Y), add 3-5 rooms and tick
+    ONE as the Mission Board room. "Returnable" off = a one-way prologue that
+    vanishes once you leave (its missions then turn in remotely). Room ids + exits
+    are generated for you (the entry room gets the door out to the map).
 
 ## 6 · Main quest (bosses FIRST)
   - Bosses: name, faction, stats, loot, quest item, spawn mode (main_quest /
     location / random). Build these BEFORE the quest.
   - Main quest: line-by-line objective list; "kill" steps pick a main-quest boss.
+    Steps can be faction-GATED (skipForFactions/onlyForFactions).
 
 ## 7 · Side content
-  - Missions (hunts / mysteries / faction quests / storylines + procedural seeds)
+  - Faction missions (form): contracts a faction posts on its board. Set the
+    posting faction, the REP GATE (standing where it appears), the rewards
+    (TC + rep + item drops), and the plan — ordered beats (each advances on a
+    kill / travel / anything) or a single "gather N of an item" fetch.
+  - Other missions (hunts / mysteries / storylines + procedural seeds)
   - Hooks (atmospheric leads) · Whispers (overheard tips) · Travel encounters
   - Interaction tags (which verbs each noun accepts) · Titles (achievements)
   - Collectables (character stories the player reassembles from loot fragments)
@@ -789,10 +802,12 @@ function bundleEntries(): BundleEntry[] {
     { key: 'narrator', hint: 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', content: JSON.stringify('Narrator') },
     { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration uses "Tartaria" in dozens of lines; set this and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
     { key: 'corruptionName', hint: 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', content: JSON.stringify('Corruption') },
+    { key: 'crucibleName', hint: 'Your name for the fusion/forge feature the engine calls the "Crucible" (also the {crucible}/{fuse}/{forge} token). Set in the GAME IDENTITY section.', content: JSON.stringify('Crucible') },
+    { key: 'crucibleEnabled', hint: 'Whether the fusion/forge feature exists in this game: true (default) keeps it, false removes the Crucible entirely. Toggle it in the GAME IDENTITY section.', content: JSON.stringify(true) },
   ];
   for (const b of LORE_BLOCKS) entries.push({ key: b.id, hint: b.hint, content: getLoreTemplate(b.id, false) });
   for (const t of CONTENT_TABLES) entries.push({ key: t.id, hint: t.hint, content: getTableTemplate(t.id, TEMPLATE_SAMPLE_ROWS, false) });
-  entries.push({ key: 'missions', hint: 'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Omit any sub-table to keep its built-in default.', content: buildMissionsTemplate(TEMPLATE_SAMPLE_ROWS, false) });
+  entries.push({ key: 'missions', hint: 'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Build factionQuests in the dedicated FACTION MISSIONS box: each is { id, factionId (who posts it), title, objective, requirement: { rep } (the GATE where it appears on that faction\'s board), reward: { tc, rep, items?: ["name"] (item drops granted on turn-in) }, and a plan — stages[] (ordered beats) or fetch: { itemName, quantity } }. Omit any sub-table to keep its built-in default.', content: buildMissionsTemplate(TEMPLATE_SAMPLE_ROWS, false) });
   entries.push({ key: 'hooks', hint: 'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.', content: buildHooksTemplate(false) });
   entries.push({ key: 'wasteland', hint: 'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.', content: buildWastelandTemplate(false) });
   entries.push({ key: 'titles', hint: 'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.', content: buildTitlesTemplate() });
