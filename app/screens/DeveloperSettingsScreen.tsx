@@ -2660,6 +2660,23 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
   );
 }
 
+// engine_Dev — collapsible section. Tap the header bar to expand/collapse its boxes,
+// so the console reads as ~16 closed headers instead of one 4,000-line scroll.
+// Default collapsed; a badge shows how many ● overrides live inside (filled by the
+// caller) so you can see at a glance which sections you've authored.
+function CollapsibleSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <View style={styles.section}>
+      <TouchableOpacity style={styles.sectionHeader} onPress={() => setOpen((v) => !v)} activeOpacity={0.7}>
+        <Text style={styles.sectionHeaderChevron}>{open ? '▾' : '▸'}</Text>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+      </TouchableOpacity>
+      {open && <View style={styles.sectionBody}>{children}</View>}
+    </View>
+  );
+}
+
 export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const setScreen = useGameStore((s) => s.setScreen);
   const clearAll = useContentPackStore((s) => s.clearAll);
@@ -2732,12 +2749,14 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         {guideMsg && <Text style={styles.ok}>{guideMsg}</Text>}
       </View>
 
-      <Text style={styles.sectionLabel}>★ WHOLE GAME — build it all in one file</Text>
-      <GameBundleBox />
+      <CollapsibleSection title="★ WHOLE GAME — build it all in one file">
+        <GameBundleBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>MAIN QUEST</Text>
-      <MainQuestBox />
-      <BossesBox />
+      <CollapsibleSection title="MAIN QUEST">
+        <MainQuestBox />
+        <BossesBox />
+      </CollapsibleSection>
 
       {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine. */}
       <TouchableOpacity
@@ -2770,61 +2789,80 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         <Text style={styles.copyBtnText}>⧉ COPY DIAGNOSTICS</Text>
       </TouchableOpacity>
 
-      <GameIdentitySection />
+      <CollapsibleSection title="GAME IDENTITY">
+        <GameIdentitySection />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>LORE</Text>
-      {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
+      <CollapsibleSection title="LORE">
+        {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>TABLES</Text>
-      {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
+      <CollapsibleSection title="TABLES">
+        {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>MISSIONS</Text>
-      <MissionsBox />
+      <CollapsibleSection title="MISSIONS">
+        <MissionsBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>FACTION MISSIONS</Text>
-      <FactionMissionsBox />
+      <CollapsibleSection title="FACTION MISSIONS">
+        <FactionMissionsBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>HOOKS</Text>
-      <HooksBox />
+      <CollapsibleSection title="HOOKS">
+        <HooksBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>WHISPERS</Text>
-      <WhispersBox />
+      <CollapsibleSection title="WHISPERS">
+        <WhispersBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>TRAVEL ENCOUNTERS</Text>
-      <WastelandBox />
+      <CollapsibleSection title="TRAVEL ENCOUNTERS">
+        <WastelandBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>INTERACTION TAGS</Text>
-      <InteractionTagsBox />
+      <CollapsibleSection title="INTERACTION TAGS">
+        <InteractionTagsBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>STARTING AREAS</Text>
-      <StartingAreasBox />
-      <TitlesBox />
+      <CollapsibleSection title="STARTING AREAS">
+        <StartingAreasBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>COLLECTABLES</Text>
-      <CollectablesBox />
+      <CollapsibleSection title="TITLES">
+        <TitlesBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>SUMMONED SIDEKICKS</Text>
-      <SummonsBox />
+      <CollapsibleSection title="COLLECTABLES">
+        <CollectablesBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>ADVANCED COMBAT &amp; CRAFTING RULES</Text>
-      <AdvancedRulesBoxes />
+      <CollapsibleSection title="SUMMONED SIDEKICKS">
+        <SummonsBox />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>MUSIC</Text>
-      <MusicBox
-        category="battle"
-        label="Battle Music"
-        hint="Plays during combat and boss fights. Uploads replace the built-in battle score."
-      />
-      <MusicBox
-        category="ambient"
-        label="Ambient Music"
-        hint="Plays while exploring. Uploads replace the built-in exploration score."
-      />
+      <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES">
+        <AdvancedRulesBoxes />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>MAPS</Text>
-      <MapsSection />
+      <CollapsibleSection title="MUSIC">
+        <MusicBox
+          category="battle"
+          label="Battle Music"
+          hint="Plays during combat and boss fights. Uploads replace the built-in battle score."
+        />
+        <MusicBox
+          category="ambient"
+          label="Ambient Music"
+          hint="Plays while exploring. Uploads replace the built-in exploration score."
+        />
+      </CollapsibleSection>
 
-      <Text style={styles.sectionLabel}>FAMILY BUILD</Text>
+      <CollapsibleSection title="MAPS">
+        <MapsSection />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="FAMILY BUILD">
       {!published ? (
         <>
           <TouchableOpacity
@@ -2859,7 +2897,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         </>
       )}
 
-      <Text style={styles.sectionLabel}>DEV MODE</Text>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="DEV MODE">
       <TouchableOpacity
         style={styles.unpublishBtn}
         onPress={() => {
@@ -2878,6 +2918,7 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         Turn it off for a clean Settings screen. To get back in any time, create a character
         named “Verbal”.
       </Text>
+      </CollapsibleSection>
 
       <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
         <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
@@ -2915,6 +2956,11 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 16 },
   blurb: { color: '#9a8f78', fontSize: 12, lineHeight: 18, marginBottom: 12, fontStyle: 'italic' },
   sectionLabel: { color: '#7a705c', fontSize: 11, fontWeight: '700', letterSpacing: 3, marginTop: 12, marginBottom: 6 },
+  section: { marginTop: 10 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1610', borderWidth: 1, borderColor: '#3a3226', borderRadius: 6, paddingVertical: 11, paddingHorizontal: 12 },
+  sectionHeaderChevron: { color: '#c9a86a', fontSize: 13, fontWeight: '700', width: 18 },
+  sectionHeaderText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
+  sectionBody: { marginTop: 6 },
   card: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   cardTitle: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
