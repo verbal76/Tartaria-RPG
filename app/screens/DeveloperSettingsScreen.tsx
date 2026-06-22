@@ -1574,7 +1574,9 @@ const DAMAGE_TYPES_TEMPLATE = JSON.stringify([
   { name: 'fire', keywords: ['fire', 'flame', 'burn', 'scorch'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } },
   { name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.7, weakBonus: 0.25, strongPenalty: 0.25 } },
 ], null, 2);
-const DT_STATS: Array<'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma' | 'stealth'> = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
+// engine_Dev — stealth is a SKILL modifier (approach/first-strike), not a combat
+// stat a damage type debuffs, so it's intentionally excluded from on-hit effects.
+const DT_STATS: Array<'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma'> = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'];
 
 // engine_Dev — DAMAGE TYPES builder. Name + keyword aliases + an optional ON-HIT
 // stat effect (per-stat +/- applied to whoever is hit by this type, for N rounds),

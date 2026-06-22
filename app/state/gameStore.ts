@@ -23748,8 +23748,22 @@ function applyEnemyCounter(
       } : s));
     }
 
+    // engine_Dev — gate the incoming-effect chance by the PLAYER's resist/weak to
+    // this type. Armor that turned some of the hit (resisted.blocked) or a race/
+    // faction resist lowers the chance to suffer the effect; a race/faction weakness
+    // raises it; no buff = full base chance (the "high chance unless you're protected"
+    // the design calls for). Mirrors how enemy weak/strong gates OUR procs.
+    let incChanceMult = 1;
+    {
+      const t = (explicitDamageType ?? '').toLowerCase();
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rf = (require('../engine/raceMechanics') as typeof import('../engine/raceMechanics')).playerRaceFactionResists(player);
+      const resists = resisted.blocked || rf.resist.includes(t);
+      const weak = rf.weak.includes(t);
+      incChanceMult = resists ? 0.35 : weak ? 1.6 : 1;
+    }
     // Roll for a status effect to apply based on the damage type.
-    const newEffect = rollIncomingStatusEffect(explicitDamageType, player.statusEffects ?? []);
+    const newEffect = rollIncomingStatusEffect(explicitDamageType, player.statusEffects ?? [], incChanceMult);
     // Per-enemy trait effects on a successful hit (bleeder / corrupting /
     // concussive). Independent of the damage-type roll so a trait can
     // stack with a type-based status.

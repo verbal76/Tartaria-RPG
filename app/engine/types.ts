@@ -206,6 +206,11 @@ export interface Race {
   /** engine_Dev — once-a-day activatable abilities this race grants (data-driven;
    *  see ActivatableAbility). Replaces the hard-coded built-in race abilities. */
   abilities?: ActivatableAbility[];
+  /** engine_Dev — damage types this race innately RESISTS (lower chance to suffer
+   *  that type's on-hit effect) / is WEAK to (higher chance). Names match your
+   *  Damage Types. The player has no weaknesses unless a race/faction grants them. */
+  resist?: string[];
+  weak?: string[];
 }
 
 /** engine_Dev — a data-driven, once-a-day activatable ability granted by a race or
@@ -285,6 +290,10 @@ export interface Faction {
   /** engine_Dev — once-a-day activatable abilities this faction grants its members
    *  (data-driven; see ActivatableAbility). */
   abilities?: ActivatableAbility[];
+  /** engine_Dev — damage types members innately RESIST / are WEAK to (same meaning
+   *  as the race fields; stacks with race + armor). */
+  resist?: string[];
+  weak?: string[];
 }
 
 export interface Enemy {

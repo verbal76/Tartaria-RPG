@@ -65,11 +65,16 @@ export interface AppliedEffect {
 export function rollIncomingStatusEffect(
   damageType: string | null | undefined,
   existing: readonly StatusEffect[],
+  // engine_Dev — scales the proc chance by the PLAYER's relationship to the type:
+  // <1 when the player RESISTS it (armor/race/faction/potion — much lower chance to
+  // suffer the effect), >1 when WEAK to it. 1 = no buff either way (full base chance).
+  chanceMultiplier = 1,
 ): AppliedEffect | null {
   if (!damageType) return null;
   const rule = TYPE_TO_EFFECT[damageType.toLowerCase()];
   if (!rule) return null;
-  if (Math.random() >= rule.procChance) return null;
+  const chance = Math.max(0, Math.min(0.95, rule.procChance * chanceMultiplier));
+  if (Math.random() >= chance) return null;
 
   const isNew = !existing.some((e) => e.kind === rule.kind);
   const newEffect: StatusEffect = {

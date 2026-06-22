@@ -44,6 +44,20 @@ export function factionStatBonusesFor(factionId: string | undefined): RacialStat
   return (faction?.factionStatBonuses as RacialStatBonuses | undefined) ?? {};
 }
 
+const lc = (a: readonly string[] | undefined): string[] => (a ?? []).map((s) => String(s).toLowerCase());
+
+/** engine_Dev — damage types the PLAYER resists / is weak to from their race +
+ *  faction rows (armor + potion resists are layered on at the combat site). The
+ *  player carries no innate weakness unless a race/faction declares one. */
+export function playerRaceFactionResists(player: PlayerCharacter): { resist: string[]; weak: string[] } {
+  const race = getRace(player.raceId);
+  const faction = getFaction(player.factionId);
+  return {
+    resist: [...lc(race?.resist), ...lc(faction?.resist)],
+    weak: [...lc(race?.weak), ...lc(faction?.weak)],
+  };
+}
+
 // ─── Barehand damage ────────────────────────────────────────────────
 // Parses race.barehandDamage strings:
 //   "1d6"           → { count: 1, sides: 6, bonus: 0 }
