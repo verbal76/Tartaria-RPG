@@ -101,6 +101,21 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     expect(hit ? `${id} leaks "${hit[0]}"` : 'clean').toBe('clean');
   });
 
+  // The genericized special builders (Phase 2) must also be free of Tartaria nouns.
+  // (Flavor pools are Phase 3 and still themed, so the whole bundle isn't asserted yet.)
+  const genericSpecials: Array<[string, () => string]> = [
+    ['missions', () => buildMissionsTemplate()],
+    ['hooks', () => buildHooksTemplate()],
+    ['whispers', () => buildWhispersTemplate()],
+    ['summons', () => buildSummonsTemplate()],
+    ['powers', () => getTableTemplate('powers', undefined, false)],
+    ['world lore', () => getLoreTemplate('world')],
+  ];
+  test.each(genericSpecials)('special template is generic (no Tartaria nouns): %s', (_name, build) => {
+    const hit = build().match(TARTARIA_NOUNS);
+    expect(hit ? `leaks "${hit[0]}"` : 'clean').toBe('clean');
+  });
+
   test('whole-game bundle includes every loader-supported section key', () => {
     const t = buildGameBundleTemplate();
     const required = [

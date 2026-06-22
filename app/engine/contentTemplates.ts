@@ -4,15 +4,7 @@
 // wade through) the entire existing game. The export format matches what the
 // upload boxes expect: a JSON ARRAY of rows.
 
-import huntsData from '../data/quests/hunts.json';
-import mysteriesData from '../data/quests/mysteries.json';
-import factionQuestsData from '../data/quests/faction-quests.json';
-import storylinesData from '../data/quests/faction-storylines.json';
-import objectivesData from '../data/quests/objectives.json';
-import complicationsData from '../data/quests/complications.json';
-import rewardsData from '../data/quests/rewards.json';
 import {
-  DEFAULT_WORLD_TONE,
   getGameTitle,
   CONTENT_TABLES,
   LORE_BLOCKS,
@@ -24,7 +16,7 @@ import { getInteractionTags } from './interactionTags';
 import { buildFlavorTemplate } from './narrativeGenerator';
 import { POWERS_TEMPLATE } from './powers';
 import { TRACKABLE_VARS } from './customTitles';
-import { GENERIC_TABLE_ROWS } from './genericTemplateData';
+import { GENERIC_TABLE_ROWS, GENERIC_MISSIONS } from './genericTemplateData';
 
 /** Example narrator persona seeded into the World-lore template — illustrative
  *  only; the author edits it. (The live default is built from the narrator's
@@ -194,29 +186,30 @@ export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): strin
     return JSON.stringify(
       {
         narrator: NARRATOR_PERSONA_EXAMPLE,
-        tone: DEFAULT_WORLD_TONE,
+        // engine_Dev — a one-line example tone; replace with your world's premise.
+        tone: 'A small band scavenges the ruins of a fallen age; a strange power still lingers in the old places.',
         setting: '',
         terms: [],
         vocabulary: [],
         // engine_Dev — CATCHALL term map. Any built-in narration noun the engine
         // still names gets rewritten to your word everywhere the player reads it
         // (pools, one-off lines, and dynamic text). Add a pair per residual term.
-        termMap: { 'Reclaimers': 'REPLACE-with-your-faction-noun', 'Aetherstone': 'REPLACE-with-your-material' },
+        termMap: { 'REPLACE-with-a-built-in-noun-to-swap': 'REPLACE-with-your-word' },
         // engine_Dev — rename the CORRUPTION/affliction tiers (the noun itself is the
-        // top-level corruptionName / {corruption}). Built-in: Tainted/Corrupted/Hollowed.
-        corruptionTiers: { tainted: 'Phase-touched', corrupted: 'Phase-sick', hollowed: 'Phase-lost' },
-        // engine_Dev — the ENERGY / "magic" concept. The engine calls it Aether /
-        // Aetheric / Aetherstone; set yours and the whole family is swapped
-        // everywhere (also the {energy} / {energy_adj} / {energy_material} tokens).
-        // slang + factionTerms let each faction name the SAME force differently.
+        // top-level corruptionName / {corruption}). Built-in tier ids: tainted /
+        // corrupted / hollowed — keep the ids, set your display words.
+        corruptionTiers: { tainted: 'REPLACE (e.g. Touched)', corrupted: 'REPLACE (e.g. Sickened)', hollowed: 'REPLACE (e.g. Lost)' },
+        // engine_Dev — the ENERGY / "magic" concept. Set yours and the whole family is
+        // swapped everywhere (also the {energy} / {energy_adj} / {energy_material}
+        // tokens). slang + factionTerms let each faction name the SAME force differently.
         energy: {
-          name: 'REPLACE-with-your-energy (e.g. The Fold)',
-          adjective: 'REPLACE (e.g. folded / anomalous)',
-          material: 'REPLACE (e.g. Fold-matter / Vril dust)',
+          name: 'REPLACE-with-your-energy (e.g. Magic, the Weave)',
+          adjective: 'REPLACE (e.g. arcane / charged)',
+          material: 'REPLACE (e.g. essence / raw crystal)',
           verb: 'weave',
-          caster: 'Resonator',
-          slang: ['the Static', 'Vril', 'the Red Shift', 'Green Fog', 'Slip'],
-          factionTerms: { 'REPLACE-faction-id': 'Unified-Field Resonance' },
+          caster: 'Caster',
+          slang: ['the Hum', 'the Glow', 'the Tide', 'the Pull', 'Drift'],
+          factionTerms: { 'REPLACE-faction-id': 'REPLACE-with-that-faction-s-word-for-it' },
         },
       },
       null,
@@ -288,18 +281,16 @@ export function buildBossesTemplate(): string {
  *  missions; objectives/complications/rewards are the seeds the engine mixes into
  *  procedural "lead" quests. A few sample rows of each, from the built-ins. */
 export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
-  const arr = (data: unknown, key: string): unknown[] => {
-    const v = (data as Record<string, unknown>)[key];
-    return Array.isArray(v) ? v : Array.isArray(data) ? (data as unknown[]) : [];
-  };
+  // engine_Dev — GENERIC sample missions (not the built-in Tartaria quests). Same
+  // shapes + the newer faction-quest fields (fetch, staged plan, reward.items).
   return tokenNote(JSON.stringify({
-    hunts: arr(huntsData, 'hunts').slice(0, n),
-    mysteries: arr(mysteriesData, 'mysteries').slice(0, n),
-    factionQuests: arr(factionQuestsData, 'quests').slice(0, n),
-    storylines: arr(storylinesData, 'storylines').slice(0, 1),
-    objectives: (objectivesData as unknown[]).slice(0, 3),
-    complications: (complicationsData as unknown[]).slice(0, 3),
-    rewards: (rewardsData as unknown[]).slice(0, 3),
+    hunts: GENERIC_MISSIONS.hunts.slice(0, n),
+    mysteries: GENERIC_MISSIONS.mysteries.slice(0, n),
+    factionQuests: GENERIC_MISSIONS.quests.slice(0, n),
+    storylines: GENERIC_MISSIONS.storylines.slice(0, 1),
+    objectives: GENERIC_MISSIONS.objectives.slice(0, 3),
+    complications: GENERIC_MISSIONS.complications.slice(0, 3),
+    rewards: GENERIC_MISSIONS.rewards.slice(0, 3),
   }, null, 2), includeTokenNote);
 }
 
@@ -487,17 +478,17 @@ export function buildTitlesTemplate(): string {
 export function buildHooksTemplate(includeTokenNote = true): string {
   return tokenNote(JSON.stringify({
     plants: {
-      green_fog_vent: [
-        { line: 'A vent in the seam breathes a slow coil of green fog.', nouns: ['vent', 'fog', 'seam', 'grate'] },
+      strange_vent: [
+        { line: 'A vent in the rock breathes a slow coil of pale mist.', nouns: ['vent', 'mist', 'seam', 'grate'] },
       ],
     },
     chains: {
-      green_fog_vent: [
-        { line: 'You step closer. The ozone stings; something metallic is wedged in the grate.', effects: [], done: false, addNouns: ['grate'] },
-        { line: 'You pry the grate loose. A ticking brass device tumbles into your hand.', effects: [{ type: 'grant_item', name: 'Doomsday Chronometer' }, { type: 'grant_tc', amount: 40 }], done: true },
+      strange_vent: [
+        { line: 'You step closer. The air stings; something metal is wedged in the grate.', effects: [], done: false, addNouns: ['grate'] },
+        { line: 'You pry the grate loose. A ticking brass device tumbles into your hand.', effects: [{ type: 'grant_item', name: 'Old Mechanism' }, { type: 'grant_tc', amount: 40 }], done: true },
       ],
     },
-    weights: { green_fog_vent: 6 },
+    weights: { strange_vent: 6 },
     indoor: [],
   }, null, 2), includeTokenNote);
 }
@@ -512,17 +503,17 @@ export function buildWhispersTemplate(includeTokenNote = true): string {
   return tokenNote(JSON.stringify([
     {
       id: 'cache_rumor',
-      title: 'The Ace’s Cache',
-      plantLocations: ['outpost_messhall', 'REPLACE-with-one-of-your-location-ids'],
+      title: 'The Buried Cache',
+      plantLocations: ['REPLACE-with-a-hub-room-id-or-one-of-your-location-ids'],
       plantChance: 0.15,
       plantLines: [
-        'A sailor at the corner table leans in. "Word is there’s a stash in a wreck two, three tiles south. Go after dark. Don’t ask who told you."',
+        'A traveler at the corner table leans in. "Word is there’s a stash in a wreck two, three tiles south. Go after dark. Don’t ask who told you."',
       ],
       targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
       activeHours: [20, 4],
-      meetLine: 'You find the half-sunk wreck. Wedged behind a buckled bulkhead: a brass device, still ticking.',
+      meetLine: 'You find the half-sunk wreck. Wedged behind a buckled beam: a brass device, still ticking.',
       meetEffects: [
-        { type: 'grant_item', name: 'Doomsday Chronometer' },
+        { type: 'grant_item', name: 'Old Mechanism' },
         { type: 'grant_tc', amount: 60 },
       ],
     },
@@ -603,12 +594,12 @@ export function buildSummonsTemplate(): string {
     noun: 'automaton',
     summons: [
       {
-        kind: 'phase_automaton',
-        name: 'Phase Automaton',
-        aliases: ['phase', 'phase automaton', 'phase bot'],
+        kind: 'spark_automaton',
+        name: 'Spark Automaton',
+        aliases: ['spark', 'spark automaton', 'spark bot'],
         fuel: [
-          { name: 'Phase Capacitor', quantity: 2 },
-          { name: 'Brass Frame', quantity: 1 },
+          { name: 'Spark Core', quantity: 2 },
+          { name: 'Iron Frame', quantity: 1 },
         ],
         hpMax: 24,
         attackDie: '1d10',
@@ -618,17 +609,17 @@ export function buildSummonsTemplate(): string {
         summonDC: 14,
         resistBase: 0.20,
         resistCap: 0.40,
-        elementTags: ['phase'],
-        blurb: 'Nimble striker. Phase-charged limbs hit hard but the frame is light.',
+        elementTags: ['spark'],
+        blurb: 'Nimble striker. Charged limbs hit hard but the frame is light.',
       },
       {
-        kind: 'fold_automaton',
-        name: 'Fold Automaton',
-        aliases: ['fold', 'fold automaton', 'fold bot'],
+        kind: 'iron_automaton',
+        name: 'Iron Automaton',
+        aliases: ['iron', 'iron automaton', 'iron bot'],
         fuel: [
-          { name: 'Fold Cell', quantity: 2 },
+          { name: 'Heavy Cell', quantity: 2 },
           { name: 'Riveted Plating', quantity: 2 },
-          { name: 'Brass Frame', quantity: 1 },
+          { name: 'Iron Frame', quantity: 1 },
         ],
         hpMax: 44,
         attackDie: '1d8',
@@ -638,8 +629,8 @@ export function buildSummonsTemplate(): string {
         summonDC: 17,
         resistBase: 0.32,
         resistCap: 0.52,
-        elementTags: ['fold'],
-        blurb: 'Heavy guardian. Fold-core armor soaks punishment; slow but relentless.',
+        elementTags: ['iron'],
+        blurb: 'Heavy guardian. Plated armor soaks punishment; slow but relentless.',
       },
     ],
   }, null, 2);
@@ -656,7 +647,7 @@ export function buildSummonsTemplate(): string {
     '//   fuel     — [{ name, quantity }] consumed on a successful summon. Use item',
     '//              names that EXIST in your materials/gear catalog.',
     '//   hpMax / attackDie ("1d10") / attackMod / hitBonus / damageType',
-    '//              (bludgeoning|slashing|piercing|aetheric) — its combat profile.',
+    '//              (bludgeoning|slashing|piercing|frost) — its combat profile.',
     '//   summonDC — d20 + INT must meet this to bind it (harder = stronger).',
     '//   resistBase/resistCap — innate damage resistance (0..1), grows with training.',
     '//   elementTags — raw-material tags it can mend from when its exact parts run out.',
@@ -798,9 +789,9 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in "golems"), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
   entries.push({ key: 'dogEnabled', hint: 'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.', content: JSON.stringify(true) });
   entries.push({ key: 'damageTypes', hint: 'Author-ADDED damage types beyond the built-in 10. Array of { name, keywords?: [..], onHit?: [{stat,amount}] + onHitRounds (stat +/- to the victim when hit), combat?: { mode "on_hit"|"dot", dice, rounds (dot), baseChance 0..1, weakBonus, strongPenalty } }. combat = a weapon-deals-this-type effect (immediate or ticking), whose apply chance rises vs targets WEAK to it and falls vs STRONG. keywords let the engine infer the type from a bare attack string.', content: JSON.stringify([{ name: 'fire', keywords: ['fire', 'flame', 'burn'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } }, { name: 'frost', keywords: ['ice', 'freeze'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3 } }], null, 2) });
-  entries.push({ key: 'damageResistances', hint: 'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Ghost Crew": { "resist": ["aetheric"], "weak": ["frost"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in Tartaria map.', content: JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2) });
-  entries.push({ key: 'fusionTags', hint: 'EXTRA material tags that count toward the Crucible fusion diversity gate, on top of the built-in set (metal/cloth/wood/stone/bone/crystal/…). Array of tag words your items use, e.g. ["servo", "fold-core", "bakelite"].', content: JSON.stringify(['servo', 'fold-core'], null, 2) });
-  entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Phase-rot".', content: JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2) });
+  entries.push({ key: 'damageResistances', hint: 'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Marsh Wyrm": { "resist": ["frost"], "weak": ["burn"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in map.', content: JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2) });
+  entries.push({ key: 'fusionTags', hint: 'EXTRA material tags that count toward the Crucible fusion diversity gate, on top of the built-in set (metal/cloth/wood/stone/bone/crystal/…). Array of tag words your items use, e.g. ["clockwork", "glass", "resin"].', content: JSON.stringify(['clockwork', 'glass'], null, 2) });
+  entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Searing".', content: JSON.stringify({ corruption: { label: 'Searing', blurb: 'sears the wound (damage over time + worsening stacks)', lootLabel: 'Searing' } }, null, 2) });
   entries.push({ key: 'inventory', hint: 'Inventory presentation: { labels?: { weapon|armor|accessory|consumable|tool|relic|material|loot|quest: "Your name" } (rename the category sections), toolTags?: ["tag"] (extra item tags that read as Tools), repairMaterialPct?: 200 (repair material cost as a % of an item\'s scrap yield; 200 = built-in 2x) }. Category ids + order stay fixed.', content: JSON.stringify({ labels: { loot: 'Salvage', material: 'Components' }, toolTags: ['multitool'], repairMaterialPct: 200 }, null, 2) });
   entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
   entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.', content: buildWhispersTemplate(false) });

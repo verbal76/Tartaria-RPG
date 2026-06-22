@@ -69,3 +69,116 @@ export const GENERIC_TABLE_ROWS = {
     { id: 'REPLACE-with-a-weather-id-2', name: 'Ash Wind', description: 'A wall of grey ash rolls across the open ground. Breathing burns; the skin gathers a film of dead land.', visibility: -3, travelPenalty: 4, corruptionChance: 2, tags: ['ash', 'respiratory'], source: 'manual' },
   ],
 } satisfies Record<string, unknown[]>;
+
+// engine_Dev — GENERIC missions for the Missions template. Mirrors the real
+// faction-quest / hunt / mystery / storyline shapes (and shows the newer fields —
+// faction-quest fetch, staged plans, reward.items) with neutral light-fantasy flavor.
+// TEMPLATE-ONLY; the engine's built-in quests are unchanged.
+export const GENERIC_MISSIONS = {
+  hunts: [
+    {
+      id: 'hunt_marsh_wyrm', title: 'The Great Beast of the Old Marsh',
+      posterText: 'A village reeve seeks proof of death — a long shadow has crossed the marsh at dawn, a wing-mark longer than a barn. 800 coin on a confirmed kill.',
+      targetEnemyName: 'Marsh Wyrm', biomeTag: 'marsh', targetLocationName: 'the Old Marsh (the ruined steeple roost)',
+      templateKind: 'standard_7', difficultyTier: 3, difficultyLabel: 'Veteran', recommendedHp: 50, recommendedWeaponRarity: 'Rare',
+      minRep: 0, factionId: null, rewardTc: 800, rewardItem: 'Worked Crystal', rewardRep: null, trophyName: 'Wyrm Scale',
+      stages: [
+        { stageType: 'inciting_hook', narration: 'The reeve closes the bounty book. "I don\'t know where it roosts. Old Mira does — out on the marsh edge. Bring her this token, she\'ll talk."', arbiter: '"Posters mean someone is desperate or someone has died," the narrator says. "Read the room before you sign."', checkKind: null },
+        { stageType: 'first_friction', narration: 'Half a day on, a wing-shadow crosses you. Over the next rise: a goat torn open, three dark scales steaming in the silt. The beast knows there are eyes here now.', arbiter: null, checkKind: 'investigate' },
+        { stageType: 'toll', narration: 'Mira reads the token and waves you to sit. "I\'ll mark its roost. But my boy went into the flooded shrine after the first attack. Bring me his locket. Then we talk."', arbiter: null, checkKind: 'diplomacy' },
+        { stageType: 'favor', narration: 'The flooded shrine is still water and old prayer. You find the boy where he fell and free the locket from his hand. It is still warm.', arbiter: null, checkKind: 'boss' },
+        { stageType: 'approach', narration: 'Mira marks the roost. You make the long climb to the steeple where the beast sleeps off its kill.', arbiter: null, checkKind: 'travel' },
+        { stageType: 'confrontation', narration: 'The beast wakes as your shadow crosses it. No more stalking now — only the fight.', arbiter: null, checkKind: 'boss' },
+        { stageType: 'resolution', narration: 'It falls. You take a scale for proof and start the long walk back to the reeve.', arbiter: null, checkKind: null },
+      ],
+    },
+    {
+      id: 'hunt_pit_stalker', title: 'Something in the Pit',
+      posterText: 'A mine foreman wants the killings stopped — three crews gone in a week. Pays fast and asks no questions. 450 coin.',
+      targetEnemyName: 'Pit Stalker', biomeTag: 'underground', targetLocationName: 'the lower shafts',
+      templateKind: 'bait_switch_5', difficultyTier: 2, difficultyLabel: 'Seasoned', recommendedHp: 35, recommendedWeaponRarity: 'Uncommon',
+      minRep: 0, factionId: 'REPLACE-with-a-faction-id', rewardTc: 450, rewardItem: null, rewardRep: 4, trophyName: 'Stalker Fang',
+      stages: [
+        { stageType: 'inciting_hook', narration: 'The foreman keeps his voice low. "It doesn\'t come up. We go down. Whatever it is, it learned the shafts before we did."', arbiter: null, checkKind: null },
+        { stageType: 'descent', narration: 'The lamps gutter the deeper you go. Drag-marks in the dust lead off the mapped tunnels entirely.', arbiter: null, checkKind: 'investigate' },
+        { stageType: 'reversal', narration: 'The marks loop back. It is not fleeing into the dark — it has been circling you the whole way down.', arbiter: '"You were the one being tracked," the narrator says.', checkKind: 'stealth' },
+        { stageType: 'confrontation', narration: 'It drops from the shaft ceiling between you and the way out. Nowhere to run but through it.', arbiter: null, checkKind: 'boss' },
+        { stageType: 'resolution', narration: 'You climb back into daylight with a fang and a story the foreman would rather not hear.', arbiter: null, checkKind: null },
+      ],
+    },
+  ],
+  mysteries: [
+    {
+      id: 'mystery_cipher_casing', title: 'The Cipher Casing',
+      posterText: 'A scholar will pay handsomely for an intact Cipher Casing — the cursed core\'s outer shell, never recovered whole. 400 coin.',
+      trophyName: 'Cipher Casing', minRep: 0, factionId: 'REPLACE-with-a-faction-id', rewardTc: 400, rewardItem: 'Worked Crystal', rewardRep: 8,
+      stages: [
+        { narration: 'The scholar slides a sketch across the table — a hexagonal ironwork with a maker\'s seal on one face. "The casing shed pieces when it cooled. They turn up. Find one."', arbiter: null, checkKind: null },
+        { narration: 'You think back through old salvage notes. The pieces roll downhill — anywhere loose ground collects, eventually one ends up. Crystal-rich soil is the place to look.', arbiter: '"You know the where," the narrator says. "Now do the work."', checkKind: 'investigate' },
+        { narration: 'You dig along a vein where the silt has built a lip. After an hour, a piece catches your blade — hexagonal, faintly warm.', arbiter: null, checkKind: 'investigate' },
+        { narration: 'You wipe it clean. The seal is intact. This will satisfy the scholar.', arbiter: null, checkKind: 'boss' },
+      ],
+    },
+    {
+      id: 'mystery_steady_compass', title: 'The Steady Compass',
+      posterText: 'A trader offers 300 coin for a working Steady Compass — one of the few instruments that holds true through a lightning storm.',
+      trophyName: 'Steady Compass', minRep: 0, factionId: null, rewardTc: 300, rewardItem: null, rewardRep: null,
+      stages: [
+        { narration: 'The trader taps a dead compass on the counter. "Find me one that doesn\'t spin. They were made before the storms. Somebody still has one."', arbiter: null, checkKind: null },
+        { narration: 'Asking around points you to a wreck on the high ground where a surveyor died with his kit still strapped on.', arbiter: null, checkKind: 'investigate' },
+        { narration: 'You pry the compass from the surveyor\'s pack. The needle holds dead steady, even as the air hums.', arbiter: null, checkKind: 'boss' },
+      ],
+    },
+  ],
+  quests: [
+    {
+      id: 'fq_relay', factionId: 'REPLACE-with-a-faction-id', title: 'Silence the Relay',
+      description: 'Knock out the forward relay before the next supply drop. Staged contract — comes with a small reward kit.',
+      objective: 'Cross the line, find the relay, and put it down.',
+      requirement: { rep: 15 }, reward: { tc: 120, rep: 8, items: ['Bright Torch'] },
+      stages: [
+        { narration: 'Cross the line and find the relay mast on the high ground.', advanceOn: 'travel' },
+        { narration: 'Put the relay down, and its guards with it.', advanceOn: 'kill' },
+      ],
+    },
+    {
+      id: 'fq_scrap_run', factionId: 'REPLACE-with-a-faction-id', title: 'Scrap Run',
+      description: 'The board\'s standing bounty: the order always needs reforging stock. Bring in 3 Scrap Metal.',
+      objective: 'Gather 3 Scrap Metal, then turn the quest in at the board or any agent.',
+      requirement: { rep: 0 }, reward: { tc: 35, rep: 6 },
+      fetch: { itemName: 'Scrap Metal', quantity: 3 },
+    },
+  ],
+  storylines: [
+    {
+      id: 'story_gather_casings', title: 'The Scattered Casings',
+      posterText: 'A scholar wants you to gather every Cipher Casing you can find and bring them in. Multi-step contract. 1500 coin and standing on completion.',
+      factionId: 'REPLACE-with-a-faction-id', minRep: 5, rewardTc: 1500, rewardItem: 'Banded Cuirass', rewardRep: 25,
+      stages: [
+        { narration: 'The scholar spreads a map. "We need every Casing we can put hands on. At least seven, scattered across the silt belt. Find them. Bring them. We pay for each."', arbiter: '"They\'re rebuilding something," the narrator says.', checkKind: null },
+        { narration: 'The first Casing shows up where the scholar promised — a hexagonal piece of cooled iron, still warm. You pocket it.', arbiter: null, checkKind: 'investigate' },
+        { narration: 'A second turns up in an old caravan-wreck. You haggle with the survivor over the price of taking it.', arbiter: null, checkKind: 'diplomacy' },
+        { narration: 'A rival courier is also hunting the Casings — you pass on the road and stay clear of their notice.', arbiter: null, checkKind: 'stealth' },
+        { narration: 'You assemble what you have and study them. They fit together — partially. The scholar was right. You carry the bundle back.', arbiter: null, checkKind: 'boss' },
+      ],
+    },
+  ],
+  objectives: [
+    { id: 'recover_core', verb: 'Recover', target: 'a power core', tags: ['relic', 'high_value', 'core'] },
+    { id: 'map_chamber', verb: 'Map', target: 'the unexplored chamber beneath', tags: ['exploration', 'map'] },
+    { id: 'escort_scholar', verb: 'Escort', target: 'a wandering scholar', tags: ['escort'] },
+    { id: 'raid_vault', verb: 'Raid', target: 'a rival supply vault', tags: ['theft'] },
+  ],
+  complications: [
+    { id: 'rival_patrol', text: 'before a rival patrol arrives', severity: 3, tags: ['faction:REPLACE-with-a-faction-id', 'time_pressure'] },
+    { id: 'approaching_storm', text: 'before the storm rolls in', severity: 3, tags: ['weather', 'time_pressure'] },
+    { id: 'before_collapse', text: 'before the chamber collapses on itself', severity: 4, tags: ['structural', 'time_pressure'] },
+    { id: 'tracked', text: 'while something unseen tracks you through the dark', severity: 3, tags: ['psychological', 'stalker'] },
+  ],
+  rewards: [
+    { id: 'tc_small', type: 'currency', label: '30 Coin', amount: 30, tags: ['currency', 'small'] },
+    { id: 'tc_medium', type: 'currency', label: '120 Coin', amount: 120, tags: ['currency', 'medium'] },
+    { id: 'faction_favor', type: 'standing', label: 'a faction\'s favor (+5)', faction: 'REPLACE-with-a-faction-id', amount: 5, tags: ['faction'] },
+    { id: 'common_relic', type: 'relic', label: 'a common relic', tier: 'common', tags: ['relic'] },
+  ],
+} satisfies Record<string, unknown[]>;
