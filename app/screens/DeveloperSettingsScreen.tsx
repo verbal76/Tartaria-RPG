@@ -2758,37 +2758,6 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         <BossesBox />
       </CollapsibleSection>
 
-      {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine. */}
-      <TouchableOpacity
-        style={styles.applyBtn}
-        onPress={() => {
-          reapply();
-          setApplyMsg('Applied — the engine re-read every uploaded JSON. Start a NEW game to see world/character/enemy changes.');
-        }}
-      >
-        <Text style={styles.applyBtnText}>↻ APPLY ALL — re-read every JSON</Text>
-      </TouchableOpacity>
-      <Text style={styles.publishNote}>
-        Forces the engine to re-read every uploaded pack right now. Uploads already apply as you
-        LOAD them; this is the “make sure everything’s live” switch. A game already in progress
-        keeps the content it was created with — start a NEW game (or new character) to see world,
-        race/faction, enemy, and location changes.
-      </Text>
-      {applyMsg && <Text style={styles.ok}>{applyMsg}</Text>}
-
-      {/* engine_Dev — COPY DIAGNOSTICS: dumps store vs registry vs persisted blob
-          to the clipboard so the dev can paste it for analysis. */}
-      <TouchableOpacity
-        style={styles.copyBtn}
-        onPress={async () => {
-          const dump = await buildContentDiagnostics();
-          await Clipboard.setStringAsync(dump);
-          setApplyMsg('Diagnostics copied to clipboard — paste them back to share the exact engine state.');
-        }}
-      >
-        <Text style={styles.copyBtnText}>⧉ COPY DIAGNOSTICS</Text>
-      </TouchableOpacity>
-
       <CollapsibleSection title="GAME IDENTITY">
         <GameIdentitySection />
       </CollapsibleSection>
@@ -2919,6 +2888,39 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         named “Verbal”.
       </Text>
       </CollapsibleSection>
+
+      {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine.
+          Lives at the bottom (above the red reset) so it's the last thing you hit
+          after editing the sections above. */}
+      <TouchableOpacity
+        style={styles.applyBtn}
+        onPress={() => {
+          reapply();
+          setApplyMsg('Applied — the engine re-read every uploaded JSON. Start a NEW game to see world/character/enemy changes.');
+        }}
+      >
+        <Text style={styles.applyBtnText}>↻ APPLY ALL — re-read every JSON</Text>
+      </TouchableOpacity>
+      <Text style={styles.publishNote}>
+        Forces the engine to re-read every uploaded pack right now. Uploads already apply as you
+        LOAD them; this is the “make sure everything’s live” switch. A game already in progress
+        keeps the content it was created with — start a NEW game (or new character) to see world,
+        race/faction, enemy, and location changes.
+      </Text>
+
+      {/* engine_Dev — COPY DIAGNOSTICS: dumps store vs registry vs persisted blob
+          to the clipboard so the dev can paste it for analysis. */}
+      <TouchableOpacity
+        style={styles.copyBtn}
+        onPress={async () => {
+          const dump = await buildContentDiagnostics();
+          await Clipboard.setStringAsync(dump);
+          setApplyMsg('Diagnostics copied to clipboard — paste them back to share the exact engine state.');
+        }}
+      >
+        <Text style={styles.copyBtnText}>⧉ COPY DIAGNOSTICS</Text>
+      </TouchableOpacity>
+      {applyMsg && <Text style={styles.ok}>{applyMsg}</Text>}
 
       <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
         <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
