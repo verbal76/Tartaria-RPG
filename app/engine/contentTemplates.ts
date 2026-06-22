@@ -680,122 +680,90 @@ and has a TEMPLATE button with an example to edit.
 `;
 }
 
+/** One whole-game section: its key, reference comment, and the TEMPLATE scaffold. */
+interface BundleEntry { key: string; hint: string; content: string }
+
+/** Every whole-game section in file order, each with its template scaffold. Shared
+ *  by the blank template and the annotated download so the section list can never
+ *  drift between them. */
+function bundleEntries(): BundleEntry[] {
+  const entries: BundleEntry[] = [
+    { key: 'title', hint: 'The game title shown on the start screen.', content: JSON.stringify('My Game') },
+    { key: 'tagline', hint: 'One-line tagline under the title.', content: JSON.stringify('A world of your making.') },
+    { key: 'narrator', hint: 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', content: JSON.stringify('Narrator') },
+    { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration uses "Tartaria" in dozens of lines; set this and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
+    { key: 'corruptionName', hint: 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', content: JSON.stringify('Corruption') },
+  ];
+  for (const b of LORE_BLOCKS) entries.push({ key: b.id, hint: b.hint, content: getLoreTemplate(b.id, false) });
+  for (const t of CONTENT_TABLES) entries.push({ key: t.id, hint: t.hint, content: getTableTemplate(t.id, TEMPLATE_SAMPLE_ROWS, false) });
+  entries.push({ key: 'missions', hint: 'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Omit any sub-table to keep its built-in default.', content: buildMissionsTemplate(TEMPLATE_SAMPLE_ROWS, false) });
+  entries.push({ key: 'hooks', hint: 'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.', content: buildHooksTemplate(false) });
+  entries.push({ key: 'wasteland', hint: 'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.', content: buildWastelandTemplate(false) });
+  entries.push({ key: 'titles', hint: 'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.', content: buildTitlesTemplate() });
+  entries.push({ key: 'mainQuest', hint: 'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId? }] }. Steps run in order; the last completes the quest.', content: JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'the ONR Director', bossId: 'REPLACE-with-a-boss-id', locationId: 'REPLACE-with-a-location-id', reward: 'ONR Dog Tags' }, { id: 'step_2', action: 'hand_in', target: 'the dog tags', locationId: 'REPLACE-with-your-base-location-id' }, { id: 'step_3', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' }] }, null, 2) });
+  entries.push({ key: 'bosses', hint: 'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest|always|once) }. Build them in the BOSSES box.', content: JSON.stringify([{ id: 'onr_director', name: 'The ONR Director', factionId: 'REPLACE-with-a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'ONR Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' }], null, 2) });
+  entries.push({ key: 'startingAreas', hint: 'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). The faction member spawns inside it and can walk room-to-room; an exit of "world" steps back out onto the world map. Whispers can plant in a room by naming its room id in plantLocations.', content: buildStartingAreasTemplate() });
+  entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });
+  entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in "golems"), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
+  entries.push({ key: 'dogEnabled', hint: 'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.', content: JSON.stringify(true) });
+  entries.push({ key: 'damageTypes', hint: 'Author-ADDED damage types beyond the built-in 10 (bludgeoning/slashing/piercing/burn/electrical/poison/radiation/stun/degradation/aetheric). Array of { name, keywords?: [..] }. keywords let the engine infer the type from a bare attack string (e.g. "frost" from "ice"/"freeze"). Declare a type on a weapon/enemy and give it resistances below.', content: JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'] }], null, 2) });
+  entries.push({ key: 'damageResistances', hint: 'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Ghost Crew": { "resist": ["aetheric"], "weak": ["frost"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in Tartaria map.', content: JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2) });
+  entries.push({ key: 'fusionTags', hint: 'EXTRA material tags that count toward the Crucible fusion diversity gate, on top of the built-in set (metal/cloth/wood/stone/bone/crystal/…). Array of tag words your items use, e.g. ["servo", "fold-core", "bakelite"].', content: JSON.stringify(['servo', 'fold-core'], null, 2) });
+  entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Phase-rot".', content: JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2) });
+  entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
+  entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.', content: buildWhispersTemplate(false) });
+  return entries;
+}
+
+const BUNDLE_HEADER = [
+  '  // ============================================================',
+  '  // WHOLE-GAME FILE. Edit every section, delete what you don\'t need,',
+  '  // then upload under "UPLOAD FILE FROM DEVICE". // and block comments are OK.',
+  '  // Any section you omit keeps the built-in (Tartaria) default.',
+  '  // ------------------------------------------------------------',
+  '  // CALLABLE TOKENS — drop these in ANY text string (mission arbiter/',
+  '  // narration lines, whispers, hooks, wasteland narration, flavor, lore)',
+  '  // and the engine fills in the name YOU chose, so you never hard-code it:',
+  '  //   {narrator} / {arbiter} / {guide}  -> your narrator name',
+  '  //   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
+  '  //   {title} / {game}                  -> your game title',
+  '  //   {world} / {setting}               -> your world name (replaces "Tartaria")',
+  '  //   {corruption} / {plague}           -> your affliction name (replaces "Corruption")',
+  '  // ============================================================',
+].join('\n');
+
 export function buildGameBundleTemplate(): string {
-  // Each entry is a complete `"key": value` block (with its own reference
-  // comment). They're joined with commas, so every section is comma-separated and
-  // the file parses as JSON once the comments are stripped.
+  const sections = bundleEntries().map((e, i) => {
+    const sec = bundleSection(e.key, e.hint, e.content);
+    return i === 0 ? `${BUNDLE_HEADER}\n${sec}` : sec;
+  });
+  return `{\n${sections.join(',\n\n')}\n}\n`;
+}
+
+/** The WHOLE-GAME download with a per-section status marker so the author can see
+ *  at a glance what's done. A key present in `uploaded` (the export of the current
+ *  game) emits the author's content under "✅ UPLOADED"; every other section emits
+ *  the TEMPLATE scaffold under "⬜ TEMPLATE — default; fill in or delete". The file
+ *  still parses + re-uploads cleanly (markers are // comments). */
+export function buildAnnotatedGameBundle(uploaded: Record<string, unknown>): string {
+  const upCount = Object.keys(uploaded).length;
+  const entries = bundleEntries();
   const header = [
-    '  // ============================================================',
-    '  // WHOLE-GAME FILE. Edit every section, delete what you don\'t need,',
-    '  // then upload under "UPLOAD ENTIRE GAME". // and block comments are OK.',
-    '  // Any section you omit keeps the built-in (Tartaria) default.',
+    BUNDLE_HEADER,
     '  // ------------------------------------------------------------',
-    '  // CALLABLE TOKENS — drop these in ANY text string (mission arbiter/',
-    '  // narration lines, whispers, hooks, wasteland narration, flavor, lore)',
-    '  // and the engine fills in the name YOU chose, so you never hard-code it:',
-    '  //   {narrator} / {arbiter} / {guide}  -> your narrator name',
-    '  //   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
-    '  //   {title} / {game}                  -> your game title',
-    '  //   {world} / {setting}               -> your world name (replaces "Tartaria")',
-    '  //   {corruption} / {plague}           -> your affliction name (replaces "Corruption")',
+    `  // STATUS MARKERS — ${upCount} of ${entries.length} sections uploaded so far:`,
+    '  //   ✅ UPLOADED  = your content (already customized)',
+    '  //   ⬜ TEMPLATE  = still the default scaffold — fill it in or delete it',
     '  // ============================================================',
   ].join('\n');
-
-  const sections: string[] = [
-    // The header sits above the first real key (comments need no comma).
-    `${header}\n${bundleSection('title', 'The game title shown on the start screen.', JSON.stringify('My Game'))}`,
-    bundleSection('tagline', 'One-line tagline under the title.', JSON.stringify('A world of your making.')),
-    bundleSection('narrator', 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', JSON.stringify('Narrator')),
-    bundleSection('worldName', 'Your world\'s proper noun. The built-in narration uses "Tartaria" in dozens of lines; set this and the engine swaps it everywhere the player reads it (also callable as the {world} token).', JSON.stringify('My World')),
-    bundleSection('corruptionName', 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', JSON.stringify('Corruption')),
-  ];
-
-  for (const b of LORE_BLOCKS) {
-    sections.push(bundleSection(b.id, b.hint, getLoreTemplate(b.id, false)));
-  }
-  for (const t of CONTENT_TABLES) {
-    sections.push(bundleSection(t.id, t.hint, getTableTemplate(t.id, TEMPLATE_SAMPLE_ROWS, false)));
-  }
-  sections.push(bundleSection(
-    'missions',
-    'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Omit any sub-table to keep its built-in default.',
-    buildMissionsTemplate(TEMPLATE_SAMPLE_ROWS, false),
-  ));
-  sections.push(bundleSection(
-    'hooks',
-    'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.',
-    buildHooksTemplate(false),
-  ));
-  sections.push(bundleSection(
-    'wasteland',
-    'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.',
-    buildWastelandTemplate(false),
-  ));
-  sections.push(bundleSection(
-    'titles',
-    'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.',
-    buildTitlesTemplate(),
-  ));
-  sections.push(bundleSection(
-    'mainQuest',
-    'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId? }] }. Steps run in order; the last completes the quest.',
-    JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'the ONR Director', bossId: 'REPLACE-with-a-boss-id', locationId: 'REPLACE-with-a-location-id', reward: 'ONR Dog Tags' }, { id: 'step_2', action: 'hand_in', target: 'the dog tags', locationId: 'REPLACE-with-your-base-location-id' }, { id: 'step_3', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' }] }, null, 2),
-  ));
-  sections.push(bundleSection(
-    'bosses',
-    'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest|always|once) }. Build them in the BOSSES box.',
-    JSON.stringify([{ id: 'onr_director', name: 'The ONR Director', factionId: 'REPLACE-with-a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'ONR Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' }], null, 2),
-  ));
-  sections.push(bundleSection(
-    'startingAreas',
-    'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). The faction member spawns inside it and can walk room-to-room; an exit of "world" steps back out onto the world map. Whispers can plant in a room by naming its room id in plantLocations.',
-    buildStartingAreasTemplate(),
-  ));
-  sections.push(bundleSection(
-    'interactionTags',
-    'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.',
-    interactionTagsKeywordSample(),
-  ));
-  sections.push(bundleSection(
-    'summons',
-    'Summoned-sidekick pack (replaces the built-in "golems"), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.',
-    buildSummonsTemplate(),
-  ));
-  sections.push(bundleSection(
-    'dogEnabled',
-    'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.',
-    JSON.stringify(true),
-  ));
-  sections.push(bundleSection(
-    'damageTypes',
-    'Author-ADDED damage types beyond the built-in 10 (bludgeoning/slashing/piercing/burn/electrical/poison/radiation/stun/degradation/aetheric). Array of { name, keywords?: [..] }. keywords let the engine infer the type from a bare attack string (e.g. "frost" from "ice"/"freeze"). Declare a type on a weapon/enemy and give it resistances below.',
-    JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'] }], null, 2),
-  ));
-  sections.push(bundleSection(
-    'damageResistances',
-    'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Ghost Crew": { "resist": ["aetheric"], "weak": ["frost"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in Tartaria map.',
-    JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2),
-  ));
-  sections.push(bundleSection(
-    'fusionTags',
-    'EXTRA material tags that count toward the Crucible fusion diversity gate, on top of the built-in set (metal/cloth/wood/stone/bone/crystal/…). Array of tag words your items use, e.g. ["servo", "fold-core", "bakelite"].',
-    JSON.stringify(['servo', 'fold-core'], null, 2),
-  ));
-  sections.push(bundleSection(
-    'coatings',
-    'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Phase-rot".',
-    JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2),
-  ));
-  sections.push(bundleSection(
-    'collectables',
-    'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.',
-    buildCollectablesTemplate(),
-  ));
-  sections.push(bundleSection(
-    'whispers',
-    'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.',
-    buildWhispersTemplate(false),
-  ));
-
+  const sections = entries.map((e, i) => {
+    const isUp = Object.prototype.hasOwnProperty.call(uploaded, e.key);
+    const status = isUp
+      ? '  // ✅ UPLOADED — your content'
+      : '  // ⬜ TEMPLATE — default; fill in or delete';
+    const content = isUp ? JSON.stringify(uploaded[e.key], null, 2) : e.content;
+    const sec = `${status}\n${bundleSection(e.key, e.hint, content)}`;
+    return i === 0 ? `${header}\n${sec}` : sec;
+  });
   return `{\n${sections.join(',\n\n')}\n}\n`;
 }

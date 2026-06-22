@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildGameBundleTemplate, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -458,9 +458,14 @@ function GameBundleBox() {
   // the right file either way.
   const saveToDevice = async () => {
     const built = hasContent();
-    const out = built ? useContentPackStore.getState().exportGameBundle() : buildGameBundleTemplate();
+    // engine_Dev — always emit the ANNOTATED bundle: every section present, each
+    // marked ✅ UPLOADED (your content) or ⬜ TEMPLATE (still the default), so the
+    // file is easy to navigate. Empty game → all ⬜.
+    let uploaded: Record<string, unknown> = {};
+    try { uploaded = JSON.parse(useContentPackStore.getState().exportGameBundle()) as Record<string, unknown>; } catch { uploaded = {}; }
+    const out = buildAnnotatedGameBundle(uploaded);
     const filename = built ? 'my-game.json' : 'game-template.json';
-    const what = built ? 'your game' : 'the blank template';
+    const what = built ? `your game (${Object.keys(uploaded).length} sections uploaded, rest marked ⬜ template)` : 'the blank template (all sections marked ⬜)';
     try {
       if (Platform.OS === 'android') {
         const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
