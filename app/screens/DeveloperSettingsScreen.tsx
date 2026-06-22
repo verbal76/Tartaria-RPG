@@ -436,126 +436,92 @@ function MusicBox({ category, label, hint }: { category: MusicCategory; label: s
   );
 }
 
-// engine_Dev — WHOLE-GAME upload. One JSONC file holding every section (tables +
-// lore + title/tagline/narrator). Build the entire game in a single upload; the
-// per-section boxes below then show what loaded. GAME TEMPLATE emits the combined
-// file with an inline reference comment on every section.
+// engine_Dev — WHOLE-GAME file. One JSONC file holding every section (tables +
+// lore + title/tagline/narrator). Two actions: SAVE FILE TO DEVICE (the blank
+// commented template while empty, else your built game) and UPLOAD FILE FROM
+// DEVICE; plus a RESET that wipes all uploads back to the built-in defaults.
 function GameBundleBox() {
   const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
-  const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
-  // engine_Dev — EXPORT the finished game to a file you can hand off for an APK
-  // bake. Clipboard works everywhere; on Android we also offer a Save-to-folder
-  // (Downloads) via the Storage Access Framework so you can attach the file
-  // instead of pasting a large blob.
-  const exportToClipboard = () => {
-    const out = useContentPackStore.getState().exportGameBundle();
-    void Clipboard.setStringAsync(out);
-    setStatus({ kind: 'ok', msg: `Copied your whole game to the clipboard (${(out.length / 1024).toFixed(0)} KB). Paste it back to have it baked into an APK.` });
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  // engine_Dev — does the author have ANYTHING loaded yet? exportGameBundle emits
+  // only the sections that have been uploaded, so an empty game serialises to "{}".
+  const hasContent = (): boolean => {
+    try { return Object.keys(JSON.parse(useContentPackStore.getState().exportGameBundle())).length > 0; }
+    catch { return false; }
   };
-  const exportToFile = async () => {
-    const out = useContentPackStore.getState().exportGameBundle();
-    const filename = 'my-game.json';
+
+  // engine_Dev — SAVE to a file on the device. Smart: if the author has loaded
+  // anything, save THEIR game (the file they hand back for an APK bake); if the
+  // game is still empty, save the blank fillable TEMPLATE to start from. One button,
+  // the right file either way.
+  const saveToDevice = async () => {
+    const built = hasContent();
+    const out = built ? useContentPackStore.getState().exportGameBundle() : buildGameBundleTemplate();
+    const filename = built ? 'my-game.json' : 'game-template.json';
+    const what = built ? 'your game' : 'the blank template';
     try {
       if (Platform.OS === 'android') {
         const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (!perm.granted) { setStatus({ kind: 'err', msg: 'Save cancelled — no folder chosen.' }); return; }
         const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, filename, 'application/json');
         await FileSystem.writeAsStringAsync(uri, out);
-        setStatus({ kind: 'ok', msg: `Saved ${filename} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Find it in Files and attach it back to me.` });
+        setStatus({ kind: 'ok', msg: `Saved ${what} as ${filename} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Find it in Files — edit it, then UPLOAD FILE FROM DEVICE.` });
       } else {
         const uri = `${FileSystem.documentDirectory}${filename}`;
         await FileSystem.writeAsStringAsync(uri, out);
-        setStatus({ kind: 'ok', msg: `Saved to ${uri}` });
+        setStatus({ kind: 'ok', msg: `Saved ${what} to ${uri}` });
       }
     } catch (e) {
-      setStatus({ kind: 'err', msg: `Save failed: ${e instanceof Error ? e.message : String(e)}. Use EXPORT (COPY) instead.` });
+      setStatus({ kind: 'err', msg: `Save failed: ${e instanceof Error ? e.message : String(e)}.` });
     }
   };
+
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
         <Text style={styles.cardTitle}>Whole-game file</Text>
-        <Text style={styles.badgeOff}>one upload builds everything</Text>
+        <Text style={styles.badgeOff}>one file is the whole game</Text>
       </View>
       <Text style={styles.hint}>
-        A single JSON object whose keys are section names — weapons, armor, races, factions,
-        locations, weather, enemies, recipes, powers, the lore document, the four lore blocks
-        (world / faction / race / flavor), plus title / tagline / narrator. // and /* */ comments
-        are allowed (the GAME TEMPLATE has a description on every section). Any section you omit
-        keeps its built-in default. Loading this is the same as filling each box below by hand.
-        {' '}Use <Text style={{ fontWeight: 'bold' }}>UPLOAD FILE</Text> to pick a .json straight from
-        your device, or paste into the box and hit <Text style={{ fontWeight: 'bold' }}>UPLOAD ENTIRE
-        GAME (PASTE)</Text>.
+        Your entire game in one .json. Hit{' '}
+        <Text style={{ fontWeight: 'bold' }}>SAVE FILE TO DEVICE</Text> to get the file: the blank
+        fillable template while your game is still empty, or YOUR built game once you’ve loaded
+        anything (that’s the file you hand back for an APK bake). Edit it anywhere, then{' '}
+        <Text style={{ fontWeight: 'bold' }}>UPLOAD FILE FROM DEVICE</Text> to load it — every section
+        it contains is applied at once; anything omitted keeps its built-in default. // and /* */
+        comments are allowed. <Text style={{ fontWeight: 'bold' }}>RESET</Text> wipes all uploaded
+        content back to the built-in defaults if you need a clean slate.
       </Text>
-      <TextInput
-        style={styles.input}
-        value={text}
-        onChangeText={setText}
-        placeholder="Paste your whole-game JSON here…"
-        placeholderTextColor="#5c5446"
-        multiline
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
       <View style={styles.row}>
-        <TouchableOpacity
-          style={styles.loadBtn}
-          onPress={() => {
-            const r = loadGameBundle(text);
-            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
-            if (r.ok) setText('');
-          }}
-        >
-          <Text style={styles.loadBtnText}>⬆ UPLOAD ENTIRE GAME (PASTE)</Text>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.loadBtn}
-          onPress={() => { void (async () => {
+          onPress={() => { setConfirmReset(false); void (async () => {
             const picked = await pickJsonFile();
             if (picked.canceled) { setStatus({ kind: 'err', msg: 'Upload cancelled — no file chosen.' }); return; }
             if (!picked.ok || !picked.content) { setStatus({ kind: 'err', msg: picked.msg ?? 'Could not read that file.' }); return; }
             const r = loadGameBundle(picked.content);
             setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
-            if (r.ok) setText('');
           })(); }}
         >
-          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.tmplBtn}
+          style={styles.resetBtn}
           onPress={() => {
-            setText(buildGameBundleTemplate());
-            setStatus({ kind: 'ok', msg: 'Loaded the whole-game template (every section + reference comments) — edit, then UPLOAD.' });
+            if (!confirmReset) { setConfirmReset(true); setStatus({ kind: 'err', msg: 'Tap RESET again to wipe ALL uploaded content back to the built-in defaults.' }); return; }
+            useContentPackStore.getState().clearAll();
+            setConfirmReset(false);
+            setStatus({ kind: 'ok', msg: 'Reset — every section is back to its built-in default.' });
           }}
         >
-          <Text style={styles.tmplBtnText}>GAME TEMPLATE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            const out = text.trim().length > 0 ? text : buildGameBundleTemplate();
-            void Clipboard.setStringAsync(out);
-            setText('');
-            setStatus({ kind: 'ok', msg: 'Copied the template to clipboard and cleared the box — fill it in, paste back, then UPLOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>COPY TEMPLATE</Text>
+          <Text style={styles.resetBtnText}>{confirmReset ? 'RESET — SURE?' : 'RESET'}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.copyBtn} onPress={exportToClipboard}>
-          <Text style={styles.copyBtnText}>⬇ EXPORT MY GAME (COPY)</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.copyBtn} onPress={() => { void exportToFile(); }}>
-          <Text style={styles.copyBtnText}>⬇ EXPORT (SAVE FILE)</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.hint}>
-        EXPORT serialises your CURRENT game — every table you’ve loaded, the four lore blocks, and
-        the title / tagline / narrator — into one whole-game JSON. That’s the file you hand back to
-        have your game baked into its own standalone APK.
-      </Text>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
     </View>
   );
