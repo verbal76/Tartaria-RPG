@@ -486,7 +486,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   loadTableJson(id, json) {
     let parsed: unknown;
     try {
-      parsed = JSON.parse(json);
+      parsed = JSON.parse(stripJsonComments(json));
     } catch (e) {
       return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
     }
@@ -514,7 +514,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   loadLoreJson(id, json) {
     let parsed: unknown;
     try {
-      parsed = JSON.parse(json);
+      parsed = JSON.parse(stripJsonComments(json));
     } catch (e) {
       return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
     }
