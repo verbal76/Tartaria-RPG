@@ -151,6 +151,8 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   'ready', 'surprised', 'fighting_back', 'quick_fire',
   'stealthed', 'shielded', 'shaped_stone_ward', 'power_attack_pending',
   'defensive_stance', 'distracted',
+  // engine_Dev — a drunk coating's resist lasts "the rest of the fight".
+  'resist_buff',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 

@@ -131,6 +131,7 @@ export function InventoryScreen() {
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
   const applyCoating = useGameStore((s) => s.applyCoating);
+  const drinkCoating = useGameStore((s) => s.drinkCoating);
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
   // the equip modal entirely when pouchFilterActive — a single tap
   // on the eligible item stows it and clears the filter.
@@ -628,6 +629,18 @@ export function InventoryScreen() {
           const coat = pending.item;
           closeModal();
           setCoatTarget(coat);
+        },
+        tone: 'primary',
+      });
+      // engine_Dev — DRINK the vial to resist its damage type for the rest of the
+      // fight. The type is the coating-kind tag the vial carries.
+      const coatType = (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
+      buttons.push({
+        label: coatType ? `Drink (resist ${coatType})` : 'Drink (resist its type)',
+        onPress: () => {
+          const id = pending.item.id;
+          closeModal();
+          drinkCoating(id);
         },
         tone: 'primary',
       });

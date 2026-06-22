@@ -892,7 +892,11 @@ export type StatusEffectKind =
   // OTA-120 — dog distract success applies this to one enemy for
   // the player's NEXT action. The next attack hit roll, dodge
   // parry, or flee from THAT enemy gets +2. Consumed when applied.
-  | 'distracted';
+  | 'distracted'
+  // engine_Dev — drinking a coating vial grants RESIST to its damage type for the
+  // rest of the fight (cleared at combat end). `resistType` carries the type; the
+  // combat site halves that type's damage + lowers its on-hit-effect chance.
+  | 'resist_buff';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -905,6 +909,8 @@ export interface StatusEffect {
    *  how much. effectiveStats reads these when summing buffs. */
   buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
   buffBonus?: number;
+  /** engine_Dev — for 'resist_buff': the damage-type name the drink protects against. */
+  resistType?: string;
 }
 
 // v2.4.1 (OTA 033) — Mud Flood Nexus main quest arc.

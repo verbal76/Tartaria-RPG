@@ -2598,6 +2598,9 @@ interface GameStore {
    *  the prior coating. Returns nothing; surfaces success/refusal
    *  via the log. */
   applyCoating: (coatingItemId: string, weaponId: string) => void;
+  /** engine_Dev — DRINK a coating vial: gain resist to its damage type for the rest
+   *  of the fight, consuming one unit. */
+  drinkCoating: (coatingItemId: string) => void;
   /** OTA-361 — loot a knocked-out humanoid. Transfers the enemy's
    *  `carries` kit (weapons + armor, DAMAGED — durability scaled to how
    *  hurt they were), the full `loot` drop list, and a little TC into
@@ -20309,6 +20312,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
   },
 
+  drinkCoating(coatingItemId) {
+    const player = get().player;
+    if (!player) return;
+    const coatItem = player.inventory.find((i) => i.id === coatingItemId);
+    if (!coatItem) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveItemEffect } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findGearByName } = require('../engine/crafting');
+    const fx = resolveItemEffect(coatItem.name, [findGearByName]);
+    const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+    if (!spec) { get().appendLog('world', `The ${coatItem.name} isn't something you can drink for protection.`); return; }
+    const type = String(spec.kind);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { applyEffect } = require('../engine/statusEffects') as typeof import('../engine/statusEffects');
+    set((s) => {
+      if (!s.player) return s;
+      const effects = applyEffect((s.player.statusEffects ?? []).filter((e) => !(e.kind === 'resist_buff' && e.resistType === type)), {
+        kind: 'resist_buff', remainingRounds: 999, resistType: type, label: `resist ${type}`,
+      });
+      const inv = s.player.inventory
+        .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
+      return { player: { ...s.player, inventory: inv, statusEffects: effects } };
+    });
+    get().appendLog('reward', `You drink the ${coatItem.name.toLowerCase()}. Your blood turns it back on itself — ${type} damage runs off you for the rest of this fight.`);
+    void get().persist();
+  },
+
   async fuseAtCrucible() {
     const player = get().player;
     if (!player) return;
@@ -23629,6 +23661,15 @@ function applyEnemyCounter(
       dmg = Math.max(1, Math.ceil(dmg / 2));
       shieldTag = ' (Defensive Protocols shield)';
     }
+    // engine_Dev — DRUNK-COATING resist: a resist_buff for this damage type halves
+    // the incoming damage (and lowers its on-hit-effect chance, below) for the rest
+    // of the fight.
+    let drinkResistTag = '';
+    const drinkResists = (player.statusEffects ?? []).some((e) => e.kind === 'resist_buff' && (e.resistType ?? '').toLowerCase() === (enemyDamageType ?? '').toLowerCase());
+    if (dmg > 1 && drinkResists) {
+      dmg = Math.max(1, Math.ceil(dmg / 2));
+      drinkResistTag = ` (you shrug off the ${enemyDamageType})`;
+    }
 
     // ACTIVE PARRY — the player committed a dodge before this swing
     // landed. Opposed roll: d20 + DEX vs the enemy's attack total.
@@ -23758,7 +23799,7 @@ function applyEnemyCounter(
       const t = (explicitDamageType ?? '').toLowerCase();
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const rf = (require('../engine/raceMechanics') as typeof import('../engine/raceMechanics')).playerRaceFactionResists(player);
-      const resists = resisted.blocked || rf.resist.includes(t);
+      const resists = resisted.blocked || drinkResists || rf.resist.includes(t);
       const weak = rf.weak.includes(t);
       incChanceMult = resists ? 0.35 : weak ? 1.6 : 1;
     }
@@ -23790,7 +23831,7 @@ function applyEnemyCounter(
         : titleHazardShaved > 0
           ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
           : '';
-      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag;
+      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag + drinkResistTag;
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;
