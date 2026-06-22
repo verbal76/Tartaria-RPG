@@ -30,7 +30,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'amulets', label: 'Amulets', hint: 'JSON array of amulet/relic rows (data/items/amulets.json)' },
   { id: 'rings', label: 'Rings', hint: 'JSON array of ring rows (data/items/rings.json)' },
   { id: 'recipes', label: 'Crafting recipes', hint: 'JSON array (data/items/recipes.json)' },
-  { id: 'enemies', label: 'Enemies', hint: 'JSON array of enemy rows (data/enemies/…)' },
+  { id: 'enemies', label: 'Enemies', hint: 'JSON array of enemy rows. DAMAGE RELATIONS per enemy: "damage" carries what it DELIVERS (dice + a damage-type word, e.g. "2d6 frost" — any type you defined in Damage Types); "traits" carries WEAK / STRONG — add "vulnerable:<type>" for weak-to (takes 1.5×) and "resist:<type>" for strong-against (takes ½), e.g. traits: ["vulnerable:burn","resist:electrical"]. Types must match your Damage Types names.' },
   { id: 'races', label: 'Races (playable — character creation)', hint: 'JSON array of race rows. THIS is what the race-selection screen shows. (Not the "Race lore" box up in LORE — that\'s freeform story text.) PERKS + GEAR per race: "racialStatBonuses" {strength?,…} (always-on stat bumps), "racialACBonusRules" [{condition,delta}] (conditional AC), "startingWeapon" (item name for the starter primary), "startingGear" ["item names"] (extra creation items from your catalogs), "abilities" [{id,name,description,combatOnly?,effect:{type:heal|stat_buff|shield|repair|strike, amount?|dice?, stat?, rounds?, damageType?}}] (once-a-day powers).' },
   { id: 'factions', label: 'Factions (playable — character creation)', hint: 'JSON array of faction rows. THIS is what the faction-selection screen shows. (Not the "Faction lore" box up in LORE.) Optional per faction: "flavor" (2-3 sentence blurb), "baseName" (STARTER COMPLEX title), "baseLocationId" (spawn location id). PERKS + GEAR: "startingGear" ["item names"] (creation items from your catalogs — replaces the built-in faction knife), "factionStatBonuses" {strength?,…} (always-on stat bumps while a member), "factionACBonusRules" [{condition,delta}] (conditional AC), "abilities" [{id,name,description,combatOnly?,effect:{type:heal|stat_buff|shield|repair|strike,…}}] (once-a-day powers).' },
   { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json). Optional per row: "x" / "y" — the spot to plot this location on your uploaded world map, in the world size set under MAPS (0,0 = top-left). Optional "hidden": true — the place shows as a colored "?" on the map and in the travel list (still fully routable) and reveals its real name only after the player travels there once.' },
@@ -513,9 +513,21 @@ export function isDogEnabled(): boolean { return dogEnabled; }
 // engine_Dev — the engine ships 10 built-in damage types (bludgeoning, slashing,
 // piercing, burn, electrical, poison, radiation, stun, degradation, aetheric). An
 // author can ADD their own (e.g. "frost", "sonic") here; each extra type carries
-// optional keyword aliases so the engine can infer it from a bare attack string.
-// Extends (never removes) the built-ins. Read via damageTypes.ts.
-export interface ExtraDamageType { name: string; keywords?: string[] }
+// optional keyword aliases so the engine can infer it from a bare attack string,
+// and an optional ON-HIT stat effect: when a creature is HIT by this type, the
+// listed stat mods apply to the VICTIM for `onHitRounds` rounds (e.g. "cucumber"
+// -> target −2 INT for 3 rounds). Extends (never removes) the built-ins.
+export interface DamageStatMod { stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma' | 'stealth'; amount: number }
+export interface ExtraDamageType { name: string; keywords?: string[]; onHit?: DamageStatMod[]; onHitRounds?: number }
+/** The on-hit stat effect for a damage type, or null when none (built-in types
+ *  carry no stat effect). Resolved against the author's uploaded damage types. */
+export function getDamageTypeOnHit(typeName: string | null | undefined): { mods: DamageStatMod[]; rounds: number } | null {
+  if (!typeName) return null;
+  const lc = typeName.toLowerCase();
+  const t = getExtraDamageTypes().find((e) => e.name.toLowerCase() === lc);
+  if (!t || !Array.isArray(t.onHit) || t.onHit.length === 0) return null;
+  return { mods: t.onHit, rounds: Math.max(1, t.onHitRounds ?? 3) };
+}
 let damageTypesOverride: ExtraDamageType[] | null = null;
 export function setDamageTypesOverride(rows: readonly ExtraDamageType[] | null): void {
   damageTypesOverride = rows && rows.length > 0 ? (rows as ExtraDamageType[]) : null;

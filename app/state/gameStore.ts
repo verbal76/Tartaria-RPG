@@ -23735,6 +23735,24 @@ function applyEnemyCounter(
           label: traitHit.label,
         });
       }
+      // engine_Dev — DAMAGE-TYPE ON-HIT stat effect. If the author gave this damage
+      // type an on-hit stat mod (e.g. "cucumber" → −2 INT), apply it to the VICTIM
+      // (here, the player) as a temporary stat status for the type's onHitRounds.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const onHit = (require('../engine/contentPack') as typeof import('../engine/contentPack')).getDamageTypeOnHit(enemyDamageType);
+      if (onHit) {
+        for (const m of onHit.mods) {
+          if (!m.amount) continue;
+          if (m.stat === 'stealth') continue; // buff-status effects don't carry stealth
+          effects = applyEffect(effects ?? [], {
+            kind: 'food_buff',
+            remainingRounds: onHit.rounds,
+            buffStat: m.stat,
+            buffBonus: m.amount,
+            label: `${enemyDamageType} (${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3).toUpperCase()})`,
+          });
+        }
+      }
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 

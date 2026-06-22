@@ -1570,7 +1570,106 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
   );
 }
 
-const DAMAGE_TYPES_TEMPLATE = JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'] }], null, 2);
+const DAMAGE_TYPES_TEMPLATE = JSON.stringify([{ name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3 }], null, 2);
+const DT_STATS: Array<'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma' | 'stealth'> = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
+
+// engine_Dev — DAMAGE TYPES builder. Name + keyword aliases + an optional ON-HIT
+// stat effect (per-stat +/- applied to whoever is hit by this type, for N rounds),
+// written straight into the damageTypes JSON. Round-trips: an uploaded file shows
+// in the list, edit/add here, it rewrites the file. These names then populate the
+// enemy Weak / Strong / Delivers pickers below.
+function DamageTypesBuilder() {
+  const damageTypes = useContentPackStore((s) => s.damageTypes) as Array<{ name: string; keywords?: string[]; onHit?: Array<{ stat: string; amount: number }>; onHitRounds?: number }>;
+  const loadDamageTypesJson = useContentPackStore((s) => s.loadDamageTypesJson);
+  const [name, setName] = useState('');
+  const [keywords, setKeywords] = useState('');
+  const [rounds, setRounds] = useState('3');
+  const [mods, setMods] = useState<Record<string, string>>({});
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+
+  const apply = (list: unknown[], msg: string) => {
+    const r = loadDamageTypesJson(JSON.stringify(list));
+    setStatus(r.ok ? { kind: 'ok', msg } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  const addType = () => {
+    const nm = name.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Name the damage type.' }); return; }
+    const onHit = DT_STATS
+      .map((s) => ({ stat: s, amount: Math.trunc(Number(mods[s] ?? '')) }))
+      .filter((m) => Number.isFinite(m.amount) && m.amount !== 0);
+    const def: Record<string, unknown> = { name: nm };
+    const kw = keywords.split(',').map((k) => k.trim()).filter(Boolean);
+    if (kw.length > 0) def.keywords = kw;
+    if (onHit.length > 0) { def.onHit = onHit; def.onHitRounds = Math.max(1, Math.trunc(Number(rounds) || 3)); }
+    const next = [...damageTypes.filter((d) => d.name.toLowerCase() !== nm.toLowerCase()), def];
+    apply(next, `Added “${nm}”${onHit.length ? ` (${onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')} on hit)` : ''}. (${next.length} total)`);
+    setName(''); setKeywords(''); setMods({});
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Damage types (define)</Text>
+        <Text style={damageTypes.length > 0 ? styles.badgeOn : styles.badgeOff}>{damageTypes.length > 0 ? `● ${damageTypes.length} added` : '○ built-in 10'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        Define damage types beyond the built-in 10 (bludgeoning, slashing, piercing, burn, electrical,
+        poison, radiation, stun, degradation, aetheric). Name it, add keyword aliases (so a bare attack
+        string like “ice blast” infers it), and optionally an <Text style={{ fontWeight: 'bold' }}>on-hit
+        stat effect</Text> — when something is HIT by this type, the +/- applies to the victim for N
+        rounds. These names then fill the enemy Weak / Strong / Delivers pickers.
+      </Text>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Type name (e.g. frost)" placeholderTextColor="#5c5446" autoCapitalize="none" />
+        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={keywords} onChangeText={setKeywords} placeholder="keywords, comma-sep (ice, freeze)" placeholderTextColor="#5c5446" autoCapitalize="none" />
+      </View>
+      <Text style={styles.hint}>On-hit stat effect (optional) — leave blank for none:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {DT_STATS.map((s) => (
+          <View key={s} style={{ alignItems: 'center', marginRight: 6, marginBottom: 4 }}>
+            <Text style={[styles.hint, { marginBottom: 0 }]}>{s.slice(0, 3).toUpperCase()}</Text>
+            <TextInput
+              style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]}
+              value={mods[s] ?? ''}
+              onChangeText={(v) => setMods((m) => ({ ...m, [s]: v }))}
+              placeholder="0"
+              placeholderTextColor="#5c5446"
+              keyboardType="numbers-and-punctuation"
+            />
+          </View>
+        ))}
+        <View style={{ alignItems: 'center', marginBottom: 4 }}>
+          <Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text>
+          <TextInput style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]} value={rounds} onChangeText={setRounds} placeholder="3" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        </View>
+        <TouchableOpacity style={[styles.loadBtn, { alignSelf: 'flex-end', marginBottom: 4 }]} onPress={addType}><Text style={styles.loadBtnText}>+ ADD</Text></TouchableOpacity>
+      </View>
+
+      {damageTypes.map((d) => (
+        <View key={d.name} style={styles.titleRowDev}>
+          <Text style={styles.hint}>
+            ◆ <Text style={{ fontWeight: 'bold' }}>{d.name}</Text>
+            {Array.isArray(d.onHit) && d.onHit.length > 0 ? ` — ${d.onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')} / ${d.onHitRounds ?? 3}r` : ''}
+          </Text>
+          <TouchableOpacity onPress={() => apply(damageTypes.filter((x) => x.name !== d.name), `Removed “${d.name}”.`)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a damage-types JSON array" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDamageTypesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); setStatus({ kind: 'ok', msg: damageTypes.length > 0 ? 'Loaded your current types — edit, then LOAD.' : 'Loaded the template — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>{damageTypes.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : (damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); const r = await saveJsonToFile('damage-types.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.loadBtn} onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadDamageTypesJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}><Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text></TouchableOpacity>
+        {damageTypes.length > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDamageTypes(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
 const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2);
 const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
 const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2);
@@ -1583,17 +1682,7 @@ function AdvancedRulesBoxes() {
   const store = useContentPackStore;
   return (
     <>
-      <RulesBox
-        title="Damage types (extra)"
-        badge={`● ${damageTypes.length} added`}
-        hasData={damageTypes.length > 0}
-        filename="damage-types.json"
-        currentJson={() => JSON.stringify(damageTypes, null, 2)}
-        template={DAMAGE_TYPES_TEMPLATE}
-        onLoad={(j) => store.getState().loadDamageTypesJson(j)}
-        onClear={() => store.getState().clearDamageTypes()}
-        hint={<>Add damage types beyond the built-in 10 (e.g. <Text style={{ fontWeight: 'bold' }}>frost</Text>, sonic). Array of {'{ name, keywords? }'}; keywords let the engine infer the type from a bare attack string. Then give enemies resistances to it below.</>}
-      />
+      <DamageTypesBuilder />
       <RulesBox
         title="Enemy resistances"
         badge={`● ${damageResistances ? Object.keys(damageResistances).length : 0} types`}
