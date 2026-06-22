@@ -697,6 +697,10 @@ export interface StartingAreaRoom {
   interactables?: string[];
   exits?: { north?: string | null; south?: string | null; east?: string | null; west?: string | null };
   anchorNpc?: string | null;
+  /** engine_Dev — when true, the starter Mission Board stands in THIS room (the
+   *  faction's rep-gated postings). Replaces the built-in hard-coded outpost_central
+   *  gate for uploaded areas. Flag exactly one room per area. */
+  missionBoard?: boolean;
 }
 
 /** Sentinel exit value meaning "leave the instance back onto the world map". */
@@ -706,6 +710,15 @@ export interface StartingArea {
   name: string;
   locationId: string;
   rooms: StartingAreaRoom[];
+  /** engine_Dev — world-map grid cell where this area sits. Optional metadata used
+   *  by the map planner (tap-to-place) and as a placement hint; the live hub still
+   *  anchors on `locationId`. */
+  coords?: { x: number; y: number };
+  /** engine_Dev — if false, the area is a one-way prologue: once the player exits to
+   *  the world map it vanishes (can't be re-entered), and any missions that
+   *  originated here switch to REMOTE turn-in (completable from anywhere) since
+   *  there's no board to return to. Defaults to true (a normal, returnable base). */
+  returnable?: boolean;
 }
 let startingAreasOverride: StartingArea[] | null = null;
 export function setStartingAreasOverride(rows: readonly unknown[] | null): void {
@@ -722,6 +735,17 @@ export function startingAreaForFaction(factionId: string | null | undefined): St
 export function startingAreaAtLocation(locationId: string | null | undefined): StartingArea | null {
   if (!locationId || !startingAreasOverride) return null;
   return startingAreasOverride.find((a) => a.locationId === locationId) ?? null;
+}
+/** A starting area is returnable unless its author explicitly set returnable:false.
+ *  A non-returnable area is a one-way prologue (vanishes after you leave). */
+export function startingAreaIsReturnable(area: StartingArea | null | undefined): boolean {
+  return !area || area.returnable !== false;
+}
+/** True when a faction's home base is a one-way prologue → its missions use REMOTE
+ *  turn-in (no board to come back to). */
+export function factionUsesRemoteTurnIn(factionId: string | null | undefined): boolean {
+  const area = startingAreaForFaction(factionId);
+  return area != null && area.returnable === false;
 }
 
 

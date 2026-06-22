@@ -4897,8 +4897,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // posts the player's own faction's contracts (the rep-0 starters + anything
     // they qualify for), giving a brand-new character an immediate quest on-ramp
     // without having to stumble onto a wandering trader.
+    // engine_Dev — the board stands in the room the uploaded starter area flags
+    // (hubRoom.missionBoard); for the built-in Tartaria outpost it falls back to the
+    // hard-coded central square. Either way it posts the player faction's contracts.
     const missionBoard: { faction: string } | null =
-      hubRoom?.id === 'outpost_central' && player?.factionId
+      (hubRoom?.missionBoard === true || hubRoom?.id === 'outpost_central') && player?.factionId
         ? { faction: player.factionId }
         : null;
     const scene: CurrentScene = {

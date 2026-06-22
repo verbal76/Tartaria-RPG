@@ -43,6 +43,8 @@ export interface HubRoom {
    *  parser targets. Replaces the noun extractor for hub rooms.
    *  Lowercase, no punctuation, singular preferred. */
   interactables?: string[];
+  /** engine_Dev — the starter Mission Board stands in this room (uploaded areas). */
+  missionBoard?: boolean;
 }
 
 interface HubData {
@@ -88,6 +90,7 @@ function mapStartingRoom(r: StartingAreaRoom): HubRoom {
     anchorNpc: r.anchorNpc ?? null,
     tags: [],
     interactables: r.interactables,
+    missionBoard: r.missionBoard === true,
   };
 }
 
