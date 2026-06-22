@@ -995,6 +995,15 @@ function InteractionTagsBox() {
       {/* engine_Dev — file path: the per-noun list is long; save it to a file, edit
           in a real editor, and upload the file back (no giant paste). */}
       <View style={styles.row}>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => {
+          let current: Record<string, string[]> | undefined;
+          try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
+          if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
+          void Clipboard.setStringAsync(buildInteractionTagsTemplate(current));
+          setStatus({ kind: 'ok', msg: 'Copied to clipboard.' });
+        }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={async () => {
@@ -1104,6 +1113,9 @@ function StartingAreasBox() {
         )}
       </View>
       <View style={styles.row}>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(startingAreas, null, 2) : buildStartingAreasTemplate())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={async () => {
@@ -1256,6 +1268,9 @@ function TitlesBox() {
         >
           <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={async () => {
@@ -1347,6 +1362,9 @@ function CollectablesBox() {
           }}
         >
           <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate()); void Clipboard.setStringAsync(content); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
@@ -1458,6 +1476,9 @@ function SummonsBox() {
         >
           <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : current()); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={async () => {
@@ -1543,21 +1564,12 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
         }}>
           <Text style={styles.tmplBtnText}>{hasData ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.copyBtn} onPress={async () => {
+        <TouchableOpacity style={styles.copyBtn} onPress={() => {
           const content = text.trim().length > 0 ? text : editOrTemplate();
-          const r = await saveJsonToFile(filename, content);
-          setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          void Clipboard.setStringAsync(content);
+          setStatus({ kind: 'ok', msg: 'Copied to clipboard.' });
         }}>
-          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.loadBtn} onPress={async () => {
-          const r = await pickJsonFile();
-          if (r.canceled) return;
-          if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
-          const res = onLoad(r.content);
-          setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} entr${res.count === 1 ? 'y' : 'ies'} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
-        }}>
-          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+          <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
         {hasData && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { onClear(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
@@ -1703,8 +1715,7 @@ function DamageTypesBuilder() {
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDamageTypesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); setStatus({ kind: 'ok', msg: damageTypes.length > 0 ? 'Loaded your current types — edit, then LOAD.' : 'Loaded the template — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>{damageTypes.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : (damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); const r = await saveJsonToFile('damage-types.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.loadBtn} onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadDamageTypesJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}><Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { const content = text.trim().length > 0 ? text : (damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); void Clipboard.setStringAsync(content); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         {damageTypes.length > 0 && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDamageTypes(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>
         )}
@@ -1972,6 +1983,7 @@ function BossesBox() {
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadBossesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} boss(es).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(customBosses.length > 0 ? JSON.stringify(customBosses, null, 2) : JSON.stringify([{ id: 'a_boss', name: 'The Warlord', factionId: 'a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'a-location-id', spawnCondition: 'main_quest' }], null, 2)); setStatus({ kind: 'ok', msg: customBosses.length > 0 ? 'Loaded your bosses — edit, then LOAD.' : 'Loaded an example boss — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>{customBosses.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2)); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2); const r = await saveJsonToFile('bosses.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.loadBtn} onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadBossesJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} boss(es) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}><Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text></TouchableOpacity>
         {customBosses.length > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearBosses(); setStatus({ kind: 'ok', msg: 'Cleared bosses.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
@@ -2163,6 +2175,9 @@ function MainQuestBox() {
           }}
         >
           <Text style={styles.tmplBtnText}>{steps.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : JSON.stringify(customMainQuest ?? { title: 'My Main Quest', steps: [] }, null, 2)); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
@@ -2611,7 +2626,9 @@ const styles = StyleSheet.create({
     color: '#e6d8b3', backgroundColor: '#0a0908', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
     padding: 8, marginTop: 6, minHeight: 70, maxHeight: 160, fontSize: 11, fontFamily: 'monospace', textAlignVertical: 'top',
   },
-  row: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  // engine_Dev — wrap so a row of action buttons stacks onto the next line instead
+  // of running off the right edge of the screen.
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   // engine_Dev — full-width stacked buttons (the whole-game actions are too wide to
   // sit side by side). Column container + centered, stretched buttons.
   stackCol: { flexDirection: 'column', gap: 8, marginTop: 8 },
