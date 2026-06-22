@@ -14,6 +14,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { resolveGolemDefs, getSummonNoun, type GolemDefinition } from '../engine/golems';
+import { getEnergyName, hasEnergyOverride } from '../engine/contentPack';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -170,6 +171,10 @@ export function CraftingScreen() {
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   const [tab, setTab] = useState<Tab>('craft');
+  // engine_Dev — the 4th tab is the "magic" discipline. Its label pulls the game's
+  // energy name (world.energy.name) once set; default is a generic "Magic" (not the
+  // Tartaria "Aetheric") so a fresh engine_Dev game reads agnostic until configured.
+  const magicWord = (hasEnergyOverride() ? getEnergyName() : 'Magic').toUpperCase();
   // OTA-264 — post-craft confirmation modal state. Non-null after a
   // successful craft (RecipesView's inventory diff produced items);
   // CONTINUE CRAFTING clears it to null (popup closes, screen stays
@@ -295,7 +300,7 @@ export function CraftingScreen() {
           {tab === 'craft' ? 'CRAFTING'
             : tab === 'repair' ? 'REPAIR'
             : tab === 'recipes' ? 'RECIPES'
-            : 'AETHERIC'}
+            : magicWord}
         </Text>
         <View style={{ width: 80 }} />
       </View>
@@ -329,7 +334,7 @@ export function CraftingScreen() {
           style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>AETHERIC</Text>
+          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>{magicWord}</Text>
         </TouchableOpacity>
       </View>
 
