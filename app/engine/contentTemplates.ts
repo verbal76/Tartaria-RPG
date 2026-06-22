@@ -698,7 +698,7 @@ also keeps a raw-JSON/file strip for power edits.
 
 ## 1 · Identity & World (do first — everything else reads these)
   - Game name / Tagline / Narrator name / Fusion-feature (Crucible) name + on-off
-  - World name (replaces "Tartaria" everywhere) · Corruption/affliction name
+  - World name (replaces the built-in world name everywhere) · Corruption/affliction name
   - World lore: narrator persona ({narrator}/{world}/{energy} tokens work here),
     tone, setting, terms, vocabulary, and:
       • energy: name + adjective + material + slang + per-faction terms (your "magic")
@@ -771,7 +771,7 @@ function bundleEntries(): BundleEntry[] {
     { key: 'title', hint: 'The game title shown on the start screen.', content: JSON.stringify('My Game') },
     { key: 'tagline', hint: 'One-line tagline under the title.', content: JSON.stringify('A world of your making.') },
     { key: 'narrator', hint: 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', content: JSON.stringify('Narrator') },
-    { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration uses "Tartaria" in dozens of lines; set this and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
+    { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration names a default world in dozens of lines; set yours and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
     { key: 'corruptionName', hint: 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', content: JSON.stringify('Corruption') },
     { key: 'crucibleName', hint: 'Your name for the fusion/forge feature the engine calls the "Crucible" (also the {crucible}/{fuse}/{forge} token). Set in the GAME IDENTITY section.', content: JSON.stringify('Crucible') },
     { key: 'crucibleEnabled', hint: 'Whether the fusion/forge feature exists in this game: true (default) keeps it, false removes the Crucible entirely. Toggle it in the GAME IDENTITY section.', content: JSON.stringify(true) },
@@ -802,7 +802,7 @@ const BUNDLE_HEADER = [
   '  // ============================================================',
   '  // WHOLE-GAME FILE. Edit every section, delete what you don\'t need,',
   '  // then upload under "UPLOAD FILE FROM DEVICE". // and block comments are OK.',
-  '  // Any section you omit keeps the built-in (Tartaria) default.',
+  '  // Any section you omit keeps the built-in default.',
   '  // ------------------------------------------------------------',
   '  // CALLABLE TOKENS — drop these in ANY text string (mission arbiter/',
   '  // narration lines, whispers, hooks, wasteland narration, flavor, lore)',
@@ -810,7 +810,7 @@ const BUNDLE_HEADER = [
   '  //   {narrator} / {arbiter} / {guide}  -> your narrator name',
   '  //   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
   '  //   {title} / {game}                  -> your game title',
-  '  //   {world} / {setting}               -> your world name (replaces "Tartaria")',
+  '  //   {world} / {setting}               -> your world name (replaces the built-in world name)',
   '  //   {corruption} / {plague}           -> your affliction name (replaces "Corruption")',
   '  // ============================================================',
 ].join('\n');
