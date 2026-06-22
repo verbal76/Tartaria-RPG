@@ -579,15 +579,14 @@ function MissionsBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(missions, null, 2) : buildMissionsTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current missions — edit, then LOAD.' : 'Loaded the missions template — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildMissionsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the missions template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(missions, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current missions — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
@@ -661,15 +660,14 @@ function HooksBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(hooks, null, 2) : buildHooksTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current hooks — edit, then LOAD.' : 'Loaded the hooks template — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildHooksTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the hooks template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(hooks, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current hooks — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
@@ -746,15 +744,14 @@ function WhispersBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(whispers, null, 2) : buildWhispersTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current whispers — edit, then LOAD.' : 'Loaded the whispers template — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildWhispersTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the whispers template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(whispers, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current whispers — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
@@ -834,15 +831,14 @@ function WastelandBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(wasteland, null, 2) : buildWastelandTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current encounters — edit, then LOAD.' : 'Loaded the encounters template — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildWastelandTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the encounters template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(wasteland, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current encounters — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
@@ -1083,15 +1079,14 @@ function StartingAreasBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(startingAreas, null, 2) : buildStartingAreasTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current areas — edit, then LOAD.' : 'Loaded a 4-room example — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildStartingAreasTemplate()); setStatus({ kind: 'ok', msg: 'Loaded a 4-room example — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(startingAreas, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current areas — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
@@ -1259,15 +1254,14 @@ function TitlesBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your titles — edit, then LOAD.' : 'Loaded the template (lists every trackable variable).' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildTitlesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the template (lists every trackable variable).' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(customTitles, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your titles — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
           <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
@@ -1354,15 +1348,14 @@ function CollectablesBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current stories — edit, then LOAD.' : 'Loaded the collectables template — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildCollectablesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the collectables template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify({ stories: collectables }, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current stories — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.copyBtn} onPress={() => { const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate()); void Clipboard.setStringAsync(content); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
           <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
@@ -1467,15 +1460,14 @@ function SummonsBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tmplBtn}
-          onPress={() => {
-            setText(current());
-            setStatus({ kind: 'ok', msg: loaded > 0 ? 'Loaded your current summons — edit, then LOAD.' : 'Loaded the summons template — edit, then LOAD.' });
-          }}
-        >
-          <Text style={styles.tmplBtnText}>{loaded > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSummonsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the summons template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify({ noun: summons?.noun, summons: summons?.defs ?? [] }, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current summons — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : current()); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
           <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
@@ -1558,12 +1550,14 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
         }}>
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => {
-          setText(editOrTemplate());
-          setStatus({ kind: 'ok', msg: hasData ? 'Loaded your current entries — edit, then LOAD.' : 'Loaded the template — edit, then LOAD.' });
-        }}>
-          <Text style={styles.tmplBtnText}>{hasData ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(template); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {hasData && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(currentJson()); setStatus({ kind: 'ok', msg: 'Loaded your current entries — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.copyBtn} onPress={() => {
           const content = text.trim().length > 0 ? text : editOrTemplate();
           void Clipboard.setStringAsync(content);
@@ -1714,7 +1708,8 @@ function DamageTypesBuilder() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a damage-types JSON array" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDamageTypesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); setStatus({ kind: 'ok', msg: damageTypes.length > 0 ? 'Loaded your current types — edit, then LOAD.' : 'Loaded the template — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>{damageTypes.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(DAMAGE_TYPES_TEMPLATE); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        {damageTypes.length > 0 && <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(damageTypes, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current types — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>EDIT CURRENT</Text></TouchableOpacity>}
         <TouchableOpacity style={styles.copyBtn} onPress={() => { const content = text.trim().length > 0 ? text : (damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); void Clipboard.setStringAsync(content); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         {damageTypes.length > 0 && (
           <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDamageTypes(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>
@@ -2261,14 +2256,23 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
         <TouchableOpacity
           style={styles.tmplBtn}
           onPress={() => {
-            setText(templateText());
-            setStatus({ kind: 'ok', msg: hasUpload
-              ? `Loaded your current ${count} uploaded rows — edit, then LOAD to save changes.`
-              : `Loaded the first ${TEMPLATE_SAMPLE_ROWS} built-in rows as a template — edit, then LOAD.` });
+            setText(getTableTemplate(id));
+            setStatus({ kind: 'ok', msg: `Loaded the first ${TEMPLATE_SAMPLE_ROWS} built-in rows + the optional-field notes as a template — edit, then LOAD.` });
           }}
         >
-          <Text style={styles.tmplBtnText}>{hasUpload ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {hasUpload && (
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => {
+              setText(JSON.stringify(current, null, 2));
+              setStatus({ kind: 'ok', msg: `Loaded your current ${count} uploaded rows — edit, then LOAD to save changes.` });
+            }}
+          >
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
@@ -2334,14 +2338,23 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
         <TouchableOpacity
           style={styles.tmplBtn}
           onPress={() => {
-            setText(templateText());
-            setStatus({ kind: 'ok', msg: on
-              ? 'Loaded your current upload — edit, then LOAD to save changes.'
-              : 'Loaded a template — edit, then LOAD.' });
+            setText(getLoreTemplate(id));
+            setStatus({ kind: 'ok', msg: 'Loaded a template — edit, then LOAD.' });
           }}
         >
-          <Text style={styles.tmplBtnText}>{on ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {on && (
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => {
+              setText(JSON.stringify(current, null, 2));
+              setStatus({ kind: 'ok', msg: 'Loaded your current upload — edit, then LOAD to save changes.' });
+            }}
+          >
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.copyBtn}
           onPress={() => {
