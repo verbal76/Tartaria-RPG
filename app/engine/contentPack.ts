@@ -82,6 +82,8 @@ interface GenericDefaultPack {
   mainQuest?: { title?: string; steps?: unknown[] };
   bosses?: unknown[];
   collectables?: unknown[];
+  // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
+  identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
 const genericDefaults: GenericDefaultPack = { tables: {}, missions: {} };
 let genericDefaultsInstalled = false;
@@ -93,6 +95,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.mainQuest = pack.mainQuest;
   genericDefaults.bosses = pack.bosses;
   genericDefaults.collectables = pack.collectables;
+  genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
 export function hasGenericDefaults(): boolean { return genericDefaultsInstalled; }
@@ -105,6 +108,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.mainQuest = undefined;
   genericDefaults.bosses = undefined;
   genericDefaults.collectables = undefined;
+  genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
 
@@ -134,7 +138,7 @@ export function setGameTitleOverride(name: string | null): void {
 }
 export function hasGameTitleOverride(): boolean { return gameTitleOverride != null; }
 /** The game's display title — shown under the icon on the start screen. */
-export function getGameTitle(): string { return gameTitleOverride ?? DEFAULT_GAME_TITLE; }
+export function getGameTitle(): string { return gameTitleOverride ?? genericDefaults.identity?.gameTitle ?? DEFAULT_GAME_TITLE; }
 
 /** Set the tagline manually (or null to fall back to lore / the default). */
 export function setGameTaglineOverride(text: string | null): void {
@@ -164,7 +168,7 @@ export function hasNarratorNameOverride(): boolean {
 /** The narrator's display name — "Narrator" by default, or whatever the author
  *  set in the dev console. Read by player-facing UI and the LLM persona. */
 export function getNarratorName(): string {
-  return narratorNameOverride ?? DEFAULT_NARRATOR_NAME;
+  return narratorNameOverride ?? genericDefaults.identity?.narratorName ?? DEFAULT_NARRATOR_NAME;
 }
 
 /** The item-fusion feature's display name — "Crucible" by default, renamable in
@@ -191,7 +195,7 @@ export function setWorldNameOverride(name: string | null): void {
   worldNameOverride = trimmed.length > 0 ? trimmed : null;
 }
 export function hasWorldNameOverride(): boolean { return worldNameOverride != null; }
-export function getWorldName(): string { return worldNameOverride ?? DEFAULT_WORLD_NAME; }
+export function getWorldName(): string { return worldNameOverride ?? genericDefaults.identity?.worldName ?? DEFAULT_WORLD_NAME; }
 
 /** engine_Dev — true when the world has been re-skinned in a way that makes the
  *  BUILT-IN Tartaria main quest (cores / Lost Capitals / phase hints) meaningless:
@@ -215,7 +219,7 @@ export function setCorruptionNameOverride(name: string | null): void {
   corruptionNameOverride = trimmed.length > 0 ? trimmed : null;
 }
 export function hasCorruptionNameOverride(): boolean { return corruptionNameOverride != null; }
-export function getCorruptionName(): string { return corruptionNameOverride ?? DEFAULT_CORRUPTION_NAME; }
+export function getCorruptionName(): string { return corruptionNameOverride ?? genericDefaults.identity?.corruptionName ?? DEFAULT_CORRUPTION_NAME; }
 
 /** engine_Dev — the affliction TIER names. Built-in are Tainted / Corrupted /
  *  Hollowed; a re-skin sets world.corruptionTiers: { tainted, corrupted, hollowed }

@@ -42,7 +42,12 @@ describe('engine_Dev — data-driven powers', () => {
     const heal = POWERS_TEMPLATE.find((p) => p.effect?.kind === 'heal_self');
     expect(fog).toBeTruthy();
     expect(heal).toBeTruthy();
-    // The built-in disciplines are still there to edit.
-    expect(POWERS_TEMPLATE.some((p) => p.id === 'aether_summon')).toBe(true);
+    // engine_Dev (OTA-770) — the template's discipline set is now GENERIC (no Tartaria
+    // "aether_*" names), but all three engine disciplines are still present to edit.
+    expect(POWERS_TEMPLATE.some((p) => p.discipline === 'summon')).toBe(true);
+    expect(POWERS_TEMPLATE.some((p) => p.discipline === 'shape')).toBe(true);
+    expect(POWERS_TEMPLATE.some((p) => p.discipline === 'mend')).toBe(true);
+    // …and no Tartaria-specific ids leak into the template anymore.
+    expect(POWERS_TEMPLATE.some((p) => p.id.startsWith('aether'))).toBe(false);
   });
 });
