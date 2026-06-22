@@ -34,8 +34,10 @@ export interface FactionQuestDef {
   objective: string;
   /** Minimum rep with the faction required to accept the quest. */
   requirement: { rep: number };
-  /** Reward on completion. */
-  reward: { tc: number; rep: number };
+  /** Reward on completion. `items` are crafted-item names granted into the pack on
+   *  turn-in (TC + rep are halved on a remote turn-in; items are always granted in
+   *  full since they can't be split). */
+  reward: { tc: number; rep: number; items?: string[] };
   /** Narrative stages. Each accepted quest plays stage 0 immediately
    *  and advances on player progress. Turn-in is allowed when stage >=
    *  stages.length. When omitted (legacy data), the engine treats it as

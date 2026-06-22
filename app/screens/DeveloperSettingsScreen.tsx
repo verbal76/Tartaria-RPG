@@ -1270,6 +1270,156 @@ function StartingAreasBox() {
   );
 }
 
+// engine_Dev — FACTION MISSIONS builder. Plan a faction's posted contract as a
+// form: which faction posts it, the rep gate where it appears on that faction's
+// Mission Board, the rep + TC + item rewards on completion, and the mission plan
+// itself (ordered beats, each advancing on kill / travel / anything — or a single
+// "gather N of an item" fetch requirement). Writes into missions.factionQuests,
+// preserving the other mission sub-tables; the Missions box still does raw JSON.
+const FQ_ADVANCE: Array<{ id: string; name: string }> = [
+  { id: 'any', name: 'anything' },
+  { id: 'kill', name: 'a kill' },
+  { id: 'travel', name: 'a travel' },
+];
+function FactionMissionsBox() {
+  const loadMissionsJson = useContentPackStore((s) => s.loadMissionsJson);
+  const missions = useContentPackStore((s) => s.missions) as { factionQuests?: Array<{ id: string; factionId: string; title: string }> };
+  const existing = missions.factionQuests ?? [];
+  const factions = getFactions() as Array<{ id: string; name: string }>;
+  const [status, setStatus] = useState<Status>(null);
+
+  const [f, setF] = useState({ factionId: '', title: '', objective: '', description: '', gateRep: '0', rewardTc: '', rewardRep: '', rewardItems: '', fetchItem: '', fetchQty: '' });
+  const up = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
+  const [stages, setStages] = useState<Array<{ narration: string; advanceOn: string }>>([]);
+  const [stageText, setStageText] = useState('');
+  const [stageAdvance, setStageAdvance] = useState('any');
+
+  const slug = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+  const addStage = () => {
+    const nm = stageText.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Type the beat’s narration first.' }); return; }
+    setStages((p) => [...p, { narration: nm, advanceOn: stageAdvance }]);
+    setStageText('');
+  };
+  const removeStage = (i: number) => setStages((p) => p.filter((_, j) => j !== i));
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+
+  const save = () => {
+    if (!f.factionId) { setStatus({ kind: 'err', msg: 'Pick the faction that POSTS this mission.' }); return; }
+    if (!f.title.trim()) { setStatus({ kind: 'err', msg: 'Give the mission a title.' }); return; }
+    if (!f.objective.trim()) { setStatus({ kind: 'err', msg: 'Add a one-line objective (shown on the board).' }); return; }
+    const fetchSet = f.fetchItem.trim() !== '' && Number(f.fetchQty) > 0;
+    // unique id from title
+    let base = slug(f.title) || `fq_${Date.now()}`; let id = base; let n = 2;
+    const ids = existing.filter((q) => slug(q.title) !== slug(f.title)).map((q) => q.id);
+    while (ids.includes(id)) id = `${base}_${n++}`;
+    const items = f.rewardItems.split(',').map((s) => s.trim()).filter(Boolean);
+    const quest = {
+      id,
+      factionId: f.factionId,
+      title: f.title.trim(),
+      description: f.description.trim() || f.objective.trim(),
+      objective: f.objective.trim(),
+      requirement: { rep: Number(f.gateRep) || 0 },
+      reward: {
+        tc: Number(f.rewardTc) || 0,
+        rep: Number(f.rewardRep) || 0,
+        ...(items.length > 0 ? { items } : {}),
+      },
+      // A fetch quest carries no stages; otherwise emit the ordered beats (if any).
+      ...(fetchSet ? { fetch: { itemName: f.fetchItem.trim(), quantity: Number(f.fetchQty) } } : (stages.length > 0 ? { stages } : {})),
+    };
+    const merged = [...existing.filter((q) => q.id !== id), quest];
+    const nextMissions = { ...missions, factionQuests: merged };
+    const r = loadMissionsJson(JSON.stringify(nextMissions));
+    if (!r.ok) { setStatus({ kind: 'err', msg: r.error ?? 'Failed to save.' }); return; }
+    setStatus({ kind: 'ok', msg: `Saved "${quest.title}" for ${factions.find((x) => x.id === f.factionId)?.name ?? f.factionId} (rep gate ${quest.requirement.rep}).` });
+    setF((p) => ({ ...p, title: '', objective: '', description: '', rewardTc: '', rewardRep: '', rewardItems: '', fetchItem: '', fetchQty: '' }));
+    setStages([]); setStageText('');
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Faction missions</Text>
+        <Text style={existing.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {existing.length > 0 ? `● ${existing.length}` : '○ none'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Plan a contract a FACTION posts on its Mission Board. Set the posting faction, the
+        <Text style={{ fontWeight: 'bold' }}> rep gate</Text> (the standing where it appears),
+        the <Text style={{ fontWeight: 'bold' }}>rewards</Text> (TC, rep, and any item drops), and the
+        mission plan — ordered beats, or a single “gather N of an item” fetch. These post to whichever
+        room you flag as the board in that faction’s starting area.
+      </Text>
+
+      {/* existing faction missions */}
+      {existing.map((q) => (
+        <View key={q.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{q.title}</Text> — {factions.find((x) => x.id === q.factionId)?.name ?? q.factionId}</Text>
+          <TouchableOpacity onPress={() => { const next = existing.filter((x) => x.id !== q.id); const r = loadMissionsJson(JSON.stringify({ ...missions, factionQuests: next })); setStatus(r.ok ? { kind: 'ok', msg: `Removed ${q.title}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); }}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {factions.length > 0
+        ? chipRow('Posted by faction:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))
+        : <Text style={styles.err}>Load a Factions table first — a mission is posted by a faction.</Text>}
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.title} onChangeText={(v) => up('title', v)} placeholder="Mission title (e.g. Silence the Relay)" placeholderTextColor="#5c5446" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.objective} onChangeText={(v) => up('objective', v)} placeholder="One-line objective (shown on the board)" placeholderTextColor="#5c5446" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.description} onChangeText={(v) => up('description', v)} placeholder="Flavor / briefing (optional)" placeholderTextColor="#5c5446" />
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.gateRep} onChangeText={(v) => up('gateRep', v)} placeholder="rep gate" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardTc} onChangeText={(v) => up('rewardTc', v)} placeholder="reward TC" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardRep} onChangeText={(v) => up('rewardRep', v)} placeholder="reward rep" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.rewardItems} onChangeText={(v) => up('rewardItems', v)} placeholder="Item drops (comma-sep names, optional)" placeholderTextColor="#5c5446" />
+
+      <Text style={styles.hint}>Mission plan — ordered beats ({stages.length}):</Text>
+      {stages.map((st, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>{i + 1}. {st.narration} <Text style={{ fontStyle: 'italic' }}>(adv: {FQ_ADVANCE.find((a) => a.id === st.advanceOn)?.name ?? st.advanceOn})</Text></Text>
+          <TouchableOpacity onPress={() => removeStage(i)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={stageText} onChangeText={setStageText} placeholder="Beat narration → add" placeholderTextColor="#5c5446" onSubmitEditing={addStage} />
+      {chipRow('…this beat advances on:', FQ_ADVANCE, stageAdvance, setStageAdvance)}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={addStage}><Text style={styles.tmplBtnText}>+ ADD BEAT</Text></TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>…or instead, a single GATHER requirement (turn-in consumes these):</Text>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.fetchItem} onChangeText={(v) => up('fetchItem', v)} placeholder="Item to gather" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.fetchQty} onChangeText={(v) => up('fetchQty', v)} placeholder="qty" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={save}><Text style={styles.loadBtnText}>+ SAVE MISSION</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(JSON.stringify({ factionQuests: existing }, null, 2)); setStatus({ kind: 'ok', msg: 'Copied current faction missions JSON.' }); }}>
+          <Text style={styles.copyBtnText}>COPY JSON</Text>
+        </TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
 // variable, naming the title, and setting a threshold — or upload/paste the JSON.
 function TitlesBox() {
@@ -2630,6 +2780,9 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <Text style={styles.sectionLabel}>MISSIONS</Text>
       <MissionsBox />
+
+      <Text style={styles.sectionLabel}>FACTION MISSIONS</Text>
+      <FactionMissionsBox />
 
       <Text style={styles.sectionLabel}>HOOKS</Text>
       <HooksBox />

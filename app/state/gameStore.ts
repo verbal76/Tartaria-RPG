@@ -16446,12 +16446,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const payTc = remote ? Math.max(1, Math.round(candidate.reward.tc * 0.5)) : candidate.reward.tc;
     const payRep = remote ? Math.max(1, Math.round(candidate.reward.rep * 0.5)) : candidate.reward.rep;
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, payRep);
+    // engine_Dev — reward.items: crafted-item drops granted into the pack on turn-in.
+    // Granted in full even on a remote turn-in (items can't be halved). Mirrors the
+    // storyline rewardItem grant — honors the pack cap and narrates an overflow.
+    let rewardInv = player.inventory.map((i) => ({ ...i }));
+    const grantedNames: string[] = [];
+    for (const itemName of candidate.reward.items ?? []) {
+      const lookup = lookupCraftedItem(itemName);
+      if (!lookup) continue;
+      const reward = stampDurability({
+        id: `fq_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: itemName,
+        kind: lookup.kind,
+        rarity: lookup.rarity,
+        quantity: 1,
+        tags: lookup.tags,
+      });
+      const g = grantItem(rewardInv, reward);
+      rewardInv = g.inventory;
+      if (g.accepted > 0) grantedNames.push(itemName);
+      else get().appendLog('world', `Pack too full — ${itemName} couldn't be carried. Make room and turn the contract in again to claim.`);
+    }
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
               tc: s.player.tc + payTc,
+              inventory: rewardInv,
               factionStanding: repResult.standing,
               activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => id !== candidate.id),
               activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== candidate.id),
@@ -16461,11 +16483,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     const fLabel = candidate.factionId.replace(/_/g, ' ');
+    const itemSuffix = grantedNames.length > 0 ? ` + ${grantedNames.join(', ')}` : '';
     get().appendLog(
       'reward',
       remote
-        ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}.`
-        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}.`,
+        ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}${itemSuffix}.`
+        : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}${itemSuffix}.`,
     );
     logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
