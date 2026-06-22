@@ -271,22 +271,80 @@ export function ContractsScreen() {
         // cores/capitals card below. (Without this the card leaked Tartaria into every
         // re-skin — "the primary objective is all still tartaria".)
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { liveMainQuest } = require('../engine/customMainQuest') as typeof import('../engine/customMainQuest');
+        const cmq = require('../engine/customMainQuest') as typeof import('../engine/customMainQuest');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
-        const customQ = liveMainQuest();
+        const customQ = cmq.liveMainQuest();
         if (customQ) {
           const complete = cmqe.questIsComplete(player);
           const total = customQ.steps.length;
-          const done = Math.max(0, Math.min(cmqe.questStepIndex(player), total));
+          const activeIdx = cmqe.effectiveStepIndex(player);
+          const done = Math.max(0, Math.min(activeIdx, total));
           const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
           const objLine = complete ? 'Complete.' : (cmqe.currentObjectiveLine(player) ?? 'No active objective.');
+          // engine_Dev — restore the tap-to-expand ROUTE TO drop-down for the
+          // DATA-DRIVEN main quest. The custom-quest card had regressed to a static
+          // View (no expansion, no route buttons); mirror the built-in Capitals
+          // tracker so each objective with a location offers a travel course.
+          // id → name honors an uploaded Locations table.
+          const locNameById = new Map(cmq.mainQuestLocations().map((l) => [l.id, l.name] as const));
           return (
-            <View style={styles.mainQuestCard}>
-              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+            <TouchableOpacity
+              style={styles.mainQuestCard}
+              onPress={() => setMqExpanded((v) => !v)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
               <Text style={styles.mainQuestPhase}>{title}</Text>
               <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
-            </View>
+              {mqExpanded && (
+                <View style={styles.mqTracker}>
+                  <Text style={styles.mqTrackerHead}>
+                    {total} OBJECTIVES · STEP {Math.min(activeIdx + 1, total)}/{total}
+                  </Text>
+                  <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
+                    {customQ.steps.map((step, i) => {
+                      // Skip steps gated out for this player's faction — the engine
+                      // skips them too, so they aren't objectives this character has.
+                      if (!cmqe.stepApplies(step, player)) return null;
+                      const locId = step.locationId;
+                      const lName = locId ? (locNameById.get(locId) ?? locId) : null;
+                      const isActive = i === activeIdx && !complete;
+                      const isDone = complete || i < activeIdx;
+                      const here = !!locId && player.currentLocationId === locId;
+                      const color = isDone ? '#7a8a5a' : isActive ? '#c9a86a' : '#7a705c';
+                      const status = isDone ? '✓ done' : isActive ? '○ current objective' : '· upcoming';
+                      const rowContent = (
+                        <>
+                          <Text style={styles.mqTrackerCap}>{i + 1}. {cmq.describeStep(step)}</Text>
+                          <Text style={[styles.mqTrackerStatus, { color }]}>{status}</Text>
+                          {locId && (here
+                            ? <Text style={styles.routeHereNote}>▸ You're at {lName}.</Text>
+                            : <Text style={styles.mqTrackerTap}>▸ tap to travel to {lName}</Text>
+                          )}
+                        </>
+                      );
+                      if (!locId || here) {
+                        return <View key={step.id ?? `step${i}`} style={styles.mqTrackerRow}>{rowContent}</View>;
+                      }
+                      return (
+                        <TouchableOpacity
+                          key={step.id ?? `step${i}`}
+                          style={styles.mqTrackerRow}
+                          activeOpacity={0.7}
+                          onPress={() => setPendingRoute({ id: locId, name: lName ?? locId })}
+                        >
+                          {rowContent}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <Text style={styles.mqTrackerFoot}>
+                    Tap any objective with a location to start travel.
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
           );
         }
         // eslint-disable-next-line @typescript-eslint/no-require-imports
