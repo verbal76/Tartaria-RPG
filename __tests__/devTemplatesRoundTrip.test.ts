@@ -37,7 +37,7 @@ import {
   getTableTemplate, getLoreTemplate,
   buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate,
   buildTitlesTemplate, buildStartingAreasTemplate, buildCollectablesTemplate, buildSummonsTemplate,
-  buildInteractionTagsTemplate, buildMainQuestTemplate, buildAnnotatedGameBundle,
+  buildInteractionTagsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildAnnotatedGameBundle,
 } from '../app/engine/contentTemplates';
 import { CONTENT_TABLES, LORE_BLOCKS, clearAllOverrides } from '../app/engine/contentPack';
 import { useContentPackStore } from '../app/state/contentPackStore';
@@ -68,6 +68,7 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     ['summons', () => store().loadSummonsJson(buildSummonsTemplate())],
     ['interactionTags', () => store().loadInteractionTagsJson(buildInteractionTagsTemplate())],
     ['mainQuest', () => store().loadMainQuestJson(buildMainQuestTemplate())],
+    ['bosses', () => store().loadBossesJson(buildBossesTemplate())],
   ];
   test.each(special)('special template loads: %s', (_name, load) => {
     expect(load().ok).toBe(true);

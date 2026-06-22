@@ -155,7 +155,38 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
 export const TEMPLATE_SAMPLE_ROWS = 2;
 
 /** First `n` rows of a built-in table as a pretty JSON string (a starter schema). */
+// engine_Dev — optional-field reference notes prepended to a table template so the
+// TEMPLATE button always reflects the CURRENT functionality, even for rows whose
+// built-in sample doesn't happen to use the newer fields. Loaders strip // comments,
+// so the template still round-trips. Only shown in the dev box (includeTokenNote),
+// not the whole-game bundle (which carries its own section hint).
+const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
+  races: [
+    '// Optional per RACE row (perks + gear + abilities):',
+    '//   racialStatBonuses: { strength?, dexterity?, intelligence?, wisdom?, charisma? }  — always-on stat bumps',
+    '//   racialACBonusRules: [{ condition: underground|dark|confined|runic_gear|aether_powers|constructed_environment|relic_armor, delta }]',
+    '//   startingWeapon: "Item Name"   ·   startingGear: ["Item Name", …]  (granted at creation, from your catalogs)',
+    '//   resist: ["<damage type>"]  /  weak: ["<damage type>"]   — lower/raise the chance you suffer that type\'s on-hit effect',
+    '//   abilities: [{ id, name, description, combatOnly?, effect: { type: heal|stat_buff|shield|repair|strike, amount?|dice?, stat?, rounds?, damageType? } }]',
+  ].join('\n'),
+  factions: [
+    '// Optional per FACTION row:',
+    '//   flavor, baseName, baseLocationId, baseDescription   (starter complex)',
+    '//   startingGear: ["Item Name", …]   (granted at creation)',
+    '//   factionStatBonuses: { strength?, … }   ·   factionACBonusRules: [{ condition, delta }]',
+    '//   resist: ["<damage type>"]  /  weak: ["<damage type>"]',
+    '//   abilities: [{ id, name, description, combatOnly?, effect: { type: heal|stat_buff|shield|repair|strike, … } }]',
+  ].join('\n'),
+  enemies: [
+    '// DAMAGE RELATIONS per ENEMY row:',
+    '//   damage carries the DELIVERED type, e.g. "2d6 frost" (any type you defined in Damage Types)',
+    '//   traits: ["vulnerable:<type>"]  = WEAK to it (takes 1.5x)   ·   ["resist:<type>"] = STRONG (takes 1/2)',
+  ].join('\n'),
+  locations: '// Optional per LOCATION row: x / y (plot on your world map), hidden: true (colored "?" until visited), aliases: [..], interactables: [..]',
+};
+
 export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
+  const note = includeTokenNote && TABLE_OPTION_NOTES[id] ? TABLE_OPTION_NOTES[id] + '\n' : '';
   // The Lore document + Powers ship their FULL set (not a 2-row sample) so the
   // author sees every section / power to edit. Both carry author prose, so they
   // get the rename-token note.
@@ -171,9 +202,9 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
       // authors see the shape: a colored "?" on the map until the player visits it.
       ...(i === Math.min(n, TABLE_ROWS.locations.length) - 1 ? { hidden: false } : {}),
     }));
-    return JSON.stringify(rows, null, 2);
+    return note + JSON.stringify(rows, null, 2);
   }
-  return JSON.stringify(TABLE_ROWS[id].slice(0, n), null, 2);
+  return note + JSON.stringify(TABLE_ROWS[id].slice(0, n), null, 2);
 }
 
 /** A lore-block starter. World shows the CURRENT defaults to edit; faction/race
@@ -252,6 +283,23 @@ export function buildMainQuestTemplate(): string {
         { id: 'step_7', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' },
       ],
     }, null, 2),
+  ].join('\n');
+}
+
+/** engine_Dev — the FULL bosses template: one of every spawn mode (main_quest /
+ *  location / random) so the TEMPLATE shows the complete schema + spawn options. */
+export function buildBossesTemplate(): string {
+  return [
+    '// BOSSES — named foes a main-quest "kill" step references, or a fixed/random spawn.',
+    '//   spawnCondition: "main_quest" (tied to a quest step) | "location" (always at its',
+    '//     spawnLocationId) | "random" (rolls spawnChance % on travel encounters).',
+    '//   questItem drops on kill (used by a quest "kill" step); drops[] are extra loot.',
+    '//   damage can carry a type, e.g. "1d10 frost". factionId is optional (null = neutral).',
+    JSON.stringify([
+      { id: 'enemy_commander', name: 'The Enemy Commander', factionId: 'REPLACE-with-a-faction-id', hp: 120, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'Commander Dog Tags', drops: ['Field Medal'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' },
+      { id: 'fortress_warden', name: 'The Fortress Warden', hp: 90, attack: 6, damage: '2d6', ac: 15, spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'location' },
+      { id: 'roaming_horror', name: 'A Roaming Horror', hp: 70, attack: 8, damage: '1d10 frost', ac: 14, spawnCondition: 'random', spawnChance: 8 },
+    ], null, 2),
   ].join('\n');
 }
 
@@ -742,7 +790,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'wasteland', hint: 'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.', content: buildWastelandTemplate(false) });
   entries.push({ key: 'titles', hint: 'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.', content: buildTitlesTemplate() });
   entries.push({ key: 'mainQuest', hint: 'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId?, skipForFactions?: ["factionId"] (faction GATE — players of these factions skip this step, e.g. a German isn\'t sent to kill the German boss; can also use onlyForFactions to make a step faction-specific) }] }. Steps run in order; gated steps are skipped per the player\'s faction; the last applicable step completes the quest.', content: buildMainQuestTemplate() });
-  entries.push({ key: 'bosses', hint: 'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest|always|once) }. Build them in the BOSSES box.', content: JSON.stringify([{ id: 'onr_director', name: 'The ONR Director', factionId: 'REPLACE-with-a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'ONR Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' }], null, 2) });
+  entries.push({ key: 'bosses', hint: 'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest | location | random), spawnChance? (% for random) }. Build them in the BOSSES box.', content: buildBossesTemplate() });
   entries.push({ key: 'startingAreas', hint: 'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). The faction member spawns inside it and can walk room-to-room; an exit of "world" steps back out onto the world map. Whispers can plant in a room by naming its room id in plantLocations.', content: buildStartingAreasTemplate() });
   entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });
   entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in "golems"), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
