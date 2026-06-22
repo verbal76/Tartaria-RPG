@@ -139,7 +139,18 @@ export interface LlamaGenerateOptions {
   onToken?: (token: string) => void;
 }
 
-export class LlamaRuntime {
+/** engine_Dev — the swappable generation backend. The mobile build implements this
+ *  with on-device llama.rn (LlamaRuntime, below); the desktop/PC build (Dev_engine_PC)
+ *  implements it with an HTTP call to a local LLM server. QwenGenerativeEngine talks
+ *  only to this interface, so the whole game is backend-agnostic. */
+export interface ILlamaRuntime {
+  initialize(opts: LlamaInitOptions): Promise<void>;
+  generate(messages: readonly QwenChatMessage[], opts?: LlamaGenerateOptions): Promise<string>;
+  isReady(): boolean;
+  dispose(): Promise<void>;
+}
+
+export class LlamaRuntime implements ILlamaRuntime {
   private context: LlamaContext | null = null;
   private modelPath: string | null = null;
 
