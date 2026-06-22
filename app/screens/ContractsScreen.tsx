@@ -265,6 +265,39 @@ export function ContractsScreen() {
         // player can see which Cores are recovered, which Guardians
         // they've attempted, and which Capitals are still untouched.
         if (!player) return null;
+        // engine_Dev — the Primary Objective card mirrors the exploration chip: a
+        // DATA-DRIVEN main quest (uploaded) drives it; a re-skin with no custom quest
+        // shows a neutral line; only the genuine built-in game shows the Tartaria
+        // cores/capitals card below. (Without this the card leaked Tartaria into every
+        // re-skin — "the primary objective is all still tartaria".)
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { liveMainQuest } = require('../engine/customMainQuest') as typeof import('../engine/customMainQuest');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+        const customQ = liveMainQuest();
+        if (customQ) {
+          const complete = cmqe.questIsComplete(player);
+          const total = customQ.steps.length;
+          const done = Math.max(0, Math.min(cmqe.questStepIndex(player), total));
+          const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
+          const objLine = complete ? 'Complete.' : (cmqe.currentObjectiveLine(player) ?? 'No active objective.');
+          return (
+            <View style={styles.mainQuestCard}>
+              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+              <Text style={styles.mainQuestPhase}>{title}</Text>
+              <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
+            </View>
+          );
+        }
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        if ((require('../engine/contentPack') as typeof import('../engine/contentPack')).isReskinActive()) {
+          return (
+            <View style={styles.mainQuestCard}>
+              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+              <Text style={styles.mainQuestHint}>No main quest set — build one in the dev console.</Text>
+            </View>
+          );
+        }
         const mq = ensureMainQuest(player.mainQuest);
         const recoveredCount = mq.coresRecovered.length;
         const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(

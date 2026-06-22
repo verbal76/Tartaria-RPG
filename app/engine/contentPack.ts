@@ -157,7 +157,11 @@ export function getWorldName(): string { return worldNameOverride ?? DEFAULT_WOR
  *  uses this to suppress the hard-coded Tartaria caption when a re-skin has no
  *  custom main quest of its own (it shows a neutral line instead). */
 export function isReskinActive(): boolean {
-  return hasTableOverride('locations') || worldNameOverride != null;
+  return hasTableOverride('locations')
+    || hasTableOverride('factions')
+    || hasTableOverride('races')
+    || hasTableOverride('enemies')
+    || worldNameOverride != null;
 }
 
 /** engine_Dev — the CORRUPTION / affliction noun (default "Corruption"). A re-skin
