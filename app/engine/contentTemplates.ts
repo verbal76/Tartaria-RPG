@@ -643,7 +643,9 @@ granular edits. Recommended order:
   - Race lore / Faction lore — story notes the narrator knows
 
 ## 3 · The world
-  - Locations (give each x/y to plot on your map) — needed before quests/areas
+  - Locations (give each x/y to plot on your map) — needed before quests/areas.
+    Flag any location "hidden": true to show it as a colored "?" (still routable)
+    that reveals its name only once the player travels there.
   - Weather · Enemies · Weapons / Armor / Materials / Gear / Exploration / Amulets
     / Rings · Recipes · Powers · Lore document
 
