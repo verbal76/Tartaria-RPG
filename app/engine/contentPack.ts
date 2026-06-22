@@ -66,6 +66,48 @@ export const DEFAULT_GAME_TAGLINE = 'A procedural text RPG — your world, their
  *  flows everywhere at once. */
 export const DEFAULT_NARRATOR_NAME = 'Narrator';
 
+// --- GENERIC DEFAULT PACK -------------------------------------------------------
+// engine_Dev — a complete, setting-neutral game that sits BETWEEN the author's
+// uploads and the built-in (Tartaria) data. When a section has no override (the
+// author skipped it, or RESET wiped it), the resolvers fall to this pack instead of
+// Tartaria — so the built-in setting never leaks into someone else's game. It is
+// EMPTY until installGenericDefaults() runs (called once at app boot), so unit tests
+// — which never install it — still resolve to the Tartaria built-ins they assert
+// against. A partial install would be inconsistent, so install all-or-nothing.
+interface GenericDefaultPack {
+  tables: Partial<Record<ContentTableId, readonly unknown[]>>;
+  missions: Partial<Record<MissionTableId, readonly unknown[]>>;
+  flavor?: Record<string, unknown>;
+  startingAreas?: StartingArea[];
+  mainQuest?: { title?: string; steps?: unknown[] };
+  bosses?: unknown[];
+  collectables?: unknown[];
+}
+const genericDefaults: GenericDefaultPack = { tables: {}, missions: {} };
+let genericDefaultsInstalled = false;
+export function installGenericDefaults(pack: GenericDefaultPack): void {
+  genericDefaults.tables = pack.tables ?? {};
+  genericDefaults.missions = pack.missions ?? {};
+  genericDefaults.flavor = pack.flavor;
+  genericDefaults.startingAreas = pack.startingAreas;
+  genericDefaults.mainQuest = pack.mainQuest;
+  genericDefaults.bosses = pack.bosses;
+  genericDefaults.collectables = pack.collectables;
+  genericDefaultsInstalled = true;
+}
+export function hasGenericDefaults(): boolean { return genericDefaultsInstalled; }
+/** Test/host hook — drop the generic pack back out (restores pure Tartaria fallback). */
+export function clearGenericDefaults(): void {
+  genericDefaults.tables = {};
+  genericDefaults.missions = {};
+  genericDefaults.flavor = undefined;
+  genericDefaults.startingAreas = undefined;
+  genericDefaults.mainQuest = undefined;
+  genericDefaults.bosses = undefined;
+  genericDefaults.collectables = undefined;
+  genericDefaultsInstalled = false;
+}
+
 // --- active overrides (module-level; mirrored from the content-pack store) ------
 const tableOverrides: Partial<Record<ContentTableId, readonly unknown[]>> = {};
 const loreOverrides: Partial<Record<LoreBlockId, unknown>> = {};
@@ -379,7 +421,9 @@ export function tableOverrideCount(id: ContentTableId): number {
 /** Engine modules pass their built-in table; if an override is loaded it wins. */
 export function resolveTable<T>(id: ContentTableId, builtin: readonly T[]): readonly T[] {
   const ov = tableOverrides[id];
-  return ov && ov.length > 0 ? (ov as readonly T[]) : builtin;
+  if (ov && ov.length > 0) return ov as readonly T[];
+  const gd = genericDefaults.tables[id];
+  return gd && gd.length > 0 ? (gd as readonly T[]) : builtin;
 }
 
 export function setLoreOverride(id: LoreBlockId, value: unknown | null): void {
@@ -422,7 +466,9 @@ export function missionOverrideCount(id: MissionTableId): number {
 /** Engine mission modules pass their built-in array; an uploaded sub-table wins. */
 export function resolveMissions<T>(id: MissionTableId, builtin: readonly T[]): readonly T[] {
   const ov = missionOverrides[id];
-  return ov && ov.length > 0 ? (ov as readonly T[]) : builtin;
+  if (ov && ov.length > 0) return ov as readonly T[];
+  const gd = genericDefaults.missions[id];
+  return gd && gd.length > 0 ? (gd as readonly T[]) : builtin;
 }
 
 // --- hooks override -------------------------------------------------------------
@@ -467,7 +513,7 @@ export function setCustomMainQuestOverride(obj: { title?: string; steps?: unknow
   customMainQuestOverride = obj && Array.isArray(obj.steps) && obj.steps.length > 0 ? obj : null;
 }
 export function hasCustomMainQuestOverride(): boolean { return customMainQuestOverride != null; }
-export function getCustomMainQuest(): { title?: string; steps?: unknown[] } | null { return customMainQuestOverride; }
+export function getCustomMainQuest(): { title?: string; steps?: unknown[] } | null { return customMainQuestOverride ?? genericDefaults.mainQuest ?? null; }
 
 // --- custom bosses override -----------------------------------------------------
 // engine_Dev — named, faction-affiliated bosses with stats / loot / quest item /
@@ -477,7 +523,7 @@ export function setCustomBossesOverride(rows: readonly unknown[] | null): void {
   customBossesOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
 }
 export function hasCustomBossesOverride(): boolean { return customBossesOverride != null; }
-export function getCustomBosses(): unknown[] { return customBossesOverride ?? []; }
+export function getCustomBosses(): unknown[] { return customBossesOverride ?? genericDefaults.bosses ?? []; }
 
 // --- collectables override -------------------------------------------------------
 // engine_Dev — character-story COLLECTABLES (note/letter/journal fragments the
@@ -487,7 +533,7 @@ export function setCollectablesOverride(rows: readonly unknown[] | null): void {
   collectablesOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
 }
 export function hasCollectablesOverride(): boolean { return collectablesOverride != null; }
-export function getCollectablesOverride(): unknown[] | null { return collectablesOverride; }
+export function getCollectablesOverride(): unknown[] | null { return collectablesOverride ?? genericDefaults.collectables ?? null; }
 
 // --- summons override ----------------------------------------------------------
 // engine_Dev — SUMMONED SIDEKICKS (the golem family). An uploaded pack replaces
@@ -726,7 +772,7 @@ export function setStartingAreasOverride(rows: readonly unknown[] | null): void 
   startingAreasOverride = valid ? (rows as StartingArea[]) : null;
 }
 export function hasStartingAreasOverride(): boolean { return startingAreasOverride != null; }
-export function getStartingAreas(): StartingArea[] { return startingAreasOverride ?? []; }
+export function getStartingAreas(): StartingArea[] { return startingAreasOverride ?? genericDefaults.startingAreas ?? []; }
 export function startingAreaForFaction(factionId: string | null | undefined): StartingArea | null {
   if (!factionId || !startingAreasOverride) return null;
   return startingAreasOverride.find((a) => a.factionId === factionId) ?? null;
@@ -797,7 +843,12 @@ export function getNarratorPersona(): string {
  *  defines (expand/contract friendly). */
 export function resolveFlavor<T>(key: string, builtin: T): T {
   const f = loreOverrides.flavor as Record<string, unknown> | undefined;
-  const v = f ? f[key] : undefined;
+  let v = f ? f[key] : undefined;
+  if (v == null || (Array.isArray(v) && v.length === 0)) {
+    // engine_Dev — no author override → try the generic default pack before Tartaria.
+    const g = genericDefaults.flavor;
+    v = g ? g[key] : undefined;
+  }
   if (v == null) return builtin;
   if (Array.isArray(v) && v.length === 0) return builtin;
   return v as T;
