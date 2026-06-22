@@ -38,6 +38,7 @@ import {
   buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate,
   buildTitlesTemplate, buildStartingAreasTemplate, buildCollectablesTemplate, buildSummonsTemplate,
   buildInteractionTagsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildAnnotatedGameBundle,
+  buildGameBundleTemplate,
 } from '../app/engine/contentTemplates';
 import { CONTENT_TABLES, LORE_BLOCKS, clearAllOverrides } from '../app/engine/contentPack';
 import { useContentPackStore } from '../app/state/contentPackStore';
@@ -80,5 +81,23 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
   test('whole-game template applies via loadGameBundle', () => {
     const r = store().loadGameBundle(buildAnnotatedGameBundle({}));
     expect(r.ok).toBe(true);
+  });
+
+  // The whole-game file must carry EVERY loader-supported section, so an export is
+  // never missing a section the engine can load (anything absent from the bundle is
+  // silently dropped on export). This locks identity + every content section in.
+  test('whole-game bundle includes every loader-supported section key', () => {
+    const t = buildGameBundleTemplate();
+    const required = [
+      // identity
+      'title', 'tagline', 'narrator', 'worldName', 'corruptionName', 'crucibleName', 'crucibleEnabled',
+      // tables + lore (data-driven from the registries)
+      ...CONTENT_TABLES.map((x) => x.id), ...LORE_BLOCKS.map((x) => x.id),
+      // special content
+      'missions', 'hooks', 'wasteland', 'titles', 'mainQuest', 'bosses', 'startingAreas',
+      'interactionTags', 'summons', 'dogEnabled', 'damageTypes', 'damageResistances',
+      'fusionTags', 'coatings', 'inventory', 'collectables', 'whispers',
+    ];
+    for (const key of required) expect(t).toContain(`"${key}"`);
   });
 });
