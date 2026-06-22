@@ -228,6 +228,33 @@ export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): strin
   return JSON.stringify(out, null, 2);
 }
 
+/** engine_Dev — the FULL-FEATURED main-quest template. Shows every action verb and
+ *  every per-step field — including the newer faction GATES (skipForFactions /
+ *  onlyForFactions) — so the TEMPLATE button always reflects the current
+ *  functionality even after an author built a quest before those options existed. */
+export function buildMainQuestTemplate(): string {
+  return [
+    '// MAIN QUEST — steps run in order; the last completes the quest. Actions:',
+    '//   kill (needs bossId) · clear · reach · collect · talk_to · deliver ·',
+    '//   return_to · hand_in · claim. Per step: target?, locationId, reward? (item',
+    '//   collected), bossId? (kill steps), and FACTION GATES:',
+    '//   skipForFactions: [..]  — players of these factions SKIP this step',
+    '//   onlyForFactions: [..]  — step runs ONLY for these factions',
+    JSON.stringify({
+      title: 'Your campaign name',
+      steps: [
+        { id: 'step_1', action: 'kill', target: 'the enemy commander', bossId: 'REPLACE-with-a-boss-id', locationId: 'REPLACE-with-a-location-id', reward: 'the commander\'s dog tags', skipForFactions: ['REPLACE-with-that-commander-s-own-faction-id'] },
+        { id: 'step_2', action: 'collect', target: 'the cipher key', locationId: 'REPLACE-with-a-location-id' },
+        { id: 'step_3', action: 'reach', locationId: 'REPLACE-with-a-location-id' },
+        { id: 'step_4', action: 'talk_to', target: 'the informant', locationId: 'REPLACE-with-a-location-id', onlyForFactions: ['REPLACE-with-a-faction-id-if-this-step-is-faction-specific'] },
+        { id: 'step_5', action: 'return_to', locationId: 'REPLACE-with-your-base-location-id' },
+        { id: 'step_6', action: 'hand_in', target: 'the dog tags', locationId: 'REPLACE-with-your-base-location-id' },
+        { id: 'step_7', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' },
+      ],
+    }, null, 2),
+  ].join('\n');
+}
+
 /** The Missions template — one object whose keys are the mission sub-tables.
  *  Hunts/mysteries/faction-quests/storylines are the designed multi-stage
  *  missions; objectives/complications/rewards are the seeds the engine mixes into
@@ -714,7 +741,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'hooks', hint: 'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.', content: buildHooksTemplate(false) });
   entries.push({ key: 'wasteland', hint: 'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.', content: buildWastelandTemplate(false) });
   entries.push({ key: 'titles', hint: 'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.', content: buildTitlesTemplate() });
-  entries.push({ key: 'mainQuest', hint: 'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId?, skipForFactions?: ["factionId"] (faction GATE — players of these factions skip this step, e.g. a German isn\'t sent to kill the German boss; can also use onlyForFactions to make a step faction-specific) }] }. Steps run in order; gated steps are skipped per the player\'s faction; the last applicable step completes the quest.', content: JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'the ONR Director', bossId: 'REPLACE-with-a-boss-id', locationId: 'REPLACE-with-a-location-id', reward: 'ONR Dog Tags', skipForFactions: ['REPLACE-with-the-onr-faction-id'] }, { id: 'step_2', action: 'hand_in', target: 'the dog tags', locationId: 'REPLACE-with-your-base-location-id' }, { id: 'step_3', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' }] }, null, 2) });
+  entries.push({ key: 'mainQuest', hint: 'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId?, skipForFactions?: ["factionId"] (faction GATE — players of these factions skip this step, e.g. a German isn\'t sent to kill the German boss; can also use onlyForFactions to make a step faction-specific) }] }. Steps run in order; gated steps are skipped per the player\'s faction; the last applicable step completes the quest.', content: buildMainQuestTemplate() });
   entries.push({ key: 'bosses', hint: 'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest|always|once) }. Build them in the BOSSES box.', content: JSON.stringify([{ id: 'onr_director', name: 'The ONR Director', factionId: 'REPLACE-with-a-faction-id', hp: 90, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'ONR Dog Tags', drops: ['Doomsday Chronometer'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' }], null, 2) });
   entries.push({ key: 'startingAreas', hint: 'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). The faction member spawns inside it and can walk room-to-room; an exit of "world" steps back out onto the world map. Whispers can plant in a room by naming its room id in plantLocations.', content: buildStartingAreasTemplate() });
   entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });

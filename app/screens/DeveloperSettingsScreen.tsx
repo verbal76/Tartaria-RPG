@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -2168,14 +2168,23 @@ function MainQuestBox() {
         <TouchableOpacity
           style={styles.tmplBtn}
           onPress={() => {
-            setText(steps.length > 0
-              ? JSON.stringify(customMainQuest, null, 2)
-              : JSON.stringify({ title: 'Take the Fold', steps: [{ id: 'step_1', action: 'kill', target: 'the boss', bossId: 'a-boss-id', locationId: 'a-location-id', reward: 'dog tags' }, { id: 'step_2', action: 'return_to', locationId: 'your-base-id' }, { id: 'step_3', action: 'claim', locationId: 'your-base-id' }] }, null, 2));
-            setStatus({ kind: 'ok', msg: steps.length > 0 ? 'Loaded your quest — edit, then LOAD.' : 'Loaded an example quest — edit, then LOAD.' });
+            setText(buildMainQuestTemplate());
+            setStatus({ kind: 'ok', msg: 'Loaded the FULL template — shows every action + the faction-gate options (skipForFactions / onlyForFactions). Edit, then LOAD.' });
           }}
         >
-          <Text style={styles.tmplBtnText}>{steps.length > 0 ? 'EDIT CURRENT' : 'TEMPLATE'}</Text>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
+        {steps.length > 0 && (
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => {
+              setText(JSON.stringify(customMainQuest, null, 2));
+              setStatus({ kind: 'ok', msg: 'Loaded your current quest — edit, then LOAD.' });
+            }}
+          >
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : JSON.stringify(customMainQuest ?? { title: 'My Main Quest', steps: [] }, null, 2)); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
           <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
