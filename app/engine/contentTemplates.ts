@@ -718,6 +718,23 @@ export function buildDiggingTemplate(): string {
  *  when an item is broken down, the raw-mat guards, premium mats, and failure lines. */
 /** The Salvage template — generic per-noun salvage pools (the FIRST pool whose
  *  pattern matches the salvaged noun wins) + the small-haul junk fallback + lines. */
+/** The Elevated-overlay template — generic mini-scenes surfaced at the top of a tall
+ *  climb. kind: encounter (rolls an enemy from encounterPool) | trader | lookout. */
+export function buildOverlaysTemplate(): string {
+  return [
+    '// ELEVATED OVERLAYS — a mini-scene at the apex of a tall climb (a nook, a vantage,',
+    '// a lookout). The roll/scene RULES stay in the engine. Each: { id, kind',
+    "// (encounter|trader|lookout), arrivalLine, ambientNouns: [...], minTiers? (min climb",
+    '// height to fire), encounterChance? + encounterPool? [enemy names] (kind=encounter),',
+    '// trader? / lookout? templates }.',
+    JSON.stringify([
+      { id: 'ledge_nook', kind: 'encounter', arrivalLine: 'The climb opens onto a wind-scoured ledge — a cracked nook, and something stirring in it.', ambientNouns: ['nook', 'crack', 'nest', 'ledge'], minTiers: 2, encounterChance: 0.6, encounterPool: ['REPLACE-with-an-enemy-name', 'REPLACE-with-another-enemy-name'] },
+      { id: 'high_perch', kind: 'encounter', arrivalLine: 'The top is a narrow perch over a long drop. You are not the only thing that climbed up here.', ambientNouns: ['perch', 'drop', 'rail', 'wind'], minTiers: 3, encounterChance: 0.7, encounterPool: ['REPLACE-with-a-tougher-enemy-name'] },
+      { id: 'open_sky', kind: 'encounter', arrivalLine: 'You reach the top and the sky opens up. Nothing here but wind and a long, clean view.', ambientNouns: ['sky', 'wind', 'view', 'edge'], minTiers: 2, encounterChance: 0.0, encounterPool: [] },
+    ], null, 2),
+  ].join('\n');
+}
+
 export function buildSalvageTemplate(): string {
   return [
     '// SALVAGE — what salvaging a noun (a wagon, a blade, a hull…) yields. The match',
@@ -843,6 +860,7 @@ also keeps a raw-JSON/file strip for power edits.
     good shovels (item → score), and the productive-dig cap
   - Scrap: what breaking an item down yields (role → material), plus the failure lines
   - Salvage: per-noun salvage pools (salvage a wagon → rations/scrap; a blade → metal)
+  - Elevated overlays: mini-scenes at the top of a tall climb (a nook, a vantage, an encounter)
 
 ## 8 · Assets (not JSON — their own uploads)
   - World map image · Per-faction maps · Music (battle + ambient, multi-select)
@@ -887,6 +905,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Searing".', content: JSON.stringify({ corruption: { label: 'Searing', blurb: 'sears the wound (damage over time + worsening stacks)', lootLabel: 'Searing' } }, null, 2) });
   entries.push({ key: 'inventory', hint: 'Inventory presentation: { labels?: { weapon|armor|accessory|consumable|tool|relic|material|loot|quest: "Your name" } (rename the category sections), toolTags?: ["tag"] (extra item tags that read as Tools), repairMaterialPct?: 200 (repair material cost as a % of an item\'s scrap yield; 200 = built-in 2x) }. Category ids + order stay fixed.', content: JSON.stringify({ labels: { loot: 'Salvage', material: 'Components' }, toolTags: ['multitool'], repairMaterialPct: 200 }, null, 2) });
   entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
+  entries.push({ key: 'overlays', hint: 'ELEVATED OVERLAYS (array) — a mini-scene at the top of a tall climb. Each: { id, kind (encounter|trader|lookout), arrivalLine, ambientNouns: [...], minTiers? (min climb height), encounterChance? + encounterPool? [enemy names] for kind=encounter, trader? / lookout? }. The roll/scene RULES stay in the engine. Build it in the ELEVATED OVERLAYS box.', content: buildOverlaysTemplate() });
   entries.push({ key: 'salvage', hint: 'The SALVAGE subsystem (what salvaging a noun yields): { pools: [{ id, patterns: ["noun substrings"], items: [{ name, rarity, weight, min, max }] }] (FIRST matching pool wins, ordered specific→general), junkPool, materialLines, junkLines, nothingChance }. The match/pick RULES stay in the engine. Build it in the SALVAGE box.', content: buildSalvageTemplate() });
   entries.push({ key: 'scrap', hint: 'The SCRAP subsystem (what breaking an item down yields): { roles: { metalBulk, metalPremium, essencePrimary, essenceSecondary, essenceBonus, stone, mud, cloth, organic, wood } (role → material name), rawGuard: ["mats that can\'t scrap into themselves"], premiumMats: ["mats stripped from self-crafted scrap"], failureLines: ["…{item}…"] }. The tag→material RULES stay in the engine; this is the data. Build it in the SCRAP box.', content: buildScrapTemplate() });
   entries.push({ key: 'digging', hint: 'The DIGGING subsystem (what "dig" pulls from the ground): { itemScores: { "Item": score }, tagScores: { tag: score }, productiveCap: number, loot: [{ name, rarity (Common|Uncommon|Rare), baseWeight }] }. Higher dig score = finds more + better rarity. Build it in the DIGGING box; omit to keep the built-in.', content: buildDiggingTemplate() });

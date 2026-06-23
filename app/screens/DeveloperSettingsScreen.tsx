@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1619,6 +1619,38 @@ function SalvageBox() {
   );
 }
 
+// engine_Dev — ELEVATED OVERLAYS box. Mini-scenes at the top of a tall climb. Array
+// of nested templates, so a template/paste/load box matching the other list boxes.
+function OverlaysBox() {
+  const loadOverlaysJson = useContentPackStore((s) => s.loadOverlaysJson);
+  const overlays = useContentPackStore((s) => s.overlays) as unknown[];
+  const loaded = overlays.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Elevated overlays</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        Mini-scenes surfaced at the top of a tall climb (a nook, a vantage trader, a lookout, an
+        encounter). The roll/scene RULES stay in the engine; you set the array of overlays — each
+        with a <Text style={{ fontWeight: 'bold' }}>kind</Text> (encounter / trader / lookout),
+        arrival line, ambient nouns, and (for encounters) a pool of enemy names. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste an overlays array (or { overlays: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadOverlaysJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} overlay(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildOverlaysTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded > 0 ? JSON.stringify(overlays, null, 2) : buildOverlaysTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearOverlays(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
 // variable, naming the title, and setting a threshold — or upload/paste the JSON.
 function TitlesBox() {
@@ -3019,6 +3051,10 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <CollapsibleSection title="SALVAGE">
         <SalvageBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="ELEVATED OVERLAYS">
+        <OverlaysBox />
       </CollapsibleSection>
 
       <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES">
