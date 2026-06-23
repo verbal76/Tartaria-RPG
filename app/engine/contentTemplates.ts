@@ -996,7 +996,8 @@ The thematic detail for each follows.
     Flag any location "hidden": true to show it as a colored "?" (still routable)
     that reveals its name only once the player travels there.
   - Weather · Enemies · Weapons / Armor / Materials / Gear / Exploration / Amulets
-    / Rings · Recipes · Powers · Lore document
+    / Rings / Dog gear (armor the companion DOG wears — a dog-armor recipe resolves
+    its result here) · Recipes · Powers · Lore document
 
 ## 4 · Narration flavor
   - Flavor pools (opening, combat/look/noted/generic remarks, investigation, etc.)
@@ -1028,6 +1029,10 @@ The thematic detail for each follows.
   - Collectables (character stories the player reassembles from loot fragments)
   - Summoned sidekicks (the buildable companion family — replaces "golems") +
     the dog companion on/off toggle
+  - Dog-rescue scenarios (the "dog hook" wording — how the player finds & frees the
+    dog): hook nouns, the captor + their faction, the intro/victory lines. The
+    rescue MECHANIC stays fixed; you only reword it. Keyed by the captor's faction,
+    with one captorFactionId:null row as the unaligned fallback.
   - Advanced rules: add damage types, set enemy resist/weak by type, extend the
     fusion material tags, rename the weapon coatings
   - Digging: what "dig" pulls from the ground — the dig loot table, which items make

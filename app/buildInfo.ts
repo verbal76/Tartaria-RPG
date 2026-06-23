@@ -15426,4 +15426,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // new PlayerCharacter.staminaProgress accumulator (replacing the discarded
 // milestones.climbTiersCleared counter); growStaminaFromClimb() in statTraining
 // is the pure, unit-tested core.
-export const OTA_BUILD_ID = '2026-06-22-791';
+// engine_Dev-792 — dev INSTRUCTION SHEET (buildDevGuide) caught up with the new
+// authorable sections: §3 (The world) now lists Dog gear in the items line, and
+// §7 (Side content) gains a Dog-rescue scenarios entry alongside the dog toggle.
+// (The whole-game JSON bundle already carried both — dogGear via the CONTENT_TABLES
+// loop, dogScenarios as its own entry; this only closes the docs gap.)
+export const OTA_BUILD_ID = '2026-06-22-792';
