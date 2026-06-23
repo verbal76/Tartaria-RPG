@@ -235,4 +235,15 @@ export const GENERIC_GAME = {
       captorLoot: ['Scrap Metal', 'Trail Rations', 'Tough Fiber'],
     },
   ],
+  // Generic SUMMONED SIDEKICKS — the lore-neutral fallback so a reskin that skips
+  // the box doesn't summon Tartaria's golems. Mechanics (fuel cost, skill growth,
+  // armament) are the engine's; this is just the buildable family + the noun.
+  summons: {
+    noun: 'sidekick',
+    defs: [
+      { kind: 'scrap_sentry', name: 'Scrap Sentry', fuel: [{ name: 'Scrap Metal', quantity: 3 }, { name: 'Tough Fiber', quantity: 1 }], hpMax: 24, attackDie: '1d8', attackMod: 1, hitBonus: 0, damageType: 'bludgeoning', blurb: 'Starter build. Cheap to raise, steady in a brawl.', summonDC: 13, resistBase: 0.15, resistCap: 0.35, aliases: ['scrap', 'sentry'], elementTags: ['metal'] },
+      { kind: 'iron_warden', name: 'Iron Warden', fuel: [{ name: 'Scrap Metal', quantity: 4 }, { name: 'Worked Crystal', quantity: 1 }], hpMax: 40, attackDie: '1d8', attackMod: 2, hitBonus: 1, damageType: 'slashing', blurb: 'Tank build. Tough frame, steady slashing strikes.', summonDC: 15, resistBase: 0.30, resistCap: 0.50, aliases: ['iron', 'warden'], elementTags: ['metal'] },
+      { kind: 'crystal_striker', name: 'Crystal Striker', fuel: [{ name: 'Raw Crystal', quantity: 2 }, { name: 'Worked Crystal', quantity: 2 }], hpMax: 34, attackDie: '1d12', attackMod: 3, hitBonus: 3, damageType: 'piercing', blurb: 'Apex striker — the hardest to raise and the strongest in every measure.', summonDC: 19, resistBase: 0.35, resistCap: 0.55, aliases: ['crystal', 'striker'], elementTags: ['crystal'] },
+    ],
+  },
 };

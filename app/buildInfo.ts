@@ -15476,4 +15476,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // for the built-in quest. Both puppy nets re-gated on isMainQuestNearEnd (rubble
 // when near end, vendor while not). Tests: bossStepsRemaining unit coverage +
 // store-level near-end assertions.
-export const OTA_BUILD_ID = '2026-06-22-797';
+// engine_Dev-798 — Bucket A: golems.ts burned down + summoned companions are now
+// "sidekicks", not "golems". (1) The built-in defs (8 Aether* literals) moved to
+// app/data/summons/builtin-sidekicks.json (golems.ts 8→0). (2) getSummonNoun()
+// now defaults to "sidekick"; a new generic-default summon layer
+// (GenericDefaultPack.summons + resolveSummons: upload → generic sidekicks →
+// built-in) gives reskins generic sidekicks (Scrap Sentry / Iron Warden / Crystal
+// Striker) instead of Tartaria golems, set in GENERIC_GAME. (3) Player-facing
+// summon lines + the arm/disarm/command/feed input parsers now use the active
+// noun (with "golem" kept as a legacy alias), and 3 bonus Aether* leaks in the
+// summon narration were scrubbed (gameStore 153→150). The WEAPON tag
+// (golem_weapon / isGolemWeapon) and SKILL-advancement (power/resilience
+// statProgress) systems are unchanged. Leak baseline tightened.
+export const OTA_BUILD_ID = '2026-06-22-798';
