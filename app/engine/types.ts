@@ -751,9 +751,6 @@ export interface PlayerMilestones {
    *  on first hub entry so a new player understands the inside-building
    *  state. */
   firstOutpostHintShown?: boolean;
-  /** Count of climb TIERS cleared. Every CLIMB_STAMINA_STEP → +1 staminaMax
-   *  (climbing is the only stamina-pool grower besides the travel milestone). */
-  climbTiersCleared?: number;
 }
 
 export type EquipSlot =
@@ -980,6 +977,10 @@ export interface PlayerCharacter {
   hpMax: number;
   stamina: number;
   staminaMax: number;
+  /** OTA-790 — climbing slow-burn: progress (0..CLIMB_STAMINA_THRESHOLD) toward
+   *  the next +1 staminaMax. A very minute amount accrues per cleared climb tier;
+   *  crossing the threshold ticks staminaMax up. Absent on legacy saves → 0. */
+  staminaProgress?: number;
   /** 2026-05-24 — hunger penalty. Increments by 1 every 8 in-game hours
    *  without eating, capped at 5. effectiveStaminaMax = staminaMax - this.
    *  Eating any food consumable resets to 0. Absent for legacy saves,

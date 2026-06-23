@@ -15419,4 +15419,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // can't be farmed in place. Cadence lives in engine/statTraining
 // (climbGrowsStamina) so it's unit-testable; PlayerMilestones gains
 // climbTiersCleared.
-export const OTA_BUILD_ID = '2026-06-22-790';
+// engine_Dev-791 — climb stamina growth reworked into a SLOW BURN. Instead of a
+// +1 every-4-tiers milestone, each cleared tier now accrues a very minute amount
+// of progress (CLIMB_STAMINA_AWARD 2 / threshold 100 ⇒ ~50 tiers, ≈ a dozen tall
+// climbs, per +1 staminaMax), with overshoot rolled over. Progress persists on a
+// new PlayerCharacter.staminaProgress accumulator (replacing the discarded
+// milestones.climbTiersCleared counter); growStaminaFromClimb() in statTraining
+// is the pure, unit-tested core.
+export const OTA_BUILD_ID = '2026-06-22-791';
