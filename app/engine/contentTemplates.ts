@@ -899,6 +899,7 @@ function bundleEntries(): BundleEntry[] {
     { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration names a default world in dozens of lines; set yours and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
     { key: 'corruptionName', hint: 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', content: JSON.stringify('Corruption') },
     { key: 'crucibleName', hint: 'Your name for the fusion/forge feature the engine calls the "Crucible" (also the {crucible}/{fuse}/{forge} token). Set in the GAME IDENTITY section.', content: JSON.stringify('Crucible') },
+    { key: 'energyName', hint: 'What this world calls its "magic" / power source (renames the engine\'s built-in energy concept). Shows on the magic tab + everywhere the {energy} token is used. Set in GAME IDENTITY; the fuller energy concept (adjective/material/slang) is in the World-lore block.', content: JSON.stringify('Magic') },
     { key: 'crucibleEnabled', hint: 'Whether the fusion/forge feature exists in this game: true (default) keeps it, false removes the Crucible entirely. Toggle it in the GAME IDENTITY section.', content: JSON.stringify(true) },
   ];
   for (const b of LORE_BLOCKS) entries.push({ key: b.id, hint: b.hint, content: getLoreTemplate(b.id, false) });

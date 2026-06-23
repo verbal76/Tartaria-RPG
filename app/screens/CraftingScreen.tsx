@@ -14,7 +14,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { resolveGolemDefs, getSummonNoun, type GolemDefinition } from '../engine/golems';
-import { getEnergyName, hasEnergyOverride } from '../engine/contentPack';
+import { getEnergyName, hasEnergyOverride, getNarratorName } from '../engine/contentPack';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -155,8 +155,8 @@ const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
     body: 'Food, tonics, elixirs. Tap a recipe with materials in hand to fire it. Same craftable-highlight rule as Craft.',
   },
   aetheric: {
-    title: 'Aetheric tab',
-    body: 'Aethercraft disciplines — shape stone, summon golem, mend wounds. Per-race DC + stat bonuses apply.',
+    title: 'Magic tab',
+    body: 'Your disciplines — shape, summon, mend. Tap a card to stage its phrase. Per-race DC + stat bonuses apply. (Reskins to your energy + summon names.)',
   },
 };
 
@@ -394,7 +394,7 @@ export function CraftingScreen() {
               clipboard. Player then hits BACK and the phrase is
               already staged in the input — they just submit. */}
           <Text style={styles.arbiterLine}>
-            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a golem to summon it on the spot; shape and mend stage their phrase for the input box."
+            {`The ${getNarratorName()} taps a finger to their temple. "Three disciplines, all drawing on ${getEnergyName()}. Tap a ${getSummonNoun()} to summon it on the spot; shape and mend stage their phrase for the input box."`}
           </Text>
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {getPowers().map((d) => {
