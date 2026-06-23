@@ -82,6 +82,7 @@ interface GenericDefaultPack {
   mainQuest?: { title?: string; steps?: unknown[] };
   bosses?: unknown[];
   collectables?: unknown[];
+  digging?: unknown;
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -95,6 +96,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.mainQuest = pack.mainQuest;
   genericDefaults.bosses = pack.bosses;
   genericDefaults.collectables = pack.collectables;
+  genericDefaults.digging = pack.digging;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -108,6 +110,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.mainQuest = undefined;
   genericDefaults.bosses = undefined;
   genericDefaults.collectables = undefined;
+  genericDefaults.digging = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -658,6 +661,23 @@ export function setCoatingsOverride(map: CoatingSkinMap | null): void {
 export function hasCoatingsOverride(): boolean { return coatingsOverride != null; }
 export function getCoatingsOverride(): CoatingSkinMap | null { return coatingsOverride; }
 
+// --- digging config (dig-tool scores + dig loot table) -------------------------
+// engine_Dev — the DIGGING subsystem's data: which items/tags dig well, how many
+// productive digs a wild tile yields, and the dig loot table. Author-uploadable
+// (was hardcoded in digging.ts). Resolved override → generic default → built-in.
+let diggingOverride: unknown | null = null;
+export function setDiggingOverride(o: unknown | null): void {
+  diggingOverride = o && typeof o === 'object' && !Array.isArray(o) ? o : null;
+}
+export function hasDiggingOverride(): boolean { return diggingOverride != null; }
+export function getDiggingOverride(): unknown | null { return diggingOverride; }
+/** override → generic default → built-in (the JSON passed by digging.ts). */
+export function resolveDigging<T>(builtin: T): T {
+  if (diggingOverride != null) return diggingOverride as T;
+  if (genericDefaults.digging != null) return genericDefaults.digging as T;
+  return builtin;
+}
+
 // --- inventory presentation (category labels + tool tags) ----------------------
 // engine_Dev — RENAME the inventory category sections (Weapons -> Arsenal, Loot ->
 // Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
@@ -886,6 +906,7 @@ export function clearAllOverrides(): void {
   fusionTagsOverride = null;
   coatingsOverride = null;
   inventoryOverride = null;
+  diggingOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

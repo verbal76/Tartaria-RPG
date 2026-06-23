@@ -274,7 +274,7 @@ import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
 import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/portability';
-import { bestDigTool, rollDig, DIG_SPOT_PRODUCTIVE_CAP } from '../engine/digging';
+import { bestDigTool, rollDig, digSpotProductiveCap } from '../engine/digging';
 import {
   generateWorldMap,
   surveyAll,
@@ -19322,7 +19322,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (enough to build a Stone Spear / Cudgel without walking) but kills
     // the in-place farm. Failed ("nothing") digs don't count toward it.
     const groundDigCount = get().worldMemory.visitedRooms?.[groundRoomKey]?.groundDigCount ?? 0;
-    if (groundDigCount >= DIG_SPOT_PRODUCTIVE_CAP) {
+    if (groundDigCount >= digSpotProductiveCap()) {
       get().appendLog(
         'world',
         `You work the same patch of ground again, but it's spent — you've turned over everything this spot had to give. Try fresh ground.`,

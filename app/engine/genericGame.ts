@@ -147,4 +147,19 @@ export const GENERIC_GAME = {
   mainQuest: MAIN_QUEST,
   bosses: BOSSES,
   collectables: COLLECTABLES,
+  digging: {
+    itemScores: { 'Worn Sword': 3, "Hunter's Bow": 1, 'Scrap Metal': 4, 'Banded Cuirass': 2 },
+    tagScores: { weapon: 2, melee: 3, metal: 4, food: 0, ring: 0, amulet: 0 },
+    productiveCap: 16,
+    loot: [
+      { name: 'Small Rock', rarity: 'Common', baseWeight: 55 },
+      { name: 'Stick', rarity: 'Common', baseWeight: 50 },
+      { name: 'Common Residue', rarity: 'Common', baseWeight: 14 },
+      { name: 'Scrap Metal', rarity: 'Common', baseWeight: 8 },
+      { name: 'Tough Fiber', rarity: 'Common', baseWeight: 8 },
+      { name: 'Trail Rations', rarity: 'Common', baseWeight: 6 },
+      { name: 'Raw Crystal', rarity: 'Uncommon', baseWeight: 5 },
+      { name: 'Worked Crystal', rarity: 'Rare', baseWeight: 1 },
+    ],
+  },
 };
