@@ -48,15 +48,41 @@ export function progressAwardFor(currentStat: number): number {
 
 // OTA-790 — stamina POOL growth from climbing. The six trainable stats grow
 // per-use via trainStat above; stamina is a depletable pool, not a stat, so it
-// grows on a milestone cadence instead (like the travel milestone). Climbing is
-// its only source besides travel: every CLIMB_STAMINA_STEP cleared tiers → +1
-// staminaMax. A tier is a real action, so this can't be farmed standing still.
-export const CLIMB_STAMINA_STEP = 4;
+// grows on its own progress accumulator. Climbing is its only source besides the
+// travel milestone, and it's a deliberate SLOW BURN: each cleared tier adds a
+// very minute amount of progress, and only when that progress crosses the
+// threshold does staminaMax tick up by 1 (overshoot rolls over — nothing lost).
+// A tier is a real action, so this can't be farmed standing still.
+export const CLIMB_STAMINA_THRESHOLD = 100;
+// Progress awarded per cleared climb tier. 2 / 100 ⇒ ~50 tiers per +1 staminaMax
+// (≈ a dozen tall climbs) — a slow burn. Tune here to change the rate.
+export const CLIMB_STAMINA_AWARD = 2;
 
-/** Given the NEW running count of cleared climb tiers, did this tier just cross
- *  a stamina-growth milestone (caller then bumps staminaMax + current stamina)? */
-export function climbGrowsStamina(climbTiersCleared: number): boolean {
-  return climbTiersCleared > 0 && climbTiersCleared % CLIMB_STAMINA_STEP === 0;
+export interface ClimbStaminaResult {
+  staminaMax: number;
+  /** Carried-forward progress (0..threshold) toward the NEXT +1 staminaMax. */
+  staminaProgress: number;
+  /** True only on the tier that crossed the threshold (caller logs + bumps the
+   *  current stamina pool). */
+  grew: boolean;
+}
+
+/** Apply one cleared climb tier's worth of stamina-pool growth — a very minute
+ *  uptick (CLIMB_STAMINA_AWARD) toward the threshold. Pure; the store persists
+ *  the returned staminaMax + staminaProgress. */
+export function growStaminaFromClimb(
+  staminaMax: number,
+  staminaProgress: number,
+): ClimbStaminaResult {
+  let progress = (staminaProgress || 0) + CLIMB_STAMINA_AWARD;
+  let max = staminaMax;
+  let grew = false;
+  while (progress >= CLIMB_STAMINA_THRESHOLD) {
+    progress -= CLIMB_STAMINA_THRESHOLD;
+    max += 1;
+    grew = true;
+  }
+  return { staminaMax: max, staminaProgress: progress, grew };
 }
 
 export interface TrainResult {

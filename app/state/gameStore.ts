@@ -173,7 +173,7 @@ import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
-import { trainStat, climbGrowsStamina, type StatKey } from '../engine/statTraining';
+import { trainStat, growStaminaFromClimb, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
@@ -1676,8 +1676,8 @@ function recordMemorableEvent(
 // earned, not handed out.
 const MILESTONE_KILL_STEP = 5;     // every 5 enemies defeated → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
-// Climb-tier stamina growth lives in engine/statTraining (climbGrowsStamina /
-// CLIMB_STAMINA_STEP) so the cadence is unit-testable without booting the store.
+// Climb-tier stamina growth lives in engine/statTraining (growStaminaFromClimb)
+// — a per-tier progress accumulator, unit-testable without booting the store.
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
 // growth still use the milestone counters above.
@@ -11739,25 +11739,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             }
           }
-          // OTA-790 — climbing slowly grows the stamina POOL. Every
-          // MILESTONE_CLIMB_STEP cleared tiers → +1 staminaMax (and +1 current
-          // stamina so the gain is felt now). A slight uptick, and climbing is
-          // its only source besides the travel milestone — a tier is a real
-          // action, so it can't be farmed standing still.
+          // OTA-790 — climbing slowly grows the stamina POOL. A very minute
+          // uptick PER cleared tier accrues on staminaProgress; only when it
+          // crosses the threshold does staminaMax tick up by 1 (+1 current
+          // stamina so it's felt). A deliberate slow burn, and climbing is its
+          // only source besides the travel milestone — a tier is a real action,
+          // so it can't be farmed standing still.
           const liveStamClimber = get().player;
           if (liveStamClimber) {
-            const prevMs = liveStamClimber.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
-            const newTiers = (prevMs.climbTiersCleared ?? 0) + 1;
-            const hitStamMs = climbGrowsStamina(newTiers);
+            const res = growStaminaFromClimb(liveStamClimber.staminaMax, liveStamClimber.staminaProgress ?? 0);
             set((s) => (s.player ? {
               player: {
                 ...s.player,
-                staminaMax: hitStamMs ? s.player.staminaMax + 1 : s.player.staminaMax,
-                stamina: hitStamMs ? Math.min(s.player.staminaMax + 1, s.player.stamina + 1) : s.player.stamina,
-                milestones: { ...(s.player.milestones ?? prevMs), climbTiersCleared: newTiers },
+                staminaMax: res.staminaMax,
+                stamina: res.grew ? Math.min(res.staminaMax, s.player.stamina + 1) : s.player.stamina,
+                staminaProgress: res.staminaProgress,
               },
             } : s));
-            if (hitStamMs) {
+            if (res.grew) {
               get().appendLog(
                 'reward',
                 `✦ Your wind comes easier on the climb. +1 max stamina (now ${get().player?.staminaMax}).`,
