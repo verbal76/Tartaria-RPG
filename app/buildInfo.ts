@@ -15459,4 +15459,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (word-bounded) in the target — "black ash tree" matches "the black ash tree"
 // but never "tree". Authors list single-word triggers explicitly. rescueHook
 // Matches simplified; template / dev-panel hint / bundle hint / tests updated.
-export const OTA_BUILD_ID = '2026-06-22-795';
+// engine_Dev-796 — puppy safety-nets (vendor + rubble-puppy) un-coupled from
+// Core Guardians. They gated on "all Core Guardians defeated" — a Tartaria
+// concept a custom game never reaches, so both dog-replacement nets were dead in
+// a reskin. New isMainQuestComplete(player) (true when an uploaded custom main
+// quest has all steps done, or the built-in quest hit its end / an ending was
+// chosen) replaces the guardian-count gate at both sites: the rubble-puppy
+// fallback now fires once the MAIN QUEST is complete, and the vendor net queues
+// while it's still in progress. No more guardiansDefeated/totalGuardiansCount in
+// the dog nets. Tests re-pointed at the completion gate.
+export const OTA_BUILD_ID = '2026-06-22-796';
