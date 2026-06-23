@@ -1,0 +1,864 @@
+{
+  "_comment": "Built-in (Tartaria) salvage pools — extracted from app/engine/salvagePools.ts. pools: ordered most-specific→general; the FIRST pool whose any pattern (substring) matches the salvaged noun wins; items are a weighted material pool. junkPool/lines = the ~5% small-haul fallback. The match/pick RULES stay in the engine.",
+  "pools": [
+    {
+      "id": "mechanical",
+      "patterns": [
+        "drone",
+        "sentinel",
+        "automaton",
+        "circuit",
+        "scrap drone",
+        "clockwork",
+        "mechanical",
+        "machine",
+        "machinery",
+        "construct",
+        "robot",
+        "husk",
+        "chassis",
+        "frame",
+        "exoframe",
+        "rig",
+        "plating",
+        "wreck",
+        "wreckage"
+      ],
+      "items": [
+        {
+          "name": "Automaton Circuit",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 2,
+          "max": 4
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Sentinel Core Plate",
+          "rarity": "Uncommon",
+          "weight": 10,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "wagon",
+      "patterns": [
+        "wagon",
+        "cart",
+        "sled",
+        "caravan",
+        "axle",
+        "vessel"
+      ],
+      "items": [
+        {
+          "name": "Trail Rations",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Climbing Rope",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 3,
+          "max": 8
+        },
+        {
+          "name": "Aetheric Torch",
+          "rarity": "Common",
+          "weight": 10,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "weapon_scrap",
+      "patterns": [
+        "blade",
+        "sword",
+        "axe",
+        "pike",
+        "rifle",
+        "spear",
+        "rod",
+        "knife",
+        "cleaver",
+        "maul",
+        "hammer",
+        "gun",
+        "gauntlet",
+        "staff",
+        "bow",
+        "harpoon"
+      ],
+      "items": [
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 40,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Rusted Blade",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Throwing Knife",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 5,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "engine_parts",
+      "patterns": [
+        "engine",
+        "console",
+        "conduit",
+        "capacitor",
+        "coil",
+        "panel",
+        "battery",
+        "core",
+        "pipe",
+        "valve",
+        "pump",
+        "motor",
+        "cable",
+        "wire",
+        "relay",
+        "gear",
+        "cog",
+        "reactor",
+        "terminal",
+        "circuit panel",
+        "observatory",
+        "scope",
+        "lens",
+        "telescope",
+        "array",
+        "dish",
+        "antenna"
+      ],
+      "items": [
+        {
+          "name": "Automaton Circuit",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Aetheric Shard",
+          "rarity": "Uncommon",
+          "weight": 10,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "nautical",
+      "patterns": [
+        "hull",
+        "mast",
+        "anchor",
+        "chain",
+        "hook",
+        "harpoon",
+        "rigging",
+        "sail",
+        "plank",
+        "beam",
+        "driftwood",
+        "ship",
+        "boat"
+      ],
+      "items": [
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 35,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Climbing Rope",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Trail Rations",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 5,
+          "max": 12
+        }
+      ]
+    },
+    {
+      "id": "light",
+      "patterns": [
+        "lantern",
+        "torch",
+        "lamp",
+        "flare",
+        "beacon"
+      ],
+      "items": [
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 40,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aetheric Torch",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "tomb",
+      "patterns": [
+        "sarcophagus",
+        "coffin",
+        "urn",
+        "burial",
+        "skeleton",
+        "remains",
+        "bone",
+        "skull",
+        "corpse",
+        "cadaver",
+        "tomb",
+        "crypt",
+        "grave",
+        "ossuary",
+        "rib",
+        "body",
+        "satchel",
+        "robes"
+      ],
+      "items": [
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 35,
+          "min": 3,
+          "max": 10
+        },
+        {
+          "name": "Aetheric Locket",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "archive",
+      "patterns": [
+        "archive",
+        "tome",
+        "tablet",
+        "ledger",
+        "slate",
+        "blueprint",
+        "map",
+        "parchment",
+        "scroll",
+        "journal",
+        "paper",
+        "letter"
+      ],
+      "items": [
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 2,
+          "max": 6
+        },
+        {
+          "name": "Tartarian Map Fragment",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Sealed Tartarian Letter",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "rubble",
+      "patterns": [
+        "rubble",
+        "debris",
+        "mound",
+        "pile",
+        "rock",
+        "stone",
+        "shard",
+        "fragment",
+        "flagstone",
+        "masonry",
+        "brick"
+      ],
+      "items": [
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Mud Fragment",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 2,
+          "max": 6
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 10,
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "relic_site",
+      "patterns": [
+        "pedestal",
+        "reliquary",
+        "altar",
+        "shrine",
+        "vault",
+        "monolith",
+        "obelisk",
+        "plinth",
+        "library",
+        "doorway",
+        "gate",
+        "shelf",
+        "banner",
+        "standard",
+        "sigil",
+        "relic",
+        "spire",
+        "pylon",
+        "pillar"
+      ],
+      "items": [
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 2,
+          "max": 8
+        },
+        {
+          "name": "Aetheric Locket",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "rarity": "Uncommon",
+          "weight": 10,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Sealed Tartarian Letter",
+          "rarity": "Common",
+          "weight": 5,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "container",
+      "patterns": [
+        "lockbox",
+        "strongbox",
+        "coffer",
+        "safe",
+        "crate",
+        "chest",
+        "box",
+        "cache",
+        "stash",
+        "barrel",
+        "locker",
+        "jar",
+        "bottle",
+        "casket",
+        "case",
+        "urn"
+      ],
+      "items": [
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 3,
+          "max": 10
+        },
+        {
+          "name": "Trail Rations",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 10,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aetheric Shard",
+          "rarity": "Uncommon",
+          "weight": 10,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "fabric",
+      "patterns": [
+        "shroud",
+        "curtain",
+        "tarp",
+        "cloak",
+        "cloth",
+        "rag"
+      ],
+      "items": [
+        {
+          "name": "Cloth Scrap",
+          "rarity": "Common",
+          "weight": 50,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Spider Silk",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 10,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "rarity": "Rare",
+          "weight": 5,
+          "min": 1,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "id": "furniture",
+      "patterns": [
+        "bench",
+        "rack",
+        "table",
+        "door",
+        "chair",
+        "stool",
+        "cabinet"
+      ],
+      "items": [
+        {
+          "name": "Bent Nail",
+          "rarity": "Common",
+          "weight": 35,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Stick",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Cloth Scrap",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 3
+        }
+      ]
+    },
+    {
+      "id": "trap_salvage",
+      "patterns": [
+        "trap",
+        "snare",
+        "tripwire",
+        "deadfall",
+        "defenses",
+        "defense",
+        "golem"
+      ],
+      "items": [
+        {
+          "name": "Scrap Metal",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Bent Nail",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Spider Silk",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 1
+        },
+        {
+          "name": "Aether Dust",
+          "rarity": "Common",
+          "weight": 10,
+          "min": 1,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "junk_salvage",
+      "patterns": [
+        "rust",
+        "rusted",
+        "broken",
+        "fallen",
+        "toppled",
+        "scrap",
+        "cracked",
+        "shattered",
+        "stripped",
+        "weathered",
+        "tilted",
+        "salt-crusted",
+        "dust-buried",
+        "mud-glazed",
+        "half-buried",
+        "buried",
+        "hidden",
+        "crashed"
+      ],
+      "items": [
+        {
+          "name": "Bent Nail",
+          "rarity": "Common",
+          "weight": 30,
+          "min": 1,
+          "max": 3
+        },
+        {
+          "name": "Cloth Scrap",
+          "rarity": "Common",
+          "weight": 25,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Stick",
+          "rarity": "Common",
+          "weight": 20,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Smooth Stone",
+          "rarity": "Common",
+          "weight": 15,
+          "min": 1,
+          "max": 2
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "rarity": "Common",
+          "weight": 10,
+          "min": 1,
+          "max": 2
+        }
+      ]
+    }
+  ],
+  "nothingChance": 0.05,
+  "junkPool": [
+    {
+      "name": "Stick",
+      "rarity": "Common",
+      "weight": 5,
+      "min": 1,
+      "max": 1
+    },
+    {
+      "name": "Smooth Stone",
+      "rarity": "Common",
+      "weight": 5,
+      "min": 1,
+      "max": 1
+    },
+    {
+      "name": "Cloth Scrap",
+      "rarity": "Common",
+      "weight": 4,
+      "min": 1,
+      "max": 1
+    },
+    {
+      "name": "Bent Nail",
+      "rarity": "Common",
+      "weight": 4,
+      "min": 1,
+      "max": 1
+    },
+    {
+      "name": "Bone Sliver",
+      "rarity": "Common",
+      "weight": 3,
+      "min": 1,
+      "max": 1
+    }
+  ],
+  "materialLines": [
+    "You strip {target} carefully. Something usable comes free in your hand.",
+    "You break {target} apart. Among the pieces, something worth keeping.",
+    "You salvage {target}. The take is small but real.",
+    "You work {target} over. A part of it comes loose, intact."
+  ],
+  "junkLines": [
+    "You strip {target} down. Mostly debris — but a {item} comes loose at the bottom of the pile.",
+    "The {target} yields little of value, though a {item} ends up in your pack.",
+    "Slim pickings on {target}. You pocket a {item} on the way out.",
+    "You scavenge {target} thoroughly. One {item} survives the sorting."
+  ]
+}

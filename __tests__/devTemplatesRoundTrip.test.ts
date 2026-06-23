@@ -37,7 +37,7 @@ import {
   getTableTemplate, getLoreTemplate,
   buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate,
   buildTitlesTemplate, buildStartingAreasTemplate, buildCollectablesTemplate, buildSummonsTemplate,
-  buildInteractionTagsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildAnnotatedGameBundle,
+  buildInteractionTagsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildAnnotatedGameBundle,
   buildGameBundleTemplate,
 } from '../app/engine/contentTemplates';
 import { CONTENT_TABLES, LORE_BLOCKS, clearAllOverrides } from '../app/engine/contentPack';
@@ -73,6 +73,7 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     ['bosses', () => store().loadBossesJson(buildBossesTemplate())],
     ['digging', () => store().loadDiggingJson(buildDiggingTemplate())],
     ['scrap', () => store().loadScrapJson(buildScrapTemplate())],
+    ['salvage', () => store().loadSalvageJson(buildSalvageTemplate())],
   ];
   test.each(special)('special template loads: %s', (_name, load) => {
     expect(load().ok).toBe(true);
@@ -138,7 +139,7 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
       // special content
       'missions', 'hooks', 'wasteland', 'titles', 'mainQuest', 'bosses', 'startingAreas',
       'interactionTags', 'summons', 'dogEnabled', 'damageTypes', 'damageResistances',
-      'fusionTags', 'coatings', 'digging', 'scrap', 'inventory', 'collectables', 'whispers',
+      'fusionTags', 'coatings', 'digging', 'scrap', 'salvage', 'inventory', 'collectables', 'whispers',
     ];
     for (const key of required) expect(t).toContain(`"${key}"`);
   });

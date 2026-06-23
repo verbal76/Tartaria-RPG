@@ -84,6 +84,7 @@ interface GenericDefaultPack {
   collectables?: unknown[];
   digging?: unknown;
   scrap?: unknown;
+  salvage?: unknown;
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -99,6 +100,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.collectables = pack.collectables;
   genericDefaults.digging = pack.digging;
   genericDefaults.scrap = pack.scrap;
+  genericDefaults.salvage = pack.salvage;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -114,6 +116,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.collectables = undefined;
   genericDefaults.digging = undefined;
   genericDefaults.scrap = undefined;
+  genericDefaults.salvage = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -697,6 +700,21 @@ export function resolveScrap<T>(builtin: T): T {
   return builtin;
 }
 
+// --- salvage pools (per-noun salvage outcome pools) ----------------------------
+// engine_Dev — the SALVAGE subsystem's data: per-noun outcome pools + junk fallback
+// + flavor lines. The match/pick RULES stay in salvagePools.ts. Author-uploadable.
+let salvageOverride: unknown | null = null;
+export function setSalvageOverride(o: unknown | null): void {
+  salvageOverride = o && typeof o === 'object' && !Array.isArray(o) ? o : null;
+}
+export function hasSalvageOverride(): boolean { return salvageOverride != null; }
+export function getSalvageOverride(): unknown | null { return salvageOverride; }
+export function resolveSalvage<T>(builtin: T): T {
+  if (salvageOverride != null) return salvageOverride as T;
+  if (genericDefaults.salvage != null) return genericDefaults.salvage as T;
+  return builtin;
+}
+
 // --- inventory presentation (category labels + tool tags) ----------------------
 // engine_Dev — RENAME the inventory category sections (Weapons -> Arsenal, Loot ->
 // Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
@@ -927,6 +945,7 @@ export function clearAllOverrides(): void {
   inventoryOverride = null;
   diggingOverride = null;
   scrapOverride = null;
+  salvageOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

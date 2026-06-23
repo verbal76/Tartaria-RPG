@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1559,6 +1559,38 @@ function ScrapBox() {
   );
 }
 
+// engine_Dev — SALVAGE config box. Per-noun salvage outcome pools. Config-shaped,
+// so a template/paste/load box matching the other config boxes.
+function SalvageBox() {
+  const loadSalvageJson = useContentPackStore((s) => s.loadSalvageJson);
+  const salvage = useContentPackStore((s) => s.salvage) as { pools?: unknown[] } | null;
+  const loaded = !!salvage;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Salvage</Text>
+        <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? `● override · ${salvage?.pools?.length ?? 0}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        What salvaging a noun yields. The match/pick RULES stay in the engine; you set the
+        <Text style={{ fontWeight: 'bold' }}> pools</Text> — each with pattern nouns (a wagon, a
+        blade…) and a weighted material list — plus the small-haul <Text style={{ fontWeight: 'bold' }}>junk</Text>
+        fallback and flavor lines. First matching pool wins. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a salvage JSON object" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadSalvageJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded salvage (${r.count} pools).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSalvageTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(salvage, null, 2) : buildSalvageTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearSalvage(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
 // variable, naming the title, and setting a threshold — or upload/paste the JSON.
 function TitlesBox() {
@@ -2955,6 +2987,10 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <CollapsibleSection title="SCRAP">
         <ScrapBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="SALVAGE">
+        <SalvageBox />
       </CollapsibleSection>
 
       <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES">
