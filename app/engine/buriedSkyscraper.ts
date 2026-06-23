@@ -66,19 +66,19 @@ export const FLOOR_ARCHETYPES: Record<FloorArchetype, FloorArchetypeMeta> = {
   shrine_level: {
     id: 'shrine_level',
     label: 'Shrine Level',
-    flavor: 'Aetherkin sacred space. Censers, candle-grids, low chanting from rooms you have not entered yet.',
+    flavor: 'A sacred space. Censers, candle-grids, low chanting from rooms you have not entered yet.',
     color: '#9888a8',
   },
   mechanical_floor: {
     id: 'mechanical_floor',
     label: 'Mechanical Floor',
-    flavor: 'Aethercraft engines, hazard plates, the smell of burning Aetherstone. Walk where the floor is dark, not where it glows.',
+    flavor: 'Old engines, hazard plates, the smell of burning fuel. Walk where the floor is dark, not where it glows.',
     color: '#a85a3a',
   },
   dig_camp: {
     id: 'dig_camp',
-    label: 'Reclaimer Dig Camp',
-    flavor: 'Salvage piles, foreman tents, a lantern grid the Reclaimers maintain themselves. Trade if they recognize your colors.',
+    label: 'Salvager Dig Camp',
+    flavor: 'Salvage piles, foreman tents, a lantern grid the salvagers maintain themselves. Trade if they recognize your colors.',
     color: '#9ec96a',
   },
 };

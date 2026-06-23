@@ -52,15 +52,20 @@ const BASELINE: Record<string, number> = {
   // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).
   'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 9,
   'app/engine/character.ts': 9, 'app/engine/golems.ts': 8, 'app/engine/titles.ts': 7,
-  'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 6, 'app/engine/buriedSkyscraper.ts': 5,
-  'app/engine/climbHeight.ts': 5, 'app/engine/itemFusion.ts': 5, 'app/engine/dogCompanion.ts': 0,
+  'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 6, 'app/engine/buriedSkyscraper.ts': 0,
+  // buriedSkyscraper floor flavors genericized; itemFusion adjective pools + dog-vest
+  // example name genericized (5→0 each).
+  'app/engine/climbHeight.ts': 5, 'app/engine/itemFusion.ts': 0, 'app/engine/dogCompanion.ts': 0,
   'app/screens/TitleScreen.tsx': 4, 'app/screens/ExplorationScreen.tsx': 4, 'app/screens/CraftingScreen.tsx': 0,
   'app/screens/DeveloperSettingsScreen.tsx': 4, 'app/engine/raceMechanics.ts': 3, 'app/engine/combatRules.ts': 3,
   'app/engine/portability.ts': 2, 'app/engine/narrativeGenerator.ts': 2, 'app/engine/crafting.ts': 2,
-  'app/engine/hunts.ts': 2, 'app/engine/encounter.ts': 2, 'app/engine/locationChallenges.ts': 2,
+  'app/engine/hunts.ts': 2, 'app/engine/encounter.ts': 2, 'app/engine/locationChallenges.ts': 0,
+  // FACTION_COVETED_ITEM map extracted to app/data/factions/coveted-items.json (2→0).
   'app/engine/itemEffect.ts': 2, 'app/screens/AboutScreen.tsx': 2, 'app/screens/ActionReferenceScreen.tsx': 2,
-  'app/engine/statTraining.ts': 1, 'app/engine/investigationTable.ts': 1, 'app/engine/vendors.ts': 1,
-  'app/engine/itemDefaults.ts': 1, 'app/engine/hookPuzzles.ts': 1, 'app/engine/sceneNounMaterial.ts': 1,
+  // investigate LLM prompt now uses getNarratorPersona()/getWorldSetting() (1→0);
+  // hookPuzzles vault-tumbler intro genericized (1→0).
+  'app/engine/statTraining.ts': 1, 'app/engine/investigationTable.ts': 0, 'app/engine/vendors.ts': 1,
+  'app/engine/itemDefaults.ts': 1, 'app/engine/hookPuzzles.ts': 0, 'app/engine/sceneNounMaterial.ts': 1,
   'app/engine/arbiterKnowledge.ts': 1, 'app/engine/buildings.ts': 1, 'app/screens/MapScreen.tsx': 1,
   'app/screens/VendorScreen.tsx': 1, 'app/screens/EndingScreen.tsx': 1,
 };

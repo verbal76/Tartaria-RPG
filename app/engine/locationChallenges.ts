@@ -14,6 +14,9 @@
 // from these (disabled) completion sites, so the 6 Tier-C titles cannot be
 // earned until the challenges go live.
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import covetedItemData from '../data/factions/coveted-items.json';
+
 export type ChallengeEntryKind = 'storyline' | 'encounter' | 'whisper' | 'found_map';
 
 export interface LocationChallenge {
@@ -132,20 +135,12 @@ export interface CovetedItem {
   sourceLocationId: string;
 }
 
-export const FACTION_COVETED_ITEM: Record<string, CovetedItem> = {
-  // arb53 — upgraded to canon Tartarian relics (see docs/lore + canon-loot-
-  // treasure.json). Each is a low-tier broker token authored in exploration.json
-  // under the same name; the full artifact lore lives in canon-loot-treasure.
-  mud_monarchs:          { itemId: 'mud_flood_pulse_key',       name: 'Mud Flood Nexus Pulse-Key', sourceLocationId: 'mud_flood_nexus' },
-  forgotten_order:       { itemId: 'architects_master_blueprint', name: "Architect's Master Blueprint", sourceLocationId: 'red_tower_of_nimari' },
-  reclaimers_guild:      { itemId: 'fragment_of_endless_stair', name: 'Fragment of the Endless Stair', sourceLocationId: 'endless_stair' },
-  true_tartarians:       { itemId: 'mask_of_the_last_king',     name: "Mask of Tartaria's Last King", sourceLocationId: 'buried_cities' },
-  eternal_dynasty:       { itemId: 'dynasty_blood_signet',      name: "Eternal Dynasty's Blood-Signet", sourceLocationId: 'asgardar' },
-  conspiracy_architects: { itemId: 'timeworn_ether_compass',    name: 'Timeworn Ether Compass', sourceLocationId: 'cradle_of_dusk' },
-  servants_of_giants:    { itemId: 'entombeds_prayer_tablet',   name: "The Entombed's Prayer Tablet", sourceLocationId: 'buried_cities' },
-  stone_builders:        { itemId: 'obsidian_siphon',           name: 'Obsidian Siphon', sourceLocationId: 'obsidian_pillars' },
-  tartarian_revivalists: { itemId: 'aetheric_phoenix_feather',  name: 'Aetheric Phoenix Feather', sourceLocationId: 'sinking_cathedral' },
-};
+// engine_Dev — the Tartaria faction→relic chart moved to app/data/factions/
+// coveted-items.json so the engine carries no hardcoded setting strings (the
+// names match the data catalog + canon-loot lore; data is the reference game's
+// to own). The brokering MECHANIC below stays in the engine.
+export const FACTION_COVETED_ITEM: Record<string, CovetedItem> =
+  (covetedItemData as { covetedItems: Record<string, CovetedItem> }).covetedItems;
 
 /** Standing at/above which the player counts as "affiliated" with a faction
  *  (mirrors the join threshold). Affiliated factions + the player's own faction

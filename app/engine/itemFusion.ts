@@ -258,7 +258,7 @@ function buildPrompt(
         '{ "kind": "armor", "name": "Cinderhalt Brace", "description": "<one line>", "rarity": "Rare"|"Legendary", "armorSlot": "head"|"chest"|"legs"|"feet", "acBonus": 1–6, "resistance"?: "...", "special": "<one-line flavor>" }',
         '',
         'Shape (kind === "dog_armor"):',
-        '{ "kind": "dog_armor", "name": "Reclaimer Pattern Vigil", "description": "<one line>", "rarity": "Rare"|"Legendary", "acBonus": 1–6, "resistance"?: "...", "special": "<one-line flavor>" }',
+        '{ "kind": "dog_armor", "name": "Plated Guard Vest", "description": "<one line>", "rarity": "Rare"|"Legendary", "acBonus": 1–6, "resistance"?: "...", "special": "<one-line flavor>" }',
         '',
         'Rules:',
         '- Pick the kind that best matches the material tag profile (metal/blade → weapon; cloth/fiber → armor or dog_armor; aether dominates either).',
@@ -548,8 +548,8 @@ export function synthesizeFusionDeterministic(
   // two independent slices, so different input sets rarely collide on a name).
   const themePool: Record<string, string[]> = {
     aether: [
-      'Resonant', 'Humming', 'Singing', 'Aether-Veined', 'Etheric', 'Glimmerwrought',
-      'Stormcalled', 'Voltaic', 'Pulse-Woven', 'Lumenforged', 'Aether-Touched', 'Spark-Riven',
+      'Resonant', 'Humming', 'Singing', 'Current-Veined', 'Galvanic', 'Glimmerwrought',
+      'Stormcalled', 'Voltaic', 'Pulse-Woven', 'Lumenforged', 'Charge-Kissed', 'Spark-Riven',
       'Choir-Bound', 'Static-Laced', 'Witchlit', 'Ghost-Charged', 'Auralite', 'Halcyon',
     ],
     metal: [
@@ -572,7 +572,7 @@ export function synthesizeFusionDeterministic(
       'Driftwood', 'Bog-Oak', 'Sap-Sealed', 'Bark-Lashed', 'Pith-Cored', 'Timberbound',
     ],
     stone: [
-      'Mudstone', 'Cairn', 'Slate', 'Pillar', 'Granite-Cut', 'Cobble-Set',
+      'Sandstone', 'Cairn', 'Slate', 'Pillar', 'Granite-Cut', 'Cobble-Set',
       'Flint-Knapped', 'Basalt', 'Quarry-Hewn', 'Shale-Split', 'Geode-Cored', 'Menhir',
     ],
     improvised: [

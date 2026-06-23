@@ -15431,4 +15431,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // §7 (Side content) gains a Dog-rescue scenarios entry alongside the dog toggle.
 // (The whole-game JSON bundle already carried both — dogGear via the CONTENT_TABLES
 // loop, dogScenarios as its own entry; this only closes the docs gap.)
-export const OTA_BUILD_ID = '2026-06-22-792';
+// engine_Dev-793 — Tartaria burn-down: Bucket B cleared (the five small engine
+// files, ~14 string-literal leaks → 0). investigationTable: the investigate LLM
+// prompt now builds from getNarratorPersona()/getWorldSetting() instead of a
+// hardcoded "the Arbiter … Tartaria" system line. locationChallenges: the
+// FACTION_COVETED_ITEM (Guild Broker faction→relic) map moved to app/data/
+// factions/coveted-items.json (names stay in sync with the data catalog).
+// hookPuzzles: vault-tumbler intro genericized. buriedSkyscraper: shrine/
+// mechanical/dig-camp floor flavors genericized. itemFusion: the fusion-namer
+// adjective pools + the dog-vest LLM example name genericized. Leak baseline
+// tightened for all five. Engine MECHANICS unchanged throughout.
+export const OTA_BUILD_ID = '2026-06-22-793';
