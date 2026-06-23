@@ -46,6 +46,19 @@ export function progressAwardFor(currentStat: number): number {
   return 0.1;
 }
 
+// OTA-790 — stamina POOL growth from climbing. The six trainable stats grow
+// per-use via trainStat above; stamina is a depletable pool, not a stat, so it
+// grows on a milestone cadence instead (like the travel milestone). Climbing is
+// its only source besides travel: every CLIMB_STAMINA_STEP cleared tiers → +1
+// staminaMax. A tier is a real action, so this can't be farmed standing still.
+export const CLIMB_STAMINA_STEP = 4;
+
+/** Given the NEW running count of cleared climb tiers, did this tier just cross
+ *  a stamina-growth milestone (caller then bumps staminaMax + current stamina)? */
+export function climbGrowsStamina(climbTiersCleared: number): boolean {
+  return climbTiersCleared > 0 && climbTiersCleared % CLIMB_STAMINA_STEP === 0;
+}
+
 export interface TrainResult {
   player: PlayerCharacter;
   /** Set when the use crossed the threshold and the base stat just

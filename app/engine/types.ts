@@ -751,6 +751,9 @@ export interface PlayerMilestones {
    *  on first hub entry so a new player understands the inside-building
    *  state. */
   firstOutpostHintShown?: boolean;
+  /** Count of climb TIERS cleared. Every CLIMB_STAMINA_STEP → +1 staminaMax
+   *  (climbing is the only stamina-pool grower besides the travel milestone). */
+  climbTiersCleared?: number;
 }
 
 export type EquipSlot =

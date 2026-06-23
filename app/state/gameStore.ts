@@ -173,7 +173,7 @@ import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
-import { trainStat, type StatKey } from '../engine/statTraining';
+import { trainStat, climbGrowsStamina, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
@@ -1676,6 +1676,8 @@ function recordMemorableEvent(
 // earned, not handed out.
 const MILESTONE_KILL_STEP = 5;     // every 5 enemies defeated → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
+// Climb-tier stamina growth lives in engine/statTraining (climbGrowsStamina /
+// CLIMB_STAMINA_STEP) so the cadence is unit-testable without booting the store.
 // OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
 // now per-use via engine/statTraining (Skyrim model). HP and stamina
 // growth still use the milestone counters above.
@@ -11735,6 +11737,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   `✦ The haul wears in. +1 STR (now ${trStr.leveled.to}).`,
                 );
               }
+            }
+          }
+          // OTA-790 — climbing slowly grows the stamina POOL. Every
+          // MILESTONE_CLIMB_STEP cleared tiers → +1 staminaMax (and +1 current
+          // stamina so the gain is felt now). A slight uptick, and climbing is
+          // its only source besides the travel milestone — a tier is a real
+          // action, so it can't be farmed standing still.
+          const liveStamClimber = get().player;
+          if (liveStamClimber) {
+            const prevMs = liveStamClimber.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
+            const newTiers = (prevMs.climbTiersCleared ?? 0) + 1;
+            const hitStamMs = climbGrowsStamina(newTiers);
+            set((s) => (s.player ? {
+              player: {
+                ...s.player,
+                staminaMax: hitStamMs ? s.player.staminaMax + 1 : s.player.staminaMax,
+                stamina: hitStamMs ? Math.min(s.player.staminaMax + 1, s.player.stamina + 1) : s.player.stamina,
+                milestones: { ...(s.player.milestones ?? prevMs), climbTiersCleared: newTiers },
+              },
+            } : s));
+            if (hitStamMs) {
+              get().appendLog(
+                'reward',
+                `✦ Your wind comes easier on the climb. +1 max stamina (now ${get().player?.staminaMax}).`,
+              );
             }
           }
           const isTop = currentTier === totalTiers;
