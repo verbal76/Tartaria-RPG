@@ -15401,4 +15401,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "misc". GENERIC_GAME + generic templates carry generic vests so reskins don't
 // fall back to the built-in Tartaria vests. Static DOG_GEAR const kept as the
 // built-in fallback alias. (Was built-in only — "dog gear needs to be JSON defined".)
-export const OTA_BUILD_ID = '2026-06-22-788';
+// engine_Dev-789 — Dog hook ("dog-rescue scenarios") is now author-definable.
+// The acquisition MECHANIC is unchanged (one dog/save; tap a hookNoun -> a
+// faction-neutral captor spawns -> kill it -> name/breed onboarding; captor
+// keyed by faction with the unaligned fallback). Only the WORDING moved out of
+// engine code into data: RESCUE_SCENARIOS (+ the intro lines that were hardcoded
+// in gameStore) now live in app/data/dog/rescue-scenarios.json and resolve
+// through a new resolveDogScenarios() override layer (uploaded 'dogScenarios'
+// table -> generic-default pack -> built-in). New DOG-RESCUE SCENARIOS dev-console
+// box (TEMPLATE/COPY/LOAD), bundle key, generic-default scenarios, and tests.
+// Net: dogCompanion.ts drops to 0 Tartaria literals (leak baseline tightened).
+export const OTA_BUILD_ID = '2026-06-22-789';

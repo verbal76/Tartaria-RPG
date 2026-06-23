@@ -87,6 +87,7 @@ interface GenericDefaultPack {
   scrap?: unknown;
   salvage?: unknown;
   overlays?: unknown[];
+  dogScenarios?: unknown[];
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -104,6 +105,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.scrap = pack.scrap;
   genericDefaults.salvage = pack.salvage;
   genericDefaults.overlays = pack.overlays;
+  genericDefaults.dogScenarios = pack.dogScenarios;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -121,6 +123,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.scrap = undefined;
   genericDefaults.salvage = undefined;
   genericDefaults.overlays = undefined;
+  genericDefaults.dogScenarios = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -762,6 +765,23 @@ export function resolveOverlays<T>(builtin: readonly T[]): readonly T[] {
   return builtin;
 }
 
+// --- dog-rescue scenarios (the "dog hook" wording) -----------------------------
+// engine_Dev — the WORDING of the dog-acquisition rescue scenarios (hook nouns,
+// captor names/factions, intro + victory lines, breed seed). The firing MECHANIC
+// (one dog per save; tap a hookNoun -> faction-neutral captor -> onboarding) stays
+// in the store + dogCompanion.ts. Author-uploadable array; null = built-in.
+let dogScenariosOverride: unknown[] | null = null;
+export function setDogScenariosOverride(rows: readonly unknown[] | null): void {
+  dogScenariosOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
+}
+export function hasDogScenariosOverride(): boolean { return dogScenariosOverride != null; }
+export function getDogScenariosOverride(): unknown[] | null { return dogScenariosOverride; }
+export function resolveDogScenarios<T>(builtin: readonly T[]): readonly T[] {
+  if (dogScenariosOverride != null) return dogScenariosOverride as readonly T[];
+  if (genericDefaults.dogScenarios != null) return genericDefaults.dogScenarios as readonly T[];
+  return builtin;
+}
+
 // --- inventory presentation (category labels + tool tags) ----------------------
 // engine_Dev — RENAME the inventory category sections (Weapons -> Arsenal, Loot ->
 // Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
@@ -997,6 +1017,7 @@ export function clearAllOverrides(): void {
   scrapOverride = null;
   salvageOverride = null;
   overlaysOverride = null;
+  dogScenariosOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------

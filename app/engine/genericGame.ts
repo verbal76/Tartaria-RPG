@@ -203,4 +203,33 @@ export const GENERIC_GAME = {
     { id: 'high_perch', kind: 'encounter', arrivalLine: 'The top is a narrow perch over a long drop. You are not the only thing that climbed up here.', ambientNouns: ['perch', 'drop', 'rail', 'wind'], minTiers: 3, encounterChance: 0.7, encounterPool: ['Stone Sentinel', 'Grave Wight'] },
     { id: 'open_sky', kind: 'encounter', arrivalLine: 'You reach the top and the sky opens up. Nothing here but wind and a long, clean view.', ambientNouns: ['sky', 'wind', 'view', 'edge'], minTiers: 2, encounterChance: 0.0, encounterPool: [] },
   ],
+  dogScenarios: [
+    {
+      id: 'cage', hookNouns: ['cage', 'kennel', 'pen', 'crate'],
+      captorFactionId: 'wardens', captorName: 'Rogue Warden',
+      defaultBreed: 'mongrel', startingProfile: 'mongrel',
+      archetypes: ['ruin', 'settlement', 'wilderness'],
+      rumorVenue: 'a cage at an old waystation',
+      introLine: 'You find a dog locked in a cage. The {captorName} stands over it. "Walk on. This one’s not yours."',
+      victoryLine: 'The captor goes down. The dog watches you from the cage, wary and quiet. They had no right to it. No faction reckoning falls on you for this.',
+    },
+    {
+      id: 'rope', hookNouns: ['rope', 'stake', 'post', 'tether'],
+      captorFactionId: 'seekers', captorName: 'Bad-faith Seeker',
+      defaultBreed: 'hound', startingProfile: 'hound',
+      archetypes: ['road', 'wilderness', 'camp'],
+      rumorVenue: 'a dog staked by a roadside',
+      introLine: 'A dog is tied to a stake by a short rope. The {captorName} turns as you approach. "Keep moving. The dog stays."',
+      victoryLine: 'The captor falls. The hound stops pulling at the rope and starts watching you instead. They had no right to it. No faction reckoning falls on you for this.',
+    },
+    {
+      id: 'snare', hookNouns: ['snare', 'pit', 'trap', 'trapper camp'],
+      captorFactionId: null, captorName: 'Unaligned Poacher',
+      defaultBreed: 'mutt', startingProfile: 'mutt',
+      archetypes: ['wilderness', 'camp'],
+      rumorVenue: 'a snare pit at a trapper camp',
+      introLine: 'You crest a snare pit. A half-grown mutt is caught in it, growling weak. The {captorName} turns. "That’s my catch. Walk."',
+      victoryLine: 'The poacher folds over their own snare line. The mutt stops snarling and settles. They had no right to it. No faction reckoning falls on you for this.',
+    },
+  ],
 };

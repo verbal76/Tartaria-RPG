@@ -34,6 +34,7 @@ import {
   setScrapOverride,
   setSalvageOverride,
   setOverlaysOverride,
+  setDogScenariosOverride,
   setInventoryOverride,
   setCrucibleNameOverride,
   setCrucibleEnabled,
@@ -134,6 +135,7 @@ interface PersistShape {
   scrap?: Record<string, unknown> | null;
   salvage?: Record<string, unknown> | null;
   overlays?: unknown[];
+  dogScenarios?: unknown[];
   /** Inventory presentation: category label renames + extra tool tags. */
   inventory?: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null;
   published?: boolean;
@@ -194,6 +196,8 @@ interface ContentPackState {
   scrap: Record<string, unknown> | null;
   salvage: Record<string, unknown> | null;
   overlays: unknown[];
+  /** Dog-rescue scenario wording (the "dog hook"), or [] = built-in. */
+  dogScenarios: unknown[];
   /** Inventory category-label renames + extra tool tags, or null = built-in. */
   inventory: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
@@ -302,6 +306,8 @@ interface ContentPackState {
   clearSalvage: () => void;
   loadOverlaysJson: (json: string) => LoadResult;
   clearOverlays: () => void;
+  loadDogScenariosJson: (json: string) => LoadResult;
+  clearDogScenarios: () => void;
   /** Load inventory presentation: { labels?: { categoryId: name }, toolTags?: [..] }. */
   loadInventoryJson: (json: string) => LoadResult;
   clearInventory: () => void;
@@ -333,7 +339,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -357,6 +363,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     scrap: state.scrap && Object.keys(state.scrap).length > 0 ? state.scrap : undefined,
     salvage: state.salvage && Object.keys(state.salvage).length > 0 ? state.salvage : undefined,
     overlays: state.overlays.length > 0 ? state.overlays : undefined,
+    dogScenarios: state.dogScenarios.length > 0 ? state.dogScenarios : undefined,
     inventory: state.inventory ?? undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
@@ -395,6 +402,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   scrap: null,
   salvage: null,
   overlays: [],
+  dogScenarios: [],
   inventory: null,
   published: false,
   narratorName: '',
@@ -440,6 +448,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setScrapOverride(s.scrap && Object.keys(s.scrap).length > 0 ? s.scrap : null);
     setSalvageOverride(s.salvage && Object.keys(s.salvage).length > 0 ? s.salvage : null);
     setOverlaysOverride(s.overlays.length > 0 ? s.overlays : null);
+    setDogScenariosOverride(s.dogScenarios.length > 0 ? s.dogScenarios : null);
     setInventoryOverride(s.inventory ?? null);
     invalidateLocationCaches();
     setNarratorNameOverride(s.narratorName || null);
@@ -1064,6 +1073,22 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), overlays: [] });
   },
 
+  loadDogScenariosJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); } catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    const arr = Array.isArray(parsed) ? parsed : (parsed && typeof parsed === 'object' ? (parsed as { scenarios?: unknown }).scenarios : null);
+    if (!Array.isArray(arr) || arr.length === 0) return { ok: false, error: 'Dog scenarios must be a JSON array (or { "scenarios": [...] }).' };
+    setDogScenariosOverride(arr);
+    set({ dogScenarios: arr, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), dogScenarios: arr });
+    return { ok: true, count: arr.length };
+  },
+  clearDogScenarios() {
+    setDogScenariosOverride(null);
+    set({ dogScenarios: [], contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), dogScenarios: [] });
+  },
+
   loadInventoryJson(json) {
     let parsed: unknown;
     try { parsed = JSON.parse(stripJsonComments(json)); }
@@ -1122,6 +1147,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextScrap: Record<string, unknown> | null = get().scrap;
     let nextSalvage: Record<string, unknown> | null = get().salvage;
     let nextOverlays: unknown[] = get().overlays;
+    let nextDogScenarios: unknown[] = get().dogScenarios;
     let nextInventory: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null = get().inventory;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
@@ -1225,6 +1251,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         const a = Array.isArray(value) ? value : (value && typeof value === 'object' ? (value as { overlays?: unknown }).overlays : null);
         if (Array.isArray(a) && a.length > 0) { nextOverlays = a; applied.push(`overlays (${a.length})`); }
         else skipped.push('overlays (empty/not an array)');
+      } else if (key === 'dogScenarios') {
+        const a = Array.isArray(value) ? value : (value && typeof value === 'object' ? (value as { scenarios?: unknown }).scenarios : null);
+        if (Array.isArray(a) && a.length > 0) { nextDogScenarios = a; applied.push(`dogScenarios (${a.length})`); }
+        else skipped.push('dogScenarios (empty/not an array)');
       } else if (key === 'inventory') {
         if (value && typeof value === 'object' && !Array.isArray(value)) { nextInventory = value as { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }; applied.push('inventory'); }
         else skipped.push('inventory (not an object)');
@@ -1296,6 +1326,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setScrapOverride(nextScrap && Object.keys(nextScrap).length > 0 ? nextScrap : null);
     setSalvageOverride(nextSalvage && Object.keys(nextSalvage).length > 0 ? nextSalvage : null);
     setOverlaysOverride(nextOverlays.length > 0 ? nextOverlays : null);
+    setDogScenariosOverride(nextDogScenarios.length > 0 ? nextDogScenarios : null);
     setInventoryOverride(nextInventory ?? null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
@@ -1328,6 +1359,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       scrap: nextScrap,
       salvage: nextSalvage,
       overlays: nextOverlays,
+      dogScenarios: nextDogScenarios,
       inventory: nextInventory,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
@@ -1339,7 +1371,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       energyName: nextEnergyName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -1393,6 +1425,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.scrap && Object.keys(s.scrap).length > 0) out.scrap = s.scrap;
     if (s.salvage && Object.keys(s.salvage).length > 0) out.salvage = s.salvage;
     if (s.overlays.length > 0) out.overlays = s.overlays;
+    if (s.dogScenarios.length > 0) out.dogScenarios = s.dogScenarios;
     if (s.inventory && ((s.inventory.labels && Object.keys(s.inventory.labels).length > 0) || (s.inventory.toolTags && s.inventory.toolTags.length > 0) || typeof s.inventory.repairMaterialPct === 'number')) out.inventory = s.inventory;
     return JSON.stringify(out, null, 2);
   },
@@ -1462,7 +1495,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1522,6 +1555,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setSalvageOverride(salvage && Object.keys(salvage).length > 0 ? salvage : null);
         const overlays = Array.isArray(shape.overlays) ? (shape.overlays as unknown[]) : [];
         setOverlaysOverride(overlays.length > 0 ? overlays : null);
+        const dogScenarios = Array.isArray(shape.dogScenarios) ? (shape.dogScenarios as unknown[]) : [];
+        setDogScenariosOverride(dogScenarios.length > 0 ? dogScenarios : null);
         const inventory = shape.inventory && typeof shape.inventory === 'object' && !Array.isArray(shape.inventory) ? (shape.inventory as { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }) : null;
         setInventoryOverride(inventory);
         const published = shape.published === true;
@@ -1545,7 +1580,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
