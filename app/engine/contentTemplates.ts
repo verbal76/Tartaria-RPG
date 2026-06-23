@@ -135,7 +135,17 @@ export const TEMPLATE_SAMPLE_ROWS = 2;
 // built-in sample doesn't happen to use the newer fields. Loaders strip // comments,
 // so the template still round-trips. Only shown in the dev box (includeTokenNote),
 // not the whole-game bundle (which carries its own section hint).
+const STAT_BONUS_NOTE = [
+  '// statBonuses: [{ stat, amount }] — boosts applied while EQUIPPED. Attribute stats',
+  '//   (strength/dexterity/intelligence/wisdom/charisma/stealth) change your effective',
+  '//   stats; the two DERIVED caps hp (max HP) and staminaMax (max stamina) raise those',
+  '//   pools instead, e.g. { "stat": "staminaMax", "amount": 4 }.',
+].join('\n');
+
 const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
+  weapons: STAT_BONUS_NOTE,
+  armor: STAT_BONUS_NOTE,
+  gear: STAT_BONUS_NOTE,
   races: [
     '// Optional per RACE row (perks + gear + abilities):',
     '//   racialStatBonuses: { strength?, dexterity?, intelligence?, wisdom?, charisma? }  — always-on stat bumps',
@@ -566,8 +576,9 @@ export function buildTitlesTemplate(): string {
     '// its TRACKABLE VARIABLE reaches the threshold. Pick a "track" from this list:',
     varList,
     '// Each title: { id, name, description?, track, threshold, perk?: { stat, amount } }.',
-    '// Optional perk applies a flat attribute bonus while held; valid stats:',
-    '// strength, dexterity, intelligence, wisdom, charisma, stealth.',
+    '// Optional perk applies a flat bonus while the title is held; valid stats:',
+    '// strength, dexterity, intelligence, wisdom, charisma, stealth — plus the derived',
+    '// caps hp (max HP) and staminaMax (max stamina), e.g. perk: { stat: "staminaMax", amount: 3 }.',
     body,
   ].join('\n');
 }

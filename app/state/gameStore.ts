@@ -194,7 +194,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, bonusStaminaMaxFor, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
@@ -1739,7 +1739,10 @@ function debugEnemy(e: Record<string, unknown>): string {
 // capping restoreStamina / showing remaining headroom / computing
 // tired-status thresholds.
 function effectiveStaminaMax(player: PlayerCharacter): number {
-  return Math.max(1, player.staminaMax - (player.hungerStaminaPenalty ?? 0));
+  // engine_Dev — base (creation + climb growth) + author-granted gear/title
+  // staminaMax bonuses, then the hunger penalty. So a +staminaMax perk raises the
+  // real cap (regen + clamps) exactly like the displayed max.
+  return Math.max(1, player.staminaMax + bonusStaminaMaxFor(player) - (player.hungerStaminaPenalty ?? 0));
 }
 
 // 2026-05-24 — keep tired / exhausted statuses in sync with current

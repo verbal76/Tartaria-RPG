@@ -11,7 +11,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
-import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+import { effectiveStatsBreakdown, resolveEquippedItem, displayStaminaMax, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
@@ -66,7 +66,8 @@ export function CharacterScreen() {
   const faction = getFactions().find((f) => f.id === player.factionId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   const hpPct = player.hpMax > 0 ? player.hp / player.hpMax : 0;
-  const stamPct = player.staminaMax > 0 ? player.stamina / player.staminaMax : 0;
+  const stamMaxShown = displayStaminaMax(player);
+  const stamPct = stamMaxShown > 0 ? player.stamina / stamMaxShown : 0;
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#c9a86a' : '#e07a5f';
   const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
 
@@ -128,7 +129,7 @@ export function CharacterScreen() {
             <View style={styles.barBg}>
               <View style={[styles.barFill, { width: `${Math.max(0, stamPct * 100)}%`, backgroundColor: stamColor }]} />
             </View>
-            <Text style={styles.barValue}>{player.stamina}/{player.staminaMax}</Text>
+            <Text style={styles.barValue}>{player.stamina}/{stamMaxShown}</Text>
           </View>
         </View>
 

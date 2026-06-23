@@ -4,7 +4,7 @@ import type { PlayerCharacter } from '../engine/types';
 import { getRaces } from '../engine/character';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
-import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, displayStaminaMax } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { getCorruptionName } from '../engine/contentPack';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -241,7 +241,7 @@ export function StatsPanel({ player }: Props) {
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
-        <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
+        <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
         <Stat label={getCorruptionName().slice(0, 4)} value={`${player.corruption}`} />

@@ -15616,4 +15616,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (effective step / total; 100 when no quest loaded, so a quest-less game is never
 // blocked). The craft handler refuses a golem_weapon recipe with an Arbiter line
 // until the threshold is met.
-export const OTA_BUILD_ID = '2026-06-23-811';
+//
+// engine_Dev-812 — staminaMax is now an author-grantable PERK (gear + title). A
+// piece of gear or an active custom title can carry a statBonus { stat:'staminaMax',
+// amount } that raises the max-stamina cap, exactly mirroring how 'hp' already works
+// (neither is a base attribute, so effectiveStats ignores them). New equipment.ts
+// helpers gearStaminaMaxBonus / equippedStaminaMaxBonus / bonusStaminaMaxFor /
+// displayStaminaMax; effectiveStaminaMax (the regen/clamp chokepoint) folds the bonus
+// in, and the display sites (Character screen, StatsPanel, ClimbModal, LLM context)
+// show the boosted cap. The stored staminaMax stays the base (creation + climb growth),
+// so bonuses are computed, not baked — no equip/title bookkeeping. Titles + gear
+// templates document the new stat.
+export const OTA_BUILD_ID = '2026-06-23-812';
