@@ -39,6 +39,7 @@ import {
   setCrucibleEnabled,
   setWorldNameOverride,
   setCorruptionNameOverride,
+  setEnergyNameOverride,
   CONTENT_TABLES,
   LORE_BLOCKS,
   type ContentTableId,
@@ -150,6 +151,7 @@ interface PersistShape {
   worldName?: string;
   /** Custom CORRUPTION/affliction noun; '' / absent → "Corruption". */
   corruptionName?: string;
+  energyName?: string;
   /** Dev mode: while true, the dev console is the first/default Settings tab.
    *  Absent → treated as true (engine dev build default). */
   devMode?: boolean;
@@ -211,6 +213,7 @@ interface ContentPackState {
   worldName: string;
   /** Custom CORRUPTION/affliction noun ('' = "Corruption"). */
   corruptionName: string;
+  energyName: string;
   /** While true, Settings opens to the dev console as its first/default tab. */
   devMode: boolean;
   /** Bumped by reapply() (and uploads) so content-reading screens re-render. */
@@ -234,6 +237,7 @@ interface ContentPackState {
   setWorldName: (name: string) => void;
   /** Rename the corruption/affliction (pass '' to reset to "Corruption"). */
   setCorruptionName: (name: string) => void;
+  setEnergyName: (name: string) => void;
   /** Turn dev mode on/off (controls the Settings dev tab + default tab). */
   setDevMode: (on: boolean) => void;
   /** Force the engine to re-read every uploaded pack: re-mirror all overrides
@@ -329,7 +333,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -362,6 +366,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     crucibleEnabled: state.crucibleEnabled === false ? false : undefined,
     worldName: state.worldName || undefined,
     corruptionName: state.corruptionName || undefined,
+    energyName: state.energyName || undefined,
     devMode: state.devMode,
   };
   void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shape)).catch(() => { /* best effort */ });
@@ -399,6 +404,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   crucibleEnabled: true,
   worldName: '',
   corruptionName: '',
+  energyName: '',
   devMode: true,
   contentVersion: 0,
   hydrated: false,
@@ -443,6 +449,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCrucibleEnabled(s.crucibleEnabled);
     setWorldNameOverride(s.worldName || null);
     setCorruptionNameOverride(s.corruptionName || null);
+    setEnergyNameOverride(s.energyName || null);
     setPublishedFlag(s.published);
     invalidateLocationCaches(); // rebuild routing positions from the live locations
     set({ contentVersion: s.contentVersion + 1 });
@@ -508,6 +515,12 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), worldName: clean });
   },
 
+  setEnergyName(name) {
+    const clean = name.trim();
+    setEnergyNameOverride(clean.length > 0 ? clean : null);
+    set({ energyName: clean, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), energyName: clean });
+  },
   setCorruptionName(name) {
     const clean = name.trim();
     setCorruptionNameOverride(clean.length > 0 ? clean : null);
@@ -1117,6 +1130,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextCrucibleEnabled = get().crucibleEnabled;
     let nextWorldName = get().worldName;
     let nextCorruptionName = get().corruptionName;
+    let nextEnergyName = get().energyName;
     const applied: string[] = [];
     const skipped: string[] = [];
 
@@ -1250,6 +1264,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         if (typeof value === 'string') { nextWorldName = value.trim(); applied.push('world name'); }
       } else if (key === 'corruptionName' || key === 'corruption_name') {
         if (typeof value === 'string') { nextCorruptionName = value.trim(); applied.push('corruption name'); }
+      } else if (key === 'energyName' || key === 'energy_name') {
+        if (typeof value === 'string') { nextEnergyName = value.trim(); applied.push('energy name'); }
       } else {
         skipped.push(`${key} (unknown section)`);
       }
@@ -1288,6 +1304,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCrucibleEnabled(nextCrucibleEnabled);
     setWorldNameOverride(nextWorldName || null);
     setCorruptionNameOverride(nextCorruptionName || null);
+    setEnergyNameOverride(nextEnergyName || null);
     set({
       tables: nextTables,
       lore: nextLore,
@@ -1319,9 +1336,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       crucibleEnabled: nextCrucibleEnabled,
       worldName: nextWorldName,
       corruptionName: nextCorruptionName,
+      energyName: nextEnergyName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -1338,6 +1356,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.crucibleEnabled === false) out.crucibleEnabled = false;
     if (s.worldName) out.worldName = s.worldName;
     if (s.corruptionName) out.corruptionName = s.corruptionName;
+    if (s.energyName) out.energyName = s.energyName;
     // Lore blocks (world / faction / race / flavor), in the registry's order.
     for (const b of LORE_BLOCKS) {
       const v = s.lore[b.id];
@@ -1443,7 +1462,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1521,10 +1540,12 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setWorldNameOverride(worldName.length > 0 ? worldName : null);
         const corruptionName = typeof shape.corruptionName === 'string' ? shape.corruptionName : '';
         setCorruptionNameOverride(corruptionName.length > 0 ? corruptionName : null);
+        const energyName = typeof shape.energyName === 'string' ? shape.energyName : '';
+        setEnergyNameOverride(energyName.length > 0 ? energyName : null);
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

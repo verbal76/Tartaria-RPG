@@ -271,23 +271,35 @@ export interface EnergyConfig {
 const DEFAULT_ENERGY: EnergyConfig = {
   name: 'Aether', adjective: 'Aetheric', material: 'Aetherstone', slang: [], factionTerms: {},
 };
+// engine_Dev — quick "Energy / magic name" rename, settable as a first-class dev field
+// (like world/corruption), without writing the whole World-lore energy block. Wins over
+// the World-lore energy.name when set.
+let energyNameOverride: string | null = null;
+export function setEnergyNameOverride(n: string | null): void {
+  const t = (n ?? '').trim();
+  energyNameOverride = t.length > 0 ? t : null;
+}
+export function hasEnergyNameOverride(): boolean { return energyNameOverride != null; }
+export function getEnergyNameOverride(): string | null { return energyNameOverride; }
 export function hasEnergyOverride(): boolean {
+  if (energyNameOverride != null) return true;
   const w = loreOverrides.world as { energy?: unknown } | undefined;
   return !!w && typeof w.energy === 'object' && w.energy !== null;
 }
 export function getEnergy(): EnergyConfig {
   const w = loreOverrides.world as { energy?: Partial<EnergyConfig> } | undefined;
   const e = w?.energy;
-  if (!e || typeof e !== 'object') return DEFAULT_ENERGY;
+  if ((!e || typeof e !== 'object') && energyNameOverride == null) return DEFAULT_ENERGY;
+  const ee = (e && typeof e === 'object' ? e : {}) as Partial<EnergyConfig>;
   const str = (v: unknown, d: string): string => (typeof v === 'string' && v.trim() ? v.trim() : d);
   return {
-    name: str(e.name, DEFAULT_ENERGY.name),
-    adjective: str(e.adjective, DEFAULT_ENERGY.adjective),
-    material: str(e.material, DEFAULT_ENERGY.material),
-    verb: typeof e.verb === 'string' ? e.verb.trim() : undefined,
-    caster: typeof e.caster === 'string' ? e.caster.trim() : undefined,
-    slang: Array.isArray(e.slang) ? e.slang.filter((s): s is string => typeof s === 'string' && s.trim().length > 0) : [],
-    factionTerms: e.factionTerms && typeof e.factionTerms === 'object' ? (e.factionTerms as Record<string, string>) : {},
+    name: energyNameOverride ?? str(ee.name, DEFAULT_ENERGY.name),
+    adjective: str(ee.adjective, DEFAULT_ENERGY.adjective),
+    material: str(ee.material, DEFAULT_ENERGY.material),
+    verb: typeof ee.verb === 'string' ? ee.verb.trim() : undefined,
+    caster: typeof ee.caster === 'string' ? ee.caster.trim() : undefined,
+    slang: Array.isArray(ee.slang) ? ee.slang.filter((s): s is string => typeof s === 'string' && s.trim().length > 0) : [],
+    factionTerms: ee.factionTerms && typeof ee.factionTerms === 'object' ? (ee.factionTerms as Record<string, string>) : {},
   };
 }
 export function getEnergyName(): string { return getEnergy().name; }
@@ -959,6 +971,7 @@ export function clearAllOverrides(): void {
   crucibleEnabled = true;
   worldNameOverride = null;
   corruptionNameOverride = null;
+  energyNameOverride = null;
   customTitlesOverride = null;
   customMainQuestOverride = null;
   customBossesOverride = null;

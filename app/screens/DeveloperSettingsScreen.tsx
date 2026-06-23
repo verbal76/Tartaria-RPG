@@ -31,6 +31,8 @@ import {
   hasWorldNameOverride,
   getCorruptionName,
   hasCorruptionNameOverride,
+  getEnergyName,
+  hasEnergyNameOverride,
   DEFAULT_NARRATOR_NAME,
   DEFAULT_GAME_TITLE,
   DEFAULT_CRUCIBLE_NAME,
@@ -162,6 +164,8 @@ function GameIdentitySection() {
   const setWorldName = useContentPackStore((s) => s.setWorldName);
   const corruptionName = useContentPackStore((s) => s.corruptionName);
   const setCorruptionName = useContentPackStore((s) => s.setCorruptionName);
+  const energyName = useContentPackStore((s) => s.energyName);
+  const setEnergyName = useContentPackStore((s) => s.setEnergyName);
   return (
     <>
       <Text style={styles.sectionLabel}>GAME</Text>
@@ -215,6 +219,18 @@ function GameIdentitySection() {
         autoCapitalize="words"
         maxLength={40}
         onSave={setCorruptionName}
+      />
+      <RenameBox
+        title="Energy / magic name"
+        hint="What this world calls its “magic” / power source — renames the engine's built-in energy concept. Set yours (Vril, the Fold, Essence, Mana, Spice…) and it shows on the magic tab + everywhere the {energy} token is used. (For the full energy concept — adjective, material, slang, per-faction names — use the World-lore block's “energy” object; this just sets the name quickly.)"
+        defaultLabel="Magic"
+        active={getEnergyName()}
+        isCustom={hasEnergyNameOverride()}
+        initial={energyName}
+        placeholder="Magic"
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setEnergyName}
       />
 
       <Text style={styles.sectionLabel}>NARRATOR</Text>
