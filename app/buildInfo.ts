@@ -15641,4 +15641,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // worldMemory.dogGolemCoActivated/coexistedWithGolem, the 'golem_weapon' recipe tag,
 // the showGolemVariants power-schema field, and reference-content strings (e.g. the
 // "Golem Core" material). Renaming player.golem is a separate save-migration task.
-export const OTA_BUILD_ID = '2026-06-23-813';
+//
+// engine_Dev-814 — rename the four reference SIDEKICK WEAPONS off "Golem": Golem
+// Sledge/Greatsword/Pike/Aether-Lance → Sidekick Sledge/Greatsword/Pike/Aether-Lance,
+// in both the weapons catalog and the matching recipe results (the name is the
+// recipe↔catalog key, so they move together), plus their flavor descriptions. The
+// 'golem_weapon' categorization tag is unchanged, so Magic-tab routing + the
+// sidekick-weapon gate still work. Tests updated to the new names.
+export const OTA_BUILD_ID = '2026-06-23-814';
