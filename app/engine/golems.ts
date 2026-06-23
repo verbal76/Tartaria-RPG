@@ -62,91 +62,16 @@ export interface GolemDefinition {
   elementTags?: string[];
 }
 
-export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
-  mud_golem: {
-    kind: 'mud_golem',
-    name: 'Mud Golem',
-    // arb119 — the STARTER anchor ("cheap to bind, easiest") was gated by RARE
-    // Mudstone, which made the first golem effectively unbuildable. Now fueled by
-    // the COMMON mud you actually forage (Aether Mud + Mud Fragment), matching the
-    // flavor. Mudstone is reserved for higher-tier mud gear and is refinable from
-    // Mud Fragment for anything that still wants it.
-    fuel: [
-      { name: 'Aether Mud', quantity: 2 },
-      { name: 'Mud Fragment', quantity: 2 },
-      { name: 'Aether Crystal', quantity: 1 },
-    ],
-    hpMax: 24, // arb170 — raised from 16 (durability pass)
-    attackDie: '1d8',
-    attackMod: 1,
-    hitBonus: 0,
-    damageType: 'bludgeoning',
-    blurb: 'Starter anchor. Cheap to bind, modest in every measure.',
-    summonDC: 13, // easiest — abundant Aether Mud, low-power binding
-    resistBase: 0.15,
-    resistCap: 0.35,
-    aliases: ['mud'],
-    elementTags: ['mud'],
-  },
-  iron_golem: {
-    kind: 'iron_golem',
-    name: 'Iron Golem',
-    fuel: [
-      { name: 'Scrap Metal', quantity: 3 },
-      { name: 'Golem Core', quantity: 1 },
-    ],
-    hpMax: 40, // arb170 — raised from 24 (durability pass; the tank build)
-    attackDie: '1d8',
-    attackMod: 2,
-    hitBonus: 1,
-    damageType: 'slashing',
-    blurb: 'Tank build. Tough frame, steady slashing strikes.',
-    summonDC: 15,
-    resistBase: 0.30,
-    resistCap: 0.50,
-    aliases: ['iron'],
-    elementTags: ['metal', 'iron'],
-  },
-  aether_golem: {
-    kind: 'aether_golem',
-    name: 'Aether Golem',
-    fuel: [
-      { name: 'Aether Crystal', quantity: 2 },
-      { name: 'Aetheric Shard', quantity: 1 },
-    ],
-    hpMax: 34, // arb170 — raised from 24 (durability pass)
-    attackDie: '1d10',
-    attackMod: 2,
-    hitBonus: 2,
-    damageType: 'aetheric',
-    blurb: 'Energy striker. Heavy aetheric blows pierce armor.',
-    summonDC: 17, // volatile mix, the binding fights you
-    resistBase: 0.20,
-    resistCap: 0.40,
-    aliases: ['aether'],
-    elementTags: ['aether', 'aetheric'],
-  },
-  crystal_golem: {
-    kind: 'crystal_golem',
-    name: 'Crystal Golem',
-    fuel: [
-      { name: 'Aether Crystal', quantity: 2 },
-      { name: 'Aetheric Cloth', quantity: 1 },
-      { name: 'Aetheric Shard', quantity: 1 },
-    ],
-    hpMax: 52, // arb170 — raised from 30 (durability pass; apex tank)
-    attackDie: '1d12',
-    attackMod: 3,
-    hitBonus: 3,
-    damageType: 'piercing',
-    blurb: 'Apex anchor — the hardest to seat and the strongest in every measure.',
-    summonDC: 19, // lattice-structured, the hardest to seat
-    resistBase: 0.35,
-    resistCap: 0.55,
-    aliases: ['crystal'],
-    elementTags: ['aether', 'crystal'],
-  },
-};
+// engine_Dev — the built-in sidekick ("golem") definitions moved to
+// app/data/summons/builtin-sidekicks.json so the engine carries no hardcoded
+// setting strings. They are the LAST-RESORT fallback only: an uploaded "summons"
+// pack replaces them, and the generic-default pack supplies generic sidekicks for
+// a reskin. The summon / weapon / skill MECHANICS below are unchanged.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import builtinSidekickData from '../data/summons/builtin-sidekicks.json';
+
+export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> =
+  (builtinSidekickData as { definitions: Record<GolemKind, GolemDefinition> }).definitions;
 
 // engine_Dev — DATA-DRIVEN summon set. An uploaded "summons" pack (via the dev
 // console's SUMMONED SIDEKICKS box) replaces the built-in golems wholesale; the
@@ -159,7 +84,9 @@ function readSummonsOverride(): { noun?: string; defs: GolemDefinition[] } | nul
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const cp = require('./contentPack') as typeof import('./contentPack');
-    return cp.getSummonsOverride?.() ?? null;
+    // resolveSummons = uploaded pack → generic-default sidekicks → null, so a
+    // reskin that skips the box falls to generic sidekicks, not Tartaria golems.
+    return cp.resolveSummons?.() ?? null;
   } catch {
     return null;
   }
@@ -173,11 +100,12 @@ export function resolveGolemDefs(): GolemDefinition[] {
 }
 
 /** The category noun the player types after "summon" and reads in summon lines
- *  ("golem" by default; an uploaded pack can set "automaton", "construct", …). */
+ *  ("sidekick" by default; an uploaded pack can set "automaton", "construct",
+ *  "golem", …). */
 export function getSummonNoun(): string {
   const ov = readSummonsOverride();
   const n = ov?.noun?.trim();
-  return n && n.length > 0 ? n : 'golem';
+  return n && n.length > 0 ? n : 'sidekick';
 }
 
 /** Lookup a sidekick definition by kind, resolving against the active set. Falls
@@ -222,8 +150,10 @@ export function parseGolemKind(text: string): GolemKind | null {
   for (const c of cands) {
     if (c.needle && t.includes(c.needle)) return c.kind;
   }
-  // Bare category noun ("summon golem" / "summon automaton") → first active def.
-  if (t.includes(getSummonNoun().toLowerCase()) || t.includes('golem')) return defs[0]?.kind ?? null;
+  // Bare category noun ("summon sidekick" / "summon automaton") → first active
+  // def. (A built-in golem def still matches via its name words above, so
+  // "summon golem" keeps working without a hardcoded noun here.)
+  if (t.includes(getSummonNoun().toLowerCase())) return defs[0]?.kind ?? null;
   return null;
 }
 

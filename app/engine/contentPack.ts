@@ -88,6 +88,7 @@ interface GenericDefaultPack {
   salvage?: unknown;
   overlays?: unknown[];
   dogScenarios?: unknown[];
+  summons?: { noun?: string; defs: unknown[] };
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -106,6 +107,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.salvage = pack.salvage;
   genericDefaults.overlays = pack.overlays;
   genericDefaults.dogScenarios = pack.dogScenarios;
+  genericDefaults.summons = pack.summons;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -124,6 +126,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.salvage = undefined;
   genericDefaults.overlays = undefined;
   genericDefaults.dogScenarios = undefined;
+  genericDefaults.summons = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -597,6 +600,18 @@ export function setSummonsOverride(payload: { noun?: string; defs: readonly unkn
 }
 export function hasSummonsOverride(): boolean { return summonsOverride != null; }
 export function getSummonsOverride(): { noun?: string; defs: GolemDefinition[] } | null { return summonsOverride; }
+/** The live summon set: the author's uploaded pack if present, else the generic
+ *  default pack's sidekicks, else null (golems.ts then falls to its built-in).
+ *  Lets a reskin that skips the SUMMONED SIDEKICKS box fall to generic sidekicks
+ *  rather than the Tartaria golems. */
+export function resolveSummons(): { noun?: string; defs: GolemDefinition[] } | null {
+  if (summonsOverride != null) return summonsOverride;
+  const g = genericDefaults.summons;
+  if (g && Array.isArray(g.defs) && g.defs.length > 0) {
+    return { noun: g.noun, defs: g.defs as GolemDefinition[] };
+  }
+  return null;
+}
 
 // --- dog companion toggle ------------------------------------------------------
 // engine_Dev — the rescuable DOG sidekick is on by default (Tartaria keeps it).

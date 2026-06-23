@@ -6607,16 +6607,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // match the golem intent.
     {
       const lower = trimmed.toLowerCase();
-      const isGolemCommand = /^(use|command|order|attack with)?\s*golem(\s+(attack\s+)?(.*))?$/i.test(lower)
-        || /^(use|command)\s+golem\b/i.test(lower);
-      const isGolemDismiss = /^(dismiss|release|unbind)\s+(the\s+)?golem\b/i.test(lower);
+      const nAlt = summonNounAlt();
+      const isGolemCommand = new RegExp(`^(use|command|order|attack with)?\\s*(?:${nAlt})(\\s+(attack\\s+)?(.*))?$`, 'i').test(lower)
+        || new RegExp(`^(use|command)\\s+(?:${nAlt})\\b`, 'i').test(lower);
+      const isGolemDismiss = new RegExp(`^(dismiss|release|unbind)\\s+(the\\s+)?(?:${nAlt})\\b`, 'i').test(lower);
       if (isGolemCommand || isGolemDismiss) {
         get().appendLog('player', trimmed);
         if (isGolemDismiss) {
           handleGolemDismiss(get, set);
         } else {
           // Extract optional target name from the input.
-          const match = lower.match(/^(use|command|order|attack with)?\s*golem(\s+(?:attack\s+)?(.*))?$/);
+          const match = lower.match(new RegExp(`^(use|command|order|attack with)?\\s*(?:${nAlt})(\\s+(?:attack\\s+)?(.*))?$`));
           const cmdTarget = (match?.[3] ?? '').trim() || null;
           handleGolemCommand(get, set, cmdTarget);
           // OTA-611 — exploit close (player ruling): commanding the golem is a
@@ -6702,13 +6703,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-478 — `arm golem with <weapon>` / `give golem <weapon>` / `disarm golem`.
     {
       const gl = trimmed.toLowerCase();
-      if (/^(disarm|unarm)\s+(the\s+)?golem\b/i.test(gl)) {
+      const nAlt = summonNounAlt();
+      if (new RegExp(`^(disarm|unarm)\\s+(the\\s+)?(?:${nAlt})\\b`, 'i').test(gl)) {
         get().appendLog('player', trimmed);
         get().disarmGolem();
         void get().persist();
         return;
       }
-      const armMatch = /^(?:arm|give|equip)\s+(?:the\s+)?golem(?:\s+with)?\s+(.+)$/i.exec(trimmed);
+      const armMatch = new RegExp(`^(?:arm|give|equip)\\s+(?:the\\s+)?(?:${nAlt})(?:\\s+with)?\\s+(.+)$`, 'i').exec(trimmed);
       if (armMatch) {
         get().appendLog('player', trimmed);
         get().armGolem(armMatch[1]!.trim());
@@ -17607,7 +17609,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const golem = player.golem;
     if (!golem || golem.hp <= 0) {
-      get().appendLog('arbiter', `"No golem at your side to arm," the ${getNarratorName()} says. "Summon one first."`);
+      get().appendLog('arbiter', `"No ${summonNoun()} at your side to arm," the ${getNarratorName()} says. "Summon one first."`);
       return;
     }
     const lower = weaponName.toLowerCase().trim();
@@ -17624,7 +17626,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { findWeaponByName: fwbn } = require('../engine/crafting');
     const cat = fwbn(item.name);
     if (!cat || !isGolemWeapon(cat.tags)) {
-      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "The ${item.name} isn't shaped for a construct's grip. Forge a golem armament — a Sledge, Greatsword, Pike, or Aether-Lance."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "The ${item.name} isn't shaped for a ${summonNoun()}'s grip. Forge a ${summonNoun()} armament — a Sledge, Greatsword, Pike, or Lance."`);
       return;
     }
     // Stamp durability + take one instance out of the pack; return any current
@@ -17638,14 +17640,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (s.player.golem.weapon) inv = grantItem(inv, s.player.golem.weapon).inventory;
       return { player: { ...s.player, inventory: inv, golem: { ...s.player.golem, weapon: armed } } };
     });
-    get().appendLog('world', `${golem.name} takes up the ${item.name}. It settles into the construct's grip like it was cast for it.`);
+    get().appendLog('world', `${golem.name} takes up the ${item.name}. It settles into the ${summonNoun()}'s grip like it was cast for it.`);
     void get().persist();
   },
 
   disarmGolem() {
     const player = get().player;
     if (!player || !player.golem || !player.golem.weapon) {
-      get().appendLog('arbiter', `"Your golem carries nothing to take back," the ${getNarratorName()} says.`);
+      get().appendLog('arbiter', `"Your ${summonNoun()} carries nothing to take back," the ${getNarratorName()} says.`);
       return;
     }
     const wName = player.golem.weapon.name;
@@ -25571,7 +25573,7 @@ function runAethercraft(
     set((s) => s.player ? { player: { ...s.player, golem }, pendingGolemNaming: true } : s);
     get().appendLog(
       'world',
-      `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
+      `Your materials draw together and fold into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
     // OTA-466 — like the dog, a thing you gave life gets a name. The next typed
     // input is captured as the golem's name (or "skip" to keep the type label).
@@ -25665,7 +25667,7 @@ function handleGolemCommand(
   if (!golem || golem.hp <= 0) {
     get().appendLog(
       'arbiter',
-      `"You have no golem to send," the ${getNarratorName()} says. "Summon one first."`,
+      `"You have no ${summonNoun()} to send," the ${getNarratorName()} says. "Summon one first."`,
     );
     return;
   }
@@ -25673,7 +25675,7 @@ function handleGolemCommand(
   if (enemies.length === 0) {
     get().appendLog(
       'world',
-      `The ${golem.name} braces, scans the room, finds no enemy. The Aetheric thrum settles.`,
+      `The ${golem.name} braces, scans the room, finds no enemy. The thrum of its making settles.`,
     );
     return;
   }
@@ -25858,7 +25860,7 @@ function handleGolemCommand(
     if (newGolemHp <= 0) {
       get().appendLog(
         'world',
-        `The ${golem.name} stills, then crumbles back into ${golem.kind === 'mud_golem' ? 'mud' : golem.kind === 'iron_golem' ? 'iron filings' : golem.kind === 'aether_golem' ? 'a fading aetheric afterimage' : 'a scatter of crystal shards'}.`,
+        `The ${golem.name} stills, then crumbles back into the parts it was made from.`,
       );
       // arb170 — INERT CORE. If the golem had trained anything, it leaves a core
       // carrying HALF its levels; feed it to a new golem to graft them on. So a
@@ -25881,7 +25883,7 @@ function handleGolemCommand(
             rarity: 'Uncommon',
             quantity: 1,
             tags: ['golem', 'core', 'salvage'],
-            description: `The settled heart of ${golem.name} — its hard-won memory of fighting, half-intact. Feed it to a newly-summoned golem to graft on +${core.power} power, +${core.resilience} resilience, +${core.bonusHp} max HP.`,
+            description: `The settled heart of ${golem.name} — its hard-won memory of fighting, half-intact. Feed it to a newly-summoned ${summonNoun()} to graft on +${core.power} power, +${core.resilience} resilience, +${core.bonusHp} max HP.`,
             golemCore: core,
           });
           player = { ...player, inventory: res.inventory };
@@ -25889,7 +25891,7 @@ function handleGolemCommand(
         return { player };
       });
       if (hadTraining) {
-        get().appendLog('reward', `✦ Inert Golem Core recovered — feed it to your next golem to pass on half of ${golem.name}'s training.`);
+        get().appendLog('reward', `✦ Inert Golem Core recovered — feed it to your next ${summonNoun()} to pass on half of ${golem.name}'s training.`);
       }
     } else {
       // OTA-467 — surviving a hit trains RESILIENCE; carry the turn's POWER too.
@@ -26204,7 +26206,7 @@ function handleDogCombat(
     }));
     get().appendLog(
       'world',
-      `Your dog gives the golem a wide arc and watches it sideways. Both will fight.`,
+      `Your dog gives the ${summonNoun()} a wide arc and watches it sideways. Both will fight.`,
     );
   }
   // Pick target.
@@ -26570,7 +26572,7 @@ function applyItemToGolem(
   if (!player) return false;
   const golem = player.golem;
   if (!golem || golem.hp <= 0) {
-    get().appendLog('arbiter', `"You have no golem at your side to mend," the ${getNarratorName()} says. "Summon one first."`);
+    get().appendLog('arbiter', `"You have no ${summonNoun()} at your side to mend," the ${getNarratorName()} says. "Summon one first."`);
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26649,7 +26651,7 @@ function tryGolemApplyVerb(
   const golem = get().player?.golem;
   if (!golem || golem.hp <= 0) return false;
   const lower = rawInput.toLowerCase().trim();
-  const golemTokens = new Set<string>(['golem']);
+  const golemTokens = new Set<string>(['golem', summonNoun().toLowerCase()]);
   if (golem.name) golemTokens.add(golem.name.toLowerCase());
   const m = /^(?:feed|repair|mend|fix|fuel)\s+(\S+)\s+(.+)$/i.exec(lower);
   if (m) {
@@ -27127,6 +27129,22 @@ export function tickDogStatus(
 export function hasActiveDog(player: PlayerCharacter | null | undefined): boolean {
   const dog = player?.dog;
   return !!dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base');
+}
+
+// engine_Dev — the active summoned-sidekick category noun ("sidekick" by default;
+// an uploaded summons pack can set "automaton", "golem", …). Lazy-required so the
+// many player-facing summon lines below read the live noun without a static cycle.
+function summonNoun(): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return (require('../engine/golems') as typeof import('../engine/golems')).getSummonNoun();
+}
+
+// engine_Dev — regex alternation of the active summon noun + the legacy alias
+// "golem", so command parsing accepts "arm sidekick" / "command sidekick" as well
+// as the built-in "golem" wording. Escaped for safe inlining into a RegExp.
+function summonNounAlt(): string {
+  const sn = summonNoun().toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return sn && sn !== 'golem' ? `${sn}|golem` : 'golem';
 }
 
 // engine_Dev — lore-agnostic "main quest complete" signal. Replaces the old
