@@ -157,6 +157,20 @@ const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
     '//   traits: ["vulnerable:<type>"]  = WEAK to it (takes 1.5x)   ·   ["resist:<type>"] = STRONG (takes 1/2)',
   ].join('\n'),
   locations: '// Optional per LOCATION row: x / y (plot on your world map), hidden: true (colored "?" until visited), aliases: [..], interactables: [..]',
+  recipes: [
+    '// CRAFTING RECIPES — a recipe is ONLY the formula. Two HARD requirements or it breaks:',
+    '//   result      — must be the EXACT name of an item you ALSO defined in your',
+    '//                  Weapons / Armor / Gear / Exploration / Amulets / Rings table.',
+    '//                  THAT table is where the crafted item gets its stats (damage, AC,',
+    '//                  effect, kind, rarity, tags). A result not in any item table crafts',
+    '//                  to a blank stat-less "misc". Consumables (stims/food/tonics) go in',
+    '//                  the GEAR table with kind:"consumable" + an effect — that also makes',
+    '//                  them land on the RECIPES tab instead of the CRAFT tab.',
+    '//   ingredients[].name — must be a real MATERIAL (in your Materials table) and be',
+    '//                  OBTAINABLE (it drops from an enemy, or your dig / salvage / scrap',
+    '//                  loot lists it) — otherwise the recipe can never be crafted.',
+    '// Names match by EXACT string (case + spelling). Build items + materials FIRST.',
+  ].join('\n'),
 };
 
 export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
