@@ -15525,4 +15525,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "aethercraft" concept name is still used internally across many engine/data
 // files — a separate, larger rename; this only de-Tartaria's the race-affinity
 // fields I just added so authors don't write Tartaria's term in their race JSON.)
-export const OTA_BUILD_ID = '2026-06-22-802';
+// engine_Dev-803 — Bucket A: powers.ts burned down + the magic DISCIPLINES now
+// genericize for a reskin. The dev panel already renames the energy NAME (the
+// magic-tab label + intro read getEnergyName()), but the discipline CARDS still
+// fell to Tartaria's DEFAULT_POWERS (Aetherstone Manipulation / Aether Golem
+// Constructor / Aetheric Healing) unless an author uploaded a powers override.
+// (1) DEFAULT_POWERS moved to app/data/powers/default-powers.json (powers.ts
+// 24→0). (2) GENERIC_POWERS (Stone Shaping / Construct Summoning / Mending) is now
+// exported and wired as GENERIC_GAME.tables.powers, so a reskin that skips the
+// Powers box shows generic disciplines — not Tartaria's — with the author's energy
+// name. Stale "+4 harder" race text replaced with the data-driven "power affinity".
+export const OTA_BUILD_ID = '2026-06-22-803';

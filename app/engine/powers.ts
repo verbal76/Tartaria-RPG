@@ -10,6 +10,8 @@
 // can do things like a fog blind. Stage 1 makes the DEFINITIONS data.)
 
 import { resolveTable } from './contentPack';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import defaultPowersData from '../data/powers/default-powers.json';
 
 export type PowerDiscipline = 'shape' | 'summon' | 'mend';
 
@@ -64,70 +66,31 @@ export interface Power {
   showGolemVariants?: boolean;
 }
 
-/** The built-in Tartaria Aethercraft disciplines — the default power set. */
-export const DEFAULT_POWERS: Power[] = [
-  {
-    id: 'aether_shape',
-    discipline: 'shape',
-    name: 'Aetherstone Manipulation',
-    title: 'Aetherstone Manipulation (shape)',
-    body:
-      'INT check, DC 12. In combat: +4 AC for one turn (shaped-stone ward). Out of combat: ' +
-      'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    stat: 'intelligence',
-    dcBase: 12,
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],
-    examples: ['shape stone', 'mold the aetherstone', 'manipulate stone'],
-  },
-  {
-    id: 'aether_summon',
-    discipline: 'summon',
-    name: 'Aether Golem Constructor',
-    title: 'Aether Golem Constructor (summon)',
-    body:
-      'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
-      'a golem ally that fights for you for the rest of the scene. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    stat: 'intelligence',
-    dcBase: 15,
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
-    examples: ['summon golem', 'summon an aether golem', 'call a golem'],
-    showGolemVariants: true,
-  },
-  {
-    id: 'aether_mend',
-    discipline: 'mend',
-    name: 'Aetheric Healing',
-    title: 'Aetheric Healing (mend)',
-    body:
-      'WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption ' +
-      'when they cast this — racial trait. Mud Dwellers and Aetherborn cast at the base DC; ' +
-      'every other race rolls +4 harder.',
-    stat: 'wisdom',
-    dcBase: 12,
-    fuels: ['Aetheric Shard', 'Aether Crystal'],
-    examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
-  },
-];
+/** The built-in (Tartaria) disciplines — the LAST-RESORT default power set. Moved
+ *  to app/data/powers/default-powers.json so the engine carries no hardcoded
+ *  setting strings; an uploaded 'powers' table or the generic-default pack
+ *  (GENERIC_POWERS) takes precedence. */
+export const DEFAULT_POWERS: Power[] = (defaultPowersData as { powers: Power[] }).powers;
 
-/** engine_Dev — GENERIC, setting-neutral versions of the three disciplines for the
- *  TEMPLATE only (the live DEFAULT_POWERS above stay the built-in game). Same
- *  disciplines / stats / DCs / showGolemVariants — bland names, fuels, and prose. */
-const GENERIC_POWERS: Power[] = [
+/** engine_Dev — GENERIC, setting-neutral versions of the three disciplines. Used
+ *  both for the dev-console TEMPLATE and as the generic-default pack's power set
+ *  (GENERIC_GAME.tables.powers), so a reskin that skips the Powers box gets these
+ *  bland disciplines — Stone Shaping / Construct Summoning / Mending — rather than
+ *  Tartaria's Aetherstone/Aether-golem set. Same disciplines / stats / DCs. */
+export const GENERIC_POWERS: Power[] = [
   {
     id: 'shape_power', discipline: 'shape', name: 'Stone Shaping', title: 'Stone Shaping (shape)',
-    body: 'INT check, DC 12. In combat: +4 AC for one turn (a shaped ward). Out of combat: binds a crystal shard to a small rock, producing a throwable shaped shard. Some races cast at the base DC; every other race rolls +4 harder.',
+    body: 'INT check, DC 12. In combat: +4 AC for one turn (a shaped ward). Out of combat: binds a crystal shard to a small rock, producing a throwable shaped shard. Power affinity (set per race) adjusts the DC.',
     stat: 'intelligence', dcBase: 12, fuels: ['Raw Crystal', 'Worked Crystal', 'Common Residue'], examples: ['shape stone', 'mold the stone', 'manipulate stone'],
   },
   {
     id: 'summon_power', discipline: 'summon', name: 'Construct Summoning', title: 'Construct Summoning (summon)',
-    body: 'INT check, DC 15 (harder than the others — constructs take stronger anchors). Summons a construct ally that fights for you for the rest of the scene. Some races cast at the base DC; every other race rolls +4 harder.',
+    body: 'INT check, DC 15 (harder than the others — constructs take stronger anchors). Summons a construct ally that fights for you for the rest of the scene. Power affinity (set per race) adjusts the DC.',
     stat: 'intelligence', dcBase: 15, fuels: ['Raw Crystal', 'Worked Crystal'], examples: ['summon construct', 'summon a construct', 'call a construct'], showGolemVariants: true,
   },
   {
     id: 'mend_power', discipline: 'mend', name: 'Mending', title: 'Mending (mend)',
-    body: 'WIS check, DC 12. Restores HP to you or an ally. Some races cast at the base DC; every other race rolls +4 harder.',
+    body: 'WIS check, DC 12. Restores HP to you or an ally. Power affinity (set per race) adjusts the DC.',
     stat: 'wisdom', dcBase: 12, fuels: ['Raw Crystal', 'Worked Crystal'], examples: ['mend wounds', 'heal me', 'mend self'],
   },
 ];
