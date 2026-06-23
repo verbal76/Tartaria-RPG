@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1414,6 +1414,111 @@ function FactionMissionsBox() {
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(JSON.stringify({ factionQuests: existing }, null, 2)); setStatus({ kind: 'ok', msg: 'Copied current faction missions JSON.' }); }}>
           <Text style={styles.copyBtnText}>COPY JSON</Text>
         </TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — DIGGING builder. What the player scrapes out of the ground with
+// "dig": which items dig well, the productive-dig cap, and the dig loot table.
+// Form on top + raw-JSON strip below, matching the other content boxes.
+const DIG_RARITIES: Array<{ id: string; name: string }> = [
+  { id: 'Common', name: 'Common' }, { id: 'Uncommon', name: 'Uncommon' }, { id: 'Rare', name: 'Rare' },
+];
+function DiggingBox() {
+  const loadDiggingJson = useContentPackStore((s) => s.loadDiggingJson);
+  const digging = useContentPackStore((s) => s.digging) as { loot?: unknown[] } | null;
+  const loaded = !!digging;
+  const [status, setStatus] = useState<Status>(null);
+  const [text, setText] = useState('');
+  const [cap, setCap] = useState('16');
+  const [loot, setLoot] = useState<Array<{ name: string; rarity: string; weight: string }>>([]);
+  const [lootName, setLootName] = useState(''); const [lootRarity, setLootRarity] = useState('Common'); const [lootWeight, setLootWeight] = useState('');
+  const [scores, setScores] = useState<Array<{ name: string; score: string }>>([]);
+  const [scoreName, setScoreName] = useState(''); const [scoreVal, setScoreVal] = useState('');
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+  const addLoot = () => { if (!lootName.trim() || !Number(lootWeight)) { setStatus({ kind: 'err', msg: 'Loot needs a name and a weight.' }); return; } setLoot((p) => [...p, { name: lootName.trim(), rarity: lootRarity, weight: lootWeight }]); setLootName(''); setLootWeight(''); };
+  const addScore = () => { if (!scoreName.trim() || scoreVal === '') { setStatus({ kind: 'err', msg: 'Item score needs a name and a number.' }); return; } setScores((p) => [...p, { name: scoreName.trim(), score: scoreVal }]); setScoreName(''); setScoreVal(''); };
+
+  const save = () => {
+    if (loot.length === 0) { setStatus({ kind: 'err', msg: 'Add at least one loot entry.' }); return; }
+    const obj = {
+      itemScores: Object.fromEntries(scores.map((s) => [s.name, Number(s.score) || 0])),
+      tagScores: {},
+      productiveCap: Number(cap) || 16,
+      loot: loot.map((l) => ({ name: l.name, rarity: l.rarity, baseWeight: Number(l.weight) || 1 })),
+    };
+    const r = loadDiggingJson(JSON.stringify(obj));
+    setStatus(r.ok ? { kind: 'ok', msg: `Saved digging — ${loot.length} loot, ${scores.length} item scores.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Digging</Text>
+        <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? `● override · ${digging?.loot?.length ?? 0}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        What “dig” pulls from the ground. Set the loot table (what can be found + rarity + weight),
+        which items are good shovels (item → score), and the productive-dig cap. Higher dig score
+        finds more, and better rarities. Omit to keep the built-in.
+      </Text>
+
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={cap} onChangeText={setCap} placeholder="productive cap" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+
+      <Text style={styles.hint}>Dig loot ({loot.length}):</Text>
+      {loot.map((l, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ {l.name} — {l.rarity} · w{l.weight}</Text>
+          <TouchableOpacity onPress={() => setLoot((p) => p.filter((_, j) => j !== i))}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={lootName} onChangeText={setLootName} placeholder="loot item name" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={lootWeight} onChangeText={setLootWeight} placeholder="weight" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+      </View>
+      {chipRow('…rarity:', DIG_RARITIES, lootRarity, setLootRarity)}
+      <View style={styles.row}><TouchableOpacity style={styles.tmplBtn} onPress={addLoot}><Text style={styles.tmplBtnText}>+ ADD LOOT</Text></TouchableOpacity></View>
+
+      <Text style={styles.hint}>Good shovels — item → dig score ({scores.length}):</Text>
+      {scores.map((sc, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ {sc.name} → {sc.score}</Text>
+          <TouchableOpacity onPress={() => setScores((p) => p.filter((_, j) => j !== i))}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={scoreName} onChangeText={setScoreName} placeholder="item name" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={scoreVal} onChangeText={setScoreVal} placeholder="score" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TouchableOpacity style={styles.tmplBtn} onPress={addScore}><Text style={styles.tmplBtnText}>+ ADD</Text></TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={save}><Text style={styles.loadBtnText}>+ SAVE DIGGING</Text></TouchableOpacity>
+        {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDigging(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+
+      <Text style={styles.hint}>Or edit raw JSON (template / file):</Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a digging JSON object" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDiggingJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded digging (${r.count} loot).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDiggingTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(digging, null, 2) : buildDiggingTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
       </View>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
     </View>
@@ -2808,6 +2913,10 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <CollapsibleSection title="SUMMONED SIDEKICKS">
         <SummonsBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="DIGGING">
+        <DiggingBox />
       </CollapsibleSection>
 
       <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES">

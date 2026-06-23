@@ -685,6 +685,35 @@ function bundleSection(key: string, hint: string, content: string): string {
 /** engine_Dev — the downloadable BUILD GUIDE: what each section is + the order to
  *  fill them so a game comes together cleanly. Saved from the dev console's top
  *  "DEV GUIDE" button. */
+/** The Digging template — generic, setting-neutral dig config: which items/tags dig
+ *  well, the productive-dig cap, and the dig loot table. Author edits + uploads;
+ *  resolves override → generic default → built-in. */
+export function buildDiggingTemplate(): string {
+  return [
+    '// DIGGING — what the player can scrape out of the ground with "dig".',
+    '//   itemScores: per-item dig effectiveness (higher digs better; 0 = can\'t dig).',
+    '//   tagScores : fallback by item tag when an item isn\'t listed.',
+    '//   productiveCap: productive digs one wild tile yields before it\'s worked-out.',
+    '//   loot: the dig table — { name, rarity (Common|Uncommon|Rare), baseWeight }.',
+    '//         Uncommon/Rare weights scale UP with the dig tool\'s score.',
+    JSON.stringify({
+      itemScores: { 'Worn Sword': 3, "Hunter's Bow": 1, 'Scrap Metal': 4, 'Iron Frame': 3 },
+      tagScores: { weapon: 2, melee: 3, metal: 4, food: 0, ring: 0, amulet: 0 },
+      productiveCap: 16,
+      loot: [
+        { name: 'Small Rock', rarity: 'Common', baseWeight: 55 },
+        { name: 'Stick', rarity: 'Common', baseWeight: 50 },
+        { name: 'Common Residue', rarity: 'Common', baseWeight: 14 },
+        { name: 'Scrap Metal', rarity: 'Common', baseWeight: 8 },
+        { name: 'Tough Fiber', rarity: 'Common', baseWeight: 8 },
+        { name: 'Trail Rations', rarity: 'Common', baseWeight: 6 },
+        { name: 'Raw Crystal', rarity: 'Uncommon', baseWeight: 5 },
+        { name: 'Worked Crystal', rarity: 'Rare', baseWeight: 1 },
+      ],
+    }, null, 2),
+  ].join('\n');
+}
+
 export function buildDevGuide(): string {
   return `# ${getGameTitle()} — Engine Build Guide
 
@@ -750,6 +779,8 @@ also keeps a raw-JSON/file strip for power edits.
     the dog companion on/off toggle
   - Advanced rules: add damage types, set enemy resist/weak by type, extend the
     fusion material tags, rename the weapon coatings
+  - Digging: what "dig" pulls from the ground — the dig loot table, which items make
+    good shovels (item → score), and the productive-dig cap
 
 ## 8 · Assets (not JSON — their own uploads)
   - World map image · Per-faction maps · Music (battle + ambient, multi-select)
@@ -794,6 +825,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Searing".', content: JSON.stringify({ corruption: { label: 'Searing', blurb: 'sears the wound (damage over time + worsening stacks)', lootLabel: 'Searing' } }, null, 2) });
   entries.push({ key: 'inventory', hint: 'Inventory presentation: { labels?: { weapon|armor|accessory|consumable|tool|relic|material|loot|quest: "Your name" } (rename the category sections), toolTags?: ["tag"] (extra item tags that read as Tools), repairMaterialPct?: 200 (repair material cost as a % of an item\'s scrap yield; 200 = built-in 2x) }. Category ids + order stay fixed.', content: JSON.stringify({ labels: { loot: 'Salvage', material: 'Components' }, toolTags: ['multitool'], repairMaterialPct: 200 }, null, 2) });
   entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
+  entries.push({ key: 'digging', hint: 'The DIGGING subsystem (what "dig" pulls from the ground): { itemScores: { "Item": score }, tagScores: { tag: score }, productiveCap: number, loot: [{ name, rarity (Common|Uncommon|Rare), baseWeight }] }. Higher dig score = finds more + better rarity. Build it in the DIGGING box; omit to keep the built-in.', content: buildDiggingTemplate() });
   entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.', content: buildWhispersTemplate(false) });
   return entries;
 }
