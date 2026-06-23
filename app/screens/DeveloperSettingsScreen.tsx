@@ -39,7 +39,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1525,6 +1525,40 @@ function DiggingBox() {
   );
 }
 
+// engine_Dev — SCRAP config box. What an item breaks down into (role → material,
+// raw guards, premium mats, failure lines). Config-shaped, so a template/paste/load
+// box matching the other config boxes.
+function ScrapBox() {
+  const loadScrapJson = useContentPackStore((s) => s.loadScrapJson);
+  const scrap = useContentPackStore((s) => s.scrap) as { roles?: Record<string, unknown> } | null;
+  const loaded = !!scrap;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Scrap</Text>
+        <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? '● override' : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        What breaking an item down yields. The tag→material RULES stay in the engine; you set the
+        data: <Text style={{ fontWeight: 'bold' }}>roles</Text> (which material each role gives —
+        metalBulk, aetherPrimary, stone, cloth, wood…), <Text style={{ fontWeight: 'bold' }}>rawGuard</Text>
+        (mats that can’t scrap into themselves), <Text style={{ fontWeight: 'bold' }}>premiumMats</Text>,
+        and <Text style={{ fontWeight: 'bold' }}>failureLines</Text>. Hit TEMPLATE for the shape; omit to keep the built-in.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scrap JSON object" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadScrapJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded scrap (${r.count} roles).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildScrapTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(scrap, null, 2) : buildScrapTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearScrap(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
 // variable, naming the title, and setting a threshold — or upload/paste the JSON.
 function TitlesBox() {
@@ -2917,6 +2951,10 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <CollapsibleSection title="DIGGING">
         <DiggingBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="SCRAP">
+        <ScrapBox />
       </CollapsibleSection>
 
       <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES">

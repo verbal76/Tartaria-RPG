@@ -714,6 +714,27 @@ export function buildDiggingTemplate(): string {
   ].join('\n');
 }
 
+/** The Scrap template — generic scrap config: which material each tag-ROLE yields
+ *  when an item is broken down, the raw-mat guards, premium mats, and failure lines. */
+export function buildScrapTemplate(): string {
+  return [
+    '// SCRAP — what an item breaks down into. The tag→material RULES are engine logic;',
+    '// this is the data: roles (which material each role yields), rawGuard (mats that',
+    "// can't scrap into themselves), premiumMats (stripped from self-crafted scrap),",
+    '// and failureLines ({item} is replaced with the item name).',
+    JSON.stringify({
+      roles: { metalBulk: 'Scrap Metal', metalPremium: 'Worked Crystal', essencePrimary: 'Raw Crystal', essenceSecondary: 'Common Residue', essenceBonus: 'Common Residue', stone: 'Small Rock', mud: 'Common Residue', cloth: 'Tough Fiber', organic: 'Tough Fiber', wood: 'Stick' },
+      rawGuard: ['Scrap Metal', 'Stick', 'Small Rock', 'Tough Fiber', 'Raw Crystal', 'Worked Crystal', 'Common Residue'],
+      premiumMats: ['Worked Crystal', 'Raw Crystal'],
+      failureLines: [
+        'You work the {item} apart, but the pieces crumble in your hands. Nothing salvageable.',
+        "The {item} comes apart — but the bits are warped past use. Pile it on the scrap heap.",
+        'Too far gone. You open the {item} and find only powdered rot inside. Nothing to keep.',
+      ],
+    }, null, 2),
+  ].join('\n');
+}
+
 export function buildDevGuide(): string {
   return `# ${getGameTitle()} — Engine Build Guide
 
@@ -781,6 +802,7 @@ also keeps a raw-JSON/file strip for power edits.
     fusion material tags, rename the weapon coatings
   - Digging: what "dig" pulls from the ground — the dig loot table, which items make
     good shovels (item → score), and the productive-dig cap
+  - Scrap: what breaking an item down yields (role → material), plus the failure lines
 
 ## 8 · Assets (not JSON — their own uploads)
   - World map image · Per-faction maps · Music (battle + ambient, multi-select)
@@ -825,6 +847,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label?, blurb?, lootLabel? }. e.g. rename "corruption" to "Searing".', content: JSON.stringify({ corruption: { label: 'Searing', blurb: 'sears the wound (damage over time + worsening stacks)', lootLabel: 'Searing' } }, null, 2) });
   entries.push({ key: 'inventory', hint: 'Inventory presentation: { labels?: { weapon|armor|accessory|consumable|tool|relic|material|loot|quest: "Your name" } (rename the category sections), toolTags?: ["tag"] (extra item tags that read as Tools), repairMaterialPct?: 200 (repair material cost as a % of an item\'s scrap yield; 200 = built-in 2x) }. Category ids + order stay fixed.', content: JSON.stringify({ labels: { loot: 'Salvage', material: 'Components' }, toolTags: ['multitool'], repairMaterialPct: 200 }, null, 2) });
   entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
+  entries.push({ key: 'scrap', hint: 'The SCRAP subsystem (what breaking an item down yields): { roles: { metalBulk, metalPremium, essencePrimary, essenceSecondary, essenceBonus, stone, mud, cloth, organic, wood } (role → material name), rawGuard: ["mats that can\'t scrap into themselves"], premiumMats: ["mats stripped from self-crafted scrap"], failureLines: ["…{item}…"] }. The tag→material RULES stay in the engine; this is the data. Build it in the SCRAP box.', content: buildScrapTemplate() });
   entries.push({ key: 'digging', hint: 'The DIGGING subsystem (what "dig" pulls from the ground): { itemScores: { "Item": score }, tagScores: { tag: score }, productiveCap: number, loot: [{ name, rarity (Common|Uncommon|Rare), baseWeight }] }. Higher dig score = finds more + better rarity. Build it in the DIGGING box; omit to keep the built-in.', content: buildDiggingTemplate() });
   entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.', content: buildWhispersTemplate(false) });
   return entries;

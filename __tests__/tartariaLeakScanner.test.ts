@@ -47,8 +47,8 @@ const BASELINE: Record<string, number> = {
   'app/state/gameStore.ts': 153, 'app/engine/mainQuest.ts': 85, 'app/engine/itemAliases.ts': 55,
   'app/engine/hooks.ts': 49, 'app/engine/elevatedOverlay.ts': 45, 'app/engine/salvagePools.ts': 41,
   'app/engine/powers.ts': 24, 'app/engine/coreGuardians.ts': 23,
-  // 'app/engine/digging.ts': extracted to app/data/digging/digging.json (was 18 → 0).
-  'app/engine/scrapEngine.ts': 15, 'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 9,
+  // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).
+  'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 9,
   'app/engine/character.ts': 9, 'app/engine/golems.ts': 8, 'app/engine/titles.ts': 7,
   'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 6, 'app/engine/buriedSkyscraper.ts': 5,
   'app/engine/climbHeight.ts': 5, 'app/engine/itemFusion.ts': 5, 'app/engine/dogCompanion.ts': 4,

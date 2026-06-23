@@ -83,6 +83,7 @@ interface GenericDefaultPack {
   bosses?: unknown[];
   collectables?: unknown[];
   digging?: unknown;
+  scrap?: unknown;
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -97,6 +98,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.bosses = pack.bosses;
   genericDefaults.collectables = pack.collectables;
   genericDefaults.digging = pack.digging;
+  genericDefaults.scrap = pack.scrap;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -111,6 +113,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.bosses = undefined;
   genericDefaults.collectables = undefined;
   genericDefaults.digging = undefined;
+  genericDefaults.scrap = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -678,6 +681,22 @@ export function resolveDigging<T>(builtin: T): T {
   return builtin;
 }
 
+// --- scrap config (item-scrap material roles + failure lines) ------------------
+// engine_Dev — the SCRAP subsystem's data: which material each tag-ROLE yields,
+// raw-mat guards, premium mats (stripped from self-crafted scrap), and failure
+// narration. The tag→material RULES stay in scrapEngine.ts. Author-uploadable.
+let scrapOverride: unknown | null = null;
+export function setScrapOverride(o: unknown | null): void {
+  scrapOverride = o && typeof o === 'object' && !Array.isArray(o) ? o : null;
+}
+export function hasScrapOverride(): boolean { return scrapOverride != null; }
+export function getScrapOverride(): unknown | null { return scrapOverride; }
+export function resolveScrap<T>(builtin: T): T {
+  if (scrapOverride != null) return scrapOverride as T;
+  if (genericDefaults.scrap != null) return genericDefaults.scrap as T;
+  return builtin;
+}
+
 // --- inventory presentation (category labels + tool tags) ----------------------
 // engine_Dev — RENAME the inventory category sections (Weapons -> Arsenal, Loot ->
 // Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
@@ -907,6 +926,7 @@ export function clearAllOverrides(): void {
   coatingsOverride = null;
   inventoryOverride = null;
   diggingOverride = null;
+  scrapOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------
