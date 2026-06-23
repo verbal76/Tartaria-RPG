@@ -25306,9 +25306,9 @@ function narratePossibleDirections(
 // an Aethercraft-keyword target. Validates fuel + skill check +
 // applies the discipline outcome.
 //
-// Race gates: Mud Dweller base DC; Aetherborn +2; others +4.
-// Mud Dweller "Aethercraft Mastery" +2 INT applies through
-// aethercraftStatBonus before the roll.
+// engine_Dev — race POWER affinity (data-driven via powerDcModifier /
+// powerStatBonus, read from each race's powerDcMod / powerIntBonus) is added to
+// the DC + effective INT before the roll.
 //
 // Fuel: 1 Aetherstone-tagged consumable (Aether Crystal, Aether Mud,
 // Aether Residue, Aetheric Shard, Golem Core).
@@ -25322,7 +25322,7 @@ function runAethercraft(
   powerOverride?: import('../engine/powers').Power,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { aethercraftDcModifier, aethercraftStatBonus } = require('../engine/raceMechanics');
+  const { powerDcModifier, powerStatBonus } = require('../engine/raceMechanics');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -25393,13 +25393,13 @@ function runAethercraft(
   } else {
     dcBase = discipline === 'summon' ? (power?.dcBase ?? 15) : (power?.dcBase ?? 12);
   }
-  const dc = dcBase + aethercraftDcModifier(player.raceId);
+  const dc = dcBase + powerDcModifier(player.raceId);
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { effectiveStats } = require('../engine/equipment');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { weatherStatModifiers } = require('../engine/weatherEffects');
   const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
-  const racialBonus = aethercraftStatBonus(player.raceId);
+  const racialBonus = powerStatBonus(player.raceId);
   const stat: keyof PlayerCharacter['stats'] = (power?.stat ?? (discipline === 'mend' ? 'wisdom' : 'intelligence')) as keyof PlayerCharacter['stats'];
   const statValue = stats[stat] + (racialBonus[stat] ?? 0);
   const statLabel = stat === 'wisdom' ? 'WIS' : 'INT';

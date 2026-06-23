@@ -15516,4 +15516,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // their historical values in races.json (mud_dweller 0/+2INT, aetherborn +2, the
 // rest +3) so their balance is unchanged. Tests updated: unknown/undefined race
 // now +0 (was +3); new aethercraftRaceAffinity proves an uploaded race drives it.
-export const OTA_BUILD_ID = '2026-06-22-801';
+// engine_Dev-802 — rename the race POWER-affinity vertical off "aethercraft"
+// (Tartaria's word for the magic system) to the engine's generic term "power".
+// The author-facing race fields aethercraftDcMod/aethercraftIntBonus -> powerDcMod
+// /powerIntBonus, and the helpers aethercraftDcModifier/aethercraftStatBonus ->
+// powerDcModifier/powerStatBonus, updated at all call sites (gameStore,
+// CraftingScreen) + races.json + tests. Behavior unchanged. (The broader
+// "aethercraft" concept name is still used internally across many engine/data
+// files — a separate, larger rename; this only de-Tartaria's the race-affinity
+// fields I just added so authors don't write Tartaria's term in their race JSON.)
+export const OTA_BUILD_ID = '2026-06-22-802';

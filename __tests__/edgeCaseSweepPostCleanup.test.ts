@@ -68,7 +68,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { applyPuzzleInput } from '../app/engine/hookPuzzles';
 import type { Hook } from '../app/engine/hooks';
 import { getGolemDefinition, GOLEM_DEFINITIONS } from '../app/engine/golems';
-import { aethercraftDcModifier } from '../app/engine/raceMechanics';
+import { powerDcModifier } from '../app/engine/raceMechanics';
 import { createDogCompanion } from '../app/engine/dogCompanion';
 
 const NEW_VERBS = ['drink', 'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull'] as const;
@@ -319,7 +319,7 @@ describe('race-condition: rapid-fire submitPlayerAction calls', () => {
 
 describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
   // Reproduces the runAethercraft dc computation:
-  //   dc = (def.summonDC ?? 15) + aethercraftDcModifier(raceId)
+  //   dc = (def.summonDC ?? 15) + powerDcModifier(raceId)
   //
   // Spec the cleanup OTAs locked in:
   //   Mud 13 / Iron 15 / Aether 17 / Crystal 19
@@ -327,7 +327,7 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
   //   mud_dweller 0, aetherborn +2, everyone else +3
   function effectiveDc(raceId: string, kind: keyof typeof GOLEM_DEFINITIONS): number {
     const def = getGolemDefinition(kind);
-    return (def.summonDC ?? 15) + aethercraftDcModifier(raceId);
+    return (def.summonDC ?? 15) + powerDcModifier(raceId);
   }
 
   it('Mud Dweller (no DC penalty) — full table matches spec', () => {
@@ -344,7 +344,7 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
     expect(effectiveDc('aetherborn', 'crystal_golem')).toBe(21);
   });
 
-  // engine_Dev — the Tartaria untrained races carry aethercraftDcMod:3 in
+  // engine_Dev — the Tartaria untrained races carry powerDcMod:3 in
   // races.json, so they still get +3 (now data-driven, not hardcoded ids).
   it.each([
     'tartarian_giant',
@@ -373,10 +373,10 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
     expect(getGolemDefinition('crystal_golem').summonDC).toBe(19);
   });
 
-  it('aethercraftDcModifier — data-driven affinity (Tartaria values preserved)', () => {
-    expect(aethercraftDcModifier('mud_dweller')).toBe(0);   // from races.json
-    expect(aethercraftDcModifier('aetherborn')).toBe(2);    // from races.json
-    expect(aethercraftDcModifier('zorglax')).toBe(0);       // unknown → neutral default
-    expect(aethercraftDcModifier(undefined)).toBe(0);       // no race → neutral default
+  it('powerDcModifier — data-driven affinity (Tartaria values preserved)', () => {
+    expect(powerDcModifier('mud_dweller')).toBe(0);   // from races.json
+    expect(powerDcModifier('aetherborn')).toBe(2);    // from races.json
+    expect(powerDcModifier('zorglax')).toBe(0);       // unknown → neutral default
+    expect(powerDcModifier(undefined)).toBe(0);       // no race → neutral default
   });
 });
