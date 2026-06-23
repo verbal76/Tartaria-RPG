@@ -3,6 +3,7 @@ import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRecipes, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
+import { isGolemWeapon, getSummonNoun } from '../engine/golems';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
@@ -19,6 +20,9 @@ const RECIPE_RARITY_RANK: Record<string, number> = {
 interface RecipeStatus {
   recipe: Recipe;
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
+  /** engine_Dev — a sidekick armament (result tagged golem_weapon). These show on
+   *  the MAGIC tab next to the summon disciplines, not the general Craft tab. */
+  isSidekickWeapon: boolean;
   missing: { name: string; short: number }[];
   available: boolean;
 }
@@ -33,7 +37,7 @@ function evaluateRecipe(recipe: Recipe, inventory: { name: string; quantity: num
   const short = missingIngredientsList(recipe.ingredients, inventory as never);
   const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
   const cat = lookupCraftedItem(recipe.result);
-  return { recipe, kind: cat.kind, missing, available: missing.length === 0 };
+  return { recipe, kind: cat.kind, isSidekickWeapon: isGolemWeapon(cat.tags), missing, available: missing.length === 0 };
 }
 
 function rarityColor(rarity: string | undefined): string {
@@ -45,7 +49,7 @@ function rarityColor(rarity: string | undefined): string {
   }
 }
 
-export type RecipeKindFilter = 'consumable' | 'non-consumable';
+export type RecipeKindFilter = 'consumable' | 'non-consumable' | 'sidekick-weapon';
 
 export interface RecipesViewProps {
   /** OTA-264 — called AFTER a successful craft attempt. Receives the
@@ -77,6 +81,10 @@ export interface RecipesViewProps {
   sortKey?: 'ready' | 'name' | 'rarity' | string;
   /** OTA-087 — direction for the sort axis. */
   sortDirection?: SortDirection;
+  /** engine_Dev — when true, render WITHOUT the component's own ScrollView (just
+   *  the count line + card list) so it can be embedded inside a parent ScrollView
+   *  (e.g. the sidekick-armament section on the Magic tab). */
+  embedded?: boolean;
 }
 
 // 2026-05-24 — extracted from CraftingScreen.tsx so both the standalone
@@ -95,6 +103,7 @@ export function RecipesView({
   query,
   sortKey = 'ready',
   sortDirection = 'asc',
+  embedded = false,
 }: RecipesViewProps) {
   const player = useGameStore((s) => s.player);
   const craftRecipe = useGameStore((s) => s.craftRecipe);
@@ -106,7 +115,11 @@ export function RecipesView({
       ? all.filter((e) =>
           kindFilter === 'consumable'
             ? e.kind === 'consumable'
-            : e.kind !== 'consumable',
+            : kindFilter === 'sidekick-weapon'
+              ? e.isSidekickWeapon
+              // 'non-consumable' (Craft tab): everything wearable/usable EXCEPT
+              // the sidekick armaments, which live on the MAGIC tab.
+              : e.kind !== 'consumable' && !e.isSidekickWeapon,
         )
       : all;
     // OTA-087 — search filter (substring on the result name,
@@ -167,9 +180,19 @@ export function RecipesView({
 
   const arbiterLine = kindFilter === 'consumable'
     ? `The ${getNarratorName()} eyes your pantry. "Food and tonics — what the body remembers."`
-    : kindFilter === 'non-consumable'
-      ? `The ${getNarratorName()} looks over your pack. "Every blueprint you carry. The lit ones you can build right now."`
-      : `The ${getNarratorName()} looks over your pack. "These are the things you can — or nearly can — set together."`;
+    : kindFilter === 'sidekick-weapon'
+      ? `The ${getNarratorName()} nods at your kit. "Armaments shaped for a ${getSummonNoun()}'s grip. Forge one, then arm your ${getSummonNoun()} with it."`
+      : kindFilter === 'non-consumable'
+        ? `The ${getNarratorName()} looks over your pack. "Every blueprint you carry. The lit ones you can build right now."`
+        : `The ${getNarratorName()} looks over your pack. "These are the things you can — or nearly can — set together."`;
+
+  // engine_Dev — embedded mode drops the inner ScrollView so this list can live
+  // inside a parent ScrollView (the Magic-tab sidekick-armament section).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ListWrap: React.ComponentType<any> = embedded ? View : ScrollView;
+  const listWrapProps = embedded
+    ? { style: styles.scrollContent }
+    : { style: styles.scroll, contentContainerStyle: styles.scrollContent };
 
   return (
     <>
@@ -182,14 +205,16 @@ export function RecipesView({
         </Text>
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ListWrap {...listWrapProps}>
         {evaluated.length === 0 ? (
           <Text style={styles.empty}>
             {kindFilter === 'consumable'
               ? 'No food / tonic recipes in the book yet.'
-              : kindFilter === 'non-consumable'
-                ? 'No gear blueprints in the book yet.'
-                : 'Nothing fits together yet.'}
+              : kindFilter === 'sidekick-weapon'
+                ? `No ${getSummonNoun()} armaments in the book yet.`
+                : kindFilter === 'non-consumable'
+                  ? 'No gear blueprints in the book yet.'
+                  : 'Nothing fits together yet.'}
           </Text>
         ) : (
           evaluated.map((e) => {
@@ -250,7 +275,7 @@ export function RecipesView({
             );
           })
         )}
-      </ScrollView>
+      </ListWrap>
     </>
   );
 }

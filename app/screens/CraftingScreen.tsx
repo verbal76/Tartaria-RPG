@@ -518,6 +518,19 @@ export function CraftingScreen() {
                 </Pressable>
               );
             })}
+            {/* engine_Dev — SIDEKICK ARMAMENTS. The golem_weapon recipes live here
+                on the Magic tab, next to the summon disciplines, instead of the
+                general Craft tab. Embedded so it shares this ScrollView. */}
+            <View style={styles.sidekickArmsHeaderWrap}>
+              <Text style={styles.sidekickArmsHeader}>
+                {getSummonNoun().replace(/^\w/, (c) => c.toUpperCase())} armaments
+              </Text>
+            </View>
+            <RecipesView
+              kindFilter="sidekick-weapon"
+              embedded
+              onAfterCraft={(delta) => { if (delta.length > 0) setCraftResult(delta); }}
+            />
           </ScrollView>
         </>
       ) : (
@@ -777,6 +790,8 @@ const styles = StyleSheet.create({
   // defaults to mud_golem on a bare `summon golem`).
   golemVariants: { marginTop: 6, marginBottom: 4 },
   golemVariantsHeader: { color: '#9aaab0', fontSize: 11, fontWeight: '700', marginBottom: 4 },
+  sidekickArmsHeaderWrap: { marginTop: 18, marginBottom: 8, borderTopWidth: 1, borderTopColor: '#3a342c', paddingTop: 12 },
+  sidekickArmsHeader: { color: '#9aaab0', fontSize: 13, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
   golemVariantRow: {
     backgroundColor: '#0e0d0c',
     borderColor: '#2a2620',
