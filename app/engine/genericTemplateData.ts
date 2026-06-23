@@ -44,6 +44,10 @@ export const GENERIC_TABLE_ROWS = {
     { name: 'Guild Signet', rarity: 'Rare', statBonus: { stat: 'charisma', amount: 2 }, resistances: [], baseDurability: 40, tags: ['ring', 'seal'], description: 'An old seal that opens doors money usually cannot.' },
     { name: 'Order Band', rarity: 'Uncommon', statBonus: { stat: 'intelligence', amount: 2 }, resistances: [], baseDurability: 35, faction: 'REPLACE-with-a-faction-id', tc: 90, tags: ['ring', 'faction_gear', 'scholarly'], description: 'Order issue. Etched edge-to-edge with proofs only the initiated can read; wearing it keeps them close. (+2 Intelligence)' },
   ],
+  dogGear: [
+    { name: 'Burlap Dog Vest', kind: 'dog_armor', rarity: 'Common', acBonus: 1, baseDurability: 18, tags: ['dog_armor', 'vest', 'cloth'], description: 'A scrap of stitched cloth belted across the dog’s chest. Cheap, but it turns a claw.' },
+    { name: 'Plated Dog Harness', kind: 'dog_armor', rarity: 'Uncommon', acBonus: 3, baseDurability: 35, statBonus: { stat: 'strength', amount: 1 }, tags: ['dog_armor', 'harness', 'metal'], description: 'Riveted plates over a heavy harness. Heavier, but the dog walks into trouble now.' },
+  ],
   recipes: [
     { result: 'Cleansing Tonic', ingredients: [{ name: 'Common Residue', quantity: 1 }, { name: 'Red Cap Mushroom', quantity: 1 }] },
     { result: 'Strong Tonic', ingredients: [{ name: 'Worked Crystal', quantity: 1 }, { name: 'Tough Fiber', quantity: 2 }] },

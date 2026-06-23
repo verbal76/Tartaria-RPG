@@ -178,10 +178,19 @@ export const RINGS = (ringsData as { rings: CatalogAccessory[] }).rings;
 /** OTA-120 Phase 5 — dog vest catalog. 4 entries (Burlap / Riveted /
  *  Aetheric / Reclaimer). Read by the dog-equip flow on the Character
  *  screen Companion panel and the Inventory `[fits dog]` tag. */
-export const DOG_GEAR = (dogGearData as { dogGear: CatalogDogGear[] }).dogGear;
+const DOG_GEAR_BUILTIN = (dogGearData as { dogGear: CatalogDogGear[] }).dogGear;
+/** Built-in dog-vest catalog (static). Use {@link getDogGear} for the live,
+ *  override-aware view; this const is the engine's bundled fallback rows. */
+export const DOG_GEAR = DOG_GEAR_BUILTIN;
+/** Live dog-armor catalog — the author's uploaded 'dogGear' table if loaded, else the
+ *  built-in vests. A dog-armor recipe's result resolves here, so authors can now define
+ *  their own dog vests (was built-in only). */
+export function getDogGear(): readonly CatalogDogGear[] {
+  return resolveTable('dogGear', DOG_GEAR_BUILTIN);
+}
 export function findDogGearByName(name: string): CatalogDogGear | undefined {
   const lower = name.toLowerCase();
-  return DOG_GEAR.find((g) => g.name.toLowerCase() === lower);
+  return getDogGear().find((g) => g.name.toLowerCase() === lower);
 }
 // Note: exploration.json is a bare top-level array, unlike the
 // other catalogs which wrap in { weapons: [...] }, { armor: [...] },
@@ -224,7 +233,7 @@ export function lookupCraftedItem(resultName: string): {
   // and couldn't be equipped on the dog. Resolve them to their real kind so
   // the loot paths grant a proper, wearable vest. (Crafting/fusion still
   // exclude DOG_GEAR via their own guards — this branch is construction-only.)
-  const dg = DOG_GEAR.find((x) => x.name === resultName);
+  const dg = getDogGear().find((x) => x.name === resultName);
   if (dg) return { kind: 'dog_armor', rarity: dg.rarity, tags: dg.tags, baseDurability: dg.baseDurability ?? DEFAULT_DURABILITY };
   const am = rAmulets().find((x) => x.name === resultName);
   if (am) return { kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
@@ -359,7 +368,7 @@ export function isInferredItem(name: string): boolean {
   if (findCatalogItem(name)) return false;
   const q = name.toLowerCase().trim();
   if (rExploration().some((x) => x.name.toLowerCase() === q)) return false;
-  if (DOG_GEAR.some((x) => x.name.toLowerCase() === q)) return false;
+  if (getDogGear().some((x) => x.name.toLowerCase() === q)) return false;
   return true;
 }
 
@@ -669,7 +678,7 @@ function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amul
   // armor inference regex today, but a future vest named e.g.
   // "Plated Vest" or "Bladed Harness" would slip past the guard.
   // Including DOG_GEAR closes that path before authoring opens it.
-  if (DOG_GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  if (getDogGear().some((g) => g.name.toLowerCase() === t)) return true;
   return false;
 }
 

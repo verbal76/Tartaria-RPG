@@ -107,6 +107,7 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   exploration: GENERIC_TABLE_ROWS.exploration,
   amulets: GENERIC_TABLE_ROWS.amulets,
   rings: GENERIC_TABLE_ROWS.rings,
+  dogGear: GENERIC_TABLE_ROWS.dogGear,
   recipes: GENERIC_TABLE_ROWS.recipes,
   enemies: GENERIC_TABLE_ROWS.enemies,
   races: GENERIC_TABLE_ROWS.races,
@@ -893,10 +894,11 @@ strip for power edits.
   3.  Damage types — define them BEFORE anything that references a type.
   4.  Materials — the crafting/loot stock. Recipes + Digging/Salvage/Scrap loot all
       name materials, so they must exist first.
-  5.  Items — Weapons · Armor · Gear · Exploration · Amulets · Rings. Recipes craft
-      these by name, loot pools drop them, races/factions grant them as starting
-      gear, bosses drop them — so the item must be in its table or it resolves to a
-      blank "misc".
+  5.  Items — Weapons · Armor · Gear · Exploration · Amulets · Rings · Dog gear.
+      Recipes craft these by name, loot pools drop them, races/factions grant them
+      as starting gear, bosses drop them — so the item must be in its table or it
+      resolves to a blank "misc". (Dog gear = armor the COMPANION DOG wears, not the
+      player; a dog-armor recipe's result resolves from the Dog-gear table.)
   6.  Enemies — referenced by Bosses, Elevated overlays (encounterPool), main-quest
       "kill" steps, Travel encounters, and Damage resistances (keyed by enemy type).
   7.  Damage resistances — needs Damage types (4) + Enemies (6).
