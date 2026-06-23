@@ -55,6 +55,21 @@ export function questIsComplete(p: PlayerCharacter): boolean {
   return !!q && effectiveStepIndex(p) >= q.steps.length;
 }
 
+/** Count of remaining BOSS ("kill") steps for this player — from the effective
+ *  current step to the end, skipping faction-gated steps. null when no custom
+ *  main quest is loaded. Used to open the rubble-puppy window at "one boss left"
+ *  (remaining <= 1) instead of at full completion. */
+export function bossStepsRemaining(p: PlayerCharacter): number | null {
+  const q = liveMainQuest();
+  if (!q) return null;
+  let n = 0;
+  for (let i = effectiveStepIndex(p); i < q.steps.length; i++) {
+    const s = q.steps[i]!;
+    if (stepApplies(s, p) && s.action === 'kill') n++;
+  }
+  return n;
+}
+
 /** The boss the active KILL step wants at this location, if any. */
 export function questBossAt(p: PlayerCharacter, locationId: string): ReturnType<typeof bossById> {
   const step = activeQuestStep(p);

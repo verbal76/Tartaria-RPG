@@ -5140,11 +5140,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         triggerPuppyVendor(get, set);
       }
       // OTA-120 — Phase 6 rubble-puppy fallback. Late-game outdoor
-      // scene; ~5% per scene-entry once the MAIN QUEST is complete.
-      // Plant a "rubble" investigation noun the player can investigate.
-      // (engine_Dev — was gated on "all Core Guardians defeated", a
-      // Tartaria concept; now tied to main-quest completion so it works
-      // in a custom game too.)
+      // scene; ~5% per scene-entry once the MAIN QUEST is down to its
+      // final boss (one boss left). Plant a "rubble" investigation noun
+      // the player can investigate. (engine_Dev — was gated on "all Core
+      // Guardians defeated", a Tartaria concept; now on isMainQuestNearEnd
+      // so it works in a custom game and opens before the finale.)
       const livePlayer = get().player;
       if (
         wm.puppyVendorOwed &&
@@ -5152,7 +5152,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         !wm.pendingDogOnboarding &&
         livePlayer &&
         !hasActiveDog(livePlayer) &&
-        isMainQuestComplete(livePlayer) &&
+        isMainQuestNearEnd(livePlayer) &&
         isOutdoor &&
         Math.random() < 0.05
       ) {
@@ -15287,17 +15287,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // OTA-120 — Phase 6 puppy-vendor safety net. If the dog
           // died in combat AND the safety-net hasn't been used,
           // queue the vendor for the player's NEXT outdoor scene. The
-          // rubble-puppy fallback (above) handles the case where the
-          // MAIN QUEST is already complete. (engine_Dev — was split on
-          // "all Core Guardians defeated", a Tartaria concept; now on
-          // main-quest completion so it works in a custom game too.)
+          // rubble-puppy fallback (above) takes over once the MAIN QUEST
+          // is down to its final boss. (engine_Dev — was split on "all
+          // Core Guardians defeated", a Tartaria concept; now on
+          // isMainQuestNearEnd so it works in a custom game too.)
           {
             const liveWm = get().worldMemory;
             const livePlayer = get().player;
             if (
               liveWm.puppyVendorOwed &&
               !liveWm.puppyVendorUsed &&
-              !isMainQuestComplete(livePlayer)
+              !isMainQuestNearEnd(livePlayer)
             ) {
               queuePuppyVendor(get, set);
             }
@@ -27141,6 +27141,20 @@ export function isMainQuestComplete(player: PlayerCharacter | null | undefined):
   if (cmq.questIsComplete(player)) return true;
   const mq = player.mainQuest;
   return !!mq && (mq.phase === 'ended' || !!mq.ending);
+}
+
+// engine_Dev — the rubble-puppy window: open once the main quest is down to its
+// FINAL boss (one boss left) rather than fully complete, so it's reachable before
+// the finale. For an uploaded custom quest that means <= 1 "kill" step remaining;
+// the built-in quest (no custom override) falls back to completion. The vendor
+// net covers the earlier game (window not yet open).
+export function isMainQuestNearEnd(player: PlayerCharacter | null | undefined): boolean {
+  if (!player) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cmq = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+  const bossesLeft = cmq.bossStepsRemaining(player);
+  if (bossesLeft != null) return bossesLeft <= 1;
+  return isMainQuestComplete(player);
 }
 
 function queuePuppyVendor(
