@@ -126,6 +126,7 @@ export const GENERIC_GAME = {
     exploration: withFaction(GENERIC_TABLE_ROWS.exploration, 'wardens'),
     amulets: GENERIC_TABLE_ROWS.amulets,
     rings: withFaction(GENERIC_TABLE_ROWS.rings, 'wardens'),
+    dogGear: GENERIC_TABLE_ROWS.dogGear,
     recipes: GENERIC_TABLE_ROWS.recipes,
     weather: GENERIC_TABLE_ROWS.weather,
     enemies: ENEMIES,

@@ -15390,4 +15390,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persist (tartaria.customMusic.v1), and replace the built-in AudioManager
 // pools for those contexts. New expo-document-picker dep → needs a native
 // rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
-export const OTA_BUILD_ID = '2026-06-22-787';
+// engine_Dev-788 — Dog gear is now author-definable as a first-class content
+// table. 'dogGear' joins ContentTableId / CONTENT_TABLES (gets a TableBox in the
+// dev console + TEMPLATE/COPY/LOAD, bundle inclusion, round-trip + leak coverage
+// for free). crafting.ts gains getDogGear() = resolveTable('dogGear', built-in);
+// findDogGearByName, lookupCraftedItem's dog branch, and the two fusion/inference
+// guards now read the live (override-aware) catalog, so an uploaded dog-vest
+// table drives dog-armor lookup AND makes a dog-armor recipe/loot result resolve
+// to kind 'dog_armor' (equippable on the companion dog) instead of a blank
+// "misc". GENERIC_GAME + generic templates carry generic vests so reskins don't
+// fall back to the built-in Tartaria vests. Static DOG_GEAR const kept as the
+// built-in fallback alias. (Was built-in only — "dog gear needs to be JSON defined".)
+export const OTA_BUILD_ID = '2026-06-22-788';

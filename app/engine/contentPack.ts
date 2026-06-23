@@ -12,7 +12,7 @@
 
 export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
-  | 'amulets' | 'rings'
+  | 'amulets' | 'rings' | 'dogGear'
   | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore' | 'powers' | 'weather';
 
 export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
@@ -29,6 +29,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'exploration', label: 'Exploration items', hint: 'JSON array (data/items/exploration.json)' },
   { id: 'amulets', label: 'Amulets', hint: 'JSON array of amulet/relic rows (data/items/amulets.json)' },
   { id: 'rings', label: 'Rings', hint: 'JSON array of ring rows (data/items/rings.json)' },
+  { id: 'dogGear', label: 'Dog gear (armor the DOG wears)', hint: 'JSON array of dog-armor rows the COMPANION DOG equips (not the player). Each: { "name", "kind": "dog_armor", "rarity", "acBonus", "baseDurability"?, "statBonus"?: { "stat": "strength|dexterity|intelligence", "amount" }, "tags": [...], "description" }. A dog-armor CRAFTING recipe\'s result resolves here, so define your dog vests in this table or the recipe crafts to a blank "misc".' },
   { id: 'recipes', label: 'Crafting recipes', hint: 'Crafting formulas: [{ "result": "Item Name", "ingredients": [{ "name": "Material", "quantity": 2 }] }]. IMPORTANT: a recipe is only the formula — the "result" MUST also be defined in your Weapons/Armor/Gear/Exploration/Amulets/Rings table (that\'s where the crafted item gets its stats; an undefined result crafts to a blank "misc"), and each ingredient "name" must be a real Material that is obtainable (loot/dig/salvage). Build items + materials FIRST. Names match by exact string.' },
   { id: 'enemies', label: 'Enemies', hint: 'JSON array of enemy rows. DAMAGE RELATIONS per enemy: "damage" carries what it DELIVERS (dice + a damage-type word, e.g. "2d6 frost" — any type you defined in Damage Types); "traits" carries WEAK / STRONG — add "vulnerable:<type>" for weak-to (takes 1.5×) and "resist:<type>" for strong-against (takes ½), e.g. traits: ["vulnerable:burn","resist:electrical"]. Types must match your Damage Types names.' },
   { id: 'races', label: 'Races (playable — character creation)', hint: 'JSON array of race rows. THIS is what the race-selection screen shows. (Not the "Race lore" box up in LORE — that\'s freeform story text.) PERKS + GEAR per race: "racialStatBonuses" {strength?,…} (always-on stat bumps), "racialACBonusRules" [{condition,delta}] (conditional AC), "startingWeapon" (item name for the starter primary), "startingGear" ["item names"] (extra creation items from your catalogs), "abilities" [{id,name,description,combatOnly?,effect:{type:heal|stat_buff|shield|repair|strike, amount?|dice?, stat?, rounds?, damageType?}}] (once-a-day powers). "resist": ["<damage type>"] / "weak": ["<damage type>"] — lower/raise the chance the member suffers that type\'s on-hit effect (the player has NO weakness unless granted here).' },

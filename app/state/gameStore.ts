@@ -157,7 +157,7 @@ import {
   findArmorByName,
   findWeaponByName,
   findDogGearByName,
-  DOG_GEAR,
+  getDogGear,
   applyDamageTypeModifier,
   applyArmorResistance,
   armorResistances,
@@ -27661,7 +27661,7 @@ function rollDogVestLootName(enemy: Enemy): string | null {
     : 0.05;
   if (Math.random() >= baseChance) return null;
   const reclaimerAligned = /reclaimer/i.test(`${enemy.name} ${enemy.type}`);
-  const pool = DOG_GEAR.filter((v) => !v.faction || reclaimerAligned);
+  const pool = getDogGear().filter((v) => !v.faction || reclaimerAligned);
   if (pool.length === 0) return null;
   const total = pool.reduce((s, v) => s + dogVestLootWeight(v.rarity), 0);
   let roll = Math.random() * total;
