@@ -315,6 +315,11 @@ import {
   reapExpiredWhispers,
   spawnChainEnemy,
   makeStolenDiscs,
+  isMultiStageWhisper,
+  currentWhisperStage,
+  whisperStageIndex,
+  stageTargetTile,
+  findReadyStageWhisper,
 } from '../engine/whispers';
 import { TUTORIAL_STEPS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
@@ -4956,6 +4961,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             targetLocationId: livePlayer.currentLocationId,
             activeFromHour: chain.activeHours?.[0],
             activeToHour: chain.activeHours?.[1],
+            // engine_Dev — a multi-stage mission tracks its current leg in ctx;
+            // leg 0's tile is the chain.targetOffset tile computed above.
+            ...(isMultiStageWhisper(chain) ? { ctx: { stageIndex: 0 } } : {}),
           };
           set((s) => (s.player ? {
             player: {
@@ -14876,6 +14884,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         queueMicrotask(() => advanceCustomQuest(get, set));
       }
     }
+    // engine_Dev — multi-stage whisper kill-gate: if a leg is blocking on THIS
+    // foe, fire that leg's effects and advance the mission.
+    {
+      const awaiting = (player.activeWhispers ?? []).find(
+        (w) => w.ctx?.awaitEnemy && w.ctx.awaitEnemy === enemy.name,
+      );
+      if (awaiting) {
+        const stage = currentWhisperStage(findChain(awaiting.id), awaiting);
+        for (const eff of stage?.effects ?? []) applyHookEffect(eff, get, set);
+        advanceWhisperStage(get, set, awaiting);
+      }
+    }
     // Whisper-chain hook — Silt Thief death grants Stolen Aetheric
     // Discs and advances the Yulka chain to its return stage.
     // Other chains can plug in here when they get authored.
@@ -22583,6 +22603,14 @@ function resolveWhispersForTile(
   const p = get().player;
   if (!p) return;
 
+  // engine_Dev — multi-stage mission leg: the player reached the current leg's
+  // tile. Resolve it (and, if the leg names a foe, spawn it + block on the kill).
+  const stageW = findReadyStageWhisper(p.activeWhispers, hours, mapX, mapY);
+  if (stageW) {
+    fireWhisperStage(get, set, stageW);
+    return;
+  }
+
   // 2) Meet check — planted whisper, right tile, right time.
   const meet = findReadyMeetWhisper(p.activeWhispers, hours, mapX, mapY);
   if (meet && meet.id === 'yulka_discs') {
@@ -22647,6 +22675,84 @@ function fireGenericWhisperMeet(
   } : s));
   // A spawn_enemy_tag effect already staged combat; nothing else to do here.
   void fatal;
+}
+
+// engine_Dev — resolve one leg of a multi-stage whisper. Narrates the leg's line;
+// if the leg names a foe, spawns it and blocks until it's defeated (the kill hook
+// in resolveEnemyDefeat fires the leg effects + advances); otherwise fires the
+// leg effects and advances to the next leg now.
+function fireWhisperStage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  const chain = findChain(whisper.id);
+  const stage = currentWhisperStage(chain, whisper);
+  if (!chain || !stage) return;
+  if (stage.line) get().appendLog('world', stage.line);
+  if (stage.enemyName && get().currentScene) {
+    let foe: Enemy | null = null;
+    try { foe = spawnChainEnemy(stage.enemyName); } catch { foe = null; }
+    if (foe) {
+      const f = foe;
+      const await_ = stage.enemyName;
+      set((s) => (s.currentScene ? {
+        currentScene: {
+          ...s.currentScene,
+          enemies: [...s.currentScene.enemies, f],
+          enemyHps: [...s.currentScene.enemyHps, f.hp],
+          enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+          activeEnemyIdx: s.currentScene.enemies.length,
+          range: 'mid' as const,
+        },
+        player: s.player ? {
+          ...s.player,
+          activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+            w.id === whisper.id ? { ...w, ctx: { ...(w.ctx ?? {}), awaitEnemy: await_ } } : w),
+        } : s.player,
+      } : s));
+      return;
+    }
+    // Bad enemy name — don't soft-lock; resolve the leg as if there were no foe.
+  }
+  for (const eff of stage.effects ?? []) applyHookEffect(eff, get, set);
+  advanceWhisperStage(get, set, whisper);
+}
+
+// engine_Dev — advance a multi-stage whisper to its next leg (recomputing that
+// leg's tile from where the player is now), or complete the mission on the last.
+function advanceWhisperStage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  const chain = findChain(whisper.id);
+  if (!chain?.stages) return;
+  const nextIdx = whisperStageIndex(whisper) + 1;
+  if (nextIdx >= chain.stages.length) {
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+        completedWhisperIds: [...(s.player.completedWhisperIds ?? []), whisper.id],
+      },
+    } : s));
+    applyTrainAndLog(get, set, 'wisdom', '✦ A whisper resolved. +1 WIS (now {to}).');
+    return;
+  }
+  const live = get().player;
+  const baseX = typeof live?.mapX === 'number' ? live.mapX : whisper.targetMapX;
+  const baseY = typeof live?.mapY === 'number' ? live.mapY : whisper.targetMapY;
+  const tile = stageTargetTile(chain.stages[nextIdx], baseX, baseY);
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+        w.id === whisper.id
+          ? { ...w, targetMapX: tile.x, targetMapY: tile.y, ctx: { ...(w.ctx ?? {}), stageIndex: nextIdx, awaitEnemy: '' } }
+          : w),
+    },
+  } : s));
 }
 
 function fireYulkaMeet(

@@ -34,6 +34,25 @@ export function isHourInWindow(hour: number, from: number | undefined, to: numbe
   return hour >= from || hour <= to;
 }
 
+/** engine_Dev — one LEG of a multi-stage whisper mission. The engine walks the
+ *  player through the legs in order; each resolves when they reach its tile (and,
+ *  if `enemyName` is set, defeat that foe). Lightweight + whisper-specific — NOT
+ *  the full main-quest step system. */
+export interface WhisperStage {
+  /** Narration when this leg resolves (on arrival, or on the foe's defeat). */
+  line: string;
+  /** Where this leg's tile is — a random offset from the player's position when
+   *  the PREVIOUS leg completed (or from the plant spot for leg 0). Omit to
+   *  resolve on the same tile as the previous leg (e.g. fight, then pick up). */
+  targetOffset?: { dxRange: [number, number]; dyRange: [number, number] };
+  /** Optional foe to spawn when the player arrives (must be in your enemies
+   *  table). The leg does NOT advance until it's defeated. */
+  enemyName?: string;
+  /** Effects fired when this leg COMPLETES — same verbs as hooks (grant_item,
+   *  grant_tc, heal, damage, unlock_location, rep_change, spawn_enemy_tag, …). */
+  effects?: HookEffect[];
+}
+
 /** A chain definition. Authored in code so the engine can run typed
  *  callbacks per stage; future iterations may move to JSON once the
  *  stage-language stabilises. */
@@ -62,6 +81,12 @@ export interface ChainDef {
    *  bespoke multi-stage fetch/fight/return logic. */
   meetLine?: string;
   meetEffects?: HookEffect[];
+  /** engine_Dev — MULTI-STAGE mission. When present (and non-empty), the whisper
+   *  runs leg-by-leg instead of the one-hop meet: plant → reach stage 0's tile →
+   *  (optional foe; resolve) → reach stage 1's tile → … → last stage completes the
+   *  whisper. A chain uses EITHER stages (multi-stage) OR meetLine/meetEffects
+   *  (one-hop) — stages win when both are set. */
+  stages?: WhisperStage[];
   /** Bespoke-chain only — the quest item this chain mints + returns (e.g. the
    *  yulka chain's recovered stock). Read by makeStolenDiscs so the name isn't
    *  hardcoded. Generic one-hop chains don't use it. */
@@ -88,6 +113,59 @@ export function isGenericWhisper(chain: ChainDef | undefined): boolean {
 
 export function findChain(id: string): ChainDef | undefined {
   return getWhispers().find((c) => c.id === id);
+}
+
+// ----- multi-stage mission runner (data-driven) ----------------------------
+
+/** True when a chain is a multi-stage mission (has at least one stage). */
+export function isMultiStageWhisper(chain: ChainDef | undefined): boolean {
+  return !!chain?.stages && chain.stages.length > 0;
+}
+
+/** The current leg index stored on the record (0 when unset). */
+export function whisperStageIndex(whisper: WhisperRecord): number {
+  const i = Number(whisper.ctx?.stageIndex ?? 0);
+  return Number.isFinite(i) && i >= 0 ? i : 0;
+}
+
+/** The current leg for a multi-stage whisper, or undefined when done / one-hop. */
+export function currentWhisperStage(chain: ChainDef | undefined, whisper: WhisperRecord): WhisperStage | undefined {
+  if (!isMultiStageWhisper(chain)) return undefined;
+  return chain!.stages![whisperStageIndex(whisper)];
+}
+
+/** Compute a leg's destination tile from a base position + the leg's offset
+ *  (random within range). When the leg has no offset it resolves on the base tile. */
+export function stageTargetTile(
+  stage: WhisperStage | undefined,
+  baseX: number,
+  baseY: number,
+): { x: number; y: number } {
+  const off = stage?.targetOffset;
+  if (!off) return { x: baseX, y: baseY };
+  const dx = off.dxRange[0] + rollDie(off.dxRange[1] - off.dxRange[0] + 1) - 1;
+  const dy = off.dyRange[0] + rollDie(off.dyRange[1] - off.dyRange[0] + 1) - 1;
+  return { x: baseX + dx, y: baseY + dy };
+}
+
+/** A multi-stage whisper whose CURRENT leg's tile the player is standing on and
+ *  which is not waiting on a foe — i.e. ready to resolve this leg by arrival. */
+export function findReadyStageWhisper(
+  whispers: readonly WhisperRecord[] | undefined,
+  hoursElapsed: number,
+  playerMapX: number,
+  playerMapY: number,
+): WhisperRecord | null {
+  if (!whispers) return null;
+  for (const w of whispers) {
+    if (!isMultiStageWhisper(findChain(w.id))) continue;
+    if (w.ctx?.awaitEnemy) continue; // a fight leg is blocking; not a tile arrival
+    if (w.targetMapX !== playerMapX || w.targetMapY !== playerMapY) continue;
+    const hourOfDay = Math.floor(hoursElapsed % 24);
+    if (!isHourInWindow(hourOfDay, w.activeFromHour, w.activeToHour)) continue;
+    return w;
+  }
+  return null;
 }
 
 /** Compute the rendezvous tile for a freshly-planted whisper. Uses
@@ -205,6 +283,16 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
       default:
         return `Stage: ${whisper.stage}`;
     }
+  }
+  // engine_Dev — multi-stage mission: show the current leg's progress.
+  const chain = findChain(whisper.id);
+  if (isMultiStageWhisper(chain)) {
+    const idx = whisperStageIndex(whisper);
+    const total = chain!.stages!.length;
+    const awaiting = whisper.ctx?.awaitEnemy;
+    if (awaiting) return `Leg ${idx + 1} of ${total}: defeat the ${awaiting}.`;
+    const line = chain!.stages![idx]?.line;
+    return `Leg ${idx + 1} of ${total}${line ? `: ${line}` : ' — head to the marked tile.'}`;
   }
   return `Stage: ${whisper.stage}`;
 }

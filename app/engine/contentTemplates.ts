@@ -583,8 +583,11 @@ export function buildHooksTemplate(includeTokenNote = true): string {
  *  "outpost_messhall") OR one of YOUR location ids — engine_Dev plants the chain
  *  when the player is in the hub room OR standing at that macro location. */
 export function buildWhispersTemplate(includeTokenNote = true): string {
+  // An ARRAY of whisper missions — each entry is a SEPARATE random-triggered lead.
+  // Two shapes: ONE-HOP (meetLine + meetEffects) and MULTI-STAGE (stages[]).
   return tokenNote(JSON.stringify([
     {
+      // ── ONE-HOP whisper: plant → reach the tile → narrate + fire effects → done.
       id: 'cache_rumor',
       title: 'The Buried Cache',
       plantLocations: ['REPLACE-with-a-hub-room-id-or-one-of-your-location-ids'],
@@ -598,6 +601,26 @@ export function buildWhispersTemplate(includeTokenNote = true): string {
       meetEffects: [
         { type: 'grant_item', name: 'Old Mechanism' },
         { type: 'grant_tc', amount: 60 },
+      ],
+    },
+    {
+      // ── MULTI-STAGE whisper: a small mission run leg-by-leg. Plant → reach leg 0's
+      //    tile (the chain.targetOffset) → each later leg uses its own targetOffset
+      //    from the previous tile (omit it to resolve on the same tile). A leg with
+      //    enemyName spawns that foe and won't advance until it's defeated. Each
+      //    leg's effects fire when it completes. The LAST leg ends the mission.
+      id: 'dredge_job',
+      title: 'The Dredge Job',
+      plantLocations: ['REPLACE-with-a-hub-room-id-or-one-of-your-location-ids'],
+      plantChance: 0.15,
+      plantLines: [
+        'A figure two tables over keeps their voice low. "There’s salvage out past the old dredge — but you’ll have to deal with whoever’s squatting it first. East of the docks. Bring steel."',
+      ],
+      targetOffset: { dxRange: [1, 2], dyRange: [-1, 1] },
+      stages: [
+        { line: 'You reach the dredge. The hold is chained — and someone’s been here recently.' },
+        { line: 'A squatter rises out of the rust, blade out. They mean to keep what they found.', targetOffset: { dxRange: [1, 1], dyRange: [0, 0] }, enemyName: 'REPLACE-with-an-enemy-from-your-table', effects: [{ type: 'grant_item', name: 'REPLACE-with-a-quest-item' }] },
+        { line: 'You haul the salvage back to safer ground. Word will get around that you can be relied on.', targetOffset: { dxRange: [-2, -1], dyRange: [0, 1] }, effects: [{ type: 'grant_tc', amount: 80 }, { type: 'rep_change', factionId: 'REPLACE-with-a-faction-id', amount: 4 }] },
       ],
     },
   ], null, 2), includeTokenNote);
@@ -1135,7 +1158,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'salvage', hint: 'The SALVAGE subsystem (what salvaging a noun yields): { pools: [{ id, patterns: ["noun substrings"], items: [{ name, rarity, weight, min, max }] }] (FIRST matching pool wins, ordered specific→general), junkPool, materialLines, junkLines, nothingChance }. The match/pick RULES stay in the engine. Build it in the SALVAGE box.', content: buildSalvageTemplate() });
   entries.push({ key: 'scrap', hint: 'The SCRAP subsystem (what breaking an item down yields): { roles: { metalBulk, metalPremium, essencePrimary, essenceSecondary, essenceBonus, stone, mud, cloth, organic, wood } (role → material name), rawGuard: ["mats that can\'t scrap into themselves"], premiumMats: ["mats stripped from self-crafted scrap"], failureLines: ["…{item}…"] }. The tag→material RULES stay in the engine; this is the data. Build it in the SCRAP box.', content: buildScrapTemplate() });
   entries.push({ key: 'digging', hint: 'The DIGGING subsystem (what "dig" pulls from the ground): { itemScores: { "Item": score }, tagScores: { tag: score }, productiveCap: number, loot: [{ name, rarity (Common|Uncommon|Rare), baseWeight }] }. Higher dig score = finds more + better rarity. Build it in the DIGGING box; omit to keep the built-in.', content: buildDiggingTemplate() });
-  entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array). Each: plants at a plant location (plantLocations), points to a nearby tile (targetOffset) in a time window (activeHours), and pays off via meetLine + meetEffects (same effect verbs as hooks) when the player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids — the chain plants when the player is in that hub room or standing at that macro location.', content: buildWhispersTemplate(false) });
+  entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array) — each entry is a SEPARATE random-triggered mission. It plants at a plant location (plantLocations) with a per-visit chance (plantChance) in a time window (activeHours) and points to a nearby tile (targetOffset). Two shapes: ONE-HOP — pays off via meetLine + meetEffects (same effect verbs as hooks) on arrival; or MULTI-STAGE — a stages[] array runs leg-by-leg (reach a tile, optionally defeat an enemyName foe before advancing, fire that leg’s effects), the last leg ends it. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids.', content: buildWhispersTemplate(false) });
   return entries;
 }
 
