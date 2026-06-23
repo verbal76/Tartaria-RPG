@@ -15468,4 +15468,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fallback now fires once the MAIN QUEST is complete, and the vendor net queues
 // while it's still in progress. No more guardiansDefeated/totalGuardiansCount in
 // the dog nets. Tests re-pointed at the completion gate.
-export const OTA_BUILD_ID = '2026-06-22-796';
+// engine_Dev-797 — rubble-puppy window now opens at "one boss left" instead of
+// full completion (no free-roam after the finale, per design). New
+// customMainQuestEngine.bossStepsRemaining(player) counts remaining "kill" steps
+// (faction-gated steps excluded); isMainQuestNearEnd(player) opens the window at
+// <= 1 boss remaining for an uploaded custom quest, falling back to completion
+// for the built-in quest. Both puppy nets re-gated on isMainQuestNearEnd (rubble
+// when near end, vendor while not). Tests: bossStepsRemaining unit coverage +
+// store-level near-end assertions.
+export const OTA_BUILD_ID = '2026-06-22-797';

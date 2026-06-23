@@ -50,7 +50,8 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore, tickDogStatus, hasActiveDog, isMainQuestComplete } from '../app/state/gameStore';
+import { useGameStore, tickDogStatus, hasActiveDog, isMainQuestComplete, isMainQuestNearEnd } from '../app/state/gameStore';
+import { setCustomMainQuestOverride, clearAllOverrides } from '../app/engine/contentPack';
 
 async function bootBase() {
   const store = useGameStore;
@@ -216,6 +217,29 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
         ? { player: { ...s.player, mainQuest: { ...(s.player.mainQuest ?? {}), ending: 'seal' } as never } }
         : s));
       expect(isMainQuestComplete(store.getState().player)).toBe(true);
+    });
+
+    it('custom quest: rubble window opens at the FINAL boss (one boss left), not full completion', async () => {
+      const store = await bootBase();
+      setCustomMainQuestOverride({
+        title: 'x',
+        steps: [
+          { id: 'a', action: 'kill', bossId: 'a' },
+          { id: 'b', action: 'kill', bossId: 'b' },
+          { id: 'c', action: 'return_to', locationId: 'home' },
+        ],
+      } as never);
+      try {
+        const at = (step: number) => {
+          store.setState((s) => (s.player ? { player: { ...s.player, customQuestStep: step } as never } : s));
+          return isMainQuestNearEnd(store.getState().player);
+        };
+        expect(at(0)).toBe(false); // two bosses ahead → vendor net
+        expect(at(1)).toBe(true);  // one boss left → rubble window OPEN
+        expect(at(2)).toBe(true);  // bosses done → still open
+      } finally {
+        clearAllOverrides();
+      }
     });
   });
 
