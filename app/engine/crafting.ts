@@ -200,6 +200,10 @@ const rExploration = (): readonly CatalogExploration[] => resolveTable('explorat
 const rAmulets = (): readonly CatalogAccessory[] => resolveTable('amulets', AMULETS);
 const rRings = (): readonly CatalogAccessory[] => resolveTable('rings', RINGS);
 const rRecipes = (): readonly Recipe[] => resolveTable('recipes', RECIPES);
+/** The LIVE recipe book — the author's uploaded recipes if loaded, else the built-in.
+ *  UI (RecipesView) must use this, NOT the static RECIPES, or it shows the built-in
+ *  set and ignores the author's upload. */
+export function getRecipes(): readonly Recipe[] { return rRecipes(); }
 
 const DEFAULT_DURABILITY = 25;
 
