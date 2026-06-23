@@ -15506,4 +15506,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // raceMechanics.ts — a separate Bucket-A item.) Confirmed trainGolemStat is wired
 // (power on attack @25728, resilience on surviving a hit @25899) and added a test
 // proving power/resilience level up through use (+ HP bump, failures don't train).
-export const OTA_BUILD_ID = '2026-06-22-800';
+// engine_Dev-801 — sidekick-summon race AFFINITY is now data-driven. The
+// aethercraft DC/INT race modifier was hardcoded ("mud_dweller 0 / aetherborn +2
+// / else +3"), so in a reskin every race landed in the +3 "untrained" bucket.
+// Race rows gain optional aethercraftDcMod (added to every summon/shape/mend DC)
+// + aethercraftIntBonus (added to effective INT); raceMechanics reads them via
+// getRace(). Default when unset = 0 (neutral), so a reskin race casts at base DC
+// unless the author gives it an affinity. The Tartaria reference races carry
+// their historical values in races.json (mud_dweller 0/+2INT, aetherborn +2, the
+// rest +3) so their balance is unchanged. Tests updated: unknown/undefined race
+// now +0 (was +3); new aethercraftRaceAffinity proves an uploaded race drives it.
+export const OTA_BUILD_ID = '2026-06-22-801';
