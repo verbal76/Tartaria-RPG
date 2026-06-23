@@ -9,10 +9,17 @@ import {
   CONTENT_TABLES,
   LORE_BLOCKS,
   resolveTable,
+  getStartingAreas,
   type ContentTableId,
   type LoreBlockId,
 } from './contentPack';
 import { getInteractionTags } from './interactionTags';
+// engine_Dev — LIVE built-in fallbacks for the interaction-tag noun collector (the
+// real game content the player meets, not the generic template). resolveTable layers
+// the author's upload on top.
+import locationsData from '../data/locations/locations.json';
+import staticHubData from '../data/world/static_hub.json';
+import worldLadderData from '../data/world/worldLadder.json';
 import { buildFlavorTemplate } from './narrativeGenerator';
 import { POWERS_TEMPLATE } from './powers';
 import { TRACKABLE_VARS } from './customTitles';
@@ -389,13 +396,35 @@ export function interactionTagsKeywordSample(): string {
  *  current best guess (from the keyword matcher); the author edits the arrays.
  *  Pass `current` (a prior per-noun map) to PRESERVE the author's edits while
  *  pulling in any newly-added nouns — that's the "refresh" path. */
-export function buildInteractionTagsTemplate(current?: Record<string, string[]>): string {
-  const locs = resolveTable('locations', TABLE_ROWS.locations as unknown[]) as Array<{ interactables?: unknown }>;
+/** engine_Dev — every interactable noun in the LOADED game, unioned across all the
+ *  content that carries them: locations (your upload or the built-in), starting-area
+ *  rooms, the built-in hub rooms, and the world-ladder (macro → micro → micro-micro).
+ *  This is the list the INTERACTION TAGS box tags — pulled from real content, not the
+ *  generic template. */
+export function collectInteractableNouns(): string[] {
   const nouns = new Set<string>();
-  for (const l of locs) {
-    const list = (l as { interactables?: unknown }).interactables;
+  const add = (list: unknown): void => {
     if (Array.isArray(list)) for (const n of list) if (typeof n === 'string' && n.trim()) nouns.add(n.trim());
+  };
+  // 1) Locations — your uploaded Locations table, else the built-in locations.
+  for (const l of resolveTable('locations', locationsData as unknown[]) as Array<{ interactables?: unknown }>) add(l.interactables);
+  // 2) Starting areas — each room's interactables (your uploaded per-faction bases).
+  for (const a of getStartingAreas()) for (const r of (a.rooms ?? [])) add((r as { interactables?: unknown }).interactables);
+  // 3) Built-in hub rooms (the default base interior, when no starting area replaces it).
+  for (const r of ((staticHubData as { rooms?: Array<{ interactables?: unknown }> }).rooms ?? [])) add(r.interactables);
+  // 4) World ladder — structures within a location (macro → micro → micro-micro).
+  for (const macro of ((worldLadderData as { macroLocations?: unknown[] }).macroLocations ?? []) as Array<{ interactables?: unknown; microLocations?: Array<{ interactables?: unknown; microMicroLocations?: Array<{ interactables?: unknown }> }> }>) {
+    add(macro.interactables);
+    for (const micro of (macro.microLocations ?? [])) {
+      add(micro.interactables);
+      for (const mm of (micro.microMicroLocations ?? [])) add(mm.interactables);
+    }
   }
+  return [...nouns].sort((a, b) => a.localeCompare(b));
+}
+
+export function buildInteractionTagsTemplate(current?: Record<string, string[]>): string {
+  const nouns = new Set(collectInteractableNouns());
   const out: Record<string, string[]> = {};
   for (const noun of [...nouns].sort((a, b) => a.localeCompare(b))) {
     // Preserve the author's prior tags for this noun; else the engine's guess.
