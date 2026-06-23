@@ -15488,4 +15488,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // summon narration were scrubbed (gameStore 153→150). The WEAPON tag
 // (golem_weapon / isGolemWeapon) and SKILL-advancement (power/resilience
 // statProgress) systems are unchanged. Leak baseline tightened.
-export const OTA_BUILD_ID = '2026-06-22-798';
+// engine_Dev-799 — sidekick ARMAMENTS moved to the Magic tab in crafting. The
+// golem_weapon recipes (Golem Sledge/Greatsword/Pike/Lance) used to list on the
+// general CRAFT tab; they now sit under the Magic tab next to the summon
+// disciplines, which is where you arm a sidekick. RecipesView gains a
+// 'sidekick-weapon' kindFilter (result tagged golem_weapon) + an 'embedded' mode
+// (no inner ScrollView) so it nests inside the Magic-tab scroll; the CRAFT tab's
+// 'non-consumable' filter now EXCLUDES sidekick armaments so they show in exactly
+// one place. No separate JSON: a sidekick weapon is just a weapon tagged
+// golem_weapon + its recipe in the recipes table (fully author-overridable).
+export const OTA_BUILD_ID = '2026-06-22-799';
