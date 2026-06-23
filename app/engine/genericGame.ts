@@ -162,4 +162,14 @@ export const GENERIC_GAME = {
       { name: 'Worked Crystal', rarity: 'Rare', baseWeight: 1 },
     ],
   },
+  scrap: {
+    roles: { metalBulk: 'Scrap Metal', metalPremium: 'Worked Crystal', essencePrimary: 'Raw Crystal', essenceSecondary: 'Common Residue', essenceBonus: 'Common Residue', stone: 'Small Rock', mud: 'Common Residue', cloth: 'Tough Fiber', organic: 'Tough Fiber', wood: 'Stick' },
+    rawGuard: ['Scrap Metal', 'Stick', 'Small Rock', 'Tough Fiber', 'Raw Crystal', 'Worked Crystal', 'Common Residue'],
+    premiumMats: ['Worked Crystal', 'Raw Crystal'],
+    failureLines: [
+      'You work the {item} apart, but the pieces crumble in your hands. Nothing salvageable.',
+      'The {item} comes apart — but the bits are warped past use.',
+      'Too far gone. You open the {item} and find only rot inside.',
+    ],
+  },
 };

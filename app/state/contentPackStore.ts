@@ -31,6 +31,7 @@ import {
   setFusionTagsOverride,
   setCoatingsOverride,
   setDiggingOverride,
+  setScrapOverride,
   setInventoryOverride,
   setCrucibleNameOverride,
   setCrucibleEnabled,
@@ -127,6 +128,7 @@ interface PersistShape {
   /** Coating renames keyed by mechanic (replaces built-in names). */
   coatings?: Record<string, unknown> | null;
   digging?: Record<string, unknown> | null;
+  scrap?: Record<string, unknown> | null;
   /** Inventory presentation: category label renames + extra tool tags. */
   inventory?: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null;
   published?: boolean;
@@ -183,6 +185,7 @@ interface ContentPackState {
   /** Coating renames keyed by mechanic, or null = built-in. */
   coatings: Record<string, unknown> | null;
   digging: Record<string, unknown> | null;
+  scrap: Record<string, unknown> | null;
   /** Inventory category-label renames + extra tool tags, or null = built-in. */
   inventory: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null;
   /** When true the title DEV pill is hidden (clean family build). The "Verbal"
@@ -283,6 +286,8 @@ interface ContentPackState {
   clearCoatings: () => void;
   loadDiggingJson: (json: string) => LoadResult;
   clearDigging: () => void;
+  loadScrapJson: (json: string) => LoadResult;
+  clearScrap: () => void;
   /** Load inventory presentation: { labels?: { categoryId: name }, toolTags?: [..] }. */
   loadInventoryJson: (json: string) => LoadResult;
   clearInventory: () => void;
@@ -314,7 +319,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -335,6 +340,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     fusionTags: state.fusionTags.length > 0 ? state.fusionTags : undefined,
     coatings: state.coatings && Object.keys(state.coatings).length > 0 ? state.coatings : undefined,
     digging: state.digging && Object.keys(state.digging).length > 0 ? state.digging : undefined,
+    scrap: state.scrap && Object.keys(state.scrap).length > 0 ? state.scrap : undefined,
     inventory: state.inventory ?? undefined,
     published: state.published,
     narratorName: state.narratorName || undefined,
@@ -369,6 +375,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   fusionTags: [],
   coatings: null,
   digging: null,
+  scrap: null,
   inventory: null,
   published: false,
   narratorName: '',
@@ -410,6 +417,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setFusionTagsOverride(s.fusionTags.length > 0 ? s.fusionTags : null);
     setCoatingsOverride(s.coatings && Object.keys(s.coatings).length > 0 ? (s.coatings as Parameters<typeof setCoatingsOverride>[0]) : null);
     setDiggingOverride(s.digging && Object.keys(s.digging).length > 0 ? s.digging : null);
+    setScrapOverride(s.scrap && Object.keys(s.scrap).length > 0 ? s.scrap : null);
     setInventoryOverride(s.inventory ?? null);
     invalidateLocationCaches();
     setNarratorNameOverride(s.narratorName || null);
@@ -979,6 +987,22 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     set({ digging: null, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), digging: null });
   },
+  loadScrapJson(json) {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(json)); } catch (e) { return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }; }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return { ok: false, error: 'Scrap must be a JSON OBJECT: { roles, rawGuard, premiumMats, failureLines }.' };
+    const obj = parsed as Record<string, unknown>;
+    if (!obj.roles || typeof obj.roles !== 'object') return { ok: false, error: 'Scrap needs a roles{} object (role → material name).' };
+    setScrapOverride(obj);
+    set({ scrap: obj, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), scrap: obj });
+    return { ok: true, count: Object.keys(obj.roles as object).length };
+  },
+  clearScrap() {
+    setScrapOverride(null);
+    set({ scrap: null, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), scrap: null });
+  },
 
   loadInventoryJson(json) {
     let parsed: unknown;
@@ -1035,6 +1059,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextFusionTags: string[] = get().fusionTags;
     let nextCoatings: Record<string, unknown> | null = get().coatings;
     let nextDigging: Record<string, unknown> | null = get().digging;
+    let nextScrap: Record<string, unknown> | null = get().scrap;
     let nextInventory: { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number } | null = get().inventory;
     let nextNarrator = get().narratorName;
     let nextTitle = get().gameTitle;
@@ -1127,6 +1152,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'digging') {
         if (value && typeof value === 'object' && !Array.isArray(value) && Array.isArray((value as { loot?: unknown }).loot)) { nextDigging = value as Record<string, unknown>; applied.push('digging'); }
         else skipped.push('digging (needs an object with loot[])');
+      } else if (key === 'scrap') {
+        if (value && typeof value === 'object' && !Array.isArray(value) && (value as { roles?: unknown }).roles) { nextScrap = value as Record<string, unknown>; applied.push('scrap'); }
+        else skipped.push('scrap (needs an object with roles{})');
       } else if (key === 'inventory') {
         if (value && typeof value === 'object' && !Array.isArray(value)) { nextInventory = value as { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }; applied.push('inventory'); }
         else skipped.push('inventory (not an object)');
@@ -1193,6 +1221,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setFusionTagsOverride(nextFusionTags.length > 0 ? nextFusionTags : null);
     setCoatingsOverride(nextCoatings && Object.keys(nextCoatings).length > 0 ? (nextCoatings as Parameters<typeof setCoatingsOverride>[0]) : null);
     setDiggingOverride(nextDigging && Object.keys(nextDigging).length > 0 ? nextDigging : null);
+    setScrapOverride(nextScrap && Object.keys(nextScrap).length > 0 ? nextScrap : null);
     setInventoryOverride(nextInventory ?? null);
     setNarratorNameOverride(nextNarrator || null);
     setGameTitleOverride(nextTitle || null);
@@ -1221,6 +1250,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       fusionTags: nextFusionTags,
       coatings: nextCoatings,
       digging: nextDigging,
+      scrap: nextScrap,
       inventory: nextInventory,
       narratorName: nextNarrator,
       gameTitle: nextTitle,
@@ -1231,7 +1261,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       corruptionName: nextCorruptionName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -1281,6 +1311,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.fusionTags.length > 0) out.fusionTags = s.fusionTags;
     if (s.coatings && Object.keys(s.coatings).length > 0) out.coatings = s.coatings;
     if (s.digging && Object.keys(s.digging).length > 0) out.digging = s.digging;
+    if (s.scrap && Object.keys(s.scrap).length > 0) out.scrap = s.scrap;
     if (s.inventory && ((s.inventory.labels && Object.keys(s.inventory.labels).length > 0) || (s.inventory.toolTags && s.inventory.toolTags.length > 0) || typeof s.inventory.repairMaterialPct === 'number')) out.inventory = s.inventory;
     return JSON.stringify(out, null, 2);
   },
@@ -1350,7 +1381,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1404,6 +1435,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setCoatingsOverride(coatings && Object.keys(coatings).length > 0 ? (coatings as Parameters<typeof setCoatingsOverride>[0]) : null);
         const digging = shape.digging && typeof shape.digging === 'object' ? (shape.digging as Record<string, unknown>) : null;
         setDiggingOverride(digging && Object.keys(digging).length > 0 ? digging : null);
+        const scrap = shape.scrap && typeof shape.scrap === 'object' ? (shape.scrap as Record<string, unknown>) : null;
+        setScrapOverride(scrap && Object.keys(scrap).length > 0 ? scrap : null);
         const inventory = shape.inventory && typeof shape.inventory === 'object' && !Array.isArray(shape.inventory) ? (shape.inventory as { labels?: Record<string, string>; toolTags?: string[]; repairMaterialPct?: number }) : null;
         setInventoryOverride(inventory);
         const published = shape.published === true;
@@ -1425,7 +1458,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
