@@ -631,6 +631,15 @@ let dogEnabled = true;
 export function setDogEnabled(on: boolean): void { dogEnabled = on !== false; }
 export function isDogEnabled(): boolean { return dogEnabled; }
 
+// engine_Dev — global gate: the player must be at least this % (0..100) through the
+// data-driven main mission before SIDEKICK WEAPONS (golem_weapon recipes) can be
+// crafted. 0 = no gate. Authored in the Sidekicks box; read by the craft handler.
+let sidekickWeaponQuestPct = 0;
+export function setSidekickWeaponQuestPct(pct: number): void {
+  sidekickWeaponQuestPct = Number.isFinite(pct) ? Math.max(0, Math.min(100, Math.round(pct))) : 0;
+}
+export function getSidekickWeaponQuestPct(): number { return sidekickWeaponQuestPct; }
+
 // --- damage types (EXTRA, author-added) ----------------------------------------
 // engine_Dev — the engine ships 10 built-in damage types (bludgeoning, slashing,
 // piercing, burn, electrical, poison, radiation, stun, degradation, aetheric). An
@@ -1038,6 +1047,7 @@ export function clearAllOverrides(): void {
   collectablesOverride = null;
   summonsOverride = null;
   dogEnabled = true;
+  sidekickWeaponQuestPct = 0;
   damageTypesOverride = null;
   damageResistancesOverride = null;
   fusionTagsOverride = null;

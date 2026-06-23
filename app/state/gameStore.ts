@@ -12907,9 +12907,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
-        // engine_Dev — the Core-4 forge gate was removed with the built-in
-        // (Tartaria) main quest. These recipes are now gated only by their normal
-        // ingredient / skill requirements, so they're reachable in any game.
+        // engine_Dev — SIDEKICK-WEAPON gate. The Core-4 forge gate (a Tartaria
+        // main-quest core count) was deleted with the built-in quest; in its place,
+        // a SINGLE author-set threshold gates ALL sidekick weapons (golem_weapon
+        // recipes) on the player's progress through the data-driven main mission.
+        // 0 (the default) = no gate. Set in the Sidekicks authoring box.
+        {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const cp = require('../engine/contentPack') as typeof import('../engine/contentPack');
+          const gatePct = cp.getSidekickWeaponQuestPct();
+          if (gatePct > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { isGolemWeapon, getSummonNoun } = require('../engine/golems') as typeof import('../engine/golems');
+            const resultTags = findWeaponByName(recipe.result)?.tags;
+            if (isGolemWeapon(resultTags)) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+              const progress = cmqe.mainQuestProgressPercent(player);
+              if (progress < gatePct) {
+                get().appendLog(
+                  'arbiter',
+                  `The ${getNarratorName()} sets a hand on the schematic. "${recipe.result} is bound to your ${getSummonNoun()} — that craft stays sealed until you're at least ${gatePct}% through the main story. You're at ${progress}%. Press on, then come back."`,
+                );
+                break;
+              }
+            }
+          }
+        }
         // OTA-193 — check shortfall AFTER tag-substitution. Misc items
         // with the right material tag (a synthesized "Brass Sextant"
         // carrying ['metal'], say) count toward "Scrap Metal" cost so

@@ -55,6 +55,17 @@ export function questIsComplete(p: PlayerCharacter): boolean {
   return !!q && effectiveStepIndex(p) >= q.steps.length;
 }
 
+/** engine_Dev — the player's progress through the data-driven main mission as a
+ *  whole-number percent (0..100): effective step index / total steps. Returns 100
+ *  when no quest is loaded (so a % gate keyed to "no main quest" never blocks a
+ *  game that ships without one), and 100 when complete. */
+export function mainQuestProgressPercent(p: PlayerCharacter): number {
+  const q = liveMainQuest();
+  if (!q || q.steps.length === 0) return 100;
+  const idx = Math.max(0, Math.min(effectiveStepIndex(p), q.steps.length));
+  return Math.floor((idx / q.steps.length) * 100);
+}
+
 /** Count of remaining BOSS ("kill") steps for this player — from the effective
  *  current step to the end, skipping faction-gated steps. null when no custom
  *  main quest is loaded. Used to open the rubble-puppy window at "one boss left"

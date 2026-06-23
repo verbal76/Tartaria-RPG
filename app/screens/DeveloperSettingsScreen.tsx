@@ -2101,10 +2101,20 @@ function SummonsBox() {
   const summons = useContentPackStore((s) => s.summons) as { noun?: string; defs: unknown[] } | null;
   const dogEnabled = useContentPackStore((s) => s.dogEnabled);
   const setDogCompanionEnabled = useContentPackStore((s) => s.setDogCompanionEnabled);
+  const sidekickWeaponQuestPct = useContentPackStore((s) => s.sidekickWeaponQuestPct);
+  const setSidekickWeaponQuestPct = useContentPackStore((s) => s.setSidekickWeaponQuestPct);
   const loaded = summons?.defs?.length ?? 0;
   const noun = summons?.noun?.trim() || 'golem';
   const [text, setText] = useState('');
+  const [pctText, setPctText] = useState(String(sidekickWeaponQuestPct || ''));
   const [status, setStatus] = useState<Status>(null);
+  const commitPct = () => {
+    const n = parseInt(pctText, 10);
+    const clamped = Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+    setSidekickWeaponQuestPct(clamped);
+    setPctText(clamped ? String(clamped) : '');
+    setStatus({ kind: 'ok', msg: clamped > 0 ? `Sidekick weapons gated to ${clamped}% main-mission progress.` : 'Sidekick-weapon gate cleared (craftable any time).' });
+  };
   const current = () => loaded > 0 ? JSON.stringify(summons, null, 2) : buildSummonsTemplate();
   return (
     <View style={styles.card}>
@@ -2133,6 +2143,30 @@ function SummonsBox() {
           onPress={() => { setDogCompanionEnabled(!dogEnabled); setStatus({ kind: 'ok', msg: !dogEnabled ? 'Dog companion ON.' : 'Dog companion OFF — no rescue scenarios will fire.' }); }}
         >
           <Text style={dogEnabled ? styles.loadBtnText : styles.tmplBtnText}>{dogEnabled ? '☑ DOG ON' : '☐ DOG OFF'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* SIDEKICK-WEAPON GATE — a single global threshold: the player must be at
+          least this % through the main mission before any sidekick weapon (the
+          golem_weapon recipes on the Magic tab) can be crafted. 0/blank = no gate. */}
+      <View style={[styles.row, { alignItems: 'center', marginBottom: 6 }]}>
+        <Text style={[styles.hint, { flex: 1, marginBottom: 0 }]}>
+          <Text style={{ fontWeight: 'bold' }}>Sidekick-weapon gate</Text> — % of the main mission the
+          player must reach before sidekick weapons can be crafted. Blank or 0 = craftable any time.
+        </Text>
+        <TextInput
+          style={[styles.input, { width: 64, marginBottom: 0, textAlign: 'center' }]}
+          value={pctText}
+          onChangeText={(t) => setPctText(t.replace(/[^0-9]/g, '').slice(0, 3))}
+          onBlur={commitPct}
+          onSubmitEditing={commitPct}
+          placeholder="0"
+          placeholderTextColor="#5c5446"
+          keyboardType="number-pad"
+          maxLength={3}
+        />
+        <TouchableOpacity style={styles.loadBtn} onPress={commitPct}>
+          <Text style={styles.loadBtnText}>SET %</Text>
         </TouchableOpacity>
       </View>
 

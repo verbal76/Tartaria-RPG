@@ -15606,4 +15606,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // MAIN QUEST chip, shown only while STANDING at the boss's location with no copy
 // already in the scene. The summoned boss is an ordinary enemy, so FLEE (a DEX
 // check; a failed flee provokes the group counter-attack) already works on it.
-export const OTA_BUILD_ID = '2026-06-23-810';
+//
+// engine_Dev-811 — SIDEKICK-WEAPON gate. Replaces the deleted Core-4 (Tartaria
+// core-count) forge gate with a single author-set threshold: the player must be at
+// least N% through the data-driven main mission before any sidekick weapon
+// (golem_weapon recipes) can be crafted. New contentPackStore.sidekickWeaponQuestPct
+// (0 = no gate, default), set via a box in the Sidekicks authoring panel, persisted
+// + carried in the whole-game bundle. New customMainQuestEngine.mainQuestProgressPercent()
+// (effective step / total; 100 when no quest loaded, so a quest-less game is never
+// blocked). The craft handler refuses a golem_weapon recipe with an Arbiter line
+// until the threshold is met.
+export const OTA_BUILD_ID = '2026-06-23-811';
