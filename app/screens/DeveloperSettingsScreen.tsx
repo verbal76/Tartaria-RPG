@@ -923,16 +923,17 @@ function InteractionTagsBox() {
         <Text style={{ fontWeight: 'bold' }}>breakable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>searchable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>salvageable</Text>. Tap{' '}
-        <Text style={{ fontWeight: 'bold' }}>↻ FROM LOCATIONS</Text> to pull every interactable from
-        your loaded Locations into a list, each pre-filled with a best-guess tag — edit the arrays
-        (e.g. add "climbable" to "rusted t-34 tank"), then LOAD. Hit ↻ again after changing your
-        locations to pull in new items (your existing tags are kept).
+        <Text style={{ fontWeight: 'bold' }}>↻ FROM WORLD</Text> to pull every interactable from ALL
+        your loaded content — Locations, Starting-area rooms, the hub, and the world-ladder — into
+        one list, each pre-filled with a best-guess tag. Edit the arrays (e.g. add "climbable" to
+        "rusted t-34 tank"), then LOAD. Hit ↻ again after changing your content to pull in new items
+        (your existing tags are kept).
       </Text>
       <TextInput
         style={styles.input}
         value={text}
         onChangeText={setText}
-        placeholder="Tap ↻ FROM LOCATIONS to build the taggable list…"
+        placeholder="Tap ↻ FROM WORLD to build the taggable list…"
         placeholderTextColor="#5c5446"
         multiline
         autoCapitalize="none"
@@ -963,7 +964,7 @@ function InteractionTagsBox() {
             setStatus({ kind: 'ok', msg: `Pulled ${count} interactables from your locations — edit the tags, then LOAD.` });
           }}
         >
-          <Text style={styles.tmplBtnText}>↻ FROM LOCATIONS</Text>
+          <Text style={styles.tmplBtnText}>↻ FROM WORLD</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyBtn}
