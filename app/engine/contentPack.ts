@@ -271,6 +271,13 @@ export interface EnergyConfig {
 const DEFAULT_ENERGY: EnergyConfig = {
   name: 'Aether', adjective: 'Aetheric', material: 'Aetherstone', slang: [], factionTerms: {},
 };
+// engine_Dev — for a RE-SKINNED game (world renamed / tables replaced) that never set an
+// energy name, fall back to NEUTRAL words instead of the built-in "Aether" family, so
+// {energy}/{energy_adj}/{energy_material} tokens don't leak Tartaria. The author should
+// still set the Energy/magic name; this just stops the bleed when they don't.
+const NEUTRAL_ENERGY: EnergyConfig = {
+  name: 'energy', adjective: 'charged', material: 'essence', slang: [], factionTerms: {},
+};
 // engine_Dev — quick "Energy / magic name" rename, settable as a first-class dev field
 // (like world/corruption), without writing the whole World-lore energy block. Wins over
 // the World-lore energy.name when set.
@@ -289,13 +296,15 @@ export function hasEnergyOverride(): boolean {
 export function getEnergy(): EnergyConfig {
   const w = loreOverrides.world as { energy?: Partial<EnergyConfig> } | undefined;
   const e = w?.energy;
-  if ((!e || typeof e !== 'object') && energyNameOverride == null) return DEFAULT_ENERGY;
+  // Re-skinned game with no energy named → neutral words, not the built-in "Aether".
+  const base = isReskinActive() ? NEUTRAL_ENERGY : DEFAULT_ENERGY;
+  if ((!e || typeof e !== 'object') && energyNameOverride == null) return base;
   const ee = (e && typeof e === 'object' ? e : {}) as Partial<EnergyConfig>;
   const str = (v: unknown, d: string): string => (typeof v === 'string' && v.trim() ? v.trim() : d);
   return {
-    name: energyNameOverride ?? str(ee.name, DEFAULT_ENERGY.name),
-    adjective: str(ee.adjective, DEFAULT_ENERGY.adjective),
-    material: str(ee.material, DEFAULT_ENERGY.material),
+    name: energyNameOverride ?? str(ee.name, base.name),
+    adjective: str(ee.adjective, base.adjective),
+    material: str(ee.material, base.material),
     verb: typeof ee.verb === 'string' ? ee.verb.trim() : undefined,
     caster: typeof ee.caster === 'string' ? ee.caster.trim() : undefined,
     slang: Array.isArray(ee.slang) ? ee.slang.filter((s): s is string => typeof s === 'string' && s.trim().length > 0) : [],
