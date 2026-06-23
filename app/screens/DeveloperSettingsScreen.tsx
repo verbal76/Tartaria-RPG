@@ -1293,6 +1293,27 @@ function FactionMissionsBox() {
   const [stages, setStages] = useState<Array<{ narration: string; advanceOn: string }>>([]);
   const [stageText, setStageText] = useState('');
   const [stageAdvance, setStageAdvance] = useState('any');
+  const [text, setText] = useState('');
+
+  // A generic faction-quest example for the TEMPLATE button (one staged + one fetch).
+  const tmpl = () => JSON.stringify({ factionQuests: [
+    { id: 'silence_the_relay', factionId: 'REPLACE-with-a-faction-id', title: 'Silence the Relay', description: 'Knock out the forward relay before the next drop.', objective: 'Destroy the enemy relay', requirement: { rep: 15 }, reward: { tc: 120, rep: 8, items: ['Field Radio'] }, stages: [{ narration: 'Cross the line and find the relay mast.', advanceOn: 'travel' }, { narration: 'Put the relay down and its guards with it.', advanceOn: 'kill' }] },
+    { id: 'forge_stock', factionId: 'REPLACE-with-a-faction-id', title: 'Forge Stock', description: 'The board’s standing bounty: bring in 3 Scrap Metal.', objective: 'Gather 3 Scrap Metal and turn it in.', requirement: { rep: 0 }, reward: { tc: 35, rep: 6 }, fetch: { itemName: 'Scrap Metal', quantity: 3 } },
+  ] }, null, 2);
+
+  // LOAD raw JSON — accepts a bare factionQuests array OR { factionQuests: [...] };
+  // merges by id into the current set (preserving the other mission sub-tables).
+  const loadRaw = () => {
+    let parsed: unknown;
+    try { parsed = JSON.parse(text); } catch (e) { setStatus({ kind: 'err', msg: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }); return; }
+    const arr = Array.isArray(parsed) ? parsed : (parsed && typeof parsed === 'object' ? (parsed as { factionQuests?: unknown }).factionQuests : null);
+    if (!Array.isArray(arr) || arr.length === 0) { setStatus({ kind: 'err', msg: 'Expected a factionQuests array (or { "factionQuests": [...] }).' }); return; }
+    const ids = new Set(arr.map((q) => (q as { id?: string }).id));
+    const merged = [...existing.filter((q) => !ids.has(q.id)), ...(arr as Array<{ id: string; factionId: string; title: string }>)];
+    const r = loadMissionsJson(JSON.stringify({ ...missions, factionQuests: merged }));
+    setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${arr.length} faction mission(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+    if (r.ok) setText('');
+  };
 
   const slug = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 
@@ -1411,8 +1432,15 @@ function FactionMissionsBox() {
 
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={save}><Text style={styles.loadBtnText}>+ SAVE MISSION</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(JSON.stringify({ factionQuests: existing }, null, 2)); setStatus({ kind: 'ok', msg: 'Copied current faction missions JSON.' }); }}>
-          <Text style={styles.copyBtnText}>COPY JSON</Text>
+      </View>
+
+      <Text style={styles.hint}>Or edit raw JSON (template / paste / load):</Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a factionQuests array (or { factionQuests: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={loadRaw}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(tmpl()); setStatus({ kind: 'ok', msg: 'Loaded an example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (existing.length > 0 ? JSON.stringify({ factionQuests: existing }, null, 2) : tmpl())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
         </TouchableOpacity>
       </View>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
