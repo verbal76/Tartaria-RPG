@@ -318,23 +318,23 @@ export function raceResistLabel(raceId: string | undefined, mult: number): strin
   return ` (${name} absorbs ${pct}%)`;
 }
 
-// ─── Aethercraft DC modifier ────────────────────────────────────────
-// engine_Dev — data-driven race AFFINITY for summon/shape/mend. Each race row
-// carries an optional aethercraftDcMod (added to every discipline DC; + = harder)
-// and aethercraftIntBonus (added to effective INT). A race that sets neither casts
-// at the base DC with no INT bonus — the neutral default for a reskin. The
-// Tartaria reference races carry their historical values in races.json
-// (mud_dweller 0 / +2 INT, aetherborn +2, the rest +3), so their balance is
-// unchanged; the rule is just no longer hardcoded to those ids.
-export function aethercraftDcModifier(raceId: string | undefined): number {
-  const m = getRace(raceId)?.aethercraftDcMod;
+// ─── Power-discipline DC modifier ───────────────────────────────────
+// engine_Dev — data-driven race AFFINITY for the POWERS (the "magic" disciplines:
+// summon/shape/mend). Each race row carries an optional powerDcMod (added to every
+// power-check DC; + = harder) and powerIntBonus (added to effective INT). A race
+// that sets neither casts at the base DC with no INT bonus — the neutral default
+// for a reskin. The Tartaria reference races carry their historical values in
+// races.json (mud_dweller 0 / +2 INT, aetherborn +2, the rest +3), so their
+// balance is unchanged; the rule is just no longer hardcoded to those ids.
+export function powerDcModifier(raceId: string | undefined): number {
+  const m = getRace(raceId)?.powerDcMod;
   return typeof m === 'number' ? m : 0;
 }
 
-// ─── Aethercraft context bonus ──────────────────────────────────────
-// The race's aethercraftIntBonus is added to effective INT before the skill
-// check (Tartaria's Mud Dwellers carry +2). Verb handlers apply it.
-export function aethercraftStatBonus(raceId: string | undefined): Partial<Stats> {
-  const b = getRace(raceId)?.aethercraftIntBonus;
+// ─── Power-discipline INT bonus ─────────────────────────────────────
+// The race's powerIntBonus is added to effective INT before the power skill check
+// (Tartaria's Mud Dwellers carry +2). Verb handlers apply it.
+export function powerStatBonus(raceId: string | undefined): Partial<Stats> {
+  const b = getRace(raceId)?.powerIntBonus;
   return typeof b === 'number' && b !== 0 ? { intelligence: b } : {};
 }

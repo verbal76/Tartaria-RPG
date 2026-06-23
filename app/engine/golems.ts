@@ -44,7 +44,7 @@ export interface GolemDefinition {
    *  binding), Iron 15 (baseline — matches old default), Aether 17
    *  (volatile mix, the binding fights you), Crystal 19 (lattice-
    *  structured, the hardest to seat). Per-race modifiers
-   *  (raceMechanics.aethercraftDcModifier) still apply on top. */
+   *  (raceMechanics.powerDcModifier) still apply on top. */
   summonDC?: number;
   /** arb170 — innate % damage resistance (0..1) baked in at summon, scaled to how
    *  hard the kind is to build. `resistBase` is the floor a fresh golem ships with;
