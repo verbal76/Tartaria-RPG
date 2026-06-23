@@ -887,7 +887,7 @@ export type StatusEffectKind =
   // OTA 039 — Aethercraft shape outcome. shaped_stone_ward grants a
   // one-round +4 AC. The companion-style 'golem_companion' kind was
   // retired 2026-05-25 (MECHANIC-1b OTA-011) — replaced by
-  // player.golem + handleGolemCommand. Removed from the union now
+  // player.golem + handleSidekickCommand. Removed from the union now
   // that the unreachable handler block was deleted.
   | 'shaped_stone_ward'
   // 2026-05-24 — stamina-driven combat statuses. tired and exhausted
@@ -1352,15 +1352,15 @@ export interface PendingDogOnboarding {
 // engine_Dev — widened so an uploaded "summons" pack can define its OWN sidekick
 // ids (e.g. 'phase_automaton'). The four built-in literals stay for autocomplete;
 // `(string & {})` lets any custom id flow through every kind-keyed lookup without
-// touching the call sites. resolveGolemDefs()/getGolemDefinition() resolve a kind
+// touching the call sites. resolveSidekickDefs()/getSidekickDefinition() resolve a kind
 // against the active (uploaded or built-in) definition set.
-export type GolemKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem' | (string & {});
+export type SidekickKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem' | (string & {});
 /** OTA-467 — trainable golem stats, mirroring the dog's progression. POWER
  *  boosts the golem's to-hit (full) and damage (half); RESILIENCE reduces the
  *  damage it takes from retaliation. */
-export type GolemStatKey = 'power' | 'resilience';
+export type SidekickStatKey = 'power' | 'resilience';
 export interface Companion {
-  kind: GolemKind;
+  kind: SidekickKind;
   /** Display label. "Mud Golem" / "Iron Golem" / etc. (or a player-given name). */
   name: string;
   hp: number;

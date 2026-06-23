@@ -1699,7 +1699,7 @@
 // uses a single hard-coded dcBase = 15 (INT) for all four
 // golems. Crystal/Aether (lore-wise stronger anchors) cost
 // the same INT roll as Mud. Adding per-golem `summonDC` to
-// GolemDefinition is a design call — flagged as an open
+// SidekickDefinition is a design call — flagged as an open
 // follow-up in HANDOFF.md 0.A.
 //
 // Also lands: __tests__/statGrowthBalanceSim.test.ts — 5000-
@@ -2703,13 +2703,13 @@
 // Aether 17 / Crystal 19 to reflect that Crystal +
 // Aether are lore-stronger anchors than Mud + Iron.
 // Shipped:
-//   - GolemDefinition gains optional summonDC field
+//   - SidekickDefinition gains optional summonDC field
 //     in app/engine/golems.ts.
 //   - All 4 golem records get summonDC values:
 //     mud_golem 13, iron_golem 15, aether_golem 17,
 //     crystal_golem 19.
 //   - runAethercraft in gameStore.ts reads
-//     getGolemDefinition(golemKindHint).summonDC ??
+//     getSidekickDefinition(golemKindHint).summonDC ??
 //     15 when discipline === 'summon'. Falls back
 //     to historical flat 15 / 12 (mend) when
 //     summonDC is unset or discipline is shape /
@@ -13795,7 +13795,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-466 (Promethium Decay) — [feature] GOLEM repair + naming, mirroring the dog. (1) A golem that
 // survives combat holds its HP (OTA-433); now you mend it by feeding it the PARTS IT'S MADE OF — its own
 // summon fuel set (Iron Golem ← Scrap Metal / Golem Core; Mud ← Aether Mud / Mudstone / Aether Crystal).
-// New golems.ts helpers golemRepairParts / isGolemRepairPart / golemRepairHeal (heal = round(hpMax/4):
+// New golems.ts helpers sidekickRepairParts / isSidekickRepairPart / sidekickRepairHeal (heal = round(hpMax/4):
 // Mud 4, Iron/Aether 6, Crystal 8 — a few parts for a full repair). `feed/repair/mend golem <item>` (or
 // `feed <golem name> <item>`) routes through applyItemToGolem; only constituent parts work (others refused
 // with a hint listing what it eats), each consumes one part + restores HP capped at hpMax. The inventory
@@ -13809,7 +13809,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // trainable stats on Companion (optional, backward-compat: absent → 0): POWER (adds full to the golem's
 // to-hit + half to its damage) trains on a landed strike; RESILIENCE (soaks retaliation damage, min 1
 // always lands) trains on surviving a hit. Same per-tier diminishing-returns curve + 100-progress
-// level-up threshold as the dog (golems.ts golemStatBonus / trainGolemStat mirror dogCompanion). Applied
+// level-up threshold as the dog (golems.ts sidekickStatBonus / trainSidekickStat mirror dogCompanion). Applied
 // at BOTH golem-damage sites (handleGolemCommand's strike+retaliation and the dog-present retaliation
 // split). makeCompanion seeds {power:0, resilience:0}. The Character screen gets a GOLEM panel under the
 // dog's — HP + POW/RES with the same fractional progress bars — so a veteran golem reads as stronger than
@@ -14494,7 +14494,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // substitute: an Aether Golem mends from any aether material (Aether Dust/Residue/Venom/Disc/Moss/Sludge), a Mud
 // Golem from mud loot, an Iron Golem from scrap metal. So a pack of aether loot can top one up when you're out of
 // its exact fuel — answering "I have a ton of aetheric items but can't heal my aether golem." Restricted to
-// misc/material items (no feeding it an aether WEAPON). golemSubstituteHeal = floor(fullHeal/2); the panel + the
+// misc/material items (no feeding it an aether WEAPON). sidekickSubstituteHeal = floor(fullHeal/2); the panel + the
 // wrong-item refusal both spell out the substitute path. app/engine/golems.ts, app/state/gameStore.ts,
 // app/screens/CharacterScreen.tsx. JS-only OTA.
 // OTA-554 (Unquadennium Grade) — [balance] golem substitute-repair now SCALES BY RARITY (refines OTA-553). A flat
@@ -14504,9 +14504,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // material a lot. Panel + refusal reworded ("more from higher-grade material"). app/engine/golems.ts,
 // app/state/gameStore.ts, app/screens/CharacterScreen.tsx. JS-only OTA.
 // OTA-555 (Unpentnilium Marker) — [ux] inventory now flags SUBSTITUTE repair materials for the equipped golem,
-// not just its exact fuel parts. The purple golem stripe + the one-tap "Heal <golem>" button used isGolemRepairPart
+// not just its exact fuel parts. The purple golem stripe + the one-tap "Heal <golem>" button used isSidekickRepairPart
 // (fuel parts only), so the new element-matched substitutes (OTA-553/554) were feedable by typing but had no
-// visual cue. Both now also honor isGolemSubstitutePart(equipped golem kind, item) — so every mud/metal/aether
+// visual cue. Both now also honor isSidekickSubstitutePart(equipped golem kind, item) — so every mud/metal/aether
 // material that can mend YOUR golem gets the purple hatch + Heal action, and it stays kind-specific (never lights
 // for a golem you don't have). app/screens/InventoryScreen.tsx. JS-only OTA.
 // OTA-556 (Unpentunium Spent) — [bugfix] flavor-exhausted investigate nouns stayed tappable forever. A noun that
@@ -14871,7 +14871,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // raised — Mud 16→24, Aether 24→34, Iron 24→40, Crystal 30→52. (2) Innate % DAMAGE RESIST by kind (Mud 15 / Aether 20 /
 // Iron 30 / Crystal 35%), applied to the enemy's real damage roll, min-1 always lands (never immune). (3) TRAINABLE:
 // resist climbs as the golem trains resilience (capped 35/40/50/55%), and a NEW max-HP track grows +3 per stat level-up
-// (baked into trainGolemStat) — trash/mid fights build it toward bosses. (4) Self-mend: ~25% max HP on rest + part-feeds
+// (baked into trainSidekickStat) — trash/mid fights build it toward bosses. (4) Self-mend: ~25% max HP on rest + part-feeds
 // bumped hpMax/4→hpMax/3 (eases the material drain). (5) INERT GOLEM CORE: a crumbled golem drops a core holding HALF its
 // trained levels; feed it to a new golem to graft them on (death = ~half setback + re-summon, not a wipe). Guardrail:
 // resist caps + min-1 damage keep a maxed golem mortal to bosses (preserves OTA-433). JS-only → 290.
@@ -15486,7 +15486,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // summon lines + the arm/disarm/command/feed input parsers now use the active
 // noun (with "golem" kept as a legacy alias), and 3 bonus Aether* leaks in the
 // summon narration were scrubbed (gameStore 153→150). The WEAPON tag
-// (golem_weapon / isGolemWeapon) and SKILL-advancement (power/resilience
+// (golem_weapon / isSidekickWeapon) and SKILL-advancement (power/resilience
 // statProgress) systems are unchanged. Leak baseline tightened.
 // engine_Dev-799 — sidekick ARMAMENTS moved to the Magic tab in crafting. The
 // golem_weapon recipes (Golem Sledge/Greatsword/Pike/Lance) used to list on the
@@ -15503,7 +15503,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // list from the LIVE sidekick defs (name + summonDC) and shows THIS player's race
 // modifier via aethercraftDcModifier/aethercraftStatBonus — no Tartaria kind/race
 // names. (The race-modifier MECHANIC is still keyed on Tartaria race ids in
-// raceMechanics.ts — a separate Bucket-A item.) Confirmed trainGolemStat is wired
+// raceMechanics.ts — a separate Bucket-A item.) Confirmed trainSidekickStat is wired
 // (power on attack @25728, resilience on surviving a hit @25899) and added a test
 // proving power/resilience level up through use (+ HP bump, failures don't train).
 // engine_Dev-801 — sidekick-summon race AFFINITY is now data-driven. The
@@ -15627,4 +15627,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // show the boosted cap. The stored staminaMax stays the base (creation + climb growth),
 // so bonuses are computed, not baked — no equip/title bookkeeping. Titles + gear
 // templates document the new stat.
-export const OTA_BUILD_ID = '2026-06-23-812';
+//
+// engine_Dev-813 — golem → SIDEKICK rename (internal). The companion module and its
+// whole public surface are renamed: engine/golems.ts → engine/sidekicks.ts;
+// GolemDefinition→SidekickDefinition, GolemKind→SidekickKind, GOLEM_DEFINITIONS→
+// SIDEKICK_DEFINITIONS, isGolemWeapon→isSidekickWeapon, parseGolemKind→parseSidekickKind,
+// trainGolemStat→trainSidekickStat, golemStatBonus→sidekickStatBonus, etc. (~20
+// exports), plus gameStore actions/helpers (armGolem→armSidekick, disarmGolem→
+// disarmSidekick, handleGolemCommand/Dismiss→handleSidekick…, pendingGolemNaming→
+// pendingSidekickNaming). User-facing labels now follow getSummonNoun() (Character
+// screen section header) or read "sidekicks" (dev Sidekicks panel). DELIBERATELY KEPT
+// to avoid a save/upload migration: the persisted player.golem field +
+// worldMemory.dogGolemCoActivated/coexistedWithGolem, the 'golem_weapon' recipe tag,
+// the showGolemVariants power-schema field, and reference-content strings (e.g. the
+// "Golem Core" material). Renaming player.golem is a separate save-migration task.
+export const OTA_BUILD_ID = '2026-06-23-813';

@@ -50,7 +50,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import type { InventoryItem } from '../app/engine/types';
-import { GOLEM_DEFINITIONS, makeCompanion, golemRepairHeal } from '../app/engine/golems';
+import { SIDEKICK_DEFINITIONS, makeCompanion, sidekickRepairHeal } from '../app/engine/sidekicks';
 
 function stockItem(name: string, qty: number): InventoryItem {
   return { id: `inv_${name}_${Math.random().toString(36).slice(2, 8)}`, name, kind: 'misc', rarity: 'Common', quantity: qty, tags: [] } as never;
@@ -82,7 +82,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
     const p0 = store.getState().player!;
     // Effectively immortal HP so it survives long enough to level POWER (which needs
     // ~34 landed hits at stat 0); the in-range HP invariant still holds throughout.
-    const golem = { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hp: 100000, hpMax: 100000, hitBonus: 40 };
+    const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 100000, hpMax: 100000, hitBonus: 40 };
     const scene = store.getState().currentScene!;
     store.setState({
       player: { ...p0, golem, stamina: 100000, staminaMax: 100000 },
@@ -104,7 +104,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
       // The golem may crumble if the dummy ever drops it; re-summon a fresh one and
       // keep going (the sweep should never crash regardless of who's standing).
       if (!g) {
-        store.setState((s) => (s.player ? { player: { ...s.player, golem: { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hitBonus: 40 } } } : s));
+        store.setState((s) => (s.player ? { player: { ...s.player, golem: { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hitBonus: 40 } } } : s));
         prevPower = 0; prevRes = 0;
       } else {
         expect(finite(g.hp)).toBe(true);
@@ -136,7 +136,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
   it('repair sweep: feeding constituent parts mends (capped), non-parts never do', async () => {
     const store = await boot();
     const p0 = store.getState().player!;
-    const golem = { ...makeCompanion(GOLEM_DEFINITIONS.iron_golem), hp: 1, hpMax: 24 };
+    const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 1, hpMax: 24 };
     store.setState({
       player: {
         ...p0,
@@ -144,7 +144,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
         inventory: [stockItem('Scrap Metal', 50), stockItem('Aether Mud', 50)],
       },
     });
-    const heal = golemRepairHeal('iron_golem'); // 6
+    const heal = sidekickRepairHeal('iron_golem'); // 6
 
     // Feed the WRONG part 10×: never repairs, never consumes.
     for (let i = 0; i < 10; i++) {

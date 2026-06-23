@@ -598,27 +598,27 @@ export function getCollectablesOverride(): unknown[] | null { return collectable
 // --- summons override ----------------------------------------------------------
 // engine_Dev — SUMMONED SIDEKICKS (the golem family). An uploaded pack replaces
 // the built-in golems wholesale and may rename the category noun ("automaton",
-// "construct", …). Shape: { noun?: string, defs: GolemDefinition[] }. null =
-// built-in golems. Resolved by golems.ts resolveGolemDefs()/getSummonNoun().
-import type { GolemDefinition } from './golems';
-let summonsOverride: { noun?: string; defs: GolemDefinition[] } | null = null;
+// "construct", …). Shape: { noun?: string, defs: SidekickDefinition[] }. null =
+// built-in golems. Resolved by golems.ts resolveSidekickDefs()/getSummonNoun().
+import type { SidekickDefinition } from './sidekicks';
+let summonsOverride: { noun?: string; defs: SidekickDefinition[] } | null = null;
 export function setSummonsOverride(payload: { noun?: string; defs: readonly unknown[] } | null): void {
   // The store validates/normalizes each def before this point; we trust the shape.
   summonsOverride = payload && Array.isArray(payload.defs) && payload.defs.length > 0
-    ? { noun: payload.noun, defs: payload.defs as GolemDefinition[] }
+    ? { noun: payload.noun, defs: payload.defs as SidekickDefinition[] }
     : null;
 }
 export function hasSummonsOverride(): boolean { return summonsOverride != null; }
-export function getSummonsOverride(): { noun?: string; defs: GolemDefinition[] } | null { return summonsOverride; }
+export function getSummonsOverride(): { noun?: string; defs: SidekickDefinition[] } | null { return summonsOverride; }
 /** The live summon set: the author's uploaded pack if present, else the generic
  *  default pack's sidekicks, else null (golems.ts then falls to its built-in).
  *  Lets a reskin that skips the SUMMONED SIDEKICKS box fall to generic sidekicks
  *  rather than the Tartaria golems. */
-export function resolveSummons(): { noun?: string; defs: GolemDefinition[] } | null {
+export function resolveSummons(): { noun?: string; defs: SidekickDefinition[] } | null {
   if (summonsOverride != null) return summonsOverride;
   const g = genericDefaults.summons;
   if (g && Array.isArray(g.defs) && g.defs.length > 0) {
-    return { noun: g.noun, defs: g.defs as GolemDefinition[] };
+    return { noun: g.noun, defs: g.defs as SidekickDefinition[] };
   }
   return null;
 }

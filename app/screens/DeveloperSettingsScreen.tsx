@@ -2104,7 +2104,7 @@ function SummonsBox() {
   const sidekickWeaponQuestPct = useContentPackStore((s) => s.sidekickWeaponQuestPct);
   const setSidekickWeaponQuestPct = useContentPackStore((s) => s.setSidekickWeaponQuestPct);
   const loaded = summons?.defs?.length ?? 0;
-  const noun = summons?.noun?.trim() || 'golem';
+  const noun = summons?.noun?.trim() || 'sidekick';
   const [text, setText] = useState('');
   const [pctText, setPctText] = useState(String(sidekickWeaponQuestPct || ''));
   const [status, setStatus] = useState<Status>(null);
@@ -2121,16 +2121,16 @@ function SummonsBox() {
       <View style={styles.cardHead}>
         <Text style={styles.cardTitle}>Summoned Sidekicks</Text>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
-          {loaded > 0 ? `● override · ${loaded} ${noun}${loaded === 1 ? '' : 's'}` : '○ built-in golems'}
+          {loaded > 0 ? `● override · ${loaded} ${noun}${loaded === 1 ? '' : 's'}` : '○ built-in sidekicks'}
         </Text>
       </View>
       <Text style={styles.hint}>
-        The buildable companion family — the engine's “golems”, fully reskinnable. Set a{' '}
+        The buildable companion family — the engine's <Text style={{ fontWeight: 'bold' }}>sidekicks</Text>, fully reskinnable. Set a{' '}
         <Text style={{ fontWeight: 'bold' }}>noun</Text> (what the player types after “summon”, e.g.
         “automaton”) and a list of <Text style={{ fontWeight: 'bold' }}>summons</Text>, each with its
         fuel, combat profile, summon DC, and aliases. The player summons by typing “summon &lt;alias&gt;”.
         Fuel names must exist in your materials/gear catalog. The uploaded pack replaces the built-in
-        golems. Hit TEMPLATE for the shape.
+        sidekicks. Hit TEMPLATE for the shape.
       </Text>
 
       {/* DOG TOGGLE — independent of the summon pack. */}
@@ -2227,7 +2227,7 @@ function SummonsBox() {
         {loaded > 0 && (
           <TouchableOpacity
             style={styles.resetBtn}
-            onPress={() => { useContentPackStore.getState().clearSummons(); setStatus({ kind: 'ok', msg: 'Reset summons to built-in golems.' }); }}
+            onPress={() => { useContentPackStore.getState().clearSummons(); setStatus({ kind: 'ok', msg: 'Reset summons to built-in sidekicks.' }); }}
           >
             <Text style={styles.resetBtnText}>RESET</Text>
           </TouchableOpacity>

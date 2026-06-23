@@ -11,7 +11,7 @@
 // here, the screen renders the right rows.
 
 import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
-import { isGolemWeapon } from '../app/engine/golems';
+import { isSidekickWeapon } from '../app/engine/sidekicks';
 
 describe('OTA-059 — RecipesView kindFilter', () => {
   it('every recipe resolves to a kind via lookupCraftedItem', () => {
@@ -81,7 +81,7 @@ describe('OTA-059 — RecipesView kindFilter', () => {
 // engine_Dev — sidekick armaments (golem_weapon recipes) split OFF the Craft tab
 // and onto the Magic tab, mirroring RecipesView's kindFilter logic exactly.
 describe('engine_Dev — sidekick armaments live on the Magic tab', () => {
-  const isSidekick = (result: string) => isGolemWeapon(lookupCraftedItem(result).tags);
+  const isSidekick = (result: string) => isSidekickWeapon(lookupCraftedItem(result).tags);
 
   it('recognizes the golem_weapon recipes as sidekick armaments', () => {
     const arms = RECIPES.filter((r) => isSidekick(r.result)).map((r) => r.result);
@@ -93,7 +93,7 @@ describe('engine_Dev — sidekick armaments live on the Magic tab', () => {
   it("the Craft tab ('non-consumable') EXCLUDES sidekick armaments", () => {
     const craft = RECIPES.filter((r) => {
       const c = lookupCraftedItem(r.result);
-      return c.kind !== 'consumable' && !isGolemWeapon(c.tags);
+      return c.kind !== 'consumable' && !isSidekickWeapon(c.tags);
     }).map((r) => r.result);
     expect(craft).toContain('Iron Spear');       // normal gear stays on Craft
     expect(craft).not.toContain('Golem Sledge');  // sidekick arm moved to Magic

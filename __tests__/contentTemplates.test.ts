@@ -33,14 +33,14 @@ describe('engine_Dev — content templates', () => {
   });
 
   it('the weapons template carries a real built-in row (shows the schema)', () => {
-    const parsed = JSON.parse(getTableTemplate('weapons')) as Array<Record<string, unknown>>;
+    const parsed = JSON.parse(stripComments(getTableTemplate('weapons'))) as Array<Record<string, unknown>>;
     expect(parsed[0]).toHaveProperty('name');
     expect(parsed[0]).toHaveProperty('damageDice');
   });
 
   it('does NOT dump the whole table — sample is far smaller than the source', () => {
     // weapons.json has dozens of rows; the template is just the sample size.
-    expect(JSON.parse(getTableTemplate('weapons')).length).toBe(TEMPLATE_SAMPLE_ROWS);
+    expect(JSON.parse(stripComments(getTableTemplate('weapons'))).length).toBe(TEMPLATE_SAMPLE_ROWS);
   });
 
   it('world lore template is the current narrator + tone, editable', () => {

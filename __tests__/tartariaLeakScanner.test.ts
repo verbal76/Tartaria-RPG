@@ -57,8 +57,9 @@ const BASELINE: Record<string, number> = {
   // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).
   // whispers.ts: the yulka chain DATA extracted to app/data/whispers/builtin-whispers.json (9→0).
   'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 0,
-  // golems.ts: built-in defs extracted to app/data/summons/builtin-sidekicks.json (8→0).
-  'app/engine/character.ts': 9, 'app/engine/golems.ts': 0, 'app/engine/titles.ts': 7,
+  // sidekicks.ts (renamed from golems.ts): built-in defs extracted to
+  // app/data/summons/builtin-sidekicks.json (8→0).
+  'app/engine/character.ts': 9, 'app/engine/sidekicks.ts': 0, 'app/engine/titles.ts': 7,
   'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 6, 'app/engine/buriedSkyscraper.ts': 0,
   // buriedSkyscraper floor flavors genericized; itemFusion adjective pools + dog-vest
   // example name genericized (5→0 each).

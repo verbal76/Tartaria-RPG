@@ -383,9 +383,9 @@ export function CharacterScreen() {
           // of" is discoverable. A golem heals only from its own fuel items, so a
           // pack full of other aether loot reads as unusable until you know which.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { golemRepairParts, GOLEM_ELEMENT_TAGS } = require('../engine/golems');
-          const repairParts = (golemRepairParts(golem.kind) as string[]);
-          const elementWord = (GOLEM_ELEMENT_TAGS[golem.kind]?.[0] as string | undefined) ?? null;
+          const { sidekickRepairParts, SIDEKICK_ELEMENT_TAGS } = require('../engine/sidekicks');
+          const repairParts = (sidekickRepairParts(golem.kind) as string[]);
+          const elementWord = (SIDEKICK_ELEMENT_TAGS[golem.kind]?.[0] as string | undefined) ?? null;
           const heldRepair = repairParts.filter((p) =>
             player.inventory.some((i) => i.name.toLowerCase() === p.toLowerCase() && i.quantity > 0),
           );
@@ -394,9 +394,13 @@ export function CharacterScreen() {
             const filled = Math.round(pct * 20);
             return '▰'.repeat(filled) + '▱'.repeat(20 - filled);
           };
+          // engine_Dev — the section label follows the author's summon NOUN
+          // (sidekick / automaton / familiar / …), not the hardcoded "GOLEM".
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const summonLabel = (require('../engine/sidekicks') as typeof import('../engine/sidekicks')).getSummonNoun().toUpperCase();
           return (
             <>
-              {sectionHeader('golem', 'GOLEM')}
+              {sectionHeader('golem', summonLabel)}
               {!collapsed.golem && (
               <View style={styles.card}>
                 <Text style={styles.name}>{golem.name}</Text>

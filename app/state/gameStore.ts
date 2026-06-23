@@ -2532,10 +2532,10 @@ interface GameStore {
   continueWhisperCourse: () => void;
   stopWhisperCourse: () => void;
   /** OTA-478 "Golem Armaments" — arm the active golem with a crafted golem weapon
-   *  matching its kind (the weapon moves from pack to golem.weapon); disarmGolem
+   *  matching its kind (the weapon moves from pack to golem.weapon); disarmSidekick
    *  returns it to the pack. */
-  armGolem: (weaponName: string) => void;
-  disarmGolem: () => void;
+  armSidekick: (weaponName: string) => void;
+  disarmSidekick: () => void;
   /** 2026-05-25 OTA-035 — when a player issues `travel to <city>` from
    *  inside an outpost, this field holds the pending destination until
    *  they confirm or cancel via the BrandedModal. The screen layer
@@ -2544,7 +2544,7 @@ interface GameStore {
   /** OTA-466 — set true right after a golem is summoned: the next typed input
    *  is captured as the golem's name (or 'skip' to keep the type label), like
    *  the dog onboarding. Transient — not persisted. */
-  pendingGolemNaming: boolean;
+  pendingSidekickNaming: boolean;
   /** Set the pending destination; the screen renders the modal. */
   requestTravelConfirm: (locationId: string, locationName: string) => void;
   /** Yes path: leave outpost, then set course. Clears pending. */
@@ -2863,7 +2863,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ pendingContractsTab: null });
   },
   pendingTravelConfirm: null,
-  pendingGolemNaming: false,
+  pendingSidekickNaming: false,
   hydrated: false,
   lowHpWarned: false,
   weaponResistStreak: null,
@@ -3602,7 +3602,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
-        pendingGolemNaming: false,
+        pendingSidekickNaming: false,
         justUpdatedFromBuild: null,
         // OTA-100 — clear pendingOtaAppliedFrom in the same set
         // that fires the debug log below. One marker per
@@ -3936,7 +3936,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       pendingRolls: null,
       pendingHookContinue: null,
-      pendingGolemNaming: false,
+      pendingSidekickNaming: false,
       activeSlotId: slotId,
       // Tungsten Spire — reset tutorial-props ledger for the new
       // character. Old characters loaded via loadSlotIntoGame don't
@@ -6612,25 +6612,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const lower = trimmed.toLowerCase();
       const nAlt = summonNounAlt();
-      const isGolemCommand = new RegExp(`^(use|command|order|attack with)?\\s*(?:${nAlt})(\\s+(attack\\s+)?(.*))?$`, 'i').test(lower)
+      const isSidekickCommand = new RegExp(`^(use|command|order|attack with)?\\s*(?:${nAlt})(\\s+(attack\\s+)?(.*))?$`, 'i').test(lower)
         || new RegExp(`^(use|command)\\s+(?:${nAlt})\\b`, 'i').test(lower);
-      const isGolemDismiss = new RegExp(`^(dismiss|release|unbind)\\s+(the\\s+)?(?:${nAlt})\\b`, 'i').test(lower);
-      if (isGolemCommand || isGolemDismiss) {
+      const isSidekickDismiss = new RegExp(`^(dismiss|release|unbind)\\s+(the\\s+)?(?:${nAlt})\\b`, 'i').test(lower);
+      if (isSidekickCommand || isSidekickDismiss) {
         get().appendLog('player', trimmed);
-        if (isGolemDismiss) {
-          handleGolemDismiss(get, set);
+        if (isSidekickDismiss) {
+          handleSidekickDismiss(get, set);
         } else {
           // Extract optional target name from the input.
           const match = lower.match(new RegExp(`^(use|command|order|attack with)?\\s*(?:${nAlt})(\\s+(?:attack\\s+)?(.*))?$`));
           const cmdTarget = (match?.[3] ?? '').trim() || null;
-          handleGolemCommand(get, set, cmdTarget);
+          handleSidekickCommand(get, set, cmdTarget);
           // OTA-611 — exploit close (player ruling): commanding the golem is a
           // player TURN — the enemy group still swings at YOU (mirrors the dog
           // command), so a golem is no longer a risk-free group-killer. The
-          // golem soaks its own targeted retaliation inside handleGolemCommand;
+          // golem soaks its own targeted retaliation inside handleSidekickCommand;
           // this exposes the player to the rest of the group's volley.
-          const sceneAfterGolem = get().currentScene;
-          if (sceneAfterGolem && sceneAfterGolem.enemies.length > 0) {
+          const sceneAfterSidekick = get().currentScene;
+          if (sceneAfterSidekick && sceneAfterSidekick.enemies.length > 0) {
             runEnemyGroupCounters(get, set, get().player ?? player);
           }
         }
@@ -6652,20 +6652,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // OTA-466 — golem naming takeover. Set right after a summon: the next typed
     // input names the golem (or "skip" keeps the type label). One input only.
-    if (get().pendingGolemNaming) {
+    if (get().pendingSidekickNaming) {
       get().appendLog('player', trimmed);
       const golemNow = get().player?.golem;
       if (!golemNow) {
         // Golem vanished before naming (dismissed / died) — just clear the flag.
-        set({ pendingGolemNaming: false });
+        set({ pendingSidekickNaming: false });
       } else if (/^(skip|no|none|nope|leave it|no name|nvm|cancel|n)$/i.test(trimmed)) {
-        set({ pendingGolemNaming: false });
+        set({ pendingSidekickNaming: false });
         get().appendLog('arbiter', `"As you like," the ${getNarratorName()} says. "It answers to its making, then — ${golemNow.name}."`);
       } else {
         const name = trimmed.slice(0, 16).trim() || golemNow.name;
         set((s) => (s.player && s.player.golem
-          ? { pendingGolemNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
-          : { pendingGolemNaming: false }));
+          ? { pendingSidekickNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
+          : { pendingSidekickNaming: false }));
         get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
         get().appendLog('arbiter', `The ${getNarratorName()} nods. "${name}, then."`);
       }
@@ -6710,14 +6710,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const nAlt = summonNounAlt();
       if (new RegExp(`^(disarm|unarm)\\s+(the\\s+)?(?:${nAlt})\\b`, 'i').test(gl)) {
         get().appendLog('player', trimmed);
-        get().disarmGolem();
+        get().disarmSidekick();
         void get().persist();
         return;
       }
       const armMatch = new RegExp(`^(?:arm|give|equip)\\s+(?:the\\s+)?(?:${nAlt})(?:\\s+with)?\\s+(.+)$`, 'i').exec(trimmed);
       if (armMatch) {
         get().appendLog('player', trimmed);
-        get().armGolem(armMatch[1]!.trim());
+        get().armSidekick(armMatch[1]!.trim());
         void get().persist();
         return;
       }
@@ -9131,11 +9131,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const { matchPower } = require('../engine/powers');
             const matchedPower = (matchPower(`${verbLow} ${tgtLow}`.trim()) ?? matchPower(verbLow)) as import('../engine/powers').Power | null;
             if (matchedPower) {
-              let mGolemHint: import('../engine/types').GolemKind | null = null;
+              let mGolemHint: import('../engine/types').SidekickKind | null = null;
               if (matchedPower.discipline === 'summon') {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const { parseGolemKind } = require('../engine/golems');
-                mGolemHint = parseGolemKind(`${verbLow} ${tgtLow}`);
+                const { parseSidekickKind } = require('../engine/sidekicks');
+                mGolemHint = parseSidekickKind(`${verbLow} ${tgtLow}`);
               }
               runAethercraft(matchedPower.discipline, get, set, player, currentScene, mGolemHint, matchedPower);
               break;
@@ -9145,12 +9145,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\baetherstone manipulation\b/.test(verbLow);
           // engine_Dev — "summon <X>" fires when X is the category noun ("golem",
           // or an uploaded pack's noun like "automaton") OR any uploaded summon's
-          // alias/name (e.g. "summon phase"). parseGolemKind resolves all of these.
+          // alias/name (e.g. "summon phase"). parseSidekickKind resolves all of these.
           const wantSummon = /\bsummon\b/.test(verbLow) && (
             /\bgolem\b/.test(tgtLow + ' ' + verbLow)
             || /\baether golem\b/.test(verbLow)
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            || (require('../engine/golems') as typeof import('../engine/golems')).parseGolemKind(`${verbLow} ${tgtLow}`) != null
+            || (require('../engine/sidekicks') as typeof import('../engine/sidekicks')).parseSidekickKind(`${verbLow} ${tgtLow}`) != null
           );
           const wantMend = (/\b(mend|heal)\b/.test(verbLow) && /\b(wounds?|self|me|aetheric)\b/.test(tgtLow + ' ' + verbLow))
             || /\baetheric healing\b/.test(verbLow);
@@ -9159,11 +9159,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // 2026-05-25 [MECHANIC-1b] — extract golem kind from the
             // input text when summoning. Defaults to mud_golem if the
             // player just types `summon golem` (backward-compat).
-            let golemKindHint: import('../engine/types').GolemKind | null = null;
+            let golemKindHint: import('../engine/types').SidekickKind | null = null;
             if (discipline === 'summon') {
               // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const { parseGolemKind } = require('../engine/golems');
-              golemKindHint = parseGolemKind(`${verbLow} ${tgtLow}`);
+              const { parseSidekickKind } = require('../engine/sidekicks');
+              golemKindHint = parseSidekickKind(`${verbLow} ${tgtLow}`);
             }
             runAethercraft(discipline, get, set, player, currentScene, golemKindHint);
             break;
@@ -12921,9 +12921,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const gatePct = cp.getSidekickWeaponQuestPct();
           if (gatePct > 0) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const { isGolemWeapon, getSummonNoun } = require('../engine/golems') as typeof import('../engine/golems');
+            const { isSidekickWeapon, getSummonNoun } = require('../engine/sidekicks') as typeof import('../engine/sidekicks');
             const resultTags = findWeaponByName(recipe.result)?.tags;
-            if (isGolemWeapon(resultTags)) {
+            if (isSidekickWeapon(resultTags)) {
               // eslint-disable-next-line @typescript-eslint/no-require-imports
               const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
               const progress = cmqe.mainQuestProgressPercent(player);
@@ -14155,7 +14155,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // 2026-05-25 — removed dead OTA-039 'golem_companion' status
       // follow-up block. The status kind is no longer emitted by any
       // code path (MECHANIC-1b OTA-011 replaced it with player.golem
-      // + a dedicated golem QuickBtn / handleGolemCommand). The
+      // + a dedicated golem QuickBtn / handleSidekickCommand). The
       // legacy block was reachable only via the status's old emitter
       // which itself was removed. Free 1d6 hit per swing was over-
       // generous and shadowed the deliberate command-golem affordance.
@@ -17307,7 +17307,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   // OTA-478 — arm the active golem with a crafted golem weapon of its kind.
-  armGolem(weaponName) {
+  armSidekick(weaponName) {
     const player = get().player;
     if (!player) return;
     const golem = player.golem;
@@ -17324,11 +17324,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isGolemWeapon } = require('../engine/golems');
+    const { isSidekickWeapon } = require('../engine/sidekicks');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { findWeaponByName: fwbn } = require('../engine/crafting');
     const cat = fwbn(item.name);
-    if (!cat || !isGolemWeapon(cat.tags)) {
+    if (!cat || !isSidekickWeapon(cat.tags)) {
       get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "The ${item.name} isn't shaped for a ${summonNoun()}'s grip. Forge a ${summonNoun()} armament — a Sledge, Greatsword, Pike, or Lance."`);
       return;
     }
@@ -17347,7 +17347,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  disarmGolem() {
+  disarmSidekick() {
     const player = get().player;
     if (!player || !player.golem || !player.golem.weapon) {
       get().appendLog('arbiter', `"Your ${summonNoun()} carries nothing to take back," the ${getNarratorName()} says.`);
@@ -24944,7 +24944,7 @@ function runAethercraft(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   player: PlayerCharacter,
   scene: CurrentScene,
-  golemKindHint?: import('../engine/types').GolemKind | null,
+  golemKindHint?: import('../engine/types').SidekickKind | null,
   powerOverride?: import('../engine/powers').Power,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -24952,7 +24952,7 @@ function runAethercraft(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getGolemDefinition, makeCompanion, missingFuelFor, consumeFuel, getSummonNoun } = require('../engine/golems') as typeof import('../engine/golems');
+  const { getSidekickDefinition, makeCompanion, missingFuelFor, consumeFuel, getSummonNoun } = require('../engine/sidekicks') as typeof import('../engine/sidekicks');
   // engine_Dev — the power's fuel / DC / stat / name come from the data-driven
   // power set (uploaded 'powers' override, or the built-in Aethercraft default),
   // so a re-skinned game's powers cast with their own fuel and difficulty.
@@ -24964,7 +24964,7 @@ function runAethercraft(
   // golem-specific RECIPE (multiple items) instead of a single
   // generic Aetheric fuel. Validate the recipe early so we don't
   // burn time on a skill check we can't fulfill anyway.
-  let golemDef: ReturnType<typeof getGolemDefinition> | null = null;
+  let golemDef: ReturnType<typeof getSidekickDefinition> | null = null;
   let fuelItem: InventoryItem | null = null;
   if (discipline === 'summon') {
     if (player.golem) {
@@ -24975,7 +24975,7 @@ function runAethercraft(
       return;
     }
     const golemKind = golemKindHint ?? 'mud_golem';
-    golemDef = getGolemDefinition(golemKind);
+    golemDef = getSidekickDefinition(golemKind);
     const missing = missingFuelFor(golemDef, player.inventory);
     if (missing.length > 0) {
       get().appendLog(
@@ -25009,12 +25009,12 @@ function runAethercraft(
   // for mend (the lorebook frames healing as wisdom-channelled).
   // OTA-137 — per-golem summonDC. Mud 13, Iron 15, Aether 17,
   // Crystal 19. Falls back to the historical flat 15 / 12 when the
-  // GolemDefinition omits summonDC (shape / mend still flat 12).
+  // SidekickDefinition omits summonDC (shape / mend still flat 12).
   let dcBase: number;
   if (discipline === 'summon' && golemKindHint) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getGolemDefinition } = require('../engine/golems') as typeof import('../engine/golems');
-    const def = getGolemDefinition(golemKindHint);
+    const { getSidekickDefinition } = require('../engine/sidekicks') as typeof import('../engine/sidekicks');
+    const def = getSidekickDefinition(golemKindHint);
     dcBase = def.summonDC ?? 15;
   } else {
     dcBase = discipline === 'summon' ? (power?.dcBase ?? 15) : (power?.dcBase ?? 12);
@@ -25196,7 +25196,7 @@ function runAethercraft(
       golem = { ...golem, hp: golem.hp + bonusHp, hpMax: golem.hpMax + bonusHp, attackDie: upsizeDie(golem.attackDie) };
       golemEdgeTag = ' Your mastery shapes it stronger than most.';
     }
-    set((s) => s.player ? { player: { ...s.player, golem }, pendingGolemNaming: true } : s);
+    set((s) => s.player ? { player: { ...s.player, golem }, pendingSidekickNaming: true } : s);
     get().appendLog(
       'world',
       `Your materials draw together and fold into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
@@ -25281,7 +25281,7 @@ function applyWeaponCoatingProc(
 // Picks a target enemy, rolls the golem's attack, applies damage,
 // then routes the enemy's retaliation onto the golem's HP pool
 // instead of the player's.
-function handleGolemCommand(
+function handleSidekickCommand(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   cmdTarget: string | null,
@@ -25337,9 +25337,9 @@ function handleGolemCommand(
   // like the dog's STR. A working copy carries any stat-training from this turn
   // through to the final state write (incl. the kill-return path).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { golemStatBonus, trainGolemStat, golemDamageResist, getGolemDefinition } = require('../engine/golems');
+  const { sidekickStatBonus, trainSidekickStat, sidekickDamageResist, getSidekickDefinition } = require('../engine/sidekicks');
   let workingGolem = golem;
-  const golemPower: number = golemStatBonus(golem, 'power');
+  const golemPower: number = sidekickStatBonus(golem, 'power');
   const atkRoll = rollDie(20);
   const golemAtkBonus = golem.hitBonus + golemPower;
   const atkTotal = atkRoll + golemAtkBonus;
@@ -25351,7 +25351,7 @@ function handleGolemCommand(
 
   if (hit) {
     // OTA-467 — a landed strike trains POWER.
-    const tp = trainGolemStat(workingGolem, 'power', true);
+    const tp = trainSidekickStat(workingGolem, 'power', true);
     workingGolem = tp.golem;
     if (tp.leveled) get().appendLog('reward', `✦ ${workingGolem.name}'s Power rises to ${tp.leveled.to}.`);
     // OTA-478 — a WIELDED golem weapon's dice REPLACE the innate attackDie (it
@@ -25475,7 +25475,7 @@ function handleGolemCommand(
     // OTA-467 — trained RESILIENCE soaks part of the hit (min 1 always lands).
     // arb170 — % damage resistance (innate by kind + trained resilience), capped,
     // applied to the enemy's REAL damage roll. Min 1 always lands (never immune).
-    const resist: number = golemDamageResist(workingGolem);
+    const resist: number = sidekickDamageResist(workingGolem);
     const rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
     const enemyDmg = Math.max(1, Math.round(rawDmg * (1 - resist)));
     const newGolemHp = Math.max(0, workingGolem.hp - enemyDmg);
@@ -25491,7 +25491,7 @@ function handleGolemCommand(
       // arb170 — INERT CORE. If the golem had trained anything, it leaves a core
       // carrying HALF its levels; feed it to a new golem to graft them on. So a
       // death costs ~half the investment + a re-summon, not the whole golem.
-      const dG = getGolemDefinition(workingGolem.kind);
+      const dG = getSidekickDefinition(workingGolem.kind);
       const core = {
         power: Math.floor((workingGolem.stats?.power ?? 0) / 2),
         resilience: Math.floor((workingGolem.stats?.resilience ?? 0) / 2),
@@ -25522,7 +25522,7 @@ function handleGolemCommand(
     } else {
       // OTA-467 — surviving a hit trains RESILIENCE; carry the turn's POWER too.
       let survived: typeof workingGolem = { ...workingGolem, hp: newGolemHp };
-      const tr = trainGolemStat(survived, 'resilience', true);
+      const tr = trainSidekickStat(survived, 'resilience', true);
       survived = tr.golem;
       if (tr.leveled) get().appendLog('reward', `✦ ${survived.name}'s Resilience rises to ${tr.leveled.to}.`);
       set((s) => s.player ? { player: { ...s.player, golem: survived } } : s);
@@ -25542,7 +25542,7 @@ function handleGolemCommand(
 // 2026-05-25 [MECHANIC-1b] — dismiss the active golem on player
 // command. Clears player.golem and logs a flavor line. No-op when
 // no golem is active.
-function handleGolemDismiss(
+function handleSidekickDismiss(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ): void {
@@ -26188,7 +26188,7 @@ function applyItemToDog(
  *  golem holds its HP between fights (OTA-433); now the player can mend it with
  *  its own constituent materials (Iron Golem ← Scrap Metal / Golem Core, etc.)
  *  the same way they feed the dog. Only the golem's own fuel parts work; each
- *  part restores golemRepairHeal HP. Returns true when handled. */
+ *  part restores sidekickRepairHeal HP. Returns true when handled. */
 function applyItemToGolem(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -26202,9 +26202,9 @@ function applyItemToGolem(
     return false;
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { getGolemDefinition, isGolemRepairPart, golemRepairParts, golemRepairHeal,
-    isGolemSubstitutePart, golemSubstituteHeal, golemElementTags } = require('../engine/golems');
-  const def = getGolemDefinition(golem.kind);
+  const { getSidekickDefinition, isSidekickRepairPart, sidekickRepairParts, sidekickRepairHeal,
+    isSidekickSubstitutePart, sidekickSubstituteHeal, sidekickElementTags } = require('../engine/sidekicks');
+  const def = getSidekickDefinition(golem.kind);
   const lower = itemName.toLowerCase().trim();
   const item = player.inventory.find((i) =>
     i.quantity > 0 && (i.name.toLowerCase() === lower || i.name.toLowerCase().includes(lower)),
@@ -26235,11 +26235,11 @@ function applyItemToGolem(
   // arb121 — a full FUEL PART heals full; an elemental MATERIAL substitute (e.g.
   // any aether loot for an Aether Golem) heals half. Anything else is refused —
   // and the refusal now names both the parts AND that its element scraps will do.
-  const isPart = isGolemRepairPart(golem.kind, item.name);
-  const isSub = !isPart && isGolemSubstitutePart(golem.kind, item);
+  const isPart = isSidekickRepairPart(golem.kind, item.name);
+  const isSub = !isPart && isSidekickSubstitutePart(golem.kind, item);
   if (!isPart && !isSub) {
-    const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
-    get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(golemElementTags(golem.kind)?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
+    const parts = (sidekickRepairParts(golem.kind) as string[]).join(', ');
+    get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(sidekickElementTags(golem.kind)?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
     return false;
   }
   if (golem.hp >= golem.hpMax) {
@@ -26248,7 +26248,7 @@ function applyItemToGolem(
   }
   const heal = Math.min(
     golem.hpMax - golem.hp,
-    (isSub ? golemSubstituteHeal(golem.kind, item.rarity) : golemRepairHeal(golem.kind)) as number,
+    (isSub ? sidekickSubstituteHeal(golem.kind, item.rarity) : sidekickRepairHeal(golem.kind)) as number,
   );
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
@@ -26762,7 +26762,7 @@ export function hasActiveDog(player: PlayerCharacter | null | undefined): boolea
 // many player-facing summon lines below read the live noun without a static cycle.
 function summonNoun(): string {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return (require('../engine/golems') as typeof import('../engine/golems')).getSummonNoun();
+  return (require('../engine/sidekicks') as typeof import('../engine/sidekicks')).getSummonNoun();
 }
 
 // engine_Dev — regex alternation of the active summon noun + the legacy alias
