@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
+import { getRecipes, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
@@ -101,7 +101,7 @@ export function RecipesView({
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
-    const all = RECIPES.map((r) => evaluateRecipe(r, player.inventory));
+    const all = getRecipes().map((r) => evaluateRecipe(r, player.inventory));
     const kindFiltered = kindFilter
       ? all.filter((e) =>
           kindFilter === 'consumable'
