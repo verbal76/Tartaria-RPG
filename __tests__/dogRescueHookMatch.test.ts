@@ -30,11 +30,14 @@ describe('rescueHookMatches — whole-word matching', () => {
     expect(rescueHookMatches('brig', 'bright')).toBe(false);
   });
 
-  it('a multi-word noun also matches on any of its words', () => {
-    expect(rescueHookMatches('snare pit', 'snare')).toBe(true);
-    expect(rescueHookMatches('snare pit', 'pit')).toBe(true);
+  it('a multi-word phrase fires ONLY on the full phrase, never its single words', () => {
     expect(rescueHookMatches('snare pit', 'the snare pit')).toBe(true);
-    expect(rescueHookMatches('diving-bell', 'bell')).toBe(true);
+    expect(rescueHookMatches('snare pit', 'snare pit')).toBe(true);
+    expect(rescueHookMatches('snare pit', 'snare')).toBe(false);
+    expect(rescueHookMatches('snare pit', 'pit')).toBe(false);
+    expect(rescueHookMatches('black ash tree', 'the black ash tree by the path')).toBe(true);
+    expect(rescueHookMatches('black ash tree', 'tree')).toBe(false);
+    expect(rescueHookMatches('black ash tree', 'black')).toBe(false);
   });
 });
 
@@ -51,10 +54,12 @@ describe('matchRescueScenarioId — over an uploaded set, no false fires', () =>
   it('intended targets fire', () => {
     expect(matchRescueScenarioId('the containment unit')).toBe('lab');
     expect(matchRescueScenarioId('airlock')).toBe('bunker');
-    expect(matchRescueScenarioId('pit')).toBe('snare'); // word of "snare pit"
+    expect(matchRescueScenarioId('snare')).toBe('snare');          // single-word entry
+    expect(matchRescueScenarioId('the snare pit')).toBe('snare');  // full phrase entry
   });
 
   it('previously-false targets no longer fire anything', () => {
+    expect(matchRescueScenarioId('pit')).toBeNull();   // "snare pit" no longer fires on "pit"
     expect(matchRescueScenarioId('lock')).toBeNull();
     expect(matchRescueScenarioId('arm')).toBeNull();
     expect(matchRescueScenarioId('trash')).toBeNull();

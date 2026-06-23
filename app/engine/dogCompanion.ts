@@ -36,12 +36,13 @@ export type RescueScenarioId = string;
 
 export interface RescueScenario {
   id: RescueScenarioId;
-  /** Trigger words. The rescue fires when the player investigates / attacks /
+  /** Trigger phrases. The rescue fires when the player investigates / attacks /
    *  approaches a target that matches one of these, in any enemy-free scene.
-   *  Matching is WHOLE-WORD (see rescueHookMatches): "ash" fires on "ash tree"
-   *  but NOT "trash"; "airlock" fires on "the airlock" but NOT a bare "lock". A
-   *  multi-word noun ("snare pit") also matches when the target is one of its
-   *  words ("pit"). */
+   *  Matching is WHOLE-PHRASE + whole-word (see rescueHookMatches): "ash tree"
+   *  fires on "the black ash tree" but NOT "trash"; "airlock" fires on "the
+   *  airlock" but NOT a bare "lock". A multi-word phrase only fires on the FULL
+   *  phrase — "black ash tree" does NOT fire on "tree" — so list any single word
+   *  you also want to trigger as its own entry. */
   hookNouns: string[];
   /** Captor faction template id when the player IS NOT this faction.
    *  Resolves to the unaligned poacher captor when the player IS
@@ -100,25 +101,23 @@ function unalignedScenario(): RescueScenario | undefined {
   return getRescueScenarios().find((s) => s.captorFactionId == null);
 }
 
-/** Does a rescue hookNoun match the player's target text? WHOLE-WORD matching,
- *  so short/common nouns no longer false-trigger:
+/** Does a rescue hookNoun match the player's target text? WHOLE-PHRASE,
+ *  whole-word matching — the hookNoun fires only when that EXACT phrase appears
+ *  (bounded by word edges) in what the player engaged:
  *    - exact: target === noun
- *    - the noun phrase appears word-bounded inside the target ("ash" ⊂ "ash
- *      tree" ✓, but NOT "trash"; "the airlock" ✓, but a bare "lock" ✗)
- *    - for a MULTI-word noun, the target is one of its words ("snare pit" fires
- *      on "snare" or "pit")
- *  Replaces the old loose bidirectional substring test that fired "forest" on
- *  "trash", "bunker" on "lock"/"arm", "snare" on "spit"/"strap", etc. */
+ *    - the noun phrase appears word-bounded inside a longer target
+ *      ("ash tree" ⊂ "the black ash tree" ✓; "ash" ⊄ "trash"; "airlock" ⊄ "lock")
+ *  A multi-word noun does NOT fire on its individual words ("black ash tree"
+ *  does NOT fire on "tree"/"black") — list any single word you want to trigger
+ *  as its own hookNoun. This replaces the old loose bidirectional substring test
+ *  (which fired "forest" on "trash", "bunker" on "lock", "snare" on "pit", etc.). */
 export function rescueHookMatches(noun: string, target: string): boolean {
   const nl = (noun ?? '').toLowerCase().trim();
   const t = (target ?? '').toLowerCase().trim();
   if (!nl || !t) return false;
   if (t === nl) return true;
   const escaped = nl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  if (new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`, 'i').test(t)) return true;
-  const words = nl.split(/[\s-]+/).filter(Boolean);
-  if (words.length > 1 && words.includes(t)) return true;
-  return false;
+  return new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`, 'i').test(t);
 }
 
 /** Id of the first live scenario whose hookNouns match the target text, else
