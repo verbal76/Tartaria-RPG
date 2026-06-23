@@ -107,6 +107,7 @@ export function ContractsScreen() {
     null | 'enemies' | 'travels' | 'checks' | 'npcs'
   >(null);
   const worldMemory = useGameStore((s) => s.worldMemory);
+  const currentScene = useGameStore((s) => s.currentScene);
   // arb99 — same "?" numbering the atlas + map rows use, so a whisper's SET COURSE
   // block here shows the same number as its mark on the map.
   const questionNumbers = questionMarkerNumbers(worldMemory);
@@ -280,6 +281,21 @@ export function ContractsScreen() {
           // tracker so each objective with a location offers a travel course.
           // id → name honors an uploaded Locations table.
           const locNameById = new Map(cmq.mainQuestLocations().map((l) => [l.id, l.name] as const));
+          // engine_Dev — SUMMON chip for the active KILL step. The kill-step boss
+          // auto-spawns on arrival, but a death-revive / scene rebuild clears it; the
+          // chip lets the player re-engage from here (the same affordance the old
+          // built-in Core-Guardian SUMMON gave, now pointed at the data-driven boss).
+          // Show only while STANDING at the boss's location with no copy already in
+          // the scene; the summon action re-checks the same preconditions.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { WORLD_MAP_CENTER_X: scx, WORLD_MAP_CENTER_Y: scy } = require('../engine/worldMap');
+          const stationedHere = !player.travelTarget
+            && (player.hubRoomId != null || (player.mapX === scx && player.mapY === scy));
+          const bossHere = !complete && stationedHere ? cmqe.questBossAt(player, player.currentLocationId) : null;
+          const bossInScene = !!bossHere && (currentScene?.enemies ?? []).some(
+            (e) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
+          );
+          const canSummonBoss = !!bossHere && !bossInScene;
           return (
             <TouchableOpacity
               style={styles.mainQuestCard}
@@ -289,6 +305,16 @@ export function ContractsScreen() {
               <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
               <Text style={styles.mainQuestPhase}>{title}</Text>
               <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
+              {canSummonBoss && (
+                <TouchableOpacity
+                  style={styles.summonChip}
+                  onPress={() => useGameStore.getState().summonMainQuestBoss()}
+                  activeOpacity={0.7}
+                  hitSlop={6}
+                >
+                  <Text style={styles.summonChipText}>★ SUMMON {bossHere.name.toUpperCase()}</Text>
+                </TouchableOpacity>
+              )}
               {mqExpanded && (
                 <View style={styles.mqTracker}>
                   <Text style={styles.mqTrackerHead}>

@@ -2723,6 +2723,12 @@ interface GameStore {
    *  to the log. Used when a new player action arrives mid-stream. */
   cancelGeneration: () => void;
 
+  /** engine_Dev — re-summon the active main-quest KILL-step boss into the current
+   *  scene. The boss auto-spawns on arrival, but a death-revive / scene rebuild
+   *  clears the field; this re-engages it. Returns ok/reason so the SUMMON chip
+   *  on the Primary-Objective card / MAIN QUEST chip can hide when it can't fire. */
+  summonMainQuestBoss: () => { ok: boolean; reason?: string };
+
   /** OTA-120 Phase 5 — CallDogModal visibility flag. Set by the parser
    *  intercept for `call dog` / `call <name>`; cleared by the modal's
    *  CLOSE button or after the player picks an option. */
@@ -21198,6 +21204,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
       arbiterGenerationEpoch++;
       set({ isGenerating: false, partialArbiterText: null });
     }
+  },
+
+  // engine_Dev — SUMMON the active main-quest KILL-step boss into the current
+  // scene. The data-driven boss already auto-spawns when the player ARRIVES at its
+  // kill-step location (see _beginSceneCore), but a death-revive (or any scene
+  // rebuild) clears the field, leaving the player standing on the objective with no
+  // boss to fight and no obvious way to re-engage. This is the explicit re-summon —
+  // the same affordance the old built-in Core-Guardian SUMMON chip provided, now
+  // pointed at the data-driven quest. Returns ok/reason so the UI can hide/disable
+  // the chip when preconditions fail. The summoned boss is an ordinary scene enemy,
+  // so flee (a DEX check; a failed flee provokes the group counter) works on it.
+  summonMainQuestBoss() {
+    const player = get().player;
+    const currentScene = get().currentScene;
+    if (!player) return { ok: false, reason: 'no_player' };
+    if (!currentScene) return { ok: false, reason: 'no_scene' };
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+    const boss = cmqe.questBossAt(player, player.currentLocationId);
+    if (!boss) return { ok: false, reason: 'no_quest_boss_here' };
+    // currentLocationId lingers as the departure location while travelling — confirm
+    // the player is actually STANDING at the named location before answering.
+    if (!isStationedAtNamedLocation(player)) return { ok: false, reason: 'not_at_location' };
+    // Already on the field (by name)? Just bounce back to the fight.
+    if (currentScene.enemies.some((e) => e.name.trim().toLowerCase() === boss.name.trim().toLowerCase())) {
+      set({ currentScreen: 'exploration' });
+      return { ok: true, reason: 'already_present' };
+    }
+    const enemy = cmqe.questBossEnemyAt(player, player.currentLocationId);
+    if (!enemy) return { ok: false, reason: 'no_quest_boss_here' };
+    set((s) => (
+      s.currentScene
+        ? {
+            currentScene: {
+              ...s.currentScene,
+              enemies: [...s.currentScene.enemies, enemy],
+              enemyHps: [...s.currentScene.enemyHps, enemy.hp],
+              activeEnemyIdx: s.currentScene.enemies.length,
+              range: 'mid',
+            },
+          }
+        : s
+    ));
+    get().appendLog(
+      'combat',
+      `${enemy.name} closes — ${enemy.attack} ready, ${enemy.damage} damage on a hit. (range: mid)`,
+    );
+    recordMemorableEvent(get, set, {
+      kind: 'mq_guardian_spawned',
+      text: `summoned ${enemy.name} at ${player.currentLocationId}`,
+      locationId: player.currentLocationId,
+      hoursElapsed: player.hoursElapsed ?? 0,
+      enemyName: enemy.name,
+    });
+    // Bounce to exploration so the boss card surfaces immediately.
+    set({ currentScreen: 'exploration' });
+    void get().persist();
+    return { ok: true };
   },
 
   async persist() {

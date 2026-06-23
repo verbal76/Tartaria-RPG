@@ -610,7 +610,7 @@ export function ExplorationScreen() {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { liveMainQuest } = require('../engine/customMainQuest');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { currentObjectiveLine, questIsComplete, questStepIndex } = require('../engine/customMainQuestEngine');
+        const { currentObjectiveLine, questIsComplete, questStepIndex, questBossAt } = require('../engine/customMainQuestEngine');
         const customQ = liveMainQuest();
         if (customQ) {
           // engine_Dev — the chip leads with the QUEST TITLE (the author's name for
@@ -621,6 +621,19 @@ export function ExplorationScreen() {
           const done = Math.max(0, Math.min(questStepIndex(player), total));
           const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
           const objLine = complete ? 'Complete.' : (currentObjectiveLine(player) ?? 'No active objective.');
+          // engine_Dev — SUMMON chip for the active KILL step. The kill-step boss
+          // auto-spawns on arrival; this re-engages it after a death-revive / scene
+          // rebuild clears the field. Shown only while STANDING at the boss's location
+          // with no copy already in the scene (the summon action re-checks the same).
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { WORLD_MAP_CENTER_X: scx, WORLD_MAP_CENTER_Y: scy } = require('../engine/worldMap');
+          const stationedHere = !player.travelTarget
+            && (player.hubRoomId != null || (player.mapX === scx && player.mapY === scy));
+          const bossHere = !complete && stationedHere ? questBossAt(player, player.currentLocationId) : null;
+          const bossInScene = !!bossHere && (currentScene?.enemies ?? []).some(
+            (e: { name: string }) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
+          );
+          const canSummonBoss = !!bossHere && !bossInScene;
           return (
             <TutorialTarget area="objective-chip">
               <TouchableOpacity
@@ -636,6 +649,16 @@ export function ExplorationScreen() {
                     {objLine}
                     <Text style={styles.objectiveChipProgress}>{`   ${done}/${total} parts`}</Text>
                   </Text>
+                  {canSummonBoss && (
+                    <TouchableOpacity
+                      style={styles.objectiveChipSummon}
+                      onPress={() => useGameStore.getState().summonMainQuestBoss()}
+                      activeOpacity={0.7}
+                      hitSlop={8}
+                    >
+                      <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </TouchableOpacity>
             </TutorialTarget>

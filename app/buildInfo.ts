@@ -15596,4 +15596,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the shape, the tag vocabulary). Recipes template note de-staled — dropped the
 // coresRequired gate that 808 removed. All templates still round-trip (loaders strip
 // the // headers on upload); devTemplatesRoundTrip + contentTemplates stay green.
-export const OTA_BUILD_ID = '2026-06-23-809';
+//
+// engine_Dev-810 — SUMMON the data-driven main-quest boss. The deleted built-in
+// Core-Guardian SUMMON chip is reborn pointed at the custom main quest: a new
+// summonMainQuestBoss() store action re-spawns the active KILL-step boss into the
+// current scene (the boss auto-spawns on arrival, but a death-revive / scene rebuild
+// clears the field, leaving the player on the objective with nothing to fight). The
+// ★ SUMMON chip is back on the Contracts Primary-Objective card + the Exploration
+// MAIN QUEST chip, shown only while STANDING at the boss's location with no copy
+// already in the scene. The summoned boss is an ordinary enemy, so FLEE (a DEX
+// check; a failed flee provokes the group counter-attack) already works on it.
+export const OTA_BUILD_ID = '2026-06-23-810';
