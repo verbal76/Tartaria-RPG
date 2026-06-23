@@ -344,19 +344,26 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
     expect(effectiveDc('aetherborn', 'crystal_golem')).toBe(21);
   });
 
-  // Every other race gets +3.
+  // engine_Dev — the Tartaria untrained races carry aethercraftDcMod:3 in
+  // races.json, so they still get +3 (now data-driven, not hardcoded ids).
   it.each([
     'tartarian_giant',
     'reclaimer',
     'architectural_sentinel',
     'mud_golem',
     'unknowing_mass',
-    'made_up_race_id',
-  ])('untrained race "%s" (+3 DC) — full table', (race) => {
+  ])('untrained Tartaria race "%s" (+3 DC) — full table', (race) => {
     expect(effectiveDc(race, 'mud_golem')).toBe(16);
     expect(effectiveDc(race, 'iron_golem')).toBe(18);
     expect(effectiveDc(race, 'aether_golem')).toBe(20);
     expect(effectiveDc(race, 'crystal_golem')).toBe(22);
+  });
+
+  // engine_Dev — an UNKNOWN race (a reskin race that sets no affinity) now casts
+  // at the BASE DC (+0), not the old hardcoded +3 "untrained" default.
+  it('unknown / affinity-less race casts at the base DC (+0)', () => {
+    expect(effectiveDc('made_up_race_id', 'mud_golem')).toBe(13);
+    expect(effectiveDc('made_up_race_id', 'crystal_golem')).toBe(19);
   });
 
   it('summonDC values themselves match the OTA-137 spec on the GolemDefinition', () => {
@@ -366,10 +373,10 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
     expect(getGolemDefinition('crystal_golem').summonDC).toBe(19);
   });
 
-  it('aethercraftDcModifier monotonicity — mud_dweller 0 < aetherborn 2 < other 3', () => {
-    expect(aethercraftDcModifier('mud_dweller')).toBe(0);
-    expect(aethercraftDcModifier('aetherborn')).toBe(2);
-    expect(aethercraftDcModifier('zorglax')).toBe(3);
-    expect(aethercraftDcModifier(undefined)).toBe(3);
+  it('aethercraftDcModifier — data-driven affinity (Tartaria values preserved)', () => {
+    expect(aethercraftDcModifier('mud_dweller')).toBe(0);   // from races.json
+    expect(aethercraftDcModifier('aetherborn')).toBe(2);    // from races.json
+    expect(aethercraftDcModifier('zorglax')).toBe(0);       // unknown → neutral default
+    expect(aethercraftDcModifier(undefined)).toBe(0);       // no race → neutral default
   });
 });

@@ -319,31 +319,22 @@ export function raceResistLabel(raceId: string | undefined, mult: number): strin
 }
 
 // ─── Aethercraft DC modifier ────────────────────────────────────────
-// OTA 039 — True Tartarians (Mud Dwellers) trained the discipline;
-// they cast at base DC. Aetherborn share Aetheric blood but lack the
-// True Tartarian training, so they cast at +2 DC. All other races
-// are guessing — +4 DC.
-//
-// 2026-05-25 [MECHANIC-1] — non-Aetheric races dropped from +4 → +3.
-// User reported summon-golem felt unreasonably hard: three attempts
-// (d20 1 → auto-fail, d20 15 vs DC 19 → fail, d20 16 + INT 3 = 19 →
-// pass). The +4 modifier put non-mud-dweller / non-aetherborn casters
-// at ~25% success on early-game INT scores. +3 brings it to ~35%
-// while still preserving the "untrained casters" gap from
-// mud_dweller (0) and aetherborn (+2). Larger redesign — sending
-// the golem to fight + follow until next combat — tracked as
-// MECHANIC-1b follow-up; this OTA is the DC-fairness piece only.
+// engine_Dev — data-driven race AFFINITY for summon/shape/mend. Each race row
+// carries an optional aethercraftDcMod (added to every discipline DC; + = harder)
+// and aethercraftIntBonus (added to effective INT). A race that sets neither casts
+// at the base DC with no INT bonus — the neutral default for a reskin. The
+// Tartaria reference races carry their historical values in races.json
+// (mud_dweller 0 / +2 INT, aetherborn +2, the rest +3), so their balance is
+// unchanged; the rule is just no longer hardcoded to those ids.
 export function aethercraftDcModifier(raceId: string | undefined): number {
-  if (raceId === 'mud_dweller') return 0;
-  if (raceId === 'aetherborn') return 2;
-  return 3;
+  const m = getRace(raceId)?.aethercraftDcMod;
+  return typeof m === 'number' ? m : 0;
 }
 
 // ─── Aethercraft context bonus ──────────────────────────────────────
-// Mud Dwellers' "Aethercraft Mastery: +2 Intelligence when using
-// Aethercraft" trait fires here. Verb handlers add this to the
-// effective INT before the skill check. Other races: no bonus.
+// The race's aethercraftIntBonus is added to effective INT before the skill
+// check (Tartaria's Mud Dwellers carry +2). Verb handlers apply it.
 export function aethercraftStatBonus(raceId: string | undefined): Partial<Stats> {
-  if (raceId === 'mud_dweller') return { intelligence: 2 };
-  return {};
+  const b = getRace(raceId)?.aethercraftIntBonus;
+  return typeof b === 'number' && b !== 0 ? { intelligence: b } : {};
 }

@@ -5,20 +5,30 @@
     "baseAC": 12,
     "racialACBonus": "+2 AC due to size and resilience; -4 in confined spaces (low caves, pre-flood dwellings)",
     "racialACBonusRules": [
-      { "condition": "confined", "delta": -4 }
+      {
+        "condition": "confined",
+        "delta": -4
+      }
     ],
-    "racialStatBonuses": { "strength": 2 },
+    "racialStatBonuses": {
+      "strength": 2
+    },
     "startingTCFormula": "4d6 x 10",
     "startingHPBonus": 15,
     "barehandDamage": "1d6 +2",
-    "tags": ["large", "strength", "relic_savvy"],
+    "tags": [
+      "large",
+      "strength",
+      "relic_savvy"
+    ],
     "traits": [
       "Towering Strength: +2 Strength.",
       "Ancient Insight: +1 Intelligence when investigating ancient structures or artifacts.",
       "Legacy of Power: Once per day, channel Aetheric energy into a relic (repair, power-up, unexpected effect)."
     ],
     "description": "Towering descendants of Tartaria's first builders. Strongest hand-to-hand fighters; revered as divine by True Tartarians.",
-    "flavor": "You stand a head taller than any ceiling down here. The buried halls remember your bloodline; the stones still hum with the commands your ancestors left in them. Whatever you reclaim, you do not bow to take it."
+    "flavor": "You stand a head taller than any ceiling down here. The buried halls remember your bloodline; the stones still hum with the commands your ancestors left in them. Whatever you reclaim, you do not bow to take it.",
+    "aethercraftDcMod": 3
   },
   {
     "id": "mud_dweller",
@@ -26,13 +36,22 @@
     "baseAC": 10,
     "racialACBonus": "+1 AC in underground areas",
     "racialACBonusRules": [
-      { "condition": "underground", "delta": 1 }
+      {
+        "condition": "underground",
+        "delta": 1
+      }
     ],
-    "racialStatBonuses": { "dexterity": 2 },
+    "racialStatBonuses": {
+      "dexterity": 2
+    },
     "startingTCFormula": "3d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6 -3",
-    "tags": ["true_tartarian", "subterranean", "aethercraft"],
+    "tags": [
+      "true_tartarian",
+      "subterranean",
+      "aethercraft"
+    ],
     "traits": [
       "Tunnel Sense: At home in the dark. Indoors or underground you turn up loot more often and pull more story hooks when you investigate.",
       "Aethercraft Mastery: +2 Intelligence when using Aethercraft (shaping Aetherstone, tools, weapons, golems, earth).",
@@ -40,7 +59,9 @@
       "Aetherstone Resilience: Half damage from Aetheric or Mud-power attacks."
     ],
     "description": "True Tartarians who survived underground in subterranean enclaves. Nimble but lacking brute force; rely on Aethercraft.",
-    "flavor": "The dark was your cradle. You hear stone the way the surface hears wind, and Aetherstone shapes under your fingers like wet clay. Above you are the cities that should have been yours."
+    "flavor": "The dark was your cradle. You hear stone the way the surface hears wind, and Aetherstone shapes under your fingers like wet clay. Above you are the cities that should have been yours.",
+    "aethercraftDcMod": 0,
+    "aethercraftIntBonus": 2
   },
   {
     "id": "reclaimer",
@@ -48,20 +69,30 @@
     "baseAC": 10,
     "racialACBonus": "+1 AC in constructed environments (cities, ruins)",
     "racialACBonusRules": [
-      { "condition": "constructed_environment", "delta": 1 }
+      {
+        "condition": "constructed_environment",
+        "delta": 1
+      }
     ],
-    "racialStatBonuses": { "dexterity": 1 },
+    "racialStatBonuses": {
+      "dexterity": 1
+    },
     "startingTCFormula": "5d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6",
-    "tags": ["scavenger", "urban", "rogue"],
+    "tags": [
+      "scavenger",
+      "urban",
+      "rogue"
+    ],
     "traits": [
       "Urban Explorer: +2 Stealth in city ruins or underground.",
       "Ruins Specialist: +1 Investigation when searching for relics or navigating dangerous areas.",
       "Relic Hunter: A scavenger's nose for buried value — a strong, always-on chance to turn up rare Aetheric loot, materials, weapons, and armor when you search or investigate."
     ],
     "description": "Treasure hunters and scavengers, equally at home in ruined cities and dangerous tunnels. Profit before ideology.",
-    "flavor": "Other people see ruins. You see paydays. The relic is real, the buyer is real, the danger is real — three more things than most mornings give you. Whatever you carry out, somebody's already paying for it."
+    "flavor": "Other people see ruins. You see paydays. The relic is real, the buyer is real, the danger is real — three more things than most mornings give you. Whatever you carry out, somebody's already paying for it.",
+    "aethercraftDcMod": 3
   },
   {
     "id": "architectural_sentinel",
@@ -69,13 +100,23 @@
     "baseAC": 10,
     "racialACBonus": "+2 AC when using or wearing runic gear",
     "racialACBonusRules": [
-      { "condition": "runic_gear", "delta": 2 }
+      {
+        "condition": "runic_gear",
+        "delta": 2
+      }
     ],
-    "racialStatBonuses": { "strength": 2, "intelligence": 1 },
+    "racialStatBonuses": {
+      "strength": 2,
+      "intelligence": 1
+    },
     "startingTCFormula": "3d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d10 even/odd roll to land",
-    "tags": ["construct", "ageless", "runic"],
+    "tags": [
+      "construct",
+      "ageless",
+      "runic"
+    ],
     "traits": [
       "Aetheric Constitution: Half damage from energy-based attacks.",
       "Indomitable Strength: +2 Strength, +1 Intelligence.",
@@ -83,7 +124,8 @@
       "Defensive Protocols: Once per day, activate a shield reducing incoming damage by half for 3 rounds."
     ],
     "description": "Aetherstone-powered constructs left over from Tartaria's golden age. Tireless, durable, programmed with ancient duties.",
-    "flavor": "You do not eat. You do not sleep. You have not stopped patrolling for a span of years that has no word in any language still being spoken. You were told to watch. You watch."
+    "flavor": "You do not eat. You do not sleep. You have not stopped patrolling for a span of years that has no word in any language still being spoken. You were told to watch. You watch.",
+    "aethercraftDcMod": 3
   },
   {
     "id": "mud_golem",
@@ -91,20 +133,30 @@
     "baseAC": 8,
     "racialACBonus": "+1 AC with relic armor or shields",
     "racialACBonusRules": [
-      { "condition": "relic_armor", "delta": 1 }
+      {
+        "condition": "relic_armor",
+        "delta": 1
+      }
     ],
-    "racialStatBonuses": { "strength": 2 },
+    "racialStatBonuses": {
+      "strength": 2
+    },
     "startingTCFormula": "3d6 x 10",
     "startingHPBonus": 10,
     "barehandDamage": "1d6",
-    "tags": ["construct", "aetherstone", "regenerative"],
+    "tags": [
+      "construct",
+      "aetherstone",
+      "regenerative"
+    ],
     "traits": [
       "Aetherstone Resilience: +2 Strength; half damage from non-Aetheric attacks.",
       "Elemental Control: Manipulate Aetherstone within arm's reach/close range. 1d6 block / 1d6 attack, one of each per encounter.",
       "Regenerative Core: Near Aetherstone, roll 1d10 daily for free HP recharge up to max."
     ],
     "description": "Etheric constructs born of the mud that consumed Tartaria. Unpredictable. Some serve their makers, others turn on them.",
-    "flavor": "You are mud and Aether and the violence of an empire's last breath, given a shape that walks. You do not remember being summoned. You only know that the buried things still belong somewhere, and that you go where they hum."
+    "flavor": "You are mud and Aether and the violence of an empire's last breath, given a shape that walks. You do not remember being summoned. You only know that the buried things still belong somewhere, and that you go where they hum.",
+    "aethercraftDcMod": 3
   },
   {
     "id": "unknowing_mass",
@@ -116,14 +168,19 @@
     "startingTCFormula": "5d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6",
-    "tags": ["surface", "ignorant", "adaptive"],
+    "tags": [
+      "surface",
+      "ignorant",
+      "adaptive"
+    ],
     "traits": [
       "Curious Mind: +2 Intelligence and Wisdom after first exposure to Tartaria's secrets.",
       "Beginner's Luck: Once per day, reroll a failed difficulty roll for survival, combat, or relic interaction.",
       "Ignorant of Aetheric Power: No initial resistance; can only use Common-level Aether/mud magic. 1d6 for damage, 1d6 for blocking/restoration."
     ],
     "description": "Ordinary surface-dwellers unaware of Tartaria's existence until they stumble into it. Average human stock, but adaptive.",
-    "flavor": "Last week you had never heard the word Tartaria. This week you can't stop hearing it. Something in a pawn shop window stared back at you and now the world doesn't fit the way it did, and you are not going home until it does."
+    "flavor": "Last week you had never heard the word Tartaria. This week you can't stop hearing it. Something in a pawn shop window stared back at you and now the world doesn't fit the way it did, and you are not going home until it does.",
+    "aethercraftDcMod": 3
   },
   {
     "id": "aetherborn",
@@ -131,13 +188,22 @@
     "baseAC": 11,
     "racialACBonus": "+1 AC with Aetheric powers or runecasters",
     "racialACBonusRules": [
-      { "condition": "aether_powers", "delta": 1 }
+      {
+        "condition": "aether_powers",
+        "delta": 1
+      }
     ],
-    "racialStatBonuses": { "charisma": 1 },
+    "racialStatBonuses": {
+      "charisma": 1
+    },
     "startingTCFormula": "6d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6 -2",
-    "tags": ["bloodline", "aetheric", "noble"],
+    "tags": [
+      "bloodline",
+      "aetheric",
+      "noble"
+    ],
     "traits": [
       "Aetheric Awakening: Attuned to relics — +2 Intelligence when investigating them, and a higher chance to turn up rare Aetheric loot when you search or investigate.",
       "Noble Heritage: +1 Charisma; once per day, an Aetheric-presence surge (+3 Charisma for 3 rounds) for persuasion or intimidation.",
@@ -145,6 +211,7 @@
       "Destiny Unfolding: Your awakened bloodline charges Aetheric weapons — they deal an extra 1d6 damage on every hit."
     ],
     "description": "Descendants of Tartaria's noble bloodlines, born with awakened Aetheric genes. Powerful, dangerous, hunted.",
-    "flavor": "Your grandmother kept the locket no one would explain. The locket is in your pocket now and it is humming, and you finally understand why she never let anyone else hold it. Some people will kill to take that locket from you. Others will kill to protect it."
+    "flavor": "Your grandmother kept the locket no one would explain. The locket is in your pocket now and it is humming, and you finally understand why she never let anyone else hold it. Some people will kill to take that locket from you. Others will kill to protect it.",
+    "aethercraftDcMod": 2
   }
 ]

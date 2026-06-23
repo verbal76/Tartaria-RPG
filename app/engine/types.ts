@@ -185,6 +185,13 @@ export interface Race {
     wisdom?: number;
     charisma?: number;
   };
+  /** engine_Dev — aethercraft (summon/shape/mend) AFFINITY. aethercraftDcMod is
+   *  added to every discipline DC for this race (+ = harder, − = easier; 0/absent
+   *  = no modifier, the default for a reskin race that sets no affinity).
+   *  aethercraftIntBonus adds to effective INT when using aethercraft. Replaces
+   *  the old hardcoded "mud_dweller 0 / aetherborn +2 / else +3" rule. */
+  aethercraftDcMod?: number;
+  aethercraftIntBonus?: number;
   startingTCFormula: string;
   startingHPBonus: number;
   barehandDamage: string;
