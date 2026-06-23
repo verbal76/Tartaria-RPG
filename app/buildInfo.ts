@@ -15555,4 +15555,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a generalized kill-gate hook in resolveEnemyDefeat). One-hop (meetLine/
 // meetEffects) chains and the bespoke Yulka chain are unchanged. Template + bundle
 // hint show both shapes. Phase 2 (a form-builder UI with Add-Whisper/Add-Leg) next.
-export const OTA_BUILD_ID = '2026-06-22-805';
+// engine_Dev-806 — MULTI-STAGE whispers (Phase 2: form-builder UI). The WHISPERS
+// dev box is now a builder like the Main Quest box: fields for a new mission (id,
+// title, plant location, plant chance, first-tile offset, tip line), an ADD LEG
+// sub-builder (per-leg narration, tile offset, a foe to defeat, and TC/item
+// rewards), and an ＋ADD WHISPER button that appends a SEPARATE mission to the
+// array. Existing missions list with REMOVE. The paste/TEMPLATE/EDIT/COPY/RESET
+// path is kept below for advanced effects. Builder always emits multi-stage
+// (stages[]); the engine runs them (Phase 1, -805).
+export const OTA_BUILD_ID = '2026-06-22-806';

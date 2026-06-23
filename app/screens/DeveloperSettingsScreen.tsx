@@ -5,7 +5,7 @@
 // dependency; a real file picker can be layered on the web/desktop builds later.)
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform, type StyleProp, type TextStyle } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
@@ -714,31 +714,141 @@ function HooksBox() {
 
 // engine_Dev — WHISPERS upload. An array of overheard-tip chains (plant → travel
 // to a tile in a time window → meetLine + meetEffects payoff).
+// engine_Dev — Phase 2: WHISPERS form-builder. Build a random-triggered mission
+// leg-by-leg (like the Main Quest box), add as many SEPARATE missions as you want,
+// and still paste/edit raw JSON for advanced effects.
+interface BuiltLeg { line: string; targetOffset?: { dxRange: [number, number]; dyRange: [number, number] }; enemyName?: string; effects?: Array<{ type: string; amount?: number; name?: string }> }
 function WhispersBox() {
   const loadWhispersJson = useContentPackStore((s) => s.loadWhispersJson);
-  const whispers = useContentPackStore((s) => s.whispers);
+  const whispers = useContentPackStore((s) => s.whispers) as Array<{ id: string; title?: string; stages?: unknown[] }>;
   const loaded = whispers.length;
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
+
+  // --- builder state ---
+  const [wId, setWId] = useState('');
+  const [wTitle, setWTitle] = useState('');
+  const [wPlant, setWPlant] = useState('');
+  const [wChance, setWChance] = useState('0.15');
+  const [wLine, setWLine] = useState('');
+  const [wDx, setWDx] = useState('2');
+  const [wDy, setWDy] = useState('0');
+  // leg sub-builder
+  const [legs, setLegs] = useState<BuiltLeg[]>([]);
+  const [legLine, setLegLine] = useState('');
+  const [legEnemy, setLegEnemy] = useState('');
+  const [legTc, setLegTc] = useState('');
+  const [legItem, setLegItem] = useState('');
+  const [legDx, setLegDx] = useState('');
+  const [legDy, setLegDy] = useState('');
+
+  const num = (s: string) => { const n = parseInt(s, 10); return Number.isFinite(n) ? n : 0; };
+
+  const addLeg = () => {
+    if (!legLine.trim()) { setStatus({ kind: 'err', msg: 'A leg needs a narration line.' }); return; }
+    const effects: BuiltLeg['effects'] = [];
+    if (num(legTc) > 0) effects.push({ type: 'grant_tc', amount: num(legTc) });
+    if (legItem.trim()) effects.push({ type: 'grant_item', name: legItem.trim() });
+    const leg: BuiltLeg = {
+      line: legLine.trim(),
+      ...(legDx.trim() || legDy.trim() ? { targetOffset: { dxRange: [num(legDx), num(legDx)], dyRange: [num(legDy), num(legDy)] } } : {}),
+      ...(legEnemy.trim() ? { enemyName: legEnemy.trim() } : {}),
+      ...(effects.length > 0 ? { effects } : {}),
+    };
+    setLegs((ls) => [...ls, leg]);
+    setLegLine(''); setLegEnemy(''); setLegTc(''); setLegItem(''); setLegDx(''); setLegDy('');
+    setStatus({ kind: 'ok', msg: `Leg ${legs.length + 1} added.` });
+  };
+
+  const addWhisper = () => {
+    if (!wId.trim()) { setStatus({ kind: 'err', msg: 'Give the mission an id (e.g. dredge_job).' }); return; }
+    if (!wPlant.trim()) { setStatus({ kind: 'err', msg: 'Pick where it plants (a hub-room id or your location id).' }); return; }
+    if (legs.length === 0) { setStatus({ kind: 'err', msg: 'Add at least one leg (the mission’s steps).' }); return; }
+    if (whispers.some((w) => w.id === wId.trim())) { setStatus({ kind: 'err', msg: `A whisper with id "${wId.trim()}" already exists.` }); return; }
+    const whisper = {
+      id: wId.trim(),
+      title: wTitle.trim() || wId.trim(),
+      plantLocations: [wPlant.trim()],
+      plantChance: Number(wChance) > 0 ? Number(wChance) : 0.15,
+      plantLines: [wLine.trim() || 'You overhear something worth following up.'],
+      targetOffset: { dxRange: [num(wDx), num(wDx)] as [number, number], dyRange: [num(wDy), num(wDy)] as [number, number] },
+      stages: legs,
+    };
+    const r = loadWhispersJson(JSON.stringify([...whispers, whisper]));
+    if (!r.ok) { setStatus({ kind: 'err', msg: r.error ?? 'Failed to save.' }); return; }
+    setStatus({ kind: 'ok', msg: `Added "${whisper.title}" (${legs.length} leg${legs.length > 1 ? 's' : ''}).` });
+    setWId(''); setWTitle(''); setWPlant(''); setWChance('0.15'); setWLine(''); setWDx('2'); setWDy('0'); setLegs([]);
+  };
+
+  const removeWhisper = (id: string) => {
+    const next = whispers.filter((w) => w.id !== id);
+    if (next.length === 0) { useContentPackStore.getState().clearWhispers(); }
+    else loadWhispersJson(JSON.stringify(next));
+    setStatus({ kind: 'ok', msg: `Removed "${id}".` });
+  };
+
+  const smallInput: StyleProp<TextStyle> = [styles.input, { minHeight: 0, height: 40 }];
+
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
         <Text style={styles.cardTitle}>Whispers (overheard tips)</Text>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
-          {loaded > 0 ? `● override · ${loaded} chains` : '○ built-in'}
+          {loaded > 0 ? `● override · ${loaded} mission(s)` : '○ built-in'}
         </Text>
       </View>
       <Text style={styles.hint}>
-        An array of overheard-tip chains. Each plants at a plant location (plantLocations), points to
-        a nearby tile (targetOffset) in a time window (activeHours), and pays off via{' '}
-        <Text style={{ fontWeight: 'bold' }}>meetLine</Text> +{' '}
-        <Text style={{ fontWeight: 'bold' }}>meetEffects</Text> (same effect verbs as hooks) when the
-        player arrives. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one
-        of your own location ids — it plants in that hub room or at that location. You can use{' '}
-        <Text style={{ fontWeight: 'bold' }}>{'{narrator}'}</Text> /{' '}
-        <Text style={{ fontWeight: 'bold' }}>{'{crucible}'}</Text> tokens in any line. Hit TEMPLATE for
-        the shape.
+        Random-triggered overheard-tip missions. Each one plants at a location (a per-visit
+        chance), points to a tile, and runs <Text style={{ fontWeight: 'bold' }}>leg by leg</Text>:
+        reach a tile, optionally beat a foe before advancing, then the next leg. Build one below
+        and hit <Text style={{ fontWeight: 'bold' }}>ADD WHISPER</Text>; add as many separate
+        missions as you like. (Advanced effects: use TEMPLATE / EDIT CURRENT to paste JSON.)
       </Text>
+
+      {/* ---- existing missions ---- */}
+      {whispers.length > 0 && (
+        <View style={{ marginBottom: 8 }}>
+          {whispers.map((w) => (
+            <View key={w.id} style={styles.row}>
+              <Text style={[styles.hint, { flex: 1 }]}>• {w.title ?? w.id} <Text style={styles.whisperCountDim}>({Array.isArray(w.stages) ? w.stages.length : 1} leg{(Array.isArray(w.stages) ? w.stages.length : 1) > 1 ? 's' : ''})</Text></Text>
+              <TouchableOpacity style={styles.resetBtn} onPress={() => removeWhisper(w.id)}><Text style={styles.resetBtnText}>REMOVE</Text></TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* ---- build a mission ---- */}
+      <Text style={styles.whisperSectionLabel}>New mission</Text>
+      <TextInput style={smallInput} value={wId} onChangeText={setWId} placeholder="id (e.g. dredge_job)" placeholderTextColor="#5c5446" autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={smallInput} value={wTitle} onChangeText={setWTitle} placeholder="title (shown in the Whispers panel)" placeholderTextColor="#5c5446" />
+      <TextInput style={smallInput} value={wPlant} onChangeText={setWPlant} placeholder="plants at (hub-room id or your location id)" placeholderTextColor="#5c5446" autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TextInput style={[smallInput, { flex: 1 }]} value={wChance} onChangeText={setWChance} placeholder="plant chance 0–1" placeholderTextColor="#5c5446" keyboardType="numeric" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wDx} onChangeText={setWDx} placeholder="1st tile dx" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wDy} onChangeText={setWDy} placeholder="dy" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
+      </View>
+      <TextInput style={smallInput} value={wLine} onChangeText={setWLine} placeholder="the overheard tip line" placeholderTextColor="#5c5446" />
+
+      {/* legs */}
+      <Text style={styles.whisperSectionLabel}>Legs ({legs.length})</Text>
+      {legs.map((l, i) => (
+        <Text key={i} style={styles.hint}>{i + 1}. {l.line.slice(0, 60)}{l.enemyName ? ` ⚔ ${l.enemyName}` : ''}</Text>
+      ))}
+      <TextInput style={smallInput} value={legLine} onChangeText={setLegLine} placeholder="leg narration (what happens on arrival)" placeholderTextColor="#5c5446" />
+      <View style={styles.row}>
+        <TextInput style={[smallInput, { flex: 1 }]} value={legDx} onChangeText={setLegDx} placeholder="dx (blank=same tile)" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={legDy} onChangeText={setLegDy} placeholder="dy" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1.4 }]} value={legEnemy} onChangeText={setLegEnemy} placeholder="foe to defeat (optional)" placeholderTextColor="#5c5446" />
+      </View>
+      <View style={styles.row}>
+        <TextInput style={[smallInput, { flex: 1 }]} value={legTc} onChangeText={setLegTc} placeholder="reward TC" placeholderTextColor="#5c5446" keyboardType="numeric" />
+        <TextInput style={[smallInput, { flex: 1.6 }]} value={legItem} onChangeText={setLegItem} placeholder="reward item name (optional)" placeholderTextColor="#5c5446" />
+        <TouchableOpacity style={styles.tmplBtn} onPress={addLeg}><Text style={styles.tmplBtnText}>ADD LEG</Text></TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.loadBtn} onPress={addWhisper}><Text style={styles.loadBtnText}>＋ ADD WHISPER</Text></TouchableOpacity>
+
+      {/* ---- raw JSON (advanced) ---- */}
+      <Text style={[styles.whisperSectionLabel, { marginTop: 12 }]}>Or paste / edit JSON</Text>
       <TextInput
         style={styles.input}
         value={text}
@@ -3295,6 +3405,8 @@ const styles = StyleSheet.create({
   badgeOn: { color: '#9ec96a', fontSize: 10, fontWeight: '700' },
   badgeOff: { color: '#7a705c', fontSize: 10 },
   hint: { color: '#7a705c', fontSize: 10, marginTop: 3, lineHeight: 14 },
+  whisperSectionLabel: { color: '#9aaab0', fontSize: 12, fontWeight: '700' as const, marginTop: 8, marginBottom: 4 },
+  whisperCountDim: { color: '#7a705c' },
   specLine: { color: '#6a9bbf', fontSize: 10, marginTop: 5, lineHeight: 14, fontStyle: 'italic' },
   toneLine: { color: '#b88ce0', fontSize: 11, marginTop: 5, fontStyle: 'italic', lineHeight: 15 },
   trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, backgroundColor: '#0a0908', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 8 },
