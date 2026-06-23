@@ -10,6 +10,7 @@
 
 import { GENERIC_TABLE_ROWS, GENERIC_MISSIONS } from './genericTemplateData';
 import { genericFlavorPools } from './narrativeGenerator';
+import { GENERIC_POWERS } from './powers';
 
 // Reuse the generic mission scaffolds as DEFAULT content by swapping their REPLACE
 // id placeholders for the real ids defined below. (Free-text fields never contain
@@ -128,6 +129,7 @@ export const GENERIC_GAME = {
     rings: withFaction(GENERIC_TABLE_ROWS.rings, 'wardens'),
     dogGear: GENERIC_TABLE_ROWS.dogGear,
     recipes: GENERIC_TABLE_ROWS.recipes,
+    powers: GENERIC_POWERS,
     weather: GENERIC_TABLE_ROWS.weather,
     enemies: ENEMIES,
     races: RACES,

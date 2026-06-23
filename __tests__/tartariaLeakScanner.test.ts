@@ -48,7 +48,8 @@ const BASELINE: Record<string, number> = {
   'app/engine/hooks.ts': 49,
   // elevatedOverlay.ts extracted to app/data/overlays/elevated-overlays.json (45 → 0).
   // salvagePools.ts extracted to app/data/salvage/salvage-pools.json (41 → 0).
-  'app/engine/powers.ts': 24, 'app/engine/coreGuardians.ts': 23,
+  // powers.ts: DEFAULT_POWERS extracted to app/data/powers/default-powers.json (24→0).
+  'app/engine/powers.ts': 0, 'app/engine/coreGuardians.ts': 23,
   // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).
   'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 9,
   // golems.ts: built-in defs extracted to app/data/summons/builtin-sidekicks.json (8→0).

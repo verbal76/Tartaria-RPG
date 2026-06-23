@@ -1,0 +1,39 @@
+{
+  "_comment": "engine_Dev — built-in (Tartaria) power disciplines: the LAST-RESORT default power set. An uploaded 'powers' table replaces these, and the generic-default pack (GENERIC_POWERS) supplies bland disciplines for a reskin. Moved out of engine source so powers.ts carries no hardcoded setting strings. The shape/summon/mend effect PRIMITIVES stay in the engine.",
+  "powers": [
+    {
+      "id": "aether_shape",
+      "discipline": "shape",
+      "name": "Aetherstone Manipulation",
+      "title": "Aetherstone Manipulation (shape)",
+      "body": "INT check, DC 12. In combat: +4 AC for one turn (shaped-stone ward). Out of combat: binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. Power affinity (set per race) adjusts the DC.",
+      "stat": "intelligence",
+      "dcBase": 12,
+      "fuels": ["Aetheric Shard", "Aether Crystal", "Aether Mud", "Aether Residue", "Golem Core", "Aetheric Locket"],
+      "examples": ["shape stone", "mold the aetherstone", "manipulate stone"]
+    },
+    {
+      "id": "aether_summon",
+      "discipline": "summon",
+      "name": "Aether Golem Constructor",
+      "title": "Aether Golem Constructor (summon)",
+      "body": "INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons a golem ally that fights for you for the rest of the scene. Power affinity (set per race) adjusts the DC.",
+      "stat": "intelligence",
+      "dcBase": 15,
+      "fuels": ["Aetheric Shard", "Aether Crystal", "Golem Core"],
+      "examples": ["summon golem", "summon an aether golem", "call a golem"],
+      "showGolemVariants": true
+    },
+    {
+      "id": "aether_mend",
+      "discipline": "mend",
+      "name": "Aetheric Healing",
+      "title": "Aetheric Healing (mend)",
+      "body": "WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption when they cast this — racial trait. Power affinity (set per race) adjusts the DC.",
+      "stat": "wisdom",
+      "dcBase": 12,
+      "fuels": ["Aetheric Shard", "Aether Crystal"],
+      "examples": ["mend wounds", "heal me", "mend self", "aetheric healing"]
+    }
+  ]
+}
