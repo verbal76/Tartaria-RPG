@@ -1248,7 +1248,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Golem Sledge",
+      "result": "Sidekick Sledge",
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1265,7 +1265,7 @@
       ]
     },
     {
-      "result": "Golem Greatsword",
+      "result": "Sidekick Greatsword",
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1282,7 +1282,7 @@
       ]
     },
     {
-      "result": "Golem Pike",
+      "result": "Sidekick Pike",
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1299,7 +1299,7 @@
       ]
     },
     {
-      "result": "Golem Aether-Lance",
+      "result": "Sidekick Aether-Lance",
       "ingredients": [
         {
           "name": "Aether Crystal",
