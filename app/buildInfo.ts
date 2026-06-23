@@ -15452,4 +15452,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // whole-game bundle hint updated; generic-game captors given generic loot. New
 // tests cover the matcher + authorable combat. archetypes documented as
 // cosmetic/reserved (it never gated placement).
-export const OTA_BUILD_ID = '2026-06-22-794';
+// engine_Dev-795 — dog-hook matcher tightened to WHOLE-PHRASE. The 794 matcher
+// also let a multi-word hookNoun fire on any single word of it, which backfires
+// on descriptive phrases ("black ash tree" fired on "tree"/"black"; "weapon
+// rack" on "weapon"). Now a hookNoun fires ONLY when its full phrase appears
+// (word-bounded) in the target — "black ash tree" matches "the black ash tree"
+// but never "tree". Authors list single-word triggers explicitly. rescueHook
+// Matches simplified; template / dev-panel hint / bundle hint / tests updated.
+export const OTA_BUILD_ID = '2026-06-22-795';

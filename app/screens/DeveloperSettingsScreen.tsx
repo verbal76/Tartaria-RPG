@@ -1703,8 +1703,9 @@ function DogScenariosBox() {
         How the player FINDS and frees the one companion dog. The mechanic is fixed: in an
         enemy-free scene, investigating / attacking / approaching a target that matches a
         <Text style={{ fontWeight: 'bold' }}> hookNoun</Text> spawns the captor → kill them (no
-        faction cost) → breed/name/sex onboarding. Matching is <Text style={{ fontWeight: 'bold' }}>whole-word</Text>
-        {' '}(“ash” fires on “ash tree”, not “trash”), so pick distinctive nouns.{'\n\n'}
+        faction cost) → breed/name/sex onboarding. Matching is <Text style={{ fontWeight: 'bold' }}>whole-phrase</Text>
+        {' '}(“ash tree” fires on “the black ash tree”, not “trash”; a multi-word phrase fires only on the
+        full phrase, not its single words), so pick distinctive phrases.{'\n\n'}
         Each scenario is keyed by the <Text style={{ fontWeight: 'bold' }}>captor’s faction</Text>
         {' '}(must match a faction id from your Factions table). When the PLAYER is that faction the
         engine swaps in the unaligned captor — so give <Text style={{ fontWeight: 'bold' }}>exactly one</Text> row
