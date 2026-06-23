@@ -1700,13 +1700,18 @@ function DogScenariosBox() {
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
-        How the player FINDS and frees the companion dog. The mechanic is fixed (tap a
-        <Text style={{ fontWeight: 'bold' }}> hookNoun</Text> like “cage/wagon/cellar/snare” → a
-        captor appears → kill them → name the dog). You write the wording: each scenario is keyed
-        by the <Text style={{ fontWeight: 'bold' }}>captor’s faction</Text> (when the PLAYER is
-        that faction, the engine swaps in the unaligned captor — the row whose captorFactionId is
-        null — so you never fight your own). Use <Text style={{ fontWeight: 'bold' }}>{'{captorName}'}</Text> in the
-        intro line. Hit TEMPLATE for the shape.
+        How the player FINDS and frees the one companion dog. The mechanic is fixed: in an
+        enemy-free scene, investigating / attacking / approaching a target that matches a
+        <Text style={{ fontWeight: 'bold' }}> hookNoun</Text> spawns the captor → kill them (no
+        faction cost) → breed/name/sex onboarding. Matching is <Text style={{ fontWeight: 'bold' }}>whole-word</Text>
+        {' '}(“ash” fires on “ash tree”, not “trash”), so pick distinctive nouns.{'\n\n'}
+        Each scenario is keyed by the <Text style={{ fontWeight: 'bold' }}>captor’s faction</Text>
+        {' '}(must match a faction id from your Factions table). When the PLAYER is that faction the
+        engine swaps in the unaligned captor — so give <Text style={{ fontWeight: 'bold' }}>exactly one</Text> row
+        {' '}<Text style={{ fontWeight: 'bold' }}>captorFactionId: null</Text> as the fallback. Use
+        {' '}<Text style={{ fontWeight: 'bold' }}>{'{captorName}'}</Text> in the intro line. You can also set optional
+        captor combat per scenario: <Text style={{ fontWeight: 'bold' }}>captorHp / captorAttack / captorDamage / captorLoot</Text>
+        {' '}(loot must be items from your own tables). Hit TEMPLATE — its header explains every field.
       </Text>
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scenarios array (or { scenarios: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>

@@ -23,6 +23,7 @@ import type {
 import {
   getRescueScenarios,
   getRescueScenario,
+  matchRescueScenarioId,
   spawnRescueCaptor,
   createDogCompanion,
   defaultDogName,
@@ -25972,15 +25973,10 @@ function pickHiddenSmellNounsForLocation(location: Location): string[] {
  *  text, or null when no scenario matches. Case-insensitive
  *  substring; the first match wins. */
 function matchRescueHookNoun(text: string): RescueScenarioId | null {
-  const t = text.toLowerCase().trim();
-  if (!t) return null;
-  for (const scenario of getRescueScenarios()) {
-    for (const noun of scenario.hookNouns) {
-      const nl = noun.toLowerCase();
-      if (t.includes(nl) || nl.includes(t)) return scenario.id;
-    }
-  }
-  return null;
+  // engine_Dev — whole-word matching lives in dogCompanion.matchRescueScenarioId
+  // so it's shared + unit-testable. (Was a loose bidirectional substring test
+  // that false-fired "forest" on "trash", "bunker" on "lock", etc.)
+  return matchRescueScenarioId(text);
 }
 
 /** Spawn the rescue captor for the given scenario into the current
