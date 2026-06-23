@@ -21,7 +21,8 @@ import type {
   PendingDogOnboarding,
 } from '../engine/types';
 import {
-  RESCUE_SCENARIOS,
+  getRescueScenarios,
+  getRescueScenario,
   spawnRescueCaptor,
   createDogCompanion,
   defaultDogName,
@@ -18604,7 +18605,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && Math.random() < 0.005
       ) {
         const dir = pick(['north', 'south', 'east', 'west']);
-        const venue = pick(['a smelter ruin', 'an overturned wagon at a roadside camp', 'a cellar door under a buried structure', 'a snare pit at a trapper camp']);
+        // engine_Dev — rumor venues come from the (overridable) rescue scenarios.
+        const rumorVenues = getRescueScenarios()
+          .map((sc) => sc.rumorVenue)
+          .filter((v): v is string => typeof v === 'string' && v.trim().length > 0);
+        const venue = pick(rumorVenues.length > 0 ? rumorVenues : ['a place where a dog is held']);
         get().appendLog(
           'arbiter',
           `The ${getNarratorName()}, half to themselves: "Travelers have been speaking of a dog held at ${venue} to the ${dir}. Whoever's keeping it isn't doing right by it. If you ever pass one — there are ways to free a thing like that."`,
@@ -25943,11 +25948,10 @@ function pickHiddenSmellNounsForLocation(location: Location): string[] {
 function matchRescueHookNoun(text: string): RescueScenarioId | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  for (const id of Object.keys(RESCUE_SCENARIOS) as RescueScenarioId[]) {
-    const scenario = RESCUE_SCENARIOS[id];
+  for (const scenario of getRescueScenarios()) {
     for (const noun of scenario.hookNouns) {
       const nl = noun.toLowerCase();
-      if (t.includes(nl) || nl.includes(t)) return id;
+      if (t.includes(nl) || nl.includes(t)) return scenario.id;
     }
   }
   return null;
@@ -25969,14 +25973,12 @@ function tryFireRescueScenario(
   // console. When off, no rescue captor spawns and the dog never enters play.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   if (!(require('../engine/contentPack') as typeof import('../engine/contentPack')).isDogEnabled()) return;
-  const scenario = RESCUE_SCENARIOS[scenarioId];
+  const scenario = getRescueScenario(scenarioId);
+  if (!scenario) return;
   const captor = spawnRescueCaptor(scenarioId, player.factionId);
-  const introLines: Record<RescueScenarioId, string> = {
-    smelter: `You step into the smelter's ruin. The ${scenario.captorName} is here, working a chain that ends in a dog's collar. ${scenario.captorName} sees you. "Walk on. This one's not yours."`,
-    wagon: `The overturned wagon shifts as you approach. The ${scenario.captorName} steps out from behind it, a leash in one hand, the shepherd lashed to the wheel snarling against the cord. "Walk on, stranger. Or stay, and lose."`,
-    cellar: `The cellar door clatters open under your hand. Up out of the dark comes the ${scenario.captorName}, lantern raised, hound chained at their heel. "Down door's closed to you. The dog stays."`,
-    snare: `You crest the snare pit. The ${scenario.captorName} is checking their lines — and one line holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. "That's my catch. Walk."`,
-  };
+  // engine_Dev — intro wording now comes from the (overridable) scenario row.
+  // {captorName} resolves to this scenario's captorName.
+  const introLine = scenario.introLine.replace(/\{captorName\}/g, scenario.captorName);
   set((s) => s.currentScene
     ? {
         currentScene: {
@@ -26005,7 +26007,7 @@ function tryFireRescueScenario(
   // OTA-177 — rescue intro now routes to the dog_quest channel
   // (purple) so the player visually flags the quest beat instead
   // of mistaking it for a generic Arbiter remark.
-  get().appendLog('dog_quest', introLines[scenarioId]);
+  get().appendLog('dog_quest', introLine);
 }
 
 /** Called from resolveEnemyDefeat when the killed enemy was a
@@ -26020,8 +26022,8 @@ function completeRescueScenario(
   const pending = [...memos].reverse().find((m) => m.text.startsWith('dog_rescue_pending:'));
   if (!pending) return;
   const scenarioId = pending.text.split(':')[1] as RescueScenarioId | undefined;
-  if (!scenarioId || !RESCUE_SCENARIOS[scenarioId]) return;
-  const scenario = RESCUE_SCENARIOS[scenarioId];
+  const scenario = scenarioId ? getRescueScenario(scenarioId) : undefined;
+  if (!scenario) return;
   // Strip the memo and launch the onboarding state machine.
   set((s) => ({
     worldMemory: {

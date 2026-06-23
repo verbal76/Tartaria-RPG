@@ -23,10 +23,16 @@ import type {
   Enemy,
   Rarity,
 } from './types';
+import { resolveDogScenarios } from './contentPack';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import rescueScenarioData from '../data/dog/rescue-scenarios.json';
 
 // ----- Rescue scenarios -----------------------------------------------
 
-export type RescueScenarioId = 'smelter' | 'wagon' | 'cellar' | 'snare';
+// engine_Dev — scenario ids are author-defined now (a reskin supplies its own
+// 'dog hook' wording via the dog-rescue content table), so the id is a free
+// string rather than the old fixed 'smelter'|'wagon'|'cellar'|'snare' union.
+export type RescueScenarioId = string;
 
 export interface RescueScenario {
   id: RescueScenarioId;
@@ -51,54 +57,35 @@ export interface RescueScenario {
   victoryLine: string;
   /** Captor name shown in the combat log. */
   captorName: string;
+  /** Arbiter beat shown when the captor first spawns. `{captorName}`
+   *  resolves to this row's captorName. */
+  introLine: string;
+  /** Short venue phrase used in the ~day-5 rumor tip ("a dog held at
+   *  {rumorVenue} to the north"). Optional. */
+  rumorVenue?: string;
 }
 
-export const RESCUE_SCENARIOS: Record<RescueScenarioId, RescueScenario> = {
-  smelter: {
-    id: 'smelter',
-    hookNouns: ['cage', 'chain', 'anvil post', 'smelter', 'forge ruin'],
-    captorFactionId: 'reclaimers',
-    defaultBreed: 'mongrel',
-    startingProfile: 'mongrel',
-    archetypes: ['ruin', 'forge', 'industrial', 'wasteland'],
-    captorName: 'Reclaimer Deserter',
-    victoryLine:
-      'The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.',
-  },
-  wagon: {
-    id: 'wagon',
-    hookNouns: ['wagon', 'wagon wheel', 'wheel', 'roadside camp', 'overturned wagon'],
-    captorFactionId: 'mud_monarchs',
-    defaultBreed: 'shepherd',
-    startingProfile: 'shepherd',
-    archetypes: ['road', 'wasteland', 'camp'],
-    captorName: 'Mud Monarch Enforcer',
-    victoryLine:
-      'The enforcer breathes wet, then not at all. The shepherd lashed to the wheel finally stops growling at you — starts watching you instead. They were keeping the dog illegally. No faction reckoning falls on you for this.',
-  },
-  cellar: {
-    id: 'cellar',
-    hookNouns: ['cellar door', 'cellar', 'trapdoor', 'buried structure', 'hatch'],
-    captorFactionId: 'aetherborn',
-    defaultBreed: 'hound',
-    startingProfile: 'hound',
-    archetypes: ['ruin', 'dungeon', 'buried', 'wasteland'],
-    captorName: 'Aetherborn Scavenger',
-    victoryLine:
-      'The scavenger crumples into the dark below. Up through the cellar floor comes a hound, lean and quiet, that pauses to look you over before it commits. They were keeping the dog illegally. No faction reckoning falls on you for this.',
-  },
-  snare: {
-    id: 'snare',
-    hookNouns: ['snare pit', 'snare', 'pit', 'trapper camp', 'trap'],
-    captorFactionId: null, // unaligned — always available as fallback
-    defaultBreed: 'mutt',
-    startingProfile: 'mutt',
-    archetypes: ['wilderness', 'wasteland', 'camp'],
-    captorName: 'Unaligned Poacher',
-    victoryLine:
-      'The poacher folds over the line of their own snare. The mutt in the pit stops snarling, settles. They were keeping the dog illegally. No faction reckoning falls on you for this.',
-  },
-};
+const RESCUE_SCENARIOS_BUILTIN: RescueScenario[] =
+  (rescueScenarioData as { scenarios: RescueScenario[] }).scenarios;
+
+/** Live dog-rescue scenarios — the author's uploaded 'dog hook' wording if
+ *  loaded, else the generic-default pack, else the built-in Tartaria scenarios.
+ *  The firing MECHANIC stays in the store; only this wording is data-driven. */
+export function getRescueScenarios(): RescueScenario[] {
+  return resolveDogScenarios(RESCUE_SCENARIOS_BUILTIN) as RescueScenario[];
+}
+
+/** Look a scenario up by id from the live (resolved) set. */
+export function getRescueScenario(id: RescueScenarioId): RescueScenario | undefined {
+  return getRescueScenarios().find((s) => s.id === id);
+}
+
+/** The fallback "unaligned" scenario — the first row whose captorFactionId is
+ *  null. Used when the player belongs to a scenario's captor faction, so we
+ *  never make them fight their own. */
+function unalignedScenario(): RescueScenario | undefined {
+  return getRescueScenarios().find((s) => s.captorFactionId == null);
+}
 
 // ----- Captor factory --------------------------------------------------
 
@@ -109,15 +96,15 @@ export function spawnRescueCaptor(
   scenarioId: RescueScenarioId,
   playerFactionId: string | null | undefined,
 ): Enemy {
-  const scenario = RESCUE_SCENARIOS[scenarioId];
+  const scenario = getRescueScenario(scenarioId) ?? getRescueScenarios()[0]!;
   // If the captor's faction matches the player's faction, fall back
-  // to the unaligned poacher template so we never make the player
+  // to the unaligned captor template so we never make the player
   // fight one of their own under the neutral-kill flag.
   const useFallback =
     scenario.captorFactionId !== null &&
     scenario.captorFactionId === playerFactionId;
   const captorName = useFallback
-    ? RESCUE_SCENARIOS.snare.captorName
+    ? (unalignedScenario()?.captorName ?? scenario.captorName)
     : scenario.captorName;
   return {
     name: captorName,

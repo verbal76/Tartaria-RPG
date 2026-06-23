@@ -41,7 +41,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -1683,6 +1683,43 @@ function OverlaysBox() {
   );
 }
 
+// engine_Dev — DOG-RESCUE SCENARIOS ("the dog hook"). The acquisition MECHANIC
+// stays in the engine (one dog per save; tap a hookNoun -> faction-neutral
+// captor -> name/breed onboarding). This box only re-words it: hook nouns,
+// captor name + faction, the intro + victory lines, breed/profile seed.
+function DogScenariosBox() {
+  const loadDogScenariosJson = useContentPackStore((s) => s.loadDogScenariosJson);
+  const dogScenarios = useContentPackStore((s) => s.dogScenarios) as unknown[];
+  const loaded = dogScenarios.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Dog-rescue scenarios (the “dog hook”)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        How the player FINDS and frees the companion dog. The mechanic is fixed (tap a
+        <Text style={{ fontWeight: 'bold' }}> hookNoun</Text> like “cage/wagon/cellar/snare” → a
+        captor appears → kill them → name the dog). You write the wording: each scenario is keyed
+        by the <Text style={{ fontWeight: 'bold' }}>captor’s faction</Text> (when the PLAYER is
+        that faction, the engine swaps in the unaligned captor — the row whose captorFactionId is
+        null — so you never fight your own). Use <Text style={{ fontWeight: 'bold' }}>{'{captorName}'}</Text> in the
+        intro line. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scenarios array (or { scenarios: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDogScenariosJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} scenario(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDogScenariosTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded > 0 ? JSON.stringify(dogScenarios, null, 2) : buildDogScenariosTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDogScenarios(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
 // engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
 // variable, naming the title, and setting a threshold — or upload/paste the JSON.
 function TitlesBox() {
@@ -3071,6 +3108,10 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
 
       <CollapsibleSection title="SUMMONED SIDEKICKS">
         <SummonsBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="DOG-RESCUE SCENARIOS">
+        <DogScenariosBox />
       </CollapsibleSection>
 
       <CollapsibleSection title="DIGGING">

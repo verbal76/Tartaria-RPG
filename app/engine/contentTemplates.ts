@@ -818,6 +818,52 @@ export function buildOverlaysTemplate(): string {
   ].join('\n');
 }
 
+export function buildDogScenariosTemplate(): string {
+  return [
+    '// DOG-RESCUE SCENARIOS ("the dog hook") — how the player finds & frees the',
+    '// companion dog. The MECHANIC is fixed in the engine and does NOT change:',
+    '//   • ONE dog per save. After the first rescue, all hooks die globally.',
+    '//   • The player tap a hookNoun (on investigate / attack / approach) → a',
+    '//     faction-neutral CAPTOR spawns → kill the captor → the player names &',
+    '//     breeds the dog. Killing the captor costs you NO faction standing.',
+    '// You only supply the WORDING. Fields per scenario:',
+    '//   id            unique slug (any text).',
+    '//   hookNouns     [..] the nouns that fire this rescue (player taps one).',
+    '//   captorFactionId   the faction HOLDING the dog. When the PLAYER belongs to',
+    '//                     this faction, the engine swaps in the unaligned captor',
+    '//                     (the row whose captorFactionId is null) so you never',
+    '//                     fight your own. Give EXACTLY ONE row captorFactionId: null',
+    '//                     as that fallback.',
+    '//   captorName    name shown in combat + substituted for {captorName}.',
+    '//   defaultBreed  / startingProfile  ("mongrel"|"shepherd"|"hound"|"mutt"|"puppy")',
+    '//                 — breed is just a seed; the player can rename it.',
+    '//   archetypes    [..] scene tags this hook is thematically tied to (flavor).',
+    '//   rumorVenue    short phrase for the ~day-5 "a dog held at <venue> to the north" tip.',
+    '//   introLine     shown when the captor spawns. Use {captorName}.',
+    '//   victoryLine   shown when the captor falls and the dog is freed.',
+    '// TIP: make one scenario per faction that might hold a dog, plus the single',
+    '//      unaligned (captorFactionId: null) fallback.',
+    JSON.stringify([
+      {
+        id: 'cage', hookNouns: ['cage', 'kennel', 'pen'],
+        captorFactionId: 'REPLACE-with-a-faction-id', captorName: 'REPLACE-with-a-captor-name',
+        defaultBreed: 'mongrel', startingProfile: 'mongrel',
+        archetypes: ['ruin', 'settlement'], rumorVenue: 'a cage at REPLACE-a-place',
+        introLine: 'You find a dog locked in a cage. The {captorName} stands over it. "Walk on. This one’s not yours."',
+        victoryLine: 'The captor goes down. The dog watches you, wary and quiet. They had no right to it. No faction reckoning falls on you for this.',
+      },
+      {
+        id: 'snare', hookNouns: ['snare', 'pit', 'trap'],
+        captorFactionId: null, captorName: 'Unaligned Poacher',
+        defaultBreed: 'mutt', startingProfile: 'mutt',
+        archetypes: ['wilderness', 'camp'], rumorVenue: 'a snare pit at a trapper camp',
+        introLine: 'You crest a snare pit. A mutt is caught in it, growling weak. The {captorName} turns. "That’s my catch. Walk."',
+        victoryLine: 'The poacher folds over their own snare line. The mutt settles. They had no right to it. No faction reckoning falls on you for this.',
+      },
+    ], null, 2),
+  ].join('\n');
+}
+
 export function buildSalvageTemplate(): string {
   return [
     '// SALVAGE — what salvaging a noun (a wagon, a blade, a hull…) yields. The match',
@@ -919,7 +965,9 @@ strip for power edits.
   18. Digging · Scrap · Salvage — reference Materials (4) + Items (5).
   19. Interaction tags — PULLS its noun list from your loaded Locations (9) + Starting
       areas (14), so do this AFTER both. (↻ FROM WORLD)
-  20. Collectables · Summoned sidekicks (+ dog toggle) · Titles · Narration flavor.
+  20. Collectables · Summoned sidekicks (+ dog toggle) · Dog-rescue scenarios (the
+      "dog hook" — keyed by the captor's Faction (8); give one row captorFactionId:null
+      as the unaligned fallback) · Titles · Narration flavor.
   21. Assets — World/faction map images, Music. (Their own uploads, not JSON.)
 
 The thematic detail for each follows.
@@ -1033,6 +1081,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'inventory', hint: 'Inventory presentation: { labels?: { weapon|armor|accessory|consumable|tool|relic|material|loot|quest: "Your name" } (rename the category sections), toolTags?: ["tag"] (extra item tags that read as Tools), repairMaterialPct?: 200 (repair material cost as a % of an item\'s scrap yield; 200 = built-in 2x) }. Category ids + order stay fixed.', content: JSON.stringify({ labels: { loot: 'Salvage', material: 'Components' }, toolTags: ['multitool'], repairMaterialPct: 200 }, null, 2) });
   entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
   entries.push({ key: 'overlays', hint: 'ELEVATED OVERLAYS (array) — a mini-scene at the top of a tall climb. Each: { id, kind (encounter|trader|lookout), arrivalLine, ambientNouns: [...], minTiers? (min climb height), encounterChance? + encounterPool? [enemy names] for kind=encounter, trader? / lookout? }. The roll/scene RULES stay in the engine. Build it in the ELEVATED OVERLAYS box.', content: buildOverlaysTemplate() });
+  entries.push({ key: 'dogScenarios', hint: 'DOG-RESCUE SCENARIOS (array) — the "dog hook": how the player finds & frees the companion dog. The acquisition MECHANIC stays in the engine (one dog/save; tap a hookNoun -> faction-neutral captor -> name/breed onboarding); you supply the wording. Each: { id, hookNouns: [...], captorFactionId (the faction holding the dog; give ONE row null = the unaligned fallback used when the player IS that faction), captorName, defaultBreed, startingProfile, archetypes: [...], rumorVenue?, introLine ({captorName} token), victoryLine }. Build it in the DOG-RESCUE SCENARIOS box.', content: buildDogScenariosTemplate() });
   entries.push({ key: 'salvage', hint: 'The SALVAGE subsystem (what salvaging a noun yields): { pools: [{ id, patterns: ["noun substrings"], items: [{ name, rarity, weight, min, max }] }] (FIRST matching pool wins, ordered specific→general), junkPool, materialLines, junkLines, nothingChance }. The match/pick RULES stay in the engine. Build it in the SALVAGE box.', content: buildSalvageTemplate() });
   entries.push({ key: 'scrap', hint: 'The SCRAP subsystem (what breaking an item down yields): { roles: { metalBulk, metalPremium, essencePrimary, essenceSecondary, essenceBonus, stone, mud, cloth, organic, wood } (role → material name), rawGuard: ["mats that can\'t scrap into themselves"], premiumMats: ["mats stripped from self-crafted scrap"], failureLines: ["…{item}…"] }. The tag→material RULES stay in the engine; this is the data. Build it in the SCRAP box.', content: buildScrapTemplate() });
   entries.push({ key: 'digging', hint: 'The DIGGING subsystem (what "dig" pulls from the ground): { itemScores: { "Item": score }, tagScores: { tag: score }, productiveCap: number, loot: [{ name, rarity (Common|Uncommon|Rare), baseWeight }] }. Higher dig score = finds more + better rarity. Build it in the DIGGING box; omit to keep the built-in.', content: buildDiggingTemplate() });
