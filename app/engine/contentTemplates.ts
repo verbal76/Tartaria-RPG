@@ -158,20 +158,59 @@ const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   ].join('\n'),
   locations: '// Optional per LOCATION row: x / y (plot on your world map), hidden: true (colored "?" until visited), aliases: [..], interactables: [..]',
   recipes: [
-    '// CRAFTING RECIPES — a recipe is ONLY the formula. Two HARD requirements or it breaks:',
-    '//   result      — must be the EXACT name of an item you ALSO defined in your',
-    '//                  Weapons / Armor / Gear / Exploration / Amulets / Rings table.',
-    '//                  THAT table is where the crafted item gets its stats (damage, AC,',
-    '//                  effect, kind, rarity, tags). A result not in any item table crafts',
-    '//                  to a blank stat-less "misc". Consumables (stims/food/tonics) go in',
-    '//                  the GEAR table with kind:"consumable" + an effect — that also makes',
-    '//                  them land on the RECIPES tab instead of the CRAFT tab.',
-    '//   ingredients[].name — must be a real MATERIAL (in your Materials table) and be',
-    '//                  OBTAINABLE (it drops from an enemy, or your dig / salvage / scrap',
-    '//                  loot lists it) — otherwise the recipe can never be crafted.',
-    '// Names match by EXACT string (case + spelling). Build items + materials FIRST.',
+    '// ═══════════════════════════════════════════════════════════════════════════',
+    '// CRAFTING RECIPES — shape: { "result": "Item Name", "ingredients": [{ "name":',
+    '//   "Material", "quantity": 2 }], "intRequirement"?: 11, "coresRequired"?: 4 }',
+    '// ───────────────────────────────────────────────────────────────────────────',
+    '// A recipe is ONLY the formula. The crafted item\'s STATS come from the table you',
+    '// define the RESULT in — so the TYPE of recipe = WHICH table the result lives in:',
+    '//   WEAPON     → define result in the WEAPONS table   (damageDice / stat / tags)',
+    '//   ARMOR      → define result in the ARMOR table     (a valid slot + acBonus)',
+    '//   CONSUMABLE → stim / medkit / food / tonic / coating-oil → GEAR table,',
+    '//                kind:"consumable" + an effect (healHP/restoreStamina/buff…).',
+    '//                These also land on the RECIPES tab instead of the CRAFT tab.',
+    '//   ACCESSORY  → define result in the AMULETS or RINGS table (statBonus/resist)',
+    '//   TOOL/LIGHT → define result in the EXPLORATION (or GEAR) table',
+    '// ───────────────────────────────────────────────────────────────────────────',
+    '// HARD RULES (break these and the recipe silently fails):',
+    '//   • result MUST be an EXACT item name in one of those tables — an undefined',
+    '//     result crafts to a blank stat-less "misc".',
+    '//   • every ingredients[].name MUST be a real MATERIAL that is OBTAINABLE (enemy',
+    '//     loot / dig / salvage / scrap), or the recipe can never be crafted.',
+    '//   • names match by EXACT string (case + spelling). Build items + materials FIRST.',
+    '// OPTIONAL GATES (omit for none):',
+    '//   "intRequirement": 11  — refuses the craft until the player\'s INT meets it.',
+    '//   "coresRequired": 4    — refuses until the player has recovered N main-quest',
+    '//                           objective items (a late-game "war-forge" gate).',
+    '// The rows below show ONE of every type — edit/replace them.',
+    '// ═══════════════════════════════════════════════════════════════════════════',
   ].join('\n'),
 };
+
+// engine_Dev — the Recipes TEMPLATE shows ONE recipe of EVERY type (the kind is set by
+// which item table the result lives in), each commented, plus the optional gate. The
+// generic-game DEFAULT recipes stay minimal (GENERIC_TABLE_ROWS.recipes); this richer
+// teaching set is template-only. Comments are stripped on load, so it still round-trips.
+const RECIPES_EXAMPLE = `[
+  // WEAPON (melee) — define "Iron Spear" in your WEAPONS table for its damage/stats.
+  { "result": "Iron Spear", "ingredients": [{ "name": "Scrap Metal", "quantity": 2 }, { "name": "Stick", "quantity": 1 }] },
+  // WEAPON (ranged) — define "Hunter's Bow" in WEAPONS (weaponKind:"ranged").
+  { "result": "Hunter's Bow", "ingredients": [{ "name": "Tough Fiber", "quantity": 3 }, { "name": "Stick", "quantity": 2 }] },
+  // ARMOR — define "Banded Cuirass" in the ARMOR table with a valid slot (chest).
+  { "result": "Banded Cuirass", "ingredients": [{ "name": "Scrap Metal", "quantity": 4 }, { "name": "Tough Fiber", "quantity": 2 }] },
+  // CONSUMABLE (medicine) — define "Healing Draught" in GEAR, kind:"consumable", effect.healHP.
+  { "result": "Healing Draught", "ingredients": [{ "name": "Common Residue", "quantity": 1 }, { "name": "Raw Crystal", "quantity": 1 }] },
+  // CONSUMABLE (food) — define "Trail Rations" in GEAR, kind:"consumable".
+  { "result": "Trail Rations", "ingredients": [{ "name": "Tough Fiber", "quantity": 1 }, { "name": "Common Residue", "quantity": 1 }] },
+  // ACCESSORY — define "Seeker's Locket" in the AMULETS table (or a ring in RINGS).
+  { "result": "Seeker's Locket", "ingredients": [{ "name": "Worked Crystal", "quantity": 1 }, { "name": "Scrap Metal", "quantity": 1 }] },
+  // TOOL / LIGHT — define "Bright Torch" in the EXPLORATION (or GEAR) table.
+  { "result": "Bright Torch", "ingredients": [{ "name": "Stick", "quantity": 1 }, { "name": "Tough Fiber", "quantity": 1 }] },
+  // COATING — a consumable that buffs a weapon; define "Blade Oil" in GEAR, kind:"consumable".
+  { "result": "Blade Oil", "ingredients": [{ "name": "Common Residue", "quantity": 2 }, { "name": "Scrap Metal", "quantity": 1 }] },
+  // INT-GATED — only craftable once the player's INT >= 11.
+  { "result": "Etched Focus", "ingredients": [{ "name": "Worked Crystal", "quantity": 2 }], "intRequirement": 11 }
+]`;
 
 export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
   const note = includeTokenNote && TABLE_OPTION_NOTES[id] ? TABLE_OPTION_NOTES[id] + '\n' : '';
@@ -179,6 +218,10 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
   // author sees every section / power to edit. Both carry author prose, so they
   // get the rename-token note.
   if (id === 'lore' || id === 'powers') return tokenNote(JSON.stringify(TABLE_ROWS[id], null, 2), includeTokenNote);
+  // engine_Dev — Recipes get a hand-built example showing ONE of every recipe type +
+  // the optional gates (the generic-game DEFAULT recipes stay minimal). The header note
+  // is prepended by `note`; both are stripped on load so it still round-trips.
+  if (id === 'recipes') return note + RECIPES_EXAMPLE;
   // engine_Dev — the Locations sample shows the optional map x / y (grid column /
   // row) so authors know they can plot each place on the uploaded world map.
   if (id === 'locations') {
