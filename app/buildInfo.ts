@@ -15545,4 +15545,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in GENERIC_GAME ('roadside_cache') means a reskin that skips the box gets a bland
 // whisper, not Yulka. The yulka chain's bespoke multi-stage QUEST logic stays
 // scripted in gameStore (reference-game content, keyed on its id).
-export const OTA_BUILD_ID = '2026-06-22-804';
+// engine_Dev-805 — MULTI-STAGE whispers (Phase 1: engine). A whisper chain can now
+// carry a stages[] array and run as a small mission leg-by-leg: plant → reach leg
+// 0's tile → each later leg uses its own targetOffset from the previous tile (omit
+// to stay put) → a leg with enemyName spawns that foe and won't advance until it's
+// defeated → each leg's effects fire on completion → the last leg ends it. New
+// engine helpers (isMultiStageWhisper / currentWhisperStage / stageTargetTile /
+// findReadyStageWhisper) + store runner (fireWhisperStage / advanceWhisperStage +
+// a generalized kill-gate hook in resolveEnemyDefeat). One-hop (meetLine/
+// meetEffects) chains and the bespoke Yulka chain are unchanged. Template + bundle
+// hint show both shapes. Phase 2 (a form-builder UI with Add-Whisper/Add-Leg) next.
+export const OTA_BUILD_ID = '2026-06-22-805';
