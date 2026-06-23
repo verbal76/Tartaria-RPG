@@ -431,6 +431,12 @@ export function hasTableOverride(id: ContentTableId): boolean {
   const ov = tableOverrides[id];
   return Array.isArray(ov) && ov.length > 0;
 }
+/** The RAW author upload for a table (ignores generic defaults + built-in). null when
+ *  the author hasn't loaded one. Used where we want ONLY the author's loaded content. */
+export function getTableOverride(id: ContentTableId): readonly unknown[] | null {
+  const ov = tableOverrides[id];
+  return Array.isArray(ov) && ov.length > 0 ? ov : null;
+}
 export function tableOverrideCount(id: ContentTableId): number {
   return tableOverrides[id]?.length ?? 0;
 }
@@ -853,6 +859,8 @@ export function setStartingAreasOverride(rows: readonly unknown[] | null): void 
 }
 export function hasStartingAreasOverride(): boolean { return startingAreasOverride != null; }
 export function getStartingAreas(): StartingArea[] { return startingAreasOverride ?? genericDefaults.startingAreas ?? []; }
+/** RAW author upload of starting areas (ignores the generic default). null = none loaded. */
+export function getStartingAreasOverride(): StartingArea[] | null { return startingAreasOverride; }
 export function startingAreaForFaction(factionId: string | null | undefined): StartingArea | null {
   if (!factionId || !startingAreasOverride) return null;
   return startingAreasOverride.find((a) => a.factionId === factionId) ?? null;

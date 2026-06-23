@@ -68,7 +68,9 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     ['startingAreas', () => store().loadStartingAreasJson(buildStartingAreasTemplate())],
     ['collectables', () => store().loadCollectablesJson(buildCollectablesTemplate())],
     ['summons', () => store().loadSummonsJson(buildSummonsTemplate())],
-    ['interactionTags', () => store().loadInteractionTagsJson(buildInteractionTagsTemplate())],
+    // interactionTags collects nouns from LOADED content only, so seed a locations
+    // upload first; then the template is non-empty and round-trips.
+    ['interactionTags', () => { store().loadTableJson('locations', JSON.stringify([{ id: 'x', interactables: ['door', 'wall', 'crate'] }])); return store().loadInteractionTagsJson(buildInteractionTagsTemplate()); }],
     ['mainQuest', () => store().loadMainQuestJson(buildMainQuestTemplate())],
     ['bosses', () => store().loadBossesJson(buildBossesTemplate())],
     ['digging', () => store().loadDiggingJson(buildDiggingTemplate())],

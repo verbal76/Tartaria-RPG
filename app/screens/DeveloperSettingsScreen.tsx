@@ -923,11 +923,11 @@ function InteractionTagsBox() {
         <Text style={{ fontWeight: 'bold' }}>breakable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>searchable</Text>,{' '}
         <Text style={{ fontWeight: 'bold' }}>salvageable</Text>. Tap{' '}
-        <Text style={{ fontWeight: 'bold' }}>↻ FROM WORLD</Text> to pull every interactable from ALL
-        your loaded content — Locations, Starting-area rooms, the hub, and the world-ladder — into
-        one list, each pre-filled with a best-guess tag. Edit the arrays (e.g. add "climbable" to
-        "rusted t-34 tank"), then LOAD. Hit ↻ again after changing your content to pull in new items
-        (your existing tags are kept).
+        <Text style={{ fontWeight: 'bold' }}>↻ FROM WORLD</Text> to pull every interactable from the
+        content you’ve LOADED — your Locations table and your Starting-area rooms — deduped into one
+        list, each pre-filled with a best-guess tag. (Only your uploads — never the built-in/template
+        defaults.) Edit the arrays (e.g. add "climbable" to "rusted t-34 tank"), then LOAD. Hit ↻
+        again after loading more content to pull in new items (existing tags kept).
       </Text>
       <TextInput
         style={styles.input}
