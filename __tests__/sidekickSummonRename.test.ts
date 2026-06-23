@@ -12,6 +12,7 @@ import {
   isGolemWeapon,
   makeCompanion,
   getGolemDefinition,
+  trainGolemStat,
 } from '../app/engine/golems';
 import {
   installGenericDefaults,
@@ -69,5 +70,27 @@ describe('weapons + skill advancement preserved', () => {
     expect(c.stats).toEqual({ power: 0, resilience: 0 });
     expect(c.statProgress).toEqual({ power: 0, resilience: 0 });
     expect(c.hpMax).toBeGreaterThan(0);
+  });
+
+  it('trainGolemStat actually GROWS power/resilience through repeated success', () => {
+    let c = makeCompanion(getGolemDefinition('mud_golem'));
+    // power trains on attacking; ~34 successful hits at stat 0 (award 3/use) -> +1.
+    let leveledOnce = false;
+    for (let i = 0; i < 40; i++) {
+      const r = trainGolemStat(c, 'power', true);
+      c = r.golem;
+      if (r.leveled) leveledOnce = true;
+    }
+    expect(leveledOnce).toBe(true);
+    expect(c.stats!.power).toBeGreaterThanOrEqual(1);
+    // a level-up also toughens the frame (HP grows through use).
+    expect(c.hpMax).toBeGreaterThan(makeCompanion(getGolemDefinition('mud_golem')).hpMax);
+
+    // failures never train; resilience grows on surviving hits.
+    const before = c.stats!.resilience;
+    c = trainGolemStat(c, 'resilience', false).golem;
+    expect(c.stats!.resilience).toBe(before);
+    for (let i = 0; i < 40; i++) c = trainGolemStat(c, 'resilience', true).golem;
+    expect(c.stats!.resilience).toBeGreaterThanOrEqual(1);
   });
 });

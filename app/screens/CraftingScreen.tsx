@@ -14,6 +14,7 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { resolveGolemDefs, getSummonNoun, type GolemDefinition } from '../engine/golems';
+import { aethercraftDcModifier, aethercraftStatBonus } from '../engine/raceMechanics';
 import { getEnergyName, hasEnergyOverride, getNarratorName } from '../engine/contentPack';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
@@ -495,7 +496,19 @@ export function CraftingScreen() {
                         );
                       })}
                       <Text style={styles.golemVariantsRequires}>
-                        Requires: d20 + INT vs per-golem DC — Mud 13, Iron 15, Aether 17, Crystal 19. Shape and mend roll vs DC 12. Mud Dwellers cast at base DC and gain +2 INT, Aetherborn +2 DC, other races +3 DC.
+                        {(() => {
+                          // engine_Dev — derive the DC list from the LIVE sidekick defs
+                          // (no hardcoded Mud/Iron/Aether/Crystal) + show THIS player's
+                          // race modifier (no Tartaria race names).
+                          const list = resolveGolemDefs().map((g) => `${g.name} ${g.summonDC ?? 15}`).join(', ');
+                          const dcMod = aethercraftDcModifier(player.raceId);
+                          const intBonus = aethercraftStatBonus(player.raceId).intelligence ?? 0;
+                          const raceClause = dcMod === 0
+                            ? 'Your race casts at the base DC'
+                            : `Your race casts at +${dcMod} to the DC`;
+                          const intClause = intBonus ? ` and gains +${intBonus} INT` : '';
+                          return `Requires: d20 + INT vs each ${getSummonNoun()}'s DC — ${list}. ${raceClause}${intClause}.`;
+                        })()}
                       </Text>
                     </View>
                   )}

@@ -15497,4 +15497,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 'non-consumable' filter now EXCLUDES sidekick armaments so they show in exactly
 // one place. No separate JSON: a sidekick weapon is just a weapon tagged
 // golem_weapon + its recipe in the recipes table (fully author-overridable).
-export const OTA_BUILD_ID = '2026-06-22-799';
+// engine_Dev-800 — Magic-tab summon DC blurb de-Tartaria'd + sidekick skill
+// progression verified. The summon "Requires:" line hardcoded "Mud 13, Iron 15,
+// Aether 17, Crystal 19 … Mud Dwellers … Aetherborn …"; it now derives the DC
+// list from the LIVE sidekick defs (name + summonDC) and shows THIS player's race
+// modifier via aethercraftDcModifier/aethercraftStatBonus — no Tartaria kind/race
+// names. (The race-modifier MECHANIC is still keyed on Tartaria race ids in
+// raceMechanics.ts — a separate Bucket-A item.) Confirmed trainGolemStat is wired
+// (power on attack @25728, resilience on surviving a hit @25899) and added a test
+// proving power/resilience level up through use (+ HP bump, failures don't train).
+export const OTA_BUILD_ID = '2026-06-22-800';
