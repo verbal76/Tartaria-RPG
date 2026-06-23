@@ -567,6 +567,13 @@ export function setCustomMainQuestOverride(obj: { title?: string; steps?: unknow
 }
 export function hasCustomMainQuestOverride(): boolean { return customMainQuestOverride != null; }
 export function getCustomMainQuest(): { title?: string; steps?: unknown[] } | null { return customMainQuestOverride ?? genericDefaults.mainQuest ?? null; }
+/** engine_Dev — a DATA-DRIVEN main quest exists (an uploaded one OR the generic-
+ *  default pack's). When true, the engine runs THAT quest (customMainQuestEngine)
+ *  and the legacy built-in Tartaria main quest + Core Guardians are disabled. At
+ *  runtime a quest is always present (generic defaults install at boot), so the
+ *  built-in path only "runs" in unit tests that install nothing — i.e. it's dead
+ *  in every real game. The hardcoded built-in quest is slated for removal. */
+export function hasAnyMainQuest(): boolean { return getCustomMainQuest() != null; }
 
 // --- custom bosses override -----------------------------------------------------
 // engine_Dev — named, faction-affiliated bosses with stats / loot / quest item /

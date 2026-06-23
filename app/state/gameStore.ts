@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, hasAnyMainQuest } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -7128,7 +7128,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Monarch's `attack` on a wilderness Mudling — would summon that
       // capital's Core Guardian miles from the city. Only let the Core
       // gate fire when the player is actually standing IN the capital.
-      if (mqMod.canRecoverCore(player, parsed.intent) && isStationedAtNamedLocation(player)) {
+      // engine_Dev — built-in Core-Guardian spawn is off whenever a data-driven
+      // quest exists (always, at runtime); the engine no longer ships a quest.
+      if (!hasAnyMainQuest() && mqMod.canRecoverCore(player, parsed.intent) && isStationedAtNamedLocation(player)) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const cg = require('../engine/coreGuardians');
         const capitalId = player.currentLocationId;
@@ -14813,7 +14815,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const mq = require('../engine/mainQuest');
-      if (mq.LOST_CAPITAL_LOCATIONS.includes(locationId)) {
+      // engine_Dev — the built-in Lost-Capital arrival narration is off when a
+      // data-driven quest exists (always, at runtime).
+      if (!hasAnyMainQuest() && mq.LOST_CAPITAL_LOCATIONS.includes(locationId)) {
         const playerNow = get().player;
         // OTA-442 — [audit #22] play the Capital's one-time arrival signature
         // FIRST (before the gate hint), so each of the nine reads as its own
@@ -21586,6 +21590,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const cg = require('../engine/coreGuardians');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mq = require('../engine/mainQuest');
+    // engine_Dev — built-in Core-Guardian summon is off when a data-driven quest
+    // exists (always, at runtime). The engine no longer ships a main quest.
+    if (hasAnyMainQuest()) return { ok: false, reason: 'no_builtin_quest' };
     const capitalId = player.currentLocationId;
     if (!mq.LOST_CAPITAL_LOCATIONS.includes(capitalId)) {
       return { ok: false, reason: 'not_at_capital' };
@@ -23239,6 +23246,12 @@ function triggerMainQuest(
 ): void {
   const player = get().player;
   if (!player) return;
+  // engine_Dev — the legacy built-in (Tartaria) main quest is disabled whenever a
+  // data-driven quest exists (an upload, or the generic-default pack). At runtime
+  // one always does, so this phase machine never advances in a real game; it stays
+  // live only for unit tests that install nothing. (Slated for removal.)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  if ((require('../engine/contentPack') as typeof import('../engine/contentPack')).hasAnyMainQuest()) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mq = require('../engine/mainQuest');
   const prevState = mq.ensureMainQuest(player.mainQuest);

@@ -15563,4 +15563,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // array. Existing missions list with REMOVE. The paste/TEMPLATE/EDIT/COPY/RESET
 // path is kept below for advanced effects. Builder always emits multi-stage
 // (stages[]); the engine runs them (Phase 1, -805).
-export const OTA_BUILD_ID = '2026-06-22-806';
+// engine_Dev-807 — built-in (Tartaria) main quest + Core Guardians GATED DEAD
+// (Phase 1 of removal). The engine shouldn't ship a hardcoded Tartaria main
+// quest — it already has a data-driven one (customMainQuestEngine, fed by an
+// upload OR the generic-default pack). New contentPack.hasAnyMainQuest() is true
+// whenever a data-driven quest exists (always, at runtime), and the legacy
+// built-in path is now short-circuited on it: triggerMainQuest (the phase
+// machine) no-ops, both Core-Guardian spawn routes (the gate-verb path +
+// summonCoreGuardian) refuse, and the Lost-Capital arrival narration is skipped.
+// So the built-in quest is provably dead in every real game; it stays live only
+// for unit tests that install nothing. Phase 2 deletes the dead code (coreGuardians
+// + the built-in mainQuest phase machine + its wiring).
+export const OTA_BUILD_ID = '2026-06-22-807';
