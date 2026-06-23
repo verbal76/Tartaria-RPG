@@ -14882,7 +14882,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (enemy.name === 'Silt Thief') {
       const live = (player.activeWhispers ?? []).find((w) => w.id === 'yulka_discs' && w.stage === 'fetch_active');
       if (live) {
-        const stolen = makeStolenDiscs(12);
+        const stolen = makeStolenDiscs(12, findChain('yulka_discs')?.fetchItemName ?? 'Recovered Goods');
         set((s) => (s.player ? {
           player: {
             ...s.player,

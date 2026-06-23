@@ -248,4 +248,21 @@ export const GENERIC_GAME = {
       { kind: 'crystal_striker', name: 'Crystal Striker', fuel: [{ name: 'Raw Crystal', quantity: 2 }, { name: 'Worked Crystal', quantity: 2 }], hpMax: 34, attackDie: '1d12', attackMod: 3, hitBonus: 3, damageType: 'piercing', blurb: 'Apex striker — the hardest to raise and the strongest in every measure.', summonDC: 19, resistBase: 0.35, resistCap: 0.55, aliases: ['crystal', 'striker'], elementTags: ['crystal'] },
     ],
   },
+  // Generic WHISPER — a bland one-hop overheard tip (plant -> reach tile ->
+  // meetLine + meetEffects), so a reskin that skips the WHISPERS box gets this
+  // instead of Tartaria's bespoke Yulka chain. The author uploads their own.
+  whispers: [
+    {
+      id: 'roadside_cache',
+      title: 'A Cache off the Road',
+      plantLocations: ['crossroads'],
+      plantChance: 0.15,
+      plantLines: [
+        'A traveler at the next bench lowers their voice. "There’s a cache buried a few steps east of the crossroads — left by someone who never came back for it. Go look, if you’ve the nerve."',
+      ],
+      targetOffset: { dxRange: [1, 2], dyRange: [-1, 1] },
+      meetLine: 'You scuff the dirt where the traveler pointed and your boot catches on a buried tin. Inside: a few coins and a wrapped ration, dry and good.',
+      meetEffects: [{ type: 'grant_tc', amount: 25 }, { type: 'grant_item', name: 'Trail Rations' }],
+    },
+  ],
 };

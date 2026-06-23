@@ -15535,4 +15535,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // exported and wired as GENERIC_GAME.tables.powers, so a reskin that skips the
 // Powers box shows generic disciplines — not Tartaria's — with the author's energy
 // name. Stale "+4 harder" race text replaced with the data-driven "power affinity".
-export const OTA_BUILD_ID = '2026-06-22-803';
+// engine_Dev-804 — Bucket A: whispers.ts burned down + the built-in whisper chain
+// is now a designer-editable JSON. The overheard-tip CHAIN data (the bespoke
+// "Yulka and the Aetheric Discs" lead) moved to app/data/whispers/
+// builtin-whispers.json (whispers.ts 9→0; designers edit it there or upload via the
+// WHISPERS box). makeStolenDiscs is parameterized — its quest-item name comes from
+// the chain's new fetchItemName field, not a literal. A generic-default layer
+// (genericDefaults.whispers → 3-layer resolveWhispers) + a generic one-hop whisper
+// in GENERIC_GAME ('roadside_cache') means a reskin that skips the box gets a bland
+// whisper, not Yulka. The yulka chain's bespoke multi-stage QUEST logic stays
+// scripted in gameStore (reference-game content, keyed on its id).
+export const OTA_BUILD_ID = '2026-06-22-804';

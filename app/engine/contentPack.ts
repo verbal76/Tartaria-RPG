@@ -89,6 +89,7 @@ interface GenericDefaultPack {
   overlays?: unknown[];
   dogScenarios?: unknown[];
   summons?: { noun?: string; defs: unknown[] };
+  whispers?: unknown[];
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -108,6 +109,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.overlays = pack.overlays;
   genericDefaults.dogScenarios = pack.dogScenarios;
   genericDefaults.summons = pack.summons;
+  genericDefaults.whispers = pack.whispers;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -127,6 +129,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.overlays = undefined;
   genericDefaults.dogScenarios = undefined;
   genericDefaults.summons = undefined;
+  genericDefaults.whispers = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -838,7 +841,12 @@ export function setWhispersOverride(rows: readonly unknown[] | null): void {
 }
 export function hasWhispersOverride(): boolean { return whispersOverride != null; }
 export function resolveWhispers<T>(builtin: readonly T[]): readonly T[] {
-  return whispersOverride && whispersOverride.length > 0 ? (whispersOverride as readonly T[]) : builtin;
+  if (whispersOverride && whispersOverride.length > 0) return whispersOverride as readonly T[];
+  // engine_Dev — generic-default pack before the Tartaria built-in, so a reskin
+  // that skips the WHISPERS box gets a bland generic whisper, not the yulka chain.
+  const g = genericDefaults.whispers;
+  if (g && g.length > 0) return g as readonly T[];
+  return builtin;
 }
 
 // --- wasteland encounters override ----------------------------------------------
