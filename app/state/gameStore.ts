@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, hasAnyMainQuest } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -2722,19 +2722,6 @@ interface GameStore {
    *  running but its output will be dropped on the floor instead of appended
    *  to the log. Used when a new player action arrives mid-stream. */
   cancelGeneration: () => void;
-
-  /** v2.4.1 (OTA 033) — make The Choice at the Mud Flood Nexus.
-   *  Only valid when mainQuest.phase === 'choice'. Final. */
-  chooseEndingMainQuest: (ending: 'seal' | 'unleash' | 'preserve') => void;
-
-  /** OTA-148 — Contracts-screen SUMMON button handler. When the
-   *  player is standing in a Lost Capital whose Core they haven't
-   *  recovered yet, taps the SUMMON chip on the PRIMARY OBJECTIVE
-   *  card. Spawns the Capital's Core Guardian into the current
-   *  scene (same pipeline the gate-verb path uses) and switches
-   *  to exploration so the fight surfaces. Returns ok / reason so
-   *  the UI can disable / hide the button when preconditions fail. */
-  summonCoreGuardian: () => { ok: boolean; reason?: string };
 
   /** OTA-120 Phase 5 — CallDogModal visibility flag. Set by the parser
    *  intercept for `call dog` / `call <name>`; cleared by the modal's
@@ -7075,170 +7062,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     // OTA-149 — `summon guardian` command intercept. Mirror of the
-    // OTA-148 SUMMON chip — a player who'd rather type the verb
-    // ("summon guardian", "summon the guardian", "summon core
-    // guardian", common typo "summon gaurdian") gets the same boss
-    // card + arbiter approachLine the chip produces. Lets the player
-    // prep for the fight on their own terms (full HP, rations eaten,
-    // golem standing, dog at heel) and then call the Guardian in
-    // with full swagger. The actual spawn pipeline + Core grant on
-    // defeat reuse the OTA-148 + pre-existing resolveEnemyDefeat
-    // plumbing — this is purely the verb-side entry point.
-    {
-      const targetText = (parsed.target ?? '').toLowerCase();
-      const resolvedText = (parsed.resolvedNoun ?? '').toLowerCase();
-      const wantsGuardian = /(guardian|gaurdian)/.test(targetText)
-        || /(guardian|gaurdian)/.test(resolvedText);
-      if (parsed.matchedVerb === 'summon' && wantsGuardian) {
-        const res = get().summonCoreGuardian();
-        if (res.ok) return;
-        // Preconditions failed — surface a useful Arbiter line so the
-        // player knows why the verb didn't bite.
-        const reasonLine =
-          res.reason === 'not_at_capital'
-            ? `The ${getNarratorName()} shakes their head. "A Core Guardian only answers at a Lost Capital. You are not standing in one."`
-          : res.reason === 'wrong_phase'
-            ? `The ${getNarratorName()} folds their hands. "The Guardians are not yet your concern. The Cores will reveal themselves first."`
-          : res.reason === 'already_recovered'
-            ? `The ${getNarratorName()} inclines their head. "This Capital's Core is already yours. The Guardian here is at rest. Travel to a Capital you have not yet broken."`
-          : null;
-        if (reasonLine) get().appendLog('arbiter', reasonLine);
-        return;
-      }
-    }
-
-    // v2.4.1 (OTA 035 — Phase 2) — Main quest Core-gate check.
-    // Fires BEFORE the action's normal handler runs so the Core
-    // grant + faction-flavored narration lands first; the action
-    // itself (salvage / ask / steal / etc.) then continues normally
-    // through its switch case below. The check is no-op when the
-    // player isn't at a Lost Capital, isn't in revelation/cores
-    // phase, has already recovered this Capital's Core, or didn't
-    // submit an action matching the faction's gate intents.
-    //
-    // OTA 052 — the gate verb now SUMMONS the Core Guardian
-    // instead of immediately granting the Core. The Core is only
-    // granted when the Guardian falls (see resolveEnemyDefeat).
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mqMod = require('../engine/mainQuest');
-      // isStationedAtNamedLocation gate: currentLocationId lingers as the
-      // departure capital all through travel (and while wandering off its
-      // anchor), so without this a faction gate-intent action — e.g. a
-      // Monarch's `attack` on a wilderness Mudling — would summon that
-      // capital's Core Guardian miles from the city. Only let the Core
-      // gate fire when the player is actually standing IN the capital.
-      // engine_Dev — built-in Core-Guardian spawn is off whenever a data-driven
-      // quest exists (always, at runtime); the engine no longer ships a quest.
-      if (!hasAnyMainQuest() && mqMod.canRecoverCore(player, parsed.intent) && isStationedAtNamedLocation(player)) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const cg = require('../engine/coreGuardians');
-        const capitalId = player.currentLocationId;
-        const alreadyDefeated = (player.mainQuest?.guardiansDefeated ?? []).includes(capitalId);
-        // Guardian already beaten in a prior session (or legacy
-        // save) — fall through to the normal Core grant path.
-        if (alreadyDefeated) {
-          triggerMainQuest(get, set, { kind: 'core_recovered', locationId: capitalId });
-        } else {
-          // No live Guardian in the current scene? Spawn one.
-          // (If the player already triggered a spawn this visit
-          // and the Guardian is still alive in the scene, the
-          // gate verb just doubles as a "re-engage" — the existing
-          // boss simply receives the action.)
-          const livingGuardian = currentScene.enemies.find((e) => cg.isCoreGuardian(e));
-          if (!livingGuardian) {
-            const guardian = cg.spawnGuardianForCapital(player, capitalId);
-            if (guardian) {
-              set((s) => (
-                s.currentScene
-                  ? {
-                      currentScene: {
-                        ...s.currentScene,
-                        enemies: [...s.currentScene.enemies, guardian],
-                        enemyHps: [...s.currentScene.enemyHps, guardian.hp],
-                        activeEnemyIdx: s.currentScene.enemies.length,
-                        range: 'mid',
-                      },
-                    }
-                  : s
-              ));
-              // OTA-146 — parallel enemy-card beat. Pre-fix the
-              // Guardian's approachLine only emitted to 'arbiter' so
-              // the player read it as scene narration, missed the
-              // BOSS arrival entirely, and got crit for 25 with no
-              // warning. Playtester: "was that a guardian? he spawned
-              // with another character? I never even saw his tag."
-              // Now: ALSO emit the canonical `[combat]` enemy-card
-              // line ("X closes — Attack ready, NdN damage on a hit.
-              // (range: close) ★ BOSS") matching what regular
-              // encounters get, so the boss surfaces in the same UI
-              // affordance as every other enemy.
-              get().appendLog(
-                'combat',
-                `${guardian.name} closes — ${guardian.attack} ready, ${guardian.damage} damage on a hit. (range: close) ★ CORE GUARDIAN`,
-              );
-              get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
-              // Record the spawn for the Milestones tab.
-              recordMemorableEvent(get, set, {
-                kind: 'mq_guardian_spawned',
-                text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,
-                locationId: capitalId,
-                locationName: cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName,
-                hoursElapsed: player.hoursElapsed ?? 0,
-                enemyName: guardian.name,
-              });
-              // OTA 454 — record the Guardian as a met NPC so they
-              // show up in the NPCs Met milestone list.
-              set((s) => ({
-                worldMemory: recordNpcMet(s.worldMemory, {
-                  id: `guardian:${capitalId}`,
-                  name: guardian.name,
-                  role: 'Core Guardian',
-                  factionId: 'aether_born_order',
-                  locationId: capitalId,
-                  hoursElapsed: player.hoursElapsed ?? 0,
-                  firstMetAt: Date.now(),
-                }),
-              }));
-              // Don't run the normal gate verb's effect this turn —
-              // the Guardian is now the scene's focus. Skip the
-              // rest of the action handler.
-              return;
-            }
-          }
-        }
-      } else {
-        // v2.4.1 (OTA 050) — nudge when the player targets a "core"
-        // ambient noun with the wrong verb for their faction's gate.
-        // Without this, salvaging the room's "core" noun reads as
-        // success ("Automaton Circuit recovered") even though the
-        // Main Quest Core hasn't been touched. Refuse the action and
-        // surface the faction's actual recovery verb so the player
-        // can correct course.
-        // v2.4.1 (OTA 053) — also check resolvedNoun. Some verbs
-        // (salvage) route through investigate intent but the parser
-        // routes the matched ambient noun into `resolvedNoun`, not
-        // `target`. Without checking both, "salvage core" slipped
-        // past the nudge and gave the player an ambient-noun
-        // Automaton Circuit instead of the Tartarian Core gate
-        // refusal (playtest 2026-05-23 at Nimari).
-        const targetText = (parsed.target ?? '').toLowerCase();
-        const resolvedText = (parsed.resolvedNoun ?? '').toLowerCase();
-        const wantsCore = /\bcore\b/.test(targetText) || /\bcore\b/.test(resolvedText);
-        const atUnrecoveredCapital =
-          mqMod.LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
-          && !(player.mainQuest?.coresRecovered ?? []).includes(player.currentLocationId)
-          && (player.mainQuest?.phase === 'revelation' || player.mainQuest?.phase === 'cores');
-        if (wantsCore && atUnrecoveredCapital) {
-          const nextAction = mqMod.coreGateNextAction(player.factionId);
-          get().appendLog(
-            'arbiter',
-            `The ${getNarratorName()} holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
-          );
-          return;
-        }
-      }
-    }
 
     switch (parsed.intent) {
       case 'attack': {
@@ -13078,20 +12901,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
-        // OTA-495 — Core-4 forge gate. The golem armaments (Sledge / Greatsword /
-        // Pike / Aether-Lance) are pre-Flood war-forging the Arbiter only entrusts
-        // once the player has carried FOUR Cores out of the Lost Capitals (the
-        // four_core_forge beat). Until then the schematic reads but won't assemble.
-        if (typeof recipe.coresRequired === 'number') {
-          const cores = player.mainQuest?.coresRecovered?.length ?? 0;
-          if (cores < recipe.coresRequired) {
-            get().appendLog(
-              'arbiter',
-              `The ${getNarratorName()} sets a hand on the schematic. "${recipe.result} is war-forging from before the flood — I'll guide your hands once you've carried ${recipe.coresRequired} Cores out of the dark. You've recovered ${cores}. Bring more home."`,
-            );
-            break;
-          }
-        }
+        // engine_Dev — the Core-4 forge gate was removed with the built-in
+        // (Tartaria) main quest. These recipes are now gated only by their normal
+        // ingredient / skill requirements, so they're reachable in any game.
         // OTA-193 — check shortfall AFTER tag-substitution. Misc items
         // with the right material tag (a synthesized "Brass Sextant"
         // carrying ['metal'], say) count toward "Scrap Metal" cost so
@@ -13734,36 +13546,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           case 'escape': {
-            // v2.4.1 (OTA 052) — Core Guardian flee path. If a
-            // Guardian is in the scene the rebuke fires + the
-            // Guardian de-spawns (fully restored on next gate
-            // verb at this Capital — flee can't be used to chip
-            // them down across multiple visits). Player keeps any
-            // damage / durability loss taken in the attempt.
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const cg = require('../engine/coreGuardians');
-            const fleeingGuardian = currentScene.enemies.find((e) => cg.isCoreGuardian(e));
-            if (fleeingGuardian) {
-              const capitalId = cg.capitalIdFromGuardian(fleeingGuardian);
-              const def = capitalId ? cg.GUARDIANS_BY_CAPITAL[capitalId] : null;
-              get().appendLog('arbiter', def?.rebukeLine ?? 'The Guardian watches you go without moving.');
-              const after = cg.fleeAftermathLine(player.factionId);
-              if (after) {
-                get().appendLog('arbiter', after);
-              }
-              if (capitalId && def) {
-                recordMemorableEvent(get, set, {
-                  kind: 'mq_guardian_fled',
-                  text: `fled from ${def.base.name} at ${def.capitalName}`,
-                  locationId: capitalId,
-                  locationName: def.capitalName,
-                  hoursElapsed: player.hoursElapsed ?? 0,
-                  enemyName: def.base.name,
-                });
-              }
-            } else {
-              get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
-            }
+            get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
             if (currentScene.enemies.length > 0) {
               set((s) => (s.currentScene
                 ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
@@ -14806,59 +14589,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // standing here, at FULL reward, with a completion popup (player ask:
     // "submission should happen as soon as you arrive at the spot it routed").
     autoSubmitReadyFactionQuests(get, set);
-    // v2.4.1 (OTA 035 — Phase 2) — Lost Capital arrival logs the
-    // faction's recovery hint; the Core itself only grants after the
-    // player performs the faction's gate verb (see canRecoverCore
-    // checked in submitPlayerAction). Auto-grant was Phase 1
-    // shorthand and has been removed.
-    triggerMainQuest(get, set, { kind: 'first_capital_visit', locationId });
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mq = require('../engine/mainQuest');
-      // engine_Dev — the built-in Lost-Capital arrival narration is off when a
-      // data-driven quest exists (always, at runtime).
-      if (!hasAnyMainQuest() && mq.LOST_CAPITAL_LOCATIONS.includes(locationId)) {
-        const playerNow = get().player;
-        // OTA-442 — [audit #22] play the Capital's one-time arrival signature
-        // FIRST (before the gate hint), so each of the nine reads as its own
-        // place instead of a generic ruin. Gated once per Capital per character.
-        const seen = get().worldMemory.capitalArrivalSeen ?? [];
-        if (!seen.includes(locationId)) {
-          const sig = mq.capitalArrivalSignature(locationId);
-          if (sig) {
-            get().appendLog('world', sig);
-            set((s) => ({
-              worldMemory: {
-                ...s.worldMemory,
-                capitalArrivalSeen: [...(s.worldMemory.capitalArrivalSeen ?? []), locationId],
-              },
-            }));
-          }
-        }
-        const alreadyRecovered = playerNow?.mainQuest?.coresRecovered?.includes(locationId) ?? false;
-        if (!alreadyRecovered) {
-          const hint = mq.coreGateHint(playerNow?.factionId ?? '', locationId);
-          if (hint) get().appendLog('arbiter', hint);
-          // arb144 — name the SUMMON affordance the FIRST time the player ever
-          // stands in a Lost Capital with an unclaimed Core. The Core Guardian
-          // is challenged via the ★ SUMMON chip on the Contracts → Primary
-          // Objective card — but nothing ever pointed there, so a player wandered
-          // a capital looking for a "summon button" and concluded the main quest
-          // "didn't tie in." (Note: faction outposts like Varakush are NOT
-          // capitals and have no Core — that confusion is the same gap.) `seen`
-          // was read BEFORE this Capital was appended, so length 0 = first ever.
-          if (seen.length === 0) {
-            get().appendLog(
-              'arbiter',
-              `The ${getNarratorName()}'s voice drops. "This is one of the nine Lost Capitals — and it holds a Core, the whole reason we walk. Open CONTRACTS, find the Primary Objective, and press ★ SUMMON to call up this place's Guardian. Put it down and the Core is yours. That is the main road; everything else is a detour."`,
-            );
-          }
-        }
-      }
-    }
-    if (locationId === 'mud_flood_nexus') {
-      triggerMainQuest(get, set, { kind: 'reached_nexus' });
-    }
+    // engine_Dev — the built-in (Tartaria) Lost-Capital / Core-Guardian main quest
+    // was removed; main-quest content is now entirely data-driven (customMainQuest).
     void get().persist();
   },
 
@@ -15242,95 +14974,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // most playtests will never see one organically; long campaigns
     // will see a handful. The gem saves to the install-wide stash, not
     // the active character.
-    // v2.4.1 (OTA 052) — Core Guardian defeat. Detect the kill,
-    // grant the Capital's Core, drop the unique Core Guardian
-    // weapon + armor, mark the Guardian as defeated on the
-    // mainQuest state, and surface the defeat narration. The
-    // Res Gem drop below still fires because Guardians are
-    // boss=true.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const cg = require('../engine/coreGuardians');
-      if (cg.isCoreGuardian(enemy)) {
-        const capitalId = cg.capitalIdFromGuardian(enemy);
-        if (capitalId) {
-          const def = cg.GUARDIANS_BY_CAPITAL[capitalId];
-          const drops = cg.dropsForCapital(capitalId);
-          // Log the defeat line + the signature gear drop before
-          // the Core itself lands so the chamber narration reads
-          // in order.
-          get().appendLog('arbiter', def.defeatLine);
-          if (drops) {
-            set((s) => (
-              s.player
-                ? {
-                    player: {
-                      ...s.player,
-                      inventory: [
-                        ...s.player.inventory,
-                        drops.weapon,
-                        drops.armor,
-                      ],
-                    },
-                  }
-                : s
-            ));
-            get().appendLog(
-              'reward',
-              `✦ ${drops.weapon.name} taken from ${enemy.name}. ✦ ${drops.armor.name} taken from ${enemy.name}.`,
-            );
-          }
-          // Mark the Guardian beaten BEFORE the core_recovered
-          // trigger so the spawn-vs-grant logic in submitPlayerAction
-          // sees a defeated guardian if anything re-runs the gate.
-          set((s) => {
-            if (!s.player) return s;
-            const mq = s.player.mainQuest ?? { phase: 'hook' as const, coresRecovered: [] };
-            const guardiansDefeated = Array.from(new Set([...(mq.guardiansDefeated ?? []), capitalId]));
-            return {
-              player: { ...s.player, mainQuest: { ...mq, guardiansDefeated } },
-            };
-          });
-          // Record the milestone event.
-          recordMemorableEvent(get, set, {
-            kind: 'mq_guardian_defeated',
-            text: `defeated ${enemy.name} at ${def.capitalName}`,
-            locationId: capitalId,
-            locationName: def.capitalName,
-            hoursElapsed: get().player?.hoursElapsed ?? 0,
-            enemyName: enemy.name,
-          });
-          // Now grant the Core — this advances the mainQuest phase
-          // and writes the Core item to inventory.
-          triggerMainQuest(get, set, { kind: 'core_recovered', locationId: capitalId });
-          recordMemorableEvent(get, set, {
-            kind: 'mq_core_recovered',
-            text: `recovered the ${def.capitalName} Core`,
-            locationId: capitalId,
-            locationName: def.capitalName,
-            hoursElapsed: get().player?.hoursElapsed ?? 0,
-          });
-          // OTA-120 — Phase 6 puppy-vendor safety net. If the dog
-          // died in combat AND the safety-net hasn't been used,
-          // queue the vendor for the player's NEXT outdoor scene. The
-          // rubble-puppy fallback (above) takes over once the MAIN QUEST
-          // is down to its final boss. (engine_Dev — was split on "all
-          // Core Guardians defeated", a Tartaria concept; now on
-          // isMainQuestNearEnd so it works in a custom game too.)
-          {
-            const liveWm = get().worldMemory;
-            const livePlayer = get().player;
-            if (
-              liveWm.puppyVendorOwed &&
-              !liveWm.puppyVendorUsed &&
-              !isMainQuestNearEnd(livePlayer)
-            ) {
-              queuePuppyVendor(get, set);
-            }
-          }
-        }
-      }
-    }
+    // engine_Dev — the built-in (Tartaria) Core-Guardian defeat handler was removed.
+    // Boss defeats that advance a data-driven main quest are handled in
+    // resolveEnemyDefeat's kill-step path above.
 
     // OTA 454 — Resurrection Gem drop sources:
     //  • boss kill → guaranteed (existing)
@@ -21554,114 +21200,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  // v2.4.1 (OTA 033) — Mud Flood Nexus main quest action: the player
-  // makes The Choice from the Contracts screen. Ending must be one
-  // of 'seal' | 'unleash' | 'preserve'; the choice is final.
-  chooseEndingMainQuest(ending: 'seal' | 'unleash' | 'preserve') {
-    const player = get().player;
-    if (!player) return;
-    triggerMainQuest(get, set, { kind: 'chose_ending', ending });
-    // v2.4.1 (OTA 040) — navigate to the ending splash.
-    set({ currentScreen: 'ending' });
-    // v2.4.1 (OTA 043) — record the completion badge in global
-    // stash so the title screen can surface "faction X seal" /
-    // "faction Y unleash" badges across runs.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { recordEndingBadge } = require('../engine/saveSystem');
-      void recordEndingBadge(player.factionId, ending);
-    }
-    void get().persist();
-  },
-
-  // OTA-148 — explicit SUMMON entry point for the PRIMARY OBJECTIVE
-  // card on Contracts. Pre-OTA-148, summoning the Guardian required
-  // taking the player's faction-gate verb (attack/diplomacy for the
-  // Monarchs, salvage for the Reclaimers, etc.) at the Capital — a
-  // discoverability black hole, especially after death-revive when
-  // the Guardian was wiped from the scene. The card chip now drives
-  // the same spawn pipeline the gate-verb path uses.
-  summonCoreGuardian() {
-    const player = get().player;
-    const currentScene = get().currentScene;
-    if (!player) return { ok: false, reason: 'no_player' };
-    if (!currentScene) return { ok: false, reason: 'no_scene' };
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const cg = require('../engine/coreGuardians');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mq = require('../engine/mainQuest');
-    // engine_Dev — built-in Core-Guardian summon is off when a data-driven quest
-    // exists (always, at runtime). The engine no longer ships a main quest.
-    if (hasAnyMainQuest()) return { ok: false, reason: 'no_builtin_quest' };
-    const capitalId = player.currentLocationId;
-    if (!mq.LOST_CAPITAL_LOCATIONS.includes(capitalId)) {
-      return { ok: false, reason: 'not_at_capital' };
-    }
-    // currentLocationId lingers as the departure capital while travelling /
-    // wandering, so confirm the player is actually standing in the city
-    // before answering the summons in the wilderness.
-    if (!isStationedAtNamedLocation(player)) {
-      return { ok: false, reason: 'not_at_capital' };
-    }
-    const mqState = mq.ensureMainQuest(player.mainQuest);
-    if (mqState.phase !== 'revelation' && mqState.phase !== 'cores') {
-      return { ok: false, reason: 'wrong_phase' };
-    }
-    if (mqState.coresRecovered.includes(capitalId)) {
-      return { ok: false, reason: 'already_recovered' };
-    }
-    if (currentScene.enemies.find((e) => cg.isCoreGuardian(e))) {
-      // Already in the scene — just bounce the screen back to
-      // exploration so the player can engage.
-      set({ currentScreen: 'exploration' });
-      return { ok: true, reason: 'already_present' };
-    }
-    const guardian = cg.spawnGuardianForCapital(player, capitalId);
-    if (!guardian) return { ok: false, reason: 'no_guardian_def' };
-    set((s) => (
-      s.currentScene
-        ? {
-            currentScene: {
-              ...s.currentScene,
-              enemies: [...s.currentScene.enemies, guardian],
-              enemyHps: [...s.currentScene.enemyHps, guardian.hp],
-              activeEnemyIdx: s.currentScene.enemies.length,
-              range: 'mid',
-            },
-          }
-        : s
-    ));
-    get().appendLog(
-      'combat',
-      `${guardian.name} closes — ${guardian.attack} ready, ${guardian.damage} damage on a hit. (range: close) ★ CORE GUARDIAN`,
-    );
-    get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
-    recordMemorableEvent(get, set, {
-      kind: 'mq_guardian_spawned',
-      text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,
-      locationId: capitalId,
-      locationName: cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName,
-      hoursElapsed: player.hoursElapsed ?? 0,
-      enemyName: guardian.name,
-    });
-    set((s) => ({
-      worldMemory: recordNpcMet(s.worldMemory, {
-        id: `guardian:${capitalId}`,
-        name: guardian.name,
-        role: 'Core Guardian',
-        factionId: 'aether_born_order',
-        locationId: capitalId,
-        hoursElapsed: player.hoursElapsed ?? 0,
-        firstMetAt: Date.now(),
-      }),
-    }));
-    // Bounce to exploration so the boss card is visible to the
-    // player immediately — no second tap required.
-    set({ currentScreen: 'exploration' });
-    void get().persist();
-    return { ok: true };
-  },
-
   async persist() {
     // OTA-627 — coalescing guard (see persistInFlight note above). If a write is
     // already running, request ONE trailing write (to capture any state that
@@ -23227,128 +22765,6 @@ function nextCardinalToward(
     return dx > 0 ? 'east' : 'west';
   }
   return dy > 0 ? 'south' : 'north';
-}
-
-// v2.4.1 (OTA 033) — main-quest trigger helper. Calls advanceMainQuest
-// and, if the phase actually moved, updates the player + logs the
-// new phase's narration line. Also grants the Core inventory item
-// when a 'core_recovered' trigger lands.
-type MainQuestTrigger =
-  | { kind: 'first_capital_visit'; locationId: string }
-  | { kind: 'core_recovered'; locationId: string }
-  | { kind: 'reached_nexus' }
-  | { kind: 'chose_ending'; ending: 'seal' | 'unleash' | 'preserve' };
-
-function triggerMainQuest(
-  get: () => GameStore,
-  set: (partial: Partial<GameStore>) => void,
-  trigger: MainQuestTrigger,
-): void {
-  const player = get().player;
-  if (!player) return;
-  // engine_Dev — the legacy built-in (Tartaria) main quest is disabled whenever a
-  // data-driven quest exists (an upload, or the generic-default pack). At runtime
-  // one always does, so this phase machine never advances in a real game; it stays
-  // live only for unit tests that install nothing. (Slated for removal.)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  if ((require('../engine/contentPack') as typeof import('../engine/contentPack')).hasAnyMainQuest()) return;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mq = require('../engine/mainQuest');
-  const prevState = mq.ensureMainQuest(player.mainQuest);
-  const nextState = mq.advanceMainQuest(player, trigger);
-  if (nextState === prevState) return;
-  if (nextState.phase === prevState.phase
-      && nextState.coresRecovered.length === prevState.coresRecovered.length) {
-    return;
-  }
-  // Grant the Core inventory item when a core_recovered trigger
-  // actually counted (the advance produced a new coresRecovered
-  // entry). Core items are inline-created InventoryItems — Phase 1
-  // doesn't add catalog rows for them since they're quest-bound.
-  let inventory = player.inventory;
-  if (trigger.kind === 'core_recovered'
-      && nextState.coresRecovered.length > prevState.coresRecovered.length) {
-    const capitalNames: Record<string, string> = {
-      asgardar: 'Asgardar Core',
-      samarran: 'Samarran Core',
-      nimari: 'Nimari Core',
-      drakova: 'Drakova Core',
-      voronov: 'Voronov Core',
-      karok_sa: 'Karok-Sa Core',
-      yuldra_tul: 'Yuldra-Tul Core',
-      ostragar: 'Ostragar Core',
-      iskan_veil: 'Iskan-Veil Core',
-    };
-    const coreName = capitalNames[trigger.locationId];
-    if (coreName) {
-      const newCore: InventoryItem = {
-        id: `core_${trigger.locationId}_${Date.now()}`,
-        name: coreName,
-        kind: 'relic',
-        rarity: 'Legendary',
-        quantity: 1,
-        tags: ['quest', 'aetheric_core', 'main_quest'],
-      };
-      inventory = [...inventory, newCore];
-    }
-  }
-  set({
-    player: { ...player, mainQuest: nextState, inventory },
-  });
-  // Narration log
-  const context: Record<string, unknown> = { seed: player.name };
-  if (trigger.kind === 'core_recovered') {
-    context.coreRecovered = trigger.locationId;
-    context.coresCount = nextState.coresRecovered.length;
-  } else if (trigger.kind === 'chose_ending') {
-    context.ending = trigger.ending;
-  }
-  // Suppress the single-line 'choice' phase narration — the Phase 5
-  // Nexus cinematic below replaces it with a 7-paragraph beat.
-  if (nextState.phase !== 'choice') {
-    const line = mq.narrationForPhase(nextState.phase, player.factionId, context);
-    if (line) {
-      get().appendLog('arbiter', line);
-    }
-  }
-  // For multi-phase triggers — e.g. core_recovered that lands the
-  // player on phase 'descent' (5th Core) — also log the descent
-  // narration so the player gets the "Stair opens" beat.
-  if (prevState.phase === 'cores' && nextState.phase === 'descent') {
-    const descentLine = mq.narrationForPhase('descent', player.factionId, { seed: player.name });
-    if (descentLine) get().appendLog('arbiter', descentLine);
-  }
-  // v2.4.1 (OTA 042 — Phase 4b) — 3-Core rival-pressure twist.
-  // Fires once per character the moment coresRecovered hits 3.
-  // Updates twistsFired so it never repeats. Uses the same player
-  // record we just wrote, then re-set with the new flag.
-  if (mq.shouldFireThreeCoreTwist(nextState)) {
-    const twistLine = mq.threeCoreTwistLine(player.factionId);
-    if (twistLine) get().appendLog('arbiter', twistLine);
-    const flagged = mq.markTwistFired(nextState, 'three_core_pressure');
-    const cur = get().player;
-    if (cur) set({ player: { ...cur, mainQuest: flagged } });
-  }
-  // OTA-495 — Core-4 golem-forge unlock beat (one-shot, mirrors the 3-core
-  // twist). Fires the moment coresRecovered hits 4 and opens the golem-armament
-  // recipes (gated in the craft handler on recipe.coresRequired).
-  if (mq.shouldFireFourCoreForge(nextState)) {
-    get().appendLog('arbiter', mq.fourCoreForgeLine());
-    const flagged = mq.markTwistFired(nextState, 'four_core_forge');
-    const cur = get().player;
-    if (cur) set({ player: { ...cur, mainQuest: flagged } });
-  }
-  // v2.4.1 (OTA 038 — Phase 5) — the Nexus interior cinematic.
-  // When reached_nexus advances 'descent' -> 'choice', emit the
-  // arrival + 5 Core-slotting beats + the prompt as separate log
-  // entries so the feed reads as paragraphs. The choice buttons on
-  // ContractsScreen already wire up to chooseEndingMainQuest.
-  if (prevState.phase === 'descent' && nextState.phase === 'choice') {
-    const cine = mq.nexusArrivalCinematic();
-    for (const line of cine) {
-      get().appendLog('arbiter', line);
-    }
-  }
 }
 
 // HANDOFF #15c — has the player already grabbed this loot in this room?
@@ -27381,11 +26797,10 @@ function tryFireRubblePuppy(
   const player = get().player;
   const wm = get().worldMemory;
   if (!player || !wm.puppyVendorOwed || wm.puppyVendorUsed) return false;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const cg = require('../engine/coreGuardians');
-  const totalGuardians = cg.totalGuardiansCount();
-  const defeated = (player.mainQuest?.guardiansDefeated ?? []).length;
-  if (defeated < totalGuardians) return false;
+  // engine_Dev — gate on main-quest progress (was "all Core Guardians defeated",
+  // a Tartaria concept that never fired in a custom game). Mirrors the rubble-noun
+  // plant gate so the plant and the spawn agree.
+  if (!isMainQuestNearEnd(player)) return false;
   // Fire the puppy-in-rubble onboarding directly (no item trade).
   set((s) => ({
     worldMemory: {

@@ -29,7 +29,6 @@ import { installGenericDefaults } from './app/engine/contentPack';
 import { GENERIC_GAME } from './app/engine/genericGame';
 import { useCustomMusicStore } from './app/state/customMusicStore';
 import { useCustomMapsStore } from './app/state/customMapsStore';
-import { EndingScreen } from './app/screens/EndingScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
 import { CharacterScreen } from './app/screens/CharacterScreen';
 import { MapScreen } from './app/screens/MapScreen';
@@ -808,7 +807,6 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'actions' && <ActionReferenceScreen />}
           {screen === 'contracts' && <ContractsScreen />}
           {screen === 'developer' && <DeveloperSettingsScreen />}
-          {screen === 'ending' && <EndingScreen />}
         </View>
       </View>
       {/* OTA-471 — opening splash overlay at the ROOT (outside the safe-area

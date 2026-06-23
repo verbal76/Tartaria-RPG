@@ -1249,7 +1249,6 @@
     },
     {
       "result": "Golem Sledge",
-      "coresRequired": 4,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1267,7 +1266,6 @@
     },
     {
       "result": "Golem Greatsword",
-      "coresRequired": 4,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1285,7 +1283,6 @@
     },
     {
       "result": "Golem Pike",
-      "coresRequired": 4,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1303,7 +1300,6 @@
     },
     {
       "result": "Golem Aether-Lance",
-      "coresRequired": 4,
       "ingredients": [
         {
           "name": "Aether Crystal",

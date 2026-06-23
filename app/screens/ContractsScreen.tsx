@@ -13,14 +13,6 @@ import { computeAllProgress, getCharacterStories, allFragments } from '../engine
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
-import {
-  ensureMainQuest,
-  phaseLabel,
-  phaseHint,
-  LOST_CAPITAL_LOCATIONS,
-  coreGateNextAction,
-} from '../engine/mainQuest';
-import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
 function MilestoneStat({
   label,
@@ -347,180 +339,13 @@ export function ContractsScreen() {
             </TouchableOpacity>
           );
         }
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        if ((require('../engine/contentPack') as typeof import('../engine/contentPack')).isReskinActive()) {
-          return (
-            <View style={styles.mainQuestCard}>
-              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
-              <Text style={styles.mainQuestHint}>No main quest set — build one in the dev console.</Text>
-            </View>
-          );
-        }
-        const mq = ensureMainQuest(player.mainQuest);
-        const recoveredCount = mq.coresRecovered.length;
-        const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(
-          (acc, e) => {
-            if (e.kind === 'mq_guardian_fled' && e.locationId) {
-              acc[e.locationId] = (acc[e.locationId] ?? 0) + 1;
-            }
-            return acc;
-          },
-          {},
-        );
-        // OTA-148 — SUMMON chip eligibility. Shows when the player
-        // is standing in an unrecovered Lost Capital with the main
-        // quest active. Pre-OTA-148, summoning the Guardian required
-        // taking the faction-gate verb (attack/diplomacy/salvage/…)
-        // at the Capital, which the player had no way to discover
-        // post-revive when the Guardian had been wiped from the
-        // scene. Tap the chip → store fires the same spawn pipeline
-        // and bounces back to exploration.
-        // OTA-412 — only while STANDING ON the capital's anchor tile.
-        // currentLocationId lingers as the capital after a cardinal step into the
-        // wilderness; gating on it alone left the SUMMON chip live miles outside
-        // the city. Mirror isStationedAtNamedLocation (the summon action enforces
-        // the same — summonCoreGuardian → not_at_capital).
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-        const stationedAtCapital = !player.travelTarget
-          && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
-        const atCapitalForSummon =
-          stationedAtCapital
-          && (mq.phase === 'revelation' || mq.phase === 'cores')
-          && LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
-          && !mq.coresRecovered.includes(player.currentLocationId);
+        // engine_Dev — no data-driven quest loaded (built-in Tartaria main quest
+        // was removed): show a neutral card pointing the author at the dev console.
         return (
-          <TouchableOpacity
-            style={styles.mainQuestCard}
-            onPress={() => setMqExpanded((v) => !v)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
-            <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
-            <Text style={styles.mainQuestHint}>{phaseHint(mq.phase, recoveredCount)}</Text>
-            {(() => {
-              // v2.4.1 (OTA 035) — when the player is standing at an
-              // unrecovered Lost Capital, surface the faction's
-              // next-action prompt as a second hint line.
-              if (mq.phase !== 'revelation' && mq.phase !== 'cores') return null;
-              const here = player.currentLocationId;
-              if (!LOST_CAPITAL_LOCATIONS.includes(here)) return null;
-              if (mq.coresRecovered.includes(here)) return null;
-              const next = coreGateNextAction(player.factionId);
-              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
-            })()}
-            {atCapitalForSummon && (
-              <TouchableOpacity
-                style={styles.summonChip}
-                onPress={() => useGameStore.getState().summonCoreGuardian()}
-                activeOpacity={0.7}
-                hitSlop={6}
-              >
-                <Text style={styles.summonChipText}>★ SUMMON</Text>
-              </TouchableOpacity>
-            )}
-            {mqExpanded && (
-              <View style={styles.mqTracker}>
-                <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
-                {/* arb148 — the Primary Objective card sits in the FIXED region
-                    above the tabs/scroll, so the expanded 9-Capital list pushed
-                    the bottom Capital half off-screen. Cap it and let the rows
-                    scroll internally (nestedScroll) so all nine are reachable. */}
-                <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
-                {LOST_CAPITAL_LOCATIONS.map((capId) => {
-                  const def = GUARDIANS_BY_CAPITAL[capId];
-                  const recovered = mq.coresRecovered.includes(capId);
-                  const guardianDown = (mq.guardiansDefeated ?? []).includes(capId);
-                  const here = player.currentLocationId === capId;
-                  const fleeCount = fledByCapital[capId] ?? 0;
-                  let status: string;
-                  let color: string;
-                  if (recovered) {
-                    status = '✓ Core recovered';
-                    color = '#7a8a5a';
-                  } else if (guardianDown) {
-                    status = '✓ Guardian down — return to claim Core';
-                    color = '#c9a86a';
-                  } else if (fleeCount > 0) {
-                    status = `△ Guardian fought, fled ${fleeCount}× — return to finish`;
-                    color = '#a85a3a';
-                  } else if (here) {
-                    status = '○ At this Capital now';
-                    color = '#c9a86a';
-                  } else {
-                    status = '· not yet visited';
-                    color = '#7a705c';
-                  }
-                  const capName = def?.capitalName ?? capId;
-                  // 2026-05-24 — rows are now tappable to start a
-                  // travel-to course (mirrors Lore→Places). The row
-                  // for the player's current Capital stays a plain
-                  // View since you can't travel to where you are.
-                  const rowContent = (
-                    <>
-                      <Text style={styles.mqTrackerCap}>{capName}</Text>
-                      <Text style={[styles.mqTrackerStatus, { color }]}>{status}</Text>
-                      <Text style={styles.mqTrackerGuardian}>
-                        Guardian: {def?.base.name ?? '—'}
-                      </Text>
-                      {!here && (
-                        <Text style={styles.mqTrackerTap}>▸ tap to travel</Text>
-                      )}
-                    </>
-                  );
-                  if (here) {
-                    return (
-                      <View key={capId} style={styles.mqTrackerRow}>{rowContent}</View>
-                    );
-                  }
-                  return (
-                    <TouchableOpacity
-                      key={capId}
-                      style={styles.mqTrackerRow}
-                      activeOpacity={0.7}
-                      onPress={() => setPendingRoute({ id: capId, name: capName })}
-                    >
-                      {rowContent}
-                    </TouchableOpacity>
-                  );
-                })}
-                </ScrollView>
-                <Text style={styles.mqTrackerFoot}>
-                  Tap any Capital row above to start travel.
-                </Text>
-              </View>
-            )}
-            {mq.phase === 'choice' && (
-              <View style={styles.mainQuestChoiceRow}>
-                <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.mainQuestChoiceText}>SEAL</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.mainQuestChoiceText}>UNLEASH</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {mq.phase === 'ended' && mq.ending && (
-              <Text style={styles.mainQuestEnded}>
-                Ending recorded: {mq.ending.toUpperCase()}.
-              </Text>
-            )}
-          </TouchableOpacity>
+          <View style={styles.mainQuestCard}>
+            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+            <Text style={styles.mainQuestHint}>No main quest set — build one in the dev console.</Text>
+          </View>
         );
       })()}
 
