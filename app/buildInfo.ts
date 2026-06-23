@@ -15441,4 +15441,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // mechanical/dig-camp floor flavors genericized. itemFusion: the fusion-namer
 // adjective pools + the dog-vest LLM example name genericized. Leak baseline
 // tightened for all five. Engine MECHANICS unchanged throughout.
-export const OTA_BUILD_ID = '2026-06-22-793';
+// engine_Dev-794 — dog-hook matcher hardened + captor combat made authorable.
+// (1) The hookNoun matcher is now WHOLE-WORD (dogCompanion.rescueHookMatches /
+// matchRescueScenarioId) instead of a loose bidirectional substring test — kills
+// the false fires where "trash"→forest, "lock"/"arm"→bunker, "spit"/"strap"→snare,
+// "slab"→lab, "bright"→brig. (2) RescueScenario gains optional captorHp /
+// captorAttack / captorDamage / captorLoot, so a dead captor can drop YOUR items
+// (the fallback-swap uses the unaligned row's stats too). Template rewritten with
+// a full field-by-field header + the new fields; dev-panel DogScenariosBox hint +
+// whole-game bundle hint updated; generic-game captors given generic loot. New
+// tests cover the matcher + authorable combat. archetypes documented as
+// cosmetic/reserved (it never gated placement).
+export const OTA_BUILD_ID = '2026-06-22-794';

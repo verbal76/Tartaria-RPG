@@ -36,9 +36,12 @@ export type RescueScenarioId = string;
 
 export interface RescueScenario {
   id: RescueScenarioId;
-  /** The investigation hook noun the player must engage to fire the
-   *  rescue. The hook nouns are added to roomInvestigationTable on
-   *  matching scene archetypes. */
+  /** Trigger words. The rescue fires when the player investigates / attacks /
+   *  approaches a target that matches one of these, in any enemy-free scene.
+   *  Matching is WHOLE-WORD (see rescueHookMatches): "ash" fires on "ash tree"
+   *  but NOT "trash"; "airlock" fires on "the airlock" but NOT a bare "lock". A
+   *  multi-word noun ("snare pit") also matches when the target is one of its
+   *  words ("pit"). */
   hookNouns: string[];
   /** Captor faction template id when the player IS NOT this faction.
    *  Resolves to the unaligned poacher captor when the player IS
@@ -50,8 +53,8 @@ export interface RescueScenario {
   defaultBreed: string;
   /** Starting profile drives stat baselines. */
   startingProfile: DogStartingProfile;
-  /** Scene archetypes where this hook is eligible to spawn. Matched
-   *  against location.tags. */
+  /** Thematic scene tags. OPTIONAL / reserved — placement is driven entirely by
+   *  hookNouns; this does not currently gate where a scenario can fire. */
   archetypes: string[];
   /** Arbiter beat shown to the player when the captor falls. */
   victoryLine: string;
@@ -63,6 +66,16 @@ export interface RescueScenario {
   /** Short venue phrase used in the ~day-5 rumor tip ("a dog held at
    *  {rumorVenue} to the north"). Optional. */
   rumorVenue?: string;
+  // ----- Optional captor combat overrides (defaults shown) -----
+  /** Captor max HP. Default 14. */
+  captorHp?: number;
+  /** Captor to-hit value (string or number). Default '4'. */
+  captorAttack?: string | number;
+  /** Captor damage dice, e.g. '1d8+2'. Default '1d6+1'. */
+  captorDamage?: string;
+  /** Item names the captor drops on death — define these in YOUR item tables so
+   *  they grant as real items. Default ['Scrap Metal','Hardtack','Mud Cloth']. */
+  captorLoot?: string[];
 }
 
 const RESCUE_SCENARIOS_BUILTIN: RescueScenario[] =
@@ -87,6 +100,38 @@ function unalignedScenario(): RescueScenario | undefined {
   return getRescueScenarios().find((s) => s.captorFactionId == null);
 }
 
+/** Does a rescue hookNoun match the player's target text? WHOLE-WORD matching,
+ *  so short/common nouns no longer false-trigger:
+ *    - exact: target === noun
+ *    - the noun phrase appears word-bounded inside the target ("ash" ⊂ "ash
+ *      tree" ✓, but NOT "trash"; "the airlock" ✓, but a bare "lock" ✗)
+ *    - for a MULTI-word noun, the target is one of its words ("snare pit" fires
+ *      on "snare" or "pit")
+ *  Replaces the old loose bidirectional substring test that fired "forest" on
+ *  "trash", "bunker" on "lock"/"arm", "snare" on "spit"/"strap", etc. */
+export function rescueHookMatches(noun: string, target: string): boolean {
+  const nl = (noun ?? '').toLowerCase().trim();
+  const t = (target ?? '').toLowerCase().trim();
+  if (!nl || !t) return false;
+  if (t === nl) return true;
+  const escaped = nl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (new RegExp(`(?:^|[^a-z0-9])${escaped}(?:[^a-z0-9]|$)`, 'i').test(t)) return true;
+  const words = nl.split(/[\s-]+/).filter(Boolean);
+  if (words.length > 1 && words.includes(t)) return true;
+  return false;
+}
+
+/** Id of the first live scenario whose hookNouns match the target text, else
+ *  null. The store's dog-rescue dispatch calls this. */
+export function matchRescueScenarioId(target: string): RescueScenarioId | null {
+  for (const s of getRescueScenarios()) {
+    for (const n of s.hookNouns) {
+      if (rescueHookMatches(n, target)) return s.id;
+    }
+  }
+  return null;
+}
+
 // ----- Captor factory --------------------------------------------------
 
 /** Build an Enemy record for the rescue captor. Always sets
@@ -103,18 +148,18 @@ export function spawnRescueCaptor(
   const useFallback =
     scenario.captorFactionId !== null &&
     scenario.captorFactionId === playerFactionId;
-  const captorName = useFallback
-    ? (unalignedScenario()?.captorName ?? scenario.captorName)
-    : scenario.captorName;
+  // The captor's identity AND combat profile come from the fallback row when the
+  // swap fires, so the player fights the unaligned poacher as that row defines it.
+  const src = useFallback ? (unalignedScenario() ?? scenario) : scenario;
   return {
-    name: captorName,
+    name: src.captorName,
     type: 'humanoid',
     abilityPoint: 'Strength 4',
-    attack: '4',
-    damage: '1d6+1',
-    hp: 14,
+    attack: String(src.captorAttack ?? '4'),
+    damage: src.captorDamage ?? '1d6+1',
+    hp: src.captorHp ?? 14,
     rarity: 'Uncommon' as Rarity,
-    loot: ['Scrap Metal', 'Hardtack', 'Mud Cloth'],
+    loot: src.captorLoot ?? ['Scrap Metal', 'Hardtack', 'Mud Cloth'],
     aliases: ['captor', 'deserter', 'enforcer', 'scavenger', 'poacher', 'stranger'],
     factionNeutralFight: true,
   };
