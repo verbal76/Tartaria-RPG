@@ -15574,4 +15574,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // So the built-in quest is provably dead in every real game; it stays live only
 // for unit tests that install nothing. Phase 2 deletes the dead code (coreGuardians
 // + the built-in mainQuest phase machine + its wiring).
-export const OTA_BUILD_ID = '2026-06-22-807';
+//
+// engine_Dev-808 — built-in (Tartaria) main quest DELETED (Phase 2). With the gate
+// proven dead at runtime (807), the dead code is now gone: engine/coreGuardians.ts
+// and screens/EndingScreen.tsx removed; engine/mainQuest.ts gutted to just the
+// vestigial player.mainQuest helpers (initMainQuest / ensureMainQuest) + the
+// reference-game capital list used by worldgen — the phase machine, faction core
+// gates, ending cinematics, and all their Tartaria prose are deleted. gameStore
+// loses triggerMainQuest, summonCoreGuardian, chooseEndingMainQuest, the Core-
+// Guardian defeat handler, and the Lost-Capital arrival block; ContractsScreen +
+// ExplorationScreen drop the built-in Primary-Objective panel/chip (the data-driven
+// card still renders). The Core-4 craft gate (coresRequired) is removed so the
+// golem-armament recipes are reachable in any game. Leak scanner ratcheted:
+// mainQuest 85→0, coreGuardians/EndingScreen removed. ~110 Tartaria leaks gone.
+export const OTA_BUILD_ID = '2026-06-23-808';

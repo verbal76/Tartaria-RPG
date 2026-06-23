@@ -42,14 +42,18 @@ function scanFile(file: string): number {
   return n;
 }
 
-// Per-file baseline (captured 2026-06-22). RATCHET: these may only ever go DOWN.
+// Per-file baseline (captured 2026-06-22; tightened 2026-06-23). RATCHET: these
+// may only ever go DOWN.
 const BASELINE: Record<string, number> = {
-  'app/state/gameStore.ts': 150, 'app/engine/mainQuest.ts': 85, 'app/engine/itemAliases.ts': 55,
+  // engine_Dev — the built-in (Tartaria) main quest was DELETED: mainQuest.ts
+  // gutted to vestigial state helpers (85→0), coreGuardians.ts + EndingScreen.tsx
+  // removed entirely, and the dead built-in-quest blocks pruned from gameStore.ts.
+  'app/state/gameStore.ts': 149, 'app/engine/mainQuest.ts': 0, 'app/engine/itemAliases.ts': 55,
   'app/engine/hooks.ts': 49,
   // elevatedOverlay.ts extracted to app/data/overlays/elevated-overlays.json (45 → 0).
   // salvagePools.ts extracted to app/data/salvage/salvage-pools.json (41 → 0).
   // powers.ts: DEFAULT_POWERS extracted to app/data/powers/default-powers.json (24→0).
-  'app/engine/powers.ts': 0, 'app/engine/coreGuardians.ts': 23,
+  'app/engine/powers.ts': 0,
   // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).
   // whispers.ts: the yulka chain DATA extracted to app/data/whispers/builtin-whispers.json (9→0).
   'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 0,
@@ -70,7 +74,7 @@ const BASELINE: Record<string, number> = {
   'app/engine/statTraining.ts': 1, 'app/engine/investigationTable.ts': 0, 'app/engine/vendors.ts': 1,
   'app/engine/itemDefaults.ts': 1, 'app/engine/hookPuzzles.ts': 0, 'app/engine/sceneNounMaterial.ts': 1,
   'app/engine/arbiterKnowledge.ts': 1, 'app/engine/buildings.ts': 1, 'app/screens/MapScreen.tsx': 1,
-  'app/screens/VendorScreen.tsx': 1, 'app/screens/EndingScreen.tsx': 1,
+  'app/screens/VendorScreen.tsx': 1,
 };
 const BASELINE_TOTAL = Object.values(BASELINE).reduce((a, c) => a + c, 0);
 

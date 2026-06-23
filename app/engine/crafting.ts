@@ -160,12 +160,6 @@ export interface Recipe {
    *  refuses with an Arbiter line if the player's effective INT is
    *  below the threshold. Omitted recipes have no INT gate. */
   intRequirement?: number;
-  /** OTA-495 — Cores-recovered gate. The golem-armament recipes set this to 4:
-   *  the Arbiter only entrusts the pre-Flood war-forging once the player has
-   *  carried four Cores out of the Lost Capitals (the Core-4 forge beat). When
-   *  set, the craft handler refuses with an Arbiter line until
-   *  mainQuest.coresRecovered.length meets the threshold. Omitted = no gate. */
-  coresRequired?: number;
 }
 
 export const MATERIALS = (materialsData as { materials: CatalogMaterial[] }).materials;

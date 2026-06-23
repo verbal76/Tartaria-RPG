@@ -605,12 +605,8 @@ export function ExplorationScreen() {
           the 'ended' phase (no live quest to point at). */}
       {(() => {
         if (!player) return null;
-        const mq = player.mainQuest;
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { phaseHint, LOST_CAPITAL_LOCATIONS: capitals, coreGateNextAction } = require('../engine/mainQuest');
-        let mainLine: string;
-        // engine_Dev — a DATA-DRIVEN main quest (uploaded) takes the chip when one
-        // is loaded, showing its current objective the same way Tartaria's does.
+        // engine_Dev — a DATA-DRIVEN main quest (uploaded, or the generic default)
+        // drives the chip. The built-in Tartaria main quest was removed.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { liveMainQuest } = require('../engine/customMainQuest');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -645,48 +641,8 @@ export function ExplorationScreen() {
             </TutorialTarget>
           );
         }
-        // OTA-154 — atUnrecovered flag also drives the SUMMON chip on
-        // the right edge of the home-screen MAIN QUEST card. Player
-        // asked to skip the bounce through Contracts: "I want to be
-        // able to get right to the city smack that button and have at
-        // it." Same precondition surface the Contracts SUMMON chip
-        // uses — both stay live so the secondary path remains as a
-        // backup.
-        let atUnrecovered = false;
-        // engine_Dev — the built-in caption below (cores / Lost Capitals / phase
-        // hints) is Tartaria content. When the world is re-skinned but no custom
-        // main quest was uploaded, don't leak it — show a neutral line pointing the
-        // author at the dev console instead.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const reskinNoQuest = (require('../engine/contentPack') as typeof import('../engine/contentPack')).isReskinActive();
-        if (reskinNoQuest) {
-          mainLine = 'No main quest set — build one in the dev console.';
-        } else if (!mq || mq.phase === 'ended') {
-          // No active main quest — chip still serves as the menu
-          // entry but doesn't pretend to point anywhere.
-          mainLine = 'No active objective.';
-        } else {
-          const cores = mq.coresRecovered?.length ?? 0;
-          // OTA-412 — the SUMMON chip must only show while the player is
-          // STANDING ON the capital's anchor tile. currentLocationId lingers as
-          // the capital after a cardinal step off into the wilderness, so gating
-          // on it alone left the chip drawn (and the "recover the core here" line)
-          // miles outside the city. Mirror isStationedAtNamedLocation: not
-          // mid-journey, and either inside a building or on the map-center anchor.
-          // The summon ACTION already enforces this (summonCoreGuardian →
-          // not_at_capital); this hides the button so the affordance matches.
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-          const stationedAtCapital = !player.travelTarget
-            && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
-          atUnrecovered = stationedAtCapital
-            && capitals.includes(player.currentLocationId)
-            && !mq.coresRecovered.includes(player.currentLocationId)
-            && (mq.phase === 'revelation' || mq.phase === 'cores');
-          mainLine = atUnrecovered
-            ? `${coreGateNextAction(player.factionId)}.`
-            : phaseHint(mq.phase, cores);
-        }
+        // engine_Dev — no data-driven quest loaded: the chip is just the menu
+        // entry into the full Contracts screen (side quests, hunts, collectibles).
         return (
           <TutorialTarget area="objective-chip">
           <TouchableOpacity
@@ -702,24 +658,11 @@ export function ExplorationScreen() {
             hitSlop={6}
           >
             <View style={styles.objectiveChipRow}>
-              {/* arb120 — slimmed to ONE line (was title + subtitle) to give the
-                  exploration feed more room; the MISSIONS quick-button now carries
-                  the "open Contracts" affordance the subtitle used to spell out. */}
               <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={1}>
                 <Text style={styles.objectiveChipStar}>★ </Text>
                 <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
-                {mainLine}
+                No main quest set — build one in the dev console.
               </Text>
-              {atUnrecovered && (
-                <TouchableOpacity
-                  style={styles.objectiveChipSummon}
-                  onPress={() => useGameStore.getState().summonCoreGuardian()}
-                  activeOpacity={0.7}
-                  hitSlop={8}
-                >
-                  <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
-                </TouchableOpacity>
-              )}
             </View>
           </TouchableOpacity>
           </TutorialTarget>
