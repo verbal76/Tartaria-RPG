@@ -172,4 +172,29 @@ export const GENERIC_GAME = {
       'Too far gone. You open the {item} and find only rot inside.',
     ],
   },
+  salvage: {
+    pools: [
+      { id: 'metal', patterns: ['blade', 'sword', 'axe', 'spear', 'knife', 'hammer', 'gun', 'frame', 'plating', 'wreck', 'machine', 'construct'], items: [
+        { name: 'Scrap Metal', rarity: 'Common', weight: 50, min: 1, max: 3 },
+        { name: 'Raw Crystal', rarity: 'Common', weight: 20, min: 1, max: 2 },
+        { name: 'Worked Crystal', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+      ] },
+      { id: 'cloth', patterns: ['robe', 'sack', 'tent', 'sail', 'cloth', 'rag', 'banner'], items: [
+        { name: 'Tough Fiber', rarity: 'Common', weight: 50, min: 1, max: 2 },
+        { name: 'Common Residue', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      ] },
+      { id: 'wood', patterns: ['cart', 'wagon', 'crate', 'barrel', 'plank', 'beam', 'door', 'chest'], items: [
+        { name: 'Stick', rarity: 'Common', weight: 50, min: 1, max: 3 },
+        { name: 'Scrap Metal', rarity: 'Common', weight: 20, min: 1, max: 1 },
+      ] },
+    ],
+    nothingChance: 0.05,
+    junkPool: [
+      { name: 'Stick', rarity: 'Common', weight: 5, min: 1, max: 1 },
+      { name: 'Smooth Stone', rarity: 'Common', weight: 5, min: 1, max: 1 },
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 4, min: 1, max: 1 },
+    ],
+    materialLines: ['You strip {target} carefully. Something usable comes free.', 'You salvage {target}. The take is small but real.'],
+    junkLines: ['Slim pickings on {target}. You pocket a {item} on the way out.', 'The {target} yields little, though a {item} ends up in your pack.'],
+  },
 };

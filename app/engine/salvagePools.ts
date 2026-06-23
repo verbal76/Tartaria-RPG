@@ -11,7 +11,8 @@
 
 import type { Rarity } from './types';
 import materialsData from '../data/items/materials.json';
-import { resolveTable, hasTableOverride, getWastelandOverride, getCustomBosses, getCustomMainQuest } from './contentPack';
+import salvageData from '../data/salvage/salvage-pools.json';
+import { resolveTable, hasTableOverride, getWastelandOverride, getCustomBosses, getCustomMainQuest, resolveSalvage } from './contentPack';
 
 // arb61 — salvage yields MATERIALS ONLY (player verb-economy: take = gear,
 // salvage = materials, investigate = clues/hooks). The hand-authored pools
@@ -125,252 +126,22 @@ interface SalvagePool {
   items: PoolEntry[];
 }
 
+// engine_Dev — salvage DATA (pools + junk fallback + flavor lines) is now
+// app/data/salvage/salvage-pools.json and author-uploadable; the match/pick RULES
+// stay below. Resolved override → generic default → built-in.
+interface SalvageConfig {
+  pools: SalvagePool[];
+  junkPool: PoolEntry[];
+  materialLines: string[];
+  junkLines: string[];
+  nothingChance: number;
+}
+function salvCfg(): SalvageConfig { return resolveSalvage(salvageData as unknown as SalvageConfig); }
+
 // Pool definitions, ordered most-specific → most-general. The
 // matcher walks top-down and stops at the first hit, so weapons
 // land in WEAPON_SCRAP before they leak into the broader METAL
 // fallback.
-const POOLS: SalvagePool[] = [
-  {
-    id: 'mechanical',
-    patterns: [
-      'drone', 'sentinel', 'automaton', 'circuit', 'scrap drone',
-      'clockwork', 'mechanical', 'machine', 'machinery', 'construct',
-      'robot', 'husk', 'chassis', 'frame', 'exoframe', 'rig',
-      'plating', 'wreck', 'wreckage',
-    ],
-    items: [
-      { name: 'Automaton Circuit', rarity: 'Common', weight: 30, min: 1, max: 2 },
-      { name: 'Scrap Metal', rarity: 'Common', weight: 30, min: 2, max: 4 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 2 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 3 },
-      { name: 'Sentinel Core Plate', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'wagon',
-    patterns: ['wagon', 'cart', 'sled', 'caravan', 'axle', 'vessel'],
-    items: [
-      { name: 'Trail Rations', rarity: 'Common', weight: 25, min: 1, max: 2 },
-      { name: 'Scrap Metal', rarity: 'Common', weight: 25, min: 1, max: 3 },
-      { name: 'Climbing Rope', rarity: 'Common', weight: 20, min: 1, max: 1 },
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 20, min: 3, max: 8 },
-      { name: 'Aetheric Torch', rarity: 'Common', weight: 10, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'weapon_scrap',
-    patterns: [
-      'blade', 'sword', 'axe', 'pike', 'rifle', 'spear', 'rod',
-      'knife', 'cleaver', 'maul', 'hammer', 'gun', 'gauntlet',
-      'staff', 'bow', 'harpoon',
-    ],
-    items: [
-      { name: 'Scrap Metal', rarity: 'Common', weight: 40, min: 1, max: 2 },
-      { name: 'Rusted Blade', rarity: 'Common', weight: 20, min: 1, max: 1 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Throwing Knife', rarity: 'Common', weight: 15, min: 1, max: 2 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 5, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'engine_parts',
-    patterns: [
-      'engine', 'console', 'conduit', 'capacitor', 'coil', 'panel',
-      'battery', 'core', 'pipe', 'valve', 'pump', 'motor', 'cable',
-      'wire', 'relay', 'gear', 'cog', 'reactor', 'terminal', 'circuit panel',
-      'observatory', 'scope', 'lens', 'telescope', 'array', 'dish',
-      'antenna',
-    ],
-    items: [
-      { name: 'Automaton Circuit', rarity: 'Common', weight: 25, min: 1, max: 2 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 25, min: 1, max: 2 },
-      { name: 'Scrap Metal', rarity: 'Common', weight: 25, min: 1, max: 3 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 3 },
-      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'nautical',
-    patterns: [
-      'hull', 'mast', 'anchor', 'chain', 'hook', 'harpoon', 'rigging',
-      'sail', 'plank', 'beam', 'driftwood', 'ship', 'boat',
-    ],
-    items: [
-      { name: 'Scrap Metal', rarity: 'Common', weight: 35, min: 1, max: 3 },
-      { name: 'Climbing Rope', rarity: 'Common', weight: 25, min: 1, max: 2 },
-      { name: 'Trail Rations', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 20, min: 5, max: 12 },
-    ],
-  },
-  {
-    id: 'light',
-    patterns: ['lantern', 'torch', 'lamp', 'flare', 'beacon'],
-    items: [
-      { name: 'Aether Dust', rarity: 'Common', weight: 40, min: 1, max: 3 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 25, min: 1, max: 1 },
-      { name: 'Scrap Metal', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Aetheric Torch', rarity: 'Common', weight: 15, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'tomb',
-    patterns: [
-      'sarcophagus', 'coffin', 'urn', 'burial', 'skeleton', 'remains',
-      'bone', 'skull', 'corpse', 'cadaver', 'tomb', 'crypt', 'grave',
-      'ossuary', 'rib',
-      // 2026-05-25 OTA-041 — hook-revealed corpse nouns (preserved_corpse
-      // hook plants body / satchel / robes as resolvers). Routes the
-      // body chip to tomb-style loot when the player salvages it.
-      'body', 'satchel', 'robes',
-    ],
-    items: [
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 35, min: 3, max: 10 },
-      { name: 'Aetheric Locket', rarity: 'Common', weight: 25, min: 1, max: 1 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 20, min: 1, max: 1 },
-    ],
-  },
-  {
-    id: 'archive',
-    patterns: [
-      'archive', 'tome', 'tablet', 'ledger', 'slate', 'blueprint',
-      'map', 'parchment', 'scroll', 'journal', 'paper', 'letter',
-    ],
-    items: [
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 2, max: 6 },
-      { name: 'Tartarian Map Fragment', rarity: 'Common', weight: 25, min: 1, max: 1 },
-      { name: 'Sealed Tartarian Letter', rarity: 'Common', weight: 25, min: 1, max: 1 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 20, min: 1, max: 2 },
-    ],
-  },
-  {
-    id: 'rubble',
-    patterns: [
-      'rubble', 'debris', 'mound', 'pile', 'rock', 'stone', 'shard',
-      'fragment', 'flagstone', 'masonry', 'brick',
-    ],
-    items: [
-      { name: 'Scrap Metal', rarity: 'Common', weight: 30, min: 1, max: 3 },
-      { name: 'Mud Fragment', rarity: 'Common', weight: 25, min: 1, max: 3 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 20, min: 1, max: 1 },
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 2, max: 6 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
-    ],
-  },
-  // 2026-05-25 OTA-037 — relic-site pool for hub-thematic salvageables.
-  // A playtester hit SALVAGE ALL on "salt-crusted vault relic pedestal,
-  // weathered forgotten order reliquary, gate" inside The Crown Gate
-  // and got zero output — pickPool returned null for all three because
-  // no existing pool had patterns for pedestal / reliquary / vault /
-  // gate / shelf / altar / shrine / monolith / obelisk / plinth /
-  // library / doorway. Drops thematic relic stock so the player walks
-  // away with something thematic (coins, lockets, dust, shards).
-  {
-    id: 'relic_site',
-    patterns: [
-      'pedestal', 'reliquary', 'altar', 'shrine', 'vault', 'monolith',
-      'obelisk', 'plinth', 'library', 'doorway', 'gate', 'shelf',
-      'banner', 'standard', 'sigil', 'relic', 'spire', 'pylon', 'pillar',
-    ],
-    items: [
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 2, max: 8 },
-      { name: 'Aetheric Locket', rarity: 'Common', weight: 20, min: 1, max: 1 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 20, min: 1, max: 3 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
-      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
-      { name: 'Sealed Tartarian Letter', rarity: 'Common', weight: 5, min: 1, max: 1 },
-    ],
-  },
-  // 2026-05-25 OTA-038 — container pool. Lockboxes, crates, jars, etc.
-  // Containers historically routed through container_loot.json on
-  // direct "break open <X>" verbs, but tapping SALVAGE on a container
-  // chip routed nowhere. Now drops standard container-style loot.
-  {
-    id: 'container',
-    patterns: [
-      'lockbox', 'strongbox', 'coffer', 'safe', 'crate', 'chest',
-      'box', 'cache', 'stash', 'barrel', 'locker', 'jar', 'bottle',
-      'casket', 'case', 'urn',
-    ],
-    items: [
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 3, max: 10 },
-      { name: 'Trail Rations', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 2 },
-      { name: 'Scrap Metal', rarity: 'Common', weight: 10, min: 1, max: 2 },
-      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
-    ],
-  },
-  // 2026-05-25 OTA-038 — fabric pool. Cloth-y nouns the player might
-  // strip for material: shrouds, curtains, tarps, etc. Drops cloth
-  // scraps + light Aetheric stock.
-  {
-    id: 'fabric',
-    patterns: [
-      'shroud', 'curtain', 'tarp', 'cloak', 'cloth', 'rag',
-    ],
-    items: [
-      { name: 'Cloth Scrap', rarity: 'Common', weight: 50, min: 1, max: 3 },
-      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 1 },
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 1, max: 3 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
-      { name: 'Aetheric Cloth', rarity: 'Rare', weight: 5, min: 1, max: 1 },
-    ],
-  },
-  // 2026-05-25 OTA-038 — furniture pool. Hub-room benches, tables,
-  // doors, racks: low-value but the player should still get a tick of
-  // wood scrap, nails, sometimes a coin.
-  {
-    id: 'furniture',
-    patterns: [
-      'bench', 'rack', 'table', 'door', 'chair', 'stool', 'cabinet',
-    ],
-    items: [
-      { name: 'Bent Nail', rarity: 'Common', weight: 35, min: 1, max: 3 },
-      { name: 'Stick', rarity: 'Common', weight: 30, min: 1, max: 2 },
-      { name: 'Cloth Scrap', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 1, max: 3 },
-    ],
-  },
-  // 2026-05-25 OTA-038 — trap-salvage pool. Disarmed traps yield
-  // springs, wire, the occasional Aetheric component.
-  {
-    id: 'trap_salvage',
-    patterns: [
-      'trap', 'snare', 'tripwire', 'deadfall', 'defenses', 'defense',
-      'golem',
-    ],
-    items: [
-      { name: 'Scrap Metal', rarity: 'Common', weight: 30, min: 1, max: 2 },
-      { name: 'Bent Nail', rarity: 'Common', weight: 25, min: 1, max: 2 },
-      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 1 },
-      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
-      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
-    ],
-  },
-  // 2026-05-25 OTA-038 — junk-salvage catch-all for modifier-only nouns
-  // (rust, broken, fallen, toppled, scrap, etc.) and any noun the
-  // other pools missed. ALWAYS matches anything in SALVAGE_PATTERN —
-  // any future pattern added without a more specific pool falls here
-  // by design, so the player never sees a silent SALVAGE ALL again.
-  // Kept LAST in the array so more specific pools win first.
-  {
-    id: 'junk_salvage',
-    patterns: [
-      'rust', 'rusted', 'broken', 'fallen', 'toppled', 'scrap',
-      'cracked', 'shattered', 'stripped', 'weathered', 'tilted',
-      'salt-crusted', 'dust-buried', 'mud-glazed', 'half-buried',
-      'buried', 'hidden', 'crashed',
-    ],
-    items: [
-      { name: 'Bent Nail', rarity: 'Common', weight: 30, min: 1, max: 3 },
-      { name: 'Cloth Scrap', rarity: 'Common', weight: 25, min: 1, max: 2 },
-      { name: 'Stick', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Smooth Stone', rarity: 'Common', weight: 15, min: 1, max: 2 },
-      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 10, min: 1, max: 2 },
-    ],
-  },
-];
 
 // 2026-05-25 — NOTHING_LINES removed. POLISH-2 (OTA-003) repurposed
 // the would-be-nothing branch in rollSalvagePool to roll from
@@ -380,12 +151,6 @@ const POOLS: SalvagePool[] = [
 // still return that kind, and the gameStore salvage handler at
 // :3878 unions both outcomes via the shared kind discriminator.
 
-const MATERIAL_LINES = [
-  'You strip {target} carefully. Something usable comes free in your hand.',
-  'You break {target} apart. Among the pieces, something worth keeping.',
-  'You salvage {target}. The take is small but real.',
-  'You work {target} over. A part of it comes loose, intact.',
-];
 
 export interface SalvageOutcome {
   kind: 'nothing' | 'material';
@@ -410,34 +175,20 @@ export interface SalvageOutcome {
  *  (stick / pebble / nail / cloth scrap) instead of the original
  *  weighted material. RNG still feels meaningful — junk vs. real
  *  loot is a perceptible difference — but the action never empties. */
-const NOTHING_CHANCE = 0.05;
 
 /** Fallback pool used when the weighted roll would have produced
  *  nothing. Tiny set of low-value, evocative materials authored in
  *  materials.json. Always min=max=1 — you get exactly one piece of
  *  junk, never a stack. */
-const JUNK_POOL: PoolEntry[] = [
-  { name: 'Stick',        rarity: 'Common', weight: 5, min: 1, max: 1 },
-  { name: 'Smooth Stone', rarity: 'Common', weight: 5, min: 1, max: 1 },
-  { name: 'Cloth Scrap',  rarity: 'Common', weight: 4, min: 1, max: 1 },
-  { name: 'Bent Nail',    rarity: 'Common', weight: 4, min: 1, max: 1 },
-  { name: 'Bone Sliver',  rarity: 'Common', weight: 3, min: 1, max: 1 },
-];
 
 /** Flavor lines for junk-pool drops. Conveys "you searched
  *  thoroughly but the haul was small" without using the harsher
  *  "nothing salvageable" wording that misled players into thinking
  *  the salvage failed. */
-const JUNK_LINES: string[] = [
-  'You strip {target} down. Mostly debris — but a {item} comes loose at the bottom of the pile.',
-  'The {target} yields little of value, though a {item} ends up in your pack.',
-  'Slim pickings on {target}. You pocket a {item} on the way out.',
-  'You scavenge {target} thoroughly. One {item} survives the sorting.',
-];
 
 function pickPool(noun: string): SalvagePool | null {
   const lower = noun.toLowerCase();
-  for (const pool of POOLS) {
+  for (const pool of salvCfg().pools) {
     for (const pat of pool.patterns) {
       if (lower.includes(pat)) return pool;
     }
@@ -472,10 +223,10 @@ function pickWeighted(items: PoolEntry[], rng: () => number): PoolEntry {
 export function rollSalvagePool(noun: string, rng: () => number = Math.random): SalvageOutcome | null {
   const pool = pickPool(noun);
   if (!pool) return null;
-  if (rng() < NOTHING_CHANCE) {
-    const junk = pickWeighted(JUNK_POOL, rng);
+  if (rng() < salvCfg().nothingChance) {
+    const junk = pickWeighted(salvCfg().junkPool, rng);
     const fin = finalizeMaterial(junk.name, junk.rarity, rng);
-    const line = format(JUNK_LINES, noun, rng).replace(/\{item\}/g, fin.name);
+    const line = format(salvCfg().junkLines, noun, rng).replace(/\{item\}/g, fin.name);
     return {
       kind: 'material',
       poolId: pool.id,
@@ -489,11 +240,11 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
   // pool if this pool's only entries were the now-excluded gear/food/clues.
   const materialItems = pool.items.filter((e) => isSalvageMaterial(e.name));
   if (materialItems.length === 0) {
-    const junk = pickWeighted(JUNK_POOL, rng);
+    const junk = pickWeighted(salvCfg().junkPool, rng);
     const fin = finalizeMaterial(junk.name, junk.rarity, rng);
     return {
       kind: 'material', poolId: pool.id, itemName: fin.name, rarity: fin.rarity,
-      quantity: 1, line: format(MATERIAL_LINES, noun, rng),
+      quantity: 1, line: format(salvCfg().materialLines, noun, rng),
     };
   }
   const entry = pickWeighted(materialItems, rng);
@@ -506,9 +257,9 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
     itemName: fin.name,
     rarity: fin.rarity,
     quantity,
-    line: format(MATERIAL_LINES, noun, rng),
+    line: format(salvCfg().materialLines, noun, rng),
   };
 }
 
 /** Exposed for tests. */
-export const __TEST_ONLY__ = { POOLS, NOTHING_CHANCE };
+export const __TEST_ONLY__ = { get POOLS() { return salvCfg().pools; }, get NOTHING_CHANCE() { return salvCfg().nothingChance; } };
