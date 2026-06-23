@@ -422,6 +422,50 @@ export function gearHpBonus(name: string | null | undefined): number {
   return armorHpBonus(name) + weaponHpBonus(name);
 }
 
+// engine_Dev — STAMINA-MAX gear bonus, mirroring the HP bonus exactly: a piece
+// grants +max-stamina via a statBonus { stat: 'staminaMax', amount }. Like 'hp',
+// 'staminaMax' is NOT a base attribute, so aggregateEquippedStatBonuses / effectiveStats
+// ignore it — it's summed here and folded into the stamina cap instead.
+export function gearStaminaMaxBonus(name: string | null | undefined): number {
+  if (!name) return 0;
+  let total = 0;
+  const armor = findArmorByName(name);
+  if (armor) {
+    const bonuses = armor.statBonuses ?? (armor.statBonus ? [armor.statBonus] : []);
+    total += bonuses.filter((b) => b.stat === 'staminaMax').reduce((s, b) => s + (b.amount ?? 0), 0);
+  }
+  const wpn = findWeaponByName(name);
+  if (wpn) {
+    total += (wpn.statBonuses ?? []).filter((b) => b.stat === 'staminaMax').reduce((s, b) => s + (b.amount ?? 0), 0);
+  }
+  return total;
+}
+
+/** Sum of staminaMax bonuses from every EQUIPPED piece (armor slots + main/off). */
+export function equippedStaminaMaxBonus(player: PlayerCharacter): number {
+  const eq = player.equipped ?? {};
+  let total = 0;
+  for (const slot of [...ARMOR_SLOTS, 'main', 'off'] as const) {
+    total += gearStaminaMaxBonus((eq as Record<string, string | undefined>)[slot]);
+  }
+  return total;
+}
+
+/** engine_Dev — total author-granted staminaMax bonus: equipped GEAR + active custom
+ *  TITLE perks ({ stat: 'staminaMax', amount }). Folded into the stamina cap + the
+ *  displayed max so a +staminaMax perk reads everywhere the player sees their cap. */
+export function bonusStaminaMaxFor(player: PlayerCharacter): number {
+  const title = (require('./customTitles') as typeof import('./customTitles'))
+    .customTitleStatBonuses(player).staminaMax ?? 0;
+  return equippedStaminaMaxBonus(player) + title;
+}
+
+/** The player's displayed max stamina: stored base (creation + climb growth) plus
+ *  gear/title bonuses. Mechanics also subtract the hunger penalty (effectiveStaminaMax). */
+export function displayStaminaMax(player: PlayerCharacter): number {
+  return Math.max(1, (player.staminaMax ?? 0) + bonusStaminaMaxFor(player));
+}
+
 // Apply the aggregated stat bonuses on top of the player's base stats.
 // Used by combat (attack rolls, damage rolls, skill checks) so equipped
 // gear actually changes the math. Optional `weatherMod` parameter folds

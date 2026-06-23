@@ -14,6 +14,7 @@ import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLa
 import { describeTraits } from './enemyTraits';
 import { buildCanonFactsParagraph } from './canonFacts';
 import { getNarratorPersona, getWorldTone, getWorldSetting, getWorldTerms, getWorldVocabulary, hasLoreOverride, resolveTable } from './contentPack';
+import { displayStaminaMax } from './equipment';
 
 const EMPTY_LORE_DOC: readonly unknown[] = [];
 
@@ -356,7 +357,7 @@ export function formatPlayerStats(player: PlayerCharacter | null): string {
   if (!player) return 'Unknown.';
   const parts: string[] = [];
   parts.push(`HP ${player.hp}/${player.hpMax}`);
-  parts.push(`Stamina ${player.stamina}/${player.staminaMax}`);
+  parts.push(`Stamina ${player.stamina}/${displayStaminaMax(player)}`);
   parts.push(`AC ${player.ac}`);
   if (typeof player.corruption === 'number' && player.corruption > 0) {
     parts.push(`Corruption ${player.corruption}`);

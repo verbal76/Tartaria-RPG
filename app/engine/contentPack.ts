@@ -598,27 +598,27 @@ export function getCollectablesOverride(): unknown[] | null { return collectable
 // --- summons override ----------------------------------------------------------
 // engine_Dev — SUMMONED SIDEKICKS (the golem family). An uploaded pack replaces
 // the built-in golems wholesale and may rename the category noun ("automaton",
-// "construct", …). Shape: { noun?: string, defs: GolemDefinition[] }. null =
-// built-in golems. Resolved by golems.ts resolveGolemDefs()/getSummonNoun().
-import type { GolemDefinition } from './golems';
-let summonsOverride: { noun?: string; defs: GolemDefinition[] } | null = null;
+// "construct", …). Shape: { noun?: string, defs: SidekickDefinition[] }. null =
+// built-in golems. Resolved by golems.ts resolveSidekickDefs()/getSummonNoun().
+import type { SidekickDefinition } from './sidekicks';
+let summonsOverride: { noun?: string; defs: SidekickDefinition[] } | null = null;
 export function setSummonsOverride(payload: { noun?: string; defs: readonly unknown[] } | null): void {
   // The store validates/normalizes each def before this point; we trust the shape.
   summonsOverride = payload && Array.isArray(payload.defs) && payload.defs.length > 0
-    ? { noun: payload.noun, defs: payload.defs as GolemDefinition[] }
+    ? { noun: payload.noun, defs: payload.defs as SidekickDefinition[] }
     : null;
 }
 export function hasSummonsOverride(): boolean { return summonsOverride != null; }
-export function getSummonsOverride(): { noun?: string; defs: GolemDefinition[] } | null { return summonsOverride; }
+export function getSummonsOverride(): { noun?: string; defs: SidekickDefinition[] } | null { return summonsOverride; }
 /** The live summon set: the author's uploaded pack if present, else the generic
  *  default pack's sidekicks, else null (golems.ts then falls to its built-in).
  *  Lets a reskin that skips the SUMMONED SIDEKICKS box fall to generic sidekicks
  *  rather than the Tartaria golems. */
-export function resolveSummons(): { noun?: string; defs: GolemDefinition[] } | null {
+export function resolveSummons(): { noun?: string; defs: SidekickDefinition[] } | null {
   if (summonsOverride != null) return summonsOverride;
   const g = genericDefaults.summons;
   if (g && Array.isArray(g.defs) && g.defs.length > 0) {
-    return { noun: g.noun, defs: g.defs as GolemDefinition[] };
+    return { noun: g.noun, defs: g.defs as SidekickDefinition[] };
   }
   return null;
 }
@@ -630,6 +630,15 @@ export function resolveSummons(): { noun?: string; defs: GolemDefinition[] } | n
 let dogEnabled = true;
 export function setDogEnabled(on: boolean): void { dogEnabled = on !== false; }
 export function isDogEnabled(): boolean { return dogEnabled; }
+
+// engine_Dev — global gate: the player must be at least this % (0..100) through the
+// data-driven main mission before SIDEKICK WEAPONS (golem_weapon recipes) can be
+// crafted. 0 = no gate. Authored in the Sidekicks box; read by the craft handler.
+let sidekickWeaponQuestPct = 0;
+export function setSidekickWeaponQuestPct(pct: number): void {
+  sidekickWeaponQuestPct = Number.isFinite(pct) ? Math.max(0, Math.min(100, Math.round(pct))) : 0;
+}
+export function getSidekickWeaponQuestPct(): number { return sidekickWeaponQuestPct; }
 
 // --- damage types (EXTRA, author-added) ----------------------------------------
 // engine_Dev — the engine ships 10 built-in damage types (bludgeoning, slashing,
@@ -1038,6 +1047,7 @@ export function clearAllOverrides(): void {
   collectablesOverride = null;
   summonsOverride = null;
   dogEnabled = true;
+  sidekickWeaponQuestPct = 0;
   damageTypesOverride = null;
   damageResistancesOverride = null;
   fusionTagsOverride = null;

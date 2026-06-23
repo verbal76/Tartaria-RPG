@@ -11,7 +11,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
-import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+import { effectiveStatsBreakdown, resolveEquippedItem, displayStaminaMax, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
@@ -66,7 +66,8 @@ export function CharacterScreen() {
   const faction = getFactions().find((f) => f.id === player.factionId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   const hpPct = player.hpMax > 0 ? player.hp / player.hpMax : 0;
-  const stamPct = player.staminaMax > 0 ? player.stamina / player.staminaMax : 0;
+  const stamMaxShown = displayStaminaMax(player);
+  const stamPct = stamMaxShown > 0 ? player.stamina / stamMaxShown : 0;
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#c9a86a' : '#e07a5f';
   const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
 
@@ -128,7 +129,7 @@ export function CharacterScreen() {
             <View style={styles.barBg}>
               <View style={[styles.barFill, { width: `${Math.max(0, stamPct * 100)}%`, backgroundColor: stamColor }]} />
             </View>
-            <Text style={styles.barValue}>{player.stamina}/{player.staminaMax}</Text>
+            <Text style={styles.barValue}>{player.stamina}/{stamMaxShown}</Text>
           </View>
         </View>
 
@@ -382,9 +383,9 @@ export function CharacterScreen() {
           // of" is discoverable. A golem heals only from its own fuel items, so a
           // pack full of other aether loot reads as unusable until you know which.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { golemRepairParts, GOLEM_ELEMENT_TAGS } = require('../engine/golems');
-          const repairParts = (golemRepairParts(golem.kind) as string[]);
-          const elementWord = (GOLEM_ELEMENT_TAGS[golem.kind]?.[0] as string | undefined) ?? null;
+          const { sidekickRepairParts, SIDEKICK_ELEMENT_TAGS } = require('../engine/sidekicks');
+          const repairParts = (sidekickRepairParts(golem.kind) as string[]);
+          const elementWord = (SIDEKICK_ELEMENT_TAGS[golem.kind]?.[0] as string | undefined) ?? null;
           const heldRepair = repairParts.filter((p) =>
             player.inventory.some((i) => i.name.toLowerCase() === p.toLowerCase() && i.quantity > 0),
           );
@@ -393,9 +394,13 @@ export function CharacterScreen() {
             const filled = Math.round(pct * 20);
             return '▰'.repeat(filled) + '▱'.repeat(20 - filled);
           };
+          // engine_Dev — the section label follows the author's summon NOUN
+          // (sidekick / automaton / familiar / …), not the hardcoded "GOLEM".
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const summonLabel = (require('../engine/sidekicks') as typeof import('../engine/sidekicks')).getSummonNoun().toUpperCase();
           return (
             <>
-              {sectionHeader('golem', 'GOLEM')}
+              {sectionHeader('golem', summonLabel)}
               {!collapsed.golem && (
               <View style={styles.card}>
                 <Text style={styles.name}>{golem.name}</Text>

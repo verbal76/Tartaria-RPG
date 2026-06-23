@@ -26,6 +26,7 @@ import {
   setCollectablesOverride,
   setSummonsOverride,
   setDogEnabled,
+  setSidekickWeaponQuestPct as setSidekickWeaponQuestPctEngine,
   setDamageTypesOverride,
   setDamageResistancesOverride,
   setFusionTagsOverride,
@@ -123,6 +124,8 @@ interface PersistShape {
   summons?: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off. Absent → on (the built-in default). */
   dogEnabled?: boolean;
+  /** Main-mission % the player must reach before sidekick weapons unlock. Absent → 0. */
+  sidekickWeaponQuestPct?: number;
   /** Author-added damage types (extend the built-in 10). */
   damageTypes?: unknown[];
   /** Enemy-type → resist/weak map (replaces the built-in). */
@@ -184,6 +187,10 @@ interface ContentPackState {
   summons: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off (default true). */
   dogEnabled: boolean;
+  /** engine_Dev — global gate: the player must be at least this % through the main
+   *  mission before SIDEKICK WEAPONS (golem_weapon recipes) can be crafted. 0 = no
+   *  gate (the default). Set in the Sidekicks authoring box. */
+  sidekickWeaponQuestPct: number;
   /** Author-added damage types (extend the built-in set). */
   damageTypes: unknown[];
   /** Enemy-type → resist/weak map, or null = built-in. */
@@ -286,6 +293,9 @@ interface ContentPackState {
   clearSummons: () => void;
   /** Toggle the rescuable dog companion on/off for this game. */
   setDogCompanionEnabled: (on: boolean) => void;
+  /** Set the main-mission % the player must reach before sidekick weapons unlock
+   *  (0..100; 0 = no gate). Set from the Sidekicks authoring box. */
+  setSidekickWeaponQuestPct: (pct: number) => void;
   /** Load author-added damage types: array of { name, keywords? }. */
   loadDamageTypesJson: (json: string) => LoadResult;
   clearDamageTypes: () => void;
@@ -339,7 +349,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -355,6 +365,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     collectables: state.collectables.length > 0 ? state.collectables : undefined,
     summons: state.summons ?? undefined,
     dogEnabled: state.dogEnabled === false ? false : undefined,
+    sidekickWeaponQuestPct: state.sidekickWeaponQuestPct > 0 ? state.sidekickWeaponQuestPct : undefined,
     damageTypes: state.damageTypes.length > 0 ? state.damageTypes : undefined,
     damageResistances: state.damageResistances && Object.keys(state.damageResistances).length > 0 ? state.damageResistances : undefined,
     fusionTags: state.fusionTags.length > 0 ? state.fusionTags : undefined,
@@ -394,6 +405,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   collectables: [],
   summons: null,
   dogEnabled: true,
+  sidekickWeaponQuestPct: 0,
   damageTypes: [],
   damageResistances: null,
   fusionTags: [],
@@ -440,6 +452,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCollectablesOverride(s.collectables.length > 0 ? s.collectables : null);
     setSummonsOverride(s.summons ?? null);
     setDogEnabled(s.dogEnabled !== false);
+    setSidekickWeaponQuestPctEngine(s.sidekickWeaponQuestPct ?? 0);
     setDamageTypesOverride(s.damageTypes.length > 0 ? (s.damageTypes as { name: string; keywords?: string[] }[]) : null);
     setDamageResistancesOverride(s.damageResistances && Object.keys(s.damageResistances).length > 0 ? (s.damageResistances as Record<string, { resist: string[]; weak: string[] }>) : null);
     setFusionTagsOverride(s.fusionTags.length > 0 ? s.fusionTags : null);
@@ -923,6 +936,13 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), dogEnabled: on });
   },
 
+  setSidekickWeaponQuestPct(pct) {
+    const clamped = Number.isFinite(pct) ? Math.max(0, Math.min(100, Math.round(pct))) : 0;
+    setSidekickWeaponQuestPctEngine(clamped);
+    set({ sidekickWeaponQuestPct: clamped, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), sidekickWeaponQuestPct: clamped });
+  },
+
   loadDamageTypesJson(json) {
     let parsed: unknown;
     try { parsed = JSON.parse(stripJsonComments(json)); }
@@ -1139,6 +1159,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextCollectables: unknown[] = get().collectables;
     let nextSummons: { noun?: string; defs: unknown[] } | null = get().summons;
     let nextDogEnabled = get().dogEnabled;
+    let nextSidekickWeaponQuestPct = get().sidekickWeaponQuestPct;
     let nextDamageTypes: unknown[] = get().damageTypes;
     let nextDamageResistances: Record<string, unknown> | null = get().damageResistances;
     let nextFusionTags: string[] = get().fusionTags;
@@ -1222,6 +1243,11 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'dogEnabled' || key === 'dogCompanion') {
         if (typeof value === 'boolean') { nextDogEnabled = value; applied.push(`dogEnabled (${value})`); }
         else skipped.push('dogEnabled (not a boolean)');
+      } else if (key === 'sidekickWeaponQuestPct' || key === 'sidekickWeaponPct') {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          nextSidekickWeaponQuestPct = Math.max(0, Math.min(100, Math.round(value)));
+          applied.push(`sidekickWeaponQuestPct (${nextSidekickWeaponQuestPct})`);
+        } else skipped.push('sidekickWeaponQuestPct (not a number)');
       } else if (key === 'damageTypes') {
         let arr: unknown = value;
         if (!Array.isArray(arr) && arr && typeof arr === 'object' && Array.isArray((arr as { types?: unknown[] }).types)) arr = (arr as { types: unknown[] }).types;
@@ -1318,6 +1344,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCollectablesOverride(nextCollectables.length > 0 ? nextCollectables : null);
     setSummonsOverride(nextSummons ?? null);
     setDogEnabled(nextDogEnabled !== false);
+    setSidekickWeaponQuestPctEngine(nextSidekickWeaponQuestPct);
     setDamageTypesOverride(nextDamageTypes.length > 0 ? (nextDamageTypes as { name: string; keywords?: string[] }[]) : null);
     setDamageResistancesOverride(nextDamageResistances && Object.keys(nextDamageResistances).length > 0 ? (nextDamageResistances as Record<string, { resist: string[]; weak: string[] }>) : null);
     setFusionTagsOverride(nextFusionTags.length > 0 ? nextFusionTags : null);
@@ -1351,6 +1378,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       collectables: nextCollectables,
       summons: nextSummons,
       dogEnabled: nextDogEnabled,
+      sidekickWeaponQuestPct: nextSidekickWeaponQuestPct,
       damageTypes: nextDamageTypes,
       damageResistances: nextDamageResistances,
       fusionTags: nextFusionTags,
@@ -1371,7 +1399,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       energyName: nextEnergyName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -1417,6 +1445,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.collectables.length > 0) out.collectables = s.collectables;
     if (s.summons && Array.isArray(s.summons.defs) && s.summons.defs.length > 0) out.summons = s.summons;
     if (s.dogEnabled === false) out.dogEnabled = false;
+    if (s.sidekickWeaponQuestPct > 0) out.sidekickWeaponQuestPct = s.sidekickWeaponQuestPct;
     if (s.damageTypes.length > 0) out.damageTypes = s.damageTypes;
     if (s.damageResistances && Object.keys(s.damageResistances).length > 0) out.damageResistances = s.damageResistances;
     if (s.fusionTags.length > 0) out.fusionTags = s.fusionTags;
@@ -1495,7 +1524,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, sidekickWeaponQuestPct: 0, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1539,6 +1568,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setSummonsOverride(summons as { noun?: string; defs: never[] } | null);
         const dogEnabled = shape.dogEnabled !== false;
         setDogEnabled(dogEnabled);
+        const sidekickWeaponQuestPct = typeof shape.sidekickWeaponQuestPct === 'number' && Number.isFinite(shape.sidekickWeaponQuestPct)
+          ? Math.max(0, Math.min(100, Math.round(shape.sidekickWeaponQuestPct))) : 0;
+        setSidekickWeaponQuestPctEngine(sidekickWeaponQuestPct);
         const damageTypes = Array.isArray(shape.damageTypes) ? shape.damageTypes : [];
         setDamageTypesOverride(damageTypes.length > 0 ? (damageTypes as { name: string; keywords?: string[] }[]) : null);
         const damageResistances = shape.damageResistances && typeof shape.damageResistances === 'object' ? (shape.damageResistances as Record<string, { resist: string[]; weak: string[] }>) : null;
@@ -1580,7 +1612,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

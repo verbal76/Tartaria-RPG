@@ -48,7 +48,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { createDogCompanion } from '../app/engine/dogCompanion';
-import { GOLEM_DEFINITIONS, makeCompanion } from '../app/engine/golems';
+import { SIDEKICK_DEFINITIONS, makeCompanion } from '../app/engine/sidekicks';
 import type { Enemy } from '../app/engine/types';
 
 function makeEnemy(name: string, hp: number, idx: number): Enemy {
@@ -82,7 +82,7 @@ async function boot(combo: 'alone' | 'dog' | 'golem' | 'both', enemyHp: number, 
     ? createDogCompanion({ name: 'Marrow', breed: 'mutt', rawSex: 'boy', startingProfile: 'mongrel', currentHour: 0 })
     : null;
   const golem = combo === 'golem' || combo === 'both'
-    ? makeCompanion(GOLEM_DEFINITIONS.iron_golem)
+    ? makeCompanion(SIDEKICK_DEFINITIONS.iron_golem)
     : null;
   store.setState({
     player: {
@@ -379,7 +379,7 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
       if (!liveG) {
         // golem already crumbled — re-summon a fresh one
         store.setState((s) => s.player
-          ? { player: { ...s.player, golem: makeCompanion(GOLEM_DEFINITIONS.iron_golem) } }
+          ? { player: { ...s.player, golem: makeCompanion(SIDEKICK_DEFINITIONS.iron_golem) } }
           : s);
       } else if (liveG.hp <= 1) {
         store.setState((s) => s.player && s.player.golem

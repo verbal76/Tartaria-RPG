@@ -3,7 +3,7 @@ import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRecipes, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
-import { isGolemWeapon, getSummonNoun } from '../engine/golems';
+import { isSidekickWeapon, getSummonNoun } from '../engine/sidekicks';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
@@ -37,7 +37,7 @@ function evaluateRecipe(recipe: Recipe, inventory: { name: string; quantity: num
   const short = missingIngredientsList(recipe.ingredients, inventory as never);
   const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
   const cat = lookupCraftedItem(recipe.result);
-  return { recipe, kind: cat.kind, isSidekickWeapon: isGolemWeapon(cat.tags), missing, available: missing.length === 0 };
+  return { recipe, kind: cat.kind, isSidekickWeapon: isSidekickWeapon(cat.tags), missing, available: missing.length === 0 };
 }
 
 function rarityColor(rarity: string | undefined): string {

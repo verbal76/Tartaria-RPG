@@ -67,7 +67,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import { applyPuzzleInput } from '../app/engine/hookPuzzles';
 import type { Hook } from '../app/engine/hooks';
-import { getGolemDefinition, GOLEM_DEFINITIONS } from '../app/engine/golems';
+import { getSidekickDefinition, SIDEKICK_DEFINITIONS } from '../app/engine/sidekicks';
 import { powerDcModifier } from '../app/engine/raceMechanics';
 import { createDogCompanion } from '../app/engine/dogCompanion';
 
@@ -325,8 +325,8 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
   //   Mud 13 / Iron 15 / Aether 17 / Crystal 19
   // Race modifier:
   //   mud_dweller 0, aetherborn +2, everyone else +3
-  function effectiveDc(raceId: string, kind: keyof typeof GOLEM_DEFINITIONS): number {
-    const def = getGolemDefinition(kind);
+  function effectiveDc(raceId: string, kind: keyof typeof SIDEKICK_DEFINITIONS): number {
+    const def = getSidekickDefinition(kind);
     return (def.summonDC ?? 15) + powerDcModifier(raceId);
   }
 
@@ -366,11 +366,11 @@ describe('per-golem summonDC × race table (OTA-137 + race modifier)', () => {
     expect(effectiveDc('made_up_race_id', 'crystal_golem')).toBe(19);
   });
 
-  it('summonDC values themselves match the OTA-137 spec on the GolemDefinition', () => {
-    expect(getGolemDefinition('mud_golem').summonDC).toBe(13);
-    expect(getGolemDefinition('iron_golem').summonDC).toBe(15);
-    expect(getGolemDefinition('aether_golem').summonDC).toBe(17);
-    expect(getGolemDefinition('crystal_golem').summonDC).toBe(19);
+  it('summonDC values themselves match the OTA-137 spec on the SidekickDefinition', () => {
+    expect(getSidekickDefinition('mud_golem').summonDC).toBe(13);
+    expect(getSidekickDefinition('iron_golem').summonDC).toBe(15);
+    expect(getSidekickDefinition('aether_golem').summonDC).toBe(17);
+    expect(getSidekickDefinition('crystal_golem').summonDC).toBe(19);
   });
 
   it('powerDcModifier — data-driven affinity (Tartaria values preserved)', () => {

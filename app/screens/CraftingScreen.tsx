@@ -13,7 +13,7 @@ import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
-import { resolveGolemDefs, getSummonNoun, type GolemDefinition } from '../engine/golems';
+import { resolveSidekickDefs, getSummonNoun, type SidekickDefinition } from '../engine/sidekicks';
 import { powerDcModifier, powerStatBonus } from '../engine/raceMechanics';
 import { getEnergyName, hasEnergyOverride, getNarratorName } from '../engine/contentPack';
 
@@ -35,7 +35,7 @@ interface AethercraftDiscipline {
   /** OTA-111 — when true, the card renders a per-golem-variant
    *  block (HP / attack / damage type / fuel cost) under the body
    *  so the player can decide which golem to summon. Data is
-   *  pulled live from GOLEM_DEFINITIONS so a new golem kind shows
+   *  pulled live from SIDEKICK_DEFINITIONS so a new golem kind shows
    *  up automatically. */
   showGolemVariants?: boolean;
 }
@@ -46,12 +46,12 @@ interface AethercraftDiscipline {
 // subset of Power, so the render below is unchanged.
 
 // OTA-111 — phrasing that ROUTES to each golem kind via
-// parseGolemKind in app/engine/golems.ts. The keyword each phrase
+// parseSidekickKind in app/engine/golems.ts. The keyword each phrase
 // has to carry (iron / aether / crystal / mud) is what the parser
-// looks at. The order here mirrors GOLEM_DEFINITIONS' insertion
+// looks at. The order here mirrors SIDEKICK_DEFINITIONS' insertion
 // order so the cards read mud → iron → aether → crystal (lightest
 // fuel to heaviest, then HP / damage trade-offs).
-const GOLEM_VARIANT_PHRASE: Record<GolemDefinition['kind'], string> = {
+const GOLEM_VARIANT_PHRASE: Record<SidekickDefinition['kind'], string> = {
   mud_golem: 'summon mud golem',
   iron_golem: 'summon iron golem',
   aether_golem: 'summon aether golem',
@@ -62,9 +62,9 @@ const GOLEM_VARIANT_PHRASE: Record<GolemDefinition['kind'], string> = {
 // card tap AND each per-golem variant row produce the SAME confirm (no copy-to-
 // input / clipboard step anywhere in the golem flow).
 type GolemConfirm = { name: string; phrase: string; stats: string; fuel: string; afford: boolean };
-function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): GolemConfirm {
+function buildGolemConfirm(g: SidekickDefinition, inventory: InventoryItem[]): GolemConfirm {
   // engine_Dev — built-ins carry a curated phrase; an uploaded summon falls back
-  // to "summon <first alias or name>" (parseGolemKind matches either).
+  // to "summon <first alias or name>" (parseSidekickKind matches either).
   const phrase = GOLEM_VARIANT_PHRASE[g.kind] ?? `summon ${(g.aliases?.[0] ?? g.name).toLowerCase()}`;
   const afford = missingIngredientsList(g.fuel, inventory).length === 0;
   const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
@@ -433,7 +433,7 @@ export function CraftingScreen() {
                     // tap-to-stage cycling — they have no per-variant confirm.
                     if (d.showGolemVariants) {
                       // engine_Dev — live set: uploaded summons or the built-in golems.
-                      const variants = resolveGolemDefs();
+                      const variants = resolveSidekickDefs();
                       const pick = variants.find(
                         (g) => missingIngredientsList(g.fuel, player.inventory).length === 0,
                       ) ?? variants[0]!;
@@ -470,7 +470,7 @@ export function CraftingScreen() {
                   {d.showGolemVariants && (
                     <View style={styles.golemVariants}>
                       <Text style={styles.golemVariantsHeader}>{getSummonNoun().replace(/^\w/, (c) => c.toUpperCase())} variants — tap to stage that summon:</Text>
-                      {resolveGolemDefs().map((g) => {
+                      {resolveSidekickDefs().map((g) => {
                         // OTA-629 — same payload the summon card uses; tapping a
                         // row opens the confirm popup (→ Summon dispatches and
                         // jumps to exploration), no copy-to-input step.
@@ -500,7 +500,7 @@ export function CraftingScreen() {
                           // engine_Dev — derive the DC list from the LIVE sidekick defs
                           // (no hardcoded Mud/Iron/Aether/Crystal) + show THIS player's
                           // race modifier (no Tartaria race names).
-                          const list = resolveGolemDefs().map((g) => `${g.name} ${g.summonDC ?? 15}`).join(', ');
+                          const list = resolveSidekickDefs().map((g) => `${g.name} ${g.summonDC ?? 15}`).join(', ');
                           const dcMod = powerDcModifier(player.raceId);
                           const intBonus = powerStatBonus(player.raceId).intelligence ?? 0;
                           const raceClause = dcMod === 0

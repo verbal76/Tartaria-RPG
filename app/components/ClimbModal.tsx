@@ -9,6 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { displayStaminaMax } from '../engine/equipment';
 
 interface Props {
   visible: boolean;
@@ -45,7 +46,7 @@ export function ClimbModal({
 }: Props) {
   const tapTo = (target: string) => onSubmit(target);
   const stamina = useGameStore((s) => s.player?.stamina ?? 0);
-  const staminaMax = useGameStore((s) => s.player?.staminaMax ?? 0);
+  const staminaMax = useGameStore((s) => (s.player ? displayStaminaMax(s.player) : 0));
 
   return (
     <Modal

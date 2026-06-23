@@ -22,7 +22,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon } from '../engine/golems';
+import { isSidekickRepairPart, isSidekickSubstitutePart, isSidekickWeapon } from '../engine/sidekicks';
 import { isQuestLockedItem } from '../engine/questItems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
@@ -584,8 +584,8 @@ export function InventoryScreen() {
       // SUBSTITUTE material (both route through `feed golem <item>`; the engine
       // applies the right full / rarity-scaled heal).
       const isGolemFeedable = !!golem && (
-        isGolemRepairPart(golem.kind, pending.item.name)
-        || isGolemSubstitutePart(golem.kind, pending.item)
+        isSidekickRepairPart(golem.kind, pending.item.name)
+        || isSidekickSubstitutePart(golem.kind, pending.item)
       );
       if (golemActive && isGolemFeedable) {
         // arb111 — keep the Heal button visible even when the golem is FULL (player
@@ -607,7 +607,7 @@ export function InventoryScreen() {
       // wieldable by any golem), offer a one-tap arm (routes through `arm golem`).
       if (golemActive) {
         const cat = findWeaponByName(pending.item.name);
-        if (cat && isGolemWeapon(cat.tags)) {
+        if (cat && isSidekickWeapon(cat.tags)) {
           buttons.push({
             label: `Arm ${golem.name}`,
             onPress: () => {
@@ -834,10 +834,10 @@ export function InventoryScreen() {
     if (golemActiveForStripe && golemForStripe) {
       // Full fuel part OR an element-matched SUBSTITUTE material (arb122) — both
       // feed THIS golem (kind-specific, so it never lights for the wrong golem).
-      if (isGolemRepairPart(golemForStripe.kind, item.name)) return COMPANION_STRIPE_GOLEM;
-      if (isGolemSubstitutePart(golemForStripe.kind, item)) return COMPANION_STRIPE_GOLEM;
+      if (isSidekickRepairPart(golemForStripe.kind, item.name)) return COMPANION_STRIPE_GOLEM;
+      if (isSidekickSubstitutePart(golemForStripe.kind, item)) return COMPANION_STRIPE_GOLEM;
       const w = findWeaponByName(item.name);
-      if (w && isGolemWeapon(w.tags)) return COMPANION_STRIPE_GOLEM;
+      if (w && isSidekickWeapon(w.tags)) return COMPANION_STRIPE_GOLEM;
     }
     return null;
   };
