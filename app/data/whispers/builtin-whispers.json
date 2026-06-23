@@ -1,0 +1,19 @@
+{
+  "_comment": "engine_Dev — built-in whisper chains (overheard-tip leads). DESIGNERS: edit these, or upload your own via the dev console's WHISPERS box / the whole-game 'whispers' key. Each chain plants a tip in a hub room and points to a nearby tile. SIMPLE chains add meetLine + meetEffects for a one-hop payoff (the recommended, fully-data-driven shape). The built-in 'yulka_discs' chain is a BESPOKE multi-stage quest (meet -> buy/fight -> return) whose stage logic is scripted in the engine (gameStore), keyed on its id; only its overheard-tip DATA lives here. fetchItemName is the quest item that bespoke chain mints/returns.",
+  "chains": [
+    {
+      "id": "yulka_discs",
+      "title": "Yulka and the Aetheric Discs",
+      "plantLocations": ["outpost_messhall"],
+      "plantChance": 0.15,
+      "plantLines": [
+        "A pilgrim at the corner table cups her hands around a steaming mug and looks over at you. \"South of here, past the gate. After the moon's up. Mud Dweller name of Yulka camps out there some nights — sells Aetheric Discs cheap. Don't ask where she gets them.\"",
+        "A Reclaimer one table over leans back: \"If you need Aetheric Discs and don't want to pay Irma's mark-up, walk south after dark. Yulka. She's there some nights, gone others. Two tiles, three. You'll see her fire.\"",
+        "An off-duty Reclaimer presses a thumb into the salt of her plate. \"Yulka. South. Night work. Aetheric Discs at half the going rate. If she's there.\" She doesn't say what to do if she's not."
+      ],
+      "targetOffset": { "dxRange": [-1, 1], "dyRange": [-3, -2] },
+      "activeHours": [20, 4],
+      "fetchItemName": "Stolen Aetheric Discs"
+    }
+  ]
+}

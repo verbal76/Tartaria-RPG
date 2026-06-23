@@ -23,6 +23,8 @@ import type { HookEffect } from './hooks';
 import { rollDie } from './rng';
 import { findEnemyByName } from './encounter';
 import { resolveWhispers } from './contentPack';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import builtinWhisperData from '../data/whispers/builtin-whispers.json';
 
 /** Time window check that handles midnight wraparound. */
 export function isHourInWindow(hour: number, from: number | undefined, to: number | undefined): boolean {
@@ -60,23 +62,19 @@ export interface ChainDef {
    *  bespoke multi-stage fetch/fight/return logic. */
   meetLine?: string;
   meetEffects?: HookEffect[];
+  /** Bespoke-chain only — the quest item this chain mints + returns (e.g. the
+   *  yulka chain's recovered stock). Read by makeStolenDiscs so the name isn't
+   *  hardcoded. Generic one-hop chains don't use it. */
+  fetchItemName?: string;
 }
 
-export const CHAINS: ChainDef[] = [
-  {
-    id: 'yulka_discs',
-    title: 'Yulka and the Aetheric Discs',
-    plantLocations: ['outpost_messhall'],
-    plantChance: 0.15,
-    plantLines: [
-      `A pilgrim at the corner table cups her hands around a steaming mug and looks over at you. "South of here, past the gate. After the moon's up. Mud Dweller name of Yulka camps out there some nights — sells Aetheric Discs cheap. Don't ask where she gets them."`,
-      `A Reclaimer one table over leans back: "If you need Aetheric Discs and don't want to pay Irma's mark-up, walk south after dark. Yulka. She's there some nights, gone others. Two tiles, three. You'll see her fire."`,
-      `An off-duty Reclaimer presses a thumb into the salt of her plate. "Yulka. South. Night work. Aetheric Discs at half the going rate. If she's there." She doesn't say what to do if she's not.`,
-    ],
-    targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
-    activeHours: [20, 4],
-  },
-];
+// engine_Dev — the built-in whisper chains moved to app/data/whispers/
+// builtin-whispers.json so the engine carries no hardcoded setting strings and
+// designers can edit them. An uploaded 'whispers' table or the generic-default
+// pack takes precedence. (The yulka chain's bespoke multi-stage QUEST logic stays
+// scripted in gameStore, keyed on its id; only the overheard-tip DATA is here.)
+export const CHAINS: ChainDef[] =
+  (builtinWhisperData as unknown as { chains: ChainDef[] }).chains;
 
 /** The live whisper chains — uploaded override if present, else built-in. */
 export function getWhispers(): ChainDef[] {
@@ -199,7 +197,7 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
         // OTA-458 — include the location hint. If a player was stranded here by the
         // old disc-clobber bug (thief gone, stage stuck), returning to the thief
         // tile east of Yulka re-spawns the encounter so they can finish.
-        return `Defeat the Silt Thief and recover the Aetheric Discs — east of Yulka's tile (2-3 over). If the thief isn't there, step back onto that tile to draw them out again.`;
+        return `Defeat the Silt Thief and recover the Discs — east of Yulka's tile (2-3 over). If the thief isn't there, step back onto that tile to draw them out again.`;
       case 'fetch_returned':
         return `Return to Yulka's tile with the recovered Discs. She owes you 5.`;
       case 'ambush_armed':
@@ -265,13 +263,13 @@ export function spawnChainEnemy(name: string): Enemy {
 /** Build a fresh "Stolen Aetheric Discs" inventory item the player
  *  picks up off the thief. Carries a marker tag so the return
  *  step can find them in the player's pack. */
-export function makeStolenDiscs(quantity: number): InventoryItem {
+export function makeStolenDiscs(quantity: number, name = 'Recovered Goods'): InventoryItem {
   return {
     id: `whisper_loot_${Date.now()}_${rollDie(9999)}`,
-    name: 'Stolen Aetheric Discs',
+    name,
     kind: 'misc',
     rarity: 'Uncommon',
     quantity,
-    tags: ['whisper', 'aether', 'quest'],
+    tags: ['whisper', 'quest'],
   };
 }
