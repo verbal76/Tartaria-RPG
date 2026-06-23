@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../state/gameStore';
-import { useContentPackStore, type LoadResult } from '../state/contentPackStore';
+import { useContentPackStore, stripJsonComments, type LoadResult } from '../state/contentPackStore';
 import {
   CONTENT_TABLES,
   LORE_BLOCKS,
@@ -1312,17 +1312,32 @@ function FactionMissionsBox() {
   const [stageAdvance, setStageAdvance] = useState('any');
   const [text, setText] = useState('');
 
-  // A generic faction-quest example for the TEMPLATE button (one staged + one fetch).
-  const tmpl = () => JSON.stringify({ factionQuests: [
-    { id: 'silence_the_relay', factionId: 'REPLACE-with-a-faction-id', title: 'Silence the Relay', description: 'Knock out the forward relay before the next drop.', objective: 'Destroy the enemy relay', requirement: { rep: 15 }, reward: { tc: 120, rep: 8, items: ['Field Radio'] }, stages: [{ narration: 'Cross the line and find the relay mast.', advanceOn: 'travel' }, { narration: 'Put the relay down and its guards with it.', advanceOn: 'kill' }] },
-    { id: 'forge_stock', factionId: 'REPLACE-with-a-faction-id', title: 'Forge Stock', description: 'The board’s standing bounty: bring in 3 Scrap Metal.', objective: 'Gather 3 Scrap Metal and turn it in.', requirement: { rep: 0 }, reward: { tc: 35, rep: 6 }, fetch: { itemName: 'Scrap Metal', quantity: 3 } },
-  ] }, null, 2);
+  // The TEMPLATE — header instructions (the dependencies) + one of each PLAN type
+  // (staged + fetch). Comments are stripped on LOAD, so it still parses.
+  const tmpl = () => [
+    '// FACTION MISSIONS — contracts a faction posts on its board. Each:',
+    '//   { id, factionId, title, objective, description?, requirement:{ rep },',
+    '//     reward:{ tc, rep, items?:[names] },  + a PLAN:  stages:[{ narration,',
+    '//     advanceOn: "kill"|"travel"|"any" }]   OR   fetch:{ itemName, quantity } }',
+    '// DEPENDENCIES — match EXACTLY (case + spelling):',
+    "//   factionId       — a real id from your FACTIONS table (who posts the mission).",
+    "//   requirement.rep — the standing where it appears on that faction's board.",
+    '//   reward.items[]  — EXACT names of items defined in your item tables, else they',
+    '//                     grant as a stat-less "misc".',
+    '//   fetch.itemName  — a real, OBTAINABLE material/item (loot / dig / salvage), or',
+    '//                     the gather quest can never be turned in.',
+    '// Two PLAN types shown: a STAGED contract and a FETCH ("gather N") contract.',
+    JSON.stringify({ factionQuests: [
+      { id: 'silence_the_relay', factionId: 'REPLACE-with-a-faction-id', title: 'Silence the Relay', description: 'Knock out the forward relay before the next drop.', objective: 'Destroy the enemy relay', requirement: { rep: 15 }, reward: { tc: 120, rep: 8, items: ['REPLACE-with-an-item-you-defined'] }, stages: [{ narration: 'Cross the line and find the relay mast.', advanceOn: 'travel' }, { narration: 'Put the relay down and its guards with it.', advanceOn: 'kill' }] },
+      { id: 'forge_stock', factionId: 'REPLACE-with-a-faction-id', title: 'Forge Stock', description: "The board's standing bounty: bring in 3 of a material.", objective: 'Gather 3 of the material and turn it in.', requirement: { rep: 0 }, reward: { tc: 35, rep: 6 }, fetch: { itemName: 'REPLACE-with-an-obtainable-material', quantity: 3 } },
+    ] }, null, 2),
+  ].join('\n');
 
   // LOAD raw JSON — accepts a bare factionQuests array OR { factionQuests: [...] };
   // merges by id into the current set (preserving the other mission sub-tables).
   const loadRaw = () => {
     let parsed: unknown;
-    try { parsed = JSON.parse(text); } catch (e) { setStatus({ kind: 'err', msg: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }); return; }
+    try { parsed = JSON.parse(stripJsonComments(text)); } catch (e) { setStatus({ kind: 'err', msg: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }); return; }
     const arr = Array.isArray(parsed) ? parsed : (parsed && typeof parsed === 'object' ? (parsed as { factionQuests?: unknown }).factionQuests : null);
     if (!Array.isArray(arr) || arr.length === 0) { setStatus({ kind: 'err', msg: 'Expected a factionQuests array (or { "factionQuests": [...] }).' }); return; }
     const ids = new Set(arr.map((q) => (q as { id?: string }).id));
