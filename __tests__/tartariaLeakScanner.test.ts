@@ -45,7 +45,8 @@ function scanFile(file: string): number {
 // Per-file baseline (captured 2026-06-22). RATCHET: these may only ever go DOWN.
 const BASELINE: Record<string, number> = {
   'app/state/gameStore.ts': 153, 'app/engine/mainQuest.ts': 85, 'app/engine/itemAliases.ts': 55,
-  'app/engine/hooks.ts': 49, 'app/engine/elevatedOverlay.ts': 45,
+  'app/engine/hooks.ts': 49,
+  // elevatedOverlay.ts extracted to app/data/overlays/elevated-overlays.json (45 → 0).
   // salvagePools.ts extracted to app/data/salvage/salvage-pools.json (41 → 0).
   'app/engine/powers.ts': 24, 'app/engine/coreGuardians.ts': 23,
   // extracted to app/data/: digging.ts (18→0), scrapEngine.ts (15→0).

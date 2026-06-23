@@ -197,4 +197,9 @@ export const GENERIC_GAME = {
     materialLines: ['You strip {target} carefully. Something usable comes free.', 'You salvage {target}. The take is small but real.'],
     junkLines: ['Slim pickings on {target}. You pocket a {item} on the way out.', 'The {target} yields little, though a {item} ends up in your pack.'],
   },
+  overlays: [
+    { id: 'ledge_nook', kind: 'encounter', arrivalLine: 'The climb opens onto a wind-scoured ledge — a cracked nook, and something stirring in it.', ambientNouns: ['nook', 'crack', 'nest', 'ledge'], minTiers: 2, encounterChance: 0.6, encounterPool: ['Wild Boar', 'Road Bandit', 'Wood Lurker'] },
+    { id: 'high_perch', kind: 'encounter', arrivalLine: 'The top is a narrow perch over a long drop. You are not the only thing that climbed up here.', ambientNouns: ['perch', 'drop', 'rail', 'wind'], minTiers: 3, encounterChance: 0.7, encounterPool: ['Stone Sentinel', 'Grave Wight'] },
+    { id: 'open_sky', kind: 'encounter', arrivalLine: 'You reach the top and the sky opens up. Nothing here but wind and a long, clean view.', ambientNouns: ['sky', 'wind', 'view', 'edge'], minTiers: 2, encounterChance: 0.0, encounterPool: [] },
+  ],
 };

@@ -85,6 +85,7 @@ interface GenericDefaultPack {
   digging?: unknown;
   scrap?: unknown;
   salvage?: unknown;
+  overlays?: unknown[];
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -101,6 +102,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.digging = pack.digging;
   genericDefaults.scrap = pack.scrap;
   genericDefaults.salvage = pack.salvage;
+  genericDefaults.overlays = pack.overlays;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -117,6 +119,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.digging = undefined;
   genericDefaults.scrap = undefined;
   genericDefaults.salvage = undefined;
+  genericDefaults.overlays = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -715,6 +718,22 @@ export function resolveSalvage<T>(builtin: T): T {
   return builtin;
 }
 
+// --- elevated overlays (climb-apex mini-scenes) --------------------------------
+// engine_Dev — the OVERLAY templates surfaced at the top of a tall climb (a nook,
+// a vantage trader, a lookout, an encounter). Author-uploadable array; the roll +
+// scene-build RULES stay in elevatedOverlay.ts.
+let overlaysOverride: unknown[] | null = null;
+export function setOverlaysOverride(rows: readonly unknown[] | null): void {
+  overlaysOverride = rows && rows.length > 0 ? (rows as unknown[]) : null;
+}
+export function hasOverlaysOverride(): boolean { return overlaysOverride != null; }
+export function getOverlaysOverride(): unknown[] | null { return overlaysOverride; }
+export function resolveOverlays<T>(builtin: readonly T[]): readonly T[] {
+  if (overlaysOverride != null) return overlaysOverride as readonly T[];
+  if (genericDefaults.overlays != null) return genericDefaults.overlays as readonly T[];
+  return builtin;
+}
+
 // --- inventory presentation (category labels + tool tags) ----------------------
 // engine_Dev — RENAME the inventory category sections (Weapons -> Arsenal, Loot ->
 // Salvage, …) and EXTEND the tool-tag list (which item tags read as "Tools"). The
@@ -946,6 +965,7 @@ export function clearAllOverrides(): void {
   diggingOverride = null;
   scrapOverride = null;
   salvageOverride = null;
+  overlaysOverride = null;
 }
 
 // --- publish lock --------------------------------------------------------------
