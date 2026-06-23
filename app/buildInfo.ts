@@ -15411,4 +15411,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // table -> generic-default pack -> built-in). New DOG-RESCUE SCENARIOS dev-console
 // box (TEMPLATE/COPY/LOAD), bundle key, generic-default scenarios, and tests.
 // Net: dogCompanion.ts drops to 0 Tartaria literals (leak baseline tightened).
-export const OTA_BUILD_ID = '2026-06-22-789';
+// engine_Dev-790 — climbing now slowly grows the stamina POOL. Stamina is a
+// depletable pool (not one of the six use-trained stats), so it grows on a
+// milestone cadence like the travel milestone: every CLIMB_STAMINA_STEP (4)
+// cleared climb tiers -> +1 staminaMax (and +1 current stamina so it's felt).
+// Climbing is its only source besides travel; a tier is a real action so it
+// can't be farmed in place. Cadence lives in engine/statTraining
+// (climbGrowsStamina) so it's unit-testable; PlayerMilestones gains
+// climbTiersCleared.
+export const OTA_BUILD_ID = '2026-06-22-790';
