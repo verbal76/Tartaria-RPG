@@ -322,11 +322,22 @@ export function buildMainQuestTemplate(): string {
  *  location / random) so the TEMPLATE shows the complete schema + spawn options. */
 export function buildBossesTemplate(): string {
   return [
-    '// BOSSES — named foes a main-quest "kill" step references, or a fixed/random spawn.',
-    '//   spawnCondition: "main_quest" (tied to a quest step) | "location" (always at its',
-    '//     spawnLocationId) | "random" (rolls spawnChance % on travel encounters).',
-    '//   questItem drops on kill (used by a quest "kill" step); drops[] are extra loot.',
-    '//   damage can carry a type, e.g. "1d10 frost". factionId is optional (null = neutral).',
+    '// BOSSES — named foes a main-quest "kill" step references (by bossId), or a fixed /',
+    '// random world spawn. Shape: { id, name, factionId?, hp, attack, damage, ac?,',
+    '//   abilityPoint?, questItem?, drops?: [names], spawnLocationId?, spawnCondition,',
+    '//   spawnChance? }.',
+    '// DEPENDENCIES — these ids/names must match other tables EXACTLY (case + spelling):',
+    '//   id              — what a main-quest "kill" step points at via its bossId.',
+    '//   factionId       — a real id from your FACTIONS table (omit / null = neutral).',
+    '//   spawnLocationId — a real id from your LOCATIONS table.',
+    '//   questItem + drops[] — SHOULD be EXACT names of items defined in your item tables',
+    '//     (Weapons / Armor / Gear / Amulets / Rings / Exploration). An undefined name',
+    '//     drops as a stat-less "misc". The questItem is what a main-quest collect /',
+    '//     hand_in step looks for BY NAME, so it MUST match. Build factions, locations',
+    '//     and those items FIRST.',
+    '// spawnCondition: "main_quest" (tied to a quest step) | "location" (always at its',
+    '//   spawnLocationId) | "random" (rolls spawnChance % on travel encounters).',
+    '//   damage can carry a type, e.g. "1d10 frost".',
     JSON.stringify([
       { id: 'enemy_commander', name: 'The Enemy Commander', factionId: 'REPLACE-with-a-faction-id', hp: 120, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'Commander Dog Tags', drops: ['Field Medal'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' },
       { id: 'fortress_warden', name: 'The Fortress Warden', hp: 90, attack: 6, damage: '2d6', ac: 15, spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'location' },
