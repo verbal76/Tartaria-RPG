@@ -5140,21 +5140,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         triggerPuppyVendor(get, set);
       }
       // OTA-120 — Phase 6 rubble-puppy fallback. Late-game outdoor
-      // wasteland scene; ~5% per scene-entry once Guardians are all
-      // cleared. Plant a "rubble" investigation noun the player can
-      // investigate.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const cgMod = require('../engine/coreGuardians');
-      const totalGuardians = cgMod.totalGuardiansCount();
+      // scene; ~5% per scene-entry once the MAIN QUEST is complete.
+      // Plant a "rubble" investigation noun the player can investigate.
+      // (engine_Dev — was gated on "all Core Guardians defeated", a
+      // Tartaria concept; now tied to main-quest completion so it works
+      // in a custom game too.)
       const livePlayer = get().player;
-      const defCount = (livePlayer?.mainQuest?.guardiansDefeated ?? []).length;
       if (
         wm.puppyVendorOwed &&
         !wm.puppyVendorUsed &&
         !wm.pendingDogOnboarding &&
         livePlayer &&
         !hasActiveDog(livePlayer) &&
-        defCount >= totalGuardians &&
+        isMainQuestComplete(livePlayer) &&
         isOutdoor &&
         Math.random() < 0.05
       ) {
@@ -15288,20 +15286,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
           // OTA-120 — Phase 6 puppy-vendor safety net. If the dog
           // died in combat AND the safety-net hasn't been used,
-          // queue the vendor for the player's NEXT outdoor scene.
-          // The rubble-puppy fallback handles the case where all
-          // Guardians are already cleared.
+          // queue the vendor for the player's NEXT outdoor scene. The
+          // rubble-puppy fallback (above) handles the case where the
+          // MAIN QUEST is already complete. (engine_Dev — was split on
+          // "all Core Guardians defeated", a Tartaria concept; now on
+          // main-quest completion so it works in a custom game too.)
           {
             const liveWm = get().worldMemory;
             const livePlayer = get().player;
-            const livePlayerGuardiansDef = (livePlayer?.mainQuest?.guardiansDefeated ?? []).length;
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const cgRef = require('../engine/coreGuardians');
-            const total = cgRef.totalGuardiansCount();
             if (
               liveWm.puppyVendorOwed &&
               !liveWm.puppyVendorUsed &&
-              livePlayerGuardiansDef < total
+              !isMainQuestComplete(livePlayer)
             ) {
               queuePuppyVendor(get, set);
             }
@@ -27131,6 +27127,20 @@ export function tickDogStatus(
 export function hasActiveDog(player: PlayerCharacter | null | undefined): boolean {
   const dog = player?.dog;
   return !!dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base');
+}
+
+// engine_Dev — lore-agnostic "main quest complete" signal. Replaces the old
+// "all Core Guardians defeated" gate on the puppy safety-nets (Core Guardians
+// are Tartaria lore; a custom game never defeats them, so those nets were dead in
+// a reskin). True when an uploaded custom main quest has all its steps done, OR
+// the built-in quest reached its end / an ending was chosen.
+export function isMainQuestComplete(player: PlayerCharacter | null | undefined): boolean {
+  if (!player) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cmq = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+  if (cmq.questIsComplete(player)) return true;
+  const mq = player.mainQuest;
+  return !!mq && (mq.phase === 'ended' || !!mq.ending);
 }
 
 function queuePuppyVendor(
