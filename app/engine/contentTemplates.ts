@@ -810,14 +810,54 @@ export function buildDevGuide(): string {
 
 This engine is lore-agnostic: a game is just the JSON you upload. The fastest path
 is the WHOLE-GAME file (one file holds every section); the per-section boxes are for
-granular edits. Recommended order:
+granular edits. The console is collapsible — tap a header to open a section. Most are
+form builders (text + checkboxes that save to JSON); each also keeps a raw-JSON/file
+strip for power edits.
 
-The console is organized into collapsible sections — tap a header bar to open it.
-Most sections are form builders (text boxes + checkboxes that save to JSON); each
-also keeps a raw-JSON/file strip for power edits.
+═══════════════════════════════════════════════════════════════════════════════
+ RECOMMENDED FILL ORDER  (later sections REFERENCE names from earlier ones by
+ exact text — build the lists they pull from FIRST, or those references resolve
+ to nothing)
+═══════════════════════════════════════════════════════════════════════════════
+  1.  Identity & naming — game title, narrator, world name, corruption name,
+      ENERGY / MAGIC name, fusion (Crucible) name. Everything reads these.
+  2.  World lore — narrator persona, tone, the energy concept, termMap.
+  3.  Damage types — define them BEFORE anything that references a type.
+  4.  Materials — the crafting/loot stock. Recipes + Digging/Salvage/Scrap loot all
+      name materials, so they must exist first.
+  5.  Items — Weapons · Armor · Gear · Exploration · Amulets · Rings. Recipes craft
+      these by name, loot pools drop them, races/factions grant them as starting
+      gear, bosses drop them — so the item must be in its table or it resolves to a
+      blank "misc".
+  6.  Enemies — referenced by Bosses, Elevated overlays (encounterPool), main-quest
+      "kill" steps, Travel encounters, and Damage resistances (keyed by enemy type).
+  7.  Damage resistances — needs Damage types (4) + Enemies (6).
+  8.  Races · Factions — character creation. Factions are referenced by Starting
+      areas, Faction missions, Bosses, and main-quest faction gates.
+  9.  Locations — give each x/y. Referenced by the Main quest, Starting areas,
+      Bosses (spawn), Whispers/Hooks (plant locations), and the Interaction-tags
+      collector. Build the map before anything placed on it.
+  10. Recipes — needs Materials (4) + the result Items (5).
+  11. Powers (the "magic" disciplines).
+  12. Bosses — needs Enemies/Factions/Locations/Items. Build BEFORE the main quest.
+  13. Main quest — needs Bosses (12) + Locations (9).
+  14. Starting areas — needs Factions (8) + Locations (9). (Tick one room as the
+      Mission Board; "returnable" off = one-way prologue.)
+  15. Faction missions — needs Factions (8) + reward Items (5).
+  16. Hooks · Whispers · Travel encounters — reference Locations (9) + Enemies (6).
+  17. Elevated overlays — reference Enemies (6).
+  18. Digging · Scrap · Salvage — reference Materials (4) + Items (5).
+  19. Interaction tags — PULLS its noun list from your loaded Locations (9) + Starting
+      areas (14), so do this AFTER both. (↻ FROM WORLD)
+  20. Collectables · Summoned sidekicks (+ dog toggle) · Titles · Narration flavor.
+  21. Assets — World/faction map images, Music. (Their own uploads, not JSON.)
+
+The thematic detail for each follows.
 
 ## 1 · Identity & World (do first — everything else reads these)
   - Game name / Tagline / Narrator name / Fusion-feature (Crucible) name + on-off
+  - ENERGY / MAGIC name — what this world calls its "magic" (Vril, the Fold, Essence,
+    Mana…); shows on the magic tab + every {energy} token
   - World name (replaces the built-in world name everywhere) · Corruption/affliction name
   - World lore: narrator persona ({narrator}/{world}/{energy} tokens work here),
     tone, setting, terms, vocabulary, and:
@@ -864,7 +904,9 @@ also keeps a raw-JSON/file strip for power edits.
     kill / travel / anything) or a single "gather N of an item" fetch.
   - Other missions (hunts / mysteries / storylines + procedural seeds)
   - Hooks (atmospheric leads) · Whispers (overheard tips) · Travel encounters
-  - Interaction tags (which verbs each noun accepts) · Titles (achievements)
+  - Interaction tags (which verbs each noun accepts) — ↻ FROM WORLD pulls the noun
+    list from your LOADED Locations + Starting areas, so populate those first ·
+    Titles (achievements)
   - Collectables (character stories the player reassembles from loot fragments)
   - Summoned sidekicks (the buildable companion family — replaces "golems") +
     the dog companion on/off toggle
