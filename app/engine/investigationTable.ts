@@ -634,11 +634,18 @@ function buildLorePrompt(
   entry: InvestigationEntry,
   locationName: string,
 ): ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }> {
+  // engine_Dev — persona + setting come from the content pack (getNarratorPersona
+  // defaults to the narrator's name; getWorldSetting is the authored setting),
+  // so a reskin's investigate-narration isn't hardcoded "the Arbiter / Tartaria".
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('./contentPack') as typeof import('./contentPack');
+  const setting = cp.getWorldSetting();
   return [
     {
       role: 'system',
       content:
-        'You are the Arbiter, a laconic narrator in a post-flood fantasy world called Tartaria. ' +
+        cp.getNarratorPersona() + ' ' +
+        (setting ? `Setting: ${setting}. ` : '') +
         'Produce ONE short atmospheric sentence (max 30 words) describing what the player notices ' +
         'when investigating a scene object. Sensory and specific. No second-person address ("you"), ' +
         'just the description. No setup phrases ("you see"). No metaphors about time or memory unless ' +
