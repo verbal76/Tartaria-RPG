@@ -15587,4 +15587,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // card still renders). The Core-4 craft gate (coresRequired) is removed so the
 // golem-armament recipes are reachable in any game. Leak scanner ratcheted:
 // mainQuest 85→0, coreGuardians/EndingScreen removed. ~110 Tartaria leaks gone.
-export const OTA_BUILD_ID = '2026-06-23-808';
+//
+// engine_Dev-809 — dev-tab TEMPLATE audit: every downloadable template now carries
+// an explicit purpose/capability header AND, where its schema supports variants,
+// shows a few different variations. Hooks template gained a full instruction header
+// + three variant hooks (multi-step outdoor, one-step outdoor, indoor). Faction/Race
+// LORE and Interaction-Tags templates gained instruction headers (what they're for,
+// the shape, the tag vocabulary). Recipes template note de-staled — dropped the
+// coresRequired gate that 808 removed. All templates still round-trip (loaders strip
+// the // headers on upload); devTemplatesRoundTrip + contentTemplates stay green.
+export const OTA_BUILD_ID = '2026-06-23-809';

@@ -161,7 +161,7 @@ const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   recipes: [
     '// ═══════════════════════════════════════════════════════════════════════════',
     '// CRAFTING RECIPES — shape: { "result": "Item Name", "ingredients": [{ "name":',
-    '//   "Material", "quantity": 2 }], "intRequirement"?: 11, "coresRequired"?: 4 }',
+    '//   "Material", "quantity": 2 }], "intRequirement"?: 11 }',
     '// ───────────────────────────────────────────────────────────────────────────',
     '// A recipe is ONLY the formula. The crafted item\'s STATS come from the table you',
     '// define the RESULT in — so the TYPE of recipe = WHICH table the result lives in:',
@@ -179,10 +179,8 @@ const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
     '//   • every ingredients[].name MUST be a real MATERIAL that is OBTAINABLE (enemy',
     '//     loot / dig / salvage / scrap), or the recipe can never be crafted.',
     '//   • names match by EXACT string (case + spelling). Build items + materials FIRST.',
-    '// OPTIONAL GATES (omit for none):',
+    '// OPTIONAL GATE (omit for none):',
     '//   "intRequirement": 11  — refuses the craft until the player\'s INT meets it.',
-    '//   "coresRequired": 4    — refuses until the player has recovered N main-quest',
-    '//                           objective items (a late-game "war-forge" gate).',
     '// The rows below show ONE of every type — edit/replace them.',
     '// ═══════════════════════════════════════════════════════════════════════════',
   ].join('\n'),
@@ -283,13 +281,23 @@ export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): strin
   // the playable rows (those live in the Factions/Races TABLE boxes — and the lore
   // loader rejects table-shaped arrays). Emit an object of id → a story paragraph so
   // Template → edit → Load round-trips cleanly.
+  const which = id === 'faction' ? 'FACTION' : 'RACE';
+  const tableBox = id === 'faction' ? 'Factions' : 'Races';
+  const header = [
+    `// ${which} LORE — free-form BACKSTORY the narrator knows about each ${which.toLowerCase()}.`,
+    `// This is STORY TEXT ONLY; it does NOT create playable ${which.toLowerCase()}s — those go in`,
+    `// the "${tableBox}" box under TABLES (character creation). Shape: an OBJECT mapping a`,
+    `// ${which.toLowerCase()} id to one prose paragraph: { "<id>": "the story…" }. Each <id>`,
+    `// SHOULD match an id in your ${tableBox} table so the narrator ties the lore to that`,
+    '// pick; add as many entries as you want. (Loaders strip these // lines on upload.)',
+  ].join('\n');
   const src = (id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races) as Array<{ id: string; name: string; description?: string; flavor?: string; philosophy?: string; goal?: string }>;
   const out: Record<string, string> = {};
   for (const r of src.slice(0, TEMPLATE_SAMPLE_ROWS)) {
     const blurb = (r.flavor || r.description || r.philosophy || r.goal || `Story the narrator knows about ${r.name}.`).trim();
     out[r.id] = blurb;
   }
-  return JSON.stringify(out, null, 2);
+  return header + '\n' + JSON.stringify(out, null, 2);
 }
 
 /** engine_Dev — the FULL-FEATURED main-quest template. Shows every action verb and
@@ -485,7 +493,21 @@ export function buildInteractionTagsTemplate(current?: Record<string, string[]>)
     const prior = current?.[noun];
     out[noun] = Array.isArray(prior) ? prior : [...getInteractionTags(noun)];
   }
-  return JSON.stringify(out, null, 2);
+  const header = [
+    '// INTERACTION TAGS — which physical VERBS each interactable noun in YOUR world',
+    '// supports. The object maps a noun → an array of any of these five tags:',
+    '//   climbable  — the player can climb it (needs a rope; ties into the climb system)',
+    '//   swimmable  — the player can swim through/across it',
+    '//   breakable  — the player can smash it open',
+    '//   searchable — the player can search it for loot/clues',
+    '//   salvageable— the player can salvage it for crafting materials',
+    '// This list is BUILT FROM the interactables on the Locations + Starting areas you',
+    '// loaded (empty until you load some), each pre-filled with the engine\'s best guess —',
+    '// edit the arrays to taste. ALTERNATIVE keyword form (added to, not replacing, these):',
+    '//   { "climbable": ["tower","wall",…], "swimmable": ["water",…], … } maps a tag → the',
+    '//   nouns it applies to, so one line tags many nouns at once. (// lines stripped on upload.)',
+  ].join('\n');
+  return header + '\n' + JSON.stringify(out, null, 2);
 }
 
 /** The Starting-areas template — a SEPARATE list of per-faction 4-room instances,
@@ -559,10 +581,40 @@ export function buildTitlesTemplate(): string {
  *  rep_change {factionId,amount} · advance_time {hours} · memo {text} ·
  *  spawn_vendor {vendor} . */
 export function buildHooksTemplate(includeTokenNote = true): string {
-  return tokenNote(JSON.stringify({
+  const header = [
+    '// HOOKS — ambient "atmospheric leads" the player can DISCOVER while looking around',
+    '// and then PURSUE. A hook turns a noticed detail into a small staged interaction.',
+    '// The object below has four parts, all keyed by a hook id you choose:',
+    '//   plants  : the discovery line(s) + the "nouns" that let look/investigate <noun>',
+    '//             find this hook. Add as many hook ids as you like.',
+    '//   chains  : the staged outcomes for that hook. Each stage is { line, effects?,',
+    '//             done, addNouns? }. done:false = more stages follow (the player keeps',
+    '//             engaging to advance); done:true = the FINAL stage. So a ONE-STEP hook',
+    '//             is a single done:true stage; a MULTI-STEP hook lists several, the last',
+    '//             one done:true. addNouns reveals new investigate-able words mid-chain.',
+    '//   weights : how often each hook is picked vs the others (bigger = more common).',
+    '//   indoor  : the hook ids that may ONLY plant INSIDE rooms; every other id is outdoor.',
+    '// EFFECT VERBS for a stage\'s effects[]:  { type:"grant_tc", amount } ·',
+    '//   { type:"grant_item", name } · { type:"spawn_enemy_tag", tag } · { type:"heal",',
+    '//   amount } · { type:"damage", amount, cause } · { type:"unlock_location", locationId }',
+    '//   · { type:"rep_change", factionId, amount } · { type:"advance_time", hours } ·',
+    '//   { type:"memo", text } · { type:"spawn_vendor", vendor }.',
+    '// The three hooks below show the variations — a MULTI-STEP outdoor chain, a ONE-STEP',
+    '// outdoor chain, and an INDOOR hook. Edit/replace them (the built-in set is ~50 hooks).',
+  ].join('\n');
+  return tokenNote(header + '\n' + JSON.stringify({
     plants: {
+      // VARIANT 1 — MULTI-STEP outdoor hook: noticed, then engaged twice for a payoff.
       strange_vent: [
         { line: 'A vent in the rock breathes a slow coil of pale mist.', nouns: ['vent', 'mist', 'seam', 'grate'] },
+      ],
+      // VARIANT 2 — ONE-STEP outdoor hook: a single done:true stage, small reward.
+      roadside_marker: [
+        { line: 'A cairn of stones sits just off the path, one flat rock scratched with a crude map.', nouns: ['cairn', 'stones', 'marker', 'map', 'rock'] },
+      ],
+      // VARIANT 3 — INDOOR hook (listed in `indoor` below): only plants inside rooms.
+      loose_floorboard: [
+        { line: 'One floorboard sits proud of the rest, its nails backed half out — lifted before.', nouns: ['floorboard', 'board', 'plank', 'floor', 'nails'] },
       ],
     },
     chains: {
@@ -570,9 +622,16 @@ export function buildHooksTemplate(includeTokenNote = true): string {
         { line: 'You step closer. The air stings; something metal is wedged in the grate.', effects: [], done: false, addNouns: ['grate'] },
         { line: 'You pry the grate loose. A ticking brass device tumbles into your hand.', effects: [{ type: 'grant_item', name: 'Old Mechanism' }, { type: 'grant_tc', amount: 40 }], done: true },
       ],
+      roadside_marker: [
+        { line: 'You read the scratched map — a cache, a few tiles on. You note the bearing and pocket the loose coins someone left as a toll.', effects: [{ type: 'grant_tc', amount: 25 }, { type: 'memo', text: 'A scratched cairn-map hinted at a cache nearby.' }], done: true },
+      ],
+      loose_floorboard: [
+        { line: 'You work the board up. Beneath it, a cloth bundle has been hidden a long time.', effects: [], done: false, addNouns: ['bundle', 'cloth'] },
+        { line: 'Inside the bundle: a small purse and a folded letter, its ink long dry.', effects: [{ type: 'grant_item', name: 'Old Letter' }, { type: 'grant_tc', amount: 50 }], done: true },
+      ],
     },
-    weights: { strange_vent: 6 },
-    indoor: [],
+    weights: { strange_vent: 6, roadside_marker: 5, loose_floorboard: 4 },
+    indoor: ['loose_floorboard'],
   }, null, 2), includeTokenNote);
 }
 
