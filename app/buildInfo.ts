@@ -15991,4 +15991,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // each color's LIGHTNESS so contrast holds. Semantic colors are LEFT ALONE so health/HP green
 // (#9ec96a/#56d364) isn't drowned by the new teal, and failure-red + corruption-purple still read.
 // Base is still fully slider-tunable. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-844';
+//
+// engine_Dev-845 — Validate Game upgrades (from the architecture review's useful parts). The
+// validator gains an INFO tier + a stable `code` (+ optional suggestion/id) per issue, a structured
+// runValidation() report { ok, errorCount, warningCount, infoCount, errors, warnings, info }, and
+// new reference checks that map to real engine data: hook + whisper EFFECT VERBS (unknown verb +
+// grant_item / unlock_location / rep_change refs), summoned-sidekick fuel items, wasteland-encounter
+// enemies, and a starting-area "no mission board" warning. The VALIDATE GAME button shows the
+// error/warning/info counts; SAVE FILE TO DEVICE now soft-gates on hard errors (a second tap exports
+// anyway). Skipped the review's non-mapping bits (dialogue graphs, schemaVersion/engineVersionRequired
+// manifest, generic player-start) — no such fields exist yet. Extended test (13 cases). tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-845';
