@@ -73,7 +73,7 @@ describe('arbiterKnowledge — Arbiter world-knowledge', () => {
 
   it('answers "How many sites can I visit?" with the visitable-site count (was the garbled-echo bug)', () => {
     const a = answerWorldKnowledge('How many sites can I visit?', {}) ?? '';
-    expect(a).toMatch(/places in the buried country/i);
+    expect(a).toMatch(/places worth your boots/i);
     expect(a).toContain(String(_knowledgeCounts.sites));
   });
 

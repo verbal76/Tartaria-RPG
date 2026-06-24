@@ -59,8 +59,8 @@ const BASELINE: Record<string, number> = {
   'app/engine/areaSearch.ts': 13, 'app/engine/whispers.ts': 0,
   // sidekicks.ts (renamed from golems.ts): built-in defs extracted to
   // app/data/summons/builtin-sidekicks.json (8→0).
-  'app/engine/character.ts': 9, 'app/engine/sidekicks.ts': 0, 'app/engine/titles.ts': 7,
-  'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 6, 'app/engine/buriedSkyscraper.ts': 0,
+  'app/engine/character.ts': 7, 'app/engine/sidekicks.ts': 0, 'app/engine/titles.ts': 0,
+  'app/engine/raceAbilities.ts': 6, 'app/engine/contentPack.ts': 4, 'app/engine/buriedSkyscraper.ts': 0,
   // buriedSkyscraper floor flavors genericized; itemFusion adjective pools + dog-vest
   // example name genericized (5→0 each).
   'app/engine/climbHeight.ts': 5, 'app/engine/itemFusion.ts': 0, 'app/engine/dogCompanion.ts': 0,
@@ -73,8 +73,8 @@ const BASELINE: Record<string, number> = {
   // investigate LLM prompt now uses getNarratorPersona()/getWorldSetting() (1→0);
   // hookPuzzles vault-tumbler intro genericized (1→0).
   'app/engine/statTraining.ts': 1, 'app/engine/investigationTable.ts': 0, 'app/engine/vendors.ts': 1,
-  'app/engine/itemDefaults.ts': 1, 'app/engine/hookPuzzles.ts': 0, 'app/engine/sceneNounMaterial.ts': 1,
-  'app/engine/arbiterKnowledge.ts': 1, 'app/engine/buildings.ts': 1, 'app/screens/MapScreen.tsx': 1,
+  'app/engine/itemDefaults.ts': 0, 'app/engine/hookPuzzles.ts': 0, 'app/engine/sceneNounMaterial.ts': 1,
+  'app/engine/arbiterKnowledge.ts': 0, 'app/engine/buildings.ts': 1, 'app/screens/MapScreen.tsx': 1,
   'app/screens/VendorScreen.tsx': 1,
 };
 const BASELINE_TOTAL = Object.values(BASELINE).reduce((a, c) => a + c, 0);
