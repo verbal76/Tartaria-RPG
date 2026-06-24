@@ -20,13 +20,13 @@ describe('stealth-granting titles', () => {
   });
 
   it('Etherbound Survivor grants +1 Stealth (and keeps its hazard save)', () => {
-    const p = titlePerkModifiers(withTitles(['etherbound_survivor']));
+    const p = titlePerkModifiers(withTitles(['stormbound_survivor']));
     expect(p.stealthBonus).toBe(1);
     expect(p.envHazardSaveBonus).toBe(2);
   });
 
   it('the three stack to +3 Stealth when all earned', () => {
-    const p = titlePerkModifiers(withTitles(['shadow_diver', 'wayfarer_of_the_lost_paths', 'etherbound_survivor']));
+    const p = titlePerkModifiers(withTitles(['shadow_diver', 'wayfarer_of_the_lost_paths', 'stormbound_survivor']));
     expect(p.stealthBonus).toBe(3);
   });
 

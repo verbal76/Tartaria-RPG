@@ -13,7 +13,7 @@
       ]
     },
     {
-      "id": "aetheric_attuned",
+      "id": "arcane_attuned",
       "title": "Arcane-Attuned",
       "requirement": "Survive a direct encounter with an energy anomaly",
       "perk": "Once per day, gain temporary resistance to energy damage for 3 rounds.",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "id": "etherbound_survivor",
+      "id": "stormbound_survivor",
       "title": "Stormbound Survivor",
       "requirement": "Survive an energy storm",
       "perk": "Once per day, reroll a failed saving throw against environmental hazards.",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "id": "golem_whisperer",
+      "id": "sidekick_whisperer",
       "title": "Sidekick Whisperer",
       "requirement": "Successfully control an construct",
       "perk": "Once per encounter, temporarily disable an construct.",
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "id": "aetherborn_awakened",
+      "id": "inner_awakening",
       "title": "Awakened",
       "requirement": "Unlock the latent powers of a latent power",
       "perk": "Once per day, activate a powerful energy surge to enhance movement or strength for 2 rounds.",
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "id": "bane_of_sentinels",
+      "id": "bane_of_constructs",
       "title": "Bane of Constructs",
       "requirement": "Defeat five constructs",
       "perk": "Once per day, deal an extra damage die against mechanical foes.",
@@ -127,7 +127,7 @@
       ]
     },
     {
-      "id": "etheric_explorer",
+      "id": "far_explorer",
       "title": "Far Explorer",
       "requirement": "Lead an expedition deep into unexplored ancient ruins",
       "perk": "+1 to Leadership when guiding a party through ruins or unknown terrain.",
@@ -149,7 +149,7 @@
       ]
     },
     {
-      "id": "survivor_of_aetherstone",
+      "id": "survivor_of_the_stones",
       "title": "Survivor of energy stone",
       "requirement": "Survive prolonged exposure to energy stone",
       "perk": "Gain advantage on Constitution checks against energy corruption or radiation.",
@@ -171,7 +171,7 @@
       ]
     },
     {
-      "id": "master_of_aethercraft",
+      "id": "master_of_spellcraft",
       "title": "Master of Spellcraft",
       "requirement": "Successfully create or enhance an construct",
       "perk": "Once per encounter, temporarily enhance a summoned construct's abilities.",

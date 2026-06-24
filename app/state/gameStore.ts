@@ -1374,7 +1374,34 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   return out;
 }
 
+// engine_Dev-834 — title ids were genericized off Tartaria (Aether/Etheric/Golem/
+// Sentinel → neutral). Old saves carry the legacy ids in earnedTitles; remap them so an
+// earned title keeps its display + perk after the rename. Forward-only, idempotent.
+const LEGACY_TITLE_ID_MIGRATION: Record<string, string> = {
+  aetheric_attuned: 'arcane_attuned',
+  aetherborn_awakened: 'inner_awakening',
+  etheric_explorer: 'far_explorer',
+  etherbound_survivor: 'stormbound_survivor',
+  survivor_of_aetherstone: 'survivor_of_the_stones',
+  golem_whisperer: 'sidekick_whisperer',
+  master_of_aethercraft: 'master_of_spellcraft',
+  bane_of_sentinels: 'bane_of_constructs',
+};
+function migrateEarnedTitleIds(ids: readonly string[] | undefined): string[] {
+  if (!ids || ids.length === 0) return [];
+  const seen = new Set<string>();
+  for (const id of ids) {
+    const next = LEGACY_TITLE_ID_MIGRATION[id] ?? id;
+    seen.add(next);
+  }
+  return [...seen];
+}
+
 function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
+  // Migrate any legacy (Tartaria-flavored) earned-title ids to their genericized form.
+  if (p.earnedTitles && p.earnedTitles.some((id) => id in LEGACY_TITLE_ID_MIGRATION)) {
+    p = { ...p, earnedTitles: migrateEarnedTitleIds(p.earnedTitles) };
+  }
   // 2026-05-24 — staminaMax formula bumped from `8 + floor(STR/2)` to
   // `12 + floor(STR/2)` so the new Tired status (< 25% max) triggers at
   // a realistic count instead of after 3 actions. Existing saves with a

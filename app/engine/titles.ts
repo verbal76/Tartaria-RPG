@@ -135,7 +135,7 @@ function hasCompanion(player: PlayerCharacter): boolean {
 export const WIRED_TITLES: TitleDef[] = [
   // ── Tier A ────────────────────────────────────────────────────────────
   {
-    id: 'bane_of_sentinels',
+    id: 'bane_of_constructs',
     earned: (_pl, p) => p.sentinelsDefeated >= 5,
     perk: (a) => { a.mechanicalDamageDice += 1; },
   },
@@ -150,13 +150,13 @@ export const WIRED_TITLES: TitleDef[] = [
     perk: (a) => { a.tradeBonus += 2; },
   },
   {
-    id: 'etherbound_survivor',
+    id: 'stormbound_survivor',
     // OTA-350 — a survivor of the wastes has learned to keep to cover. (perk below)
     earned: (_pl, p) => p.stormsSurvived >= 1,
     perk: (a) => { a.envHazardSaveBonus += 2; a.stealthBonus += 1; },
   },
   {
-    id: 'survivor_of_aetherstone',
+    id: 'survivor_of_the_stones',
     // prolonged exposure: reached a high corruption load and lived.
     earned: (_pl, p) => p.maxCorruption >= 25,
     perk: (a) => { a.corruptionResist = true; },
@@ -167,20 +167,20 @@ export const WIRED_TITLES: TitleDef[] = [
     perk: (a) => { a.socialBonus += 2; },
   },
   {
-    id: 'etheric_explorer',
+    id: 'far_explorer',
     // "Lead an expedition deep into unexplored ruins" → clear a Lost Capital
     // (a deep, guardian-held buried ruin = the canonical deep expedition).
     earned: (pl) => (pl.mainQuest?.coresRecovered?.length ?? 0) >= 1,
     perk: (a) => { a.leadershipBonus += 1; },
   },
   {
-    id: 'golem_whisperer',
+    id: 'sidekick_whisperer',
     earned: (pl) => !!pl.sidekick,
     perk: (a) => { a.golemEdge = true; },
   },
   // ── Tier B (substitute mappings) ──────────────────────────────────────
   {
-    id: 'master_of_aethercraft',
+    id: 'master_of_spellcraft',
     earned: (_pl, p) => p.fusionsCompleted >= 1,
     perk: (a) => { a.golemEdge = true; },
   },
@@ -190,7 +190,7 @@ export const WIRED_TITLES: TitleDef[] = [
     perk: (a) => { a.repairBonus += 2; },
   },
   {
-    id: 'aetherborn_awakened',
+    id: 'inner_awakening',
     earned: (pl) => pl.raceId === 'aetherborn' && (pl.corruption ?? 0) >= 10,
     perk: (a) => { a.ethericSurge = true; },
   },
@@ -200,7 +200,7 @@ export const WIRED_TITLES: TitleDef[] = [
     perk: (a) => { a.loreBonus += 2; },
   },
   {
-    id: 'aetheric_attuned',
+    id: 'arcane_attuned',
     // survive a direct brush with an Etheric anomaly (a storm tick counts).
     earned: (_pl, p) => p.stormsSurvived >= 1 || p.maxCorruption >= 5,
     perk: (a) => { a.ethericDamageResist = true; },
@@ -254,20 +254,20 @@ export const WIRED_TITLE_IDS: ReadonlySet<string> = new Set(WIRED_TITLES.map((t)
 // an honest, present-tense description of the PASSIVE effect the engine now
 // applies. Titles absent here fall back to the canon string.
 export const TITLE_PASSIVE_PERK: Record<string, string> = {
-  bane_of_sentinels: 'Passive: +1d6 damage against mechanical foes (automatons, sentinels, drones).',
+  bane_of_constructs: 'Passive: +1d6 damage against mechanical foes (automatons, constructs, drones).',
   seeker_of_lost_relics: 'Passive: +2 to Investigate checks.',
   relic_trader: 'Passive: relics sell for more (≈+10%).',
-  etherbound_survivor: 'Passive: shrugs off some damage from falls and elemental/environmental hits; +1 Stealth (you\'ve learned to keep to cover).',
-  survivor_of_aetherstone: 'Passive: halves corruption gained from Etheric weather.',
+  stormbound_survivor: 'Passive: shrugs off some damage from falls and elemental/environmental hits; +1 Stealth (you\'ve learned to keep to cover).',
+  survivor_of_the_stones: 'Passive: halves corruption gained from charged weather.',
   scion_of_the_giants: 'Passive: +2 to social (diplomacy) checks.',
-  etheric_explorer: 'Passive: +1 to social (diplomacy) checks.',
-  golem_whisperer: 'Passive: golems you summon come out tougher (+30% HP, one larger attack die).',
-  master_of_aethercraft: 'Passive: golems you summon come out tougher (+30% HP, one larger attack die).',
+  far_explorer: 'Passive: +1 to social (diplomacy) checks.',
+  sidekick_whisperer: 'Passive: sidekicks you summon come out tougher (+30% HP, one larger attack die).',
+  master_of_spellcraft: 'Passive: sidekicks you summon come out tougher (+30% HP, one larger attack die).',
   architects_eye: 'Passive: ancient / relic repairs cost less (≈−10%).',
-  aetherborn_awakened: 'Passive: once per fight, your first hit detonates an Aetheric surge (+1d8 damage).',
+  inner_awakening: 'Passive: once per fight, your first hit detonates an energy surge (+1d8 damage).',
   scholar_of_forgotten_lore: 'Passive: +2 to Investigate / lore checks.',
-  aetheric_attuned: 'Passive: halves incoming Aetheric damage — in combat AND from Etheric weather.',
-  stormcaller: 'Passive: halves incoming Aetheric damage — in combat AND from Etheric weather.',
+  arcane_attuned: 'Passive: halves incoming energy damage — in combat AND from charged weather.',
+  stormcaller: 'Passive: halves incoming energy damage — in combat AND from charged weather.',
   // Tier-C (earnable once those challenges go live):
   guild_broker: 'Passive: +1 to social (diplomacy) checks.',
   shadow_diver: 'Passive: +1 to Stealth checks.',
