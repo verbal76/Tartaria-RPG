@@ -138,7 +138,9 @@ export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;
  *  the spawner. */
 export function getActiveVendors(): VendorTemplate[] {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const ov = (require('./contentPack') as typeof import('./contentPack')).getVendorsOverride();
+  const cp = require('./contentPack') as typeof import('./contentPack');
+  // author override → installed GENERIC default → built-in Tartaria pool.
+  const ov = cp.getVendorsOverride() ?? cp.getGenericVendors();
   if (!ov || ov.length === 0) return VENDORS;
   return ov.filter(
     (v): v is VendorTemplate =>

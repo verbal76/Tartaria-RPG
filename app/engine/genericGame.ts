@@ -80,10 +80,39 @@ const FACTION_QUESTS = [
 
 // A small walkable base per faction, placed at its location, with one mission-board room.
 const room = (id: string, name: string, desc: string, exits: Record<string, string | null>, board = false, npc: string | null = null) => ({ id, name, shortName: name, description: desc, exits, anchorNpc: npc, ...(board ? { missionBoard: true } : {}) });
+// engine_Dev — the yard is the entry/exit room (the board is here). Leaving is the EXIT
+// button / "leave outpost" — NOT a compass exit, so the yard carries no `world` exit (a
+// directional "west: world" used to render a confusing stray "West" alongside EXIT). The
+// store anchors the hub trader (a vendor whose name matches a GENERIC vendor template).
 const baseRooms = (areaName: string) => [
-  room('yard', 'Yard', `The open yard of ${areaName}. The way in and out, and the board where work is posted.`, { north: 'hall', east: 'store', west: 'world' }, true),
-  room('hall', 'Hall', 'A long common hall — a fire, a table, low talk.', { south: 'yard' }, false, 'Keeper'),
-  room('store', 'Store', 'Shelves of crates and spare kit.', { west: 'yard' }, false),
+  room('yard', 'Yard', `The open yard of ${areaName}. The way in and out, and the board where work is posted.`, { north: 'hall', east: 'store' }, true),
+  room('hall', 'Hall', 'A long common hall — a fire, a table, low talk.', { south: 'yard' }, false),
+  room('store', 'Store', 'Shelves of crates and spare kit. A quartermaster keeps the counter.', { west: 'yard' }, false, 'Quartermaster Vael'),
+];
+
+// Named traders for the generic game — the hub anchor ("Quartermaster Vael") plus a
+// roadside peddler. offers reference generic catalog items so they resolve. Setting-neutral.
+const GENERIC_VENDORS = [
+  {
+    id: 'hold_quartermaster', name: 'Quartermaster Vael', title: 'Quartermaster', faction: null,
+    description: 'Runs the base store. Buys salvage, sells the basics, asks few questions.',
+    offers: [
+      { itemName: 'Trail Rations', price: 8 },
+      { itemName: 'Worn Sword', price: 20 },
+      { itemName: "Hunter's Bow", price: 95 },
+      { itemName: 'Bright Torch', price: 18 },
+    ],
+    gender: 'female',
+  },
+  {
+    id: 'roadside_peddler', name: 'Odd Hallin', title: 'Roadside Peddler', faction: 'freeholders',
+    description: 'A wandering trader who turns up where the roads cross.',
+    offers: [
+      { itemName: 'Trail Rations', price: 9 },
+      { itemName: 'Worked Crystal', price: 60 },
+    ],
+    gender: 'male',
+  },
 ];
 const STARTING_AREAS = [
   { factionId: 'wardens', name: 'Warden Hold', locationId: 'warden_hold', coords: { x: 7, y: 8 }, returnable: true, rooms: baseRooms('Warden Hold') },
@@ -147,6 +176,7 @@ export const GENERIC_GAME = {
   },
   flavor: FLAVOR,
   startingAreas: STARTING_AREAS,
+  vendors: GENERIC_VENDORS,
   mainQuest: MAIN_QUEST,
   bosses: BOSSES,
   collectables: COLLECTABLES,

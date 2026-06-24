@@ -90,6 +90,7 @@ interface GenericDefaultPack {
   dogScenarios?: unknown[];
   summons?: { noun?: string; defs: unknown[] };
   whispers?: unknown[];
+  vendors?: unknown[];
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -110,6 +111,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.dogScenarios = pack.dogScenarios;
   genericDefaults.summons = pack.summons;
   genericDefaults.whispers = pack.whispers;
+  genericDefaults.vendors = pack.vendors;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -130,8 +132,15 @@ export function clearGenericDefaults(): void {
   genericDefaults.dogScenarios = undefined;
   genericDefaults.summons = undefined;
   genericDefaults.whispers = undefined;
+  genericDefaults.vendors = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
+}
+
+/** The generic game's named vendors, if the generic pack is installed (else null). The
+ *  vendor resolver layers author override → this → Tartaria built-in. */
+export function getGenericVendors(): unknown[] | null {
+  return genericDefaults.vendors && genericDefaults.vendors.length > 0 ? genericDefaults.vendors : null;
 }
 
 // --- active overrides (module-level; mirrored from the content-pack store) ------
@@ -971,13 +980,16 @@ export function getStartingAreas(): StartingArea[] { return startingAreasOverrid
 /** RAW author upload of starting areas (ignores the generic default). null = none loaded. */
 export function getStartingAreasOverride(): StartingArea[] | null { return startingAreasOverride; }
 export function startingAreaForFaction(factionId: string | null | undefined): StartingArea | null {
-  if (!factionId || !startingAreasOverride) return null;
-  return startingAreasOverride.find((a) => a.factionId === factionId) ?? null;
+  if (!factionId) return null;
+  // engine_Dev — author override → installed GENERIC default (so the generic game's hub,
+  // with its mission board + anchor vendor, actually renders). Falls to null for the
+  // built-in Tartaria factions, which use the static hub instead.
+  return getStartingAreas().find((a) => a.factionId === factionId) ?? null;
 }
 /** Map a placement location id → the starting area sitting there (any faction). */
 export function startingAreaAtLocation(locationId: string | null | undefined): StartingArea | null {
-  if (!locationId || !startingAreasOverride) return null;
-  return startingAreasOverride.find((a) => a.locationId === locationId) ?? null;
+  if (!locationId) return null;
+  return getStartingAreas().find((a) => a.locationId === locationId) ?? null;
 }
 /** A starting area is returnable unless its author explicitly set returnable:false.
  *  A non-returnable area is a one-way prologue (vanishes after you leave). */

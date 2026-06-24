@@ -15773,4 +15773,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the author's vendors + lookup; clear restores built-ins; malformed rows dropped) +
 // round-trip + bundle-completeness. tsc 141 = baseline (zero new); vendor + content-pack
 // suites green.
-export const OTA_BUILD_ID = '2026-06-24-824';
+//
+// engine_Dev-825 — fix the GENERIC GAME's empty starting hub (content audit). All content
+// types still exist; the hub was a WIRING gap. (1) startingAreaForFaction /
+// startingAreaAtLocation read only the AUTHOR override slot — never the installed generic
+// default — so the generic game's spawn tile (warden_hold/seeker_camp/crossroads) failed
+// isHubLocation(), no hub interior rendered, and with hubRoom=null neither the anchor vendor
+// nor the mission board ever surfaced (getStartingAreas(), the only fn that consults the
+// generic default, was dead code). Both accessors now go through getStartingAreas()
+// (override → generic default); built-in Tartaria factions still fall to null → static hub.
+// (2) GENERIC_GAME had no vendors → getActiveVendors() leaked Tartaria traders. Added a
+// vendors generic-default layer (contentPack getGenericVendors; vendor resolver now layers
+// override → generic → built-in) + GENERIC_VENDORS ("Quartermaster Vael" anchored in the
+// store room + a roadside peddler), itemNames from the generic catalog. (3) Removed the
+// stray "West": the generic yard's `west: 'world'` compass exit was redundant with the EXIT
+// button ("leave outpost") and rendered a confusing extra "West" — dropped it (room count
+// unchanged otherwise, per request). Tests lock all three. tsc 141 = baseline.
+export const OTA_BUILD_ID = '2026-06-24-825';
