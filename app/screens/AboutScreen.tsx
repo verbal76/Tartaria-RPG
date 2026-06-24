@@ -5,7 +5,7 @@ import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { useContentPackStore } from '../state/contentPackStore';
 import { DeveloperConsole } from './DeveloperSettingsScreen';
-import { getGameTitle } from '../engine/contentPack';
+import { getGameTitle, getNarratorName } from '../engine/contentPack';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
@@ -444,7 +444,7 @@ export function AboutScreen() {
         ? `  Last response: ${cognitiveLastResponse.inferredEmotions.join(',') || '-'} / ${cognitiveLastResponse.inferredIntentions.join(',') || '-'} (${cognitiveLastResponse.embeddingMs.toFixed(1)}ms embed, ${cognitiveLastResponse.inferenceMs.toFixed(1)}ms infer)`
         : `  Last response: none yet`,
       ``,
-      `Qwen generator (Arbiter narration)`,
+      `Qwen generator (${getNarratorName()} narration)`,
       `  Status: ${qwenStatus}`,
       `  Progress: ${(qwenFraction * 100).toFixed(0)}%`,
       `  Model: ${qwenModelId}`,
