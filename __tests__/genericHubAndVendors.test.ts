@@ -10,9 +10,12 @@ import {
   startingAreaForFaction,
   startingAreaAtLocation,
   getGenericVendors,
+  getGenericWasteland,
+  resolveTable,
 } from '../app/engine/contentPack';
 import { GENERIC_GAME } from '../app/engine/genericGame';
 import { getActiveVendors } from '../app/engine/vendors';
+import { GENERIC_TABLE_ROWS } from '../app/engine/genericTemplateData';
 
 describe('engine_Dev — generic game hub + vendors', () => {
   beforeEach(() => installGenericDefaults(GENERIC_GAME));
@@ -52,5 +55,27 @@ describe('engine_Dev — generic game hub + vendors', () => {
     clearGenericDefaults();
     expect(getGenericVendors()).toBeNull();
     expect(getActiveVendors().some((v) => v.name === 'Tellin Mak')).toBe(true);
+  });
+
+  it('generic LORE document resolves (no Tartaria canon) with an `always` block', () => {
+    const lore = resolveTable('lore') as Array<{ tags?: string[]; text?: string }>;
+    expect(Array.isArray(lore)).toBe(true);
+    expect(lore.length).toBeGreaterThan(0);
+    expect(lore.some((b) => Array.isArray(b.tags) && b.tags.includes('always'))).toBe(true);
+    expect(JSON.stringify(lore)).not.toMatch(/tartar|aether/i);
+  });
+
+  it('generic WASTELAND encounters are installed (no Tartaria archetypes leak)', () => {
+    const w = getGenericWasteland();
+    expect(w).toBeTruthy();
+    expect(Object.keys(w!).length).toBeGreaterThan(0);
+    expect(JSON.stringify(w)).not.toMatch(/tartar|aether/i);
+  });
+
+  it("the generic Cleansing Tonic recipe's ingredients all exist as generic materials", () => {
+    const mats = new Set(GENERIC_TABLE_ROWS.materials.map((m) => (m as { name: string }).name));
+    const tonic = GENERIC_TABLE_ROWS.recipes.find((r) => (r as { result: string }).result === 'Cleansing Tonic') as { ingredients: { name: string }[] };
+    expect(tonic).toBeTruthy();
+    for (const ing of tonic.ingredients) expect(mats.has(ing.name)).toBe(true);
   });
 });

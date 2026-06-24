@@ -15789,4 +15789,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stray "West": the generic yard's `west: 'world'` compass exit was redundant with the EXIT
 // button ("leave outpost") and rendered a confusing extra "West" — dropped it (room count
 // unchanged otherwise, per request). Tests lock all three. tsc 141 = baseline.
-export const OTA_BUILD_ID = '2026-06-24-825';
+//
+// engine_Dev-826 — fill three generic-game content gaps from the audit (all already
+// author-overridable via their existing JSON sections; this gives the GENERIC game its
+// own version so a default playthrough isn't missing them / leaking Tartaria):
+//  • LORE document — added LORE_DOC (4 keyworded "the Reaches" passages incl. an `always`
+//    block) to GENERIC_GAME.tables.lore; surfaces through the existing table resolver.
+//  • WASTELAND encounters — added a generic-default LAYER (GenericDefaultPack.wasteland +
+//    getGenericWasteland; getArchetypes now layers override → generic → built-in) +
+//    GENERIC_GAME.wasteland (3 road archetypes referencing generic enemies/loot).
+//  • Cleansing Tonic recipe — its 2nd ingredient (Red Cap Mushroom) wasn't in the generic
+//    materials, so it was uncraftable; added Red Cap Mushroom to GENERIC_TABLE_ROWS.materials
+//    (a foraged herb) so the recipe resolves from the materials set.
+// Tests lock all three + their setting-neutrality. tsc 141 = baseline. (Reference answers
+// given to the user: returnable:false ⇒ remote turn-in, else mapped/return; the mission
+// board is a room flag + the faction-quests JSON, not its own file; starting-area rooms are
+// already JSON via the startingAreas section.) NEXT: roadside traders / NPCs authorable.
+export const OTA_BUILD_ID = '2026-06-24-826';
