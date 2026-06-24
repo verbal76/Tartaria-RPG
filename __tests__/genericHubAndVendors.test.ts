@@ -12,6 +12,11 @@ import {
   getGenericVendors,
   getGenericWasteland,
   resolveTable,
+  getWorldTone,
+  getWorldSetting,
+  hasWorldLore,
+  setLoreOverride,
+  DEFAULT_WORLD_TONE,
 } from '../app/engine/contentPack';
 import { GENERIC_GAME } from '../app/engine/genericGame';
 import { getActiveVendors } from '../app/engine/vendors';
@@ -77,5 +82,30 @@ describe('engine_Dev — generic game hub + vendors', () => {
     const tonic = GENERIC_TABLE_ROWS.recipes.find((r) => (r as { result: string }).result === 'Cleansing Tonic') as { ingredients: { name: string }[] };
     expect(tonic).toBeTruthy();
     for (const ing of tonic.ingredients) expect(mats.has(ing.name)).toBe(true);
+  });
+
+  it('WORLD LORE: the built-in DEFAULT tone is setting-neutral (no Tartaria leak)', () => {
+    expect(DEFAULT_WORLD_TONE).not.toMatch(/tartar|aether|reclaimer/i);
+  });
+
+  it('WORLD LORE: the generic game supplies its own world tone/setting (not the default)', () => {
+    expect(hasWorldLore()).toBe(true);
+    expect(getWorldTone()).not.toBe(DEFAULT_WORLD_TONE);
+    expect(getWorldTone()).toMatch(/fallen world|ruins/i);
+    expect(getWorldSetting()).toMatch(/Reaches/);
+    expect(getWorldTone()).not.toMatch(/tartar|aether/i);
+  });
+
+  it('WORLD LORE: an author override still wins over the generic default', () => {
+    setLoreOverride('world', { tone: 'A 1943 occult war folded into a single doomed city.' });
+    expect(getWorldTone()).toMatch(/1943/);
+    setLoreOverride('world', null);
+    expect(getWorldTone()).toMatch(/fallen world|ruins/i); // back to generic
+  });
+
+  it('WORLD LORE: with the generic pack cleared, the tone falls to the NEUTRAL default', () => {
+    clearGenericDefaults();
+    expect(hasWorldLore()).toBe(false);
+    expect(getWorldTone()).toBe(DEFAULT_WORLD_TONE);
   });
 });

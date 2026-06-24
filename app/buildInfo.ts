@@ -15817,4 +15817,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // + Road Fence) on GENERIC_GAME. Tests: override-applies + spawner uses it + generic supplies
 // its own (no Tartaria leak) + malformed-drop + round-trip + bundle-completeness. With this,
 // EVERY major content type is reskinnable. tsc unchanged from baseline (zero new errors).
-export const OTA_BUILD_ID = '2026-06-24-827';
+//
+// engine_Dev-828 — WORLD LORE: neutralize the default + give the generic game its own.
+// getWorldTone/Setting/Terms/Vocabulary/Persona read only the author's `world` block else
+// the Tartaria DEFAULT_WORLD_TONE, with NO generic layer — so every default/custom game's
+// narrator was fed the Tartaria tone ("Reclaimers… the Aether…"). Fixes: (1) DEFAULT_WORLD_
+// TONE rewritten setting-neutral; (2) GenericDefaultPack.worldLore + a resolveWorldBlock()
+// helper (author override → installed generic → neutral default) now backs all five world
+// accessors; (3) new hasWorldLore() (override OR generic) replaces hasLoreOverride('world')
+// as the narration-injection gate so the generic game's setting/terms/vocab actually fire;
+// (4) GENERIC_GAME.worldLore — a coherent "the Reaches" tone/setting/persona/terms/vocab.
+// Author World-lore uploads still win. Tests lock the layering + neutrality. tsc baseline.
+export const OTA_BUILD_ID = '2026-06-24-828';
