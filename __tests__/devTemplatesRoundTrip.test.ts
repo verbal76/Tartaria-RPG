@@ -42,7 +42,7 @@ import {
 } from '../app/engine/contentTemplates';
 import { CONTENT_TABLES, LORE_BLOCKS, clearAllOverrides } from '../app/engine/contentPack';
 import { GENERIC_TABLE_ROWS } from '../app/engine/genericTemplateData';
-import { useContentPackStore } from '../app/state/contentPackStore';
+import { useContentPackStore, stripJsonComments } from '../app/state/contentPackStore';
 
 const store = () => useContentPackStore.getState();
 beforeEach(() => { store().clearAll(); clearAllOverrides(); });
@@ -80,6 +80,22 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
   ];
   test.each(special)('special template loads: %s', (_name, load) => {
     expect(load().ok).toBe(true);
+  });
+
+  // REGRESSION (engine_Dev-817): the INTERACTION TAGS "↻ FROM WORLD" button parsed the
+  // freshly built template to count its keys. The template carries a `//` instruction
+  // header, so a RAW JSON.parse threw "Unexpected character: /" and crashed the dev
+  // panel to desktop. Any consumer that parses a build*Template() string MUST run it
+  // through stripJsonComments first — lock that invariant for the interaction-tags box.
+  test('FROM WORLD: interaction-tags template needs stripping before parse (no raw-parse crash)', () => {
+    store().loadTableJson('locations', JSON.stringify([{ id: 'x', interactables: ['door', 'wall', 'crate'] }]));
+    const built = buildInteractionTagsTemplate({ door: ['breakable'] });
+    // The raw string is intentionally NOT valid JSON (it leads with a `//` header)…
+    expect(() => JSON.parse(built)).toThrow();
+    // …but stripped it parses to the per-noun tag object the panel counts.
+    const parsed = JSON.parse(stripJsonComments(built)) as Record<string, unknown>;
+    expect(typeof parsed).toBe('object');
+    expect(Object.keys(parsed).length).toBeGreaterThan(0);
   });
 
   // The WHOLE-GAME file (blank, all-template) must apply through loadGameBundle, which

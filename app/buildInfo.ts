@@ -15677,4 +15677,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // catches golem / mud dweller / core guardian, and the per-table check renders WITH the
 // optional-field notes (the channel `aether_powers` had hidden in) so nothing can
 // regress. Whole-bundle + all table/lore templates now assert fully generic.
-export const OTA_BUILD_ID = '2026-06-24-816';
+//
+// engine_Dev-817 — FIX a fatal dev-panel crash: the INTERACTION TAGS "↻ FROM WORLD"
+// button built the per-noun template (which leads with a `//` instruction header) and
+// then called JSON.parse on it RAW to count the keys — the bare `/` threw "JSON Parse
+// error: Unexpected character: /" and crashed the app to desktop. Now strips comments
+// (the shared stripJsonComments the loaders already use) before the count AND guards it
+// in try/catch so a count can never be fatal. Audited every JSON.parse in the dev panel
+// — this was the only unstripped/unguarded one. Regression test locks the invariant.
+export const OTA_BUILD_ID = '2026-06-24-817';
