@@ -15920,4 +15920,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the template + refresh your upload"). Also fixed an 835 follow-on: loadTitlesJson now tolerates
 // built-in-id re-skin entries (id+name, no track/threshold). New templateVersioning test. tsc
 // baseline; templateVersioning/customTitleRoster/devTemplatesRoundTrip/title suites green.
+//
+// (re-publish trigger — no code change: 836's OTA publish failed when GitHub Actions minutes
+// were exhausted; this republishes the same 836 build once minutes were restored.)
 export const OTA_BUILD_ID = '2026-06-24-836';
