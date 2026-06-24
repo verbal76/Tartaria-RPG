@@ -142,7 +142,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)}>
+    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
       {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
     </TouchableOpacity>
   );
@@ -156,7 +156,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
-        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
           {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
         </TouchableOpacity>
       ) : (
@@ -357,7 +357,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   wrap: { width: '100%' },
-  wrapFill: { flex: 1 },
+  // engine_Dev — combat arena: the enemy column becomes a tall filled box (matches the char box),
+  // and every link in the flex chain (wrap → TouchableOpacity → ScrollView) fills so it doesn't
+  // collapse to zero height.
+  wrapFill: { flex: 1, backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 6, overflow: 'hidden' },
+  fillTouch: { flex: 1 },
   card: {
     backgroundColor: '#0e1618',
     borderColor: '#5a2a26',

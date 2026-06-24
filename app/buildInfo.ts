@@ -16028,4 +16028,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // + EnemyPanel get a `fill` prop so each is ONE long box on its side. tsc baseline 142.
 //
 // engine_Dev-850 — splash poster +50% (caps 0.56→0.84 width / 0.54→0.81 height), still centered.
-export const OTA_BUILD_ID = '2026-06-24-850';
+//
+// engine_Dev-851 — combat arena + roll popup fixes. (1) The char/enemy columns are now EQUAL halves
+// (combatColEqual overrides statsCol's 1.2) so the char box no longer runs past the screen middle,
+// and the EnemyPanel `fill` flex chain is fixed (wrap → TouchableOpacity → ScrollView all flex:1,
+// wrap painted as a tall box) so the enemy box actually shows as one long box on its side. (2) The
+// result popup no longer mirrors the dice roller per step — it now fires ONCE when a roll sequence
+// resolves in combat and shows the FINAL output line (the narration that the hidden feed would
+// show), held ~2s. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-851';
