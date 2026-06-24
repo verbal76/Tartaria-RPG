@@ -36,7 +36,7 @@ jest.mock('expo-application', () => ({ nativeApplicationVersion: '0', applicatio
 import {
   getTableTemplate, getLoreTemplate,
   buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate,
-  buildTitlesTemplate, buildStartingAreasTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildScenePropsTemplate, buildVendorsTemplate,
+  buildTitlesTemplate, buildStartingAreasTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildScenePropsTemplate, buildVendorsTemplate, buildRoadsideTradersTemplate,
   buildInteractionTagsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildAnnotatedGameBundle,
   buildGameBundleTemplate,
 } from '../app/engine/contentTemplates';
@@ -70,6 +70,7 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     ['summons', () => store().loadSummonsJson(buildSummonsTemplate())],
     ['sceneProps', () => store().loadScenePropsJson(buildScenePropsTemplate())],
     ['vendors', () => store().loadVendorsJson(buildVendorsTemplate())],
+    ['roadsideTraders', () => store().loadRoadsideTradersJson(buildRoadsideTradersTemplate())],
     // interactionTags collects nouns from LOADED content only, so seed a locations
     // upload first; then the template is non-empty and round-trips.
     ['interactionTags', () => { store().loadTableJson('locations', JSON.stringify([{ id: 'x', interactables: ['door', 'wall', 'crate'] }])); return store().loadInteractionTagsJson(buildInteractionTagsTemplate()); }],
@@ -160,7 +161,7 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
       ...CONTENT_TABLES.map((x) => x.id), ...LORE_BLOCKS.map((x) => x.id),
       // special content
       'missions', 'hooks', 'wasteland', 'titles', 'mainQuest', 'bosses', 'startingAreas',
-      'interactionTags', 'sceneProps', 'vendors', 'summons', 'dogEnabled', 'damageTypes', 'damageResistances',
+      'interactionTags', 'sceneProps', 'vendors', 'roadsideTraders', 'summons', 'dogEnabled', 'damageTypes', 'damageResistances',
       'fusionTags', 'coatings', 'digging', 'scrap', 'salvage', 'overlays', 'inventory', 'collectables', 'whispers',
     ];
     for (const key of required) expect(t).toContain(`"${key}"`);

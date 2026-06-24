@@ -91,6 +91,7 @@ interface GenericDefaultPack {
   summons?: { noun?: string; defs: unknown[] };
   whispers?: unknown[];
   vendors?: unknown[];
+  roadsideTraders?: unknown[];
   wasteland?: Record<string, unknown>;
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
@@ -113,6 +114,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.summons = pack.summons;
   genericDefaults.whispers = pack.whispers;
   genericDefaults.vendors = pack.vendors;
+  genericDefaults.roadsideTraders = pack.roadsideTraders;
   genericDefaults.wasteland = pack.wasteland;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
@@ -135,6 +137,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.summons = undefined;
   genericDefaults.whispers = undefined;
   genericDefaults.vendors = undefined;
+  genericDefaults.roadsideTraders = undefined;
   genericDefaults.wasteland = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
@@ -922,6 +925,23 @@ export function setVendorsOverride(arr: unknown[] | null): void {
 export function hasVendorsOverride(): boolean { return vendorsOverride != null; }
 export function getVendorsOverride(): unknown[] | null { return vendorsOverride; }
 
+// --- roadside traders override --------------------------------------------------
+// engine_Dev — the wandering market-stall archetypes the engine spawns on the road. An
+// uploaded array replaces the built-in pool so an author ships their own. Each archetype:
+// { id, name, title, demeanor: 'honest'|'sketchy', description, pool: [{ itemName,
+// priceMin, priceMax, weight }] }.
+let roadsideOverride: unknown[] | null = null;
+export function setRoadsideOverride(arr: unknown[] | null): void {
+  roadsideOverride = arr && arr.length > 0 ? arr : null;
+}
+export function hasRoadsideOverride(): boolean { return roadsideOverride != null; }
+export function getRoadsideOverride(): unknown[] | null { return roadsideOverride; }
+/** The generic game's roadside archetypes, if installed (else null). The resolver layers
+ *  author override → this → built-in Tartaria pool. */
+export function getGenericRoadside(): unknown[] | null {
+  return genericDefaults.roadsideTraders && genericDefaults.roadsideTraders.length > 0 ? genericDefaults.roadsideTraders : null;
+}
+
 // --- interaction tags override --------------------------------------------------
 // engine_Dev — the keyword lists that decide which interactable nouns are
 // climbable / swimmable / breakable / searchable / salvageable. Uploaded as
@@ -1082,6 +1102,7 @@ export function clearAllOverrides(): void {
   setWastelandOverride(null);
   setScenePropsOverride(null);
   setVendorsOverride(null);
+  setRoadsideOverride(null);
   setInteractionTagsOverride(null);
   setStartingAreasOverride(null);
   narratorNameOverride = null;

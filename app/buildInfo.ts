@@ -15805,4 +15805,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // given to the user: returnable:false ⇒ remote turn-in, else mapped/return; the mission
 // board is a room flag + the faction-quests JSON, not its own file; starting-area rooms are
 // already JSON via the startingAreas section.) NEXT: roadside traders / NPCs authorable.
-export const OTA_BUILD_ID = '2026-06-24-826';
+//
+// engine_Dev-827 — make ROADSIDE TRADERS author-overridable (the last content type still
+// hardcoded outside the override system). Full section, mirroring vendors (824): contentPack
+// registry (setRoadsideOverride/get/has + clearAll) + generic-default layer (GenericDefaultPack
+// .roadsideTraders + getGenericRoadside); vendors.ts getActiveRoadside() layers override →
+// generic → built-in (drops malformed archetypes) and pickRoadsideTrader() uses it;
+// contentPackStore loadRoadsideTradersJson (bare array or { archetypes: [...] }) + clear +
+// state + persist + reapply + hydrate + whole-game bundle apply (key "roadsideTraders") +
+// PersistShape; buildRoadsideTradersTemplate() + bundle entry; GENERIC_ROADSIDE (Road Hawker
+// + Road Fence) on GENERIC_GAME. Tests: override-applies + spawner uses it + generic supplies
+// its own (no Tartaria leak) + malformed-drop + round-trip + bundle-completeness. With this,
+// EVERY major content type is reskinnable. tsc unchanged from baseline (zero new errors).
+export const OTA_BUILD_ID = '2026-06-24-827';

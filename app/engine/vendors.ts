@@ -88,6 +88,23 @@ interface RoadsideArchetype {
 }
 const ROADSIDE = (roadsideData as { archetypes: RoadsideArchetype[] });
 
+/** The live roadside-trader archetypes: author override → installed GENERIC default →
+ *  built-in pool. Malformed rows (missing name/pool) are dropped so a bad upload can't
+ *  crash the spawner. */
+export function getActiveRoadside(): RoadsideArchetype[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('./contentPack') as typeof import('./contentPack');
+  const ov = cp.getRoadsideOverride() ?? cp.getGenericRoadside();
+  if (!ov || ov.length === 0) return ROADSIDE.archetypes;
+  const valid = ov.filter(
+    (a): a is RoadsideArchetype =>
+      !!a && typeof a === 'object' &&
+      typeof (a as RoadsideArchetype).name === 'string' &&
+      Array.isArray((a as RoadsideArchetype).pool) && (a as RoadsideArchetype).pool.length > 0,
+  );
+  return valid.length > 0 ? valid : ROADSIDE.archetypes;
+}
+
 export interface VendorTemplate {
   id: string;
   name: string;
@@ -176,7 +193,8 @@ export function pickRandomVendor(): VendorInstance {
 // outdoor (non-hub) peaceful scenes so the player has somewhere cheap
 // to spend small TC drops.
 export function pickRoadsideTrader(): VendorInstance {
-  const arch = ROADSIDE.archetypes[Math.floor(Math.random() * ROADSIDE.archetypes.length)]!;
+  const pool = getActiveRoadside();
+  const arch = pool[Math.floor(Math.random() * pool.length)]!;
   const n = 3 + Math.floor(Math.random() * 4); // 3-6 offers
   const picked = new Set<string>();
   const offers: VendorOffer[] = [];

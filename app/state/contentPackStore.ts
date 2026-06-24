@@ -22,6 +22,7 @@ import {
   type ScenePropsOverride,
   type ScenePropSpawn,
   setVendorsOverride,
+  setRoadsideOverride,
   setInteractionTagsOverride,
   setStartingAreasOverride,
   setCustomTitlesOverride,
@@ -120,6 +121,7 @@ interface PersistShape {
   wasteland?: Record<string, unknown>;
   sceneProps?: ScenePropsOverride;
   vendors?: unknown[];
+  roadsideTraders?: unknown[];
   interactionTags?: Record<string, string[]>;
   startingAreas?: unknown[];
   customTitles?: unknown[];
@@ -185,6 +187,7 @@ interface ContentPackState {
   sceneProps: ScenePropsOverride;
   /** Uploaded named vendors (array of trader rows). Empty = built-in. */
   vendors: unknown[];
+  roadsideTraders: unknown[];
   /** Uploaded interaction-tag keyword additions ({ climbable: [...], … }). Empty = built-in. */
   interactionTags: Record<string, string[]>;
   /** Uploaded per-faction starting areas (array of 4-room instances + placement). */
@@ -288,6 +291,10 @@ interface ContentPackState {
    *  offers: [{ itemName, price, quantity? }], voiceId?, gender? }. Replaces the built-in
    *  trader pool the engine spawns. */
   loadVendorsJson: (json: string) => BundleLoadResult;
+  /** Parse a roadside-traders array (JSONC). Each archetype: { id, name, title, demeanor:
+   *  "honest"|"sketchy", description, pool: [{ itemName, priceMin, priceMax, weight }] }.
+   *  Replaces the built-in wandering-stall pool. */
+  loadRoadsideTradersJson: (json: string) => BundleLoadResult;
   /** Parse an interaction-tags object (JSONC): { climbable, swimmable, breakable,
    *  searchable, salvageable } keyword lists; the author's words are added to the
    *  built-in generic set. */
@@ -362,6 +369,8 @@ interface ContentPackState {
   clearSceneProps: () => void;
   /** Drop the uploaded named vendors back to the built-in set. */
   clearVendors: () => void;
+  /** Drop the uploaded roadside traders back to the built-in set. */
+  clearRoadsideTraders: () => void;
   /** Drop the uploaded interaction-tag keywords back to the built-in set. */
   clearInteractionTags: () => void;
   /** Drop the uploaded starting areas. */
@@ -371,7 +380,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -381,6 +390,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     wasteland: Object.keys(state.wasteland).length > 0 ? state.wasteland : undefined,
     sceneProps: ((state.sceneProps.climbables?.length ?? 0) + (state.sceneProps.salvageables?.length ?? 0)) > 0 ? state.sceneProps : undefined,
     vendors: state.vendors.length > 0 ? state.vendors : undefined,
+    roadsideTraders: state.roadsideTraders.length > 0 ? state.roadsideTraders : undefined,
     interactionTags: Object.keys(state.interactionTags).length > 0 ? state.interactionTags : undefined,
     startingAreas: state.startingAreas.length > 0 ? state.startingAreas : undefined,
     customTitles: state.customTitles.length > 0 ? state.customTitles : undefined,
@@ -423,6 +433,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   wasteland: {},
   sceneProps: {},
   vendors: [],
+  roadsideTraders: [],
   interactionTags: {},
   startingAreas: [],
   customTitles: [],
@@ -471,6 +482,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setWastelandOverride(Object.keys(s.wasteland).length > 0 ? s.wasteland : null);
     setScenePropsOverride(s.sceneProps ?? null);
     setVendorsOverride(s.vendors.length > 0 ? s.vendors : null);
+    setRoadsideOverride(s.roadsideTraders.length > 0 ? s.roadsideTraders : null);
     setInteractionTagsOverride(Object.keys(s.interactionTags).length > 0 ? s.interactionTags : null);
     invalidateInteractionTagCache();
     setStartingAreasOverride(s.startingAreas.length > 0 ? s.startingAreas : null);
@@ -798,6 +810,35 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     set({ vendors, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), vendors });
     return { ok: true, summary: `Loaded ${valid.length} named vendor(s).` };
+  },
+
+  loadRoadsideTradersJson(json) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(stripJsonComments(json));
+    } catch (e) {
+      return { ok: false, error: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` };
+    }
+    // Accept a bare array OR an object wrapped under "archetypes" / "roadsideTraders".
+    const arr = Array.isArray(parsed)
+      ? parsed
+      : parsed && typeof parsed === 'object'
+        ? (parsed as { archetypes?: unknown; roadsideTraders?: unknown }).archetypes ?? (parsed as { roadsideTraders?: unknown }).roadsideTraders
+        : null;
+    if (!Array.isArray(arr)) {
+      return { ok: false, error: 'Roadside traders must be a JSON ARRAY (or { "archetypes": [...] }) of trader archetypes.' };
+    }
+    const valid = arr.filter(
+      (a) => !!a && typeof a === 'object' && typeof (a as { name?: unknown }).name === 'string' && Array.isArray((a as { pool?: unknown }).pool) && ((a as { pool: unknown[] }).pool).length > 0,
+    );
+    if (valid.length === 0) {
+      return { ok: false, error: 'No archetypes found. Each needs { "name", "pool": [{ "itemName", "priceMin", "priceMax", "weight" }] }.' };
+    }
+    setRoadsideOverride(valid);
+    const roadsideTraders = valid;
+    set({ roadsideTraders, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), roadsideTraders });
+    return { ok: true, summary: `Loaded ${valid.length} roadside-trader archetype(s).` };
   },
 
   loadInteractionTagsJson(json) {
@@ -1244,6 +1285,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextWasteland: Record<string, unknown> = get().wasteland;
     let nextSceneProps: ScenePropsOverride = get().sceneProps;
     let nextVendors: unknown[] = get().vendors;
+    let nextRoadside: unknown[] = get().roadsideTraders;
     let nextInteractionTags: Record<string, string[]> = get().interactionTags;
     let nextStartingAreas: unknown[] = get().startingAreas;
     let nextCustomTitles: unknown[] = get().customTitles;
@@ -1311,6 +1353,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'vendors') {
         if (Array.isArray(value) && value.length > 0) { nextVendors = value; applied.push(`vendors (${value.length})`); }
         else skipped.push('vendors (empty/not an array)');
+      } else if (key === 'roadsideTraders') {
+        if (Array.isArray(value) && value.length > 0) { nextRoadside = value; applied.push(`roadside traders (${value.length})`); }
+        else skipped.push('roadsideTraders (empty/not an array)');
       } else if (key === 'interactionTags') {
         if (value && typeof value === 'object' && !Array.isArray(value)) { nextInteractionTags = value as Record<string, string[]>; applied.push('interaction tags'); }
         else skipped.push('interactionTags (not an object)');
@@ -1436,6 +1481,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setWastelandOverride(Object.keys(nextWasteland).length > 0 ? nextWasteland : null);
     setScenePropsOverride(nextSceneProps ?? null);
     setVendorsOverride(nextVendors.length > 0 ? nextVendors : null);
+    setRoadsideOverride(nextRoadside.length > 0 ? nextRoadside : null);
     setInteractionTagsOverride(Object.keys(nextInteractionTags).length > 0 ? nextInteractionTags : null);
     invalidateInteractionTagCache();
     setStartingAreasOverride(nextStartingAreas.length > 0 ? nextStartingAreas : null);
@@ -1473,6 +1519,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       wasteland: nextWasteland,
       sceneProps: nextSceneProps,
       vendors: nextVendors,
+      roadsideTraders: nextRoadside,
       interactionTags: nextInteractionTags,
       startingAreas: nextStartingAreas,
       customTitles: nextCustomTitles,
@@ -1502,7 +1549,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       energyName: nextEnergyName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
+    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, roadsideTraders: nextRoadside, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };
@@ -1621,6 +1668,13 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), vendors });
   },
 
+  clearRoadsideTraders() {
+    setRoadsideOverride(null);
+    const roadsideTraders: unknown[] = [];
+    set({ roadsideTraders, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), roadsideTraders });
+  },
+
   clearInteractionTags() {
     setInteractionTagsOverride(null);
     invalidateInteractionTagCache();
@@ -1641,7 +1695,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, sceneProps: {}, vendors: [], interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, sidekickWeaponQuestPct: 0, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, sceneProps: {}, vendors: [], roadsideTraders: [], interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, sidekickWeaponQuestPct: 0, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1671,6 +1725,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setScenePropsOverride(sceneProps);
         const vendors = Array.isArray(shape.vendors) ? shape.vendors : [];
         setVendorsOverride(vendors.length > 0 ? vendors : null);
+        const roadsideTraders = Array.isArray(shape.roadsideTraders) ? shape.roadsideTraders : [];
+        setRoadsideOverride(roadsideTraders.length > 0 ? roadsideTraders : null);
         const interactionTags = shape.interactionTags && typeof shape.interactionTags === 'object' ? shape.interactionTags : {};
         setInteractionTagsOverride(Object.keys(interactionTags).length > 0 ? interactionTags : null);
         invalidateInteractionTagCache();
@@ -1733,7 +1789,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
