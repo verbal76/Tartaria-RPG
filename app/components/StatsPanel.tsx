@@ -216,7 +216,7 @@ export function StatsPanel({ player }: Props) {
   // OTA-145 — golem name displays under the dog name, right-aligned.
   // Playtester: "the golem.name.shluld be under the dogs in the
   // character box."
-  const golemShows = !!player.golem && player.golem.hp > 0;
+  const golemShows = !!player.sidekick && player.sidekick.hp > 0;
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
@@ -231,10 +231,10 @@ export function StatsPanel({ player }: Props) {
           </Text>
         ) : null}
       </View>
-      {golemShows && player.golem ? (
+      {golemShows && player.sidekick ? (
         <View style={styles.golemRow}>
           <Text style={styles.golemName} numberOfLines={1}>
-            {player.golem.name} ({player.golem.hp}/{player.golem.hpMax})
+            {player.sidekick.name} ({player.sidekick.hp}/{player.sidekick.hpMax})
           </Text>
         </View>
       ) : null}

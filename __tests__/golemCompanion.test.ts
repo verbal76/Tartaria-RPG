@@ -1,10 +1,10 @@
 // 2026-05-25 [MECHANIC-1b] — Golem sidekick combat companion test.
 // Covers:
-//   - summon path consumes the recipe's fuel set + creates player.golem
+//   - summon path consumes the recipe's fuel set + creates player.sidekick
 //   - duplicate summon refusal when a golem already exists
 //   - command-golem strike damages enemy + retaliation routes to golem HP
-//   - golem HP ≤ 0 → clear player.golem
-//   - dismiss path clears player.golem
+//   - golem HP ≤ 0 → clear player.sidekick
+//   - dismiss path clears player.sidekick
 //   - parseSidekickKind picks the right kind from input text
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -151,16 +151,16 @@ describe('MECHANIC-1b — golem sidekick', () => {
     });
   });
 
-  describe('summon → player.golem written', () => {
+  describe('summon → player.sidekick written', () => {
     it('writes a mud_golem when fuel is present + skill check is forced to succeed', async () => {
       const store = await bootstrap(mudGolemFuelStock());
       const before = store.getState().player!;
-      expect(before.golem).toBeFalsy();
+      expect(before.sidekick).toBeFalsy();
 
       // Stack the deck — int 20 + mud_dweller (DC 15, +0 racial, +2 INT
       // bonus) means total > DC on any non-1 roll. Spam should land.
       let attempts = 0;
-      while (!store.getState().player?.golem && attempts < 12) {
+      while (!store.getState().player?.sidekick && attempts < 12) {
         store.getState().submitPlayerAction('summon golem');
         attempts++;
         // Restock fuel between attempts because failed attempts also burn it.
@@ -170,37 +170,37 @@ describe('MECHANIC-1b — golem sidekick', () => {
           store.setState({ player: { ...store.getState().player!, inventory: mudGolemFuelStock() } });
         }
       }
-      const golem = store.getState().player?.golem;
+      const golem = store.getState().player?.sidekick;
       expect(golem).toBeTruthy();
       expect(golem?.kind).toBe('mud_golem');
       expect(golem?.hp).toBe(golem?.hpMax);
     });
   });
 
-  describe('dismiss clears player.golem', () => {
+  describe('dismiss clears player.sidekick', () => {
     it('clears the golem on "dismiss golem"', async () => {
       const store = await bootstrap();
       // Force a golem directly so we test the dismiss path in isolation.
       const golem = makeCompanion(SIDEKICK_DEFINITIONS.iron_golem);
-      store.setState({ player: { ...store.getState().player!, golem } });
-      expect(store.getState().player!.golem).toBeTruthy();
+      store.setState({ player: { ...store.getState().player!, sidekick: golem } });
+      expect(store.getState().player!.sidekick).toBeTruthy();
 
       store.getState().submitPlayerAction('dismiss golem');
-      expect(store.getState().player!.golem).toBeNull();
+      expect(store.getState().player!.sidekick).toBeNull();
     });
   });
 
   describe('golem persists across cardinal moves', () => {
-    it('player.golem survives a stepDirection call', async () => {
+    it('player.sidekick survives a stepDirection call', async () => {
       const store = await bootstrap();
       const golem = makeCompanion(SIDEKICK_DEFINITIONS.aether_golem);
-      store.setState({ player: { ...store.getState().player!, golem } });
+      store.setState({ player: { ...store.getState().player!, sidekick: golem } });
 
       store.getState().stepDirection('east');
       // Step direction may move the player or fire spawn rolls, but
       // shouldn't touch the golem (POLISH-4 path only clears vendor).
-      expect(store.getState().player!.golem).toBeTruthy();
-      expect(store.getState().player!.golem!.kind).toBe('aether_golem');
+      expect(store.getState().player!.sidekick).toBeTruthy();
+      expect(store.getState().player!.sidekick!.kind).toBe('aether_golem');
     });
   });
 
@@ -226,17 +226,17 @@ describe('MECHANIC-1b — golem sidekick', () => {
         // PLAYER (closed the risk-free group-grind exploit). This test measures
         // the GOLEM's retaliation, so give the player enough HP to survive the
         // Apex Guardian's swing and keep the golem assertion isolated.
-        player: { ...store.getState().player!, golem, hp: 1000000, hpMax: 1000000 },
+        player: { ...store.getState().player!, sidekick: golem, hp: 1000000, hpMax: 1000000 },
         currentScene: {
           ...scene, enemies: [enemy as never], enemyHps: [100000], activeEnemyIdx: 0,
           range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
         },
       });
 
-      const golemHpBefore = store.getState().player!.golem!.hp;
+      const golemHpBefore = store.getState().player!.sidekick!.hp;
       await store.getState().submitPlayerAction('golem attack');
 
-      const after = store.getState().player!.golem!;
+      const after = store.getState().player!.sidekick!;
       // 10d10 is at least 10 — comfortably above the old flat cap of 7.
       expect(after.hp).toBeLessThanOrEqual(golemHpBefore - 8);
       // OTA-611 — and the player took the group's volley too (no longer risk-free).
@@ -263,7 +263,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const tcBefore = p0.tc;
       const killsBefore = p0.milestones?.enemiesDefeated ?? 0;
       store.setState({
-        player: { ...p0, golem },
+        player: { ...p0, sidekick: golem },
         currentScene: {
           ...scene, enemies: [enemy as never], enemyHps: [1], activeEnemyIdx: 0,
           range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
@@ -302,12 +302,12 @@ describe('MECHANIC-1b — golem sidekick', () => {
       ]);
       const p0 = store.getState().player!;
       const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 5 }; // hurt, hpMax 24
-      store.setState({ player: { ...p0, golem } });
+      store.setState({ player: { ...p0, sidekick: golem } });
 
       store.getState().submitPlayerAction('feed golem scrap metal');
 
       const after = store.getState().player!;
-      expect(after.golem!.hp).toBe(18); // arb170 — 5 + 13 (round(40/3))
+      expect(after.sidekick!.hp).toBe(18); // arb170 — 5 + 13 (round(40/3))
       expect((after.inventory.find((i) => i.name === 'Scrap Metal')?.quantity) ?? 0).toBe(1);
     });
 
@@ -317,12 +317,12 @@ describe('MECHANIC-1b — golem sidekick', () => {
       ]);
       const p0 = store.getState().player!;
       const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 5 };
-      store.setState({ player: { ...p0, golem } });
+      store.setState({ player: { ...p0, sidekick: golem } });
 
       store.getState().submitPlayerAction('feed golem aether mud');
 
       const after = store.getState().player!;
-      expect(after.golem!.hp).toBe(5); // unchanged
+      expect(after.sidekick!.hp).toBe(5); // unchanged
       expect((after.inventory.find((i) => i.name === 'Aether Mud')?.quantity) ?? 0).toBe(1); // not consumed
       // arb121 — refusal now reads "mends best … or, at half worth, any raw <element> scrap"
       // (a true non-matching item like tagless Aether Mud on an IRON golem still won't take).
@@ -338,14 +338,14 @@ describe('MECHANIC-1b — golem sidekick', () => {
       ]);
       const p0 = store.getState().player!;
       const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.aether_golem), hp: 1 };
-      store.setState({ player: { ...p0, golem } });
+      store.setState({ player: { ...p0, sidekick: golem } });
       // arb170 — aether golem full part = round(34/3) = 11. Common substitute = floor(11 * 0.25) = 2.
       store.getState().submitPlayerAction('feed golem aether dust');
-      expect(store.getState().player!.golem!.hp).toBe(3); // 1 + 2 (Common = quarter)
+      expect(store.getState().player!.sidekick!.hp).toBe(3); // 1 + 2 (Common = quarter)
       expect((store.getState().player!.inventory.find((i) => i.name === 'Aether Dust')?.quantity) ?? 0).toBe(1);
       // Uncommon substitute = floor(11 * 0.5) = 5.
       store.getState().submitPlayerAction('feed golem aether residue');
-      expect(store.getState().player!.golem!.hp).toBe(8); // 3 + 5 (Uncommon = half)
+      expect(store.getState().player!.sidekick!.hp).toBe(8); // 3 + 5 (Uncommon = half)
     });
 
     it('arb122 — the substitute system covers MUD and IRON golems too (generic by element tag)', async () => {
@@ -355,40 +355,40 @@ describe('MECHANIC-1b — golem sidekick', () => {
         { id: 'bn', name: 'Bent Nail', kind: 'misc', rarity: 'Common', quantity: 1, tags: ['metal', 'junk', 'scrap'] } as never,
       ]);
       const p0 = store.getState().player!;
-      store.setState({ player: { ...p0, golem: { ...makeCompanion(SIDEKICK_DEFINITIONS.mud_golem), hp: 1 } } });
+      store.setState({ player: { ...p0, sidekick: { ...makeCompanion(SIDEKICK_DEFINITIONS.mud_golem), hp: 1 } } });
       store.getState().submitPlayerAction('feed golem mudstone'); // arb170 — Rare mud → floor(8 * 0.75) = 6
-      expect(store.getState().player!.golem!.hp).toBe(7); // 1 + 6
+      expect(store.getState().player!.sidekick!.hp).toBe(7); // 1 + 6
 
       // arb170 — IRON golem (hpMax 40 → full part 13) mends from common metal scrap.
       const p1 = store.getState().player!;
-      store.setState({ player: { ...p1, golem: { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 1 } } });
+      store.setState({ player: { ...p1, sidekick: { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 1 } } });
       store.getState().submitPlayerAction('feed golem bent nail'); // arb170 — Common metal → floor(13 * 0.25) = 3
-      expect(store.getState().player!.golem!.hp).toBe(4); // 1 + 3
+      expect(store.getState().player!.sidekick!.hp).toBe(4); // 1 + 3
     });
 
     it('naming takeover: the input after a summon names the golem', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
       // Simulate the post-summon state the summon path sets.
-      store.setState({ player: { ...p0, golem: makeCompanion(SIDEKICK_DEFINITIONS.mud_golem) }, pendingSidekickNaming: true });
+      store.setState({ player: { ...p0, sidekick: makeCompanion(SIDEKICK_DEFINITIONS.mud_golem) }, pendingSidekickNaming: true });
 
       store.getState().submitPlayerAction('Clanker');
 
       const after = store.getState();
       expect(after.pendingSidekickNaming).toBe(false);
-      expect(after.player!.golem!.name).toBe('Clanker');
+      expect(after.player!.sidekick!.name).toBe('Clanker');
     });
 
     it('naming takeover: "skip" keeps the type label', async () => {
       const store = await bootstrap();
       const p0 = store.getState().player!;
-      store.setState({ player: { ...p0, golem: makeCompanion(SIDEKICK_DEFINITIONS.mud_golem) }, pendingSidekickNaming: true });
+      store.setState({ player: { ...p0, sidekick: makeCompanion(SIDEKICK_DEFINITIONS.mud_golem) }, pendingSidekickNaming: true });
 
       store.getState().submitPlayerAction('skip');
 
       const after = store.getState();
       expect(after.pendingSidekickNaming).toBe(false);
-      expect(after.player!.golem!.name).toBe('Mud Golem');
+      expect(after.player!.sidekick!.name).toBe('Mud Golem');
     });
   });
 
@@ -425,7 +425,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       };
       const scene = store.getState().currentScene!;
       store.setState({
-        player: { ...p0, golem },
+        player: { ...p0, sidekick: golem },
         currentScene: {
           ...scene, enemies: [enemy as never], enemyHps: [500], activeEnemyIdx: 0,
           range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
@@ -434,7 +434,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
 
       await store.getState().submitPlayerAction('golem attack');
 
-      const after = store.getState().player!.golem!;
+      const after = store.getState().player!.sidekick!;
       // Strike landed → power progress; the dummy hit back (atk vs AC 11) often
       // enough that across a few asserts we at least see power trained.
       expect((after.statProgress?.power ?? 0)).toBeGreaterThan(0);
@@ -450,21 +450,21 @@ describe('MECHANIC-1b — golem sidekick', () => {
       ]);
       const p0 = store.getState().player!;
       // A MUD golem (any kind) CAN wield the universal greatsword.
-      store.setState({ player: { ...p0, golem: makeCompanion(SIDEKICK_DEFINITIONS.mud_golem) } });
+      store.setState({ player: { ...p0, sidekick: makeCompanion(SIDEKICK_DEFINITIONS.mud_golem) } });
       store.getState().submitPlayerAction('arm golem with Sidekick Greatsword');
-      const g = store.getState().player!.golem!;
+      const g = store.getState().player!.sidekick!;
       expect(g.weapon?.name).toBe('Sidekick Greatsword');
       expect(g.weapon?.durability?.current).toBeGreaterThan(0);
       expect(store.getState().player!.inventory.some((i) => i.name === 'Sidekick Greatsword')).toBe(false);
 
       // A normal (non-golem) weapon is refused — golem keeps the greatsword.
       store.getState().submitPlayerAction('arm golem with Tartarian Spear');
-      expect(store.getState().player!.golem!.weapon?.name).toBe('Sidekick Greatsword');
+      expect(store.getState().player!.sidekick!.weapon?.name).toBe('Sidekick Greatsword');
       expect(store.getState().player!.inventory.some((i) => i.name === 'Tartarian Spear')).toBe(true);
 
       // Disarm returns the greatsword to the pack.
       store.getState().submitPlayerAction('disarm golem');
-      expect(store.getState().player!.golem!.weapon ?? null).toBeNull();
+      expect(store.getState().player!.sidekick!.weapon ?? null).toBeNull();
       expect(store.getState().player!.inventory.some((i) => i.name === 'Sidekick Greatsword')).toBe(true);
     });
 
@@ -475,12 +475,12 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.crystal_golem), hp: 200, hpMax: 200, hitBonus: 40, weapon: weapon as never };
       const scene = store.getState().currentScene!;
       store.setState({
-        player: { ...p0, golem },
+        player: { ...p0, sidekick: golem },
         currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
       });
       // 3 strikes: weapon (durability 3) wears to 0 and shatters → golem.weapon cleared.
       for (let i = 0; i < 3; i++) await store.getState().submitPlayerAction('golem attack');
-      const g = store.getState().player!.golem!;
+      const g = store.getState().player!.sidekick!;
       expect(g.weapon ?? null).toBeNull();
       const log = store.getState().gameLog.map((l) => l.text).join('\n');
       expect(log).toMatch(/swings the Sidekick Sledge/);
@@ -503,7 +503,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.crystal_golem), hp: 300, hpMax: 300, hitBonus: 40, weapon: weapon as never };
       const scene = store.getState().currentScene!;
       store.setState({
-        player: { ...p0, golem },
+        player: { ...p0, sidekick: golem },
         currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
       });
 

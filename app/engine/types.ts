@@ -1250,13 +1250,13 @@ export interface PlayerCharacter {
    *  location). Drives the same travel-row continue/stop UX, but steps
    *  cardinally within the current area toward the coordinate. */
   whisperCourse?: { mapX: number; mapY: number; label: string } | null;
-  /** 2026-05-25 [MECHANIC-1b] — active golem sidekick. Persists on
+  /** 2026-05-25 [MECHANIC-1b] — active sidekick companion. Persists on
    *  the player so it survives cardinal moves + scene transitions
    *  (the "follows until needed again" requirement). null when no
-   *  golem is summoned or after dismissal / death. Named 'golem'
-   *  to avoid colliding with the existing optional 'companion'
-   *  NPC follower field above. */
-  golem?: Companion | null;
+   *  sidekick is summoned or after dismissal / death. Named 'sidekick'
+   *  (was 'golem' through OTA-814) to avoid colliding with the existing
+   *  optional 'companion' NPC follower field above. */
+  sidekick?: Companion | null;
   /** OTA-120 — Dog Companion. One per save, acquired via a rescue
    *  scenario (or the puppy-vendor / rubble-puppy safety net). null
    *  on character creation and on legacy saves (backfilled to null

@@ -15648,4 +15648,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // recipe↔catalog key, so they move together), plus their flavor descriptions. The
 // 'golem_weapon' categorization tag is unchanged, so Magic-tab routing + the
 // sidekick-weapon gate still work. Tests updated to the new names.
-export const OTA_BUILD_ID = '2026-06-23-814';
+//
+// engine_Dev-815 — rename the PERSISTED companion field player.golem → player.sidekick
+// (the save-migration task 813 deferred). Safe to do cleanly with NO back-compat shim
+// because there is no live save to migrate. Driven by the type system: flipped the
+// PlayerCharacter.golem declaration in types.ts, then fixed every site tsc flagged
+// (~52 across state/engine/screens/components/diagnostics + tests). The intermediate
+// combat carrier SidekickTrainResult.golem and the per-turn `tp.golem`/`tr.golem`
+// reads are a DIFFERENT type and stay 'golem' (tsc confirms they're untouched); the
+// 'golem_weapon' tag, worldMemory.dogGolemCoActivated, the CharacterScreen collapse
+// toggle, and reference-content golems (Mud Golems race, golem enemies/items) are all
+// left as-is. Diagnostic snapshot label + all test seeds updated to 'sidekick'.
+// Verified: full tsc shows zero new errors vs baseline; all sidekick suites green.
+export const OTA_BUILD_ID = '2026-06-24-815';

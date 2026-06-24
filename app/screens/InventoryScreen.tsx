@@ -578,7 +578,7 @@ export function InventoryScreen() {
     // of the parts it's MADE of, offer a one-tap repair (routes through the same
     // `feed golem <item>` engine path). Mirrors the dog feed affordance.
     {
-      const golem = player?.golem;
+      const golem = player?.sidekick;
       const golemActive = !!golem && golem.hp > 0;
       // arb122 — Heal button shows for a full fuel PART or an element-matched
       // SUBSTITUTE material (both route through `feed golem <item>`; the engine
@@ -825,7 +825,7 @@ export function InventoryScreen() {
   const dogActiveForStripe = !!player.dog
     && player.dog.status !== 'abandoned'
     && player.dog.status !== 'dead';
-  const golemForStripe = player.golem;
+  const golemForStripe = player.sidekick;
   const golemActiveForStripe = !!golemForStripe && golemForStripe.hp > 0;
   const companionStripeColor = (item: InventoryItem): string | null => {
     if (dogActiveForStripe && (item.kind === 'consumable' || item.kind === 'dog_armor')) {

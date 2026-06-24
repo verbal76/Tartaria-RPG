@@ -6515,7 +6515,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Aetherstone. recordTitleProgress also runs the award check.
       if (isEthericWeather) {
         const survivor = get().player;
-        const withCompanion = !!(survivor && (survivor.dog || survivor.golem));
+        const withCompanion = !!(survivor && (survivor.dog || survivor.sidekick));
         recordTitleProgress(
           get,
           set,
@@ -6654,7 +6654,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // input names the golem (or "skip" keeps the type label). One input only.
     if (get().pendingSidekickNaming) {
       get().appendLog('player', trimmed);
-      const golemNow = get().player?.golem;
+      const golemNow = get().player?.sidekick;
       if (!golemNow) {
         // Golem vanished before naming (dismissed / died) — just clear the flag.
         set({ pendingSidekickNaming: false });
@@ -6663,8 +6663,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('arbiter', `"As you like," the ${getNarratorName()} says. "It answers to its making, then — ${golemNow.name}."`);
       } else {
         const name = trimmed.slice(0, 16).trim() || golemNow.name;
-        set((s) => (s.player && s.player.golem
-          ? { pendingSidekickNaming: false, player: { ...s.player, golem: { ...s.player.golem, name } } }
+        set((s) => (s.player && s.player.sidekick
+          ? { pendingSidekickNaming: false, player: { ...s.player, sidekick: { ...s.player.sidekick, name } } }
           : { pendingSidekickNaming: false }));
         get().appendLog('world', `${name}. The name takes hold in the Aetherstone.`);
         get().appendLog('arbiter', `The ${getNarratorName()} nods. "${name}, then."`);
@@ -14154,7 +14154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       // 2026-05-25 — removed dead OTA-039 'golem_companion' status
       // follow-up block. The status kind is no longer emitted by any
-      // code path (MECHANIC-1b OTA-011 replaced it with player.golem
+      // code path (MECHANIC-1b OTA-011 replaced it with player.sidekick
       // + a dedicated golem QuickBtn / handleSidekickCommand). The
       // legacy block was reachable only via the status's old emitter
       // which itself was removed. Free 1d6 hit per swing was over-
@@ -17310,7 +17310,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   armSidekick(weaponName) {
     const player = get().player;
     if (!player) return;
-    const golem = player.golem;
+    const golem = player.sidekick;
     if (!golem || golem.hp <= 0) {
       get().appendLog('arbiter', `"No ${summonNoun()} at your side to arm," the ${getNarratorName()} says. "Summon one first."`);
       return;
@@ -17336,12 +17336,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // weapon to the pack first.
     const armed = stampDurability({ ...item, quantity: 1 });
     set((s) => {
-      if (!s.player || !s.player.golem) return s;
+      if (!s.player || !s.player.sidekick) return s;
       let inv = s.player.inventory
         .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => (i.quantity ?? 0) > 0);
-      if (s.player.golem.weapon) inv = grantItem(inv, s.player.golem.weapon).inventory;
-      return { player: { ...s.player, inventory: inv, golem: { ...s.player.golem, weapon: armed } } };
+      if (s.player.sidekick.weapon) inv = grantItem(inv, s.player.sidekick.weapon).inventory;
+      return { player: { ...s.player, inventory: inv, sidekick: { ...s.player.sidekick, weapon: armed } } };
     });
     get().appendLog('world', `${golem.name} takes up the ${item.name}. It settles into the ${summonNoun()}'s grip like it was cast for it.`);
     void get().persist();
@@ -17349,15 +17349,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   disarmSidekick() {
     const player = get().player;
-    if (!player || !player.golem || !player.golem.weapon) {
+    if (!player || !player.sidekick || !player.sidekick.weapon) {
       get().appendLog('arbiter', `"Your ${summonNoun()} carries nothing to take back," the ${getNarratorName()} says.`);
       return;
     }
-    const wName = player.golem.weapon.name;
-    set((s) => (s.player && s.player.golem && s.player.golem.weapon
-      ? { player: { ...s.player, inventory: grantItem(s.player.inventory, s.player.golem.weapon).inventory, golem: { ...s.player.golem, weapon: null } } }
+    const wName = player.sidekick.weapon.name;
+    set((s) => (s.player && s.player.sidekick && s.player.sidekick.weapon
+      ? { player: { ...s.player, inventory: grantItem(s.player.inventory, s.player.sidekick.weapon).inventory, sidekick: { ...s.player.sidekick, weapon: null } } }
       : s));
-    get().appendLog('world', `You take the ${wName} back from ${player.golem.name}. It returns to its bare-fisted stance.`);
+    get().appendLog('world', `You take the ${wName} back from ${player.sidekick.name}. It returns to its bare-fisted stance.`);
     void get().persist();
   },
 
@@ -23840,7 +23840,7 @@ function handlePlayerDeath(
         ...s.player,
         dead: true,
         hp: 0,
-        golem: null,
+        sidekick: null,
         dog: dogDiedInFight && dog ? { ...dog, status: 'dead' as const } : dog,
       },
       worldMemory: dogDiedInFight && !wm.puppyVendorUsed
@@ -24967,10 +24967,10 @@ function runAethercraft(
   let golemDef: ReturnType<typeof getSidekickDefinition> | null = null;
   let fuelItem: InventoryItem | null = null;
   if (discipline === 'summon') {
-    if (player.golem) {
+    if (player.sidekick) {
       get().appendLog(
         'arbiter',
-        `"Only one ${getSummonNoun()} can wear the same tether," the ${getNarratorName()} says. "Dismiss the ${player.golem.name} first."`,
+        `"Only one ${getSummonNoun()} can wear the same tether," the ${getNarratorName()} says. "Dismiss the ${player.sidekick.name} first."`,
       );
       return;
     }
@@ -25175,7 +25175,7 @@ function runAethercraft(
     }
   } else if (discipline === 'summon' && golemDef) {
     // 2026-05-25 [MECHANIC-1b] — write the new golem sidekick to
-    // player.golem. Persists across cardinal moves + combats
+    // player.sidekick. Persists across cardinal moves + combats
     // until HP hits 0 or the player dismisses. The "golem"
     // QuickBtn picks up the existence of this field in combat
     // and renders a commandable strike button.
@@ -25196,7 +25196,7 @@ function runAethercraft(
       golem = { ...golem, hp: golem.hp + bonusHp, hpMax: golem.hpMax + bonusHp, attackDie: upsizeDie(golem.attackDie) };
       golemEdgeTag = ' Your mastery shapes it stronger than most.';
     }
-    set((s) => s.player ? { player: { ...s.player, golem }, pendingSidekickNaming: true } : s);
+    set((s) => s.player ? { player: { ...s.player, sidekick: golem }, pendingSidekickNaming: true } : s);
     get().appendLog(
       'world',
       `Your materials draw together and fold into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
@@ -25289,7 +25289,7 @@ function handleSidekickCommand(
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
-  const golem = player.golem;
+  const golem = player.sidekick;
   if (!golem || golem.hp <= 0) {
     get().appendLog(
       'arbiter',
@@ -25418,7 +25418,7 @@ function handleSidekickCommand(
       get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
       // OTA-467 — persist the POWER training the killing strike earned BEFORE the
       // kill-resolver returns (the golem survives the fight; keep its growth).
-      set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: workingGolem } } : s));
+      set((s) => (s.player && s.player.sidekick ? { player: { ...s.player, sidekick: workingGolem } } : s));
       set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
       set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: targetIdx } } : s));
       get().resolveEnemyDefeat();
@@ -25500,7 +25500,7 @@ function handleSidekickCommand(
       const hadTraining = core.power > 0 || core.resilience > 0 || core.bonusHp > 0;
       set((s) => {
         if (!s.player) return s;
-        let player = { ...s.player, golem: null };
+        let player = { ...s.player, sidekick: null };
         if (hadTraining) {
           const res = grantItem(player.inventory, {
             id: `golemcore_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -25525,7 +25525,7 @@ function handleSidekickCommand(
       const tr = trainSidekickStat(survived, 'resilience', true);
       survived = tr.golem;
       if (tr.leveled) get().appendLog('reward', `✦ ${survived.name}'s Resilience rises to ${tr.leveled.to}.`);
-      set((s) => s.player ? { player: { ...s.player, golem: survived } } : s);
+      set((s) => s.player ? { player: { ...s.player, sidekick: survived } } : s);
     }
   } else {
     get().appendLog(
@@ -25533,14 +25533,14 @@ function handleSidekickCommand(
       `${target.name} swings at ${golem.name} and misses.`,
     );
     // OTA-467 — no retaliation, but persist any POWER trained on this strike.
-    set((s) => (s.player && s.player.golem ? { player: { ...s.player, golem: workingGolem } } : s));
+    set((s) => (s.player && s.player.sidekick ? { player: { ...s.player, sidekick: workingGolem } } : s));
   }
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
   void get().persist();
 }
 
 // 2026-05-25 [MECHANIC-1b] — dismiss the active golem on player
-// command. Clears player.golem and logs a flavor line. No-op when
+// command. Clears player.sidekick and logs a flavor line. No-op when
 // no golem is active.
 function handleSidekickDismiss(
   get: () => GameStore,
@@ -25548,15 +25548,15 @@ function handleSidekickDismiss(
 ): void {
   const player = get().player;
   if (!player) return;
-  if (!player.golem) {
+  if (!player.sidekick) {
     get().appendLog(
       'arbiter',
       `"Nothing to dismiss," the ${getNarratorName()} says. "The Aether is quiet here."`,
     );
     return;
   }
-  const name = player.golem.name;
-  set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
+  const name = player.sidekick.name;
+  set((s) => s.player ? { player: { ...s.player, sidekick: null } } : s);
   get().appendLog(
     'world',
     `${name} stills, then dissolves. The Aether returns to itself, indifferent.`,
@@ -25826,7 +25826,7 @@ function handleDogCombat(
     return;
   }
   // First co-activation flavor with golem.
-  if (player.golem && !get().worldMemory.dogGolemCoActivated) {
+  if (player.sidekick && !get().worldMemory.dogGolemCoActivated) {
     set((s) => ({
       worldMemory: { ...s.worldMemory, dogGolemCoActivated: true },
     }));
@@ -26196,7 +26196,7 @@ function applyItemToGolem(
 ): boolean {
   const player = get().player;
   if (!player) return false;
-  const golem = player.golem;
+  const golem = player.sidekick;
   if (!golem || golem.hp <= 0) {
     get().appendLog('arbiter', `"You have no ${summonNoun()} at your side to mend," the ${getNarratorName()} says. "Summon one first."`);
     return false;
@@ -26219,13 +26219,13 @@ function applyItemToGolem(
   if (item.golemCore) {
     const c = item.golemCore;
     set((s) => {
-      if (!s.player || !s.player.golem) return s;
-      const g = s.player.golem;
+      if (!s.player || !s.player.sidekick) return s;
+      const g = s.player.sidekick;
       const stats = g.stats ?? { power: 0, resilience: 0 };
       const inv = s.player.inventory
         .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => i.quantity > 0);
-      return { player: { ...s.player, inventory: inv, golem: { ...g,
+      return { player: { ...s.player, inventory: inv, sidekick: { ...g,
         stats: { power: stats.power + c.power, resilience: stats.resilience + c.resilience },
         hpMax: g.hpMax + c.bonusHp, hp: g.hp + c.bonusHp } } };
     });
@@ -26254,8 +26254,8 @@ function applyItemToGolem(
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
     .filter((i) => i.quantity > 0);
   const newHp = golem.hp + heal;
-  set((s) => (s.player && s.player.golem
-    ? { player: { ...s.player, inventory: newInventory, golem: { ...s.player.golem, hp: newHp } } }
+  set((s) => (s.player && s.player.sidekick
+    ? { player: { ...s.player, inventory: newInventory, sidekick: { ...s.player.sidekick, hp: newHp } } }
     : s));
   get().appendLog(
     'world',
@@ -26274,7 +26274,7 @@ function tryGolemApplyVerb(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   rawInput: string,
 ): boolean {
-  const golem = get().player?.golem;
+  const golem = get().player?.sidekick;
   if (!golem || golem.hp <= 0) return false;
   const lower = rawInput.toLowerCase().trim();
   const golemTokens = new Set<string>(['golem', summonNoun().toLowerCase()]);

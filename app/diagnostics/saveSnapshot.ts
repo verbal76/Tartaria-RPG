@@ -25,7 +25,7 @@ export function buildSaveSnapshot(
   lines.push('--- HIGHLIGHTS (brick-suspect fields) ---');
   lines.push(`player: ${player.name} · race ${player.raceId} · faction ${player.factionId}`);
   lines.push(`hp ${player.hp}/${player.hpMax} · dead ${player.dead === true} · hoursElapsed ${player.hoursElapsed ?? 0} · loc ${player.currentLocationId ?? '?'}`);
-  lines.push(`inventory ${player.inventory?.length ?? 0} items · statusEffects ${(player.statusEffects ?? []).length} · golem ${player.golem ? 'yes' : 'no'}`);
+  lines.push(`inventory ${player.inventory?.length ?? 0} items · statusEffects ${(player.statusEffects ?? []).length} · sidekick ${player.sidekick ? 'yes' : 'no'}`);
   lines.push(`mainQuest phase ${player.mainQuest?.phase ?? '?'} · guardiansDefeated ${(player.mainQuest?.guardiansDefeated ?? []).length}`);
   if (dog) {
     lines.push(`dog: ${dog.name} · status ${dog.status} · hp ${dog.hp}/${dog.hpMax} · loyalty ${dog.loyalty}`);
