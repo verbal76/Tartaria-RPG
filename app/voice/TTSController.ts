@@ -16,6 +16,7 @@
 //   reading the same line twice (sentence-by-sentence already
 //   covered the whole response).
 
+import { AppState, type AppStateStatus } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { speak, stopAndClear } from './TTSManager';
 import { getVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
@@ -110,6 +111,32 @@ import { onKokoroStateChange, getKokoroErrorHistory } from './PiperTTSManager';
 // which this also notes.
 let unsubKokoro: (() => void) | null = null;
 let lastVoicePhase: string | null = null;
+
+// engine_Dev — BACKGROUND TEARDOWN. Repro from a player: backgrounded the app
+// (heavy foreground app evicted it), got a text message, returned, tapped Main
+// Quest → the process died to the home screen. The bundled neural TTS keeps a
+// live expo-av Sound + a queue; when the OS hands audio focus to a notification
+// (the text) and the app is mid- or just-resumed, the next spoken line plays
+// into a disrupted native audio session — the SIGSEGV the OTA-413 breadcrumb
+// was built to catch (and the same family as the documented SILENCE-ARBITER
+// teardown-rejection crash). Nothing listened to AppState, so audio was never
+// stopped on background. Now we tear the voice down the instant we lose the
+// foreground (audio can't outlive it — staysActiveInBackground is false anyway)
+// and resync the controller to the log tail so the saved backlog isn't
+// re-spoken on return. stopAndClear() is the unhandled-rejection-safe path.
+let appStateSub: { remove: () => void } | null = null;
+let lastAppState: AppStateStatus = 'active';
+
+function onAppStateChange(next: AppStateStatus): void {
+  const leavingForeground = lastAppState === 'active' && next !== 'active';
+  lastAppState = next;
+  if (leavingForeground) {
+    try { stopAndClear(); } catch { /* teardown is best-effort */ }
+    // Realign indices so the restored/queued backlog doesn't replay on return;
+    // the next genuinely-new appendLog after resume still speaks normally.
+    try { syncToCurrent(useGameStore.getState()); } catch { /* store not ready */ }
+  }
+}
 
 function logVoice(line: string): void {
   try { useGameStore.getState().appendLog('debug', line); } catch { /* log not ready */ }
@@ -298,6 +325,10 @@ export function startTTSController(): void {
   controllerStartedAt = Date.now();
   syncToCurrent(useGameStore.getState());
   unsub = useGameStore.subscribe(onState);
+  // engine_Dev — tear the voice down when the app loses the foreground (see
+  // onAppStateChange). Tolerate older RN return shapes (void) defensively.
+  lastAppState = AppState.currentState ?? 'active';
+  appStateSub = AppState.addEventListener('change', onAppStateChange) as { remove: () => void } | null;
   // arb54 — voice diagnostics → game log. Fires immediately with the current
   // state (so a boot-time download failure shows up right away), then on each
   // transition. Errors always log (each retry); other phases log once.
@@ -330,6 +361,7 @@ export function stopTTSController(): void {
   if (unsub) { unsub(); unsub = null; }
   if (unsubSettings) { unsubSettings(); unsubSettings = null; }
   if (unsubKokoro) { unsubKokoro(); unsubKokoro = null; }
+  if (appStateSub) { try { appStateSub.remove(); } catch { /* ignore */ } appStateSub = null; }
   lastVoicePhase = null;
   stopAndClear();
 }
