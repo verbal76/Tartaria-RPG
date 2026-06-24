@@ -155,6 +155,12 @@ const BUILTIN_TITLES = (arbiterTitlesData as {
 }).titles;
 const BUILTIN_TITLE_IDS: ReadonlySet<string> = new Set(BUILTIN_TITLES.map((t) => t.id));
 
+/** True when an id names one of the 20 built-in earnable titles (so an uploaded entry with
+ *  this id is a DISPLAY override, valid without a track/threshold). */
+export function isBuiltinTitleId(id: string): boolean {
+  return BUILTIN_TITLE_IDS.has(id);
+}
+
 /** Find a raw uploaded entry by id (no track/threshold requirement — built-in
  *  overrides only need the display fields the author wants to change). */
 function findUploadedTitle(id: string): Record<string, unknown> | null {

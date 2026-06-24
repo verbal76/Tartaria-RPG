@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useGameStore } from '../state/gameStore';
-import { useContentPackStore, stripJsonComments, type LoadResult } from '../state/contentPackStore';
+import { useContentPackStore, stripJsonComments, getStaleSectionKeys, type LoadResult } from '../state/contentPackStore';
 import {
   CONTENT_TABLES,
   LORE_BLOCKS,
@@ -3125,7 +3125,7 @@ function authoredStatus(bools: boolean[]): SectionStatus {
   const n = bools.filter(Boolean).length;
   return n === bools.length ? 'all' : n === 0 ? 'none' : 'partial';
 }
-function CollapsibleSection({ title, status, defaultOpen = false, children }: { title: string; status?: SectionStatus; defaultOpen?: boolean; children: React.ReactNode }) {
+function CollapsibleSection({ title, status, stale = false, defaultOpen = false, children }: { title: string; status?: SectionStatus; stale?: boolean; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <View style={styles.section}>
@@ -3137,6 +3137,9 @@ function CollapsibleSection({ title, status, defaultOpen = false, children }: { 
             {status === 'all' ? '◆' : '◇'}
           </Text>
         )}
+        {/* engine_Dev — YELLOW diamond: this section has an upload that was built against an
+            OLDER template than the engine now ships. Re-download the template + refresh it. */}
+        {stale && <Text style={[styles.sectionDiamond, { color: '#e3b341' }]}>◆</Text>}
       </TouchableOpacity>
       {open && <View style={styles.sectionBody}>{children}</View>}
     </View>
@@ -3157,6 +3160,8 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const [guideMsg, setGuideMsg] = useState<string | null>(null);
   // engine_Dev — re-read when the pack changes so the banner stays accurate.
   useContentPackStore((s) => s.contentVersion);
+  // engine_Dev — re-render when stale stamps reconcile (stamps change without a contentVersion bump).
+  useContentPackStore((s) => s.templateStamps);
   const racesLoaded = hasTableOverride('races');
   const factionsLoaded = hasTableOverride('factions');
 
@@ -3189,6 +3194,29 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   const dSalvage = st([has(cp.salvage)]);
   const dOverlays = st([arr(cp.overlays)]);
   const dAdvanced = st([arr(cp.damageTypes), has(cp.damageResistances), arr(cp.fusionTags), has(cp.coatings), has(cp.inventory)]);
+
+  // engine_Dev — STALE-UPLOAD (yellow) per section: any of its uploaded keys whose template
+  // version has moved since the upload. Recomputed on each contentVersion / templateStamps bump.
+  const staleSet = getStaleSectionKeys();
+  const stale = (keys: string[]) => keys.some((k) => staleSet.has(k));
+  const tableKeys = CONTENT_TABLES.filter((t) => t.id !== 'lore').map((t) => `table:${t.id}`);
+  const yMainQuest = stale(['mainQuest', 'bosses']);
+  const yLore = stale(['lore:world', 'lore:faction', 'lore:race', 'lore:flavor', 'table:lore']);
+  const yTables = stale(tableKeys);
+  const yMissions = stale(['missions']);
+  const yHooks = stale(['hooks']);
+  const yWhispers = stale(['whispers']);
+  const yTravel = stale(['wasteland']);
+  const yInteractionTags = stale(['interactionTags']);
+  const yStartingAreas = stale(['startingAreas']);
+  const yTitles = stale(['titles']);
+  const yCollectables = stale(['collectables']);
+  const ySummons = stale(['summons']);
+  const yDogScenarios = stale(['dogScenarios']);
+  const yDigging = stale(['digging']);
+  const yScrap = stale(['scrap']);
+  const ySalvage = stale(['salvage']);
+  const yOverlays = stale(['overlays']);
 
   return (
     <>
@@ -3249,7 +3277,7 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         <GameBundleBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="MAIN QUEST" status={dMainQuest}>
+      <CollapsibleSection title="MAIN QUEST" status={dMainQuest} stale={yMainQuest}>
         <MainQuestBox />
         <BossesBox />
       </CollapsibleSection>
@@ -3258,71 +3286,71 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         <GameIdentitySection />
       </CollapsibleSection>
 
-      <CollapsibleSection title="LORE" status={dLore}>
+      <CollapsibleSection title="LORE" status={dLore} stale={yLore}>
         {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
       </CollapsibleSection>
 
-      <CollapsibleSection title="TABLES" status={dTables}>
+      <CollapsibleSection title="TABLES" status={dTables} stale={yTables}>
         {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
       </CollapsibleSection>
 
-      <CollapsibleSection title="MISSIONS" status={dMissions}>
+      <CollapsibleSection title="MISSIONS" status={dMissions} stale={yMissions}>
         <MissionsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="FACTION MISSIONS" status={dFactionMissions}>
+      <CollapsibleSection title="FACTION MISSIONS" status={dFactionMissions} stale={yMissions}>
         <FactionMissionsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="HOOKS" status={dHooks}>
+      <CollapsibleSection title="HOOKS" status={dHooks} stale={yHooks}>
         <HooksBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="WHISPERS" status={dWhispers}>
+      <CollapsibleSection title="WHISPERS" status={dWhispers} stale={yWhispers}>
         <WhispersBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="TRAVEL ENCOUNTERS" status={dTravel}>
+      <CollapsibleSection title="TRAVEL ENCOUNTERS" status={dTravel} stale={yTravel}>
         <WastelandBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="INTERACTION TAGS" status={dInteractionTags}>
+      <CollapsibleSection title="INTERACTION TAGS" status={dInteractionTags} stale={yInteractionTags}>
         <InteractionTagsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="STARTING AREAS" status={dStartingAreas}>
+      <CollapsibleSection title="STARTING AREAS" status={dStartingAreas} stale={yStartingAreas}>
         <StartingAreasBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="TITLES" status={dTitles}>
+      <CollapsibleSection title="TITLES" status={dTitles} stale={yTitles}>
         <TitlesBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="COLLECTABLES" status={dCollectables}>
+      <CollapsibleSection title="COLLECTABLES" status={dCollectables} stale={yCollectables}>
         <CollectablesBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="SUMMONED SIDEKICKS" status={dSummons}>
+      <CollapsibleSection title="SUMMONED SIDEKICKS" status={dSummons} stale={ySummons}>
         <SummonsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="DOG-RESCUE SCENARIOS" status={dDogScenarios}>
+      <CollapsibleSection title="DOG-RESCUE SCENARIOS" status={dDogScenarios} stale={yDogScenarios}>
         <DogScenariosBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="DIGGING" status={dDigging}>
+      <CollapsibleSection title="DIGGING" status={dDigging} stale={yDigging}>
         <DiggingBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="SCRAP" status={dScrap}>
+      <CollapsibleSection title="SCRAP" status={dScrap} stale={yScrap}>
         <ScrapBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="SALVAGE" status={dSalvage}>
+      <CollapsibleSection title="SALVAGE" status={dSalvage} stale={ySalvage}>
         <SalvageBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="ELEVATED OVERLAYS" status={dOverlays}>
+      <CollapsibleSection title="ELEVATED OVERLAYS" status={dOverlays} stale={yOverlays}>
         <OverlaysBox />
       </CollapsibleSection>
 

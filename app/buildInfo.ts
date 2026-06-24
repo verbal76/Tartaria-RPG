@@ -15909,4 +15909,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // built-ins on any upload; the earn announcement resolves through the override too (dropped the
 // now-dead ARBITER_TITLE_META). Titles template documents the re-skin path + lists the 20 built-in
 // ids. New customTitleRoster test. tsc baseline; title/customTitleRoster/template suites green.
-export const OTA_BUILD_ID = '2026-06-24-835';
+//
+// engine_Dev-836 — STALE-UPLOAD detection (yellow diamond). New templateVersioning.ts hashes each
+// authorable section's current TEMPLATE output → a per-section version. The content-pack store
+// records, per uploaded section, the template version its CURRENT override was built against
+// (templateStamps: { content, tmpl }), reconciled automatically on every contentVersion bump (a
+// store subscription — zero per-loader wiring) and on hydrate. A re-upload (override content
+// changes) refreshes the stamp; when the engine later ships a changed template the recorded
+// version no longer matches → the dev panel shows a YELLOW ◆ on that section bar ("re-download
+// the template + refresh your upload"). Also fixed an 835 follow-on: loadTitlesJson now tolerates
+// built-in-id re-skin entries (id+name, no track/threshold). New templateVersioning test. tsc
+// baseline; templateVersioning/customTitleRoster/devTemplatesRoundTrip/title suites green.
+export const OTA_BUILD_ID = '2026-06-24-836';
