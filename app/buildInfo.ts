@@ -15697,4 +15697,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enemy-name highlighting. PHASE 2 (next) — flag un-overridden built-in DEFAULTS via the
 // resolver's override-vs-default provenance (catches e.g. the built-in "Aetheric Torch"
 // leaking into an authored game), reusing this same color + helpers.
-export const OTA_BUILD_ID = '2026-06-24-818';
+//
+// engine_Dev-819 — AUTHOR-OVERRIDABLE built-in pools, STEP 1 of N: genericize the
+// scene-prop FALLBACK pools. The curated climbable + salvageable noun pools
+// (climbableSpawns.ts / salvageableSpawns.ts) are injected into EVERY scene regardless
+// of setting, and shipped Tartaria/fantasy nouns ("zharak's teeth spire", "forgotten
+// order reliquary", "shattered tartarian relay", "royal vault pedestal", "aetheric drone
+// shell") that leaked into authored games (surfaced by a 1943 WWII playtest). Rewrote
+// all themed entries to setting-neutral structural nouns (collapsed tower / jagged rock
+// spire / sealed storage locker / old power conduit …). Guard test locks the four pools
+// neutral. Tests unaffected (they use the nouns as literals, not pool imports). NEXT
+// STEPS: (a) the content-pack OVERRIDE hooks so authors supply their own pools (the
+// generic ones become the fallback); (b) arbiter-quote pools (arbiter-intent/mood-quotes
+// .json still leak "the Giants"/"essence"/"rune"); (c) the deeper coupling this exposed —
+// salvage pools YIELD built-in Tartaria ITEMS ("Aetheric Torch", "Worn Tartarian Coin"),
+// the same item-catalog leak seen in the bug report — part of the broader built-in
+// genericization.
+export const OTA_BUILD_ID = '2026-06-24-819';
