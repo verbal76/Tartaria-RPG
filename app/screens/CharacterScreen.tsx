@@ -372,8 +372,8 @@ export function CharacterScreen() {
         {/* ── GOLEM ─────────────────────────────────────────────── */}
         {/* OTA-467 — golem panel. Mirrors the dog: HP + trained stats (POWER /
             RESILIENCE), which a kept-alive golem grows through combat. */}
-        {player.golem && player.golem.hp > 0 && (() => {
-          const golem = player.golem;
+        {player.sidekick && player.sidekick.hp > 0 && (() => {
+          const golem = player.sidekick;
           const hpPctG = golem.hpMax > 0 ? golem.hp / golem.hpMax : 0;
           const hpColorG = hpPctG > 0.5 ? '#9ec96a' : hpPctG > 0.25 ? '#c9a86a' : '#e07a5f';
           const gStats = golem.stats ?? { power: 0, resilience: 0 };

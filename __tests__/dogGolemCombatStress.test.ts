@@ -89,7 +89,7 @@ async function boot(combo: 'alone' | 'dog' | 'golem' | 'both', enemyHp: number, 
       ...p0,
       hp: 100, hpMax: 100, stamina: 100,
       dog,
-      golem,
+      sidekick: golem,
       hoursElapsed: 0,
     },
     currentScene: {
@@ -112,7 +112,7 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
   });
 
   // Track aggregate retaliation distribution across the "both" combo.
-  const retaliationCounts = { dog: 0, golem: 0, player: 0 };
+  const retaliationCounts = { dog: 0, sidekick: 0, player: 0 };
 
   it('500 random encounters across all 4 combos resolve without NaN/infinity/loops', async () => {
     const combos: ('alone' | 'dog' | 'golem' | 'both')[] = ['alone', 'dog', 'golem', 'both'];
@@ -167,9 +167,9 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
         if (p2) {
           if (Number.isNaN(p2.hp)) issues++;
           if (p2.dog && Number.isNaN(p2.dog.hp)) issues++;
-          if (p2.golem && Number.isNaN(p2.golem.hp)) issues++;
+          if (p2.sidekick && Number.isNaN(p2.sidekick.hp)) issues++;
           if (p2.dog && p2.dog.hp < 0) issues++;
-          if (p2.golem && p2.golem.hp < 0) issues++;
+          if (p2.sidekick && p2.sidekick.hp < 0) issues++;
           // Track retaliation breakdown via the gameLog (combat lines mention
           // "swings on Marrow|the golem|you").
         }
@@ -200,7 +200,7 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
           if (!scene || scene.enemies.length === 0) break;
           if (!player || player.hp <= 0) break;
           if (combo === 'dog' && (!player.dog || player.dog.status !== 'with_player')) break;
-          if (combo === 'golem' && !player.golem) break;
+          if (combo === 'golem' && !player.sidekick) break;
           if (combo === 'dog') store.getState().submitPlayerAction('bite drone');
           else if (combo === 'golem') store.getState().submitPlayerAction('command golem');
           else {
@@ -222,11 +222,11 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
     let dogHits = 0, golemHits = 0, playerHits = 0;
     for (let i = 0; i < 200; i++) {
       const beforeDogHp = store.getState().player?.dog?.hp ?? 0;
-      const beforeGolemHp = store.getState().player?.golem?.hp ?? 0;
+      const beforeGolemHp = store.getState().player?.sidekick?.hp ?? 0;
       const beforePlayerHp = store.getState().player?.hp ?? 0;
       store.getState().submitPlayerAction('bite drone');
       const afterDogHp = store.getState().player?.dog?.hp ?? 0;
-      const afterGolemHp = store.getState().player?.golem?.hp ?? 0;
+      const afterGolemHp = store.getState().player?.sidekick?.hp ?? 0;
       const afterPlayerHp = store.getState().player?.hp ?? 0;
       if (afterDogHp < beforeDogHp) dogHits++;
       else if (afterGolemHp < beforeGolemHp) golemHits++;
@@ -240,7 +240,7 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
               dog: s.player.dog && s.player.dog.status === 'with_player'
                 ? { ...s.player.dog, hp: s.player.dog.hpMax }
                 : s.player.dog,
-              golem: s.player.golem ? { ...s.player.golem, hp: s.player.golem.hpMax } : null,
+              sidekick: s.player.sidekick ? { ...s.player.sidekick, hp: s.player.sidekick.hpMax } : null,
             },
           }
         : s);
@@ -265,7 +265,7 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
     const golemPct = (golemHits / Math.max(1, total)) * 100;
     const playerPct = (playerHits / Math.max(1, total)) * 100;
     retaliationCounts.dog = dogHits;
-    retaliationCounts.golem = golemHits;
+    retaliationCounts.sidekick = golemHits;
     retaliationCounts.player = playerHits;
     expect(dogPct).toBeGreaterThan(15);
     expect(dogPct).toBeLessThan(45);
@@ -355,12 +355,12 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
 
   it('golem HP never goes below 0 visible — clamps at 0 and clears slot', async () => {
     const store = await boot('golem', 4, 1);
-    store.setState((s) => s.player && s.player.golem
-      ? { player: { ...s.player, golem: { ...s.player.golem, hp: 1 } } }
+    store.setState((s) => s.player && s.player.sidekick
+      ? { player: { ...s.player, sidekick: { ...s.player.sidekick, hp: 1 } } }
       : s);
     let belowZeroObserved = false;
     for (let i = 0; i < 30; i++) {
-      const g = store.getState().player?.golem;
+      const g = store.getState().player?.sidekick;
       if (g && g.hp < 0) belowZeroObserved = true;
       store.getState().submitPlayerAction('command golem');
       store.setState((s) => s.currentScene
@@ -375,15 +375,15 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
             },
           }
         : s);
-      const liveG = store.getState().player?.golem;
+      const liveG = store.getState().player?.sidekick;
       if (!liveG) {
         // golem already crumbled — re-summon a fresh one
         store.setState((s) => s.player
-          ? { player: { ...s.player, golem: makeCompanion(SIDEKICK_DEFINITIONS.iron_golem) } }
+          ? { player: { ...s.player, sidekick: makeCompanion(SIDEKICK_DEFINITIONS.iron_golem) } }
           : s);
       } else if (liveG.hp <= 1) {
-        store.setState((s) => s.player && s.player.golem
-          ? { player: { ...s.player, golem: { ...s.player.golem, hp: 1 } } }
+        store.setState((s) => s.player && s.player.sidekick
+          ? { player: { ...s.player, sidekick: { ...s.player.sidekick, hp: 1 } } }
           : s);
       }
     }

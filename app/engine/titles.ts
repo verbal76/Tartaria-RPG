@@ -128,7 +128,7 @@ const GIANT_RESPECTING_FACTIONS = new Set([
 ]);
 
 function hasCompanion(player: PlayerCharacter): boolean {
-  return !!(player.dog || player.golem);
+  return !!(player.dog || player.sidekick);
 }
 
 /** The 14 wired titles (Tier A + B). */
@@ -175,7 +175,7 @@ export const WIRED_TITLES: TitleDef[] = [
   },
   {
     id: 'golem_whisperer',
-    earned: (pl) => !!pl.golem,
+    earned: (pl) => !!pl.sidekick,
     perk: (a) => { a.golemEdge = true; },
   },
   // ── Tier B (substitute mappings) ──────────────────────────────────────

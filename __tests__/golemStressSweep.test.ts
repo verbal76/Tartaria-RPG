@@ -85,7 +85,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
     const golem = { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hp: 100000, hpMax: 100000, hitBonus: 40 };
     const scene = store.getState().currentScene!;
     store.setState({
-      player: { ...p0, golem, stamina: 100000, staminaMax: 100000 },
+      player: { ...p0, sidekick: golem, stamina: 100000, staminaMax: 100000 },
       currentScene: {
         ...scene, enemies: [softDummy() as never], enemyHps: [100000], activeEnemyIdx: 0,
         range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
@@ -100,11 +100,11 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
                       // tank (% resist is capped), so final power isn't reliable.
     for (let i = 0; i < 300; i++) {
       await store.getState().submitPlayerAction('golem attack');
-      const g = store.getState().player?.golem;
+      const g = store.getState().player?.sidekick;
       // The golem may crumble if the dummy ever drops it; re-summon a fresh one and
       // keep going (the sweep should never crash regardless of who's standing).
       if (!g) {
-        store.setState((s) => (s.player ? { player: { ...s.player, golem: { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hitBonus: 40 } } } : s));
+        store.setState((s) => (s.player ? { player: { ...s.player, sidekick: { ...makeCompanion(SIDEKICK_DEFINITIONS.iron_golem), hitBonus: 40 } } } : s));
         prevPower = 0; prevRes = 0;
       } else {
         expect(finite(g.hp)).toBe(true);
@@ -140,7 +140,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
     store.setState({
       player: {
         ...p0,
-        golem,
+        sidekick: golem,
         inventory: [stockItem('Scrap Metal', 50), stockItem('Aether Mud', 50)],
       },
     });
@@ -151,7 +151,7 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
       store.getState().submitPlayerAction('feed golem aether mud');
       store.setState((s) => ({ gameLog: s.gameLog.slice(-10) }));
     }
-    expect(store.getState().player!.golem!.hp).toBe(1);
+    expect(store.getState().player!.sidekick!.hp).toBe(1);
     expect(store.getState().player!.inventory.find((i) => i.name === 'Aether Mud')!.quantity).toBe(50);
 
     // Feed the RIGHT part repeatedly: HP climbs by `heal` each time and caps at hpMax;
@@ -159,9 +159,9 @@ describe('OTA-466/467 — golem stress sweep (repair + combat stat growth)', () 
     let prevHp = 1;
     let scrapLeft = 50;
     for (let i = 0; i < 20; i++) {
-      const before = store.getState().player!.golem!.hp;
+      const before = store.getState().player!.sidekick!.hp;
       store.getState().submitPlayerAction('feed golem scrap metal');
-      const g = store.getState().player!.golem!;
+      const g = store.getState().player!.sidekick!;
       expect(finite(g.hp)).toBe(true);
       expect(g.hp).toBeLessThanOrEqual(g.hpMax);
       expect(g.hp).toBeGreaterThanOrEqual(before); // never goes backwards

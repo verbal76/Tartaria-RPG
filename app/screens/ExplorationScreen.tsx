@@ -1062,10 +1062,10 @@ export function ExplorationScreen() {
                 activeRopeDurability,
               });
             })()}
-            golem={player?.golem ? {
-              name: player.golem.name,
-              hp: player.golem.hp,
-              hpMax: player.golem.hpMax,
+            golem={player?.sidekick ? {
+              name: player.sidekick.name,
+              hp: player.sidekick.hp,
+              hpMax: player.sidekick.hpMax,
             } : null}
             // arb-fix — keep the dog in the combat arsenal whenever it's a
             // living companion, INCLUDING when benched at a climb base

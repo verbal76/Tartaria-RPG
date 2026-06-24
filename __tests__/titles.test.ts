@@ -60,7 +60,7 @@ describe('titles — earning engine', () => {
     expect(evaluateEarnedTitles(mk({ raceId: 'tartarian_giant', factionId: 'servants_of_giants' }))).toContain('scion_of_the_giants');
     expect(evaluateEarnedTitles(mk({ raceId: 'tartarian_giant', factionId: 'mud_monarchs' }))).not.toContain('scion_of_the_giants');
     expect(evaluateEarnedTitles(mk({ mainQuest: { coresRecovered: ['asgardar'] } }))).toContain('etheric_explorer');
-    expect(evaluateEarnedTitles(mk({ golem: { hp: 10 } }))).toContain('golem_whisperer');
+    expect(evaluateEarnedTitles(mk({ sidekick: { hp: 10 } }))).toContain('golem_whisperer');
     expect(evaluateEarnedTitles(mk({ raceId: 'aetherborn', corruption: 12 }))).toContain('aetherborn_awakened');
     expect(evaluateEarnedTitles(mk({ raceId: 'aetherborn', corruption: 4 }))).not.toContain('aetherborn_awakened');
   });
