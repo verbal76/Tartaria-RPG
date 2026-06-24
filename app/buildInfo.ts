@@ -15854,4 +15854,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from text), so a custom game answers setting questions from its OWN lore, and only falls
 // through to the built-in concept bank for mechanics + unmatched terms. The Action Reference
 // screen still reads concepts.json for its mechanical action cards (neutral). tsc baseline.
-export const OTA_BUILD_ID = '2026-06-24-830';
+//
+// engine_Dev-831 — DELETE the built-in Tartaria canon (Arbiter knowledge), don't just gate
+// it. The Arbiter's knowledge now comes ENTIRELY from the active lore document (author
+// override or installed generic default): loreConceptBank dropped buildBuiltinConceptBank
+// (the ~190-line Tartaria fallback) + its canon interfaces — an empty lore doc yields an
+// empty bank; canonFacts.buildCanonFactsParagraph dropped the canon-events/food-drink
+// fallback → lore doc or null. Deleted 10 now-unused data files: canon-events,
+// canon-food-drink, glossary, canon-armor, canon-weapons, canon-skills, canon-currency-goods,
+// canon-loot-treasure, canon-task-difficulty, canon-action-difficulty. Tests rewritten to
+// the lore-doc-driven behavior (+ fixed a pre-existing stale "Arbiter" assertion). STILL
+// TARTARIA, handled next: arbiter-titles.json (live titles feature → genericize) and
+// concepts.json (76 neutral mechanics + 96 Tartaria-setting entries → strip the 96; findConcept
+// already prefers the lore doc). tsc baseline; arbiter/lore suites green.
+export const OTA_BUILD_ID = '2026-06-24-831';

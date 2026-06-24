@@ -17,31 +17,8 @@
 // section is a single compact paragraph, ~50 words max. Anything
 // bigger eats the model's already-tight 90-token narration budget.
 
-import canonEventsData from '../data/lore/canon-events.json';
-import canonFoodDrinkData from '../data/lore/canon-food-drink.json';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
 import { resolveTable } from './contentPack';
-
-interface CanonEvent {
-  id: string;
-  year: number;
-  title: string;
-  factions: string[];
-  location: string;
-  outcome: string;
-  summary: string;
-  tags: string[];
-}
-
-interface CanonFoodDrink {
-  id: string;
-  name: string;
-  type: 'food' | 'drink';
-  rarity: string;
-  source: string;
-  effect: string;
-  tcValue: number;
-}
 
 interface ArbiterTitle {
   id: string;
@@ -51,8 +28,6 @@ interface ArbiterTitle {
   tags: string[];
 }
 
-export const CANON_EVENTS = (canonEventsData as { events: CanonEvent[] }).events;
-export const CANON_FOOD_DRINK = (canonFoodDrinkData as { items: CanonFoodDrink[] }).items;
 export const ARBITER_TITLES = (arbiterTitlesData as { titles: ArbiterTitle[] }).titles;
 
 export interface CanonFactQuery {
@@ -105,70 +80,10 @@ function pickLorePassage(passages: readonly LorePassage[], q: CanonFactQuery): s
 }
 
 export function buildCanonFactsParagraph(q: CanonFactQuery): string | null {
-  // Author lore document wins outright when present.
+  // engine_Dev — canon facts come ENTIRELY from the active lore document (author override or
+  // the installed generic default — always present). No built-in Tartaria fallback.
   const loreDoc = resolveTable<LorePassage>('lore', EMPTY_LORE);
-  if (loreDoc.length > 0) return pickLorePassage(loreDoc, q);
-
-  const lines: string[] = [];
-
-  const event = pickCanonEvent(q);
-  if (event) {
-    const factions = event.factions.join(', ');
-    lines.push(`${event.year} · ${event.title} (${factions}): ${event.summary}`);
-  }
-
-  if (q.hasVendor) {
-    const item = pickFoodDrinkForVendor(q);
-    if (item) {
-      lines.push(`Canonical wares may include "${item.name}" (${item.rarity} ${item.type}, ${item.tcValue} TC): ${item.effect}.`);
-    }
-  }
-
-  if (lines.length === 0) return null;
-  return lines.join(' ');
-}
-
-function pickCanonEvent(q: CanonFactQuery): CanonEvent | null {
-  let best: { event: CanonEvent; score: number } | null = null;
-  for (const event of CANON_EVENTS) {
-    let score = 0;
-    for (const tag of event.tags) {
-      const t = tag.toLowerCase();
-      for (const k of q.sceneKeywords) {
-        if (k.includes(t) || t.includes(k)) score += 1;
-      }
-    }
-    if (q.playerFactionId) {
-      const f = q.playerFactionId.toLowerCase();
-      if (event.factions.some((x) => x.toLowerCase().includes(f) || f.includes(x.toLowerCase()))) {
-        score += 1;
-      }
-    }
-    if (score > 0 && (!best || score > best.score)) best = { event, score };
-  }
-  return best?.event ?? null;
-}
-
-function pickFoodDrinkForVendor(q: CanonFactQuery): CanonFoodDrink | null {
-  const keywords = q.sceneKeywords.join(' ');
-  const isMudDweller = /mud.?dweller|mud.?monarch/.test(keywords);
-  const isTartarianMarket = /tartarian|market|ruin/.test(keywords);
-  const isUnknowingMasses = /unknowing|surface|wasteland/.test(keywords);
-  const matches = CANON_FOOD_DRINK.filter((it) => {
-    const src = it.source.toLowerCase();
-    if (isMudDweller && /mud.?dweller|mud.?monarch/.test(src)) return true;
-    if (isTartarianMarket && /tartarian/.test(src)) return true;
-    if (isUnknowingMasses && /unknowing|surface|wasteland/.test(src)) return true;
-    return false;
-  });
-  if (matches.length === 0) return null;
-  // Deterministic from keyword joint hash so the same scene tends to
-  // surface the same canonical item (avoids prompt-jitter between turns).
-  let hash = 5381;
-  for (let i = 0; i < keywords.length; i++) {
-    hash = ((hash << 5) + hash + keywords.charCodeAt(i)) >>> 0;
-  }
-  return matches[hash % matches.length] ?? null;
+  return loreDoc.length > 0 ? pickLorePassage(loreDoc, q) : null;
 }
 
 /** Look up a title by free-text. Phase 1 — used by the future
