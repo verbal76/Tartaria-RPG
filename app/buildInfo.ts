@@ -15955,4 +15955,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // them back in ANY order (refusing to mix parts from different saves), showing how many remain. All
 // downloads timestamp the filename. New pure gameSaveParts module (buildSaveParts/addSavePart/
 // isGameSavePart/fileStamp) + N-part test. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-839';
+//
+// engine_Dev-840 — BAKED GAME SLOT (the publish linchpin). New app/data/default-game.json ships
+// EMPTY, so a dev build boots the generic engine and you author by uploading JSON. The publish
+// "bake" step fills it with the author's whole-game master JSON; App.tsx then auto-loads it at boot
+// (loadGameBundle with persist:false — re-read from the build each launch, never written to storage,
+// so a later rebuild's game can't be shadowed) so a shipped build IS their game with dev off. A
+// runtime dev upload still wins for in-app editing. New persist flag on loadGameBundle + bakedDefaultGame
+// test. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-840';
