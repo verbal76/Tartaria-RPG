@@ -42,6 +42,7 @@ import {
   type LoreBlockId,
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -460,6 +461,8 @@ function GameBundleBox() {
   const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
   const [status, setStatus] = useState<Status>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  // engine_Dev — multi-part save: uploaded parts collect here until every 1..N is in, then knit.
+  const [pendingParts, setPendingParts] = useState<GameSavePart[]>([]);
 
   // engine_Dev — does the author have ANYTHING loaded yet? exportGameBundle emits
   // only the sections that have been uploaded, so an empty game serialises to "{}".
@@ -480,23 +483,69 @@ function GameBundleBox() {
     let uploaded: Record<string, unknown> = {};
     try { uploaded = JSON.parse(useContentPackStore.getState().exportGameBundle()) as Record<string, unknown>; } catch { uploaded = {}; }
     const out = buildAnnotatedGameBundle(uploaded);
-    const filename = built ? 'my-game.json' : 'game-template.json';
-    const what = built ? `your game (${Object.keys(uploaded).length} sections uploaded, rest marked ⬜ template)` : 'the blank template (all sections marked ⬜)';
+    // engine_Dev — stamp the filename so successive downloads are distinguishable.
+    const stamp = fileStamp(new Date());
+    const base = built ? 'my-game' : 'game-template';
+    const what = built ? `your game (${Object.keys(uploaded).length} sections uploaded, rest marked ⬜ template)` : 'the blank template';
+    // engine_Dev — AUTO-SPLIT by size. A whole-game file over the per-part ceiling can't be
+    // pasted / re-read in one piece on device, so split into as many parts as needed (each ≤
+    // SAFE_PART_CHARS). Under the ceiling → one normal file. Parts knit back on UPLOAD, any order.
+    const parts = out.length <= SAFE_PART_CHARS ? null : buildSaveParts(out, `${stamp}-${out.length}c`, stamp);
     try {
       if (Platform.OS === 'android') {
         const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (!perm.granted) { setStatus({ kind: 'err', msg: 'Save cancelled — no folder chosen.' }); return; }
-        const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, filename, 'application/json');
-        await FileSystem.writeAsStringAsync(uri, out);
-        setStatus({ kind: 'ok', msg: `Saved ${what} as ${filename} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Find it in Files — edit it, then UPLOAD FILE FROM DEVICE.` });
+        if (!parts) {
+          const fn = `${base}-${stamp}.json`;
+          const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, fn, 'application/json');
+          await FileSystem.writeAsStringAsync(uri, out);
+          setStatus({ kind: 'ok', msg: `Saved ${what} as ${fn} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Edit it, then UPLOAD FILE FROM DEVICE.` });
+        } else {
+          const names: string[] = [];
+          for (const p of parts) {
+            const fn = `${base}p${p.__gameSavePart}-${stamp}.json`;
+            const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, fn, 'application/json');
+            await FileSystem.writeAsStringAsync(uri, JSON.stringify(p, null, 2));
+            names.push(fn);
+          }
+          setStatus({ kind: 'ok', msg: `Your game is ${(out.length / 1024).toFixed(0)} KB — over the ${(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, so I split it into ${parts.length} parts: ${names.join(', ')}. Upload ALL ${parts.length} (any order) to rebuild it.` });
+        }
       } else {
-        const uri = `${FileSystem.documentDirectory}${filename}`;
-        await FileSystem.writeAsStringAsync(uri, out);
-        setStatus({ kind: 'ok', msg: `Saved ${what} to ${uri}` });
+        if (!parts) {
+          const uri = `${FileSystem.documentDirectory}${base}-${stamp}.json`;
+          await FileSystem.writeAsStringAsync(uri, out);
+          setStatus({ kind: 'ok', msg: `Saved ${what} to ${uri}` });
+        } else {
+          for (const p of parts) await FileSystem.writeAsStringAsync(`${FileSystem.documentDirectory}${base}p${p.__gameSavePart}-${stamp}.json`, JSON.stringify(p, null, 2));
+          setStatus({ kind: 'ok', msg: `Split into ${parts.length} parts (${base}p1..p${parts.length}-${stamp}.json) in ${FileSystem.documentDirectory}` });
+        }
       }
     } catch (e) {
       setStatus({ kind: 'err', msg: `Save failed: ${e instanceof Error ? e.message : String(e)}.` });
     }
+  };
+
+  // engine_Dev — handle one uploaded file: a whole bundle (load it) OR one part of a multi-part
+  // save (collect parts, knit when every 1..N is in — any order; reject mixing different saves).
+  const handleUpload = (content: string) => {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(content)); } catch { parsed = null; }
+    if (isGameSavePart(parsed)) {
+      const r = addSavePart(pendingParts, parsed);
+      setPendingParts(r.parts);
+      if (r.kind === 'complete') {
+        setPendingParts([]);
+        const loaded = loadGameBundle(r.text);
+        setStatus(loaded.ok ? { kind: 'ok', msg: `All ${parsed.__of} parts knit back together. ${loaded.summary ?? 'Loaded.'}` } : { kind: 'err', msg: loaded.error ?? 'Failed.' });
+      } else if (r.kind === 'reset') {
+        setStatus({ kind: 'err', msg: `That part is from a DIFFERENT save (${parsed.__savedAt}). Starting over with it — now upload the rest of THIS save's parts: ${r.need.join(', ')} of ${r.of}.` });
+      } else {
+        setStatus({ kind: 'ok', msg: `Part ${parsed.__gameSavePart} of ${r.of} loaded (save ${parsed.__savedAt}). Have ${r.have.join(', ')}; still need ${r.need.join(', ')}. Keep uploading.` });
+      }
+      return;
+    }
+    const r = loadGameBundle(content);
+    setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
   };
 
   return (
@@ -513,7 +562,13 @@ function GameBundleBox() {
         <Text style={{ fontWeight: 'bold' }}>UPLOAD FILE FROM DEVICE</Text> to load it — every section
         it contains is applied at once; anything omitted keeps its built-in default. // and /* */
         comments are allowed. <Text style={{ fontWeight: 'bold' }}>RESET</Text> wipes all uploaded
-        content back to the built-in defaults if you need a clean slate.
+        content back to the built-in defaults if you need a clean slate.{'\n\n'}
+        <Text style={{ fontWeight: 'bold' }}>Big game?</Text> If the file is over the{' '}
+        {(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, SAVE automatically splits it into as
+        many timestamped parts as it needs (<Text style={{ fontStyle: 'italic' }}>my-gamep1</Text>,{' '}
+        <Text style={{ fontStyle: 'italic' }}>my-gamep2</Text>,{' '}
+        <Text style={{ fontStyle: 'italic' }}>my-gamep3</Text>…) and tells you how many. Upload ALL of them to
+        rebuild — order doesn’t matter, and it won’t let you mix parts from different saves.
       </Text>
       <View style={styles.stackCol}>
         <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
@@ -525,11 +580,10 @@ function GameBundleBox() {
             const picked = await pickJsonFile();
             if (picked.canceled) { setStatus({ kind: 'err', msg: 'Upload cancelled — no file chosen.' }); return; }
             if (!picked.ok || !picked.content) { setStatus({ kind: 'err', msg: picked.msg ?? 'Could not read that file.' }); return; }
-            const r = loadGameBundle(picked.content);
-            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            handleUpload(picked.content);
           })(); }}
         >
-          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE</Text>
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE{pendingParts.length > 0 ? ` (${pendingParts[0]!.__of - pendingParts.length} more part${pendingParts[0]!.__of - pendingParts.length === 1 ? '' : 's'} needed)` : ''}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.resetBtn, styles.stackBtn]}

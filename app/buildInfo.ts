@@ -15945,4 +15945,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resolveFlavor too (overridable via the Flavor block). Flavor template now documents all five new
 // keys. Content depth: added a Freeholders faction quest so all three generic factions have a board
 // contract. New flavorPoolOverride test. tsc baseline 142; flavor/narration/faction/generic suites green.
-export const OTA_BUILD_ID = '2026-06-24-838';
+//
+// engine_Dev-839 — auto-splitting whole-game save (handles games too big to move in one piece).
+// SAVE FILE TO DEVICE now measures the file: under the per-part ceiling (SAFE_PART_CHARS ≈ 45 KB,
+// headroom under the ~60 KB device clipboard/paste + read hard limits) it writes one file as before;
+// over it, it auto-splits into as MANY timestamped parts as needed (my-gamep1-<stamp>.json,
+// my-gamep2…, my-gamep3…) and tells you how many. Each part is valid JSON carrying a raw slice of
+// the bundle text + { __gameSavePart, __of, __saveId, __savedAt }; UPLOAD collects parts and knits
+// them back in ANY order (refusing to mix parts from different saves), showing how many remain. All
+// downloads timestamp the filename. New pure gameSaveParts module (buildSaveParts/addSavePart/
+// isGameSavePart/fileStamp) + N-part test. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-839';
