@@ -715,7 +715,7 @@ export function TitleScreen() {
         {(item.mainQuestObjective || item.mainQuestPhase) && (
           <Text style={styles.slotObjective}>
             {item.mainQuestObjective
-              ? `◆ ${item.mainQuestObjective}`
+              ? `◆ ${item.mainQuestStep && item.mainQuestStepCount ? `Step ${item.mainQuestStep}/${item.mainQuestStepCount} · ` : ''}${item.mainQuestObjective}`
               : resumeObjectiveLine(item.mainQuestPhase as MainQuestPhase)}
           </Text>
         )}

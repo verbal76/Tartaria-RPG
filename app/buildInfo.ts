@@ -16009,4 +16009,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // own quest. Also genericized gameStore's no-compass narrator line ("the mud-flood country" → "this
 // country"). The remaining 'nexus'/'mud flood' hits are internal ids / noun-matchers, not displayed.
 // tsc baseline 142; leak-scanner/save/title suites green.
-export const OTA_BUILD_ID = '2026-06-24-846';
+//
+// engine_Dev-847 — (1) save-slot main-quest progress now reads "Step X/N · <objective>": new
+// currentQuestProgress() + mainQuestStep/mainQuestStepCount on SlotSummary, computed at save time
+// from the live custom quest. (2) New "Text RPG Engine" splash poster (glowing d20 over an open
+// book) — re-encoded to a lean ~200 KB / 900px JPEG at assets/splash-art.jpg (overwrites the old
+// one; the SplashOverlay wiring + loading bar are unchanged). tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-847';

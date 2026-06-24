@@ -12,6 +12,15 @@ function safeObjectiveLine(player: PlayerCharacter): string | undefined {
     return undefined;
   }
 }
+function safeQuestProgress(player: PlayerCharacter): { step?: number; total?: number } {
+  try {
+    const { currentQuestProgress } = require('./customMainQuestEngine') as typeof import('./customMainQuestEngine');
+    const p = currentQuestProgress(player);
+    return p ? { step: p.step, total: p.total } : {};
+  } catch {
+    return {};
+  }
+}
 
 // v2 schema: multi-slot. Each character is its own keyed save with its
 // own log; an index file lists summaries for the title screen.
@@ -54,6 +63,10 @@ export interface SlotSummary {
   /** engine_Dev — the live CUSTOM main-quest objective at save time (neutral, data-driven).
    *  The slot card prefers this over the legacy phase line so a reskin shows its own quest. */
   mainQuestObjective?: string;
+  /** engine_Dev — current step position through the custom main quest (1-based) + total, for the
+   *  slot card's "Step X/N" readout. */
+  mainQuestStep?: number;
+  mainQuestStepCount?: number;
   /** OTA-120 Phase 5 — dog snapshot for the TitleScreen slot tile.
    *  Lets the player pick the right save at a glance when multiple
    *  characters carry different companions. Only populated when the
@@ -427,6 +440,7 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       mainQuestPhase: state.player.mainQuest?.phase,
       mainQuestCoresRecovered: state.player.mainQuest?.coresRecovered?.length ?? 0,
       mainQuestObjective: safeObjectiveLine(state.player),
+      ...safeQuestProgress(state.player),
       // OTA-120 Phase 5 — dog snapshot. Only populate when the dog is
       // actively with the player (not abandoned / dead) so the slot tile
       // doesn't dangle a name the player has already lost.

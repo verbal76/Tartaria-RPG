@@ -66,6 +66,16 @@ export function mainQuestProgressPercent(p: PlayerCharacter): number {
   return Math.floor((idx / q.steps.length) * 100);
 }
 
+/** engine_Dev — current step position through the data-driven main quest, for the save-slot
+ *  "Step X/N" readout. 1-based current step; when complete, step === total. null when no quest. */
+export function currentQuestProgress(p: PlayerCharacter): { step: number; total: number } | null {
+  const q = liveMainQuest();
+  if (!q || q.steps.length === 0) return null;
+  const total = q.steps.length;
+  const idx = Math.max(0, Math.min(effectiveStepIndex(p), total));
+  return { step: idx >= total ? total : idx + 1, total };
+}
+
 /** Count of remaining BOSS ("kill") steps for this player — from the effective
  *  current step to the end, skipping faction-gated steps. null when no custom
  *  main quest is loaded. Used to open the rubble-puppy window at "one boss left"

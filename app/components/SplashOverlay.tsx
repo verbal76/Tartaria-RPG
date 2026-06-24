@@ -8,12 +8,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, Text, StyleSheet, useWindowDimensions, StatusBar, Platform } from 'react-native';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
-// Splash art native dimensions (assets/splash-art.jpg). The RPG Engine splash is a
-// complete full-screen portrait poster (gear + terminal + book + d20 emblem, title,
-// tagline, feature row), so it's rendered full-bleed with cover — not the old
-// top-left-anchored emblem treatment.
-const SPLASH_W = 853;
-const SPLASH_H = 1844;
+// Splash art native dimensions (assets/splash-art.jpg). engine_Dev — new "Text RPG Engine" poster
+// (glowing d20 over an open book, cosmic teal-gold). Portrait; rendered `contain` + inset with the
+// loading bar below.
+const SPLASH_W = 900;
+const SPLASH_H = 1599;
 
 // Module-scoped so it survives remounts within the same JS process; resets on a
 // fresh process / OTA reload.
