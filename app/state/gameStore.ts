@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, resolveTable } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -343,6 +343,45 @@ function getAllConcepts(): Concept[] {
   return _allConcepts!;
 }
 
+// engine_Dev — concepts built from the active LORE document (author override or generic
+// default), cached by the lore-doc array identity. Lets "what is X" answer from the
+// author's own lore instead of the built-in (Tartaria) concept bank. Keywords come from a
+// passage's tags/keywords; the answer is its text.
+const EMPTY_LORE_CONCEPTS: readonly { tags?: unknown; keywords?: unknown; section?: unknown; text?: unknown }[] = [];
+let _loreDocConcepts: Concept[] | null = null;
+let _loreDocConceptsRef: unknown = null;
+function getLoreDocConcepts(): Concept[] {
+  const loreDoc = resolveTable('lore', EMPTY_LORE_CONCEPTS) as Array<{ tags?: unknown; keywords?: unknown; section?: unknown; text?: unknown }>;
+  if (_loreDocConcepts && _loreDocConceptsRef === loreDoc) return _loreDocConcepts;
+  _loreDocConceptsRef = loreDoc;
+  _loreDocConcepts = loreDoc
+    .map((p, i): Concept => {
+      const raw = Array.isArray(p.tags) ? p.tags : Array.isArray(p.keywords) ? p.keywords : [];
+      return {
+        id: `lore_${i}`,
+        keywords: (raw as unknown[]).filter((k): k is string => typeof k === 'string' && k.trim().length > 0),
+        title: typeof p.section === 'string' ? p.section : '',
+        answer: typeof p.text === 'string' ? p.text.trim() : '',
+      };
+    })
+    .filter((c) => c.keywords.length > 0 && c.answer.length > 0);
+  return _loreDocConcepts;
+}
+
+function matchConcept(t: string, pool: Concept[]): Concept | null {
+  if (pool.length === 0) return null;
+  // Prefer longer keyword matches (so "burn damage" matches before "burn").
+  const sorted = [...pool].sort(
+    (a, b) => Math.max(0, ...b.keywords.map((k) => k.length)) - Math.max(0, ...a.keywords.map((k) => k.length)),
+  );
+  for (const c of sorted) {
+    for (const kw of c.keywords) {
+      if (kw && t.includes(kw.toLowerCase())) return c;
+    }
+  }
+  return null;
+}
+
 // Match a player's "what is X / explain X / tell me about X" target text
 // against the concepts knowledge base. First substring hit on any keyword
 // wins; returns null if nothing matches so the caller can fall back.
@@ -350,16 +389,10 @@ function findConcept(targetText: string | undefined): Concept | null {
   if (!targetText) return null;
   const t = targetText.toLowerCase();
   if (!t.trim()) return null;
-  // Prefer longer keyword matches (so "burn damage" matches before "burn").
-  const sorted = [...getAllConcepts()].sort(
-    (a, b) => Math.max(...b.keywords.map((k) => k.length)) - Math.max(...a.keywords.map((k) => k.length)),
-  );
-  for (const c of sorted) {
-    for (const kw of c.keywords) {
-      if (t.includes(kw.toLowerCase())) return c;
-    }
-  }
-  return null;
+  // engine_Dev — the active LORE document (author override or generic default) wins for
+  // setting questions, so a custom game answers from its OWN lore, not the built-in
+  // (Tartaria) concepts. Falls through to the built-in bank for mechanics + unmatched terms.
+  return matchConcept(t, getLoreDocConcepts()) ?? matchConcept(t, getAllConcepts());
 }
 
 const allLocations = locationsData as Location[];

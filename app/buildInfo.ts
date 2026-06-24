@@ -15840,4 +15840,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // COLLECTABLES, SUMMONED SIDEKICKS, DOG-RESCUE, DIGGING, SCRAP, SALVAGE, OVERLAYS, ADVANCED
 // RULES). Control/meta bars (WHOLE GAME, MUSIC, MAPS, FAMILY BUILD, DEV MODE) carry no
 // diamond. tsc unchanged from baseline.
-export const OTA_BUILD_ID = '2026-06-24-829';
+//
+// engine_Dev-830 — CANON FACT FILES: close the last Arbiter-knowledge leak. Audit finding:
+// the Arbiter's two main knowledge paths were ALREADY gated behind the lore document —
+// buildCanonFactsParagraph (LLM context injection) and loadLoreConceptBank ("Ask the
+// Arbiter" MiniLM corpus) both return from the author/generic lore doc when present and only
+// fall to the built-in (Tartaria) canon files when absent. Since 826 gave the generic game a
+// lore doc, those Tartaria files (canon-events / food-drink / glossary / arbiter-titles /
+// canon-armor·weapons·skills·currency·loot) are never reached at runtime. The ONE ungated
+// path was gameStore.findConcept() — the player's "what is X" lookup over concepts.json (172
+// mixed mechanics + Tartaria-setting entries). Fixed: findConcept now matches the active LORE
+// document FIRST (getLoreDocConcepts, cached by lore-doc identity — keywords from tags, answer
+// from text), so a custom game answers setting questions from its OWN lore, and only falls
+// through to the built-in concept bank for mechanics + unmatched terms. The Action Reference
+// screen still reads concepts.json for its mechanical action cards (neutral). tsc baseline.
+export const OTA_BUILD_ID = '2026-06-24-830';
