@@ -15889,4 +15889,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (NOTE: location-flavors KEYS are still built-in location ids — great_tartary_plains,
 // tartarian_outskirts — those belong to the built-in locations.json coupling, addressed
 // with that table, not here.) tsc baseline; narration/ambient/mystery/context suites green.
-export const OTA_BUILD_ID = '2026-06-24-833';
+//
+// engine_Dev-834 — title-id genericization + save migration. Renamed the 8 Tartaria-flavored
+// earnable title ids to neutral forms (aetheric_attuned->arcane_attuned, golem_whisperer->
+// sidekick_whisperer, bane_of_sentinels->bane_of_constructs, master_of_aethercraft->
+// master_of_spellcraft, etc.) across titles.ts + arbiter-titles.json + tests, and genericized
+// the perk display text. Old saves carry the legacy ids in player.earnedTitles, so backfillPlayer
+// now remaps them (LEGACY_TITLE_ID_MIGRATION) — forward-only, idempotent, deduped — so an earned
+// title keeps its display AND its passive perk after the rename. New titleIdMigration test locks
+// it. (Internal counter field names like golemEdge/sentinelsDefeated are never displayed, left
+// as-is.) tsc baseline; titles/stealthTitles/arbiterTitlesScreen/titleIdMigration suites green.
+export const OTA_BUILD_ID = '2026-06-24-834';
