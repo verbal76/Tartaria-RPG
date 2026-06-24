@@ -16026,4 +16026,6 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // HP color. Removed CombatArena entirely. Now during a fight the ORIGINAL top row grows tall to fill
 // the world-window (topRowCombat flex:1, feed hidden) and the ORIGINAL StatsPanel (reactive HP color)
 // + EnemyPanel get a `fill` prop so each is ONE long box on its side. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-849';
+//
+// engine_Dev-850 — splash poster +50% (caps 0.56→0.84 width / 0.54→0.81 height), still centered.
+export const OTA_BUILD_ID = '2026-06-24-850';
