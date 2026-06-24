@@ -1,7 +1,17 @@
 import type { Faction, FactionStanding } from './types';
 import factionsData from '../data/factions/factions.json';
+import { resolveTable } from './contentPack';
 
+/** The BUILT-IN faction list. Prefer `liveFactions()` / `findFaction()` for anything that
+ *  must honor an author's uploaded Factions table — this raw export is the default only. */
 export const FACTIONS = factionsData as Faction[];
+
+/** The ACTIVE faction list: author override → installed generic default → built-in. Every
+ *  faction lookup (standings, rep propagation, UI names) must go through this so a reskin's
+ *  uploaded Factions table actually drives the faction systems. */
+export function liveFactions(): Faction[] {
+  return resolveTable<Faction>('factions', FACTIONS) as Faction[];
+}
 
 // arb119 — reputation is a bounded standing, never an unbounded resource. The join
 // threshold is 20; ±100 is "fully allied / sworn enemy". Clamping here stops the
@@ -18,11 +28,11 @@ function normalizeRef(ref: string): string {
 }
 
 function isKnownFactionId(id: string): boolean {
-  return FACTIONS.some((f) => f.id === id);
+  return liveFactions().some((f) => f.id === id);
 }
 
 export function findFaction(id: string): Faction | null {
-  return FACTIONS.find((f) => f.id === id) ?? null;
+  return liveFactions().find((f) => f.id === id) ?? null;
 }
 
 /**

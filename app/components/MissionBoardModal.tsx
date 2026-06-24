@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { availableFactionQuests } from '../engine/factionQuests';
-import { getStanding, FACTIONS } from '../engine/factions';
+import { getStanding, findFaction } from '../engine/factions';
 
 interface Props {
   visible: boolean;
@@ -36,7 +36,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
   const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
 
   const factionLabel = board
-    ? FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ')
+    ? findFaction(board.faction)?.name ?? board.faction.replace(/_/g, ' ')
     : '';
 
   const postings = useMemo(() => {

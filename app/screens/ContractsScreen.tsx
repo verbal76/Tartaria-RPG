@@ -6,7 +6,7 @@ import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, getMysteries } from '../engine/mysteries';
 import { findStorylineById, getStorylines } from '../engine/factionStorylines';
 import { findFactionQuestById, getFactionQuests, factionQuestReady } from '../engine/factionQuests';
-import { FACTIONS } from '../engine/factions';
+import { findFaction } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
 import { computeAllProgress, getCharacterStories, allFragments } from '../engine/collectables';
@@ -57,7 +57,7 @@ const milestoneStyles = StyleSheet.create({
 
 function factionLabel(factionId: string | null | undefined): string {
   if (!factionId) return 'Unaffiliated';
-  const f = FACTIONS.find((x) => x.id === factionId);
+  const f = findFaction(factionId);
   return f?.name ?? factionId.replace(/_/g, ' ');
 }
 

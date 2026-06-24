@@ -233,7 +233,7 @@ import {
   synthesizeItemFromName,
 } from '../engine/crafting';
 import {
-  FACTIONS,
+  liveFactions,
   findFaction,
   applyRepChange,
   getStanding,
@@ -12887,7 +12887,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        const match = FACTIONS.find(
+        const match = liveFactions().find(
           (f) => f.name.toLowerCase().includes(target) || target.includes(f.name.toLowerCase()) || f.id === target,
         );
         if (!match) {
@@ -16084,7 +16084,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!turnFaction && isHubLocation(player.currentLocationId)) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { startingLocationForFaction } = require('../engine/character');
-      const homeFaction = FACTIONS.find((f) => {
+      const homeFaction = liveFactions().find((f) => {
         try { return startingLocationForFaction(f.id) === player.currentLocationId; } catch { return false; }
       });
       if (homeFaction) {
@@ -16114,7 +16114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const factionEntries = Array.from(
           new Map(
             active.map((q) => {
-              const f = FACTIONS.find((x) => x.id === q.factionId);
+              const f = liveFactions().find((x) => x.id === q.factionId);
               return [q.factionId, f?.name ?? q.factionId.replace(/_/g, ' ')];
             }),
           ).entries(),
@@ -16170,7 +16170,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // handed over in person (board or any same-faction agent). Deed quests
     // (kill / travel / stage) CAN be sent word remotely below.
     if (remote && candidate.fetch) {
-      const fLabel = FACTIONS.find((f) => f.id === candidate.factionId)?.name ?? candidate.factionId.replace(/_/g, ' ');
+      const fLabel = liveFactions().find((f) => f.id === candidate.factionId)?.name ?? candidate.factionId.replace(/_/g, ' ');
       get().appendLog(
         'arbiter',
         `The ${getNarratorName()} shakes their head. "${candidate.title} is a delivery — ${candidate.fetch.quantity}× ${candidate.fetch.itemName} doesn't travel by word of mouth. Carry it to the board or any ${fLabel} agent yourself."`,
@@ -16287,7 +16287,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The ${getNarratorName()} glances around. "No board posted here."`);
       return;
     }
-    const factionLabel = FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ');
+    const factionLabel = liveFactions().find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ');
     const pool = availableFactionQuests(
       board.faction,
       getStanding(player.factionStanding, board.faction),
@@ -20332,7 +20332,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const catalyst = fusion.findFactionCatalyst(livePlayer.inventory, equippedIdSet) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
-      const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
+      const fac = liveFactions().find((f) => (catalyst.tags ?? []).includes(f.id));
       if (fac) {
         const facRarity: 'Rare' | 'Legendary' = gate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
@@ -27052,7 +27052,7 @@ function logRepChanges(
   changes: { factionId: string; delta: number; newStanding: number }[],
 ): void {
   for (const c of changes) {
-    const faction = FACTIONS.find((f) => f.id === c.factionId);
+    const faction = liveFactions().find((f) => f.id === c.factionId);
     const name = faction?.name ?? c.factionId;
     const sign = c.delta > 0 ? '+' : '';
     get().appendLog('system', `${name} standing ${sign}${c.delta} (now ${c.newStanding})`);
