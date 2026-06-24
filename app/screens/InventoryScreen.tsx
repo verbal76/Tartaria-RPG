@@ -1127,19 +1127,19 @@ const pouchStyles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     paddingVertical: 8,
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
   },
-  title: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  title: { color: '#6ab0c9', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
+  hint: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6 },
   slot: { flex: 1 },
   slotFilled: {
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 3,
     backgroundColor: '#26201a',
@@ -1156,17 +1156,17 @@ const pouchStyles = StyleSheet.create({
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     alignItems: 'center',
   },
   slotEmptyActive: {
     backgroundColor: '#1a2614',
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
   },
-  slotName: { color: '#e6d8b3', fontSize: 11, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 9, marginTop: 2 },
+  slotName: { color: '#d6e4e8', fontSize: 11, fontWeight: '700' },
+  slotAction: { color: '#6c8088', fontSize: 9, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 10, fontWeight: '600', letterSpacing: 0.5 },
-  slotEmptyTextActive: { color: '#c9a86a' },
+  slotEmptyTextActive: { color: '#6ab0c9' },
 });
 
 // arb110 — BANDOLIER banner. The throwables counterpart to the tool pouch: five
@@ -1237,7 +1237,7 @@ const bandolierStyles = StyleSheet.create({
     borderRadius: 4,
   },
   title: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  hint: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   slot: { flexBasis: '18%', flexGrow: 1 },
   slotFilled: {
@@ -1254,18 +1254,18 @@ const bandolierStyles = StyleSheet.create({
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     alignItems: 'center',
   },
   slotEmptyActive: { backgroundColor: '#2a1a14', borderColor: '#e07a5f' },
-  slotName: { color: '#e6d8b3', fontSize: 10, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 8, marginTop: 2 },
+  slotName: { color: '#d6e4e8', fontSize: 10, fontWeight: '700' },
+  slotAction: { color: '#6c8088', fontSize: 8, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 9, fontWeight: '600', letterSpacing: 0.3, textAlign: 'center' },
   slotEmptyTextActive: { color: '#e07a5f' },
 });
 
 // OTA-485 — companion signature colours, keyed to the hues each name renders in
-// (StatsPanel: dogName #c9a86a gold, golemName #9888a8 purple).
+// (StatsPanel: dogName #6ab0c9 gold, golemName #9888a8 purple).
 // OTA-489 — player asked to "keep the translucence but bump the saturation": same
 // gold/purple HUES, richer chroma so they read clearly as gold/purple at the
 // unchanged ~0.2 stripe opacity (the name-label hues stay as-is; these brighter
@@ -1476,7 +1476,7 @@ function rarityHexColor(rarity: string | null | undefined): string {
     case 'Legendary': return '#e07a5f';
     case 'Rare': return '#b88ce0';
     case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a'; // Common / undefined
+    default: return '#6ab0c9'; // Common / undefined
   }
 }
 
@@ -1491,8 +1491,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -1500,9 +1500,9 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  tc: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  tc: { color: '#6ab0c9', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
   section: { marginBottom: 12 },
@@ -1527,8 +1527,8 @@ const styles = StyleSheet.create({
   sectionCount: { color: '#9a8e74', fontSize: 11 },
   row: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 4,
@@ -1548,11 +1548,11 @@ const styles = StyleSheet.create({
   rowStripe: { width: 4 },
   rowBody: { flex: 1, padding: 8 },
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  rowName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1 },
+  rowName: { color: '#d6e4e8', fontSize: 14, fontWeight: '600', flex: 1 },
   rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
-  rowQty: { color: '#cdbf99', fontSize: 12 },
+  rowQty: { color: '#bcd2db', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
-  rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  rowMeta: { color: '#6c8088', fontSize: 10, letterSpacing: 1 },
   // arb87 — per-item stat line (AC / resists / bonuses / restores).
   rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
   // arb87 — "slot already worn" red ✗ (combat-miss red).
@@ -1565,16 +1565,16 @@ const styles = StyleSheet.create({
   rowDamage: { color: '#9ec96a' },
   // OTA-120 Phase 5 — [fits dog] / [treat] tag styling. Amber so they
   // stand out from the grey rarity / durability metadata.
-  rowDogTag: { color: '#c9a86a', fontWeight: '700' },
+  rowDogTag: { color: '#6ab0c9', fontWeight: '700' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
   // OTA-360 — weapon-coating chip. Sickly green-violet so it reads as
   // an applied toxin distinct from the green damage-dice chip.
   rowCoating: { color: '#b08fd4', fontWeight: '700' },
-  rowPouch: { color: '#c9a86a', fontWeight: '700' },
+  rowPouch: { color: '#6ab0c9', fontWeight: '700' },
   rowBandolier: { color: '#e07a5f', fontWeight: '700' },
-  rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
+  rowEquipped: { color: '#6ab0c9', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  rowEquippable: { color: '#6c8088', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
   // OTA-269 — callout shown above the inventory list when the player
   // has tapped an empty pouch slot. Tan accent bar + CANCEL chip so
   // the player always has a clear exit from the filter mode.
@@ -1583,33 +1583,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#1a2614',
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     borderLeftWidth: 3,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginBottom: 8,
   },
-  pouchFilterText: { color: '#cdbf99', fontSize: 12, flexShrink: 1, flexGrow: 1 },
+  pouchFilterText: { color: '#bcd2db', fontSize: 12, flexShrink: 1, flexGrow: 1 },
   pouchFilterCancel: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
   },
-  pouchFilterCancelText: { color: '#cdbf99', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  pouchFilterCancelText: { color: '#bcd2db', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     paddingVertical: 8,
-    borderTopColor: '#3a342c',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
     marginTop: 4,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendSwatch: { width: 10, height: 10, borderRadius: 2 },
-  legendText: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  legendText: { color: '#6c8088', fontSize: 10, letterSpacing: 1 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });

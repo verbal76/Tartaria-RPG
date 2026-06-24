@@ -25,8 +25,8 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   consumable: '#9ec96a',
   tool: '#7fb0a8', // teal — utility implements (pry bar, lockpick, scanner…)
   relic: '#b88ce0',
-  material: '#c9a86a',
-  loot: '#a89a7a',
+  material: '#6ab0c9',
+  loot: '#8fa6ac',
   quest: '#d9c34a', // gold — reserved objective items (locked)
 };
 

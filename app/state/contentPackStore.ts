@@ -356,7 +356,7 @@ interface ContentPackState {
   /** Parse a SINGLE whole-game JSON (JSONC; comments allowed) whose keys are
    *  table ids / lore block ids / title / tagline / narrator, and apply every
    *  recognised section at once. One upload builds the whole game. */
-  loadGameBundle: (json: string) => BundleLoadResult;
+  loadGameBundle: (json: string, opts?: { persist?: boolean }) => BundleLoadResult;
   /** Serialize the CURRENT game (every uploaded table + lore block + title /
    *  tagline / narrator) into one whole-game JSON string — the exact shape
    *  loadGameBundle reads. This is the file you send back to have the game baked
@@ -1327,7 +1327,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), inventory: null });
   },
 
-  loadGameBundle(json) {
+  loadGameBundle(json, opts) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(stripJsonComments(json));
@@ -1613,7 +1613,12 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       energyName: nextEnergyName,
       contentVersion: get().contentVersion + 1,
     });
-    persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, roadsideTraders: nextRoadside, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
+    // engine_Dev — a BAKED default game (App.tsx boot) applies with persist:false: it's part of
+    // the build, re-derived each launch, so it must not be written into AsyncStorage (which would
+    // shadow a later rebuild's baked game). Normal dev uploads persist as before.
+    if (opts?.persist !== false) {
+      persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, roadsideTraders: nextRoadside, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
+    }
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
     return { ok: true, summary };

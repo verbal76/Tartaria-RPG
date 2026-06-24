@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, resolveTable } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, resolveTable, resolveFlavor } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -18360,9 +18360,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // TRAVEL_LORE_BEATS pool. Surfaces the lore layer for players who
     // never explicitly ask 'what is X'. rotatingPick keeps the same
     // line from firing twice in a row across the session.
-    if (TRAVEL_LORE_BEATS.length > 0 && Math.random() < 0.05) {
-      const idx = rotatingPick(TRAVEL_LORE_BEATS.map((_, i) => i), 'travel.lore.beat');
-      get().appendLog('arbiter', TRAVEL_LORE_BEATS[idx]!);
+    // engine_Dev — overridable via the Flavor block's `travelBeats` key (author → generic →
+    // built-in), so a reskin / the generic game shows neutral beats, not the Tartaria pool.
+    const travelBeats = resolveFlavor('travelBeats', TRAVEL_LORE_BEATS);
+    if (travelBeats.length > 0 && Math.random() < 0.05) {
+      const idx = rotatingPick(travelBeats.map((_, i) => i), 'travel.lore.beat');
+      get().appendLog('arbiter', travelBeats[idx]!);
     }
     // OTA-139 — rumor-of-trapped-dog discoverability nudge. After
     // ~5 in-game days with no dog, no onboarding in flight, and
@@ -24353,10 +24356,12 @@ function narrateAmbientFind(
   ];
   const lines = inHub ? indoor : wilderness;
   get().appendLog('world', pick(lines));
-  // Ambient-flavor lore reveal — 25% chance on EVERY search.
-  if (AMBIENT_FLAVOR_LINES.length > 0 && chance(25)) {
-    const idx = rotatingPick(AMBIENT_FLAVOR_LINES.map((_, i) => i), 'ambient.flavor');
-    const factoid = AMBIENT_FLAVOR_LINES[idx]!.replace(/\{noun\}/g, noun);
+  // Ambient-flavor lore reveal — 25% chance on EVERY search. engine_Dev — overridable via
+  // the Flavor block's `ambientFlavor` key (author → generic → built-in).
+  const ambientFlavor = resolveFlavor('ambientFlavor', AMBIENT_FLAVOR_LINES);
+  if (ambientFlavor.length > 0 && chance(25)) {
+    const idx = rotatingPick(ambientFlavor.map((_, i) => i), 'ambient.flavor');
+    const factoid = ambientFlavor[idx]!.replace(/\{noun\}/g, noun);
     get().appendLog('world', factoid);
   }
   // 2026-05-25 OTA-047 — curiosity-gap "mystery seed" reveal. ~8%
@@ -24369,8 +24374,10 @@ function narrateAmbientFind(
   // ambient-flavor reveal so a single investigate can hit both at
   // independent probabilities. Pool lives in app/data/lore/mystery-
   // seeds.json — extend by adding lines, no engine touch.
-  if (MYSTERY_SEED_LINES.length > 0 && chance(8)) {
-    const seed = MYSTERY_SEED_LINES[Math.floor(Math.random() * MYSTERY_SEED_LINES.length)]!;
+  // engine_Dev — overridable via the Flavor block's `mysterySeeds` key (author → generic → built-in).
+  const mysterySeeds = resolveFlavor('mysterySeeds', MYSTERY_SEED_LINES);
+  if (mysterySeeds.length > 0 && chance(8)) {
+    const seed = mysterySeeds[Math.floor(Math.random() * mysterySeeds.length)]!;
     get().appendLog('world', seed.replace(/\{noun\}/g, noun));
   }
   // 2026-05-25 OTA-039 — outcome-ladder rewrite. Goal per playtester:

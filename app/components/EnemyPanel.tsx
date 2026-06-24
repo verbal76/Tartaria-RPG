@@ -244,7 +244,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
   const attackNum = parseInt(String(view.enemy.attack), 10);
   const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
-  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#c9a86a' : '#e07a5f';
+  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#6ab0c9' : '#e07a5f';
   // Range indicator. Engine doesn't track per-enemy positioning yet —
   // anyone staged in the scene is in arm's reach. Once positioning is
   // added this becomes view.inRange.
@@ -316,7 +316,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
       {view.statuses && view.statuses.length > 0 && (
         <View style={styles.statusCol}>
           {view.statuses.map((st, i) => {
-            const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#c9a86a' };
+            const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#6ab0c9' };
             const turns = `${st.turnsRemaining}t left`;
             const dmg = st.dmgPerTurn > 0 ? ` · ${st.dmgPerTurn}/turn` : '';
             return (
@@ -353,7 +353,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   wrap: { width: '100%' },
   card: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#5a2a26',
     borderWidth: 1,
     borderRadius: 4,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
-  rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  rarity: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
   subhead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -374,12 +374,12 @@ const styles = StyleSheet.create({
   },
   range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1, marginLeft: 6 },
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
-  rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
-  subline: { color: '#7a705c', fontSize: 11, flexShrink: 1 },
+  rangeOut: { color: '#6c8088', borderColor: '#2b3a3e' },
+  subline: { color: '#6c8088', fontSize: 11, flexShrink: 1 },
   hpBarBg: {
     height: 6,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 2,
     overflow: 'hidden',
@@ -389,8 +389,8 @@ const styles = StyleSheet.create({
   // the narrow column rather than spreading into a wide single row.
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
   stat: { width: '50%', paddingVertical: 1 },
-  statLabel: { color: '#7a705c', fontSize: 9, letterSpacing: 1 },
-  statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  statLabel: { color: '#6c8088', fontSize: 9, letterSpacing: 1 },
+  statValue: { color: '#d6e4e8', fontSize: 12, fontWeight: '600' },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   statusVal: { color: '#c9b89a', fontSize: 9 },
   traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   traitBadge: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 9,
     letterSpacing: 1,
     paddingHorizontal: 4,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     gap: 4,
     marginTop: 4,
   },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#3a342c' },
-  dotActive: { backgroundColor: '#c9a86a' },
-  hint: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#2b3a3e' },
+  dotActive: { backgroundColor: '#6ab0c9' },
+  hint: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
 });

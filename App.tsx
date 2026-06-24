@@ -27,6 +27,10 @@ import { DeveloperSettingsScreen } from './app/screens/DeveloperSettingsScreen';
 import { useContentPackStore } from './app/state/contentPackStore';
 import { installGenericDefaults } from './app/engine/contentPack';
 import { GENERIC_GAME } from './app/engine/genericGame';
+// engine_Dev — the BAKED GAME SLOT. Empty in a dev build (boots the generic engine); the publish
+// "bake" step fills it with the author's whole-game master JSON so a shipped build auto-loads
+// their game at startup with no upload. See app/data/default-game.json.
+import BAKED_GAME from './app/data/default-game.json';
 import { useCustomMusicStore } from './app/state/customMusicStore';
 import { useCustomMapsStore } from './app/state/customMapsStore';
 import { InventoryScreen } from './app/screens/InventoryScreen';
@@ -217,6 +221,16 @@ export default function App() {
     // below) still win over this; this only fills the gaps. Unit tests never run this
     // boot path, so they keep resolving to the Tartaria builtins they assert against.
     installGenericDefaults(GENERIC_GAME);
+    // engine_Dev — BAKED GAME SLOT. If the build ships a filled-in default-game.json (the publish
+    // bake), apply it as the boot game with persist:false (it lives in the build, re-read each
+    // launch — never written to storage, so a later rebuild's game can't be shadowed). A dev build
+    // keeps this file empty, so this is a no-op and the generic engine shows. A runtime dev upload
+    // (hydrate, below) still wins over the baked game for in-app editing.
+    try {
+      const baked = BAKED_GAME as Record<string, unknown>;
+      const hasBaked = Object.keys(baked).some((k) => !k.startsWith('_') && !k.startsWith('//'));
+      if (hasBaked) useContentPackStore.getState().loadGameBundle(JSON.stringify(baked), { persist: false });
+    } catch { /* malformed baked game → fall through to the generic engine */ }
     // engine_Dev — load any developer content-pack overrides into the registry
     // before gameplay so the engine reads them from the first action.
     void useContentPackStore.getState().hydrate();

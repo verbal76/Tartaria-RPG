@@ -42,6 +42,8 @@ import {
   type LoreBlockId,
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
+import { validateGame, summarizeValidation } from '../engine/validateGame';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -118,7 +120,7 @@ function RenameBox({
         value={text}
         onChangeText={setText}
         placeholder={placeholder}
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         autoCapitalize={autoCapitalize ?? 'sentences'}
         autoCorrect={false}
         maxLength={maxLength ?? 60}
@@ -348,7 +350,7 @@ function MapsSection() {
             value={w}
             onChangeText={setW}
             placeholder="columns"
-            placeholderTextColor="#5c5446"
+            placeholderTextColor="#46555a"
             keyboardType="number-pad"
           />
         </View>
@@ -359,7 +361,7 @@ function MapsSection() {
             value={h}
             onChangeText={setH}
             placeholder="rows"
-            placeholderTextColor="#5c5446"
+            placeholderTextColor="#46555a"
             keyboardType="number-pad"
           />
         </View>
@@ -460,6 +462,8 @@ function GameBundleBox() {
   const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
   const [status, setStatus] = useState<Status>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  // engine_Dev — multi-part save: uploaded parts collect here until every 1..N is in, then knit.
+  const [pendingParts, setPendingParts] = useState<GameSavePart[]>([]);
 
   // engine_Dev — does the author have ANYTHING loaded yet? exportGameBundle emits
   // only the sections that have been uploaded, so an empty game serialises to "{}".
@@ -480,23 +484,69 @@ function GameBundleBox() {
     let uploaded: Record<string, unknown> = {};
     try { uploaded = JSON.parse(useContentPackStore.getState().exportGameBundle()) as Record<string, unknown>; } catch { uploaded = {}; }
     const out = buildAnnotatedGameBundle(uploaded);
-    const filename = built ? 'my-game.json' : 'game-template.json';
-    const what = built ? `your game (${Object.keys(uploaded).length} sections uploaded, rest marked ⬜ template)` : 'the blank template (all sections marked ⬜)';
+    // engine_Dev — stamp the filename so successive downloads are distinguishable.
+    const stamp = fileStamp(new Date());
+    const base = built ? 'my-game' : 'game-template';
+    const what = built ? `your game (${Object.keys(uploaded).length} sections uploaded, rest marked ⬜ template)` : 'the blank template';
+    // engine_Dev — AUTO-SPLIT by size. A whole-game file over the per-part ceiling can't be
+    // pasted / re-read in one piece on device, so split into as many parts as needed (each ≤
+    // SAFE_PART_CHARS). Under the ceiling → one normal file. Parts knit back on UPLOAD, any order.
+    const parts = out.length <= SAFE_PART_CHARS ? null : buildSaveParts(out, `${stamp}-${out.length}c`, stamp);
     try {
       if (Platform.OS === 'android') {
         const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (!perm.granted) { setStatus({ kind: 'err', msg: 'Save cancelled — no folder chosen.' }); return; }
-        const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, filename, 'application/json');
-        await FileSystem.writeAsStringAsync(uri, out);
-        setStatus({ kind: 'ok', msg: `Saved ${what} as ${filename} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Find it in Files — edit it, then UPLOAD FILE FROM DEVICE.` });
+        if (!parts) {
+          const fn = `${base}-${stamp}.json`;
+          const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, fn, 'application/json');
+          await FileSystem.writeAsStringAsync(uri, out);
+          setStatus({ kind: 'ok', msg: `Saved ${what} as ${fn} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Edit it, then UPLOAD FILE FROM DEVICE.` });
+        } else {
+          const names: string[] = [];
+          for (const p of parts) {
+            const fn = `${base}p${p.__gameSavePart}-${stamp}.json`;
+            const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, fn, 'application/json');
+            await FileSystem.writeAsStringAsync(uri, JSON.stringify(p, null, 2));
+            names.push(fn);
+          }
+          setStatus({ kind: 'ok', msg: `Your game is ${(out.length / 1024).toFixed(0)} KB — over the ${(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, so I split it into ${parts.length} parts: ${names.join(', ')}. Upload ALL ${parts.length} (any order) to rebuild it.` });
+        }
       } else {
-        const uri = `${FileSystem.documentDirectory}${filename}`;
-        await FileSystem.writeAsStringAsync(uri, out);
-        setStatus({ kind: 'ok', msg: `Saved ${what} to ${uri}` });
+        if (!parts) {
+          const uri = `${FileSystem.documentDirectory}${base}-${stamp}.json`;
+          await FileSystem.writeAsStringAsync(uri, out);
+          setStatus({ kind: 'ok', msg: `Saved ${what} to ${uri}` });
+        } else {
+          for (const p of parts) await FileSystem.writeAsStringAsync(`${FileSystem.documentDirectory}${base}p${p.__gameSavePart}-${stamp}.json`, JSON.stringify(p, null, 2));
+          setStatus({ kind: 'ok', msg: `Split into ${parts.length} parts (${base}p1..p${parts.length}-${stamp}.json) in ${FileSystem.documentDirectory}` });
+        }
       }
     } catch (e) {
       setStatus({ kind: 'err', msg: `Save failed: ${e instanceof Error ? e.message : String(e)}.` });
     }
+  };
+
+  // engine_Dev — handle one uploaded file: a whole bundle (load it) OR one part of a multi-part
+  // save (collect parts, knit when every 1..N is in — any order; reject mixing different saves).
+  const handleUpload = (content: string) => {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(content)); } catch { parsed = null; }
+    if (isGameSavePart(parsed)) {
+      const r = addSavePart(pendingParts, parsed);
+      setPendingParts(r.parts);
+      if (r.kind === 'complete') {
+        setPendingParts([]);
+        const loaded = loadGameBundle(r.text);
+        setStatus(loaded.ok ? { kind: 'ok', msg: `All ${parsed.__of} parts knit back together. ${loaded.summary ?? 'Loaded.'}` } : { kind: 'err', msg: loaded.error ?? 'Failed.' });
+      } else if (r.kind === 'reset') {
+        setStatus({ kind: 'err', msg: `That part is from a DIFFERENT save (${parsed.__savedAt}). Starting over with it — now upload the rest of THIS save's parts: ${r.need.join(', ')} of ${r.of}.` });
+      } else {
+        setStatus({ kind: 'ok', msg: `Part ${parsed.__gameSavePart} of ${r.of} loaded (save ${parsed.__savedAt}). Have ${r.have.join(', ')}; still need ${r.need.join(', ')}. Keep uploading.` });
+      }
+      return;
+    }
+    const r = loadGameBundle(content);
+    setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
   };
 
   return (
@@ -513,9 +563,36 @@ function GameBundleBox() {
         <Text style={{ fontWeight: 'bold' }}>UPLOAD FILE FROM DEVICE</Text> to load it — every section
         it contains is applied at once; anything omitted keeps its built-in default. // and /* */
         comments are allowed. <Text style={{ fontWeight: 'bold' }}>RESET</Text> wipes all uploaded
-        content back to the built-in defaults if you need a clean slate.
+        content back to the built-in defaults if you need a clean slate.{'\n\n'}
+        <Text style={{ fontWeight: 'bold' }}>VALIDATE GAME</Text> scans your loaded content for broken
+        references (a recipe, quest, vendor, boss, or starting-area pointing at an item / faction / boss /
+        location / room that doesn’t exist) and duplicate ids. Run it before you export so a broken game
+        never gets baked.{'\n\n'}
+        <Text style={{ fontWeight: 'bold' }}>Big game?</Text> If the file is over the{' '}
+        {(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, SAVE automatically splits it into as
+        many timestamped parts as it needs (<Text style={{ fontStyle: 'italic' }}>my-gamep1</Text>,{' '}
+        <Text style={{ fontStyle: 'italic' }}>my-gamep2</Text>,{' '}
+        <Text style={{ fontStyle: 'italic' }}>my-gamep3</Text>…) and tells you how many. Upload ALL of them to
+        rebuild — order doesn’t matter, and it won’t let you mix parts from different saves.
       </Text>
       <View style={styles.stackCol}>
+        {/* engine_Dev — pre-export sanity pass: dangling refs (recipes/quests/vendors/bosses/
+            starting-areas → items/factions/bosses/locations/rooms) + duplicate ids. Run it before
+            you bake so a broken game never ships. */}
+        <TouchableOpacity
+          style={[styles.copyBtn, styles.stackBtn]}
+          onPress={() => {
+            setConfirmReset(false);
+            const s = summarizeValidation(validateGame());
+            if (s.errors === 0 && s.warnings === 0) { setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
+            const head = s.errors > 0
+              ? `✗ Validate Game: ${s.errors} error${s.errors === 1 ? '' : 's'}${s.warnings ? ` + ${s.warnings} warning${s.warnings === 1 ? '' : 's'}` : ''} — fix the errors before you bake.`
+              : `⚠ Validate Game: 0 errors, ${s.warnings} warning${s.warnings === 1 ? '' : 's'} (safe to export).`;
+            setStatus({ kind: s.errors > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more.` : ''}` });
+          }}
+        >
+          <Text style={styles.copyBtnText}>✓ VALIDATE GAME</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
           <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
         </TouchableOpacity>
@@ -525,11 +602,10 @@ function GameBundleBox() {
             const picked = await pickJsonFile();
             if (picked.canceled) { setStatus({ kind: 'err', msg: 'Upload cancelled — no file chosen.' }); return; }
             if (!picked.ok || !picked.content) { setStatus({ kind: 'err', msg: picked.msg ?? 'Could not read that file.' }); return; }
-            const r = loadGameBundle(picked.content);
-            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            handleUpload(picked.content);
           })(); }}
         >
-          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE</Text>
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE{pendingParts.length > 0 ? ` (${pendingParts[0]!.__of - pendingParts.length} more part${pendingParts[0]!.__of - pendingParts.length === 1 ? '' : 's'} needed)` : ''}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.resetBtn, styles.stackBtn]}
@@ -579,7 +655,7 @@ function MissionsBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your missions JSON object here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -660,7 +736,7 @@ function HooksBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your hooks JSON object here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -819,30 +895,30 @@ function WhispersBox() {
 
       {/* ---- build a mission ---- */}
       <Text style={styles.whisperSectionLabel}>New mission</Text>
-      <TextInput style={smallInput} value={wId} onChangeText={setWId} placeholder="id (e.g. dredge_job)" placeholderTextColor="#5c5446" autoCapitalize="none" autoCorrect={false} />
-      <TextInput style={smallInput} value={wTitle} onChangeText={setWTitle} placeholder="title (shown in the Whispers panel)" placeholderTextColor="#5c5446" />
-      <TextInput style={smallInput} value={wPlant} onChangeText={setWPlant} placeholder="plants at (hub-room id or your location id)" placeholderTextColor="#5c5446" autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={smallInput} value={wId} onChangeText={setWId} placeholder="id (e.g. dredge_job)" placeholderTextColor="#46555a" autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={smallInput} value={wTitle} onChangeText={setWTitle} placeholder="title (shown in the Whispers panel)" placeholderTextColor="#46555a" />
+      <TextInput style={smallInput} value={wPlant} onChangeText={setWPlant} placeholder="plants at (hub-room id or your location id)" placeholderTextColor="#46555a" autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
-        <TextInput style={[smallInput, { flex: 1 }]} value={wChance} onChangeText={setWChance} placeholder="plant chance 0–1" placeholderTextColor="#5c5446" keyboardType="numeric" />
-        <TextInput style={[smallInput, { flex: 1 }]} value={wDx} onChangeText={setWDx} placeholder="1st tile dx" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
-        <TextInput style={[smallInput, { flex: 1 }]} value={wDy} onChangeText={setWDy} placeholder="dy" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wChance} onChangeText={setWChance} placeholder="plant chance 0–1" placeholderTextColor="#46555a" keyboardType="numeric" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wDx} onChangeText={setWDx} placeholder="1st tile dx" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wDy} onChangeText={setWDy} placeholder="dy" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
       </View>
-      <TextInput style={smallInput} value={wLine} onChangeText={setWLine} placeholder="the overheard tip line" placeholderTextColor="#5c5446" />
+      <TextInput style={smallInput} value={wLine} onChangeText={setWLine} placeholder="the overheard tip line" placeholderTextColor="#46555a" />
 
       {/* legs */}
       <Text style={styles.whisperSectionLabel}>Legs ({legs.length})</Text>
       {legs.map((l, i) => (
         <Text key={i} style={styles.hint}>{i + 1}. {l.line.slice(0, 60)}{l.enemyName ? ` ⚔ ${l.enemyName}` : ''}</Text>
       ))}
-      <TextInput style={smallInput} value={legLine} onChangeText={setLegLine} placeholder="leg narration (what happens on arrival)" placeholderTextColor="#5c5446" />
+      <TextInput style={smallInput} value={legLine} onChangeText={setLegLine} placeholder="leg narration (what happens on arrival)" placeholderTextColor="#46555a" />
       <View style={styles.row}>
-        <TextInput style={[smallInput, { flex: 1 }]} value={legDx} onChangeText={setLegDx} placeholder="dx (blank=same tile)" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
-        <TextInput style={[smallInput, { flex: 1 }]} value={legDy} onChangeText={setLegDy} placeholder="dy" placeholderTextColor="#5c5446" keyboardType="numbers-and-punctuation" />
-        <TextInput style={[smallInput, { flex: 1.4 }]} value={legEnemy} onChangeText={setLegEnemy} placeholder="foe to defeat (optional)" placeholderTextColor="#5c5446" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={legDx} onChangeText={setLegDx} placeholder="dx (blank=same tile)" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={legDy} onChangeText={setLegDy} placeholder="dy" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1.4 }]} value={legEnemy} onChangeText={setLegEnemy} placeholder="foe to defeat (optional)" placeholderTextColor="#46555a" />
       </View>
       <View style={styles.row}>
-        <TextInput style={[smallInput, { flex: 1 }]} value={legTc} onChangeText={setLegTc} placeholder="reward TC" placeholderTextColor="#5c5446" keyboardType="numeric" />
-        <TextInput style={[smallInput, { flex: 1.6 }]} value={legItem} onChangeText={setLegItem} placeholder="reward item name (optional)" placeholderTextColor="#5c5446" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={legTc} onChangeText={setLegTc} placeholder="reward TC" placeholderTextColor="#46555a" keyboardType="numeric" />
+        <TextInput style={[smallInput, { flex: 1.6 }]} value={legItem} onChangeText={setLegItem} placeholder="reward item name (optional)" placeholderTextColor="#46555a" />
         <TouchableOpacity style={styles.tmplBtn} onPress={addLeg}><Text style={styles.tmplBtnText}>ADD LEG</Text></TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.loadBtn} onPress={addWhisper}><Text style={styles.loadBtnText}>＋ ADD WHISPER</Text></TouchableOpacity>
@@ -854,7 +930,7 @@ function WhispersBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your whispers JSON array here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -941,7 +1017,7 @@ function WastelandBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your wasteland encounters JSON object here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -1060,7 +1136,7 @@ function InteractionTagsBox() {
         value={text}
         onChangeText={setText}
         placeholder="Tap ↻ FROM WORLD to build the taggable list…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -1291,11 +1367,11 @@ function StartingAreasBox() {
       {factions.length > 0
         ? chipRow('Faction:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))
         : <Text style={styles.err}>Load a Factions table first — areas attach to a faction.</Text>}
-      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Area name (e.g. Drydock 4 Command)" placeholderTextColor="#5c5446" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Area name (e.g. Drydock 4 Command)" placeholderTextColor="#46555a" />
       {locations.length > 0 && chipRow('Place it at:', locations, f.locationId, (id) => up('locationId', id === f.locationId ? '' : id))}
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.x} onChangeText={(v) => up('x', v)} placeholder="grid X" placeholderTextColor="#5c5446" keyboardType="number-pad" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.y} onChangeText={(v) => up('y', v)} placeholder="grid Y" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.x} onChangeText={(v) => up('x', v)} placeholder="grid X" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.y} onChangeText={(v) => up('y', v)} placeholder="grid Y" placeholderTextColor="#46555a" keyboardType="number-pad" />
         <TouchableOpacity style={[styles.tmplBtn, f.returnable && styles.loadBtn]} onPress={() => up('returnable', !f.returnable)}>
           <Text style={f.returnable ? styles.loadBtnText : styles.tmplBtnText}>{f.returnable ? '☑' : '☐'} Returnable</Text>
         </TouchableOpacity>
@@ -1312,7 +1388,7 @@ function StartingAreasBox() {
         </View>
       ))}
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={roomName} onChangeText={setRoomName} placeholder="Room name → add" placeholderTextColor="#5c5446" onSubmitEditing={addRoom} />
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={roomName} onChangeText={setRoomName} placeholder="Room name → add" placeholderTextColor="#46555a" onSubmitEditing={addRoom} />
         <TouchableOpacity style={styles.tmplBtn} onPress={addRoom}><Text style={styles.tmplBtnText}>+ ADD ROOM</Text></TouchableOpacity>
       </View>
       <View style={styles.row}>
@@ -1325,7 +1401,7 @@ function StartingAreasBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your starting-areas JSON array here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -1547,15 +1623,15 @@ function FactionMissionsBox() {
       {factions.length > 0
         ? chipRow('Posted by faction:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))
         : <Text style={styles.err}>Load a Factions table first — a mission is posted by a faction.</Text>}
-      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.title} onChangeText={(v) => up('title', v)} placeholder="Mission title (e.g. Silence the Relay)" placeholderTextColor="#5c5446" />
-      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.objective} onChangeText={(v) => up('objective', v)} placeholder="One-line objective (shown on the board)" placeholderTextColor="#5c5446" />
-      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.description} onChangeText={(v) => up('description', v)} placeholder="Flavor / briefing (optional)" placeholderTextColor="#5c5446" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.title} onChangeText={(v) => up('title', v)} placeholder="Mission title (e.g. Silence the Relay)" placeholderTextColor="#46555a" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.objective} onChangeText={(v) => up('objective', v)} placeholder="One-line objective (shown on the board)" placeholderTextColor="#46555a" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.description} onChangeText={(v) => up('description', v)} placeholder="Flavor / briefing (optional)" placeholderTextColor="#46555a" />
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.gateRep} onChangeText={(v) => up('gateRep', v)} placeholder="rep gate" placeholderTextColor="#5c5446" keyboardType="number-pad" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardTc} onChangeText={(v) => up('rewardTc', v)} placeholder="reward TC" placeholderTextColor="#5c5446" keyboardType="number-pad" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardRep} onChangeText={(v) => up('rewardRep', v)} placeholder="reward rep" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.gateRep} onChangeText={(v) => up('gateRep', v)} placeholder="rep gate" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardTc} onChangeText={(v) => up('rewardTc', v)} placeholder="reward TC" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardRep} onChangeText={(v) => up('rewardRep', v)} placeholder="reward rep" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
-      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.rewardItems} onChangeText={(v) => up('rewardItems', v)} placeholder="Item drops (comma-sep names, optional)" placeholderTextColor="#5c5446" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.rewardItems} onChangeText={(v) => up('rewardItems', v)} placeholder="Item drops (comma-sep names, optional)" placeholderTextColor="#46555a" />
 
       <Text style={styles.hint}>Mission plan — ordered beats ({stages.length}):</Text>
       {stages.map((st, i) => (
@@ -1564,7 +1640,7 @@ function FactionMissionsBox() {
           <TouchableOpacity onPress={() => removeStage(i)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
         </View>
       ))}
-      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={stageText} onChangeText={setStageText} placeholder="Beat narration → add" placeholderTextColor="#5c5446" onSubmitEditing={addStage} />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={stageText} onChangeText={setStageText} placeholder="Beat narration → add" placeholderTextColor="#46555a" onSubmitEditing={addStage} />
       {chipRow('…this beat advances on:', FQ_ADVANCE, stageAdvance, setStageAdvance)}
       <View style={styles.row}>
         <TouchableOpacity style={styles.tmplBtn} onPress={addStage}><Text style={styles.tmplBtnText}>+ ADD BEAT</Text></TouchableOpacity>
@@ -1572,8 +1648,8 @@ function FactionMissionsBox() {
 
       <Text style={styles.hint}>…or instead, a single GATHER requirement (turn-in consumes these):</Text>
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.fetchItem} onChangeText={(v) => up('fetchItem', v)} placeholder="Item to gather" placeholderTextColor="#5c5446" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.fetchQty} onChangeText={(v) => up('fetchQty', v)} placeholder="qty" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.fetchItem} onChangeText={(v) => up('fetchItem', v)} placeholder="Item to gather" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.fetchQty} onChangeText={(v) => up('fetchQty', v)} placeholder="qty" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
 
       <View style={styles.row}>
@@ -1581,7 +1657,7 @@ function FactionMissionsBox() {
       </View>
 
       <Text style={styles.hint}>Or edit raw JSON (template / paste / load):</Text>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a factionQuests array (or { factionQuests: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a factionQuests array (or { factionQuests: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={loadRaw}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(tmpl()); setStatus({ kind: 'ok', msg: 'Loaded an example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -1652,7 +1728,7 @@ function DiggingBox() {
       </Text>
 
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={cap} onChangeText={setCap} placeholder="productive cap" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={cap} onChangeText={setCap} placeholder="productive cap" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
 
       <Text style={styles.hint}>Dig loot ({loot.length}):</Text>
@@ -1663,8 +1739,8 @@ function DiggingBox() {
         </View>
       ))}
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={lootName} onChangeText={setLootName} placeholder="loot item name" placeholderTextColor="#5c5446" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={lootWeight} onChangeText={setLootWeight} placeholder="weight" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={lootName} onChangeText={setLootName} placeholder="loot item name" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={lootWeight} onChangeText={setLootWeight} placeholder="weight" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
       {chipRow('…rarity:', DIG_RARITIES, lootRarity, setLootRarity)}
       <View style={styles.row}><TouchableOpacity style={styles.tmplBtn} onPress={addLoot}><Text style={styles.tmplBtnText}>+ ADD LOOT</Text></TouchableOpacity></View>
@@ -1677,8 +1753,8 @@ function DiggingBox() {
         </View>
       ))}
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={scoreName} onChangeText={setScoreName} placeholder="item name" placeholderTextColor="#5c5446" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={scoreVal} onChangeText={setScoreVal} placeholder="score" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={scoreName} onChangeText={setScoreName} placeholder="item name" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={scoreVal} onChangeText={setScoreVal} placeholder="score" placeholderTextColor="#46555a" keyboardType="number-pad" />
         <TouchableOpacity style={styles.tmplBtn} onPress={addScore}><Text style={styles.tmplBtnText}>+ ADD</Text></TouchableOpacity>
       </View>
 
@@ -1688,7 +1764,7 @@ function DiggingBox() {
       </View>
 
       <Text style={styles.hint}>Or edit raw JSON (template / file):</Text>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a digging JSON object" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a digging JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDiggingJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded digging (${r.count} loot).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDiggingTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -1721,7 +1797,7 @@ function ScrapBox() {
         (mats that can’t scrap into themselves), <Text style={{ fontWeight: 'bold' }}>premiumMats</Text>,
         and <Text style={{ fontWeight: 'bold' }}>failureLines</Text>. Hit TEMPLATE for the shape; omit to keep the built-in.
       </Text>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scrap JSON object" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scrap JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadScrapJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded scrap (${r.count} roles).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildScrapTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -1753,7 +1829,7 @@ function SalvageBox() {
         blade…) and a weighted material list — plus the small-haul <Text style={{ fontWeight: 'bold' }}>junk</Text>
         fallback and flavor lines. First matching pool wins. Hit TEMPLATE for the shape.
       </Text>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a salvage JSON object" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a salvage JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadSalvageJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded salvage (${r.count} pools).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSalvageTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -1785,7 +1861,7 @@ function OverlaysBox() {
         with a <Text style={{ fontWeight: 'bold' }}>kind</Text> (encounter / trader / lookout),
         arrival line, ambient nouns, and (for encounters) a pool of enemy names. Hit TEMPLATE for the shape.
       </Text>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste an overlays array (or { overlays: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste an overlays array (or { overlays: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadOverlaysJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} overlay(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildOverlaysTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -1828,7 +1904,7 @@ function DogScenariosBox() {
         captor combat per scenario: <Text style={{ fontWeight: 'bold' }}>captorHp / captorAttack / captorDamage / captorLoot</Text>
         {' '}(loot must be items from your own tables). Hit TEMPLATE — its header explains every field.
       </Text>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scenarios array (or { scenarios: [...] })" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scenarios array (or { scenarios: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDogScenariosJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} scenario(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDogScenariosTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -1903,7 +1979,7 @@ function TitlesBox() {
           value={bName}
           onChangeText={setBName}
           placeholder="Title name (e.g. Veteran of the Fold)"
-          placeholderTextColor="#5c5446"
+          placeholderTextColor="#46555a"
           autoCapitalize="words"
         />
         <TextInput
@@ -1911,7 +1987,7 @@ function TitlesBox() {
           value={bThresh}
           onChangeText={setBThresh}
           placeholder="threshold"
-          placeholderTextColor="#5c5446"
+          placeholderTextColor="#46555a"
           keyboardType="number-pad"
         />
         <TouchableOpacity style={styles.loadBtn} onPress={addBuilderTitle}>
@@ -1939,7 +2015,7 @@ function TitlesBox() {
         value={text}
         onChangeText={setText}
         placeholder="…or paste a titles JSON array here"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -2033,7 +2109,7 @@ function CollectablesBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your collectables JSON here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -2165,7 +2241,7 @@ function SummonsBox() {
           onBlur={commitPct}
           onSubmitEditing={commitPct}
           placeholder="0"
-          placeholderTextColor="#5c5446"
+          placeholderTextColor="#46555a"
           keyboardType="number-pad"
           maxLength={3}
         />
@@ -2179,7 +2255,7 @@ function SummonsBox() {
         value={text}
         onChangeText={setText}
         placeholder="Paste your summons JSON here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -2272,7 +2348,7 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
         value={text}
         onChangeText={setText}
         placeholder="Paste JSON here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -2385,8 +2461,8 @@ function DamageTypesBuilder() {
         rounds. These names then fill the enemy Weak / Strong / Delivers pickers.
       </Text>
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Type name (e.g. frost)" placeholderTextColor="#5c5446" autoCapitalize="none" />
-        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={keywords} onChangeText={setKeywords} placeholder="keywords, comma-sep (ice, freeze)" placeholderTextColor="#5c5446" autoCapitalize="none" />
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Type name (e.g. frost)" placeholderTextColor="#46555a" autoCapitalize="none" />
+        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={keywords} onChangeText={setKeywords} placeholder="keywords, comma-sep (ice, freeze)" placeholderTextColor="#46555a" autoCapitalize="none" />
       </View>
       <Text style={styles.hint}>On-hit stat effect (optional) — leave blank for none:</Text>
       <View style={[styles.row, { flexWrap: 'wrap' }]}>
@@ -2398,14 +2474,14 @@ function DamageTypesBuilder() {
               value={mods[s] ?? ''}
               onChangeText={(v) => setMods((m) => ({ ...m, [s]: v }))}
               placeholder="0"
-              placeholderTextColor="#5c5446"
+              placeholderTextColor="#46555a"
               keyboardType="numbers-and-punctuation"
             />
           </View>
         ))}
         <View style={{ alignItems: 'center', marginBottom: 4 }}>
           <Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text>
-          <TextInput style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]} value={rounds} onChangeText={setRounds} placeholder="3" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+          <TextInput style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]} value={rounds} onChangeText={setRounds} placeholder="3" placeholderTextColor="#46555a" keyboardType="number-pad" />
         </View>
       </View>
       <Text style={styles.hint}>Combat effect when a weapon DEALS this type (optional):</Text>
@@ -2418,11 +2494,11 @@ function DamageTypesBuilder() {
       </View>
       {cMode !== 'none' && (
         <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
-          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>DICE</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cDice} onChangeText={setCDice} placeholder="1d6" placeholderTextColor="#5c5446" autoCapitalize="none" /></View>
-          {cMode === 'dot' && <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text><TextInput style={[styles.input, { width: 44, minHeight: 0, height: 36, textAlign: 'center' }]} value={cRounds} onChangeText={setCRounds} placeholder="3" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>}
-          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>CHANCE%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cChance} onChangeText={setCChance} placeholder="70" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>
-          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>+WEAK%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cWeak} onChangeText={setCWeak} placeholder="25" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>
-          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>−STRONG%</Text><TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={cStrong} onChangeText={setCStrong} placeholder="25" placeholderTextColor="#5c5446" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>DICE</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cDice} onChangeText={setCDice} placeholder="1d6" placeholderTextColor="#46555a" autoCapitalize="none" /></View>
+          {cMode === 'dot' && <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text><TextInput style={[styles.input, { width: 44, minHeight: 0, height: 36, textAlign: 'center' }]} value={cRounds} onChangeText={setCRounds} placeholder="3" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>}
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>CHANCE%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cChance} onChangeText={setCChance} placeholder="70" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>+WEAK%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cWeak} onChangeText={setCWeak} placeholder="25" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>−STRONG%</Text><TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={cStrong} onChangeText={setCStrong} placeholder="25" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>
         </View>
       )}
       <View style={styles.row}>
@@ -2440,7 +2516,7 @@ function DamageTypesBuilder() {
         </View>
       ))}
 
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a damage-types JSON array" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a damage-types JSON array" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDamageTypesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(DAMAGE_TYPES_TEMPLATE); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -2524,12 +2600,12 @@ function EnemyRelationsBuilder() {
         stats/loot in the ENEMIES table).
       </Text>
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Enemy name (e.g. Stone Crab)" placeholderTextColor="#5c5446" autoCapitalize="words" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={hp} onChangeText={setHp} placeholder="HP" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Enemy name (e.g. Stone Crab)" placeholderTextColor="#46555a" autoCapitalize="words" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={hp} onChangeText={setHp} placeholder="HP" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
       <Text style={[styles.hint, { marginBottom: 2 }]}>Delivers (dice + type):</Text>
       <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
-        <TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={dice} onChangeText={setDice} placeholder="1d6" placeholderTextColor="#5c5446" autoCapitalize="none" />
+        <TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={dice} onChangeText={setDice} placeholder="1d6" placeholderTextColor="#46555a" autoCapitalize="none" />
         {types.map((t) => chip(t, delivers === t, () => setDelivers(t)))}
       </View>
       <Text style={[styles.hint, { marginBottom: 2 }]}>Weak against (takes more):</Text>
@@ -2687,29 +2763,29 @@ function BossesBox() {
         </View>
       ))}
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Boss name" placeholderTextColor="#5c5446" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.hp} onChangeText={(v) => up('hp', v)} placeholder="HP" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Boss name" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.hp} onChangeText={(v) => up('hp', v)} placeholder="HP" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.attack} onChangeText={(v) => up('attack', v)} placeholder="ATK" placeholderTextColor="#5c5446" keyboardType="number-pad" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.damage} onChangeText={(v) => up('damage', v)} placeholder="dmg (2d8+3)" placeholderTextColor="#5c5446" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.ac} onChangeText={(v) => up('ac', v)} placeholder="AC" placeholderTextColor="#5c5446" keyboardType="number-pad" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.abilityPoint} onChangeText={(v) => up('abilityPoint', v)} placeholder="tier" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.attack} onChangeText={(v) => up('attack', v)} placeholder="ATK" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.damage} onChangeText={(v) => up('damage', v)} placeholder="dmg (2d8+3)" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.ac} onChangeText={(v) => up('ac', v)} placeholder="AC" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.abilityPoint} onChangeText={(v) => up('abilityPoint', v)} placeholder="tier" placeholderTextColor="#46555a" keyboardType="number-pad" />
       </View>
       <View style={styles.row}>
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.questItem} onChangeText={(v) => up('questItem', v)} placeholder="Quest item drop (dog tags)" placeholderTextColor="#5c5446" />
-        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.drops} onChangeText={(v) => up('drops', v)} placeholder="Other drops (comma-sep)" placeholderTextColor="#5c5446" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.questItem} onChangeText={(v) => up('questItem', v)} placeholder="Quest item drop (dog tags)" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.drops} onChangeText={(v) => up('drops', v)} placeholder="Other drops (comma-sep)" placeholderTextColor="#46555a" />
       </View>
       {factions.length > 0 && chipRow('Faction affiliation:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))}
       {chipRow('Spawn mode:', BOSS_SPAWN_CONDITIONS.map((c) => ({ id: c.id, name: c.label })), f.spawnCondition, (id) => up('spawnCondition', id))}
       {f.spawnCondition !== 'random' && chipRow('Spawn location:', locations, f.spawnLocationId, (id) => up('spawnLocationId', id))}
       {f.spawnCondition === 'random' && (
-        <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.spawnChance} onChangeText={(v) => up('spawnChance', v)} placeholder="Random spawn chance % (e.g. 8)" placeholderTextColor="#5c5446" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.spawnChance} onChangeText={(v) => up('spawnChance', v)} placeholder="Random spawn chance % (e.g. 8)" placeholderTextColor="#46555a" keyboardType="number-pad" />
       )}
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={add}><Text style={styles.loadBtnText}>+ SAVE BOSS</Text></TouchableOpacity>
       </View>
-      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a bosses JSON array" placeholderTextColor="#5c5446" multiline autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a bosses JSON array" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadBossesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} boss(es).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
         <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildBossesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the FULL bosses template (every spawn mode). Edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
@@ -2794,7 +2870,7 @@ function MainQuestBox() {
         value={qTitle}
         onChangeText={(t) => { setQTitle(t); if (steps.length > 0) save({ title: t.trim() || undefined, steps }, 'Title updated.'); }}
         placeholder="Quest title (e.g. Take the Fold)"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
       />
 
       {/* current steps */}
@@ -2838,7 +2914,7 @@ function MainQuestBox() {
           value={bTarget}
           onChangeText={setBTarget}
           placeholder="Target (e.g. the dog tags, an officer)"
-          placeholderTextColor="#5c5446"
+          placeholderTextColor="#46555a"
         />
       )}
       <Text style={styles.hint}>Location:</Text>
@@ -2871,7 +2947,7 @@ function MainQuestBox() {
           value={bReward}
           onChangeText={setBReward}
           placeholder="…and collect (optional item)"
-          placeholderTextColor="#5c5446"
+          placeholderTextColor="#46555a"
         />
         <TouchableOpacity style={styles.loadBtn} onPress={addStep}>
           <Text style={styles.loadBtnText}>+ ADD STEP</Text>
@@ -2884,7 +2960,7 @@ function MainQuestBox() {
         value={text}
         onChangeText={setText}
         placeholder="…or paste a main-quest JSON ({ title, steps: [...] })"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -2972,7 +3048,7 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
         value={text}
         onChangeText={setText}
         placeholder="Paste table JSON here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -3054,7 +3130,7 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
         value={text}
         onChangeText={setText}
         placeholder="Paste lore JSON here…"
-        placeholderTextColor="#5c5446"
+        placeholderTextColor="#46555a"
         multiline
         autoCapitalize="none"
         autoCorrect={false}
@@ -3496,36 +3572,36 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0d0c0b', paddingHorizontal: 12, paddingTop: 8 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 },
   backBtn: { paddingVertical: 8, paddingHorizontal: 6, minWidth: 70 },
-  backText: { color: '#c9a86a', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
-  title: { color: '#c9a86a', fontSize: 15, fontWeight: '700', letterSpacing: 4 },
+  backText: { color: '#6ab0c9', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
+  title: { color: '#6ab0c9', fontSize: 15, fontWeight: '700', letterSpacing: 4 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },
   blurb: { color: '#9a8f78', fontSize: 12, lineHeight: 18, marginBottom: 12, fontStyle: 'italic' },
-  sectionLabel: { color: '#7a705c', fontSize: 11, fontWeight: '700', letterSpacing: 3, marginTop: 12, marginBottom: 6 },
+  sectionLabel: { color: '#6c8088', fontSize: 11, fontWeight: '700', letterSpacing: 3, marginTop: 12, marginBottom: 6 },
   section: { marginTop: 10 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1610', borderWidth: 1, borderColor: '#3a3226', borderRadius: 6, paddingVertical: 11, paddingHorizontal: 12 },
-  sectionHeaderChevron: { color: '#c9a86a', fontSize: 13, fontWeight: '700', width: 18 },
-  sectionHeaderText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
+  sectionHeaderChevron: { color: '#6ab0c9', fontSize: 13, fontWeight: '700', width: 18 },
+  sectionHeaderText: { color: '#6ab0c9', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
   sectionDiamond: { fontSize: 14, fontWeight: '700', marginLeft: 8 },
   sectionBody: { marginTop: 6 },
-  card: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
+  card: { backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  cardTitle: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  cardTitle: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
   badgeOn: { color: '#9ec96a', fontSize: 10, fontWeight: '700' },
-  badgeOff: { color: '#7a705c', fontSize: 10 },
-  hint: { color: '#7a705c', fontSize: 10, marginTop: 3, lineHeight: 14 },
+  badgeOff: { color: '#6c8088', fontSize: 10 },
+  hint: { color: '#6c8088', fontSize: 10, marginTop: 3, lineHeight: 14 },
   whisperSectionLabel: { color: '#9aaab0', fontSize: 12, fontWeight: '700' as const, marginTop: 8, marginBottom: 4 },
-  whisperCountDim: { color: '#7a705c' },
+  whisperCountDim: { color: '#6c8088' },
   specLine: { color: '#6a9bbf', fontSize: 10, marginTop: 5, lineHeight: 14, fontStyle: 'italic' },
   toneLine: { color: '#b88ce0', fontSize: 11, marginTop: 5, fontStyle: 'italic', lineHeight: 15 },
-  trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, backgroundColor: '#0a0908', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 8 },
-  trackName: { color: '#e6d8b3', fontSize: 12, flex: 1, marginRight: 8 },
+  trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, backgroundColor: '#0a1012', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 8 },
+  trackName: { color: '#d6e4e8', fontSize: 12, flex: 1, marginRight: 8 },
   trackRemove: { borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 4, paddingHorizontal: 8 },
   trackRemoveText: { color: '#e07a5f', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  emptyLine: { color: '#5c5446', fontSize: 11, marginTop: 6, fontStyle: 'italic' },
+  emptyLine: { color: '#46555a', fontSize: 11, marginTop: 6, fontStyle: 'italic' },
   btnDisabled: { opacity: 0.4 },
   input: {
-    color: '#e6d8b3', backgroundColor: '#0a0908', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
+    color: '#d6e4e8', backgroundColor: '#0a1012', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
     padding: 8, marginTop: 6, minHeight: 70, maxHeight: 160, fontSize: 11, fontFamily: 'monospace', textAlignVertical: 'top',
   },
   // engine_Dev — wrap so a row of action buttons stacks onto the next line instead
@@ -3537,25 +3613,25 @@ const styles = StyleSheet.create({
   stackBtn: { alignItems: 'center', alignSelf: 'stretch' },
   loadBtn: { backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 18 },
   loadBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  tmplBtn: { backgroundColor: '#1a1714', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  tmplBtn: { backgroundColor: '#131c1f', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
   tmplBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
-  copyBtn: { backgroundColor: '#1a1714', borderColor: '#cdbf99', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
-  copyBtnText: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
-  resetBtn: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
-  resetBtnText: { color: '#a89a7a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  copyBtn: { backgroundColor: '#131c1f', borderColor: '#bcd2db', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  copyBtnText: { color: '#bcd2db', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  resetBtn: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  resetBtnText: { color: '#8fa6ac', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   titleRowDev: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 2 },
   ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
   err: { color: '#e07a5f', fontSize: 11, marginTop: 6 },
   applyBtn: { marginTop: 4, marginBottom: 2, backgroundColor: '#243a3f', borderColor: '#6ad0c9', borderWidth: 1, borderRadius: 4, paddingVertical: 13, alignItems: 'center' },
-  warnBanner: { backgroundColor: '#2a2410', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
+  warnBanner: { backgroundColor: '#2a2410', borderColor: '#6ab0c9', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
   warnBannerTitle: { color: '#e6c96a', fontSize: 12, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
-  warnBannerLine: { color: '#e6d8b3', fontSize: 11, lineHeight: 16, marginTop: 2 },
+  warnBannerLine: { color: '#d6e4e8', fontSize: 11, lineHeight: 16, marginTop: 2 },
   warnBannerNote: { color: '#a89776', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
   applyBtnText: { color: '#7fe3da', fontSize: 13, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
   publishBtn: { marginTop: 6, backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   publishBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
-  publishNote: { color: '#7a705c', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
-  unpublishBtn: { marginTop: 6, backgroundColor: '#1a1714', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
+  publishNote: { color: '#6c8088', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
+  unpublishBtn: { marginTop: 6, backgroundColor: '#131c1f', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   unpublishBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
   resetAll: { marginTop: 18, borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
   resetAllText: { color: '#e07a5f', fontSize: 12, fontWeight: '700', letterSpacing: 2 },

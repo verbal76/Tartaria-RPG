@@ -19,8 +19,8 @@ interface Props {
 //   - COMBAT = warning red — used both as the combat log color AND as
 //     the inline highlight for enemy names appearing inside world text
 //     so the live threat is easy to scan.
-const WORLD_COLOR = '#cdbf99';
-const ARBITER_COLOR = '#c9a86a';
+const WORLD_COLOR = '#bcd2db';
+const ARBITER_COLOR = '#6ab0c9';
 const PLAYER_COLOR = '#7fb8ff';
 const COMBAT_COLOR = '#e07a5f';
 const REWARD_COLOR = '#9ec96a';
@@ -32,7 +32,7 @@ const channelColors: Record<LogChannel, string> = {
   system: WORLD_COLOR,
   combat: COMBAT_COLOR,
   reward: REWARD_COLOR,
-  cognitive: '#7a705c',
+  cognitive: '#6c8088',
   debug: '#605648',
   // OTA 202 — designer notes from the 📝 button. Distinct accent so
   // a glance distinguishes them from world prose during a long
@@ -236,8 +236,8 @@ function renderEnemyMissLine(text: string): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0908',
-    borderColor: '#3a342c',
+    backgroundColor: '#0a1012',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 8,

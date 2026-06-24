@@ -140,7 +140,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                 value={text}
                 onChangeText={setText}
                 placeholder='e.g. "the mud", "the doorway", "left side"'
-                placeholderTextColor="#c9a86a"
+                placeholderTextColor="#6ab0c9"
                 onSubmitEditing={handleSubmit}
                 returnKeyType="search"
                 autoCorrect={false}
@@ -262,20 +262,20 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 380,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
   },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
+  title: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  rule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 10 },
+  body: { color: '#d6e4e8', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     paddingHorizontal: 10,
     paddingVertical: 9,
     borderRadius: 3,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   //   hints, examples, chipRow, chipScrollRow, chip, chipScene,
   //   chipText, chipTextScene, chipConsumed, chipTextConsumed,
   //   chipRequiresText — all unreferenced after the rewrite.
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   // 2026-05-25 — stacked-list styles matching TakeModal so the
   // four ambient-noun modals share one visual pattern. Bounded
   // scroll height keeps long lists from blowing past the screen
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
@@ -312,21 +312,21 @@ const styles = StyleSheet.create({
   // like "half-buried royal vault pedestal" got "→ investigate" cut to
   // "→ inv"). The suffix Text gets flexShrink:0 + marginLeft:8 so it
   // always renders in full at its natural width.
-  chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1, flexShrink: 1 },
+  chipFullText: { color: '#d6e4e8', fontSize: 14, fontWeight: '600', flex: 1, flexShrink: 1 },
   chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, flexShrink: 0, marginLeft: 8 },
   // arb-fix — the scanner-requirement label on a locked chip ("requires Mud
   // Scanner") used #bf9b6a, an off-tone amber the player flagged. Match the
-  // inventory "EQUIPPED" amber (#c9a86a) so the palette is consistent.
-  chipFullHint: { color: '#c9a86a', fontSize: 11, letterSpacing: 0.5, flexShrink: 0, marginLeft: 8 },
+  // inventory "EQUIPPED" amber (#6ab0c9) so the palette is consistent.
+  chipFullHint: { color: '#6ab0c9', fontSize: 11, letterSpacing: 0.5, flexShrink: 0, marginLeft: 8 },
   chipFullConsumed: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#2a2622',
   },
   // arb115 — a finished investigation now reads in the SAME completed-gold as a
-  // cleared climb (ClimbModal rowNameCleared/rowHeightCleared, #c9a86a italic),
+  // cleared climb (ClimbModal rowNameCleared/rowHeightCleared, #6ab0c9 italic),
   // instead of the old dim grey, so "done" looks consistent across the game.
-  chipFullTextConsumed: { color: '#c9a86a', fontStyle: 'italic' },
-  chipFullArrowConsumed: { color: '#c9a86a' },
+  chipFullTextConsumed: { color: '#6ab0c9', fontStyle: 'italic' },
+  chipFullArrowConsumed: { color: '#6ab0c9' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,
@@ -338,8 +338,8 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnPrimary: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnTextPrimary: { color: '#0e1618', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnTextNeutral: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

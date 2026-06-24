@@ -445,14 +445,16 @@ function getIntentRemarks(): Partial<Record<Intent, string[]>> {
 let _locationFlavors: Record<string, string[]> | null = null;
 export function getLocationFlavors(): Record<string, string[]> {
   if (_locationFlavors) return _locationFlavors;
-  _locationFlavors = require('../data/lore/location-flavors.json') as Record<string, string[]>;
+  // engine_Dev — overridable via the Flavor block's `locationFlavors` key (author → built-in).
+  _locationFlavors = resolveFlavor('locationFlavors', require('../data/lore/location-flavors.json') as Record<string, string[]>);
   return _locationFlavors!;
 }
 
 let _sceneFlavors: Record<string, string[]> | null = null;
 function getSceneFlavors(): Record<string, string[]> {
   if (_sceneFlavors) return _sceneFlavors;
-  _sceneFlavors = require('../data/lore/scene-flavors.json') as Record<string, string[]>;
+  // engine_Dev — overridable via the Flavor block's `sceneFlavors` key (author → built-in).
+  _sceneFlavors = resolveFlavor('sceneFlavors', require('../data/lore/scene-flavors.json') as Record<string, string[]>);
   return _sceneFlavors!;
 }
 
@@ -1602,6 +1604,14 @@ export function buildFlavorTemplate(n = 2): Record<string, unknown> {
   for (const [key, val] of Object.entries(genericFlavorPools())) {
     out[key] = trimFlavorValue(val, n);
   }
+  // engine_Dev — extra overridable flavor pools that don't live in genericFlavorPools but
+  // resolve through this same Flavor block (so the author can re-skin them). Stubs are
+  // illustrative; omit any key to keep its built-in / generic default.
+  if (!('travelBeats' in out)) out.travelBeats = ['A standalone world-color beat the narrator drops while traveling (no {noun}).'];
+  if (!('ambientFlavor' in out)) out.ambientFlavor = ['A factoid revealed on a ~25% search; use {noun} for the searched object.'];
+  if (!('mysterySeeds' in out)) out.mysterySeeds = ['A tiny unanswered observation on investigate; {noun} = the object.'];
+  if (!('locationFlavors' in out)) out.locationFlavors = { example_location_id: ['A line that fires when the player is at this location id.'] };
+  if (!('sceneFlavors' in out)) out.sceneFlavors = { example_scene_tag: ['A line that fires when the scene carries this tag.'] };
   return out;
 }
 

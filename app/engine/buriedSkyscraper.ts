@@ -55,13 +55,13 @@ export const FLOOR_ARCHETYPES: Record<FloorArchetype, FloorArchetypeMeta> = {
     id: 'service_corridor',
     label: 'Service Corridor',
     flavor: 'Utility level. Pipework, drains, a lantern every twenty paces. The kind of floor the city built to forget.',
-    color: '#7a705c',
+    color: '#6c8088',
   },
   market_level: {
     id: 'market_level',
     label: 'Market Level',
     flavor: 'Stalls, vendors, errand-runners. A floor that still believes it is a city.',
-    color: '#c9a86a',
+    color: '#6ab0c9',
   },
   shrine_level: {
     id: 'shrine_level',

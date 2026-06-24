@@ -305,8 +305,8 @@ function Stat({ label, value, valueColor }: { label: string; value: string; valu
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     padding: 8,
     borderRadius: 4,
@@ -318,24 +318,24 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: HP_PULSE_COLOR,
   },
-  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', flexShrink: 1 },
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  dogName: { color: '#6ab0c9', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
   golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
-  subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
-  equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
+  subline: { color: '#6c8088', fontSize: 10, marginBottom: 2 },
+  equipped: { color: '#6ab0c9', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  tapHint: { color: '#7a705c', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
+  tapHint: { color: '#6c8088', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },
-  label: { color: '#7a705c', fontSize: 9 },
-  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  label: { color: '#6c8088', fontSize: 9 },
+  value: { color: '#d6e4e8', fontSize: 12, fontWeight: '600' },
 });

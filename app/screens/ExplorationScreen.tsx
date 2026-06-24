@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { getNarratorName, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { hubNameForFaction } from '../engine/hub';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
@@ -7,8 +7,20 @@ import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
+import { CombatArena } from '../components/CombatArena';
+
+// engine_Dev EXPERIMENT — during a fight, replace the world-window feed with a two-column combat
+// arena (you | enemy, with live HP bars). Presentational only; combat logic + rolls are untouched.
+// Set to false to instantly revert to the plain feed. It only renders while inCombat is true, so it
+// can't affect anything outside a fight.
+const COMBAT_ARENA_VIEW = true;
+
+// engine_Dev — flash the just-resolved roll result in a transient popup just above the controls
+// (below the action buttons). Shows the LAST roll only, holds ~2s, then fades. Set false to remove.
+const ROLL_RESULT_POPUP = true;
+const ROLL_POPUP_MS = 2000;
 import { InputBox } from '../components/InputBox';
-import { DiceRoller } from '../components/DiceRoller';
+import { DiceRoller, type RollResolveInfo } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
@@ -72,7 +84,7 @@ function timeOfDayTint(hours: number): string {
   const hourOfDay = Math.floor(hours % 24);
   if (hourOfDay < 6) return '#080a10';   // night — cool, deep blue
   if (hourOfDay < 12) return '#0f0d0a';  // morning — warm amber undertone
-  if (hourOfDay < 18) return '#0a0908';  // afternoon — neutral (the default)
+  if (hourOfDay < 18) return '#0a1012';  // afternoon — neutral (the default)
   return '#0e0b08';                       // evening — dusty rust
 }
 
@@ -131,6 +143,16 @@ export function ExplorationScreen() {
   // Measured height of the left stats panel — the enemy panel caps to this so a
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
+  // engine_Dev — transient "last roll result" popup (above the controls). Held in state + a timer
+  // that's reset on each new roll so only the most recent result is ever shown, then auto-hidden.
+  const [lastRoll, setLastRoll] = useState<RollResolveInfo | null>(null);
+  const rollPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showRollResult = useCallback((info: RollResolveInfo) => {
+    setLastRoll(info);
+    if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current);
+    rollPopupTimer.current = setTimeout(() => setLastRoll(null), ROLL_POPUP_MS);
+  }, []);
+  useEffect(() => () => { if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current); }, []);
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
   // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
@@ -793,7 +815,11 @@ export function ExplorationScreen() {
       })()}
 
       <TutorialTarget area="feed" style={styles.feed}>
-        <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        {COMBAT_ARENA_VIEW && inCombat && player ? (
+          <CombatArena player={player} enemyViews={enemyViews} activeIdx={activeIdx} />
+        ) : (
+          <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        )}
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
             <Text style={styles.streamingPrefix}>The {getNarratorName()}:</Text>
@@ -805,12 +831,26 @@ export function ExplorationScreen() {
         )}
       </TutorialTarget>
 
+      {/* engine_Dev — transient last-roll result popup: above the controls (dice roller / input),
+          below the action buttons. Appears the moment a roll resolves, holds ~2s, then clears. */}
+      {ROLL_RESULT_POPUP && lastRoll && (
+        <View style={[styles.rollPopup, lastRoll.success === true ? styles.rollPopupHit : lastRoll.success === false ? styles.rollPopupMiss : styles.rollPopupNeutral]} pointerEvents="none">
+          <Text style={styles.rollPopupKind}>{lastRoll.kind}</Text>
+          <Text style={styles.rollPopupText} numberOfLines={1}>
+            {lastRoll.label ? `${lastRoll.label} — ` : ''}Total {lastRoll.total}
+            {lastRoll.targetLabel ? ` vs ${lastRoll.targetLabel}` : ''}
+            {lastRoll.success === true ? '  ✓' : lastRoll.success === false ? '  ✗' : ''}
+          </Text>
+        </View>
+      )}
+
       <View style={styles.controls}>
         {pendingRolls ? (
           <DiceRoller
             state={pendingRolls}
             onRoll={resolveRollStep}
             onCancel={cancelPendingRolls}
+            onResolve={ROLL_RESULT_POPUP ? showRollResult : undefined}
           />
         ) : (
           <InputBox
@@ -1708,7 +1748,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     backgroundColor: 'rgba(26, 23, 20, 0.85)',
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1716,29 +1756,29 @@ const styles = StyleSheet.create({
   },
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
-    borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
+    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
     gap: 6,
   },
-  sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
-  timeText: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  sceneText: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1 },
+  timeText: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginTop: 1 },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
-  sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
+  sceneBtn: { color: '#bcd2db', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
   // reference, 'QUESTS' opens the active hunts / mysteries / storylines /
   // faction quests board. Short labels keep the row from crowding the
   // location + weather text on narrow Android screens. Settings stays
   // accessible via the gear in the bottom menu row.
   sceneBarBtn: {
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
-  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#2a2620' },
-  sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#1d262a' },
+  sceneBarBtnText: { color: '#6ab0c9', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-179 — flex:1 alone wasn't shrinking the feed enough when
   // the OTA-172 combat row went 3 lines tall, so the bottom action
   // button row clipped below the safe-area bottom edge. Adding
@@ -1753,13 +1793,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     backgroundColor: '#0e0c0a',
-    borderLeftColor: '#c9a86a',
+    borderLeftColor: '#6ab0c9',
     borderLeftWidth: 2,
     marginTop: 4,
   },
-  streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
-  streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
-  streamingCursor: { color: '#c9a86a', fontSize: 13 },
+  streamingPrefix: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  streamingText: { color: '#bcd2db', fontSize: 13, lineHeight: 18 },
+  streamingCursor: { color: '#6ab0c9', fontSize: 13 },
   // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
   // log, gear) was removed; gear is the cornerGear above and the
   // session controls all live in the gear screen's SESSION tab. The
@@ -1767,7 +1807,14 @@ const styles = StyleSheet.create({
   // feed's flex:1 naturally absorbs the reclaimed vertical real
   // estate.
   controls: { gap: 6 },
-  gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
+  // engine_Dev — transient last-roll result popup (above the controls).
+  rollPopup: { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, marginBottom: 6, alignItems: 'center', backgroundColor: '#0a1012' },
+  rollPopupHit: { borderColor: '#9ec96a' },
+  rollPopupMiss: { borderColor: '#e07a5f' },
+  rollPopupNeutral: { borderColor: '#2b3a3e' },
+  rollPopupKind: { color: '#6c8088', fontSize: 9, fontWeight: '700', letterSpacing: 2 },
+  rollPopupText: { color: '#bcd2db', fontSize: 13, fontWeight: '700', letterSpacing: 0.5, marginTop: 1 },
+  gear: { color: '#6ab0c9', fontSize: 16, lineHeight: 18 },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line
@@ -1778,36 +1825,36 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
   },
   objectiveChipTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 12,
     lineHeight: 16,
     fontStyle: 'italic',
   },
   objectiveChipStar: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontStyle: 'normal',
     fontWeight: '700',
   },
   objectiveChipLabel: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontStyle: 'normal',
     fontWeight: '700',
     letterSpacing: 1,
   },
   // engine_Dev — dim parts-completed counter trailing the custom-quest objective.
   objectiveChipProgress: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontStyle: 'normal',
     fontWeight: '700',
   },
   objectiveChipSubtitle: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
@@ -1824,15 +1871,15 @@ const styles = StyleSheet.create({
   },
   objectiveChipBody: { flex: 1, minWidth: 0 },
   objectiveChipSummon: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
   objectiveChipSummonText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -1840,24 +1887,24 @@ const styles = StyleSheet.create({
   vendorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
     minHeight: 44,
   },
-  vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
+  vendorBannerStripe: { width: 4, backgroundColor: '#6ab0c9', alignSelf: 'stretch' },
   vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
-  vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
-  vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  vendorBannerName: { color: '#6ab0c9', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  vendorBannerHint: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginTop: 1 },
+  vendorBannerArrow: { color: '#6ab0c9', fontSize: 22, paddingHorizontal: 12 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
   missionBoardBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#8b7355',
     borderWidth: 1,
     borderRadius: 4,
@@ -1876,7 +1923,7 @@ const styles = StyleSheet.create({
   // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
   // purple accent colour distinguishes it.
   fusionBanner: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     flexDirection: 'row',
     alignItems: 'center',
     borderColor: '#b88ce0',
@@ -1890,7 +1937,7 @@ const styles = StyleSheet.create({
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
   crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
   crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });
 
 // Build the chip pool the search / approach modals show.

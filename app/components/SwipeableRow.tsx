@@ -93,6 +93,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   deleteBtn: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  deleteText: { color: '#e6d8b3', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  surface: { backgroundColor: '#0a0908' },
+  deleteText: { color: '#d6e4e8', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  surface: { backgroundColor: '#0a1012' },
 });

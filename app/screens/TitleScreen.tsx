@@ -792,7 +792,7 @@ export function TitleScreen() {
         const isEngine = appId.endsWith('.engine');
         const isArb = appId.endsWith('.arbiters');
         const label = isEngine ? '⟁ DEVELOPMENT BUILD' : isArb ? '⟁ ARBITER BUILD' : '⟁ GOLEM BUILD';
-        const color = isEngine ? '#9ec96a' : isArb ? '#7ec8e3' : '#c9a86a';
+        const color = isEngine ? '#9ec96a' : isArb ? '#7ec8e3' : '#6ab0c9';
         return (
           <Text style={[styles.buildMarker, { color }]}>
             {label}
@@ -1002,7 +1002,7 @@ export function TitleScreen() {
         keyExtractor={(s) => s.slotId}
         renderItem={renderItem}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#c9a86a" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#6ab0c9" />
         }
         ListEmptyComponent={
           <Text style={[styles.empty, { color: mutedColor }]}>
@@ -1331,7 +1331,7 @@ const styles = StyleSheet.create({
   // banner). The full opening splash now lives in <SplashOverlay/> at the AppShell
   // root; only the thin track/fill are reused here for the menu's download bar.
   splashBarTrack: { width: '100%', height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.18)', overflow: 'hidden' },
-  splashBarFill: { height: '100%', borderRadius: 2, backgroundColor: '#c9a86a' },
+  splashBarFill: { height: '100%', borderRadius: 2, backgroundColor: '#6ab0c9' },
   compactLoadWrap: { width: '100%', marginVertical: 10, alignItems: 'center' },
   compactLoadLabel: { marginTop: 6, color: '#9a8f78', fontSize: 10, letterSpacing: 1, textAlign: 'center' },
   // OTA-275 — width cap for tablets. Phones (<600pt wide) render
@@ -1339,16 +1339,16 @@ const styles = StyleSheet.create({
   // get the layout centered at 600pt instead of edge-to-edge buttons.
   container: { flex: 1, backgroundColor: 'transparent', padding: 16, paddingTop: 24, width: '100%', maxWidth: 600, alignSelf: 'center' },
   crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
-  title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
-  subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
-  flavor: { color: '#7a705c', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
+  title: { fontSize: 36, color: '#d6e4e8', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
+  subtitle: { fontSize: 14, color: '#6ab0c9', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
+  flavor: { color: '#6c8088', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
   list: { flex: 1 },
   listContent: { paddingVertical: 4 },
-  listLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
-  empty: { color: '#7a705c', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
+  listLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
+  empty: { color: '#6c8088', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
   slot: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 12,
@@ -1356,8 +1356,8 @@ const styles = StyleSheet.create({
   slotDead: { borderColor: '#5a2a26', opacity: 0.75 },
   slotHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   slotNameRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, flexShrink: 1 },
-  slotName: { color: '#e6d8b3', fontSize: 16, fontWeight: '700' },
-  slotNameDead: { color: '#a89a7a' },
+  slotName: { color: '#d6e4e8', fontSize: 16, fontWeight: '700' },
+  slotNameDead: { color: '#8fa6ac' },
   deadBadge: {
     color: '#e07a5f',
     fontSize: 10,
@@ -1369,19 +1369,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 1,
   },
-  slotTime: { color: '#7a705c', fontSize: 11 },
-  slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
+  slotTime: { color: '#6c8088', fontSize: 11 },
+  slotMeta: { color: '#6c8088', fontSize: 12, marginTop: 2 },
   // v2.4.1 (OTA 036) — RESUME OBJECTIVE line on each slot card.
   // Warm-gold to distinguish from the gray meta rows + signal it's
   // the main-quest beat.
-  slotObjective: { color: '#c9a86a', fontSize: 12, marginTop: 4, fontStyle: 'italic' },
+  slotObjective: { color: '#6ab0c9', fontSize: 12, marginTop: 4, fontStyle: 'italic' },
   // OTA-120 Phase 5 — dog sub-line styling.
-  slotDogLine: { color: '#c9a86a', fontSize: 11, marginTop: 2, letterSpacing: 0.5 },
+  slotDogLine: { color: '#6ab0c9', fontSize: 11, marginTop: 2, letterSpacing: 0.5 },
   // arb38 — amber load-crash warning on a flagged slot tile.
-  slotCrashWarn: { color: '#d8923c', fontSize: 11, marginTop: 3, fontWeight: '600' },
+  slotCrashWarn: { color: '#3f9fc0', fontSize: 11, marginTop: 3, fontWeight: '600' },
   deadActions: { flexDirection: 'row', gap: 6, marginTop: 8 },
   copyLogBtn: {
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#5a2a26',
     borderWidth: 1,
     borderRadius: 3,
@@ -1395,25 +1395,25 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   shareLogBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 6,
   },
   shareLogText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 2,
   },
-  gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
+  gems: { color: '#6ab0c9', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
   // arb132 — build-line marker (GOLEM vs ARBITER), shown above the gem line.
   buildMarker: { fontSize: 11, fontWeight: '800', textAlign: 'center', marginBottom: 8, letterSpacing: 3 },
   // v2.4.1 (OTA 043) — completion-badges row styles.
   badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },
-  badgesTag: { color: '#7a705c', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
+  badgesTag: { color: '#6c8088', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
   badgesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4 },
   badge: {
     flexDirection: 'row',
@@ -1422,11 +1422,11 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderWidth: 1,
     borderRadius: 3,
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     gap: 4,
   },
   badgeGlyph: { fontSize: 12, fontWeight: '700' },
-  badgeText: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
+  badgeText: { color: '#bcd2db', fontSize: 10, letterSpacing: 0.5 },
   // OTA-150 — Mastery capstone. Centered chip + one-line Arbiter
   // acknowledgement sit above the regular 27-grid when the player
   // has every (faction, ending) combo on file.
@@ -1437,24 +1437,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderWidth: 1.5,
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     borderRadius: 4,
     backgroundColor: '#1a1408',
     gap: 6,
     marginBottom: 4,
   },
-  masteryGlyph: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
-  masteryText: { color: '#c9a86a', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
+  masteryGlyph: { color: '#6ab0c9', fontSize: 14, fontWeight: '700' },
+  masteryText: { color: '#6ab0c9', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
   masteryLine: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     fontStyle: 'italic',
     letterSpacing: 0.5,
     textAlign: 'center',
   },
   updateBanner: {
-    backgroundColor: '#2a1f12',
-    borderColor: '#c9a86a',
+    backgroundColor: '#16242a',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 8,
@@ -1462,14 +1462,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   updateBannerTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     letterSpacing: 2,
     fontWeight: '800',
     textAlign: 'center',
   },
   updateBannerBody: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     textAlign: 'center',
     marginTop: 3,
@@ -1496,7 +1496,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modelLoadingBannerBody: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 11,
     textAlign: 'center',
     marginTop: 4,
@@ -1516,7 +1516,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modelLoadingRowLabel: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 11,
     letterSpacing: 1.5,
     fontWeight: '700',
@@ -1543,8 +1543,8 @@ const styles = StyleSheet.create({
   // the green sideload banner above) so the two never read as the
   // same affordance — different install paths, different visual.
   playStoreNag: {
-    backgroundColor: '#1a1612',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 8,
@@ -1552,14 +1552,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   playStoreNagTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     letterSpacing: 2,
     fontWeight: '800',
     marginBottom: 4,
   },
   playStoreNagBody: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 12,
     lineHeight: 16,
     marginBottom: 8,
@@ -1573,10 +1573,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 3,
-    backgroundColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
   },
   playStoreNagPrimaryText: {
-    color: '#13110f',
+    color: '#0e1618',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1.5,
@@ -1585,11 +1585,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 3,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
   },
   playStoreNagDismissText: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -1601,7 +1601,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   apkBannerBody: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     textAlign: 'center',
     marginTop: 3,
@@ -1637,7 +1637,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   apkBannerInstallText: {
-    color: '#0a0908',
+    color: '#0a1012',
     fontSize: 12,
     letterSpacing: 1.5,
     fontWeight: '800',
@@ -1645,23 +1645,23 @@ const styles = StyleSheet.create({
   },
   footerActions: { gap: 8, marginTop: 12 },
   primaryBtn: {
-    backgroundColor: '#3a342c',
+    backgroundColor: '#2b3a3e',
     paddingVertical: 14,
     alignItems: 'center',
     borderRadius: 4,
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
   },
-  primaryBtnText: { color: '#e6d8b3', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  primaryBtnText: { color: '#d6e4e8', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   secondaryBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     paddingVertical: 12,
     alignItems: 'center',
     borderRadius: 4,
   },
-  secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
+  secondaryBtnText: { color: '#bcd2db', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
   btnDisabled: { opacity: 0.55 },
   // OTA-065 — bottomBar now stacks vertically so the action
   // button row (INVITE PLAYTESTER + REPORT BUG + EXIT GAME) has
@@ -1677,7 +1677,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   exitBtn: {
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#8a3a3a',
     borderWidth: 1,
     paddingHorizontal: 10,
@@ -1702,20 +1702,20 @@ const styles = StyleSheet.create({
   // glance. The COPIED-flash state swaps in a green border so
   // the player sees confirmation.
   bugReportBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 4,
   },
-  bugReportBtnText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  bugReportBtnText: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
   // OTA-065 — INVITE PLAYTESTER button. Cool-blue accent so it
   // doesn't compete with REPORT BUG (amber) or EXIT GAME (red).
   // Three distinct tones in the action row keep the buttons
   // glanceable.
   inviteBtn: {
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#6a9ec9',
     borderWidth: 1,
     paddingHorizontal: 10,
@@ -1735,29 +1735,29 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: 'rgba(26, 23, 20, 0.85)',
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
-  gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
+  gear: { color: '#6ab0c9', fontSize: 18, lineHeight: 18, textAlign: 'center' },
   devPill: {
     position: 'absolute', top: 66, right: 12, zIndex: 10,
-    backgroundColor: 'rgba(26, 23, 20, 0.85)', borderColor: '#3a342c', borderWidth: 1,
+    backgroundColor: 'rgba(26, 23, 20, 0.85)', borderColor: '#2b3a3e', borderWidth: 1,
     borderRadius: 11, paddingHorizontal: 10, paddingVertical: 4,
   },
   devPillText: { color: '#9ec96a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-068 — footer now centered (was left-aligned with a
   // small marginLeft) so it sits under the centered action row
   // and thank-you message as the third centered line.
-  // OTA-234 — was #3a342c (too faded; playtest: "I can barely see
-  // it"). Bumped to #c9a86a to match REPORT BUG (bugReportBtnText)
+  // OTA-234 — was #2b3a3e (too faded; playtest: "I can barely see
+  // it"). Bumped to #6ab0c9 to match REPORT BUG (bugReportBtnText)
   // so the version line reads at a glance.
-  footer: { color: '#c9a86a', fontSize: 10, textAlign: 'center' },
+  footer: { color: '#6ab0c9', fontSize: 10, textAlign: 'center' },
   // OTA-068 — thank-you message above the action row. Color
-  // sits between the action button text (#c9a86a / #6a9ec9 /
-  // #c97a7a — bright accents) and the footer (#3a342c — deep
+  // sits between the action button text (#6ab0c9 / #6a9ec9 /
+  // #c97a7a — bright accents) and the footer (#2b3a3e — deep
   // muted) so the message reads as warm-but-secondary.
   thankYou: {
     color: '#8a7d5c',
@@ -1768,16 +1768,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   kokoroBanner: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginBottom: 8,
   },
-  kokoroBannerText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
-  kokoroBannerProgress: { color: '#7a705c', fontSize: 11, marginTop: 2 },
+  kokoroBannerText: { color: '#6ab0c9', fontSize: 12, letterSpacing: 1 },
+  kokoroBannerProgress: { color: '#6c8088', fontSize: 11, marginTop: 2 },
 });
 
 // Surfaces the bundled-voice download state on the title screen so
@@ -1846,7 +1846,7 @@ function EndingBadgesRow(): React.ReactElement | null {
           const [factionId, ending] = id.split(':');
           const faction = FACTION_NAMES_FOR_BADGES[factionId ?? ''] ?? factionId;
           const glyph = ENDING_GLYPH[ending ?? ''] ?? '◯';
-          const color = ENDING_COLOR[ending ?? ''] ?? '#7a705c';
+          const color = ENDING_COLOR[ending ?? ''] ?? '#6c8088';
           return (
             <View key={id} style={[styles.badge, { borderColor: color }]}>
               <Text style={[styles.badgeGlyph, { color }]}>{glyph}</Text>
@@ -1919,7 +1919,7 @@ const lastCrashStyles = StyleSheet.create({
     backgroundColor: 'rgba(80,20,20,0.25)',
   },
   title: { color: '#c97a7a', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  message: { color: '#e6d8b3', fontSize: 11, marginTop: 2 },
+  message: { color: '#d6e4e8', fontSize: 11, marginTop: 2 },
 });
 
 // OTA-343 — COPY CRASHED SAVE surface. When a crash captured the offending
@@ -1974,7 +1974,7 @@ function CopyCrashedSaveLine(): React.ReactElement | null {
 
 const crashSaveStyles = StyleSheet.create({
   pill: {
-    borderColor: '#d8923c',
+    borderColor: '#3f9fc0',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 10,
@@ -1983,18 +1983,18 @@ const crashSaveStyles = StyleSheet.create({
     marginHorizontal: 12,
     backgroundColor: 'rgba(80,50,10,0.25)',
   },
-  title: { color: '#d8923c', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  title: { color: '#3f9fc0', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   row: { flexDirection: 'row', gap: 8, marginTop: 6 },
   btn: {
-    borderColor: '#d8923c',
+    borderColor: '#3f9fc0',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: '#2a1f12',
+    backgroundColor: '#16242a',
   },
   btnGhost: { backgroundColor: 'transparent' },
-  btnText: { color: '#e6d8b3', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  btnText: { color: '#d6e4e8', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
 });
 
 function KokoroDownloadBanner(): React.ReactElement | null {

@@ -1,0 +1,3 @@
+{
+  "_README": "BAKED GAME SLOT. This file is EMPTY by default, so a dev build boots the bland generic engine and you build your game by uploading JSON in the dev console. To PUBLISH a finished game, the bake step replaces this file's contents with the author's whole-game master JSON (the same shape SAVE FILE TO DEVICE produces: top-level keys are section names like tables, lore, missions, identity, ...). When this file has real sections, the app auto-loads them at boot as the default game and dev mode can be turned off. Keep the object empty ({} plus this comment) to ship the generic engine."
+}
