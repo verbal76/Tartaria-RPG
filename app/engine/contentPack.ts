@@ -91,6 +91,7 @@ interface GenericDefaultPack {
   summons?: { noun?: string; defs: unknown[] };
   whispers?: unknown[];
   vendors?: unknown[];
+  wasteland?: Record<string, unknown>;
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -112,6 +113,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.summons = pack.summons;
   genericDefaults.whispers = pack.whispers;
   genericDefaults.vendors = pack.vendors;
+  genericDefaults.wasteland = pack.wasteland;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -133,6 +135,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.summons = undefined;
   genericDefaults.whispers = undefined;
   genericDefaults.vendors = undefined;
+  genericDefaults.wasteland = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -141,6 +144,12 @@ export function clearGenericDefaults(): void {
  *  vendor resolver layers author override → this → Tartaria built-in. */
 export function getGenericVendors(): unknown[] | null {
   return genericDefaults.vendors && genericDefaults.vendors.length > 0 ? genericDefaults.vendors : null;
+}
+
+/** The generic game's wasteland encounters, if installed (else null). The wasteland
+ *  resolver layers author override → this → Tartaria built-in. */
+export function getGenericWasteland(): Record<string, unknown> | null {
+  return genericDefaults.wasteland && Object.keys(genericDefaults.wasteland).length > 0 ? genericDefaults.wasteland : null;
 }
 
 // --- active overrides (module-level; mirrored from the content-pack store) ------

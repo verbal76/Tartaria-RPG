@@ -21,7 +21,7 @@
 
 import data from '../data/world/wasteland_encounters.json';
 import type { Location, Rarity } from './types';
-import { getWastelandOverride } from './contentPack';
+import { getWastelandOverride, getGenericWasteland } from './contentPack';
 
 /** engine_Dev — wasteland loot. For encounter-ONLY items (not in any table), the
  *  optional stat fields give them real stats inline instead of relying on the
@@ -106,7 +106,8 @@ const ARCHETYPES: Record<string, WastelandArchetype> = archetypesFrom(RAW);
 // built-in Tartaria set wholesale. Resolved at runtime (not module load) so an
 // upload mirrored after boot is honored.
 function getArchetypes(): Record<string, WastelandArchetype> {
-  const ov = getWastelandOverride();
+  // author override → installed GENERIC default → built-in Tartaria set.
+  const ov = getWastelandOverride() ?? getGenericWasteland();
   if (ov) {
     const built = archetypesFrom(ov);
     if (Object.keys(built).length > 0) return built;

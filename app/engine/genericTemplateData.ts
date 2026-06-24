@@ -24,6 +24,7 @@ export const GENERIC_TABLE_ROWS = {
     { name: 'Scrap Metal', rarity: 'Common', tags: ['metal'], description: 'Mixed metal from old ruins. Reforges into weapon stock.' },
     { name: 'Tough Fiber', rarity: 'Common', tags: ['organic', 'fiber'], description: 'Strong silken thread — enough to bind metal.' },
     { name: 'Worked Crystal', rarity: 'Rare', tags: ['essence', 'crystal'], description: 'A single clean shard of high-grade crystal. Cores rare-tier relic work.' },
+    { name: 'Red Cap Mushroom', rarity: 'Common', tags: ['organic', 'foraged', 'herb'], description: 'A bright-capped fungus from shaded ground. Brewed down, it makes a cleansing draught.' },
   ],
   gear: [
     { name: 'Trail Rations', kind: 'consumable', rarity: 'Common', tags: ['food'], effect: { kind: 'consumable', healHP: 6, restoreStamina: 3 }, description: 'Hardtack and dried meat. Mends the body and puts wind back in your lungs — +6 HP, +3 stamina.' },

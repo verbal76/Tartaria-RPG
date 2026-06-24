@@ -146,6 +146,23 @@ const FLAVOR = {
 const withFaction = (rows: readonly unknown[], factionId: string) =>
   rows.map((r) => ({ ...(r as Record<string, unknown>), ...((r as { faction?: unknown }).faction ? { faction: factionId } : {}) }));
 
+// The generic world bible — keyworded passages the narrator surfaces when a scene's tags
+// match. The `always` block is the default. Setting-neutral ("the Reaches").
+const LORE_DOC = [
+  { tags: ['always'], section: 'World', text: 'The Reaches are what is left of a wider world — roads between ruins, settlements that hold, and a great deal that does not.' },
+  { tags: ['ruin', 'old world'], section: 'The Old World', text: 'The old world built high and reached far, then fell. What it left is buried, broken, and occasionally still working — which is more dangerous than broken.' },
+  { tags: ['blight', 'corruption'], section: 'The Blight', text: 'The Blight is the slow rot that takes those who linger where the old powers spilled. It does not hurry. It does not need to.' },
+  { tags: ['faction', 'wardens', 'seekers', 'freeholders'], section: 'The Orders', text: 'The Wardens keep the roads, the Seekers dig for what the roads forgot, and the Freeholders keep the crossroads open between them.' },
+];
+
+// Generic between-location travel encounters (the wasteland), keyed by archetype id. A
+// matcher of "any" fires anywhere on the road. enemyPool / loot reference generic content.
+const WASTELAND = {
+  road_find: { type: 'treasure', weight: 3, matchers: ['any'], narration: 'The road throws up something half-buried — a strap, a buckle, a tin still sealed.', loot: ['Scrap Metal', 'Trail Rations'] },
+  road_stranger: { type: 'npc', weight: 2, matchers: ['any'], narration: 'A figure waits where the road bends, hands open, in no hurry.', npc_lines: ['"Long way to anywhere out here."', '"Mind the dark ground past the ridge."'] },
+  road_ambush: { type: 'skirmish', weight: 2, matchers: ['any'], narration: 'Something was waiting in the brush, and now it is not waiting.', enemyPool: ['Wood Lurker', 'Bog Thing'] },
+};
+
 export const GENERIC_GAME = {
   identity: { worldName: 'the Reaches', corruptionName: 'the Blight', narratorName: 'the Narrator', gameTitle: 'The Reaches' },
   tables: {
@@ -164,6 +181,7 @@ export const GENERIC_GAME = {
     races: RACES,
     factions: FACTIONS,
     locations: LOCATIONS,
+    lore: LORE_DOC,
   },
   missions: {
     factionQuests: FACTION_QUESTS,
@@ -177,6 +195,7 @@ export const GENERIC_GAME = {
   flavor: FLAVOR,
   startingAreas: STARTING_AREAS,
   vendors: GENERIC_VENDORS,
+  wasteland: WASTELAND,
   mainQuest: MAIN_QUEST,
   bosses: BOSSES,
   collectables: COLLECTABLES,
