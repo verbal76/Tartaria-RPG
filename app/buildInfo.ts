@@ -16057,4 +16057,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The three functional residuals are baselined, not "fixed": gameStore's '../engine/askArbiter' require
 // path, and narrativeGenerator/arbiterFrame's legacy-"Arbiter" matchers that strip the old narrator name
 // from model output. Scanner green at 328; tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-854';
+//
+// engine_Dev-855 — VOICE BACKGROUND-TEARDOWN crash fix. Repro: player backgrounded the app (heavy
+// foreground app evicted it), got a text message, returned, tapped Main Quest → process died to the
+// home screen. The bundled neural TTS held a live expo-av Sound + queue, and nothing listened to
+// AppState, so on resume the next spoken line played into a native audio session still disrupted by
+// the notification's audio-focus grab — the OTA-413 SIGSEGV family (same as the documented
+// SILENCE-ARBITER teardown-rejection crash). startTTSController now stops + clears the voice the
+// instant the app leaves the foreground (audio can't outlive it; staysActiveInBackground is false)
+// and resyncs the controller to the log tail so the saved backlog isn't re-spoken on return.
+// Regression test: __tests__/ttsBackgroundTeardown.test.ts. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-855';
