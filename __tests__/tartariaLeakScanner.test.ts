@@ -12,7 +12,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const NOUNS_G = /Tartar|Aether|Etheric|Reclaimer|Mud Monarch|Mud Dweller|Forgotten Order|Mudstone|Aetherstone|Bog Dragon/g;
+const NOUNS_G = /Tartar|Aether|Etheric|Reclaimer|Mud Monarch|Mud Dweller|Forgotten Order|Mudstone|Aetherstone|Bog Dragon|Arbiter|Mud Flood/g;
 
 // Count noun occurrences that sit inside a quoted string on a line, honoring a
 // line-comment (//) start outside strings. Block comments are stripped by scanFile.
@@ -48,7 +48,10 @@ const BASELINE: Record<string, number> = {
   // engine_Dev — the built-in (Tartaria) main quest was DELETED: mainQuest.ts
   // gutted to vestigial state helpers (85→0), coreGuardians.ts + EndingScreen.tsx
   // removed entirely, and the dead built-in-quest blocks pruned from gameStore.ts.
-  'app/state/gameStore.ts': 149, 'app/engine/mainQuest.ts': 0, 'app/engine/itemAliases.ts': 55,
+  // gameStore 150: the +1 over the prior 149 is the functional require path
+  // '../engine/askArbiter' (module id, not player-facing) surfaced when the
+  // scanner regex was widened to include the legacy "Arbiter" noun.
+  'app/state/gameStore.ts': 150, 'app/engine/mainQuest.ts': 0, 'app/engine/itemAliases.ts': 55,
   'app/engine/hooks.ts': 49,
   // elevatedOverlay.ts extracted to app/data/overlays/elevated-overlays.json (45 → 0).
   // salvagePools.ts extracted to app/data/salvage/salvage-pools.json (41 → 0).
@@ -66,7 +69,11 @@ const BASELINE: Record<string, number> = {
   'app/engine/climbHeight.ts': 5, 'app/engine/itemFusion.ts': 0, 'app/engine/dogCompanion.ts': 0,
   'app/screens/TitleScreen.tsx': 4, 'app/screens/ExplorationScreen.tsx': 4, 'app/screens/CraftingScreen.tsx': 0,
   'app/screens/DeveloperSettingsScreen.tsx': 4, 'app/engine/raceMechanics.ts': 3, 'app/engine/combatRules.ts': 3,
-  'app/engine/portability.ts': 2, 'app/engine/narrativeGenerator.ts': 2, 'app/engine/crafting.ts': 2,
+  // portability narrator/flavor strings genericized (2→0). narrativeGenerator 3
+  // and arbiterFrame 2 are FUNCTIONAL: legacy-"Arbiter" matchers that detect/strip
+  // the old narrator name from model output — not author-facing content.
+  'app/engine/portability.ts': 0, 'app/engine/narrativeGenerator.ts': 3, 'app/voice/arbiterFrame.ts': 2,
+  'app/engine/crafting.ts': 2,
   'app/engine/hunts.ts': 2, 'app/engine/encounter.ts': 2, 'app/engine/locationChallenges.ts': 0,
   // FACTION_COVETED_ITEM map extracted to app/data/factions/coveted-items.json (2→0).
   'app/engine/itemEffect.ts': 2, 'app/screens/AboutScreen.tsx': 0, 'app/screens/ActionReferenceScreen.tsx': 2,
@@ -81,7 +88,7 @@ const BASELINE_TOTAL = Object.values(BASELINE).reduce((a, c) => a + c, 0);
 
 function candidateFiles(): string[] {
   const out = execSync(
-    'grep -rlE "Tartar|Aether|Etheric|Reclaimer|Mud Monarch|Mud Dweller|Forgotten Order|Mudstone|Aetherstone|Bog Dragon" app/engine app/state app/screens --include=*.ts --include=*.tsx',
+    'grep -rlE "Tartar|Aether|Etheric|Reclaimer|Mud Monarch|Mud Dweller|Forgotten Order|Mudstone|Aetherstone|Bog Dragon|Arbiter|Mud Flood" app/engine app/state app/screens app/components app/voice app/diagnostics app/ui app/data --include=*.ts --include=*.tsx',
     { encoding: 'utf8', cwd: path.resolve(__dirname, '..') },
   ).trim();
   return out ? out.split('\n') : [];

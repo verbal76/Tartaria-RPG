@@ -282,7 +282,7 @@ export const THIRD_PARTY_NOTICES: ThirdPartyNotice[] = [
     id: 'qwen25',
     name: 'Qwen2.5-0.5B-Instruct (GGUF)',
     role:
-      "Small language model that generates the Arbiter's contextual " +
+      "Small language model that generates the narrator's contextual " +
       'narration. Quantised Q4_K_M build downloaded at first boot.',
     license: 'Apache-2.0',
     copyright: 'Copyright (c) 2024 Alibaba Cloud (Qwen team).',

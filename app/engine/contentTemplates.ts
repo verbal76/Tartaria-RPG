@@ -1312,7 +1312,7 @@ function bundleEntries(): BundleEntry[] {
   const entries: BundleEntry[] = [
     { key: 'title', hint: 'The game title shown on the start screen.', content: JSON.stringify('My Game') },
     { key: 'tagline', hint: 'One-line tagline under the title.', content: JSON.stringify('A world of your making.') },
-    { key: 'narrator', hint: 'The narrator\'s display NAME (e.g. "Bob", "The Arbiter"). Persona/voice is set in the world block below.', content: JSON.stringify('Narrator') },
+    { key: 'narrator', hint: 'The narrator\'s display NAME (e.g. "Bob", "The Voice"). Persona/voice is set in the world block below.', content: JSON.stringify('Narrator') },
     { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration names a default world in dozens of lines; set yours and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
     { key: 'corruptionName', hint: 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', content: JSON.stringify('Corruption') },
     { key: 'crucibleName', hint: 'Your name for the fusion/forge feature the engine calls the "Crucible" (also the {crucible}/{fuse}/{forge} token). Set in the GAME IDENTITY section.', content: JSON.stringify('Crucible') },

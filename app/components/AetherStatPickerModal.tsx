@@ -17,7 +17,7 @@ export function AetherStatPickerModal() {
   return (
     <BrandedModal
       visible
-      title="Aether Lacing"
+      title="Stat Lacing"
       body="The dust catches behind your eyes. Which edge does it sharpen?"
       buttons={[
         { label: 'Strength (+3 STR / 5 min)', onPress: () => select('strength'), tone: 'primary' },

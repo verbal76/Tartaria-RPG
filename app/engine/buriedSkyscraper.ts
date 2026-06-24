@@ -27,6 +27,7 @@
 
 import type { PlayerCharacter } from './types';
 import { ensureMainQuest } from './mainQuest';
+import { getNarratorName } from './contentPack';
 
 // ---------------------------------------------------------------------------
 // Floor archetypes — 5 flavors. These pin the visual + narrative
@@ -306,5 +307,5 @@ export function canEnterSkyscraper(player: PlayerCharacter | null | undefined): 
  *  `canEnterSkyscraper` is false. The Arbiter delivers this on any
  *  attempt to engage with the entrance before completion. */
 export function skyscraperGateRefusal(): string {
-  return 'The Arbiter blocks the doorway. "This place opens only to those who have finished the work above. Return to the Cores. Return to the Choice. Then come back."';
+  return `The ${getNarratorName()} blocks the doorway. "This place opens only to those who have finished the work above. Come back when you've seen your story through."`;
 }
