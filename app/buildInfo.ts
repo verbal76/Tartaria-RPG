@@ -16015,4 +16015,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from the live custom quest. (2) New "Text RPG Engine" splash poster (glowing d20 over an open
 // book) — re-encoded to a lean ~200 KB / 900px JPEG at assets/splash-art.jpg (overwrites the old
 // one; the SplashOverlay wiring + loading bar are unchanged). tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-847';
+//
+// engine_Dev-848 — splash poster sizing fix. The art was inset-fit to ~5% margins → `contain`
+// fit it to WIDTH = ~90% of screen ("too big"). Replaced with an explicit, clamped, CENTERED box
+// (≤56% width / ≤54% height, aspect-preserved, nudged just above middle) so it reads as a centred
+// poster with dark margins and clear room for the loading bar below. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-848';
