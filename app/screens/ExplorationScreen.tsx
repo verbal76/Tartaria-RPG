@@ -18,7 +18,7 @@ const COMBAT_ARENA_VIEW = true;
 const ROLL_RESULT_POPUP = true;
 const ROLL_POPUP_MS = 2000;
 import { InputBox } from '../components/InputBox';
-import { DiceRoller, type RollResolveInfo } from '../components/DiceRoller';
+import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
@@ -141,14 +141,15 @@ export function ExplorationScreen() {
   // Measured height of the left stats panel — the enemy panel caps to this so a
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
-  // engine_Dev — transient "last roll result" popup (above the controls). Held in state + a timer
-  // that's reset on each new roll so only the most recent result is ever shown, then auto-hidden.
-  const [lastRoll, setLastRoll] = useState<RollResolveInfo | null>(null);
+  // engine_Dev — transient combat-RESULT popup (above the controls). During a fight the feed is
+  // hidden by the arena, so when a roll sequence resolves we surface the FINAL output line (the one
+  // that would normally show in the feed) here for ~2s — NOT the dice math (the roller shows that).
+  const [resultPop, setResultPop] = useState<string | null>(null);
   const rollPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const showRollResult = useCallback((info: RollResolveInfo) => {
-    setLastRoll(info);
+  const showResult = useCallback((text: string) => {
+    setResultPop(text);
     if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current);
-    rollPopupTimer.current = setTimeout(() => setLastRoll(null), ROLL_POPUP_MS);
+    rollPopupTimer.current = setTimeout(() => setResultPop(null), ROLL_POPUP_MS);
   }, []);
   useEffect(() => () => { if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current); }, []);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -469,6 +470,18 @@ export function ExplorationScreen() {
   const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
 
   const inCombat = enemyViews.length > 0;
+  // engine_Dev — when a roll sequence finishes resolving (pendingRolls goes null) during combat,
+  // surface the FINAL output line in the result popup (the feed is hidden behind the arena). Only
+  // the latest log line, only in combat, only once per sequence — no per-step dice-math duplication.
+  const prevPendingRef = useRef(pendingRolls);
+  useEffect(() => {
+    const was = prevPendingRef.current;
+    prevPendingRef.current = pendingRolls;
+    if (ROLL_RESULT_POPUP && was && !pendingRolls && inCombat) {
+      const last = gameLog[gameLog.length - 1];
+      if (last?.text) showResult(last.text);
+    }
+  }, [pendingRolls, gameLog, inCombat, showResult]);
   const equippedMain = player?.equipped?.main ?? null;
   const equippedOff = player?.equipped?.off ?? null;
   // OTA-406 — coating adjective for the equipped instance in each hand, resolved
@@ -523,7 +536,7 @@ export function ExplorationScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={[styles.topRow, COMBAT_ARENA_VIEW && inCombat && styles.topRowCombat]}>
-        <TutorialTarget area="top-left-stats" style={styles.statsCol}>
+        <TutorialTarget area="top-left-stats" style={[styles.statsCol, COMBAT_ARENA_VIEW && inCombat && styles.combatColEqual]}>
           {/* OTA 040 — tap the stats panel to open the full Player
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
               still measures the same layout box. */}
@@ -831,16 +844,12 @@ export function ExplorationScreen() {
       </TutorialTarget>
       )}
 
-      {/* engine_Dev — transient last-roll result popup: above the controls (dice roller / input),
-          below the action buttons. Appears the moment a roll resolves, holds ~2s, then clears. */}
-      {ROLL_RESULT_POPUP && lastRoll && (
-        <View style={[styles.rollPopup, lastRoll.success === true ? styles.rollPopupHit : lastRoll.success === false ? styles.rollPopupMiss : styles.rollPopupNeutral]} pointerEvents="none">
-          <Text style={styles.rollPopupKind}>{lastRoll.kind}</Text>
-          <Text style={styles.rollPopupText} numberOfLines={1}>
-            {lastRoll.label ? `${lastRoll.label} — ` : ''}Total {lastRoll.total}
-            {lastRoll.targetLabel ? ` vs ${lastRoll.targetLabel}` : ''}
-            {lastRoll.success === true ? '  ✓' : lastRoll.success === false ? '  ✗' : ''}
-          </Text>
+      {/* engine_Dev — transient combat-RESULT popup: above the controls, below the action buttons.
+          Shows the FINAL output line once a roll sequence resolves (the feed is hidden in combat),
+          holds ~2s, then clears. Not the dice math — the roller shows that. */}
+      {ROLL_RESULT_POPUP && resultPop && (
+        <View style={[styles.rollPopup, styles.rollPopupNeutral]} pointerEvents="none">
+          <Text style={styles.rollPopupText} numberOfLines={3}>{resultPop}</Text>
         </View>
       )}
 
@@ -850,7 +859,6 @@ export function ExplorationScreen() {
             state={pendingRolls}
             onRoll={resolveRollStep}
             onCancel={cancelPendingRolls}
-            onResolve={ROLL_RESULT_POPUP ? showRollResult : undefined}
           />
         ) : (
           <InputBox
@@ -1733,6 +1741,7 @@ const styles = StyleSheet.create({
   // engine_Dev — combat arena: the top row fills the world-window so the char + enemy boxes run long.
   topRowCombat: { flex: 1, minHeight: 0 },
   combatColFill: { flex: 1 },
+  combatColEqual: { flex: 1 }, // equal halves during combat (override statsCol's 1.2)
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
