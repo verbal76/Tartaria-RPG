@@ -189,7 +189,7 @@
     "racialACBonus": "+1 AC with Aetheric powers or runecasters",
     "racialACBonusRules": [
       {
-        "condition": "aether_powers",
+        "condition": "energy_powers",
         "delta": 1
       }
     ],

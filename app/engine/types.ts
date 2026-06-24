@@ -172,7 +172,7 @@ export interface Race {
   /** OTA 038 — structured AC bonus rules applied at runtime in
    *  effectiveAC(player, scene). Empty array = no conditional bonus. */
   racialACBonusRules?: Array<{
-    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'aether_powers' | 'constructed_environment' | 'relic_armor';
+    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'energy_powers' | 'constructed_environment' | 'relic_armor';
     delta: number;
   }>;
   /** OTA 038 — always-on racial stat bumps applied at every
@@ -291,7 +291,7 @@ export interface Faction {
   /** engine_Dev — conditional AC bonuses for faction members (same shape + scene
    *  conditions as a race's racialACBonusRules). */
   factionACBonusRules?: Array<{
-    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'aether_powers' | 'constructed_environment' | 'relic_armor';
+    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'energy_powers' | 'constructed_environment' | 'relic_armor';
     delta: number;
   }>;
   /** engine_Dev — once-a-day activatable abilities this faction grants its members

@@ -15660,4 +15660,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // toggle, and reference-content golems (Mud Golems race, golem enemies/items) are all
 // left as-is. Diagnostic snapshot label + all test seeds updated to 'sidekick'.
 // Verified: full tsc shows zero new errors vs baseline; all sidekick suites green.
-export const OTA_BUILD_ID = '2026-06-24-815';
+//
+// engine_Dev-816 — blend the last Tartaria nouns out of the dev-console TEMPLATE /
+// whole-game-bundle surface (the setting-NEUTRAL author scaffold). Scope is the
+// template layer ONLY — the runtime DEFAULT game (app/data) stays Tartaria, and code
+// internals/types are untouched. Two leaks remained vs a strengthened guard:
+//   (1) the SUMMONED SIDEKICKS hints still said the default summon noun was "golem"
+//       and "replaces the built-in golems" — stale since the rename (getSummonNoun()
+//       already defaults to "sidekick"); reworded to "sidekick" (correctness + leak).
+//   (2) the author-facing racialACBonusRules condition id `aether_powers` leaked into
+//       the races template NOTE. Renamed the enum → `energy_powers` (5 sites: types.ts
+//       union ×2, raceMechanics type + derive, races.json), aligning with the engine's
+//       existing renameable {energy}/energyName concept. The derive trigger still keys
+//       off the built-in 'aether*' gear tags (built-in game data, unchanged).
+// Strengthened the existing guard (devTemplatesRoundTrip): TARTARIA_NOUNS now also
+// catches golem / mud dweller / core guardian, and the per-table check renders WITH the
+// optional-field notes (the channel `aether_powers` had hidden in) so nothing can
+// regress. Whole-bundle + all table/lore templates now assert fully generic.
+export const OTA_BUILD_ID = '2026-06-24-816';
