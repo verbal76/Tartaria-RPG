@@ -14,7 +14,7 @@ import { getMysteries, fuzzyFindMystery } from './mysteries';
 import { getStorylines, fuzzyFindStoryline } from './factionStorylines';
 import { getFactionQuests, fuzzyFindFactionQuest } from './factionQuests';
 import { FACTIONS } from './factions';
-import { VENDORS } from './vendors';
+import { getActiveVendors } from './vendors';
 
 export type QuestKind = 'hunt' | 'mystery' | 'storyline' | 'quest';
 
@@ -46,7 +46,7 @@ function packHint(factionId: string, contractTitle: string, kind: QuestKind): Qu
   const factionLabel = faction?.name ?? factionId.replace(/_/g, ' ');
   // First 3 vendor names from this faction, deterministic catalog order
   // for stable narration.
-  const vendorNames = VENDORS
+  const vendorNames = getActiveVendors()
     .filter((v) => v.faction === factionId)
     .slice(0, 3)
     .map((v) => v.name);

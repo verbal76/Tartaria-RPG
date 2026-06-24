@@ -859,6 +859,45 @@ export function buildScenePropsTemplate(): string {
   ].join('\n');
 }
 
+/** The Vendors template — the named traders the engine spawns at scenes/roadside.
+ *  Replaces the built-in pool so an author ships their own setting's merchants.
+ *  Setting-neutral example rows; itemNames must exist in your catalogs. */
+export function buildVendorsTemplate(): string {
+  const body = JSON.stringify([
+    {
+      id: 'roadside_trader',
+      name: 'Maren the Trader',
+      title: 'Roadside Merchant',
+      faction: 'REPLACE-with-a-faction-id',
+      description: 'A practical trader working the roads between settlements. Buys salvage, sells the basics.',
+      offers: [
+        { itemName: 'Trail Rations', price: 8 },
+        { itemName: 'Worn Sword', price: 20 },
+      ],
+      gender: 'female',
+    },
+    {
+      id: 'town_smith',
+      name: 'Garrick Ironhand',
+      title: 'Blacksmith',
+      faction: null,
+      description: 'A blunt, fair smith. Will repair and sell honest steel.',
+      offers: [{ itemName: 'Banded Cuirass', price: 60 }],
+      gender: 'male',
+    },
+  ], null, 2);
+  return [
+    '// NAMED VENDORS — the traders the engine spawns (scene vendor rolls + roadside).',
+    '// Replaces the built-in trader pool so your merchants fit YOUR setting. A JSON ARRAY',
+    '// of: { "id", "name", "title", "faction"? (a faction id, or null for unaligned),',
+    '//   "description", "offers": [{ "itemName", "price", "quantity"? }], "voiceId"?,',
+    '//   "gender"? ("male"|"female") }.',
+    '//   itemName — must EXIST in your item catalogs (weapons/armor/gear/…).',
+    '//   faction  — gates faction-flavored spawn/hints; null = unaligned roadside trader.',
+    body,
+  ].join('\n');
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -1243,6 +1282,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'startingAreas', hint: 'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), optional coords {x,y} (the map cell — read it off the in-game map planner), returnable? (false = one-way prologue that vanishes once you leave; its missions then use remote turn-in), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). Flag exactly one room with missionBoard:true to stand the starter Mission Board there. The faction member spawns inside and walks room-to-room; an exit of "world" steps back onto the world map. Whispers can plant in a room by naming its room id in plantLocations.', content: buildStartingAreasTemplate() });
   entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });
   entries.push({ key: 'sceneProps', hint: 'The curated ambient nouns the engine injects into scenes as CLIMB and SALVAGE targets: { climbables?: [{ name, context?: inside|outside|both, height?: 1..8 }], salvageables?: [{ name, context? }] }. Replaces the built-in setting-neutral pools so the props match YOUR world. Omit either array to keep its built-in pool.', content: buildScenePropsTemplate() });
+  entries.push({ key: 'vendors', hint: 'Named traders the engine spawns (scene vendor rolls + roadside). A JSON array of { id, name, title, faction? (a faction id, or null for unaligned), description, offers: [{ itemName, price, quantity? }], voiceId?, gender? }. itemNames must exist in your catalogs. Replaces the built-in trader pool.', content: buildVendorsTemplate() });
   entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in sidekicks), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
   entries.push({ key: 'dogEnabled', hint: 'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.', content: JSON.stringify(true) });
   entries.push({ key: 'damageTypes', hint: 'Author-ADDED damage types beyond the built-in 10. Array of { name, keywords?: [..], onHit?: [{stat,amount}] + onHitRounds (stat +/- to the victim when hit), combat?: { mode "on_hit"|"dot", dice, rounds (dot), baseChance 0..1, weakBonus, strongPenalty } }. combat = a weapon-deals-this-type effect (immediate or ticking), whose apply chance rises vs targets WEAK to it and falls vs STRONG. keywords let the engine infer the type from a bare attack string.', content: JSON.stringify([{ name: 'fire', keywords: ['fire', 'flame', 'burn'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } }, { name: 'frost', keywords: ['ice', 'freeze'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3 } }], null, 2) });

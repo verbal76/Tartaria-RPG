@@ -133,10 +133,26 @@ export interface VendorInstance {
 
 export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;
 
+/** The live vendor pool: the author's uploaded vendors override when present, else the
+ *  built-in pool. Rows missing required fields are dropped so a bad upload can't crash
+ *  the spawner. */
+export function getActiveVendors(): VendorTemplate[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getVendorsOverride();
+  if (!ov || ov.length === 0) return VENDORS;
+  return ov.filter(
+    (v): v is VendorTemplate =>
+      !!v && typeof v === 'object' &&
+      typeof (v as VendorTemplate).name === 'string' &&
+      Array.isArray((v as VendorTemplate).offers),
+  );
+}
+
 // Random vendor pick. Used when a peaceful scene rolls a vendor encounter.
 // Returns a fresh VendorInstance (mutable offers, decoupled from template).
 export function pickRandomVendor(): VendorInstance {
-  const v = VENDORS[Math.floor(Math.random() * VENDORS.length)]!;
+  const pool = getActiveVendors();
+  const v = pool[Math.floor(Math.random() * pool.length)]!;
   return {
     id: v.id,
     name: v.name,
@@ -360,7 +376,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
 // or null if no template matches.
 export function findVendorByName(name: string): VendorInstance | null {
   const lowered = name.toLowerCase();
-  const v = VENDORS.find((vt) => vt.name.toLowerCase() === lowered);
+  const v = getActiveVendors().find((vt) => vt.name.toLowerCase() === lowered);
   if (!v) return null;
   return {
     id: v.id,

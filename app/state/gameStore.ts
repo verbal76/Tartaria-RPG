@@ -172,7 +172,7 @@ import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
-import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, getActiveVendors, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, growStaminaFromClimb, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
@@ -4493,7 +4493,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // capital (the roadside roll above is suppressed there), so a capital begin-
       // scene ALWAYS lands a named vendor unless they've all been killed.
       if (!base && atCoreCapital) {
-        const candidates = VENDORS.filter((v) => !defeatedSet.has(v.name));
+        const candidates = getActiveVendors().filter((v) => !defeatedSet.has(v.name));
         if (candidates.length > 0) {
           const pickName = candidates[Math.floor(Math.random() * candidates.length)]!.name;
           base = findVendorByName(pickName) ?? null;
@@ -16070,7 +16070,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ).entries(),
         );
         const lines = factionEntries.map(([fid, fname]) => {
-          const sample = VENDORS.filter((v) => v.faction === fid).slice(0, 2).map((v) => v.name).join(' / ');
+          const sample = getActiveVendors().filter((v) => v.faction === fid).slice(0, 2).map((v) => v.name).join(' / ');
           return sample ? `${fname} (e.g. ${sample})` : fname;
         });
         const list =
