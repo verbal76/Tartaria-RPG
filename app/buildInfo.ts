@@ -15738,4 +15738,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Guard test locks both pools neutral. This completes the author-overridable-pools work
 // the playtest surfaced (steps 1-3). Still open from that thread: the built-in ITEM-
 // CATALOG leak (Aetheric Torch / Worn Tartarian Coin yields) — the bug-report item.
-export const OTA_BUILD_ID = '2026-06-24-821';
+//
+// engine_Dev-822 — built-in ITEM leak, part 1: the universal STARTER KIT. The shared
+// kit every character begins with (DEFAULT_STARTER_ITEMS in character.ts) is already
+// author-overridable (resolveFlavor('starterItems', …)), but its built-in default leaked
+// "Aetheric Torch" + "Aetheric Locket" into every game — exactly the items seen in the
+// WWII bug-report inventory. Renamed to setting-neutral "Hand Torch" + "Finder's Locket"
+// (ids + behavior TAGS unchanged — light/detection drive the mechanics, names are pure
+// flavor; verified no name-based behavior coupling). Trail Rations + Water Bottle were
+// already neutral. NEXT (part 2): the deeper coupling — salvage/investigation POOLS still
+// yield built-in catalog items ("Worn Tartarian Coin", "Aetheric Shard", "Sentinel Core
+// Plate"), which needs the item catalog (gear/materials/relics) genericized in lockstep.
+export const OTA_BUILD_ID = '2026-06-24-822';
