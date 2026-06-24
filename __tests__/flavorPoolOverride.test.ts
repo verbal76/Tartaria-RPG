@@ -32,10 +32,11 @@ describe('engine_Dev — flavor pools resolve through the override layer', () =>
   it('the installed generic game ships neutral travel/ambient/mystery pools (no Tartaria fallback)', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { GENERIC_GAME } = require('../app/engine/genericGame') as typeof import('../app/engine/genericGame');
-    const f = GENERIC_GAME.flavor as Record<string, string[]>;
+    const f = GENERIC_GAME.flavor as unknown as Record<string, string[]>;
     for (const key of ['travelBeats', 'ambientFlavor', 'mysterySeeds']) {
-      expect(Array.isArray(f[key]) && f[key].length > 0).toBe(true);
-      expect(f[key].join(' ')).not.toMatch(/Tartar|Aether|Reclaimer|Mud Monarch/i);
+      const pool = f[key] ?? [];
+      expect(Array.isArray(pool) && pool.length > 0).toBe(true);
+      expect(pool.join(' ')).not.toMatch(/Tartar|Aether|Reclaimer|Mud Monarch/i);
     }
   });
 });

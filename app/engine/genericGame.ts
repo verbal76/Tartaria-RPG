@@ -76,6 +76,7 @@ const MAIN_QUEST = {
 const FACTION_QUESTS = [
   { id: 'wardens_scrap', factionId: 'wardens', title: 'Forge Stock', description: 'The Wardens always need reforging stock. Bring in 3 Scrap Metal.', objective: 'Gather 3 Scrap Metal and turn it in at the Hold or any Warden.', requirement: { rep: 0 }, reward: { tc: 35, rep: 6 }, fetch: { itemName: 'Scrap Metal', quantity: 3 } },
   { id: 'seekers_dig', factionId: 'seekers', title: 'The Sunken Dig', description: 'The Seekers want the lake wreck searched before the water rises. Staged contract.', objective: 'Reach the Still Lake and clear what guards the wreck.', requirement: { rep: 5 }, reward: { tc: 120, rep: 8, items: ['Seeker\'s Locket'] }, stages: [{ narration: 'Make your way to the Still Lake and find the half-sunk wreck.', advanceOn: 'travel' }, { narration: 'Drive off whatever has made the wreck its nest.', advanceOn: 'kill' }] },
+  { id: 'freeholders_supply', factionId: 'freeholders', title: 'Keep the Stall Stocked', description: 'The Freeholders\' crossroads stall is running thin. Bring in 3 Trail Rations to keep the travelers fed.', objective: 'Gather 3 Trail Rations and turn them in at the Crossroads or any Freeholder.', requirement: { rep: 0 }, reward: { tc: 40, rep: 6 }, fetch: { itemName: 'Trail Rations', quantity: 3 } },
 ];
 
 // A small walkable base per faction, placed at its location, with one mission-board room.
