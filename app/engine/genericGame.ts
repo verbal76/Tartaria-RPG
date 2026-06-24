@@ -146,6 +146,29 @@ const FLAVOR = {
 const withFaction = (rows: readonly unknown[], factionId: string) =>
   rows.map((r) => ({ ...(r as Record<string, unknown>), ...((r as { faction?: unknown }).faction ? { faction: factionId } : {}) }));
 
+// Wandering market-stall archetypes for the road. Each mints a fresh stall from its pool.
+const GENERIC_ROADSIDE = [
+  {
+    id: 'road_hawker', name: 'Road Hawker', title: 'wandering trader', demeanor: 'honest',
+    description: 'A stall thrown together from cart-boards and tarpaulin. Watches the road with one eye and the goods with the other.',
+    pool: [
+      { itemName: 'Trail Rations', priceMin: 4, priceMax: 7, weight: 14 },
+      { itemName: 'Worn Sword', priceMin: 16, priceMax: 24, weight: 6 },
+      { itemName: 'Bright Torch', priceMin: 14, priceMax: 22, weight: 8 },
+      { itemName: 'Scrap Metal', priceMin: 2, priceMax: 5, weight: 10 },
+    ],
+  },
+  {
+    id: 'road_fence', name: 'Road Fence', title: 'fence', demeanor: 'sketchy',
+    description: 'No stall, just a coat full of pockets and a quick way out. Prices are good; provenance is not.',
+    pool: [
+      { itemName: 'Worked Crystal', priceMin: 40, priceMax: 70, weight: 4 },
+      { itemName: 'Raw Crystal', priceMin: 8, priceMax: 16, weight: 10 },
+      { itemName: 'Tough Fiber', priceMin: 3, priceMax: 6, weight: 10 },
+    ],
+  },
+];
+
 // The generic world bible — keyworded passages the narrator surfaces when a scene's tags
 // match. The `always` block is the default. Setting-neutral ("the Reaches").
 const LORE_DOC = [
@@ -195,6 +218,7 @@ export const GENERIC_GAME = {
   flavor: FLAVOR,
   startingAreas: STARTING_AREAS,
   vendors: GENERIC_VENDORS,
+  roadsideTraders: GENERIC_ROADSIDE,
   wasteland: WASTELAND,
   mainQuest: MAIN_QUEST,
   bosses: BOSSES,

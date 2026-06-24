@@ -898,6 +898,40 @@ export function buildVendorsTemplate(): string {
   ].join('\n');
 }
 
+/** The Roadside-traders template — the wandering market-stall ARCHETYPES the engine
+ *  spawns on the road (each mints a fresh stall with a random pick from its pool).
+ *  Replaces the built-in pool. Setting-neutral example; itemNames must exist in catalogs. */
+export function buildRoadsideTradersTemplate(): string {
+  const body = JSON.stringify([
+    {
+      id: 'road_hawker', name: 'Road Hawker', title: 'wandering trader', demeanor: 'honest',
+      description: 'A stall thrown together from cart-boards and tarpaulin. Watches the road with one eye and the goods with the other.',
+      pool: [
+        { itemName: 'Trail Rations', priceMin: 4, priceMax: 7, weight: 14 },
+        { itemName: 'Worn Sword', priceMin: 16, priceMax: 24, weight: 6 },
+        { itemName: 'Bright Torch', priceMin: 14, priceMax: 22, weight: 8 },
+      ],
+    },
+    {
+      id: 'road_fence', name: 'Road Fence', title: 'fence', demeanor: 'sketchy',
+      description: 'No stall, just a coat full of pockets and a quick way out. Prices are good; provenance is not.',
+      pool: [
+        { itemName: 'Worked Crystal', priceMin: 40, priceMax: 70, weight: 4 },
+        { itemName: 'Scrap Metal', priceMin: 2, priceMax: 5, weight: 12 },
+      ],
+    },
+  ], null, 2);
+  return [
+    '// ROADSIDE TRADERS — wandering market-stall ARCHETYPES spawned on the road. Each',
+    '// mints a fresh stall with a random pick from its pool. A JSON ARRAY of:',
+    '//   { "id", "name", "title", "demeanor": "honest"|"sketchy", "description",',
+    '//     "pool": [{ "itemName", "priceMin", "priceMax", "weight" }] }.',
+    '//   demeanor — drives the steal DC / hostility-flip when the player tries to rob them.',
+    '//   itemName — must EXIST in your item catalogs.',
+    body,
+  ].join('\n');
+}
+
 /** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
  *  template stays readable. */
 function commentBlock(hint: string, width = 90): string {
@@ -1283,6 +1317,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });
   entries.push({ key: 'sceneProps', hint: 'The curated ambient nouns the engine injects into scenes as CLIMB and SALVAGE targets: { climbables?: [{ name, context?: inside|outside|both, height?: 1..8 }], salvageables?: [{ name, context? }] }. Replaces the built-in setting-neutral pools so the props match YOUR world. Omit either array to keep its built-in pool.', content: buildScenePropsTemplate() });
   entries.push({ key: 'vendors', hint: 'Named traders the engine spawns (scene vendor rolls + roadside). A JSON array of { id, name, title, faction? (a faction id, or null for unaligned), description, offers: [{ itemName, price, quantity? }], voiceId?, gender? }. itemNames must exist in your catalogs. Replaces the built-in trader pool.', content: buildVendorsTemplate() });
+  entries.push({ key: 'roadsideTraders', hint: 'Wandering market-stall ARCHETYPES spawned on the road (each mints a fresh stall with a random pick from its pool). A JSON array of { id, name, title, demeanor: "honest"|"sketchy", description, pool: [{ itemName, priceMin, priceMax, weight }] }. itemNames must exist in your catalogs. Replaces the built-in roadside pool.', content: buildRoadsideTradersTemplate() });
   entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in sidekicks), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
   entries.push({ key: 'dogEnabled', hint: 'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.', content: JSON.stringify(true) });
   entries.push({ key: 'damageTypes', hint: 'Author-ADDED damage types beyond the built-in 10. Array of { name, keywords?: [..], onHit?: [{stat,amount}] + onHitRounds (stat +/- to the victim when hit), combat?: { mode "on_hit"|"dot", dice, rounds (dot), baseChance 0..1, weakBonus, strongPenalty } }. combat = a weapon-deals-this-type effect (immediate or ticking), whose apply chance rises vs targets WEAK to it and falls vs STRONG. keywords let the engine infer the type from a bare attack string.', content: JSON.stringify([{ name: 'fire', keywords: ['fire', 'flame', 'burn'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } }, { name: 'frost', keywords: ['ice', 'freeze'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3 } }], null, 2) });
