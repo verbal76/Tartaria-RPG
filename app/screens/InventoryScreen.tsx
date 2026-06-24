@@ -12,6 +12,9 @@ import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types'
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
+import { isBuiltInDefaultItem } from '../engine/builtinCatalogNames';
+import { TEMPLATE_FLAG_COLOR } from '../engine/templatePlaceholders';
+import { useContentPackStore } from '../state/contentPackStore';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -1366,10 +1369,12 @@ function ItemRow({
           {isInferredInventoryItem(item) && (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           )}
-          <Text style={styles.rowName} numberOfLines={1}>
+          <Text style={[styles.rowName, useContentPackStore.getState().devMode && isBuiltInDefaultItem(item.name) && { color: TEMPLATE_FLAG_COLOR }]} numberOfLines={1}>
             {/* OTA-360 — a coated weapon shows its coated name
                 ("Corrupted Battle Axe"); the underlying name is
                 unchanged for stat lookup. */}
+            {/* engine_Dev — a built-in DEFAULT item name renders PINK: it's un-authored
+                template material the author should replace with their own. */}
             {item.coating ? `${item.coating.label} ${item.name}` : item.name}
           </Text>
           <Text style={styles.rowQty}>×{item.quantity}</Text>

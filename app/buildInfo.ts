@@ -15749,4 +15749,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // already neutral. NEXT (part 2): the deeper coupling — salvage/investigation POOLS still
 // yield built-in catalog items ("Worn Tartarian Coin", "Aetheric Shard", "Sentinel Core
 // Plate"), which needs the item catalog (gear/materials/relics) genericized in lockstep.
-export const OTA_BUILD_ID = '2026-06-24-822';
+//
+// engine_Dev-823 — PINK PHASE 2 (provenance) for ITEMS. New builtinCatalogNames.ts indexes
+// every built-in catalog item NAME (weapons/armor/gear/materials/amulets/rings/exploration/
+// loot, ~built straight from the DEFAULT JSON, override-independent). isBuiltInDefaultItem()
+// = "this item is un-authored template material the author should replace." Wired into the
+// inventory row name: a built-in default renders PINK (TEMPLATE_FLAG_COLOR), GATED on devMode
+// so end-players of a published game never see the markers. Author-uploaded items (a name
+// not in the built-in catalog) stay normal. This makes ALL ~265 themed catalog leaks visible
+// at once without renaming. NEXT: the genericization rename itself (catalog item names ->
+// neutral), which keeps them pink (still built-in defaults) until the author overrides.
+export const OTA_BUILD_ID = '2026-06-24-823';
