@@ -12,6 +12,7 @@
 // quick eyeball before diving into the JSON.
 
 import type { PlayerCharacter } from '../engine/types';
+import { getGameTitle } from '../engine/contentPack';
 
 export function buildSaveSnapshot(
   player: PlayerCharacter | null,
@@ -54,8 +55,9 @@ export function stampSaveExport(
   deviceSummary: string,
   playerName?: string,
 ): string {
-  const begin = `=== TARTARIA SAVE · ${snapshot.length} CHARS · BEGIN ===`;
+  const game = getGameTitle();
+  const begin = `=== ${game.toUpperCase()} SAVE · ${snapshot.length} CHARS · BEGIN ===`;
   const end = `=== END SAVE · ${snapshot.length} CHARS ===`;
-  const header = playerName ? `Tartaria Realms · ${playerName}` : 'Tartaria Realms';
+  const header = playerName ? `${game} · ${playerName}` : game;
   return `${begin}\n${snapshot}\n${end}\n\n${header}\n\n${deviceSummary}\n`;
 }

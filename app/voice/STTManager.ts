@@ -16,6 +16,7 @@
 // — the app never tries to invoke a null native method.
 
 import type { EventSubscription } from 'expo-modules-core';
+import { getGameTitle } from '../engine/contentPack';
 
 export interface STTResult {
   /** Recognised transcript so far (best confidence). */
@@ -153,7 +154,7 @@ function attachListeners(): void {
         if (code !== 'no-speech' && code !== 'aborted') {
           const hint =
             code === 'not-allowed' || code === 'service-not-allowed'
-              ? ' — open Android Settings → Apps → Tartaria Realms → Permissions and enable Microphone.'
+              ? ` — open Android Settings → Apps → ${getGameTitle()} → Permissions and enable Microphone.`
               : code === 'network'
                 ? ' — the speech engine needs network. Try again with mobile data or wifi on.'
                 : code === 'language-not-supported'
@@ -237,7 +238,7 @@ export async function startListening(
     diag('debug', `stt: getPermissions granted=${cur?.granted} canAskAgain=${cur?.canAskAgain}`);
     if (!cur?.granted) {
       if (cur?.canAskAgain === false) {
-        diag('system', 'Mic: permission was denied earlier. Open Android Settings → Apps → Tartaria Realms → Permissions → Microphone and turn it on.');
+        diag('system', `Mic: permission was denied earlier. Open Android Settings → Apps → ${getGameTitle()} → Permissions → Microphone and turn it on.`);
         onError('Mic permission denied. Enable in Settings.');
         return;
       }

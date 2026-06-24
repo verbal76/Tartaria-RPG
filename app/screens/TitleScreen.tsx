@@ -551,7 +551,7 @@ export function TitleScreen() {
     }
 
     const report = [
-      `=== TARTARIA BUG REPORT ===`,
+      `=== ${getGameTitle().toUpperCase()} BUG REPORT ===`,
       `Submitted: ${new Date().toISOString()}`,
       `Character: ${charName}`,
       slot ? `Slot ID: ${slot.slotId}` : null,
@@ -885,7 +885,7 @@ export function TitleScreen() {
             </Text>
             <Text style={styles.playStoreNagBody}>
               You're on build {apkBuild}. Open Google Play Store to install
-              the latest Tartaria Realms ({getApkCodename(MINIMUM_RECOMMENDED_APK_BUILD)},
+              the latest {getGameTitle()} ({getApkCodename(MINIMUM_RECOMMENDED_APK_BUILD)},
               build {MINIMUM_RECOMMENDED_APK_BUILD}) — newer features, bug
               fixes, and OTA-update compatibility.
             </Text>

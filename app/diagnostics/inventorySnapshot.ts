@@ -17,6 +17,7 @@
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
 import { categorizeItem, CATEGORY_ORDER, CATEGORY_LABEL, type InventoryCategory } from '../components/InventoryCategorize';
 import { consumeVerb } from '../engine/consumeVerb';
+import { getGameTitle } from '../engine/contentPack';
 import {
   findWeaponByName,
   isInferredItem,
@@ -203,8 +204,9 @@ export function stampInventoryExport(
   deviceSummary: string,
   playerName?: string,
 ): string {
-  const begin = `=== TARTARIA INVENTORY · ${snapshot.length} CHARS · BEGIN ===`;
+  const game = getGameTitle();
+  const begin = `=== ${game.toUpperCase()} INVENTORY · ${snapshot.length} CHARS · BEGIN ===`;
   const end = `=== END INVENTORY · ${snapshot.length} CHARS ===`;
-  const header = playerName ? `Tartaria Realms · ${playerName}` : 'Tartaria Realms';
+  const header = playerName ? `${game} · ${playerName}` : game;
   return `${begin}\n${snapshot}\n${end}\n\n${header}\n\n${deviceSummary}\n`;
 }
