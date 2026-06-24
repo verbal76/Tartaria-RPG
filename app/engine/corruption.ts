@@ -70,17 +70,20 @@ export function tierLabel(tier: CorruptionTier): string {
 export function tierCrossLine(prev: CorruptionTier, next: CorruptionTier): string | null {
   if (prev === next) return null;
   const name = cp().getCorruptionName();
+  // engine_Dev — the energy noun resolves through the content pack (generic → "energy",
+  // Tartaria built-in → "aether", a reskin → its own), so the line never hardcodes "aether".
+  const energy = cp().getEnergyName().toLowerCase();
   const t = (x: CorruptionTier) => tierLabel(x);
   const order: Record<CorruptionTier, number> = { clean: 0, tainted: 1, corrupted: 2, hollowed: 3 };
   const worsening = order[next] > order[prev];
   if (worsening) {
     if (next === 'tainted') return `✦ The ${name.toLowerCase()} tightens its grip — ${t('tainted')}. (CHA −1)`;
-    if (next === 'corrupted') return `✦ The aether under your skin has its own pulse now — ${t('corrupted')}. (all stats −1, prices bump)`;
+    if (next === 'corrupted') return `✦ The ${energy} under your skin has its own pulse now — ${t('corrupted')}. (all stats −1, prices bump)`;
     if (next === 'hollowed') return `✦ You are ${t('hollowed')}. They will come for you. (all stats −2, hunters on your trail)`;
   } else {
     if (next === 'corrupted') return `✦ You feel cleaner — back to ${t('corrupted')}.`;
-    if (next === 'tainted') return `✦ The aether dims — back to ${t('tainted')}.`;
-    if (next === 'clean') return `✦ ${t('clean')}. The hum of the aether is no longer your own.`;
+    if (next === 'tainted') return `✦ The ${energy} dims — back to ${t('tainted')}.`;
+    if (next === 'clean') return `✦ ${t('clean')}. The hum of the ${energy} is no longer your own.`;
   }
   return null;
 }
@@ -88,7 +91,8 @@ export function tierCrossLine(prev: CorruptionTier, next: CorruptionTier): strin
 // One-line tier description for the player sheet. Plain language
 // so the player sees what each tier actually does to them.
 export function tierDescription(tier: CorruptionTier): string {
-  if (tier === 'clean') return 'No aether on you. Nothing reacting to you.';
+  const energy = cp().getEnergyName().toLowerCase();
+  if (tier === 'clean') return `No ${energy} on you. Nothing reacting to you.`;
   if (tier === 'tainted') return 'CHA −1. Extra apparition encounters when you walk outdoors.';
   if (tier === 'corrupted') return 'All stats −1. Vendors charge +15%. Encounters spike further.';
   return 'All stats −2. Vendors charge +30%. Hunters will track you every few steps.';

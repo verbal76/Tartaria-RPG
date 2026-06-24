@@ -16195,6 +16195,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-450 — fetch gate. The generic per-faction starter quests require the
     // player to actually HOLD the items; verify, then consume them on turn-in so
     // it's a real "gather N, bring them back" loop (not a free narrative close).
+    // engine_Dev — thread the (possibly fetch-consumed) inventory through to the single
+    // reward writeback below. Previously the consume wrote inventory via its own set(), but
+    // the reward grant rebuilt from the STALE pre-consume snapshot and the final set clobbered
+    // the consumption — so fetch items were verified but never actually removed on turn-in.
+    let workingInventory = player.inventory;
     if (candidate.fetch) {
       const { itemName, quantity } = candidate.fetch;
       const have = player.inventory
@@ -16208,7 +16213,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       let toRemove = quantity;
-      const consumed = player.inventory
+      workingInventory = player.inventory
         .map((i) => {
           if (toRemove <= 0 || i.name.toLowerCase() !== itemName.toLowerCase()) return i;
           const take = Math.min(toRemove, i.quantity ?? 1);
@@ -16216,7 +16221,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return { ...i, quantity: (i.quantity ?? 1) - take };
         })
         .filter((i) => (i.quantity ?? 1) > 0);
-      set((s) => (s.player ? { player: { ...s.player, inventory: consumed } } : s));
     }
     // Pay out reward + record completion. arb166 — a remote "send word" turn-in
     // now pays HALF (both TC and rep): travelling to the agent/board and handing
@@ -16228,7 +16232,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // engine_Dev — reward.items: crafted-item drops granted into the pack on turn-in.
     // Granted in full even on a remote turn-in (items can't be halved). Mirrors the
     // storyline rewardItem grant — honors the pack cap and narrates an overflow.
-    let rewardInv = player.inventory.map((i) => ({ ...i }));
+    let rewardInv = workingInventory.map((i) => ({ ...i }));
     const grantedNames: string[] = [];
     for (const itemName of candidate.reward.items ?? []) {
       const lookup = lookupCraftedItem(itemName);

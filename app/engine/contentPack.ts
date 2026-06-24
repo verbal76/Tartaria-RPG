@@ -91,6 +91,7 @@ interface GenericDefaultPack {
   dogScenarios?: unknown[];
   summons?: { noun?: string; defs: unknown[] };
   whispers?: unknown[];
+  hooks?: HooksOverride;
   vendors?: unknown[];
   roadsideTraders?: unknown[];
   wasteland?: Record<string, unknown>;
@@ -116,6 +117,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.dogScenarios = pack.dogScenarios;
   genericDefaults.summons = pack.summons;
   genericDefaults.whispers = pack.whispers;
+  genericDefaults.hooks = pack.hooks;
   genericDefaults.vendors = pack.vendors;
   genericDefaults.roadsideTraders = pack.roadsideTraders;
   genericDefaults.wasteland = pack.wasteland;
@@ -140,6 +142,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.dogScenarios = undefined;
   genericDefaults.summons = undefined;
   genericDefaults.whispers = undefined;
+  genericDefaults.hooks = undefined;
   genericDefaults.vendors = undefined;
   genericDefaults.roadsideTraders = undefined;
   genericDefaults.wasteland = undefined;
@@ -251,7 +254,8 @@ export function getWorldName(): string { return worldNameOverride ?? genericDefa
  *  uses this to suppress the hard-coded Tartaria caption when a re-skin has no
  *  custom main quest of its own (it shows a neutral line instead). */
 export function isReskinActive(): boolean {
-  return hasTableOverride('locations')
+  return hasGenericDefaults()
+    || hasTableOverride('locations')
     || hasTableOverride('factions')
     || hasTableOverride('races')
     || hasTableOverride('enemies')
@@ -577,6 +581,10 @@ export function setHooksOverride(obj: HooksOverride | null): void {
 }
 export function hasHooksOverride(): boolean { return hooksOverride != null; }
 export function getHooksOverride(): HooksOverride | null { return hooksOverride; }
+/** engine_Dev — the installed generic-default hooks (neutral "the Reaches" leads). The
+ *  hooks layer is author override → generic default → built-in Tartaria, mirroring whispers,
+ *  so the stock generic game never falls back to the Tartaria-flavored built-in hook pool. */
+export function getGenericHooks(): HooksOverride | null { return genericDefaults.hooks ?? null; }
 
 // --- custom titles override -----------------------------------------------------
 // engine_Dev — IMPORTABLE TITLES. An uploaded array of title defs, each tying a

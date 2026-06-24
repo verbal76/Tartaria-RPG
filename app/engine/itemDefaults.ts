@@ -198,7 +198,7 @@ export function inferWeapon(name: string): CatalogWeapon {
     baseDurability: h.baseDurability,
     defense: h.defense,
     tags,
-    description: `${h.kind === 'ranged' ? 'A ranged weapon' : h.kind === 'runecaster' ? 'An Aether-channeling focus' : 'A melee weapon'}, sized for a reclaimer's hand.`,
+    description: `${h.kind === 'ranged' ? 'A ranged weapon' : h.kind === 'runecaster' ? 'An energy-channeling focus' : 'A melee weapon'}, sized for a fighter's hand.`,
     ...(effect ? { effect } : {}),
     ...(ste > 0 ? { statBonuses: [{ stat: 'stealth', amount: ste }] } : {}),
   };
@@ -266,7 +266,7 @@ export function inferArmor(name: string): CatalogArmor | null {
     rarity,
     baseDurability: h.baseDurability,
     tags,
-    description: `Worn armor, sized for a reclaimer's frame.`,
+    description: `Worn armor, sized for a fighter's frame.`,
     ...(ste > 0 ? { statBonuses: [{ stat: 'stealth', amount: ste }] } : {}),
   };
 }
@@ -385,7 +385,7 @@ export function inferGear(name: string, tags: readonly string[] = []): CatalogGe
   const isFungus = /\b(fungus|mushroom|sporecap|shroom|lichen|moss)\b/i.test(name);
   const aether = /\b(aether|aetheric|aetherstone|etheric|ether)\b/i.test(name);
   let kind: CatalogGear['kind'] = 'misc';
-  let description = `A reclaimer's find. Useful in the right hands.`;
+  let description = `A scavenger's find. Useful in the right hands.`;
   let effect: ItemEffect | undefined;
   const rarity: Rarity = aether ? 'Uncommon' : 'Common';
 

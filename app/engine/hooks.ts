@@ -3,7 +3,7 @@
 // Hooks are drawn from canonical Tartaria Prima lore — half-buried spires,
 // Etheric storms, Aether Golem stirrings, Black Cloak shadows, etc.
 
-import { getNarratorName, getHooksOverride } from './contentPack';
+import { getNarratorName, getHooksOverride, getGenericHooks, type HooksOverride } from './contentPack';
 
 export type HookKind =
   // Tier-1: atmospheric finds (the originals)
@@ -848,16 +848,26 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
 // re-skin can define its own hook ids.
 type PlantMap = Record<string, { line: string; nouns: string[] }[]>;
 type ChainMap = Record<string, HookOutcome[]>;
+// engine_Dev — the active hook set: author override → installed generic default → built-in
+// Tartaria. Mirrors whispers' layering so the stock generic game uses neutral "the Reaches"
+// hooks instead of leaking the built-in Tartaria pool (Reclaimer / Aetheric Torch / etc.).
+function activeHooks(): HooksOverride | null {
+  const author = getHooksOverride();
+  if (author?.plants && Object.keys(author.plants).length > 0) return author;
+  const generic = getGenericHooks();
+  if (generic?.plants && Object.keys(generic.plants).length > 0) return generic;
+  return null;
+}
 function getPlants(): PlantMap {
-  const o = getHooksOverride();
+  const o = activeHooks();
   return o?.plants && Object.keys(o.plants).length > 0 ? o.plants : (HOOK_PLANTS as PlantMap);
 }
 function getChainMap(): ChainMap {
-  const o = getHooksOverride();
+  const o = activeHooks();
   return o?.chains && Object.keys(o.chains).length > 0 ? (o.chains as ChainMap) : (CHAINS as ChainMap);
 }
 function getHookWeights(): Record<string, number> {
-  const o = getHooksOverride();
+  const o = activeHooks();
   if (o?.weights && Object.keys(o.weights).length > 0) return o.weights;
   // Custom plants with no declared weights → even weight over the authored kinds.
   if (o?.plants && Object.keys(o.plants).length > 0) {
@@ -868,7 +878,7 @@ function getHookWeights(): Record<string, number> {
   return HOOK_WEIGHTS as Record<string, number>;
 }
 function getIndoorKinds(): ReadonlySet<string> {
-  const o = getHooksOverride();
+  const o = activeHooks();
   if (o?.indoor) return new Set(o.indoor);
   // Custom hook set with no indoor declaration → treat all as outdoor.
   if (o?.plants && Object.keys(o.plants).length > 0) return new Set<string>();

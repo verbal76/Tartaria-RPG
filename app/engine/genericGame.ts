@@ -351,4 +351,35 @@ export const GENERIC_GAME = {
       meetEffects: [{ type: 'grant_tc', amount: 25 }, { type: 'grant_item', name: 'Trail Rations' }],
     },
   ],
+  // Generic HOOKS — neutral atmospheric leads so a reskin that skips the HOOKS box
+  // gets these instead of the built-in Tartaria pool (Reclaimer / Aetheric Torch / Mud
+  // Monarchs). Plain "the Reaches" leads; the author replaces them wholesale.
+  hooks: {
+    plants: {
+      old_marker: [
+        { line: 'A weathered stone marker leans in the long grass, its carving worn almost smooth.', nouns: ['marker', 'stone', 'carving'] },
+        { line: 'Someone set a marker here a long time ago. The dirt at its base looks recently disturbed.', nouns: ['marker', 'stone', 'dirt'] },
+      ],
+      roadside_fire: [
+        { line: 'A thin trail of smoke rises ahead — a lone traveler keeping a small fire.', nouns: ['fire', 'smoke', 'traveler', 'stranger'] },
+      ],
+      sunken_crate: [
+        { line: 'Half-buried in the mud, the corner of an old crate juts up at an angle.', nouns: ['crate', 'box', 'mud'] },
+      ],
+    },
+    chains: {
+      old_marker: [
+        { line: 'You dig at the base of the marker. A flat tin has been pressed into the soil beneath it.', done: false, addNouns: ['tin', 'soil'] },
+        { line: 'The tin opens with a tug — a handful of coins and a folded scrap of map inside.', effects: [{ type: 'grant_tc', amount: 20 }], done: true },
+      ],
+      roadside_fire: [
+        { line: 'The traveler waves you to the fire. "Warm yourself. Word is there’s good salvage a ridge over." They press a strip of dried meat into your hand before you move on.', effects: [{ type: 'grant_item', name: 'Trail Rations' }, { type: 'heal', amount: 3 }, { type: 'memo', text: 'A traveler at a roadside fire spoke of salvage a ridge over.' }], done: true },
+      ],
+      sunken_crate: [
+        { line: 'You work the crate free of the mud and pry the lid. Salvage rattles inside — scrap worth carrying.', effects: [{ type: 'grant_item', name: 'Scrap Metal' }, { type: 'grant_tc', amount: 10 }], done: true },
+      ],
+    },
+    weights: { old_marker: 6, roadside_fire: 5, sunken_crate: 6 },
+    indoor: [],
+  },
 };
