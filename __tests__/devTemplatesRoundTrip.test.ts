@@ -97,12 +97,13 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
   // emit slices of the real game tables, leaking setting nouns (Aether/Mud Monarchs/
   // Tartary) into a blank author's file. This locks the genericized table templates
   // free of those proper nouns so they can't regress back to built-in data.
-  const TARTARIA_NOUNS = /tartar|aether|etheric|reclaimer|mud monarch|forgotten order|mudstone|aetherstone/i;
+  const TARTARIA_NOUNS = /tartar|aether|etheric|reclaimer|mud monarch|mud dweller|forgotten order|core guardian|mudstone|aetherstone|\bgolem/i;
   test.each(Object.keys(GENERIC_TABLE_ROWS))('table template is generic (no Tartaria nouns): %s', (id) => {
-    // Row CONTENT only (includeTokenNote=false). The optional-field NOTES legitimately
-    // document real engine condition ids (e.g. aether_powers) which are functional, not
-    // flavor, and stay per "templates' scripting only, not the coding/usage".
-    const t = getTableTemplate(id as (typeof CONTENT_TABLES)[number]['id'], undefined, false);
+    // Render WITH the optional-field NOTES (includeTokenNote=true) so a setting noun
+    // can't hide in a note. The old `aether_powers` condition id leaked there until it
+    // was renamed to the generic `energy_powers` (engine_Dev-816), so notes are now
+    // guarded too — the whole TEMPLATE surface must read generic.
+    const t = getTableTemplate(id as (typeof CONTENT_TABLES)[number]['id'], undefined, true);
     const hit = t.match(TARTARIA_NOUNS);
     expect(hit ? `${id} leaks "${hit[0]}"` : 'clean').toBe('clean');
   });

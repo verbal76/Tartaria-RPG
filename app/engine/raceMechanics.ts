@@ -125,7 +125,7 @@ export type ACBonusCondition =
   | 'dark'
   | 'confined'
   | 'runic_gear'
-  | 'aether_powers'
+  | 'energy_powers'
   | 'constructed_environment'
   | 'relic_armor';
 
@@ -179,7 +179,9 @@ export function detectACContexts(
     const item = player.inventory.find((i) => i.name === slotItem);
     const tags = item?.tags ?? [];
     if (tags.some((t) => /runic/i.test(t))) set.add('runic_gear');
-    if (tags.some((t) => /aether/i.test(t))) set.add('aether_powers');
+    // built-in game's energy gear carries 'aether*' tags; the engine-level condition
+    // is the generic 'energy_powers' (renames cleanly with the {energy} concept).
+    if (tags.some((t) => /aether|energy/i.test(t))) set.add('energy_powers');
     if (item?.kind === 'relic' && tags.some((t) => /armor|plate|chest|head|legs/i.test(t))) {
       set.add('relic_armor');
     }

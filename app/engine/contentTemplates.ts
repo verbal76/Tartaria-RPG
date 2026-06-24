@@ -149,7 +149,7 @@ const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   races: [
     '// Optional per RACE row (perks + gear + abilities):',
     '//   racialStatBonuses: { strength?, dexterity?, intelligence?, wisdom?, charisma? }  — always-on stat bumps',
-    '//   racialACBonusRules: [{ condition: underground|dark|confined|runic_gear|aether_powers|constructed_environment|relic_armor, delta }]',
+    '//   racialACBonusRules: [{ condition: underground|dark|confined|runic_gear|energy_powers|constructed_environment|relic_armor, delta }]',
     '//   startingWeapon: "Item Name"   ·   startingGear: ["Item Name", …]  (granted at creation, from your catalogs)',
     '//   resist: ["<damage type>"]  /  weak: ["<damage type>"]   — lower/raise the chance you suffer that type\'s on-hit effect',
     '//   abilities: [{ id, name, description, combatOnly?, effect: { type: heal|stat_buff|shield|repair|strike, amount?|dice?, stat?, rounds?, damageType? } }]',
@@ -759,12 +759,12 @@ export function buildCollectablesTemplate(): string {
   ].join('\n');
 }
 
-/** The Summons template — the SUMMONED-SIDEKICK pack (the engine's "golem"
- *  family, reskinnable). `noun` renames the category the player types after
- *  "summon" and reads in the summon lines ("golem" by default). Each entry in
+/** The Summons template — the SUMMONED-SIDEKICK pack (the engine's reskinnable
+ *  companion family). `noun` renames the category the player types after
+ *  "summon" and reads in the summon lines ("sidekick" by default). Each entry in
  *  `summons` is one buildable sidekick: what it's made of (fuel), its combat
  *  profile, how hard it is to summon, and the words the player types to call it.
- *  The uploaded pack REPLACES the built-in golems wholesale. */
+ *  The uploaded pack REPLACES the built-in sidekicks wholesale. */
 export function buildSummonsTemplate(): string {
   const body = JSON.stringify({
     noun: 'automaton',
@@ -812,9 +812,9 @@ export function buildSummonsTemplate(): string {
   }, null, 2);
   return [
     '// SUMMONED SIDEKICKS — the buildable companion family (replaces the built-in',
-    '// "golems"). Top level: { "noun"?: "automaton", "summons": [ ... ] }.',
+    '// sidekicks). Top level: { "noun"?: "automaton", "summons": [ ... ] }.',
     '//   noun     — what the player types after "summon" and reads in the summon',
-    '//              lines (default "golem"). Each summon can also be called by its',
+    '//              lines (default "sidekick"). Each summon can also be called by its',
     '//              own aliases below.',
     '// Each summon:',
     '//   kind     — a unique id (also "id" is accepted).',
@@ -827,7 +827,7 @@ export function buildSummonsTemplate(): string {
     '//   summonDC — d20 + INT must meet this to bind it (harder = stronger).',
     '//   resistBase/resistCap — innate damage resistance (0..1), grows with training.',
     '//   elementTags — raw-material tags it can mend from when its exact parts run out.',
-    '// The uploaded pack REPLACES the built-in golems.',
+    '// The uploaded pack REPLACES the built-in sidekicks.',
     body,
   ].join('\n');
 }
@@ -1165,7 +1165,7 @@ The thematic detail for each follows.
     list from your LOADED Locations + Starting areas, so populate those first ·
     Titles (achievements)
   - Collectables (character stories the player reassembles from loot fragments)
-  - Summoned sidekicks (the buildable companion family — replaces "golems") +
+  - Summoned sidekicks (the buildable companion family — replaces the built-in sidekicks) +
     the dog companion on/off toggle
   - Dog-rescue scenarios (the "dog hook" wording — how the player finds & frees the
     dog): hook nouns, the captor + their faction, the intro/victory lines. The
@@ -1215,7 +1215,7 @@ function bundleEntries(): BundleEntry[] {
   entries.push({ key: 'bosses', hint: 'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest | location | random), spawnChance? (% for random) }. Build them in the BOSSES box.', content: buildBossesTemplate() });
   entries.push({ key: 'startingAreas', hint: 'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), optional coords {x,y} (the map cell — read it off the in-game map planner), returnable? (false = one-way prologue that vanishes once you leave; its missions then use remote turn-in), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). Flag exactly one room with missionBoard:true to stand the starter Mission Board there. The faction member spawns inside and walks room-to-room; an exit of "world" steps back onto the world map. Whispers can plant in a room by naming its room id in plantLocations.', content: buildStartingAreasTemplate() });
   entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });
-  entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in "golems"), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
+  entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in sidekicks), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
   entries.push({ key: 'dogEnabled', hint: 'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.', content: JSON.stringify(true) });
   entries.push({ key: 'damageTypes', hint: 'Author-ADDED damage types beyond the built-in 10. Array of { name, keywords?: [..], onHit?: [{stat,amount}] + onHitRounds (stat +/- to the victim when hit), combat?: { mode "on_hit"|"dot", dice, rounds (dot), baseChance 0..1, weakBonus, strongPenalty } }. combat = a weapon-deals-this-type effect (immediate or ticking), whose apply chance rises vs targets WEAK to it and falls vs STRONG. keywords let the engine infer the type from a bare attack string.', content: JSON.stringify([{ name: 'fire', keywords: ['fire', 'flame', 'burn'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } }, { name: 'frost', keywords: ['ice', 'freeze'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3 } }], null, 2) });
   entries.push({ key: 'damageResistances', hint: 'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Marsh Wyrm": { "resist": ["frost"], "weak": ["burn"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in map.', content: JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2) });
