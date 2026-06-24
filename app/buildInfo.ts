@@ -15963,4 +15963,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so a later rebuild's game can't be shadowed) so a shipped build IS their game with dev off. A
 // runtime dev upload still wins for in-app editing. New persist flag on loadGameBundle + bakedDefaultGame
 // test. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-840';
+//
+// engine_Dev-841 — VALIDATE GAME pre-export pass (from the architecture review). New validateGame()
+// scans the EFFECTIVE loaded content for the failure modes that bake into a broken release: dangling
+// references (recipe result/ingredient, vendor/roadside offers, faction-quest factionId + fetch +
+// reward items, main-quest step bosses/locations, boss drops/spawn, starting-area faction/location +
+// room-exit targets) and duplicate ids — errors (will break play) vs warnings (soft). New "✓ VALIDATE
+// GAME" button in the whole-game card surfaces the counts + lines so authors fix problems before the
+// bake. Pure reads through the content resolvers; new validateGame test (9 cases). tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-841';

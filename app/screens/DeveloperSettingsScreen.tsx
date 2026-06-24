@@ -43,6 +43,7 @@ import {
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
+import { validateGame, summarizeValidation } from '../engine/validateGame';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -563,6 +564,10 @@ function GameBundleBox() {
         it contains is applied at once; anything omitted keeps its built-in default. // and /* */
         comments are allowed. <Text style={{ fontWeight: 'bold' }}>RESET</Text> wipes all uploaded
         content back to the built-in defaults if you need a clean slate.{'\n\n'}
+        <Text style={{ fontWeight: 'bold' }}>VALIDATE GAME</Text> scans your loaded content for broken
+        references (a recipe, quest, vendor, boss, or starting-area pointing at an item / faction / boss /
+        location / room that doesn’t exist) and duplicate ids. Run it before you export so a broken game
+        never gets baked.{'\n\n'}
         <Text style={{ fontWeight: 'bold' }}>Big game?</Text> If the file is over the{' '}
         {(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, SAVE automatically splits it into as
         many timestamped parts as it needs (<Text style={{ fontStyle: 'italic' }}>my-gamep1</Text>,{' '}
@@ -571,6 +576,23 @@ function GameBundleBox() {
         rebuild — order doesn’t matter, and it won’t let you mix parts from different saves.
       </Text>
       <View style={styles.stackCol}>
+        {/* engine_Dev — pre-export sanity pass: dangling refs (recipes/quests/vendors/bosses/
+            starting-areas → items/factions/bosses/locations/rooms) + duplicate ids. Run it before
+            you bake so a broken game never ships. */}
+        <TouchableOpacity
+          style={[styles.copyBtn, styles.stackBtn]}
+          onPress={() => {
+            setConfirmReset(false);
+            const s = summarizeValidation(validateGame());
+            if (s.errors === 0 && s.warnings === 0) { setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
+            const head = s.errors > 0
+              ? `✗ Validate Game: ${s.errors} error${s.errors === 1 ? '' : 's'}${s.warnings ? ` + ${s.warnings} warning${s.warnings === 1 ? '' : 's'}` : ''} — fix the errors before you bake.`
+              : `⚠ Validate Game: 0 errors, ${s.warnings} warning${s.warnings === 1 ? '' : 's'} (safe to export).`;
+            setStatus({ kind: s.errors > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more.` : ''}` });
+          }}
+        >
+          <Text style={styles.copyBtnText}>✓ VALIDATE GAME</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
           <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
         </TouchableOpacity>
