@@ -63,7 +63,7 @@ const FACTION_KNIFE: Record<string, string> = {
 
 // Each race ships with TWO items from their rulebook starter table —
 // kept tight so the default 10-slot Player's Backpack still has room for
-// the shared starter items (Aetheric Torch + Trail Rations + Locket) plus
+// the shared starter items (Hand Torch + Trail Rations + Locket) plus
 // the primary weapon + faction knife. Total = 7 slots used. Remaining
 // items from the table live in exploration.json and can be acquired from
 // vendors / loot pools.
@@ -129,16 +129,16 @@ function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem
 // the mechanics (light reveals hooks, drink restores stamina, detection finds
 // relics, food feeds), so a re-skinned game can rename these to its own props
 // (Flashlight / K-Rations / Canteen / Geiger Counter) by uploading a 'starterItems'
-// flavor array — keep the tags to keep the behavior. Built-in Tartaria kit is the
-// default when no override is uploaded.
+// flavor array — keep the tags to keep the behavior. Built-in SETTING-NEUTRAL kit is the
+// default when no override is uploaded (so it never seeds another setting's proper nouns).
 const DEFAULT_STARTER_ITEMS: InventoryItem[] = [
-  { id: 'aetheric_torch', name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+  { id: 'aetheric_torch', name: 'Hand Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held torch. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
   { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
   // OTA-375 — every character starts with a Water Bottle (the cheap,
   // refillable stamina recovery item) so exhaustion in an early fight
   // is never a dead end. Drink it for +10 stamina; refill free at water.
   { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
-  { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
+  { id: 'aether_locket', name: "Finder's Locket", kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
 ];
 
 // engine_Dev — rows of a LIVE item catalog (uploaded override, else built-in). The
