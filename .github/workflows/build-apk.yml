@@ -1,5 +1,9 @@
 name: Build · Android APK
 
+# engine_Dev-844 — trigger-touch for a preview APK of the engine_Dev line (cool color scheme +
+# baked slot + validate-game + 2-part save + combat arena). Non-ignored edit so the [build-apk]
+# job fires despite paths-ignore skipping app/**.
+#
 # OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
 # build-apk's paths-ignore skips app/**, so an OTA bump alone won't fire the
