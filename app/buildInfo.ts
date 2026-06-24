@@ -15971,4 +15971,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // room-exit targets) and duplicate ids — errors (will break play) vs warnings (soft). New "✓ VALIDATE
 // GAME" button in the whole-game card surfaces the counts + lines so authors fix problems before the
 // bake. Pure reads through the content resolvers; new validateGame test (9 cases). tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-841';
+//
+// engine_Dev-842 — EXPERIMENT: combat arena view. During a fight the world-window feed is replaced
+// by a two-column arena (YOU | active ENEMY) with live HP/stamina bars + stats; it reverts to the
+// plain feed the instant combat ends. Presentational ONLY — reads existing state (player + enemy
+// views), writes nothing, touches no combat logic / rolls / action bar. Gated by COMBAT_ARENA_VIEW
+// in ExplorationScreen (set false to revert instantly) and only renders while inCombat is true, so
+// it can't affect anything outside a fight. New CombatArena component. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-842';

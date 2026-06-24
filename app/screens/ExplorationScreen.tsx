@@ -7,6 +7,13 @@ import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
+import { CombatArena } from '../components/CombatArena';
+
+// engine_Dev EXPERIMENT — during a fight, replace the world-window feed with a two-column combat
+// arena (you | enemy, with live HP bars). Presentational only; combat logic + rolls are untouched.
+// Set to false to instantly revert to the plain feed. It only renders while inCombat is true, so it
+// can't affect anything outside a fight.
+const COMBAT_ARENA_VIEW = true;
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
@@ -793,7 +800,11 @@ export function ExplorationScreen() {
       })()}
 
       <TutorialTarget area="feed" style={styles.feed}>
-        <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        {COMBAT_ARENA_VIEW && inCombat && player ? (
+          <CombatArena player={player} enemyViews={enemyViews} activeIdx={activeIdx} />
+        ) : (
+          <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
+        )}
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
             <Text style={styles.streamingPrefix}>The {getNarratorName()}:</Text>
