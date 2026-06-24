@@ -566,19 +566,33 @@ export function buildStartingAreasTemplate(): string {
  *  number — the same list the dev console's TITLES box shows as checkboxes. */
 export function buildTitlesTemplate(): string {
   const varList = TRACKABLE_VARS.map((v) => `//   "${v.id}"  —  ${v.label}`).join('\n');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const builtinIds = ((require('../data/lore/arbiter-titles.json') as { titles: Array<{ id: string }> }).titles)
+    .map((t) => `//   "${t.id}"`).join('\n');
   const body = JSON.stringify([
     { id: 'veteran', name: 'Veteran of the Fold', description: 'Hardened by too many firefights. +1 STR.', track: 'enemiesDefeated', threshold: 25, perk: { stat: 'strength', amount: 1 } },
     { id: 'wayfarer', name: 'Wayfarer', description: 'You have crossed more ground than most see in a lifetime.', track: 'travelsCompleted', threshold: 10 },
     { id: 'war_profiteer', name: 'War Profiteer', track: 'tc', threshold: 1000 },
+    // Re-skin a BUILT-IN title: match its id, give a new name/requirement/description.
+    // No track/threshold needed — the engine still earns it the same way.
+    { id: 'bane_of_constructs', name: 'Machine Breaker', requirement: 'Destroy 5 constructs', description: 'Hits mechanical foes harder.' },
   ], null, 2);
   return [
-    '// IMPORTABLE TITLES — an array of achievements. A title is earned the moment',
-    '// its TRACKABLE VARIABLE reaches the threshold. Pick a "track" from this list:',
+    '// IMPORTABLE TITLES — an array of achievements. Two kinds of entry, both optional:',
+    '//',
+    '// 1) ADD a new achievement — earned the moment its TRACKABLE VARIABLE reaches the',
+    '//    threshold. Each: { id, name, description?, track, threshold, perk?: { stat, amount } }.',
+    '//    Pick a "track" from this list:',
     varList,
-    '// Each title: { id, name, description?, track, threshold, perk?: { stat, amount } }.',
-    '// Optional perk applies a flat bonus while the title is held; valid stats:',
-    '// strength, dexterity, intelligence, wisdom, charisma, stealth — plus the derived',
-    '// caps hp (max HP) and staminaMax (max stamina), e.g. perk: { stat: "staminaMax", amount: 3 }.',
+    '//    Optional perk applies a flat bonus while held; valid stats: strength, dexterity,',
+    '//    intelligence, wisdom, charisma, stealth — plus derived caps hp (max HP) and',
+    '//    staminaMax (max stamina), e.g. perk: { stat: "staminaMax", amount: 3 }.',
+    '//',
+    '// 2) RE-SKIN a built-in earnable title — give an entry whose "id" matches one of the',
+    '//    20 built-ins below and set any of name / requirement / description to override its',
+    '//    DISPLAY. The engine keeps earning it exactly as before (no track/threshold needed).',
+    '//    Built-in ids you can override:',
+    builtinIds,
     body,
   ].join('\n');
 }

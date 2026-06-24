@@ -5,8 +5,8 @@
 // its sources so the player can audit any surprising value.
 
 import React, { useState } from 'react';
-import { getNarratorName, getCorruptionName, hasCustomTitlesOverride } from '../engine/contentPack';
-import { liveCustomTitles, TRACKABLE_VARS } from '../engine/customTitles';
+import { getNarratorName, getCorruptionName } from '../engine/contentPack';
+import { resolveTitleRoster } from '../engine/customTitles';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
@@ -16,8 +16,6 @@ import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
-import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-import { TITLE_PASSIVE_PERK } from '../engine/titles';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -567,18 +565,11 @@ export function CharacterScreen() {
         {!collapsed.titles && (
         <View style={styles.card}>
           {(() => {
-            // engine_Dev — IMPORTABLE TITLES. When the author has uploaded a custom
-            // title set, show THAT (their achievements) instead of the built-in list.
-            const varLabel = (id: string): string => TRACKABLE_VARS.find((v) => v.id === id)?.label ?? id;
-            const builtinTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
-            const allTitles = hasCustomTitlesOverride()
-              ? liveCustomTitles().map((t) => ({
-                  id: t.id,
-                  title: t.name,
-                  requirement: `${varLabel(t.track)} ≥ ${t.threshold}`,
-                  perk: t.description ?? '◆ earned',
-                }))
-              : builtinTitles;
+            // engine_Dev — IMPORTABLE + CUSTOMIZABLE TITLES. The roster MERGES the 20 built-in
+            // earnable titles (exploring/killing/etc., with any author display overrides applied)
+            // with the author's added data-driven achievements — so an upload customizes the
+            // built-ins instead of hiding them. Earned rows already carry the resolved perk text.
+            const allTitles = resolveTitleRoster();
             const earned = new Set(player.earnedTitles ?? []);
             const sorted = [...allTitles].sort((a, b) => {
               const ea = earned.has(a.id) ? 0 : 1;
@@ -602,7 +593,7 @@ export function CharacterScreen() {
                         {isEarned ? '◆ ' : '◇ '}{t.title}
                       </Text>
                       <Text style={isEarned ? styles.titlePerk : styles.titleRequirement}>
-                        {isEarned ? (TITLE_PASSIVE_PERK[t.id] ?? t.perk) : t.requirement}
+                        {isEarned ? t.perk : t.requirement}
                       </Text>
                     </View>
                   );
