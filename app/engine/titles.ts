@@ -273,7 +273,7 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   shadow_diver: 'Passive: +1 to Stealth checks.',
   protector_of_the_forgotten: 'Passive: +1 AC while in ruins / constructed places (stacks with Warden).',
   warden_of_the_old_world: 'Passive: +1 AC while in ruins / constructed places (stacks with Protector).',
-  speaker_of_forgotten_tongues: 'Passive: +2 when investigating relics & Tartarian machines.',
+  speaker_of_forgotten_tongues: 'Passive: +2 when investigating relics & ancient machines.',
   wayfarer_of_the_lost_paths: 'Passive: cardinal travel costs less stamina (2 → 1.5); +1 Stealth (you move the lost paths unseen).',
 };
 

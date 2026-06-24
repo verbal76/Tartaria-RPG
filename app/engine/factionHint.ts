@@ -13,7 +13,7 @@ import { getHunts, fuzzyFindHunt } from './hunts';
 import { getMysteries, fuzzyFindMystery } from './mysteries';
 import { getStorylines, fuzzyFindStoryline } from './factionStorylines';
 import { getFactionQuests, fuzzyFindFactionQuest } from './factionQuests';
-import { FACTIONS } from './factions';
+import { findFaction } from './factions';
 import { getActiveVendors } from './vendors';
 
 export type QuestKind = 'hunt' | 'mystery' | 'storyline' | 'quest';
@@ -42,7 +42,7 @@ export function findQuestFactionHint(text: string): QuestFactionHint | null {
 }
 
 function packHint(factionId: string, contractTitle: string, kind: QuestKind): QuestFactionHint {
-  const faction = FACTIONS.find((f) => f.id === factionId);
+  const faction = findFaction(factionId);
   const factionLabel = faction?.name ?? factionId.replace(/_/g, ' ');
   // First 3 vendor names from this faction, deterministic catalog order
   // for stable narration.
