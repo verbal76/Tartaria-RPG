@@ -169,6 +169,18 @@ const GENERIC_ROADSIDE = [
   },
 ];
 
+// The generic WORLD-LORE block — the narrator's tone / setting / persona / vocabulary.
+// Replaces the setting-neutral DEFAULT so the generic game ("the Reaches") reads coherent
+// instead of leaking the Tartaria default tone.
+const WORLD_LORE = {
+  narrator: 'You are {narrator}, a dry, watchful guide to {world} — plainspoken, never cheerful, never cruel.',
+  tone: 'A fallen world of ruins and long roads, where the old powers left a strange residue wherever they broke.',
+  tagline: 'What the old world left behind.',
+  setting: 'The Reaches are what remains after the old world fell — settlements that hold the roads, ruins that do not, and a slow blight that takes those who linger where the old powers spilled. The Wardens keep the roads, the Seekers dig for what was buried, and the Freeholders keep the crossroads trading.',
+  terms: ['the Reaches', 'the Blight', 'the Wardens', 'the Seekers', 'the Freeholders', 'the old world'],
+  vocabulary: ['scavenge', 'hold', 'dig', 'reclaim', 'ward'],
+};
+
 // The generic world bible — keyworded passages the narrator surfaces when a scene's tags
 // match. The `always` block is the default. Setting-neutral ("the Reaches").
 const LORE_DOC = [
@@ -220,6 +232,7 @@ export const GENERIC_GAME = {
   vendors: GENERIC_VENDORS,
   roadsideTraders: GENERIC_ROADSIDE,
   wasteland: WASTELAND,
+  worldLore: WORLD_LORE,
   mainQuest: MAIN_QUEST,
   bosses: BOSSES,
   collectables: COLLECTABLES,

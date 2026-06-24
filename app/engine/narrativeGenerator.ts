@@ -11,7 +11,7 @@ import type {
   WorldMemory,
 } from './types';
 import { pick, chance, rotatingPick } from './rng';
-import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride } from './contentPack';
+import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride, hasWorldLore } from './contentPack';
 import { GENERIC_VARIANTS as INVESTIGATE_GENERIC, CREEPY_VARIANTS as INVESTIGATE_CREEPY, INVESTIGATE_LORE_DEFAULT } from './investigationTable';
 import {
   NOTHING_LINES as SEARCH_NOTHING,
@@ -117,7 +117,7 @@ export function buildOpeningNarrative(input: {
     `Of the ${raceName}, sworn to the ${factionName}: you have crossed into the buried country. The cataclysm that made it ended a thousand years ago — yet here, at ground level, it never quite stopped. The ground still moves. The air still hums.`,
   ];
   let p1: string;
-  if (hasLoreOverride('world')) {
+  if (hasWorldLore()) {
     const lead = named
       ? `You are ${playerName} of the ${raceName}, under the colors of the ${factionName}.`
       : `You walk under the colors of the ${factionName}, ${raceName} blood in your veins.`;

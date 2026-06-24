@@ -48,10 +48,11 @@ export const LORE_BLOCKS: LoreBlockDef[] = [
   { id: 'flavor', label: 'Narration flavor', hint: 'JSON object of the narrator’s canned line-pools by key (opening, genericRemarks, combatRemarks, lookLines, notedLines, sceneIntros, combatIntros, hubOpening, personalBeats, moodRemarks, intentRemarks, raceRemarks, factionRemarks). Also "starterItems": an array of starting-inventory item rows (keep each row\'s "tags" to keep its behavior — light/drink/food/detection). Hit TEMPLATE to see the keys; any key you omit keeps the built-in lines.' },
 ];
 
-/** Built-in default world tone (Tartaria). The LLM prompt falls back to this when
- *  no World-lore override is loaded. Replace it via an uploaded World lore block. */
+/** Built-in default world tone — SETTING-NEUTRAL. The LLM prompt falls back to this
+ *  only when neither an author World-lore override NOR the installed generic default is
+ *  present. Authors replace it via an uploaded World lore block. */
 export const DEFAULT_WORLD_TONE =
-  'Reclaimers scavenge a flooded wasteland; the Aether is a strange resonant material left over from a fallen civilization.';
+  'Survivors pick through the ruins of a fallen world, where a strange residual power lingers wherever the old world broke.';
 
 /** Default game title shown on the start screen (under the icon). Lore-agnostic;
  *  renamable in the dev console. */
@@ -93,6 +94,8 @@ interface GenericDefaultPack {
   vendors?: unknown[];
   roadsideTraders?: unknown[];
   wasteland?: Record<string, unknown>;
+  /** Generic World-lore block ({ tone?, setting?, terms?, vocabulary?, narrator?, tagline? }). */
+  worldLore?: Record<string, unknown>;
   // engine_Dev — identity strings (the loudest leaks: "Tartaria" / narrator / title).
   identity?: { worldName?: string; corruptionName?: string; narratorName?: string; gameTitle?: string };
 }
@@ -116,6 +119,7 @@ export function installGenericDefaults(pack: GenericDefaultPack): void {
   genericDefaults.vendors = pack.vendors;
   genericDefaults.roadsideTraders = pack.roadsideTraders;
   genericDefaults.wasteland = pack.wasteland;
+  genericDefaults.worldLore = pack.worldLore;
   genericDefaults.identity = pack.identity;
   genericDefaultsInstalled = true;
 }
@@ -139,6 +143,7 @@ export function clearGenericDefaults(): void {
   genericDefaults.vendors = undefined;
   genericDefaults.roadsideTraders = undefined;
   genericDefaults.wasteland = undefined;
+  genericDefaults.worldLore = undefined;
   genericDefaults.identity = undefined;
   genericDefaultsInstalled = false;
 }
@@ -506,6 +511,12 @@ export function setLoreOverride(id: LoreBlockId, value: unknown | null): void {
 }
 export function hasLoreOverride(id: LoreBlockId): boolean {
   return loreOverrides[id] != null;
+}
+/** True when a World-lore block is active — author override OR the installed generic
+ *  default. Gates world setting/terms/vocabulary injection so the GENERIC game's world
+ *  lore is used (the author-override-only hasLoreOverride('world') would miss it). */
+export function hasWorldLore(): boolean {
+  return resolveWorldBlock() != null;
 }
 export function getLoreOverride(id: LoreBlockId): unknown | null {
   return loreOverrides[id] ?? null;
@@ -1035,20 +1046,28 @@ export function factionUsesRemoteTurnIn(factionId: string | null | undefined): b
 
 /** The world-tone string injected into the LLM prompts. Override with a World
  *  lore block ({ "tone": "..." }); defaults to the Tartaria tone. */
+/** The active World-lore block: author override → installed generic default → null.
+ *  So the generic game's world tone/setting are used (instead of leaking the Tartaria
+ *  DEFAULT) until an author uploads their own World lore. */
+function resolveWorldBlock(): Record<string, unknown> | null {
+  const ov = loreOverrides.world as Record<string, unknown> | undefined;
+  if (ov && Object.keys(ov).length > 0) return ov;
+  return (genericDefaults.worldLore as Record<string, unknown> | undefined) ?? null;
+}
 export function getWorldTone(): string {
-  const w = loreOverrides.world as { tone?: unknown } | undefined;
+  const w = resolveWorldBlock() as { tone?: unknown } | null;
   return w && typeof w.tone === 'string' && w.tone.trim().length > 0 ? w.tone.trim() : DEFAULT_WORLD_TONE;
 }
 /** Optional one-paragraph setting blurb from the World lore block ({ "setting":
  *  "..." }). Injected into the narration prompt when present; '' when absent. */
 export function getWorldSetting(): string {
-  const w = loreOverrides.world as { setting?: unknown } | undefined;
+  const w = resolveWorldBlock() as { setting?: unknown } | null;
   return w && typeof w.setting === 'string' ? w.setting.trim() : '';
 }
 /** Optional key-terms list from the World lore block ({ "terms": ["...","..."] }
  *  or a plain string). Helps the model use the world's nouns. '' when absent. */
 export function getWorldTerms(): string {
-  const w = loreOverrides.world as { terms?: unknown } | undefined;
+  const w = resolveWorldBlock() as { terms?: unknown } | null;
   if (!w) return '';
   if (Array.isArray(w.terms)) return w.terms.filter((t) => typeof t === 'string').join(', ').trim();
   return typeof w.terms === 'string' ? w.terms.trim() : '';
@@ -1058,7 +1077,7 @@ export function getWorldTerms(): string {
  *  verbs" line so the engine teaches the AUTHOR'S verbs, not Tartaria's. '' when
  *  absent → no vocabulary line is injected at all. */
 export function getWorldVocabulary(): string {
-  const w = loreOverrides.world as { vocabulary?: unknown } | undefined;
+  const w = resolveWorldBlock() as { vocabulary?: unknown } | null;
   if (!w) return '';
   if (Array.isArray(w.vocabulary)) return w.vocabulary.filter((t) => typeof t === 'string').join(', ').trim();
   return typeof w.vocabulary === 'string' ? w.vocabulary.trim() : '';
@@ -1067,7 +1086,7 @@ export function getWorldVocabulary(): string {
  *  with a World lore block ({ "narrator": "..." }); otherwise built from the
  *  narrator's name so a rename flows into the narration the model generates. */
 export function getNarratorPersona(): string {
-  const w = loreOverrides.world as { narrator?: unknown } | undefined;
+  const w = resolveWorldBlock() as { narrator?: unknown } | null;
   // engine_Dev — run the authored persona through the token filler so an author can
   // write {narrator}/{world}/{energy}/{crucible} in it instead of hard-coding the
   // chosen names (e.g. "You are {narrator}, a weary guide…").
