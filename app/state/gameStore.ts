@@ -751,21 +751,13 @@ async function arbiterPersonaAnswer(question: string): Promise<string | null> {
 // evaluation is holistic, the derived titles (golem/scion/explorer/aetherborn)
 // are caught by the periodic catch-all call in the world tick — no per-site
 // wiring needed for those.
-const ARBITER_TITLE_META: Record<string, { title: string; perk: string }> = (() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const data = require('../data/lore/arbiter-titles.json') as { titles: Array<{ id: string; title: string; perk: string }> };
-  const m: Record<string, { title: string; perk: string }> = {};
-  for (const t of data.titles) m[t.id] = { title: t.title, perk: t.perk };
-  return m;
-})();
-
 function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void): void {
   const player = getStore().player;
   if (!player) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { newlyEarnedTitles, TITLE_PASSIVE_PERK } = require('../engine/titles');
+  const { newlyEarnedTitles } = require('../engine/titles');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { newlyEarnedCustomTitles } = require('../engine/customTitles') as typeof import('../engine/customTitles');
+  const { newlyEarnedCustomTitles, builtinTitleDisplay } = require('../engine/customTitles') as typeof import('../engine/customTitles');
   const fresh: string[] = newlyEarnedTitles(player);
   // engine_Dev — IMPORTABLE TITLES. Award uploaded custom titles whose tracked
   // variable has reached its threshold, alongside the built-in wired titles.
@@ -781,17 +773,15 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
     );
   }
   for (const id of fresh) {
-    const meta = ARBITER_TITLE_META[id];
-    if (!meta) continue;
-    // OTA-353 — announce the HONEST passive effect, not the canon
-    // arbiter-titles.json "Once per day…" flavor. The engine implements these
-    // as always-on passives (and several now grant +Stealth, OTA-350); the
-    // earn message used to promise a daily active that doesn't exist. The
-    // Character screen already shows TITLE_PASSIVE_PERK — match it here.
-    const honest: string = (TITLE_PASSIVE_PERK as Record<string, string>)[id] ?? meta.perk;
+    // engine_Dev — resolve the earned title's display through the author-override
+    // layer: a re-skin's uploaded titles JSON can rename/re-describe a built-in
+    // title. Falls back to the honest passive text (TITLE_PASSIVE_PERK) then the
+    // arbiter-titles.json string. (Was: ARBITER_TITLE_META + TITLE_PASSIVE_PERK.)
+    const { title, perk } = builtinTitleDisplay(id);
+    if (!title) continue;
     getStore().appendLog(
       'arbiter',
-      `The ${getNarratorName()} studies you a long moment. "You have earned a name to carry: ${meta.title}. ${honest}"`,
+      `The ${getNarratorName()} studies you a long moment. "You have earned a name to carry: ${title}.${perk ? ` ${perk}` : ''}"`,
     );
   }
 }

@@ -15899,4 +15899,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // title keeps its display AND its passive perk after the rename. New titleIdMigration test locks
 // it. (Internal counter field names like golemEdge/sentinelsDefeated are never displayed, left
 // as-is.) tsc baseline; titles/stealthTitles/arbiterTitlesScreen/titleIdMigration suites green.
-export const OTA_BUILD_ID = '2026-06-24-834';
+//
+// engine_Dev-835 — make the 20 built-in earnable titles (exploring/killing/etc.) author-
+// customizable through the SAME uploaded titles JSON. New resolveTitleRoster()/builtinTitleDisplay()
+// in customTitles.ts: an uploaded entry whose id matches a built-in re-skins its display
+// (name / requirement / perk) while the engine's earning predicate is untouched; entries with a
+// new id + track/threshold remain added achievements. The Character screen now MERGES the built-ins
+// (with overrides applied) + the author's added titles instead of the old either/or that hid the
+// built-ins on any upload; the earn announcement resolves through the override too (dropped the
+// now-dead ARBITER_TITLE_META). Titles template documents the re-skin path + lists the 20 built-in
+// ids. New customTitleRoster test. tsc baseline; title/customTitleRoster/template suites green.
+export const OTA_BUILD_ID = '2026-06-24-835';
