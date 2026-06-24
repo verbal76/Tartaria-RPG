@@ -15685,4 +15685,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (the shared stripJsonComments the loaders already use) before the count AND guards it
 // in try/catch so a count can never be fatal. Audited every JSON.parse in the dev panel
 // — this was the only unstripped/unguarded one. Regression test locks the invariant.
-export const OTA_BUILD_ID = '2026-06-24-817';
+//
+// engine_Dev-818 — TEMPLATE-FLAG (pink), PHASE 1 of 2: tint unfilled TEMPLATE material
+// PINK where the PLAYER sees it, so the author knows to go fill in the template. New
+// app/engine/templatePlaceholders.ts: TEMPLATE_FLAG_COLOR + detectors — isTemplate-
+// Placeholder() (whole-field: REPLACE markers, bundle identity defaults, generic sample-
+// row names, sourced from GENERIC_TABLE_ROWS so it never drifts) and splitOnPlaceholders()
+// (prose-safe substring scan for the all-caps REPLACE markers; CASE-SENSITIVE so ordinary
+// "replace" prose is never flagged). Wired into AdventureFeed (the central narration feed)
+// so REPLACE… markers left in loaded content render pink inline alongside the existing
+// enemy-name highlighting. PHASE 2 (next) — flag un-overridden built-in DEFAULTS via the
+// resolver's override-vs-default provenance (catches e.g. the built-in "Aetheric Torch"
+// leaking into an authored game), reusing this same color + helpers.
+export const OTA_BUILD_ID = '2026-06-24-818';
