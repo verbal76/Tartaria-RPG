@@ -1604,6 +1604,14 @@ export function buildFlavorTemplate(n = 2): Record<string, unknown> {
   for (const [key, val] of Object.entries(genericFlavorPools())) {
     out[key] = trimFlavorValue(val, n);
   }
+  // engine_Dev — extra overridable flavor pools that don't live in genericFlavorPools but
+  // resolve through this same Flavor block (so the author can re-skin them). Stubs are
+  // illustrative; omit any key to keep its built-in / generic default.
+  if (!('travelBeats' in out)) out.travelBeats = ['A standalone world-color beat the narrator drops while traveling (no {noun}).'];
+  if (!('ambientFlavor' in out)) out.ambientFlavor = ['A factoid revealed on a ~25% search; use {noun} for the searched object.'];
+  if (!('mysterySeeds' in out)) out.mysterySeeds = ['A tiny unanswered observation on investigate; {noun} = the object.'];
+  if (!('locationFlavors' in out)) out.locationFlavors = { example_location_id: ['A line that fires when the player is at this location id.'] };
+  if (!('sceneFlavors' in out)) out.sceneFlavors = { example_scene_tag: ['A line that fires when the scene carries this tag.'] };
   return out;
 }
 

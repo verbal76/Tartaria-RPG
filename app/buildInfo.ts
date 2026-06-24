@@ -15936,4 +15936,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // factions/races/capitals/sites live + drops Tartaria prose. Real bug fixed: faction fetch-quest
 // items were verified but never consumed on turn-in (stale-snapshot clobber). Leak-scanner baseline
 // ratcheted 341 → 328. New factionOverrideRouting test. Full parity confirmed (no lost features).
-export const OTA_BUILD_ID = '2026-06-24-837';
+//
+// engine_Dev-838 — finish the stress-test follow-ups. Gated the biggest remaining player-facing
+// leak: TRAVEL_LORE_BEATS (15 Tartaria narrator beats surfaced during travel) + AMBIENT_FLAVOR_LINES
+// + MYSTERY_SEED_LINES now resolve through resolveFlavor (author Flavor block → installed generic
+// default → built-in), with neutral travelBeats/ambientFlavor/mysterySeeds pools added to GENERIC_GAME
+// so the stock generic game shows neutral beats. location-flavors + scene-flavors routed through
+// resolveFlavor too (overridable via the Flavor block). Flavor template now documents all five new
+// keys. Content depth: added a Freeholders faction quest so all three generic factions have a board
+// contract. New flavorPoolOverride test. tsc baseline 142; flavor/narration/faction/generic suites green.
+export const OTA_BUILD_ID = '2026-06-24-838';
