@@ -80,7 +80,7 @@ const coresBadgeStyle = StyleSheet.create({
   badge: { color: '#d8b46a', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
 });
 
-interface Props { player: PlayerCharacter; }
+interface Props { player: PlayerCharacter; fill?: boolean; }
 
 // OTA-632 — health-tinted player card. The HP readout is a tiny number in the
 // top-left card; a playtester died (broken-ladder fall) partly because it's so
@@ -127,7 +127,7 @@ const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
 const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
-export function StatsPanel({ player }: Props) {
+export function StatsPanel({ player, fill }: Props) {
   const race = getRaces().find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
@@ -219,7 +219,7 @@ export function StatsPanel({ player }: Props) {
   const golemShows = !!player.sidekick && player.sidekick.hp > 0;
 
   return (
-    <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
+    <Animated.View style={[styles.container, fill ? styles.fill : null, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
           behind the card content so the text stays readable. */}
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
@@ -304,6 +304,8 @@ function Stat({ label, value, valueColor }: { label: string; value: string; valu
 }
 
 const styles = StyleSheet.create({
+  // engine_Dev — combat arena: let the card fill the tall column so the box runs long.
+  fill: { flex: 1 },
   container: {
     backgroundColor: '#0e1618',
     borderColor: '#2b3a3e',

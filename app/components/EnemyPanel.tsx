@@ -61,6 +61,9 @@ interface Props {
    *  measured by ExplorationScreen). The card scrolls vertically past this so a
    *  tall enemy never grows the row — it stays in the corner like the feed. */
   maxHeight?: number;
+  /** engine_Dev — combat arena: fill the (tall) column instead of capping at maxHeight, so the
+   *  enemy box runs long like the character box. */
+  fill?: boolean;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -90,7 +93,7 @@ function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } 
   };
 }
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: Props) {
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fill }: Props) {
   // Measure the column we actually live in so cards fit the top-right corner
   // (portrait), instead of being sized to the full screen width and spilling
   // out into a left/right-scrolling "landscape" strip.
@@ -108,9 +111,11 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
+  // engine_Dev — combat arena: when `fill`, take the whole tall column (flex:1) instead of capping
+  // at maxHeight, so the enemy box runs long like the character box.
   const scrollWrap = (card: React.ReactNode) => (
     <ScrollView
-      style={{ maxHeight: capH }}
+      style={fill ? { flex: 1 } : { maxHeight: capH }}
       showsVerticalScrollIndicator
       nestedScrollEnabled
     >
@@ -146,7 +151,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   // instant combat starts; render the (empty) wrap and bail on the list.
   return (
     <>
-    <View style={styles.wrap} onLayout={onLayout}>
+    <View style={[styles.wrap, fill ? styles.wrapFill : null]} onLayout={onLayout}>
       {enemies.length === 0 ? null : enemies.length === 1 ? (
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
@@ -352,6 +357,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   wrap: { width: '100%' },
+  wrapFill: { flex: 1 },
   card: {
     backgroundColor: '#0e1618',
     borderColor: '#5a2a26',

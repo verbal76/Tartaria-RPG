@@ -16020,4 +16020,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fit it to WIDTH = ~90% of screen ("too big"). Replaced with an explicit, clamped, CENTERED box
 // (≤56% width / ≤54% height, aspect-preserved, nudged just above middle) so it reads as a centred
 // poster with dark margins and clear room for the loading bar below. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-848';
+//
+// engine_Dev-849 — fix the combat arena. The 842 experiment added a SECOND char + enemy box (a
+// custom CombatArena) under the originals → two of each, and the custom char box lacked the reactive
+// HP color. Removed CombatArena entirely. Now during a fight the ORIGINAL top row grows tall to fill
+// the world-window (topRowCombat flex:1, feed hidden) and the ORIGINAL StatsPanel (reactive HP color)
+// + EnemyPanel get a `fill` prop so each is ONE long box on its side. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-849';
