@@ -27,11 +27,20 @@ export function SplashOverlay() {
   // tablet alike, plus the Android status-bar height so the top frame clears it.
   const { width: winW, height: winH } = useWindowDimensions();
   const statusTop = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0;
+  // engine_Dev — explicit, clamped, CENTERED poster box (not a near-edge inset-fit, which made the
+  // art ~90% of screen width = "too big"). Cap to a fraction of BOTH width and height, keep the
+  // poster's aspect, and centre it slightly above middle so the loading bar sits clearly below it.
+  const aspect = SPLASH_H / SPLASH_W; // height / width
+  const maxW = winW * 0.56;
+  const maxH = winH * 0.54;
+  let posterW = maxW;
+  let posterH = maxW * aspect;
+  if (posterH > maxH) { posterH = maxH; posterW = maxH / aspect; }
   const posterInset = {
-    top: Math.round(winH * 0.05) + statusTop,
-    bottom: Math.round(winH * 0.10), // leaves room for the loading bar + nav gesture area
-    left: Math.round(winW * 0.05),
-    right: Math.round(winW * 0.05),
+    width: Math.round(posterW),
+    height: Math.round(posterH),
+    left: Math.round((winW - posterW) / 2),
+    top: Math.round((winH - posterH) / 2 - winH * 0.04) + statusTop,
   };
   const [minElapsed, setMinElapsed] = useState(false);
   const [capReached, setCapReached] = useState(false);
