@@ -73,19 +73,20 @@ function timeAgo(ts: number): string {
   return `${Math.round(delta / 86_400_000)}d ago`;
 }
 
-// v2.4.1 (OTA 036) — RESUME OBJECTIVE line for the slot card.
-// Phase-aware so the player sees real progress (e.g. "3 of 9 Cores
-// recovered. Heading to the Endless Stair next.").
-function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
+// v2.4.1 (OTA 036) — RESUME OBJECTIVE line for the slot card. engine_Dev — the built-in Tartaria
+// "Mud Flood Nexus" quest was removed, so this is now a NEUTRAL progress hint keyed off the legacy
+// phase (used only as a fallback for old save summaries; new summaries carry mainQuestObjective,
+// the live custom-quest objective, which the card prefers).
+function resumeObjectiveLine(phase: MainQuestPhase): string {
   switch (phase) {
-    case 'hook':       return '◆ A rumor of the Mud Flood Nexus.';
-    case 'revelation': return '◆ 9 Cores to recover. None yet in pack.';
-    case 'cores':      return `◆ ${cores}/9 Cores recovered.`;
-    case 'descent':    return '◆ All 9 Cores in pack. The Endless Stair waits.';
-    case 'nexus':      return '◆ Standing at the Mud Flood Nexus.';
-    case 'choice':     return '◆ The Choice waits at the Nexus.';
+    case 'hook':       return '◆ Your story is just beginning.';
+    case 'revelation': return '◆ The path ahead is taking shape.';
+    case 'cores':      return '◆ Making progress on your quest.';
+    case 'descent':    return '◆ Nearing the end of your journey.';
+    case 'nexus':      return '◆ At the threshold of the end.';
+    case 'choice':     return '◆ A final choice awaits.';
     case 'ended':      return '◆ The run is closed.';
-    default:           return '◆ Mud Flood Nexus quest in progress.';
+    default:           return '◆ Your story continues.';
   }
 }
 
@@ -711,12 +712,11 @@ export function TitleScreen() {
             the save. Only renders when the slot summary has the
             mainQuestPhase field (legacy summaries pass through
             silently). */}
-        {item.mainQuestPhase && (
+        {(item.mainQuestObjective || item.mainQuestPhase) && (
           <Text style={styles.slotObjective}>
-            {resumeObjectiveLine(
-              item.mainQuestPhase as MainQuestPhase,
-              item.mainQuestCoresRecovered ?? 0,
-            )}
+            {item.mainQuestObjective
+              ? `◆ ${item.mainQuestObjective}`
+              : resumeObjectiveLine(item.mainQuestPhase as MainQuestPhase)}
           </Text>
         )}
         {item.dead && (

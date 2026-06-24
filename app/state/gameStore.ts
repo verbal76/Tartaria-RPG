@@ -10555,7 +10555,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             get().appendLog(
               'arbiter',
-              `The ${getNarratorName()} shrugs. "You have no compass. The mud-flood country looks the same in every direction — find one or guess."`,
+              `The ${getNarratorName()} shrugs. "You have no compass. This country looks the same in every direction — find one or guess."`,
               { skipDedup: true },
             );
           }

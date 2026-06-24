@@ -16001,4 +16001,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // error/warning/info counts; SAVE FILE TO DEVICE now soft-gates on hard errors (a second tap exports
 // anyway). Skipped the review's non-mapping bits (dialogue graphs, schemaVersion/engineVersionRequired
 // manifest, generic player-start) — no such fields exist yet. Extended test (13 cases). tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-845';
+//
+// engine_Dev-846 — fix two displayed "Mud Flood Nexus" Tartaria leaks (the built-in quest was
+// removed but its display strings lingered). TitleScreen's save-slot "resume objective" line is
+// genericized (neutral phase hints) AND now prefers a new SlotSummary.mainQuestObjective — the live
+// CUSTOM main-quest objective (currentObjectiveLine) computed at save time — so a reskin shows its
+// own quest. Also genericized gameStore's no-compass narrator line ("the mud-flood country" → "this
+// country"). The remaining 'nexus'/'mud flood' hits are internal ids / noun-matchers, not displayed.
+// tsc baseline 142; leak-scanner/save/title suites green.
+export const OTA_BUILD_ID = '2026-06-24-846';
