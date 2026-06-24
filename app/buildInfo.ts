@@ -15923,4 +15923,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //
 // (re-publish trigger — no code change: 836's OTA publish failed when GitHub Actions minutes
 // were exhausted; this republishes the same 836 build once minutes were restored.)
-export const OTA_BUILD_ID = '2026-06-24-836';
+//
+// engine_Dev-837 — stress-test fixes (5-agent audit). Closed the verified Tartaria leaks that
+// reached the player in the STOCK GENERIC GAME: (1) hooks now layer author → generic → built-in
+// (new neutral "the Reaches" hook set in GENERIC_GAME) so exploration leads stop falling back to
+// the Tartaria pool; (2) energy stops reading "Aether" — isReskinActive() counts the installed
+// generic pack, so getEnergy() returns neutral words; (3) corruption tier narration routes the
+// energy noun through getEnergyName(); (4) titles "Tartarian machines" → "ancient machines";
+// (5) itemDefaults synthesized descriptions drop "reclaimer's"/"Aether-channeling". Tier-2
+// override seams: factions systems now read the uploaded Factions table (liveFactions/findFaction
+// across factionHint/MissionBoard/Contracts/7 gameStore sites); narrator world-knowledge resolves
+// factions/races/capitals/sites live + drops Tartaria prose. Real bug fixed: faction fetch-quest
+// items were verified but never consumed on turn-in (stale-snapshot clobber). Leak-scanner baseline
+// ratcheted 341 → 328. New factionOverrideRouting test. Full parity confirmed (no lost features).
+export const OTA_BUILD_ID = '2026-06-24-837';
