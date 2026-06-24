@@ -16048,4 +16048,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // remaining displayed bleed was the About page's "Qwen generator (Arbiter narration)" label →
 // now getNarratorName(). The @tartaria/* + tartaria.ml.* AsyncStorage keys and __TARTARIA_BOOT_STAGE
 // are internal (never displayed; renaming orphans saved state) so they stay. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-853';
+//
+// engine_Dev-854 — leak-scanner widening pass. NOUNS_G + the candidateFiles() grep now cover the
+// full bleed family (added Arbiter, Mud Flood) and scan app/components, app/voice, app/diagnostics,
+// app/ui, app/data on top of engine/state/screens. Newly-surfaced DISPLAYED bleeds genericized:
+// portability.ts (narrator/flavor lines, 2→0), buriedSkyscraper / LoreCodexBody gate lines (→{narrator}),
+// AetherStatPickerModal title, contentTemplates hint example, tutorialSteps (6 setting strings → neutral).
+// The three functional residuals are baselined, not "fixed": gameStore's '../engine/askArbiter' require
+// path, and narrativeGenerator/arbiterFrame's legacy-"Arbiter" matchers that strip the old narrator name
+// from model output. Scanner green at 328; tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-854';

@@ -164,7 +164,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'objective-chip',
     pulse: true,
     title: 'Your Main Quest',
-    body: 'The road leads to the Aetheric Cores the Guardians protect. Tap the MAIN QUEST objective chip to open your contracts.',
+    body: 'Your main quest is your through-line. Tap the MAIN QUEST objective chip to open your contracts.',
     arbiter:
       '"Nine Cores, nine Guardians, nine Lost Capitals. That\'s the road. Tap MAIN QUEST to start."',
   },
@@ -173,9 +173,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'contracts',
     area: 'fullscreen',
     title: 'Choose a Capital',
-    body: 'Tap the primary objective box at the top to open the list of nine Capitals, then choose one. Any works — distance varies, but the Aether marks the road.',
+    body: 'Tap the primary objective box at the top to open your quest objectives, then choose where to head next.',
     arbiter:
-      '"Tap the objective box up top. Pick a Capital; the Aether marks the road."',
+      '"Tap the objective box up top. Pick your next objective."',
   },
 ];
 
@@ -218,7 +218,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     area: 'top-right-enemy',
     title: 'Enemy panel / Crest',
     body:
-      'Out of combat this shows the Tartaria crest. In combat the panel becomes one card per enemy ' +
+      'Out of combat this shows the game crest. In combat the panel becomes one card per enemy ' +
       '(swipe or tap to cycle targets) with their HP, AC, attack bonus, damage dice, and whether ' +
       'they\'re in range of your equipped weapon. ' +
       '\n\nThe ⚙ gear in the bottom-right corner is your settings/lore/session hub — we\'ll see it.',
@@ -292,7 +292,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     body:
       'There are 9 Lost Capitals on the map. Each holds a Core — the prize the main quest is ' +
       'built around — but every Core is guarded by a Core Guardian: a one-of-nine boss from the ' +
-      'Aether-Born Order, a semi-religious sub-faction that exists only to keep the buried world ' +
+      'a guardian order, a semi-religious sub-faction that exists only to keep the buried world ' +
       'from being woken.' +
       '\n\nDefeat them to get the Core PLUS a unique signature weapon + signature armor (the ' +
       'Core Guardian Set — 18 unique pieces across the 9 Capitals).',
@@ -312,7 +312,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     area: 'fullscreen',
     title: 'You\'re set.',
     body:
-      'Tartaria is procedural — every move resolves something, even if it\'s just dust. ' +
+      'This world is procedural — every move resolves something, even if it\'s just dust. ' +
       'When in doubt: tap "look around you" for full bearings, then search or approach the ' +
       `nouns in the chips. Ask the ${getNarratorName()} ("ask about X"), "what city is north of me", ` +
       '"closest hub", and rest when you need to. Good hunting.',

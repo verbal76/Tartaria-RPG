@@ -25,7 +25,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'rea
 import { BrandedModal } from './BrandedModal';
 import locationsData from '../data/locations/locations.json';
 import { getRaces, getFactions } from '../engine/character';
-import { resolveTable, hasTableOverride } from '../engine/contentPack';
+import { resolveTable, hasTableOverride, getNarratorName } from '../engine/contentPack';
 import timelineData from '../data/events/timeline.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
@@ -205,7 +205,7 @@ export function LoreCodexBody() {
         visible={hubRefusalDest !== null}
         title="Leave the outpost first"
         body={hubRefusalDest
-          ? `The Arbiter can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
+          ? `The ${getNarratorName()} can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
           : undefined}
         buttons={[
           {

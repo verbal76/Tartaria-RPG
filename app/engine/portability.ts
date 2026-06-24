@@ -28,7 +28,7 @@ const RULES: PortabilityRule[] = [
     // Vehicles, carts, sleds
     patterns: ['wagon', 'cart', 'sled', 'caravan', 'carriage', 'skiff', 'boat', 'ship'],
     refusals: [
-      `The Arbiter snorts. "I like your style, but I don't think you'll fit the {target} in your pack."`,
+      `The {narrator} snorts. "I like your style, but I don't think you'll fit the {target} in your pack."`,
       `The {target} isn't going anywhere — not with you, anyway. Not without a team of mules and a long road.`,
       `You consider the {target}. You consider your shoulders. The math doesn't work.`,
     ],
@@ -44,7 +44,7 @@ const RULES: PortabilityRule[] = [
     ],
     refusals: [
       `The {target} is staying right where it is. Centuries-old stonework doesn't fit in any pack ever made.`,
-      `The Arbiter raises an eyebrow. "The {target}? With what — a second {target} to carry it in?"`,
+      `The {narrator} raises an eyebrow. "The {target}? With what — a second {target} to carry it in?"`,
       `You eye the {target}. Whatever you'd need to move it, you do not have.`,
       `The {target} is part of the building, not a thing you take. Try the SALVAGE button if you want pieces of it.`,
     ],
@@ -59,7 +59,7 @@ const RULES: PortabilityRule[] = [
     refusals: [
       `The {target} is heavier than it looks, and it looks heavy.`,
       `You can lift one end of the {target} maybe. Carry the whole thing — not happening.`,
-      `The Arbiter shakes their head. "Take the small things off the {target}. Not the {target}."`,
+      `The {narrator} shakes their head. "Take the small things off the {target}. Not the {target}."`,
     ],
   },
   {
@@ -97,7 +97,7 @@ const RULES: PortabilityRule[] = [
     ],
     refusals: [
       `The {target} is rock. Rock is heavy. You are not.`,
-      `The Arbiter glances at the {target}. "That boulder might be a bit much for you to carry, don't you think?"`,
+      `The {narrator} glances at the {target}. "That boulder might be a bit much for you to carry, don't you think?"`,
       `You can chip at the {target} for fragments — pick CHIPS via SALVAGE — but the whole thing stays.`,
     ],
   },
@@ -121,7 +121,7 @@ const RULES: PortabilityRule[] = [
       'rift', 'crack', 'vent', 'sinkhole', 'puddle',
     ],
     refusals: [
-      `You can't pocket {target}. The Arbiter waits politely for you to figure that out.`,
+      `You can't pocket {target}. The {narrator} waits politely for you to figure that out.`,
       `Nothing about the {target} fits in a pack. It's a feature of the place, not a thing.`,
     ],
   },
@@ -179,12 +179,12 @@ export const __TEST_ONLY__ = { RULES };
 // an explicit "(Try SALVAGE.)" or equivalent so any single tap on a
 // scene-feature noun teaches the salvage path.
 const SCENE_FEATURE_REFUSALS: string[] = [
-  `You reach for the {target}, but a bolt of Aetheric energy snaps across the ground beside you. You decide that's not the best idea. (Try SALVAGE.)`,
+  `You reach for the {target}, but a bolt of strange energy snaps across the ground beside you. You decide that's not the best idea. (Try SALVAGE.)`,
   `Your fingers close on the {target} — and pass through where you thought a handhold was. It's part of the world here, not a thing to take. (Try SALVAGE.)`,
   `You start to lift the {target} and the silt shifts beneath your boots; you let go. Some things belong to the ground — but they can be pried loose. (Try SALVAGE.)`,
   `The {target} is fused to the stone around it. You'd need to break it loose, not just pick it up. (Try SALVAGE.)`,
-  `An Aetheric hum rises from the {target} the moment you touch it. You step back, breathing. The world's keeping that one for itself. (Try SALVAGE.)`,
-  `The {target} weighs more than you do. The Arbiter watches you try anyway, then mercifully looks away. (Try SALVAGE.)`,
+  `An odd hum rises from the {target} the moment you touch it. You step back, breathing. The world's keeping that one for itself. (Try SALVAGE.)`,
+  `The {target} weighs more than you do. The {narrator} watches you try anyway, then mercifully looks away. (Try SALVAGE.)`,
   `You wrap your hands around the {target} and your shoulders argue. It's part of the bones of this place. Whatever it gives up, it'll give to a pry, not a lift. (Try SALVAGE.)`,
   `Dust rises off the {target} when you touch it — and settles right back. Whatever it is, it's been here longer than your race. Leave it. Or salvage it.`,
 ];
