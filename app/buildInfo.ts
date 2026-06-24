@@ -15725,4 +15725,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // examples). Tests: override-applies (engine output swaps to author nouns + heights;
 // clear restores built-ins) + round-trip + bundle-completeness. NEXT (step 3): the
 // arbiter-quote pools (still leak "the Giants"/"essence"/"rune").
-export const OTA_BUILD_ID = '2026-06-24-820';
+//
+// engine_Dev-821 — AUTHOR-OVERRIDABLE built-in pools, STEP 3: the ARBITER-QUOTE pools.
+// Finding: these were ALREADY author-overridable — narrativeGenerator merges them with
+// resolveFlavor('moodRemarks'/'intentRemarks'), so authors add their own via the flavor
+// section. The bug was the built-in Tartaria quotes are ALWAYS merged in (loaded via raw
+// require(), bypassing the override resolver), so they leaked regardless — Bob spouting
+// "the Giants"/"the Aether"/"Tartaria"/"Mud Monarchs" in a 1943 WWII game. Fix: rewrote
+// both baselines (arbiter-intent-quotes.json + arbiter-mood-quotes.json, ~150 lines) to
+// SETTING-NEUTRAL aphorisms — same intents/moods + counts, no proper nouns — so the
+// always-merged baseline fits any setting and the author's flavor lines layer on top.
+// Guard test locks both pools neutral. This completes the author-overridable-pools work
+// the playtest surfaced (steps 1-3). Still open from that thread: the built-in ITEM-
+// CATALOG leak (Aetheric Torch / Worn Tartarian Coin yields) — the bug-report item.
+export const OTA_BUILD_ID = '2026-06-24-821';
