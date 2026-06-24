@@ -15879,4 +15879,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Sidekick Whisperer, Bane of Constructs, Far Explorer…); ids kept (titles.ts predicates +
 // saved earnedTitles reference them — internal, never displayed). tsc baseline; concept /
 // askArbiter / titles / arbiterTitlesScreen / actionReference suites green.
-export const OTA_BUILD_ID = '2026-06-24-832';
+//
+// engine_Dev-833 — sweep the remaining lore-flavor files for Tartaria + genericize:
+// ambient-flavor, location-flavors, scene-flavors, mystery-seeds, dc_table. Recursive
+// value-only genericization (object KEYS untouched, so keyed references stay intact):
+// Aether*->energy/arcane, Etheric->energy, Tartaria/Tartarian->this world/old-world,
+// Reclaimer->scavenger, Forgotten Order->the order, Mud Monarch/Dweller->old rulers/deep
+// folk, "the Arbiter"->"the narrator". All five files now carry zero Tartaria in their TEXT.
+// (NOTE: location-flavors KEYS are still built-in location ids — great_tartary_plains,
+// tartarian_outskirts — those belong to the built-in locations.json coupling, addressed
+// with that table, not here.) tsc baseline; narration/ambient/mystery/context suites green.
+export const OTA_BUILD_ID = '2026-06-24-833';

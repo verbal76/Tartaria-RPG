@@ -1,5 +1,5 @@
 {
-  "lootRule": "When an enemy is defeated the Arbiter rolls 1d6: if odd the first loot item drops; if even the second loot item drops.",
+  "lootRule": "When an enemy is defeated the narrator rolls 1d6: if odd the first loot item drops; if even the second loot item drops.",
   "difficultyTable": [
     {
       "level": 1,
@@ -41,7 +41,7 @@
       "level": 7,
       "label": "Very Difficult",
       "rollNeeded": 21,
-      "example": "Battling a powerful Aetheric creature, convincing a faction leader to give away key information."
+      "example": "Battling a powerful arcane creature, convincing a faction leader to give away key information."
     },
     {
       "level": 8,
@@ -59,7 +59,7 @@
       "level": 10,
       "label": "Legendary",
       "rollNeeded": 30,
-      "example": "Surviving a fall from a great height with last-second intervention, battling an ancient Aetheric entity."
+      "example": "Surviving a fall from a great height with last-second intervention, battling an ancient arcane entity."
     }
   ]
 }
