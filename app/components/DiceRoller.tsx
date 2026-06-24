@@ -24,9 +24,21 @@ interface Props {
   state: PendingRollState;
   onRoll: (values: number[]) => void;
   onCancel: () => void;
+  /** engine_Dev — fired the moment a roll resolves (after the hold), with the just-rolled
+   *  result. The screen uses it to flash a transient "last roll" popup above the controls. */
+  onResolve?: (info: RollResolveInfo) => void;
 }
 
-export function DiceRoller({ state, onRoll, onCancel }: Props) {
+/** A compact summary of a resolved roll, for the transient result popup. */
+export interface RollResolveInfo {
+  kind: string;            // 'COMBAT' | 'SKILL CHECK'
+  label: string;
+  total: number;
+  targetLabel?: string;
+  success: boolean | null; // null = no target (e.g. a damage roll)
+}
+
+export function DiceRoller({ state, onRoll, onCancel, onResolve }: Props) {
   const [rolledValues, setRolledValues] = useState<number[] | null>(null);
   const [scale] = useState(new Animated.Value(1));
 
@@ -77,6 +89,8 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
   useEffect(() => {
     if (rolledValues === null) return;
     const timer = setTimeout(() => {
+      // engine_Dev — surface the resolved result for the transient popup BEFORE advancing.
+      onResolve?.({ kind: stepLabel, label: step.label, total: total ?? 0, targetLabel: step.targetLabel, success });
       // Match the prior handleNext() shape: kept-die for adv/dis,
       // raw values otherwise. The caller's bonus math expects a
       // single-element array on adv/dis steps.
@@ -89,7 +103,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
       setRolledValues(null);
     }, AUTO_RESOLVE_HOLD_MS);
     return () => clearTimeout(timer);
-  }, [rolledValues, isAdv, isDis, onRoll]);
+  }, [rolledValues, isAdv, isDis, onRoll, onResolve, stepLabel, step.label, step.targetLabel, total, success]);
 
   const diceLabel = isAdv || isDis
     ? `2d${step.sides}`

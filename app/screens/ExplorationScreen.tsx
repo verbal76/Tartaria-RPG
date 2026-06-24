@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { getNarratorName, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import { hubNameForFaction } from '../engine/hub';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
@@ -14,8 +14,13 @@ import { CombatArena } from '../components/CombatArena';
 // Set to false to instantly revert to the plain feed. It only renders while inCombat is true, so it
 // can't affect anything outside a fight.
 const COMBAT_ARENA_VIEW = true;
+
+// engine_Dev — flash the just-resolved roll result in a transient popup just above the controls
+// (below the action buttons). Shows the LAST roll only, holds ~2s, then fades. Set false to remove.
+const ROLL_RESULT_POPUP = true;
+const ROLL_POPUP_MS = 2000;
 import { InputBox } from '../components/InputBox';
-import { DiceRoller } from '../components/DiceRoller';
+import { DiceRoller, type RollResolveInfo } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
@@ -138,6 +143,16 @@ export function ExplorationScreen() {
   // Measured height of the left stats panel — the enemy panel caps to this so a
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
+  // engine_Dev — transient "last roll result" popup (above the controls). Held in state + a timer
+  // that's reset on each new roll so only the most recent result is ever shown, then auto-hidden.
+  const [lastRoll, setLastRoll] = useState<RollResolveInfo | null>(null);
+  const rollPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showRollResult = useCallback((info: RollResolveInfo) => {
+    setLastRoll(info);
+    if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current);
+    rollPopupTimer.current = setTimeout(() => setLastRoll(null), ROLL_POPUP_MS);
+  }, []);
+  useEffect(() => () => { if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current); }, []);
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
   // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
@@ -816,12 +831,26 @@ export function ExplorationScreen() {
         )}
       </TutorialTarget>
 
+      {/* engine_Dev — transient last-roll result popup: above the controls (dice roller / input),
+          below the action buttons. Appears the moment a roll resolves, holds ~2s, then clears. */}
+      {ROLL_RESULT_POPUP && lastRoll && (
+        <View style={[styles.rollPopup, lastRoll.success === true ? styles.rollPopupHit : lastRoll.success === false ? styles.rollPopupMiss : styles.rollPopupNeutral]} pointerEvents="none">
+          <Text style={styles.rollPopupKind}>{lastRoll.kind}</Text>
+          <Text style={styles.rollPopupText} numberOfLines={1}>
+            {lastRoll.label ? `${lastRoll.label} — ` : ''}Total {lastRoll.total}
+            {lastRoll.targetLabel ? ` vs ${lastRoll.targetLabel}` : ''}
+            {lastRoll.success === true ? '  ✓' : lastRoll.success === false ? '  ✗' : ''}
+          </Text>
+        </View>
+      )}
+
       <View style={styles.controls}>
         {pendingRolls ? (
           <DiceRoller
             state={pendingRolls}
             onRoll={resolveRollStep}
             onCancel={cancelPendingRolls}
+            onResolve={ROLL_RESULT_POPUP ? showRollResult : undefined}
           />
         ) : (
           <InputBox
@@ -1778,6 +1807,13 @@ const styles = StyleSheet.create({
   // feed's flex:1 naturally absorbs the reclaimed vertical real
   // estate.
   controls: { gap: 6 },
+  // engine_Dev — transient last-roll result popup (above the controls).
+  rollPopup: { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, marginBottom: 6, alignItems: 'center', backgroundColor: '#0a0908' },
+  rollPopupHit: { borderColor: '#9ec96a' },
+  rollPopupMiss: { borderColor: '#e07a5f' },
+  rollPopupNeutral: { borderColor: '#3a342c' },
+  rollPopupKind: { color: '#7a705c', fontSize: 9, fontWeight: '700', letterSpacing: 2 },
+  rollPopupText: { color: '#cdbf99', fontSize: 13, fontWeight: '700', letterSpacing: 0.5, marginTop: 1 },
   gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
