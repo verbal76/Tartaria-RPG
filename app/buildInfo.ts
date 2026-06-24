@@ -15713,4 +15713,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // salvage pools YIELD built-in Tartaria ITEMS ("Aetheric Torch", "Worn Tartarian Coin"),
 // the same item-catalog leak seen in the bug report — part of the broader built-in
 // genericization.
-export const OTA_BUILD_ID = '2026-06-24-819';
+//
+// engine_Dev-820 — AUTHOR-OVERRIDABLE built-in pools, STEP 2: the SCENE-PROP override.
+// Authors can now supply their own climbable + salvageable ambient-noun pools; the
+// genericized built-ins (819) are the fallback. New content-pack section "sceneProps"
+// ({ climbables?: [{name,context?,height?}], salvageables?: [{name,context?}] }), wired
+// the full standard path: contentPack.ts override registry (set/get/has + clearAll),
+// climbableSpawns/salvageableSpawns read the override (else built-in), contentPackStore
+// loader (loadScenePropsJson) + clearSceneProps + persist + reapply + hydrate + whole-
+// game bundle apply, and a buildScenePropsTemplate() bundle entry (setting-neutral
+// examples). Tests: override-applies (engine output swaps to author nouns + heights;
+// clear restores built-ins) + round-trip + bundle-completeness. NEXT (step 3): the
+// arbiter-quote pools (still leak "the Giants"/"essence"/"rune").
+export const OTA_BUILD_ID = '2026-06-24-820';
