@@ -140,6 +140,28 @@ const FLAVOR = {
     seekers: ['"The Seekers would tell you to dig," the Narrator says. "There is always something under the dirt."'],
     freeholders: ['"The Freeholders owe no one," the Narrator says. "Keep it that way and keep moving."'],
   },
+  // Neutral travel/ambient/mystery beats so the stock generic game never falls back to the
+  // built-in Tartaria pools (TRAVEL_LORE_BEATS / ambient-flavor / mystery-seeds). {noun} is
+  // replaced with the searched object in ambient/mystery lines.
+  travelBeats: [
+    'The Narrator, walking with you: "The old world left more under the dirt than on top of it. Mind where you step."',
+    'The Narrator, half to themselves: "Roads remember. Walk them long enough and they start to walk back."',
+    'The Narrator: "Three powers hold these Reaches — the Wardens who guard, the Seekers who dig, the Freeholders who trade. Pick your debts carefully."',
+    'The Narrator glances at the horizon: "Ruins out here run deep. Some sank slow enough that the people inside knew it was happening."',
+    'The Narrator, quieter: "The Blight is not weather. It settles on what lingers too long in the wrong places. Keep moving."',
+  ],
+  ambientFlavor: [
+    'There is older writing beneath the {noun}, worn too smooth to read.',
+    'The {noun} has been moved before — the dust around it doesn\'t match.',
+    'Something was pried off the {noun} long ago; the scar is still bright.',
+    'A faint mark is scratched into the {noun}, the kind left by someone counting days.',
+  ],
+  mysterySeeds: [
+    'A single coin is wedged behind the {noun}, too deep to have fallen there by accident.',
+    'There\'s a tally mark on the {noun} — and a second, fainter one beside it.',
+    'A smell clings to the {noun} that doesn\'t belong to this place.',
+    'For just a moment the {noun} feels warmer than it should. Then it doesn\'t.',
+  ],
 };
 
 // Fix the two item tables that carry a faction reference (use a real faction id).

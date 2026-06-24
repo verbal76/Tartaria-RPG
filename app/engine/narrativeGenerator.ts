@@ -445,14 +445,16 @@ function getIntentRemarks(): Partial<Record<Intent, string[]>> {
 let _locationFlavors: Record<string, string[]> | null = null;
 export function getLocationFlavors(): Record<string, string[]> {
   if (_locationFlavors) return _locationFlavors;
-  _locationFlavors = require('../data/lore/location-flavors.json') as Record<string, string[]>;
+  // engine_Dev — overridable via the Flavor block's `locationFlavors` key (author → built-in).
+  _locationFlavors = resolveFlavor('locationFlavors', require('../data/lore/location-flavors.json') as Record<string, string[]>);
   return _locationFlavors!;
 }
 
 let _sceneFlavors: Record<string, string[]> | null = null;
 function getSceneFlavors(): Record<string, string[]> {
   if (_sceneFlavors) return _sceneFlavors;
-  _sceneFlavors = require('../data/lore/scene-flavors.json') as Record<string, string[]>;
+  // engine_Dev — overridable via the Flavor block's `sceneFlavors` key (author → built-in).
+  _sceneFlavors = resolveFlavor('sceneFlavors', require('../data/lore/scene-flavors.json') as Record<string, string[]>);
   return _sceneFlavors!;
 }
 

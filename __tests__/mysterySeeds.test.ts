@@ -99,8 +99,10 @@ describe('OTA-047 — narrateAmbientFind surfaces mystery seeds', () => {
     // The pool constant must be loaded from JSON. `.` flagged 's' for
     // newlines so the load IIFE matches.
     expect(src).toMatch(/MYSTERY_SEED_LINES[\s\S]*data\/lore\/mystery-seeds\.json/);
-    // The pool must be invoked inside narrateAmbientFind with chance(8).
-    expect(src).toMatch(/MYSTERY_SEED_LINES\.length[\s\S]*?chance\(8\)/);
+    // The pool must be invoked inside narrateAmbientFind with chance(8). engine_Dev — the
+    // pool now resolves through the Flavor override (author → generic → built-in) before use.
+    expect(src).toMatch(/resolveFlavor\('mysterySeeds', MYSTERY_SEED_LINES\)/);
+    expect(src).toMatch(/mysterySeeds\.length[\s\S]*?chance\(8\)/);
     // The seed emit must {noun}-substitute.
     expect(src).toMatch(/seed\.replace\(\/\\\{noun\\\}\/g, noun\)/);
   });
