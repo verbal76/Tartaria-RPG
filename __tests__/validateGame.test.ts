@@ -1,10 +1,11 @@
 // engine_Dev — the pre-export "Validate Game" pass: catches dangling references + duplicate ids
 // that would otherwise bake into a broken release.
 
-import { validateGame, summarizeValidation } from '../app/engine/validateGame';
+import { validateGame, runValidation, summarizeValidation } from '../app/engine/validateGame';
 import {
   setTableOverride, setMissionsOverride, setCustomBossesOverride, setCustomMainQuestOverride,
-  setVendorsOverride, setStartingAreasOverride, clearAllOverrides,
+  setVendorsOverride, setStartingAreasOverride, setHooksOverride, setSummonsOverride,
+  setWastelandOverride, clearAllOverrides,
 } from '../app/engine/contentPack';
 
 const errs = () => validateGame().filter((i) => i.severity === 'error');
@@ -71,5 +72,34 @@ describe('validateGame — pre-export reference checks', () => {
     const s = summarizeValidation(validateGame());
     expect(s.errors).toBeGreaterThanOrEqual(1);
     expect(s.lines[0]).toMatch(/^✗/);
+  });
+
+  it('flags a hook with an unknown effect verb and a missing granted item', () => {
+    setHooksOverride({
+      plants: { h1: [{ line: 'x', nouns: ['x'] }] },
+      chains: { h1: [{ line: 'y', effects: [{ type: 'teleport_player' }, { type: 'grant_item', name: 'Phantom Widget' }], done: true }] },
+    });
+    const t = errText();
+    expect(t).toMatch(/unknown effect "teleport_player"/);
+    expect(t).toMatch(/Phantom Widget/);
+  });
+
+  it('flags a summoned sidekick whose fuel item does not exist', () => {
+    setSummonsOverride({ defs: [{ kind: 'wisp', name: 'Wisp', fuel: [{ name: 'Imaginary Crystal', quantity: 1 }] }] });
+    expect(errText()).toMatch(/Imaginary Crystal/);
+  });
+
+  it('flags a wasteland encounter referencing an enemy not in the table', () => {
+    setWastelandOverride({ ambush: { type: 'skirmish', weight: 5, enemyPool: ['Nonexistent Beast'] } });
+    expect(errText()).toMatch(/Nonexistent Beast/);
+  });
+
+  it('runValidation returns a structured report (ok=false with errors, counts add up)', () => {
+    setTableOverride('recipes', [{ result: 'Missing Thing', ingredients: [] }]);
+    const r = runValidation();
+    expect(r.ok).toBe(false);
+    expect(r.errorCount).toBeGreaterThanOrEqual(1);
+    expect(r.errors.length + r.warnings.length + r.info.length).toBe(validateGame().length);
+    expect(r.errors[0]!.code).toBeTruthy();
   });
 });

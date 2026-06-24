@@ -43,7 +43,7 @@ import {
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
-import { validateGame, summarizeValidation } from '../engine/validateGame';
+import { validateGame, runValidation, summarizeValidation } from '../engine/validateGame';
 import { TRACKABLE_VARS } from '../engine/customTitles';
 import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
 import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
@@ -464,6 +464,8 @@ function GameBundleBox() {
   const [confirmReset, setConfirmReset] = useState(false);
   // engine_Dev — multi-part save: uploaded parts collect here until every 1..N is in, then knit.
   const [pendingParts, setPendingParts] = useState<GameSavePart[]>([]);
+  // engine_Dev — soft export gate: a SAVE with hard validation errors asks for a second tap.
+  const [saveAck, setSaveAck] = useState(false);
 
   // engine_Dev — does the author have ANYTHING loaded yet? exportGameBundle emits
   // only the sections that have been uploaded, so an empty game serialises to "{}".
@@ -478,6 +480,17 @@ function GameBundleBox() {
   // the right file either way.
   const saveToDevice = async () => {
     const built = hasContent();
+    // engine_Dev — soft pre-export gate. If the game has hard validation errors (broken
+    // references that bake into a broken release), ask for a second tap before exporting.
+    if (built) {
+      const v = runValidation();
+      if (v.errorCount > 0 && !saveAck) {
+        setSaveAck(true);
+        setStatus({ kind: 'err', msg: `⚠ ${v.errorCount} validation error${v.errorCount === 1 ? '' : 's'} — your game has broken references that will bake in. Hit VALIDATE GAME to see them, or tap SAVE again to export anyway.` });
+        return;
+      }
+      setSaveAck(false);
+    }
     // engine_Dev — always emit the ANNOTATED bundle: every section present, each
     // marked ✅ UPLOADED (your content) or ⬜ TEMPLATE (still the default), so the
     // file is easy to navigate. Empty game → all ⬜.
@@ -583,12 +596,14 @@ function GameBundleBox() {
           style={[styles.copyBtn, styles.stackBtn]}
           onPress={() => {
             setConfirmReset(false);
-            const s = summarizeValidation(validateGame());
-            if (s.errors === 0 && s.warnings === 0) { setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
-            const head = s.errors > 0
-              ? `✗ Validate Game: ${s.errors} error${s.errors === 1 ? '' : 's'}${s.warnings ? ` + ${s.warnings} warning${s.warnings === 1 ? '' : 's'}` : ''} — fix the errors before you bake.`
-              : `⚠ Validate Game: 0 errors, ${s.warnings} warning${s.warnings === 1 ? '' : 's'} (safe to export).`;
-            setStatus({ kind: s.errors > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more.` : ''}` });
+            const r = runValidation();
+            const s = summarizeValidation([...r.errors, ...r.warnings, ...r.info]);
+            if (r.errorCount === 0 && r.warningCount === 0 && r.infoCount === 0) { setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
+            const counts = `${r.errorCount} error${r.errorCount === 1 ? '' : 's'}, ${r.warningCount} warning${r.warningCount === 1 ? '' : 's'}, ${r.infoCount} info`;
+            const head = r.errorCount > 0
+              ? `✗ Validate Game: ${counts} — fix the errors before you bake.`
+              : `⚠ Validate Game: ${counts} (safe to export).`;
+            setStatus({ kind: r.errorCount > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more.` : ''}` });
           }}
         >
           <Text style={styles.copyBtnText}>✓ VALIDATE GAME</Text>
