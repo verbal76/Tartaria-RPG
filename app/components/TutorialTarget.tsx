@@ -48,8 +48,8 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
   // Static glow for non-pulse beats; pulse-interpolated glow for the
   // ones the player should act on right now.
   const borderColor = shouldPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
-    : '#c9a86a';
+    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#6ab0c9', '#ffe28a'] })
+    : '#6ab0c9';
   const shadowOpacity = shouldPulse
     ? pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] })
     : 0.95;
@@ -65,7 +65,7 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
     // cluster). The 2px pulsing border + glow already spotlight the target, so
     // the fill is pure cost. Keep the region's own background (transparent).
     backgroundColor: 'transparent',
-    shadowColor: '#c9a86a',
+    shadowColor: '#6ab0c9',
     shadowOpacity,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 0 },

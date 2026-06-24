@@ -1675,7 +1675,7 @@
 //   (1) WEAPON damage dice — already shipping via previewWeapon
 //       in itemPreview.ts:99-110 ("Damage: 2d6 (slashing) ·
 //       Scales with STR · ..."). Verified intact; no code
-//       change. Quiet styling (#cdbf99 italic fontSize 11) is
+//       change. Quiet styling (#bcd2db italic fontSize 11) is
 //       the likely reason the user missed it on screen — can
 //       bump emphasis in a follow-up if they want it shouting.
 //   (2) FOOD / consumable restore — extended previewGear in
@@ -3973,7 +3973,7 @@
 // preview.stats.join(' · ') beneath
 // the name line. Style matches
 // RecipesView's recipeStats
-// (italic, #cdbf99) so the REPAIR
+// (italic, #bcd2db) so the REPAIR
 // tab reads consistently with
 // CRAFT / RECIPES.
 //
@@ -6471,7 +6471,7 @@
 // true, prefixes the item
 // name with "◆ " in the
 // rarity color:
-//   - Common: #c9a86a (warm
+//   - Common: #6ab0c9 (warm
 //     tan, matches default
 //     UI accent)
 //   - Uncommon: #9ec96a (green)
@@ -9305,12 +9305,12 @@
 //
 // Third issue: TitleScreen
 // footer (version + 2148
-// line) used color #3a342c
+// line) used color #2b3a3e
 // — barely visible against
 // the dark background.
 // Player: "I can barely see
 // it; very faded." Bumped to
-// #c9a86a matching REPORT
+// #6ab0c9 matching REPORT
 // BUG button text so it
 // reads at a glance.
 //
@@ -11408,8 +11408,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   is up." Two problems:
 //     1. The keyboard COVERS the input row when up — so the in-row
 //        ▼ only helps when the keyboard is already down (useless).
-//     2. Even when not covered, the ▼ used a muted color (#7a705c
-//        on #1a1714) that was essentially invisible on her iPhone's
+//     2. Even when not covered, the ▼ used a muted color (#6c8088
+//        on #131c1f) that was essentially invisible on her iPhone's
 //        screen — first screenshot shows the ▼ just barely visible.
 //
 //   The correct iOS pattern for this exact problem is
@@ -11427,8 +11427,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     2. New `<InputAccessoryView>` block rendering a "▼ Hide
 //        Keyboard" button on a dark bar with accent-gold text and
 //        a tan-bordered button — high contrast, easy to find.
-//     3. Brightened the in-row ▼ chevron from muted (#7a705c) to
-//        accent gold (#c9a86a). Stays as a redundant affordance for
+//     3. Brightened the in-row ▼ chevron from muted (#6c8088) to
+//        accent gold (#6ab0c9). Stays as a redundant affordance for
 //        Android and for when keyboard is down.
 //
 //   What the iPhone tester sees after this OTA:
@@ -12271,7 +12271,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // color of the locked title NAMES + requirement DESCRIPTIONS on the Character
 // page (unreadable on the dark card), plus muted/placeholder text in ~13 files.
 // Per the user's call, every occurrence is replaced with the Explore-screen
-// amber `#c9a86a` (the brand accent, already used for EARNED title names), so
+// amber `#6ab0c9` (the brand accent, already used for EARNED title names), so
 // `#5a5246` now appears nowhere in the app.
 //
 // arb50 — Speaker of Forgotten Tongues + Warden of the Old World BUILT + ON
@@ -12287,11 +12287,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // check @ Sinking Cathedral → relicsPreserved/ruinsDefenseBonus). Their
 // enabled flags flipped true; only trap_dives / defense / parley remain OFF.
 //
-// arb51 — readability pass 2 on the Character screen. The dim taupe `#7a705c`
+// arb51 — readability pass 2 on the Character screen. The dim taupe `#6c8088`
 // (stat "Grows from:" descriptions, the italic kv caption notes, faction-row
 // names, HP/STA + slot labels) and the titles-summary `#9b8e74` were too dark
-// to read; both → the Explore amber `#c9a86a`, scoped to CharacterScreen's own
-// styles. Empty-slot dashes (`#3a342c`) + the green/cream/red accents kept.
+// to read; both → the Explore amber `#6ab0c9`, scoped to CharacterScreen's own
+// styles. Empty-slot dashes (`#2b3a3e`) + the green/cream/red accents kept.
 //
 // arb52 — Ask-the-Arbiter fix: "How many sites can I visit?" (playtester log)
 // fell through to a garbled echo because "sites" wasn't a world-knowledge
@@ -12629,7 +12629,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // within each category gear orders head-to-toe (main→off→head→chest→hands→
 // legs→feet→cloak→amulet→ring); resets to SLOT each open, switchable after.
 // (3) The locked-chip scanner-requirement label in the investigate modal now
-// uses the inventory EQUIPPED amber (#c9a86a) instead of the off-tone #bf9b6a.
+// uses the inventory EQUIPPED amber (#6ab0c9) instead of the off-tone #bf9b6a.
 // OTA-336 — Rowan Anvil. Fusion + corruption batch. (1) A reserved faction
 // CATALYST now counts toward the fusion gate (2 inferred + 1 catalyst = a
 // faction fusion); equipped catalysts are excluded (never consume worn gear).
@@ -13826,7 +13826,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-469 (Gadolinium Doping) — [UX] splash-art fit fix. On a tall/narrow phone OTA-468's resizeMode
 // "cover" filled the height and cropped the SIDES — slicing the "TARTARIA REALMS" title off the left edge.
 // Switched to resizeMode "contain" so the whole composition (title included) shows, letterboxed against
-// the dark splash background (#0b0a09, which blends with the moody art). One-line change. JS-only → OTA.
+// the dark splash background (#0a1012, which blends with the moody art). One-line change. JS-only → OTA.
 // OTA-470 (Terbium Anneal) — [UX] taller splash art + full-width top-anchored layout. Swapped the cover
 // image for a phone-shaped 941×1672 piece (aspect 0.56, close to the screen's 0.45) and changed the
 // layout: the art now fills the full WIDTH with no side-crop (title stays intact at top), anchored to the
@@ -13904,7 +13904,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // height follows by the SAME ratio so aspect is preserved — no distortion) and offset the top-left-anchored
 // corner by SPLASH_OFFSET = 40dp (≈1/4" at RN's 160dp-per-inch baseline; RN has no true DPI API) on both
 // top + left. Still grows down-right FROM the anchored corner; the thin top/left margin this exposes is the
-// overlay's near-black backing (#0b0a09), which matches the art's dark vignette. JS-only → OTA.
+// overlay's near-black backing (#0a1012), which matches the art's dark vignette. JS-only → OTA.
 // OTA-484 (Gold Inlay) — [polish] REVERTS OTA-483's splash offset. The 40dp top/left offset read as the art
 // moving DOWN-AND-LEFT — it just exposed a black top/left margin (player: "you moved it down and left").
 // Correct model: the image is anchored by its TOP-LEFT corner, so enlarging ALONE grows it down-right from
@@ -13913,7 +13913,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // JS-only → OTA.
 // OTA-485 (Mercury Gilding) — [polish] COMPANION-ITEM stripes in the inventory. Items the player can FEED or
 // USE ON a companion now carry faint diagonal hatching in that companion's signature colour (the hue its
-// name renders in): GOLD (#c9a86a) for the dog, PURPLE (#9888a8) for the golem — a glanceable "this is for
+// name renders in): GOLD (#6ab0c9) for the dog, PURPLE (#9888a8) for the golem — a glanceable "this is for
 // my dog / golem" cue while scanning the pack. Eligibility mirrors the modal action buttons exactly (no
 // drift): dog = active dog + a consumable (Feed) or a dog_armor vest; golem = active golem + a repair part
 // (Repair) or a golem weapon (Arm). Drawn with plain <View> bands (oversized 45°-rotated flex row clipped by
@@ -13951,7 +13951,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // app/state/gameStore.ts. JS-only → OTA.
 // OTA-489 (Polonium Tint) — [polish] companion-stripe saturation. Player on the OTA-485 stripes: "keep the
 // translucence but bump the saturation." Same gold/purple HUES, richer chroma so they read clearly as
-// gold/purple at the UNCHANGED ~0.2 stripe opacity: COMPANION_STRIPE_DOG #c9a86a → #e3a82a (saturated gold),
+// gold/purple at the UNCHANGED ~0.2 stripe opacity: COMPANION_STRIPE_DOG #6ab0c9 → #e3a82a (saturated gold),
 // COMPANION_STRIPE_GOLEM #9888a8 → #a45fe0 (saturated amethyst). Stripe-only; the name-label hues are
 // untouched. app/screens/InventoryScreen.tsx. JS-only → OTA.
 // OTA-490 (Astatine Purge) — [bugfix+diag] SAVE FAILED "storage full" on a near-empty device. Player's
@@ -14287,8 +14287,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from ~20 distinct to ~220+ (measured 222 distinct across 400 input sets). Names stay deterministic per input
 // set. app/engine/itemFusion.ts. JS-only OTA.
 // OTA-528 (Unbitrium Gilt) — [polish] a finished investigation in the Search modal now turns the SAME
-// completed-gold (#c9a86a italic + ✓) as a cleared CLIMB row (ClimbModal rowNameCleared/rowHeightCleared),
-// instead of the old dim grey (#7a705c/#5e5547 at 0.55 opacity). "Done" now reads consistently across the
+// completed-gold (#6ab0c9 italic + ✓) as a cleared CLIMB row (ClimbModal rowNameCleared/rowHeightCleared),
+// instead of the old dim grey (#6c8088/#5e5547 at 0.55 opacity). "Done" now reads consistently across the
 // game. app/components/SearchModal.tsx. JS-only OTA.
 // OTA-529 (Unbiquadium Bulwark) — [balance] armor RESISTANCE LADDER. Only 20 of 279 catalog pieces carried any
 // damage-type resistance, so armor was almost entirely the AC (miss-chance) stat. Now EVERY piece derives its
@@ -14459,7 +14459,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Tartarians, the Aether, the Guardians, the factions — so the player-Arbiter dialogue is prompted in-fiction
 // rather than via a menu button. app/components/InputBox.tsx, app/state/gameStore.ts. JS-only OTA.
 // OTA-549 (Unquadquadium Clarity) — [ux/bugfix] two small fixes from the vendor/throwables report. (1) The SELL
-// screen's three sort tabs (VALUE / RARITY / NAME) rendered inactive text in a dim #7a705c the player couldn't
+// screen's three sort tabs (VALUE / RARITY / NAME) rendered inactive text in a dim #6c8088 the player couldn't
 // read; text is now always readable amber and the BORDER alone marks the active sort. (2) Shaped Aetheric Shard
 // was CREATED as rarity Common despite its Rare catalog row, so it sold for a pittance; the shape recipe now
 // stamps Rare to match (a 2d20 one-shot). app/screens/VendorScreen.tsx, app/state/gameStore.ts. JS-only OTA.
@@ -15983,4 +15983,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // moment a roll commits; ExplorationScreen flashes a small popup just above the controls (below the
 // action buttons) showing the result (label · total · vs target · ✓/✗), held ~2s then auto-hidden,
 // reset on each new roll so only the latest shows. Gated by ROLL_RESULT_POPUP. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-843';
+//
+// engine_Dev-844 — cool color scheme. The engine's default look moves off the Tartaria warm-umber
+// "mud" to a dark TEAL-SLATE (greenish-blue): the slider-driven base default hue goes 24 → 192, and
+// the warm-brown accent family across ~48 component stylesheets is recolored to a cohesive cool set
+// (gold #c9a86a → teal #6ab0c9, tan/cream → cool light, brown borders/cards → slate), preserving
+// each color's LIGHTNESS so contrast holds. Semantic colors are LEFT ALONE so health/HP green
+// (#9ec96a/#56d364) isn't drowned by the new teal, and failure-red + corruption-purple still read.
+// Base is still fully slider-tunable. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-844';

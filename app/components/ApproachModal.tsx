@@ -114,7 +114,7 @@ export function ApproachModal({
                 value={text}
                 onChangeText={setText}
                 placeholder='e.g. "the guard", "the dragon", "the door"'
-                placeholderTextColor="#c9a86a"
+                placeholderTextColor="#6ab0c9"
                 onSubmitEditing={handleSubmit}
                 returnKeyType="go"
                 autoCorrect={false}
@@ -234,39 +234,39 @@ export function ApproachModal({
 
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  card: { width: '100%', maxWidth: 380, backgroundColor: '#13110f', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 14 },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
-  input: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, color: '#e6d8b3', paddingHorizontal: 10, paddingVertical: 9, borderRadius: 3, fontSize: 14 },
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  card: { width: '100%', maxWidth: 380, backgroundColor: '#0e1618', borderColor: '#6ab0c9', borderWidth: 1, borderRadius: 4, padding: 14 },
+  title: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  rule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 10 },
+  body: { color: '#d6e4e8', fontSize: 13, lineHeight: 18, marginBottom: 10 },
+  input: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, color: '#d6e4e8', paddingHorizontal: 10, paddingVertical: 9, borderRadius: 3, fontSize: 14 },
+  chipLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
-  chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 10, paddingVertical: 6 },
+  chip: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 3, paddingHorizontal: 10, paddingVertical: 6 },
   chipScene: { borderColor: '#9ec96a' },
   chipEnemy: { borderColor: '#e07a5f' },
-  chipText: { color: '#cdbf99', fontSize: 12 },
+  chipText: { color: '#bcd2db', fontSize: 12 },
   chipTextScene: { color: '#9ec96a', fontSize: 12 },
   chipTextEnemy: { color: '#e07a5f', fontSize: 12 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnPrimary: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnTextPrimary: { color: '#0e1618', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnTextNeutral: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   stealthToggle: {
     marginTop: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     alignItems: 'center',
   },
   stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
-  stealthToggleText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  stealthToggleText: { color: '#6c8088', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   stealthToggleTextActive: { color: '#6a9bbf' },
 });

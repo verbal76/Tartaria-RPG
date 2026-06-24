@@ -45,7 +45,7 @@ function rarityColor(rarity: string | undefined): string {
     case 'Legendary': return '#e07a5f';
     case 'Rare': return '#b88ce0';
     case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
+    default: return '#6ab0c9';
   }
 }
 
@@ -220,7 +220,7 @@ export function RecipesView({
           evaluated.map((e) => {
             const cat = lookupCraftedItem(e.recipe.result);
             const preview = getItemPreview(e.recipe.result);
-            const stripeColor = e.available ? '#9ec96a' : '#3a342c';
+            const stripeColor = e.available ? '#9ec96a' : '#2b3a3e';
             return (
               <TouchableOpacity
                 key={e.recipe.result}
@@ -281,17 +281,17 @@ export function RecipesView({
 }
 
 const styles = StyleSheet.create({
-  arbiterLine: { color: '#cdbf99', fontSize: 12, fontStyle: 'italic', marginBottom: 6, lineHeight: 17 },
+  arbiterLine: { color: '#bcd2db', fontSize: 12, fontStyle: 'italic', marginBottom: 6, lineHeight: 17 },
   countLine: { marginBottom: 8 },
   countText: { fontSize: 11, letterSpacing: 1 },
   countReady: { color: '#9ec96a', fontWeight: '700' },
-  countDim: { color: '#7a705c' },
+  countDim: { color: '#6c8088' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },
   recipeRow: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 6,
@@ -301,16 +301,16 @@ const styles = StyleSheet.create({
   recipeStripe: { width: 4 },
   recipeBody: { flex: 1, padding: 10 },
   recipeHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  recipeName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  recipeName: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
   recipeNameReady: { color: '#9ec96a' },
-  recipeNameMuted: { color: '#a89a7a' },
+  recipeNameMuted: { color: '#8fa6ac' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
-  recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
-  recipeIngLabel: { color: '#7a705c' },
+  recipeStats: { color: '#bcd2db', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
+  recipeIng: { color: '#6c8088', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeIngLabel: { color: '#6c8088' },
   recipeIngHave: { color: '#9ec96a', fontWeight: '600' },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });

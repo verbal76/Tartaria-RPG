@@ -214,8 +214,8 @@ function dieFace(value: number, sides: number): string {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 6,
     padding: 14,
@@ -227,29 +227,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepKind: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
   },
   stepCount: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 11,
   },
   rollLabel: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 1,
   },
   context: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 12,
     marginBottom: 4,
   },
   card: {
-    backgroundColor: '#0a0908',
-    borderColor: '#3a342c',
+    backgroundColor: '#0a1012',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
@@ -262,13 +262,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   diceNotation: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 22,
     fontWeight: '700',
     letterSpacing: 2,
   },
   targetText: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 13,
     letterSpacing: 1,
   },
@@ -305,25 +305,25 @@ const styles = StyleSheet.create({
   },
   dieFace: {
     fontSize: 28,
-    color: '#cdbf99',
+    color: '#bcd2db',
   },
   dieValue: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 16,
     fontWeight: '700',
   },
   bonusLine: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 13,
   },
   divider: {
     height: 1,
     width: 80,
-    backgroundColor: '#3a342c',
+    backgroundColor: '#2b3a3e',
     marginVertical: 4,
   },
   total: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -337,25 +337,25 @@ const styles = StyleSheet.create({
   success: { color: '#9ec96a' },
   failure: { color: '#e07a5f' },
   rollBtn: {
-    backgroundColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
     borderRadius: 4,
     paddingVertical: 14,
     alignItems: 'center',
   },
   rollBtnText: {
-    color: '#0a0908',
+    color: '#0a1012',
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 2,
   },
   nextBtn: {
-    backgroundColor: '#3a342c',
+    backgroundColor: '#2b3a3e',
     borderRadius: 4,
     paddingVertical: 12,
     alignItems: 'center',
   },
   nextBtnText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 2,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   advancingHintText: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 12,
     fontStyle: 'italic',
     letterSpacing: 1,
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   cancelText: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 11,
     letterSpacing: 1,
   },

@@ -18,8 +18,8 @@ export function CrestPlaceholder() {
 const styles = StyleSheet.create({
   wrap: {
     flex: 1,
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 4,

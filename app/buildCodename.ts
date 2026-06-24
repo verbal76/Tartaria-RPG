@@ -936,13 +936,13 @@ const CODENAMES: Record<string, string> = {
   '2026-06-04-arb48': 'Cobalt Reliquary',
   // Readability: retire the too-dark #5a5246 everywhere (locked title names +
   // descriptions on the Character page were unreadable); all 20 uses -> the
-  // Explore-screen amber #c9a86a. Fresh-minted (OTA reserved pool exhausted).
+  // Explore-screen amber #6ab0c9. Fresh-minted (OTA reserved pool exhausted).
   '2026-06-04-arb49': 'Lead Casket',
   // Speaker + Warden Tier-C trials built + ON (titles 16 & 17). New
   // engine/titleChallenges.ts + gameStore handler; one-shot attempts, free
   // scouting. Fresh-minted (OTA reserved pool exhausted).
   '2026-06-04-arb50': 'Tin Strongbox',
-  // Character-screen readability pass 2: dim #7a705c + #9b8e74 → Explore amber.
+  // Character-screen readability pass 2: dim #6c8088 + #9b8e74 → Explore amber.
   // Fresh-minted (OTA reserved pool exhausted).
   '2026-06-04-arb51': 'Steel Flask',
   // Ask-the-Arbiter: "how many sites can I visit" now answers a visitable-site

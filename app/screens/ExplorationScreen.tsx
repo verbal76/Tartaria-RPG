@@ -84,7 +84,7 @@ function timeOfDayTint(hours: number): string {
   const hourOfDay = Math.floor(hours % 24);
   if (hourOfDay < 6) return '#080a10';   // night — cool, deep blue
   if (hourOfDay < 12) return '#0f0d0a';  // morning — warm amber undertone
-  if (hourOfDay < 18) return '#0a0908';  // afternoon — neutral (the default)
+  if (hourOfDay < 18) return '#0a1012';  // afternoon — neutral (the default)
   return '#0e0b08';                       // evening — dusty rust
 }
 
@@ -1748,7 +1748,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     backgroundColor: 'rgba(26, 23, 20, 0.85)',
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1756,29 +1756,29 @@ const styles = StyleSheet.create({
   },
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
-    borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
+    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
     gap: 6,
   },
-  sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
-  timeText: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  sceneText: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1 },
+  timeText: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginTop: 1 },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
-  sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
+  sceneBtn: { color: '#bcd2db', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
   // reference, 'QUESTS' opens the active hunts / mysteries / storylines /
   // faction quests board. Short labels keep the row from crowding the
   // location + weather text on narrow Android screens. Settings stays
   // accessible via the gear in the bottom menu row.
   sceneBarBtn: {
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
-  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#2a2620' },
-  sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#1d262a' },
+  sceneBarBtnText: { color: '#6ab0c9', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-179 — flex:1 alone wasn't shrinking the feed enough when
   // the OTA-172 combat row went 3 lines tall, so the bottom action
   // button row clipped below the safe-area bottom edge. Adding
@@ -1793,13 +1793,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     backgroundColor: '#0e0c0a',
-    borderLeftColor: '#c9a86a',
+    borderLeftColor: '#6ab0c9',
     borderLeftWidth: 2,
     marginTop: 4,
   },
-  streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
-  streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
-  streamingCursor: { color: '#c9a86a', fontSize: 13 },
+  streamingPrefix: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  streamingText: { color: '#bcd2db', fontSize: 13, lineHeight: 18 },
+  streamingCursor: { color: '#6ab0c9', fontSize: 13 },
   // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
   // log, gear) was removed; gear is the cornerGear above and the
   // session controls all live in the gear screen's SESSION tab. The
@@ -1808,13 +1808,13 @@ const styles = StyleSheet.create({
   // estate.
   controls: { gap: 6 },
   // engine_Dev — transient last-roll result popup (above the controls).
-  rollPopup: { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, marginBottom: 6, alignItems: 'center', backgroundColor: '#0a0908' },
+  rollPopup: { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, marginBottom: 6, alignItems: 'center', backgroundColor: '#0a1012' },
   rollPopupHit: { borderColor: '#9ec96a' },
   rollPopupMiss: { borderColor: '#e07a5f' },
-  rollPopupNeutral: { borderColor: '#3a342c' },
-  rollPopupKind: { color: '#7a705c', fontSize: 9, fontWeight: '700', letterSpacing: 2 },
-  rollPopupText: { color: '#cdbf99', fontSize: 13, fontWeight: '700', letterSpacing: 0.5, marginTop: 1 },
-  gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
+  rollPopupNeutral: { borderColor: '#2b3a3e' },
+  rollPopupKind: { color: '#6c8088', fontSize: 9, fontWeight: '700', letterSpacing: 2 },
+  rollPopupText: { color: '#bcd2db', fontSize: 13, fontWeight: '700', letterSpacing: 0.5, marginTop: 1 },
+  gear: { color: '#6ab0c9', fontSize: 16, lineHeight: 18 },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line
@@ -1825,36 +1825,36 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
   },
   objectiveChipTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 12,
     lineHeight: 16,
     fontStyle: 'italic',
   },
   objectiveChipStar: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontStyle: 'normal',
     fontWeight: '700',
   },
   objectiveChipLabel: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontStyle: 'normal',
     fontWeight: '700',
     letterSpacing: 1,
   },
   // engine_Dev — dim parts-completed counter trailing the custom-quest objective.
   objectiveChipProgress: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontStyle: 'normal',
     fontWeight: '700',
   },
   objectiveChipSubtitle: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
@@ -1871,15 +1871,15 @@ const styles = StyleSheet.create({
   },
   objectiveChipBody: { flex: 1, minWidth: 0 },
   objectiveChipSummon: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
   objectiveChipSummonText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -1887,24 +1887,24 @@ const styles = StyleSheet.create({
   vendorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
     minHeight: 44,
   },
-  vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
+  vendorBannerStripe: { width: 4, backgroundColor: '#6ab0c9', alignSelf: 'stretch' },
   vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
-  vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
-  vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  vendorBannerName: { color: '#6ab0c9', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  vendorBannerHint: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginTop: 1 },
+  vendorBannerArrow: { color: '#6ab0c9', fontSize: 22, paddingHorizontal: 12 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
   missionBoardBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#8b7355',
     borderWidth: 1,
     borderRadius: 4,
@@ -1923,7 +1923,7 @@ const styles = StyleSheet.create({
   // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
   // purple accent colour distinguishes it.
   fusionBanner: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     flexDirection: 'row',
     alignItems: 'center',
     borderColor: '#b88ce0',
@@ -1937,7 +1937,7 @@ const styles = StyleSheet.create({
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
   crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
   crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });
 
 // Build the chip pool the search / approach modals show.

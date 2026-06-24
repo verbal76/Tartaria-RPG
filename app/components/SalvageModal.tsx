@@ -299,7 +299,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                     value={text}
                     onChangeText={setText}
                     placeholder='e.g. "the construct", "the drone", "the wreck"'
-                    placeholderTextColor="#c9a86a"
+                    placeholderTextColor="#6ab0c9"
                     onSubmitEditing={handleSubmit}
                     returnKeyType="search"
                     autoCorrect={false}
@@ -405,20 +405,20 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 380,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
   },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
+  title: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  rule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 10 },
+  body: { color: '#d6e4e8', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     paddingHorizontal: 10,
     paddingVertical: 9,
     borderRadius: 3,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   // 2026-05-25 — removed dead style keys after the chip layout
   // migrated to the stacked chipFull pattern: chipRow, chipScrollRow,
   // chip, chipScene, chipText, chipTextScene — all unreferenced.
-  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   // 2026-05-25 — stacked-list styles matching TakeModal so the
   // four ambient-noun modals share one visual pattern.
   chipScroll: { maxHeight: 280 },
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   chipFullScene: { borderColor: '#9ec96a' },
-  chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
+  chipFullText: { color: '#d6e4e8', fontSize: 14, fontWeight: '600' },
   chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
@@ -457,24 +457,24 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnPrimary: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnTextPrimary: { color: '#0e1618', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnTextNeutral: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   // Result-phase rows. ✦ marker + rarity badge on the right.
-  resultsLead: { color: '#cdbf99', fontSize: 13, lineHeight: 18, marginBottom: 10 },
+  resultsLead: { color: '#bcd2db', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   resultList: { gap: 6, marginBottom: 8 },
   resultRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  resultName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
+  resultName: { color: '#d6e4e8', fontSize: 14, fontWeight: '600' },
   resultRarity: { color: '#9ec96a', fontSize: 10, letterSpacing: 1.5 },
 });
