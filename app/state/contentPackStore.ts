@@ -60,6 +60,7 @@ const MISSION_KEYS: MissionTableId[] = ['hunts', 'mysteries', 'factionQuests', '
 
 import { invalidateLocationCaches } from '../engine/worldMap';
 import { invalidateInteractionTagCache } from '../engine/interactionTags';
+import { reconcileStamps, staleKeys, type TemplateStamps } from '../engine/templateVersioning';
 
 const INTERACTION_TAG_KEYS = ['climbable', 'swimmable', 'breakable', 'searchable', 'salvageable'] as const;
 
@@ -168,6 +169,8 @@ interface PersistShape {
   /** Dev mode: while true, the dev console is the first/default Settings tab.
    *  Absent → treated as true (engine dev build default). */
   devMode?: boolean;
+  /** engine_Dev — per-section template-version stamps (stale-upload detection). */
+  templateStamps?: TemplateStamps;
 }
 
 interface ContentPackState {
@@ -242,6 +245,10 @@ interface ContentPackState {
   devMode: boolean;
   /** Bumped by reapply() (and uploads) so content-reading screens re-render. */
   contentVersion: number;
+  /** engine_Dev — per-section "what template version was this upload built against".
+   *  Refreshed on (re)upload; compared to the live template version to flag STALE uploads
+   *  in the dev panel (yellow diamond). Reconciled automatically on every contentVersion bump. */
+  templateStamps: TemplateStamps;
   hydrated: boolean;
   /** Hide the title DEV pill for a family build (reversible; Verbal still works). */
   publish: () => void;
@@ -380,7 +387,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode' | 'templateStamps'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -420,8 +427,61 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     corruptionName: state.corruptionName || undefined,
     energyName: state.energyName || undefined,
     devMode: state.devMode,
+    templateStamps: state.templateStamps && Object.keys(state.templateStamps).length > 0 ? state.templateStamps : undefined,
   };
   void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shape)).catch(() => { /* best effort */ });
+}
+
+const _hasContent = (v: unknown): boolean =>
+  Array.isArray(v) ? v.length > 0
+    : v != null && typeof v === 'object' ? Object.keys(v as object).length > 0
+    : v != null;
+
+/** Snapshot every currently-present override, keyed the way templateVersioning expects
+ *  (`table:<id>`, `lore:<block>`, then the standalone section keys). Drives stale-upload
+ *  reconciliation — only sections the author has actually uploaded get a stamp. */
+function overrideSnapshot(s: ContentPackState): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [id, rows] of Object.entries(s.tables)) if (_hasContent(rows)) out[`table:${id}`] = rows;
+  for (const [id, doc] of Object.entries(s.lore)) if (_hasContent(doc)) out[`lore:${id}`] = doc;
+  const add = (k: string, v: unknown) => { if (_hasContent(v)) out[k] = v; };
+  add('missions', s.missions);
+  add('hooks', s.hooks);
+  add('whispers', s.whispers);
+  add('wasteland', s.wasteland);
+  add('interactionTags', s.interactionTags);
+  add('startingAreas', s.startingAreas);
+  add('titles', s.customTitles);
+  add('collectables', s.collectables);
+  add('summons', s.summons);
+  add('mainQuest', s.customMainQuest);
+  add('bosses', s.customBosses);
+  add('digging', s.digging);
+  add('scrap', s.scrap);
+  add('salvage', s.salvage);
+  add('overlays', s.overlays);
+  add('dogScenarios', s.dogScenarios);
+  add('sceneProps', s.sceneProps);
+  add('vendors', s.vendors);
+  add('roadsideTraders', s.roadsideTraders);
+  return out;
+}
+
+/** Reconcile the per-section template stamps against the live overrides + current template
+ *  versions, persisting only when the stamps actually change. Does NOT bump contentVersion
+ *  (so it can run inside the contentVersion subscription without recursing). */
+function reconcileTemplateStamps(): void {
+  const s = useContentPackStore.getState();
+  const next = reconcileStamps(s.templateStamps, overrideSnapshot(s));
+  if (next !== s.templateStamps) {
+    useContentPackStore.setState({ templateStamps: next });
+    persist({ ...useContentPackStore.getState() });
+  }
+}
+
+/** Section keys whose upload was built against an older template than the engine now ships. */
+export function getStaleSectionKeys(): Set<string> {
+  return staleKeys(useContentPackStore.getState().templateStamps);
 }
 
 export const useContentPackStore = create<ContentPackState>((set, get) => ({
@@ -464,6 +524,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   energyName: '',
   devMode: true,
   contentVersion: 0,
+  templateStamps: {},
   hydrated: false,
 
   reapply() {
@@ -914,17 +975,20 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
     if (parsed.length === 0) return { ok: false, error: 'The array is empty.' };
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { TRACKABLE_VARS } = require('../engine/customTitles') as typeof import('../engine/customTitles');
+    const { TRACKABLE_VARS, isBuiltinTitleId } = require('../engine/customTitles') as typeof import('../engine/customTitles');
     const trackable = new Set(TRACKABLE_VARS.map((v) => v.id));
     const bad = parsed.find((t) => {
       if (!t || typeof t !== 'object') return true;
       const c = t as Record<string, unknown>;
-      return typeof c.id !== 'string' || !c.id
-        || typeof c.name !== 'string' || !c.name
-        || typeof c.track !== 'string' || !trackable.has(c.track)
-        || typeof c.threshold !== 'number';
+      if (typeof c.id !== 'string' || !c.id || typeof c.name !== 'string' || !c.name) return true;
+      // engine_Dev — an entry whose id matches a BUILT-IN earnable title is a display
+      // override (re-skin name/requirement/perk); it doesn't need a track/threshold, since
+      // the engine still earns it by its built-in predicate. Everything else is a new
+      // data-driven achievement and must carry a valid track + numeric threshold.
+      if (isBuiltinTitleId(c.id)) return false;
+      return typeof c.track !== 'string' || !trackable.has(c.track) || typeof c.threshold !== 'number';
     });
-    if (bad) return { ok: false, error: 'Every title needs id, name, a valid "track" variable, and a numeric "threshold".' };
+    if (bad) return { ok: false, error: 'Every NEW title needs id, name, a valid "track" variable, and a numeric "threshold". (A built-in title id only needs id + name to re-skin it.)' };
     setCustomTitlesOverride(parsed);
     const customTitles = parsed;
     set({ customTitles, contentVersion: get().contentVersion + 1 });
@@ -1788,16 +1852,31 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setEnergyNameOverride(energyName.length > 0 ? energyName : null);
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
+        const templateStamps = shape.templateStamps && typeof shape.templateStamps === 'object' ? shape.templateStamps : {};
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode });
+        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
     } finally {
       set({ hydrated: true });
+      // Stamp any upload that predates this feature (or any new upload) at the current
+      // template version, and drop stamps for sections no longer overridden.
+      reconcileTemplateStamps();
     }
   },
 }));
+
+// engine_Dev — keep the per-section template stamps in sync with uploads. Every loader bumps
+// contentVersion, so reconcile on that edge (no per-loader wiring). reconcileTemplateStamps()
+// never bumps contentVersion itself, so this cannot recurse.
+let _lastReconciledVersion = useContentPackStore.getState().contentVersion;
+useContentPackStore.subscribe((s) => {
+  if (s.contentVersion !== _lastReconciledVersion) {
+    _lastReconciledVersion = s.contentVersion;
+    reconcileTemplateStamps();
+  }
+});
 
 /** Convenience for non-React reads of the live narrator name. */
 export function currentNarratorName(): string {
