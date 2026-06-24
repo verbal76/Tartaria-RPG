@@ -3116,15 +3116,27 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
 
 // engine_Dev — collapsible section. Tap the header bar to expand/collapse its boxes,
 // so the console reads as ~16 closed headers instead of one 4,000-line scroll.
-// Default collapsed; a badge shows how many ● overrides live inside (filled by the
-// caller) so you can see at a glance which sections you've authored.
-function CollapsibleSection({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+// `status` puts an AUTHORING diamond on the bar: ◆ filled (green) = every JSON section
+// inside has an upload/save (authored); ◇ hollow (pink) = at least one is still on the
+// built-in template. Undefined = a control/meta bar with no JSON to author.
+type SectionStatus = 'all' | 'partial' | 'none';
+function authoredStatus(bools: boolean[]): SectionStatus {
+  if (bools.length === 0) return 'none';
+  const n = bools.filter(Boolean).length;
+  return n === bools.length ? 'all' : n === 0 ? 'none' : 'partial';
+}
+function CollapsibleSection({ title, status, defaultOpen = false, children }: { title: string; status?: SectionStatus; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <View style={styles.section}>
       <TouchableOpacity style={styles.sectionHeader} onPress={() => setOpen((v) => !v)} activeOpacity={0.7}>
         <Text style={styles.sectionHeaderChevron}>{open ? '▾' : '▸'}</Text>
         <Text style={styles.sectionHeaderText}>{title}</Text>
+        {status && (
+          <Text style={[styles.sectionDiamond, { color: status === 'all' ? '#56d364' : '#ff4fb0' }]}>
+            {status === 'all' ? '◆' : '◇'}
+          </Text>
+        )}
       </TouchableOpacity>
       {open && <View style={styles.sectionBody}>{children}</View>}
     </View>
@@ -3147,6 +3159,36 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
   useContentPackStore((s) => s.contentVersion);
   const racesLoaded = hasTableOverride('races');
   const factionsLoaded = hasTableOverride('factions');
+
+  // engine_Dev — AUTHORING diamonds: ◆ every JSON section in the bar is authored
+  // (uploaded/saved override), ◇ at least one is still on the built-in template. Recomputed
+  // on every contentVersion bump (the subscription above) so it stays live.
+  const cp = useContentPackStore.getState();
+  const arr = (x: unknown) => Array.isArray(x) && x.length > 0;
+  const obj = (x: unknown) => !!x && typeof x === 'object' && Object.keys(x as object).length > 0;
+  const has = (x: unknown) => x != null;
+  const str = (x: unknown) => typeof x === 'string' && x.trim().length > 0;
+  const st = authoredStatus;
+  const dMainQuest = st([has(cp.customMainQuest), arr(cp.customBosses)]);
+  const dIdentity = st([str(cp.gameTitle), str(cp.gameTagline), str(cp.narratorName), str(cp.worldName), str(cp.corruptionName), str(cp.energyName), str(cp.crucibleName)]);
+  const dLore = st([hasLoreOverride('world'), hasLoreOverride('faction'), hasLoreOverride('race'), hasLoreOverride('flavor'), hasTableOverride('lore')]);
+  const dTables = st(CONTENT_TABLES.filter((t) => t.id !== 'lore').map((t) => hasTableOverride(t.id)));
+  const dMissions = st([obj(cp.missions)]);
+  const dFactionMissions = st([!!(cp.missions && (cp.missions as Record<string, unknown>).factionQuests)]);
+  const dHooks = st([obj(cp.hooks)]);
+  const dWhispers = st([arr(cp.whispers)]);
+  const dTravel = st([obj(cp.wasteland)]);
+  const dInteractionTags = st([obj(cp.interactionTags)]);
+  const dStartingAreas = st([arr(cp.startingAreas)]);
+  const dTitles = st([arr(cp.customTitles)]);
+  const dCollectables = st([arr(cp.collectables)]);
+  const dSummons = st([has(cp.summons)]);
+  const dDogScenarios = st([arr(cp.dogScenarios)]);
+  const dDigging = st([has(cp.digging)]);
+  const dScrap = st([has(cp.scrap)]);
+  const dSalvage = st([has(cp.salvage)]);
+  const dOverlays = st([arr(cp.overlays)]);
+  const dAdvanced = st([arr(cp.damageTypes), has(cp.damageResistances), arr(cp.fusionTags), has(cp.coatings), has(cp.inventory)]);
 
   return (
     <>
@@ -3207,84 +3249,84 @@ export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
         <GameBundleBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="MAIN QUEST">
+      <CollapsibleSection title="MAIN QUEST" status={dMainQuest}>
         <MainQuestBox />
         <BossesBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="GAME IDENTITY">
+      <CollapsibleSection title="GAME IDENTITY" status={dIdentity}>
         <GameIdentitySection />
       </CollapsibleSection>
 
-      <CollapsibleSection title="LORE">
+      <CollapsibleSection title="LORE" status={dLore}>
         {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
       </CollapsibleSection>
 
-      <CollapsibleSection title="TABLES">
+      <CollapsibleSection title="TABLES" status={dTables}>
         {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
       </CollapsibleSection>
 
-      <CollapsibleSection title="MISSIONS">
+      <CollapsibleSection title="MISSIONS" status={dMissions}>
         <MissionsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="FACTION MISSIONS">
+      <CollapsibleSection title="FACTION MISSIONS" status={dFactionMissions}>
         <FactionMissionsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="HOOKS">
+      <CollapsibleSection title="HOOKS" status={dHooks}>
         <HooksBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="WHISPERS">
+      <CollapsibleSection title="WHISPERS" status={dWhispers}>
         <WhispersBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="TRAVEL ENCOUNTERS">
+      <CollapsibleSection title="TRAVEL ENCOUNTERS" status={dTravel}>
         <WastelandBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="INTERACTION TAGS">
+      <CollapsibleSection title="INTERACTION TAGS" status={dInteractionTags}>
         <InteractionTagsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="STARTING AREAS">
+      <CollapsibleSection title="STARTING AREAS" status={dStartingAreas}>
         <StartingAreasBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="TITLES">
+      <CollapsibleSection title="TITLES" status={dTitles}>
         <TitlesBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="COLLECTABLES">
+      <CollapsibleSection title="COLLECTABLES" status={dCollectables}>
         <CollectablesBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="SUMMONED SIDEKICKS">
+      <CollapsibleSection title="SUMMONED SIDEKICKS" status={dSummons}>
         <SummonsBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="DOG-RESCUE SCENARIOS">
+      <CollapsibleSection title="DOG-RESCUE SCENARIOS" status={dDogScenarios}>
         <DogScenariosBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="DIGGING">
+      <CollapsibleSection title="DIGGING" status={dDigging}>
         <DiggingBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="SCRAP">
+      <CollapsibleSection title="SCRAP" status={dScrap}>
         <ScrapBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="SALVAGE">
+      <CollapsibleSection title="SALVAGE" status={dSalvage}>
         <SalvageBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="ELEVATED OVERLAYS">
+      <CollapsibleSection title="ELEVATED OVERLAYS" status={dOverlays}>
         <OverlaysBox />
       </CollapsibleSection>
 
-      <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES">
+      <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES" status={dAdvanced}>
         <AdvancedRulesBoxes />
       </CollapsibleSection>
 
@@ -3436,6 +3478,7 @@ const styles = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1610', borderWidth: 1, borderColor: '#3a3226', borderRadius: 6, paddingVertical: 11, paddingHorizontal: 12 },
   sectionHeaderChevron: { color: '#c9a86a', fontSize: 13, fontWeight: '700', width: 18 },
   sectionHeaderText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
+  sectionDiamond: { fontSize: 14, fontWeight: '700', marginLeft: 8 },
   sectionBody: { marginTop: 6 },
   card: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },

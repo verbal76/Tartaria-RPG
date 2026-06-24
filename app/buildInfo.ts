@@ -15828,4 +15828,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // as the narration-injection gate so the generic game's setting/terms/vocab actually fire;
 // (4) GENERIC_GAME.worldLore — a coherent "the Reaches" tone/setting/persona/terms/vocab.
 // Author World-lore uploads still win. Tests lock the layering + neutrality. tsc baseline.
-export const OTA_BUILD_ID = '2026-06-24-828';
+//
+// engine_Dev-829 — AUTHORING DIAMONDS on the dev-panel section bars. Each collapsible
+// content bar now shows a diamond: ◆ filled (green) = every JSON section inside is authored
+// (an uploaded/saved override), ◇ hollow (pink) = at least one is still on the built-in
+// template. CollapsibleSection takes a `status` ('all'|'partial'|'none' via authoredStatus());
+// DeveloperConsole computes each bar's status live from the content-pack override state
+// (hasTableOverride / hasLoreOverride + the store slots), recomputed on every contentVersion
+// bump. Wired to 20 content bars (MAIN QUEST, GAME IDENTITY, LORE, TABLES, MISSIONS, FACTION
+// MISSIONS, HOOKS, WHISPERS, TRAVEL ENCOUNTERS, INTERACTION TAGS, STARTING AREAS, TITLES,
+// COLLECTABLES, SUMMONED SIDEKICKS, DOG-RESCUE, DIGGING, SCRAP, SALVAGE, OVERLAYS, ADVANCED
+// RULES). Control/meta bars (WHOLE GAME, MUSIC, MAPS, FAMILY BUILD, DEV MODE) carry no
+// diamond. tsc unchanged from baseline.
+export const OTA_BUILD_ID = '2026-06-24-829';
