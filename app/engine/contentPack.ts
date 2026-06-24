@@ -892,6 +892,18 @@ export function setScenePropsOverride(obj: ScenePropsOverride | null): void {
 export function hasScenePropsOverride(): boolean { return scenePropsOverride != null; }
 export function getScenePropsOverride(): ScenePropsOverride | null { return scenePropsOverride; }
 
+// --- named vendors override -----------------------------------------------------
+// engine_Dev — the named traders the engine spawns (id, name, title, faction?,
+// description, offers[]). Built-in pool is the demo's; an uploaded array replaces it so
+// an author can ship their own setting's traders. Each: { id, name, title, faction?,
+// description, offers: [{ itemName, price, quantity? }], voiceId?, gender? }.
+let vendorsOverride: unknown[] | null = null;
+export function setVendorsOverride(arr: unknown[] | null): void {
+  vendorsOverride = arr && arr.length > 0 ? arr : null;
+}
+export function hasVendorsOverride(): boolean { return vendorsOverride != null; }
+export function getVendorsOverride(): unknown[] | null { return vendorsOverride; }
+
 // --- interaction tags override --------------------------------------------------
 // engine_Dev — the keyword lists that decide which interactable nouns are
 // climbable / swimmable / breakable / searchable / salvageable. Uploaded as
@@ -1048,6 +1060,7 @@ export function clearAllOverrides(): void {
   setWhispersOverride(null);
   setWastelandOverride(null);
   setScenePropsOverride(null);
+  setVendorsOverride(null);
   setInteractionTagsOverride(null);
   setStartingAreasOverride(null);
   narratorNameOverride = null;

@@ -15759,4 +15759,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // not in the built-in catalog) stay normal. This makes ALL ~265 themed catalog leaks visible
 // at once without renaming. NEXT: the genericization rename itself (catalog item names ->
 // neutral), which keeps them pink (still built-in defaults) until the author overrides.
-export const OTA_BUILD_ID = '2026-06-24-823';
+//
+// engine_Dev-824 — NAMED VENDORS are now author-overridable (the last major built-in
+// content type that wasn't reskinnable). vendors.json shipped 30 fantasy traders keyed to
+// Tartaria factions with NO override path — so a custom game (e.g. the WWII playtest)
+// couldn't ship its own merchants. Added the standard override path (mirrors scene-props
+// 820): contentPack.ts registry (setVendorsOverride/get/has + clearAll); vendors.ts
+// getActiveVendors() (override-or-built-in, drops malformed rows) — routed the 4 consumers
+// (pickRandomVendor, findVendorByName, factionHint, gameStore vendor-encounter + faction
+// sample); contentPackStore.ts loadVendorsJson (bare array or { vendors: [...] }) + clear +
+// persist + reapply + hydrate + whole-game bundle apply + PersistShape; buildVendorsTemplate()
+// + bundle entry (setting-neutral example traders). Tests: override-applies (pool swaps to
+// the author's vendors + lookup; clear restores built-ins; malformed rows dropped) +
+// round-trip + bundle-completeness. tsc 141 = baseline (zero new); vendor + content-pack
+// suites green.
+export const OTA_BUILD_ID = '2026-06-24-824';
