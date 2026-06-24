@@ -7,12 +7,10 @@ import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
-import { CombatArena } from '../components/CombatArena';
 
-// engine_Dev EXPERIMENT — during a fight, replace the world-window feed with a two-column combat
-// arena (you | enemy, with live HP bars). Presentational only; combat logic + rolls are untouched.
-// Set to false to instantly revert to the plain feed. It only renders while inCombat is true, so it
-// can't affect anything outside a fight.
+// engine_Dev — during a fight, the top char + enemy panels grow tall to fill the world-window
+// (one long box each side) and the feed hides. Uses the ORIGINAL StatsPanel (reactive HP color) +
+// EnemyPanel. Set false to revert to the normal compact combat layout.
 const COMBAT_ARENA_VIEW = true;
 
 // engine_Dev — flash the just-resolved roll result in a transient popup just above the controls
@@ -524,7 +522,7 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={styles.topRow}>
+      <View style={[styles.topRow, COMBAT_ARENA_VIEW && inCombat && styles.topRowCombat]}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
           {/* OTA 040 — tap the stats panel to open the full Player
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
@@ -532,12 +530,13 @@ export function ExplorationScreen() {
           <TouchableOpacity
             onPress={() => setScreen('character')}
             activeOpacity={0.75}
+            style={COMBAT_ARENA_VIEW && inCombat ? styles.combatColFill : undefined}
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;
               if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
             }}
           >
-            <StatsPanel player={player} />
+            <StatsPanel player={player} fill={COMBAT_ARENA_VIEW && inCombat} />
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
@@ -547,6 +546,7 @@ export function ExplorationScreen() {
               activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
+              fill={COMBAT_ARENA_VIEW}
             />
           ) : (
             <CrestPlaceholder />
@@ -814,12 +814,11 @@ export function ExplorationScreen() {
         );
       })()}
 
+      {/* engine_Dev — during the combat arena, the tall char|enemy topRow takes the world-window,
+          so the feed hides; otherwise the normal scrolling feed shows. */}
+      {!(COMBAT_ARENA_VIEW && inCombat) && (
       <TutorialTarget area="feed" style={styles.feed}>
-        {COMBAT_ARENA_VIEW && inCombat && player ? (
-          <CombatArena player={player} enemyViews={enemyViews} activeIdx={activeIdx} />
-        ) : (
-          <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
-        )}
+        <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
             <Text style={styles.streamingPrefix}>The {getNarratorName()}:</Text>
@@ -830,6 +829,7 @@ export function ExplorationScreen() {
           </View>
         )}
       </TutorialTarget>
+      )}
 
       {/* engine_Dev — transient last-roll result popup: above the controls (dice roller / input),
           below the action buttons. Appears the moment a roll resolves, holds ~2s, then clears. */}
@@ -1730,6 +1730,9 @@ const styles = StyleSheet.create({
   // clipped the bottom rows behind the scene bar. Letting the row grow
   // to fit content keeps every stat visible.
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
+  // engine_Dev — combat arena: the top row fills the world-window so the char + enemy boxes run long.
+  topRowCombat: { flex: 1, minHeight: 0 },
+  combatColFill: { flex: 1 },
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
