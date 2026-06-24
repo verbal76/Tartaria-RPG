@@ -16,6 +16,25 @@
 
 import type { Location } from './types';
 import { isIndoorLocation } from './climbableSpawns';
+import { getScenePropsOverride } from './contentPack';
+
+/** All active salvageables: the author's scene-props override when present, else the
+ *  built-in setting-neutral fallback. Override entries default to context 'both'. */
+function allActiveSalvageables(): SalvageSpawn[] {
+  const ov = getScenePropsOverride();
+  return ov?.salvageables?.length
+    ? ov.salvageables.map((s) => ({ name: s.name, context: s.context ?? 'both' }))
+    : [...OUTSIDE_SALVAGEABLES, ...INSIDE_SALVAGEABLES];
+}
+
+/** Active salvageables filtered to the scene context, falling back to the full active
+ *  set when the override supplies none for this context. */
+function activeSalvageables(indoor: boolean): SalvageSpawn[] {
+  const want = indoor ? 'inside' : 'outside';
+  const all = allActiveSalvageables();
+  const matched = all.filter((s) => s.context === want || s.context === 'both');
+  return matched.length ? matched : all;
+}
 
 export interface SalvageSpawn {
   /** Canonical noun as it appears in the chip row. Adjective prefix
@@ -94,7 +113,7 @@ export function isCommonStockSalvageable(noun: string): boolean {
 
 export function isCuratedSalvageable(noun: string): boolean {
   const n = noun.toLowerCase();
-  for (const spawn of [...OUTSIDE_SALVAGEABLES, ...INSIDE_SALVAGEABLES]) {
+  for (const spawn of allActiveSalvageables()) {
     if (n.includes(spawn.name.toLowerCase())) return true;
   }
   return false;
@@ -117,7 +136,7 @@ export function pickSalvageablesForScene(
   rng: () => number = Math.random,
 ): string[] {
   const indoor = isIndoorLocation(loc);
-  const pool = indoor ? INSIDE_SALVAGEABLES : OUTSIDE_SALVAGEABLES;
+  const pool = activeSalvageables(indoor);
   const cap = indoor ? 2 : 3;
   const shuffled = shuffle(pool, rng);
   const picked = shuffled.slice(0, cap);

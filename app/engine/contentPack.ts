@@ -876,6 +876,22 @@ export function setWastelandOverride(obj: Record<string, unknown> | null): void 
 export function hasWastelandOverride(): boolean { return wastelandOverride != null; }
 export function getWastelandOverride(): Record<string, unknown> | null { return wastelandOverride; }
 
+// --- scene-prop pools override (climbable + salvageable ambient nouns) -----------
+// engine_Dev — the curated nouns the engine injects into every scene as climb / salvage
+// targets. Built-in pools are SETTING-NEUTRAL fallbacks; an uploaded set replaces them
+// so an author can theme the props to their world (e.g. WWII wreckage instead of generic
+// ruins). Each climbable: { name, context?: inside|outside|both, height? }. Each
+// salvageable: { name, context? }.
+export interface ScenePropSpawn { name: string; context?: 'inside' | 'outside' | 'both'; height?: number }
+export interface ScenePropsOverride { climbables?: ScenePropSpawn[]; salvageables?: ScenePropSpawn[] }
+let scenePropsOverride: ScenePropsOverride | null = null;
+export function setScenePropsOverride(obj: ScenePropsOverride | null): void {
+  const has = obj && ((obj.climbables?.length ?? 0) > 0 || (obj.salvageables?.length ?? 0) > 0);
+  scenePropsOverride = has ? obj : null;
+}
+export function hasScenePropsOverride(): boolean { return scenePropsOverride != null; }
+export function getScenePropsOverride(): ScenePropsOverride | null { return scenePropsOverride; }
+
 // --- interaction tags override --------------------------------------------------
 // engine_Dev — the keyword lists that decide which interactable nouns are
 // climbable / swimmable / breakable / searchable / salvageable. Uploaded as
@@ -1031,6 +1047,7 @@ export function clearAllOverrides(): void {
   setHooksOverride(null);
   setWhispersOverride(null);
   setWastelandOverride(null);
+  setScenePropsOverride(null);
   setInteractionTagsOverride(null);
   setStartingAreasOverride(null);
   narratorNameOverride = null;

@@ -13,6 +13,26 @@
 // reads distinct from the next.
 
 import type { Location } from './types';
+import { getScenePropsOverride } from './contentPack';
+
+/** All active climbables: the author's scene-props override when present, else the
+ *  built-in setting-neutral fallback. Override entries default to context 'both',
+ *  height 2. */
+function allActiveClimbables(): ClimbableSpawn[] {
+  const ov = getScenePropsOverride();
+  return ov?.climbables?.length
+    ? ov.climbables.map((s) => ({ name: s.name, context: s.context ?? 'both', height: s.height ?? 2 }))
+    : [...OUTSIDE_CLIMBABLES, ...INSIDE_CLIMBABLES];
+}
+
+/** Active climbables filtered to the scene context (indoor/outdoor), falling back to the
+ *  full active set if the override supplies none for this context. */
+function activeClimbables(indoor: boolean): ClimbableSpawn[] {
+  const want = indoor ? 'inside' : 'outside';
+  const all = allActiveClimbables();
+  const matched = all.filter((s) => s.context === want || s.context === 'both');
+  return matched.length ? matched : all;
+}
 
 export interface ClimbableSpawn {
   /** Canonical noun as it'll appear in the climb modal. The runtime
@@ -107,7 +127,7 @@ export function pickClimbablesForScene(
   rng: () => number = Math.random,
 ): string[] {
   const indoor = isIndoorLocation(loc);
-  const pool = indoor ? INSIDE_CLIMBABLES : OUTSIDE_CLIMBABLES;
+  const pool = activeClimbables(indoor);
   const cap = indoor ? 2 : 3;
   const shuffled = shuffle(pool, rng);
   const picked = shuffled.slice(0, cap);
@@ -125,7 +145,7 @@ export function pickClimbablesForScene(
  *  caller falls back to the existing substring-based climbHeight. */
 export function curatedClimbHeight(noun: string): number | null {
   const n = noun.toLowerCase();
-  for (const spawn of [...OUTSIDE_CLIMBABLES, ...INSIDE_CLIMBABLES]) {
+  for (const spawn of allActiveClimbables()) {
     if (n.includes(spawn.name.toLowerCase())) return spawn.height;
   }
   return null;
