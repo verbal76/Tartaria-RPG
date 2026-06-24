@@ -17,21 +17,30 @@ import {
   ARBITER_SILENT_LINE,
   _resetLoreVectorCache,
 } from '../app/engine/askArbiter';
+import { setTableOverride } from '../app/engine/contentPack';
+
+// engine_Dev-831 — the concept bank is now built ENTIRELY from the active lore document
+// (no built-in Tartaria canon). Seed a lore doc so the bank is non-empty in tests.
+const LORE_DOC = [
+  { tags: ['always', 'world'], text: 'A grey, patient world picks through what the old age left behind.' },
+  { tags: ['market', 'vendor', 'trade'], text: 'The market never closes; everything here has a price, including the way out.' },
+  { tags: ['berlin', 'drowned', 'ruin'], text: 'The drowned districts of old Berlin still hum at night, with no one left to switch them off.' },
+  { tags: ['wardens', 'order'], text: 'The Wardens hold the roads so the rest can sleep. It is thankless work.' },
+];
 
 beforeEach(() => {
   _resetLoreVectorCache();
+  _resetConceptBankCache();
+  setTableOverride('lore', LORE_DOC);
 });
+afterEach(() => setTableOverride('lore', []));
 
-describe('OTA-233 — loreConceptBank loads + has expected shape', () => {
-  it('loads roughly 130+ concepts spanning all categories', () => {
+describe('engine_Dev — loreConceptBank builds from the lore document', () => {
+  it('builds one lore_doc concept per passage (no built-in Tartaria canon)', () => {
     const bank = loadLoreConceptBank();
-    expect(bank.length).toBeGreaterThanOrEqual(130);
-    const categories = new Set(bank.map((c) => c.category));
-    expect(categories.has('event')).toBe(true);
-    expect(categories.has('title')).toBe(true);
-    expect(categories.has('food_drink')).toBe(true);
-    expect(categories.has('faction')).toBe(true);
-    expect(categories.has('place')).toBe(true);
+    expect(bank.length).toBe(LORE_DOC.length);
+    expect(bank.every((c) => c.category === 'lore_doc')).toBe(true);
+    expect(JSON.stringify(bank)).not.toMatch(/tartar|aether|reclaimer|mud dweller/i);
   });
 
   it('every concept has non-empty id / label / definition / searchText', () => {
@@ -184,35 +193,22 @@ describe('OTA-233 — findClosestLoreConcept routes through the embedder', () =>
   });
 });
 
-describe('OTA-233 — formatArbiterAnswer routes by category', () => {
-  it('event category gets "The Arbiter recalls the X" framing', () => {
+describe('engine_Dev — formatArbiterAnswer frames a lore-doc concept', () => {
+  it('surfaces the passage text as a narrator recollection', () => {
     const bank = loadLoreConceptBank();
-    const event = bank.find((c) => c.category === 'event');
-    expect(event).toBeTruthy();
-    const line = formatArbiterAnswer(event!);
-    expect(line).toMatch(/Arbiter recalls/);
-  });
-
-  it('title category gets "title" framing', () => {
-    const bank = loadLoreConceptBank();
-    const title = bank.find((c) => c.category === 'title');
-    expect(title).toBeTruthy();
-    const line = formatArbiterAnswer(title!);
-    expect(line).toMatch(/title/i);
-  });
-
-  it('lore_term / faction / person / place get quoted explanation', () => {
-    const bank = loadLoreConceptBank();
-    const place = bank.find((c) => c.category === 'place');
-    expect(place).toBeTruthy();
-    const line = formatArbiterAnswer(place!);
-    expect(line).toMatch(/Arbiter says/);
+    const concept = bank[0]!;
+    expect(concept.category).toBe('lore_doc');
+    const line = formatArbiterAnswer(concept);
+    expect(line).toMatch(/recalls/);
+    expect(line).toContain(concept.definition);
   });
 });
 
 describe('OTA-233 — ARBITER_SILENT_LINE is a tight, identifiable string', () => {
-  it('reads as Arbiter prose and mentions "lore"', () => {
-    expect(ARBITER_SILENT_LINE).toMatch(/Arbiter/);
+  it('reads as narrator prose and mentions "lore"', () => {
+    // engine_Dev — the narrator name is generic now ("Narrator" by default), so assert the
+    // shape (silent + lore), not a hard-coded "Arbiter".
+    expect(ARBITER_SILENT_LINE).toMatch(/silent/i);
     expect(ARBITER_SILENT_LINE).toMatch(/lore/);
   });
 });
