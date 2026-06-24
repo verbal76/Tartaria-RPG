@@ -16036,4 +16036,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // result popup no longer mirrors the dice roller per step — it now fires ONCE when a roll sequence
 // resolves in combat and shows the FINAL output line (the narration that the hidden feed would
 // show), held ~2s. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-851';
+//
+// engine_Dev-852 — genericize the export/diagnostics "Tartaria" bleeds. The inventory + save +
+// bug-report export headers and the About device-summary header hardcoded "TARTARIA …" / "Tartaria
+// Realms"; they now use getGameTitle() (the LOG export already did). Also genericized the same app-
+// name string in the mic-permission instructions (STTManager), the playtester-invite modal, the
+// title-screen update note, and the third-party-licenses preamble. Leak-scanner baseline 328 → 326.
+export const OTA_BUILD_ID = '2026-06-24-852';

@@ -6,6 +6,7 @@
 // whitelists + replies with the install link (advertised as up
 // to 24 hours, usually within the hour).
 import React, { useEffect, useState } from 'react';
+import { getGameTitle } from '../engine/contentPack';
 import {
   Modal,
   View,
@@ -86,7 +87,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
 
                 <Text style={styles.body}>
                   Type the Gmail address of someone you'd like added to
-                  the Tartaria Realms playtest. We'll whitelist them
+                  the {getGameTitle()} playtest. We'll whitelist them
                   and email them an install link — usually within the
                   hour, up to 24 hours.
                 </Text>

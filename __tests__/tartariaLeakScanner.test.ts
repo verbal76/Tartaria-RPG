@@ -69,7 +69,7 @@ const BASELINE: Record<string, number> = {
   'app/engine/portability.ts': 2, 'app/engine/narrativeGenerator.ts': 2, 'app/engine/crafting.ts': 2,
   'app/engine/hunts.ts': 2, 'app/engine/encounter.ts': 2, 'app/engine/locationChallenges.ts': 0,
   // FACTION_COVETED_ITEM map extracted to app/data/factions/coveted-items.json (2→0).
-  'app/engine/itemEffect.ts': 2, 'app/screens/AboutScreen.tsx': 2, 'app/screens/ActionReferenceScreen.tsx': 2,
+  'app/engine/itemEffect.ts': 2, 'app/screens/AboutScreen.tsx': 0, 'app/screens/ActionReferenceScreen.tsx': 2,
   // investigate LLM prompt now uses getNarratorPersona()/getWorldSetting() (1→0);
   // hookPuzzles vault-tumbler intro genericized (1→0).
   'app/engine/statTraining.ts': 1, 'app/engine/investigationTable.ts': 0, 'app/engine/vendors.ts': 1,

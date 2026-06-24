@@ -424,7 +424,7 @@ export function AboutScreen() {
     // floating lines below the OTA status). The OTA status block
     // stays here because it pulls live Updates.* state.
     const lines = [
-      `Tartaria Realms`,
+      `${getGameTitle()}`,
       ``,
       buildBasicDeviceSummary(),
       ``,
@@ -479,7 +479,7 @@ export function AboutScreen() {
   // timezone, screen, and Hermes flag.
   const voiceInfo = useMemo(() => {
     const lines = [
-      `Tartaria Realms`,
+      `${getGameTitle()}`,
       ``,
       buildBasicDeviceSummary(),
       ``,
