@@ -1085,7 +1085,11 @@ function InteractionTagsBox() {
             try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
             if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
             const built = buildInteractionTagsTemplate(current);
-            const count = Object.keys(JSON.parse(built)).length;
+            // built carries a `//` instruction header — strip it before parsing (raw
+            // JSON.parse on the comment line threw "Unexpected character: /" and crashed
+            // the panel). Guard the count too so it can never be fatal.
+            let count = 0;
+            try { count = Object.keys(JSON.parse(stripJsonComments(built))).length; } catch { /* count only */ }
             setText(built);
             setStatus({ kind: 'ok', msg: `Pulled ${count} interactables from your locations — edit the tags, then LOAD.` });
           }}
