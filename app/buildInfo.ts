@@ -16042,4 +16042,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Realms"; they now use getGameTitle() (the LOG export already did). Also genericized the same app-
 // name string in the mic-permission instructions (STTManager), the playtester-invite modal, the
 // title-screen update note, and the third-party-licenses preamble. Leak-scanner baseline 328 → 326.
-export const OTA_BUILD_ID = '2026-06-24-852';
+//
+// engine_Dev-853 — audited ALL copiable debug logs for setting bleeds. The export builders (LOG /
+// inventory / save / bug report / device summary) are now clean (getGameTitle from 852); the one
+// remaining displayed bleed was the About page's "Qwen generator (Arbiter narration)" label →
+// now getNarratorName(). The @tartaria/* + tartaria.ml.* AsyncStorage keys and __TARTARIA_BOOT_STAGE
+// are internal (never displayed; renaming orphans saved state) so they stay. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-853';
