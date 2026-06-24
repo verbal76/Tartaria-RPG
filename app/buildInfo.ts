@@ -15867,4 +15867,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // TARTARIA, handled next: arbiter-titles.json (live titles feature → genericize) and
 // concepts.json (76 neutral mechanics + 96 Tartaria-setting entries → strip the 96; findConcept
 // already prefers the lore doc). tsc baseline; arbiter/lore suites green.
-export const OTA_BUILD_ID = '2026-06-24-831';
+//
+// engine_Dev-832 — finish the canon genericization: concepts.json + arbiter-titles.json.
+// concepts.json (172 mixed) → STRIPPED the 88 pure Tartaria-setting Q&A entries (the lore
+// document covers setting questions now, 830/831) and GENERICIZED the 9 mechanics entries
+// that carried setting flavor (Aether→energy/arcane, Tartarian→ancient, bolt-caster→carbine,
+// Aether Golem→construct, etc.) + renamed the one Tartaria-flavored id (aetheric_related_
+// actions → arcane_related_actions, updated in ActionReferenceScreen). Result: 84 neutral
+// mechanics entries, ZERO Tartaria, all 65 Action-Reference ids intact. arbiter-titles.json
+// (20 earnable titles) → genericized every display name/requirement/perk (Arcane-Attuned,
+// Sidekick Whisperer, Bane of Constructs, Far Explorer…); ids kept (titles.ts predicates +
+// saved earnedTitles reference them — internal, never displayed). tsc baseline; concept /
+// askArbiter / titles / arbiterTitlesScreen / actionReference suites green.
+export const OTA_BUILD_ID = '2026-06-24-832';

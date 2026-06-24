@@ -77,7 +77,7 @@ const SECTIONS: { title: string; ids: string[] }[] = [
   },
   {
     title: 'Aetheric-Related Actions',
-    ids: ['aetheric_related_actions', 'learn_spell'],
+    ids: ['arcane_related_actions', 'learn_spell'],
   },
 ];
 
