@@ -23750,7 +23750,10 @@ function applyEnemyCounter(
           (resisted.blocked || drinkResists || rf2.resist.includes(et)) ? 'resist'
           : rf2.weak.includes(et) ? 'weak'
           : 'normal';
-        if (Math.random() < cpMod.damageTypeApplyChance(dtc, match)) {
+        // engine_Dev (balance OTA-881) — a guessed/inferred enemy type procs at 0.4× chance; only an
+        // EXPLICITLY-typed enemy (`damage` string carries a type word) gets the full default proc.
+        const procChance = cpMod.damageTypeApplyChance(dtc, match) * (explicitDamageType ? 1 : 0.4);
+        if (Math.random() < procChance) {
           const roll = Math.max(1, rollFromNotation(dtc.dice ?? '1d4'));
           if (dtc.mode === 'on_hit') {
             dmg += roll;
@@ -23815,7 +23818,9 @@ function applyEnemyCounter(
       // type an on-hit stat mod (e.g. "cucumber" → −2 INT), apply it to the VICTIM
       // (here, the player) as a temporary stat status for the type's onHitRounds.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const onHit = (require('../engine/contentPack') as typeof import('../engine/contentPack')).getDamageTypeOnHit(enemyDamageType);
+      // engine_Dev (balance OTA-881) — only an EXPLICITLY-typed enemy debuffs the player; a guessed
+      // (inferred) type does NOT silently tax player stats (mirrors the rollIncomingStatusEffect gate).
+      const onHit = explicitDamageType ? (require('../engine/contentPack') as typeof import('../engine/contentPack')).getDamageTypeOnHit(enemyDamageType) : null;
       if (onHit) {
         for (const m of onHit.mods) {
           if (!m.amount) continue;

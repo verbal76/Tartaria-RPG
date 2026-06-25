@@ -16253,4 +16253,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armor stat bonuses and applies at every stat-read + the validator. (3) DT alias (canonicalDamage-
 // Type): force/psychic→aetheric, frost→cold, shock→electrical — off-catalog type words stop being
 // inert. Balancing pass to follow. tsc 142; combat/equipment/validator/leak suites green (73).
-export const OTA_BUILD_ID = '2026-06-25-880';
+// OTA-881 — combat BALANCE pass on the OTA-880 default type procs (3-agent balancing review). (1)
+// DOT family was overtuned (refresh-to-full-uptime → 24-49% of a healthbar for free): burn/poison
+// 1d4×3@0.6 → ×2@0.45; radiation 1d4×4@0.7 → ×3@0.45; electrical/aetheric on_hit 1d6 → 1d4 @0.45.
+// (2) Enemy→player: the default procs no longer silently tax the player off an INFERRED type — the
+// onHit stat-debuff is skipped entirely for bare-dice enemies, and the damage proc fires at 0.4×
+// chance when inferred; only EXPLICITLY-typed enemies get the full proc/debuff. (3) stun debuff now
+// 2 rounds, aetheric debuff −2 WIS → −2 DEX (a combat stat) @1 round. (4) effectiveStats floored at
+// 1 so stacked debuffs can't zero a roll stat. Values only + one gate — tsc 142; suites green (73).
+export const OTA_BUILD_ID = '2026-06-25-881';

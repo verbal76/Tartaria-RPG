@@ -731,13 +731,13 @@ const BUILTIN_DT_DEFAULTS: Record<string, { combat?: DamageCombatEffect; onHit?:
   piercing:    { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
   slashing:    { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
   bludgeoning: { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 }, onHit: [{ stat: 'dexterity', amount: -1 }], onHitRounds: 2 },
-  burn:        { combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.6, weakBonus: 0.2, strongPenalty: 0.3 } },
-  electrical:  { combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.5, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'strength', amount: -1 }], onHitRounds: 2 },
-  poison:      { combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.6, weakBonus: 0.2, strongPenalty: 0.3 } },
-  radiation:   { combat: { mode: 'dot', dice: '1d4', rounds: 4, baseChance: 0.7, weakBonus: 0.1, strongPenalty: 0.4 } },
-  stun:        { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.4, weakBonus: 0.2, strongPenalty: 0.2 }, onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 1 },
+  burn:        { combat: { mode: 'dot', dice: '1d4', rounds: 2, baseChance: 0.45, weakBonus: 0.2, strongPenalty: 0.3 } },
+  electrical:  { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'strength', amount: -1 }], onHitRounds: 2 },
+  poison:      { combat: { mode: 'dot', dice: '1d4', rounds: 2, baseChance: 0.45, weakBonus: 0.2, strongPenalty: 0.3 } },
+  radiation:   { combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.45, weakBonus: 0.2, strongPenalty: 0.4 } },
+  stun:        { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.4, weakBonus: 0.2, strongPenalty: 0.2 }, onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 2 },
   degradation: { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
-  aetheric:    { combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.5, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'wisdom', amount: -2 }], onHitRounds: 2 },
+  aetheric:    { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 1 },
 };
 // Off-catalog type words that appear in built-in content → mapped to the closest real type so they
 // stop being inert. force/psychic read as "otherworldly energy" → aetheric; common spelling variants.
