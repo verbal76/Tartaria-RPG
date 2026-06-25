@@ -16244,4 +16244,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the enemy for onHitRounds (reusing the existing buildCombatSteps acReduction path that acid-shred
 // uses), so subsequent attacks land more often, then it ticks down and expires. New 'exposed' enemy
 // status + EnemyPanel badge. Design picked by the author (AC penalty vs miss/damage). tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-879';
+// OTA-880 — Tartaria→Philly combat parity, engine-side (no content authored). (1) The 10 BUILT-IN
+// damage types now carry DEFAULT combat blocks (on_hit/dot) + onHit debuffs (BUILTIN_DT_DEFAULTS in
+// contentPack), so a game on the built-in catalog gets the same bidirectional typed-damage procs +
+// the OTA-879 'exposed' debuff that author-defined types get; an uploaded damageTypes entry still
+// overrides. (2) STAT-ALIAS map (equipment.canonicalStatKey): constitution→hp, acrobatics→dexterity,
+// investigation/aetheria→intelligence, perception→wisdom, etc. — revives the ~100 silently-dropped
+// armor stat bonuses and applies at every stat-read + the validator. (3) DT alias (canonicalDamage-
+// Type): force/psychic→aetheric, frost→cold, shock→electrical — off-catalog type words stop being
+// inert. Balancing pass to follow. tsc 142; combat/equipment/validator/leak suites green (73).
+export const OTA_BUILD_ID = '2026-06-25-880';

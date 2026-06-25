@@ -201,6 +201,25 @@ type StatKey = keyof Stats;
 // + ~16 other authored pieces) actually apply through aggregateEquippedStatBonuses.
 const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
 
+// engine_Dev — common stat SYNONYMS → the engine's tracked stat (or the hp/staminaMax pools). Lets a
+// catalog authored with D&D-ish names (constitution, acrobatics, perception, investigation, …)
+// resolve to the closest real stat instead of being silently dropped. Lowercased keys.
+const STAT_ALIAS: Record<string, string> = {
+  str: 'strength', power: 'strength', might: 'strength', brawn: 'strength',
+  dex: 'dexterity', agility: 'dexterity', acrobatics: 'dexterity', reflexes: 'dexterity', finesse: 'dexterity', sleight: 'dexterity',
+  int: 'intelligence', logic: 'intelligence', investigation: 'intelligence', knowledge: 'intelligence', arcana: 'intelligence', aetheria: 'intelligence', aether: 'intelligence',
+  wis: 'wisdom', perception: 'wisdom', awareness: 'wisdom', insight: 'wisdom', intuition: 'wisdom', willpower: 'wisdom',
+  cha: 'charisma', presence: 'charisma', persuasion: 'charisma', charm: 'charisma',
+  ste: 'stealth', sneak: 'stealth', sneaking: 'stealth',
+  constitution: 'hp', con: 'hp', vitality: 'hp', endurance: 'hp', toughness: 'hp', health: 'hp', fortitude: 'hp',
+  stamina: 'staminamax', staminamax: 'staminamax',
+};
+/** Canonicalize a stat name: lowercase + map a known synonym to the engine stat/pool key. */
+export function canonicalStatKey(raw: string | null | undefined): string {
+  const lc = (raw ?? '').toLowerCase();
+  return STAT_ALIAS[lc] ?? lc;
+}
+
 // Shared resolver list — the effect system can be backed by any
 // catalog row that carries an `effect` field. As of OTA 192 that's
 // exploration / gear / material rows in addition to the existing
@@ -281,7 +300,7 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   const bonus: Partial<Record<StatKey, number>> = {};
   const eq = player.equipped ?? {};
   const add = (stat: string, amount: number) => {
-    const key = stat as StatKey;
+    const key = canonicalStatKey(stat) as StatKey; // map synonyms (acrobatics→dexterity, …); hp/staminaMax fall out here and route to the pools
     if (!STAT_KEYS.includes(key)) return;
     bonus[key] = (bonus[key] ?? 0) + amount;
   };
@@ -396,7 +415,7 @@ export function armorHpBonus(name: string | null | undefined): number {
   if (!piece) return 0;
   const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
   return bonuses
-    .filter((b) => b.stat === 'hp')
+    .filter((b) => canonicalStatKey(b.stat) === 'hp')
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
@@ -410,7 +429,7 @@ export function weaponHpBonus(name: string | null | undefined): number {
   if (!wpn) return 0;
   const bonuses = wpn.statBonuses ?? [];
   return bonuses
-    .filter((b) => b.stat === 'hp')
+    .filter((b) => canonicalStatKey(b.stat) === 'hp')
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
@@ -432,11 +451,11 @@ export function gearStaminaMaxBonus(name: string | null | undefined): number {
   const armor = findArmorByName(name);
   if (armor) {
     const bonuses = armor.statBonuses ?? (armor.statBonus ? [armor.statBonus] : []);
-    total += bonuses.filter((b) => b.stat === 'staminaMax').reduce((s, b) => s + (b.amount ?? 0), 0);
+    total += bonuses.filter((b) => canonicalStatKey(b.stat) === 'staminamax').reduce((s, b) => s + (b.amount ?? 0), 0);
   }
   const wpn = findWeaponByName(name);
   if (wpn) {
-    total += (wpn.statBonuses ?? []).filter((b) => b.stat === 'staminaMax').reduce((s, b) => s + (b.amount ?? 0), 0);
+    total += (wpn.statBonuses ?? []).filter((b) => canonicalStatKey(b.stat) === 'staminamax').reduce((s, b) => s + (b.amount ?? 0), 0);
   }
   return total;
 }
