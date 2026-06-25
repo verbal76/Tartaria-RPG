@@ -1420,6 +1420,17 @@ export function buildGameBundleTemplate(): string {
  *  game) emits the author's content under "✅ UPLOADED"; every other section emits
  *  the TEMPLATE scaffold under "⬜ TEMPLATE — default; fill in or delete". The file
  *  still parses + re-uploads cleanly (markers are // comments). */
+/** Map of bundle section key → its TEMPLATE content string (the un-customized scaffold the
+ *  annotated export bakes in for sections the author hasn't uploaded). The whole-game loader
+ *  compares each uploaded section against this and SKIPS any that still equals its template, so a
+ *  re-uploaded export can't promote template scaffolding (e.g. the placeholder vendors / roadside
+ *  traders) back into a broken override. */
+export function bundleTemplateMap(): Record<string, string> {
+  const m: Record<string, string> = {};
+  for (const e of bundleEntries()) m[e.key] = e.content;
+  return m;
+}
+
 export function buildAnnotatedGameBundle(uploaded: Record<string, unknown>): string {
   const upCount = Object.keys(uploaded).length;
   const entries = bundleEntries();
