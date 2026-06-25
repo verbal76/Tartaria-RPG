@@ -8,6 +8,7 @@ import {
   GEAR,
 } from './crafting';
 import { scrapOutputFor } from './scrapEngine';
+import { canonicalStatKey } from './equipment';
 
 // OTA-188 — when a durability-tracked item breaks, drop ONE low-tier
 // material so the player has a foothold to repair / re-craft. Ropes
@@ -118,14 +119,21 @@ function rollInstancePerks(
     if (armor.acBonus > 0) channels.push({ key: 'ac', base: armor.acBonus });
     const bonuses = armor.statBonuses ?? (armor.statBonus ? [armor.statBonus] : []);
     for (const b of bonuses) {
-      if (ATTRIBUTE_STATS.has(b.stat) && b.amount > 0) channels.push({ key: b.stat, base: b.amount });
+      // Glossary: canonicalize the authored stat (acrobatics→dexterity, aetheria→intelligence…)
+      // BEFORE the attribute gate, then channel under the real key — otherwise a synonym-named
+      // catalog bonus would be silently dropped from the rolled instance perks. constitution→hp
+      // falls out here (hp ∉ ATTRIBUTE_STATS) and stays catalog-driven, as intended.
+      const canon = canonicalStatKey(b.stat);
+      if (ATTRIBUTE_STATS.has(canon) && b.amount > 0) channels.push({ key: canon, base: b.amount });
     }
   } else if (weapon) {
     for (const b of weapon.statBonuses ?? []) {
-      if (ATTRIBUTE_STATS.has(b.stat) && b.amount > 0) channels.push({ key: b.stat, base: b.amount });
+      const canon = canonicalStatKey(b.stat);
+      if (ATTRIBUTE_STATS.has(canon) && b.amount > 0) channels.push({ key: canon, base: b.amount });
     }
-    if (channels.length === 0 && weapon.stat && ATTRIBUTE_STATS.has(weapon.stat)) {
-      channels.push({ key: weapon.stat, base: 1 }); // seed from scaling stat
+    if (channels.length === 0 && weapon.stat) {
+      const canon = canonicalStatKey(weapon.stat);
+      if (ATTRIBUTE_STATS.has(canon)) channels.push({ key: canon, base: 1 }); // seed from scaling stat
     }
   }
   if (channels.length === 0) return null;
