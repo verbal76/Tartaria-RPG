@@ -4,8 +4,9 @@ import {
   weatherAttackPenalty,
   weatherStatModifiers,
   describeWeatherStatModifiers,
+  tickWeather,
 } from '../app/engine/weatherEffects';
-import type { WeatherEntry } from '../app/engine/types';
+import type { WeatherEntry, PlayerCharacter } from '../app/engine/types';
 
 function w(id: string, name = id): WeatherEntry {
   return {
@@ -80,5 +81,48 @@ describe('describeWeatherStatModifiers — readable summary', () => {
   it('returns empty string when no modifiers apply', () => {
     expect(describeWeatherStatModifiers(null)).toBe('');
     expect(describeWeatherStatModifiers(w('unknown_storm'))).toBe('');
+  });
+});
+
+// engine_Dev — AUTHOR (custom-id) weather is driven from its own data fields, so a
+// custom-setting game's weather is mechanically real without reusing the built-in ids.
+describe('data-driven weather for custom (non-built-in) ids', () => {
+  const cw = (over: Partial<WeatherEntry>): WeatherEntry => ({
+    id: 'green_fog_bank', name: 'Green Fog Bank', description: '',
+    visibility: 0, travelPenalty: 0, corruptionChance: 0, tags: [], ...over,
+  });
+
+  it('derives attack penalty from visibility (capped at 3)', () => {
+    expect(weatherAttackPenalty(cw({ visibility: 0 }))).toBe(0);
+    expect(weatherAttackPenalty(cw({ visibility: -2 }))).toBe(1);
+    expect(weatherAttackPenalty(cw({ visibility: -10 }))).toBe(3); // capped
+  });
+
+  it('derives reposition cost from travelPenalty', () => {
+    expect(weatherRepositionCost(cw({ travelPenalty: 2 }))).toBe(1);
+    expect(weatherRepositionCost(cw({ travelPenalty: 3 }))).toBe(2);
+  });
+
+  it('derives a stat nerf from hostile tags (cold → DEX, fog → WIS)', () => {
+    expect(weatherStatModifiers(cw({ tags: ['cold', 'storm'] }))).toEqual({ dexterity: -1 });
+    expect(weatherStatModifiers(cw({ tags: ['fog', 'mundane'] }))).toEqual({ wisdom: -1 });
+    expect(weatherStatModifiers(cw({ tags: ['clear'] }))).toEqual({});
+  });
+
+  it('a high-corruptionChance custom weather can tick corruption', () => {
+    const player = { hp: 30, hpMax: 30 } as PlayerCharacter;
+    let sawCorruption = false;
+    for (let i = 0; i < 200; i++) {
+      const t = tickWeather(cw({ corruptionChance: 5, tags: ['hazardous'] }), player);
+      if (t.corruptionDelta > 0) { sawCorruption = true; break; }
+    }
+    expect(sawCorruption).toBe(true);
+  });
+
+  it('a benign custom weather (no data) never ticks', () => {
+    const player = { hp: 30, hpMax: 30 } as PlayerCharacter;
+    for (let i = 0; i < 100; i++) {
+      expect(tickWeather(cw({}), player)).toEqual({ hpDelta: 0, staminaDelta: 0, corruptionDelta: 0, line: null });
+    }
   });
 });

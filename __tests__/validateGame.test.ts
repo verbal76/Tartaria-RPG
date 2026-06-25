@@ -5,7 +5,8 @@ import { validateGame, runValidation, summarizeValidation } from '../app/engine/
 import {
   setTableOverride, setMissionsOverride, setCustomBossesOverride, setCustomMainQuestOverride,
   setVendorsOverride, setStartingAreasOverride, setHooksOverride, setSummonsOverride,
-  setWastelandOverride, setDogScenariosOverride, setCustomTitlesOverride, clearAllOverrides,
+  setWastelandOverride, setDogScenariosOverride, setCustomTitlesOverride,
+  setDamageTypesOverride, setDamageResistancesOverride, setCollectablesOverride, clearAllOverrides,
 } from '../app/engine/contentPack';
 
 const errs = () => validateGame().filter((i) => i.severity === 'error');
@@ -139,6 +140,36 @@ describe('validateGame — pre-export reference checks', () => {
     setTableOverride('armor', [{ name: 'Tough Vest', slot: 'chest', rarity: 'Common', tags: [], statBonuses: [{ stat: 'hp', amount: 5 }, { stat: 'strength', amount: 1 }] }]);
     setCustomTitlesOverride([]);
     expect(warnText()).not.toMatch(/stat "hp"|stat "strength"/);
+  });
+
+  it('warns on undefined damage types in weapons and resistances (frost/shock/explosive)', () => {
+    setTableOverride('weapons', [{ name: 'Boomstick', rarity: 'Common', tags: [], damageType: 'explosive', damageDice: '3d6' }]);
+    setDamageResistancesOverride({ 'Ice Wraith': { resist: ['frost'], weak: ['burn'] } } as never);
+    const w = warnText();
+    expect(w).toMatch(/Boomstick.*"explosive"/s);
+    expect(w).toMatch(/Ice Wraith.*resist "frost"/s);
+    expect(w).not.toMatch(/weak "burn"/); // burn is a built-in type
+    // defining the type clears the weapon warning
+    setDamageTypesOverride([{ name: 'explosive', keywords: ['boom'] }] as never);
+    expect(warnText()).not.toMatch(/Boomstick/);
+  });
+
+  it('flags a power coat that is not a real DOT kind (e.g. radiation_coat)', () => {
+    setTableOverride('powers', [{ name: 'Fog Purge', discipline: 'shape', effect: { kind: 'coat_enemies', coating: 'radiation_coat', dmgPerTurn: 4, turns: 3 } }]);
+    expect(errText()).toMatch(/Fog Purge.*radiation_coat.*never ticks/s);
+    setTableOverride('powers', [{ name: 'Fog Purge', discipline: 'shape', effect: { kind: 'coat_enemies', coating: 'corruption_coat', dmgPerTurn: 4, turns: 3 } }]);
+    expect(errs().filter((e) => e.section === 'Powers')).toEqual([]);
+  });
+
+  it('warns on a collectable fragment whose biomeTags match no location', () => {
+    setTableOverride('locations', [{ id: 'town', name: 'Town', tags: ['urban', 'safe'] }]);
+    setCollectablesOverride([{ id: 's', fragments: [
+      { id: 'reachable', biomeTags: ['urban'] },
+      { id: 'stranded', biomeTags: ['conspiracy', 'anomalous'] },
+    ] }]);
+    const w = warnText();
+    expect(w).toMatch(/fragment "stranded".*can never drop/s);
+    expect(w).not.toMatch(/"reachable"/);
   });
 
   it('runValidation returns a structured report (ok=false with errors, counts add up)', () => {

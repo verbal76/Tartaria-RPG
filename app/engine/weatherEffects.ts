@@ -108,14 +108,53 @@ const WEATHER_EFFECTS: Record<
   calm: { prob: 0, build: () => ZERO_TICK },
 };
 
+// engine_Dev — the built-in (tuned) weather ids. ANY weather whose id isn't one of
+// these is treated as AUTHOR weather and driven from its own data fields
+// (visibility / travelPenalty / corruptionChance / tags) so a custom-setting game's
+// weather is mechanically real instead of cosmetic — no need to reuse the built-in
+// ids. Built-in ids keep their exact hand-tuned behavior (these fallbacks never run
+// for them).
+const BUILTIN_WEATHER_IDS = new Set(Object.keys(WEATHER_EFFECTS));
+
+/** Severity proxy from the row's own data: how much it hurts visibility + travel. */
+function weatherSeverity(w: WeatherEntry): number {
+  return Math.max(0, -(w.visibility ?? 0)) + Math.max(0, w.travelPenalty ?? 0);
+}
+function weatherTagged(w: WeatherEntry, re: RegExp): boolean {
+  return (w.tags ?? []).some((t) => re.test(t.toLowerCase()));
+}
+
+/** Data-derived per-action tick for AUTHOR weather (unknown id). Modest by design:
+ *  corruptionChance drives a corruption tick; heavy visibility/travel penalties drain
+ *  stamina; overtly hostile tags chip HP. Narration is lore-neutral (uses the row name). */
+function dataDrivenTick(w: WeatherEntry): WeatherTick {
+  const name = (w.name || 'weather').toLowerCase();
+  const corruptP = Math.min(0.5, Math.max(0, w.corruptionChance ?? 0) * 0.12);
+  const hazardous = weatherTagged(w, /hazard|toxic|radiat|acid|storm|blizzard|fallout|ash/);
+  const r = Math.random();
+  if (corruptP > 0 && r < corruptP) {
+    return { hpDelta: 0, staminaDelta: 0, corruptionDelta: 1, line: `The ${name} works at something in you that should have stayed still.` };
+  }
+  if (weatherSeverity(w) >= 4 && r < 0.25) {
+    return { hpDelta: hazardous ? -1 : 0, staminaDelta: -1, corruptionDelta: 0, line: `The ${name} drags at every step. This action costs you more than it should.` };
+  }
+  if (hazardous && r < 0.15) {
+    return { hpDelta: -1, staminaDelta: 0, corruptionDelta: 0, line: `The ${name} bites exposed skin — a small wound, a steady reminder.` };
+  }
+  return ZERO_TICK;
+}
+
 // Roll the weather's effect on this action. Returns a zero tick if nothing
 // triggered.
 export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacter): WeatherTick {
   if (!weather) return ZERO_TICK;
   const cfg = WEATHER_EFFECTS[weather.id];
-  if (!cfg) return ZERO_TICK;
-  if (Math.random() > cfg.prob) return ZERO_TICK;
-  return cfg.build(player);
+  if (cfg) {
+    if (Math.random() > cfg.prob) return ZERO_TICK;
+    return cfg.build(player);
+  }
+  // Author weather: drive the tick from its own data fields.
+  return dataDrivenTick(weather);
 }
 
 // Iron fog used to block repositioning entirely — playtest showed this
@@ -135,6 +174,8 @@ export function weatherBlocksRepositioning(weather: WeatherEntry | null): boolea
  */
 export function weatherRepositionCost(weather: WeatherEntry | null): number {
   if (!weather) return 1;
+  // Author weather: a heavy travel penalty slows repositioning to 2 turns/band.
+  if (!BUILTIN_WEATHER_IDS.has(weather.id)) return (weather.travelPenalty ?? 0) >= 3 ? 2 : 1;
   if (weather.id === 'iron_fog' || weather.id === 'silent_blizzard') return 2;
   return 1;
 }
@@ -146,6 +187,10 @@ export function weatherRepositionCost(weather: WeatherEntry | null): number {
  */
 export function weatherAttackPenalty(weather: WeatherEntry | null): number {
   if (!weather) return 0;
+  // Author weather: low visibility = harder to land a hit. -visibility/2, capped at 3.
+  if (!BUILTIN_WEATHER_IDS.has(weather.id)) {
+    return Math.max(0, Math.min(3, Math.round(-(weather.visibility ?? 0) / 2)));
+  }
   switch (weather.id) {
     case 'iron_fog': return 2;       // can barely see the target
     case 'whisper_fog': return 1;    // mild visibility loss
@@ -169,14 +214,23 @@ export interface StatModifier {
  * the weather is active. Negative numbers nerf, positive numbers buff.
  * Calm and clear conditions give small positives; hostile weather nerfs
  * the stat the lore says it punishes (Iron Fog → DEX because compasses
- * spin and footing drags; Whisper Fog → WIS because the fog speaks your
- * name in old Tartarian; Etheric Storm → INT bump from Aether
- * resonance, but at the cost of WIS).
+ * spin and footing drags; Whisper Fog → WIS because the fog speaks to you;
+ * Etheric Storm → INT bump from energy resonance, but at the cost of WIS).
+ *
+ * Author weather (unknown id) derives a conservative nerf from its tags, so
+ * a custom-setting game's weather can still bend stats without reusing the
+ * built-in ids.
  *
  * Stacks with race / faction / equipment bonuses in effectiveStats().
  */
 export function weatherStatModifiers(weather: WeatherEntry | null): StatModifier {
   if (!weather) return {};
+  if (!BUILTIN_WEATHER_IDS.has(weather.id)) {
+    // Cold/snow drags footing (DEX); fog/ash/smoke clouds judgement (WIS).
+    if (weatherTagged(weather, /cold|snow|ice|frost|blizzard|sleet|freez/)) return { dexterity: -1 };
+    if (weatherTagged(weather, /fog|mist|smoke|ash|haze|distort|dust/)) return { wisdom: -1 };
+    return {};
+  }
   switch (weather.id) {
     case 'iron_fog':         return { dexterity: -1 };
     case 'silent_blizzard':  return { dexterity: -1, strength: -1 };
