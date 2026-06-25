@@ -562,7 +562,7 @@ export function ExplorationScreen() {
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
-          {inCombat ? (
+          {arenaActive ? (
             <EnemyPanel
               enemies={enemyViews}
               activeIndex={activeIdx}
@@ -571,6 +571,9 @@ export function ExplorationScreen() {
               fill={arenaActive}
             />
           ) : (
+            // Once the fight is over (last foe dead or knocked out) the top-right
+            // reverts to the crest, exactly as it was before combat — the KO'd body
+            // is still lootable via the "loot" button in the input row.
             <CrestPlaceholder />
           )}
           {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.

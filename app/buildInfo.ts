@@ -16087,4 +16087,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // KO'd) via `arenaActive`; the moment the last foe is down the screen collapses back to
 // the peaceful layout. `inCombat` still drives the controls + enemy panel so the "loot"
 // button and the downed body stay on screen. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-858';
+//
+// engine_Dev-859 — follow-up to 858: the TOP-RIGHT corner now also reverts. The
+// enemy panel render was still gated on enemy presence (inCombat), so a KO'd foe kept
+// the panel up after the fight; it now follows `arenaActive` too, so the crest returns
+// the instant the last foe is down — exactly as the corner looked before combat. The
+// KO'd body stays lootable via the "loot" button in the input row. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-859';
