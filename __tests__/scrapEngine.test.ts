@@ -1,6 +1,6 @@
 // Scrap engine — disassemble built items into stock materials.
 
-import { canScrap, scrapOutputFor } from '../app/engine/scrapEngine';
+import { canScrap, scrapOutputFor, hasTagScrapOutput, isStockMaterial, randomMaterialScrap } from '../app/engine/scrapEngine';
 import type { InventoryItem } from '../app/engine/types';
 
 function mk(name: string, kind: InventoryItem['kind'], tags: string[] = []): InventoryItem {
@@ -26,8 +26,36 @@ describe('canScrap', () => {
     expect(canScrap(mk('Aetheric Shard', 'misc', ['aether', 'crystal']))).toBe(false);
   });
 
-  it('refuses consumables', () => {
-    expect(canScrap(mk('Trail Rations', 'consumable'))).toBe(false);
+  it('refuses quest-bound items', () => {
+    expect(canScrap(mk('Sealed Crate', 'misc', ['quest']))).toBe(false);
+  });
+
+  // engine_Dev — unrecognized items (consumables, plain misc) no longer dead-end
+  // at "nothing to break down"; they scrap into a random material from the pool.
+  it('accepts unrecognized items (consumables / plain misc) so they never dead-end', () => {
+    expect(canScrap(mk('Trail Rations', 'consumable'))).toBe(true);
+    expect(canScrap(mk('Mystery Object', 'misc', []))).toBe(true);
+    // These have NO tag-driven output — they take the random-material path.
+    expect(hasTagScrapOutput(mk('Trail Rations', 'consumable'))).toBe(false);
+    expect(hasTagScrapOutput(mk('Mystery Object', 'misc', []))).toBe(false);
+  });
+});
+
+describe('engine_Dev — stock-material guard + random-material fallback', () => {
+  it('isStockMaterial flags real pool materials, not gear', () => {
+    expect(isStockMaterial(mk('Scrap Metal', 'misc', ['metal']))).toBe(true);
+    expect(isStockMaterial(mk('Rusted Blade', 'weapon'))).toBe(false);
+    expect(isStockMaterial(mk('Trail Rations', 'consumable'))).toBe(false);
+  });
+
+  it('randomMaterialScrap pulls a REAL name from the materials pool (never invented)', () => {
+    const out = randomMaterialScrap();
+    expect(out.grants.length).toBe(1);
+    expect(out.grants[0]!.quantity).toBe(1);
+    // The picked name must be a genuine, non-empty material name.
+    expect(typeof out.grants[0]!.name).toBe('string');
+    expect(out.grants[0]!.name.length).toBeGreaterThan(0);
+    expect(out.summary).toBe(out.grants[0]!.name);
   });
 });
 

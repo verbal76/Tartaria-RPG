@@ -203,6 +203,8 @@ import { consumeVerb } from '../engine/consumeVerb';
 import {
   canScrap,
   scrapOutputFor,
+  hasTagScrapOutput,
+  randomMaterialScrap,
   repairCostMaterials,
   scrapSuccessChance,
   scrapHasSecondChance,
@@ -2639,7 +2641,7 @@ interface GameStore {
   useInventoryItem: (itemName: string) => void;
   /** Disassemble a built item (weapon / armor / relic / built gear)
    *  into stock materials via scrapEngine. Refuses raw materials. */
-  scrapInventoryItem: (itemName: string) => void;
+  scrapInventoryItem: (itemName: string, opts?: { silent?: boolean }) => void;
   /** OTA-194 — toggle the heart/reserve flag on an inferred item. Only
    *  inferred items (catalog-absent) can be reserved; the UI gates the
    *  tap on `isInferredItem`. Reserved items are excluded from the
@@ -20728,18 +20730,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
   },
 
-  scrapInventoryItem(itemName) {
+  scrapInventoryItem(itemName, opts) {
+    const silent = opts?.silent === true;
     const player = get().player;
     if (!player) return;
     const item = player.inventory.find(
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
+      if (!silent) get().appendLog('arbiter', `The ${getNarratorName()} glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
     if (!canScrap(item)) {
-      get().appendLog('arbiter', `The ${getNarratorName()} taps the ${item.name}. "Nothing here to break down — it already IS stock material."`);
+      // Quest items are bound; genuine raw materials already ARE stock. Everything
+      // else is scrappable now (unrecognized items roll a random material below).
+      if (!silent) {
+        const bound = (item.tags ?? []).includes('quest');
+        const refusal = bound
+          ? `"That one's bound to you — it doesn't go to the forge."`
+          : `"Nothing here to break down — it already IS stock material."`;
+        get().appendLog('arbiter', `The ${getNarratorName()} taps the ${item.name}. ${refusal}`);
+      }
       return;
     }
     // OTA-058 — auto-unequip on scrap intent. The pre-OTA refusal
@@ -20784,7 +20795,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       usedSecondChance = true;
       rolled = Math.random() < successP;
     }
-    const fullOutput = scrapOutputFor(item);
+    // Recognized gear → tag-driven output; an UNRECOGNIZED item rolls a single
+    // random material from the pool (real names only — see randomMaterialScrap).
+    const fullOutput = hasTagScrapOutput(item) ? scrapOutputFor(item) : randomMaterialScrap();
     let output: typeof fullOutput | null;
     if (rolled) {
       output = fullOutput;
@@ -20841,14 +20854,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return { player: { ...s.player, inventory: newInventory } };
     });
     if (rolled && output) {
-      // Clean salvage — full output landed.
-      if (usedSecondChance) {
+      // Clean salvage — full output landed. (Per-unit narration is suppressed
+      // during a bulk scrap; the caller emits a single aggregated summary.)
+      if (!silent && usedSecondChance) {
         get().appendLog(
           'world',
           `The first pass on the ${item.name} crumbles in your hands — but your training kicks in. You stop, breathe, change angle, and try again.`,
         );
       }
-      get().appendLog('world', `You break the ${item.name} down. ✦ Recovered: ${output.summary}.`);
+      if (!silent) get().appendLog('world', `You break the ${item.name} down. ✦ Recovered: ${output.summary}.`);
       // OTA 23-014 — train INT on a successful salvage. Engineering
       // hands learn from clean disassembly, not from wrecking it.
       // OTA-058 — only full-success rolls train INT, not the
@@ -20868,9 +20882,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-058 — failure roll with the min-tier consolation grant.
       // Narrate the messy break + the salvaged remnant in one beat
       // so the player sees both the failure flavor AND the small yield.
-      get().appendLog('world', pickScrapFailureLine(item.name));
-      get().appendLog('world', `✦ Salvaged from the wreckage: ${output.summary}.`);
-    } else {
+      if (!silent) {
+        get().appendLog('world', pickScrapFailureLine(item.name));
+        get().appendLog('world', `✦ Salvaged from the wreckage: ${output.summary}.`);
+      }
+    } else if (!silent) {
       // Belt-and-suspenders branch — scrapOutputFor always returns
       // ≥1 grant via fallback, but if a future change ever breaks
       // that, surface the original failure narration.
