@@ -150,16 +150,54 @@ export interface VendorInstance {
 
 export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;
 
-/** The live vendor pool: the author's uploaded vendors override when present, else the
- *  built-in pool. Rows missing required fields are dropped so a bad upload can't crash
- *  the spawner. */
-export function getActiveVendors(): VendorTemplate[] {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const cp = require('./contentPack') as typeof import('./contentPack');
-  // author override → installed GENERIC default → built-in Tartaria pool.
-  const ov = cp.getVendorsOverride() ?? cp.getGenericVendors();
-  if (!ov || ov.length === 0) return VENDORS;
-  return ov.filter(
+// ── Data-driven generic storefront (engine_Dev) ─────────────────────
+// Five SETTING-NEUTRAL vendors whose wares are SAMPLED from the LOADED catalogs
+// (resolveTable weapons/armor/gear/materials) at spawn time — so they only ever
+// sell items that exist in THIS game. No hardcoded item names, no dangling refs
+// (the failure mode the old hardcoded GENERIC_VENDORS had). They restock — i.e.
+// re-sample — each time the pool is built, so the same vendor offers vary per
+// encounter. faction:null → they can roll on any tile during travel.
+interface CatRow { name: string; rarity?: string; tags?: string[]; tc?: number; tcBuy?: number; kind?: string }
+const RARITY_PRICE: Record<string, number> = { common: 12, uncommon: 35, rare: 80, epic: 160, legendary: 300 };
+function priceFor(it: CatRow): number {
+  const tc = typeof it.tcBuy === 'number' ? it.tcBuy : typeof it.tc === 'number' ? it.tc : null;
+  if (tc != null) return Math.max(2, Math.round(tc));
+  return RARITY_PRICE[(it.rarity ?? 'common').toLowerCase()] ?? 15;
+}
+function sampleRows(rows: CatRow[], n: number): CatRow[] {
+  const pool = rows.filter((r) => r && typeof r.name === 'string' && r.name.trim());
+  if (pool.length <= n) return pool.slice();
+  const picked: CatRow[] = []; const used = new Set<number>(); let safety = 0;
+  while (picked.length < n && used.size < pool.length && safety++ < 200) {
+    const i = Math.floor(Math.random() * pool.length);
+    if (used.has(i)) continue; used.add(i); picked.push(pool[i]!);
+  }
+  return picked;
+}
+function offersFrom(rows: CatRow[], n: number): VendorOffer[] {
+  return sampleRows(rows, n).map((it) => ({ itemName: it.name, price: priceFor(it), quantity: rollOfferQuantity(it.name) }));
+}
+/** Five generic vendors built from the effective item catalogs. Empty tables are
+ *  skipped, so a game with (say) no materials simply has no Supplier. */
+export function buildGenericStorefront(): VendorTemplate[] {
+  const weapons = resolveTable('weapons', BUILTIN_WEAPONS) as CatRow[];
+  const armor = resolveTable('armor', BUILTIN_ARMOR) as CatRow[];
+  const gear = resolveTable('gear', BUILTIN_GEAR) as CatRow[];
+  const materials = resolveTable('materials', BUILTIN_MATERIALS) as CatRow[];
+  const consumables = gear.filter((g) => g.kind === 'consumable' || (g.tags ?? []).some((t) => ['food', 'medical', 'heal', 'drink', 'consumable'].includes(t)));
+  const supplies = consumables.length ? consumables : gear;
+  const v: VendorTemplate[] = [];
+  if (weapons.length) v.push({ id: 'gen_weaponsmith', name: 'the Weaponsmith', title: 'Arms Dealer', faction: null, description: 'Deals in weapons of every make. Buys blades, sells worse ones for more.', offers: offersFrom(weapons, 6) });
+  if (armor.length) v.push({ id: 'gen_armorer', name: 'the Armorer', title: 'Armorer', faction: null, description: 'Plates, vests, and whatever will keep you breathing a little longer.', offers: offersFrom(armor, 6) });
+  if (supplies.length) v.push({ id: 'gen_quartermaster', name: 'the Quartermaster', title: 'Quartermaster', faction: null, description: 'Field supplies — rations, kits, and the small things that save a life.', offers: offersFrom(supplies, 6) });
+  if (materials.length) v.push({ id: 'gen_supplier', name: 'the Supplier', title: 'Materials Supplier', faction: null, description: 'Raw stock and crafting components by the crate.', offers: offersFrom(materials, 8) });
+  const mixed = [...offersFrom(weapons, 2), ...offersFrom(armor, 2), ...offersFrom(supplies, 2), ...offersFrom(materials, 2)];
+  if (mixed.length) v.push({ id: 'gen_trader', name: 'the Trader', title: 'Travelling Trader', faction: null, description: 'Carries a bit of everything and an opinion on all of it.', offers: mixed });
+  return v;
+}
+
+function cleanVendorList(list: unknown): VendorTemplate[] {
+  return (Array.isArray(list) ? list : []).filter(
     (v): v is VendorTemplate =>
       !!v && typeof v === 'object' &&
       typeof (v as VendorTemplate).name === 'string' &&
@@ -167,10 +205,32 @@ export function getActiveVendors(): VendorTemplate[] {
   );
 }
 
+/** The live vendor pool. FEATURES toggle off → no vendors at all. Otherwise:
+ *  author override REPLACES the generic storefront (default) or is APPENDED to it
+ *  (vendorsAppendGeneric); with no author vendors a custom/generic game uses the
+ *  data-driven storefront, while the built-in Tartaria game keeps its authored pool. */
+export function getActiveVendors(): VendorTemplate[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('./contentPack') as typeof import('./contentPack');
+  if (!cp.isVendorsEnabled()) return []; // vendors switched off
+  const ov = cleanVendorList(cp.getVendorsOverride());
+  if (ov.length > 0) {
+    return cp.isVendorsAppendGeneric() ? [...ov, ...buildGenericStorefront()] : ov;
+  }
+  // No author vendors: generic pack installed (a custom game) → data-driven storefront;
+  // otherwise (stock Tartaria) → the built-in authored pool.
+  if (cp.getGenericVendors() != null) {
+    const generic = buildGenericStorefront();
+    return generic.length > 0 ? generic : VENDORS;
+  }
+  return VENDORS;
+}
+
 // Random vendor pick. Used when a peaceful scene rolls a vendor encounter.
 // Returns a fresh VendorInstance (mutable offers, decoupled from template).
 export function pickRandomVendor(): VendorInstance {
-  const pool = getActiveVendors();
+  const active = getActiveVendors();
+  const pool = active.length > 0 ? active : VENDORS; // vendors-off pools are empty; never index undefined
   const v = pool[Math.floor(Math.random() * pool.length)]!;
   return {
     id: v.id,

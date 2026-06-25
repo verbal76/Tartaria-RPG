@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, resolveTable, resolveFlavor } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -4543,7 +4543,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
           // OTA-411 — a capital never falls to the roadside roll; it always
           // gets a NAMED vendor below. Only NON-capital outdoor tiles roll roadside.
-          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? pickRoadsideTrader() : null);
+          : (isVendorsEnabled() && !hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? pickRoadsideTrader() : null);
       // OTA-410/411 — capital named-vendor greeting. RNG-rolled which non-defeated
       // VENDORS entry arrives, re-rolled each arrival (intended). Always fires at a
       // capital (the roadside roll above is suppressed there), so a capital begin-
@@ -18258,7 +18258,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — gate on tileIsNovel (like the wasteland-encounter roll). Without
       // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
       // stock). Now a stall only appears on ground you haven't just walked.
-      if (outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
+      if (isVendorsEnabled() && outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
         const stall = pickRoadsideTrader();
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(

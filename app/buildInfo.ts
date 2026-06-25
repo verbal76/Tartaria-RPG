@@ -16193,4 +16193,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inert / unknownfield / buffstat / buffpartial). The GEAR template note now enumerates the real
 // fields (healHP/restoreStamina/buffStat+buffBonus+buffDuration/curePoison/…). Engine-side error
 // surfacing + template doc only — no engine behavior bent to content, no content edited. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-872';
+// OTA-873 — data-driven generic vendors + vendorsEnabled / vendorsAppendGeneric toggles. The five
+// generic vendors (Weaponsmith/Armorer/Quartermaster/Supplier/Trader) are now SAMPLED from the
+// loaded weapons/armor/gear/materials at spawn, so they only sell items that exist — no hardcoded
+// names, no dangling refs (the old GENERIC_VENDORS pointed at "Trail Rations" etc.). vendorsEnabled
+// off → no merchants spawn (hub/capital/roadside). vendorsAppendGeneric → an uploaded Vendors table
+// ADDS to the generic five instead of replacing them. Generic demo hub anchor retargeted from the
+// retired "Quartermaster Vael" to the storefront's "the Quartermaster". Full toggle plumbing +
+// dev-console cards + whole-game template entries. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-873';

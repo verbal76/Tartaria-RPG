@@ -88,7 +88,7 @@ const room = (id: string, name: string, desc: string, exits: Record<string, stri
 const baseRooms = (areaName: string) => [
   room('yard', 'Yard', `The open yard of ${areaName}. The way in and out, and the board where work is posted.`, { north: 'hall', east: 'store' }, true),
   room('hall', 'Hall', 'A long common hall — a fire, a table, low talk.', { south: 'yard' }, false),
-  room('store', 'Store', 'Shelves of crates and spare kit. A quartermaster keeps the counter.', { west: 'yard' }, false, 'Quartermaster Vael'),
+  room('store', 'Store', 'Shelves of crates and spare kit. A quartermaster keeps the counter.', { west: 'yard' }, false, 'the Quartermaster'),
 ];
 
 // Named traders for the generic game — the hub anchor ("Quartermaster Vael") plus a
