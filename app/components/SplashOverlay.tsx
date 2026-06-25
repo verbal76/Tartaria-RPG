@@ -31,8 +31,8 @@ export function SplashOverlay() {
   // art ~90% of screen width = "too big"). Cap to a fraction of BOTH width and height, keep the
   // poster's aspect, and centre it slightly above middle so the loading bar sits clearly below it.
   const aspect = SPLASH_H / SPLASH_W; // height / width
-  const maxW = winW * 0.84; // +50% from 0.56
-  const maxH = winH * 0.81; // +50% from 0.54
+  const maxW = winW * 0.966; // +50% (→0.84) then +15% (→0.966)
+  const maxH = winH * 0.932; // +50% (→0.81) then +15% (→0.932)
   let posterW = maxW;
   let posterH = maxW * aspect;
   if (posterH > maxH) { posterH = maxH; posterW = maxH / aspect; }
