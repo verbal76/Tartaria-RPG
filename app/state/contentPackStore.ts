@@ -117,6 +117,30 @@ export function stripJsonComments(src: string): string {
   return out;
 }
 
+/** engine_Dev — ROUND-TRIP GUARD. The annotated whole-game export bakes the TEMPLATE scaffold into
+ *  every section the author hasn't customized (the ⬜ blocks), and the ⬜/✅ markers are comments
+ *  (stripped on load). Without this, loading such a file — or hydrating a state persisted from one —
+ *  promotes those un-customized templates into real overrides, so the placeholder vendors
+ *  ("Maren the Trader" selling items the custom catalog lacks), roadside traders, etc. reappear every
+ *  round. Drop any top-level section whose value still equals its template → treated as "not uploaded"
+ *  → the built-in/generic default is used. Mutates `obj`; returns the removed keys. */
+function dropBakedTemplateSections(obj: Record<string, unknown>): string[] {
+  const removed: string[] = [];
+  try {
+    const tmpl = bundleTemplateMap();
+    for (const [key, content] of Object.entries(tmpl)) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+      let tmplVal: unknown;
+      try { tmplVal = JSON.parse(stripJsonComments(content)); } catch { continue; }
+      if (JSON.stringify(obj[key]) === JSON.stringify(tmplVal)) {
+        delete obj[key];
+        removed.push(key);
+      }
+    }
+  } catch { /* template map unavailable — proceed without the guard */ }
+  return removed;
+}
+
 interface PersistShape {
   tables: Partial<Record<ContentTableId, unknown[]>>;
   lore: Partial<Record<LoreBlockId, unknown>>;
@@ -1381,25 +1405,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     }
     const obj = parsed as Record<string, unknown>;
 
-    // engine_Dev — ROUND-TRIP GUARD. The annotated export bakes the TEMPLATE scaffold into every
-    // section the author hasn't uploaded (the ⬜ blocks), and the ⬜/✅ markers are comments, stripped
-    // on load. Without this, re-uploading your own export promotes those un-customized templates into
-    // real overrides — e.g. the placeholder vendors ("Maren the Trader" selling items your catalog
-    // doesn't have) reappear every round. Drop any section whose value still equals its template, so
-    // a baked scaffold is treated as "not uploaded" → the built-in/generic default is used instead.
-    const skippedTemplateSections: string[] = [];
-    try {
-      const tmpl = bundleTemplateMap();
-      for (const [key, content] of Object.entries(tmpl)) {
-        if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
-        let tmplVal: unknown;
-        try { tmplVal = JSON.parse(stripJsonComments(content)); } catch { continue; }
-        if (JSON.stringify(obj[key]) === JSON.stringify(tmplVal)) {
-          delete obj[key];
-          skippedTemplateSections.push(key);
-        }
-      }
-    } catch { /* template map unavailable — proceed without the guard */ }
+    // engine_Dev — ROUND-TRIP GUARD (see dropBakedTemplateSections). Drop any section whose value
+    // still equals its un-customized template so a re-uploaded export doesn't promote the template
+    // scaffold (e.g. the placeholder vendors) into a broken override.
+    const skippedTemplateSections = dropBakedTemplateSections(obj);
 
     const tableIds = new Set<string>(CONTENT_TABLES.map((t) => t.id));
     const loreIds = new Set<string>(LORE_BLOCKS.map((b) => b.id));
@@ -1856,6 +1865,10 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (raw) {
         const shape = JSON.parse(raw) as PersistShape;
+        // engine_Dev — self-heal: a state persisted from a re-uploaded annotated export may carry
+        // baked template sections (e.g. the placeholder vendors). Drop any that still equal their
+        // template so they revert to the default on this launch — no manual re-upload needed.
+        dropBakedTemplateSections(shape as unknown as Record<string, unknown>);
         const tables = shape.tables ?? {};
         const lore = shape.lore ?? {};
         // Mirror into the registry so the engine reads the override immediately.

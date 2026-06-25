@@ -16225,4 +16225,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // now drops any section whose value still equals its template (via bundleTemplateMap) → treated as
 // "not uploaded" → built-in/generic default. An all-template (blank) bundle still loads OK. Load-path
 // only — no content edited. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-876';
+// OTA-877 — round-trip guard now SELF-HEALS on launch. OTA-876 stripped baked template sections on
+// bundle UPLOAD, but a state already persisted from a bad re-upload still carried them — so updating
+// the app without re-uploading left the placeholder vendors in place. The strip (dropBakedTemplate-
+// Sections, shared by loadGameBundle + hydrate) now also runs on hydrate, so the next launch drops
+// any persisted section that still equals its template → reverts to the default with no re-upload.
+// Load/hydrate path only — no content edited. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-877';
