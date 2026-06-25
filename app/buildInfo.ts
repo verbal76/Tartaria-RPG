@@ -16201,4 +16201,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ADDS to the generic five instead of replacing them. Generic demo hub anchor retargeted from the
 // retired "Quartermaster Vael" to the storefront's "the Quartermaster". Full toggle plumbing +
 // dev-console cards + whole-game template entries. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-873';
+// OTA-874 — Validate Game now checks RESOLVED content + flags template placeholders. Several
+// reference checks read override-only getters, so OMITTING a section silenced the validator while
+// runtime fell back to the installed GENERIC default — which could reference items/factions the
+// author's catalog replaced. Hooks, Wasteland, Summons, and Dog scenarios now validate the resolved
+// (override → generic) content (they return null when no generic is installed, so no built-in-Tartaria
+// flood). Vendors/roadside stay override-only because OTA-873 made their generic fallback data-driven
+// (always valid). New section.placeholder check: any loaded section still carrying a "REPLACE-…"
+// placeholder (template scaffolding promoted to a real override on a bundle round-trip) is flagged
+// to customize or delete. Validation only — no content edited. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-874';

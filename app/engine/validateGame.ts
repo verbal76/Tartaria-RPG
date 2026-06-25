@@ -5,7 +5,7 @@
 // effect verbs, and duplicate ids. Errors = will break play; warnings = soft; info = FYI. Pure reads
 // through the content-pack resolvers, so it validates the EFFECTIVE game that will ship.
 
-import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride, getDiggingOverride, getSalvageOverride, resolveFlavor } from './contentPack';
+import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, getGenericHooks, resolveWhispers, getSummonsOverride, resolveSummons, getWastelandOverride, getGenericWasteland, getDogScenariosOverride, resolveDogScenarios, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride, getDiggingOverride, getSalvageOverride, resolveFlavor } from './contentPack';
 import { getFactions } from './character';
 import { findCatalogItem, getDogGear } from './crafting';
 import locationsBuiltin from '../data/locations/locations.json';
@@ -105,13 +105,13 @@ export function validateGame(): ValidationIssue[] {
   { const dig = getDiggingOverride() as { loot?: unknown[] } | null; if (dig) for (const l of rows(dig.loot)) addLoot(l.name); } // digging
   { const sal = getSalvageOverride() as { pools?: { items?: unknown[] }[]; junkPool?: unknown[] } | null; // salvage pools + junk
     if (sal) { for (const p of (Array.isArray(sal.pools) ? sal.pools : [])) for (const it of rows(p?.items)) addLoot(it.name); for (const it of rows(sal.junkPool)) addLoot(it.name); } }
-  { const waste = getWastelandOverride() as Record<string, { loot?: unknown }> | null;                 // travel-encounter loot (string[] or {name}[])
+  { const waste = (getWastelandOverride() ?? getGenericWasteland()) as Record<string, { loot?: unknown }> | null; // travel-encounter loot (RESOLVED: override → generic fallback)
     if (waste) for (const arch of Object.values(waste)) addLootList(arch?.loot); }
-  { const hk = getHooksOverride(); if (hk?.chains) for (const stages of Object.values(hk.chains)) for (const st of rows(stages)) for (const ef of rows(st.effects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); } // hook grants
+  { const hk = getHooksOverride() ?? getGenericHooks(); if (hk?.chains) for (const stages of Object.values(hk.chains)) for (const st of rows(stages)) for (const ef of rows(st.effects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); } // hook grants (resolved)
   for (const w of rows(resolveWhispers([]))) { for (const ef of rows(w.meetEffects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); for (const st of rows(w.stages)) for (const ef of rows(st.effects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); } // whisper grants
-  for (const v of rows(getVendorsOverride())) for (const o of rows(v.offers)) addLoot(o.itemName);      // vendor offers (buyable)
-  for (const v of rows(getRoadsideOverride())) for (const o of rows(v.pool)) addLoot(o.itemName);       // roadside stall
-  for (const d of rows(getDogScenariosOverride())) addLootList(d.captorLoot);                            // dog-captor loot
+  for (const v of rows(getVendorsOverride())) for (const o of rows(v.offers)) addLoot(o.itemName);      // vendor offers (override; generic fallback is data-driven from the catalog → already valid)
+  for (const v of rows(getRoadsideOverride())) for (const o of rows(v.pool)) addLoot(o.itemName);       // roadside stall (override)
+  for (const d of rows(resolveDogScenarios([]))) addLootList(d.captorLoot);                              // dog-captor loot (resolved)
   for (const q of rows(resolveMissions('factionQuests', []))) { const rw = q.reward as { items?: unknown } | undefined; addLootList(rw?.items); } // quest rewards
   for (const k of ['hunts', 'mysteries', 'storylines'] as const) for (const m of rows(resolveMissions(k, []))) addLoot(m.rewardItem);
   for (const s of rows(getCustomMainQuest()?.steps)) addLoot(s.reward);                                  // main-quest step rewards
@@ -234,7 +234,7 @@ export function validateGame(): ValidationIssue[] {
       if (type === 'rep_change' && !factionIds.has(str(e.factionId) ?? '')) warn('effect.faction.missing', section, `${who} changes rep with "${str(e.factionId) ?? '?'}", which isn't a defined faction.`, { id: str(e.factionId) ?? undefined });
     }
   };
-  const hooks = getHooksOverride();
+  const hooks = getHooksOverride() ?? getGenericHooks();
   if (hooks?.chains) {
     for (const [hookId, stages] of Object.entries(hooks.chains)) {
       for (const stage of rows(stages)) checkEffects('Hooks', `Hook "${hookId}"`, stage.effects);
@@ -247,7 +247,7 @@ export function validateGame(): ValidationIssue[] {
   }
 
   // 9) Summoned sidekicks: fuel must be real items.
-  const summons = getSummonsOverride();
+  const summons = resolveSummons();
   for (const def of rows(summons?.defs)) {
     for (const f of rows(def.fuel)) {
       if (!itemExists(f.name)) err('summon.fuel.missing', 'Summoned sidekicks', `Sidekick "${str(def.name) ?? '?'}" needs fuel "${str(f.name) ?? '?'}", which isn't a known item.`, { id: str(f.name) ?? undefined });
@@ -255,7 +255,7 @@ export function validateGame(): ValidationIssue[] {
   }
 
   // 10) Wasteland encounters: enemyPool names must exist in the Enemies table.
-  const wasteland = getWastelandOverride();
+  const wasteland = getWastelandOverride() ?? getGenericWasteland();
   if (wasteland) {
     for (const [archId, arch] of Object.entries(wasteland)) {
       const pool = arch && typeof arch === 'object' ? (arch as Record<string, unknown>).enemyPool : null;
@@ -351,7 +351,7 @@ export function validateGame(): ValidationIssue[] {
   }
 
   // 16) Dog-rescue scenarios: captorFactionId must be a real faction id (or null = unaligned).
-  for (const d of rows(getDogScenariosOverride())) {
+  for (const d of rows(resolveDogScenarios([]))) {
     const cf = d.captorFactionId;
     if (cf != null && !(typeof cf === 'string' && factionIds.has(cf))) err('dog.faction.invalid', 'Dog scenarios', `Dog scenario "${str(d.id) ?? '?'}" has captorFactionId "${String(cf)}", which isn't a defined faction id — the "never fight your own faction" protection won't work. Use a real faction id, or null for the one unaligned fallback.`, { id: typeof cf === 'string' ? cf : undefined });
   }
@@ -408,6 +408,29 @@ export function validateGame(): ValidationIssue[] {
   // 11) Completeness nudges.
   if (rows(resolveTable('races', [])).length === 0) warn('tables.races.empty', 'Tables', 'No Races uploaded — character creation will use the bland generic races.');
   if (rows(resolveTable('factions', [])).length === 0) warn('tables.factions.empty', 'Tables', 'No Factions uploaded — character creation will use the bland generic factions.');
+
+  // 20) Un-customized TEMPLATE detection. A loaded section that still carries a "REPLACE-…"
+  // placeholder is template scaffolding promoted to a real override (e.g. exporting the annotated
+  // whole-game bundle then re-uploading it turns the 9 un-customized sections into active overrides),
+  // so it ships broken refs like faction "REPLACE-with-a-faction-id". Flag each so the author
+  // customizes it or DELETES the section (→ built-in default).
+  const placeholderScan: Array<[string, unknown]> = [
+    ['Vendors', getVendorsOverride()], ['Roadside traders', getRoadsideOverride()],
+    ['Hooks', getHooksOverride()], ['Wasteland', getWastelandOverride()],
+    ['Summoned sidekicks', getSummonsOverride()], ['Dog scenarios', getDogScenariosOverride()],
+    ['Collectables', getCollectablesOverride()], ['Digging', getDiggingOverride()],
+    ['Salvage', getSalvageOverride()], ['Bosses', getCustomBosses()],
+    ['Main quest', getCustomMainQuest()], ['Starting areas', getStartingAreas()],
+  ];
+  for (const t of CONTENT_TABLES) placeholderScan.push([t.label, resolveTable(t.id, [])]);
+  const seenPlaceholder = new Set<string>();
+  for (const [label, content] of placeholderScan) {
+    if (!content || seenPlaceholder.has(label)) continue;
+    if (JSON.stringify(content).includes('REPLACE-')) {
+      seenPlaceholder.add(label);
+      warn('section.placeholder', label, `${label} still contains a "REPLACE-…" template placeholder — this section is un-customized template scaffolding (it ships broken references). Customize it, or DELETE the section so the built-in default is used.`);
+    }
+  }
 
   // Dedupe identical issues. A few checks can surface the SAME finding twice — e.g. an item that
   // carries a perk in both `statBonus` (singular) and `statBonuses` (plural) gets the same
