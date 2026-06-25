@@ -16067,4 +16067,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // instant the app leaves the foreground (audio can't outlive it; staysActiveInBackground is false)
 // and resyncs the controller to the log tail so the saved backlog isn't re-spoken on return.
 // Regression test: __tests__/ttsBackgroundTeardown.test.ts. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-855';
+//
+// engine_Dev-856 — hide the main-quest / objective chip during combat. It's
+// out-of-combat navigation; over a live arena it was just clutter. Suppressed
+// while enemies are present (inCombat) on ExplorationScreen; returns the instant
+// the fight ends. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-856';

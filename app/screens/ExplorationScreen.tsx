@@ -640,6 +640,10 @@ export function ExplorationScreen() {
           the 'ended' phase (no live quest to point at). */}
       {(() => {
         if (!player) return null;
+        // The main-quest / objective chip is out-of-combat navigation; during a
+        // fight it's just clutter over the arena, so suppress it while enemies
+        // are present (the chip returns the moment combat ends).
+        if (inCombat) return null;
         // engine_Dev — a DATA-DRIVEN main quest (uploaded, or the generic default)
         // drives the chip. The built-in Tartaria main quest was removed.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
