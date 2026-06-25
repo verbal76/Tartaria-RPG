@@ -16187,4 +16187,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // identical warnings, burying the report (209 warnings for ~38 real materials). Now it's one line
 // per material with a "needed by N recipe(s)" note — the count reflects the real punch-list. The
 // fix is per-material anyway (define once → all recipes work). Validation only — no content. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-871';
+// OTA-872 — surface inert consumable effects + document the effect schema. A gear/exploration item
+// whose `effect` block uses fields the eat/use handler doesn't read (e.g. {stat,amount,duration})
+// passes the existence check but is silently dead on use — the validator now warns (item.effect.
+// inert / unknownfield / buffstat / buffpartial). The GEAR template note now enumerates the real
+// fields (healHP/restoreStamina/buffStat+buffBonus+buffDuration/curePoison/…). Engine-side error
+// surfacing + template doc only — no engine behavior bent to content, no content edited. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-872';
