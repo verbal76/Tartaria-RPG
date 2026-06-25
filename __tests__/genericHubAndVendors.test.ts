@@ -45,7 +45,9 @@ describe('engine_Dev — generic game hub + vendors', () => {
   it('FIX #2: the generic game supplies its own vendors (no Tartaria fallback)', () => {
     expect(getGenericVendors()).toBeTruthy();
     const names = getActiveVendors().map((v) => v.name);
-    expect(names).toContain('Quartermaster Vael');   // the hub anchor
+    // engine_Dev — the generic vendor pool is now the five data-driven storefront vendors,
+    // stocked live from the loaded catalogs. The hub anchor resolves to "the Quartermaster".
+    expect(names).toContain('the Quartermaster');     // the hub anchor (data-driven storefront)
     expect(names).not.toContain('Tellin Mak');        // a built-in Tartaria vendor
   });
 

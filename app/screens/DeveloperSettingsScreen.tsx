@@ -164,6 +164,11 @@ function GameIdentitySection() {
   const setCrucibleEnabledFn = useContentPackStore((s) => s.setCrucibleEnabled);
   const weatherEnabled = useContentPackStore((s) => s.weatherEnabled);
   const setWeatherEnabledFn = useContentPackStore((s) => s.setWeatherEnabled);
+  const vendorsEnabled = useContentPackStore((s) => s.vendorsEnabled);
+  const setVendorsEnabledFn = useContentPackStore((s) => s.setVendorsEnabled);
+  const vendorsAppendGeneric = useContentPackStore((s) => s.vendorsAppendGeneric);
+  const setVendorsAppendGenericFn = useContentPackStore((s) => s.setVendorsAppendGeneric);
+  const hasVendorsOverride = useContentPackStore((s) => s.vendors.length > 0);
   const worldName = useContentPackStore((s) => s.worldName);
   const setWorldName = useContentPackStore((s) => s.setWorldName);
   const corruptionName = useContentPackStore((s) => s.corruptionName);
@@ -296,6 +301,47 @@ function GameIdentitySection() {
             {weatherEnabled ? '✓ WEATHER ENABLED — tap to DISABLE' : '✕ DISABLED — tap to ENABLE'}
           </Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Vendors</Text>
+          <Text style={vendorsEnabled ? styles.badgeOn : styles.badgeOff}>
+            {vendorsEnabled ? '● on' : '○ disabled'}
+          </Text>
+        </View>
+        <Text style={styles.hint}>
+          Merchants the player meets — hub anchors, capital traders, and roadside stalls that roll
+          in during travel. With no Vendors uploaded, the game spawns five setting-neutral generic
+          vendors (Weaponsmith, Armorer, Quartermaster, Supplier, Trader) whose stock is pulled
+          live from YOUR weapons / armor / gear / materials, so they only ever sell items that
+          exist. Turn this off for a game with no merchants at all. Also settable per game as
+          “vendorsEnabled”: false in JSON.
+        </Text>
+        <TouchableOpacity
+          style={[styles.applyBtn, !vendorsEnabled && styles.resetBtn]}
+          onPress={() => setVendorsEnabledFn(!vendorsEnabled)}
+        >
+          <Text style={vendorsEnabled ? styles.applyBtnText : styles.resetBtnText}>
+            {vendorsEnabled ? '✓ VENDORS ENABLED — tap to DISABLE' : '✕ DISABLED — tap to ENABLE'}
+          </Text>
+        </TouchableOpacity>
+        {vendorsEnabled && (
+          <>
+            <Text style={[styles.hint, { marginTop: 10 }]}>
+              When YOU upload a Vendors table: {vendorsAppendGeneric
+                ? 'your vendors are ADDED alongside the five generic ones.'
+                : 'your vendors REPLACE the generic ones (only yours spawn).'} {hasVendorsOverride ? '' : '(No Vendors uploaded yet — the generic five are active.)'}
+            </Text>
+            <TouchableOpacity
+              style={[styles.applyBtn, !vendorsAppendGeneric && styles.resetBtn, { marginTop: 6 }]}
+              onPress={() => setVendorsAppendGenericFn(!vendorsAppendGeneric)}
+            >
+              <Text style={vendorsAppendGeneric ? styles.applyBtnText : styles.resetBtnText}>
+                {vendorsAppendGeneric ? '✓ ADD mine to the generic vendors' : '✕ REPLACE generic with mine'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
       <RenameBox
         title="Fusion feature name"

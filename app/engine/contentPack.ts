@@ -671,6 +671,18 @@ let dogEnabled = true;
 export function setDogEnabled(on: boolean): void { dogEnabled = on !== false; }
 export function isDogEnabled(): boolean { return dogEnabled; }
 
+// engine_Dev — VENDORS on/off + merge mode. vendorsEnabled false → no vendors spawn
+// at all (hub, capital, or roadside). vendorsAppendGeneric controls what happens when
+// the author UPLOADS a vendors override: false (default) = the upload REPLACES the
+// generic storefront; true = the upload is ADDED alongside the five data-driven
+// generic vendors. With no upload, a custom game gets the generic storefront.
+let vendorsEnabled = true;
+export function setVendorsEnabled(on: boolean): void { vendorsEnabled = on !== false; }
+export function isVendorsEnabled(): boolean { return vendorsEnabled; }
+let vendorsAppendGeneric = false;
+export function setVendorsAppendGeneric(on: boolean): void { vendorsAppendGeneric = on === true; }
+export function isVendorsAppendGeneric(): boolean { return vendorsAppendGeneric; }
+
 // engine_Dev — WEATHER on/off. When false, scenes get no weather: no atmosphere line,
 // no travel/visibility/stat/tick effects. Lets an author run a setting where weather
 // isn't a mechanic without deleting their weather table. Default on.
@@ -1154,6 +1166,8 @@ export function clearAllOverrides(): void {
   summonsOverride = null;
   dogEnabled = true;
   weatherEnabled = true;
+  vendorsEnabled = true;
+  vendorsAppendGeneric = false;
   sidekickWeaponQuestPct = 0;
   damageTypesOverride = null;
   damageResistancesOverride = null;
