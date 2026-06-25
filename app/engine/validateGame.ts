@@ -5,7 +5,7 @@
 // effect verbs, and duplicate ids. Errors = will break play; warnings = soft; info = FYI. Pure reads
 // through the content-pack resolvers, so it validates the EFFECTIVE game that will ship.
 
-import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles } from './contentPack';
+import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride } from './contentPack';
 import { getFactions } from './character';
 import { findCatalogItem } from './crafting';
 import locationsBuiltin from '../data/locations/locations.json';
@@ -258,6 +258,55 @@ export function validateGame(): ValidationIssue[] {
   for (const d of rows(getDogScenariosOverride())) {
     const cf = d.captorFactionId;
     if (cf != null && !(typeof cf === 'string' && factionIds.has(cf))) err('dog.faction.invalid', 'Dog scenarios', `Dog scenario "${str(d.id) ?? '?'}" has captorFactionId "${String(cf)}", which isn't a defined faction id — the "never fight your own faction" protection won't work. Use a real faction id, or null for the one unaligned fallback.`, { id: typeof cf === 'string' ? cf : undefined });
+  }
+
+  // 17) Damage types. Combat matches a weapon's damageType against an enemy's resist/weak
+  // lists by EXACT name, and on-hit effects come from the damageTypes registry by name. A
+  // name that's neither a built-in type nor a defined author damageType silently misfires
+  // (no on-hit effect; resist/weak never lines up unless spelled identically everywhere).
+  const BUILTIN_DMG = ['degradation', 'bludgeoning', 'burn', 'aetheric', 'electrical', 'piercing', 'poison', 'radiation', 'slashing', 'stun'];
+  const definedDmg = new Set<string>([...BUILTIN_DMG, ...getExtraDamageTypes().map((d) => str(d.name)?.toLowerCase()).filter(Boolean) as string[]]);
+  for (const wpn of rows(resolveTable('weapons', []))) {
+    const dt = str(wpn.damageType)?.toLowerCase();
+    if (dt && !definedDmg.has(dt)) warn('damage.type.undefined', 'Weapons', `Weapon "${str(wpn.name) ?? '?'}" deals damage type "${str(wpn.damageType)}", which isn't a built-in type or a defined Damage Types entry — its on-hit effect won't fire and resist/weak won't line up. Add it to Damage Types or use a defined one.`, { id: str(wpn.damageType) ?? undefined });
+  }
+  const resMap = getDamageResistancesOverride();
+  if (resMap) {
+    for (const [enemy, e] of Object.entries(resMap)) {
+      const row = e && typeof e === 'object' ? (e as Record<string, unknown>) : {};
+      for (const side of ['resist', 'weak'] as const) {
+        for (const t of (Array.isArray(row[side]) ? row[side] as unknown[] : [])) {
+          const lc = str(t)?.toLowerCase();
+          if (lc && !definedDmg.has(lc)) warn('damage.resist.undefined', 'Damage resistances', `"${enemy}" lists ${side} "${str(t)}", which isn't a defined damage type — it can never match (e.g. use "cold" not "frost", "electrical" not "shock").`, { id: str(t) ?? undefined });
+        }
+      }
+    }
+  }
+
+  // 18) Power coat_enemies coatings must be a real DOT kind, or the coat never ticks/expires.
+  const VALID_COAT = new Set(['poison_coat', 'acid_coat', 'corruption_coat', 'electrical_coat', 'burn_coat']);
+  for (const p of rows(resolveTable('powers', []))) {
+    const eff = p.effect && typeof p.effect === 'object' ? (p.effect as Record<string, unknown>) : null;
+    if (eff && str(eff.kind) === 'coat_enemies') {
+      const c = str(eff.coating);
+      if (c && !VALID_COAT.has(c)) err('power.coating.invalid', 'Powers', `Power "${str(p.name) ?? '?'}" coats enemies with "${c}", which isn't a damage-over-time kind — it never ticks or expires (the cast log claims damage it never deals). Use one of: ${[...VALID_COAT].join(', ')}.`, { id: c });
+    }
+  }
+
+  // 19) Collectable fragments only drop where a location's tags overlap the fragment's
+  // biomeTags. A fragment whose biomeTags match NO location can never drop → its story
+  // is uncompletable.
+  const locTags = new Set<string>();
+  for (const l of rows(resolveTable('locations', locationsBuiltin as unknown[]))) {
+    for (const t of (Array.isArray(l.tags) ? l.tags : [])) { const s = str(t)?.toLowerCase(); if (s) locTags.add(s); }
+  }
+  if (locTags.size > 0) {
+    for (const story of rows(getCollectablesOverride())) {
+      for (const f of rows(story.fragments)) {
+        const tags = (Array.isArray(f.biomeTags) ? f.biomeTags : []).map((t) => str(t)?.toLowerCase()).filter(Boolean) as string[];
+        if (tags.length > 0 && !tags.some((t) => locTags.has(t))) warn('collectable.unreachable', 'Collectables', `Collectable fragment "${str(f.id) ?? str(f.title) ?? '?'}" has biomeTags ${JSON.stringify(tags)}, none of which appear on any location — it can never drop, so its story can't be completed.`, { id: str(f.id) ?? undefined });
+      }
+    }
   }
 
   // 11) Completeness nudges.

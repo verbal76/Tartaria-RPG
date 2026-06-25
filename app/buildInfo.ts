@@ -16131,4 +16131,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // perception → dead bonus, warning), boss.spawnCondition outside main_quest|location|random (never
 // spawns), faction-quest stage advanceOn outside kill|travel|any (un-completable), and
 // dogScenarios.captorFactionId not a real faction id. tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-863';
+//
+// engine_Dev-864 — finish the lore-agnostic pass from the stress test. (1) WEATHER is now
+// DATA-DRIVEN: any weather whose id isn't one of the 9 built-ins is driven from its own
+// row fields — visibility → attack penalty, travelPenalty → reposition cost, corruptionChance
+// + hostile tags → the per-action tick, cold/fog tags → a stat nerf. Built-in ids keep their
+// exact hand-tuned behavior (the fallback never runs for them). So a custom-setting game's
+// weather is mechanically real instead of cosmetic, with NO need to reuse engine ids — the
+// dev doesn't have to rename anything. (2) Validate Game rounded out so the dev's fix-list is
+// complete: undefined weapon/resistance damage types (frost/shock/explosive → warning),
+// power coat_enemies coatings outside the 5 DOT kinds (never ticks → error), and collectable
+// fragment biomeTags that match no location (story uncompletable → warning). No content
+// coercion — the dev fixes their input; the engine just surfaces it. tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-864';
