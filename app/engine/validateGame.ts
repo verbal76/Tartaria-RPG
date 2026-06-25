@@ -306,6 +306,34 @@ export function validateGame(): ValidationIssue[] {
     if (perk) checkStat('Titles', `Title "${str(r.name) ?? str(r.id) ?? '?'}"`, perk.stat);
   }
 
+  // 13b) Consumable effects. A gear/exploration item's `effect` block only does something if it
+  // uses the fields the eat/use handler actually reads. An effect authored with invented fields
+  // (e.g. {stat, amount, duration}) PASSES the existence check but is silently inert on use — the
+  // classic trap. Surface it so the author maps to the real schema (no engine change, no content
+  // change — just don't let a dead effect look fine).
+  const EFFECT_FIELDS = new Set(['kind', 'healHP', 'restoreStamina', 'reduceCorruption', 'extendLight', 'revealScene', 'buffStat', 'buffBonus', 'buffDuration', 'cureBleed', 'curePoison', 'dogTreat', 'coating', 'unlocks', 'bias', 'slot', 'passive', 'stat', 'bonus']);
+  const PAYLOAD_FIELDS = new Set(['healHP', 'restoreStamina', 'reduceCorruption', 'extendLight', 'revealScene', 'buffStat', 'cureBleed', 'curePoison', 'dogTreat', 'coating', 'unlocks', 'bias']);
+  const BUFF_STATS = new Set(['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma']);
+  for (const tbl of ['gear', 'exploration'] as const) {
+    for (const it of rows(resolveTable(tbl, []))) {
+      const eff = it.effect && typeof it.effect === 'object' ? (it.effect as Record<string, unknown>) : null;
+      if (!eff) continue;
+      const who = `"${str(it.name) ?? '?'}"`;
+      const keys = Object.keys(eff);
+      const unknownKeys = keys.filter((k) => !EFFECT_FIELDS.has(k));
+      const hasPayload = keys.some((k) => PAYLOAD_FIELDS.has(k));
+      if (!hasPayload) {
+        warn('item.effect.inert', tbl, `${who} has an effect block but none of its fields are read by the engine${unknownKeys.length ? ` (unknown: ${unknownKeys.join(', ')})` : ''} — it will do NOTHING when used. Valid consumable fields: healHP, restoreStamina, buffStat+buffBonus+buffDuration (buff a core stat), curePoison, cureBleed, reduceCorruption, extendLight, revealScene.`, { id: str(it.name) ?? undefined });
+      } else if (unknownKeys.length) {
+        warn('item.effect.unknownfield', tbl, `${who} effect has field(s) the engine ignores: ${unknownKeys.join(', ')}.`, { id: str(it.name) ?? undefined });
+      }
+      // Timed stat buff needs all three of buffStat/buffBonus/buffDuration, and buffStat must be a core stat.
+      const bs = str(eff.buffStat);
+      if (bs && !BUFF_STATS.has(bs.toLowerCase())) warn('item.effect.buffstat', tbl, `${who} buffStat "${bs}" isn't a buffable stat — only strength/dexterity/intelligence/wisdom/charisma can be timed-buffed (hp→healHP, stamina→restoreStamina).`, { id: bs });
+      if (bs && (eff.buffBonus == null || eff.buffDuration == null)) warn('item.effect.buffpartial', tbl, `${who} has buffStat but is missing buffBonus and/or buffDuration — all three are required or the buff is dropped (buffDuration is in TURNS, not seconds).`, { id: str(it.name) ?? undefined });
+    }
+  }
+
   // 14) Boss spawnCondition must be one the engine acts on, or the boss never appears.
   const VALID_SPAWN = new Set(['main_quest', 'location', 'random']);
   for (const b of rows(getCustomBosses())) {

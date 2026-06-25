@@ -142,6 +142,24 @@ const STAT_BONUS_NOTE = [
   '//   pools instead, e.g. { "stat": "staminaMax", "amount": 4 }.',
 ].join('\n');
 
+// engine_Dev — the consumable EFFECT schema (gear with kind:"consumable"). Only these fields are
+// read by the eat/use handler; anything else is silently ignored and the item does nothing.
+const CONSUMABLE_EFFECT_NOTE = [
+  '// CONSUMABLE effect (kind:"consumable") — effect: { kind:"consumable", … }. The engine ONLY',
+  '// reads these fields; any other field (stat/amount/duration/instant/cures/…) is IGNORED and the',
+  '// item does nothing when used:',
+  '//   healHP: N            — instant HP restored',
+  '//   restoreStamina: N    — instant stamina restored',
+  '//   buffStat + buffBonus + buffDuration — a TIMED stat buff. ALL THREE required. buffStat must be',
+  '//                          one of strength/dexterity/intelligence/wisdom/charisma. buffDuration',
+  '//                          is in TURNS (not seconds). (No timed hp/staminaMax buff — use heal/restore.)',
+  '//   curePoison: true  /  cureBleed: true   — strip that status (only poison & bleed are curable)',
+  '//   reduceCorruption: N  /  extendLight: N (torch hours)  /  revealScene: true',
+  '//   coating: { kind:"poison|acid|corruption|electrical|burn", dice, label }  — weapon-coating oil',
+].join('\n');
+
+const GEAR_NOTE = [STAT_BONUS_NOTE, CONSUMABLE_EFFECT_NOTE].join('\n');
+
 const WEATHER_NOTE = [
   '// Weather is DATA-DRIVEN — these fields drive the mechanics (ids are free-form,',
   '// nothing references them):',
@@ -158,7 +176,7 @@ const WEATHER_NOTE = [
 const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   weapons: STAT_BONUS_NOTE,
   armor: STAT_BONUS_NOTE,
-  gear: STAT_BONUS_NOTE,
+  gear: GEAR_NOTE,
   weather: WEATHER_NOTE,
   races: [
     '// Optional per RACE row (perks + gear + abilities):',
