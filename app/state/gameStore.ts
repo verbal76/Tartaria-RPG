@@ -23531,6 +23531,18 @@ function applyEnemyCounter(
         if (dmg < before) raceResistTag = raceResistLabel(player.raceId, raceMult);
       }
     }
+    // engine_Dev — content-pack RACE/FACTION resist/weak now scale the actual HP damage you take,
+    // not just on-hit-effect chance. Mirrors the enemy-side applyDamageTypeModifier (weak ×1.5,
+    // resist ×0.5), so an authored race/faction "resists burn" / "weak to cold" genuinely changes
+    // incoming damage. The hardcoded raceDamageMultiplier above stays for the 3 built-in races.
+    let rfResistTag = '';
+    if (dmg > 0 && enemyDamageType) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rf = require('../engine/raceMechanics').playerRaceFactionResists(player) as { resist: string[]; weak: string[] };
+      const et = enemyDamageType.toLowerCase();
+      if (rf.weak.includes(et)) { const b = dmg; dmg = Math.max(1, Math.ceil(dmg * 1.5)); if (dmg > b) rfResistTag = ` (weak to ${enemyDamageType})`; }
+      else if (rf.resist.includes(et)) { const b = dmg; dmg = Math.max(1, Math.floor(dmg / 2)); if (dmg < b) rfResistTag = ` (you resist ${enemyDamageType})`; }
+    }
     // arb-fix — Sentinel "Defensive Protocols" ability: an active shield halves
     // ALL incoming damage while it lasts.
     let shieldTag = '';
@@ -23737,7 +23749,7 @@ function applyEnemyCounter(
         : titleHazardShaved > 0
           ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
           : '';
-      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag + drinkResistTag;
+      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + rfResistTag + shieldTag + drinkResistTag;
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;

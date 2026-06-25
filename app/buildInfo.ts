@@ -16231,4 +16231,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Sections, shared by loadGameBundle + hydrate) now also runs on hydrate, so the next launch drops
 // any persisted section that still equals its template → reverts to the default with no re-upload.
 // Load/hydrate path only — no content edited. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-877';
+// OTA-878 — player-side resist/weak now scales incoming HP damage. The combat audit found enemy
+// resist/weak applied a real ×1.5/×0.5 HP multiplier (applyDamageTypeModifier) but the PLAYER side
+// only modulated on-hit-effect CHANCE — a content-pack race/faction that "resists burn" still took
+// full burn HP. The enemy→player damage path now reads playerRaceFactionResists and applies weak
+// ×1.5 / resist ×0.5 to the HP loss (mirroring the enemy side), stacking after armor/title/race.
+// The 3 hardcoded Tartaria-race multipliers stay. Combat wiring only — no content edited. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-878';
