@@ -470,6 +470,15 @@ export function ExplorationScreen() {
   const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
 
   const inCombat = enemyViews.length > 0;
+  // engine_Dev — the ARENA layout (tall char | enemy split, hidden feed) must track a
+  // LIVE threat, not mere enemy presence. Once the last foe is dead or knocked out the
+  // fight is effectively over, so the screen has to collapse back to the peaceful layout
+  // even though a KO'd body lingers in the scene to be looted — otherwise the character
+  // box stays stretched full-height after you "complete" the combat. `inCombat` still
+  // drives the controls + enemy panel so the "loot" button and the downed foe stay shown.
+  const arenaActive = COMBAT_ARENA_VIEW && enemyViews.some(
+    (v, i) => (v.currentHp ?? 0) > 0 && currentScene?.enemyKnockedOut?.[i] !== true,
+  );
   // engine_Dev — when a roll sequence finishes resolving (pendingRolls goes null) during combat,
   // surface the FINAL output line in the result popup (the feed is hidden behind the arena). Only
   // the latest log line, only in combat, only once per sequence — no per-step dice-math duplication.
@@ -535,21 +544,21 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={[styles.topRow, COMBAT_ARENA_VIEW && inCombat && styles.topRowCombat]}>
-        <TutorialTarget area="top-left-stats" style={[styles.statsCol, COMBAT_ARENA_VIEW && inCombat && styles.combatColEqual]}>
+      <View style={[styles.topRow, arenaActive && styles.topRowCombat]}>
+        <TutorialTarget area="top-left-stats" style={[styles.statsCol, arenaActive && styles.combatColEqual]}>
           {/* OTA 040 — tap the stats panel to open the full Player
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
               still measures the same layout box. */}
           <TouchableOpacity
             onPress={() => setScreen('character')}
             activeOpacity={0.75}
-            style={COMBAT_ARENA_VIEW && inCombat ? styles.combatColFill : undefined}
+            style={arenaActive ? styles.combatColFill : undefined}
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;
               if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
             }}
           >
-            <StatsPanel player={player} fill={COMBAT_ARENA_VIEW && inCombat} />
+            <StatsPanel player={player} fill={arenaActive} />
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
@@ -559,7 +568,7 @@ export function ExplorationScreen() {
               activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
-              fill={COMBAT_ARENA_VIEW}
+              fill={arenaActive}
             />
           ) : (
             <CrestPlaceholder />
@@ -641,9 +650,10 @@ export function ExplorationScreen() {
       {(() => {
         if (!player) return null;
         // The main-quest / objective chip is out-of-combat navigation; during a
-        // fight it's just clutter over the arena, so suppress it while enemies
-        // are present (the chip returns the moment combat ends).
-        if (inCombat) return null;
+        // fight it's just clutter over the arena, so suppress it while a live
+        // threat is up (it returns the moment the arena collapses, i.e. the last
+        // foe is down — matching the rest of the peaceful-layout revert).
+        if (arenaActive) return null;
         // engine_Dev — a DATA-DRIVEN main quest (uploaded, or the generic default)
         // drives the chip. The built-in Tartaria main quest was removed.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -832,8 +842,9 @@ export function ExplorationScreen() {
       })()}
 
       {/* engine_Dev — during the combat arena, the tall char|enemy topRow takes the world-window,
-          so the feed hides; otherwise the normal scrolling feed shows. */}
-      {!(COMBAT_ARENA_VIEW && inCombat) && (
+          so the feed hides; otherwise the normal scrolling feed shows. Keyed on a live threat
+          (arenaActive), so once the last foe is down the feed returns even if a KO'd body lingers. */}
+      {!arenaActive && (
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
