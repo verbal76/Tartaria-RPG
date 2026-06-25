@@ -123,8 +123,11 @@ export function validateGame(): ValidationIssue[] {
   // against BOTH the item tables and every loot/drop source so a loot-only ingredient is named
   // as "define it in Materials", not "doesn't exist". Aggregated lists at the end say exactly
   // what to add to the Materials table.
-  const ingMissing = new Set<string>();   // referenced by a recipe, defined NOWHERE + not obtainable
-  const ingLootOnly = new Set<string>();  // obtainable as loot/drop but in no item table (→ blank misc)
+  const ingMissing = new Map<string, string[]>();   // name → recipes referencing it (defined NOWHERE + not obtainable)
+  const ingLootOnly = new Map<string, string[]>();  // name → recipes (obtainable as loot but in no item table → blank misc)
+  const noteIng = (m: Map<string, string[]>, name: string, recipe: string) => {
+    const arr = m.get(name) ?? []; arr.push(recipe); m.set(name, arr);
+  };
   for (const r of rows(resolveTable('recipes', []))) {
     const result = str(r.result);
     if (result && !itemExists(result)) err('recipe.result.missing', 'Crafting recipes', `Recipe result "${result}" isn't in any item table — it will craft to a blank "misc".`, { id: result, suggestion: 'Add it to Weapons/Armor/Gear/Exploration/Amulets/Rings/DogGear.' });
@@ -132,17 +135,28 @@ export function validateGame(): ValidationIssue[] {
       const name = str(ing.name);
       if (!name) continue;
       if (itemExists(name)) continue; // in a catalog table → fine
-      if (lootNames.has(name.toLowerCase())) {
-        ingLootOnly.add(name);
-        warn('recipe.ingredient.lootonly', 'Crafting recipes', `Recipe "${result ?? '?'}" uses "${name}", which is obtainable as loot but isn't in any item table — add a Materials row so it has stats (otherwise it grants/crafts as a blank "misc").`, { id: name });
-      } else {
-        ingMissing.add(name);
-        err('recipe.ingredient.missing', 'Crafting recipes', `Recipe "${result ?? '?'}" needs ingredient "${name}", which isn't a known item/material and isn't dropped or obtainable anywhere — add it to your Materials table.`, { id: name });
-      }
+      noteIng(lootNames.has(name.toLowerCase()) ? ingLootOnly : ingMissing, name, result ?? '?');
     }
   }
-  if (ingMissing.size > 0) info('recipe.materials.add', 'Crafting recipes', `Materials to ADD (recipe ingredients defined nowhere): ${[...ingMissing].sort().join(', ')}.`);
-  if (ingLootOnly.size > 0) info('recipe.materials.define', 'Crafting recipes', `Loot-only recipe ingredients to DEFINE in Materials (currently blank "misc"): ${[...ingLootOnly].sort().join(', ')}.`);
+  // Aggregate ONE issue per UNIQUE material, not one per recipe usage — the same material is
+  // typically referenced by many recipes, so per-occurrence lines bury the report under dozens of
+  // duplicates. The fix is per-material (define it once → every recipe using it works), so the
+  // count now reflects the real punch-list. Each line notes how many recipes use it for context.
+  const usedBy = (recipes: string[]): string => {
+    const uniq = [...new Set(recipes)];
+    const shown = uniq.slice(0, 3).join(', ');
+    return uniq.length > 3 ? `${shown} +${uniq.length - 3} more` : shown;
+  };
+  for (const name of [...ingMissing.keys()].sort()) {
+    const rs = ingMissing.get(name)!;
+    err('recipe.ingredient.missing', 'Crafting recipes', `Ingredient "${name}" — needed by ${rs.length} recipe(s) (${usedBy(rs)}) — isn't a known item/material and isn't dropped or obtainable anywhere; add it to your Materials table.`, { id: name });
+  }
+  for (const name of [...ingLootOnly.keys()].sort()) {
+    const rs = ingLootOnly.get(name)!;
+    warn('recipe.ingredient.lootonly', 'Crafting recipes', `Ingredient "${name}" — used by ${rs.length} recipe(s) (${usedBy(rs)}) — is obtainable as loot but isn't in any item table; add a Materials row so it has stats (otherwise it grants/crafts as a blank "misc").`, { id: name });
+  }
+  if (ingMissing.size > 0) info('recipe.materials.add', 'Crafting recipes', `Materials to ADD (recipe ingredients defined nowhere): ${[...ingMissing.keys()].sort().join(', ')}.`);
+  if (ingLootOnly.size > 0) info('recipe.materials.define', 'Crafting recipes', `Loot-only recipe ingredients to DEFINE in Materials (currently blank "misc"): ${[...ingLootOnly.keys()].sort().join(', ')}.`);
 
   // 3) Vendors + roadside traders: offered items must exist; declared faction must be real.
   const checkOffers = (label: string, list: unknown[] | null) => {
