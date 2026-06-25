@@ -219,15 +219,18 @@ export function rollOverlayEncounter(
   const pool = overlay.encounterPool;
   if (!pool || pool.length === 0) return null;
   const hpMax = Math.max(1, playerHpMax);
-  // Lazy require to avoid a top-of-file circular concern
-  // with enemies.json (the JSON data is also imported by
-  // encounter.ts elsewhere; lazy keeps this module's
-  // imports clean).
+  // engine_Dev — resolve enemies through the content-pack override, NOT the raw
+  // built-in roster. Lazy require both avoids the circular concern AND uses
+  // findEnemyByName (resolveTable('enemies', …)), so an author's custom enemies
+  // resolve here exactly as they do everywhere else. The old direct
+  // require('../data/enemies/enemies.json') only saw the built-ins, so EVERY
+  // custom-roster game's elevated `encounter` overlays scored 0 enemies and
+  // spawned nothing despite the arrival line promising a threat.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const enemiesData = require('../data/enemies/enemies.json') as Array<{ name: string; hp: number }>;
+  const { findEnemyByName } = require('./encounter') as typeof import('./encounter');
   const scored = pool
     .map((name) => {
-      const e = enemiesData.find((x) => x.name === name);
+      const e = findEnemyByName(name);
       if (!e) return null;
       return { name, hp: e.hp, ratio: e.hp / hpMax };
     })

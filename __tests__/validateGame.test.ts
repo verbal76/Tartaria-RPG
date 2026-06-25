@@ -5,11 +5,12 @@ import { validateGame, runValidation, summarizeValidation } from '../app/engine/
 import {
   setTableOverride, setMissionsOverride, setCustomBossesOverride, setCustomMainQuestOverride,
   setVendorsOverride, setStartingAreasOverride, setHooksOverride, setSummonsOverride,
-  setWastelandOverride, clearAllOverrides,
+  setWastelandOverride, setDogScenariosOverride, setCustomTitlesOverride, clearAllOverrides,
 } from '../app/engine/contentPack';
 
 const errs = () => validateGame().filter((i) => i.severity === 'error');
 const errText = () => errs().map((e) => e.message).join('\n');
+const warnText = () => validateGame().filter((i) => i.severity === 'warning').map((e) => e.message).join('\n');
 
 afterEach(() => clearAllOverrides());
 
@@ -92,6 +93,52 @@ describe('validateGame — pre-export reference checks', () => {
   it('flags a wasteland encounter referencing an enemy not in the table', () => {
     setWastelandOverride({ ambush: { type: 'skirmish', weight: 5, enemyPool: ['Nonexistent Beast'] } });
     expect(errText()).toMatch(/Nonexistent Beast/);
+  });
+
+  it('flags armor with a slot the engine cannot equip (e.g. "accessory")', () => {
+    setTableOverride('armor', [{ name: 'Lucky Pin', slot: 'accessory', rarity: 'Common', tags: [] }]);
+    expect(errText()).toMatch(/Lucky Pin.*slot "accessory".*never be worn/s);
+    // a real slot passes
+    setTableOverride('armor', [{ name: 'Iron Cap', slot: 'head', rarity: 'Common', tags: [] }]);
+    expect(errs().filter((e) => e.section === 'Armor')).toEqual([]);
+  });
+
+  it('flags a boss spawnCondition the engine never acts on (e.g. "always")', () => {
+    setCustomBossesOverride([{ id: 'b1', name: 'World Boss', hp: 99, attack: 5, damage: '2d8', spawnCondition: 'always' }]);
+    expect(errText()).toMatch(/World Boss.*spawnCondition "always".*never spawn/s);
+    setCustomBossesOverride([{ id: 'b1', name: 'World Boss', hp: 99, attack: 5, damage: '2d8', spawnCondition: 'location', spawnLocationId: 'x' }]);
+    expect(errs().filter((e) => e.section === 'Bosses')).toEqual([]);
+  });
+
+  it('flags a faction-quest stage advanceOn that can never fire (e.g. "stealth")', () => {
+    setTableOverride('factions', [{ id: 'spies', name: 'Spies' }]);
+    setMissionsOverride({ factionQuests: [{ id: 'q', title: 'Tap the Wire', factionId: 'spies', requirement: { rep: 0 }, reward: { tc: 1, rep: 1 }, stages: [{ narration: 'x', advanceOn: 'stealth' }] }] });
+    expect(errText()).toMatch(/Tap the Wire.*advanceOn "stealth".*never complete/s);
+  });
+
+  it('flags a dog scenario captor faction that is not a real faction id', () => {
+    setTableOverride('factions', [{ id: 'soviet_smersh', name: 'SMERSH' }]);
+    setDogScenariosOverride([
+      { id: 'bad', hookNouns: ['x'], captorFactionId: 'SMERSH', captorName: 'Handler' },
+      { id: 'ok', hookNouns: ['y'], captorFactionId: 'soviet_smersh', captorName: 'Real' },
+      { id: 'fallback', hookNouns: ['z'], captorFactionId: null, captorName: 'Poacher' },
+    ]);
+    const t = errText();
+    expect(t).toMatch(/Dog scenario "bad".*captorFactionId "SMERSH"/s);
+    expect(t).not.toMatch(/scenario "ok"/);
+    expect(t).not.toMatch(/scenario "fallback"/);
+  });
+
+  it('warns on a stat name the engine does not track (e.g. constitution / perception)', () => {
+    setTableOverride('armor', [{ name: 'Con Vest', slot: 'chest', rarity: 'Common', tags: [], statBonus: { stat: 'constitution', amount: 2 } }]);
+    setCustomTitlesOverride([{ id: 't', name: 'Eagle Eye', track: 'kills', threshold: 5, perk: { stat: 'perception', amount: 1 } }]);
+    const w = warnText();
+    expect(w).toMatch(/constitution/);
+    expect(w).toMatch(/perception/);
+    // hp / staminaMax gear bonuses are valid and must NOT warn
+    setTableOverride('armor', [{ name: 'Tough Vest', slot: 'chest', rarity: 'Common', tags: [], statBonuses: [{ stat: 'hp', amount: 5 }, { stat: 'strength', amount: 1 }] }]);
+    setCustomTitlesOverride([]);
+    expect(warnText()).not.toMatch(/stat "hp"|stat "strength"/);
   });
 
   it('runValidation returns a structured report (ok=false with errors, counts add up)', () => {

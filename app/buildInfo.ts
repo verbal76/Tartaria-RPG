@@ -16120,4 +16120,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // log issue: salvageAllAmbient no longer dead-ends on an unmatched noun — it RNG-rolls
 // a real pool material so SALVAGE ALL always pays out. (4) Splash poster +15% (0.84→0.966
 // W, 0.81→0.932 H). tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-862';
+//
+// engine_Dev-863 — author-bundle stress test (The Philadelphia Experiment, 525KB) findings. (1)
+// ENGINE BUG, no content workaround: elevatedOverlay.ts resolved encounter enemies from the raw
+// built-in roster (require enemies.json) instead of the content-pack override — so EVERY custom-
+// roster game's elevated `encounter` overlays scored 0 enemies and spawned nothing. Now routed
+// through encounter.findEnemyByName (resolveTable('enemies')). (2) Validate Game upgraded from an
+// existence checker to also catch the SILENT no-op classes the audit surfaced: armor.slot outside
+// the EquipSlot set (unequippable), bonus stat names the engine doesn't track (constitution/
+// perception → dead bonus, warning), boss.spawnCondition outside main_quest|location|random (never
+// spawns), faction-quest stage advanceOn outside kill|travel|any (un-completable), and
+// dogScenarios.captorFactionId not a real faction id. tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-863';

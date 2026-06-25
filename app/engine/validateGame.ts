@@ -5,7 +5,7 @@
 // effect verbs, and duplicate ids. Errors = will break play; warnings = soft; info = FYI. Pure reads
 // through the content-pack resolvers, so it validates the EFFECTIVE game that will ship.
 
-import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride } from './contentPack';
+import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles } from './contentPack';
 import { getFactions } from './character';
 import { findCatalogItem } from './crafting';
 import locationsBuiltin from '../data/locations/locations.json';
@@ -196,6 +196,68 @@ export function validateGame(): ValidationIssue[] {
         if (n && enemyNames.size > 0 && !enemyNames.has(n)) err('encounter.enemy.missing', 'Travel encounters', `Encounter "${archId}" lists enemy "${str(name)}", which isn't in your Enemies table.`, { id: str(name) ?? undefined });
       }
     }
+  }
+
+  // engine_Dev — the silent-no-op classes. The engine drops unrecognized enum values
+  // and keeps going, so these never crash but the authored feature does NOTHING at
+  // runtime, with no error. Surface them HERE so the author sees them before bake.
+
+  // 12) Armor slot must be an equip slot, or the item can NEVER be equipped (validSlotsForItem
+  // returns [] for any armor whose `slot` is outside the EquipSlot set — equipment.ts).
+  const VALID_SLOTS = new Set(['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring']);
+  for (const a of rows(resolveTable('armor', []))) {
+    const slot = str(a.slot);
+    if (slot && !VALID_SLOTS.has(slot)) err('armor.slot.invalid', 'Armor', `Armor "${str(a.name) ?? '?'}" has slot "${slot}", which isn't an equip slot — it can never be worn. Use one of head/chest/legs/feet/hands/cloak/amulet/ring (or move accessories to the Amulets/Rings table).`, { id: slot });
+  }
+
+  // 13) Stat names. The engine tracks exactly STR/DEX/INT/WIS/CHA/STE (+ hp / staminaMax as gear
+  // bonuses). Any other stat on a race/faction/item/title bonus is silently dropped (does nothing).
+  const VALID_STATS = new Set(['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth', 'hp', 'staminamax']);
+  const checkStat = (section: string, who: string, statName: unknown) => {
+    const s = str(statName)?.toLowerCase();
+    if (s && !VALID_STATS.has(s)) warn('stat.unknown', section, `${who} grants stat "${str(statName)}", which the engine doesn't track (only STR/DEX/INT/WIS/CHA/STE, plus hp/staminaMax on gear) — the bonus does nothing.`, { id: str(statName) ?? undefined });
+  };
+  const checkStatBonuses = (section: string, who: string, row: Record<string, unknown>) => {
+    const single = row.statBonus && typeof row.statBonus === 'object' ? (row.statBonus as Record<string, unknown>) : null;
+    if (single) checkStat(section, who, single.stat);
+    for (const b of rows(row.statBonuses)) checkStat(section, who, b.stat);
+  };
+  for (const t of ['armor', 'amulets', 'rings'] as const) {
+    for (const r of rows(resolveTable(t, []))) checkStatBonuses(t, `"${str(r.name) ?? '?'}"`, r);
+  }
+  for (const r of rows(resolveTable('races', []))) {
+    const b = r.racialStatBonuses && typeof r.racialStatBonuses === 'object' ? r.racialStatBonuses as Record<string, unknown> : {};
+    for (const k of Object.keys(b)) checkStat('Races', `Race "${str(r.name) ?? '?'}"`, k);
+  }
+  for (const r of rows(resolveTable('factions', []))) {
+    const b = r.factionStatBonuses && typeof r.factionStatBonuses === 'object' ? r.factionStatBonuses as Record<string, unknown> : {};
+    for (const k of Object.keys(b)) checkStat('Factions', `Faction "${str(r.name) ?? '?'}"`, k);
+  }
+  for (const r of rows(getCustomTitles())) {
+    const perk = r.perk && typeof r.perk === 'object' ? (r.perk as Record<string, unknown>) : null;
+    if (perk) checkStat('Titles', `Title "${str(r.name) ?? str(r.id) ?? '?'}"`, perk.stat);
+  }
+
+  // 14) Boss spawnCondition must be one the engine acts on, or the boss never appears.
+  const VALID_SPAWN = new Set(['main_quest', 'location', 'random']);
+  for (const b of rows(getCustomBosses())) {
+    const sc = str(b.spawnCondition);
+    if (sc && !VALID_SPAWN.has(sc)) err('boss.spawncondition.invalid', 'Bosses', `Boss "${str(b.name) ?? '?'}" has spawnCondition "${sc}" — only main_quest, location, random are recognized, so it will never spawn. (A fixed-tile boss = "location"; a main-quest kill target = "main_quest".)`, { id: sc });
+  }
+
+  // 15) Faction-quest stage advanceOn must be a real trigger, or that stage can't complete.
+  const VALID_ADVANCE = new Set(['kill', 'travel', 'any']);
+  for (const q of rows(resolveMissions('factionQuests', []))) {
+    for (const stg of rows(q.stages)) {
+      const adv = str(stg.advanceOn);
+      if (adv && !VALID_ADVANCE.has(adv)) err('quest.advanceon.invalid', 'Faction missions', `Quest "${str(q.title) ?? str(q.id) ?? '?'}" has a stage advanceOn "${adv}" — only kill, travel, any advance a faction quest, so that stage can never complete.`, { id: adv });
+    }
+  }
+
+  // 16) Dog-rescue scenarios: captorFactionId must be a real faction id (or null = unaligned).
+  for (const d of rows(getDogScenariosOverride())) {
+    const cf = d.captorFactionId;
+    if (cf != null && !(typeof cf === 'string' && factionIds.has(cf))) err('dog.faction.invalid', 'Dog scenarios', `Dog scenario "${str(d.id) ?? '?'}" has captorFactionId "${String(cf)}", which isn't a defined faction id — the "never fight your own faction" protection won't work. Use a real faction id, or null for the one unaligned fallback.`, { id: typeof cf === 'string' ? cf : undefined });
   }
 
   // 11) Completeness nudges.
