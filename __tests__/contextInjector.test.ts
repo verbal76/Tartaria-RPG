@@ -9,6 +9,7 @@ import {
   type ContextInputs,
   type SceneSlice,
 } from '../app/engine/contextInjector';
+import { setLoreOverride, clearAllOverrides } from '../app/engine/contentPack';
 import type {
   PlayerCharacter,
   InventoryItem,
@@ -373,7 +374,10 @@ describe('buildSystemPrompt', () => {
     expect(messages[0]!.role).toBe('system');
     expect(messages[1]!.role).toBe('user');
     const system = messages[0]!.content;
-    expect(system).toContain('You are the Arbiter');
+    // engine_Dev — default persona is built from the narrator name (no hardcoded
+    // "Arbiter") and the world TONE is injected into the prompt.
+    expect(system).toContain('the narrator of this world');
+    expect(system).toContain('Tone:');
     expect(system).toContain('DO NOT INVENT');
     expect(system).toContain('Asgardar');
     expect(system).toContain('go north');
@@ -383,6 +387,42 @@ describe('buildSystemPrompt', () => {
     expect(system).toMatch(/do not invent.*events/i);
     // Peaceful instruction sets the length cap (arb162 — one ~20-word line).
     expect(system).toMatch(/20 words/);
+    // engine_Dev — no hardcoded Tartaria place names or vocabulary in the prompt.
+    expect(system).not.toContain('Aetherstone Deep');
+    expect(system).not.toContain('Grand Hall');
+    expect(system).not.toContain('Borderlands');
+    expect(system).not.toContain('Aetheric verbs');
+  });
+
+  it('engine_Dev — a custom World lore block reskins the narration prompt', () => {
+    const ctx: LlmContext = {
+      current_biome: 'Naval Yard',
+      room_name: 'Pier 4',
+      environmental_description: 'Fog over grey water.',
+      available_exits: 'north',
+      active_entities: 'None.',
+      player_stats: 'HP 22/22',
+      full_inventory: 'Service Revolver',
+      recent_history: 'look around',
+      in_combat: false,
+    };
+    setLoreOverride('world', {
+      narrator: 'You are the Operator, a clipped voice on a 1943 naval radio.',
+      tone: 'Sailors vanish in a green haze off the USS Eldridge.',
+      setting: 'Philadelphia Navy Yard, October 1943.',
+      vocabulary: ['degauss', 'phase', 'patch in'],
+    });
+    try {
+      const system = buildSystemPrompt(ctx)[0]!.content;
+      expect(system).toContain('You are the Operator');
+      expect(system).toContain('USS Eldridge');
+      expect(system).toContain('Philadelphia Navy Yard');
+      expect(system).toContain('degauss');
+      // No Tartaria narrator default leaked through.
+      expect(system).not.toContain('the narrator of this world');
+    } finally {
+      clearAllOverrides();
+    }
   });
 
   it('switches to the combat instruction when in_combat is true', () => {

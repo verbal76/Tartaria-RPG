@@ -17,30 +17,8 @@
 // section is a single compact paragraph, ~50 words max. Anything
 // bigger eats the model's already-tight 90-token narration budget.
 
-import canonEventsData from '../data/lore/canon-events.json';
-import canonFoodDrinkData from '../data/lore/canon-food-drink.json';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-
-interface CanonEvent {
-  id: string;
-  year: number;
-  title: string;
-  factions: string[];
-  location: string;
-  outcome: string;
-  summary: string;
-  tags: string[];
-}
-
-interface CanonFoodDrink {
-  id: string;
-  name: string;
-  type: 'food' | 'drink';
-  rarity: string;
-  source: string;
-  effect: string;
-  tcValue: number;
-}
+import { resolveTable } from './contentPack';
 
 interface ArbiterTitle {
   id: string;
@@ -50,8 +28,6 @@ interface ArbiterTitle {
   tags: string[];
 }
 
-export const CANON_EVENTS = (canonEventsData as { events: CanonEvent[] }).events;
-export const CANON_FOOD_DRINK = (canonFoodDrinkData as { items: CanonFoodDrink[] }).items;
 export const ARBITER_TITLES = (arbiterTitlesData as { titles: ArbiterTitle[] }).titles;
 
 export interface CanonFactQuery {
@@ -66,67 +42,48 @@ export interface CanonFactQuery {
 /** Build the compact CANON FACTS paragraph for Qwen system prompt
  *  injection. Returns null when no facts apply — the caller skips
  *  the section entirely rather than print a stub. */
-export function buildCanonFactsParagraph(q: CanonFactQuery): string | null {
-  const lines: string[] = [];
+// engine_Dev — author "Lore document" passages. When the dev has uploaded a
+// 'lore' table, it REPLACES the built-in Tartaria canon entirely: the narrator
+// surfaces the passage whose tags best match the scene (or nothing if none do).
+interface LorePassage { tags?: unknown; keywords?: unknown; text?: unknown }
+const EMPTY_LORE: readonly LorePassage[] = [];
 
-  const event = pickCanonEvent(q);
-  if (event) {
-    const factions = event.factions.join(', ');
-    lines.push(`${event.year} · ${event.title} (${factions}): ${event.summary}`);
-  }
-
-  if (q.hasVendor) {
-    const item = pickFoodDrinkForVendor(q);
-    if (item) {
-      lines.push(`Canonical wares may include "${item.name}" (${item.rarity} ${item.type}, ${item.tcValue} TC): ${item.effect}.`);
-    }
-  }
-
-  if (lines.length === 0) return null;
-  return lines.join(' ');
+function passageTags(p: LorePassage): string[] {
+  const raw = Array.isArray(p.tags) ? p.tags : Array.isArray(p.keywords) ? p.keywords : [];
+  return raw.filter((t): t is string => typeof t === 'string').map((t) => t.toLowerCase());
 }
 
-function pickCanonEvent(q: CanonFactQuery): CanonEvent | null {
-  let best: { event: CanonEvent; score: number } | null = null;
-  for (const event of CANON_EVENTS) {
+function truncateWords(s: string, n: number): string {
+  const w = s.trim().split(/\s+/);
+  return w.length <= n ? s.trim() : `${w.slice(0, n).join(' ')}…`;
+}
+
+function pickLorePassage(passages: readonly LorePassage[], q: CanonFactQuery): string | null {
+  let best: { text: string; score: number } | null = null;
+  let fallback: string | null = null; // first passage tagged "always"
+  for (const p of passages) {
+    if (!p || typeof p.text !== 'string' || !p.text.trim()) continue;
+    const tags = passageTags(p);
+    if (tags.includes('always') && fallback === null) fallback = p.text;
     let score = 0;
-    for (const tag of event.tags) {
-      const t = tag.toLowerCase();
+    for (const tag of tags) {
+      if (tag === 'always') continue; // a routing flag, not a scene keyword
       for (const k of q.sceneKeywords) {
-        if (k.includes(t) || t.includes(k)) score += 1;
+        if (k.includes(tag) || tag.includes(k)) score += 1;
       }
     }
-    if (q.playerFactionId) {
-      const f = q.playerFactionId.toLowerCase();
-      if (event.factions.some((x) => x.toLowerCase().includes(f) || f.includes(x.toLowerCase()))) {
-        score += 1;
-      }
-    }
-    if (score > 0 && (!best || score > best.score)) best = { event, score };
+    if (score > 0 && (!best || score > best.score)) best = { text: p.text, score };
   }
-  return best?.event ?? null;
+  // Scene-specific passage wins; else the "always" baseline; else nothing.
+  const chosen = best?.text ?? fallback;
+  return chosen ? truncateWords(chosen, 60) : null;
 }
 
-function pickFoodDrinkForVendor(q: CanonFactQuery): CanonFoodDrink | null {
-  const keywords = q.sceneKeywords.join(' ');
-  const isMudDweller = /mud.?dweller|mud.?monarch/.test(keywords);
-  const isTartarianMarket = /tartarian|market|ruin/.test(keywords);
-  const isUnknowingMasses = /unknowing|surface|wasteland/.test(keywords);
-  const matches = CANON_FOOD_DRINK.filter((it) => {
-    const src = it.source.toLowerCase();
-    if (isMudDweller && /mud.?dweller|mud.?monarch/.test(src)) return true;
-    if (isTartarianMarket && /tartarian/.test(src)) return true;
-    if (isUnknowingMasses && /unknowing|surface|wasteland/.test(src)) return true;
-    return false;
-  });
-  if (matches.length === 0) return null;
-  // Deterministic from keyword joint hash so the same scene tends to
-  // surface the same canonical item (avoids prompt-jitter between turns).
-  let hash = 5381;
-  for (let i = 0; i < keywords.length; i++) {
-    hash = ((hash << 5) + hash + keywords.charCodeAt(i)) >>> 0;
-  }
-  return matches[hash % matches.length] ?? null;
+export function buildCanonFactsParagraph(q: CanonFactQuery): string | null {
+  // engine_Dev — canon facts come ENTIRELY from the active lore document (author override or
+  // the installed generic default — always present). No built-in Tartaria fallback.
+  const loreDoc = resolveTable<LorePassage>('lore', EMPTY_LORE);
+  return loreDoc.length > 0 ? pickLorePassage(loreDoc, q) : null;
 }
 
 /** Look up a title by free-text. Phase 1 — used by the future

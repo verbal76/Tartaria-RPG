@@ -27,6 +27,7 @@
 
 import type { PlayerCharacter } from './types';
 import { ensureMainQuest } from './mainQuest';
+import { getNarratorName } from './contentPack';
 
 // ---------------------------------------------------------------------------
 // Floor archetypes — 5 flavors. These pin the visual + narrative
@@ -55,30 +56,30 @@ export const FLOOR_ARCHETYPES: Record<FloorArchetype, FloorArchetypeMeta> = {
     id: 'service_corridor',
     label: 'Service Corridor',
     flavor: 'Utility level. Pipework, drains, a lantern every twenty paces. The kind of floor the city built to forget.',
-    color: '#7a705c',
+    color: '#6c8088',
   },
   market_level: {
     id: 'market_level',
     label: 'Market Level',
     flavor: 'Stalls, vendors, errand-runners. A floor that still believes it is a city.',
-    color: '#c9a86a',
+    color: '#6ab0c9',
   },
   shrine_level: {
     id: 'shrine_level',
     label: 'Shrine Level',
-    flavor: 'Aetherkin sacred space. Censers, candle-grids, low chanting from rooms you have not entered yet.',
+    flavor: 'A sacred space. Censers, candle-grids, low chanting from rooms you have not entered yet.',
     color: '#9888a8',
   },
   mechanical_floor: {
     id: 'mechanical_floor',
     label: 'Mechanical Floor',
-    flavor: 'Aethercraft engines, hazard plates, the smell of burning Aetherstone. Walk where the floor is dark, not where it glows.',
+    flavor: 'Old engines, hazard plates, the smell of burning fuel. Walk where the floor is dark, not where it glows.',
     color: '#a85a3a',
   },
   dig_camp: {
     id: 'dig_camp',
-    label: 'Reclaimer Dig Camp',
-    flavor: 'Salvage piles, foreman tents, a lantern grid the Reclaimers maintain themselves. Trade if they recognize your colors.',
+    label: 'Salvager Dig Camp',
+    flavor: 'Salvage piles, foreman tents, a lantern grid the salvagers maintain themselves. Trade if they recognize your colors.',
     color: '#9ec96a',
   },
 };
@@ -306,5 +307,5 @@ export function canEnterSkyscraper(player: PlayerCharacter | null | undefined): 
  *  `canEnterSkyscraper` is false. The Arbiter delivers this on any
  *  attempt to engage with the entrance before completion. */
 export function skyscraperGateRefusal(): string {
-  return 'The Arbiter blocks the doorway. "This place opens only to those who have finished the work above. Return to the Cores. Return to the Choice. Then come back."';
+  return `The ${getNarratorName()} blocks the doorway. "This place opens only to those who have finished the work above. Come back when you've seen your story through."`;
 }

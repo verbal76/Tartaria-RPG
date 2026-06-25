@@ -87,7 +87,9 @@ describe('OTA 039 — corruption tier ladder', () => {
     it('worsening corrupted → hollowed emits the Hollowed warning', () => {
       const line = tierCrossLine('corrupted', 'hollowed');
       expect(line).toContain('Hollowed');
-      expect(line).toContain('Mud Monarchs');
+      // engine_Dev — the hollowed line was genericized off Tartaria ("Mud Monarchs" →
+      // neutral "hunters on your trail"); assert the genericized warning instead.
+      expect(line).toContain('hunters on your trail');
     });
     it('cleansing hollowed → corrupted emits cleaner line', () => {
       const line = tierCrossLine('hollowed', 'corrupted');

@@ -31,10 +31,22 @@ export const DAMAGE_TYPE_KEYWORDS = [
 /** Scan a string for an explicit damage-type word. Returns the canonical type
  *  (psychic normalized to aetheric) or null when none is present. Mirrors the
  *  long-standing parseIncomingDamageType so resistance behavior is unchanged
- *  for already-typed enemies. */
+ *  for already-typed enemies.
+ *
+ *  engine_Dev — author-added damage types (from the damage-types override) are
+ *  scanned FIRST (longest name first) so a custom "frost" beats any built-in
+ *  substring, and each author type's keyword aliases also resolve to it. */
 export function parseDamageTypeKeyword(s: string | null | undefined): string | null {
   if (!s) return null;
   const lower = s.toLowerCase();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const extra = (require('./contentPack') as typeof import('./contentPack')).getExtraDamageTypes();
+  const authored = extra
+    .map((e) => ({ name: e.name.toLowerCase(), needles: [e.name.toLowerCase(), ...(e.keywords ?? []).map((k) => k.toLowerCase())] }))
+    .sort((a, b) => b.name.length - a.name.length);
+  for (const a of authored) {
+    if (a.needles.some((n) => n && lower.includes(n))) return a.name;
+  }
   for (const t of DAMAGE_TYPE_KEYWORDS) {
     if (lower.includes(t)) return t === 'psychic' ? 'aetheric' : t;
   }

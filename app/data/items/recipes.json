@@ -1248,8 +1248,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Golem Sledge",
-      "coresRequired": 4,
+      "result": "Sidekick Sledge",
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1266,8 +1265,7 @@
       ]
     },
     {
-      "result": "Golem Greatsword",
-      "coresRequired": 4,
+      "result": "Sidekick Greatsword",
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1284,8 +1282,7 @@
       ]
     },
     {
-      "result": "Golem Pike",
-      "coresRequired": 4,
+      "result": "Sidekick Pike",
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1302,8 +1299,7 @@
       ]
     },
     {
-      "result": "Golem Aether-Lance",
-      "coresRequired": 4,
+      "result": "Sidekick Aether-Lance",
       "ingredients": [
         {
           "name": "Aether Crystal",

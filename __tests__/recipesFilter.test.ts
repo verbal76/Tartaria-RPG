@@ -11,6 +11,7 @@
 // here, the screen renders the right rows.
 
 import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
+import { isSidekickWeapon } from '../app/engine/sidekicks';
 
 describe('OTA-059 — RecipesView kindFilter', () => {
   it('every recipe resolves to a kind via lookupCraftedItem', () => {
@@ -74,5 +75,34 @@ describe('OTA-059 — RecipesView kindFilter', () => {
     const nonConsumable = RECIPES.filter((r) => lookupCraftedItem(r.result).kind !== 'consumable');
     expect(consumable.length).toBeGreaterThanOrEqual(5);
     expect(nonConsumable.length).toBeGreaterThanOrEqual(20);
+  });
+});
+
+// engine_Dev — sidekick armaments (golem_weapon recipes) split OFF the Craft tab
+// and onto the Magic tab, mirroring RecipesView's kindFilter logic exactly.
+describe('engine_Dev — sidekick armaments live on the Magic tab', () => {
+  const isSidekick = (result: string) => isSidekickWeapon(lookupCraftedItem(result).tags);
+
+  it('recognizes the golem_weapon recipes as sidekick armaments', () => {
+    const arms = RECIPES.filter((r) => isSidekick(r.result)).map((r) => r.result);
+    expect(arms.length).toBeGreaterThanOrEqual(3);
+    expect(arms).toContain('Sidekick Sledge');
+    expect(isSidekick('Iron Spear')).toBe(false); // a normal weapon is NOT a sidekick arm
+  });
+
+  it("the Craft tab ('non-consumable') EXCLUDES sidekick armaments", () => {
+    const craft = RECIPES.filter((r) => {
+      const c = lookupCraftedItem(r.result);
+      return c.kind !== 'consumable' && !isSidekickWeapon(c.tags);
+    }).map((r) => r.result);
+    expect(craft).toContain('Iron Spear');       // normal gear stays on Craft
+    expect(craft).not.toContain('Sidekick Sledge');  // sidekick arm moved to Magic
+  });
+
+  it("the Magic tab ('sidekick-weapon') catches exactly the golem_weapon recipes", () => {
+    const arms = RECIPES.filter((r) => isSidekick(r.result)).map((r) => r.result);
+    expect(arms).toEqual(expect.arrayContaining(['Sidekick Sledge', 'Sidekick Greatsword', 'Sidekick Pike']));
+    expect(arms).not.toContain('Iron Spear');
+    expect(arms).not.toContain("Forager's Stew");
   });
 });

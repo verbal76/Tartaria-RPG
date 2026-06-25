@@ -12,6 +12,7 @@ import { Linking } from 'react-native';
 import { buildBasicDeviceSummary } from './aboutSummary';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
+import { getGameTitle } from '../engine/contentPack';
 import { getBuildCodename } from '../buildCodename';
 import { getVoiceSettings } from '../voice/voiceSettings';
 import { getKokoroState, getKokoroErrorHistory } from '../voice/PiperTTSManager';
@@ -103,7 +104,7 @@ export async function composeAndSendBugReport(args: {
   }
 
   const report = [
-    `=== TARTARIA BUG REPORT ===`,
+    `=== ${getGameTitle().toUpperCase()} BUG REPORT ===`,
     `Submitted: ${new Date().toISOString()}`,
     `Character: ${charName}`,
     slot ? `Slot ID: ${slot.slotId}` : null,

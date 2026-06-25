@@ -5,18 +5,17 @@
 // its sources so the player can audit any surprising value.
 
 import React, { useState } from 'react';
+import { getNarratorName, getCorruptionName } from '../engine/contentPack';
+import { resolveTitleRoster } from '../engine/customTitles';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import racesData from '../data/races/races.json';
-import factionsData from '../data/factions/factions.json';
+import { getRaces, getFactions } from '../engine/character';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
-import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+import { effectiveStatsBreakdown, resolveEquippedItem, displayStaminaMax, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
-import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-import { TITLE_PASSIVE_PERK } from '../engine/titles';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -61,13 +60,14 @@ export function CharacterScreen() {
     );
   }
 
-  const race = (racesData as Race[]).find((r) => r.id === player.raceId);
-  const faction = (factionsData as Faction[]).find((f) => f.id === player.factionId);
+  const race = getRaces().find((r) => r.id === player.raceId);
+  const faction = getFactions().find((f) => f.id === player.factionId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   const hpPct = player.hpMax > 0 ? player.hp / player.hpMax : 0;
-  const stamPct = player.staminaMax > 0 ? player.stamina / player.staminaMax : 0;
-  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#c9a86a' : '#e07a5f';
-  const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
+  const stamMaxShown = displayStaminaMax(player);
+  const stamPct = stamMaxShown > 0 ? player.stamina / stamMaxShown : 0;
+  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#6ab0c9' : '#e07a5f';
+  const stamColor = stamPct > 0.4 ? '#9ec96a' : '#6ab0c9';
 
   const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null));
   const acValue = effectiveAC(player, scene ?? null);
@@ -127,7 +127,7 @@ export function CharacterScreen() {
             <View style={styles.barBg}>
               <View style={[styles.barFill, { width: `${Math.max(0, stamPct * 100)}%`, backgroundColor: stamColor }]} />
             </View>
-            <Text style={styles.barValue}>{player.stamina}/{player.staminaMax}</Text>
+            <Text style={styles.barValue}>{player.stamina}/{stamMaxShown}</Text>
           </View>
         </View>
 
@@ -178,7 +178,7 @@ export function CharacterScreen() {
             <Text style={styles.kvValue}>{player.tc}</Text>
           </View>
           <View style={styles.kvRow}>
-            <Text style={styles.kvKey}>Corruption</Text>
+            <Text style={styles.kvKey}>{getCorruptionName()}</Text>
             <Text style={[styles.kvValue, tier === 'hollowed' && styles.danger, tier === 'corrupted' && styles.warning]}>
               {player.corruption} · {tierLabel(tier)}
             </Text>
@@ -201,7 +201,7 @@ export function CharacterScreen() {
         {!collapsed.factions && (
         <View style={styles.card}>
           {(() => {
-            const factionsList = factionsData as Faction[];
+            const factionsList = getFactions();
             const rows = (player.factionStanding ?? [])
               .map((row) => ({
                 row,
@@ -217,8 +217,8 @@ export function CharacterScreen() {
               const qualifies = standing >= 20;
               const isOwn = row.factionId === player.factionId;
               const color = standing >= 20 ? '#9ec96a'
-                : standing >= 0 ? '#cdbf99'
-                : standing >= -10 ? '#c9a86a'
+                : standing >= 0 ? '#bcd2db'
+                : standing >= -10 ? '#6ab0c9'
                 : '#e07a5f';
               return (
                 <View key={row.factionId} style={styles.kvRow}>
@@ -276,6 +276,13 @@ export function CharacterScreen() {
               // and perks show (mirrored off-hand resolves the main 2H weapon).
               const inst = resolveEquippedItem(player, (isMirrored ? 'main' : slot) as EquipSlot);
               const preview = inst ? getItemPreviewForInstance(inst) : getItemPreview(name);
+              // Weapon damage line — for a weapon in hand, show what it actually
+              // deals: dice + damage type + the stat it scales off. Resolves the
+              // real catalog weapon (mirrored off-hand uses the main 2H weapon).
+              const wpn = findWeaponByName(isMirrored ? mainName! : name);
+              const damageLine = wpn
+                ? `⚔ ${wpn.damageDice} ${wpn.damageType} · scales ${STAT_LABEL[wpn.stat as keyof Stats]}`
+                : null;
               return (
                 <View key={slot} style={styles.slotRow}>
                   <Text style={styles.slotLabel}>{SLOT_LABEL[slot]}</Text>
@@ -283,6 +290,9 @@ export function CharacterScreen() {
                     <Text style={styles.slotName}>
                       {name}{isMirrored ? '  (two-handed grip)' : ''}
                     </Text>
+                    {damageLine && (
+                      <Text style={styles.slotDmg}>{damageLine}</Text>
+                    )}
                     {preview.stats.length > 0 && (
                       <Text style={styles.slotMeta}>{preview.stats.join(' · ')}</Text>
                     )}
@@ -303,8 +313,8 @@ export function CharacterScreen() {
           const sexGlyph = dog.sex.pronoun === 'he' ? '♂' : dog.sex.pronoun === 'she' ? '♀' : '⚥';
           const hpPctDog = dog.hpMax > 0 ? dog.hp / dog.hpMax : 0;
           const loyaltyPct = Math.max(0, Math.min(1, dog.loyalty / 100));
-          const hpColorDog = hpPctDog > 0.5 ? '#9ec96a' : hpPctDog > 0.25 ? '#c9a86a' : '#e07a5f';
-          const loyaltyColor = loyaltyPct > 0.5 ? '#9ec96a' : loyaltyPct > 0.3 ? '#c9a86a' : '#e07a5f';
+          const hpColorDog = hpPctDog > 0.5 ? '#9ec96a' : hpPctDog > 0.25 ? '#6ab0c9' : '#e07a5f';
+          const loyaltyColor = loyaltyPct > 0.5 ? '#9ec96a' : loyaltyPct > 0.3 ? '#6ab0c9' : '#e07a5f';
           const vestName = dog.equipped?.vest;
           // Render stat progress as a fractional 20-segment bar (mirrors player).
           const statProgressBar = (stat: 'strength' | 'dexterity' | 'intelligence') => {
@@ -322,7 +332,7 @@ export function CharacterScreen() {
                 activeOpacity={0.8}
               >
                 <Text style={styles.name}>
-                  {dog.name} <Text style={{ color: '#c9a86a' }}>{sexGlyph}</Text>
+                  {dog.name} <Text style={{ color: '#6ab0c9' }}>{sexGlyph}</Text>
                 </Text>
                 <Text style={styles.subline}>
                   {dog.breed} · {dog.status === 'waiting_at_base' ? 'waiting at base' : 'with you'}
@@ -370,10 +380,10 @@ export function CharacterScreen() {
         {/* ── GOLEM ─────────────────────────────────────────────── */}
         {/* OTA-467 — golem panel. Mirrors the dog: HP + trained stats (POWER /
             RESILIENCE), which a kept-alive golem grows through combat. */}
-        {player.golem && player.golem.hp > 0 && (() => {
-          const golem = player.golem;
+        {player.sidekick && player.sidekick.hp > 0 && (() => {
+          const golem = player.sidekick;
           const hpPctG = golem.hpMax > 0 ? golem.hp / golem.hpMax : 0;
-          const hpColorG = hpPctG > 0.5 ? '#9ec96a' : hpPctG > 0.25 ? '#c9a86a' : '#e07a5f';
+          const hpColorG = hpPctG > 0.5 ? '#9ec96a' : hpPctG > 0.25 ? '#6ab0c9' : '#e07a5f';
           const gStats = golem.stats ?? { power: 0, resilience: 0 };
           const gProg = golem.statProgress ?? { power: 0, resilience: 0 };
           const typeLabel = golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -381,9 +391,9 @@ export function CharacterScreen() {
           // of" is discoverable. A golem heals only from its own fuel items, so a
           // pack full of other aether loot reads as unusable until you know which.
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { golemRepairParts, GOLEM_ELEMENT_TAGS } = require('../engine/golems');
-          const repairParts = (golemRepairParts(golem.kind) as string[]);
-          const elementWord = (GOLEM_ELEMENT_TAGS[golem.kind]?.[0] as string | undefined) ?? null;
+          const { sidekickRepairParts, SIDEKICK_ELEMENT_TAGS } = require('../engine/sidekicks');
+          const repairParts = (sidekickRepairParts(golem.kind) as string[]);
+          const elementWord = (SIDEKICK_ELEMENT_TAGS[golem.kind]?.[0] as string | undefined) ?? null;
           const heldRepair = repairParts.filter((p) =>
             player.inventory.some((i) => i.name.toLowerCase() === p.toLowerCase() && i.quantity > 0),
           );
@@ -392,9 +402,13 @@ export function CharacterScreen() {
             const filled = Math.round(pct * 20);
             return '▰'.repeat(filled) + '▱'.repeat(20 - filled);
           };
+          // engine_Dev — the section label follows the author's summon NOUN
+          // (sidekick / automaton / familiar / …), not the hardcoded "GOLEM".
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const summonLabel = (require('../engine/sidekicks') as typeof import('../engine/sidekicks')).getSummonNoun().toUpperCase();
           return (
             <>
-              {sectionHeader('golem', 'GOLEM')}
+              {sectionHeader('golem', summonLabel)}
               {!collapsed.golem && (
               <View style={styles.card}>
                 <Text style={styles.name}>{golem.name}</Text>
@@ -557,11 +571,15 @@ export function CharacterScreen() {
             triggers yet. Future OTAs wire the requirement strings to
             runtime trackers (relic counts, sentinel kills, etc.) and
             populate player.earnedTitles. */}
-        {sectionHeader('titles', 'ARBITER ASSIGNED TITLES')}
+        {sectionHeader('titles', `${getNarratorName().toUpperCase()} ASSIGNED TITLES`)}
         {!collapsed.titles && (
         <View style={styles.card}>
           {(() => {
-            const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
+            // engine_Dev — IMPORTABLE + CUSTOMIZABLE TITLES. The roster MERGES the 20 built-in
+            // earnable titles (exploring/killing/etc., with any author display overrides applied)
+            // with the author's added data-driven achievements — so an upload customizes the
+            // built-ins instead of hiding them. Earned rows already carry the resolved perk text.
+            const allTitles = resolveTitleRoster();
             const earned = new Set(player.earnedTitles ?? []);
             const sorted = [...allTitles].sort((a, b) => {
               const ea = earned.has(a.id) ? 0 : 1;
@@ -574,7 +592,7 @@ export function CharacterScreen() {
               <>
                 <Text style={styles.titlesSummary}>
                   {earnedCount === 0
-                    ? 'No titles earned yet. The Arbiter watches your deeds.'
+                    ? `No titles earned yet. The ${getNarratorName()} watches your deeds.`
                     : `${earnedCount} of ${allTitles.length} titles earned.`}
                 </Text>
                 {sorted.map((t) => {
@@ -585,7 +603,7 @@ export function CharacterScreen() {
                         {isEarned ? '◆ ' : '◇ '}{t.title}
                       </Text>
                       <Text style={isEarned ? styles.titlePerk : styles.titleRequirement}>
-                        {isEarned ? (TITLE_PASSIVE_PERK[t.id] ?? t.perk) : t.requirement}
+                        {isEarned ? t.perk : t.requirement}
                       </Text>
                     </View>
                   );
@@ -664,8 +682,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -673,14 +691,14 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  placeholder: { color: '#c9a86a', textAlign: 'center', marginTop: 80 },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  placeholder: { color: '#6ab0c9', textAlign: 'center', marginTop: 80 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 24 },
 
   sectionTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     letterSpacing: 3,
     fontWeight: '700',
@@ -696,7 +714,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(8,6,4,0.55)',
     borderLeftWidth: 4,
-    borderLeftColor: '#c9a86a',
+    borderLeftColor: '#6ab0c9',
     borderRadius: 3,
     paddingLeft: 8,
     paddingRight: 10,
@@ -704,70 +722,71 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 6,
   },
-  sectionChevron: { color: '#c9a86a', fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
-  sectionHeaderLabel: { color: '#c9a86a', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
+  sectionChevron: { color: '#6ab0c9', fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
+  sectionHeaderLabel: { color: '#6ab0c9', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
   card: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 12,
   },
 
-  name: { color: '#e6d8b3', fontSize: 18, fontWeight: '700', letterSpacing: 1 },
-  subline: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginTop: 2, marginBottom: 10 },
+  name: { color: '#d6e4e8', fontSize: 18, fontWeight: '700', letterSpacing: 1 },
+  subline: { color: '#6ab0c9', fontSize: 12, letterSpacing: 1, marginTop: 2, marginBottom: 10 },
 
   barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  barLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, width: 30 },
-  barBg: { flex: 1, height: 8, backgroundColor: '#1a1714', borderRadius: 4, overflow: 'hidden', marginHorizontal: 8 },
+  barLabel: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1, width: 30 },
+  barBg: { flex: 1, height: 8, backgroundColor: '#131c1f', borderRadius: 4, overflow: 'hidden', marginHorizontal: 8 },
   barFill: { height: '100%' },
-  barValue: { color: '#cdbf99', fontSize: 11, width: 64, textAlign: 'right' },
+  barValue: { color: '#bcd2db', fontSize: 11, width: 64, textAlign: 'right' },
 
   statRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 6, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
-  statKey: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, width: 44, paddingTop: 2 },
+  statKey: { color: '#6ab0c9', fontSize: 12, fontWeight: '700', letterSpacing: 1, width: 44, paddingTop: 2 },
   statBody: { flex: 1 },
-  statTotal: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  statBase: { color: '#c9a86a', fontSize: 11, fontWeight: '400' },
+  statTotal: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
+  statBase: { color: '#6ab0c9', fontSize: 11, fontWeight: '400' },
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
-  progressPct: { color: '#c9a86a', fontSize: 9, letterSpacing: 0.5 },
-  activityList: { color: '#c9a86a', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
+  progressPct: { color: '#6ab0c9', fontSize: 9, letterSpacing: 0.5 },
+  activityList: { color: '#6ab0c9', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
-  chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
+  chip: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
   chipNeg: { borderColor: '#7a4040', backgroundColor: '#221512' },
   chipText: { color: '#9ec96a', fontSize: 10, letterSpacing: 0.5 },
   chipTextNeg: { color: '#e07a5f' },
 
   kvRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4 },
-  kvKey: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
-  factionOwn: { color: '#cdbf99', fontWeight: '700' },
-  kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
-  warning: { color: '#c9a86a' },
+  kvKey: { color: '#6ab0c9', fontSize: 12, letterSpacing: 1 },
+  factionOwn: { color: '#bcd2db', fontWeight: '700' },
+  kvValue: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
+  kvSub: { color: '#6ab0c9', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
+  warning: { color: '#6ab0c9' },
   danger: { color: '#e07a5f' },
 
   slotRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 6, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
-  slotLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, width: 80, paddingTop: 2 },
+  slotLabel: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1, width: 80, paddingTop: 2 },
   slotBody: { flex: 1 },
-  slotEmpty: { color: '#3a342c', fontSize: 12 },
-  slotName: { color: '#e6d8b3', fontSize: 13, fontWeight: '700' },
+  slotEmpty: { color: '#2b3a3e', fontSize: 12 },
+  slotName: { color: '#d6e4e8', fontSize: 13, fontWeight: '700' },
+  slotDmg: { color: '#e0a35f', fontSize: 10, marginTop: 2 },
   slotMeta: { color: '#9ec96a', fontSize: 10, marginTop: 2 },
 
   effectRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
-  effectLabel: { color: '#e6d8b3', fontSize: 12 },
-  effectMeta: { color: '#c9a86a', fontSize: 10, letterSpacing: 0.5 },
+  effectLabel: { color: '#d6e4e8', fontSize: 12 },
+  effectMeta: { color: '#6ab0c9', fontSize: 10, letterSpacing: 0.5 },
 
-  traitRow: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  traitRow: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginBottom: 4 },
 
-  contractRow: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 2 },
-  contractTap: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, marginTop: 6, fontStyle: 'italic', textAlign: 'right' },
+  contractRow: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginBottom: 2 },
+  contractTap: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1, marginTop: 6, fontStyle: 'italic', textAlign: 'right' },
 
-  footerHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
+  footerHint: { color: '#6ab0c9', fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
   // OTA-236 — Arbiter Titles section.
-  titlesSummary: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
+  titlesSummary: { color: '#6ab0c9', fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
   titleRow: { marginBottom: 8 },
   titleName: { fontSize: 12, fontWeight: '700', letterSpacing: 0.3, marginBottom: 2 },
-  titleNameEarned: { color: '#c9a86a' },
-  titleNameLocked: { color: '#c9a86a' },
-  titlePerk: { color: '#cdbf99', fontSize: 11, lineHeight: 15, marginLeft: 14 },
-  titleRequirement: { color: '#c9a86a', fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
+  titleNameEarned: { color: '#6ab0c9' },
+  titleNameLocked: { color: '#6ab0c9' },
+  titlePerk: { color: '#bcd2db', fontSize: 11, lineHeight: 15, marginLeft: 14 },
+  titleRequirement: { color: '#6ab0c9', fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
 });

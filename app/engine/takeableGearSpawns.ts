@@ -19,6 +19,7 @@
 import weaponsData from '../data/items/weapons.json';
 import armorData from '../data/items/armor.json';
 import { isOversized } from './portability';
+import { resolveTable } from './contentPack';
 
 interface CatRow { name?: string; rarity?: string }
 
@@ -29,13 +30,28 @@ const rows = (d: unknown): CatRow[] => {
 };
 // Exclude oversized pieces (two-handers, bulky armor) — the TakeModal filters
 // those out (isOversized), so spawning one would just be an invisible no-op.
-const namesOf = (data: unknown, rarity: string): string[] =>
-  rows(data)
+const namesOf = (arr: readonly CatRow[], rarity: string): string[] =>
+  arr
     .filter((r) => r.rarity === rarity && !!r.name && !isOversized(r.name as string))
     .map((r) => r.name as string);
 
-const COMMON_GEAR: string[] = [...namesOf(weaponsData, 'Common'), ...namesOf(armorData, 'Common')];
-const UNCOMMON_GEAR: string[] = [...namesOf(weaponsData, 'Uncommon'), ...namesOf(armorData, 'Uncommon')];
+// engine_Dev — built-in defaults; the gear pools resolve through resolveTable()
+// at SPAWN time so an uploaded weapons/armor override actually shows up as
+// takeable scene loot instead of the built-in Tartaria catalog.
+const BUILTIN_WEAPONS = rows(weaponsData);
+const BUILTIN_ARMOR = rows(armorData);
+function commonGear(): string[] {
+  return [
+    ...namesOf(resolveTable('weapons', BUILTIN_WEAPONS), 'Common'),
+    ...namesOf(resolveTable('armor', BUILTIN_ARMOR), 'Common'),
+  ];
+}
+function uncommonGear(): string[] {
+  return [
+    ...namesOf(resolveTable('weapons', BUILTIN_WEAPONS), 'Uncommon'),
+    ...namesOf(resolveTable('armor', BUILTIN_ARMOR), 'Uncommon'),
+  ];
+}
 
 // ── tiny seeded PRNG (string → deterministic stream) ────────────────────────
 // OTA-611 — exported so the climbable/salvageable spawn pickers can seed off
@@ -62,7 +78,9 @@ export function mulberry32(a: number): () => number {
  *  them), deterministic for a given `seedKey`. ~1-in-50 picks upgrades to an
  *  Uncommon so the loop stays mostly-common per the design. */
 export function pickTakeableGearForScene(seedKey: string): string[] {
-  if (COMMON_GEAR.length === 0) return [];
+  const common = commonGear();
+  if (common.length === 0) return [];
+  const uncommonPool = uncommonGear();
   const rng = mulberry32(hashSeed(`take-gear:${seedKey}`));
   const count = 1 + Math.floor(rng() * 3); // 1..3
   const picks: string[] = [];
@@ -70,8 +88,8 @@ export function pickTakeableGearForScene(seedKey: string): string[] {
   let guard = 0;
   while (picks.length < count && guard < 40) {
     guard++;
-    const uncommon = UNCOMMON_GEAR.length > 0 && rng() < 0.02; // ~99% common
-    const pool = uncommon ? UNCOMMON_GEAR : COMMON_GEAR;
+    const uncommon = uncommonPool.length > 0 && rng() < 0.02; // ~99% common
+    const pool = uncommon ? uncommonPool : common;
     const name = pool[Math.floor(rng() * pool.length)];
     if (!name || seen.has(name)) continue;
     seen.add(name);
@@ -81,4 +99,4 @@ export function pickTakeableGearForScene(seedKey: string): string[] {
 }
 
 /** Test/diagnostic accessors. */
-export const _gearCounts = { common: COMMON_GEAR.length, uncommon: UNCOMMON_GEAR.length };
+export const _gearCounts = { get common() { return commonGear().length; }, get uncommon() { return uncommonGear().length; } };

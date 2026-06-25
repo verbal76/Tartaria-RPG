@@ -14,12 +14,15 @@ export interface DisplaySettings {
   vignetteStrength: number; // 0..1    — edge-shadow (vignette) opacity multiplier
 }
 
-// Defaults reproduce the shipped Clay Anvil look (~#241C17, 6% paper, full vignette).
+// engine_Dev — the engine's default look is a cool dark TEAL-SLATE (greenish-blue), not the
+// Tartaria warm umber. The base color is still fully slider-tunable; this only moves the default
+// hue from 24 (mud brown) to ~192 (blue-teal). textureOpacity kept low so the warm paper grain
+// barely reads on the cool base.
 const DEFAULTS: DisplaySettings = {
-  bgHue: 24,
-  bgSat: 0.22,
-  bgLight: 0.115,
-  textureOpacity: 0.06,
+  bgHue: 192,
+  bgSat: 0.24,
+  bgLight: 0.11,
+  textureOpacity: 0.05,
   vignetteStrength: 1.0,
 };
 

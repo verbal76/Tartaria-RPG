@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
+import { getRecipes, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
+import { isSidekickWeapon, getSummonNoun } from '../engine/sidekicks';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
@@ -18,6 +20,9 @@ const RECIPE_RARITY_RANK: Record<string, number> = {
 interface RecipeStatus {
   recipe: Recipe;
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
+  /** engine_Dev — a sidekick armament (result tagged golem_weapon). These show on
+   *  the MAGIC tab next to the summon disciplines, not the general Craft tab. */
+  isSidekickWeapon: boolean;
   missing: { name: string; short: number }[];
   available: boolean;
 }
@@ -32,7 +37,7 @@ function evaluateRecipe(recipe: Recipe, inventory: { name: string; quantity: num
   const short = missingIngredientsList(recipe.ingredients, inventory as never);
   const missing = short.map((m) => ({ name: m.name, short: m.quantity }));
   const cat = lookupCraftedItem(recipe.result);
-  return { recipe, kind: cat.kind, missing, available: missing.length === 0 };
+  return { recipe, kind: cat.kind, isSidekickWeapon: isSidekickWeapon(cat.tags), missing, available: missing.length === 0 };
 }
 
 function rarityColor(rarity: string | undefined): string {
@@ -40,11 +45,11 @@ function rarityColor(rarity: string | undefined): string {
     case 'Legendary': return '#e07a5f';
     case 'Rare': return '#b88ce0';
     case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
+    default: return '#6ab0c9';
   }
 }
 
-export type RecipeKindFilter = 'consumable' | 'non-consumable';
+export type RecipeKindFilter = 'consumable' | 'non-consumable' | 'sidekick-weapon';
 
 export interface RecipesViewProps {
   /** OTA-264 — called AFTER a successful craft attempt. Receives the
@@ -76,6 +81,10 @@ export interface RecipesViewProps {
   sortKey?: 'ready' | 'name' | 'rarity' | string;
   /** OTA-087 — direction for the sort axis. */
   sortDirection?: SortDirection;
+  /** engine_Dev — when true, render WITHOUT the component's own ScrollView (just
+   *  the count line + card list) so it can be embedded inside a parent ScrollView
+   *  (e.g. the sidekick-armament section on the Magic tab). */
+  embedded?: boolean;
 }
 
 // 2026-05-24 — extracted from CraftingScreen.tsx so both the standalone
@@ -94,18 +103,23 @@ export function RecipesView({
   query,
   sortKey = 'ready',
   sortDirection = 'asc',
+  embedded = false,
 }: RecipesViewProps) {
   const player = useGameStore((s) => s.player);
   const craftRecipe = useGameStore((s) => s.craftRecipe);
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
-    const all = RECIPES.map((r) => evaluateRecipe(r, player.inventory));
+    const all = getRecipes().map((r) => evaluateRecipe(r, player.inventory));
     const kindFiltered = kindFilter
       ? all.filter((e) =>
           kindFilter === 'consumable'
             ? e.kind === 'consumable'
-            : e.kind !== 'consumable',
+            : kindFilter === 'sidekick-weapon'
+              ? e.isSidekickWeapon
+              // 'non-consumable' (Craft tab): everything wearable/usable EXCEPT
+              // the sidekick armaments, which live on the MAGIC tab.
+              : e.kind !== 'consumable' && !e.isSidekickWeapon,
         )
       : all;
     // OTA-087 — search filter (substring on the result name,
@@ -165,10 +179,20 @@ export function RecipesView({
   }
 
   const arbiterLine = kindFilter === 'consumable'
-    ? 'The Arbiter eyes your pantry. "Food and tonics — what the body remembers."'
-    : kindFilter === 'non-consumable'
-      ? 'The Arbiter looks over your pack. "Every blueprint you carry. The lit ones you can build right now."'
-      : 'The Arbiter looks over your pack. "These are the things you can — or nearly can — set together."';
+    ? `The ${getNarratorName()} eyes your pantry. "Food and tonics — what the body remembers."`
+    : kindFilter === 'sidekick-weapon'
+      ? `The ${getNarratorName()} nods at your kit. "Armaments shaped for a ${getSummonNoun()}'s grip. Forge one, then arm your ${getSummonNoun()} with it."`
+      : kindFilter === 'non-consumable'
+        ? `The ${getNarratorName()} looks over your pack. "Every blueprint you carry. The lit ones you can build right now."`
+        : `The ${getNarratorName()} looks over your pack. "These are the things you can — or nearly can — set together."`;
+
+  // engine_Dev — embedded mode drops the inner ScrollView so this list can live
+  // inside a parent ScrollView (the Magic-tab sidekick-armament section).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ListWrap: React.ComponentType<any> = embedded ? View : ScrollView;
+  const listWrapProps = embedded
+    ? { style: styles.scrollContent }
+    : { style: styles.scroll, contentContainerStyle: styles.scrollContent };
 
   return (
     <>
@@ -181,20 +205,22 @@ export function RecipesView({
         </Text>
       </View>
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ListWrap {...listWrapProps}>
         {evaluated.length === 0 ? (
           <Text style={styles.empty}>
             {kindFilter === 'consumable'
               ? 'No food / tonic recipes in the book yet.'
-              : kindFilter === 'non-consumable'
-                ? 'No gear blueprints in the book yet.'
-                : 'Nothing fits together yet.'}
+              : kindFilter === 'sidekick-weapon'
+                ? `No ${getSummonNoun()} armaments in the book yet.`
+                : kindFilter === 'non-consumable'
+                  ? 'No gear blueprints in the book yet.'
+                  : 'Nothing fits together yet.'}
           </Text>
         ) : (
           evaluated.map((e) => {
             const cat = lookupCraftedItem(e.recipe.result);
             const preview = getItemPreview(e.recipe.result);
-            const stripeColor = e.available ? '#9ec96a' : '#3a342c';
+            const stripeColor = e.available ? '#9ec96a' : '#2b3a3e';
             return (
               <TouchableOpacity
                 key={e.recipe.result}
@@ -249,23 +275,23 @@ export function RecipesView({
             );
           })
         )}
-      </ScrollView>
+      </ListWrap>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  arbiterLine: { color: '#cdbf99', fontSize: 12, fontStyle: 'italic', marginBottom: 6, lineHeight: 17 },
+  arbiterLine: { color: '#bcd2db', fontSize: 12, fontStyle: 'italic', marginBottom: 6, lineHeight: 17 },
   countLine: { marginBottom: 8 },
   countText: { fontSize: 11, letterSpacing: 1 },
   countReady: { color: '#9ec96a', fontWeight: '700' },
-  countDim: { color: '#7a705c' },
+  countDim: { color: '#6c8088' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },
   recipeRow: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 6,
@@ -275,16 +301,16 @@ const styles = StyleSheet.create({
   recipeStripe: { width: 4 },
   recipeBody: { flex: 1, padding: 10 },
   recipeHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  recipeName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  recipeName: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
   recipeNameReady: { color: '#9ec96a' },
-  recipeNameMuted: { color: '#a89a7a' },
+  recipeNameMuted: { color: '#8fa6ac' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
-  recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
-  recipeIngLabel: { color: '#7a705c' },
+  recipeStats: { color: '#bcd2db', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
+  recipeIng: { color: '#6c8088', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeIngLabel: { color: '#6c8088' },
   recipeIngHave: { color: '#9ec96a', fontWeight: '600' },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });

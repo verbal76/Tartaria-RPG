@@ -8,6 +8,7 @@
 // nothing dominate.
 
 import type { Rarity } from './types';
+import { resolveFlavor } from './contentPack';
 
 // Phrases that count as a generic area / surface / direction search.
 // Anything in here triggers an outcome roll instead of "I don't see X".
@@ -216,26 +217,30 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
 // atmospheric flavor lines repeatedly and not realising there was
 // nothing to find. The line below is the one hard mechanical
 // signal the player needs to move on.
-const NOTHING_LINES = [
+// engine_Dev — NEUTRAL defaults (no setting-specific proper nouns). Each pool is
+// overridable from the uploaded `flavor` block (keys: searchNothing, searchMaterial,
+// searchTc, searchHook). Exported so the flavor template + Tartaria pack can read
+// the shapes.
+export const NOTHING_LINES = [
   'You search {target}. Nothing turns up — but the thing itself is still here for another pass.',
   'You go over {target} carefully and find nothing this time. It will still be here when you come back.',
 ];
 
-const MATERIAL_LINES = [
+export const MATERIAL_LINES = [
   'You search {target}. A useful scrap turns up in your hand.',
   'You comb through {target}. You find something half-buried.',
   'You sift {target} and pull out a piece worth keeping.',
 ];
 
-const TC_LINES = [
-  'You search {target}. A few coins, half-eaten by Aetherstone, but spendable.',
-  'You comb {target}. Old coin tangled in the silt — yours now.',
+export const TC_LINES = [
+  'You search {target}. A few coins, corroded but spendable.',
+  'You comb {target}. Old coin tangled in the debris — yours now.',
   'You find a small purse forgotten in {target}.',
 ];
 
-const HOOK_LINES = [
+export const HOOK_LINES = [
   'You search {target}. Something not-quite-right catches your eye.',
-  'You comb {target}. The silt parts on something the Arbiter would call worth following.',
+  'You comb {target}. The debris parts on something worth following.',
   'You feel through {target} and your fingers close on something that does not belong here.',
 ];
 
@@ -271,12 +276,16 @@ export interface DirectionalFindSeed {
   hintNoun: string;
   lineTemplate: string;
 }
-const DIRECTIONAL_FINDS: DirectionalFindSeed[] = [
-  { direction: 'E', archetype: 'abandoned_caravan', hintNoun: 'Reclaimer caravan', lineTemplate: 'You catch a glint to the east — wagon spokes and a half-buried banner. A caravan, slumped in the silt. Two stretches that way.' },
-  { direction: 'N', archetype: 'frozen_traveller', hintNoun: 'mud-glassed body', lineTemplate: 'A shape sits north of here, too still to be alive. A body, mud-glassed in the cross-legged pose Reclaimers use when they choose where to die.' },
+// engine_Dev — NEUTRAL defaults (flavor stripped of proper nouns). Overridable from
+// the uploaded `flavor` block under `directionalFinds`; a re-skin should override
+// these to point `archetype` at ITS OWN wasteland-encounter ids (the built-in ids
+// below are the Tartaria archetypes). Exported for the template + Tartaria pack.
+export const DIRECTIONAL_FINDS: DirectionalFindSeed[] = [
+  { direction: 'E', archetype: 'abandoned_caravan', hintNoun: 'caravan', lineTemplate: 'You catch a glint to the east — wagon spokes and a half-buried banner. A caravan, slumped in the dirt. Two stretches that way.' },
+  { direction: 'N', archetype: 'frozen_traveller', hintNoun: 'still figure', lineTemplate: 'A shape sits north of here, too still to be alive. A body, settled in the cross-legged pose of someone who chose where to die.' },
   { direction: 'W', archetype: 'wandering_drifter', hintNoun: 'drifter', lineTemplate: 'Far west, a thin line of smoke. Someone built a small fire. Whoever they are is alone, and they\'ll talk if you walk up slowly.' },
-  { direction: 'S', archetype: 'fusion_crucible', hintNoun: 'Crucible', lineTemplate: 'A faint hum, south. The kind of resonance only Aetheric ironwork gives off. A Crucible, maybe — the old Reclaimers made them, then walked away.' },
-  { direction: 'E', archetype: 'old_bus_with_note', hintNoun: 'pre-flood bus', lineTemplate: 'Past the next rise east, a long shape — pre-flood transport, tipped onto its side. You can read the wreckage from here. Notes survive longer than people.' },
+  { direction: 'S', archetype: 'fusion_crucible', hintNoun: 'workshop', lineTemplate: 'A faint hum, south. The kind of resonance only old ironwork gives off. A workshop, maybe — someone made it, then walked away.' },
+  { direction: 'E', archetype: 'old_bus_with_note', hintNoun: 'wreck', lineTemplate: 'Past the next rise east, a long shape — an old transport, tipped onto its side. You can read the wreckage from here. Notes survive longer than people.' },
 ];
 
 // OTA-216 — cool-story pool. Single-line atmospheric beats that
@@ -284,23 +293,25 @@ const DIRECTIONAL_FINDS: DirectionalFindSeed[] = [
 // No mechanical payload — these exist to make investigate feel
 // like a verb that finds stories, not just loot or hooks. The
 // player can ignore them safely but they're meant to be read.
-const COOL_STORIES: string[] = [
+// engine_Dev — NEUTRAL atmospheric beats (proper nouns stripped). Overridable from
+// the uploaded `flavor` block under `coolStories`. Exported for the template + pack.
+export const COOL_STORIES: string[] = [
   'Initials carved in a stone wall: "TM was here. 2019? 2059? The dust does not say."',
   'A tiny shrine, hand-built. Three pebbles stacked, a frayed red ribbon, a coin face-down. Someone took the time.',
-  'The bone-white silhouette of a long-dead Aetheric coil, threaded with creeping ivy. The coil is older than the ivy. The ivy is older than you.',
+  'The bone-white silhouette of a long-dead power coil, threaded with creeping ivy. The coil is older than the ivy. The ivy is older than you.',
   'A child\'s shoe, no mate, dry as paper. The lacing was tied twice. They were taught well.',
   'An empty oil drum, rust-bitten through. Pressed into the rim, almost gentle: "I forgive you."',
-  'A drift of glass, the kind that only forms in Aetheric heat. Whoever was here didn\'t want to be remembered. The glass remembers anyway.',
+  'A drift of glass, the kind that only forms in extreme heat. Whoever was here didn\'t want to be remembered. The glass remembers anyway.',
   'A circle of fourteen footprints in the mud. The center is bare. Whatever stood there left without disturbing the ring.',
   'A copper pocket-watch, hands stopped at 4:14. Pre-flood manufacture. The crystal is whole. Someone wound it.',
   'Three sentences scratched into a board: "We waited. He never came. We walked." The board is half-buried; the sentences face up.',
   'A small cairn of stones in the shape of an animal — a fox, maybe. Crude, but whoever made it loved the fox.',
   'A drowned book, its pages fused. The visible spine letter is "K." The rest is mud and time.',
-  'A faded chalk mark on the rock, the kind Reclaimers use for "safe water nearby." The chalk is twenty years old. The water is not.',
-  'A broken Aetheric lantern, the kind that needed two people to carry. Whatever it lit, the people stopped lighting it.',
+  'A faded chalk mark on the rock, the kind scavengers use for "safe water nearby." The chalk is twenty years old. The water is not.',
+  'A broken iron lantern, the kind that needed two people to carry. Whatever it lit, the people stopped lighting it.',
   'A row of seven shell casings, lined up neat as you\'d expect. Someone wanted the count remembered.',
-  'A piece of mirror, no bigger than your palm. You catch your own reflection. Tartaria gives you that back, sometimes.',
-  'A hand-stitched cloth doll, its eyes embroidered crossed-shut. A Mud Dweller would have called it a sleeping doll. They\'re for children who can\'t sleep.',
+  'A piece of mirror, no bigger than your palm. You catch your own reflection. The world gives you that back, sometimes.',
+  'A hand-stitched cloth doll, its eyes embroidered crossed-shut. Some would have called it a sleeping doll. They\'re for children who can\'t sleep.',
   'Three iron nails driven into a tree at exact head-height. Either a warning or a hex; the language depends on the faction.',
   'A pre-flood photograph, the surface bubbled by water. You can almost make out a wedding. The bride\'s veil is still visible.',
   'A small wooden box, no lid, no nails. Inside: a single dry rose, brown to black. Someone meant to come back for it.',
@@ -382,7 +393,7 @@ export function rollAreaSearch(
     : findCutoff + 0.20;
   const r = Math.random();
   if (r < nothingCutoff) {
-    return { kind: 'nothing', line: format(pick(NOTHING_LINES), target) };
+    return { kind: 'nothing', line: format(pick(resolveFlavor('searchNothing', NOTHING_LINES)), target) };
   }
   if (r < findCutoff) {
     const pool = isInvestigate ? RARE_FINDS : SMALL_FINDS;
@@ -402,12 +413,12 @@ export function rollAreaSearch(
       kind: 'material',
       itemName: found.name,
       rarity: found.rarity,
-      line: format(pick(MATERIAL_LINES), target),
+      line: format(pick(resolveFlavor('searchMaterial', MATERIAL_LINES)), target),
     };
   }
   if (r < tcCutoff) {
     const amount = 5 + Math.floor(Math.random() * 12);
-    return { kind: 'tc', amount, line: format(pick(TC_LINES), target) };
+    return { kind: 'tc', amount, line: format(pick(resolveFlavor('searchTc', TC_LINES)), target) };
   }
   // OTA-216 — when investigate fires a hook outcome, split the
   // 60% hook share three ways:
@@ -421,9 +432,9 @@ export function rollAreaSearch(
   if (isInvestigate) {
     const subRoll = Math.random();
     if (subRoll < 0.50) {
-      return { kind: 'hook', line: format(pick(HOOK_LINES), target) };
+      return { kind: 'hook', line: format(pick(resolveFlavor('searchHook', HOOK_LINES)), target) };
     } else if (subRoll < 0.80) {
-      const seed = pick(DIRECTIONAL_FINDS);
+      const seed = pick(resolveFlavor('directionalFinds', DIRECTIONAL_FINDS));
       return {
         kind: 'directional_find',
         direction: seed.direction,
@@ -432,10 +443,10 @@ export function rollAreaSearch(
         line: seed.lineTemplate,
       };
     } else {
-      return { kind: 'cool_story', line: pick(COOL_STORIES) };
+      return { kind: 'cool_story', line: pick(resolveFlavor('coolStories', COOL_STORIES)) };
     }
   }
-  return { kind: 'hook', line: format(pick(HOOK_LINES), target) };
+  return { kind: 'hook', line: format(pick(resolveFlavor('searchHook', HOOK_LINES)), target) };
 }
 
 function pick<T>(arr: readonly T[]): T {

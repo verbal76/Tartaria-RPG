@@ -1,7 +1,7 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
-import { racialStatBonusesFor } from './raceMechanics';
+import { racialStatBonusesFor, factionStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
 
 /**
@@ -201,6 +201,25 @@ type StatKey = keyof Stats;
 // + ~16 other authored pieces) actually apply through aggregateEquippedStatBonuses.
 const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
 
+// engine_Dev — common stat SYNONYMS → the engine's tracked stat (or the hp/staminaMax pools). Lets a
+// catalog authored with D&D-ish names (constitution, acrobatics, perception, investigation, …)
+// resolve to the closest real stat instead of being silently dropped. Lowercased keys.
+const STAT_ALIAS: Record<string, string> = {
+  str: 'strength', power: 'strength', might: 'strength', brawn: 'strength',
+  dex: 'dexterity', agility: 'dexterity', acrobatics: 'dexterity', reflexes: 'dexterity', finesse: 'dexterity', sleight: 'dexterity',
+  int: 'intelligence', logic: 'intelligence', investigation: 'intelligence', knowledge: 'intelligence', arcana: 'intelligence', aetheria: 'intelligence', aether: 'intelligence',
+  wis: 'wisdom', perception: 'wisdom', awareness: 'wisdom', insight: 'wisdom', intuition: 'wisdom', willpower: 'wisdom',
+  cha: 'charisma', presence: 'charisma', persuasion: 'charisma', charm: 'charisma',
+  ste: 'stealth', sneak: 'stealth', sneaking: 'stealth',
+  constitution: 'hp', con: 'hp', vitality: 'hp', endurance: 'hp', toughness: 'hp', health: 'hp', fortitude: 'hp',
+  stamina: 'staminamax', staminamax: 'staminamax',
+};
+/** Canonicalize a stat name: lowercase + map a known synonym to the engine stat/pool key. */
+export function canonicalStatKey(raw: string | null | undefined): string {
+  const lc = (raw ?? '').toLowerCase();
+  return STAT_ALIAS[lc] ?? lc;
+}
+
 // Shared resolver list — the effect system can be backed by any
 // catalog row that carries an `effect` field. As of OTA 192 that's
 // exploration / gear / material rows in addition to the existing
@@ -281,7 +300,7 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   const bonus: Partial<Record<StatKey, number>> = {};
   const eq = player.equipped ?? {};
   const add = (stat: string, amount: number) => {
-    const key = stat as StatKey;
+    const key = canonicalStatKey(stat) as StatKey; // map synonyms (acrobatics→dexterity, …); hp/staminaMax fall out here and route to the pools
     if (!STAT_KEYS.includes(key)) return;
     bonus[key] = (bonus[key] ?? 0) + amount;
   };
@@ -396,7 +415,7 @@ export function armorHpBonus(name: string | null | undefined): number {
   if (!piece) return 0;
   const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
   return bonuses
-    .filter((b) => b.stat === 'hp')
+    .filter((b) => canonicalStatKey(b.stat) === 'hp')
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
@@ -410,7 +429,7 @@ export function weaponHpBonus(name: string | null | undefined): number {
   if (!wpn) return 0;
   const bonuses = wpn.statBonuses ?? [];
   return bonuses
-    .filter((b) => b.stat === 'hp')
+    .filter((b) => canonicalStatKey(b.stat) === 'hp')
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
@@ -420,6 +439,50 @@ export function weaponHpBonus(name: string | null | undefined): number {
 // catalog, so the sum is just "whichever matched".
 export function gearHpBonus(name: string | null | undefined): number {
   return armorHpBonus(name) + weaponHpBonus(name);
+}
+
+// engine_Dev — STAMINA-MAX gear bonus, mirroring the HP bonus exactly: a piece
+// grants +max-stamina via a statBonus { stat: 'staminaMax', amount }. Like 'hp',
+// 'staminaMax' is NOT a base attribute, so aggregateEquippedStatBonuses / effectiveStats
+// ignore it — it's summed here and folded into the stamina cap instead.
+export function gearStaminaMaxBonus(name: string | null | undefined): number {
+  if (!name) return 0;
+  let total = 0;
+  const armor = findArmorByName(name);
+  if (armor) {
+    const bonuses = armor.statBonuses ?? (armor.statBonus ? [armor.statBonus] : []);
+    total += bonuses.filter((b) => canonicalStatKey(b.stat) === 'staminamax').reduce((s, b) => s + (b.amount ?? 0), 0);
+  }
+  const wpn = findWeaponByName(name);
+  if (wpn) {
+    total += (wpn.statBonuses ?? []).filter((b) => canonicalStatKey(b.stat) === 'staminamax').reduce((s, b) => s + (b.amount ?? 0), 0);
+  }
+  return total;
+}
+
+/** Sum of staminaMax bonuses from every EQUIPPED piece (armor slots + main/off). */
+export function equippedStaminaMaxBonus(player: PlayerCharacter): number {
+  const eq = player.equipped ?? {};
+  let total = 0;
+  for (const slot of [...ARMOR_SLOTS, 'main', 'off'] as const) {
+    total += gearStaminaMaxBonus((eq as Record<string, string | undefined>)[slot]);
+  }
+  return total;
+}
+
+/** engine_Dev — total author-granted staminaMax bonus: equipped GEAR + active custom
+ *  TITLE perks ({ stat: 'staminaMax', amount }). Folded into the stamina cap + the
+ *  displayed max so a +staminaMax perk reads everywhere the player sees their cap. */
+export function bonusStaminaMaxFor(player: PlayerCharacter): number {
+  const title = (require('./customTitles') as typeof import('./customTitles'))
+    .customTitleStatBonuses(player).staminaMax ?? 0;
+  return equippedStaminaMaxBonus(player) + title;
+}
+
+/** The player's displayed max stamina: stored base (creation + climb growth) plus
+ *  gear/title bonuses. Mechanics also subtract the hunger penalty (effectiveStaminaMax). */
+export function displayStaminaMax(player: PlayerCharacter): number {
+  return Math.max(1, (player.staminaMax ?? 0) + bonusStaminaMaxFor(player));
 }
 
 // Apply the aggregated stat bonuses on top of the player's base stats.
@@ -459,19 +522,26 @@ export function effectiveStats(
   const w = weatherMod ?? {};
   // OTA 038 — race-derived always-on stat bonuses.
   const racial = racialStatBonusesFor(player.raceId);
+  // engine_Dev — faction-derived always-on stat bonuses (factionStatBonuses).
+  const fac = factionStatBonusesFor(player.factionId);
   // OTA 039 — corruption tier penalty. Tainted=-1 CHA, Corrupted=-1
   // all, Hollowed=-2 all. Subtracts at every skill-check site so the
   // aether under your skin actually costs you something.
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
+  // engine_Dev — flat attribute perks from earned IMPORTABLE TITLES (perk:{stat,amount}).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ttl = (require('./customTitles') as typeof import('./customTitles')).customTitleStatBonuses(player) as Partial<Record<keyof Stats, number>>;
+  // engine_Dev (balance OTA-881) — floor every effective stat at 1, so stacked debuffs (damage-type
+  // onHit + weather + corruption) can't drive a roll stat to 0 or negative.
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0),
+    strength: Math.max(1, player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (fac.strength ?? 0) + (corrPen.strength ?? 0) + (ttl.strength ?? 0)),
+    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (fac.dexterity ?? 0) + (corrPen.dexterity ?? 0) + (ttl.dexterity ?? 0)),
+    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (fac.intelligence ?? 0) + (corrPen.intelligence ?? 0) + (ttl.intelligence ?? 0)),
+    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (fac.wisdom ?? 0) + (corrPen.wisdom ?? 0) + (ttl.wisdom ?? 0)),
+    charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (fac.charisma ?? 0) + (corrPen.charisma ?? 0) + (ttl.charisma ?? 0)),
     // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player.
-    stealth: (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0),
+    stealth: Math.max(1, (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (fac.stealth ?? 0) + (corrPen.stealth ?? 0) + (ttl.stealth ?? 0)),
   };
 }
 
@@ -506,6 +576,7 @@ export function effectiveStatsBreakdown(
     });
   }
   const racial = racialStatBonusesFor(player.raceId);
+  const fac = factionStatBonusesFor(player.factionId);
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
   const w = weatherMod ?? {};
@@ -514,6 +585,7 @@ export function effectiveStatsBreakdown(
     const base = player.stats[stat] ?? 0; // OTA-348 — guard pre-backfill stealth
     const sources: StatSource[] = [];
     if ((racial[stat] ?? 0) !== 0) sources.push({ label: 'race', delta: racial[stat]! });
+    if ((fac[stat] ?? 0) !== 0) sources.push({ label: 'faction', delta: fac[stat]! });
     if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
     if ((inv[stat] ?? 0) !== 0) sources.push({ label: 'pack passive', delta: inv[stat]! });
     for (const fb of foodBuffs) {

@@ -5,6 +5,7 @@
 
 import mysteriesData from '../data/quests/mysteries.json';
 import type { HuntCheckKind } from './hunts';
+import { resolveMissions } from './contentPack';
 
 export interface MysteryStageDef {
   narration: string;
@@ -29,10 +30,16 @@ interface MysteryDataShape {
   mysteries: MysteryDef[];
 }
 
-export const MYSTERIES = (mysteriesData as MysteryDataShape).mysteries;
+const MYSTERIES_BUILTIN = (mysteriesData as MysteryDataShape).mysteries;
+/** Live mystery list — uploaded 'missions.mysteries' override or built-in. */
+export function getMysteries(): MysteryDef[] {
+  return resolveMissions('mysteries', MYSTERIES_BUILTIN) as MysteryDef[];
+}
+/** Built-in mysteries only — dev-console template. */
+export const MYSTERIES = MYSTERIES_BUILTIN;
 
 export function findMysteryById(id: string): MysteryDef | null {
-  return MYSTERIES.find((m) => m.id === id) ?? null;
+  return getMysteries().find((m) => m.id === id) ?? null;
 }
 
 export function availableMysteries(
@@ -41,7 +48,7 @@ export function availableMysteries(
   active: readonly string[],
   completed: readonly string[],
 ): MysteryDef[] {
-  return MYSTERIES.filter(
+  return getMysteries().filter(
     (m) =>
       (m.factionId === factionId || (factionId !== null && m.factionId === null)) &&
       playerRep >= m.minRep &&

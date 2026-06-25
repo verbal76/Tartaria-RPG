@@ -256,7 +256,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`;
 export const NOTICES_VERIFIED_AT = '2026-05-30';
 
 export const NOTICES_PREAMBLE =
-  'Tartaria Realms ships with several open-source AI models and ' +
+  'This app ships with several open-source AI models and ' +
   'native runtimes. The licenses for each are reproduced below in ' +
   'full as required by their authors. Last verified on ' +
   NOTICES_VERIFIED_AT +
@@ -282,7 +282,7 @@ export const THIRD_PARTY_NOTICES: ThirdPartyNotice[] = [
     id: 'qwen25',
     name: 'Qwen2.5-0.5B-Instruct (GGUF)',
     role:
-      "Small language model that generates the Arbiter's contextual " +
+      "Small language model that generates the narrator's contextual " +
       'narration. Quantised Q4_K_M build downloaded at first boot.',
     license: 'Apache-2.0',
     copyright: 'Copyright (c) 2024 Alibaba Cloud (Qwen team).',

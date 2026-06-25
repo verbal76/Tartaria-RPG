@@ -172,7 +172,7 @@ export interface Race {
   /** OTA 038 — structured AC bonus rules applied at runtime in
    *  effectiveAC(player, scene). Empty array = no conditional bonus. */
   racialACBonusRules?: Array<{
-    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'aether_powers' | 'constructed_environment' | 'relic_armor';
+    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'energy_powers' | 'constructed_environment' | 'relic_armor';
     delta: number;
   }>;
   /** OTA 038 — always-on racial stat bumps applied at every
@@ -185,6 +185,13 @@ export interface Race {
     wisdom?: number;
     charisma?: number;
   };
+  /** engine_Dev — POWERS (the "magic" disciplines: summon/shape/mend) AFFINITY.
+   *  powerDcMod is added to every power-check DC for this race (+ = harder,
+   *  − = easier; 0/absent = no modifier, the default for a reskin race that sets
+   *  no affinity). powerIntBonus adds to effective INT when using a power.
+   *  Replaces the old hardcoded "mud_dweller 0 / aetherborn +2 / else +3" rule. */
+  powerDcMod?: number;
+  powerIntBonus?: number;
   startingTCFormula: string;
   startingHPBonus: number;
   barehandDamage: string;
@@ -195,6 +202,51 @@ export interface Race {
    *  screen under the mechanical description. 2-3 sentences max. Voice:
    *  what it feels like to wake up as this race. */
   flavor?: string;
+  /** engine_Dev — the item name granted as this race's starter primary weapon
+   *  (resolved against the live weapons catalog). Omit → the built-in per-race map,
+   *  then the first Common weapon in your pack. */
+  startingWeapon?: string;
+  /** engine_Dev — extra item names granted at creation for this race (resolved
+   *  against your weapons/armor/amulets/rings/gear/exploration/materials catalogs).
+   *  Replaces the built-in per-race starter-gear map. */
+  startingGear?: string[];
+  /** engine_Dev — once-a-day activatable abilities this race grants (data-driven;
+   *  see ActivatableAbility). Replaces the hard-coded built-in race abilities. */
+  abilities?: ActivatableAbility[];
+  /** engine_Dev — damage types this race innately RESISTS (lower chance to suffer
+   *  that type's on-hit effect) / is WEAK to (higher chance). Names match your
+   *  Damage Types. The player has no weaknesses unless a race/faction grants them. */
+  resist?: string[];
+  weak?: string[];
+}
+
+/** engine_Dev — a data-driven, once-a-day activatable ability granted by a race or
+ *  faction. The `effect` maps to one of the built-in effect engines; the name/blurb
+ *  are the author's. Surfaced in the ✦ ABILITY picker. */
+export interface ActivatableAbility {
+  id: string;
+  name: string;
+  description: string;
+  /** Daily cooldown (resets when the in-game day advances). Default 'day'. */
+  cooldown?: 'day';
+  /** Requires a live enemy (e.g. a strike). */
+  combatOnly?: boolean;
+  effect: {
+    /** heal = restore HP · stat_buff = +amount to a stat for N rounds · shield =
+     *  halve incoming damage for N rounds · repair = mend your most-worn item ·
+     *  strike = deal damage to the active enemy (combatOnly). */
+    type: 'heal' | 'stat_buff' | 'shield' | 'repair' | 'strike';
+    /** Flat amount (heal HP / strike damage / buff size). `dice` overrides it. */
+    amount?: number;
+    /** Dice rolled instead of a flat amount, e.g. "1d10" (heal/strike). */
+    dice?: string;
+    /** stat_buff target stat. */
+    stat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
+    /** shield / stat_buff duration in rounds (default 3). */
+    rounds?: number;
+    /** strike damage type (default bludgeoning). */
+    damageType?: string;
+  };
 }
 
 export interface Faction {
@@ -214,6 +266,41 @@ export interface Faction {
    *  screen under the faction goal. 2-3 sentences max. Voice: what it
    *  feels like to wear this colors. */
   flavor?: string;
+  /** engine_Dev — the faction's STARTER COMPLEX (Tartaria calls these
+   *  "outposts"; a re-skin's could be a military base, a corporate HQ, a
+   *  compound). `baseName` is its display title in the opening + minimap;
+   *  `baseLocationId` is the location id (from your Locations table) the member
+   *  spawns at and is safe inside until they leave; `baseDescription` is optional
+   *  flavor. All optional — omit and the engine spawns at the first location. */
+  baseName?: string;
+  baseLocationId?: string;
+  baseDescription?: string;
+  /** engine_Dev — item names granted at creation to a member of this faction
+   *  (resolved against your catalogs). Replaces the built-in faction "knife" map. */
+  startingGear?: string[];
+  /** engine_Dev — always-on stat bumps applied while the player belongs to this
+   *  faction (mirrors a race's racialStatBonuses). */
+  factionStatBonuses?: {
+    strength?: number;
+    dexterity?: number;
+    intelligence?: number;
+    wisdom?: number;
+    charisma?: number;
+    stealth?: number;
+  };
+  /** engine_Dev — conditional AC bonuses for faction members (same shape + scene
+   *  conditions as a race's racialACBonusRules). */
+  factionACBonusRules?: Array<{
+    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'energy_powers' | 'constructed_environment' | 'relic_armor';
+    delta: number;
+  }>;
+  /** engine_Dev — once-a-day activatable abilities this faction grants its members
+   *  (data-driven; see ActivatableAbility). */
+  abilities?: ActivatableAbility[];
+  /** engine_Dev — damage types members innately RESIST / are WEAK to (same meaning
+   *  as the race fields; stacks with race + armor). */
+  resist?: string[];
+  weak?: string[];
 }
 
 export interface Enemy {
@@ -331,6 +418,17 @@ export interface Location {
    *  nouns, no verbs / abstractions / measurements. Lowercase,
    *  no punctuation, singular preferred. */
   interactables?: string[];
+  /** engine_Dev — optional map plot position, in the world coordinate size set in
+   *  the dev console (0,0 = top-left). When present, the Map screen dots this
+   *  location at (x / worldWidth, y / worldHeight) on the uploaded world map. */
+  x?: number;
+  y?: number;
+  /** engine_Dev — when true, this place shows as a colored "?" on the atlas and in
+   *  the travel list (still fully routable) and reveals its real name only after
+   *  the player has TRAVELED there once. The "?" color is derived from the id so it
+   *  stays stable per place. Mirrors the built-in Hidden Market, but author-driven:
+   *  flag any uploaded location to make it a discoverable mystery. */
+  hidden?: boolean;
 }
 
 export interface QuestObjective { id: string; verb: string; target: string; tags: string[]; }
@@ -468,6 +566,10 @@ export interface InventoryItem {
    *  status: poison = pure DOT, acid = DOT + armor shred (−AC),
    *  corruption = DOT + corruption stacks. */
   coating?: WeaponCoating;
+  /** engine_Dev — damage-type resists APPLIED to this ARMOR instance from a coating
+   *  vial (e.g. drinking-vial's "apply to armor" use). Permanent for the piece's
+   *  life; aggregateArmor adds these to the slot's resistances while it's worn. */
+  addedResists?: string[];
 }
 
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */
@@ -733,6 +835,10 @@ export interface PlayerEquipped {
   armor?: string;
 }
 
+// engine_Dev — the 10 built-in literals stay for autocomplete; `(string & {})` lets
+// an author add their OWN damage types (e.g. "frost") via the damage-types override
+// without touching engine code. The resist/weak math is plain string comparison, so
+// a custom type flows through combat once declared on a weapon/enemy + a resistance.
 export type DamageType =
   | 'degradation'
   | 'bludgeoning'
@@ -743,7 +849,8 @@ export type DamageType =
   | 'poison'
   | 'radiation'
   | 'slashing'
-  | 'stun';
+  | 'stun'
+  | (string & {});
 
 export type StatusEffectKind =
   | 'bleed'
@@ -780,7 +887,7 @@ export type StatusEffectKind =
   // OTA 039 — Aethercraft shape outcome. shaped_stone_ward grants a
   // one-round +4 AC. The companion-style 'golem_companion' kind was
   // retired 2026-05-25 (MECHANIC-1b OTA-011) — replaced by
-  // player.golem + handleGolemCommand. Removed from the union now
+  // player.golem + handleSidekickCommand. Removed from the union now
   // that the unreachable handler block was deleted.
   | 'shaped_stone_ward'
   // 2026-05-24 — stamina-driven combat statuses. tired and exhausted
@@ -796,7 +903,15 @@ export type StatusEffectKind =
   // OTA-120 — dog distract success applies this to one enemy for
   // the player's NEXT action. The next attack hit roll, dodge
   // parry, or flee from THAT enemy gets +2. Consumed when applied.
-  | 'distracted';
+  | 'distracted'
+  // engine_Dev — drinking a coating vial grants RESIST to its damage type for the
+  // rest of the fight (cleared at combat end). `resistType` carries the type; the
+  // combat site halves that type's damage + lowers its on-hit-effect chance.
+  | 'resist_buff'
+  // engine_Dev — a generic damage-type DOT applied TO THE PLAYER when an enemy hits
+  // with a custom damage type configured as 'dot' (symmetry with the enemy-side
+  // dt_dot). Ticks perRoundDamage each round; label carries the type name.
+  | 'dt_dot';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -809,6 +924,8 @@ export interface StatusEffect {
    *  how much. effectiveStats reads these when summing buffs. */
   buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
   buffBonus?: number;
+  /** engine_Dev — for 'resist_buff': the damage-type name the drink protects against. */
+  resistType?: string;
 }
 
 // v2.4.1 (OTA 033) — Mud Flood Nexus main quest arc.
@@ -867,6 +984,10 @@ export interface PlayerCharacter {
   hpMax: number;
   stamina: number;
   staminaMax: number;
+  /** OTA-790 — climbing slow-burn: progress (0..CLIMB_STAMINA_THRESHOLD) toward
+   *  the next +1 staminaMax. A very minute amount accrues per cleared climb tier;
+   *  crossing the threshold ticks staminaMax up. Absent on legacy saves → 0. */
+  staminaProgress?: number;
   /** 2026-05-24 — hunger penalty. Increments by 1 every 8 in-game hours
    *  without eating, capped at 5. effectiveStaminaMax = staminaMax - this.
    *  Eating any food consumable resets to 0. Absent for legacy saves,
@@ -884,6 +1005,11 @@ export interface PlayerCharacter {
   inventory: InventoryItem[];
   factionStanding: FactionStanding[];
   currentLocationId: string;
+  /** engine_Dev — the location id of the STARTER COMPLEX this character spawned
+   *  in (their faction's base). Encounters stay suppressed while the player is
+   *  still here (and through the tutorial); combat begins once they leave it for
+   *  the first time. Captured at character creation; absent on legacy saves. */
+  startLocationId?: string;
   activeQuests: Quest[];
   /** Set when HP hits 0; the character is barred from play until a Resurrection Gem revives them. */
   dead?: boolean;
@@ -947,6 +1073,10 @@ export interface PlayerCharacter {
   /** v2.4.1 (OTA 033) — Mud Flood Nexus main quest progress. Optional
    *  because legacy saves predate the arc; backfilled on hydrate. */
   mainQuest?: MainQuestState;
+  /** engine_Dev — progress index into the uploaded DATA-DRIVEN main quest
+   *  (customMainQuest). The current (not-yet-completed) step; >= steps.length means
+   *  the quest is won. Absent = step 0. */
+  customQuestStep?: number;
   /** HANDOFF #13 — first-cut companion system. A single NPC follower
    *  the player recruits from a vendor scene. Persists across scenes.
    *  Currently narrative-only; mechanical effects (advantage dice on
@@ -1120,13 +1250,13 @@ export interface PlayerCharacter {
    *  location). Drives the same travel-row continue/stop UX, but steps
    *  cardinally within the current area toward the coordinate. */
   whisperCourse?: { mapX: number; mapY: number; label: string } | null;
-  /** 2026-05-25 [MECHANIC-1b] — active golem sidekick. Persists on
+  /** 2026-05-25 [MECHANIC-1b] — active sidekick companion. Persists on
    *  the player so it survives cardinal moves + scene transitions
    *  (the "follows until needed again" requirement). null when no
-   *  golem is summoned or after dismissal / death. Named 'golem'
-   *  to avoid colliding with the existing optional 'companion'
-   *  NPC follower field above. */
-  golem?: Companion | null;
+   *  sidekick is summoned or after dismissal / death. Named 'sidekick'
+   *  (was 'golem' through OTA-814) to avoid colliding with the existing
+   *  optional 'companion' NPC follower field above. */
+  sidekick?: Companion | null;
   /** OTA-120 — Dog Companion. One per save, acquired via a rescue
    *  scenario (or the puppy-vendor / rubble-puppy safety net). null
    *  on character creation and on legacy saves (backfilled to null
@@ -1219,13 +1349,18 @@ export interface PendingDogOnboarding {
  *  via the Aethercraft `summon <type> golem` path, commanded via a
  *  golem QuickBtn in combat. Survives until HP ≤ 0 or until the
  *  player dismisses. */
-export type GolemKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem';
+// engine_Dev — widened so an uploaded "summons" pack can define its OWN sidekick
+// ids (e.g. 'phase_automaton'). The four built-in literals stay for autocomplete;
+// `(string & {})` lets any custom id flow through every kind-keyed lookup without
+// touching the call sites. resolveSidekickDefs()/getSidekickDefinition() resolve a kind
+// against the active (uploaded or built-in) definition set.
+export type SidekickKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem' | (string & {});
 /** OTA-467 — trainable golem stats, mirroring the dog's progression. POWER
  *  boosts the golem's to-hit (full) and damage (half); RESILIENCE reduces the
  *  damage it takes from retaliation. */
-export type GolemStatKey = 'power' | 'resilience';
+export type SidekickStatKey = 'power' | 'resilience';
 export interface Companion {
-  kind: GolemKind;
+  kind: SidekickKind;
   /** Display label. "Mud Golem" / "Iron Golem" / etc. (or a player-given name). */
   name: string;
   hp: number;
@@ -1631,6 +1766,7 @@ export type ScreenName =
   | 'vendor'
   | 'actions'
   | 'contracts'
+  | 'developer'
   | 'ending';
 
 export interface SaveState {

@@ -19,8 +19,12 @@
 // CHAINS + an entry to applyChainStage's switch.
 
 import type { WhisperRecord, Enemy, InventoryItem } from './types';
+import type { HookEffect } from './hooks';
 import { rollDie } from './rng';
 import { findEnemyByName } from './encounter';
+import { resolveWhispers } from './contentPack';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import builtinWhisperData from '../data/whispers/builtin-whispers.json';
 
 /** Time window check that handles midnight wraparound. */
 export function isHourInWindow(hour: number, from: number | undefined, to: number | undefined): boolean {
@@ -28,6 +32,25 @@ export function isHourInWindow(hour: number, from: number | undefined, to: numbe
   if (from <= to) return hour >= from && hour <= to;
   // Wraps midnight: e.g. [20, 4] = 8pm to 4am.
   return hour >= from || hour <= to;
+}
+
+/** engine_Dev — one LEG of a multi-stage whisper mission. The engine walks the
+ *  player through the legs in order; each resolves when they reach its tile (and,
+ *  if `enemyName` is set, defeat that foe). Lightweight + whisper-specific — NOT
+ *  the full main-quest step system. */
+export interface WhisperStage {
+  /** Narration when this leg resolves (on arrival, or on the foe's defeat). */
+  line: string;
+  /** Where this leg's tile is — a random offset from the player's position when
+   *  the PREVIOUS leg completed (or from the plant spot for leg 0). Omit to
+   *  resolve on the same tile as the previous leg (e.g. fight, then pick up). */
+  targetOffset?: { dxRange: [number, number]; dyRange: [number, number] };
+  /** Optional foe to spawn when the player arrives (must be in your enemies
+   *  table). The leg does NOT advance until it's defeated. */
+  enemyName?: string;
+  /** Effects fired when this leg COMPLETES — same verbs as hooks (grant_item,
+   *  grant_tc, heal, damage, unlock_location, rep_change, spawn_enemy_tag, …). */
+  effects?: HookEffect[];
 }
 
 /** A chain definition. Authored in code so the engine can run typed
@@ -50,26 +73,99 @@ export interface ChainDef {
   /** Tile-time gate on the rendezvous (when the spawn fires).
    *  When omitted, any time-of-day works. */
   activeHours?: [number, number];
+  /** engine_Dev — GENERIC payoff. An authored chain that sets meetLine/meetEffects
+   *  resolves in one hop: when the player reaches the target tile in the active
+   *  window, meetLine narrates, meetEffects fire (the same verbs hooks use:
+   *  grant_item, grant_tc, spawn_enemy_tag, rep_change, heal, damage, …), and the
+   *  whisper completes. The built-in yulka chain leaves these unset and keeps its
+   *  bespoke multi-stage fetch/fight/return logic. */
+  meetLine?: string;
+  meetEffects?: HookEffect[];
+  /** engine_Dev — MULTI-STAGE mission. When present (and non-empty), the whisper
+   *  runs leg-by-leg instead of the one-hop meet: plant → reach stage 0's tile →
+   *  (optional foe; resolve) → reach stage 1's tile → … → last stage completes the
+   *  whisper. A chain uses EITHER stages (multi-stage) OR meetLine/meetEffects
+   *  (one-hop) — stages win when both are set. */
+  stages?: WhisperStage[];
+  /** Bespoke-chain only — the quest item this chain mints + returns (e.g. the
+   *  yulka chain's recovered stock). Read by makeStolenDiscs so the name isn't
+   *  hardcoded. Generic one-hop chains don't use it. */
+  fetchItemName?: string;
 }
 
-export const CHAINS: ChainDef[] = [
-  {
-    id: 'yulka_discs',
-    title: 'Yulka and the Aetheric Discs',
-    plantLocations: ['outpost_messhall'],
-    plantChance: 0.15,
-    plantLines: [
-      `A pilgrim at the corner table cups her hands around a steaming mug and looks over at you. "South of here, past the gate. After the moon's up. Mud Dweller name of Yulka camps out there some nights — sells Aetheric Discs cheap. Don't ask where she gets them."`,
-      `A Reclaimer one table over leans back: "If you need Aetheric Discs and don't want to pay Irma's mark-up, walk south after dark. Yulka. She's there some nights, gone others. Two tiles, three. You'll see her fire."`,
-      `An off-duty Reclaimer presses a thumb into the salt of her plate. "Yulka. South. Night work. Aetheric Discs at half the going rate. If she's there." She doesn't say what to do if she's not.`,
-    ],
-    targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
-    activeHours: [20, 4],
-  },
-];
+// engine_Dev — the built-in whisper chains moved to app/data/whispers/
+// builtin-whispers.json so the engine carries no hardcoded setting strings and
+// designers can edit them. An uploaded 'whispers' table or the generic-default
+// pack takes precedence. (The yulka chain's bespoke multi-stage QUEST logic stays
+// scripted in gameStore, keyed on its id; only the overheard-tip DATA is here.)
+export const CHAINS: ChainDef[] =
+  (builtinWhisperData as unknown as { chains: ChainDef[] }).chains;
+
+/** The live whisper chains — uploaded override if present, else built-in. */
+export function getWhispers(): ChainDef[] {
+  return resolveWhispers(CHAINS) as ChainDef[];
+}
+/** True when an authored chain has a one-hop generic payoff (vs the built-in
+ *  yulka chain's bespoke multi-stage logic). */
+export function isGenericWhisper(chain: ChainDef | undefined): boolean {
+  return !!chain && (!!chain.meetLine || (chain.meetEffects != null && chain.meetEffects.length > 0));
+}
 
 export function findChain(id: string): ChainDef | undefined {
-  return CHAINS.find((c) => c.id === id);
+  return getWhispers().find((c) => c.id === id);
+}
+
+// ----- multi-stage mission runner (data-driven) ----------------------------
+
+/** True when a chain is a multi-stage mission (has at least one stage). */
+export function isMultiStageWhisper(chain: ChainDef | undefined): boolean {
+  return !!chain?.stages && chain.stages.length > 0;
+}
+
+/** The current leg index stored on the record (0 when unset). */
+export function whisperStageIndex(whisper: WhisperRecord): number {
+  const i = Number(whisper.ctx?.stageIndex ?? 0);
+  return Number.isFinite(i) && i >= 0 ? i : 0;
+}
+
+/** The current leg for a multi-stage whisper, or undefined when done / one-hop. */
+export function currentWhisperStage(chain: ChainDef | undefined, whisper: WhisperRecord): WhisperStage | undefined {
+  if (!isMultiStageWhisper(chain)) return undefined;
+  return chain!.stages![whisperStageIndex(whisper)];
+}
+
+/** Compute a leg's destination tile from a base position + the leg's offset
+ *  (random within range). When the leg has no offset it resolves on the base tile. */
+export function stageTargetTile(
+  stage: WhisperStage | undefined,
+  baseX: number,
+  baseY: number,
+): { x: number; y: number } {
+  const off = stage?.targetOffset;
+  if (!off) return { x: baseX, y: baseY };
+  const dx = off.dxRange[0] + rollDie(off.dxRange[1] - off.dxRange[0] + 1) - 1;
+  const dy = off.dyRange[0] + rollDie(off.dyRange[1] - off.dyRange[0] + 1) - 1;
+  return { x: baseX + dx, y: baseY + dy };
+}
+
+/** A multi-stage whisper whose CURRENT leg's tile the player is standing on and
+ *  which is not waiting on a foe — i.e. ready to resolve this leg by arrival. */
+export function findReadyStageWhisper(
+  whispers: readonly WhisperRecord[] | undefined,
+  hoursElapsed: number,
+  playerMapX: number,
+  playerMapY: number,
+): WhisperRecord | null {
+  if (!whispers) return null;
+  for (const w of whispers) {
+    if (!isMultiStageWhisper(findChain(w.id))) continue;
+    if (w.ctx?.awaitEnemy) continue; // a fight leg is blocking; not a tile arrival
+    if (w.targetMapX !== playerMapX || w.targetMapY !== playerMapY) continue;
+    const hourOfDay = Math.floor(hoursElapsed % 24);
+    if (!isHourInWindow(hourOfDay, w.activeFromHour, w.activeToHour)) continue;
+    return w;
+  }
+  return null;
 }
 
 /** Compute the rendezvous tile for a freshly-planted whisper. Uses
@@ -179,7 +275,7 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
         // OTA-458 — include the location hint. If a player was stranded here by the
         // old disc-clobber bug (thief gone, stage stuck), returning to the thief
         // tile east of Yulka re-spawns the encounter so they can finish.
-        return `Defeat the Silt Thief and recover the Aetheric Discs — east of Yulka's tile (2-3 over). If the thief isn't there, step back onto that tile to draw them out again.`;
+        return `Defeat the Silt Thief and recover the Discs — east of Yulka's tile (2-3 over). If the thief isn't there, step back onto that tile to draw them out again.`;
       case 'fetch_returned':
         return `Return to Yulka's tile with the recovered Discs. She owes you 5.`;
       case 'ambush_armed':
@@ -187,6 +283,16 @@ export function describeWhisperStage(whisper: WhisperRecord): string {
       default:
         return `Stage: ${whisper.stage}`;
     }
+  }
+  // engine_Dev — multi-stage mission: show the current leg's progress.
+  const chain = findChain(whisper.id);
+  if (isMultiStageWhisper(chain)) {
+    const idx = whisperStageIndex(whisper);
+    const total = chain!.stages!.length;
+    const awaiting = whisper.ctx?.awaitEnemy;
+    if (awaiting) return `Leg ${idx + 1} of ${total}: defeat the ${awaiting}.`;
+    const line = chain!.stages![idx]?.line;
+    return `Leg ${idx + 1} of ${total}${line ? `: ${line}` : ' — head to the marked tile.'}`;
   }
   return `Stage: ${whisper.stage}`;
 }
@@ -245,13 +351,13 @@ export function spawnChainEnemy(name: string): Enemy {
 /** Build a fresh "Stolen Aetheric Discs" inventory item the player
  *  picks up off the thief. Carries a marker tag so the return
  *  step can find them in the player's pack. */
-export function makeStolenDiscs(quantity: number): InventoryItem {
+export function makeStolenDiscs(quantity: number, name = 'Recovered Goods'): InventoryItem {
   return {
     id: `whisper_loot_${Date.now()}_${rollDie(9999)}`,
-    name: 'Stolen Aetheric Discs',
+    name,
     kind: 'misc',
     rarity: 'Uncommon',
     quantity,
-    tags: ['whisper', 'aether', 'quest'],
+    tags: ['whisper', 'quest'],
   };
 }

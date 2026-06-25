@@ -1,10 +1,16 @@
 import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryItem } from './types';
 import { rollDie, rollDice, rollFromNotation } from './rng';
+import { resolveTable, resolveFlavor, startingAreaForFaction } from './contentPack';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
 import armorData from '../data/items/armor.json';
 import weaponsData from '../data/items/weapons.json';
+import amuletsData from '../data/items/amulets.json';
+import ringsData from '../data/items/rings.json';
+import materialsData from '../data/items/materials.json';
+import gearData from '../data/items/gear.json';
+import locationsData from '../data/locations/locations.json';
 import { stampDurability } from './durability';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, canonicalCellOf } from './worldMap';
 import { initMainQuest } from './mainQuest';
@@ -31,6 +37,22 @@ const RACE_PRIMARY: Record<string, string> = {
   aetherborn: 'Pyric Wand',
 };
 
+// engine_Dev — the starter weapon. Priority: a race's own `startingWeapon`
+// field (authors can set it on the uploaded race row) → the built-in
+// per-Tartaria-race map → the first Common weapon from the LIVE weapons table
+// (so a custom race without a mapping starts with a real weapon from the
+// uploaded pack, e.g. an M1 Garand, not the Tartaria "Rusted Blade").
+function starterWeaponName(race: Race): string {
+  const explicit = (race as unknown as { startingWeapon?: unknown }).startingWeapon;
+  if (typeof explicit === 'string' && explicit.trim().length > 0) return explicit.trim();
+  if (RACE_PRIMARY[race.id]) return RACE_PRIMARY[race.id]!;
+  const builtin = ((weaponsData as unknown as { weapons?: { name?: string; rarity?: string }[] }).weapons ?? []);
+  const live = resolveTable('weapons', builtin) as { name?: string; rarity?: string }[];
+  const pick = live.find((w) => w && typeof w.name === 'string' && w.rarity === 'Common')
+    ?? live.find((w) => w && typeof w.name === 'string');
+  return pick?.name ?? 'Rusted Blade';
+}
+
 const FACTION_KNIFE: Record<string, string> = {
   reclaimers_guild: "Reclaimer's Trowel",
   forgotten_order: 'Order Letter-Opener',
@@ -41,7 +63,7 @@ const FACTION_KNIFE: Record<string, string> = {
 
 // Each race ships with TWO items from their rulebook starter table —
 // kept tight so the default 10-slot Player's Backpack still has room for
-// the shared starter items (Aetheric Torch + Trail Rations + Locket) plus
+// the shared starter items (Hand Torch + Trail Rations + Locket) plus
 // the primary weapon + faction knife. Total = 7 slots used. Remaining
 // items from the table live in exploration.json and can be acquired from
 // vendors / loot pools.
@@ -103,17 +125,71 @@ function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem
   return 'misc';
 }
 
+// engine_Dev — the shared starter kit every character begins with. The TAGS carry
+// the mechanics (light reveals hooks, drink restores stamina, detection finds
+// relics, food feeds), so a re-skinned game can rename these to its own props
+// (Flashlight / K-Rations / Canteen / Geiger Counter) by uploading a 'starterItems'
+// flavor array — keep the tags to keep the behavior. Built-in SETTING-NEUTRAL kit is the
+// default when no override is uploaded (so it never seeds another setting's proper nouns).
+const DEFAULT_STARTER_ITEMS: InventoryItem[] = [
+  { id: 'aetheric_torch', name: 'Hand Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held torch. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+  { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
+  // OTA-375 — every character starts with a Water Bottle (the cheap,
+  // refillable stamina recovery item) so exhaustion in an early fight
+  // is never a dead end. Drink it for +10 stamina; refill free at water.
+  { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
+  { id: 'aether_locket', name: "Finder's Locket", kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
+];
+
+// engine_Dev — rows of a LIVE item catalog (uploaded override, else built-in). The
+// per-table JSON is either a bare array or wrapped under its own key.
+function liveRows(id: 'weapons' | 'armor' | 'amulets' | 'rings' | 'materials' | 'gear' | 'exploration', raw: unknown): Array<Record<string, unknown>> {
+  const wrapped = (raw && typeof raw === 'object' && !Array.isArray(raw)) ? (raw as Record<string, unknown>)[id] : raw;
+  const builtin = Array.isArray(wrapped) ? (wrapped as Array<Record<string, unknown>>) : [];
+  return resolveTable(id, builtin as never) as Array<Record<string, unknown>>;
+}
+
+// engine_Dev — resolve an author's starting-gear ITEM NAME against the live
+// catalogs (weapons → armor → amulets/rings → exploration → gear → materials), and
+// build a creation InventoryItem with the right kind/tags/desc. Unknown names still
+// grant a generic misc item (never silently dropped) so a typo is visible in-pack.
+function resolveStarterByName(name: string, id: string): InventoryItem | null {
+  const lc = name.trim().toLowerCase();
+  if (!lc) return null;
+  const find = (rows: Array<Record<string, unknown>>) => rows.find((r) => typeof r.name === 'string' && (r.name as string).toLowerCase() === lc);
+  const mk = (r: Record<string, unknown>, kind: InventoryItem['kind'], dflt: string, dur: boolean): InventoryItem => {
+    const item: InventoryItem = {
+      id, name: r.name as string, kind,
+      rarity: ((r.rarity as InventoryItem['rarity']) ?? 'Common'),
+      quantity: 1,
+      tags: Array.isArray(r.tags) ? [...(r.tags as string[]), 'starter'] : ['starter'],
+      description: (typeof r.description === 'string' ? r.description : dflt),
+    };
+    return dur ? stampDurability(item) : item;
+  };
+  let r = find(liveRows('weapons', weaponsData));
+  if (r) return mk(r, 'weapon', 'A starter weapon.', true);
+  r = find(liveRows('armor', armorData));
+  if (r) return mk(r, 'armor', 'Starter armor.', true);
+  r = find(liveRows('amulets', amuletsData)) ?? find(liveRows('rings', ringsData));
+  // amulets/rings are categorized + equipped by NAME lookup against their catalogs,
+  // not by item kind, so 'misc' is the correct inventory kind for them.
+  if (r) return mk(r, 'misc', 'A starter accessory.', false);
+  r = find(liveRows('exploration', explorationData));
+  if (r) { const kind = explorationToInventoryKind(r as unknown as CatalogExplorationItem); return mk(r, kind, 'A starter tool.', kind === 'weapon'); }
+  r = find(liveRows('gear', gearData));
+  if (r) { const k = (r.kind as InventoryItem['kind']) ?? 'misc'; return mk(r, k, 'Starter gear.', k === 'weapon' || k === 'armor'); }
+  r = find(liveRows('materials', materialsData));
+  if (r) return mk(r, 'misc', 'A starter material.', false);
+  return { id, name: name.trim(), kind: 'misc', rarity: 'Common', quantity: 1, tags: ['starter'], description: 'A starter item.' };
+}
+
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
-  const items: InventoryItem[] = [
-    { id: 'aetheric_torch', name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
-    { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
-    // OTA-375 — every character starts with a Water Bottle (the cheap,
-    // refillable stamina recovery item) so exhaustion in an early fight
-    // is never a dead end. Drink it for +10 stamina; refill free at water.
-    { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
-    { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
-  ];
-  const primaryName = RACE_PRIMARY[race.id] ?? 'Rusted Blade';
+  // Clone so per-character inventory never shares object refs with the template.
+  const items: InventoryItem[] = resolveFlavor('starterItems', DEFAULT_STARTER_ITEMS).map(
+    (it) => ({ ...it }),
+  );
+  const primaryName = starterWeaponName(race);
   items.push(stampDurability({
     id: `starter_primary_${Date.now()}`,
     name: primaryName,
@@ -123,16 +199,36 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     tags: ['weapon', 'starter'],
     description: 'Your starter primary — given to you by your race tradition.',
   }));
-  const knifeName = FACTION_KNIFE[faction.id] ?? 'Pocket Knife';
-  items.push(stampDurability({
-    id: `starter_knife_${Date.now()}`,
-    name: knifeName,
-    kind: 'weapon',
-    rarity: 'Common',
-    quantity: 1,
-    tags: ['weapon', 'starter', 'knife', 'tool'],
-    description: 'Your faction starter knife — primarily a dig tool, sharp enough in a pinch.',
-  }));
+  // engine_Dev — FACTION starting gear: the author's uploaded faction.startingGear
+  // (resolved against the live catalogs) replaces the built-in faction "knife" map.
+  const factionGear = Array.isArray(faction.startingGear) ? faction.startingGear : null;
+  if (factionGear && factionGear.length > 0) {
+    factionGear.forEach((nm, i) => {
+      const it = resolveStarterByName(nm, `starter_fac_${i}_${Date.now()}`);
+      if (it) items.push(it);
+    });
+  } else {
+    const knifeName = FACTION_KNIFE[faction.id] ?? 'Pocket Knife';
+    items.push(stampDurability({
+      id: `starter_knife_${Date.now()}`,
+      name: knifeName,
+      kind: 'weapon',
+      rarity: 'Common',
+      quantity: 1,
+      tags: ['weapon', 'starter', 'knife', 'tool'],
+      description: 'Your faction starter knife — primarily a dig tool, sharp enough in a pinch.',
+    }));
+  }
+  // engine_Dev — RACE starting gear: the author's uploaded race.startingGear
+  // (resolved against the live catalogs) replaces the built-in per-race map.
+  const raceGear = Array.isArray(race.startingGear) ? race.startingGear : null;
+  if (raceGear && raceGear.length > 0) {
+    raceGear.forEach((nm, i) => {
+      const it = resolveStarterByName(nm, `starter_race_${i}_${Date.now()}`);
+      if (it) items.push(it);
+    });
+    return items;
+  }
   // Race-themed exploration items from the rulebook starter table.
   const raceStarterNames = RACE_STARTER_EXPLORATION[race.id] ?? [];
   for (let i = 0; i < raceStarterNames.length; i++) {
@@ -189,8 +285,12 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
 const races = racesData as Race[];
 const factions = factionsData as Faction[];
 
-export function getRaces(): Race[] { return races; }
-export function getFactions(): Faction[] { return factions; }
+// engine_Dev — resolve through the content-pack registry so uploaded races /
+// factions replace the built-ins at call time (character creation, stats panel,
+// race mechanics, etc. all read these). `races`/`factions` stay the built-in
+// defaults the override falls back to.
+export function getRaces(): Race[] { return resolveTable<Race>('races', races) as Race[]; }
+export function getFactions(): Faction[] { return resolveTable<Faction>('factions', factions) as Faction[]; }
 
 export function rollStats(): Stats {
   return {
@@ -288,12 +388,32 @@ export const FACTION_STARTING_LOCATION: Record<string, string> = {
 };
 
 export function startingLocationForFaction(factionId: string): string {
-  return FACTION_STARTING_LOCATION[factionId] ?? 'tartarian_outskirts';
+  // engine_Dev — resolve to a REAL location in the live (possibly uploaded) world.
+  const locs = resolveTable<{ id?: string }>('locations', locationsData as { id?: string }[]);
+  const exists = (id: string | undefined | null): id is string =>
+    !!id && locs.some((l) => l.id === id);
+  // 0. An uploaded STARTING AREA's placement wins — the faction spawns inside it.
+  const area = startingAreaForFaction(factionId);
+  if (exists(area?.locationId)) return area!.locationId;
+  // 1. The faction's own declared starter complex (data-driven).
+  const faction = getFactions().find((f) => f.id === factionId);
+  if (exists(faction?.baseLocationId)) return faction!.baseLocationId!;
+  // 2. The built-in Tartaria per-faction outpost.
+  if (exists(FACTION_STARTING_LOCATION[factionId])) return FACTION_STARTING_LOCATION[factionId]!;
+  // 3. Any valid location — first row of the table — so a re-skin that hasn't
+  //    declared a base still spawns at a REAL place in ITS world instead of the
+  //    missing Tartaria fallback (which silently bounced to locations[0] and left
+  //    currentLocationId pointing at a non-existent tile).
+  return locs[0]?.id ?? 'tartarian_outskirts';
 }
 
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
-  const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
-  const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
+  // engine_Dev — resolve through the content-pack registry so an uploaded races /
+  // factions table drives character creation (lore-agnostic).
+  const allRaces = getRaces();
+  const allFactions = getFactions();
+  const race = allRaces.find((r) => r.id === input.raceId) ?? allRaces[0]!;
+  const faction = allFactions.find((f) => f.id === input.factionId) ?? allFactions[0]!;
   const stats = rollStats();
   // OTA-348 — overwrite the placeholder Stealth with a race-proportional roll
   // (Giants 0, constructs low, Mud Dwellers / Reclaimers high).
@@ -305,10 +425,15 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   // wider stamina overhaul (rest cost + hunger + combat depth).
   const staminaMax = 12 + Math.floor(stats.strength / 2);
 
-  const factionStanding: FactionStanding[] = factions.map((f) => ({
+  const factionStanding: FactionStanding[] = allFactions.map((f) => ({
     factionId: f.id,
     standing: f.id === faction.id ? Math.max(10, f.startingStanding + 10) : f.startingStanding,
   }));
+
+  // engine_Dev — the starter complex (faction base) the character spawns in.
+  // Resolved once so currentLocationId, the safe-zone marker (startLocationId),
+  // and the canon grid cell all agree.
+  const startLocationId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
 
   return {
     name: input.name,
@@ -320,8 +445,9 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     stamina: staminaMax,
     staminaMax,
     milestones: { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
-    // Auto-equip the race primary so the player starts combat-ready.
-    equipped: { main: RACE_PRIMARY[race.id] ?? 'Rusted Blade' },
+    // Auto-equip the starter weapon (resolved from the live weapons table for
+    // custom races) so the player starts combat-ready holding a real weapon.
+    equipped: { main: starterWeaponName(race) },
     ac: race.baseAC,
     tc: rollFromTCFormula(race.startingTCFormula),
     corruption: 0,
@@ -329,7 +455,10 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     factionStanding,
     // v2.4.1 (OTA 029) — explicit startingLocationId wins; otherwise
     // fall back to the canonical per-faction start tile.
-    currentLocationId: input.startingLocationId ?? startingLocationForFaction(input.factionId),
+    currentLocationId: startLocationId,
+    // engine_Dev — remember the spawn so the starter-complex peace zone knows
+    // when the player has left it (combat resumes on first exit).
+    startLocationId,
     activeQuests: [],
     // Procedural map seed — combines name + race + faction + a timestamp
     // so two characters with identical names still get different maps.
@@ -342,8 +471,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     // arb47 — the authoritative ABSOLUTE position: the starting location's fixed
     // canon cell. Cardinal steps + routing move this directly; it never warps.
     ...(() => {
-      const startId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
-      const cell = canonicalCellOf(startId);
+      const cell = canonicalCellOf(startLocationId);
       return { gridX: cell.x, gridY: cell.y };
     })(),
     // OTA-510 — a freshly created character is born at their start cell and must

@@ -1,5 +1,9 @@
 name: Build · Android APK
 
+# engine_Dev-844 — trigger-touch for a preview APK of the engine_Dev line (cool color scheme +
+# baked slot + validate-game + 2-part save + combat arena). Non-ignored edit so the [build-apk]
+# job fires despite paths-ignore skipping app/**.
+#
 # OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
 # build-apk's paths-ignore skips app/**, so an OTA bump alone won't fire the
@@ -61,6 +65,7 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
+      - 'engine_Dev'
     tags:
       - 'v*'
     paths-ignore:
@@ -96,6 +101,16 @@ jobs:
   build:
     name: Build & Release Tartaria Realms APK
     runs-on: ubuntu-latest
+    # engine_Dev — "push APKs only when asked". engine_Dev is the separate
+    # RPG-Engine app; its routine content/OTA pushes must NOT burn a 30-min
+    # APK build. So for engine_Dev the build only runs when the head commit
+    # message carries the [build-apk] marker (or a manual dispatch). Every
+    # other branch (HaL2001, claude/**, main, release/**) keeps building on
+    # push exactly as before — this gate only narrows engine_Dev.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.ref_name != 'engine_Dev' ||
+      contains(github.event.head_commit.message, '[build-apk]')
     # arb155 — bound the job so a hung/disconnected runner fails fast with a red
     # X instead of spinning until GitHub's 6-hour default.
     timeout-minutes: 60
@@ -248,12 +263,28 @@ jobs:
             IS_TAG="false"
             TAG="apk-build-${{ github.run_number }}"
           fi
+          # engine_Dev is a SEPARATE app (the RPG Engine). Name its artifacts,
+          # downloaded file, and GitHub Release after "Text RPG Engine" — never
+          # "Tartaria Realms" — so what the device shows on download/install is
+          # the engine, not the family game. Also note its OTA channel.
+          if [[ "${GITHUB_REF_NAME}" == "engine_Dev" ]]; then
+            APP_SLUG="text-rpg-engine"
+            APP_NAME="Text RPG Engine"
+            APP_CHANNEL="engine_Dev"
+          else
+            APP_SLUG="tartaria-realms"
+            APP_NAME="Tartaria Realms"
+            APP_CHANNEL="preview"
+          fi
           VERSION=$(node -p "require('./package.json').version")
           echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "is_tag=$IS_TAG" >> "$GITHUB_OUTPUT"
-          echo "Building Tartaria Realms — profile: $PROFILE, tag: $TAG, version: $VERSION"
+          echo "app_slug=$APP_SLUG" >> "$GITHUB_OUTPUT"
+          echo "app_name=$APP_NAME" >> "$GITHUB_OUTPUT"
+          echo "app_channel=$APP_CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "Building $APP_NAME — profile: $PROFILE, tag: $TAG, version: $VERSION"
 
       # Strip the .hal2001 suffix from android.package + ios.bundleIdentifier
       # when building a production AAB. Reason: Play Console screenshot
@@ -644,11 +675,11 @@ jobs:
           if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
             SRC=android/app/build/outputs/bundle/release/app-release.aab
             [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
-            OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.aab"
+            OUT="artifacts/${{ steps.meta.outputs.app_slug }}-${{ steps.meta.outputs.tag }}.aab"
           else
             SRC=android/app/build/outputs/apk/release/app-release.apk
             [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
-            OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.apk"
+            OUT="artifacts/${{ steps.meta.outputs.app_slug }}-${{ steps.meta.outputs.tag }}.apk"
           fi
           # arb155 — MOVE, don't copy: SRC and OUT share the workspace
           # filesystem, so mv is a free rename and avoids keeping two ~2GB
@@ -658,10 +689,10 @@ jobs:
           echo "filename=$(basename "$OUT")" >> "$GITHUB_OUTPUT"
           ls -lh "$OUT"
 
-      - name: Upload Tartaria Realms artifact (GitHub Actions, 90d retention)
+      - name: Upload app artifact (GitHub Actions, 90d retention)
         uses: actions/upload-artifact@v4
         with:
-          name: tartaria-realms-${{ steps.meta.outputs.profile }}-${{ github.run_number }}
+          name: ${{ steps.meta.outputs.app_slug }}-${{ steps.meta.outputs.profile }}-${{ github.run_number }}
           path: ${{ steps.artifact.outputs.path }}
           retention-days: 90
 
@@ -675,26 +706,34 @@ jobs:
           BRANCH="${GITHUB_REF_NAME}"
           SHORT_SHA="${GITHUB_SHA::7}"
 
+          APP_NAME="${{ steps.meta.outputs.app_name }}"
+          APP_CHANNEL="${{ steps.meta.outputs.app_channel }}"
           if [ "$PROFILE" = "production" ]; then
-            TITLE="Tartaria Realms ${TAG}"
+            TITLE="${APP_NAME} ${TAG}"
             KIND="Production AAB (Play Store)"
             INSTALL_NOTE="Play Store AAB bundle — upload to Google Play Console. For sideloadable APKs, use a non-tagged build."
           else
-            TITLE="Tartaria Realms v${VERSION}-build.${{ github.run_number }}"
+            TITLE="${APP_NAME} v${VERSION}-build.${{ github.run_number }}"
             KIND="Playtest APK"
             INSTALL_NOTE="1. Download the .apk attached below on your Android device.
           2. Open it. If prompted, enable Install unknown apps for your browser or file manager.
-          3. Tap Install. Launch Tartaria Realms.
+          3. Tap Install. Launch ${APP_NAME}.
 
-          Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel preview while this APK is installed."
+          Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel ${APP_CHANNEL} while this APK is installed."
           fi
+
+          # engine_Dev is a separate app — keep its release OFF the repo's
+          # "latest" pointer so it never sits atop the family/Tartaria release
+          # stream. Every other branch keeps marking --latest as before.
+          LATEST_FLAG="--latest"
+          if [ "$BRANCH" = "engine_Dev" ]; then LATEST_FLAG="--latest=false"; fi
 
           gh release create "$TAG" \
             "${{ steps.artifact.outputs.path }}" \
             --repo "${{ github.repository }}" \
             --title "$TITLE" \
-            --latest \
-            --notes "## Tartaria Realms — $KIND
+            $LATEST_FLAG \
+            --notes "## ${APP_NAME} — $KIND
 
           Version: ${VERSION}
           Branch: ${BRANCH}

@@ -71,7 +71,11 @@ export function itemIsTool(item: InventoryItem): boolean {
   // 'misc' and an auto-tag (e.g. 'aetheric' from the name) would otherwise match.
   if (tags.some((t) => (WEAPON_TAGS as readonly string[]).includes(t))) return false;
   if ((TOOL_KINDS as readonly string[]).includes(kind)) return true;
-  return tags.some((t) => (TOOL_TAGS as readonly string[]).includes(t));
+  // engine_Dev — built-in tool tags PLUS any author-added ones (inventory override),
+  // so a re-skin's own tool nouns (e.g. "multitool", "spanner") read as Tools.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const extra = (require('./contentPack') as typeof import('./contentPack')).getExtraToolTags();
+  return tags.some((t) => (TOOL_TAGS as readonly string[]).includes(t) || extra.includes(t));
 }
 
 export interface PouchEligibility {

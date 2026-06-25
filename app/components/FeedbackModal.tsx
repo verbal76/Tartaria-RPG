@@ -244,7 +244,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
                   onChangeText={setText}
                   onFocus={switchToManual}
                   placeholder='Type your note. e.g. "vendor chips disappeared after I purchased"'
-                  placeholderTextColor="#c9a86a"
+                  placeholderTextColor="#6ab0c9"
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
@@ -292,26 +292,26 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 380,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
   },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 10, fontStyle: 'italic' },
+  title: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  rule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 10 },
+  body: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginBottom: 10, fontStyle: 'italic' },
   statusRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
   statusDotLive: { backgroundColor: '#9ec96a' },
-  statusDotIdle: { backgroundColor: '#3a342c' },
+  statusDotIdle: { backgroundColor: '#2b3a3e' },
   statusDotError: { backgroundColor: '#c97a5f' },
-  statusText: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  statusText: { color: '#6c8088', fontSize: 11, letterSpacing: 1 },
   input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     paddingHorizontal: 10,
     paddingVertical: 9,
     borderRadius: 3,
@@ -329,8 +329,8 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnPrimary: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnTextPrimary: { color: '#0e1618', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnTextNeutral: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

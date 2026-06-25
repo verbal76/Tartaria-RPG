@@ -9,7 +9,9 @@
 // on creation-time logic; this module is queried per-action.
 
 import racesData from '../data/races/races.json';
-import type { PlayerCharacter, Race, Stats } from './types';
+import factionsData from '../data/factions/factions.json';
+import type { PlayerCharacter, Race, Faction, Stats } from './types';
+import { resolveTable } from './contentPack';
 
 // Structural-typed scene snapshot. CurrentScene lives inline in
 // gameStore.ts and isn't exported; we accept any object with the
@@ -20,10 +22,40 @@ interface SceneContext {
 }
 
 const RACES = racesData as Race[];
+const FACTIONS = factionsData as Faction[];
 
+// engine_Dev — resolve through the content pack so a re-skin's UPLOADED races /
+// factions drive every mechanic (stat bonuses, AC, abilities), not just the
+// built-in Tartaria rows. No override → the built-in data.
 function getRace(raceId: string | undefined): Race | undefined {
   if (!raceId) return undefined;
-  return RACES.find((r) => r.id === raceId);
+  return (resolveTable('races', RACES) as Race[]).find((r) => r.id === raceId);
+}
+
+function getFaction(factionId: string | undefined): Faction | undefined {
+  if (!factionId) return undefined;
+  return (resolveTable('factions', FACTIONS) as Faction[]).find((f) => f.id === factionId);
+}
+
+/** engine_Dev — always-on stat bumps from the player's FACTION (mirrors
+ *  racialStatBonusesFor). Empty when the faction has no factionStatBonuses. */
+export function factionStatBonusesFor(factionId: string | undefined): RacialStatBonuses {
+  const faction = getFaction(factionId);
+  return (faction?.factionStatBonuses as RacialStatBonuses | undefined) ?? {};
+}
+
+const lc = (a: readonly string[] | undefined): string[] => (a ?? []).map((s) => String(s).toLowerCase());
+
+/** engine_Dev — damage types the PLAYER resists / is weak to from their race +
+ *  faction rows (armor + potion resists are layered on at the combat site). The
+ *  player carries no innate weakness unless a race/faction declares one. */
+export function playerRaceFactionResists(player: PlayerCharacter): { resist: string[]; weak: string[] } {
+  const race = getRace(player.raceId);
+  const faction = getFaction(player.factionId);
+  return {
+    resist: [...lc(race?.resist), ...lc(faction?.resist)],
+    weak: [...lc(race?.weak), ...lc(faction?.weak)],
+  };
 }
 
 // ─── Barehand damage ────────────────────────────────────────────────
@@ -93,7 +125,7 @@ export type ACBonusCondition =
   | 'dark'
   | 'confined'
   | 'runic_gear'
-  | 'aether_powers'
+  | 'energy_powers'
   | 'constructed_environment'
   | 'relic_armor';
 
@@ -147,7 +179,9 @@ export function detectACContexts(
     const item = player.inventory.find((i) => i.name === slotItem);
     const tags = item?.tags ?? [];
     if (tags.some((t) => /runic/i.test(t))) set.add('runic_gear');
-    if (tags.some((t) => /aether/i.test(t))) set.add('aether_powers');
+    // built-in game's energy gear carries 'aether*' tags; the engine-level condition
+    // is the generic 'energy_powers' (renames cleanly with the {energy} concept).
+    if (tags.some((t) => /aether|energy/i.test(t))) set.add('energy_powers');
     if (item?.kind === 'relic' && tags.some((t) => /armor|plate|chest|head|legs/i.test(t))) {
       set.add('relic_armor');
     }
@@ -164,7 +198,9 @@ export function effectiveAC(
 ): number {
   const base = player.ac ?? 10;
   const race = getRace(player.raceId);
-  const rules = getACBonusRules(race);
+  const faction = getFaction(player.factionId);
+  const factionRules = (faction?.factionACBonusRules as ACBonusRule[] | undefined) ?? [];
+  const rules = [...getACBonusRules(race), ...factionRules];
   if (rules.length === 0) return base;
   const contexts = detectACContexts(player, scene);
   let delta = 0;
@@ -284,32 +320,23 @@ export function raceResistLabel(raceId: string | undefined, mult: number): strin
   return ` (${name} absorbs ${pct}%)`;
 }
 
-// ─── Aethercraft DC modifier ────────────────────────────────────────
-// OTA 039 — True Tartarians (Mud Dwellers) trained the discipline;
-// they cast at base DC. Aetherborn share Aetheric blood but lack the
-// True Tartarian training, so they cast at +2 DC. All other races
-// are guessing — +4 DC.
-//
-// 2026-05-25 [MECHANIC-1] — non-Aetheric races dropped from +4 → +3.
-// User reported summon-golem felt unreasonably hard: three attempts
-// (d20 1 → auto-fail, d20 15 vs DC 19 → fail, d20 16 + INT 3 = 19 →
-// pass). The +4 modifier put non-mud-dweller / non-aetherborn casters
-// at ~25% success on early-game INT scores. +3 brings it to ~35%
-// while still preserving the "untrained casters" gap from
-// mud_dweller (0) and aetherborn (+2). Larger redesign — sending
-// the golem to fight + follow until next combat — tracked as
-// MECHANIC-1b follow-up; this OTA is the DC-fairness piece only.
-export function aethercraftDcModifier(raceId: string | undefined): number {
-  if (raceId === 'mud_dweller') return 0;
-  if (raceId === 'aetherborn') return 2;
-  return 3;
+// ─── Power-discipline DC modifier ───────────────────────────────────
+// engine_Dev — data-driven race AFFINITY for the POWERS (the "magic" disciplines:
+// summon/shape/mend). Each race row carries an optional powerDcMod (added to every
+// power-check DC; + = harder) and powerIntBonus (added to effective INT). A race
+// that sets neither casts at the base DC with no INT bonus — the neutral default
+// for a reskin. The Tartaria reference races carry their historical values in
+// races.json (mud_dweller 0 / +2 INT, aetherborn +2, the rest +3), so their
+// balance is unchanged; the rule is just no longer hardcoded to those ids.
+export function powerDcModifier(raceId: string | undefined): number {
+  const m = getRace(raceId)?.powerDcMod;
+  return typeof m === 'number' ? m : 0;
 }
 
-// ─── Aethercraft context bonus ──────────────────────────────────────
-// Mud Dwellers' "Aethercraft Mastery: +2 Intelligence when using
-// Aethercraft" trait fires here. Verb handlers add this to the
-// effective INT before the skill check. Other races: no bonus.
-export function aethercraftStatBonus(raceId: string | undefined): Partial<Stats> {
-  if (raceId === 'mud_dweller') return { intelligence: 2 };
-  return {};
+// ─── Power-discipline INT bonus ─────────────────────────────────────
+// The race's powerIntBonus is added to effective INT before the power skill check
+// (Tartaria's Mud Dwellers carry +2). Verb handlers apply it.
+export function powerStatBonus(raceId: string | undefined): Partial<Stats> {
+  const b = getRace(raceId)?.powerIntBonus;
+  return typeof b === 'number' && b !== 0 ? { intelligence: b } : {};
 }

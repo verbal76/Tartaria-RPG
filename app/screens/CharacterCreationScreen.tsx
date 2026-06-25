@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { useContentPackStore } from '../state/contentPackStore';
 import { getRaces, getFactions } from '../engine/character';
+import { hasTableOverride, tableOverrideCount, getNarratorName, dressNarratorArticles } from '../engine/contentPack';
 
 // Tungsten Spire — the 'name' step is gone. New flow: race → faction →
 // BEGIN. The player gives their name in-game when the Arbiter prompts
@@ -21,12 +23,47 @@ export function CharacterCreationScreen() {
   const startNewGame = useGameStore((s) => s.startNewGame);
   const setScreen = useGameStore((s) => s.setScreen);
 
+  // engine_Dev — re-read the race/faction lists whenever the content pack
+  // changes (an upload, or the persisted pack finishing its boot hydrate), so
+  // creation always shows the CURRENT pack instead of whatever was loaded the
+  // instant this screen first mounted. Subscribing to these store fields forces
+  // the re-render; getRaces()/getFactions() then pull the live override.
+  useContentPackStore((s) => s.tables);
+  useContentPackStore((s) => s.hydrated);
+  useContentPackStore((s) => s.contentVersion);
+  // engine_Dev — DEFENSIVE RE-SYNC. If the engine registry (what getRaces() reads)
+  // ever drifts out of sync with the persisted/store packs — e.g. an OTA reload
+  // reset module state and a race meant the mirror didn't re-apply — re-mirror
+  // every override from the store into the registry the moment this screen opens.
+  useEffect(() => { useContentPackStore.getState().reapply(); }, []);
   const races = getRaces();
   const factions = getFactions();
+  // engine_Dev — raw diagnostic so the source of truth is visible: what the
+  // engine returns vs. what the store/persistence holds.
+  const storeRaceCount = useContentPackStore((s) => (s.tables.races?.length ?? 0));
+  const storeFactionCount = useContentPackStore((s) => (s.tables.factions?.length ?? 0));
+  const hydratedFlag = useContentPackStore((s) => s.hydrated);
 
   const [step, setStep] = useState<Step>('race');
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
+
+  // engine_Dev — visible source indicator so it's obvious whether the screen is
+  // showing an uploaded pack or the built-in default (and whether an upload took).
+  const racesCustom = hasTableOverride('races');
+  const factionsCustom = hasTableOverride('factions');
+  const packLine = step === 'race'
+    ? (racesCustom ? `● custom races — ${tableOverrideCount('races')} loaded` : '○ built-in races (upload a Races pack in the dev console to replace these)')
+    : (factionsCustom ? `● custom factions — ${tableOverrideCount('factions')} loaded` : '○ built-in factions (upload a Factions pack in the dev console)');
+
+  // If the pack changed (upload / late hydrate) and the previously-selected id
+  // is no longer in the list, snap to the first entry of the current pack.
+  useEffect(() => {
+    if (!races.some((r) => r.id === raceId)) setRaceId(races[0]!.id);
+  }, [races, raceId]);
+  useEffect(() => {
+    if (!factions.some((f) => f.id === factionId)) setFactionId(factions[0]!.id);
+  }, [factions, factionId]);
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -61,6 +98,12 @@ export function CharacterCreationScreen() {
         <Text style={styles.headerStep}>Step {stepIndex + 1} of {STEP_ORDER.length}</Text>
       </View>
       <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
+      <Text style={[styles.packLine, (step === 'race' ? racesCustom : factionsCustom) ? styles.packLineOn : styles.packLineOff]}>
+        {packLine}
+      </Text>
+      <Text style={styles.debugLine}>
+        engine: {races[0]?.name ?? '?'} ({races.length}) · store r{storeRaceCount}/f{storeFactionCount} · hydrated {hydratedFlag ? 'Y' : 'N'}
+      </Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {step === 'race' && races.map((r) => {
@@ -131,7 +174,7 @@ export function CharacterCreationScreen() {
                 {selectedRace.name} · {selectedFaction.name}
               </Text>
               <Text style={styles.beginHint}>
-                Tap BEGIN below. The Arbiter will greet you in the outpost and ask your name.
+                Tap BEGIN below. {dressNarratorArticles(`The ${getNarratorName()}`)} will greet you and ask your name.
               </Text>
             </View>
           </>
@@ -168,41 +211,45 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     paddingBottom: 6,
   },
-  headerTitle: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  headerStep: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  headerTitle: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  headerStep: { color: '#6c8088', fontSize: 11, letterSpacing: 1 },
   stepTitle: {
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 12,
     letterSpacing: 3,
     fontWeight: '700',
     marginTop: 8,
     marginBottom: 8,
   },
+  packLine: { fontSize: 10, letterSpacing: 0.5, marginBottom: 2 },
+  packLineOn: { color: '#9ec96a' },
+  packLineOff: { color: '#6c8088', fontStyle: 'italic' },
+  debugLine: { fontSize: 9, color: '#6a9bbf', marginBottom: 8, fontFamily: 'monospace' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
   contextLine: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, marginBottom: 8, fontStyle: 'italic' },
   option: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     padding: 10,
     borderRadius: 4,
     marginBottom: 8,
   },
-  optionSelected: { borderColor: '#c9a86a' },
-  optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
-  optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
-  optionMeta: { color: '#7a705c', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
-  optionMetaSub: { color: '#c9a86a', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
-  optionTraits: { marginTop: 8, paddingLeft: 6, borderLeftColor: '#3a342c', borderLeftWidth: 2 },
+  optionSelected: { borderColor: '#6ab0c9' },
+  optionName: { color: '#d6e4e8', fontWeight: '700', fontSize: 14 },
+  optionDesc: { color: '#bcd2db', fontSize: 12, marginTop: 2 },
+  optionMeta: { color: '#6c8088', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
+  optionMetaSub: { color: '#6ab0c9', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
+  optionTraits: { marginTop: 8, paddingLeft: 6, borderLeftColor: '#2b3a3e', borderLeftWidth: 2 },
   optionTrait: { color: '#9ec96a', fontSize: 11, lineHeight: 16, marginBottom: 2 },
-  optionTraitNote: { color: '#c9a86a', fontSize: 10, marginTop: 4, fontStyle: 'italic' },
+  optionTraitNote: { color: '#6ab0c9', fontSize: 10, marginTop: 4, fontStyle: 'italic' },
   optionFlavor: {
     color: '#a89776',
     fontSize: 12,
     marginTop: 8,
     paddingTop: 8,
-    borderTopColor: '#3a342c',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
     fontStyle: 'italic',
     lineHeight: 17,
@@ -210,16 +257,16 @@ const styles = StyleSheet.create({
   beginBlock: {
     marginTop: 12,
     padding: 10,
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
   },
-  beginHint: { color: '#cdbf99', fontSize: 12, lineHeight: 17, fontStyle: 'italic' },
+  beginHint: { color: '#bcd2db', fontSize: 12, lineHeight: 17, fontStyle: 'italic' },
   footer: { flexDirection: 'row', gap: 8, paddingTop: 8 },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 16,
@@ -227,13 +274,13 @@ const styles = StyleSheet.create({
     minWidth: 100,
     alignItems: 'center',
   },
-  backBtnText: { color: '#c9a86a', fontSize: 13, letterSpacing: 2, fontWeight: '700' },
+  backBtnText: { color: '#6ab0c9', fontSize: 13, letterSpacing: 2, fontWeight: '700' },
   nextBtn: {
     flex: 1,
-    backgroundColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
     borderRadius: 4,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  nextBtnText: { color: '#13110f', fontSize: 13, fontWeight: '800', letterSpacing: 2 },
+  nextBtnText: { color: '#0e1618', fontSize: 13, fontWeight: '800', letterSpacing: 2 },
 });

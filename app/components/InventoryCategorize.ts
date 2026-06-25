@@ -25,8 +25,8 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   consumable: '#9ec96a',
   tool: '#7fb0a8', // teal — utility implements (pry bar, lockpick, scanner…)
   relic: '#b88ce0',
-  material: '#c9a86a',
-  loot: '#a89a7a',
+  material: '#6ab0c9',
+  loot: '#8fa6ac',
   quest: '#d9c34a', // gold — reserved objective items (locked)
 };
 
@@ -41,6 +41,14 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   loot: 'Loot',
   quest: 'Quest Items',
 };
+
+/** engine_Dev — the display label for a category, honoring an author rename from the
+ *  inventory override (e.g. "Weapons" -> "Arsenal"). Read this, not CATEGORY_LABEL,
+ *  at render sites. */
+export function getCategoryLabel(cat: InventoryCategory): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return (require('../engine/contentPack') as typeof import('../engine/contentPack')).getInventoryLabel(cat, CATEGORY_LABEL[cat]);
+}
 
 // Order the categories appear in. Weapons first (most actionable),
 // then armor, then accessories, then consumables, then relics, then

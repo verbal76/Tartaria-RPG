@@ -21,6 +21,7 @@
 // get a consistent voice across sessions.
 
 import vendorsData from '../data/npcs/vendors.json';
+import { getNarratorName } from '../engine/contentPack';
 
 interface VendorRow {
   id: string;
@@ -70,7 +71,10 @@ function stableHash(s: string): number {
 export function voiceForSpeaker(speaker: string): string | null {
   if (!speaker) return null;
   const lower = speaker.toLowerCase().trim();
-  if (lower === 'the arbiter' || lower === 'arbiter') return null;
+  // The narrator (live name OR legacy "Arbiter") uses the player's configured
+  // default voice — never a per-vendor voice.
+  const nn = getNarratorName().toLowerCase();
+  if (lower === 'the arbiter' || lower === 'arbiter' || lower === `the ${nn}` || lower === nn) return null;
   // Direct vendor lookup.
   const direct = NAME_TO_VOICE.get(lower);
   if (direct) return direct;

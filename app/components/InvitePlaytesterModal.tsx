@@ -6,6 +6,7 @@
 // whitelists + replies with the install link (advertised as up
 // to 24 hours, usually within the hour).
 import React, { useEffect, useState } from 'react';
+import { getGameTitle } from '../engine/contentPack';
 import {
   Modal,
   View,
@@ -86,7 +87,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
 
                 <Text style={styles.body}>
                   Type the Gmail address of someone you'd like added to
-                  the Tartaria Realms playtest. We'll whitelist them
+                  the {getGameTitle()} playtest. We'll whitelist them
                   and email them an install link — usually within the
                   hour, up to 24 hours.
                 </Text>
@@ -95,7 +96,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
                 <TextInput
                   style={[styles.input, showError && styles.inputError]}
                   placeholder="friend@gmail.com"
-                  placeholderTextColor="#5c5345"
+                  placeholderTextColor="#46555a"
                   value={gmail}
                   onChangeText={setGmail}
                   onBlur={() => setTouched(true)}
@@ -166,23 +167,23 @@ const styles = StyleSheet.create({
   },
   cardWrap: { width: '100%', maxWidth: 420 },
   card: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
   },
   headerRow: { marginBottom: 10 },
   title: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 4,
   },
-  ruleLine: { height: 1, backgroundColor: '#3a342c', marginTop: 6 },
-  body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 12 },
+  ruleLine: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6 },
+  body: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginBottom: 12 },
   sectionLabel: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
@@ -190,12 +191,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     padding: 10,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 14,
     marginBottom: 6,
   },
@@ -220,11 +221,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnDisabled: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
+  btnPrimary: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  btnDisabled: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  btnTextPrimary: { color: '#13110f' },
-  btnTextDisabled: { color: '#5c5345' },
-  btnTextNeutral: { color: '#cdbf99' },
+  btnTextPrimary: { color: '#0e1618' },
+  btnTextDisabled: { color: '#46555a' },
+  btnTextNeutral: { color: '#bcd2db' },
 });

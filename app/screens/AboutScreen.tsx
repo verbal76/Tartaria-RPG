@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
+import { useContentPackStore } from '../state/contentPackStore';
+import { DeveloperConsole } from './DeveloperSettingsScreen';
+import { getGameTitle, getNarratorName } from '../engine/contentPack';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
@@ -96,7 +99,16 @@ export function AboutScreen() {
   // clear log — the three actions that previously cluttered the
   // bottom of the ExplorationScreen menu row. save & exit is the
   // most-pressed action, so it's the default tab on open.
-  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
+  // engine_Dev — while dev mode is on, the DEV console is the first tab and the
+  // default on open. Turned off from inside the console (or by publishing).
+  const devMode = useContentPackStore((s) => s.devMode);
+  const [tab, setTab] = useState<'dev' | 'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>(
+    () => (useContentPackStore.getState().devMode ? 'dev' : 'session'),
+  );
+  // If dev mode is switched off while the DEV tab is showing, fall back to SESSION.
+  useEffect(() => {
+    if (!devMode && tab === 'dev') setTab('session');
+  }, [devMode, tab]);
   // arb78 — player-tunable background settings (live).
   const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
   useEffect(() => {
@@ -291,7 +303,7 @@ export function AboutScreen() {
   }, []);
 
   const testKokoro = () => {
-    kokoroSpeak('Welcome to Tartaria. This is the bundled neural voice — Kokoro.');
+    kokoroSpeak(`Welcome to ${getGameTitle()}. This is the bundled neural voice.`);
   };
   const handleEngineThirdBtn = () => {
     // When ready, the third button means UPDATE — wipe cache + dispose
@@ -412,7 +424,7 @@ export function AboutScreen() {
     // floating lines below the OTA status). The OTA status block
     // stays here because it pulls live Updates.* state.
     const lines = [
-      `Tartaria Realms`,
+      `${getGameTitle()}`,
       ``,
       buildBasicDeviceSummary(),
       ``,
@@ -432,7 +444,7 @@ export function AboutScreen() {
         ? `  Last response: ${cognitiveLastResponse.inferredEmotions.join(',') || '-'} / ${cognitiveLastResponse.inferredIntentions.join(',') || '-'} (${cognitiveLastResponse.embeddingMs.toFixed(1)}ms embed, ${cognitiveLastResponse.inferenceMs.toFixed(1)}ms infer)`
         : `  Last response: none yet`,
       ``,
-      `Qwen generator (Arbiter narration)`,
+      `Qwen generator (${getNarratorName()} narration)`,
       `  Status: ${qwenStatus}`,
       `  Progress: ${(qwenFraction * 100).toFixed(0)}%`,
       `  Model: ${qwenModelId}`,
@@ -467,7 +479,7 @@ export function AboutScreen() {
   // timezone, screen, and Hermes flag.
   const voiceInfo = useMemo(() => {
     const lines = [
-      `Tartaria Realms`,
+      `${getGameTitle()}`,
       ``,
       buildBasicDeviceSummary(),
       ``,
@@ -599,7 +611,10 @@ export function AboutScreen() {
           ABOUT / diagnostic block stays its own tab. Music card
           renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['session', 'sfx', 'display', 'lore', 'about', 'notices'] as const).map((id) => (
+        {(devMode
+          ? (['dev', 'session', 'sfx', 'display', 'lore', 'about', 'notices'] as const)
+          : (['session', 'sfx', 'display', 'lore', 'about', 'notices'] as const)
+        ).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -619,6 +634,8 @@ export function AboutScreen() {
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        {/* engine_Dev — DEV console as the first tab (dev mode only). */}
+        {tab === 'dev' && <DeveloperConsole embedded />}
         {/* v2.4.1 (OTA 047) — SESSION tab. The three run-control
             actions that used to clutter the in-game menu row
             (save & exit, copy log, clear log) live here as proper
@@ -1249,8 +1266,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -1258,18 +1275,18 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  back: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  back: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   body: {
     flex: 1,
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 12,
   },
   bodyContent: { paddingBottom: 24 },
-  mono: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  mono: { color: '#bcd2db', fontSize: 12, lineHeight: 18, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   // Tab row sits below the header. Three equal-flex chips; the active
   // one is filled (amber on dark) and the others are outlined.
   tabRow: {
@@ -1283,53 +1300,53 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 2,
     borderRadius: 4,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
-    backgroundColor: '#1a1612',
+    backgroundColor: '#131c1f',
     alignItems: 'center',
     justifyContent: 'center',
   },
   tabBtnActive: {
-    backgroundColor: '#c9a86a',
-    borderColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
+    borderColor: '#6ab0c9',
   },
   tabBtnText: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   tabBtnTextActive: {
-    color: '#13110f',
+    color: '#0e1618',
   },
   musicCard: {
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     padding: 10,
     marginBottom: 14,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
   },
   // v2.4.1 (OTA 047) — SESSION tab styles. Primary button (save &
   // exit) is warm gold + filled, the two secondaries (copy / clear
   // log) sit in a row below in outlined neutral tone.
   sessionCard: {
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     padding: 14,
     marginBottom: 14,
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
   },
   sessionLabel: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     letterSpacing: 3,
     fontWeight: '700',
     marginBottom: 8,
   },
   sessionHint: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 12,
     lineHeight: 18,
     marginBottom: 14,
@@ -1342,12 +1359,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   sessionBtnPrimary: {
-    backgroundColor: '#c9a86a',
-    borderColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
+    borderColor: '#6ab0c9',
     marginBottom: 10,
   },
   sessionBtnPrimaryText: {
-    color: '#13110f',
+    color: '#0e1618',
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: 3,
@@ -1359,11 +1376,11 @@ const styles = StyleSheet.create({
     borderColor: '#e07a5f',
   },
   sessionBtnSecondary: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
   },
   sessionBtnSecondaryText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 2,
@@ -1374,7 +1391,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sessionFootnote: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     lineHeight: 14,
     fontStyle: 'italic',
@@ -1386,73 +1403,73 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  musicTitle: { color: '#c9a86a', fontSize: 12, fontWeight: '800', letterSpacing: 3 },
+  musicTitle: { color: '#6ab0c9', fontSize: 12, fontWeight: '800', letterSpacing: 3 },
   musicToggle: {
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 3,
     borderWidth: 1,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     minWidth: 56,
     alignItems: 'center',
   },
-  musicToggleOn: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  musicToggleText: { color: '#7a705c', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
-  musicToggleTextOn: { color: '#13110f' },
+  musicToggleOn: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  musicToggleText: { color: '#6c8088', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  musicToggleTextOn: { color: '#0e1618' },
   musicRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  musicLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, width: 60 },
+  musicLabel: { color: '#6c8088', fontSize: 11, letterSpacing: 1, width: 60 },
   // arb85 — color-wheel row (stacked + centered, full width).
   wheelRow: { alignItems: 'center', gap: 8, marginVertical: 6 },
-  wheelLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
-  wheelHint: { color: '#7a705c', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
-  musicValue: { color: '#cdbf99', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
+  wheelLabel: { color: '#6c8088', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
+  wheelHint: { color: '#6c8088', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
+  musicValue: { color: '#bcd2db', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
   applyBtn: {
     marginTop: 10,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 3,
     borderWidth: 1,
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     alignSelf: 'flex-end',
   },
-  applyBtnFlash: { backgroundColor: '#c9a86a' },
-  applyBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
-  applyBtnTextFlash: { color: '#13110f' },
-  voiceNote: { color: '#7a705c', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
+  applyBtnFlash: { backgroundColor: '#6ab0c9' },
+  applyBtnText: { color: '#6ab0c9', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  applyBtnTextFlash: { color: '#0e1618' },
+  voiceNote: { color: '#6c8088', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
   voiceCycleBtn: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 3,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
-    backgroundColor: '#1a1612',
+    backgroundColor: '#131c1f',
   },
-  voiceCycleText: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
-  voicePickerLabel: { color: '#cdbf99', fontSize: 11, textAlign: 'center' },
+  voiceCycleText: { color: '#6ab0c9', fontSize: 12, fontWeight: '700' },
+  voicePickerLabel: { color: '#bcd2db', fontSize: 11, textAlign: 'center' },
   copyBtn: {
-    backgroundColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
     borderRadius: 4,
     paddingVertical: 12,
     alignItems: 'center',
     marginTop: 8,
   },
-  copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  copyText: { color: '#0a1012', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
   noticesPreamble: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 12,
     lineHeight: 18,
     marginBottom: 6,
   },
   noticesVerified: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     letterSpacing: 1,
     fontStyle: 'italic',
     marginBottom: 14,
   },
   noticeCard: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     padding: 10,
@@ -1464,31 +1481,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   noticeName: {
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 14,
     fontWeight: '700',
   },
   noticeLicense: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     letterSpacing: 2,
     fontWeight: '700',
     marginTop: 2,
   },
   noticeChevron: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 16,
     paddingLeft: 8,
     paddingRight: 4,
   },
   noticeRole: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 6,
   },
   noticeCopyright: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 4,
@@ -1501,11 +1518,11 @@ const styles = StyleSheet.create({
   noticeLicenseBlock: {
     marginTop: 10,
     paddingTop: 10,
-    borderTopColor: '#3a342c',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
   },
   noticeLicenseText: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     lineHeight: 15,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',

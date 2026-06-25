@@ -5913,7 +5913,7 @@
       "description": "Faction-issue ranged weapon, struck for the tartarian revivalists. Marked with their sigil."
     },
     {
-      "name": "Golem Sledge",
+      "name": "Sidekick Sledge",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
       "damageDice": "2d8",
@@ -5927,12 +5927,12 @@
         "two_handed"
       ],
       "baseDurability": 45,
-      "description": "A two-handed wrecking sledge sized for a construct's grip — dead weight in your hands, a wall-breaker in its. Smear it with whatever you like; the golem doesn't mind the mess.",
+      "description": "A two-handed wrecking sledge sized for a construct's grip — dead weight in your hands, a wall-breaker in its. Smear it with whatever you like; your sidekick doesn't mind the mess.",
       "statRequirement": null,
       "tc": 0
     },
     {
-      "name": "Golem Greatsword",
+      "name": "Sidekick Greatsword",
       "weaponKind": "melee",
       "damageType": "slashing",
       "damageDice": "2d8",
@@ -5951,7 +5951,7 @@
       "tc": 0
     },
     {
-      "name": "Golem Pike",
+      "name": "Sidekick Pike",
       "weaponKind": "melee",
       "damageType": "piercing",
       "damageDice": "2d8",
@@ -5965,12 +5965,12 @@
         "two_handed"
       ],
       "baseDurability": 45,
-      "description": "A two-handed pike sized for a construct — a single driving thrust that punches through a guard. Coat the point and the golem carries the bite home.",
+      "description": "A two-handed pike sized for a construct — a single driving thrust that punches through a guard. Coat the point and your sidekick carries the bite home.",
       "statRequirement": null,
       "tc": 0
     },
     {
-      "name": "Golem Aether-Lance",
+      "name": "Sidekick Aether-Lance",
       "weaponKind": "melee",
       "damageType": "aetheric",
       "damageDice": "2d8",
@@ -5984,7 +5984,7 @@
         "two_handed"
       ],
       "baseDurability": 45,
-      "description": "A lance of bound Aether keyed to a construct's frame; it strikes with the same charge that animates the golem. Coatings ride the discharge.",
+      "description": "A lance of bound Aether keyed to a construct's frame; it strikes with the same charge that animates the sidekick. Coatings ride the discharge.",
       "statRequirement": null,
       "tc": 0
     }

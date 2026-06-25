@@ -12,9 +12,11 @@
 import type { InventoryItem, PlayerCharacter } from './types';
 
 /** True for a deliberate one-shot throwable (the `throwable` tag, anchored so a
- *  plain `thrown` rock never qualifies). Pure, item-only. */
+ *  plain `thrown` rock never qualifies). Pure, item-only.
+ *  engine_Dev — a coating VIAL (weapon_coating) is also a one-shot throwable: racked
+ *  on the bandolier and tossed to splash its damage + effect on a target. */
 export function itemIsThrowable(item: InventoryItem): boolean {
-  return (item.tags ?? []).some((t) => /^throwable$/i.test(t));
+  return (item.tags ?? []).some((t) => /^throwable$/i.test(t) || /^weapon_coating$/i.test(t));
 }
 
 export interface BandolierEligibility {

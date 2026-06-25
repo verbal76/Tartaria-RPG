@@ -6,6 +6,7 @@
 import huntsData from '../data/quests/hunts.json';
 import type { PlayerCharacter, Enemy } from './types';
 import enemiesData from '../data/enemies/enemies.json';
+import { resolveMissions } from './contentPack';
 
 export type HuntCheckKind =
   | null
@@ -178,10 +179,18 @@ export function weaponRarityMeets(have: string | undefined, need: HuntWeaponRari
   return haveRank >= RARITY_RANK[need];
 }
 
-export const HUNTS = (huntsData as HuntDataShape).hunts;
+// engine_Dev — built-in (Tartaria) hunts; an uploaded 'missions.hunts' set wins.
+const HUNTS_BUILTIN = (huntsData as HuntDataShape).hunts;
+/** The live hunt list — uploaded override if present, else built-in. Call at
+ *  runtime (not module load) so an upload mirrored after boot is honored. */
+export function getHunts(): HuntDef[] {
+  return resolveMissions('hunts', HUNTS_BUILTIN) as HuntDef[];
+}
+/** Built-in hunts only — for the dev-console template / sample. */
+export const HUNTS = HUNTS_BUILTIN;
 
 export function findHuntById(id: string): HuntDef | null {
-  return HUNTS.find((h) => h.id === id) ?? null;
+  return getHunts().find((h) => h.id === id) ?? null;
 }
 
 // Available to a player from a given vendor or in general. Filters by
@@ -194,7 +203,7 @@ export function availableHunts(
   active: readonly string[],
   completed: readonly string[],
 ): HuntDef[] {
-  return HUNTS.filter(
+  return getHunts().filter(
     (h) =>
       (h.factionId === factionId || (factionId !== null && h.factionId === null)) &&
       playerRep >= h.minRep &&

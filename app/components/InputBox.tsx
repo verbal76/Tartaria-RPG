@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { getNarratorName } from '../engine/contentPack';
 import {
   View,
   TextInput,
@@ -223,8 +224,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     return () => { loop.stop(); };
   }, [inputPulse, pulse]);
   const inputBorderColor = inputPulse
-    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
-    : '#3a342c';
+    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#6ab0c9', '#ffe28a'] })
+    : '#2b3a3e';
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -323,10 +324,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const handleClimbPress = () => {
     if (!climbBlockedReason) { onOpenClimb(); return; }
     const line = climbBlockedReason === 'no_stamina'
-      ? 'The Arbiter catches your arm. "Not on empty — rest or eat, then climb."'
+      ? `The ${getNarratorName()} catches your arm. "Not on empty — rest or eat, then climb."`
       : climbBlockedReason === 'frayed_rope'
-        ? 'The Arbiter eyes your kit. "That rope’s frayed through — it won’t hold your weight. Mend it or find another."'
-        : 'The Arbiter looks up the height. "Not without a rope or climbing gear — you’ll need a grip first."';
+        ? `The ${getNarratorName()} eyes your kit. "That rope’s frayed through — it won’t hold your weight. Mend it or find another."`
+        : `The ${getNarratorName()} looks up the height. "Not without a rope or climbing gear — you’ll need a grip first."`;
     useGameStore.getState().appendLog('arbiter', line);
     if (climbBlockedReason === 'no_stamina') {
       try { Vibration.vibrate(40); } catch { /* ignore */ }
@@ -472,8 +473,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                       useGameStore.getState().appendLog(
                         'arbiter',
                         dogBlocked === 'aerial'
-                          ? `"${dog.name} can't reach what's in the air," the Arbiter says. "Bring it down, or fight it yourself."`
-                          : `"${dog.name} is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
+                          ? `"${dog.name} can't reach what's in the air," the ${getNarratorName()} says. "Bring it down, or fight it yourself."`
+                          : `"${dog.name} is holding the ground below," the ${getNarratorName()} says. "Dogs don't climb — come down to fight at ${dog.name}'s side."`,
                       );
                       return;
                     }
@@ -616,7 +617,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 ? 'What do you do? (or use quick buttons)'
                 : 'What do you do?'
             }
-            placeholderTextColor="#c9a86a"
+            placeholderTextColor="#6ab0c9"
             onSubmitEditing={handleSubmit}
             returnKeyType="send"
             autoCorrect={false}
@@ -747,7 +748,7 @@ const styles = StyleSheet.create({
   dogPicker: { flexDirection: 'row', gap: 8, marginTop: 6 },
   dogPickerBtn: {
     flex: 1,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#5a4f3e',
     borderWidth: 1,
     borderRadius: 4,
@@ -755,7 +756,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     alignItems: 'center',
   },
-  dogPickerLabel: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
+  dogPickerLabel: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
   dogPickerHint: { color: '#8a7e66', fontSize: 10, marginTop: 4, textAlign: 'center' },
   // arb110 — bandolier throw popup (orange accent, wraps for up to 5 items).
   bandolierPicker: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
@@ -780,7 +781,7 @@ const styles = StyleSheet.create({
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
   travelBtn: {
     flex: 1,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#5a4a2e',
     borderWidth: 1,
     paddingVertical: 10,
@@ -790,12 +791,12 @@ const styles = StyleSheet.create({
   // letterSpacing kept low (1) so longer room names ("GRAND HALL",
   // "LIVING ROOM") fit the equal-width slots without shrinking/ellipsizing
   // as hard. Short labels (NORTH / EXIT) still read fine with it.
-  travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
+  travelBtnText: { color: '#6ab0c9', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
   travelBtnDest: { paddingVertical: 8 },
-  travelBtnBlocked: { borderColor: '#2a2620', backgroundColor: '#141210', opacity: 0.5 },
+  travelBtnBlocked: { borderColor: '#1d262a', backgroundColor: '#141210', opacity: 0.5 },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
   movesBadge: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#9ec96a',
     borderWidth: 1,
     paddingHorizontal: 8,
@@ -806,10 +807,10 @@ const styles = StyleSheet.create({
     minWidth: 56,
   },
   movesBadgeText: { color: '#9ec96a', fontSize: 16, fontWeight: '800', letterSpacing: 1, lineHeight: 18 },
-  movesBadgeSub: { color: '#7a705c', fontSize: 8, letterSpacing: 1, marginTop: 1 },
+  movesBadgeSub: { color: '#6c8088', fontSize: 8, letterSpacing: 1, marginTop: 1 },
   quick: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -822,19 +823,19 @@ const styles = StyleSheet.create({
   // coloring"). Now a fully OPAQUE dark green-tinted fill so the chip keeps a
   // solid background on any tuned hue; the green border still marks "ready".
   quickReady: { borderColor: '#9ec96a', backgroundColor: '#1b2417' },
-  quickNeedsApproach: { borderColor: '#c9a86a' },
+  quickNeedsApproach: { borderColor: '#6ab0c9' },
   quickUnavailable: { borderColor: '#e07a5f' },
   // Disabled (e.g. TAKE during the typed-input rope beat) — muted so it reads
   // as "not now" without the red 'unavailable' alarm color. arb86 — was
   // opacity 0.4, which made the whole chip (fill included) translucent so the
   // tuned background bled through ("weird fading"). Now an opaque darker fill +
   // dimmer border + dimmed text instead, so the chip stays solid on any hue.
-  quickDisabled: { borderColor: '#2a2620', backgroundColor: '#141210' },
-  quickText: { color: '#cdbf99', fontSize: 12 },
+  quickDisabled: { borderColor: '#1d262a', backgroundColor: '#141210' },
+  quickText: { color: '#bcd2db', fontSize: 12 },
   quickDisabledText: { color: '#6a6253' },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
-  quickNeedsApproachText: { color: '#c9a86a' },
+  quickNeedsApproachText: { color: '#6ab0c9' },
   quickUnavailableText: { color: '#e07a5f' },
   inputRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   // Tungsten Spire — Animated.View wrapper so the input border can
@@ -844,28 +845,28 @@ const styles = StyleSheet.create({
     flex: 1,
     borderWidth: 1,
     borderRadius: 4,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
   },
   input: {
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     paddingHorizontal: 10,
     paddingVertical: 8,
     fontSize: 14,
   },
   send: {
-    backgroundColor: '#3a342c',
+    backgroundColor: '#2b3a3e',
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 4,
   },
-  sendText: { color: '#e6d8b3', fontWeight: '700' },
+  sendText: { color: '#d6e4e8', fontWeight: '700' },
   kbDismiss: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 4,
   },
-  kbDismissText: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
+  kbDismissText: { color: '#6ab0c9', fontSize: 14, fontWeight: '700' },
 });

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { availableFactionQuests } from '../engine/factionQuests';
-import { getStanding, FACTIONS } from '../engine/factions';
+import { getStanding, findFaction } from '../engine/factions';
 
 interface Props {
   visible: boolean;
@@ -36,7 +36,7 @@ export function MissionBoardModal({ visible, onClose }: Props) {
   const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
 
   const factionLabel = board
-    ? FACTIONS.find((f) => f.id === board.faction)?.name ?? board.faction.replace(/_/g, ' ')
+    ? findFaction(board.faction)?.name ?? board.faction.replace(/_/g, ' ')
     : '';
 
   const postings = useMemo(() => {
@@ -108,21 +108,21 @@ export function MissionBoardModal({ visible, onClose }: Props) {
 
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  card: { width: '100%', maxWidth: 400, maxHeight: '82%', backgroundColor: '#13110f', borderColor: '#b98a4a', borderWidth: 1, borderRadius: 4, padding: 14 },
-  title: { color: '#d8b271', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  subtitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
-  empty: { color: '#cdbf99', fontSize: 13, lineHeight: 19, marginBottom: 6 },
+  card: { width: '100%', maxWidth: 400, maxHeight: '82%', backgroundColor: '#0e1618', borderColor: '#5f9fb5', borderWidth: 1, borderRadius: 4, padding: 14 },
+  title: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
+  rule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 10 },
+  subtitle: { color: '#6c8088', fontSize: 11, letterSpacing: 1, marginBottom: 10 },
+  empty: { color: '#bcd2db', fontSize: 13, lineHeight: 19, marginBottom: 6 },
   list: { flexGrow: 0 },
   listContent: { gap: 10, paddingBottom: 4 },
-  posting: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 11 },
-  postingTitle: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  postingObjective: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginTop: 4 },
+  posting: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, padding: 11 },
+  postingTitle: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
+  postingObjective: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginTop: 4 },
   postingFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 9 },
   postingReward: { color: '#9ec96a', fontSize: 12, flexShrink: 1 },
-  acceptBtn: { backgroundColor: '#b98a4a', borderColor: '#b98a4a', borderWidth: 1, borderRadius: 3, paddingHorizontal: 16, paddingVertical: 7 },
-  acceptBtnText: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
-  closeBtn: { marginTop: 14, alignSelf: 'flex-end', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, borderColor: '#3a342c', minWidth: 80, alignItems: 'center' },
-  closeBtnText: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  acceptBtn: { backgroundColor: '#5f9fb5', borderColor: '#5f9fb5', borderWidth: 1, borderRadius: 3, paddingHorizontal: 16, paddingVertical: 7 },
+  acceptBtnText: { color: '#0e1618', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
+  closeBtn: { marginTop: 14, alignSelf: 'flex-end', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, borderColor: '#2b3a3e', minWidth: 80, alignItems: 'center' },
+  closeBtnText: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnPressed: { opacity: 0.7 },
 });

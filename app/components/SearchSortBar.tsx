@@ -71,7 +71,7 @@ export function SearchSortBar({
           value={query}
           onChangeText={onQueryChange}
           placeholder={placeholder}
-          placeholderTextColor="#c9a86a"
+          placeholderTextColor="#6ab0c9"
           autoCorrect={false}
           autoCapitalize="none"
         />
@@ -116,14 +116,14 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
   },
   input: {
     flex: 1,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 13,
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  clearText: { color: '#7a705c', fontSize: 18, fontWeight: '700' },
+  clearText: { color: '#6c8088', fontSize: 18, fontWeight: '700' },
   sortRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -141,26 +141,26 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   sortLabel: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     letterSpacing: 2,
     fontWeight: '700',
     marginRight: 4,
   },
   sortBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  sortBtnActive: { borderColor: '#c9a86a' },
+  sortBtnActive: { borderColor: '#6ab0c9' },
   sortBtnText: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
   },
-  sortBtnTextActive: { color: '#c9a86a' },
+  sortBtnTextActive: { color: '#6ab0c9' },
 });

@@ -4,6 +4,7 @@
 
 import storylineData from '../data/quests/faction-storylines.json';
 import type { HuntCheckKind } from './hunts';
+import { resolveMissions } from './contentPack';
 
 export interface StorylineStageDef {
   narration: string;
@@ -25,10 +26,16 @@ export interface StorylineDef {
 
 interface DataShape { storylines: StorylineDef[]; }
 
-export const STORYLINES = (storylineData as DataShape).storylines;
+const STORYLINES_BUILTIN = (storylineData as DataShape).storylines;
+/** Live storyline list — uploaded 'missions.storylines' override or built-in. */
+export function getStorylines(): StorylineDef[] {
+  return resolveMissions('storylines', STORYLINES_BUILTIN) as StorylineDef[];
+}
+/** Built-in storylines only — dev-console template. */
+export const STORYLINES = STORYLINES_BUILTIN;
 
 export function findStorylineById(id: string): StorylineDef | null {
-  return STORYLINES.find((s) => s.id === id) ?? null;
+  return getStorylines().find((s) => s.id === id) ?? null;
 }
 
 export function availableStorylines(
@@ -38,7 +45,7 @@ export function availableStorylines(
   completed: readonly string[],
 ): StorylineDef[] {
   if (!factionId) return [];
-  return STORYLINES.filter(
+  return getStorylines().filter(
     (s) =>
       s.factionId === factionId &&
       playerRep >= s.minRep &&

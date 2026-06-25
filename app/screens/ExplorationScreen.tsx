@@ -1,10 +1,22 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { getNarratorName, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { hubNameForFaction } from '../engine/hub';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
+
+// engine_Dev — during a fight, the top char + enemy panels grow tall to fill the world-window
+// (one long box each side) and the feed hides. Uses the ORIGINAL StatsPanel (reactive HP color) +
+// EnemyPanel. Set false to revert to the normal compact combat layout.
+const COMBAT_ARENA_VIEW = true;
+
+// engine_Dev — flash the just-resolved roll result in a transient popup just above the controls
+// (below the action buttons). Shows the LAST roll only, holds ~2s, then fades. Set false to remove.
+const ROLL_RESULT_POPUP = true;
+const ROLL_POPUP_MS = 2000;
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
@@ -26,6 +38,7 @@ import { revealedLocationName } from '../engine/hiddenLocations';
 import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
+import { getTutorialProps } from '../engine/tutorialProps';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
@@ -69,7 +82,7 @@ function timeOfDayTint(hours: number): string {
   const hourOfDay = Math.floor(hours % 24);
   if (hourOfDay < 6) return '#080a10';   // night — cool, deep blue
   if (hourOfDay < 12) return '#0f0d0a';  // morning — warm amber undertone
-  if (hourOfDay < 18) return '#0a0908';  // afternoon — neutral (the default)
+  if (hourOfDay < 18) return '#0a1012';  // afternoon — neutral (the default)
   return '#0e0b08';                       // evening — dusty rust
 }
 
@@ -128,6 +141,17 @@ export function ExplorationScreen() {
   // Measured height of the left stats panel — the enemy panel caps to this so a
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
+  // engine_Dev — transient combat-RESULT popup (above the controls). During a fight the feed is
+  // hidden by the arena, so when a roll sequence resolves we surface the FINAL output line (the one
+  // that would normally show in the feed) here for ~2s — NOT the dice math (the roller shows that).
+  const [resultPop, setResultPop] = useState<string | null>(null);
+  const rollPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showResult = useCallback((text: string) => {
+    setResultPop(text);
+    if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current);
+    rollPopupTimer.current = setTimeout(() => setResultPop(null), ROLL_POPUP_MS);
+  }, []);
+  useEffect(() => () => { if (rollPopupTimer.current) clearTimeout(rollPopupTimer.current); }, []);
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
   // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
@@ -446,6 +470,27 @@ export function ExplorationScreen() {
   const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
 
   const inCombat = enemyViews.length > 0;
+  // engine_Dev — the ARENA layout (tall char | enemy split, hidden feed) must track a
+  // LIVE threat, not mere enemy presence. Once the last foe is dead or knocked out the
+  // fight is effectively over, so the screen has to collapse back to the peaceful layout
+  // even though a KO'd body lingers in the scene to be looted — otherwise the character
+  // box stays stretched full-height after you "complete" the combat. `inCombat` still
+  // drives the controls + enemy panel so the "loot" button and the downed foe stay shown.
+  const arenaActive = COMBAT_ARENA_VIEW && enemyViews.some(
+    (v, i) => (v.currentHp ?? 0) > 0 && currentScene?.enemyKnockedOut?.[i] !== true,
+  );
+  // engine_Dev — when a roll sequence finishes resolving (pendingRolls goes null) during combat,
+  // surface the FINAL output line in the result popup (the feed is hidden behind the arena). Only
+  // the latest log line, only in combat, only once per sequence — no per-step dice-math duplication.
+  const prevPendingRef = useRef(pendingRolls);
+  useEffect(() => {
+    const was = prevPendingRef.current;
+    prevPendingRef.current = pendingRolls;
+    if (ROLL_RESULT_POPUP && was && !pendingRolls && inCombat) {
+      const last = gameLog[gameLog.length - 1];
+      if (last?.text) showResult(last.text);
+    }
+  }, [pendingRolls, gameLog, inCombat, showResult]);
   const equippedMain = player?.equipped?.main ?? null;
   const equippedOff = player?.equipped?.off ?? null;
   // OTA-406 — coating adjective for the equipped instance in each hand, resolved
@@ -499,31 +544,36 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={styles.topRow}>
-        <TutorialTarget area="top-left-stats" style={styles.statsCol}>
+      <View style={[styles.topRow, arenaActive && styles.topRowCombat]}>
+        <TutorialTarget area="top-left-stats" style={[styles.statsCol, arenaActive && styles.combatColEqual]}>
           {/* OTA 040 — tap the stats panel to open the full Player
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
               still measures the same layout box. */}
           <TouchableOpacity
             onPress={() => setScreen('character')}
             activeOpacity={0.75}
+            style={arenaActive ? styles.combatColFill : undefined}
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;
               if (h > 0 && Math.abs(h - statsColH) > 0.5) setStatsColH(h);
             }}
           >
-            <StatsPanel player={player} />
+            <StatsPanel player={player} fill={arenaActive} />
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
-          {inCombat ? (
+          {arenaActive ? (
             <EnemyPanel
               enemies={enemyViews}
               activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
+              fill={arenaActive}
             />
           ) : (
+            // Once the fight is over (last foe dead or knocked out) the top-right
+            // reverts to the crest, exactly as it was before combat — the KO'd body
+            // is still lootable via the "loot" button in the input row.
             <CrestPlaceholder />
           )}
           {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
@@ -552,7 +602,7 @@ export function ExplorationScreen() {
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.sceneText} numberOfLines={1} ellipsizeMode="tail">
             {currentScene
-              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
+              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}${currentScene.weather ? `  /  ${currentScene.weather.name}` : ''}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
               : 'No scene'}
           </Text>
           <Text style={styles.timeText} numberOfLines={1}>
@@ -602,44 +652,72 @@ export function ExplorationScreen() {
           the 'ended' phase (no live quest to point at). */}
       {(() => {
         if (!player) return null;
-        const mq = player.mainQuest;
+        // The main-quest / objective chip is out-of-combat navigation; during a
+        // fight it's just clutter over the arena, so suppress it while a live
+        // threat is up (it returns the moment the arena collapses, i.e. the last
+        // foe is down — matching the rest of the peaceful-layout revert).
+        if (arenaActive) return null;
+        // engine_Dev — a DATA-DRIVEN main quest (uploaded, or the generic default)
+        // drives the chip. The built-in Tartaria main quest was removed.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { phaseHint, LOST_CAPITAL_LOCATIONS: capitals, coreGateNextAction } = require('../engine/mainQuest');
-        let mainLine: string;
-        // OTA-154 — atUnrecovered flag also drives the SUMMON chip on
-        // the right edge of the home-screen MAIN QUEST card. Player
-        // asked to skip the bounce through Contracts: "I want to be
-        // able to get right to the city smack that button and have at
-        // it." Same precondition surface the Contracts SUMMON chip
-        // uses — both stay live so the secondary path remains as a
-        // backup.
-        let atUnrecovered = false;
-        if (!mq || mq.phase === 'ended') {
-          // No active main quest — chip still serves as the menu
-          // entry but doesn't pretend to point anywhere.
-          mainLine = 'No active objective.';
-        } else {
-          const cores = mq.coresRecovered?.length ?? 0;
-          // OTA-412 — the SUMMON chip must only show while the player is
-          // STANDING ON the capital's anchor tile. currentLocationId lingers as
-          // the capital after a cardinal step off into the wilderness, so gating
-          // on it alone left the chip drawn (and the "recover the core here" line)
-          // miles outside the city. Mirror isStationedAtNamedLocation: not
-          // mid-journey, and either inside a building or on the map-center anchor.
-          // The summon ACTION already enforces this (summonCoreGuardian →
-          // not_at_capital); this hides the button so the affordance matches.
+        const { liveMainQuest } = require('../engine/customMainQuest');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { currentObjectiveLine, questIsComplete, questStepIndex, questBossAt } = require('../engine/customMainQuestEngine');
+        const customQ = liveMainQuest();
+        if (customQ) {
+          // engine_Dev — the chip leads with the QUEST TITLE (the author's name for
+          // the campaign) and carries a small parts-completed progress count, so the
+          // player sees both what they're chasing and how far along they are.
+          const complete = questIsComplete(player);
+          const total = customQ.steps.length;
+          const done = Math.max(0, Math.min(questStepIndex(player), total));
+          const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
+          const objLine = complete ? 'Complete.' : (currentObjectiveLine(player) ?? 'No active objective.');
+          // engine_Dev — SUMMON chip for the active KILL step. The kill-step boss
+          // auto-spawns on arrival; this re-engages it after a death-revive / scene
+          // rebuild clears the field. Shown only while STANDING at the boss's location
+          // with no copy already in the scene (the summon action re-checks the same).
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-          const stationedAtCapital = !player.travelTarget
-            && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
-          atUnrecovered = stationedAtCapital
-            && capitals.includes(player.currentLocationId)
-            && !mq.coresRecovered.includes(player.currentLocationId)
-            && (mq.phase === 'revelation' || mq.phase === 'cores');
-          mainLine = atUnrecovered
-            ? `${coreGateNextAction(player.factionId)}.`
-            : phaseHint(mq.phase, cores);
+          const { WORLD_MAP_CENTER_X: scx, WORLD_MAP_CENTER_Y: scy } = require('../engine/worldMap');
+          const stationedHere = !player.travelTarget
+            && (player.hubRoomId != null || (player.mapX === scx && player.mapY === scy));
+          const bossHere = !complete && stationedHere ? questBossAt(player, player.currentLocationId) : null;
+          const bossInScene = !!bossHere && (currentScene?.enemies ?? []).some(
+            (e: { name: string }) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
+          );
+          const canSummonBoss = !!bossHere && !bossInScene;
+          return (
+            <TutorialTarget area="objective-chip">
+              <TouchableOpacity
+                style={styles.objectiveChip}
+                onPress={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
+                activeOpacity={0.7}
+                hitSlop={6}
+              >
+                <View style={styles.objectiveChipRow}>
+                  <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={2}>
+                    <Text style={styles.objectiveChipStar}>★ </Text>
+                    <Text style={styles.objectiveChipLabel}>{title.toUpperCase()} · </Text>
+                    {objLine}
+                    <Text style={styles.objectiveChipProgress}>{`   ${done}/${total} parts`}</Text>
+                  </Text>
+                  {canSummonBoss && (
+                    <TouchableOpacity
+                      style={styles.objectiveChipSummon}
+                      onPress={() => useGameStore.getState().summonMainQuestBoss()}
+                      activeOpacity={0.7}
+                      hitSlop={8}
+                    >
+                      <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </TutorialTarget>
+          );
         }
+        // engine_Dev — no data-driven quest loaded: the chip is just the menu
+        // entry into the full Contracts screen (side quests, hunts, collectibles).
         return (
           <TutorialTarget area="objective-chip">
           <TouchableOpacity
@@ -655,24 +733,11 @@ export function ExplorationScreen() {
             hitSlop={6}
           >
             <View style={styles.objectiveChipRow}>
-              {/* arb120 — slimmed to ONE line (was title + subtitle) to give the
-                  exploration feed more room; the MISSIONS quick-button now carries
-                  the "open Contracts" affordance the subtitle used to spell out. */}
               <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={1}>
                 <Text style={styles.objectiveChipStar}>★ </Text>
                 <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
-                {mainLine}
+                No main quest set — build one in the dev console.
               </Text>
-              {atUnrecovered && (
-                <TouchableOpacity
-                  style={styles.objectiveChipSummon}
-                  onPress={() => useGameStore.getState().summonCoreGuardian()}
-                  activeOpacity={0.7}
-                  hitSlop={8}
-                >
-                  <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
-                </TouchableOpacity>
-              )}
             </View>
           </TouchableOpacity>
           </TutorialTarget>
@@ -735,7 +800,7 @@ export function ExplorationScreen() {
           spawn macro-location). A wild fusion_bench permit (fusionPending)
           still shows it anywhere. This also keeps it off-screen for the whole
           tutorial, which runs before you've ever left. */}
-      {!crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
+      {isCrucibleEnabled() && !crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -756,7 +821,7 @@ export function ExplorationScreen() {
           <View style={styles.fusionBannerStripe} />
           <View style={styles.vendorBannerBody}>
             <Text style={styles.fusionBannerName}>
-              {gate.ok ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}
+              {gate.ok ? `★★ ${getCrucibleName()} ready` : `★★ ${getCrucibleName()} · needs prep`}
             </Text>
             <Text style={styles.vendorBannerHint}>
               {gate.ok
@@ -779,11 +844,15 @@ export function ExplorationScreen() {
         );
       })()}
 
+      {/* engine_Dev — during the combat arena, the tall char|enemy topRow takes the world-window,
+          so the feed hides; otherwise the normal scrolling feed shows. Keyed on a live threat
+          (arenaActive), so once the last foe is down the feed returns even if a KO'd body lingers. */}
+      {!arenaActive && (
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
-            <Text style={styles.streamingPrefix}>The Arbiter:</Text>
+            <Text style={styles.streamingPrefix}>The {getNarratorName()}:</Text>
             <Text style={styles.streamingText}>
               {partialArbiterText}
               <Text style={styles.streamingCursor}>▍</Text>
@@ -791,6 +860,16 @@ export function ExplorationScreen() {
           </View>
         )}
       </TutorialTarget>
+      )}
+
+      {/* engine_Dev — transient combat-RESULT popup: above the controls, below the action buttons.
+          Shows the FINAL output line once a roll sequence resolves (the feed is hidden in combat),
+          holds ~2s, then clears. Not the dice math — the roller shows that. */}
+      {ROLL_RESULT_POPUP && resultPop && (
+        <View style={[styles.rollPopup, styles.rollPopupNeutral]} pointerEvents="none">
+          <Text style={styles.rollPopupText} numberOfLines={3}>{resultPop}</Text>
+        </View>
+      )}
 
       <View style={styles.controls}>
         {pendingRolls ? (
@@ -1022,7 +1101,13 @@ export function ExplorationScreen() {
                 player.inventory.map((i) => i.name),
                 'climb_steep',
                 [findGearByName, findMaterialByName, findExplorationItemByName],
-              );
+              )
+                // engine_Dev — also count an item whose own tags mark it as rope/
+                // climbing gear (the generic tutorial/synth "Climbing Rope" isn't a
+                // catalog row), so the CLIMB button isn't falsely reddened.
+                || player.inventory.some(
+                  (i) => i.quantity > 0 && (i.tags ?? []).some((t) => /\b(rope|climb)\b/i.test(String(t))),
+                );
               const hasReclaimersRope = player.inventory.some(
                 (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
               );
@@ -1043,10 +1128,10 @@ export function ExplorationScreen() {
                 activeRopeDurability,
               });
             })()}
-            golem={player?.golem ? {
-              name: player.golem.name,
-              hp: player.golem.hp,
-              hpMax: player.golem.hpMax,
+            golem={player?.sidekick ? {
+              name: player.sidekick.name,
+              hp: player.sidekick.hp,
+              hpMax: player.sidekick.hpMax,
             } : null}
             // arb-fix — keep the dog in the combat arsenal whenever it's a
             // living companion, INCLUDING when benched at a climb base
@@ -1315,7 +1400,7 @@ export function ExplorationScreen() {
         // present the prop alone; the normal scene nouns return after.
         takeable={
           tutBeat === 'cudgel'
-            ? [{ noun: 'cudgel', consumed: false }]
+            ? [{ noun: getTutorialProps().weapon, consumed: false }]
             : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
                 .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
                 .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
@@ -1325,8 +1410,10 @@ export function ExplorationScreen() {
           // focus to the underlying command field and re-raise it.
           Keyboard.dismiss();
           setTakeOpen(false);
-          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
-            submit('take cudgel');
+          if (tutBeat === 'cudgel') {
+            // The cudgel beat only offers the resolved tutorial weapon; any tap
+            // here is THAT take (the gameStore beat grants the resolved weapon).
+            submit(`take ${noun}`);
             return;
           }
           takeAmbientNoun(noun);
@@ -1351,12 +1438,17 @@ export function ExplorationScreen() {
 
       <SalvageModal
         visible={salvageOpen}
+        // engine_Dev — during the scrap beat the demo armor prop is resolved from
+        // the author's own armor table; bypass the Tartaria-tuned isSalvageable
+        // name filter so a custom armor name (e.g. "Flak Vest") still shows.
+        // Otherwise the picker counted the prop but rendered empty.
+        bypassFilter={tutBeat === 'scrap'}
         // During the scrap beat, show ONLY the demo prop (the broken chest
         // plate) so the picker can't surface the room's real salvageables —
         // same confusion fix as the TAKE picker above.
         chips={
           tutBeat === 'scrap'
-            ? [{ noun: 'broken chest plate', consumed: false }]
+            ? [{ noun: getTutorialProps().armor, consumed: false }]
             : buildChipPool(currentScene).map((n) => ({
                 noun: n,
                 // OTA-167 — salvage chip greys on the engine's per-room
@@ -1468,8 +1560,8 @@ export function ExplorationScreen() {
           bank → Arbiter dialogue line lands in the feed. */}
       <BrandedModal
         visible={askArbiterOpen}
-        title="ASK THE ARBITER"
-        body="What is the Aether? Who are the Reclaimers? Tell me about the Berlin Betrayal. The Arbiter keeps what they remember of the buried world."
+        title={`ASK THE ${getNarratorName().toUpperCase()}`}
+        body={`What is the Aether? Who are the Reclaimers? Tell me about the Berlin Betrayal. The ${getNarratorName()} keeps what they remember of the buried world.`}
         textInput={{
           value: askArbiterInput,
           onChangeText: setAskArbiterInput,
@@ -1507,10 +1599,10 @@ export function ExplorationScreen() {
         visible={doorModalVisible}
         inline={Platform.OS === 'ios'}
         title="The Door Is Open"
-        body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap EXIT."
+        body={`The door of ${hubNameForFaction(player?.factionId)} stands open. Pick through what's left of this place, or step out and begin your journey. You can always come back later — just tap EXIT to step outside.`}
         buttons={[
           {
-            label: 'Explore the Outpost',
+            label: 'Stay & Explore',
             onPress: () => chooseTutorialExplore(),
             tone: 'neutral',
           },
@@ -1664,6 +1756,10 @@ const styles = StyleSheet.create({
   // clipped the bottom rows behind the scene bar. Letting the row grow
   // to fit content keeps every stat visible.
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
+  // engine_Dev — combat arena: the top row fills the world-window so the char + enemy boxes run long.
+  topRowCombat: { flex: 1, minHeight: 0 },
+  combatColFill: { flex: 1 },
+  combatColEqual: { flex: 1 }, // equal halves during combat (override statsCol's 1.2)
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
@@ -1682,7 +1778,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     backgroundColor: 'rgba(26, 23, 20, 0.85)',
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1690,29 +1786,29 @@ const styles = StyleSheet.create({
   },
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
-    borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
+    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
     gap: 6,
   },
-  sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
-  timeText: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  sceneText: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1 },
+  timeText: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginTop: 1 },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
-  sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
+  sceneBtn: { color: '#bcd2db', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
   // reference, 'QUESTS' opens the active hunts / mysteries / storylines /
   // faction quests board. Short labels keep the row from crowding the
   // location + weather text on narrow Android screens. Settings stays
   // accessible via the gear in the bottom menu row.
   sceneBarBtn: {
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
-  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#2a2620' },
-  sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#1d262a' },
+  sceneBarBtnText: { color: '#6ab0c9', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-179 — flex:1 alone wasn't shrinking the feed enough when
   // the OTA-172 combat row went 3 lines tall, so the bottom action
   // button row clipped below the safe-area bottom edge. Adding
@@ -1727,13 +1823,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     backgroundColor: '#0e0c0a',
-    borderLeftColor: '#c9a86a',
+    borderLeftColor: '#6ab0c9',
     borderLeftWidth: 2,
     marginTop: 4,
   },
-  streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
-  streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
-  streamingCursor: { color: '#c9a86a', fontSize: 13 },
+  streamingPrefix: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  streamingText: { color: '#bcd2db', fontSize: 13, lineHeight: 18 },
+  streamingCursor: { color: '#6ab0c9', fontSize: 13 },
   // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
   // log, gear) was removed; gear is the cornerGear above and the
   // session controls all live in the gear screen's SESSION tab. The
@@ -1741,7 +1837,14 @@ const styles = StyleSheet.create({
   // feed's flex:1 naturally absorbs the reclaimed vertical real
   // estate.
   controls: { gap: 6 },
-  gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
+  // engine_Dev — transient last-roll result popup (above the controls).
+  rollPopup: { alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, marginBottom: 6, alignItems: 'center', backgroundColor: '#0a1012' },
+  rollPopupHit: { borderColor: '#9ec96a' },
+  rollPopupMiss: { borderColor: '#e07a5f' },
+  rollPopupNeutral: { borderColor: '#2b3a3e' },
+  rollPopupKind: { color: '#6c8088', fontSize: 9, fontWeight: '700', letterSpacing: 2 },
+  rollPopupText: { color: '#bcd2db', fontSize: 13, fontWeight: '700', letterSpacing: 0.5, marginTop: 1 },
+  gear: { color: '#6ab0c9', fontSize: 16, lineHeight: 18 },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line
@@ -1752,30 +1855,36 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
   },
   objectiveChipTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 12,
     lineHeight: 16,
     fontStyle: 'italic',
   },
   objectiveChipStar: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontStyle: 'normal',
     fontWeight: '700',
   },
   objectiveChipLabel: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontStyle: 'normal',
     fontWeight: '700',
     letterSpacing: 1,
   },
+  // engine_Dev — dim parts-completed counter trailing the custom-quest objective.
+  objectiveChipProgress: {
+    color: '#6c8088',
+    fontStyle: 'normal',
+    fontWeight: '700',
+  },
   objectiveChipSubtitle: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     lineHeight: 14,
     marginTop: 2,
@@ -1792,15 +1901,15 @@ const styles = StyleSheet.create({
   },
   objectiveChipBody: { flex: 1, minWidth: 0 },
   objectiveChipSummon: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
   objectiveChipSummonText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -1808,24 +1917,24 @@ const styles = StyleSheet.create({
   vendorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
     minHeight: 44,
   },
-  vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
+  vendorBannerStripe: { width: 4, backgroundColor: '#6ab0c9', alignSelf: 'stretch' },
   vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
-  vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
-  vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
-  vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  vendorBannerName: { color: '#6ab0c9', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  vendorBannerHint: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginTop: 1 },
+  vendorBannerArrow: { color: '#6ab0c9', fontSize: 22, paddingHorizontal: 12 },
   // OTA-451 — Mission Board chip. Parchment/brown accent to distinguish from the
   // vendor's amber and the Crucible's purple.
   missionBoardBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#8b7355',
     borderWidth: 1,
     borderRadius: 4,
@@ -1844,7 +1953,7 @@ const styles = StyleSheet.create({
   // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
   // purple accent colour distinguishes it.
   fusionBanner: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     flexDirection: 'row',
     alignItems: 'center',
     borderColor: '#b88ce0',
@@ -1858,7 +1967,7 @@ const styles = StyleSheet.create({
   // arb152 — dismiss (✕) on the Fusing Crucible chip.
   crucibleDismiss: { paddingHorizontal: 14, paddingVertical: 8, alignSelf: 'center' },
   crucibleDismissText: { color: '#8a6fa8', fontSize: 16, fontWeight: '800' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });
 
 // Build the chip pool the search / approach modals show.

@@ -116,7 +116,7 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
                   multiline
                   numberOfLines={4}
                   placeholder="What did you expect? What actually happened? Any reproduction steps?"
-                  placeholderTextColor="#5c5345"
+                  placeholderTextColor="#46555a"
                   value={description}
                   onChangeText={setDescription}
                   textAlignVertical="top"
@@ -212,23 +212,23 @@ const styles = StyleSheet.create({
   },
   cardWrap: { width: '100%', maxWidth: 420, maxHeight: '90%' },
   card: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
   },
   headerRow: { marginBottom: 10 },
   title: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 4,
   },
-  ruleLine: { height: 1, backgroundColor: '#3a342c', marginTop: 6 },
-  body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 12 },
+  ruleLine: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6 },
+  body: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginBottom: 12 },
   sectionLabel: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
@@ -237,10 +237,10 @@ const styles = StyleSheet.create({
   },
   slotList: {
     maxHeight: 180,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
   },
   slotListContent: { padding: 4 },
   slotRow: {
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -266,19 +266,19 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
   },
-  slotLabel: { color: '#cdbf99', fontSize: 13 },
-  slotLabelSelected: { color: '#e6d8b3', fontWeight: '700' },
-  slotSub: { color: '#7a705c', fontSize: 10, marginTop: 1 },
-  emptyHint: { color: '#7a705c', fontSize: 11, padding: 10, fontStyle: 'italic' },
+  slotLabel: { color: '#bcd2db', fontSize: 13 },
+  slotLabelSelected: { color: '#d6e4e8', fontWeight: '700' },
+  slotSub: { color: '#6c8088', fontSize: 10, marginTop: 1 },
+  emptyHint: { color: '#6c8088', fontSize: 11, padding: 10, fontStyle: 'italic' },
   input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     padding: 10,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 13,
     minHeight: 80,
     marginBottom: 10,
@@ -297,11 +297,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
-  btnDisabled: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
+  btnPrimary: { backgroundColor: '#6ab0c9', borderColor: '#6ab0c9' },
+  btnDisabled: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  btnTextPrimary: { color: '#13110f' },
-  btnTextDisabled: { color: '#5c5345' },
-  btnTextNeutral: { color: '#cdbf99' },
+  btnTextPrimary: { color: '#0e1618' },
+  btnTextDisabled: { color: '#46555a' },
+  btnTextNeutral: { color: '#bcd2db' },
 });

@@ -1,0 +1,33 @@
+{
+  "_comment": "Built-in (Tartaria) scrap config — extracted from app/engine/scrapEngine.ts. The tag→material RULES (rarity scaling, premium-strip) stay in code; this holds the data: which material each ROLE yields, which raw mats refuse to scrap into themselves, which mats are 'premium' (stripped from self-crafted scrap), and the failure narration. Authors remap roles to their own material names.",
+  "roles": {
+    "metalBulk": "Scrap Metal",
+    "metalPremium": "Golem Core",
+    "essencePrimary": "Aetheric Shard",
+    "essenceSecondary": "Aether Crystal",
+    "essenceBonus": "Aether Dust",
+    "stone": "Small Rock",
+    "mud": "Mudstone",
+    "cloth": "Patched Cloth",
+    "organic": "Spider Silk",
+    "wood": "Stick"
+  },
+  "rawGuard": [
+    "Scrap Metal", "Stick", "Small Rock", "Big Rock", "Patched Cloth",
+    "Spider Silk", "Aether Crystal", "Aetheric Shard", "Aether Residue",
+    "Mud Fragment", "Aether Mud", "Golem Core", "Mudstone", "Aether Dust"
+  ],
+  "premiumMats": ["Golem Core", "Aetheric Shard", "Aether Crystal", "Aether Dust", "Mudstone"],
+  "failureLines": [
+    "You work the {item} apart, but the pieces crumble in your hands — rust-rotted through. Nothing salvageable.",
+    "Wrong angle, wrong tool, wrong something. The {item} won't yield clean parts. You toss the scraps aside.",
+    "You try your best, but the {item}'s been salt-eaten too long. Anything useful disintegrates on the bench.",
+    "The {item} comes apart, sure — but the bits are warped past use. Pile it on the scrap heap.",
+    "Too far gone. You wrench the {item} open and find only powdered rot inside. Nothing to keep.",
+    "Your hands slip twice on the {item} and the housing splits the wrong way. Whatever was inside crumbles.",
+    "The {item} was already half-eaten by something before you found it. You strip it bare. There's nothing.",
+    "You break the {item} down to its bones and the bones are hollow. Someone beat you to anything worth keeping.",
+    "Pry, twist, pry again — the {item} fights you and wins. You force it open and the contents puff out as grey dust.",
+    "You'd swear the {item} was solid. It isn't. The whole thing collapses into a brittle handful of nothing."
+  ]
+}

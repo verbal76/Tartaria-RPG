@@ -17,7 +17,21 @@
 // import it without pulling in TTSController → useGameStore →
 // AsyncStorage (a heavy mock chain).
 
-/** Pull dialogue out of arbiter-channel narration. Returns the
+import { getNarratorName } from '../engine/contentPack';
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Framing regexes accept the LIVE narrator name (renamable in the dev console)
+// AND the legacy "Arbiter" — lore data and model habit can still produce
+// "Arbiter", and we want both stripped/detected as the narrator.
+function narratorAlternation(): string {
+  const name = escapeRegExp(getNarratorName());
+  return name.toLowerCase() === 'arbiter' ? 'Arbiter' : `(?:${name}|Arbiter)`;
+}
+
+/** Pull dialogue out of narrator-channel narration. Returns the
  *  speakable text. Falls back to the original input on edge cases
  *  so TTS never goes silent. */
 export function stripArbiterFrame(text: string): string {
@@ -33,8 +47,8 @@ export function stripArbiterFrame(text: string): string {
     return quoted.join(' ').trim();
   }
   // No quoted dialogue — try to strip a leading narrator clause.
-  // "The Arbiter notes, X" / "The Arbiter shrugs. X" → "X"
-  const framed = text.match(/^[Tt]he Arbiter\s+[^.,]+[.,]\s*(.+)$/);
+  // "The Narrator notes, X" / "The Narrator shrugs. X" → "X"
+  const framed = text.match(new RegExp(`^[Tt]he ${narratorAlternation()}\\s+[^.,]+[.,]\\s*(.+)$`));
   if (framed && framed[1]) return framed[1].trim();
   return text;
 }
@@ -53,7 +67,8 @@ export function stripArbiterFrame(text: string): string {
  *  Falls back to "the Arbiter" when no framing is detected — the
  *  arbiter channel's default voice picks up the line. */
 export function detectArbiterSpeaker(text: string): string {
-  if (!text) return 'the Arbiter';
+  const narrator = `the ${getNarratorName()}`;
+  if (!text) return narrator;
   // Pattern A: leading proper-name framing — "Irma Ironhand leans in",
   // "Halem taps a notice", "Naha hands you the poster", etc.
   // Capture 1-3 leading capitalised words before the first verb.
@@ -63,9 +78,11 @@ export function detectArbiterSpeaker(text: string): string {
   // the Trader says / "Halem says quietly".
   const trailingAttr = text.match(/[.,]?["”]\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})\s+(?:says|notes|shrugs|smiles|frowns|murmurs|whispers|growls|chuckles|barks)/);
   if (trailingAttr && trailingAttr[1]) return trailingAttr[1];
-  // Pattern C: "The Arbiter X" / "the Arbiter X" — explicit arbiter.
-  if (/^[Tt]he Arbiter\b/.test(text) || /["”]\s*[Tt]he Arbiter\b/.test(text)) {
-    return 'the Arbiter';
+  // Pattern C: "The Narrator X" / "the Narrator X" (or legacy Arbiter) —
+  // explicit narrator framing.
+  const alt = narratorAlternation();
+  if (new RegExp(`^[Tt]he ${alt}\\b`).test(text) || new RegExp(`["”]\\s*[Tt]he ${alt}\\b`).test(text)) {
+    return narrator;
   }
-  return 'the Arbiter';
+  return narrator;
 }

@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { missingIngredientsList } from '../engine/crafting';
+import { getPowers } from '../engine/powers';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
 import { BrandedModal } from '../components/BrandedModal';
@@ -12,7 +13,9 @@ import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
-import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
+import { resolveSidekickDefs, getSummonNoun, type SidekickDefinition } from '../engine/sidekicks';
+import { powerDcModifier, powerStatBonus } from '../engine/raceMechanics';
+import { getEnergyName, hasEnergyOverride, getNarratorName } from '../engine/contentPack';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -32,71 +35,37 @@ interface AethercraftDiscipline {
   /** OTA-111 — when true, the card renders a per-golem-variant
    *  block (HP / attack / damage type / fuel cost) under the body
    *  so the player can decide which golem to summon. Data is
-   *  pulled live from GOLEM_DEFINITIONS so a new golem kind shows
+   *  pulled live from SIDEKICK_DEFINITIONS so a new golem kind shows
    *  up automatically. */
   showGolemVariants?: boolean;
 }
 
-const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
-  {
-    id: 'aether_shape',
-    title: 'Aetherstone Manipulation (shape)',
-    body:
-      'INT check, DC 12. In combat: +4 AC for one turn (shaped-stone ward). Out of combat: ' +
-      'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],
-    examples: ['shape stone', 'mold the aetherstone', 'manipulate stone'],
-  },
-  {
-    id: 'aether_summon',
-    title: 'Aether Golem Constructor (summon)',
-    body:
-      'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
-      'a golem ally that fights for you for the rest of the scene. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
-    examples: ['summon golem', 'summon an aether golem', 'call a golem'],
-    showGolemVariants: true,
-  },
-  {
-    id: 'aether_mend',
-    title: 'Aetheric Healing (mend)',
-    body:
-      'WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption ' +
-      'when they cast this — racial trait. Mud Dwellers and Aetherborn cast at the base DC; ' +
-      'every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal'],
-    examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
-  },
-];
+// engine_Dev — the power set is data-driven (app/engine/powers.ts). getPowers()
+// returns the built-in Aethercraft default OR the author's uploaded 'powers'
+// table, so this tab reskins automatically. AethercraftDiscipline is a structural
+// subset of Power, so the render below is unchanged.
 
 // OTA-111 — phrasing that ROUTES to each golem kind via
-// parseGolemKind in app/engine/golems.ts. The keyword each phrase
+// parseSidekickKind in app/engine/golems.ts. The keyword each phrase
 // has to carry (iron / aether / crystal / mud) is what the parser
-// looks at. The order here mirrors GOLEM_DEFINITIONS' insertion
+// looks at. The order here mirrors SIDEKICK_DEFINITIONS' insertion
 // order so the cards read mud → iron → aether → crystal (lightest
 // fuel to heaviest, then HP / damage trade-offs).
-const GOLEM_VARIANT_PHRASE: Record<GolemDefinition['kind'], string> = {
+const GOLEM_VARIANT_PHRASE: Record<SidekickDefinition['kind'], string> = {
   mud_golem: 'summon mud golem',
   iron_golem: 'summon iron golem',
   aether_golem: 'summon aether golem',
   crystal_golem: 'summon crystal golem',
 };
 
-const GOLEM_VARIANTS: GolemDefinition[] = [
-  GOLEM_DEFINITIONS.mud_golem,
-  GOLEM_DEFINITIONS.iron_golem,
-  GOLEM_DEFINITIONS.aether_golem,
-  GOLEM_DEFINITIONS.crystal_golem,
-];
-
 // OTA-629 — payload for the summon-confirm popup. Built once here so the summon
 // card tap AND each per-golem variant row produce the SAME confirm (no copy-to-
 // input / clipboard step anywhere in the golem flow).
 type GolemConfirm = { name: string; phrase: string; stats: string; fuel: string; afford: boolean };
-function buildGolemConfirm(g: GolemDefinition, inventory: InventoryItem[]): GolemConfirm {
-  const phrase = GOLEM_VARIANT_PHRASE[g.kind];
+function buildGolemConfirm(g: SidekickDefinition, inventory: InventoryItem[]): GolemConfirm {
+  // engine_Dev — built-ins carry a curated phrase; an uploaded summon falls back
+  // to "summon <first alias or name>" (parseSidekickKind matches either).
+  const phrase = GOLEM_VARIANT_PHRASE[g.kind] ?? `summon ${(g.aliases?.[0] ?? g.name).toLowerCase()}`;
   const afford = missingIngredientsList(g.fuel, inventory).length === 0;
   const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
   const modSign = g.attackMod >= 0 ? '+' : '';
@@ -187,8 +156,8 @@ const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
     body: 'Food, tonics, elixirs. Tap a recipe with materials in hand to fire it. Same craftable-highlight rule as Craft.',
   },
   aetheric: {
-    title: 'Aetheric tab',
-    body: 'Aethercraft disciplines — shape stone, summon golem, mend wounds. Per-race DC + stat bonuses apply.',
+    title: 'Magic tab',
+    body: 'Your disciplines — shape, summon, mend. Tap a card to stage its phrase. Per-race DC + stat bonuses apply. (Reskins to your energy + summon names.)',
   },
 };
 
@@ -203,6 +172,10 @@ export function CraftingScreen() {
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   const [tab, setTab] = useState<Tab>('craft');
+  // engine_Dev — the 4th tab is the "magic" discipline. Its label pulls the game's
+  // energy name (world.energy.name) once set; default is a generic "Magic" (not the
+  // Tartaria "Aetheric") so a fresh engine_Dev game reads agnostic until configured.
+  const magicWord = (hasEnergyOverride() ? getEnergyName() : 'Magic').toUpperCase();
   // OTA-264 — post-craft confirmation modal state. Non-null after a
   // successful craft (RecipesView's inventory diff produced items);
   // CONTINUE CRAFTING clears it to null (popup closes, screen stays
@@ -328,7 +301,7 @@ export function CraftingScreen() {
           {tab === 'craft' ? 'CRAFTING'
             : tab === 'repair' ? 'REPAIR'
             : tab === 'recipes' ? 'RECIPES'
-            : 'AETHERIC'}
+            : magicWord}
         </Text>
         <View style={{ width: 80 }} />
       </View>
@@ -362,7 +335,7 @@ export function CraftingScreen() {
           style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>AETHERIC</Text>
+          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>{magicWord}</Text>
         </TouchableOpacity>
       </View>
 
@@ -422,10 +395,10 @@ export function CraftingScreen() {
               clipboard. Player then hits BACK and the phrase is
               already staged in the input — they just submit. */}
           <Text style={styles.arbiterLine}>
-            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a golem to summon it on the spot; shape and mend stage their phrase for the input box."
+            {`The ${getNarratorName()} taps a finger to their temple. "Three disciplines, all drawing on ${getEnergyName()}. Tap a ${getSummonNoun()} to summon it on the spot; shape and mend stage their phrase for the input box."`}
           </Text>
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-            {AETHERCRAFT_DISCIPLINES.map((d) => {
+            {getPowers().map((d) => {
               const queuedIdx = aetherCycleIdx[d.id];
               const queuedPhrase = aetherLastStaged[d.id]
                 ?? (queuedIdx !== undefined ? d.examples[queuedIdx] : null);
@@ -459,9 +432,11 @@ export function CraftingScreen() {
                     // copying a phrase into the input. Shape/mend keep the
                     // tap-to-stage cycling — they have no per-variant confirm.
                     if (d.showGolemVariants) {
-                      const pick = GOLEM_VARIANTS.find(
+                      // engine_Dev — live set: uploaded summons or the built-in golems.
+                      const variants = resolveSidekickDefs();
+                      const pick = variants.find(
                         (g) => missingIngredientsList(g.fuel, player.inventory).length === 0,
-                      ) ?? GOLEM_VARIANTS[0]!;
+                      ) ?? variants[0]!;
                       setGolemConfirm(buildGolemConfirm(pick, player.inventory));
                       return;
                     }
@@ -494,8 +469,8 @@ export function CraftingScreen() {
                       mud_golem on a bare `summon golem`. */}
                   {d.showGolemVariants && (
                     <View style={styles.golemVariants}>
-                      <Text style={styles.golemVariantsHeader}>Golem variants — tap to stage that summon:</Text>
-                      {GOLEM_VARIANTS.map((g) => {
+                      <Text style={styles.golemVariantsHeader}>{getSummonNoun().replace(/^\w/, (c) => c.toUpperCase())} variants — tap to stage that summon:</Text>
+                      {resolveSidekickDefs().map((g) => {
                         // OTA-629 — same payload the summon card uses; tapping a
                         // row opens the confirm popup (→ Summon dispatches and
                         // jumps to exploration), no copy-to-input step.
@@ -521,7 +496,19 @@ export function CraftingScreen() {
                         );
                       })}
                       <Text style={styles.golemVariantsRequires}>
-                        Requires: d20 + INT vs per-golem DC — Mud 13, Iron 15, Aether 17, Crystal 19. Shape and mend roll vs DC 12. Mud Dwellers cast at base DC and gain +2 INT, Aetherborn +2 DC, other races +3 DC.
+                        {(() => {
+                          // engine_Dev — derive the DC list from the LIVE sidekick defs
+                          // (no hardcoded Mud/Iron/Aether/Crystal) + show THIS player's
+                          // race modifier (no Tartaria race names).
+                          const list = resolveSidekickDefs().map((g) => `${g.name} ${g.summonDC ?? 15}`).join(', ');
+                          const dcMod = powerDcModifier(player.raceId);
+                          const intBonus = powerStatBonus(player.raceId).intelligence ?? 0;
+                          const raceClause = dcMod === 0
+                            ? 'Your race casts at the base DC'
+                            : `Your race casts at +${dcMod} to the DC`;
+                          const intClause = intBonus ? ` and gains +${intBonus} INT` : '';
+                          return `Requires: d20 + INT vs each ${getSummonNoun()}'s DC — ${list}. ${raceClause}${intClause}.`;
+                        })()}
                       </Text>
                     </View>
                   )}
@@ -544,6 +531,19 @@ export function CraftingScreen() {
                 </Pressable>
               );
             })}
+            {/* engine_Dev — SIDEKICK ARMAMENTS. The golem_weapon recipes live here
+                on the Magic tab, next to the summon disciplines, instead of the
+                general Craft tab. Embedded so it shares this ScrollView. */}
+            <View style={styles.sidekickArmsHeaderWrap}>
+              <Text style={styles.sidekickArmsHeader}>
+                {getSummonNoun().replace(/^\w/, (c) => c.toUpperCase())} armaments
+              </Text>
+            </View>
+            <RecipesView
+              kindFilter="sidekick-weapon"
+              embedded
+              onAfterCraft={(delta) => { if (delta.length > 0) setCraftResult(delta); }}
+            />
           </ScrollView>
         </>
       ) : (
@@ -572,7 +572,7 @@ export function CraftingScreen() {
             ) : (
               repairableView.map((r) => {
                 const dur = r.item.durability!;
-                const stripeColor = r.available ? '#9ec96a' : '#3a342c';
+                const stripeColor = r.available ? '#9ec96a' : '#2b3a3e';
                 // OTA-165 — stats line on the REPAIR row. Pre-OTA the
                 // repair tab showed only name + durability + cost so a
                 // player with three damaged blades couldn't tell which
@@ -709,8 +709,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -718,22 +718,22 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   tabRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
   tabBtn: {
     flex: 1,
     paddingVertical: 8,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     alignItems: 'center',
   },
-  tabBtnActive: { borderColor: '#c9a86a' },
-  tabBtnText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  tabBtnTextActive: { color: '#c9a86a' },
-  arbiterLine: { color: '#cdbf99', fontSize: 12, fontStyle: 'italic', marginBottom: 10, lineHeight: 17 },
+  tabBtnActive: { borderColor: '#6ab0c9' },
+  tabBtnText: { color: '#6c8088', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  tabBtnTextActive: { color: '#6ab0c9' },
+  arbiterLine: { color: '#bcd2db', fontSize: 12, fontStyle: 'italic', marginBottom: 10, lineHeight: 17 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },
   section: { marginBottom: 16 },
@@ -747,11 +747,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
-  sectionCount: { color: '#7a705c', fontSize: 11 },
+  sectionCount: { color: '#6c8088', fontSize: 11 },
   recipeRow: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 6,
@@ -761,24 +761,24 @@ const styles = StyleSheet.create({
   recipeStripe: { width: 4 },
   recipeBody: { flex: 1, padding: 10 },
   recipeHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  recipeName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  recipeName: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
   recipeNameReady: { color: '#9ec96a' },
-  recipeNameMuted: { color: '#a89a7a' },
+  recipeNameMuted: { color: '#8fa6ac' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  durabilityChip: { color: '#c9a86a', fontSize: 11, fontWeight: '700' },
+  durabilityChip: { color: '#6ab0c9', fontSize: 11, fontWeight: '700' },
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
-  recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
-  recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
+  recipeStats: { color: '#bcd2db', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
+  recipeIng: { color: '#6c8088', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
   // OTA-095 — Aethercraft discipline card styles. Mirrors the
   // recipe-row look but with a slightly cooler border tint to
   // visually mark these as not-quite-craft (spells, not items).
   aetherCard: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#3a5a6c',
     borderWidth: 1,
     borderRadius: 4,
@@ -787,12 +787,12 @@ const styles = StyleSheet.create({
   },
   aetherCardPressed: { opacity: 0.7 },
   aetherCardQueued: { borderColor: '#9ec96a' },
-  aetherCardTitle: { color: '#cdbf99', fontSize: 14, fontWeight: '700', marginBottom: 4 },
-  aetherCardBody: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 6 },
-  aetherCardFuel: { color: '#7a705c', fontSize: 11, lineHeight: 15, marginBottom: 4 },
+  aetherCardTitle: { color: '#bcd2db', fontSize: 14, fontWeight: '700', marginBottom: 4 },
+  aetherCardBody: { color: '#8fa6ac', fontSize: 12, lineHeight: 17, marginBottom: 6 },
+  aetherCardFuel: { color: '#6c8088', fontSize: 11, lineHeight: 15, marginBottom: 4 },
   aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   fuelHave: { color: '#9ec96a', fontWeight: '700' },
-  aetherCardExamples: { color: '#7a705c', fontSize: 11, lineHeight: 15 },
+  aetherCardExamples: { color: '#6c8088', fontSize: 11, lineHeight: 15 },
   aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
   aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
   // OTA-111 — per-golem variant rows under the summon discipline
@@ -803,9 +803,11 @@ const styles = StyleSheet.create({
   // defaults to mud_golem on a bare `summon golem`).
   golemVariants: { marginTop: 6, marginBottom: 4 },
   golemVariantsHeader: { color: '#9aaab0', fontSize: 11, fontWeight: '700', marginBottom: 4 },
+  sidekickArmsHeaderWrap: { marginTop: 18, marginBottom: 8, borderTopWidth: 1, borderTopColor: '#2b3a3e', paddingTop: 12 },
+  sidekickArmsHeader: { color: '#9aaab0', fontSize: 13, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
   golemVariantRow: {
     backgroundColor: '#0e0d0c',
-    borderColor: '#2a2620',
+    borderColor: '#1d262a',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 8,
@@ -813,10 +815,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   golemVariantRowPressed: { opacity: 0.65 },
-  golemVariantName: { color: '#cdbf99', fontSize: 12, fontWeight: '700' },
-  golemVariantStats: { color: '#c9a86a', fontSize: 11, marginTop: 2 },
-  golemVariantBlurb: { color: '#a89a7a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
-  golemVariantFuel: { color: '#7a705c', fontSize: 11, marginTop: 2, lineHeight: 15 },
+  golemVariantName: { color: '#bcd2db', fontSize: 12, fontWeight: '700' },
+  golemVariantStats: { color: '#6ab0c9', fontSize: 11, marginTop: 2 },
+  golemVariantBlurb: { color: '#8fa6ac', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
+  golemVariantFuel: { color: '#6c8088', fontSize: 11, marginTop: 2, lineHeight: 15 },
   golemVariantFuelLabel: { color: '#9aaab0', fontWeight: '700' },
   golemVariantPhrase: { color: '#9ec96a', fontSize: 10, marginTop: 3, fontStyle: 'italic', letterSpacing: 1 },
   golemVariantsRequires: { color: '#9aaab0', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },

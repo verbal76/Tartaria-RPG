@@ -1675,7 +1675,7 @@
 //   (1) WEAPON damage dice — already shipping via previewWeapon
 //       in itemPreview.ts:99-110 ("Damage: 2d6 (slashing) ·
 //       Scales with STR · ..."). Verified intact; no code
-//       change. Quiet styling (#cdbf99 italic fontSize 11) is
+//       change. Quiet styling (#bcd2db italic fontSize 11) is
 //       the likely reason the user missed it on screen — can
 //       bump emphasis in a follow-up if they want it shouting.
 //   (2) FOOD / consumable restore — extended previewGear in
@@ -1699,7 +1699,7 @@
 // uses a single hard-coded dcBase = 15 (INT) for all four
 // golems. Crystal/Aether (lore-wise stronger anchors) cost
 // the same INT roll as Mud. Adding per-golem `summonDC` to
-// GolemDefinition is a design call — flagged as an open
+// SidekickDefinition is a design call — flagged as an open
 // follow-up in HANDOFF.md 0.A.
 //
 // Also lands: __tests__/statGrowthBalanceSim.test.ts — 5000-
@@ -2703,13 +2703,13 @@
 // Aether 17 / Crystal 19 to reflect that Crystal +
 // Aether are lore-stronger anchors than Mud + Iron.
 // Shipped:
-//   - GolemDefinition gains optional summonDC field
+//   - SidekickDefinition gains optional summonDC field
 //     in app/engine/golems.ts.
 //   - All 4 golem records get summonDC values:
 //     mud_golem 13, iron_golem 15, aether_golem 17,
 //     crystal_golem 19.
 //   - runAethercraft in gameStore.ts reads
-//     getGolemDefinition(golemKindHint).summonDC ??
+//     getSidekickDefinition(golemKindHint).summonDC ??
 //     15 when discipline === 'summon'. Falls back
 //     to historical flat 15 / 12 (mend) when
 //     summonDC is unset or discipline is shape /
@@ -3973,7 +3973,7 @@
 // preview.stats.join(' · ') beneath
 // the name line. Style matches
 // RecipesView's recipeStats
-// (italic, #cdbf99) so the REPAIR
+// (italic, #bcd2db) so the REPAIR
 // tab reads consistently with
 // CRAFT / RECIPES.
 //
@@ -6471,7 +6471,7 @@
 // true, prefixes the item
 // name with "◆ " in the
 // rarity color:
-//   - Common: #c9a86a (warm
+//   - Common: #6ab0c9 (warm
 //     tan, matches default
 //     UI accent)
 //   - Uncommon: #9ec96a (green)
@@ -9305,12 +9305,12 @@
 //
 // Third issue: TitleScreen
 // footer (version + 2148
-// line) used color #3a342c
+// line) used color #2b3a3e
 // — barely visible against
 // the dark background.
 // Player: "I can barely see
 // it; very faded." Bumped to
-// #c9a86a matching REPORT
+// #6ab0c9 matching REPORT
 // BUG button text so it
 // reads at a glance.
 //
@@ -11408,8 +11408,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   is up." Two problems:
 //     1. The keyboard COVERS the input row when up — so the in-row
 //        ▼ only helps when the keyboard is already down (useless).
-//     2. Even when not covered, the ▼ used a muted color (#7a705c
-//        on #1a1714) that was essentially invisible on her iPhone's
+//     2. Even when not covered, the ▼ used a muted color (#6c8088
+//        on #131c1f) that was essentially invisible on her iPhone's
 //        screen — first screenshot shows the ▼ just barely visible.
 //
 //   The correct iOS pattern for this exact problem is
@@ -11427,8 +11427,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     2. New `<InputAccessoryView>` block rendering a "▼ Hide
 //        Keyboard" button on a dark bar with accent-gold text and
 //        a tan-bordered button — high contrast, easy to find.
-//     3. Brightened the in-row ▼ chevron from muted (#7a705c) to
-//        accent gold (#c9a86a). Stays as a redundant affordance for
+//     3. Brightened the in-row ▼ chevron from muted (#6c8088) to
+//        accent gold (#6ab0c9). Stays as a redundant affordance for
 //        Android and for when keyboard is down.
 //
 //   What the iPhone tester sees after this OTA:
@@ -12271,7 +12271,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // color of the locked title NAMES + requirement DESCRIPTIONS on the Character
 // page (unreadable on the dark card), plus muted/placeholder text in ~13 files.
 // Per the user's call, every occurrence is replaced with the Explore-screen
-// amber `#c9a86a` (the brand accent, already used for EARNED title names), so
+// amber `#6ab0c9` (the brand accent, already used for EARNED title names), so
 // `#5a5246` now appears nowhere in the app.
 //
 // arb50 — Speaker of Forgotten Tongues + Warden of the Old World BUILT + ON
@@ -12287,11 +12287,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // check @ Sinking Cathedral → relicsPreserved/ruinsDefenseBonus). Their
 // enabled flags flipped true; only trap_dives / defense / parley remain OFF.
 //
-// arb51 — readability pass 2 on the Character screen. The dim taupe `#7a705c`
+// arb51 — readability pass 2 on the Character screen. The dim taupe `#6c8088`
 // (stat "Grows from:" descriptions, the italic kv caption notes, faction-row
 // names, HP/STA + slot labels) and the titles-summary `#9b8e74` were too dark
-// to read; both → the Explore amber `#c9a86a`, scoped to CharacterScreen's own
-// styles. Empty-slot dashes (`#3a342c`) + the green/cream/red accents kept.
+// to read; both → the Explore amber `#6ab0c9`, scoped to CharacterScreen's own
+// styles. Empty-slot dashes (`#2b3a3e`) + the green/cream/red accents kept.
 //
 // arb52 — Ask-the-Arbiter fix: "How many sites can I visit?" (playtester log)
 // fell through to a garbled echo because "sites" wasn't a world-knowledge
@@ -12629,7 +12629,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // within each category gear orders head-to-toe (main→off→head→chest→hands→
 // legs→feet→cloak→amulet→ring); resets to SLOT each open, switchable after.
 // (3) The locked-chip scanner-requirement label in the investigate modal now
-// uses the inventory EQUIPPED amber (#c9a86a) instead of the off-tone #bf9b6a.
+// uses the inventory EQUIPPED amber (#6ab0c9) instead of the off-tone #bf9b6a.
 // OTA-336 — Rowan Anvil. Fusion + corruption batch. (1) A reserved faction
 // CATALYST now counts toward the fusion gate (2 inferred + 1 catalyst = a
 // faction fusion); equipped catalysts are excluded (never consume worn gear).
@@ -13795,7 +13795,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-466 (Promethium Decay) — [feature] GOLEM repair + naming, mirroring the dog. (1) A golem that
 // survives combat holds its HP (OTA-433); now you mend it by feeding it the PARTS IT'S MADE OF — its own
 // summon fuel set (Iron Golem ← Scrap Metal / Golem Core; Mud ← Aether Mud / Mudstone / Aether Crystal).
-// New golems.ts helpers golemRepairParts / isGolemRepairPart / golemRepairHeal (heal = round(hpMax/4):
+// New golems.ts helpers sidekickRepairParts / isSidekickRepairPart / sidekickRepairHeal (heal = round(hpMax/4):
 // Mud 4, Iron/Aether 6, Crystal 8 — a few parts for a full repair). `feed/repair/mend golem <item>` (or
 // `feed <golem name> <item>`) routes through applyItemToGolem; only constituent parts work (others refused
 // with a hint listing what it eats), each consumes one part + restores HP capped at hpMax. The inventory
@@ -13809,7 +13809,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // trainable stats on Companion (optional, backward-compat: absent → 0): POWER (adds full to the golem's
 // to-hit + half to its damage) trains on a landed strike; RESILIENCE (soaks retaliation damage, min 1
 // always lands) trains on surviving a hit. Same per-tier diminishing-returns curve + 100-progress
-// level-up threshold as the dog (golems.ts golemStatBonus / trainGolemStat mirror dogCompanion). Applied
+// level-up threshold as the dog (golems.ts sidekickStatBonus / trainSidekickStat mirror dogCompanion). Applied
 // at BOTH golem-damage sites (handleGolemCommand's strike+retaliation and the dog-present retaliation
 // split). makeCompanion seeds {power:0, resilience:0}. The Character screen gets a GOLEM panel under the
 // dog's — HP + POW/RES with the same fractional progress bars — so a veteran golem reads as stronger than
@@ -13826,7 +13826,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-469 (Gadolinium Doping) — [UX] splash-art fit fix. On a tall/narrow phone OTA-468's resizeMode
 // "cover" filled the height and cropped the SIDES — slicing the "TARTARIA REALMS" title off the left edge.
 // Switched to resizeMode "contain" so the whole composition (title included) shows, letterboxed against
-// the dark splash background (#0b0a09, which blends with the moody art). One-line change. JS-only → OTA.
+// the dark splash background (#0a1012, which blends with the moody art). One-line change. JS-only → OTA.
 // OTA-470 (Terbium Anneal) — [UX] taller splash art + full-width top-anchored layout. Swapped the cover
 // image for a phone-shaped 941×1672 piece (aspect 0.56, close to the screen's 0.45) and changed the
 // layout: the art now fills the full WIDTH with no side-crop (title stays intact at top), anchored to the
@@ -13904,7 +13904,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // height follows by the SAME ratio so aspect is preserved — no distortion) and offset the top-left-anchored
 // corner by SPLASH_OFFSET = 40dp (≈1/4" at RN's 160dp-per-inch baseline; RN has no true DPI API) on both
 // top + left. Still grows down-right FROM the anchored corner; the thin top/left margin this exposes is the
-// overlay's near-black backing (#0b0a09), which matches the art's dark vignette. JS-only → OTA.
+// overlay's near-black backing (#0a1012), which matches the art's dark vignette. JS-only → OTA.
 // OTA-484 (Gold Inlay) — [polish] REVERTS OTA-483's splash offset. The 40dp top/left offset read as the art
 // moving DOWN-AND-LEFT — it just exposed a black top/left margin (player: "you moved it down and left").
 // Correct model: the image is anchored by its TOP-LEFT corner, so enlarging ALONE grows it down-right from
@@ -13913,7 +13913,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // JS-only → OTA.
 // OTA-485 (Mercury Gilding) — [polish] COMPANION-ITEM stripes in the inventory. Items the player can FEED or
 // USE ON a companion now carry faint diagonal hatching in that companion's signature colour (the hue its
-// name renders in): GOLD (#c9a86a) for the dog, PURPLE (#9888a8) for the golem — a glanceable "this is for
+// name renders in): GOLD (#6ab0c9) for the dog, PURPLE (#9888a8) for the golem — a glanceable "this is for
 // my dog / golem" cue while scanning the pack. Eligibility mirrors the modal action buttons exactly (no
 // drift): dog = active dog + a consumable (Feed) or a dog_armor vest; golem = active golem + a repair part
 // (Repair) or a golem weapon (Arm). Drawn with plain <View> bands (oversized 45°-rotated flex row clipped by
@@ -13951,7 +13951,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // app/state/gameStore.ts. JS-only → OTA.
 // OTA-489 (Polonium Tint) — [polish] companion-stripe saturation. Player on the OTA-485 stripes: "keep the
 // translucence but bump the saturation." Same gold/purple HUES, richer chroma so they read clearly as
-// gold/purple at the UNCHANGED ~0.2 stripe opacity: COMPANION_STRIPE_DOG #c9a86a → #e3a82a (saturated gold),
+// gold/purple at the UNCHANGED ~0.2 stripe opacity: COMPANION_STRIPE_DOG #6ab0c9 → #e3a82a (saturated gold),
 // COMPANION_STRIPE_GOLEM #9888a8 → #a45fe0 (saturated amethyst). Stripe-only; the name-label hues are
 // untouched. app/screens/InventoryScreen.tsx. JS-only → OTA.
 // OTA-490 (Astatine Purge) — [bugfix+diag] SAVE FAILED "storage full" on a near-empty device. Player's
@@ -14287,8 +14287,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from ~20 distinct to ~220+ (measured 222 distinct across 400 input sets). Names stay deterministic per input
 // set. app/engine/itemFusion.ts. JS-only OTA.
 // OTA-528 (Unbitrium Gilt) — [polish] a finished investigation in the Search modal now turns the SAME
-// completed-gold (#c9a86a italic + ✓) as a cleared CLIMB row (ClimbModal rowNameCleared/rowHeightCleared),
-// instead of the old dim grey (#7a705c/#5e5547 at 0.55 opacity). "Done" now reads consistently across the
+// completed-gold (#6ab0c9 italic + ✓) as a cleared CLIMB row (ClimbModal rowNameCleared/rowHeightCleared),
+// instead of the old dim grey (#6c8088/#5e5547 at 0.55 opacity). "Done" now reads consistently across the
 // game. app/components/SearchModal.tsx. JS-only OTA.
 // OTA-529 (Unbiquadium Bulwark) — [balance] armor RESISTANCE LADDER. Only 20 of 279 catalog pieces carried any
 // damage-type resistance, so armor was almost entirely the AC (miss-chance) stat. Now EVERY piece derives its
@@ -14459,7 +14459,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Tartarians, the Aether, the Guardians, the factions — so the player-Arbiter dialogue is prompted in-fiction
 // rather than via a menu button. app/components/InputBox.tsx, app/state/gameStore.ts. JS-only OTA.
 // OTA-549 (Unquadquadium Clarity) — [ux/bugfix] two small fixes from the vendor/throwables report. (1) The SELL
-// screen's three sort tabs (VALUE / RARITY / NAME) rendered inactive text in a dim #7a705c the player couldn't
+// screen's three sort tabs (VALUE / RARITY / NAME) rendered inactive text in a dim #6c8088 the player couldn't
 // read; text is now always readable amber and the BORDER alone marks the active sort. (2) Shaped Aetheric Shard
 // was CREATED as rarity Common despite its Rare catalog row, so it sold for a pittance; the shape recipe now
 // stamps Rare to match (a 2d20 one-shot). app/screens/VendorScreen.tsx, app/state/gameStore.ts. JS-only OTA.
@@ -14494,7 +14494,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // substitute: an Aether Golem mends from any aether material (Aether Dust/Residue/Venom/Disc/Moss/Sludge), a Mud
 // Golem from mud loot, an Iron Golem from scrap metal. So a pack of aether loot can top one up when you're out of
 // its exact fuel — answering "I have a ton of aetheric items but can't heal my aether golem." Restricted to
-// misc/material items (no feeding it an aether WEAPON). golemSubstituteHeal = floor(fullHeal/2); the panel + the
+// misc/material items (no feeding it an aether WEAPON). sidekickSubstituteHeal = floor(fullHeal/2); the panel + the
 // wrong-item refusal both spell out the substitute path. app/engine/golems.ts, app/state/gameStore.ts,
 // app/screens/CharacterScreen.tsx. JS-only OTA.
 // OTA-554 (Unquadennium Grade) — [balance] golem substitute-repair now SCALES BY RARITY (refines OTA-553). A flat
@@ -14504,9 +14504,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // material a lot. Panel + refusal reworded ("more from higher-grade material"). app/engine/golems.ts,
 // app/state/gameStore.ts, app/screens/CharacterScreen.tsx. JS-only OTA.
 // OTA-555 (Unpentnilium Marker) — [ux] inventory now flags SUBSTITUTE repair materials for the equipped golem,
-// not just its exact fuel parts. The purple golem stripe + the one-tap "Heal <golem>" button used isGolemRepairPart
+// not just its exact fuel parts. The purple golem stripe + the one-tap "Heal <golem>" button used isSidekickRepairPart
 // (fuel parts only), so the new element-matched substitutes (OTA-553/554) were feedable by typing but had no
-// visual cue. Both now also honor isGolemSubstitutePart(equipped golem kind, item) — so every mud/metal/aether
+// visual cue. Both now also honor isSidekickSubstitutePart(equipped golem kind, item) — so every mud/metal/aether
 // material that can mend YOUR golem gets the purple hatch + Heal action, and it stays kind-specific (never lights
 // for a golem you don't have). app/screens/InventoryScreen.tsx. JS-only OTA.
 // OTA-556 (Unpentunium Spent) — [bugfix] flavor-exhausted investigate nouns stayed tappable forever. A noun that
@@ -14871,7 +14871,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // raised — Mud 16→24, Aether 24→34, Iron 24→40, Crystal 30→52. (2) Innate % DAMAGE RESIST by kind (Mud 15 / Aether 20 /
 // Iron 30 / Crystal 35%), applied to the enemy's real damage roll, min-1 always lands (never immune). (3) TRAINABLE:
 // resist climbs as the golem trains resilience (capped 35/40/50/55%), and a NEW max-HP track grows +3 per stat level-up
-// (baked into trainGolemStat) — trash/mid fights build it toward bosses. (4) Self-mend: ~25% max HP on rest + part-feeds
+// (baked into trainSidekickStat) — trash/mid fights build it toward bosses. (4) Self-mend: ~25% max HP on rest + part-feeds
 // bumped hpMax/4→hpMax/3 (eases the material drain). (5) INERT GOLEM CORE: a crumbled golem drops a core holding HALF its
 // trained levels; feed it to a new golem to graft them on (death = ~half setback + re-summon, not a wipe). Guardrail:
 // resist caps + min-1 damage keep a maxed golem mortal to bosses (preserves OTA-433). JS-only → 290.
@@ -15212,4 +15212,1053 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
-export const OTA_BUILD_ID = '2026-06-18-635';
+// engine_Dev-661 — tutorial narrator name no longer frozen (JS-only OTA). The
+// tutorial 'name' beat interpolated getNarratorName() at module-load (before the
+// override hydrates), so it always said "The Narrator" even when renamed. Now it
+// uses a {narrator} placeholder filled at runtime via fillTutorialPlaceholders, so
+// a renamed narrator ("Bob") shows correctly in the opening beat.
+// engine_Dev-660 — "PLAYABLE TABLES" warning banner (JS-only OTA). The dev
+// console now shows a banner at the very top whenever the Races or Factions TABLE
+// is still built-in: "⚠ PLAYABLE TABLES — Races: ○ built-in (load yours in the
+// Races box under TABLES)…". Makes the empty-playable-table state (the reason
+// character creation still shows Tartaria) impossible to miss, and points to the
+// right TABLE box (not the Race/Faction LORE boxes).
+// engine_Dev-659 — fix the Race/Faction box mix-up (JS-only OTA). Diagnostics
+// showed the author's races/factions were loaded into the "Race lore"/"Faction
+// lore" LORE boxes (freeform story) instead of the "Races"/"Factions" TABLE boxes
+// that drive character creation — so the playable tables were empty (Tartaria).
+// Disambiguated the labels ("Races (playable — character creation)" vs "Race lore
+// (story notes — NOT playable)") and added a guard: an array of {id,name} rows
+// pasted into the race/faction LORE box is rejected with a pointer to the TABLES box.
+// engine_Dev-658 — COPY DIAGNOSTICS button (JS-only OTA). The dev console can now
+// dump a full content-pack snapshot to the clipboard — store table counts vs the
+// engine registry counts vs the engine reads (getRaces/getFactions names) vs the
+// raw persisted AsyncStorage blob (head + length) + hydrated/contentVersion/build.
+// Paste it back to pinpoint exactly where a races/factions pack is or isn't live.
+// engine_Dev-657 — character-creation registry RE-SYNC + raw diagnostic (JS-only
+// OTA). Suspected root cause of "5 OTAs, still Tartaria": the engine registry that
+// getRaces()/getFactions() read drifted out of sync with the persisted/store packs
+// (an OTA reload reset module state and the boot mirror didn't re-apply). Fix:
+// CharacterCreationScreen now calls reapply() on mount, re-mirroring every stored
+// override into the registry. Plus a raw on-screen diagnostic line ("engine: <first
+// race> (N) · store rN/fN · hydrated Y/N") so the actual source of truth is visible.
+// engine_Dev-656 — starter weapon is data-driven (JS-only OTA). A custom-race
+// character no longer falls back to the Tartaria "Rusted Blade": starterWeaponName
+// resolves the equipped + inventory starter weapon from a race's own
+// `startingWeapon` field → the built-in per-race map → the first Common weapon in
+// the LIVE weapons table. So an "Unaltered Human" with a Philadelphia weapons pack
+// starts holding an M1 Garand, not a Rusted Blade. (The shared starter items —
+// torch / rations / locket — and the faction knife are still built-in; next pass.)
+// engine_Dev-655 — character-creation pack indicator (JS-only OTA). The race /
+// faction creation screen (already 100% data-driven via getRaces()/getFactions())
+// now shows a live source line: "● custom races — N loaded" vs "○ built-in races
+// (upload a Races pack…)". Makes it unmistakable whether an uploaded pack is
+// actually live — if it says built-in, the upload didn't take (re-upload); if it
+// says custom but still looks Tartaria, the uploaded content is Tartaria-derived
+// (you loaded the TEMPLATE without changing it). Also subscribes to contentVersion
+// so APPLY ALL / any content change refreshes the screen.
+// engine_Dev-654 — data-driven tutorial props (JS-only OTA). The opening tutorial
+// teaches verbs with items pulled from the LIVE tables instead of hardcoded
+// Tartaria props: new app/engine/tutorialProps.ts getTutorialProps() resolves a
+// starter weapon / climbing rope / salvageable armor from the weapons/gear/armor
+// tables (fallbacks to the built-ins). makeTutorialItem grants the resolved items
+// (real catalog stats), the TAKE/SALVAGE pickers + the cudgel/rope/scrap beats and
+// their narration use the resolved names, and the beat copy uses {weapon}/{rope}/
+// {armor} placeholders filled at runtime. So a re-skin teaches with a .38 Revolver,
+// not a Cudgel. (Climb beat's climbable noun stays scene-driven — later pass.)
+// engine_Dev-653 — powers stage 2 + upload robustness (JS-only OTA). Powers can
+// now carry a custom `effect`: 'coat_enemies' (a damaging fog/DOT over enemies,
+// reusing the combat coating tick) or 'heal_self' — so authors define NEW powers,
+// not just reskin the 3 disciplines. The parser routes a typed cast through
+// matchPower() (matches the active powers' example phrases) before the built-in
+// keyword fallback, so a custom "call the fog" power fires its own effect. Powers
+// TEMPLATE gains fog + heal examples. Also: table uploads now tolerate the common
+// wrapped shape { "races":[...] } by unwrapping the single array.
+// engine_Dev-652 — data-driven POWERS, stage 1 (JS-only OTA). The magic/ability
+// system's DEFINITIONS are now data: app/engine/powers.ts holds DEFAULT_POWERS
+// (the built-in Aethercraft disciplines) + getPowers() via resolveTable('powers',
+// …). New 'powers' upload box + full template. The Crafting "aetheric" tab reads
+// getPowers(), and runAethercraft() sources each power's fuel / DC / stat / name
+// from the data — so a re-skinned game renames/refuels/retunes its powers. The
+// effect each runs is still the coded primitive (shape/summon/mend) selected by
+// `discipline`. STAGE 2 (next): new effect primitives (damage/status/debuff) so
+// powers can do things like a fog blind; STAGE 3: de-Aether the strings.
+// engine_Dev-651 — rings + amulets are now overridable tables (JS-only OTA).
+// Two new upload boxes ('amulets', 'rings'); crafting.ts resolves them through
+// resolveTable() everywhere (lookupCraftedItem, findCatalogItem, the catalog
+// guard, findAmuletByName/findRingByName) and vendors faction-gear honors an
+// uploaded rings table. So uploading rings/amulets replaces the built-in set for
+// NEW content. (Items already in an existing save persist by name — a new
+// character is still needed to clear old equipped gear.)
+// engine_Dev-650 — UI de-Tartaria, pass 1 (JS-only OTA). Player-facing flavor
+// strings in menus/screens swapped to the game name or genericized: the voice
+// test + log-share titles now use getGameTitle(); "buried world" / "Tartaria has
+// not given you anything" / "the buried world waits" / "Welcome to Tartaria"
+// genericized. Mechanic-bound text (the Aethercraft system, the Capitals /
+// Guardians / Aetheric Cores main quest) is intentionally left — it describes the
+// built-in game's actual systems, which the default Tartaria pack uses.
+// engine_Dev-649 — "ask the narrator" reads your Lore document (JS-only OTA).
+// When a 'lore' override is loaded, the ask-corpus (loreConceptBank) is built
+// from the author's passages (category lore_doc) INSTEAD of the built-in Tartaria
+// lore, so "ask about X" answers from the uploaded world. Concept ids are content-
+// hashed so a re-upload never hits a stale MiniLM embedding cache; the bank caches
+// by lore-doc reference and rebuilds on change. No lore doc → built-in corpus.
+// engine_Dev-648 — generic Lore-document scaffold + "always" baseline (JS-only
+// OTA). The Lore-document TEMPLATE is now a generic, setting-neutral, section-
+// organized scaffold (READ ME + World overview + History / Environment / Faction
+// / Race / Location / Key figure / Artifact sections, each with REPLACE guidance)
+// instead of the WWII example, and it ships the WHOLE scaffold (not a 2-row
+// sample). New routing: a passage tagged "always" is injected as the baseline
+// when no scene-specific passage matches, so the world overview is always present.
+// engine_Dev-647 — Lore document box (JS-only OTA). New 'lore' upload table:
+// your world bible as keyworded passages [{tags:[...], text:"..."}]. The narrator
+// surfaces the passage whose tags match the current scene (truncated to the token
+// budget), REPLACING the built-in Tartaria canon entirely when loaded — and it
+// injects even alongside a custom World block. Write the big dump once; the engine
+// pulls the right slice per scene. (The "ask the narrator" corpus still uses the
+// built-in concepts — wiring the lore doc into "ask" is the next step.)
+// engine_Dev-646 — TEMPLATE shows your CURRENT upload (JS-only OTA). In every
+// table + lore upload box, when an override is loaded the button becomes "EDIT
+// CURRENT" and loads your full uploaded JSON back into the box (not the built-in
+// Tartaria sample), so you can tweak and re-LOAD without losing or retyping your
+// work. COPY likewise copies your current upload. No override loaded → built-in
+// sample as before. Your uploads are persisted (AsyncStorage) and survive
+// restarts/OTAs regardless.
+// engine_Dev-645 — wire enemies/locations/recipes + APPLY ALL button (JS-only
+// OTA). The enemies, locations, and recipes upload boxes now actually take
+// effect: encounter.ts (enemy + location lookups), questGenerator.ts + worldMap.ts
+// (the places the player travels), and crafting.ts (recipe lookups) all resolve
+// through resolveTable() at call time. New dev-console "↻ APPLY ALL" button:
+// re-mirrors every uploaded pack into the live engine and bumps a contentVersion
+// so screens refresh — the explicit "make it all live" switch (a new game is
+// still needed to re-generate a baked save's world/character).
+// engine_Dev-644 — Narration flavor box + char-creation reactivity (JS-only OTA).
+// New "Narration flavor" upload (a 'flavor' lore block): a JSON object of the
+// narrator's canned line-pools by key (genericRemarks, combatRemarks, lookLines,
+// notedLines, sceneIntros, combatIntros, hubOpening, personalBeats, moodRemarks,
+// intentRemarks, raceRemarks, factionRemarks). narrativeGenerator resolves every
+// pool through resolveFlavor() per key (omitted keys keep built-ins); TEMPLATE
+// emits the real keys. FIX: character creation now re-reads getRaces()/
+// getFactions() when the content pack changes (upload or boot hydrate), so an
+// uploaded races/faction pack actually appears in the selection list instead of
+// the stale list captured at first render.
+// engine_Dev-643 — de-Tartaria the narration prompt (JS-only OTA). The LLM
+// system prompt now injects the content-pack World TONE (+ optional setting /
+// key-terms / vocabulary) every turn, and the hardcoded Tartaria bits are gone:
+// the "Aetheric verbs" vocabulary line and the "Borderlands/Aetheric Deep/Grand
+// Hall/Aetherstone Deep" place-name examples are replaced with generic,
+// data-driven guards. The Tartaria canon-facts injection is suppressed whenever
+// a custom World lore block is loaded, so no Tartaria canon leaks into a
+// re-skinned world. New World-lore fields: setting, terms, vocabulary.
+// engine_Dev-642 — wire item + race/faction overrides into the rest of the
+// engine (JS-only OTA). Uploaded weapons/armor/materials/gear/exploration now
+// reach: ambient loot pickup (findCatalogItem), armor equip/durability/AC
+// (findArmorByName + catalog guards), vendor stock (vendors.ts), takeable scene
+// gear (takeableGearSpawns), and salvage yields (salvagePools) — all read
+// through resolveTable() at call time instead of import-time constants. Uploaded
+// races/factions now show on the Character/Stats/Codex/Ending/Title screens.
+// NOTE: overrides apply to a NEW game (existing saves are baked); the LLM
+// narration LORE (canon/glossary/locations/enemies) is still built-in — next.
+// engine_Dev-641 — COPY now clears the upload box after copying the template
+// to the clipboard, so you can paste your filled-in JSON straight back in
+// without hitting LOAD first to clear it. (JS-only OTA.)
+// engine_Dev-640 — dev console as Settings tab (JS-only OTA). The developer
+// console is now the FIRST tab in Settings and the default tab while "dev mode"
+// is on (persisted, default on). A "turn off dev mode" toggle gives testers a
+// clean Settings screen; publishing also drops dev mode. Naming a character
+// "Verbal" (or the title DEV pill) re-enables dev mode and opens Settings on the
+// DEV tab. The console body is shared (DeveloperConsole) between the tab and the
+// standalone screen.
+// engine_Dev-639 — Arbiter→Narrator + game identity (JS-only OTA). "Arbiter"
+// renamed to a dynamic narrator name (default "Narrator") across the player-
+// facing voice/UI and the LLM persona; new dev-console blocks rename the
+// NARRATOR, the GAME name (default "Text RPG Engine", replaces "TARTARIA
+// REALMS" on the start screen), and the TAGLINE (auto-fills from World lore's
+// "tagline" field, or set manually). TTS frame/speaker detection tracks the
+// live name (legacy "Arbiter" still recognized).
+// engine_Dev-638 — engine chrome de-Tartaria'd (JS-only OTA). Title build
+// marker now reads "DEVELOPMENT BUILD" for the .engine package (was "GOLEM
+// BUILD"); character-slot labels say Player not Tartarian ("New Player",
+// "YOUR PLAYERS", "Delete/Resurrect Player", "No players yet"); splash poster
+// switched cover→contain so the whole art fits the screen instead of zooming
+// oversized. Content (lore/world/races) still defaults to Tartaria until the
+// dev uploads overrides — by design.
+// engine_Dev-637 — custom music uploads. Dev console gains a MUSIC section:
+// upload BATTLE (combat+boss) and AMBIENT (explore) tracks from the device via
+// the OS file picker (expo-document-picker), capped at 8 per category with
+// recommended-spec guidance. Uploads copy into the app document directory,
+// persist (tartaria.customMusic.v1), and replace the built-in AudioManager
+// pools for those contexts. New expo-document-picker dep → needs a native
+// rebuild. (engine_Dev-636 — full-bleed RPG Engine splash poster + app icon.)
+// engine_Dev-788 — Dog gear is now author-definable as a first-class content
+// table. 'dogGear' joins ContentTableId / CONTENT_TABLES (gets a TableBox in the
+// dev console + TEMPLATE/COPY/LOAD, bundle inclusion, round-trip + leak coverage
+// for free). crafting.ts gains getDogGear() = resolveTable('dogGear', built-in);
+// findDogGearByName, lookupCraftedItem's dog branch, and the two fusion/inference
+// guards now read the live (override-aware) catalog, so an uploaded dog-vest
+// table drives dog-armor lookup AND makes a dog-armor recipe/loot result resolve
+// to kind 'dog_armor' (equippable on the companion dog) instead of a blank
+// "misc". GENERIC_GAME + generic templates carry generic vests so reskins don't
+// fall back to the built-in Tartaria vests. Static DOG_GEAR const kept as the
+// built-in fallback alias. (Was built-in only — "dog gear needs to be JSON defined".)
+// engine_Dev-789 — Dog hook ("dog-rescue scenarios") is now author-definable.
+// The acquisition MECHANIC is unchanged (one dog/save; tap a hookNoun -> a
+// faction-neutral captor spawns -> kill it -> name/breed onboarding; captor
+// keyed by faction with the unaligned fallback). Only the WORDING moved out of
+// engine code into data: RESCUE_SCENARIOS (+ the intro lines that were hardcoded
+// in gameStore) now live in app/data/dog/rescue-scenarios.json and resolve
+// through a new resolveDogScenarios() override layer (uploaded 'dogScenarios'
+// table -> generic-default pack -> built-in). New DOG-RESCUE SCENARIOS dev-console
+// box (TEMPLATE/COPY/LOAD), bundle key, generic-default scenarios, and tests.
+// Net: dogCompanion.ts drops to 0 Tartaria literals (leak baseline tightened).
+// engine_Dev-790 — climbing now slowly grows the stamina POOL. Stamina is a
+// depletable pool (not one of the six use-trained stats), so it grows on a
+// milestone cadence like the travel milestone: every CLIMB_STAMINA_STEP (4)
+// cleared climb tiers -> +1 staminaMax (and +1 current stamina so it's felt).
+// Climbing is its only source besides travel; a tier is a real action so it
+// can't be farmed in place. Cadence lives in engine/statTraining
+// (climbGrowsStamina) so it's unit-testable; PlayerMilestones gains
+// climbTiersCleared.
+// engine_Dev-791 — climb stamina growth reworked into a SLOW BURN. Instead of a
+// +1 every-4-tiers milestone, each cleared tier now accrues a very minute amount
+// of progress (CLIMB_STAMINA_AWARD 2 / threshold 100 ⇒ ~50 tiers, ≈ a dozen tall
+// climbs, per +1 staminaMax), with overshoot rolled over. Progress persists on a
+// new PlayerCharacter.staminaProgress accumulator (replacing the discarded
+// milestones.climbTiersCleared counter); growStaminaFromClimb() in statTraining
+// is the pure, unit-tested core.
+// engine_Dev-792 — dev INSTRUCTION SHEET (buildDevGuide) caught up with the new
+// authorable sections: §3 (The world) now lists Dog gear in the items line, and
+// §7 (Side content) gains a Dog-rescue scenarios entry alongside the dog toggle.
+// (The whole-game JSON bundle already carried both — dogGear via the CONTENT_TABLES
+// loop, dogScenarios as its own entry; this only closes the docs gap.)
+// engine_Dev-793 — Tartaria burn-down: Bucket B cleared (the five small engine
+// files, ~14 string-literal leaks → 0). investigationTable: the investigate LLM
+// prompt now builds from getNarratorPersona()/getWorldSetting() instead of a
+// hardcoded "the Arbiter … Tartaria" system line. locationChallenges: the
+// FACTION_COVETED_ITEM (Guild Broker faction→relic) map moved to app/data/
+// factions/coveted-items.json (names stay in sync with the data catalog).
+// hookPuzzles: vault-tumbler intro genericized. buriedSkyscraper: shrine/
+// mechanical/dig-camp floor flavors genericized. itemFusion: the fusion-namer
+// adjective pools + the dog-vest LLM example name genericized. Leak baseline
+// tightened for all five. Engine MECHANICS unchanged throughout.
+// engine_Dev-794 — dog-hook matcher hardened + captor combat made authorable.
+// (1) The hookNoun matcher is now WHOLE-WORD (dogCompanion.rescueHookMatches /
+// matchRescueScenarioId) instead of a loose bidirectional substring test — kills
+// the false fires where "trash"→forest, "lock"/"arm"→bunker, "spit"/"strap"→snare,
+// "slab"→lab, "bright"→brig. (2) RescueScenario gains optional captorHp /
+// captorAttack / captorDamage / captorLoot, so a dead captor can drop YOUR items
+// (the fallback-swap uses the unaligned row's stats too). Template rewritten with
+// a full field-by-field header + the new fields; dev-panel DogScenariosBox hint +
+// whole-game bundle hint updated; generic-game captors given generic loot. New
+// tests cover the matcher + authorable combat. archetypes documented as
+// cosmetic/reserved (it never gated placement).
+// engine_Dev-795 — dog-hook matcher tightened to WHOLE-PHRASE. The 794 matcher
+// also let a multi-word hookNoun fire on any single word of it, which backfires
+// on descriptive phrases ("black ash tree" fired on "tree"/"black"; "weapon
+// rack" on "weapon"). Now a hookNoun fires ONLY when its full phrase appears
+// (word-bounded) in the target — "black ash tree" matches "the black ash tree"
+// but never "tree". Authors list single-word triggers explicitly. rescueHook
+// Matches simplified; template / dev-panel hint / bundle hint / tests updated.
+// engine_Dev-796 — puppy safety-nets (vendor + rubble-puppy) un-coupled from
+// Core Guardians. They gated on "all Core Guardians defeated" — a Tartaria
+// concept a custom game never reaches, so both dog-replacement nets were dead in
+// a reskin. New isMainQuestComplete(player) (true when an uploaded custom main
+// quest has all steps done, or the built-in quest hit its end / an ending was
+// chosen) replaces the guardian-count gate at both sites: the rubble-puppy
+// fallback now fires once the MAIN QUEST is complete, and the vendor net queues
+// while it's still in progress. No more guardiansDefeated/totalGuardiansCount in
+// the dog nets. Tests re-pointed at the completion gate.
+// engine_Dev-797 — rubble-puppy window now opens at "one boss left" instead of
+// full completion (no free-roam after the finale, per design). New
+// customMainQuestEngine.bossStepsRemaining(player) counts remaining "kill" steps
+// (faction-gated steps excluded); isMainQuestNearEnd(player) opens the window at
+// <= 1 boss remaining for an uploaded custom quest, falling back to completion
+// for the built-in quest. Both puppy nets re-gated on isMainQuestNearEnd (rubble
+// when near end, vendor while not). Tests: bossStepsRemaining unit coverage +
+// store-level near-end assertions.
+// engine_Dev-798 — Bucket A: golems.ts burned down + summoned companions are now
+// "sidekicks", not "golems". (1) The built-in defs (8 Aether* literals) moved to
+// app/data/summons/builtin-sidekicks.json (golems.ts 8→0). (2) getSummonNoun()
+// now defaults to "sidekick"; a new generic-default summon layer
+// (GenericDefaultPack.summons + resolveSummons: upload → generic sidekicks →
+// built-in) gives reskins generic sidekicks (Scrap Sentry / Iron Warden / Crystal
+// Striker) instead of Tartaria golems, set in GENERIC_GAME. (3) Player-facing
+// summon lines + the arm/disarm/command/feed input parsers now use the active
+// noun (with "golem" kept as a legacy alias), and 3 bonus Aether* leaks in the
+// summon narration were scrubbed (gameStore 153→150). The WEAPON tag
+// (golem_weapon / isSidekickWeapon) and SKILL-advancement (power/resilience
+// statProgress) systems are unchanged. Leak baseline tightened.
+// engine_Dev-799 — sidekick ARMAMENTS moved to the Magic tab in crafting. The
+// golem_weapon recipes (Golem Sledge/Greatsword/Pike/Lance) used to list on the
+// general CRAFT tab; they now sit under the Magic tab next to the summon
+// disciplines, which is where you arm a sidekick. RecipesView gains a
+// 'sidekick-weapon' kindFilter (result tagged golem_weapon) + an 'embedded' mode
+// (no inner ScrollView) so it nests inside the Magic-tab scroll; the CRAFT tab's
+// 'non-consumable' filter now EXCLUDES sidekick armaments so they show in exactly
+// one place. No separate JSON: a sidekick weapon is just a weapon tagged
+// golem_weapon + its recipe in the recipes table (fully author-overridable).
+// engine_Dev-800 — Magic-tab summon DC blurb de-Tartaria'd + sidekick skill
+// progression verified. The summon "Requires:" line hardcoded "Mud 13, Iron 15,
+// Aether 17, Crystal 19 … Mud Dwellers … Aetherborn …"; it now derives the DC
+// list from the LIVE sidekick defs (name + summonDC) and shows THIS player's race
+// modifier via aethercraftDcModifier/aethercraftStatBonus — no Tartaria kind/race
+// names. (The race-modifier MECHANIC is still keyed on Tartaria race ids in
+// raceMechanics.ts — a separate Bucket-A item.) Confirmed trainSidekickStat is wired
+// (power on attack @25728, resilience on surviving a hit @25899) and added a test
+// proving power/resilience level up through use (+ HP bump, failures don't train).
+// engine_Dev-801 — sidekick-summon race AFFINITY is now data-driven. The
+// aethercraft DC/INT race modifier was hardcoded ("mud_dweller 0 / aetherborn +2
+// / else +3"), so in a reskin every race landed in the +3 "untrained" bucket.
+// Race rows gain optional aethercraftDcMod (added to every summon/shape/mend DC)
+// + aethercraftIntBonus (added to effective INT); raceMechanics reads them via
+// getRace(). Default when unset = 0 (neutral), so a reskin race casts at base DC
+// unless the author gives it an affinity. The Tartaria reference races carry
+// their historical values in races.json (mud_dweller 0/+2INT, aetherborn +2, the
+// rest +3) so their balance is unchanged. Tests updated: unknown/undefined race
+// now +0 (was +3); new aethercraftRaceAffinity proves an uploaded race drives it.
+// engine_Dev-802 — rename the race POWER-affinity vertical off "aethercraft"
+// (Tartaria's word for the magic system) to the engine's generic term "power".
+// The author-facing race fields aethercraftDcMod/aethercraftIntBonus -> powerDcMod
+// /powerIntBonus, and the helpers aethercraftDcModifier/aethercraftStatBonus ->
+// powerDcModifier/powerStatBonus, updated at all call sites (gameStore,
+// CraftingScreen) + races.json + tests. Behavior unchanged. (The broader
+// "aethercraft" concept name is still used internally across many engine/data
+// files — a separate, larger rename; this only de-Tartaria's the race-affinity
+// fields I just added so authors don't write Tartaria's term in their race JSON.)
+// engine_Dev-803 — Bucket A: powers.ts burned down + the magic DISCIPLINES now
+// genericize for a reskin. The dev panel already renames the energy NAME (the
+// magic-tab label + intro read getEnergyName()), but the discipline CARDS still
+// fell to Tartaria's DEFAULT_POWERS (Aetherstone Manipulation / Aether Golem
+// Constructor / Aetheric Healing) unless an author uploaded a powers override.
+// (1) DEFAULT_POWERS moved to app/data/powers/default-powers.json (powers.ts
+// 24→0). (2) GENERIC_POWERS (Stone Shaping / Construct Summoning / Mending) is now
+// exported and wired as GENERIC_GAME.tables.powers, so a reskin that skips the
+// Powers box shows generic disciplines — not Tartaria's — with the author's energy
+// name. Stale "+4 harder" race text replaced with the data-driven "power affinity".
+// engine_Dev-804 — Bucket A: whispers.ts burned down + the built-in whisper chain
+// is now a designer-editable JSON. The overheard-tip CHAIN data (the bespoke
+// "Yulka and the Aetheric Discs" lead) moved to app/data/whispers/
+// builtin-whispers.json (whispers.ts 9→0; designers edit it there or upload via the
+// WHISPERS box). makeStolenDiscs is parameterized — its quest-item name comes from
+// the chain's new fetchItemName field, not a literal. A generic-default layer
+// (genericDefaults.whispers → 3-layer resolveWhispers) + a generic one-hop whisper
+// in GENERIC_GAME ('roadside_cache') means a reskin that skips the box gets a bland
+// whisper, not Yulka. The yulka chain's bespoke multi-stage QUEST logic stays
+// scripted in gameStore (reference-game content, keyed on its id).
+// engine_Dev-805 — MULTI-STAGE whispers (Phase 1: engine). A whisper chain can now
+// carry a stages[] array and run as a small mission leg-by-leg: plant → reach leg
+// 0's tile → each later leg uses its own targetOffset from the previous tile (omit
+// to stay put) → a leg with enemyName spawns that foe and won't advance until it's
+// defeated → each leg's effects fire on completion → the last leg ends it. New
+// engine helpers (isMultiStageWhisper / currentWhisperStage / stageTargetTile /
+// findReadyStageWhisper) + store runner (fireWhisperStage / advanceWhisperStage +
+// a generalized kill-gate hook in resolveEnemyDefeat). One-hop (meetLine/
+// meetEffects) chains and the bespoke Yulka chain are unchanged. Template + bundle
+// hint show both shapes. Phase 2 (a form-builder UI with Add-Whisper/Add-Leg) next.
+// engine_Dev-806 — MULTI-STAGE whispers (Phase 2: form-builder UI). The WHISPERS
+// dev box is now a builder like the Main Quest box: fields for a new mission (id,
+// title, plant location, plant chance, first-tile offset, tip line), an ADD LEG
+// sub-builder (per-leg narration, tile offset, a foe to defeat, and TC/item
+// rewards), and an ＋ADD WHISPER button that appends a SEPARATE mission to the
+// array. Existing missions list with REMOVE. The paste/TEMPLATE/EDIT/COPY/RESET
+// path is kept below for advanced effects. Builder always emits multi-stage
+// (stages[]); the engine runs them (Phase 1, -805).
+// engine_Dev-807 — built-in (Tartaria) main quest + Core Guardians GATED DEAD
+// (Phase 1 of removal). The engine shouldn't ship a hardcoded Tartaria main
+// quest — it already has a data-driven one (customMainQuestEngine, fed by an
+// upload OR the generic-default pack). New contentPack.hasAnyMainQuest() is true
+// whenever a data-driven quest exists (always, at runtime), and the legacy
+// built-in path is now short-circuited on it: triggerMainQuest (the phase
+// machine) no-ops, both Core-Guardian spawn routes (the gate-verb path +
+// summonCoreGuardian) refuse, and the Lost-Capital arrival narration is skipped.
+// So the built-in quest is provably dead in every real game; it stays live only
+// for unit tests that install nothing. Phase 2 deletes the dead code (coreGuardians
+// + the built-in mainQuest phase machine + its wiring).
+//
+// engine_Dev-808 — built-in (Tartaria) main quest DELETED (Phase 2). With the gate
+// proven dead at runtime (807), the dead code is now gone: engine/coreGuardians.ts
+// and screens/EndingScreen.tsx removed; engine/mainQuest.ts gutted to just the
+// vestigial player.mainQuest helpers (initMainQuest / ensureMainQuest) + the
+// reference-game capital list used by worldgen — the phase machine, faction core
+// gates, ending cinematics, and all their Tartaria prose are deleted. gameStore
+// loses triggerMainQuest, summonCoreGuardian, chooseEndingMainQuest, the Core-
+// Guardian defeat handler, and the Lost-Capital arrival block; ContractsScreen +
+// ExplorationScreen drop the built-in Primary-Objective panel/chip (the data-driven
+// card still renders). The Core-4 craft gate (coresRequired) is removed so the
+// golem-armament recipes are reachable in any game. Leak scanner ratcheted:
+// mainQuest 85→0, coreGuardians/EndingScreen removed. ~110 Tartaria leaks gone.
+//
+// engine_Dev-809 — dev-tab TEMPLATE audit: every downloadable template now carries
+// an explicit purpose/capability header AND, where its schema supports variants,
+// shows a few different variations. Hooks template gained a full instruction header
+// + three variant hooks (multi-step outdoor, one-step outdoor, indoor). Faction/Race
+// LORE and Interaction-Tags templates gained instruction headers (what they're for,
+// the shape, the tag vocabulary). Recipes template note de-staled — dropped the
+// coresRequired gate that 808 removed. All templates still round-trip (loaders strip
+// the // headers on upload); devTemplatesRoundTrip + contentTemplates stay green.
+//
+// engine_Dev-810 — SUMMON the data-driven main-quest boss. The deleted built-in
+// Core-Guardian SUMMON chip is reborn pointed at the custom main quest: a new
+// summonMainQuestBoss() store action re-spawns the active KILL-step boss into the
+// current scene (the boss auto-spawns on arrival, but a death-revive / scene rebuild
+// clears the field, leaving the player on the objective with nothing to fight). The
+// ★ SUMMON chip is back on the Contracts Primary-Objective card + the Exploration
+// MAIN QUEST chip, shown only while STANDING at the boss's location with no copy
+// already in the scene. The summoned boss is an ordinary enemy, so FLEE (a DEX
+// check; a failed flee provokes the group counter-attack) already works on it.
+//
+// engine_Dev-811 — SIDEKICK-WEAPON gate. Replaces the deleted Core-4 (Tartaria
+// core-count) forge gate with a single author-set threshold: the player must be at
+// least N% through the data-driven main mission before any sidekick weapon
+// (golem_weapon recipes) can be crafted. New contentPackStore.sidekickWeaponQuestPct
+// (0 = no gate, default), set via a box in the Sidekicks authoring panel, persisted
+// + carried in the whole-game bundle. New customMainQuestEngine.mainQuestProgressPercent()
+// (effective step / total; 100 when no quest loaded, so a quest-less game is never
+// blocked). The craft handler refuses a golem_weapon recipe with an Arbiter line
+// until the threshold is met.
+//
+// engine_Dev-812 — staminaMax is now an author-grantable PERK (gear + title). A
+// piece of gear or an active custom title can carry a statBonus { stat:'staminaMax',
+// amount } that raises the max-stamina cap, exactly mirroring how 'hp' already works
+// (neither is a base attribute, so effectiveStats ignores them). New equipment.ts
+// helpers gearStaminaMaxBonus / equippedStaminaMaxBonus / bonusStaminaMaxFor /
+// displayStaminaMax; effectiveStaminaMax (the regen/clamp chokepoint) folds the bonus
+// in, and the display sites (Character screen, StatsPanel, ClimbModal, LLM context)
+// show the boosted cap. The stored staminaMax stays the base (creation + climb growth),
+// so bonuses are computed, not baked — no equip/title bookkeeping. Titles + gear
+// templates document the new stat.
+//
+// engine_Dev-813 — golem → SIDEKICK rename (internal). The companion module and its
+// whole public surface are renamed: engine/golems.ts → engine/sidekicks.ts;
+// GolemDefinition→SidekickDefinition, GolemKind→SidekickKind, GOLEM_DEFINITIONS→
+// SIDEKICK_DEFINITIONS, isGolemWeapon→isSidekickWeapon, parseGolemKind→parseSidekickKind,
+// trainGolemStat→trainSidekickStat, golemStatBonus→sidekickStatBonus, etc. (~20
+// exports), plus gameStore actions/helpers (armGolem→armSidekick, disarmGolem→
+// disarmSidekick, handleGolemCommand/Dismiss→handleSidekick…, pendingGolemNaming→
+// pendingSidekickNaming). User-facing labels now follow getSummonNoun() (Character
+// screen section header) or read "sidekicks" (dev Sidekicks panel). DELIBERATELY KEPT
+// to avoid a save/upload migration: the persisted player.golem field +
+// worldMemory.dogGolemCoActivated/coexistedWithGolem, the 'golem_weapon' recipe tag,
+// the showGolemVariants power-schema field, and reference-content strings (e.g. the
+// "Golem Core" material). Renaming player.golem is a separate save-migration task.
+//
+// engine_Dev-814 — rename the four reference SIDEKICK WEAPONS off "Golem": Golem
+// Sledge/Greatsword/Pike/Aether-Lance → Sidekick Sledge/Greatsword/Pike/Aether-Lance,
+// in both the weapons catalog and the matching recipe results (the name is the
+// recipe↔catalog key, so they move together), plus their flavor descriptions. The
+// 'golem_weapon' categorization tag is unchanged, so Magic-tab routing + the
+// sidekick-weapon gate still work. Tests updated to the new names.
+//
+// engine_Dev-815 — rename the PERSISTED companion field player.golem → player.sidekick
+// (the save-migration task 813 deferred). Safe to do cleanly with NO back-compat shim
+// because there is no live save to migrate. Driven by the type system: flipped the
+// PlayerCharacter.golem declaration in types.ts, then fixed every site tsc flagged
+// (~52 across state/engine/screens/components/diagnostics + tests). The intermediate
+// combat carrier SidekickTrainResult.golem and the per-turn `tp.golem`/`tr.golem`
+// reads are a DIFFERENT type and stay 'golem' (tsc confirms they're untouched); the
+// 'golem_weapon' tag, worldMemory.dogGolemCoActivated, the CharacterScreen collapse
+// toggle, and reference-content golems (Mud Golems race, golem enemies/items) are all
+// left as-is. Diagnostic snapshot label + all test seeds updated to 'sidekick'.
+// Verified: full tsc shows zero new errors vs baseline; all sidekick suites green.
+//
+// engine_Dev-816 — blend the last Tartaria nouns out of the dev-console TEMPLATE /
+// whole-game-bundle surface (the setting-NEUTRAL author scaffold). Scope is the
+// template layer ONLY — the runtime DEFAULT game (app/data) stays Tartaria, and code
+// internals/types are untouched. Two leaks remained vs a strengthened guard:
+//   (1) the SUMMONED SIDEKICKS hints still said the default summon noun was "golem"
+//       and "replaces the built-in golems" — stale since the rename (getSummonNoun()
+//       already defaults to "sidekick"); reworded to "sidekick" (correctness + leak).
+//   (2) the author-facing racialACBonusRules condition id `aether_powers` leaked into
+//       the races template NOTE. Renamed the enum → `energy_powers` (5 sites: types.ts
+//       union ×2, raceMechanics type + derive, races.json), aligning with the engine's
+//       existing renameable {energy}/energyName concept. The derive trigger still keys
+//       off the built-in 'aether*' gear tags (built-in game data, unchanged).
+// Strengthened the existing guard (devTemplatesRoundTrip): TARTARIA_NOUNS now also
+// catches golem / mud dweller / core guardian, and the per-table check renders WITH the
+// optional-field notes (the channel `aether_powers` had hidden in) so nothing can
+// regress. Whole-bundle + all table/lore templates now assert fully generic.
+//
+// engine_Dev-817 — FIX a fatal dev-panel crash: the INTERACTION TAGS "↻ FROM WORLD"
+// button built the per-noun template (which leads with a `//` instruction header) and
+// then called JSON.parse on it RAW to count the keys — the bare `/` threw "JSON Parse
+// error: Unexpected character: /" and crashed the app to desktop. Now strips comments
+// (the shared stripJsonComments the loaders already use) before the count AND guards it
+// in try/catch so a count can never be fatal. Audited every JSON.parse in the dev panel
+// — this was the only unstripped/unguarded one. Regression test locks the invariant.
+//
+// engine_Dev-818 — TEMPLATE-FLAG (pink), PHASE 1 of 2: tint unfilled TEMPLATE material
+// PINK where the PLAYER sees it, so the author knows to go fill in the template. New
+// app/engine/templatePlaceholders.ts: TEMPLATE_FLAG_COLOR + detectors — isTemplate-
+// Placeholder() (whole-field: REPLACE markers, bundle identity defaults, generic sample-
+// row names, sourced from GENERIC_TABLE_ROWS so it never drifts) and splitOnPlaceholders()
+// (prose-safe substring scan for the all-caps REPLACE markers; CASE-SENSITIVE so ordinary
+// "replace" prose is never flagged). Wired into AdventureFeed (the central narration feed)
+// so REPLACE… markers left in loaded content render pink inline alongside the existing
+// enemy-name highlighting. PHASE 2 (next) — flag un-overridden built-in DEFAULTS via the
+// resolver's override-vs-default provenance (catches e.g. the built-in "Aetheric Torch"
+// leaking into an authored game), reusing this same color + helpers.
+//
+// engine_Dev-819 — AUTHOR-OVERRIDABLE built-in pools, STEP 1 of N: genericize the
+// scene-prop FALLBACK pools. The curated climbable + salvageable noun pools
+// (climbableSpawns.ts / salvageableSpawns.ts) are injected into EVERY scene regardless
+// of setting, and shipped Tartaria/fantasy nouns ("zharak's teeth spire", "forgotten
+// order reliquary", "shattered tartarian relay", "royal vault pedestal", "aetheric drone
+// shell") that leaked into authored games (surfaced by a 1943 WWII playtest). Rewrote
+// all themed entries to setting-neutral structural nouns (collapsed tower / jagged rock
+// spire / sealed storage locker / old power conduit …). Guard test locks the four pools
+// neutral. Tests unaffected (they use the nouns as literals, not pool imports). NEXT
+// STEPS: (a) the content-pack OVERRIDE hooks so authors supply their own pools (the
+// generic ones become the fallback); (b) arbiter-quote pools (arbiter-intent/mood-quotes
+// .json still leak "the Giants"/"essence"/"rune"); (c) the deeper coupling this exposed —
+// salvage pools YIELD built-in Tartaria ITEMS ("Aetheric Torch", "Worn Tartarian Coin"),
+// the same item-catalog leak seen in the bug report — part of the broader built-in
+// genericization.
+//
+// engine_Dev-820 — AUTHOR-OVERRIDABLE built-in pools, STEP 2: the SCENE-PROP override.
+// Authors can now supply their own climbable + salvageable ambient-noun pools; the
+// genericized built-ins (819) are the fallback. New content-pack section "sceneProps"
+// ({ climbables?: [{name,context?,height?}], salvageables?: [{name,context?}] }), wired
+// the full standard path: contentPack.ts override registry (set/get/has + clearAll),
+// climbableSpawns/salvageableSpawns read the override (else built-in), contentPackStore
+// loader (loadScenePropsJson) + clearSceneProps + persist + reapply + hydrate + whole-
+// game bundle apply, and a buildScenePropsTemplate() bundle entry (setting-neutral
+// examples). Tests: override-applies (engine output swaps to author nouns + heights;
+// clear restores built-ins) + round-trip + bundle-completeness. NEXT (step 3): the
+// arbiter-quote pools (still leak "the Giants"/"essence"/"rune").
+//
+// engine_Dev-821 — AUTHOR-OVERRIDABLE built-in pools, STEP 3: the ARBITER-QUOTE pools.
+// Finding: these were ALREADY author-overridable — narrativeGenerator merges them with
+// resolveFlavor('moodRemarks'/'intentRemarks'), so authors add their own via the flavor
+// section. The bug was the built-in Tartaria quotes are ALWAYS merged in (loaded via raw
+// require(), bypassing the override resolver), so they leaked regardless — Bob spouting
+// "the Giants"/"the Aether"/"Tartaria"/"Mud Monarchs" in a 1943 WWII game. Fix: rewrote
+// both baselines (arbiter-intent-quotes.json + arbiter-mood-quotes.json, ~150 lines) to
+// SETTING-NEUTRAL aphorisms — same intents/moods + counts, no proper nouns — so the
+// always-merged baseline fits any setting and the author's flavor lines layer on top.
+// Guard test locks both pools neutral. This completes the author-overridable-pools work
+// the playtest surfaced (steps 1-3). Still open from that thread: the built-in ITEM-
+// CATALOG leak (Aetheric Torch / Worn Tartarian Coin yields) — the bug-report item.
+//
+// engine_Dev-822 — built-in ITEM leak, part 1: the universal STARTER KIT. The shared
+// kit every character begins with (DEFAULT_STARTER_ITEMS in character.ts) is already
+// author-overridable (resolveFlavor('starterItems', …)), but its built-in default leaked
+// "Aetheric Torch" + "Aetheric Locket" into every game — exactly the items seen in the
+// WWII bug-report inventory. Renamed to setting-neutral "Hand Torch" + "Finder's Locket"
+// (ids + behavior TAGS unchanged — light/detection drive the mechanics, names are pure
+// flavor; verified no name-based behavior coupling). Trail Rations + Water Bottle were
+// already neutral. NEXT (part 2): the deeper coupling — salvage/investigation POOLS still
+// yield built-in catalog items ("Worn Tartarian Coin", "Aetheric Shard", "Sentinel Core
+// Plate"), which needs the item catalog (gear/materials/relics) genericized in lockstep.
+//
+// engine_Dev-823 — PINK PHASE 2 (provenance) for ITEMS. New builtinCatalogNames.ts indexes
+// every built-in catalog item NAME (weapons/armor/gear/materials/amulets/rings/exploration/
+// loot, ~built straight from the DEFAULT JSON, override-independent). isBuiltInDefaultItem()
+// = "this item is un-authored template material the author should replace." Wired into the
+// inventory row name: a built-in default renders PINK (TEMPLATE_FLAG_COLOR), GATED on devMode
+// so end-players of a published game never see the markers. Author-uploaded items (a name
+// not in the built-in catalog) stay normal. This makes ALL ~265 themed catalog leaks visible
+// at once without renaming. NEXT: the genericization rename itself (catalog item names ->
+// neutral), which keeps them pink (still built-in defaults) until the author overrides.
+//
+// engine_Dev-824 — NAMED VENDORS are now author-overridable (the last major built-in
+// content type that wasn't reskinnable). vendors.json shipped 30 fantasy traders keyed to
+// Tartaria factions with NO override path — so a custom game (e.g. the WWII playtest)
+// couldn't ship its own merchants. Added the standard override path (mirrors scene-props
+// 820): contentPack.ts registry (setVendorsOverride/get/has + clearAll); vendors.ts
+// getActiveVendors() (override-or-built-in, drops malformed rows) — routed the 4 consumers
+// (pickRandomVendor, findVendorByName, factionHint, gameStore vendor-encounter + faction
+// sample); contentPackStore.ts loadVendorsJson (bare array or { vendors: [...] }) + clear +
+// persist + reapply + hydrate + whole-game bundle apply + PersistShape; buildVendorsTemplate()
+// + bundle entry (setting-neutral example traders). Tests: override-applies (pool swaps to
+// the author's vendors + lookup; clear restores built-ins; malformed rows dropped) +
+// round-trip + bundle-completeness. tsc 141 = baseline (zero new); vendor + content-pack
+// suites green.
+//
+// engine_Dev-825 — fix the GENERIC GAME's empty starting hub (content audit). All content
+// types still exist; the hub was a WIRING gap. (1) startingAreaForFaction /
+// startingAreaAtLocation read only the AUTHOR override slot — never the installed generic
+// default — so the generic game's spawn tile (warden_hold/seeker_camp/crossroads) failed
+// isHubLocation(), no hub interior rendered, and with hubRoom=null neither the anchor vendor
+// nor the mission board ever surfaced (getStartingAreas(), the only fn that consults the
+// generic default, was dead code). Both accessors now go through getStartingAreas()
+// (override → generic default); built-in Tartaria factions still fall to null → static hub.
+// (2) GENERIC_GAME had no vendors → getActiveVendors() leaked Tartaria traders. Added a
+// vendors generic-default layer (contentPack getGenericVendors; vendor resolver now layers
+// override → generic → built-in) + GENERIC_VENDORS ("Quartermaster Vael" anchored in the
+// store room + a roadside peddler), itemNames from the generic catalog. (3) Removed the
+// stray "West": the generic yard's `west: 'world'` compass exit was redundant with the EXIT
+// button ("leave outpost") and rendered a confusing extra "West" — dropped it (room count
+// unchanged otherwise, per request). Tests lock all three. tsc 141 = baseline.
+//
+// engine_Dev-826 — fill three generic-game content gaps from the audit (all already
+// author-overridable via their existing JSON sections; this gives the GENERIC game its
+// own version so a default playthrough isn't missing them / leaking Tartaria):
+//  • LORE document — added LORE_DOC (4 keyworded "the Reaches" passages incl. an `always`
+//    block) to GENERIC_GAME.tables.lore; surfaces through the existing table resolver.
+//  • WASTELAND encounters — added a generic-default LAYER (GenericDefaultPack.wasteland +
+//    getGenericWasteland; getArchetypes now layers override → generic → built-in) +
+//    GENERIC_GAME.wasteland (3 road archetypes referencing generic enemies/loot).
+//  • Cleansing Tonic recipe — its 2nd ingredient (Red Cap Mushroom) wasn't in the generic
+//    materials, so it was uncraftable; added Red Cap Mushroom to GENERIC_TABLE_ROWS.materials
+//    (a foraged herb) so the recipe resolves from the materials set.
+// Tests lock all three + their setting-neutrality. tsc 141 = baseline. (Reference answers
+// given to the user: returnable:false ⇒ remote turn-in, else mapped/return; the mission
+// board is a room flag + the faction-quests JSON, not its own file; starting-area rooms are
+// already JSON via the startingAreas section.) NEXT: roadside traders / NPCs authorable.
+//
+// engine_Dev-827 — make ROADSIDE TRADERS author-overridable (the last content type still
+// hardcoded outside the override system). Full section, mirroring vendors (824): contentPack
+// registry (setRoadsideOverride/get/has + clearAll) + generic-default layer (GenericDefaultPack
+// .roadsideTraders + getGenericRoadside); vendors.ts getActiveRoadside() layers override →
+// generic → built-in (drops malformed archetypes) and pickRoadsideTrader() uses it;
+// contentPackStore loadRoadsideTradersJson (bare array or { archetypes: [...] }) + clear +
+// state + persist + reapply + hydrate + whole-game bundle apply (key "roadsideTraders") +
+// PersistShape; buildRoadsideTradersTemplate() + bundle entry; GENERIC_ROADSIDE (Road Hawker
+// + Road Fence) on GENERIC_GAME. Tests: override-applies + spawner uses it + generic supplies
+// its own (no Tartaria leak) + malformed-drop + round-trip + bundle-completeness. With this,
+// EVERY major content type is reskinnable. tsc unchanged from baseline (zero new errors).
+//
+// engine_Dev-828 — WORLD LORE: neutralize the default + give the generic game its own.
+// getWorldTone/Setting/Terms/Vocabulary/Persona read only the author's `world` block else
+// the Tartaria DEFAULT_WORLD_TONE, with NO generic layer — so every default/custom game's
+// narrator was fed the Tartaria tone ("Reclaimers… the Aether…"). Fixes: (1) DEFAULT_WORLD_
+// TONE rewritten setting-neutral; (2) GenericDefaultPack.worldLore + a resolveWorldBlock()
+// helper (author override → installed generic → neutral default) now backs all five world
+// accessors; (3) new hasWorldLore() (override OR generic) replaces hasLoreOverride('world')
+// as the narration-injection gate so the generic game's setting/terms/vocab actually fire;
+// (4) GENERIC_GAME.worldLore — a coherent "the Reaches" tone/setting/persona/terms/vocab.
+// Author World-lore uploads still win. Tests lock the layering + neutrality. tsc baseline.
+//
+// engine_Dev-829 — AUTHORING DIAMONDS on the dev-panel section bars. Each collapsible
+// content bar now shows a diamond: ◆ filled (green) = every JSON section inside is authored
+// (an uploaded/saved override), ◇ hollow (pink) = at least one is still on the built-in
+// template. CollapsibleSection takes a `status` ('all'|'partial'|'none' via authoredStatus());
+// DeveloperConsole computes each bar's status live from the content-pack override state
+// (hasTableOverride / hasLoreOverride + the store slots), recomputed on every contentVersion
+// bump. Wired to 20 content bars (MAIN QUEST, GAME IDENTITY, LORE, TABLES, MISSIONS, FACTION
+// MISSIONS, HOOKS, WHISPERS, TRAVEL ENCOUNTERS, INTERACTION TAGS, STARTING AREAS, TITLES,
+// COLLECTABLES, SUMMONED SIDEKICKS, DOG-RESCUE, DIGGING, SCRAP, SALVAGE, OVERLAYS, ADVANCED
+// RULES). Control/meta bars (WHOLE GAME, MUSIC, MAPS, FAMILY BUILD, DEV MODE) carry no
+// diamond. tsc unchanged from baseline.
+//
+// engine_Dev-830 — CANON FACT FILES: close the last Arbiter-knowledge leak. Audit finding:
+// the Arbiter's two main knowledge paths were ALREADY gated behind the lore document —
+// buildCanonFactsParagraph (LLM context injection) and loadLoreConceptBank ("Ask the
+// Arbiter" MiniLM corpus) both return from the author/generic lore doc when present and only
+// fall to the built-in (Tartaria) canon files when absent. Since 826 gave the generic game a
+// lore doc, those Tartaria files (canon-events / food-drink / glossary / arbiter-titles /
+// canon-armor·weapons·skills·currency·loot) are never reached at runtime. The ONE ungated
+// path was gameStore.findConcept() — the player's "what is X" lookup over concepts.json (172
+// mixed mechanics + Tartaria-setting entries). Fixed: findConcept now matches the active LORE
+// document FIRST (getLoreDocConcepts, cached by lore-doc identity — keywords from tags, answer
+// from text), so a custom game answers setting questions from its OWN lore, and only falls
+// through to the built-in concept bank for mechanics + unmatched terms. The Action Reference
+// screen still reads concepts.json for its mechanical action cards (neutral). tsc baseline.
+//
+// engine_Dev-831 — DELETE the built-in Tartaria canon (Arbiter knowledge), don't just gate
+// it. The Arbiter's knowledge now comes ENTIRELY from the active lore document (author
+// override or installed generic default): loreConceptBank dropped buildBuiltinConceptBank
+// (the ~190-line Tartaria fallback) + its canon interfaces — an empty lore doc yields an
+// empty bank; canonFacts.buildCanonFactsParagraph dropped the canon-events/food-drink
+// fallback → lore doc or null. Deleted 10 now-unused data files: canon-events,
+// canon-food-drink, glossary, canon-armor, canon-weapons, canon-skills, canon-currency-goods,
+// canon-loot-treasure, canon-task-difficulty, canon-action-difficulty. Tests rewritten to
+// the lore-doc-driven behavior (+ fixed a pre-existing stale "Arbiter" assertion). STILL
+// TARTARIA, handled next: arbiter-titles.json (live titles feature → genericize) and
+// concepts.json (76 neutral mechanics + 96 Tartaria-setting entries → strip the 96; findConcept
+// already prefers the lore doc). tsc baseline; arbiter/lore suites green.
+//
+// engine_Dev-832 — finish the canon genericization: concepts.json + arbiter-titles.json.
+// concepts.json (172 mixed) → STRIPPED the 88 pure Tartaria-setting Q&A entries (the lore
+// document covers setting questions now, 830/831) and GENERICIZED the 9 mechanics entries
+// that carried setting flavor (Aether→energy/arcane, Tartarian→ancient, bolt-caster→carbine,
+// Aether Golem→construct, etc.) + renamed the one Tartaria-flavored id (aetheric_related_
+// actions → arcane_related_actions, updated in ActionReferenceScreen). Result: 84 neutral
+// mechanics entries, ZERO Tartaria, all 65 Action-Reference ids intact. arbiter-titles.json
+// (20 earnable titles) → genericized every display name/requirement/perk (Arcane-Attuned,
+// Sidekick Whisperer, Bane of Constructs, Far Explorer…); ids kept (titles.ts predicates +
+// saved earnedTitles reference them — internal, never displayed). tsc baseline; concept /
+// askArbiter / titles / arbiterTitlesScreen / actionReference suites green.
+//
+// engine_Dev-833 — sweep the remaining lore-flavor files for Tartaria + genericize:
+// ambient-flavor, location-flavors, scene-flavors, mystery-seeds, dc_table. Recursive
+// value-only genericization (object KEYS untouched, so keyed references stay intact):
+// Aether*->energy/arcane, Etheric->energy, Tartaria/Tartarian->this world/old-world,
+// Reclaimer->scavenger, Forgotten Order->the order, Mud Monarch/Dweller->old rulers/deep
+// folk, "the Arbiter"->"the narrator". All five files now carry zero Tartaria in their TEXT.
+// (NOTE: location-flavors KEYS are still built-in location ids — great_tartary_plains,
+// tartarian_outskirts — those belong to the built-in locations.json coupling, addressed
+// with that table, not here.) tsc baseline; narration/ambient/mystery/context suites green.
+//
+// engine_Dev-834 — title-id genericization + save migration. Renamed the 8 Tartaria-flavored
+// earnable title ids to neutral forms (aetheric_attuned->arcane_attuned, golem_whisperer->
+// sidekick_whisperer, bane_of_sentinels->bane_of_constructs, master_of_aethercraft->
+// master_of_spellcraft, etc.) across titles.ts + arbiter-titles.json + tests, and genericized
+// the perk display text. Old saves carry the legacy ids in player.earnedTitles, so backfillPlayer
+// now remaps them (LEGACY_TITLE_ID_MIGRATION) — forward-only, idempotent, deduped — so an earned
+// title keeps its display AND its passive perk after the rename. New titleIdMigration test locks
+// it. (Internal counter field names like golemEdge/sentinelsDefeated are never displayed, left
+// as-is.) tsc baseline; titles/stealthTitles/arbiterTitlesScreen/titleIdMigration suites green.
+//
+// engine_Dev-835 — make the 20 built-in earnable titles (exploring/killing/etc.) author-
+// customizable through the SAME uploaded titles JSON. New resolveTitleRoster()/builtinTitleDisplay()
+// in customTitles.ts: an uploaded entry whose id matches a built-in re-skins its display
+// (name / requirement / perk) while the engine's earning predicate is untouched; entries with a
+// new id + track/threshold remain added achievements. The Character screen now MERGES the built-ins
+// (with overrides applied) + the author's added titles instead of the old either/or that hid the
+// built-ins on any upload; the earn announcement resolves through the override too (dropped the
+// now-dead ARBITER_TITLE_META). Titles template documents the re-skin path + lists the 20 built-in
+// ids. New customTitleRoster test. tsc baseline; title/customTitleRoster/template suites green.
+//
+// engine_Dev-836 — STALE-UPLOAD detection (yellow diamond). New templateVersioning.ts hashes each
+// authorable section's current TEMPLATE output → a per-section version. The content-pack store
+// records, per uploaded section, the template version its CURRENT override was built against
+// (templateStamps: { content, tmpl }), reconciled automatically on every contentVersion bump (a
+// store subscription — zero per-loader wiring) and on hydrate. A re-upload (override content
+// changes) refreshes the stamp; when the engine later ships a changed template the recorded
+// version no longer matches → the dev panel shows a YELLOW ◆ on that section bar ("re-download
+// the template + refresh your upload"). Also fixed an 835 follow-on: loadTitlesJson now tolerates
+// built-in-id re-skin entries (id+name, no track/threshold). New templateVersioning test. tsc
+// baseline; templateVersioning/customTitleRoster/devTemplatesRoundTrip/title suites green.
+//
+// (re-publish trigger — no code change: 836's OTA publish failed when GitHub Actions minutes
+// were exhausted; this republishes the same 836 build once minutes were restored.)
+//
+// engine_Dev-837 — stress-test fixes (5-agent audit). Closed the verified Tartaria leaks that
+// reached the player in the STOCK GENERIC GAME: (1) hooks now layer author → generic → built-in
+// (new neutral "the Reaches" hook set in GENERIC_GAME) so exploration leads stop falling back to
+// the Tartaria pool; (2) energy stops reading "Aether" — isReskinActive() counts the installed
+// generic pack, so getEnergy() returns neutral words; (3) corruption tier narration routes the
+// energy noun through getEnergyName(); (4) titles "Tartarian machines" → "ancient machines";
+// (5) itemDefaults synthesized descriptions drop "reclaimer's"/"Aether-channeling". Tier-2
+// override seams: factions systems now read the uploaded Factions table (liveFactions/findFaction
+// across factionHint/MissionBoard/Contracts/7 gameStore sites); narrator world-knowledge resolves
+// factions/races/capitals/sites live + drops Tartaria prose. Real bug fixed: faction fetch-quest
+// items were verified but never consumed on turn-in (stale-snapshot clobber). Leak-scanner baseline
+// ratcheted 341 → 328. New factionOverrideRouting test. Full parity confirmed (no lost features).
+//
+// engine_Dev-838 — finish the stress-test follow-ups. Gated the biggest remaining player-facing
+// leak: TRAVEL_LORE_BEATS (15 Tartaria narrator beats surfaced during travel) + AMBIENT_FLAVOR_LINES
+// + MYSTERY_SEED_LINES now resolve through resolveFlavor (author Flavor block → installed generic
+// default → built-in), with neutral travelBeats/ambientFlavor/mysterySeeds pools added to GENERIC_GAME
+// so the stock generic game shows neutral beats. location-flavors + scene-flavors routed through
+// resolveFlavor too (overridable via the Flavor block). Flavor template now documents all five new
+// keys. Content depth: added a Freeholders faction quest so all three generic factions have a board
+// contract. New flavorPoolOverride test. tsc baseline 142; flavor/narration/faction/generic suites green.
+//
+// engine_Dev-839 — auto-splitting whole-game save (handles games too big to move in one piece).
+// SAVE FILE TO DEVICE now measures the file: under the per-part ceiling (SAFE_PART_CHARS ≈ 45 KB,
+// headroom under the ~60 KB device clipboard/paste + read hard limits) it writes one file as before;
+// over it, it auto-splits into as MANY timestamped parts as needed (my-gamep1-<stamp>.json,
+// my-gamep2…, my-gamep3…) and tells you how many. Each part is valid JSON carrying a raw slice of
+// the bundle text + { __gameSavePart, __of, __saveId, __savedAt }; UPLOAD collects parts and knits
+// them back in ANY order (refusing to mix parts from different saves), showing how many remain. All
+// downloads timestamp the filename. New pure gameSaveParts module (buildSaveParts/addSavePart/
+// isGameSavePart/fileStamp) + N-part test. tsc baseline 142.
+//
+// engine_Dev-840 — BAKED GAME SLOT (the publish linchpin). New app/data/default-game.json ships
+// EMPTY, so a dev build boots the generic engine and you author by uploading JSON. The publish
+// "bake" step fills it with the author's whole-game master JSON; App.tsx then auto-loads it at boot
+// (loadGameBundle with persist:false — re-read from the build each launch, never written to storage,
+// so a later rebuild's game can't be shadowed) so a shipped build IS their game with dev off. A
+// runtime dev upload still wins for in-app editing. New persist flag on loadGameBundle + bakedDefaultGame
+// test. tsc baseline 142.
+//
+// engine_Dev-841 — VALIDATE GAME pre-export pass (from the architecture review). New validateGame()
+// scans the EFFECTIVE loaded content for the failure modes that bake into a broken release: dangling
+// references (recipe result/ingredient, vendor/roadside offers, faction-quest factionId + fetch +
+// reward items, main-quest step bosses/locations, boss drops/spawn, starting-area faction/location +
+// room-exit targets) and duplicate ids — errors (will break play) vs warnings (soft). New "✓ VALIDATE
+// GAME" button in the whole-game card surfaces the counts + lines so authors fix problems before the
+// bake. Pure reads through the content resolvers; new validateGame test (9 cases). tsc baseline 142.
+//
+// engine_Dev-842 — EXPERIMENT: combat arena view. During a fight the world-window feed is replaced
+// by a two-column arena (YOU | active ENEMY) with live HP/stamina bars + stats; it reverts to the
+// plain feed the instant combat ends. Presentational ONLY — reads existing state (player + enemy
+// views), writes nothing, touches no combat logic / rolls / action bar. Gated by COMBAT_ARENA_VIEW
+// in ExplorationScreen (set false to revert instantly) and only renders while inCombat is true, so
+// it can't affect anything outside a fight. New CombatArena component. tsc baseline 142.
+//
+// engine_Dev-843 — transient last-roll result popup. The DiceRoller now fires onResolve at the
+// moment a roll commits; ExplorationScreen flashes a small popup just above the controls (below the
+// action buttons) showing the result (label · total · vs target · ✓/✗), held ~2s then auto-hidden,
+// reset on each new roll so only the latest shows. Gated by ROLL_RESULT_POPUP. tsc baseline 142.
+//
+// engine_Dev-844 — cool color scheme. The engine's default look moves off the Tartaria warm-umber
+// "mud" to a dark TEAL-SLATE (greenish-blue): the slider-driven base default hue goes 24 → 192, and
+// the warm-brown accent family across ~48 component stylesheets is recolored to a cohesive cool set
+// (gold #c9a86a → teal #6ab0c9, tan/cream → cool light, brown borders/cards → slate), preserving
+// each color's LIGHTNESS so contrast holds. Semantic colors are LEFT ALONE so health/HP green
+// (#9ec96a/#56d364) isn't drowned by the new teal, and failure-red + corruption-purple still read.
+// Base is still fully slider-tunable. tsc baseline 142.
+//
+// engine_Dev-845 — Validate Game upgrades (from the architecture review's useful parts). The
+// validator gains an INFO tier + a stable `code` (+ optional suggestion/id) per issue, a structured
+// runValidation() report { ok, errorCount, warningCount, infoCount, errors, warnings, info }, and
+// new reference checks that map to real engine data: hook + whisper EFFECT VERBS (unknown verb +
+// grant_item / unlock_location / rep_change refs), summoned-sidekick fuel items, wasteland-encounter
+// enemies, and a starting-area "no mission board" warning. The VALIDATE GAME button shows the
+// error/warning/info counts; SAVE FILE TO DEVICE now soft-gates on hard errors (a second tap exports
+// anyway). Skipped the review's non-mapping bits (dialogue graphs, schemaVersion/engineVersionRequired
+// manifest, generic player-start) — no such fields exist yet. Extended test (13 cases). tsc baseline 142.
+//
+// engine_Dev-846 — fix two displayed "Mud Flood Nexus" Tartaria leaks (the built-in quest was
+// removed but its display strings lingered). TitleScreen's save-slot "resume objective" line is
+// genericized (neutral phase hints) AND now prefers a new SlotSummary.mainQuestObjective — the live
+// CUSTOM main-quest objective (currentObjectiveLine) computed at save time — so a reskin shows its
+// own quest. Also genericized gameStore's no-compass narrator line ("the mud-flood country" → "this
+// country"). The remaining 'nexus'/'mud flood' hits are internal ids / noun-matchers, not displayed.
+// tsc baseline 142; leak-scanner/save/title suites green.
+//
+// engine_Dev-847 — (1) save-slot main-quest progress now reads "Step X/N · <objective>": new
+// currentQuestProgress() + mainQuestStep/mainQuestStepCount on SlotSummary, computed at save time
+// from the live custom quest. (2) New "Text RPG Engine" splash poster (glowing d20 over an open
+// book) — re-encoded to a lean ~200 KB / 900px JPEG at assets/splash-art.jpg (overwrites the old
+// one; the SplashOverlay wiring + loading bar are unchanged). tsc baseline 142.
+//
+// engine_Dev-848 — splash poster sizing fix. The art was inset-fit to ~5% margins → `contain`
+// fit it to WIDTH = ~90% of screen ("too big"). Replaced with an explicit, clamped, CENTERED box
+// (≤56% width / ≤54% height, aspect-preserved, nudged just above middle) so it reads as a centred
+// poster with dark margins and clear room for the loading bar below. tsc baseline 142.
+//
+// engine_Dev-849 — fix the combat arena. The 842 experiment added a SECOND char + enemy box (a
+// custom CombatArena) under the originals → two of each, and the custom char box lacked the reactive
+// HP color. Removed CombatArena entirely. Now during a fight the ORIGINAL top row grows tall to fill
+// the world-window (topRowCombat flex:1, feed hidden) and the ORIGINAL StatsPanel (reactive HP color)
+// + EnemyPanel get a `fill` prop so each is ONE long box on its side. tsc baseline 142.
+//
+// engine_Dev-850 — splash poster +50% (caps 0.56→0.84 width / 0.54→0.81 height), still centered.
+//
+// engine_Dev-851 — combat arena + roll popup fixes. (1) The char/enemy columns are now EQUAL halves
+// (combatColEqual overrides statsCol's 1.2) so the char box no longer runs past the screen middle,
+// and the EnemyPanel `fill` flex chain is fixed (wrap → TouchableOpacity → ScrollView all flex:1,
+// wrap painted as a tall box) so the enemy box actually shows as one long box on its side. (2) The
+// result popup no longer mirrors the dice roller per step — it now fires ONCE when a roll sequence
+// resolves in combat and shows the FINAL output line (the narration that the hidden feed would
+// show), held ~2s. tsc baseline 142.
+//
+// engine_Dev-852 — genericize the export/diagnostics "Tartaria" bleeds. The inventory + save +
+// bug-report export headers and the About device-summary header hardcoded "TARTARIA …" / "Tartaria
+// Realms"; they now use getGameTitle() (the LOG export already did). Also genericized the same app-
+// name string in the mic-permission instructions (STTManager), the playtester-invite modal, the
+// title-screen update note, and the third-party-licenses preamble. Leak-scanner baseline 328 → 326.
+//
+// engine_Dev-853 — audited ALL copiable debug logs for setting bleeds. The export builders (LOG /
+// inventory / save / bug report / device summary) are now clean (getGameTitle from 852); the one
+// remaining displayed bleed was the About page's "Qwen generator (Arbiter narration)" label →
+// now getNarratorName(). The @tartaria/* + tartaria.ml.* AsyncStorage keys and __TARTARIA_BOOT_STAGE
+// are internal (never displayed; renaming orphans saved state) so they stay. tsc baseline 142.
+//
+// engine_Dev-854 — leak-scanner widening pass. NOUNS_G + the candidateFiles() grep now cover the
+// full bleed family (added Arbiter, Mud Flood) and scan app/components, app/voice, app/diagnostics,
+// app/ui, app/data on top of engine/state/screens. Newly-surfaced DISPLAYED bleeds genericized:
+// portability.ts (narrator/flavor lines, 2→0), buriedSkyscraper / LoreCodexBody gate lines (→{narrator}),
+// AetherStatPickerModal title, contentTemplates hint example, tutorialSteps (6 setting strings → neutral).
+// The three functional residuals are baselined, not "fixed": gameStore's '../engine/askArbiter' require
+// path, and narrativeGenerator/arbiterFrame's legacy-"Arbiter" matchers that strip the old narrator name
+// from model output. Scanner green at 328; tsc baseline 142.
+//
+// engine_Dev-855 — VOICE BACKGROUND-TEARDOWN crash fix. Repro: player backgrounded the app (heavy
+// foreground app evicted it), got a text message, returned, tapped Main Quest → process died to the
+// home screen. The bundled neural TTS held a live expo-av Sound + queue, and nothing listened to
+// AppState, so on resume the next spoken line played into a native audio session still disrupted by
+// the notification's audio-focus grab — the OTA-413 SIGSEGV family (same as the documented
+// SILENCE-ARBITER teardown-rejection crash). startTTSController now stops + clears the voice the
+// instant the app leaves the foreground (audio can't outlive it; staysActiveInBackground is false)
+// and resyncs the controller to the log tail so the saved backlog isn't re-spoken on return.
+// Regression test: __tests__/ttsBackgroundTeardown.test.ts. tsc baseline 142.
+//
+// engine_Dev-856 — hide the main-quest / objective chip during combat. It's
+// out-of-combat navigation; over a live arena it was just clutter. Suppressed
+// while enemies are present (inCombat) on ExplorationScreen; returns the instant
+// the fight ends. tsc baseline 142.
+//
+// engine_Dev-857 — Character screen EQUIPPED now shows each weapon's damage line:
+// dice + damage type + the stat it scales off (e.g. "⚔ 1d8 slashing · scales STR"),
+// resolved from the catalog weapon (mirrored off-hand uses the main 2H weapon).
+// Core stats (STR/DEX/INT/WIS/CHA/STE) already render in the CORE STATS card.
+// tsc baseline 142.
+//
+// engine_Dev-858 — fix the combat arena not collapsing after the fight ends. The
+// arena layout (tall char|enemy split, hidden feed, stretched StatsPanel) was keyed on
+// raw enemy PRESENCE (enemyViews.length>0), so a knocked-out foe lingering in the scene
+// to be looted kept the character box stretched full-height — "completed combat but it
+// didn't revert." Now the layout tracks a LIVE threat (an enemy with hp>0 that isn't
+// KO'd) via `arenaActive`; the moment the last foe is down the screen collapses back to
+// the peaceful layout. `inCombat` still drives the controls + enemy panel so the "loot"
+// button and the downed body stay on screen. tsc baseline 142.
+//
+// engine_Dev-859 — follow-up to 858: the TOP-RIGHT corner now also reverts. The
+// enemy panel render was still gated on enemy presence (inCombat), so a KO'd foe kept
+// the panel up after the fight; it now follows `arenaActive` too, so the crest returns
+// the instant the last foe is down — exactly as the corner looked before combat. The
+// KO'd body stays lootable via the "loot" button in the input row. tsc baseline 142.
+//
+// engine_Dev-860 — fix Scrap-All refusal spam. "Scrap All (N)" loops scrapInventoryItem
+// N times; when the resolved stack is non-scrappable stock material (e.g. a stack of 22
+// Trail Rations / Water Bottles), every iteration fired the "Nothing here to break down
+// — it already IS stock material" arbiter line — 22 identical lines in one burst (the
+// dedup only suppressed the log echo). doScrap now tracks the target's total quantity and
+// breaks the instant a scrap makes no progress, so a refusal fires at most once. tsc 142.
+//
+// engine_Dev-861 — bulk-scrap summary + unrecognized-item scrap. (1) "Scrap All" now
+// runs SILENT and emits ONE flavored summary line that notes it was a bulk scrap and
+// lists the combined haul, instead of one flavor line per unit (a stack of 20 was 20+
+// lines). (2) An UNRECOGNIZED item (consumable / plain misc — no tag-driven scrap
+// output) no longer dead-ends at "nothing to break down"; it RNG-rolls a single COMMON
+// material pulled from the resolved materials JSON (real names only, never invented;
+// Common-only so it can't be laundered into high-value mats). Quest items and genuine
+// raw stock materials still refuse. New scrapEngine exports: isStockMaterial,
+// hasTagScrapOutput, randomMaterialScrap; scrapInventoryItem takes { silent }. tsc 142.
+//
+// engine_Dev-862 — scrap/salvage realness + anti-repeat + splash +15%. (1) Random
+// material picks now AVOID the last few awarded (recentMats memory), so a run of
+// scraps doesn't keep handing out the same thing — it re-rolls. (2) realizeScrapOutput
+// swaps any built-in role default (Stick / Small Rock …) this game's materials JSON
+// doesn't actually define for a real pool material, so scrap never yields an item the
+// game doesn't use (no-op for the built-in game where every role mat exists). (3) Open
+// log issue: salvageAllAmbient no longer dead-ends on an unmatched noun — it RNG-rolls
+// a real pool material so SALVAGE ALL always pays out. (4) Splash poster +15% (0.84→0.966
+// W, 0.81→0.932 H). tsc 142.
+//
+// engine_Dev-863 — author-bundle stress test (The Philadelphia Experiment, 525KB) findings. (1)
+// ENGINE BUG, no content workaround: elevatedOverlay.ts resolved encounter enemies from the raw
+// built-in roster (require enemies.json) instead of the content-pack override — so EVERY custom-
+// roster game's elevated `encounter` overlays scored 0 enemies and spawned nothing. Now routed
+// through encounter.findEnemyByName (resolveTable('enemies')). (2) Validate Game upgraded from an
+// existence checker to also catch the SILENT no-op classes the audit surfaced: armor.slot outside
+// the EquipSlot set (unequippable), bonus stat names the engine doesn't track (constitution/
+// perception → dead bonus, warning), boss.spawnCondition outside main_quest|location|random (never
+// spawns), faction-quest stage advanceOn outside kill|travel|any (un-completable), and
+// dogScenarios.captorFactionId not a real faction id. tsc 142.
+//
+// engine_Dev-864 — finish the lore-agnostic pass from the stress test. (1) WEATHER is now
+// DATA-DRIVEN: any weather whose id isn't one of the 9 built-ins is driven from its own
+// row fields — visibility → attack penalty, travelPenalty → reposition cost, corruptionChance
+// + hostile tags → the per-action tick, cold/fog tags → a stat nerf. Built-in ids keep their
+// exact hand-tuned behavior (the fallback never runs for them). So a custom-setting game's
+// weather is mechanically real instead of cosmetic, with NO need to reuse engine ids — the
+// dev doesn't have to rename anything. (2) Validate Game rounded out so the dev's fix-list is
+// complete: undefined weapon/resistance damage types (frost/shock/explosive → warning),
+// power coat_enemies coatings outside the 5 DOT kinds (never ticks → error), and collectable
+// fragment biomeTags that match no location (story uncompletable → warning). No content
+// coercion — the dev fixes their input; the engine just surfaces it. tsc 142.
+//
+// engine_Dev-865 — WEATHER feature pass (lore-agnostic). (1) A WEATHER ON/OFF toggle:
+// new weatherEnabled flag — bundle field "weatherEnabled": false, dev-console FEATURES
+// card, full contentPackStore plumbing (state/parse/persist/apply), and a runtime gate
+// (scenes get no weather, no atmosphere line, no effects). CurrentScene.weather is now
+// nullable; all readers guard it. (2) The generic (non-Tartaria) DEFAULT weather is a
+// proper 6-row set with real ids incl a benign Clear Skies (was 2 placeholder rows) —
+// used as both the default game's weather and the template. (3) Template + hint updated
+// to document the data-driven fields and the toggle (WEATHER_NOTE on the weather box,
+// weatherEnabled in the whole-game template). tsc 142.
+//
+// engine_Dev-866 — Validate Game UX + recipe/loot cross-check. (1) COPY button: the full
+// validation report (every line, not the 20-line preview) is captured and a "⧉ COPY
+// VALIDATION OUTPUT" button copies it to the clipboard. (2) Recipe ingredients are now
+// cross-checked against an OBTAINABLE-ITEM INDEX built from every loot/drop source (enemy
+// loot, boss drops + questItem, digging, salvage pools + junk, travel-encounter loot, hook/
+// whisper grant_item, vendor/roadside offers, dog-captor loot, quest/main-quest rewards,
+// starting gear, starter items), not just the item tables. An ingredient that's a loot drop
+// but absent from every item table → WARNING ("define it in Materials", blank-misc otherwise);
+// one defined+obtainable nowhere → ERROR. Two aggregated info lines name exactly what to add
+// to Materials. No content touched — engine wiring + validation only. tsc 142.
+// OTA-867 — Validate Game: dogGear-aware item-existence check (findCatalogItem doesn't scan the
+// dog-armor table, but lookupCraftedItem does — OTA-603; the validator now mirrors it so dog
+// vests/collars used as recipe results stop false-flagging as "isn't in any item table"). Plus a
+// multi-part COPY VALIDATION button (mirrors LogScreen's 25k chunking) so big reports paste through
+// length-limited channels. Engine wiring + validation only — no content touched. tsc 142.
+// OTA-868 — Coatings rename template now ships ALL FIVE mechanics pre-filled with their generic
+// defaults + an instruction header (what each field is for, edit/delete to taste), instead of a
+// single corruption example. Both the standalone coatings.json template and the whole-game bundle
+// entry. Template/wording only — combat mechanics unchanged. tsc 142.
+// OTA-869 — Validate Game: dedupe identical findings before the report. checkStatBonuses reads
+// both `statBonus` (singular) and `statBonuses` (plural), so an item carrying a perk in both keys
+// emitted the SAME stat.unknown warning twice (read as two problems). A final pass collapses
+// issues identical in severity+code+section+message+id. Validation only — no content touched. tsc 142.
+// OTA-870 — Game SAVE no longer over-splits. The whole-game export writes/reads DEVICE FILES
+// (SAF + readAsStringAsync), never the clipboard/paste box, so the old 45 KB ceiling (sized for a
+// ~60 KB paste limit the file path never hits) needlessly fractured a 525 KB game into ~12 parts.
+// Raised SAFE_PART_CHARS to 750 KB → a normal game exports as ONE file. Knit-on-upload is
+// size-agnostic, so old multi-part saves still load. Export/IO only — no content touched. tsc 142.
+// OTA-871 — Validate Game: recipe-ingredient findings now aggregate per UNIQUE material instead of
+// one line per recipe usage. The same material referenced by 20 recipes used to print 20 near-
+// identical warnings, burying the report (209 warnings for ~38 real materials). Now it's one line
+// per material with a "needed by N recipe(s)" note — the count reflects the real punch-list. The
+// fix is per-material anyway (define once → all recipes work). Validation only — no content. tsc 142.
+// OTA-872 — surface inert consumable effects + document the effect schema. A gear/exploration item
+// whose `effect` block uses fields the eat/use handler doesn't read (e.g. {stat,amount,duration})
+// passes the existence check but is silently dead on use — the validator now warns (item.effect.
+// inert / unknownfield / buffstat / buffpartial). The GEAR template note now enumerates the real
+// fields (healHP/restoreStamina/buffStat+buffBonus+buffDuration/curePoison/…). Engine-side error
+// surfacing + template doc only — no engine behavior bent to content, no content edited. tsc 142.
+// OTA-873 — data-driven generic vendors + vendorsEnabled / vendorsAppendGeneric toggles. The five
+// generic vendors (Weaponsmith/Armorer/Quartermaster/Supplier/Trader) are now SAMPLED from the
+// loaded weapons/armor/gear/materials at spawn, so they only sell items that exist — no hardcoded
+// names, no dangling refs (the old GENERIC_VENDORS pointed at "Trail Rations" etc.). vendorsEnabled
+// off → no merchants spawn (hub/capital/roadside). vendorsAppendGeneric → an uploaded Vendors table
+// ADDS to the generic five instead of replacing them. Generic demo hub anchor retargeted from the
+// retired "Quartermaster Vael" to the storefront's "the Quartermaster". Full toggle plumbing +
+// dev-console cards + whole-game template entries. tsc 142.
+// OTA-874 — Validate Game now checks RESOLVED content + flags template placeholders. Several
+// reference checks read override-only getters, so OMITTING a section silenced the validator while
+// runtime fell back to the installed GENERIC default — which could reference items/factions the
+// author's catalog replaced. Hooks, Wasteland, Summons, and Dog scenarios now validate the resolved
+// (override → generic) content (they return null when no generic is installed, so no built-in-Tartaria
+// flood). Vendors/roadside stay override-only because OTA-873 made their generic fallback data-driven
+// (always valid). New section.placeholder check: any loaded section still carrying a "REPLACE-…"
+// placeholder (template scaffolding promoted to a real override on a bundle round-trip) is flagged
+// to customize or delete. Validation only — no content edited. tsc 142.
+// OTA-875 — generic vendor/roadside names genericized + roadside made data-driven. Vendor names are
+// now plain roles: Weapons Dealer (weapons.json), Blacksmith (armor.json), Quartermaster (gear),
+// Supplier (materials.json), General Trader (mixed). The ROADSIDE pool was still hardcoded (Road
+// Hawker selling "Trail Rations" → phantom in a custom catalog); now buildGenericRoadside() samples
+// its pools from the loaded catalog too — Roadside Vendor (honest) + Black-Market Fence (sketchy),
+// pulled from gear/materials/weapons/armor, respecting the append/replace + enabled toggles. Generic
+// demo hub anchor → "Quartermaster". No content baked — wares derive from whatever catalog loads. tsc 142.
+// OTA-876 — round-trip guard: re-uploading your own annotated export no longer promotes
+// un-customized TEMPLATE sections into broken overrides. The whole-game export bakes the template
+// scaffold into every ⬜ section the author hasn't customized, and the ⬜/✅ markers are comments
+// (stripped on load) — so re-uploading reinstated the placeholder vendors ("Maren the Trader") and
+// roadside ("Road Hawker") selling items the custom catalog lacks, every single round. loadGameBundle
+// now drops any section whose value still equals its template (via bundleTemplateMap) → treated as
+// "not uploaded" → built-in/generic default. An all-template (blank) bundle still loads OK. Load-path
+// only — no content edited. tsc 142.
+// OTA-877 — round-trip guard now SELF-HEALS on launch. OTA-876 stripped baked template sections on
+// bundle UPLOAD, but a state already persisted from a bad re-upload still carried them — so updating
+// the app without re-uploading left the placeholder vendors in place. The strip (dropBakedTemplate-
+// Sections, shared by loadGameBundle + hydrate) now also runs on hydrate, so the next launch drops
+// any persisted section that still equals its template → reverts to the default with no re-upload.
+// Load/hydrate path only — no content edited. tsc 142.
+// OTA-878 — player-side resist/weak now scales incoming HP damage. The combat audit found enemy
+// resist/weak applied a real ×1.5/×0.5 HP multiplier (applyDamageTypeModifier) but the PLAYER side
+// only modulated on-hit-effect CHANCE — a content-pack race/faction that "resists burn" still took
+// full burn HP. The enemy→player damage path now reads playerRaceFactionResists and applies weak
+// ×1.5 / resist ×0.5 to the HP loss (mirroring the enemy side), stacking after armor/title/race.
+// The 3 hardcoded Tartaria-race multipliers stay. Combat wiring only — no content edited. tsc 142.
+// OTA-879 — player damage-type onHit DEBUFFS now affect enemies ("easier to hit"). The audit found
+// a weapon's onHit stat debuff (cold −DEX, dimensional −WIS) only applied enemy→player — enemies
+// have no stats, so a player throwing a debuff grenade did nothing to the target. On a landed typed
+// hit, the engine now translates the onHit debuff magnitude into a TIMED "exposed" AC reduction on
+// the enemy for onHitRounds (reusing the existing buildCombatSteps acReduction path that acid-shred
+// uses), so subsequent attacks land more often, then it ticks down and expires. New 'exposed' enemy
+// status + EnemyPanel badge. Design picked by the author (AC penalty vs miss/damage). tsc 142.
+// OTA-880 — Tartaria→Philly combat parity, engine-side (no content authored). (1) The 10 BUILT-IN
+// damage types now carry DEFAULT combat blocks (on_hit/dot) + onHit debuffs (BUILTIN_DT_DEFAULTS in
+// contentPack), so a game on the built-in catalog gets the same bidirectional typed-damage procs +
+// the OTA-879 'exposed' debuff that author-defined types get; an uploaded damageTypes entry still
+// overrides. (2) STAT-ALIAS map (equipment.canonicalStatKey): constitution→hp, acrobatics→dexterity,
+// investigation/aetheria→intelligence, perception→wisdom, etc. — revives the ~100 silently-dropped
+// armor stat bonuses and applies at every stat-read + the validator. (3) DT alias (canonicalDamage-
+// Type): force/psychic→aetheric, frost→cold, shock→electrical — off-catalog type words stop being
+// inert. Balancing pass to follow. tsc 142; combat/equipment/validator/leak suites green (73).
+// OTA-881 — combat BALANCE pass on the OTA-880 default type procs (3-agent balancing review). (1)
+// DOT family was overtuned (refresh-to-full-uptime → 24-49% of a healthbar for free): burn/poison
+// 1d4×3@0.6 → ×2@0.45; radiation 1d4×4@0.7 → ×3@0.45; electrical/aetheric on_hit 1d6 → 1d4 @0.45.
+// (2) Enemy→player: the default procs no longer silently tax the player off an INFERRED type — the
+// onHit stat-debuff is skipped entirely for bare-dice enemies, and the damage proc fires at 0.4×
+// chance when inferred; only EXPLICITLY-typed enemies get the full proc/debuff. (3) stun debuff now
+// 2 rounds, aetheric debuff −2 WIS → −2 DEX (a combat stat) @1 round. (4) effectiveStats floored at
+// 1 so stacked debuffs can't zero a roll stat. Values only + one gate — tsc 142; suites green (73).
+export const OTA_BUILD_ID = '2026-06-25-881';

@@ -181,7 +181,7 @@ export function KeyboardInputBar() {
           value={text}
           onChangeText={setText}
           placeholder="What do you do?"
-          placeholderTextColor="#c9a86a"
+          placeholderTextColor="#6ab0c9"
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
           autoFocus
@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: 8,
     paddingVertical: 6,
-    backgroundColor: '#0a0908',
-    borderTopColor: '#3a342c',
+    backgroundColor: '#0a1012',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
   },
   row: {
@@ -216,20 +216,20 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 4,
     fontSize: 14,
   },
   send: {
-    backgroundColor: '#3a342c',
+    backgroundColor: '#2b3a3e',
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 4,
   },
-  sendText: { color: '#e6d8b3', fontWeight: '700' },
+  sendText: { color: '#d6e4e8', fontWeight: '700' },
 });

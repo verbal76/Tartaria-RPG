@@ -65,11 +65,16 @@ export interface AppliedEffect {
 export function rollIncomingStatusEffect(
   damageType: string | null | undefined,
   existing: readonly StatusEffect[],
+  // engine_Dev — scales the proc chance by the PLAYER's relationship to the type:
+  // <1 when the player RESISTS it (armor/race/faction/potion — much lower chance to
+  // suffer the effect), >1 when WEAK to it. 1 = no buff either way (full base chance).
+  chanceMultiplier = 1,
 ): AppliedEffect | null {
   if (!damageType) return null;
   const rule = TYPE_TO_EFFECT[damageType.toLowerCase()];
   if (!rule) return null;
-  if (Math.random() >= rule.procChance) return null;
+  const chance = Math.max(0, Math.min(0.95, rule.procChance * chanceMultiplier));
+  if (Math.random() >= chance) return null;
 
   const isNew = !existing.some((e) => e.kind === rule.kind);
   const newEffect: StatusEffect = {
@@ -146,6 +151,8 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   'ready', 'surprised', 'fighting_back', 'quick_fire',
   'stealthed', 'shielded', 'shaped_stone_ward', 'power_attack_pending',
   'defensive_stance', 'distracted',
+  // engine_Dev — a drunk coating's resist lasts "the rest of the fight".
+  'resist_buff',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 

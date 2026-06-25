@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   pill: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 999,
     paddingHorizontal: 12,
@@ -62,5 +62,5 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   pillPressed: { opacity: 0.7 },
-  pillText: { color: '#c9a86a', fontSize: 10, fontWeight: '800', letterSpacing: 2 },
+  pillText: { color: '#6ab0c9', fontSize: 10, fontWeight: '800', letterSpacing: 2 },
 });

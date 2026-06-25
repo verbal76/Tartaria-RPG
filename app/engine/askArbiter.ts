@@ -21,6 +21,7 @@
 // embed + cached cosine sweep).
 
 import { loadLoreConceptBank, formatArbiterAnswer, type LoreConcept } from './loreConceptBank';
+import { getNarratorName } from './contentPack';
 
 const LORE_MATCH_THRESHOLD = 0.45;
 
@@ -117,7 +118,7 @@ export function extractLoreQuery(rawText: string): string {
 }
 
 /** Default fallback line when no concept hits the threshold. */
-export const ARBITER_SILENT_LINE = 'The Arbiter is silent on that. The name does not surface in the lore.';
+export const ARBITER_SILENT_LINE = `The ${getNarratorName()} is silent on that. The name does not surface in the lore.`;
 
 export { formatArbiterAnswer };
 

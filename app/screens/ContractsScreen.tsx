@@ -1,26 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
+import { findHuntById, getHunts, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
-import { findMysteryById, MYSTERIES } from '../engine/mysteries';
-import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
-import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
-import { FACTIONS } from '../engine/factions';
+import { findMysteryById, getMysteries } from '../engine/mysteries';
+import { findStorylineById, getStorylines } from '../engine/factionStorylines';
+import { findFactionQuestById, getFactionQuests, factionQuestReady } from '../engine/factionQuests';
+import { findFaction } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
-import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
+import { computeAllProgress, getCharacterStories, allFragments } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
-import {
-  ensureMainQuest,
-  phaseLabel,
-  phaseHint,
-  LOST_CAPITAL_LOCATIONS,
-  coreGateNextAction,
-} from '../engine/mainQuest';
-import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
 function MilestoneStat({
   label,
@@ -56,16 +48,16 @@ function MilestoneStat({
 
 const milestoneStyles = StyleSheet.create({
   cell: { flex: 1, alignItems: 'center', paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: 'transparent' },
-  cellActive: { borderColor: '#c9a86a', backgroundColor: '#1a1714' },
-  value: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
-  label: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
-  next: { color: '#7a705c', fontSize: 9, marginTop: 2, textAlign: 'center' },
+  cellActive: { borderColor: '#6ab0c9', backgroundColor: '#131c1f' },
+  value: { color: '#6ab0c9', fontSize: 18, fontWeight: '700' },
+  label: { color: '#bcd2db', fontSize: 11, letterSpacing: 1 },
+  next: { color: '#6c8088', fontSize: 9, marginTop: 2, textAlign: 'center' },
   tapHint: { color: '#5a5448', fontSize: 8, marginTop: 1, letterSpacing: 1 },
 });
 
 function factionLabel(factionId: string | null | undefined): string {
   if (!factionId) return 'Unaffiliated';
-  const f = FACTIONS.find((x) => x.id === factionId);
+  const f = findFaction(factionId);
   return f?.name ?? factionId.replace(/_/g, ' ');
 }
 
@@ -115,6 +107,7 @@ export function ContractsScreen() {
     null | 'enemies' | 'travels' | 'checks' | 'npcs'
   >(null);
   const worldMemory = useGameStore((s) => s.worldMemory);
+  const currentScene = useGameStore((s) => s.currentScene);
   // arb99 — same "?" numbering the atlas + map rows use, so a whisper's SET COURSE
   // block here shows the same number as its mark on the map.
   const questionNumbers = questionMarkerNumbers(worldMemory);
@@ -237,7 +230,7 @@ export function ContractsScreen() {
 
   const progress = computeAllProgress(player.collectables ?? []);
   const totalFragmentsFound = progress.reduce((acc, p) => acc + p.found.length, 0);
-  const totalFragments = ALL_FRAGMENTS.length;
+  const totalFragments = allFragments().length;
 
   return (
     <View style={styles.container}>
@@ -265,171 +258,120 @@ export function ContractsScreen() {
         // player can see which Cores are recovered, which Guardians
         // they've attempted, and which Capitals are still untouched.
         if (!player) return null;
-        const mq = ensureMainQuest(player.mainQuest);
-        const recoveredCount = mq.coresRecovered.length;
-        const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(
-          (acc, e) => {
-            if (e.kind === 'mq_guardian_fled' && e.locationId) {
-              acc[e.locationId] = (acc[e.locationId] ?? 0) + 1;
-            }
-            return acc;
-          },
-          {},
-        );
-        // OTA-148 — SUMMON chip eligibility. Shows when the player
-        // is standing in an unrecovered Lost Capital with the main
-        // quest active. Pre-OTA-148, summoning the Guardian required
-        // taking the faction-gate verb (attack/diplomacy/salvage/…)
-        // at the Capital, which the player had no way to discover
-        // post-revive when the Guardian had been wiped from the
-        // scene. Tap the chip → store fires the same spawn pipeline
-        // and bounces back to exploration.
-        // OTA-412 — only while STANDING ON the capital's anchor tile.
-        // currentLocationId lingers as the capital after a cardinal step into the
-        // wilderness; gating on it alone left the SUMMON chip live miles outside
-        // the city. Mirror isStationedAtNamedLocation (the summon action enforces
-        // the same — summonCoreGuardian → not_at_capital).
+        // engine_Dev — the Primary Objective card mirrors the exploration chip: a
+        // DATA-DRIVEN main quest (uploaded) drives it; a re-skin with no custom quest
+        // shows a neutral line; only the genuine built-in game shows the Tartaria
+        // cores/capitals card below. (Without this the card leaked Tartaria into every
+        // re-skin — "the primary objective is all still tartaria".)
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
-        const stationedAtCapital = !player.travelTarget
-          && (player.hubRoomId != null || (player.mapX === cx && player.mapY === cy));
-        const atCapitalForSummon =
-          stationedAtCapital
-          && (mq.phase === 'revelation' || mq.phase === 'cores')
-          && LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
-          && !mq.coresRecovered.includes(player.currentLocationId);
+        const cmq = require('../engine/customMainQuest') as typeof import('../engine/customMainQuest');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+        const customQ = cmq.liveMainQuest();
+        if (customQ) {
+          const complete = cmqe.questIsComplete(player);
+          const total = customQ.steps.length;
+          const activeIdx = cmqe.effectiveStepIndex(player);
+          const done = Math.max(0, Math.min(activeIdx, total));
+          const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
+          const objLine = complete ? 'Complete.' : (cmqe.currentObjectiveLine(player) ?? 'No active objective.');
+          // engine_Dev — restore the tap-to-expand ROUTE TO drop-down for the
+          // DATA-DRIVEN main quest. The custom-quest card had regressed to a static
+          // View (no expansion, no route buttons); mirror the built-in Capitals
+          // tracker so each objective with a location offers a travel course.
+          // id → name honors an uploaded Locations table.
+          const locNameById = new Map(cmq.mainQuestLocations().map((l) => [l.id, l.name] as const));
+          // engine_Dev — SUMMON chip for the active KILL step. The kill-step boss
+          // auto-spawns on arrival, but a death-revive / scene rebuild clears it; the
+          // chip lets the player re-engage from here (the same affordance the old
+          // built-in Core-Guardian SUMMON gave, now pointed at the data-driven boss).
+          // Show only while STANDING at the boss's location with no copy already in
+          // the scene; the summon action re-checks the same preconditions.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { WORLD_MAP_CENTER_X: scx, WORLD_MAP_CENTER_Y: scy } = require('../engine/worldMap');
+          const stationedHere = !player.travelTarget
+            && (player.hubRoomId != null || (player.mapX === scx && player.mapY === scy));
+          const bossHere = !complete && stationedHere ? cmqe.questBossAt(player, player.currentLocationId) : null;
+          const bossInScene = !!bossHere && (currentScene?.enemies ?? []).some(
+            (e) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
+          );
+          const canSummonBoss = !!bossHere && !bossInScene;
+          return (
+            <TouchableOpacity
+              style={styles.mainQuestCard}
+              onPress={() => setMqExpanded((v) => !v)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
+              <Text style={styles.mainQuestPhase}>{title}</Text>
+              <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
+              {canSummonBoss && (
+                <TouchableOpacity
+                  style={styles.summonChip}
+                  onPress={() => useGameStore.getState().summonMainQuestBoss()}
+                  activeOpacity={0.7}
+                  hitSlop={6}
+                >
+                  <Text style={styles.summonChipText}>★ SUMMON {bossHere.name.toUpperCase()}</Text>
+                </TouchableOpacity>
+              )}
+              {mqExpanded && (
+                <View style={styles.mqTracker}>
+                  <Text style={styles.mqTrackerHead}>
+                    {total} OBJECTIVES · STEP {Math.min(activeIdx + 1, total)}/{total}
+                  </Text>
+                  <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
+                    {customQ.steps.map((step, i) => {
+                      // Skip steps gated out for this player's faction — the engine
+                      // skips them too, so they aren't objectives this character has.
+                      if (!cmqe.stepApplies(step, player)) return null;
+                      const locId = step.locationId;
+                      const lName = locId ? (locNameById.get(locId) ?? locId) : null;
+                      const isActive = i === activeIdx && !complete;
+                      const isDone = complete || i < activeIdx;
+                      const here = !!locId && player.currentLocationId === locId;
+                      const color = isDone ? '#7a8a5a' : isActive ? '#6ab0c9' : '#6c8088';
+                      const status = isDone ? '✓ done' : isActive ? '○ current objective' : '· upcoming';
+                      const rowContent = (
+                        <>
+                          <Text style={styles.mqTrackerCap}>{i + 1}. {cmq.describeStep(step)}</Text>
+                          <Text style={[styles.mqTrackerStatus, { color }]}>{status}</Text>
+                          {locId && (here
+                            ? <Text style={styles.routeHereNote}>▸ You're at {lName}.</Text>
+                            : <Text style={styles.mqTrackerTap}>▸ tap to travel to {lName}</Text>
+                          )}
+                        </>
+                      );
+                      if (!locId || here) {
+                        return <View key={step.id ?? `step${i}`} style={styles.mqTrackerRow}>{rowContent}</View>;
+                      }
+                      return (
+                        <TouchableOpacity
+                          key={step.id ?? `step${i}`}
+                          style={styles.mqTrackerRow}
+                          activeOpacity={0.7}
+                          onPress={() => setPendingRoute({ id: locId, name: lName ?? locId })}
+                        >
+                          {rowContent}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                  <Text style={styles.mqTrackerFoot}>
+                    Tap any objective with a location to start travel.
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        }
+        // engine_Dev — no data-driven quest loaded (built-in Tartaria main quest
+        // was removed): show a neutral card pointing the author at the dev console.
         return (
-          <TouchableOpacity
-            style={styles.mainQuestCard}
-            onPress={() => setMqExpanded((v) => !v)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
-            <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
-            <Text style={styles.mainQuestHint}>{phaseHint(mq.phase, recoveredCount)}</Text>
-            {(() => {
-              // v2.4.1 (OTA 035) — when the player is standing at an
-              // unrecovered Lost Capital, surface the faction's
-              // next-action prompt as a second hint line.
-              if (mq.phase !== 'revelation' && mq.phase !== 'cores') return null;
-              const here = player.currentLocationId;
-              if (!LOST_CAPITAL_LOCATIONS.includes(here)) return null;
-              if (mq.coresRecovered.includes(here)) return null;
-              const next = coreGateNextAction(player.factionId);
-              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
-            })()}
-            {atCapitalForSummon && (
-              <TouchableOpacity
-                style={styles.summonChip}
-                onPress={() => useGameStore.getState().summonCoreGuardian()}
-                activeOpacity={0.7}
-                hitSlop={6}
-              >
-                <Text style={styles.summonChipText}>★ SUMMON</Text>
-              </TouchableOpacity>
-            )}
-            {mqExpanded && (
-              <View style={styles.mqTracker}>
-                <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
-                {/* arb148 — the Primary Objective card sits in the FIXED region
-                    above the tabs/scroll, so the expanded 9-Capital list pushed
-                    the bottom Capital half off-screen. Cap it and let the rows
-                    scroll internally (nestedScroll) so all nine are reachable. */}
-                <ScrollView style={styles.mqTrackerScroll} nestedScrollEnabled>
-                {LOST_CAPITAL_LOCATIONS.map((capId) => {
-                  const def = GUARDIANS_BY_CAPITAL[capId];
-                  const recovered = mq.coresRecovered.includes(capId);
-                  const guardianDown = (mq.guardiansDefeated ?? []).includes(capId);
-                  const here = player.currentLocationId === capId;
-                  const fleeCount = fledByCapital[capId] ?? 0;
-                  let status: string;
-                  let color: string;
-                  if (recovered) {
-                    status = '✓ Core recovered';
-                    color = '#7a8a5a';
-                  } else if (guardianDown) {
-                    status = '✓ Guardian down — return to claim Core';
-                    color = '#c9a86a';
-                  } else if (fleeCount > 0) {
-                    status = `△ Guardian fought, fled ${fleeCount}× — return to finish`;
-                    color = '#a85a3a';
-                  } else if (here) {
-                    status = '○ At this Capital now';
-                    color = '#c9a86a';
-                  } else {
-                    status = '· not yet visited';
-                    color = '#7a705c';
-                  }
-                  const capName = def?.capitalName ?? capId;
-                  // 2026-05-24 — rows are now tappable to start a
-                  // travel-to course (mirrors Lore→Places). The row
-                  // for the player's current Capital stays a plain
-                  // View since you can't travel to where you are.
-                  const rowContent = (
-                    <>
-                      <Text style={styles.mqTrackerCap}>{capName}</Text>
-                      <Text style={[styles.mqTrackerStatus, { color }]}>{status}</Text>
-                      <Text style={styles.mqTrackerGuardian}>
-                        Guardian: {def?.base.name ?? '—'}
-                      </Text>
-                      {!here && (
-                        <Text style={styles.mqTrackerTap}>▸ tap to travel</Text>
-                      )}
-                    </>
-                  );
-                  if (here) {
-                    return (
-                      <View key={capId} style={styles.mqTrackerRow}>{rowContent}</View>
-                    );
-                  }
-                  return (
-                    <TouchableOpacity
-                      key={capId}
-                      style={styles.mqTrackerRow}
-                      activeOpacity={0.7}
-                      onPress={() => setPendingRoute({ id: capId, name: capName })}
-                    >
-                      {rowContent}
-                    </TouchableOpacity>
-                  );
-                })}
-                </ScrollView>
-                <Text style={styles.mqTrackerFoot}>
-                  Tap any Capital row above to start travel.
-                </Text>
-              </View>
-            )}
-            {mq.phase === 'choice' && (
-              <View style={styles.mainQuestChoiceRow}>
-                <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.mainQuestChoiceText}>SEAL</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.mainQuestChoiceText}>UNLEASH</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
-                  onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {mq.phase === 'ended' && mq.ending && (
-              <Text style={styles.mainQuestEnded}>
-                Ending recorded: {mq.ending.toUpperCase()}.
-              </Text>
-            )}
-          </TouchableOpacity>
+          <View style={styles.mainQuestCard}>
+            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+            <Text style={styles.mainQuestHint}>No main quest set — build one in the dev console.</Text>
+          </View>
         );
       })()}
 
@@ -500,7 +442,7 @@ export function ContractsScreen() {
                 FIRST KILLS  ·  {(worldMemory.defeatedEnemies ?? []).length} unique
               </Text>
               {(worldMemory.defeatedEnemies ?? []).length === 0 ? (
-                <Text style={styles.milestoneDetailEmpty}>No kills yet. The buried world waits.</Text>
+                <Text style={styles.milestoneDetailEmpty}>No kills yet.</Text>
               ) : (
                 (worldMemory.defeatedEnemies ?? []).map((name) => (
                   <Text key={name} style={styles.milestoneDetailRow}>· {name}</Text>
@@ -568,8 +510,8 @@ export function ContractsScreen() {
               mystery / storyline / quest to pick one up.
             </Text>
             <Text style={styles.emptySub}>
-              {HUNTS.length} hunts · {MYSTERIES.length} mysteries ·
-              {' '}{STORYLINES.length} storylines · {FACTION_QUESTS.length} faction quests
+              {getHunts().length} hunts · {getMysteries().length} mysteries ·
+              {' '}{getStorylines().length} storylines · {getFactionQuests().length} faction quests
               available in the world.
             </Text>
           </View>
@@ -1162,7 +1104,7 @@ function cap(s: string): string {
 // the discovery hint as a teaser.
 function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
   const [openId, setOpenId] = useState<string | null>(null);
-  if (CHARACTER_STORIES.length === 0) {
+  if (getCharacterStories().length === 0) {
     return (
       <View style={styles.emptyInline}>
         <Text style={styles.emptyTitle}>No collectibles authored yet.</Text>
@@ -1236,8 +1178,8 @@ const styles = StyleSheet.create({
   // signal the main quest visually distinct from the per-faction
   // contracts below.
   mainQuestCard: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1.5,
     borderRadius: 4,
     padding: 12,
@@ -1252,39 +1194,39 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
   summonChipText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1.5,
   },
   mainQuestTag: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
     marginBottom: 4,
   },
   mainQuestPhase: {
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 4,
   },
   mainQuestHint: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 12,
     lineHeight: 18,
   },
   mainQuestNextAction: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 12,
     lineHeight: 18,
     marginTop: 4,
@@ -1298,20 +1240,20 @@ const styles = StyleSheet.create({
   },
   mainQuestChoiceBtn: {
     flex: 1,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 10,
     alignItems: 'center',
   },
   mainQuestChoiceText: {
-    color: '#e6d8b3',
+    color: '#d6e4e8',
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '700',
   },
   mainQuestEnded: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 11,
     fontStyle: 'italic',
     marginTop: 6,
@@ -1322,7 +1264,7 @@ const styles = StyleSheet.create({
   mqTracker: {
     marginTop: 10,
     paddingTop: 8,
-    borderTopColor: '#3a342c',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
   },
   // arb148 — cap the expanded Capital list to ~42% of the screen and scroll it
@@ -1331,54 +1273,54 @@ const styles = StyleSheet.create({
     maxHeight: Math.round(Dimensions.get('window').height * 0.42),
   },
   mqTrackerHead: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     letterSpacing: 2,
     marginBottom: 6,
   },
   mqTrackerRow: {
     paddingVertical: 5,
-    borderBottomColor: '#1a1714',
+    borderBottomColor: '#131c1f',
     borderBottomWidth: 1,
   },
-  mqTrackerCap: { color: '#e6d8b3', fontSize: 12, fontWeight: '700' },
+  mqTrackerCap: { color: '#d6e4e8', fontSize: 12, fontWeight: '700' },
   mqTrackerStatus: { fontSize: 11, marginTop: 1 },
-  mqTrackerGuardian: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
-  mqTrackerFoot: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
+  mqTrackerGuardian: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
+  mqTrackerFoot: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
   // 2026-05-24 — tap hint + confirm-modal styles for Capital
   // tap-to-travel. Visual language mirrors LoreCodexBody's modal.
   mqTrackerTap: { color: '#9ec96a', fontSize: 10, fontStyle: 'italic', letterSpacing: 1, marginTop: 2 },
   routeScrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  routeCard: { width: '100%', maxWidth: 380, backgroundColor: '#13110f', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 16 },
-  routeTitle: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  routeRule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 12 },
-  routeBody: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 16 },
+  routeCard: { width: '100%', maxWidth: 380, backgroundColor: '#0e1618', borderColor: '#6ab0c9', borderWidth: 1, borderRadius: 4, padding: 16 },
+  routeTitle: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  routeRule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 12 },
+  routeBody: { color: '#d6e4e8', fontSize: 13, lineHeight: 18, marginBottom: 16 },
   routeBtnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
-  routeBtnNeutral: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: '#3a342c', backgroundColor: 'transparent' },
-  routeBtnPrimary: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: '#c9a86a', backgroundColor: '#1a1714' },
-  routeBtnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  routeBtnTextPrimary: { color: '#c9a86a', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  routeBtnNeutral: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: '#2b3a3e', backgroundColor: 'transparent' },
+  routeBtnPrimary: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: '#6ab0c9', backgroundColor: '#131c1f' },
+  routeBtnTextNeutral: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  routeBtnTextPrimary: { color: '#6ab0c9', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   // v2.4.1 (OTA 052) — milestone cell tap-expand detail.
   milestoneDetail: {
     marginTop: 8,
     paddingTop: 6,
     paddingBottom: 4,
-    borderTopColor: '#3a342c',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
   },
   milestoneDetailHead: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 10,
     letterSpacing: 2,
     marginBottom: 4,
   },
   milestoneDetailRow: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 11,
     marginVertical: 1,
   },
   milestoneDetailEmpty: {
-    color: '#7a705c',
+    color: '#6c8088',
     fontSize: 11,
     fontStyle: 'italic',
   },
@@ -1389,18 +1331,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     width: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#d6e4e8', letterSpacing: 4, fontSize: 14 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
   emptyWrap: {
     flex: 1,
     justifyContent: 'center',
@@ -1412,25 +1354,25 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
   },
-  emptyTitle: { color: '#c9a86a', fontSize: 16, fontWeight: '700', letterSpacing: 2, marginBottom: 8 },
-  emptyBody: { color: '#cdbf99', fontSize: 13, textAlign: 'center', lineHeight: 19, marginBottom: 16 },
-  emptySub: { color: '#7a705c', fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
+  emptyTitle: { color: '#6ab0c9', fontSize: 16, fontWeight: '700', letterSpacing: 2, marginBottom: 8 },
+  emptyBody: { color: '#bcd2db', fontSize: 13, textAlign: 'center', lineHeight: 19, marginBottom: 16 },
+  emptySub: { color: '#6c8088', fontSize: 11, textAlign: 'center', fontStyle: 'italic' },
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   section: { marginBottom: 14 },
   sectionTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '700',
     marginBottom: 6,
     paddingBottom: 4,
-    borderBottomColor: '#3a342c',
+    borderBottomColor: '#2b3a3e',
     borderBottomWidth: 1,
   },
   card: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 10,
@@ -1442,7 +1384,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     marginBottom: 2,
   },
-  cardTitle: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', flex: 1, marginRight: 8 },
+  cardTitle: { color: '#d6e4e8', fontSize: 13, fontWeight: '700', flex: 1, marginRight: 8 },
   // arb100 — the contract's atlas-pin number, inline before the title. Teal "◆"
   // matches the map pin so a card and its mark read the same.
   contractBadge: { color: '#54d6c4', fontWeight: '900' },
@@ -1463,29 +1405,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#d8a43a',
     borderColor: '#d8a43a',
   },
-  cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
+  cardFaction: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
   // 2026-05-26 OTA-055 — difficulty chip below location, color-coded
   // vs player state. Same green / amber / red traffic light the rest
   // of the game uses.
   difficultyChip: { fontSize: 11, marginBottom: 6, letterSpacing: 0.5, fontWeight: '700' },
   difficultyChipReady: { color: '#9ec96a' },
-  difficultyChipMarginal: { color: '#c9a86a' },
+  difficultyChipMarginal: { color: '#6ab0c9' },
   difficultyChipDangerous: { color: '#e07a5f' },
-  cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
-  cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
-  cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
-  cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
-  whispersBlurb: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
+  cardBody: { color: '#bcd2db', fontSize: 12, lineHeight: 17 },
+  cardHint: { color: '#6ab0c9', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
+  cardStageLabel: { color: '#6ab0c9', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
+  cardStageBody: { color: '#d6e4e8', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  whispersBlurb: { color: '#6c8088', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
   cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
   // OTA 020 — expanded contract card styles.
-  expanded: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#3a342c' },
-  expandedLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
-  expandedBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
-  expandedStage: { color: '#7a705c', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
-  expandedStageHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', lineHeight: 14, paddingLeft: 4, marginBottom: 6, letterSpacing: 0.5 },
+  expanded: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#2b3a3e' },
+  expandedLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
+  expandedBody: { color: '#bcd2db', fontSize: 12, lineHeight: 17 },
+  expandedStage: { color: '#6c8088', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
+  expandedStageHint: { color: '#6ab0c9', fontSize: 10, fontStyle: 'italic', lineHeight: 14, paddingLeft: 4, marginBottom: 6, letterSpacing: 0.5 },
   expandedStageDone: { color: '#9ec96a', textDecorationLine: 'line-through' },
-  expandedStageCurrent: { color: '#c9a86a', fontWeight: '700' },
+  expandedStageCurrent: { color: '#6ab0c9', fontWeight: '700' },
   completeBtn: {
     marginTop: 10,
     backgroundColor: '#9ec96a',
@@ -1494,7 +1436,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   completeBtnPressed: { opacity: 0.7 },
-  completeBtnText: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
+  completeBtnText: { color: '#0e1618', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
   // OTA-458 — ROUTE TO TURN-IN button. Outlined parchment-blue, distinct from
   // the filled-green COMPLETE and the warning-red ABANDON; sits above both.
   routeBtn: {
@@ -1525,18 +1467,18 @@ const styles = StyleSheet.create({
   discardBtn: {
     marginTop: 10,
     backgroundColor: 'transparent',
-    borderColor: '#7a705c',
+    borderColor: '#6c8088',
     borderWidth: 1,
     borderRadius: 3,
     paddingVertical: 10,
     alignItems: 'center',
   },
-  discardBtnText: { color: '#7a705c', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
-  milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
+  discardBtnText: { color: '#6c8088', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  milestoneRow: { flexDirection: 'row', backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, padding: 10 },
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderBottomWidth: 1,
   },
   tabBtn: {
@@ -1546,13 +1488,13 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     borderBottomWidth: 2,
   },
-  tabBtnActive: { borderBottomColor: '#c9a86a' },
-  tabBtnText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
-  tabBtnTextActive: { color: '#c9a86a' },
-  collectIntro: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  tabBtnActive: { borderBottomColor: '#6ab0c9' },
+  tabBtnText: { color: '#6c8088', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  tabBtnTextActive: { color: '#6ab0c9' },
+  collectIntro: { color: '#bcd2db', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   collectCard: { marginBottom: 8 },
   completePill: {
-    color: '#13110f',
+    color: '#0e1618',
     backgroundColor: '#9ec96a',
     fontSize: 10,
     letterSpacing: 1,
@@ -1563,23 +1505,23 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderRadius: 2,
     marginTop: 6,
     overflow: 'hidden',
   },
-  progressFill: { height: 4, backgroundColor: '#c9a86a' },
+  progressFill: { height: 4, backgroundColor: '#6ab0c9' },
   fragmentList: { marginTop: 10, gap: 8 },
   fragmentRow: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     padding: 8,
   },
-  fragTitleFound: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
-  fragTitleMissing: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, fontStyle: 'italic', marginBottom: 4 },
-  fragBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17 },
-  fragHint: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
+  fragTitleFound: { color: '#6ab0c9', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
+  fragTitleMissing: { color: '#6ab0c9', fontSize: 11, fontWeight: '700', letterSpacing: 1, fontStyle: 'italic', marginBottom: 4 },
+  fragBody: { color: '#d6e4e8', fontSize: 12, lineHeight: 17 },
+  fragHint: { color: '#6c8088', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
   completeBanner: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700', marginTop: 4 },
 });

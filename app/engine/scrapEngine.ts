@@ -11,6 +11,33 @@
 // roughly one common dig.
 
 import type { InventoryItem } from './types';
+import { resolveScrap, resolveTable } from './contentPack';
+import scrapData from '../data/scrap/scrap.json';
+import materialsData from '../data/items/materials.json';
+
+// engine_Dev — the live materials pool (author override → built-in). Drives both
+// the "is this already raw stock?" guard and the random-material scrap fallback,
+// so an UNRECOGNIZED item yields a REAL material name pulled from the data file —
+// never an invented one.
+interface MaterialRow { name: string; rarity?: string; tags?: string[] }
+function allMaterials(): MaterialRow[] {
+  return resolveTable('materials', (materialsData as { materials: MaterialRow[] }).materials) as MaterialRow[];
+}
+
+// engine_Dev — the scrap DATA (material roles, raw guards, premium mats, failure
+// lines) is now app/data/scrap/scrap.json and author-uploadable; the tag→material
+// RULES stay below. Resolved override → generic default → built-in.
+interface ScrapRoles {
+  metalBulk: string; metalPremium: string; essencePrimary: string; essenceSecondary: string;
+  essenceBonus: string; stone: string; mud: string; cloth: string; organic: string; wood: string;
+}
+interface ScrapConfig {
+  roles: ScrapRoles;
+  rawGuard: string[];
+  premiumMats: string[];
+  failureLines: string[];
+}
+function scfg(): ScrapConfig { return resolveScrap(scrapData as unknown as ScrapConfig); }
 
 export interface ScrapOutput {
   /** Materials granted to the player. */
@@ -22,36 +49,111 @@ export interface ScrapOutput {
 /** True if the item can be scrapped — weapons, armor, relics, and
  *  durable gear all qualify. Materials (`misc` / `consumable`) are
  *  already stock and refuse scrapping. */
-export function canScrap(item: InventoryItem): boolean {
-  // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
-  // bound to the character until the final act. Block scrap up
-  // front so the player can't accidentally feed a Core to the
-  // forge.
+/** Is this item already raw stock — a material itself (present in the resolved
+ *  materials pool) or a declared scrap output (rawGuard)? Such items can't be
+ *  broken down into themselves, so scrap refuses them with "it already IS stock
+ *  material". */
+export function isStockMaterial(item: InventoryItem): boolean {
+  const lc = item.name.toLowerCase();
+  if (allMaterials().some((m) => m.name.toLowerCase() === lc)) return true;
+  return scfg().rawGuard.some((n) => n.toLowerCase() === lc);
+}
+
+/** Does this item have a real, TAG-DRIVEN scrap output (recognized gear)? This is
+ *  the original canScrap rule set — weapons/armor/relics + material-tagged misc.
+ *  When false, the item is unrecognized and scrap rolls a random material from the
+ *  pool instead (randomMaterialScrap). */
+export function hasTagScrapOutput(item: InventoryItem): boolean {
   if ((item.tags ?? []).includes('quest')) return false;
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
-  // Some gear (compass, torch, rope) carries useful base materials —
-  // allow scrap as long as the item isn't a raw commodity.
-  // OTA-191 — 'improvised' added to the gate so misc items the
-  // OTA-191 inferGear default-tags as improvised (no specific material
-  // keyword in the name) still pass the scrap predicate. scrapOutputFor
-  // already routes 'improvised' to Small Rock; this just keeps the
-  // gate consistent with the output table.
+  // OTA-191 — 'improvised' keeps misc items inferGear default-tags pass the gate.
   if (item.kind === 'misc' && (item.tags ?? []).some((t) =>
     /metal|wood|stone|aether|crystal|fiber|cloth|plate|scaled|improvised|organic/i.test(t),
   )) {
-    // Materials with these tags already ARE the scrap output — refuse
-    // to scrap them into themselves.
-    const rawNames = new Set([
-      'Scrap Metal', 'Stick', 'Small Rock', 'Big Rock', 'Patched Cloth',
-      'Spider Silk', 'Aether Crystal', 'Aetheric Shard', 'Aether Residue',
-      'Mud Fragment', 'Aether Mud',
-      // OTA-443 — the higher-tier mats scrap now produces are stock too, so a
-      // player can't scrap them back into a loop (Golem Core → Scrap Metal …).
-      'Golem Core', 'Mudstone', 'Aether Dust',
-    ]);
-    return !rawNames.has(item.name);
+    return !new Set(scfg().rawGuard).has(item.name);
   }
   return false;
+}
+
+export function canScrap(item: InventoryItem): boolean {
+  // v2.4.1 (OTA 052) — quest items (main-quest keys etc.) are bound to the
+  // character until the final act. Block scrap up front so the player can't
+  // accidentally feed one to the forge.
+  if ((item.tags ?? []).includes('quest')) return false;
+  // Raw stock — a material itself or a declared scrap output — can't be broken
+  // down further. (Keeps "already IS stock material" accurate and stops a
+  // material→material money pump.)
+  if (isStockMaterial(item)) return false;
+  // engine_Dev — everything else scraps. Recognized gear yields its tag-driven
+  // output (scrapOutputFor); anything the engine DOESN'T recognize still yields a
+  // random material from the pool (randomMaterialScrap), so no author item ever
+  // dead-ends at "nothing to break down".
+  return true;
+}
+
+/** Is this name a real material in the resolved pool? */
+function isRealMaterial(name: string): boolean {
+  const lc = name.toLowerCase();
+  return allMaterials().some((m) => m.name.toLowerCase() === lc);
+}
+
+// engine_Dev — anti-repeat memory for random material picks. Consecutive scraps
+// shouldn't keep handing out the same material; we avoid the last few picks and
+// only allow a repeat once the (Common) pool is exhausted. Runtime-only.
+let recentMats: string[] = [];
+const RECENT_MAT_MEMORY = 3;
+
+/** RNG-roll a single material NAME from the resolved pool, preferring Common rarity
+ *  and avoiding the last few awarded (so a run of scraps doesn't repeat). Pulls real
+ *  names from the (author-overridable) materials JSON — never invents one. Returns
+ *  null only when no materials are defined at all. */
+export function pickRandomMaterial(): string | null {
+  const all = allMaterials();
+  if (all.length === 0) return null;
+  const common = all.filter((m) => (m.rarity ?? 'Common') === 'Common');
+  const base = common.length > 0 ? common : all;
+  let choices = base.filter((m) => !recentMats.includes(m.name));
+  if (choices.length === 0) choices = base; // whole pool is recent — allow a repeat
+  const pick = choices[Math.floor(Math.random() * choices.length)]!.name;
+  recentMats.push(pick);
+  if (recentMats.length > RECENT_MAT_MEMORY) recentMats.shift();
+  return pick;
+}
+
+/** The scrap yield for an UNRECOGNIZED item — one random (Common, non-repeating)
+ *  material from the pool. Common-only keeps it cheap so scrapping a stack of
+ *  rations can't be laundered into high-value mats. */
+export function randomMaterialScrap(): ScrapOutput {
+  const pick = pickRandomMaterial();
+  if (!pick) {
+    // No materials defined at all — basic stone so the click isn't wasted.
+    return { grants: [{ name: scfg().roles.stone, quantity: 1 }], summary: scfg().roles.stone };
+  }
+  return { grants: [{ name: pick, quantity: 1 }], summary: pick };
+}
+
+/** Ensure every grant names a REAL material in the current game's pool. A built-in
+ *  role default (Stick / Small Rock / Scrap Metal …) that THIS game's materials JSON
+ *  doesn't define is swapped for a random real material — so scrap never hands out an
+ *  item the game doesn't actually use ("don't give me Stick and Rock unless they're
+ *  real items here"). No-op for the built-in game, where every role material exists.
+ *  De-dupes and rebuilds the summary; keeps quantities. */
+export function realizeScrapOutput(output: ScrapOutput): ScrapOutput {
+  if (allMaterials().length === 0) return output; // nothing to map onto
+  let changed = false;
+  const merged = new Map<string, number>();
+  for (const g of output.grants) {
+    let name = g.name;
+    if (!isRealMaterial(name)) {
+      const sub = pickRandomMaterial();
+      if (sub) { name = sub; changed = true; }
+    }
+    merged.set(name, (merged.get(name) ?? 0) + g.quantity);
+  }
+  if (!changed) return output;
+  const grants = Array.from(merged.entries()).map(([name, quantity]) => ({ name, quantity }));
+  const summary = grants.map((g) => (g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)).join(', ');
+  return { grants, summary };
 }
 
 /** OTA-443 — scrap output scales with the scrapped item's rarity. A
@@ -81,6 +183,7 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   const grants: Array<{ name: string; quantity: number }> = [];
   const rb = rarityScrapBonus(item.rarity);
   const half = Math.floor(rb / 2);
+  const role = scfg().roles; // role → material name (data-driven)
   // Metal content → Scrap Metal (the bulk), and on a Rare+ metal piece a
   // GOLEM CORE — the Iron-Golem bottleneck — since a high-grade metal
   // construct plausibly carries one. Representative: only metal gear.
@@ -91,12 +194,12 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // non-improvised weapon) still give it.
   const isMetalTagged = tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade');
   if (isMetalTagged || (item.kind === 'weapon' && !tags.has('improvised'))) {
-    grants.push({ name: 'Scrap Metal', quantity: 2 + rb });
+    grants.push({ name: role.metalBulk, quantity: 2 + rb });
     // OTA-611 — the Golem Core (Iron-Golem bottleneck) drops ONLY from a
     // genuinely metal-tagged piece, never the broad weapon-kind fallback. A
     // Rare+ non-metal weapon (bone/aether/plasma) — or any fused weapon, which
     // is now selfCrafted and strip-guarded — no longer mints the scarce Core.
-    if (rb >= 2 && isMetalTagged) grants.push({ name: 'Golem Core', quantity: 1 });
+    if (rb >= 2 && isMetalTagged) grants.push({ name: role.metalPremium, quantity: 1 });
   }
   // Aether content → Aetheric Shard + Aether Crystal (golem fuel), plus
   // Aether Dust (the most-demanded recipe staple, otherwise unforageable) on
@@ -110,36 +213,36 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // (e.g. Voidspawn Bolt) and still qualify; mundane relics fall through to
   // the basic-material fallback, so scrapping one is a loss, not a profit.
   if (tags.has('aether') || tags.has('crystal')) {
-    grants.push({ name: 'Aetheric Shard', quantity: 2 + half });
-    grants.push({ name: 'Aether Crystal', quantity: 1 });
-    if (rb >= 1) grants.push({ name: 'Aether Dust', quantity: 1 });
+    grants.push({ name: role.essencePrimary, quantity: 2 + half });
+    grants.push({ name: role.essenceSecondary, quantity: 1 });
+    if (rb >= 1) grants.push({ name: role.essenceBonus, quantity: 1 });
   }
   // Stone heads → Small Rock.
   if (tags.has('stone') || tags.has('mudstone') || tags.has('improvised')) {
-    grants.push({ name: 'Small Rock', quantity: 2 + half });
+    grants.push({ name: role.stone, quantity: 2 + half });
   }
   // OTA-447 — MUDSTONE (Mud-Golem fuel) from ANY muddy gear, independent of the
   // stone branch. Pre-fix the Mudstone bonus was nested inside the stone check,
   // so a `mud`-but-not-stone piece (e.g. a Mud-Rend Blade tagged metal/mud/blade)
   // scrapped without it — the mud-tag path was effectively dead.
   if (tags.has('mud') || tags.has('mudstone')) {
-    grants.push({ name: 'Mudstone', quantity: 1 });
+    grants.push({ name: role.mud, quantity: 1 });
   }
   // Cloth / fiber → Patched Cloth, and SPIDER SILK (a 7-recipe fiber) from
   // organic gear.
   if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || item.kind === 'armor') {
-    grants.push({ name: 'Patched Cloth', quantity: 2 + half });
-    if (tags.has('organic')) grants.push({ name: 'Spider Silk', quantity: 1 });
+    grants.push({ name: role.cloth, quantity: 2 + half });
+    if (tags.has('organic')) grants.push({ name: role.organic, quantity: 1 });
   }
   // Wooden handle / haft → Stick (secondary on weapons; capped at 60 anyway).
   if (tags.has('wood') || tags.has('haft') || item.kind === 'weapon') {
-    grants.push({ name: 'Stick', quantity: 1 + half });
+    grants.push({ name: role.wood, quantity: 1 + half });
   }
   // Fallback — every scrap should give SOMETHING, otherwise the
   // player wasted the click. A bare misc gives a Stick + Small Rock.
   if (grants.length === 0) {
-    grants.push({ name: 'Stick', quantity: 1 + half });
-    grants.push({ name: 'Small Rock', quantity: 2 + half });
+    grants.push({ name: role.wood, quantity: 1 + half });
+    grants.push({ name: role.stone, quantity: 2 + half });
   }
   // De-dupe — if both "weapon" and "metal" tags pushed Scrap Metal,
   // collapse to a single grant rather than 2.
@@ -159,14 +262,14 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // unflagged and scraps in FULL — the intended loot→scrap→golem-feed loop is
   // untouched.
   if (item.selfCrafted) {
-    const PREMIUM = new Set(['Golem Core', 'Aetheric Shard', 'Aether Crystal', 'Aether Dust', 'Mudstone']);
+    const PREMIUM = new Set(scfg().premiumMats);
     const trimmed = finalGrants
       .filter((g) => !PREMIUM.has(g.name))
       .map((g) => ({ name: g.name, quantity: Math.floor(g.quantity / 2) }))
       .filter((g) => g.quantity > 0);
     // Always return SOMETHING so the scrap click isn't wasted — a single
     // Small Rock if the halving zeroed everything out.
-    finalGrants = trimmed.length > 0 ? trimmed : [{ name: 'Small Rock', quantity: 1 }];
+    finalGrants = trimmed.length > 0 ? trimmed : [{ name: role.stone, quantity: 1 }];
   }
   const summary = finalGrants
     .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
@@ -184,7 +287,12 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
  *  such items. */
 export function repairCostMaterials(item: InventoryItem): Array<{ name: string; quantity: number }> {
   const out = scrapOutputFor(item);
-  return out.grants.map((g) => ({ name: g.name, quantity: g.quantity * 2 }));
+  // engine_Dev — repair material cost = scrap yield × the configurable factor
+  // (default 2.0 = 200%). A re-skin can make repairs cheaper/dearer via the
+  // inventory override's repairMaterialPct.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factor = (require('./contentPack') as typeof import('./contentPack')).getRepairMaterialFactor();
+  return out.grants.map((g) => ({ name: g.name, quantity: Math.max(1, Math.round(g.quantity * factor)) }));
 }
 
 // OTA 23-014 — salvage isn't a free repeatable click anymore.
@@ -216,20 +324,14 @@ export function scrapHasSecondChance(intStat: number, dexStat: number): boolean 
  *  random-uniform so a player who fails several times in a row gets
  *  visibly different lines each time. `{item}` is substituted with
  *  the item name at pick time. */
-export const SCRAP_FAILURE_LINES: readonly string[] = [
-  "You work the {item} apart, but the pieces crumble in your hands — rust-rotted through. Nothing salvageable.",
-  "Wrong angle, wrong tool, wrong something. The {item} won't yield clean parts. You toss the scraps aside.",
-  "You try your best, but the {item}'s been salt-eaten too long. Anything useful disintegrates on the bench.",
-  "The {item} comes apart, sure — but the bits are warped past use. Pile it on the scrap heap.",
-  "Too far gone. You wrench the {item} open and find only powdered rot inside. Nothing to keep.",
-  "Your hands slip twice on the {item} and the housing splits the wrong way. Whatever was inside crumbles.",
-  "The {item} was already half-eaten by something before you found it. You strip it bare. There's nothing.",
-  "You break the {item} down to its bones and the bones are hollow. A long-dead Reclaimer beat you to anything worth keeping.",
-  "Pry, twist, pry again — the {item} fights you and wins. You force it open and the contents puff out as grey dust.",
-  "You'd swear the {item} was solid. It isn't. The whole thing collapses into a brittle handful of nothing.",
-];
+/** The built-in failure lines (from the data file). The live picker reads the
+ *  resolved config; this stays for callers/tests that want the default set. */
+export const SCRAP_FAILURE_LINES: readonly string[] = (scrapData as unknown as ScrapConfig).failureLines;
 
 export function pickScrapFailureLine(itemName: string): string {
-  const tpl = SCRAP_FAILURE_LINES[Math.floor(Math.random() * SCRAP_FAILURE_LINES.length)]!;
+  const lines = scfg().failureLines;
+  const tpl = lines.length > 0
+    ? lines[Math.floor(Math.random() * lines.length)]!
+    : 'The {item} crumbles to nothing on the bench.';
   return tpl.replace(/\{item\}/g, itemName);
 }

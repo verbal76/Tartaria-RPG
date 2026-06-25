@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { stampLogExport } from '../diagnostics/aboutSummary';
+import { getGameTitle } from '../engine/contentPack';
 
 // OTA 024 — chunk size for the chunked-copy path. 25 KB is well
 // under the silent-truncation limit of the strictest common chat
@@ -104,7 +105,7 @@ export function LogScreen() {
     // OTA-101 — appends buildBasicDeviceSummary via stampLogExport.
     const stamped = stampLogExport(fresh);
     try {
-      await Share.share({ message: stamped, title: 'Tartaria-RPG game log' });
+      await Share.share({ message: stamped, title: `${getGameTitle()} game log` });
       setShared(true);
       setTimeout(() => setShared(false), 1500);
     } catch {
@@ -177,8 +178,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -186,30 +187,30 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
-  scroll: { flex: 1, backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 8 },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#d6e4e8', letterSpacing: 4, fontSize: 14 },
+  scroll: { flex: 1, backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, padding: 8 },
   content: { paddingBottom: 24 },
-  body: { color: '#cdbf99', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 11, lineHeight: 16 },
+  body: { color: '#bcd2db', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 11, lineHeight: 16 },
   btnRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
   copyBtn: {
     flex: 2,
-    backgroundColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
     borderRadius: 4,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  copyText: { color: '#0a1012', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
   shareBtn: {
     flex: 1,
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 12,
     alignItems: 'center',
   },
-  shareText: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  shareText: { color: '#6ab0c9', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
   // OTA 024 — chunk button. Distinct color from COPY/SHARE so
   // the player notices the new path; sits below the main button
   // row only when the log is large enough to need chunking.
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
   },
-  chunkText: { color: '#0a0908', fontSize: 12, fontWeight: '800', letterSpacing: 1.5, textAlign: 'center' },
+  chunkText: { color: '#0a1012', fontSize: 12, fontWeight: '800', letterSpacing: 1.5, textAlign: 'center' },
   writeFailure: {
     color: '#e07a5f',
     fontSize: 11,

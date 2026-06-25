@@ -135,7 +135,7 @@ const sealedVaultPuzzle: PuzzleDefinition = {
     return direction === expected ? 'correct' : 'wrong';
   },
   intro:
-    'You set your hand on the locking ring. The Tartarian tumbler reads cold — three rotations in the right order. The faint markings line the rim above the ring; if you can read them you can solve it.',
+    'You set your hand on the locking ring. The old tumbler reads cold — three rotations in the right order. The faint markings line the rim above the ring; if you can read them you can solve it.',
   attemptLine: ({ result, correctSoFar, sequenceLength, direction }) => {
     if (result === 'correct') {
       const ordinal = ['first', 'second', 'third'][correctSoFar - 1] ?? `${correctSoFar}th`;

@@ -25,6 +25,7 @@
 // FirstTimeHint. This is just a doc, not the play loop.
 
 import type { ScreenName } from '../engine/types';
+import { getNarratorName } from '../engine/contentPack';
 
 export type HighlightArea =
   // World screen regions (the main exploration view — the player's
@@ -87,38 +88,38 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Your Name',
     body: 'Speak your name. Type it below, then tap ACT — or hit Enter on the keyboard.',
     arbiter:
-      'The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."',
+      'The {narrator} looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
     id: 'cudgel',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
-    title: 'Take the Cudgel',
-    body: 'Tap TAKE in the quick-action row to pick up the cudgel at your feet.',
+    title: 'Take the Weapon',
+    body: 'Tap TAKE in the quick-action row to pick up the {weapon} at your feet.',
     arbiter:
-      '"A cudgel, by your boots. Tap TAKE. You\'ll want a weapon."',
+      '"A {weapon}, by your boots. Tap TAKE. You\'ll want a weapon."',
   },
   {
     id: 'rope',
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
-    draftText: 'take rope',
+    draftText: 'take {rope}',
     title: 'Take the Rope',
-    body: 'Tartaria takes typed input too. The input below is pre-filled with "take rope". Tap Act to grab it.',
+    body: 'This game takes typed input too. The input below is pre-filled — tap Act to grab the {rope}.',
     arbiter:
-      '"Now the rope, on the shelf. This time, type it. I\'ve written the command. Tap ACT."',
+      '"Now the {rope}. This time, type it. I\'ve written the command. Tap ACT."',
   },
   {
     id: 'scrap',
     screen: 'exploration',
     area: 'quick-row',
     pulse: true,
-    title: 'Salvage the Broken Plate',
-    body: 'That broken chest plate has nothing left in it. Tap SALVAGE to break it down for parts.',
+    title: 'Salvage for Parts',
+    body: 'That {armor} is worth more in pieces. Tap SALVAGE to break it down for parts.',
     arbiter:
-      '"That broken plate is worth more in pieces. Tap SALVAGE."',
+      '"That {armor} is worth more in pieces. Tap SALVAGE."',
   },
   {
     id: 'climb',
@@ -153,7 +154,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'exploration',
     area: 'fullscreen',
     title: 'The Door Is Open',
-    body: 'The outpost door stands open. Explore what remains, or head out and begin your journey.',
+    body: 'The door stands open. Explore what remains, or head out and begin your journey.',
     arbiter:
       '"The way\'s open. Pick this place over, or step out and begin. Your call."',
   },
@@ -163,7 +164,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'objective-chip',
     pulse: true,
     title: 'Your Main Quest',
-    body: 'The road leads to the Aetheric Cores the Guardians protect. Tap the MAIN QUEST objective chip to open your contracts.',
+    body: 'Your main quest is your through-line. Tap the MAIN QUEST objective chip to open your contracts.',
     arbiter:
       '"Nine Cores, nine Guardians, nine Lost Capitals. That\'s the road. Tap MAIN QUEST to start."',
   },
@@ -172,9 +173,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'contracts',
     area: 'fullscreen',
     title: 'Choose a Capital',
-    body: 'Tap the primary objective box at the top to open the list of nine Capitals, then choose one. Any works — distance varies, but the Aether marks the road.',
+    body: 'Tap the primary objective box at the top to open your quest objectives, then choose where to head next.',
     arbiter:
-      '"Tap the objective box up top. Pick a Capital; the Aether marks the road."',
+      '"Tap the objective box up top. Pick your next objective."',
   },
 ];
 
@@ -185,7 +186,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
   {
     screen: 'exploration',
     area: 'fullscreen',
-    title: 'Welcome to Tartaria',
+    title: 'Welcome',
     body:
       'Your character is set. Before you dive in — would you like a quick tour of the screens? ' +
       'Two minutes; you can skip any time.',
@@ -217,7 +218,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     area: 'top-right-enemy',
     title: 'Enemy panel / Crest',
     body:
-      'Out of combat this shows the Tartaria crest. In combat the panel becomes one card per enemy ' +
+      'Out of combat this shows the game crest. In combat the panel becomes one card per enemy ' +
       '(swipe or tap to cycle targets) with their HP, AC, attack bonus, damage dice, and whether ' +
       'they\'re in range of your equipped weapon. ' +
       '\n\nThe ⚙ gear in the bottom-right corner is your settings/lore/session hub — we\'ll see it.',
@@ -252,7 +253,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     title: 'The world feed',
     body:
       'Every event lands here as a colored line: world description, your actions, combat rolls, ' +
-      'Arbiter remarks, rewards, system hints. Scroll to look back at anything you missed.',
+      `${getNarratorName()} remarks, rewards, system hints. Scroll to look back at anything you missed.`,
   },
   {
     screen: 'exploration',
@@ -291,7 +292,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     body:
       'There are 9 Lost Capitals on the map. Each holds a Core — the prize the main quest is ' +
       'built around — but every Core is guarded by a Core Guardian: a one-of-nine boss from the ' +
-      'Aether-Born Order, a semi-religious sub-faction that exists only to keep the buried world ' +
+      'a guardian order, a semi-religious sub-faction that exists only to keep the buried world ' +
       'from being woken.' +
       '\n\nDefeat them to get the Core PLUS a unique signature weapon + signature armor (the ' +
       'Core Guardian Set — 18 unique pieces across the 9 Capitals).',
@@ -311,9 +312,9 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     area: 'fullscreen',
     title: 'You\'re set.',
     body:
-      'Tartaria is procedural — every move resolves something, even if it\'s just dust. ' +
+      'This world is procedural — every move resolves something, even if it\'s just dust. ' +
       'When in doubt: tap "look around you" for full bearings, then search or approach the ' +
-      'nouns in the chips. Ask the Arbiter ("ask about X"), "what city is north of me", ' +
+      `nouns in the chips. Ask the ${getNarratorName()} ("ask about X"), "what city is north of me", ` +
       '"closest hub", and rest when you need to. Good hunting.',
   },
 ];

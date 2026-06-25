@@ -1,25 +1,229 @@
 {
   "_comment": "OTA-232 — ingested verbatim from Arbiter_Assigned_Titles_for_Players.docx. The 20 titles the Arbiter may confer on a player. Stored as lore today (surfaced to Qwen so the Arbiter knows the titles exist and can foreshadow them in narration). A future OTA can wire the requirements to runtime trackers + perks to mechanical effects; this file is the canonical source either way.",
   "titles": [
-    { "id": "seeker_of_lost_relics", "title": "Seeker of Lost Relics", "requirement": "Discover three Tartarian relics", "perk": "+2 to Investigation when dealing with ancient artifacts.", "tags": ["relic", "discovery", "investigation"] },
-    { "id": "aetheric_attuned", "title": "Aetheric Attuned", "requirement": "Survive a direct encounter with an Etheric anomaly", "perk": "Once per day, gain temporary resistance to Etheric damage for 3 rounds.", "tags": ["etheric", "anomaly", "survival", "resistance"] },
-    { "id": "protector_of_the_forgotten", "title": "Protector of the Forgotten", "requirement": "Successfully defend a True Tartarian settlement from invaders", "perk": "+1 to Defense when fighting in defense of settlements or relics.", "tags": ["true tartarian", "defense", "settlement"] },
-    { "id": "architects_eye", "title": "Architect's Eye", "requirement": "Repair or restore a piece of ancient Tartarian architecture", "perk": "+2 to Engineering or Repair skills when dealing with ancient structures.", "tags": ["repair", "architecture", "engineering"] },
-    { "id": "etherbound_survivor", "title": "Etherbound Survivor", "requirement": "Survive an Etheric storm", "perk": "Once per day, reroll a failed saving throw against environmental hazards.", "tags": ["etheric storm", "survival", "saving throw"] },
-    { "id": "golem_whisperer", "title": "Golem Whisperer", "requirement": "Successfully control an Aether Golem", "perk": "Once per encounter, temporarily disable an Aether Golem.", "tags": ["golem", "aether", "control"] },
-    { "id": "shadow_diver", "title": "Shadow Diver", "requirement": "Complete three dives into Tartarian ruins without triggering traps", "perk": "+1 to Stealth and the ability to bypass one trap per dive.", "tags": ["ruins", "stealth", "traps", "dive"] },
-    { "id": "aetherborn_awakened", "title": "Aetherborn Awakened", "requirement": "Unlock the latent powers of an Aetherborn character", "perk": "Once per day, activate a powerful Etheric surge to enhance movement or strength for 2 rounds.", "tags": ["aetherborn", "awakening", "surge"] },
-    { "id": "scholar_of_forgotten_lore", "title": "Scholar of Forgotten Lore", "requirement": "Decipher three pieces of ancient Tartarian text", "perk": "+2 to Lore or History checks when studying ancient civilizations.", "tags": ["scholar", "lore", "history", "decipher"] },
-    { "id": "bane_of_sentinels", "title": "Bane of Sentinels", "requirement": "Defeat five Architectural Sentinels", "perk": "Once per day, deal an extra damage die against mechanical foes.", "tags": ["sentinel", "combat", "mechanical"] },
-    { "id": "relic_trader", "title": "Relic Trader", "requirement": "Successfully barter or trade five Tartarian relics", "perk": "+2 to Persuasion when negotiating trades involving relics.", "tags": ["trade", "barter", "persuasion", "relic"] },
-    { "id": "etheric_explorer", "title": "Etheric Explorer", "requirement": "Lead an expedition deep into unexplored Tartarian ruins", "perk": "+1 to Leadership when guiding a party through ruins or unknown terrain.", "tags": ["explorer", "expedition", "leadership"] },
-    { "id": "scion_of_the_giants", "title": "Scion of the Giants", "requirement": "Prove direct descent from the Tartarian Giants", "perk": "+2 to Charisma when dealing with factions that respect the Tartarian legacy.", "tags": ["giants", "lineage", "charisma"] },
-    { "id": "survivor_of_aetherstone", "title": "Survivor of Aetherstone", "requirement": "Survive prolonged exposure to Aetherstone", "perk": "Gain advantage on Constitution checks against Etheric corruption or radiation.", "tags": ["aetherstone", "corruption", "constitution"] },
-    { "id": "wayfarer_of_the_lost_paths", "title": "Wayfarer of the Lost Paths", "requirement": "Navigate through the Labyrinth of Shadows without getting lost", "perk": "Once per day, instantly determine the correct path in a complex environment.", "tags": ["labyrinth", "navigation", "wayfarer"] },
-    { "id": "master_of_aethercraft", "title": "Master of Aethercraft", "requirement": "Successfully create or enhance an Aether Golem", "perk": "Once per encounter, temporarily enhance a summoned Aether Golem's abilities.", "tags": ["aethercraft", "golem", "summon"] },
-    { "id": "warden_of_the_old_world", "title": "Warden of the Old World", "requirement": "Preserve an ancient Tartarian relic or building from destruction", "perk": "+1 to all Defense rolls when in or around ancient ruins.", "tags": ["warden", "preservation", "old world"] },
-    { "id": "speaker_of_forgotten_tongues", "title": "Speaker of Forgotten Tongues", "requirement": "Learn to fluently speak the ancient Tartarian language", "perk": "Once per session, communicate with Tartarian machines or relics.", "tags": ["language", "tartarian", "speaker"] },
-    { "id": "stormcaller", "title": "Stormcaller", "requirement": "Survive or navigate through an Etheric storm and save a party member", "perk": "Once per day, create a small Etheric shield that deflects energy attacks.", "tags": ["storm", "shield", "rescue"] },
-    { "id": "guild_broker", "title": "Guild Broker", "requirement": "Successfully negotiate a truce or alliance between two factions", "perk": "+1 to Diplomacy and a reroll once per day when brokering peace or deals.", "tags": ["diplomacy", "alliance", "factions"] }
+    {
+      "id": "seeker_of_lost_relics",
+      "title": "Seeker of Lost Relics",
+      "requirement": "Discover three ancient relics",
+      "perk": "+2 to Investigation when dealing with ancient artifacts.",
+      "tags": [
+        "relic",
+        "discovery",
+        "investigation"
+      ]
+    },
+    {
+      "id": "arcane_attuned",
+      "title": "Arcane-Attuned",
+      "requirement": "Survive a direct encounter with an energy anomaly",
+      "perk": "Once per day, gain temporary resistance to energy damage for 3 rounds.",
+      "tags": [
+        "energy",
+        "anomaly",
+        "survival",
+        "resistance"
+      ]
+    },
+    {
+      "id": "protector_of_the_forgotten",
+      "title": "Protector of the Forgotten",
+      "requirement": "Successfully defend a settlement from invaders",
+      "perk": "+1 to Defense when fighting in defense of settlements or relics.",
+      "tags": [
+        "true ancient",
+        "defense",
+        "settlement"
+      ]
+    },
+    {
+      "id": "architects_eye",
+      "title": "Architect's Eye",
+      "requirement": "Repair or restore a piece of ancient architecture",
+      "perk": "+2 to Engineering or Repair skills when dealing with ancient structures.",
+      "tags": [
+        "repair",
+        "architecture",
+        "engineering"
+      ]
+    },
+    {
+      "id": "stormbound_survivor",
+      "title": "Stormbound Survivor",
+      "requirement": "Survive an energy storm",
+      "perk": "Once per day, reroll a failed saving throw against environmental hazards.",
+      "tags": [
+        "energy storm",
+        "survival",
+        "saving throw"
+      ]
+    },
+    {
+      "id": "sidekick_whisperer",
+      "title": "Sidekick Whisperer",
+      "requirement": "Successfully control an construct",
+      "perk": "Once per encounter, temporarily disable an construct.",
+      "tags": [
+        "construct",
+        "energy",
+        "control"
+      ]
+    },
+    {
+      "id": "shadow_diver",
+      "title": "Shadow Diver",
+      "requirement": "Complete three dives into ancient ruins without triggering traps",
+      "perk": "+1 to Stealth and the ability to bypass one trap per dive.",
+      "tags": [
+        "ruins",
+        "stealth",
+        "traps",
+        "dive"
+      ]
+    },
+    {
+      "id": "inner_awakening",
+      "title": "Awakened",
+      "requirement": "Unlock the latent powers of a latent power",
+      "perk": "Once per day, activate a powerful energy surge to enhance movement or strength for 2 rounds.",
+      "tags": [
+        "awakened",
+        "awakening",
+        "surge"
+      ]
+    },
+    {
+      "id": "scholar_of_forgotten_lore",
+      "title": "Scholar of Forgotten Lore",
+      "requirement": "Decipher three pieces of ancient text",
+      "perk": "+2 to Lore or History checks when studying ancient civilizations.",
+      "tags": [
+        "scholar",
+        "lore",
+        "history",
+        "decipher"
+      ]
+    },
+    {
+      "id": "bane_of_constructs",
+      "title": "Bane of Constructs",
+      "requirement": "Defeat five constructs",
+      "perk": "Once per day, deal an extra damage die against mechanical foes.",
+      "tags": [
+        "Construct",
+        "combat",
+        "mechanical"
+      ]
+    },
+    {
+      "id": "relic_trader",
+      "title": "Relic Trader",
+      "requirement": "Successfully barter or trade five ancient relics",
+      "perk": "+2 to Persuasion when negotiating trades involving relics.",
+      "tags": [
+        "trade",
+        "barter",
+        "persuasion",
+        "relic"
+      ]
+    },
+    {
+      "id": "far_explorer",
+      "title": "Far Explorer",
+      "requirement": "Lead an expedition deep into unexplored ancient ruins",
+      "perk": "+1 to Leadership when guiding a party through ruins or unknown terrain.",
+      "tags": [
+        "explorer",
+        "expedition",
+        "leadership"
+      ]
+    },
+    {
+      "id": "scion_of_the_giants",
+      "title": "Scion of the Giants",
+      "requirement": "Prove direct descent from the the old giants",
+      "perk": "+2 to Charisma when dealing with factions that respect the old legacy.",
+      "tags": [
+        "giants",
+        "lineage",
+        "charisma"
+      ]
+    },
+    {
+      "id": "survivor_of_the_stones",
+      "title": "Survivor of energy stone",
+      "requirement": "Survive prolonged exposure to energy stone",
+      "perk": "Gain advantage on Constitution checks against energy corruption or radiation.",
+      "tags": [
+        "energy stone",
+        "corruption",
+        "constitution"
+      ]
+    },
+    {
+      "id": "wayfarer_of_the_lost_paths",
+      "title": "Wayfarer of the Lost Paths",
+      "requirement": "Navigate through the a shifting labyrinth without getting lost",
+      "perk": "Once per day, instantly determine the correct path in a complex environment.",
+      "tags": [
+        "labyrinth",
+        "navigation",
+        "wayfarer"
+      ]
+    },
+    {
+      "id": "master_of_spellcraft",
+      "title": "Master of Spellcraft",
+      "requirement": "Successfully create or enhance an construct",
+      "perk": "Once per encounter, temporarily enhance a summoned construct's abilities.",
+      "tags": [
+        "spellcraft",
+        "construct",
+        "summon"
+      ]
+    },
+    {
+      "id": "warden_of_the_old_world",
+      "title": "Warden of the Old World",
+      "requirement": "Preserve an ancient relic or building from destruction",
+      "perk": "+1 to all Defense rolls when in or around ancient ruins.",
+      "tags": [
+        "warden",
+        "preservation",
+        "old world"
+      ]
+    },
+    {
+      "id": "speaker_of_forgotten_tongues",
+      "title": "Speaker of Forgotten Tongues",
+      "requirement": "Learn to fluently speak the ancient language",
+      "perk": "Once per session, communicate with ancient machines or relics.",
+      "tags": [
+        "language",
+        "ancient",
+        "speaker"
+      ]
+    },
+    {
+      "id": "stormcaller",
+      "title": "Stormcaller",
+      "requirement": "Survive or navigate through an energy storm and save a party member",
+      "perk": "Once per day, create a small energy shield that deflects energy attacks.",
+      "tags": [
+        "storm",
+        "shield",
+        "rescue"
+      ]
+    },
+    {
+      "id": "guild_broker",
+      "title": "Guild Broker",
+      "requirement": "Successfully negotiate a truce or alliance between two factions",
+      "perk": "+1 to Diplomacy and a reroll once per day when brokering peace or deals.",
+      "tags": [
+        "diplomacy",
+        "alliance",
+        "factions"
+      ]
+    }
   ]
 }

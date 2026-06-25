@@ -1,0 +1,3803 @@
+// engine_Dev — Developer / Content-Pack console. Paste-JSON upload boxes for every
+// content table and the three lore blocks (world / faction / race). Loading an
+// override reskins the engine without code changes; "Reset" drops back to the
+// built-in Tartaria pack. (Paste-JSON works on every platform with no native file
+// dependency; a real file picker can be layered on the web/desktop builds later.)
+
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform, type StyleProp, type TextStyle } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useGameStore } from '../state/gameStore';
+import { useContentPackStore, stripJsonComments, getStaleSectionKeys, type LoadResult } from '../state/contentPackStore';
+import {
+  CONTENT_TABLES,
+  LORE_BLOCKS,
+  tableOverrideCount,
+  hasTableOverride,
+  hasLoreOverride,
+  hasNarratorNameOverride,
+  hasGameTitleOverride,
+  hasGameTaglineOverride,
+  getWorldTone,
+  getNarratorName,
+  getGameTitle,
+  getGameTagline,
+  getCrucibleName,
+  hasCrucibleNameOverride,
+  getWorldName,
+  hasWorldNameOverride,
+  getCorruptionName,
+  hasCorruptionNameOverride,
+  getEnergyName,
+  hasEnergyNameOverride,
+  DEFAULT_NARRATOR_NAME,
+  DEFAULT_GAME_TITLE,
+  DEFAULT_CRUCIBLE_NAME,
+  DEFAULT_WORLD_NAME,
+  DEFAULT_CORRUPTION_NAME,
+  type ContentTableId,
+  type LoreBlockId,
+} from '../engine/contentPack';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
+import { validateGame, runValidation, summarizeValidation } from '../engine/validateGame';
+import { TRACKABLE_VARS } from '../engine/customTitles';
+import { MAIN_QUEST_ACTIONS, mainQuestLocations, describeStep, type MainQuestStep } from '../engine/customMainQuest';
+import { BOSS_SPAWN_CONDITIONS, mainQuestBosses, type CustomBoss } from '../engine/customBosses';
+import { getRaces, getFactions } from '../engine/character';
+import { OTA_BUILD_ID } from '../buildInfo';
+import { useCustomMusicStore } from '../state/customMusicStore';
+import { useCustomMapsStore } from '../state/customMapsStore';
+import { MAX_TRACKS_PER_CATEGORY, RECOMMENDED_AUDIO_SPECS, type MusicCategory } from '../audio/customMusic';
+
+/** Build a full content-pack diagnostic snapshot (store vs engine registry vs the
+ *  raw persisted blob) so a paste can pinpoint any desync. */
+async function buildContentDiagnostics(): Promise<string> {
+  const s = useContentPackStore.getState();
+  let rawPersisted = '(read failed)';
+  try { rawPersisted = (await AsyncStorage.getItem('tartaria.contentPack.v1')) ?? '(none)'; } catch { /* ignore */ }
+  const registry: Record<string, number> = {};
+  for (const t of CONTENT_TABLES) registry[t.id] = hasTableOverride(t.id) ? tableOverrideCount(t.id) : 0;
+  const diag = {
+    build: OTA_BUILD_ID,
+    hydrated: s.hydrated,
+    contentVersion: s.contentVersion,
+    devMode: s.devMode,
+    published: s.published,
+    store_tables: Object.fromEntries(Object.entries(s.tables).map(([k, v]) => [k, Array.isArray(v) ? v.length : `NON-ARRAY:${typeof v}`])),
+    store_lore: Object.keys(s.lore),
+    registry_counts: registry,
+    engine_reads: {
+      races: getRaces().map((r) => r.name),
+      factions: getFactions().map((f) => f.name),
+      narrator: getNarratorName(),
+      gameTitle: getGameTitle(),
+    },
+    persisted_blob_length: rawPersisted.length,
+    persisted_blob_head: rawPersisted.slice(0, 400),
+  };
+  return JSON.stringify(diag, null, 2);
+}
+
+type Status = { kind: 'ok' | 'err'; msg: string } | null;
+
+/** Generic single-line rename card (narrator name, game title, tagline). */
+function RenameBox({
+  title, hint, defaultLabel, active, isCustom, initial, placeholder, multiline, autoCapitalize, maxLength, onSave,
+}: {
+  title: string;
+  hint: string;
+  /** Shown in the badge + RESET copy as the fallback name. */
+  defaultLabel: string;
+  /** The currently-resolved value (after fallbacks). */
+  active: string;
+  isCustom: boolean;
+  /** The raw stored override text to seed the input. */
+  initial: string;
+  placeholder: string;
+  multiline?: boolean;
+  autoCapitalize?: 'none' | 'words' | 'sentences';
+  maxLength?: number;
+  onSave: (text: string) => void;
+}) {
+  const [text, setText] = useState(initial);
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={isCustom ? styles.badgeOn : styles.badgeOff}>
+          {isCustom ? '● custom' : '○ default'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <Text style={styles.toneLine}>Currently: “{active}”</Text>
+      <TextInput
+        style={[styles.input, !multiline && { minHeight: 0 }]}
+        value={text}
+        onChangeText={setText}
+        placeholder={placeholder}
+        placeholderTextColor="#46555a"
+        autoCapitalize={autoCapitalize ?? 'sentences'}
+        autoCorrect={false}
+        maxLength={maxLength ?? 60}
+        multiline={multiline}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            onSave(text);
+            const finalName = text.trim().length > 0 ? text.trim() : defaultLabel;
+            setStatus({ kind: 'ok', msg: `Saved — now “${finalName}”.` });
+          }}
+        >
+          <Text style={styles.loadBtnText}>SAVE</Text>
+        </TouchableOpacity>
+        {isCustom && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { onSave(''); setText(''); setStatus({ kind: 'ok', msg: 'Reset to default.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+function GameIdentitySection() {
+  const gameTitle = useContentPackStore((s) => s.gameTitle);
+  const gameTagline = useContentPackStore((s) => s.gameTagline);
+  const narratorName = useContentPackStore((s) => s.narratorName);
+  const setGameTitle = useContentPackStore((s) => s.setGameTitle);
+  const setGameTagline = useContentPackStore((s) => s.setGameTagline);
+  const setNarratorName = useContentPackStore((s) => s.setNarratorName);
+  const crucibleName = useContentPackStore((s) => s.crucibleName);
+  const crucibleEnabled = useContentPackStore((s) => s.crucibleEnabled);
+  const setCrucibleName = useContentPackStore((s) => s.setCrucibleName);
+  const setCrucibleEnabledFn = useContentPackStore((s) => s.setCrucibleEnabled);
+  const weatherEnabled = useContentPackStore((s) => s.weatherEnabled);
+  const setWeatherEnabledFn = useContentPackStore((s) => s.setWeatherEnabled);
+  const vendorsEnabled = useContentPackStore((s) => s.vendorsEnabled);
+  const setVendorsEnabledFn = useContentPackStore((s) => s.setVendorsEnabled);
+  const vendorsAppendGeneric = useContentPackStore((s) => s.vendorsAppendGeneric);
+  const setVendorsAppendGenericFn = useContentPackStore((s) => s.setVendorsAppendGeneric);
+  const hasVendorsOverride = useContentPackStore((s) => s.vendors.length > 0);
+  const worldName = useContentPackStore((s) => s.worldName);
+  const setWorldName = useContentPackStore((s) => s.setWorldName);
+  const corruptionName = useContentPackStore((s) => s.corruptionName);
+  const setCorruptionName = useContentPackStore((s) => s.setCorruptionName);
+  const energyName = useContentPackStore((s) => s.energyName);
+  const setEnergyName = useContentPackStore((s) => s.setEnergyName);
+  return (
+    <>
+      <Text style={styles.sectionLabel}>GAME</Text>
+      <RenameBox
+        title="Game name"
+        hint="Shown big under the icon on the start screen. Leave blank for the default."
+        defaultLabel={DEFAULT_GAME_TITLE}
+        active={getGameTitle()}
+        isCustom={hasGameTitleOverride()}
+        initial={gameTitle}
+        placeholder={DEFAULT_GAME_TITLE}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setGameTitle}
+      />
+      <RenameBox
+        title="Tagline"
+        hint="The line under the title. Auto-fills from your World lore’s “tagline” field once you upload one; set it here to override."
+        defaultLabel="the default"
+        active={getGameTagline()}
+        isCustom={hasGameTaglineOverride()}
+        initial={gameTagline}
+        placeholder={getGameTagline()}
+        autoCapitalize="sentences"
+        maxLength={120}
+        multiline
+        onSave={setGameTagline}
+      />
+
+      <Text style={styles.sectionLabel}>WORLD</Text>
+      <RenameBox
+        title="World name"
+        hint="The setting's proper noun. The built-in narration says “Tartaria” in dozens of lines (“…full of objects waiting to be remembered”); set yours and the engine swaps it everywhere the player reads it. In your JSON you can also write {world}. Leave blank to keep Tartaria."
+        defaultLabel={DEFAULT_WORLD_NAME}
+        active={getWorldName()}
+        isCustom={hasWorldNameOverride()}
+        initial={worldName}
+        placeholder={DEFAULT_WORLD_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setWorldName}
+      />
+      <RenameBox
+        title="Corruption / affliction name"
+        hint="The plague mechanic the engine calls “Corruption” (the stat that builds up and penalizes you). Rename it for your world — Phase-Sickness, Chronal Decay, Static-burn — and the word + the player-sheet label + the threshold lines all use it. In your JSON, write {corruption}. Rename the three tiers in the World-lore block: corruptionTiers: { tainted, corrupted, hollowed }."
+        defaultLabel={DEFAULT_CORRUPTION_NAME}
+        active={getCorruptionName()}
+        isCustom={hasCorruptionNameOverride()}
+        initial={corruptionName}
+        placeholder={DEFAULT_CORRUPTION_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setCorruptionName}
+      />
+      <RenameBox
+        title="Energy / magic name"
+        hint="What this world calls its “magic” / power source — renames the engine's built-in energy concept. Set yours (Vril, the Fold, Essence, Mana, Spice…) and it shows on the magic tab + everywhere the {energy} token is used. (For the full energy concept — adjective, material, slang, per-faction names — use the World-lore block's “energy” object; this just sets the name quickly.)"
+        defaultLabel="Magic"
+        active={getEnergyName()}
+        isCustom={hasEnergyNameOverride()}
+        initial={energyName}
+        placeholder="Magic"
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setEnergyName}
+      />
+
+      <Text style={styles.sectionLabel}>NARRATOR</Text>
+      <RenameBox
+        title="Narrator name"
+        hint="The voice that narrates the game — renamed everywhere the player sees or hears it, and in how the storyteller refers to itself. In your JSON, write {narrator} (or {arbiter}) in any line and it fills in this name."
+        defaultLabel={DEFAULT_NARRATOR_NAME}
+        active={getNarratorName()}
+        isCustom={hasNarratorNameOverride()}
+        initial={narratorName}
+        placeholder={DEFAULT_NARRATOR_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setNarratorName}
+      />
+
+      <Text style={styles.sectionLabel}>FEATURES</Text>
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Item fusion ({getCrucibleName()})</Text>
+          <Text style={crucibleEnabled ? styles.badgeOn : styles.badgeOff}>
+            {crucibleEnabled ? '● on' : '○ disabled'}
+          </Text>
+        </View>
+        <Text style={styles.hint}>
+          The fusion feature lets players reserve items and forge them into a unique piece — the
+          built-in “{DEFAULT_CRUCIBLE_NAME}”. Rename it for your world, or turn it off entirely if
+          your game has no item fusion (the chip, the vendor offer, and the fuse action all
+          disappear).
+        </Text>
+        <TouchableOpacity
+          style={[styles.applyBtn, !crucibleEnabled && styles.resetBtn]}
+          onPress={() => setCrucibleEnabledFn(!crucibleEnabled)}
+        >
+          <Text style={crucibleEnabled ? styles.applyBtnText : styles.resetBtnText}>
+            {crucibleEnabled ? `✓ ${getCrucibleName()} ENABLED — tap to DISABLE` : `✕ DISABLED — tap to ENABLE`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Weather</Text>
+          <Text style={weatherEnabled ? styles.badgeOn : styles.badgeOff}>
+            {weatherEnabled ? '● on' : '○ disabled'}
+          </Text>
+        </View>
+        <Text style={styles.hint}>
+          Weather presses on each scene — an atmosphere line plus mechanical pressure driven by
+          your Weather rows (visibility → harder to hit, travelPenalty → slower repositioning,
+          corruptionChance + tags → a per-action tick). Turn it off for a setting where weather
+          isn’t a mechanic: scenes get no weather line and no weather effects (your Weather table
+          can stay; it’s just dormant). Also settable per game as “weatherEnabled”: false in JSON.
+        </Text>
+        <TouchableOpacity
+          style={[styles.applyBtn, !weatherEnabled && styles.resetBtn]}
+          onPress={() => setWeatherEnabledFn(!weatherEnabled)}
+        >
+          <Text style={weatherEnabled ? styles.applyBtnText : styles.resetBtnText}>
+            {weatherEnabled ? '✓ WEATHER ENABLED — tap to DISABLE' : '✕ DISABLED — tap to ENABLE'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Vendors</Text>
+          <Text style={vendorsEnabled ? styles.badgeOn : styles.badgeOff}>
+            {vendorsEnabled ? '● on' : '○ disabled'}
+          </Text>
+        </View>
+        <Text style={styles.hint}>
+          Merchants the player meets — hub anchors, capital traders, and roadside stalls that roll
+          in during travel. With no Vendors uploaded, the game spawns five setting-neutral generic
+          vendors (Weaponsmith, Armorer, Quartermaster, Supplier, Trader) whose stock is pulled
+          live from YOUR weapons / armor / gear / materials, so they only ever sell items that
+          exist. Turn this off for a game with no merchants at all. Also settable per game as
+          “vendorsEnabled”: false in JSON.
+        </Text>
+        <TouchableOpacity
+          style={[styles.applyBtn, !vendorsEnabled && styles.resetBtn]}
+          onPress={() => setVendorsEnabledFn(!vendorsEnabled)}
+        >
+          <Text style={vendorsEnabled ? styles.applyBtnText : styles.resetBtnText}>
+            {vendorsEnabled ? '✓ VENDORS ENABLED — tap to DISABLE' : '✕ DISABLED — tap to ENABLE'}
+          </Text>
+        </TouchableOpacity>
+        {vendorsEnabled && (
+          <>
+            <Text style={[styles.hint, { marginTop: 10 }]}>
+              When YOU upload a Vendors table: {vendorsAppendGeneric
+                ? 'your vendors are ADDED alongside the five generic ones.'
+                : 'your vendors REPLACE the generic ones (only yours spawn).'} {hasVendorsOverride ? '' : '(No Vendors uploaded yet — the generic five are active.)'}
+            </Text>
+            <TouchableOpacity
+              style={[styles.applyBtn, !vendorsAppendGeneric && styles.resetBtn, { marginTop: 6 }]}
+              onPress={() => setVendorsAppendGenericFn(!vendorsAppendGeneric)}
+            >
+              <Text style={vendorsAppendGeneric ? styles.applyBtnText : styles.resetBtnText}>
+                {vendorsAppendGeneric ? '✓ ADD mine to the generic vendors' : '✕ REPLACE generic with mine'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+      <RenameBox
+        title="Fusion feature name"
+        hint="What the fusion station is called everywhere the player sees it (chip, vendor offer, narration). In your JSON, write {crucible} (or {fuse}) in any line and it fills in this name. Leave blank for “Crucible”."
+        defaultLabel={DEFAULT_CRUCIBLE_NAME}
+        active={getCrucibleName()}
+        isCustom={hasCrucibleNameOverride()}
+        initial={crucibleName}
+        placeholder={DEFAULT_CRUCIBLE_NAME}
+        autoCapitalize="words"
+        maxLength={40}
+        onSave={setCrucibleName}
+      />
+    </>
+  );
+}
+
+// engine_Dev — MAPS upload. A world map image (the overworld backdrop) + an
+// optional per-faction starting-area map, plus the world's coordinate size so
+// location pins can be plotted on the uploaded image.
+function MapsSection() {
+  const worldMap = useCustomMapsStore((s) => s.worldMap);
+  const factionMaps = useCustomMapsStore((s) => s.factionMaps);
+  const worldWidth = useCustomMapsStore((s) => s.worldWidth);
+  const worldHeight = useCustomMapsStore((s) => s.worldHeight);
+  const pickWorldMap = useCustomMapsStore((s) => s.pickWorldMap);
+  const pickFactionMap = useCustomMapsStore((s) => s.pickFactionMap);
+  const clearWorldMap = useCustomMapsStore((s) => s.clearWorldMap);
+  const clearFactionMap = useCustomMapsStore((s) => s.clearFactionMap);
+  const setWorldSize = useCustomMapsStore((s) => s.setWorldSize);
+  const [w, setW] = useState(String(worldWidth));
+  const [h, setH] = useState(String(worldHeight));
+  const [status, setStatus] = useState<Status>(null);
+  const factions = getFactions();
+  const onPick = async (fn: () => Promise<{ ok: boolean; error?: string; canceled?: boolean }>, label: string) => {
+    const r = await fn();
+    if (r.canceled) return;
+    setStatus(r.ok ? { kind: 'ok', msg: `${label} uploaded.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  return (
+    <View style={styles.card}>
+      <Text style={styles.hint}>
+        Upload your own map art. The world map is the overworld backdrop; each faction can have its
+        own starting-area map (shown while a member is in their base). The Tartaria map art has been
+        removed — with nothing uploaded, the map shows a neutral grid. Set the world size (the
+        coordinate space your location x/y values are in) so pins plot correctly. PNG / JPG / WEBP.
+      </Text>
+
+      {/* World map */}
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>World map</Text>
+        <Text style={worldMap ? styles.badgeOn : styles.badgeOff}>{worldMap ? '● uploaded' : '○ none'}</Text>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => void onPick(pickWorldMap, 'World map')}>
+          <Text style={styles.loadBtnText}>{worldMap ? 'REPLACE IMAGE' : '⬆ UPLOAD WORLD MAP'}</Text>
+        </TouchableOpacity>
+        {worldMap && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { clearWorldMap(); setStatus({ kind: 'ok', msg: 'World map removed.' }); }}>
+            <Text style={styles.resetBtnText}>REMOVE</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* World grid size */}
+      <Text style={[styles.hint, { marginTop: 10 }]}>
+        Grid size. WIDTH = number of columns (left→right), HEIGHT = number of rows (top→bottom). The
+        map screen draws this grid (over your map if one is uploaded, or on its own if not) and
+        plots each location’s number in its square. Give each location a "x" (column, 1…width) and
+        "y" (row, 1…height) field in the Locations table; (1,1) is the top-left square.
+      </Text>
+      <View style={styles.row}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.specLine}>WIDTH (columns)</Text>
+          <TextInput
+            style={[styles.input, { minHeight: 0 }]}
+            value={w}
+            onChangeText={setW}
+            placeholder="columns"
+            placeholderTextColor="#46555a"
+            keyboardType="number-pad"
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.specLine}>HEIGHT (rows)</Text>
+          <TextInput
+            style={[styles.input, { minHeight: 0 }]}
+            value={h}
+            onChangeText={setH}
+            placeholder="rows"
+            placeholderTextColor="#46555a"
+            keyboardType="number-pad"
+          />
+        </View>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            const nw = parseInt(w, 10); const nh = parseInt(h, 10);
+            if (!nw || !nh || nw < 1 || nh < 1) { setStatus({ kind: 'err', msg: 'Enter positive width and height.' }); return; }
+            setWorldSize(nw, nh);
+            setStatus({ kind: 'ok', msg: `World size set to ${nw} × ${nh}.` });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>SET SIZE</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Per-faction starting-area maps */}
+      <Text style={[styles.sectionLabel, { marginTop: 14 }]}>FACTION STARTING-AREA MAPS</Text>
+      {factions.map((f) => {
+        const has = !!factionMaps[f.id];
+        return (
+          <View key={f.id} style={styles.trackRow}>
+            <Text style={styles.trackName} numberOfLines={1}>{has ? '🗺 ' : '○ '}{f.name}</Text>
+            <TouchableOpacity style={styles.copyBtn} onPress={() => void onPick(() => pickFactionMap(f.id), `${f.name} map`)}>
+              <Text style={styles.copyBtnText}>{has ? 'REPLACE' : 'UPLOAD'}</Text>
+            </TouchableOpacity>
+            {has && (
+              <TouchableOpacity style={styles.trackRemove} onPress={() => { clearFactionMap(f.id); setStatus({ kind: 'ok', msg: `${f.name} map removed.` }); }}>
+                <Text style={styles.resetBtnText}>✕</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      })}
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+function MusicBox({ category, label, hint }: { category: MusicCategory; label: string; hint: string }) {
+  const tracks = useCustomMusicStore((s) => (category === 'battle' ? s.battle : s.ambient));
+  const addFromPicker = useCustomMusicStore((s) => s.addFromPicker);
+  const removeTrack = useCustomMusicStore((s) => s.remove);
+  const clearCategory = useCustomMusicStore((s) => s.clearCategory);
+  const [status, setStatus] = useState<Status>(null);
+  const [busy, setBusy] = useState(false);
+  const full = tracks.length >= MAX_TRACKS_PER_CATEGORY;
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{label}</Text>
+        <Text style={tracks.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {tracks.length} / {MAX_TRACKS_PER_CATEGORY}
+        </Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <Text style={styles.specLine}>{RECOMMENDED_AUDIO_SPECS}</Text>
+      {tracks.map((t) => (
+        <View key={t.id} style={styles.trackRow}>
+          <Text style={styles.trackName} numberOfLines={1}>♪ {t.name}</Text>
+          <TouchableOpacity style={styles.trackRemove} onPress={() => { removeTrack(category, t.id); setStatus({ kind: 'ok', msg: `Removed “${t.name}”.` }); }}>
+            <Text style={styles.trackRemoveText}>REMOVE</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+      {tracks.length === 0 && <Text style={styles.emptyLine}>No uploads — the built-in score plays here.</Text>}
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.loadBtn, (full || busy) && styles.btnDisabled]}
+          disabled={full || busy}
+          onPress={async () => {
+            setBusy(true);
+            const r = await addFromPicker(category);
+            setBusy(false);
+            if (r.canceled) return;
+            const skip = r.skipped && r.skipped.length > 0 ? ` (skipped ${r.skipped.length})` : '';
+            setStatus(r.ok ? { kind: 'ok', msg: `Added ${r.added ?? 1} track${(r.added ?? 1) === 1 ? '' : 's'}${skip}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>{busy ? 'ADDING…' : full ? 'LIMIT REACHED' : '＋ ADD TRACKS'}</Text>
+        </TouchableOpacity>
+        {tracks.length > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { clearCategory(category); setStatus({ kind: 'ok', msg: 'Cleared — built-in score restored.' }); }}>
+            <Text style={styles.resetBtnText}>CLEAR ALL</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — WHOLE-GAME file. One JSONC file holding every section (tables +
+// lore + title/tagline/narrator). Two actions: SAVE FILE TO DEVICE (the blank
+// commented template while empty, else your built game) and UPLOAD FILE FROM
+// DEVICE; plus a RESET that wipes all uploads back to the built-in defaults.
+function GameBundleBox() {
+  const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
+  const [status, setStatus] = useState<Status>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
+  // engine_Dev — the FULL validation report text (all lines, not the 20-line preview),
+  // captured on the last Validate run so it can be copied to the clipboard.
+  const [validationText, setValidationText] = useState<string | null>(null);
+  // engine_Dev — multi-part copy for big reports (mirrors LogScreen): when the report is larger
+  // than one paste-safe chunk, the copy button cycles PART 1..N on each tap.
+  const [vChunk, setVChunk] = useState(1);
+  // engine_Dev — multi-part save: uploaded parts collect here until every 1..N is in, then knit.
+  const [pendingParts, setPendingParts] = useState<GameSavePart[]>([]);
+  // engine_Dev — soft export gate: a SAVE with hard validation errors asks for a second tap.
+  const [saveAck, setSaveAck] = useState(false);
+
+  // engine_Dev — does the author have ANYTHING loaded yet? exportGameBundle emits
+  // only the sections that have been uploaded, so an empty game serialises to "{}".
+  const hasContent = (): boolean => {
+    try { return Object.keys(JSON.parse(useContentPackStore.getState().exportGameBundle())).length > 0; }
+    catch { return false; }
+  };
+
+  // engine_Dev — SAVE to a file on the device. Smart: if the author has loaded
+  // anything, save THEIR game (the file they hand back for an APK bake); if the
+  // game is still empty, save the blank fillable TEMPLATE to start from. One button,
+  // the right file either way.
+  const saveToDevice = async () => {
+    const built = hasContent();
+    // engine_Dev — soft pre-export gate. If the game has hard validation errors (broken
+    // references that bake into a broken release), ask for a second tap before exporting.
+    if (built) {
+      const v = runValidation();
+      if (v.errorCount > 0 && !saveAck) {
+        setSaveAck(true);
+        setStatus({ kind: 'err', msg: `⚠ ${v.errorCount} validation error${v.errorCount === 1 ? '' : 's'} — your game has broken references that will bake in. Hit VALIDATE GAME to see them, or tap SAVE again to export anyway.` });
+        return;
+      }
+      setSaveAck(false);
+    }
+    // engine_Dev — always emit the ANNOTATED bundle: every section present, each
+    // marked ✅ UPLOADED (your content) or ⬜ TEMPLATE (still the default), so the
+    // file is easy to navigate. Empty game → all ⬜.
+    let uploaded: Record<string, unknown> = {};
+    try { uploaded = JSON.parse(useContentPackStore.getState().exportGameBundle()) as Record<string, unknown>; } catch { uploaded = {}; }
+    const out = buildAnnotatedGameBundle(uploaded);
+    // engine_Dev — stamp the filename so successive downloads are distinguishable.
+    const stamp = fileStamp(new Date());
+    const base = built ? 'my-game' : 'game-template';
+    const what = built ? `your game (${Object.keys(uploaded).length} sections uploaded, rest marked ⬜ template)` : 'the blank template';
+    // engine_Dev — AUTO-SPLIT by size. A whole-game file over the per-part ceiling can't be
+    // pasted / re-read in one piece on device, so split into as many parts as needed (each ≤
+    // SAFE_PART_CHARS). Under the ceiling → one normal file. Parts knit back on UPLOAD, any order.
+    const parts = out.length <= SAFE_PART_CHARS ? null : buildSaveParts(out, `${stamp}-${out.length}c`, stamp);
+    try {
+      if (Platform.OS === 'android') {
+        const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (!perm.granted) { setStatus({ kind: 'err', msg: 'Save cancelled — no folder chosen.' }); return; }
+        if (!parts) {
+          const fn = `${base}-${stamp}.json`;
+          const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, fn, 'application/json');
+          await FileSystem.writeAsStringAsync(uri, out);
+          setStatus({ kind: 'ok', msg: `Saved ${what} as ${fn} (${(out.length / 1024).toFixed(0)} KB) to the folder you picked. Edit it, then UPLOAD FILE FROM DEVICE.` });
+        } else {
+          const names: string[] = [];
+          for (const p of parts) {
+            const fn = `${base}p${p.__gameSavePart}-${stamp}.json`;
+            const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, fn, 'application/json');
+            await FileSystem.writeAsStringAsync(uri, JSON.stringify(p, null, 2));
+            names.push(fn);
+          }
+          setStatus({ kind: 'ok', msg: `Your game is ${(out.length / 1024).toFixed(0)} KB — over the ${(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, so I split it into ${parts.length} parts: ${names.join(', ')}. Upload ALL ${parts.length} (any order) to rebuild it.` });
+        }
+      } else {
+        if (!parts) {
+          const uri = `${FileSystem.documentDirectory}${base}-${stamp}.json`;
+          await FileSystem.writeAsStringAsync(uri, out);
+          setStatus({ kind: 'ok', msg: `Saved ${what} to ${uri}` });
+        } else {
+          for (const p of parts) await FileSystem.writeAsStringAsync(`${FileSystem.documentDirectory}${base}p${p.__gameSavePart}-${stamp}.json`, JSON.stringify(p, null, 2));
+          setStatus({ kind: 'ok', msg: `Split into ${parts.length} parts (${base}p1..p${parts.length}-${stamp}.json) in ${FileSystem.documentDirectory}` });
+        }
+      }
+    } catch (e) {
+      setStatus({ kind: 'err', msg: `Save failed: ${e instanceof Error ? e.message : String(e)}.` });
+    }
+  };
+
+  // engine_Dev — handle one uploaded file: a whole bundle (load it) OR one part of a multi-part
+  // save (collect parts, knit when every 1..N is in — any order; reject mixing different saves).
+  const handleUpload = (content: string) => {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(content)); } catch { parsed = null; }
+    if (isGameSavePart(parsed)) {
+      const r = addSavePart(pendingParts, parsed);
+      setPendingParts(r.parts);
+      if (r.kind === 'complete') {
+        setPendingParts([]);
+        const loaded = loadGameBundle(r.text);
+        setStatus(loaded.ok ? { kind: 'ok', msg: `All ${parsed.__of} parts knit back together. ${loaded.summary ?? 'Loaded.'}` } : { kind: 'err', msg: loaded.error ?? 'Failed.' });
+      } else if (r.kind === 'reset') {
+        setStatus({ kind: 'err', msg: `That part is from a DIFFERENT save (${parsed.__savedAt}). Starting over with it — now upload the rest of THIS save's parts: ${r.need.join(', ')} of ${r.of}.` });
+      } else {
+        setStatus({ kind: 'ok', msg: `Part ${parsed.__gameSavePart} of ${r.of} loaded (save ${parsed.__savedAt}). Have ${r.have.join(', ')}; still need ${r.need.join(', ')}. Keep uploading.` });
+      }
+      return;
+    }
+    const r = loadGameBundle(content);
+    setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Whole-game file</Text>
+        <Text style={styles.badgeOff}>one file is the whole game</Text>
+      </View>
+      <Text style={styles.hint}>
+        Your entire game in one .json. Hit{' '}
+        <Text style={{ fontWeight: 'bold' }}>SAVE FILE TO DEVICE</Text> to get the file: the blank
+        fillable template while your game is still empty, or YOUR built game once you’ve loaded
+        anything (that’s the file you hand back for an APK bake). Edit it anywhere, then{' '}
+        <Text style={{ fontWeight: 'bold' }}>UPLOAD FILE FROM DEVICE</Text> to load it — every section
+        it contains is applied at once; anything omitted keeps its built-in default. // and /* */
+        comments are allowed. <Text style={{ fontWeight: 'bold' }}>RESET</Text> wipes all uploaded
+        content back to the built-in defaults if you need a clean slate.{'\n\n'}
+        <Text style={{ fontWeight: 'bold' }}>VALIDATE GAME</Text> scans your loaded content for broken
+        references (a recipe, quest, vendor, boss, or starting-area pointing at an item / faction / boss /
+        location / room that doesn’t exist) and duplicate ids. Run it before you export so a broken game
+        never gets baked.{'\n\n'}
+        <Text style={{ fontWeight: 'bold' }}>Big game?</Text> If the file is over the{' '}
+        {(SAFE_PART_CHARS / 1024).toFixed(0)} KB single-file limit, SAVE automatically splits it into as
+        many timestamped parts as it needs (<Text style={{ fontStyle: 'italic' }}>my-gamep1</Text>,{' '}
+        <Text style={{ fontStyle: 'italic' }}>my-gamep2</Text>,{' '}
+        <Text style={{ fontStyle: 'italic' }}>my-gamep3</Text>…) and tells you how many. Upload ALL of them to
+        rebuild — order doesn’t matter, and it won’t let you mix parts from different saves.
+      </Text>
+      <View style={styles.stackCol}>
+        {/* engine_Dev — pre-export sanity pass: dangling refs (recipes/quests/vendors/bosses/
+            starting-areas → items/factions/bosses/locations/rooms) + duplicate ids. Run it before
+            you bake so a broken game never ships. */}
+        <TouchableOpacity
+          style={[styles.copyBtn, styles.stackBtn]}
+          onPress={() => {
+            setConfirmReset(false);
+            const r = runValidation();
+            const s = summarizeValidation([...r.errors, ...r.warnings, ...r.info]);
+            if (r.errorCount === 0 && r.warningCount === 0 && r.infoCount === 0) { setValidationText('✓ Validate Game: no problems found — ready to export.'); setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
+            const counts = `${r.errorCount} error${r.errorCount === 1 ? '' : 's'}, ${r.warningCount} warning${r.warningCount === 1 ? '' : 's'}, ${r.infoCount} info`;
+            const head = r.errorCount > 0
+              ? `✗ Validate Game: ${counts} — fix the errors before you bake.`
+              : `⚠ Validate Game: ${counts} (safe to export).`;
+            // Full report captured for the COPY button; on-screen status shows a 20-line preview.
+            setValidationText(`${head}\n\n${s.lines.join('\n')}`);
+            setVChunk(1);
+            setStatus({ kind: r.errorCount > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more — tap COPY for the full list.` : ''}` });
+          }}
+        >
+          <Text style={styles.copyBtnText}>✓ VALIDATE GAME</Text>
+        </TouchableOpacity>
+        {validationText !== null && validationText.length <= VALIDATION_CHUNK_SIZE && (
+          <TouchableOpacity
+            style={[styles.copyBtn, styles.stackBtn]}
+            onPress={() => { void Clipboard.setStringAsync(validationText); setStatus({ kind: 'ok', msg: 'Validation output copied to clipboard.' }); }}
+          >
+            <Text style={styles.copyBtnText}>⧉ COPY VALIDATION OUTPUT</Text>
+          </TouchableOpacity>
+        )}
+        {validationText !== null && validationText.length > VALIDATION_CHUNK_SIZE && (() => {
+          const total = Math.max(1, Math.ceil(validationText.length / VALIDATION_CHUNK_SIZE));
+          return (
+            <TouchableOpacity
+              style={[styles.copyBtn, styles.stackBtn]}
+              onPress={() => {
+                const start = (vChunk - 1) * VALIDATION_CHUNK_SIZE;
+                const slice = validationText.slice(start, start + VALIDATION_CHUNK_SIZE);
+                const wrapped = `=== VALIDATION · PART ${vChunk} of ${total} · ${slice.length} CHARS · BEGIN ===\n${slice}\n=== VALIDATION · PART ${vChunk} of ${total} · END ===`;
+                void Clipboard.setStringAsync(wrapped);
+                setStatus({ kind: 'ok', msg: `Copied validation PART ${vChunk} of ${total} — paste it, then tap again for the next part.` });
+                setVChunk((i) => (i >= total ? 1 : i + 1));
+              }}
+            >
+              <Text style={styles.copyBtnText}>{`⧉ COPY VALIDATION · PART ${vChunk} / ${total} — TAP FOR EACH`}</Text>
+            </TouchableOpacity>
+          );
+        })()}
+        <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.loadBtn, styles.stackBtn]}
+          onPress={() => { setConfirmReset(false); void (async () => {
+            const picked = await pickJsonFile();
+            if (picked.canceled) { setStatus({ kind: 'err', msg: 'Upload cancelled — no file chosen.' }); return; }
+            if (!picked.ok || !picked.content) { setStatus({ kind: 'err', msg: picked.msg ?? 'Could not read that file.' }); return; }
+            handleUpload(picked.content);
+          })(); }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE FROM DEVICE{pendingParts.length > 0 ? ` (${pendingParts[0]!.__of - pendingParts.length} more part${pendingParts[0]!.__of - pendingParts.length === 1 ? '' : 's'} needed)` : ''}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.resetBtn, styles.stackBtn]}
+          onPress={() => {
+            if (!confirmReset) { setConfirmReset(true); setStatus({ kind: 'err', msg: 'Tap RESET again to wipe ALL uploaded content back to the built-in defaults.' }); return; }
+            useContentPackStore.getState().clearAll();
+            setConfirmReset(false);
+            setStatus({ kind: 'ok', msg: 'Reset — every section is back to its built-in default.' });
+          }}
+        >
+          <Text style={styles.resetBtnText}>{confirmReset ? 'RESET — SURE?' : 'RESET'}</Text>
+        </TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — MISSIONS upload. One object holding hunts / mysteries / faction
+// quests / storylines (designed multi-stage missions) + objectives / complications
+// / rewards (procedural-lead seeds). Replaces the built-in Tartaria quests.
+function MissionsBox() {
+  const loadMissionsJson = useContentPackStore((s) => s.loadMissionsJson);
+  const missions = useContentPackStore((s) => s.missions);
+  const loaded = Object.keys(missions).length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Missions</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} types` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        One JSON object holding your missions: <Text style={{ fontWeight: 'bold' }}>hunts</Text>,
+        <Text style={{ fontWeight: 'bold' }}> mysteries</Text>,
+        <Text style={{ fontWeight: 'bold' }}> factionQuests</Text>,
+        <Text style={{ fontWeight: 'bold' }}> storylines</Text> (designed multi-stage quests accepted
+        from vendors), plus <Text style={{ fontWeight: 'bold' }}>objectives / complications / rewards</Text>
+        {' '}(the seeds the engine mixes into procedural lead quests). Each is an array. Any sub-table you
+        omit keeps its built-in default. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your missions JSON object here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadMissionsJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildMissionsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the missions template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(missions, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current missions — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(missions, null, 2) : buildMissionsTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearMissions();
+              setStatus({ kind: 'ok', msg: 'Reset missions to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — HOOKS upload. One object { plants, chains, weights?, indoor? } of
+// atmospheric multi-stage leads, using the effect-verb language.
+function HooksBox() {
+  const loadHooksJson = useContentPackStore((s) => s.loadHooksJson);
+  const hooks = useContentPackStore((s) => s.hooks);
+  const loaded = hooks.plants ? Object.keys(hooks.plants).length : (hooks.chains ? Object.keys(hooks.chains).length : 0);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Hooks (atmospheric leads)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} hooks` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Multi-stage leads the player stumbles on while exploring (a column of smoke, a half-buried
+        spire). One object: <Text style={{ fontWeight: 'bold' }}>plants</Text> (the discovery line +
+        matchable nouns per hook id) and <Text style={{ fontWeight: 'bold' }}>chains</Text> (the
+        staged outcomes; each stage carries a list of effects). Effect verbs: grant_tc, grant_item,
+        spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor.
+        Optional weights + indoor list. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your hooks JSON object here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadHooksJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildHooksTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the hooks template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(hooks, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current hooks — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(hooks, null, 2) : buildHooksTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearHooks();
+              setStatus({ kind: 'ok', msg: 'Reset hooks to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — WHISPERS upload. An array of overheard-tip chains (plant → travel
+// to a tile in a time window → meetLine + meetEffects payoff).
+// engine_Dev — Phase 2: WHISPERS form-builder. Build a random-triggered mission
+// leg-by-leg (like the Main Quest box), add as many SEPARATE missions as you want,
+// and still paste/edit raw JSON for advanced effects.
+interface BuiltLeg { line: string; targetOffset?: { dxRange: [number, number]; dyRange: [number, number] }; enemyName?: string; effects?: Array<{ type: string; amount?: number; name?: string }> }
+function WhispersBox() {
+  const loadWhispersJson = useContentPackStore((s) => s.loadWhispersJson);
+  const whispers = useContentPackStore((s) => s.whispers) as Array<{ id: string; title?: string; stages?: unknown[] }>;
+  const loaded = whispers.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+
+  // --- builder state ---
+  const [wId, setWId] = useState('');
+  const [wTitle, setWTitle] = useState('');
+  const [wPlant, setWPlant] = useState('');
+  const [wChance, setWChance] = useState('0.15');
+  const [wLine, setWLine] = useState('');
+  const [wDx, setWDx] = useState('2');
+  const [wDy, setWDy] = useState('0');
+  // leg sub-builder
+  const [legs, setLegs] = useState<BuiltLeg[]>([]);
+  const [legLine, setLegLine] = useState('');
+  const [legEnemy, setLegEnemy] = useState('');
+  const [legTc, setLegTc] = useState('');
+  const [legItem, setLegItem] = useState('');
+  const [legDx, setLegDx] = useState('');
+  const [legDy, setLegDy] = useState('');
+
+  const num = (s: string) => { const n = parseInt(s, 10); return Number.isFinite(n) ? n : 0; };
+
+  const addLeg = () => {
+    if (!legLine.trim()) { setStatus({ kind: 'err', msg: 'A leg needs a narration line.' }); return; }
+    const effects: BuiltLeg['effects'] = [];
+    if (num(legTc) > 0) effects.push({ type: 'grant_tc', amount: num(legTc) });
+    if (legItem.trim()) effects.push({ type: 'grant_item', name: legItem.trim() });
+    const leg: BuiltLeg = {
+      line: legLine.trim(),
+      ...(legDx.trim() || legDy.trim() ? { targetOffset: { dxRange: [num(legDx), num(legDx)], dyRange: [num(legDy), num(legDy)] } } : {}),
+      ...(legEnemy.trim() ? { enemyName: legEnemy.trim() } : {}),
+      ...(effects.length > 0 ? { effects } : {}),
+    };
+    setLegs((ls) => [...ls, leg]);
+    setLegLine(''); setLegEnemy(''); setLegTc(''); setLegItem(''); setLegDx(''); setLegDy('');
+    setStatus({ kind: 'ok', msg: `Leg ${legs.length + 1} added.` });
+  };
+
+  const addWhisper = () => {
+    if (!wId.trim()) { setStatus({ kind: 'err', msg: 'Give the mission an id (e.g. dredge_job).' }); return; }
+    if (!wPlant.trim()) { setStatus({ kind: 'err', msg: 'Pick where it plants (a hub-room id or your location id).' }); return; }
+    if (legs.length === 0) { setStatus({ kind: 'err', msg: 'Add at least one leg (the mission’s steps).' }); return; }
+    if (whispers.some((w) => w.id === wId.trim())) { setStatus({ kind: 'err', msg: `A whisper with id "${wId.trim()}" already exists.` }); return; }
+    const whisper = {
+      id: wId.trim(),
+      title: wTitle.trim() || wId.trim(),
+      plantLocations: [wPlant.trim()],
+      plantChance: Number(wChance) > 0 ? Number(wChance) : 0.15,
+      plantLines: [wLine.trim() || 'You overhear something worth following up.'],
+      targetOffset: { dxRange: [num(wDx), num(wDx)] as [number, number], dyRange: [num(wDy), num(wDy)] as [number, number] },
+      stages: legs,
+    };
+    const r = loadWhispersJson(JSON.stringify([...whispers, whisper]));
+    if (!r.ok) { setStatus({ kind: 'err', msg: r.error ?? 'Failed to save.' }); return; }
+    setStatus({ kind: 'ok', msg: `Added "${whisper.title}" (${legs.length} leg${legs.length > 1 ? 's' : ''}).` });
+    setWId(''); setWTitle(''); setWPlant(''); setWChance('0.15'); setWLine(''); setWDx('2'); setWDy('0'); setLegs([]);
+  };
+
+  const removeWhisper = (id: string) => {
+    const next = whispers.filter((w) => w.id !== id);
+    if (next.length === 0) { useContentPackStore.getState().clearWhispers(); }
+    else loadWhispersJson(JSON.stringify(next));
+    setStatus({ kind: 'ok', msg: `Removed "${id}".` });
+  };
+
+  const smallInput: StyleProp<TextStyle> = [styles.input, { minHeight: 0, height: 40 }];
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Whispers (overheard tips)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} mission(s)` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Random-triggered overheard-tip missions. Each one plants at a location (a per-visit
+        chance), points to a tile, and runs <Text style={{ fontWeight: 'bold' }}>leg by leg</Text>:
+        reach a tile, optionally beat a foe before advancing, then the next leg. Build one below
+        and hit <Text style={{ fontWeight: 'bold' }}>ADD WHISPER</Text>; add as many separate
+        missions as you like. (Advanced effects: use TEMPLATE / EDIT CURRENT to paste JSON.)
+      </Text>
+
+      {/* ---- existing missions ---- */}
+      {whispers.length > 0 && (
+        <View style={{ marginBottom: 8 }}>
+          {whispers.map((w) => (
+            <View key={w.id} style={styles.row}>
+              <Text style={[styles.hint, { flex: 1 }]}>• {w.title ?? w.id} <Text style={styles.whisperCountDim}>({Array.isArray(w.stages) ? w.stages.length : 1} leg{(Array.isArray(w.stages) ? w.stages.length : 1) > 1 ? 's' : ''})</Text></Text>
+              <TouchableOpacity style={styles.resetBtn} onPress={() => removeWhisper(w.id)}><Text style={styles.resetBtnText}>REMOVE</Text></TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* ---- build a mission ---- */}
+      <Text style={styles.whisperSectionLabel}>New mission</Text>
+      <TextInput style={smallInput} value={wId} onChangeText={setWId} placeholder="id (e.g. dredge_job)" placeholderTextColor="#46555a" autoCapitalize="none" autoCorrect={false} />
+      <TextInput style={smallInput} value={wTitle} onChangeText={setWTitle} placeholder="title (shown in the Whispers panel)" placeholderTextColor="#46555a" />
+      <TextInput style={smallInput} value={wPlant} onChangeText={setWPlant} placeholder="plants at (hub-room id or your location id)" placeholderTextColor="#46555a" autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TextInput style={[smallInput, { flex: 1 }]} value={wChance} onChangeText={setWChance} placeholder="plant chance 0–1" placeholderTextColor="#46555a" keyboardType="numeric" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wDx} onChangeText={setWDx} placeholder="1st tile dx" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={wDy} onChangeText={setWDy} placeholder="dy" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+      </View>
+      <TextInput style={smallInput} value={wLine} onChangeText={setWLine} placeholder="the overheard tip line" placeholderTextColor="#46555a" />
+
+      {/* legs */}
+      <Text style={styles.whisperSectionLabel}>Legs ({legs.length})</Text>
+      {legs.map((l, i) => (
+        <Text key={i} style={styles.hint}>{i + 1}. {l.line.slice(0, 60)}{l.enemyName ? ` ⚔ ${l.enemyName}` : ''}</Text>
+      ))}
+      <TextInput style={smallInput} value={legLine} onChangeText={setLegLine} placeholder="leg narration (what happens on arrival)" placeholderTextColor="#46555a" />
+      <View style={styles.row}>
+        <TextInput style={[smallInput, { flex: 1 }]} value={legDx} onChangeText={setLegDx} placeholder="dx (blank=same tile)" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1 }]} value={legDy} onChangeText={setLegDy} placeholder="dy" placeholderTextColor="#46555a" keyboardType="numbers-and-punctuation" />
+        <TextInput style={[smallInput, { flex: 1.4 }]} value={legEnemy} onChangeText={setLegEnemy} placeholder="foe to defeat (optional)" placeholderTextColor="#46555a" />
+      </View>
+      <View style={styles.row}>
+        <TextInput style={[smallInput, { flex: 1 }]} value={legTc} onChangeText={setLegTc} placeholder="reward TC" placeholderTextColor="#46555a" keyboardType="numeric" />
+        <TextInput style={[smallInput, { flex: 1.6 }]} value={legItem} onChangeText={setLegItem} placeholder="reward item name (optional)" placeholderTextColor="#46555a" />
+        <TouchableOpacity style={styles.tmplBtn} onPress={addLeg}><Text style={styles.tmplBtnText}>ADD LEG</Text></TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.loadBtn} onPress={addWhisper}><Text style={styles.loadBtnText}>＋ ADD WHISPER</Text></TouchableOpacity>
+
+      {/* ---- raw JSON (advanced) ---- */}
+      <Text style={[styles.whisperSectionLabel, { marginTop: 12 }]}>Or paste / edit JSON</Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your whispers JSON array here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadWhispersJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} whisper chain(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildWhispersTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the whispers template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(whispers, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current whispers — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(whispers, null, 2) : buildWhispersTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearWhispers();
+              setStatus({ kind: 'ok', msg: 'Reset whispers to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — WASTELAND upload. Object of between-locations travel encounters
+// keyed by archetype id.
+function WastelandBox() {
+  const loadWastelandJson = useContentPackStore((s) => s.loadWastelandJson);
+  const wasteland = useContentPackStore((s) => s.wasteland);
+  const loaded = Object.keys(wasteland).filter((k) => !k.startsWith('_')).length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Travel encounters</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded}` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Random encounters while traveling long-distance between named locations. One JSON object
+        keyed by archetype id; each: <Text style={{ fontWeight: 'bold' }}>type</Text>{' '}
+        (treasure / npc / skirmish / mini_dungeon / fusion_bench),{' '}
+        <Text style={{ fontWeight: 'bold' }}>weight</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>matchers</Text> (location tags it can fire in — a
+        matcher of <Text style={{ fontWeight: 'bold' }}>"any"</Text> / "*" fires it at ANY location
+        during travel, alongside tag-targeted ones),{' '}
+        <Text style={{ fontWeight: 'bold' }}>narration</Text>, plus optional loot / npc_lines /
+        lore_note / enemyPool. An encounter fires roughly every 7-8 travel steps. You can use{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{narrator}'}</Text> /{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{crucible}'}</Text> tokens in any line. Hit TEMPLATE for
+        the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your wasteland encounters JSON object here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadWastelandJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildWastelandTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the encounters template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(wasteland, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current encounters — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(wasteland, null, 2) : buildWastelandTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearWasteland();
+              setStatus({ kind: 'ok', msg: 'Reset encounters to built-in.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — shared file save / pick helpers for big lists that are painful to
+// paste (e.g. the per-noun interaction tags). Save writes JSON to a folder you pick
+// (Downloads) via SAF on Android; pick reads a chosen .json back in.
+async function saveJsonToFile(filename: string, content: string): Promise<{ ok: boolean; msg: string }> {
+  try {
+    if (Platform.OS === 'android') {
+      const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (!perm.granted) return { ok: false, msg: 'Save cancelled — no folder chosen.' };
+      const uri = await FileSystem.StorageAccessFramework.createFileAsync(perm.directoryUri, filename, 'application/json');
+      await FileSystem.writeAsStringAsync(uri, content);
+      return { ok: true, msg: `Saved ${filename} (${(content.length / 1024).toFixed(0)} KB) to the folder you picked. Edit it in Files, then UPLOAD FILE.` };
+    }
+    const uri = `${FileSystem.documentDirectory}${filename}`;
+    await FileSystem.writeAsStringAsync(uri, content);
+    return { ok: true, msg: `Saved to ${uri}` };
+  } catch (e) {
+    return { ok: false, msg: `Save failed: ${e instanceof Error ? e.message : String(e)}` };
+  }
+}
+async function pickJsonFile(): Promise<{ ok: boolean; content?: string; canceled?: boolean; msg?: string }> {
+  try {
+    const res = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/plain', '*/*'], copyToCacheDirectory: true, multiple: false });
+    if (res.canceled) return { ok: false, canceled: true };
+    const asset = res.assets?.[0];
+    if (!asset) return { ok: false, msg: 'No file was returned by the picker.' };
+    const content = await FileSystem.readAsStringAsync(asset.uri);
+    return { ok: true, content };
+  } catch (e) {
+    return { ok: false, msg: `Pick failed: ${e instanceof Error ? e.message : String(e)}` };
+  }
+}
+
+// engine_Dev — INTERACTION TAGS upload. Keyword lists per verb (climbable /
+// swimmable / breakable / searchable / salvageable); the author's words add to the
+// built-in generic set.
+function InteractionTagsBox() {
+  const loadInteractionTagsJson = useContentPackStore((s) => s.loadInteractionTagsJson);
+  const interactionTags = useContentPackStore((s) => s.interactionTags);
+  const loaded = Object.values(interactionTags).reduce((a, v) => a + (Array.isArray(v) ? v.length : 0), 0);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Interaction tags</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● +${loaded} words` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Tag each interactable in YOUR world with the verbs it accepts —{' '}
+        <Text style={{ fontWeight: 'bold' }}>climbable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>swimmable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>breakable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>searchable</Text>,{' '}
+        <Text style={{ fontWeight: 'bold' }}>salvageable</Text>. Tap{' '}
+        <Text style={{ fontWeight: 'bold' }}>↻ FROM WORLD</Text> to pull every interactable from the
+        content you’ve LOADED — your Locations table and your Starting-area rooms — deduped into one
+        list, each pre-filled with a best-guess tag. (Only your uploads — never the built-in/template
+        defaults.) Edit the arrays (e.g. add "climbable" to "rusted t-34 tank"), then LOAD. Hit ↻
+        again after loading more content to pull in new items (existing tags kept).
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Tap ↻ FROM WORLD to build the taggable list…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadInteractionTagsJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: r.summary ?? 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            // Merge the author's existing tags (whatever's in the box, else the
+            // loaded override) with a fresh pull of all current interactables.
+            let current: Record<string, string[]> | undefined;
+            try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
+            if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
+            const built = buildInteractionTagsTemplate(current);
+            // built carries a `//` instruction header — strip it before parsing (raw
+            // JSON.parse on the comment line threw "Unexpected character: /" and crashed
+            // the panel). Guard the count too so it can never be fatal.
+            let count = 0;
+            try { count = Object.keys(JSON.parse(stripJsonComments(built))).length; } catch { /* count only */ }
+            setText(built);
+            setStatus({ kind: 'ok', msg: `Pulled ${count} interactables from your locations — edit the tags, then LOAD.` });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>↻ FROM WORLD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(interactionTags, null, 2) : buildInteractionTagsTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => {
+              useContentPackStore.getState().clearInteractionTags();
+              setStatus({ kind: 'ok', msg: 'Reset to built-in keywords.' });
+            }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {/* engine_Dev — file path: the per-noun list is long; save it to a file, edit
+          in a real editor, and upload the file back (no giant paste). */}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => {
+          let current: Record<string, string[]> | undefined;
+          try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
+          if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
+          void Clipboard.setStringAsync(buildInteractionTagsTemplate(current));
+          setStatus({ kind: 'ok', msg: 'Copied to clipboard.' });
+        }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            // Save the FROM-LOCATIONS list (or current edits) to a file.
+            let current: Record<string, string[]> | undefined;
+            try { const t = text.trim(); if (t) current = JSON.parse(t); } catch { /* ignore */ }
+            if (!current && loaded > 0) current = interactionTags as Record<string, string[]>;
+            const content = buildInteractionTagsTemplate(current);
+            const r = await saveJsonToFile('interaction-tags.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadInteractionTagsJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: res.summary ?? 'Loaded from file.' } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — STARTING AREAS. A form builder (pick faction → name it → drop it on
+// the map → add 3-5 rooms, flag one as the Mission Board) PLUS the raw-JSON box for
+// power users / file ops. The structure is always a small walkable instance; the
+// form auto-generates room ids and wires a linear corridor of exits (the entry room
+// gets the "world" door out to the map).
+function StartingAreasBox() {
+  const loadStartingAreasJson = useContentPackStore((s) => s.loadStartingAreasJson);
+  const startingAreas = useContentPackStore((s) => s.startingAreas) as Array<{ factionId: string; name: string; locationId: string; rooms: unknown[] }>;
+  const loaded = startingAreas.length;
+  const factions = getFactions() as Array<{ id: string; name: string }>;
+  const locations = mainQuestLocations();
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+
+  // ── form state ─────────────────────────────────────────────────────────────
+  const [f, setF] = useState({ factionId: '', name: '', locationId: '', x: '', y: '', returnable: true });
+  const up = (k: keyof typeof f, v: string | boolean) => setF((p) => ({ ...p, [k]: v }));
+  const [rooms, setRooms] = useState<Array<{ name: string; missionBoard: boolean }>>([]);
+  const [roomName, setRoomName] = useState('');
+
+  const slug = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+  const addRoom = () => {
+    const nm = roomName.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Type a room name first.' }); return; }
+    if (rooms.length >= 5) { setStatus({ kind: 'err', msg: 'A starter area holds at most 5 rooms.' }); return; }
+    setRooms((p) => [...p, { name: nm, missionBoard: p.length === 0 }]); // first room defaults to the board
+    setRoomName('');
+  };
+  const removeRoom = (i: number) => setRooms((p) => p.filter((_, j) => j !== i));
+  // Exactly one board room: checking one clears the others.
+  const toggleBoard = (i: number) => setRooms((p) => p.map((rm, j) => ({ ...rm, missionBoard: j === i ? !rm.missionBoard : false })));
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+
+  const saveArea = () => {
+    if (!f.factionId) { setStatus({ kind: 'err', msg: 'Pick which faction this area belongs to.' }); return; }
+    if (!f.name.trim()) { setStatus({ kind: 'err', msg: 'Give the area a name.' }); return; }
+    if (!f.locationId) { setStatus({ kind: 'err', msg: 'Pick where on the map it sits.' }); return; }
+    if (rooms.length < 3) { setStatus({ kind: 'err', msg: 'Add at least 3 rooms.' }); return; }
+    // Unique room ids from names.
+    const ids: string[] = [];
+    rooms.forEach((rm) => {
+      const base = slug(rm.name) || `room_${ids.length + 1}`;
+      let id = base; let n = 2;
+      while (ids.includes(id)) id = `${base}_${n++}`;
+      ids.push(id);
+    });
+    // Linear corridor: each room links to its neighbours; the entry (room 0) gets the
+    // "world" door out to the map. Every room ends up with at least one exit.
+    const last = rooms.length - 1;
+    const roomDefs = rooms.map((rm, i) => {
+      const exits: { north?: string | null; south?: string | null; east?: string | null; west?: string | null } = {};
+      if (i > 0) exits.west = ids[i - 1];
+      if (i < last) exits.east = ids[i + 1];
+      if (i === 0) exits.north = 'world';
+      return {
+        id: ids[i],
+        name: rm.name.trim(),
+        shortName: rm.name.trim(),
+        description: `${rm.name.trim()} — part of ${f.name.trim()}.`,
+        exits,
+        anchorNpc: null,
+        ...(rm.missionBoard ? { missionBoard: true } : {}),
+      };
+    });
+    const area = {
+      factionId: f.factionId,
+      name: f.name.trim(),
+      locationId: f.locationId,
+      ...(Number.isFinite(Number(f.x)) && f.x !== '' && Number.isFinite(Number(f.y)) && f.y !== ''
+        ? { coords: { x: Number(f.x), y: Number(f.y) } } : {}),
+      returnable: f.returnable,
+      rooms: roomDefs,
+    };
+    // Replace any existing area for this faction, keep the rest, reload the whole list.
+    const merged = [...startingAreas.filter((a) => a.factionId !== f.factionId), area];
+    const r = loadStartingAreasJson(JSON.stringify(merged));
+    if (!r.ok) { setStatus({ kind: 'err', msg: r.error ?? 'Failed to save.' }); return; }
+    setStatus({ kind: 'ok', msg: `Saved ${area.name} (${rooms.length} rooms) for ${factions.find((x) => x.id === f.factionId)?.name ?? f.factionId}.` });
+    setF((p) => ({ ...p, name: '', x: '', y: '' }));
+    setRooms([]);
+    setRoomName('');
+  };
+
+  const boardRoomName = rooms.find((rm) => rm.missionBoard)?.name;
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Starting areas</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded}` : '○ none'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Build a faction’s starter complex: pick the faction, name it, drop it on a map tile, then add
+        3–5 rooms and tick which one holds the <Text style={{ fontWeight: 'bold' }}>Mission Board</Text>.
+        Exits and room ids are generated for you (the first room is the entry and gets the door out to
+        the map). “Returnable” off = a one-way prologue that vanishes once you leave (its missions then
+        turn in remotely). The raw-JSON box below still works for power edits / files.
+      </Text>
+
+      {/* existing areas */}
+      {startingAreas.map((a) => (
+        <View key={a.factionId} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{a.name}</Text> — {factions.find((x) => x.id === a.factionId)?.name ?? a.factionId} · {Array.isArray(a.rooms) ? a.rooms.length : 0} rooms</Text>
+          <TouchableOpacity onPress={() => { const next = startingAreas.filter((x) => x.factionId !== a.factionId); const r = loadStartingAreasJson(JSON.stringify(next)); setStatus(r.ok || next.length === 0 ? { kind: 'ok', msg: `Removed ${a.name}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (next.length === 0) useContentPackStore.getState().clearStartingAreas(); }}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {/* ── form ── */}
+      {factions.length > 0
+        ? chipRow('Faction:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))
+        : <Text style={styles.err}>Load a Factions table first — areas attach to a faction.</Text>}
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Area name (e.g. Drydock 4 Command)" placeholderTextColor="#46555a" />
+      {locations.length > 0 && chipRow('Place it at:', locations, f.locationId, (id) => up('locationId', id === f.locationId ? '' : id))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.x} onChangeText={(v) => up('x', v)} placeholder="grid X" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.y} onChangeText={(v) => up('y', v)} placeholder="grid Y" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TouchableOpacity style={[styles.tmplBtn, f.returnable && styles.loadBtn]} onPress={() => up('returnable', !f.returnable)}>
+          <Text style={f.returnable ? styles.loadBtnText : styles.tmplBtnText}>{f.returnable ? '☑' : '☐'} Returnable</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>Rooms ({rooms.length}/5){boardRoomName ? ` · ⚑ board in ${boardRoomName}` : ' · no board room ticked'}:</Text>
+      {rooms.map((rm, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>{i + 1}. <Text style={{ fontWeight: 'bold' }}>{rm.name}</Text>{i === 0 ? ' (entry)' : ''}</Text>
+          <TouchableOpacity style={[styles.tmplBtn, rm.missionBoard && styles.loadBtn, { marginLeft: 6 }]} onPress={() => toggleBoard(i)}>
+            <Text style={rm.missionBoard ? styles.loadBtnText : styles.tmplBtnText}>{rm.missionBoard ? '☑ board' : '☐ board'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => removeRoom(i)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={roomName} onChangeText={setRoomName} placeholder="Room name → add" placeholderTextColor="#46555a" onSubmitEditing={addRoom} />
+        <TouchableOpacity style={styles.tmplBtn} onPress={addRoom}><Text style={styles.tmplBtnText}>+ ADD ROOM</Text></TouchableOpacity>
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={saveArea}><Text style={styles.loadBtnText}>+ SAVE AREA</Text></TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>Or edit raw JSON (template / file ops):</Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your starting-areas JSON array here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadStartingAreasJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} starting area(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildStartingAreasTemplate()); setStatus({ kind: 'ok', msg: 'Loaded a 4-room example — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(startingAreas, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current areas — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(startingAreas, null, 2) : buildStartingAreasTemplate());
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: 'Copied to clipboard and cleared the box.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearStartingAreas(); setStatus({ kind: 'ok', msg: 'Cleared starting areas.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(startingAreas, null, 2) : buildStartingAreasTemplate())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(startingAreas, null, 2) : buildStartingAreasTemplate());
+            const r = await saveJsonToFile('starting-areas.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadStartingAreasJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} starting area(s) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — FACTION MISSIONS builder. Plan a faction's posted contract as a
+// form: which faction posts it, the rep gate where it appears on that faction's
+// Mission Board, the rep + TC + item rewards on completion, and the mission plan
+// itself (ordered beats, each advancing on kill / travel / anything — or a single
+// "gather N of an item" fetch requirement). Writes into missions.factionQuests,
+// preserving the other mission sub-tables; the Missions box still does raw JSON.
+const FQ_ADVANCE: Array<{ id: string; name: string }> = [
+  { id: 'any', name: 'anything' },
+  { id: 'kill', name: 'a kill' },
+  { id: 'travel', name: 'a travel' },
+];
+function FactionMissionsBox() {
+  const loadMissionsJson = useContentPackStore((s) => s.loadMissionsJson);
+  const missions = useContentPackStore((s) => s.missions) as { factionQuests?: Array<{ id: string; factionId: string; title: string }> };
+  const existing = missions.factionQuests ?? [];
+  const factions = getFactions() as Array<{ id: string; name: string }>;
+  const [status, setStatus] = useState<Status>(null);
+
+  const [f, setF] = useState({ factionId: '', title: '', objective: '', description: '', gateRep: '0', rewardTc: '', rewardRep: '', rewardItems: '', fetchItem: '', fetchQty: '' });
+  const up = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
+  const [stages, setStages] = useState<Array<{ narration: string; advanceOn: string }>>([]);
+  const [stageText, setStageText] = useState('');
+  const [stageAdvance, setStageAdvance] = useState('any');
+  const [text, setText] = useState('');
+
+  // The TEMPLATE — header instructions (the dependencies) + one of each PLAN type
+  // (staged + fetch). Comments are stripped on LOAD, so it still parses.
+  const tmpl = () => [
+    '// FACTION MISSIONS — contracts a faction posts on its board. Each:',
+    '//   { id, factionId, title, objective, description?, requirement:{ rep },',
+    '//     reward:{ tc, rep, items?:[names] },  + a PLAN:  stages:[{ narration,',
+    '//     advanceOn: "kill"|"travel"|"any" }]   OR   fetch:{ itemName, quantity } }',
+    '// DEPENDENCIES — match EXACTLY (case + spelling):',
+    "//   factionId       — a real id from your FACTIONS table (who posts the mission).",
+    "//   requirement.rep — the standing where it appears on that faction's board.",
+    '//   reward.items[]  — EXACT names of items defined in your item tables, else they',
+    '//                     grant as a stat-less "misc".',
+    '//   fetch.itemName  — a real, OBTAINABLE material/item (loot / dig / salvage), or',
+    '//                     the gather quest can never be turned in.',
+    '// Two PLAN types shown: a STAGED contract and a FETCH ("gather N") contract.',
+    JSON.stringify({ factionQuests: [
+      { id: 'silence_the_relay', factionId: 'REPLACE-with-a-faction-id', title: 'Silence the Relay', description: 'Knock out the forward relay before the next drop.', objective: 'Destroy the enemy relay', requirement: { rep: 15 }, reward: { tc: 120, rep: 8, items: ['REPLACE-with-an-item-you-defined'] }, stages: [{ narration: 'Cross the line and find the relay mast.', advanceOn: 'travel' }, { narration: 'Put the relay down and its guards with it.', advanceOn: 'kill' }] },
+      { id: 'forge_stock', factionId: 'REPLACE-with-a-faction-id', title: 'Forge Stock', description: "The board's standing bounty: bring in 3 of a material.", objective: 'Gather 3 of the material and turn it in.', requirement: { rep: 0 }, reward: { tc: 35, rep: 6 }, fetch: { itemName: 'REPLACE-with-an-obtainable-material', quantity: 3 } },
+    ] }, null, 2),
+  ].join('\n');
+
+  // LOAD raw JSON — accepts a bare factionQuests array OR { factionQuests: [...] };
+  // merges by id into the current set (preserving the other mission sub-tables).
+  const loadRaw = () => {
+    let parsed: unknown;
+    try { parsed = JSON.parse(stripJsonComments(text)); } catch (e) { setStatus({ kind: 'err', msg: `Not valid JSON: ${e instanceof Error ? e.message : String(e)}` }); return; }
+    const arr = Array.isArray(parsed) ? parsed : (parsed && typeof parsed === 'object' ? (parsed as { factionQuests?: unknown }).factionQuests : null);
+    if (!Array.isArray(arr) || arr.length === 0) { setStatus({ kind: 'err', msg: 'Expected a factionQuests array (or { "factionQuests": [...] }).' }); return; }
+    const ids = new Set(arr.map((q) => (q as { id?: string }).id));
+    const merged = [...existing.filter((q) => !ids.has(q.id)), ...(arr as Array<{ id: string; factionId: string; title: string }>)];
+    const r = loadMissionsJson(JSON.stringify({ ...missions, factionQuests: merged }));
+    setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${arr.length} faction mission(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+    if (r.ok) setText('');
+  };
+
+  const slug = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+  const addStage = () => {
+    const nm = stageText.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Type the beat’s narration first.' }); return; }
+    setStages((p) => [...p, { narration: nm, advanceOn: stageAdvance }]);
+    setStageText('');
+  };
+  const removeStage = (i: number) => setStages((p) => p.filter((_, j) => j !== i));
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+
+  const save = () => {
+    if (!f.factionId) { setStatus({ kind: 'err', msg: 'Pick the faction that POSTS this mission.' }); return; }
+    if (!f.title.trim()) { setStatus({ kind: 'err', msg: 'Give the mission a title.' }); return; }
+    if (!f.objective.trim()) { setStatus({ kind: 'err', msg: 'Add a one-line objective (shown on the board).' }); return; }
+    const fetchSet = f.fetchItem.trim() !== '' && Number(f.fetchQty) > 0;
+    // unique id from title
+    let base = slug(f.title) || `fq_${Date.now()}`; let id = base; let n = 2;
+    const ids = existing.filter((q) => slug(q.title) !== slug(f.title)).map((q) => q.id);
+    while (ids.includes(id)) id = `${base}_${n++}`;
+    const items = f.rewardItems.split(',').map((s) => s.trim()).filter(Boolean);
+    const quest = {
+      id,
+      factionId: f.factionId,
+      title: f.title.trim(),
+      description: f.description.trim() || f.objective.trim(),
+      objective: f.objective.trim(),
+      requirement: { rep: Number(f.gateRep) || 0 },
+      reward: {
+        tc: Number(f.rewardTc) || 0,
+        rep: Number(f.rewardRep) || 0,
+        ...(items.length > 0 ? { items } : {}),
+      },
+      // A fetch quest carries no stages; otherwise emit the ordered beats (if any).
+      ...(fetchSet ? { fetch: { itemName: f.fetchItem.trim(), quantity: Number(f.fetchQty) } } : (stages.length > 0 ? { stages } : {})),
+    };
+    const merged = [...existing.filter((q) => q.id !== id), quest];
+    const nextMissions = { ...missions, factionQuests: merged };
+    const r = loadMissionsJson(JSON.stringify(nextMissions));
+    if (!r.ok) { setStatus({ kind: 'err', msg: r.error ?? 'Failed to save.' }); return; }
+    setStatus({ kind: 'ok', msg: `Saved "${quest.title}" for ${factions.find((x) => x.id === f.factionId)?.name ?? f.factionId} (rep gate ${quest.requirement.rep}).` });
+    setF((p) => ({ ...p, title: '', objective: '', description: '', rewardTc: '', rewardRep: '', rewardItems: '', fetchItem: '', fetchQty: '' }));
+    setStages([]); setStageText('');
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Faction missions</Text>
+        <Text style={existing.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {existing.length > 0 ? `● ${existing.length}` : '○ none'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Plan a contract a FACTION posts on its Mission Board. Set the posting faction, the
+        <Text style={{ fontWeight: 'bold' }}> rep gate</Text> (the standing where it appears),
+        the <Text style={{ fontWeight: 'bold' }}>rewards</Text> (TC, rep, and any item drops), and the
+        mission plan — ordered beats, or a single “gather N of an item” fetch. These post to whichever
+        room you flag as the board in that faction’s starting area.
+      </Text>
+
+      {/* existing faction missions */}
+      {existing.map((q) => (
+        <View key={q.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{q.title}</Text> — {factions.find((x) => x.id === q.factionId)?.name ?? q.factionId}</Text>
+          <TouchableOpacity onPress={() => { const next = existing.filter((x) => x.id !== q.id); const r = loadMissionsJson(JSON.stringify({ ...missions, factionQuests: next })); setStatus(r.ok ? { kind: 'ok', msg: `Removed ${q.title}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); }}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {factions.length > 0
+        ? chipRow('Posted by faction:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))
+        : <Text style={styles.err}>Load a Factions table first — a mission is posted by a faction.</Text>}
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.title} onChangeText={(v) => up('title', v)} placeholder="Mission title (e.g. Silence the Relay)" placeholderTextColor="#46555a" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.objective} onChangeText={(v) => up('objective', v)} placeholder="One-line objective (shown on the board)" placeholderTextColor="#46555a" />
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.description} onChangeText={(v) => up('description', v)} placeholder="Flavor / briefing (optional)" placeholderTextColor="#46555a" />
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.gateRep} onChangeText={(v) => up('gateRep', v)} placeholder="rep gate" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardTc} onChangeText={(v) => up('rewardTc', v)} placeholder="reward TC" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.rewardRep} onChangeText={(v) => up('rewardRep', v)} placeholder="reward rep" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.rewardItems} onChangeText={(v) => up('rewardItems', v)} placeholder="Item drops (comma-sep names, optional)" placeholderTextColor="#46555a" />
+
+      <Text style={styles.hint}>Mission plan — ordered beats ({stages.length}):</Text>
+      {stages.map((st, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>{i + 1}. {st.narration} <Text style={{ fontStyle: 'italic' }}>(adv: {FQ_ADVANCE.find((a) => a.id === st.advanceOn)?.name ?? st.advanceOn})</Text></Text>
+          <TouchableOpacity onPress={() => removeStage(i)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={stageText} onChangeText={setStageText} placeholder="Beat narration → add" placeholderTextColor="#46555a" onSubmitEditing={addStage} />
+      {chipRow('…this beat advances on:', FQ_ADVANCE, stageAdvance, setStageAdvance)}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={addStage}><Text style={styles.tmplBtnText}>+ ADD BEAT</Text></TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>…or instead, a single GATHER requirement (turn-in consumes these):</Text>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.fetchItem} onChangeText={(v) => up('fetchItem', v)} placeholder="Item to gather" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.fetchQty} onChangeText={(v) => up('fetchQty', v)} placeholder="qty" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={save}><Text style={styles.loadBtnText}>+ SAVE MISSION</Text></TouchableOpacity>
+      </View>
+
+      <Text style={styles.hint}>Or edit raw JSON (template / paste / load):</Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a factionQuests array (or { factionQuests: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={loadRaw}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(tmpl()); setStatus({ kind: 'ok', msg: 'Loaded an example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (existing.length > 0 ? JSON.stringify({ factionQuests: existing }, null, 2) : tmpl())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — DIGGING builder. What the player scrapes out of the ground with
+// "dig": which items dig well, the productive-dig cap, and the dig loot table.
+// Form on top + raw-JSON strip below, matching the other content boxes.
+const DIG_RARITIES: Array<{ id: string; name: string }> = [
+  { id: 'Common', name: 'Common' }, { id: 'Uncommon', name: 'Uncommon' }, { id: 'Rare', name: 'Rare' },
+];
+function DiggingBox() {
+  const loadDiggingJson = useContentPackStore((s) => s.loadDiggingJson);
+  const digging = useContentPackStore((s) => s.digging) as { loot?: unknown[] } | null;
+  const loaded = !!digging;
+  const [status, setStatus] = useState<Status>(null);
+  const [text, setText] = useState('');
+  const [cap, setCap] = useState('16');
+  const [loot, setLoot] = useState<Array<{ name: string; rarity: string; weight: string }>>([]);
+  const [lootName, setLootName] = useState(''); const [lootRarity, setLootRarity] = useState('Common'); const [lootWeight, setLootWeight] = useState('');
+  const [scores, setScores] = useState<Array<{ name: string; score: string }>>([]);
+  const [scoreName, setScoreName] = useState(''); const [scoreVal, setScoreVal] = useState('');
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+  const addLoot = () => { if (!lootName.trim() || !Number(lootWeight)) { setStatus({ kind: 'err', msg: 'Loot needs a name and a weight.' }); return; } setLoot((p) => [...p, { name: lootName.trim(), rarity: lootRarity, weight: lootWeight }]); setLootName(''); setLootWeight(''); };
+  const addScore = () => { if (!scoreName.trim() || scoreVal === '') { setStatus({ kind: 'err', msg: 'Item score needs a name and a number.' }); return; } setScores((p) => [...p, { name: scoreName.trim(), score: scoreVal }]); setScoreName(''); setScoreVal(''); };
+
+  const save = () => {
+    if (loot.length === 0) { setStatus({ kind: 'err', msg: 'Add at least one loot entry.' }); return; }
+    const obj = {
+      itemScores: Object.fromEntries(scores.map((s) => [s.name, Number(s.score) || 0])),
+      tagScores: {},
+      productiveCap: Number(cap) || 16,
+      loot: loot.map((l) => ({ name: l.name, rarity: l.rarity, baseWeight: Number(l.weight) || 1 })),
+    };
+    const r = loadDiggingJson(JSON.stringify(obj));
+    setStatus(r.ok ? { kind: 'ok', msg: `Saved digging — ${loot.length} loot, ${scores.length} item scores.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Digging</Text>
+        <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? `● override · ${digging?.loot?.length ?? 0}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        What “dig” pulls from the ground. Set the loot table (what can be found + rarity + weight),
+        which items are good shovels (item → score), and the productive-dig cap. Higher dig score
+        finds more, and better rarities. Omit to keep the built-in.
+      </Text>
+
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={cap} onChangeText={setCap} placeholder="productive cap" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+
+      <Text style={styles.hint}>Dig loot ({loot.length}):</Text>
+      {loot.map((l, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ {l.name} — {l.rarity} · w{l.weight}</Text>
+          <TouchableOpacity onPress={() => setLoot((p) => p.filter((_, j) => j !== i))}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={lootName} onChangeText={setLootName} placeholder="loot item name" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={lootWeight} onChangeText={setLootWeight} placeholder="weight" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+      {chipRow('…rarity:', DIG_RARITIES, lootRarity, setLootRarity)}
+      <View style={styles.row}><TouchableOpacity style={styles.tmplBtn} onPress={addLoot}><Text style={styles.tmplBtnText}>+ ADD LOOT</Text></TouchableOpacity></View>
+
+      <Text style={styles.hint}>Good shovels — item → dig score ({scores.length}):</Text>
+      {scores.map((sc, i) => (
+        <View key={i} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ {sc.name} → {sc.score}</Text>
+          <TouchableOpacity onPress={() => setScores((p) => p.filter((_, j) => j !== i))}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={scoreName} onChangeText={setScoreName} placeholder="item name" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={scoreVal} onChangeText={setScoreVal} placeholder="score" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TouchableOpacity style={styles.tmplBtn} onPress={addScore}><Text style={styles.tmplBtnText}>+ ADD</Text></TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={save}><Text style={styles.loadBtnText}>+ SAVE DIGGING</Text></TouchableOpacity>
+        {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDigging(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+
+      <Text style={styles.hint}>Or edit raw JSON (template / file):</Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a digging JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDiggingJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded digging (${r.count} loot).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDiggingTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(digging, null, 2) : buildDiggingTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — SCRAP config box. What an item breaks down into (role → material,
+// raw guards, premium mats, failure lines). Config-shaped, so a template/paste/load
+// box matching the other config boxes.
+function ScrapBox() {
+  const loadScrapJson = useContentPackStore((s) => s.loadScrapJson);
+  const scrap = useContentPackStore((s) => s.scrap) as { roles?: Record<string, unknown> } | null;
+  const loaded = !!scrap;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Scrap</Text>
+        <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? '● override' : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        What breaking an item down yields. The tag→material RULES stay in the engine; you set the
+        data: <Text style={{ fontWeight: 'bold' }}>roles</Text> (which material each role gives —
+        metalBulk, aetherPrimary, stone, cloth, wood…), <Text style={{ fontWeight: 'bold' }}>rawGuard</Text>
+        (mats that can’t scrap into themselves), <Text style={{ fontWeight: 'bold' }}>premiumMats</Text>,
+        and <Text style={{ fontWeight: 'bold' }}>failureLines</Text>. Hit TEMPLATE for the shape; omit to keep the built-in.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scrap JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadScrapJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded scrap (${r.count} roles).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildScrapTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(scrap, null, 2) : buildScrapTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearScrap(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — SALVAGE config box. Per-noun salvage outcome pools. Config-shaped,
+// so a template/paste/load box matching the other config boxes.
+function SalvageBox() {
+  const loadSalvageJson = useContentPackStore((s) => s.loadSalvageJson);
+  const salvage = useContentPackStore((s) => s.salvage) as { pools?: unknown[] } | null;
+  const loaded = !!salvage;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Salvage</Text>
+        <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? `● override · ${salvage?.pools?.length ?? 0}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        What salvaging a noun yields. The match/pick RULES stay in the engine; you set the
+        <Text style={{ fontWeight: 'bold' }}> pools</Text> — each with pattern nouns (a wagon, a
+        blade…) and a weighted material list — plus the small-haul <Text style={{ fontWeight: 'bold' }}>junk</Text>
+        fallback and flavor lines. First matching pool wins. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a salvage JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadSalvageJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded salvage (${r.count} pools).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSalvageTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(salvage, null, 2) : buildSalvageTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearSalvage(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — ELEVATED OVERLAYS box. Mini-scenes at the top of a tall climb. Array
+// of nested templates, so a template/paste/load box matching the other list boxes.
+function OverlaysBox() {
+  const loadOverlaysJson = useContentPackStore((s) => s.loadOverlaysJson);
+  const overlays = useContentPackStore((s) => s.overlays) as unknown[];
+  const loaded = overlays.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Elevated overlays</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        Mini-scenes surfaced at the top of a tall climb (a nook, a vantage trader, a lookout, an
+        encounter). The roll/scene RULES stay in the engine; you set the array of overlays — each
+        with a <Text style={{ fontWeight: 'bold' }}>kind</Text> (encounter / trader / lookout),
+        arrival line, ambient nouns, and (for encounters) a pool of enemy names. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste an overlays array (or { overlays: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadOverlaysJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} overlay(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildOverlaysTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded > 0 ? JSON.stringify(overlays, null, 2) : buildOverlaysTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearOverlays(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — DOG-RESCUE SCENARIOS ("the dog hook"). The acquisition MECHANIC
+// stays in the engine (one dog per save; tap a hookNoun -> faction-neutral
+// captor -> name/breed onboarding). This box only re-words it: hook nouns,
+// captor name + faction, the intro + victory lines, breed/profile seed.
+function DogScenariosBox() {
+  const loadDogScenariosJson = useContentPackStore((s) => s.loadDogScenariosJson);
+  const dogScenarios = useContentPackStore((s) => s.dogScenarios) as unknown[];
+  const loaded = dogScenarios.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Dog-rescue scenarios (the “dog hook”)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        How the player FINDS and frees the one companion dog. The mechanic is fixed: in an
+        enemy-free scene, investigating / attacking / approaching a target that matches a
+        <Text style={{ fontWeight: 'bold' }}> hookNoun</Text> spawns the captor → kill them (no
+        faction cost) → breed/name/sex onboarding. Matching is <Text style={{ fontWeight: 'bold' }}>whole-phrase</Text>
+        {' '}(“ash tree” fires on “the black ash tree”, not “trash”; a multi-word phrase fires only on the
+        full phrase, not its single words), so pick distinctive phrases.{'\n\n'}
+        Each scenario is keyed by the <Text style={{ fontWeight: 'bold' }}>captor’s faction</Text>
+        {' '}(must match a faction id from your Factions table). When the PLAYER is that faction the
+        engine swaps in the unaligned captor — so give <Text style={{ fontWeight: 'bold' }}>exactly one</Text> row
+        {' '}<Text style={{ fontWeight: 'bold' }}>captorFactionId: null</Text> as the fallback. Use
+        {' '}<Text style={{ fontWeight: 'bold' }}>{'{captorName}'}</Text> in the intro line. You can also set optional
+        captor combat per scenario: <Text style={{ fontWeight: 'bold' }}>captorHp / captorAttack / captorDamage / captorLoot</Text>
+        {' '}(loot must be items from your own tables). Hit TEMPLATE — its header explains every field.
+      </Text>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scenarios array (or { scenarios: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDogScenariosJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} scenario(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDogScenariosTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded > 0 ? JSON.stringify(dogScenarios, null, 2) : buildDogScenariosTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {loaded > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDogScenarios(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — IMPORTABLE TITLES. Build achievements by picking a trackable
+// variable, naming the title, and setting a threshold — or upload/paste the JSON.
+function TitlesBox() {
+  const loadTitlesJson = useContentPackStore((s) => s.loadTitlesJson);
+  const customTitles = useContentPackStore((s) => s.customTitles) as Array<{ id: string; name: string; track: string; threshold: number; description?: string }>;
+  const loaded = customTitles.length;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  // Builder state.
+  const [bVar, setBVar] = useState<string>(TRACKABLE_VARS[0]?.id ?? '');
+  const [bName, setBName] = useState('');
+  const [bThresh, setBThresh] = useState('');
+
+  const applyList = (list: unknown[], okMsg: string) => {
+    const r = loadTitlesJson(JSON.stringify(list));
+    setStatus(r.ok ? { kind: 'ok', msg: okMsg } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  const addBuilderTitle = () => {
+    const name = bName.trim();
+    const threshold = Number(bThresh);
+    if (!name) { setStatus({ kind: 'err', msg: 'Give the title a name.' }); return; }
+    if (!bVar || !Number.isFinite(threshold)) { setStatus({ kind: 'err', msg: 'Pick a variable and a numeric threshold.' }); return; }
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || `title_${Date.now()}`;
+    const next = [...customTitles.filter((t) => t.id !== id), { id, name, track: bVar, threshold }];
+    applyList(next, `Added “${name}” — ${TRACKABLE_VARS.find((v) => v.id === bVar)?.label} ≥ ${threshold}. (${next.length} total)`);
+    setBName(''); setBThresh('');
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Titles (achievements)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded}` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Importable titles. Each is earned when a <Text style={{ fontWeight: 'bold' }}>trackable variable</Text>{' '}
+        reaches a <Text style={{ fontWeight: 'bold' }}>threshold</Text>. Build one below — pick a variable, name
+        it, set the number — or hit TEMPLATE / UPLOAD FILE to author the JSON directly.
+      </Text>
+
+      {/* BUILDER — pick a trackable variable (checkbox), name + threshold, ADD. */}
+      <Text style={styles.hint}>1 · Pick a variable to track:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {TRACKABLE_VARS.map((v) => (
+          <TouchableOpacity
+            key={v.id}
+            style={[styles.tmplBtn, bVar === v.id && styles.loadBtn, { marginBottom: 4 }]}
+            onPress={() => setBVar(v.id)}
+          >
+            <Text style={bVar === v.id ? styles.loadBtnText : styles.tmplBtnText}>
+              {bVar === v.id ? '☑ ' : '☐ '}{v.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]}
+          value={bName}
+          onChangeText={setBName}
+          placeholder="Title name (e.g. Veteran of the Fold)"
+          placeholderTextColor="#46555a"
+          autoCapitalize="words"
+        />
+        <TextInput
+          style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]}
+          value={bThresh}
+          onChangeText={setBThresh}
+          placeholder="threshold"
+          placeholderTextColor="#46555a"
+          keyboardType="number-pad"
+        />
+        <TouchableOpacity style={styles.loadBtn} onPress={addBuilderTitle}>
+          <Text style={styles.loadBtnText}>+ ADD</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Current titles list with remove. */}
+      {loaded > 0 && customTitles.map((t) => (
+        <View key={t.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>
+            ◆ <Text style={{ fontWeight: 'bold' }}>{t.name}</Text> — {TRACKABLE_VARS.find((v) => v.id === t.track)?.label ?? t.track} ≥ {t.threshold}
+          </Text>
+          <TouchableOpacity
+            onPress={() => applyList(customTitles.filter((x) => x.id !== t.id), `Removed “${t.name}”.`)}
+          >
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {/* JSON path. */}
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="…or paste a titles JSON array here"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadTitlesJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} title(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildTitlesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the template (lists every trackable variable).' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(customTitles, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your titles — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate())); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify(customTitles, null, 2) : buildTitlesTemplate());
+            const r = await saveJsonToFile('titles.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadTitlesJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} title(s) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearTitles(); setStatus({ kind: 'ok', msg: 'Cleared custom titles.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — COLLECTABLES upload. Character stories the player reassembles from
+// loot fragments; the uploaded set replaces the built-in stories wholesale.
+function CollectablesBox() {
+  const loadCollectablesJson = useContentPackStore((s) => s.loadCollectablesJson);
+  const collectables = useContentPackStore((s) => s.collectables) as Array<{ id: string; characterName?: string; fragments?: unknown[] }>;
+  const loaded = collectables.length;
+  const fragCount = collectables.reduce((n, s) => n + (Array.isArray(s.fragments) ? s.fragments.length : 0), 0);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Collectables (character stories)</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} stories / ${fragCount} fragments` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Character stories the player reassembles from loot. Each story is one named character
+        with a chain of <Text style={{ fontWeight: 'bold' }}>fragments</Text> (note / letter /
+        journal / fragment). A fragment drops in place of normal loot where the scene's location
+        tags overlap its <Text style={{ fontWeight: 'bold' }}>biomeTags</Text>. The Contracts screen's
+        Collectables tab shows per-character completion. Top level is{' '}
+        <Text style={{ fontWeight: 'bold' }}>{'{ "stories": [ … ] }'}</Text> (a bare array also works).
+        The uploaded set replaces the built-in stories. Hit TEMPLATE for the shape.
+      </Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your collectables JSON here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadCollectablesJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} character stor${r.count === 1 ? 'y' : 'ies'}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildCollectablesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the collectables template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify({ stories: collectables }, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current stories — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate()); void Clipboard.setStringAsync(content); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : (loaded > 0 ? JSON.stringify({ stories: collectables }, null, 2) : buildCollectablesTemplate());
+            const r = await saveJsonToFile('collectables.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadCollectablesJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} character stor${res.count === 1 ? 'y' : 'ies'} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearCollectables(); setStatus({ kind: 'ok', msg: 'Reset collectables to built-in.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — SUMMONED SIDEKICKS builder. The buildable companion family (the
+// engine's "golems", reskinnable). An uploaded pack replaces the built-in golems
+// wholesale and can rename the category ("automaton", "construct", …). Also holds
+// the rescuable DOG companion on/off toggle.
+function SummonsBox() {
+  const loadSummonsJson = useContentPackStore((s) => s.loadSummonsJson);
+  const summons = useContentPackStore((s) => s.summons) as { noun?: string; defs: unknown[] } | null;
+  const dogEnabled = useContentPackStore((s) => s.dogEnabled);
+  const setDogCompanionEnabled = useContentPackStore((s) => s.setDogCompanionEnabled);
+  const sidekickWeaponQuestPct = useContentPackStore((s) => s.sidekickWeaponQuestPct);
+  const setSidekickWeaponQuestPct = useContentPackStore((s) => s.setSidekickWeaponQuestPct);
+  const loaded = summons?.defs?.length ?? 0;
+  const noun = summons?.noun?.trim() || 'sidekick';
+  const [text, setText] = useState('');
+  const [pctText, setPctText] = useState(String(sidekickWeaponQuestPct || ''));
+  const [status, setStatus] = useState<Status>(null);
+  const commitPct = () => {
+    const n = parseInt(pctText, 10);
+    const clamped = Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+    setSidekickWeaponQuestPct(clamped);
+    setPctText(clamped ? String(clamped) : '');
+    setStatus({ kind: 'ok', msg: clamped > 0 ? `Sidekick weapons gated to ${clamped}% main-mission progress.` : 'Sidekick-weapon gate cleared (craftable any time).' });
+  };
+  const current = () => loaded > 0 ? JSON.stringify(summons, null, 2) : buildSummonsTemplate();
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Summoned Sidekicks</Text>
+        <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
+          {loaded > 0 ? `● override · ${loaded} ${noun}${loaded === 1 ? '' : 's'}` : '○ built-in sidekicks'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        The buildable companion family — the engine's <Text style={{ fontWeight: 'bold' }}>sidekicks</Text>, fully reskinnable. Set a{' '}
+        <Text style={{ fontWeight: 'bold' }}>noun</Text> (what the player types after “summon”, e.g.
+        “automaton”) and a list of <Text style={{ fontWeight: 'bold' }}>summons</Text>, each with its
+        fuel, combat profile, summon DC, and aliases. The player summons by typing “summon &lt;alias&gt;”.
+        Fuel names must exist in your materials/gear catalog. The uploaded pack replaces the built-in
+        sidekicks. Hit TEMPLATE for the shape.
+      </Text>
+
+      {/* DOG TOGGLE — independent of the summon pack. */}
+      <View style={[styles.row, { alignItems: 'center', marginBottom: 6 }]}>
+        <Text style={[styles.hint, { flex: 1, marginBottom: 0 }]}>
+          Rescuable <Text style={{ fontWeight: 'bold' }}>dog companion</Text> — {dogEnabled ? 'ON (players can rescue & keep a dog)' : 'OFF (no dog in this game)'}.
+        </Text>
+        <TouchableOpacity
+          style={dogEnabled ? styles.loadBtn : styles.tmplBtn}
+          onPress={() => { setDogCompanionEnabled(!dogEnabled); setStatus({ kind: 'ok', msg: !dogEnabled ? 'Dog companion ON.' : 'Dog companion OFF — no rescue scenarios will fire.' }); }}
+        >
+          <Text style={dogEnabled ? styles.loadBtnText : styles.tmplBtnText}>{dogEnabled ? '☑ DOG ON' : '☐ DOG OFF'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* SIDEKICK-WEAPON GATE — a single global threshold: the player must be at
+          least this % through the main mission before any sidekick weapon (the
+          golem_weapon recipes on the Magic tab) can be crafted. 0/blank = no gate. */}
+      <View style={[styles.row, { alignItems: 'center', marginBottom: 6 }]}>
+        <Text style={[styles.hint, { flex: 1, marginBottom: 0 }]}>
+          <Text style={{ fontWeight: 'bold' }}>Sidekick-weapon gate</Text> — % of the main mission the
+          player must reach before sidekick weapons can be crafted. Blank or 0 = craftable any time.
+        </Text>
+        <TextInput
+          style={[styles.input, { width: 64, marginBottom: 0, textAlign: 'center' }]}
+          value={pctText}
+          onChangeText={(t) => setPctText(t.replace(/[^0-9]/g, '').slice(0, 3))}
+          onBlur={commitPct}
+          onSubmitEditing={commitPct}
+          placeholder="0"
+          placeholderTextColor="#46555a"
+          keyboardType="number-pad"
+          maxLength={3}
+        />
+        <TouchableOpacity style={styles.loadBtn} onPress={commitPct}>
+          <Text style={styles.loadBtnText}>SET %</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your summons JSON here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadSummonsJson(text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} summon${r.count === 1 ? '' : 's'}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSummonsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the summons template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify({ noun: summons?.noun, summons: summons?.defs ?? [] }, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current summons — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : current()); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : current();
+            const r = await saveJsonToFile('summons.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => {
+            const r = await pickJsonFile();
+            if (r.canceled) return;
+            if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; }
+            const res = loadSummonsJson(r.content);
+            setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} summon${res.count === 1 ? '' : 's'} from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' });
+          }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {loaded > 0 && (
+          <TouchableOpacity
+            style={styles.resetBtn}
+            onPress={() => { useContentPackStore.getState().clearSummons(); setStatus({ kind: 'ok', msg: 'Reset summons to built-in sidekicks.' }); }}
+          >
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — generic JSON-rules uploader for the advanced combat/crafting tables
+// (damage types, enemy resistances, fusion tags, coatings). Same LOAD / TEMPLATE /
+// SAVE FILE / UPLOAD FILE / RESET contract as the other boxes, parameterised by the
+// store loader/clearer so each rule set is one short declaration below.
+function RulesBox({ title, hint, badge, hasData, currentJson, template, filename, onLoad, onClear }: {
+  title: string;
+  hint: React.ReactNode;
+  badge: string | null;
+  hasData: boolean;
+  currentJson: () => string;
+  template: string;
+  filename: string;
+  onLoad: (json: string) => LoadResult;
+  onClear: () => void;
+}) {
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  const editOrTemplate = () => (hasData ? currentJson() : template);
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={hasData ? styles.badgeOn : styles.badgeOff}>{hasData ? (badge ?? '● override') : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste JSON here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => {
+          const r = onLoad(text);
+          setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} entr${r.count === 1 ? 'y' : 'ies'}.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+          if (r.ok) setText('');
+        }}>
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(template); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}>
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {hasData && (
+          <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(currentJson()); setStatus({ kind: 'ok', msg: 'Loaded your current entries — edit, then LOAD.' }); }}>
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => {
+          const content = text.trim().length > 0 ? text : editOrTemplate();
+          void Clipboard.setStringAsync(content);
+          setStatus({ kind: 'ok', msg: 'Copied to clipboard.' });
+        }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {hasData && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { onClear(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+const DAMAGE_TYPES_TEMPLATE = JSON.stringify([
+  { name: 'fire', keywords: ['fire', 'flame', 'burn', 'scorch'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } },
+  { name: 'frost', keywords: ['frost', 'ice', 'freeze', 'cold', 'chill'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.7, weakBonus: 0.25, strongPenalty: 0.25 } },
+], null, 2);
+// engine_Dev — stealth is a SKILL modifier (approach/first-strike), not a combat
+// stat a damage type debuffs, so it's intentionally excluded from on-hit effects.
+const DT_STATS: Array<'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma'> = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'];
+
+// engine_Dev — DAMAGE TYPES builder. Name + keyword aliases + an optional ON-HIT
+// stat effect (per-stat +/- applied to whoever is hit by this type, for N rounds),
+// written straight into the damageTypes JSON. Round-trips: an uploaded file shows
+// in the list, edit/add here, it rewrites the file. These names then populate the
+// enemy Weak / Strong / Delivers pickers below.
+function DamageTypesBuilder() {
+  const damageTypes = useContentPackStore((s) => s.damageTypes) as Array<{ name: string; keywords?: string[]; onHit?: Array<{ stat: string; amount: number }>; onHitRounds?: number; combat?: { mode: string; dice?: string; rounds?: number } }>;
+  const loadDamageTypesJson = useContentPackStore((s) => s.loadDamageTypesJson);
+  const [name, setName] = useState('');
+  const [keywords, setKeywords] = useState('');
+  const [rounds, setRounds] = useState('3');
+  const [mods, setMods] = useState<Record<string, string>>({});
+  // combat effect config
+  const [cMode, setCMode] = useState<'none' | 'on_hit' | 'dot'>('none');
+  const [cDice, setCDice] = useState('1d6');
+  const [cRounds, setCRounds] = useState('3');
+  const [cChance, setCChance] = useState('70');
+  const [cWeak, setCWeak] = useState('25');
+  const [cStrong, setCStrong] = useState('25');
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+
+  const apply = (list: unknown[], msg: string) => {
+    const r = loadDamageTypesJson(JSON.stringify(list));
+    setStatus(r.ok ? { kind: 'ok', msg } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  const addType = () => {
+    const nm = name.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Name the damage type.' }); return; }
+    const onHit = DT_STATS
+      .map((s) => ({ stat: s, amount: Math.trunc(Number(mods[s] ?? '')) }))
+      .filter((m) => Number.isFinite(m.amount) && m.amount !== 0);
+    const def: Record<string, unknown> = { name: nm };
+    const kw = keywords.split(',').map((k) => k.trim()).filter(Boolean);
+    if (kw.length > 0) def.keywords = kw;
+    if (onHit.length > 0) { def.onHit = onHit; def.onHitRounds = Math.max(1, Math.trunc(Number(rounds) || 3)); }
+    if (cMode !== 'none') {
+      const combat: Record<string, unknown> = {
+        mode: cMode,
+        dice: cDice.trim() || '1d6',
+        baseChance: Math.max(0, Math.min(1, (Number(cChance) || 70) / 100)),
+        weakBonus: Math.max(0, Math.min(1, (Number(cWeak) || 0) / 100)),
+        strongPenalty: Math.max(0, Math.min(1, (Number(cStrong) || 0) / 100)),
+      };
+      if (cMode === 'dot') combat.rounds = Math.max(1, Math.trunc(Number(cRounds) || 3));
+      def.combat = combat;
+    }
+    const next = [...damageTypes.filter((d) => d.name.toLowerCase() !== nm.toLowerCase()), def];
+    apply(next, `Added “${nm}”${cMode !== 'none' ? ` (${cMode === 'on_hit' ? 'on-hit' : 'DOT'} ${cDice})` : ''}${onHit.length ? ` (${onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')} on hit)` : ''}. (${next.length} total)`);
+    setName(''); setKeywords(''); setMods({}); setCMode('none');
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Damage types (define)</Text>
+        <Text style={damageTypes.length > 0 ? styles.badgeOn : styles.badgeOff}>{damageTypes.length > 0 ? `● ${damageTypes.length} added` : '○ built-in 10'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        Define damage types beyond the built-in 10 (bludgeoning, slashing, piercing, burn, electrical,
+        poison, radiation, stun, degradation, aetheric). Name it, add keyword aliases (so a bare attack
+        string like “ice blast” infers it), and optionally an <Text style={{ fontWeight: 'bold' }}>on-hit
+        stat effect</Text> — when something is HIT by this type, the +/- applies to the victim for N
+        rounds. These names then fill the enemy Weak / Strong / Delivers pickers.
+      </Text>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Type name (e.g. frost)" placeholderTextColor="#46555a" autoCapitalize="none" />
+        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={keywords} onChangeText={setKeywords} placeholder="keywords, comma-sep (ice, freeze)" placeholderTextColor="#46555a" autoCapitalize="none" />
+      </View>
+      <Text style={styles.hint}>On-hit stat effect (optional) — leave blank for none:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {DT_STATS.map((s) => (
+          <View key={s} style={{ alignItems: 'center', marginRight: 6, marginBottom: 4 }}>
+            <Text style={[styles.hint, { marginBottom: 0 }]}>{s.slice(0, 3).toUpperCase()}</Text>
+            <TextInput
+              style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]}
+              value={mods[s] ?? ''}
+              onChangeText={(v) => setMods((m) => ({ ...m, [s]: v }))}
+              placeholder="0"
+              placeholderTextColor="#46555a"
+              keyboardType="numbers-and-punctuation"
+            />
+          </View>
+        ))}
+        <View style={{ alignItems: 'center', marginBottom: 4 }}>
+          <Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text>
+          <TextInput style={[styles.input, { width: 48, minHeight: 0, height: 36, textAlign: 'center' }]} value={rounds} onChangeText={setRounds} placeholder="3" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        </View>
+      </View>
+      <Text style={styles.hint}>Combat effect when a weapon DEALS this type (optional):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+        {(['none', 'on_hit', 'dot'] as const).map((m) => (
+          <TouchableOpacity key={m} style={[styles.tmplBtn, cMode === m && styles.loadBtn, { marginBottom: 4, paddingVertical: 4, paddingHorizontal: 8 }]} onPress={() => setCMode(m)}>
+            <Text style={cMode === m ? styles.loadBtnText : styles.tmplBtnText}>{cMode === m ? '☑ ' : '☐ '}{m === 'none' ? 'none' : m === 'on_hit' ? 'on-hit (immediate)' : 'DOT (ticks)'}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      {cMode !== 'none' && (
+        <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>DICE</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cDice} onChangeText={setCDice} placeholder="1d6" placeholderTextColor="#46555a" autoCapitalize="none" /></View>
+          {cMode === 'dot' && <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>RNDS</Text><TextInput style={[styles.input, { width: 44, minHeight: 0, height: 36, textAlign: 'center' }]} value={cRounds} onChangeText={setCRounds} placeholder="3" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>}
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>CHANCE%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cChance} onChangeText={setCChance} placeholder="70" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>+WEAK%</Text><TextInput style={[styles.input, { width: 56, minHeight: 0, height: 36, textAlign: 'center' }]} value={cWeak} onChangeText={setCWeak} placeholder="25" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>
+          <View style={{ alignItems: 'center', marginRight: 6 }}><Text style={[styles.hint, { marginBottom: 0 }]}>−STRONG%</Text><TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={cStrong} onChangeText={setCStrong} placeholder="25" placeholderTextColor="#46555a" keyboardType="number-pad" /></View>
+        </View>
+      )}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={addType}><Text style={styles.loadBtnText}>+ ADD DAMAGE TYPE</Text></TouchableOpacity>
+      </View>
+
+      {damageTypes.map((d) => (
+        <View key={d.name} style={styles.titleRowDev}>
+          <Text style={styles.hint}>
+            ◆ <Text style={{ fontWeight: 'bold' }}>{d.name}</Text>
+            {d.combat ? ` — ${d.combat.mode === 'on_hit' ? 'on-hit' : 'DOT'} ${d.combat.dice ?? '1d6'}${d.combat.mode === 'dot' ? `/${d.combat.rounds ?? 3}r` : ''}` : ''}
+            {Array.isArray(d.onHit) && d.onHit.length > 0 ? ` · ${d.onHit.map((m) => `${m.amount > 0 ? '+' : ''}${m.amount} ${m.stat.slice(0, 3)}`).join(', ')}/${d.onHitRounds ?? 3}r` : ''}
+          </Text>
+          <TouchableOpacity onPress={() => apply(damageTypes.filter((x) => x.name !== d.name), `Removed “${d.name}”.`)}><Text style={styles.resetBtnText}> ✕</Text></TouchableOpacity>
+        </View>
+      ))}
+
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a damage-types JSON array" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDamageTypesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count}.` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(DAMAGE_TYPES_TEMPLATE); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        {damageTypes.length > 0 && <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(damageTypes, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your current types — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>EDIT CURRENT</Text></TouchableOpacity>}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { const content = text.trim().length > 0 ? text : (damageTypes.length > 0 ? JSON.stringify(damageTypes, null, 2) : DAMAGE_TYPES_TEMPLATE); void Clipboard.setStringAsync(content); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        {damageTypes.length > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDamageTypes(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2);
+const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
+// engine_Dev — RENAME template for the five built-in weapon-coating MECHANICS. The combat
+// effects stay wired (poison=pure DOT, acid=DOT+armor shred, corruption=DOT+sickening stacks,
+// electrical=counts as electrical dmg, burn=counts as burn dmg) — you are only re-skinning the
+// words the player reads. All five are pre-filled with their generic defaults below; edit the
+// strings to your setting and DELETE any mechanic you want to leave at its default. Per mechanic:
+//   label     — the adjective shown when a weapon is coated ("Poisoned Battle Axe")
+//   blurb     — the one-line combat/inventory description of what the coating does
+//   lootLabel — the adjective on a weapon that turns up already-coated as loot (usually = label)
+const COATINGS_TEMPLATE = [
+  '{',
+  '  // poison — pure damage over time, nothing extra.',
+  '  "poison": {',
+  '    "label": "Poisoned",',
+  '    "blurb": "leaks poison into the wound (pure damage over time)",',
+  '    "lootLabel": "Poisoned"',
+  '  },',
+  '  // acid — damage over time AND shreds the target\'s armor (AC) the more you hit.',
+  '  "acid": {',
+  '    "label": "Acid-Etched",',
+  '    "blurb": "burns and eats the target\'s armor (damage over time + armor shred)",',
+  '    "lootLabel": "Acid-Etched"',
+  '  },',
+  '  // corruption — damage over time that ticks harder per stack (worst against tough foes).',
+  '  "corruption": {',
+  '    "label": "Corrupted",',
+  '    "blurb": "pushes corruption into the target (damage over time + sickening stacks)",',
+  '    "lootLabel": "Corrupted"',
+  '  },',
+  '  // electrical — counts as electrical damage (extra-effective vs constructs/automatons).',
+  '  "electrical": {',
+  '    "label": "Charged",',
+  '    "blurb": "arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)",',
+  '    "lootLabel": "Charged"',
+  '  },',
+  '  // burn — counts as burn damage (extra-effective vs mud creatures and other burn-weak foes).',
+  '  "burn": {',
+  '    "label": "Burning",',
+  '    "blurb": "sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)",',
+  '    "lootLabel": "Burning"',
+  '  }',
+  '}',
+].join('\n');
+const INVENTORY_TEMPLATE = JSON.stringify({ labels: { loot: 'Salvage', material: 'Components', weapon: 'Arsenal' }, toolTags: ['multitool', 'spanner'], repairMaterialPct: 200 }, null, 2);
+
+const BUILTIN_DAMAGE_TYPES = ['bludgeoning', 'slashing', 'piercing', 'burn', 'electrical', 'poison', 'radiation', 'stun', 'degradation', 'aetheric'];
+
+// engine_Dev — paste-safe chunk size for the multi-part validation copy (matches LogScreen's 25k).
+const VALIDATION_CHUNK_SIZE = 25_000;
+
+// engine_Dev — ENEMY damage-relations builder. Pulls the live damage-type list
+// (built-in + the ones you defined above) and lets you set, per enemy, what it
+// DELIVERS and what it's WEAK / STRONG against — via checkboxes that write the
+// enemies content table (weak → "vulnerable:<type>" traits, strong → "resist:<type>"
+// traits, delivers → the damage string). Round-trips with an uploaded enemies file.
+function EnemyRelationsBuilder() {
+  const damageTypes = useContentPackStore((s) => s.damageTypes) as Array<{ name: string }>;
+  const tables = useContentPackStore((s) => s.tables) as Record<string, Array<Record<string, unknown>>>;
+  const loadTableJson = useContentPackStore((s) => s.loadTableJson);
+  const enemies = (Array.isArray(tables.enemies) ? tables.enemies : []) as Array<Record<string, unknown>>;
+  const types = [...BUILTIN_DAMAGE_TYPES, ...damageTypes.map((d) => d.name)].filter((t, i, a) => a.indexOf(t) === i);
+
+  const [name, setName] = useState('');
+  const [hp, setHp] = useState('');
+  const [dice, setDice] = useState('1d6');
+  const [delivers, setDelivers] = useState('bludgeoning');
+  const [weak, setWeak] = useState<string[]>([]);
+  const [strong, setStrong] = useState<string[]>([]);
+  const [status, setStatus] = useState<Status>(null);
+
+  const toggle = (arr: string[], set: (v: string[]) => void, t: string) => set(arr.includes(t) ? arr.filter((x) => x !== t) : [...arr, t]);
+  const save = (rows: Array<Record<string, unknown>>, msg: string) => {
+    const r = loadTableJson('enemies', JSON.stringify(rows));
+    setStatus(r.ok ? { kind: 'ok', msg } : { kind: 'err', msg: r.error ?? 'Failed.' });
+  };
+  const addOrUpdate = () => {
+    const nm = name.trim();
+    if (!nm) { setStatus({ kind: 'err', msg: 'Name the enemy.' }); return; }
+    const relTraits = [...weak.map((t) => `vulnerable:${t}`), ...strong.map((t) => `resist:${t}`)];
+    const rows = [...enemies];
+    const idx = rows.findIndex((r) => typeof r.name === 'string' && (r.name as string).toLowerCase() === nm.toLowerCase());
+    if (idx >= 0) {
+      const ex = rows[idx]!;
+      const keep = (Array.isArray(ex.traits) ? ex.traits as string[] : []).filter((t) => !/^(vulnerable|resist):/i.test(t));
+      const exDice = typeof ex.damage === 'string' ? (ex.damage.match(/^\d*d\d+/i)?.[0] ?? dice) : dice;
+      rows[idx] = { ...ex, traits: [...keep, ...relTraits], damage: `${exDice} ${delivers}` };
+      save(rows, `Updated “${nm}” — delivers ${delivers}${weak.length ? `, weak ${weak.join('/')}` : ''}${strong.length ? `, strong ${strong.join('/')}` : ''}.`);
+    } else {
+      rows.push({ name: nm, type: 'Custom', abilityPoint: '1d6', attack: nm, damage: `${dice || '1d6'} ${delivers}`, hp: Number(hp) || 10, rarity: 'Common', loot: [], traits: relTraits });
+      save(rows, `Added “${nm}” (${rows.length} enemies). Fill its other fields in the ENEMIES table if needed.`);
+    }
+    setName(''); setHp(''); setWeak([]); setStrong([]);
+  };
+
+  const chip = (t: string, on: boolean, onPress: () => void) => (
+    <TouchableOpacity key={t} style={[styles.tmplBtn, on && styles.loadBtn, { marginBottom: 4, paddingVertical: 4, paddingHorizontal: 8 }]} onPress={onPress}>
+      <Text style={on ? styles.loadBtnText : styles.tmplBtnText}>{on ? '☑ ' : '☐ '}{t}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Enemy damage relations</Text>
+        <Text style={enemies.length > 0 ? styles.badgeOn : styles.badgeOff}>{enemies.length > 0 ? `● ${enemies.length} enemies` : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        Set what an enemy DELIVERS and what it’s WEAK / STRONG against, from the damage types defined
+        above. Writes the ENEMIES table (weak → 1.5× taken, strong → ½ taken). Naming an enemy that’s
+        already in your uploaded enemies UPDATES it; a new name adds a minimal row (flesh out its
+        stats/loot in the ENEMIES table).
+      </Text>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 3, minHeight: 0, height: 40 }]} value={name} onChangeText={setName} placeholder="Enemy name (e.g. Stone Crab)" placeholderTextColor="#46555a" autoCapitalize="words" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={hp} onChangeText={setHp} placeholder="HP" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+      <Text style={[styles.hint, { marginBottom: 2 }]}>Delivers (dice + type):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap', alignItems: 'center' }]}>
+        <TextInput style={[styles.input, { width: 64, minHeight: 0, height: 36, textAlign: 'center' }]} value={dice} onChangeText={setDice} placeholder="1d6" placeholderTextColor="#46555a" autoCapitalize="none" />
+        {types.map((t) => chip(t, delivers === t, () => setDelivers(t)))}
+      </View>
+      <Text style={[styles.hint, { marginBottom: 2 }]}>Weak against (takes more):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>{types.map((t) => chip(t, weak.includes(t), () => toggle(weak, setWeak, t)))}</View>
+      <Text style={[styles.hint, { marginBottom: 2 }]}>Strong against (takes less):</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>{types.map((t) => chip(t, strong.includes(t), () => toggle(strong, setStrong, t)))}</View>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={addOrUpdate}><Text style={styles.loadBtnText}>+ ADD / UPDATE ENEMY</Text></TouchableOpacity>
+      </View>
+
+      {enemies.map((e) => {
+        const traits = Array.isArray(e.traits) ? e.traits as string[] : [];
+        const w = traits.filter((t) => /^vulnerable:/i.test(t)).map((t) => t.split(':')[1]).filter((x): x is string => !!x);
+        const s = traits.filter((t) => /^resist:/i.test(t)).map((t) => t.split(':')[1]).filter((x): x is string => !!x);
+        return (
+          <View key={String(e.name)} style={styles.titleRowDev}>
+            <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{String(e.name)}</Text>{typeof e.damage === 'string' ? ` — ${e.damage}` : ''}{w.length ? ` · weak ${w.join('/')}` : ''}{s.length ? ` · strong ${s.join('/')}` : ''}</Text>
+            <TouchableOpacity onPress={() => { setName(String(e.name)); setWeak(w); setStrong(s); setDelivers((typeof e.damage === 'string' && e.damage.replace(/^\d*d\d+\s*/i, '').trim()) || 'bludgeoning'); }}>
+              <Text style={styles.tmplBtnText}> edit</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      })}
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+function AdvancedRulesBoxes() {
+  const damageTypes = useContentPackStore((s) => s.damageTypes);
+  const damageResistances = useContentPackStore((s) => s.damageResistances);
+  const fusionTags = useContentPackStore((s) => s.fusionTags);
+  const coatings = useContentPackStore((s) => s.coatings);
+  const inventory = useContentPackStore((s) => s.inventory);
+  const store = useContentPackStore;
+  return (
+    <>
+      <DamageTypesBuilder />
+      <EnemyRelationsBuilder />
+      <RulesBox
+        title="Enemy resistances (by type)"
+        badge={`● ${damageResistances ? Object.keys(damageResistances).length : 0} types`}
+        hasData={!!damageResistances && Object.keys(damageResistances).length > 0}
+        filename="enemy-resistances.json"
+        currentJson={() => JSON.stringify(damageResistances ?? {}, null, 2)}
+        template={RESISTANCES_TEMPLATE}
+        onLoad={(j) => store.getState().loadDamageResistancesJson(j)}
+        onClear={() => store.getState().clearDamageResistances()}
+        hint={<>Which damage types each <Text style={{ fontWeight: 'bold' }}>enemy type</Text> resists (½ damage) or is weak to (1.5×). Object keyed by YOUR enemy types. Replaces the built-in Tartaria map.</>}
+      />
+      <RulesBox
+        title="Fusion material tags (extra)"
+        badge={`● ${fusionTags.length} added`}
+        hasData={fusionTags.length > 0}
+        filename="fusion-tags.json"
+        currentJson={() => JSON.stringify(fusionTags, null, 2)}
+        template={FUSION_TAGS_TEMPLATE}
+        onLoad={(j) => store.getState().loadFusionTagsJson(j)}
+        onClear={() => store.getState().clearFusionTags()}
+        hint={<>Extra material tag words that count toward the Crucible’s fusion-diversity gate, on top of the built-ins (metal/cloth/wood/stone/bone/crystal/…). Array of strings.</>}
+      />
+      <RulesBox
+        title="Weapon coatings (rename)"
+        badge={`● ${coatings ? Object.keys(coatings).length : 0} renamed`}
+        hasData={!!coatings && Object.keys(coatings).length > 0}
+        filename="coatings.json"
+        currentJson={() => JSON.stringify(coatings ?? {}, null, 2)}
+        template={COATINGS_TEMPLATE}
+        onLoad={(j) => store.getState().loadCoatingsJson(j)}
+        onClear={() => store.getState().clearCoatings()}
+        hint={<>Rename the five coating mechanics (the combat effects stay). Object keyed by mechanic — <Text style={{ fontWeight: 'bold' }}>poison / acid / corruption / electrical / burn</Text> — each {'{ label?, blurb?, lootLabel? }'}.</>}
+      />
+      <RulesBox
+        title="Inventory (labels + tool tags)"
+        badge={`● ${inventory ? ((inventory.labels ? Object.keys(inventory.labels).length : 0) + (inventory.toolTags ? inventory.toolTags.length : 0)) : 0}`}
+        hasData={!!inventory && !!((inventory.labels && Object.keys(inventory.labels).length > 0) || (inventory.toolTags && inventory.toolTags.length > 0))}
+        filename="inventory.json"
+        currentJson={() => JSON.stringify(inventory ?? {}, null, 2)}
+        template={INVENTORY_TEMPLATE}
+        onLoad={(j) => store.getState().loadInventoryJson(j)}
+        onClear={() => store.getState().clearInventory()}
+        hint={<>Rename the inventory category sections (<Text style={{ fontWeight: 'bold' }}>labels</Text>: weapon/armor/accessory/consumable/tool/relic/material/loot/quest → your names), add <Text style={{ fontWeight: 'bold' }}>toolTags</Text> that read as Tools, and set <Text style={{ fontWeight: 'bold' }}>repairMaterialPct</Text> (repair material cost as a % of an item's scrap yield; 200 = built-in). Category ids + order stay fixed.</>}
+      />
+    </>
+  );
+}
+
+// engine_Dev — BOSSES builder. Named, faction-affiliated bosses with stats, loot,
+// a quest item, and spawn rules — referenced by main-quest "kill" steps.
+function BossesBox() {
+  const customBosses = useContentPackStore((s) => s.customBosses) as CustomBoss[];
+  const setBosses = useContentPackStore((s) => s.setBosses);
+  const loadBossesJson = useContentPackStore((s) => s.loadBossesJson);
+  const factions = (getFactions() as Array<{ id: string; name: string }>);
+  const locations = mainQuestLocations();
+  const [status, setStatus] = useState<Status>(null);
+  const [text, setText] = useState('');
+  const [f, setF] = useState({ name: '', factionId: '', hp: '', attack: '', damage: '', ac: '', abilityPoint: '', drops: '', questItem: '', spawnLocationId: '', spawnCondition: 'main_quest', spawnChance: '' });
+  const up = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
+
+  const add = () => {
+    if (!f.name.trim()) { setStatus({ kind: 'err', msg: 'Boss needs a name.' }); return; }
+    if (!Number(f.hp)) { setStatus({ kind: 'err', msg: 'Boss needs HP.' }); return; }
+    const id = f.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || `boss_${Date.now()}`;
+    const boss: CustomBoss = {
+      id, name: f.name.trim(), hp: Number(f.hp),
+      attack: Number(f.attack) || 5, damage: f.damage.trim() || '2d8+3',
+      ...(Number(f.ac) ? { ac: Number(f.ac) } : {}),
+      ...(Number(f.abilityPoint) ? { abilityPoint: Number(f.abilityPoint) } : {}),
+      ...(f.factionId ? { factionId: f.factionId } : {}),
+      ...(f.drops.trim() ? { drops: f.drops.split(',').map((d) => d.trim()).filter(Boolean) } : {}),
+      ...(f.questItem.trim() ? { questItem: f.questItem.trim() } : {}),
+      ...(f.spawnCondition !== 'random' && f.spawnLocationId ? { spawnLocationId: f.spawnLocationId } : {}),
+      ...(f.spawnCondition === 'random' && Number(f.spawnChance) ? { spawnChance: Number(f.spawnChance) } : {}),
+      spawnCondition: f.spawnCondition,
+    };
+    if (f.spawnCondition !== 'random' && !f.spawnLocationId) { setStatus({ kind: 'err', msg: 'Pick a spawn location (or switch to Random spawn).' }); return; }
+    const next = [...customBosses.filter((b) => b.id !== id), boss];
+    setBosses(next);
+    setStatus({ kind: 'ok', msg: `Boss saved: ${boss.name} (${next.length} total).` });
+    setF((p) => ({ ...p, name: '', hp: '', damage: '', drops: '', questItem: '' }));
+  };
+
+  const chipRow = (label: string, items: Array<{ id: string; name: string }>, sel: string, onPick: (id: string) => void) => (
+    <>
+      <Text style={styles.hint}>{label}</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {items.map((it) => (
+          <TouchableOpacity key={it.id} style={[styles.tmplBtn, sel === it.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => onPick(it.id)}>
+            <Text style={sel === it.id ? styles.loadBtnText : styles.tmplBtnText}>{sel === it.id ? '☑ ' : '☐ '}{it.name}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Bosses</Text>
+        <Text style={customBosses.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {customBosses.length > 0 ? `● ${customBosses.length}` : '○ none'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Named bosses with stats, loot, a quest item they drop (e.g. dog tags) and spawn rules.
+        A main-quest “Kill the boss at …” step points at one of these.
+      </Text>
+      {customBosses.map((b) => (
+        <View key={b.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>◆ <Text style={{ fontWeight: 'bold' }}>{b.name}</Text> — HP {b.hp}{b.questItem ? ` · drops ${b.questItem}` : ''}{b.spawnLocationId ? ` @ ${locations.find((l) => l.id === b.spawnLocationId)?.name ?? b.spawnLocationId}` : ''}</Text>
+          <TouchableOpacity onPress={() => { setBosses(customBosses.filter((x) => x.id !== b.id)); setStatus({ kind: 'ok', msg: `Removed ${b.name}.` }); }}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 2, minHeight: 0, height: 40 }]} value={f.name} onChangeText={(v) => up('name', v)} placeholder="Boss name" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.hp} onChangeText={(v) => up('hp', v)} placeholder="HP" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.attack} onChangeText={(v) => up('attack', v)} placeholder="ATK" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.damage} onChangeText={(v) => up('damage', v)} placeholder="dmg (2d8+3)" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.ac} onChangeText={(v) => up('ac', v)} placeholder="AC" placeholderTextColor="#46555a" keyboardType="number-pad" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.abilityPoint} onChangeText={(v) => up('abilityPoint', v)} placeholder="tier" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      </View>
+      <View style={styles.row}>
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.questItem} onChangeText={(v) => up('questItem', v)} placeholder="Quest item drop (dog tags)" placeholderTextColor="#46555a" />
+        <TextInput style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]} value={f.drops} onChangeText={(v) => up('drops', v)} placeholder="Other drops (comma-sep)" placeholderTextColor="#46555a" />
+      </View>
+      {factions.length > 0 && chipRow('Faction affiliation:', factions, f.factionId, (id) => up('factionId', id === f.factionId ? '' : id))}
+      {chipRow('Spawn mode:', BOSS_SPAWN_CONDITIONS.map((c) => ({ id: c.id, name: c.label })), f.spawnCondition, (id) => up('spawnCondition', id))}
+      {f.spawnCondition !== 'random' && chipRow('Spawn location:', locations, f.spawnLocationId, (id) => up('spawnLocationId', id))}
+      {f.spawnCondition === 'random' && (
+        <TextInput style={[styles.input, { minHeight: 0, height: 40 }]} value={f.spawnChance} onChangeText={(v) => up('spawnChance', v)} placeholder="Random spawn chance % (e.g. 8)" placeholderTextColor="#46555a" keyboardType="number-pad" />
+      )}
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={add}><Text style={styles.loadBtnText}>+ SAVE BOSS</Text></TouchableOpacity>
+      </View>
+      <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a bosses JSON array" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadBossesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} boss(es).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildBossesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the FULL bosses template (every spawn mode). Edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        {customBosses.length > 0 && <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(customBosses, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your bosses — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>EDIT CURRENT</Text></TouchableOpacity>}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2)); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2); const r = await saveJsonToFile('bosses.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.loadBtn} onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadBossesJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} boss(es) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}><Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text></TouchableOpacity>
+        {customBosses.length > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearBosses(); setStatus({ kind: 'ok', msg: 'Cleared bosses.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — MAIN QUEST builder. Compose the win-condition objective list line by
+// line: pick an action, a target, a location (+ optional reward to collect), ADD.
+function MainQuestBox() {
+  const customMainQuest = useContentPackStore((s) => s.customMainQuest) as { title?: string; steps?: MainQuestStep[] } | null;
+  const setMainQuest = useContentPackStore((s) => s.setMainQuest);
+  const loadMainQuestJson = useContentPackStore((s) => s.loadMainQuestJson);
+  const steps: MainQuestStep[] = customMainQuest?.steps ?? [];
+  const locations = mainQuestLocations();
+  const factions = getFactions() as Array<{ id: string; name: string }>;
+  const [bSkip, setBSkip] = useState<string[]>([]);
+  const [status, setStatus] = useState<Status>(null);
+  const [qTitle, setQTitle] = useState(customMainQuest?.title ?? '');
+  const [bAction, setBAction] = useState<string>(MAIN_QUEST_ACTIONS[0]?.id ?? 'kill');
+  const [bTarget, setBTarget] = useState('');
+  const [bLoc, setBLoc] = useState<string>('');
+  const [bReward, setBReward] = useState('');
+  const [bBoss, setBBoss] = useState<string>('');
+  const [text, setText] = useState('');
+  const questBosses = mainQuestBosses();
+
+  const actionDef = MAIN_QUEST_ACTIONS.find((a) => a.id === bAction);
+  const isKill = bAction === 'kill';
+  // Picking a boss auto-fills the target (its name), the location (its spawn tile),
+  // and the reward (its quest item) so a kill step lines up with the boss.
+  const pickBoss = (id: string) => {
+    const b = questBosses.find((x) => x.id === id);
+    setBBoss(id);
+    if (b) { setBTarget(b.name); if (b.spawnLocationId) setBLoc(b.spawnLocationId); if (b.questItem) setBReward(b.questItem); }
+  };
+  const save = (next: { title?: string; steps: MainQuestStep[] }, msg: string) => {
+    setMainQuest(next.steps.length > 0 ? next : null);
+    setStatus({ kind: 'ok', msg });
+  };
+  const addStep = () => {
+    if (isKill && !bBoss) { setStatus({ kind: 'err', msg: 'Pick the boss this step requires (add one in the BOSSES box first).' }); return; }
+    if (actionDef?.needsTarget && !bTarget.trim()) { setStatus({ kind: 'err', msg: `“${actionDef.label}” needs a target.` }); return; }
+    if (!bLoc) { setStatus({ kind: 'err', msg: 'Pick a location.' }); return; }
+    const step: MainQuestStep = {
+      id: `step_${Date.now()}`,
+      action: bAction,
+      ...(actionDef?.needsTarget ? { target: bTarget.trim() } : {}),
+      locationId: bLoc,
+      ...(bReward.trim() ? { reward: bReward.trim() } : {}),
+      ...(isKill && bBoss ? { bossId: bBoss } : {}),
+      ...(bSkip.length > 0 ? { skipForFactions: bSkip } : {}),
+    };
+    save({ title: qTitle.trim() || undefined, steps: [...steps, step] }, `Step added: ${describeStep(step)}`);
+    setBTarget(''); setBReward(''); setBBoss(''); setBSkip([]);
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Main quest</Text>
+        <Text style={steps.length > 0 ? styles.badgeOn : styles.badgeOff}>
+          {steps.length > 0 ? `● ${steps.length} step(s)` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>
+        Build your win condition line by line. Each step: pick an <Text style={{ fontWeight: 'bold' }}>action</Text>,
+        a <Text style={{ fontWeight: 'bold' }}>target</Text>, a <Text style={{ fontWeight: 'bold' }}>location</Text>,
+        and optionally something to <Text style={{ fontWeight: 'bold' }}>collect</Text>. Add as many as you want —
+        they run in order, the last completes the quest.
+      </Text>
+
+      <TextInput
+        style={[styles.input, { minHeight: 0, height: 40 }]}
+        value={qTitle}
+        onChangeText={(t) => { setQTitle(t); if (steps.length > 0) save({ title: t.trim() || undefined, steps }, 'Title updated.'); }}
+        placeholder="Quest title (e.g. Take the Fold)"
+        placeholderTextColor="#46555a"
+      />
+
+      {/* current steps */}
+      {steps.map((s, i) => (
+        <View key={s.id} style={styles.titleRowDev}>
+          <Text style={styles.hint}>{i + 1}. {describeStep(s)}{(s.skipForFactions ?? []).length > 0 ? `  (skipped for: ${(s.skipForFactions ?? []).map((id) => factions.find((f) => f.id === id)?.name ?? id).join(', ')})` : ''}</Text>
+          <TouchableOpacity onPress={() => save({ title: qTitle.trim() || undefined, steps: steps.filter((x) => x.id !== s.id) }, 'Step removed.')}>
+            <Text style={styles.resetBtnText}> ✕</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
+      {/* builder */}
+      <Text style={styles.hint}>Action:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {MAIN_QUEST_ACTIONS.map((a) => (
+          <TouchableOpacity key={a.id} style={[styles.tmplBtn, bAction === a.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => setBAction(a.id)}>
+            <Text style={bAction === a.id ? styles.loadBtnText : styles.tmplBtnText}>{bAction === a.id ? '☑ ' : '☐ '}{a.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      {isKill && (
+        questBosses.length === 0 ? (
+          <Text style={styles.err}>Add a main-quest boss in the BOSSES box first — a kill step has to point at one.</Text>
+        ) : (
+          <>
+            <Text style={styles.hint}>Boss (main-quest bosses only):</Text>
+            <View style={[styles.row, { flexWrap: 'wrap' }]}>
+              {questBosses.map((b) => (
+                <TouchableOpacity key={b.id} style={[styles.tmplBtn, bBoss === b.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => pickBoss(b.id)}>
+                  <Text style={bBoss === b.id ? styles.loadBtnText : styles.tmplBtnText}>{bBoss === b.id ? '☑ ' : '☐ '}{b.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )
+      )}
+      {actionDef?.needsTarget && !isKill && (
+        <TextInput
+          style={[styles.input, { minHeight: 0, height: 40 }]}
+          value={bTarget}
+          onChangeText={setBTarget}
+          placeholder="Target (e.g. the dog tags, an officer)"
+          placeholderTextColor="#46555a"
+        />
+      )}
+      <Text style={styles.hint}>Location:</Text>
+      <View style={[styles.row, { flexWrap: 'wrap' }]}>
+        {locations.map((l) => (
+          <TouchableOpacity key={l.id} style={[styles.tmplBtn, bLoc === l.id && styles.loadBtn, { marginBottom: 4 }]} onPress={() => setBLoc(l.id)}>
+            <Text style={bLoc === l.id ? styles.loadBtnText : styles.tmplBtnText}>{bLoc === l.id ? '☑ ' : '☐ '}{l.name}</Text>
+          </TouchableOpacity>
+        ))}
+        {locations.length === 0 && <Text style={styles.hint}>Upload your Locations table first.</Text>}
+      </View>
+      {factions.length > 0 && (
+        <>
+          <Text style={styles.hint}>Skip this step for (factions) — e.g. a German won't be sent to kill the German boss:</Text>
+          <View style={[styles.row, { flexWrap: 'wrap' }]}>
+            {factions.map((fac) => {
+              const on = bSkip.includes(fac.id);
+              return (
+                <TouchableOpacity key={fac.id} style={[styles.tmplBtn, on && styles.loadBtn, { marginBottom: 4 }]} onPress={() => setBSkip((p) => on ? p.filter((x) => x !== fac.id) : [...p, fac.id])}>
+                  <Text style={on ? styles.loadBtnText : styles.tmplBtnText}>{on ? '☑ ' : '☐ '}{fac.name}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </>
+      )}
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, { flex: 1, minHeight: 0, height: 40 }]}
+          value={bReward}
+          onChangeText={setBReward}
+          placeholder="…and collect (optional item)"
+          placeholderTextColor="#46555a"
+        />
+        <TouchableOpacity style={styles.loadBtn} onPress={addStep}>
+          <Text style={styles.loadBtnText}>+ ADD STEP</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* JSON path */}
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="…or paste a main-quest JSON ({ title, steps: [...] })"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => { const r = loadMainQuestJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} step(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(buildMainQuestTemplate());
+            setStatus({ kind: 'ok', msg: 'Loaded the FULL template — shows every action + the faction-gate options (skipForFactions / onlyForFactions). Edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {steps.length > 0 && (
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => {
+              setText(JSON.stringify(customMainQuest, null, 2));
+              setStatus({ kind: 'ok', msg: 'Loaded your current quest — edit, then LOAD.' });
+            }}
+          >
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : JSON.stringify(customMainQuest ?? { title: 'My Main Quest', steps: [] }, null, 2)); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}>
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={async () => {
+            const content = text.trim().length > 0 ? text : JSON.stringify(customMainQuest ?? { title: 'My Main Quest', steps: [] }, null, 2);
+            const r = await saveJsonToFile('main-quest.json', content);
+            setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg });
+          }}
+        >
+          <Text style={styles.copyBtnText}>⬇ SAVE FILE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={async () => { const r = await pickJsonFile(); if (r.canceled) return; if (!r.ok || !r.content) { setStatus({ kind: 'err', msg: r.msg ?? 'Pick failed.' }); return; } const res = loadMainQuestJson(r.content); setStatus(res.ok ? { kind: 'ok', msg: `Loaded ${res.count} step(s) from file.` } : { kind: 'err', msg: res.error ?? 'Failed.' }); }}
+        >
+          <Text style={styles.loadBtnText}>⬆ UPLOAD FILE</Text>
+        </TouchableOpacity>
+        {steps.length > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearMainQuest(); setStatus({ kind: 'ok', msg: 'Cleared main quest.' }); }}>
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
+  const loadTableJson = useContentPackStore((s) => s.loadTableJson);
+  const clearTable = useContentPackStore((s) => s.clearTable);
+  const count = useContentPackStore((s) => s.tables[id]?.length ?? 0);
+  const current = useContentPackStore((s) => s.tables[id]);
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  // engine_Dev — TEMPLATE shows YOUR current upload (full, editable) when one is
+  // loaded so you never lose work or have to retype it; otherwise the built-in
+  // sample. The button relabels to EDIT CURRENT so it's obvious which you'll get.
+  const hasUpload = Array.isArray(current) && current.length > 0;
+  const templateText = () => (hasUpload ? JSON.stringify(current, null, 2) : getTableTemplate(id));
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{label}</Text>
+        <Text style={count > 0 ? styles.badgeOn : styles.badgeOff}>
+          {count > 0 ? `● override · ${count} rows` : '○ built-in'}
+        </Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste table JSON here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadTableJson(id, text);
+            setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} rows.` } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(getTableTemplate(id));
+            setStatus({ kind: 'ok', msg: `Loaded the first ${TEMPLATE_SAMPLE_ROWS} built-in rows + the optional-field notes as a template — edit, then LOAD.` });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {hasUpload && (
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => {
+              setText(JSON.stringify(current, null, 2));
+              setStatus({ kind: 'ok', msg: `Loaded your current ${count} uploaded rows — edit, then LOAD to save changes.` });
+            }}
+          >
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : templateText();
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: hasUpload
+              ? 'Copied your current upload to the clipboard and cleared the box.'
+              : 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {tableOverrideCount(id) > 0 && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { clearTable(id); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: string }) {
+  const loadLoreJson = useContentPackStore((s) => s.loadLoreJson);
+  const clearLore = useContentPackStore((s) => s.clearLore);
+  const current = useContentPackStore((s) => s.lore[id]);
+  const on = current != null;
+  const [text, setText] = useState('');
+  const [status, setStatus] = useState<Status>(null);
+  // engine_Dev — show YOUR current upload (full, editable) when one is loaded.
+  const templateText = () => (on ? JSON.stringify(current, null, 2) : getLoreTemplate(id));
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>{label}</Text>
+        <Text style={on ? styles.badgeOn : styles.badgeOff}>{on ? '● override' : '○ built-in'}</Text>
+      </View>
+      <Text style={styles.hint}>{hint}</Text>
+      {id === 'world' && <Text style={styles.toneLine}>Active tone: “{getWorldTone()}”</Text>}
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste lore JSON here…"
+        placeholderTextColor="#46555a"
+        multiline
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={styles.loadBtn}
+          onPress={() => {
+            const r = loadLoreJson(id, text);
+            setStatus(r.ok ? { kind: 'ok', msg: 'Loaded.' } : { kind: 'err', msg: r.error ?? 'Failed.' });
+            if (r.ok) setText('');
+          }}
+        >
+          <Text style={styles.loadBtnText}>LOAD</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tmplBtn}
+          onPress={() => {
+            setText(getLoreTemplate(id));
+            setStatus({ kind: 'ok', msg: 'Loaded a template — edit, then LOAD.' });
+          }}
+        >
+          <Text style={styles.tmplBtnText}>TEMPLATE</Text>
+        </TouchableOpacity>
+        {on && (
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => {
+              setText(JSON.stringify(current, null, 2));
+              setStatus({ kind: 'ok', msg: 'Loaded your current upload — edit, then LOAD to save changes.' });
+            }}
+          >
+            <Text style={styles.tmplBtnText}>EDIT CURRENT</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={styles.copyBtn}
+          onPress={() => {
+            const out = text.trim().length > 0 ? text : templateText();
+            void Clipboard.setStringAsync(out);
+            setText('');
+            setStatus({ kind: 'ok', msg: on
+              ? 'Copied your current upload to the clipboard and cleared the box.'
+              : 'Copied to clipboard and cleared the box — paste your filled-in JSON here, then LOAD.' });
+          }}
+        >
+          <Text style={styles.copyBtnText}>COPY</Text>
+        </TouchableOpacity>
+        {hasLoreOverride(id) && (
+          <TouchableOpacity style={styles.resetBtn} onPress={() => { clearLore(id); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}>
+            <Text style={styles.resetBtnText}>RESET</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — collapsible section. Tap the header bar to expand/collapse its boxes,
+// so the console reads as ~16 closed headers instead of one 4,000-line scroll.
+// `status` puts an AUTHORING diamond on the bar: ◆ filled (green) = every JSON section
+// inside has an upload/save (authored); ◇ hollow (pink) = at least one is still on the
+// built-in template. Undefined = a control/meta bar with no JSON to author.
+type SectionStatus = 'all' | 'partial' | 'none';
+function authoredStatus(bools: boolean[]): SectionStatus {
+  if (bools.length === 0) return 'none';
+  const n = bools.filter(Boolean).length;
+  return n === bools.length ? 'all' : n === 0 ? 'none' : 'partial';
+}
+function CollapsibleSection({ title, status, stale = false, defaultOpen = false, children }: { title: string; status?: SectionStatus; stale?: boolean; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <View style={styles.section}>
+      <TouchableOpacity style={styles.sectionHeader} onPress={() => setOpen((v) => !v)} activeOpacity={0.7}>
+        <Text style={styles.sectionHeaderChevron}>{open ? '▾' : '▸'}</Text>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+        {status && (
+          <Text style={[styles.sectionDiamond, { color: status === 'all' ? '#56d364' : '#ff4fb0' }]}>
+            {status === 'all' ? '◆' : '◇'}
+          </Text>
+        )}
+        {/* engine_Dev — YELLOW diamond: this section has an upload that was built against an
+            OLDER template than the engine now ships. Re-download the template + refresh it. */}
+        {stale && <Text style={[styles.sectionDiamond, { color: '#e3b341' }]}>◆</Text>}
+      </TouchableOpacity>
+      {open && <View style={styles.sectionBody}>{children}</View>}
+    </View>
+  );
+}
+
+export function DeveloperConsole({ embedded = false }: { embedded?: boolean }) {
+  const setScreen = useGameStore((s) => s.setScreen);
+  const clearAll = useContentPackStore((s) => s.clearAll);
+  const published = useContentPackStore((s) => s.published);
+  const publish = useContentPackStore((s) => s.publish);
+  const unpublish = useContentPackStore((s) => s.unpublish);
+  const setDevMode = useContentPackStore((s) => s.setDevMode);
+  const reapply = useContentPackStore((s) => s.reapply);
+  const [confirmPub, setConfirmPub] = useState(false);
+  const [confirmDevOff, setConfirmDevOff] = useState(false);
+  const [applyMsg, setApplyMsg] = useState<string | null>(null);
+  const [guideMsg, setGuideMsg] = useState<string | null>(null);
+  // engine_Dev — re-read when the pack changes so the banner stays accurate.
+  useContentPackStore((s) => s.contentVersion);
+  // engine_Dev — re-render when stale stamps reconcile (stamps change without a contentVersion bump).
+  useContentPackStore((s) => s.templateStamps);
+  const racesLoaded = hasTableOverride('races');
+  const factionsLoaded = hasTableOverride('factions');
+
+  // engine_Dev — AUTHORING diamonds: ◆ every JSON section in the bar is authored
+  // (uploaded/saved override), ◇ at least one is still on the built-in template. Recomputed
+  // on every contentVersion bump (the subscription above) so it stays live.
+  const cp = useContentPackStore.getState();
+  const arr = (x: unknown) => Array.isArray(x) && x.length > 0;
+  const obj = (x: unknown) => !!x && typeof x === 'object' && Object.keys(x as object).length > 0;
+  const has = (x: unknown) => x != null;
+  const str = (x: unknown) => typeof x === 'string' && x.trim().length > 0;
+  const st = authoredStatus;
+  const dMainQuest = st([has(cp.customMainQuest), arr(cp.customBosses)]);
+  const dIdentity = st([str(cp.gameTitle), str(cp.gameTagline), str(cp.narratorName), str(cp.worldName), str(cp.corruptionName), str(cp.energyName), str(cp.crucibleName)]);
+  const dLore = st([hasLoreOverride('world'), hasLoreOverride('faction'), hasLoreOverride('race'), hasLoreOverride('flavor'), hasTableOverride('lore')]);
+  const dTables = st(CONTENT_TABLES.filter((t) => t.id !== 'lore').map((t) => hasTableOverride(t.id)));
+  const dMissions = st([obj(cp.missions)]);
+  const dFactionMissions = st([!!(cp.missions && (cp.missions as Record<string, unknown>).factionQuests)]);
+  const dHooks = st([obj(cp.hooks)]);
+  const dWhispers = st([arr(cp.whispers)]);
+  const dTravel = st([obj(cp.wasteland)]);
+  const dInteractionTags = st([obj(cp.interactionTags)]);
+  const dStartingAreas = st([arr(cp.startingAreas)]);
+  const dTitles = st([arr(cp.customTitles)]);
+  const dCollectables = st([arr(cp.collectables)]);
+  const dSummons = st([has(cp.summons)]);
+  const dDogScenarios = st([arr(cp.dogScenarios)]);
+  const dDigging = st([has(cp.digging)]);
+  const dScrap = st([has(cp.scrap)]);
+  const dSalvage = st([has(cp.salvage)]);
+  const dOverlays = st([arr(cp.overlays)]);
+  const dAdvanced = st([arr(cp.damageTypes), has(cp.damageResistances), arr(cp.fusionTags), has(cp.coatings), has(cp.inventory)]);
+
+  // engine_Dev — STALE-UPLOAD (yellow) per section: any of its uploaded keys whose template
+  // version has moved since the upload. Recomputed on each contentVersion / templateStamps bump.
+  const staleSet = getStaleSectionKeys();
+  const stale = (keys: string[]) => keys.some((k) => staleSet.has(k));
+  const tableKeys = CONTENT_TABLES.filter((t) => t.id !== 'lore').map((t) => `table:${t.id}`);
+  const yMainQuest = stale(['mainQuest', 'bosses']);
+  const yLore = stale(['lore:world', 'lore:faction', 'lore:race', 'lore:flavor', 'table:lore']);
+  const yTables = stale(tableKeys);
+  const yMissions = stale(['missions']);
+  const yHooks = stale(['hooks']);
+  const yWhispers = stale(['whispers']);
+  const yTravel = stale(['wasteland']);
+  const yInteractionTags = stale(['interactionTags']);
+  const yStartingAreas = stale(['startingAreas']);
+  const yTitles = stale(['titles']);
+  const yCollectables = stale(['collectables']);
+  const ySummons = stale(['summons']);
+  const yDogScenarios = stale(['dogScenarios']);
+  const yDigging = stale(['digging']);
+  const yScrap = stale(['scrap']);
+  const ySalvage = stale(['salvage']);
+  const yOverlays = stale(['overlays']);
+
+  return (
+    <>
+      {(!racesLoaded || !factionsLoaded) && (
+        <View style={styles.warnBanner}>
+          <Text style={styles.warnBannerTitle}>⚠ PLAYABLE TABLES (character creation)</Text>
+          <Text style={styles.warnBannerLine}>
+            Races: {racesLoaded ? `● ${tableOverrideCount('races')} loaded` : '○ built-in (Tartaria) — load yours in the “Races (playable…)” box under TABLES'}
+          </Text>
+          <Text style={styles.warnBannerLine}>
+            Factions: {factionsLoaded ? `● ${tableOverrideCount('factions')} loaded` : '○ built-in (Tartaria) — load yours in the “Factions (playable…)” box under TABLES'}
+          </Text>
+          <Text style={styles.warnBannerNote}>
+            These are TABLE boxes, not the “Race lore / Faction lore” boxes. Until they’re loaded,
+            character creation shows the built-in races/factions.
+          </Text>
+        </View>
+      )}
+      {!embedded && (
+        <Text style={styles.blurb}>
+          This is the engine's developer console. Hit TEMPLATE on any box to drop in the first
+          couple of built-in (Tartaria) rows as a starter schema, edit them into your own game,
+          then LOAD to override at runtime — reskin the engine with no code changes. Empty boxes
+          use the built-in defaults.
+        </Text>
+      )}
+
+      {/* engine_Dev — WHOLE-GAME upload sits at the very top so it's the first
+          thing you see: build everything in one file, or skip it and use the
+          per-section boxes below. */}
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Build guide</Text>
+          <Text style={styles.badgeOff}>start here</Text>
+        </View>
+        <Text style={styles.hint}>
+          New here? This explains every section and the order to fill them so a game comes together
+          cleanly. Save it and read it on the side, or just follow the sections top to bottom.
+        </Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.copyBtn}
+            onPress={async () => { const r = await saveJsonToFile('build-guide.md', buildDevGuide()); setGuideMsg(r.msg); }}
+          >
+            <Text style={styles.copyBtnText}>⬇ SAVE BUILD GUIDE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.tmplBtn}
+            onPress={() => { void Clipboard.setStringAsync(buildDevGuide()); setGuideMsg('Build guide copied to clipboard.'); }}
+          >
+            <Text style={styles.tmplBtnText}>COPY</Text>
+          </TouchableOpacity>
+        </View>
+        {guideMsg && <Text style={styles.ok}>{guideMsg}</Text>}
+      </View>
+
+      <CollapsibleSection title="★ WHOLE GAME — build it all in one file">
+        <GameBundleBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="MAIN QUEST" status={dMainQuest} stale={yMainQuest}>
+        <MainQuestBox />
+        <BossesBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="GAME IDENTITY" status={dIdentity}>
+        <GameIdentitySection />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="LORE" status={dLore} stale={yLore}>
+        {LORE_BLOCKS.map((b) => <LoreBox key={b.id} id={b.id} label={b.label} hint={b.hint} />)}
+      </CollapsibleSection>
+
+      <CollapsibleSection title="TABLES" status={dTables} stale={yTables}>
+        {CONTENT_TABLES.map((t) => <TableBox key={t.id} id={t.id} label={t.label} hint={t.hint} />)}
+      </CollapsibleSection>
+
+      <CollapsibleSection title="MISSIONS" status={dMissions} stale={yMissions}>
+        <MissionsBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="FACTION MISSIONS" status={dFactionMissions} stale={yMissions}>
+        <FactionMissionsBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="HOOKS" status={dHooks} stale={yHooks}>
+        <HooksBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="WHISPERS" status={dWhispers} stale={yWhispers}>
+        <WhispersBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="TRAVEL ENCOUNTERS" status={dTravel} stale={yTravel}>
+        <WastelandBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="INTERACTION TAGS" status={dInteractionTags} stale={yInteractionTags}>
+        <InteractionTagsBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="STARTING AREAS" status={dStartingAreas} stale={yStartingAreas}>
+        <StartingAreasBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="TITLES" status={dTitles} stale={yTitles}>
+        <TitlesBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="COLLECTABLES" status={dCollectables} stale={yCollectables}>
+        <CollectablesBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="SUMMONED SIDEKICKS" status={dSummons} stale={ySummons}>
+        <SummonsBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="DOG-RESCUE SCENARIOS" status={dDogScenarios} stale={yDogScenarios}>
+        <DogScenariosBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="DIGGING" status={dDigging} stale={yDigging}>
+        <DiggingBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="SCRAP" status={dScrap} stale={yScrap}>
+        <ScrapBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="SALVAGE" status={dSalvage} stale={ySalvage}>
+        <SalvageBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="ELEVATED OVERLAYS" status={dOverlays} stale={yOverlays}>
+        <OverlaysBox />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="ADVANCED COMBAT &amp; CRAFTING RULES" status={dAdvanced}>
+        <AdvancedRulesBoxes />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="MUSIC">
+        <MusicBox
+          category="battle"
+          label="Battle Music"
+          hint="Plays during combat and boss fights. Uploads replace the built-in battle score."
+        />
+        <MusicBox
+          category="ambient"
+          label="Ambient Music"
+          hint="Plays while exploring. Uploads replace the built-in exploration score."
+        />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="MAPS">
+        <MapsSection />
+      </CollapsibleSection>
+
+      <CollapsibleSection title="FAMILY BUILD">
+      {!published ? (
+        <>
+          <TouchableOpacity
+            style={styles.publishBtn}
+            onPress={() => {
+              if (!confirmPub) { setConfirmPub(true); return; }
+              publish();
+              setConfirmPub(false);
+              if (!embedded) setScreen('title');
+            }}
+          >
+            <Text style={styles.publishBtnText}>
+              {confirmPub ? 'TAP AGAIN — HIDE THE DEV PILL FOR A FAMILY BUILD' : '★ PUBLISH (hide dev for testers)'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={styles.publishNote}>
+            Hides the title DEV pill so testers see a clean game. You keep your way back in —
+            name a character “Verbal” to return here anytime — so you can keep editing after
+            their feedback. (This only hides the pill; full removal happens at the signed
+            go-live build.)
+          </Text>
+        </>
+      ) : (
+        <>
+          <TouchableOpacity style={styles.unpublishBtn} onPress={() => { unpublish(); setConfirmPub(false); }}>
+            <Text style={styles.unpublishBtnText}>↺ UN-PUBLISH — show the DEV pill again</Text>
+          </TouchableOpacity>
+          <Text style={styles.publishNote}>
+            The DEV pill is hidden (family build). You're still in via the “Verbal” backdoor.
+            Tap above to bring the pill back while you keep iterating.
+          </Text>
+        </>
+      )}
+
+      </CollapsibleSection>
+
+      <CollapsibleSection title="DEV MODE">
+      <TouchableOpacity
+        style={styles.unpublishBtn}
+        onPress={() => {
+          if (!confirmDevOff) { setConfirmDevOff(true); return; }
+          setDevMode(false);
+          setConfirmDevOff(false);
+          if (!embedded) setScreen('title');
+        }}
+      >
+        <Text style={styles.unpublishBtnText}>
+          {confirmDevOff ? 'TAP AGAIN — TURN OFF DEV MODE' : '⏻ TURN OFF DEV MODE'}
+        </Text>
+      </TouchableOpacity>
+      <Text style={styles.publishNote}>
+        While dev mode is on, this console is the first tab in Settings and opens by default.
+        Turn it off for a clean Settings screen. To get back in any time, create a character
+        named “Verbal”.
+      </Text>
+      </CollapsibleSection>
+
+      {/* engine_Dev — APPLY ALL: re-read every uploaded pack into the live engine.
+          Lives at the bottom (above the red reset) so it's the last thing you hit
+          after editing the sections above. */}
+      <TouchableOpacity
+        style={styles.applyBtn}
+        onPress={() => {
+          reapply();
+          setApplyMsg('Applied — the engine re-read every uploaded JSON. Start a NEW game to see world/character/enemy changes.');
+        }}
+      >
+        <Text style={styles.applyBtnText}>↻ APPLY ALL — re-read every JSON</Text>
+      </TouchableOpacity>
+      <Text style={styles.publishNote}>
+        Forces the engine to re-read every uploaded pack right now. Uploads already apply as you
+        LOAD them; this is the “make sure everything’s live” switch. A game already in progress
+        keeps the content it was created with — start a NEW game (or new character) to see world,
+        race/faction, enemy, and location changes.
+      </Text>
+
+      {/* engine_Dev — COPY DIAGNOSTICS: dumps store vs registry vs persisted blob
+          to the clipboard so the dev can paste it for analysis. */}
+      <TouchableOpacity
+        style={styles.copyBtn}
+        onPress={async () => {
+          const dump = await buildContentDiagnostics();
+          await Clipboard.setStringAsync(dump);
+          setApplyMsg('Diagnostics copied to clipboard — paste them back to share the exact engine state.');
+        }}
+      >
+        <Text style={styles.copyBtnText}>⧉ COPY DIAGNOSTICS</Text>
+      </TouchableOpacity>
+      {applyMsg && <Text style={styles.ok}>{applyMsg}</Text>}
+
+      <TouchableOpacity style={styles.resetAll} onPress={() => clearAll()}>
+        <Text style={styles.resetAllText}>RESET EVERYTHING TO TARTARIA</Text>
+      </TouchableOpacity>
+      <View style={{ height: 40 }} />
+    </>
+  );
+}
+
+export function DeveloperSettingsScreen() {
+  const setScreen = useGameStore((s) => s.setScreen);
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => setScreen('title')}>
+          <Text style={styles.backText}>‹ BACK</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>CONTENT PACKS</Text>
+        <View style={{ width: 70 }} />
+      </View>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <DeveloperConsole />
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0d0c0b', paddingHorizontal: 12, paddingTop: 8 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 },
+  backBtn: { paddingVertical: 8, paddingHorizontal: 6, minWidth: 70 },
+  backText: { color: '#6ab0c9', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
+  title: { color: '#6ab0c9', fontSize: 15, fontWeight: '700', letterSpacing: 4 },
+  scroll: { flex: 1 },
+  scrollContent: { paddingBottom: 16 },
+  blurb: { color: '#9a8f78', fontSize: 12, lineHeight: 18, marginBottom: 12, fontStyle: 'italic' },
+  sectionLabel: { color: '#6c8088', fontSize: 11, fontWeight: '700', letterSpacing: 3, marginTop: 12, marginBottom: 6 },
+  section: { marginTop: 10 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a1610', borderWidth: 1, borderColor: '#3a3226', borderRadius: 6, paddingVertical: 11, paddingHorizontal: 12 },
+  sectionHeaderChevron: { color: '#6ab0c9', fontSize: 13, fontWeight: '700', width: 18 },
+  sectionHeaderText: { color: '#6ab0c9', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
+  sectionDiamond: { fontSize: 14, fontWeight: '700', marginLeft: 8 },
+  sectionBody: { marginTop: 6 },
+  card: { backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
+  cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  cardTitle: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
+  badgeOn: { color: '#9ec96a', fontSize: 10, fontWeight: '700' },
+  badgeOff: { color: '#6c8088', fontSize: 10 },
+  hint: { color: '#6c8088', fontSize: 10, marginTop: 3, lineHeight: 14 },
+  whisperSectionLabel: { color: '#9aaab0', fontSize: 12, fontWeight: '700' as const, marginTop: 8, marginBottom: 4 },
+  whisperCountDim: { color: '#6c8088' },
+  specLine: { color: '#6a9bbf', fontSize: 10, marginTop: 5, lineHeight: 14, fontStyle: 'italic' },
+  toneLine: { color: '#b88ce0', fontSize: 11, marginTop: 5, fontStyle: 'italic', lineHeight: 15 },
+  trackRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6, backgroundColor: '#0a1012', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 8 },
+  trackName: { color: '#d6e4e8', fontSize: 12, flex: 1, marginRight: 8 },
+  trackRemove: { borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 4, paddingHorizontal: 8 },
+  trackRemoveText: { color: '#e07a5f', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  emptyLine: { color: '#46555a', fontSize: 11, marginTop: 6, fontStyle: 'italic' },
+  btnDisabled: { opacity: 0.4 },
+  input: {
+    color: '#d6e4e8', backgroundColor: '#0a1012', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
+    padding: 8, marginTop: 6, minHeight: 70, maxHeight: 160, fontSize: 11, fontFamily: 'monospace', textAlignVertical: 'top',
+  },
+  // engine_Dev — wrap so a row of action buttons stacks onto the next line instead
+  // of running off the right edge of the screen.
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  // engine_Dev — full-width stacked buttons (the whole-game actions are too wide to
+  // sit side by side). Column container + centered, stretched buttons.
+  stackCol: { flexDirection: 'column', gap: 8, marginTop: 8 },
+  stackBtn: { alignItems: 'center', alignSelf: 'stretch' },
+  loadBtn: { backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 18 },
+  loadBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  tmplBtn: { backgroundColor: '#131c1f', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  tmplBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  copyBtn: { backgroundColor: '#131c1f', borderColor: '#bcd2db', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  copyBtnText: { color: '#bcd2db', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  resetBtn: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14 },
+  resetBtnText: { color: '#8fa6ac', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  titleRowDev: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 2 },
+  ok: { color: '#9ec96a', fontSize: 11, marginTop: 6 },
+  err: { color: '#e07a5f', fontSize: 11, marginTop: 6 },
+  applyBtn: { marginTop: 4, marginBottom: 2, backgroundColor: '#243a3f', borderColor: '#6ad0c9', borderWidth: 1, borderRadius: 4, paddingVertical: 13, alignItems: 'center' },
+  warnBanner: { backgroundColor: '#2a2410', borderColor: '#6ab0c9', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
+  warnBannerTitle: { color: '#e6c96a', fontSize: 12, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
+  warnBannerLine: { color: '#d6e4e8', fontSize: 11, lineHeight: 16, marginTop: 2 },
+  warnBannerNote: { color: '#a89776', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
+  applyBtnText: { color: '#7fe3da', fontSize: 13, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
+  publishBtn: { marginTop: 6, backgroundColor: '#2a3a22', borderColor: '#9ec96a', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
+  publishBtnText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center' },
+  publishNote: { color: '#6c8088', fontSize: 10, lineHeight: 14, marginTop: 6, fontStyle: 'italic' },
+  unpublishBtn: { marginTop: 6, backgroundColor: '#131c1f', borderColor: '#6a9bbf', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
+  unpublishBtnText: { color: '#6a9bbf', fontSize: 12, fontWeight: '700', letterSpacing: 1, textAlign: 'center' },
+  resetAll: { marginTop: 18, borderColor: '#e07a5f', borderWidth: 1, borderRadius: 4, paddingVertical: 12, alignItems: 'center' },
+  resetAllText: { color: '#e07a5f', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+});

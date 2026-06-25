@@ -1,0 +1,83 @@
+{
+  "_comment": "engine_Dev — BUILT-IN summoned-sidekick definitions (the reference game's 'golem' family). Lives here, not in engine source, so the engine carries no hardcoded setting strings. An uploaded 'summons' pack (dev console -> SUMMONED SIDEKICKS) replaces these wholesale, and the generic-default pack supplies generic sidekicks for a reskin; these are only the last-resort fallback. The summon/skill/weapon MECHANICS stay in golems.ts. Keyed by kind.",
+  "definitions": {
+    "mud_golem": {
+      "kind": "mud_golem",
+      "name": "Mud Golem",
+      "fuel": [
+        { "name": "Aether Mud", "quantity": 2 },
+        { "name": "Mud Fragment", "quantity": 2 },
+        { "name": "Aether Crystal", "quantity": 1 }
+      ],
+      "hpMax": 24,
+      "attackDie": "1d8",
+      "attackMod": 1,
+      "hitBonus": 0,
+      "damageType": "bludgeoning",
+      "blurb": "Starter anchor. Cheap to bind, modest in every measure.",
+      "summonDC": 13,
+      "resistBase": 0.15,
+      "resistCap": 0.35,
+      "aliases": ["mud"],
+      "elementTags": ["mud"]
+    },
+    "iron_golem": {
+      "kind": "iron_golem",
+      "name": "Iron Golem",
+      "fuel": [
+        { "name": "Scrap Metal", "quantity": 3 },
+        { "name": "Golem Core", "quantity": 1 }
+      ],
+      "hpMax": 40,
+      "attackDie": "1d8",
+      "attackMod": 2,
+      "hitBonus": 1,
+      "damageType": "slashing",
+      "blurb": "Tank build. Tough frame, steady slashing strikes.",
+      "summonDC": 15,
+      "resistBase": 0.30,
+      "resistCap": 0.50,
+      "aliases": ["iron"],
+      "elementTags": ["metal", "iron"]
+    },
+    "aether_golem": {
+      "kind": "aether_golem",
+      "name": "Aether Golem",
+      "fuel": [
+        { "name": "Aether Crystal", "quantity": 2 },
+        { "name": "Aetheric Shard", "quantity": 1 }
+      ],
+      "hpMax": 34,
+      "attackDie": "1d10",
+      "attackMod": 2,
+      "hitBonus": 2,
+      "damageType": "aetheric",
+      "blurb": "Energy striker. Heavy aetheric blows pierce armor.",
+      "summonDC": 17,
+      "resistBase": 0.20,
+      "resistCap": 0.40,
+      "aliases": ["aether"],
+      "elementTags": ["aether", "aetheric"]
+    },
+    "crystal_golem": {
+      "kind": "crystal_golem",
+      "name": "Crystal Golem",
+      "fuel": [
+        { "name": "Aether Crystal", "quantity": 2 },
+        { "name": "Aetheric Cloth", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 }
+      ],
+      "hpMax": 52,
+      "attackDie": "1d12",
+      "attackMod": 3,
+      "hitBonus": 3,
+      "damageType": "piercing",
+      "blurb": "Apex anchor — the hardest to seat and the strongest in every measure.",
+      "summonDC": 19,
+      "resistBase": 0.35,
+      "resistCap": 0.55,
+      "aliases": ["crystal"],
+      "elementTags": ["aether", "crystal"]
+    }
+  }
+}

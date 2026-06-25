@@ -12,6 +12,7 @@
 // arb43 — pairs with the Qwen persona fallback + introspection bug-fix in
 // gameStore's `case 'ask'`. All three data files are top-level ARRAYS.
 
+import { getNarratorName, getWorldName, resolveTable } from './contentPack';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -26,25 +27,23 @@ export interface KnowledgePlayer {
   discoveredSiteCount?: number;
 }
 
-const FACTION_NAMES: string[] = (factionsData as NamedThing[])
-  .map((f) => f.name ?? '')
-  .filter(Boolean);
+// engine_Dev — resolve LIVE through the content pack (author override → installed generic
+// default → built-in), so the narrator's "list the factions / races / capitals" answers
+// name the ACTIVE world's content, never the built-in Tartaria set in a reskin.
+const liveFactionData = (): readonly NamedThing[] => resolveTable<NamedThing>('factions', factionsData as NamedThing[]);
+const liveRaceData = (): readonly NamedThing[] => resolveTable<NamedThing>('races', racesData as NamedThing[]);
+const liveLocationData = (): readonly NamedThing[] => resolveTable<NamedThing>('locations', locationsData as NamedThing[]);
 
-const RACE_NAMES: string[] = (racesData as NamedThing[])
-  .map((r) => r.name ?? '')
-  .filter(Boolean);
+const factionNames = (): string[] => liveFactionData().map((f) => f.name ?? '').filter(Boolean);
+const raceNames = (): string[] => liveRaceData().map((r) => r.name ?? '').filter(Boolean);
 
-// Capitals = every tile the engine tags `capital` or `lost_capital` — the
-// world's actual named capital cities (6 today). The lore name-drops a few
-// more (Samarran, Nimari, Voronov) that aren't real locations; we answer
-// from what the engine actually has, so the count the Arbiter corrects you
-// with is true. Standing capitals first, then the drowned ones.
-const CAPITAL_NAMES: string[] = (() => {
-  const locs = locationsData as NamedThing[];
+// Capitals = every tile the active world tags `capital` or `lost_capital`. Standing
+// capitals first, then any drowned/lost ones.
+const capitalNames = (): string[] => {
   const seen = new Set<string>();
   const out: string[] = [];
   for (const tag of ['capital', 'lost_capital']) {
-    for (const l of locs) {
+    for (const l of liveLocationData()) {
       if ((l.tags ?? []).includes(tag) && l.name && !seen.has(l.name)) {
         seen.add(l.name);
         out.push(l.name);
@@ -52,12 +51,10 @@ const CAPITAL_NAMES: string[] = (() => {
     }
   }
   return out;
-})();
+};
 
-// Visitable sites = every location the engine marks discoverable (the places
-// the player can find + travel to). 25 today; rises as new tiles open.
-const VISITABLE_SITE_COUNT: number = (locationsData as NamedThing[])
-  .filter((l) => l.discoverable === true).length;
+// Visitable sites = every location the active world marks discoverable.
+const visitableSiteCount = (): number => liveLocationData().filter((l) => l.discoverable === true).length;
 
 const NUM_WORDS: Record<string, number> = {
   zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7,
@@ -87,7 +84,7 @@ function assertedCount(q: string): number | null {
 
 function locName(id: string | undefined): string | null {
   if (!id) return null;
-  return (locationsData as NamedThing[]).find((l) => l.id === id)?.name ?? null;
+  return liveLocationData().find((l) => l.id === id)?.name ?? null;
 }
 
 function joinList(items: string[]): string {
@@ -101,9 +98,9 @@ function joinList(items: string[]): string {
 function open(q: string, real: number, nounPlural: string): string {
   const asked = assertedCount(q);
   if (asked !== null && asked !== real) {
-    return `The Arbiter's eyes narrow. "There are not ${numberWord(asked)} ${nounPlural}. There are ${numberWord(real)}. `;
+    return `The ${getNarratorName()}'s eyes narrow. "There are not ${numberWord(asked)} ${nounPlural}. There are ${numberWord(real)}. `;
   }
-  return `The Arbiter answers, flat and certain. "`;
+  return `The ${getNarratorName()} answers, flat and certain. "`;
 }
 
 /** Free-text → a deterministic, data-grounded Arbiter answer, or null. */
@@ -123,15 +120,15 @@ export function answerWorldKnowledge(query: string, player: KnowledgePlayer): st
       const dist = typeof tiles === 'number' && tiles > 0
         ? (tiles <= 1 ? ' A day out, no more.' : ` Some ${tiles} days of road remain.`)
         : '';
-      return `The Arbiter looks to the horizon. "You are bound for ${name}.${dist} Keep your legs under you."`;
+      return `The ${getNarratorName()} looks to the horizon. "You are bound for ${name}.${dist} Keep your legs under you."`;
     }
-    return `The Arbiter shrugs. "You are bound nowhere. You hold where you stand — name a place and we walk."`;
+    return `The ${getNarratorName()} shrugs. "You are bound nowhere. You hold where you stand — name a place and we walk."`;
   }
 
   // 2) Current location — "where am I" (not a heading question).
   if (/\bwhere\s+(am\s+i|i\s+am)\b/.test(q) && !headingCue) {
     const here = locName(player.currentLocationId);
-    if (here) return `The Arbiter taps the ground. "You stand in ${here}."`;
+    if (here) return `The ${getNarratorName()} taps the ground. "You stand in ${here}."`;
   }
 
   const wantsList = /\b(list|name|all|every|each|how\s+many|which|what\s+are|who\s+are|count)\b/.test(q)
@@ -139,27 +136,30 @@ export function answerWorldKnowledge(query: string, player: KnowledgePlayer): st
 
   // 3) Factions
   if (/\bfactions\b/.test(q) || (/\bfaction\b/.test(q) && wantsList)) {
-    return `${open(q, FACTION_NAMES.length, 'factions')}${joinList(FACTION_NAMES)}. Each calls the buried country its own."`;
+    const names = factionNames();
+    return `${open(q, names.length, 'factions')}${joinList(names)}. Each holds its own ground."`;
   }
 
   // 4) Capitals / cities / towns
   if (/\bcapitals\b|\bcities\b/.test(q) || (/\b(capital|city|town)\b/.test(q) && wantsList)) {
-    return `${open(q, CAPITAL_NAMES.length, 'capitals')}${joinList(CAPITAL_NAMES)}. The flood took the rest before they were worth a name."`;
+    const names = capitalNames();
+    return `${open(q, names.length, 'capitals')}${joinList(names)}. The rest are gone — never worth a name."`;
   }
 
   // 5) Races / bloodlines
   if (/\b(races|bloodlines|peoples)\b/.test(q) || (/\b(race|bloodline)\b/.test(q) && wantsList)) {
-    return `${open(q, RACE_NAMES.length, 'bloodlines')}${joinList(RACE_NAMES)}. That is every blood that still walks Tartaria."`;
+    const names = raceNames();
+    return `${open(q, names.length, 'bloodlines')}${joinList(names)}. That is every bloodline that still walks ${getWorldName()}."`;
   }
 
   // 6) Sites / places to visit — a COUNT of discoverable locations (+ progress).
   //    "how many sites can I visit", "how many places are there", etc.
   if (/\b(sites?|locations?|destinations?|landmarks?|places?)\b/.test(q) && wantsList) {
-    const total = VISITABLE_SITE_COUNT;
+    const total = visitableSiteCount();
     const asked = assertedCount(q);
     const lead = (asked !== null && asked !== total)
-      ? `The Arbiter's eyes narrow. "Not ${numberWord(asked)}. There are ${numberWord(total)} places in the buried country worth your boots`
-      : `The Arbiter sweeps a hand at the dark. "There are ${numberWord(total)} places in the buried country worth your boots`;
+      ? `The ${getNarratorName()}'s eyes narrow. "Not ${numberWord(asked)}. There are ${numberWord(total)} places worth your boots`
+      : `The ${getNarratorName()} sweeps a hand at the dark. "There are ${numberWord(total)} places worth your boots`;
     const found = player.discoveredSiteCount;
     const tail = (typeof found === 'number' && found >= 0)
       ? ` — you have set foot in ${numberWord(found)}. The rest still wait."`
@@ -170,10 +170,10 @@ export function answerWorldKnowledge(query: string, player: KnowledgePlayer): st
   return null;
 }
 
-/** Test-only accessors so counts stay locked to the data. */
+/** Test-only accessors so counts stay locked to the (live-resolved) data. */
 export const _knowledgeCounts = {
-  factions: FACTION_NAMES.length,
-  races: RACE_NAMES.length,
-  capitals: CAPITAL_NAMES.length,
-  sites: VISITABLE_SITE_COUNT,
+  get factions() { return factionNames().length; },
+  get races() { return raceNames().length; },
+  get capitals() { return capitalNames().length; },
+  get sites() { return visitableSiteCount(); },
 };

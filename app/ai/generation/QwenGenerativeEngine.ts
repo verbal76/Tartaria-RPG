@@ -1,8 +1,10 @@
 import { ModelDownloader } from '../ota/ModelDownloader';
 import {
   LlamaRuntime,
+  type ILlamaRuntime,
   type QwenChatMessage,
 } from './LlamaRuntime';
+import { resolveGenerationRuntime } from './runtimeFactory';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -23,8 +25,8 @@ export interface QwenInitOptions {
   modelPath?: string;
   /** Inject a custom downloader for tests. */
   downloader?: { ensureQwenGguf(opts: { url?: string; onProgress?: (f: number) => void }): Promise<string> };
-  /** Inject a custom LlamaRuntime instance for tests. */
-  runtime?: LlamaRuntime;
+  /** Inject a custom runtime (tests, or the desktop/PC HTTP backend). */
+  runtime?: ILlamaRuntime;
   /** Optional progress callback fired during download + load. */
   onProgress?: (status: QwenStatus, fraction: number) => void;
   /** Context window in tokens. Default 2048 (plenty for Arbiter prompts). */
@@ -76,7 +78,7 @@ export class QwenGenerativeEngine {
   private status: QwenStatus = 'idle';
   private downloadFraction = 0;
   private lastError: string | null = null;
-  private runtime: LlamaRuntime | null = null;
+  private runtime: ILlamaRuntime | null = null;
   private modelId: string = DEFAULT_QWEN_MODEL_ID;
 
   getStatus(): QwenStatus {
@@ -173,7 +175,10 @@ export class QwenGenerativeEngine {
     this.status = 'loading';
     onProgress?.('loading', 0);
     try {
-      const runtime = opts.runtime ?? new LlamaRuntime();
+      // engine_Dev — backend resolution: an injected runtime (tests/desktop) wins;
+      // else the platform factory (a desktop HTTP runtime on web/PC, else on-device
+      // llama.rn). resolveGenerationRuntime() returns undefined on mobile.
+      const runtime = opts.runtime ?? resolveGenerationRuntime() ?? new LlamaRuntime();
       await runtime.initialize({
         modelPath,
         contextSize: opts.contextSize ?? 2048,

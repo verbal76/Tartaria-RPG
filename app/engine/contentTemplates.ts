@@ -1,0 +1,1455 @@
+// engine_Dev — content templates. Exports the FIRST FEW rows of each built-in
+// (Tartaria) table as a pretty-printed JSON sample, so a developer can see the
+// shape and edit it into their own game's data — without dumping (or having to
+// wade through) the entire existing game. The export format matches what the
+// upload boxes expect: a JSON ARRAY of rows.
+
+import {
+  getGameTitle,
+  CONTENT_TABLES,
+  LORE_BLOCKS,
+  resolveTable,
+  getTableOverride,
+  getStartingAreasOverride,
+  type ContentTableId,
+  type LoreBlockId,
+} from './contentPack';
+import { getInteractionTags } from './interactionTags';
+import { buildFlavorTemplate } from './narrativeGenerator';
+import { POWERS_TEMPLATE } from './powers';
+import { TRACKABLE_VARS } from './customTitles';
+import { GENERIC_TABLE_ROWS, GENERIC_MISSIONS } from './genericTemplateData';
+
+/** Example narrator persona seeded into the World-lore template — illustrative
+ *  only; the author edits it. (The live default is built from the narrator's
+ *  name via getNarratorPersona(); the narrator's NAME is set separately in the
+ *  dev console's rename block.) */
+const NARRATOR_PERSONA_EXAMPLE = 'You are the Narrator, the voice that tells this story.';
+
+/** engine_Dev — the rename-token reference, prepended to every prose template so
+ *  authors know they can drop the chosen names into ANY text. Every per-section
+ *  loader (and the whole-game loader) runs stripJsonComments, so these `//` lines
+ *  are removed on upload. The whole-game template documents the same tokens in its
+ *  header, so bundle sections pass `includeTokenNote = false` to avoid repetition. */
+const TOKEN_NOTE = [
+  '// TOKENS — usable in ANY text string below; the engine fills in the name you set:',
+  '//   {narrator} / {arbiter} / {guide}  -> your narrator name',
+  '//   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
+  '//   {title} / {game}                  -> your game title',
+].join('\n');
+
+/** Prepend the token note to a template body unless suppressed (bundle sections). */
+function tokenNote(json: string, include: boolean): string {
+  return include ? `${TOKEN_NOTE}\n${json}` : json;
+}
+
+// engine_Dev — generic, section-organized starter for the Lore document box.
+// No specific setting: the author replaces each REPLACE and fills sections out as
+// they build a world. `section` = a human label (engine ignores it). `tags` =
+// the scene words that make a passage fire (place/faction/race names from your
+// other tables). `["always"]` = the default passage when nothing else matches.
+const LORE_DOCUMENT_SCAFFOLD: unknown[] = [
+  {
+    section: 'READ ME — how this works (delete before you publish)',
+    tags: [],
+    text: 'Each block below is one lore passage. The narrator pulls in the block whose "tags" appear in the current scene — its location name, biome, and surroundings — so tag every block with the place / faction / race words it should fire near (use the same names as your Locations, Factions, and Races tables). "section" is just a label for you; the engine ignores it. Tag a block "always" to use it as the baseline when nothing scene-specific matches. Empty tags (like this block) never fire. Keep each block a few sentences; add as many as you want.',
+  },
+  {
+    section: 'World overview — the baseline the narrator always leans on',
+    tags: ['always'],
+    text: 'REPLACE: one short paragraph on your world — where and when it is, the central conflict, and the overall mood. This is the catch-all the narrator falls back on when no scene-specific lore matches.',
+  },
+  {
+    section: 'History — a defining past event',
+    tags: ['REPLACE-with-an-event-keyword'],
+    text: 'REPLACE: a pivotal event in your world’s past and why it still matters. Tag it with words that appear where its weight is felt (a place name, a faction).',
+  },
+  {
+    section: 'Environment — a region or biome',
+    tags: ['REPLACE-with-a-region-or-biome-name'],
+    text: 'REPLACE: describe a key region/biome — what it looks, sounds, and feels like. Tag it with the region/biome name you used in your Locations so it surfaces when the player is there.',
+  },
+  {
+    section: 'Faction — who they are',
+    tags: ['REPLACE-with-a-faction-id-or-name'],
+    text: 'REPLACE: who this faction is, what they want, and how they treat outsiders. Tag with the faction’s id/name from your Factions table.',
+  },
+  {
+    section: 'Race / people — culture and traits',
+    tags: ['REPLACE-with-a-race-id-or-name'],
+    text: 'REPLACE: who these people are — their culture, strengths, and how others regard them. Tag with the race id/name from your Races table.',
+  },
+  {
+    section: 'Location — a place’s deeper story',
+    tags: ['REPLACE-with-a-location-name'],
+    text: 'REPLACE: the story behind a specific place — what happened here, what’s hidden, who holds it. Tag with the location name from your Locations table.',
+  },
+  {
+    section: 'Key figure — a leader or legend',
+    tags: ['REPLACE-with-a-character-name'],
+    text: 'REPLACE: an important person, leader, or legend — who they are and why they matter. Tag with their name so it fires near their home or when they’re referenced.',
+  },
+  {
+    section: 'Artifact — the lore of a notable item',
+    tags: ['REPLACE-with-an-item-name'],
+    text: 'REPLACE: the story behind a notable item or relic. Tag with the item’s name (match your Weapons/Gear tables).',
+  },
+];
+
+const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
+  // engine_Dev — GENERIC, setting-neutral sample rows (NOT the built-in Tartaria
+  // tables). Same shapes + optional fields, bland "light fantasy" flavor, so an
+  // author's TEMPLATE never seeds another game's proper nouns. See genericTemplateData.ts.
+  weapons: GENERIC_TABLE_ROWS.weapons,
+  armor: GENERIC_TABLE_ROWS.armor,
+  materials: GENERIC_TABLE_ROWS.materials,
+  gear: GENERIC_TABLE_ROWS.gear,
+  exploration: GENERIC_TABLE_ROWS.exploration,
+  amulets: GENERIC_TABLE_ROWS.amulets,
+  rings: GENERIC_TABLE_ROWS.rings,
+  dogGear: GENERIC_TABLE_ROWS.dogGear,
+  recipes: GENERIC_TABLE_ROWS.recipes,
+  enemies: GENERIC_TABLE_ROWS.enemies,
+  races: GENERIC_TABLE_ROWS.races,
+  factions: GENERIC_TABLE_ROWS.factions,
+  locations: GENERIC_TABLE_ROWS.locations,
+  weather: GENERIC_TABLE_ROWS.weather,
+  // engine_Dev — the Lore document has no built-in file of its own shape; this is
+  // a GENERIC, section-organized scaffold (no Tartaria / no specific setting) the
+  // author fills in for any game. Each block is one passage; the narrator injects
+  // the block whose `tags` match the scene. `section` is a human label the engine
+  // ignores; the `always` tag marks the default block used when nothing else
+  // matches. Replace every REPLACE and add as many blocks as you want.
+  lore: LORE_DOCUMENT_SCAFFOLD,
+  // The built-in power set + custom-effect examples (fog / heal) — edit/replace.
+  powers: POWERS_TEMPLATE as unknown[],
+};
+
+/** How many sample rows to export per table — enough to show the shape, not the
+ *  whole game. */
+export const TEMPLATE_SAMPLE_ROWS = 2;
+
+/** First `n` rows of a built-in table as a pretty JSON string (a starter schema). */
+// engine_Dev — optional-field reference notes prepended to a table template so the
+// TEMPLATE button always reflects the CURRENT functionality, even for rows whose
+// built-in sample doesn't happen to use the newer fields. Loaders strip // comments,
+// so the template still round-trips. Only shown in the dev box (includeTokenNote),
+// not the whole-game bundle (which carries its own section hint).
+const STAT_BONUS_NOTE = [
+  '// statBonuses: [{ stat, amount }] — boosts applied while EQUIPPED. Attribute stats',
+  '//   (strength/dexterity/intelligence/wisdom/charisma/stealth) change your effective',
+  '//   stats; the two DERIVED caps hp (max HP) and staminaMax (max stamina) raise those',
+  '//   pools instead, e.g. { "stat": "staminaMax", "amount": 4 }.',
+].join('\n');
+
+// engine_Dev — the consumable EFFECT schema (gear with kind:"consumable"). Only these fields are
+// read by the eat/use handler; anything else is silently ignored and the item does nothing.
+const CONSUMABLE_EFFECT_NOTE = [
+  '// CONSUMABLE effect (kind:"consumable") — effect: { kind:"consumable", … }. The engine ONLY',
+  '// reads these fields; any other field (stat/amount/duration/instant/cures/…) is IGNORED and the',
+  '// item does nothing when used:',
+  '//   healHP: N            — instant HP restored',
+  '//   restoreStamina: N    — instant stamina restored',
+  '//   buffStat + buffBonus + buffDuration — a TIMED stat buff. ALL THREE required. buffStat must be',
+  '//                          one of strength/dexterity/intelligence/wisdom/charisma. buffDuration',
+  '//                          is in TURNS (not seconds). (No timed hp/staminaMax buff — use heal/restore.)',
+  '//   curePoison: true  /  cureBleed: true   — strip that status (only poison & bleed are curable)',
+  '//   reduceCorruption: N  /  extendLight: N (torch hours)  /  revealScene: true',
+  '//   coating: { kind:"poison|acid|corruption|electrical|burn", dice, label }  — weapon-coating oil',
+].join('\n');
+
+const GEAR_NOTE = [STAT_BONUS_NOTE, CONSUMABLE_EFFECT_NOTE].join('\n');
+
+const WEATHER_NOTE = [
+  '// Weather is DATA-DRIVEN — these fields drive the mechanics (ids are free-form,',
+  '// nothing references them):',
+  '//   visibility (0 or negative) — lower = a bigger attack-roll penalty (capped at 3)',
+  '//   travelPenalty (0+)         — 3 or more = repositioning costs 2 turns per band',
+  '//   corruptionChance (0+)      — chance per action to tick corruption',
+  '//   tags                       — hostile tags (storm/ash/hazardous) add a stamina/HP',
+  '//                                bite; cold/snow → -1 DEX; fog/ash/smoke → -1 WIS',
+  '// Add a benign row (visibility 0, travelPenalty 0, no hostile tags) for fair weather.',
+  '// To turn weather OFF entirely, set "weatherEnabled": false at the top level (or use the',
+  '// Weather toggle in the dev console FEATURES card) — scenes then get no weather at all.',
+].join('\n');
+
+const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
+  weapons: STAT_BONUS_NOTE,
+  armor: STAT_BONUS_NOTE,
+  gear: GEAR_NOTE,
+  weather: WEATHER_NOTE,
+  races: [
+    '// Optional per RACE row (perks + gear + abilities):',
+    '//   racialStatBonuses: { strength?, dexterity?, intelligence?, wisdom?, charisma? }  — always-on stat bumps',
+    '//   racialACBonusRules: [{ condition: underground|dark|confined|runic_gear|energy_powers|constructed_environment|relic_armor, delta }]',
+    '//   startingWeapon: "Item Name"   ·   startingGear: ["Item Name", …]  (granted at creation, from your catalogs)',
+    '//   resist: ["<damage type>"]  /  weak: ["<damage type>"]   — lower/raise the chance you suffer that type\'s on-hit effect',
+    '//   abilities: [{ id, name, description, combatOnly?, effect: { type: heal|stat_buff|shield|repair|strike, amount?|dice?, stat?, rounds?, damageType? } }]',
+  ].join('\n'),
+  factions: [
+    '// Optional per FACTION row:',
+    '//   flavor, baseName, baseLocationId, baseDescription   (starter complex)',
+    '//   startingGear: ["Item Name", …]   (granted at creation)',
+    '//   factionStatBonuses: { strength?, … }   ·   factionACBonusRules: [{ condition, delta }]',
+    '//   resist: ["<damage type>"]  /  weak: ["<damage type>"]',
+    '//   abilities: [{ id, name, description, combatOnly?, effect: { type: heal|stat_buff|shield|repair|strike, … } }]',
+  ].join('\n'),
+  enemies: [
+    '// DAMAGE RELATIONS per ENEMY row:',
+    '//   damage carries the DELIVERED type, e.g. "2d6 frost" (any type you defined in Damage Types)',
+    '//   traits: ["vulnerable:<type>"]  = WEAK to it (takes 1.5x)   ·   ["resist:<type>"] = STRONG (takes 1/2)',
+  ].join('\n'),
+  locations: '// Optional per LOCATION row: x / y (plot on your world map), hidden: true (colored "?" until visited), aliases: [..], interactables: [..]',
+  recipes: [
+    '// ═══════════════════════════════════════════════════════════════════════════',
+    '// CRAFTING RECIPES — shape: { "result": "Item Name", "ingredients": [{ "name":',
+    '//   "Material", "quantity": 2 }], "intRequirement"?: 11 }',
+    '// ───────────────────────────────────────────────────────────────────────────',
+    '// A recipe is ONLY the formula. The crafted item\'s STATS come from the table you',
+    '// define the RESULT in — so the TYPE of recipe = WHICH table the result lives in:',
+    '//   WEAPON     → define result in the WEAPONS table   (damageDice / stat / tags)',
+    '//   ARMOR      → define result in the ARMOR table     (a valid slot + acBonus)',
+    '//   CONSUMABLE → stim / medkit / food / tonic / coating-oil → GEAR table,',
+    '//                kind:"consumable" + an effect (healHP/restoreStamina/buff…).',
+    '//                These also land on the RECIPES tab instead of the CRAFT tab.',
+    '//   ACCESSORY  → define result in the AMULETS or RINGS table (statBonus/resist)',
+    '//   TOOL/LIGHT → define result in the EXPLORATION (or GEAR) table',
+    '// ───────────────────────────────────────────────────────────────────────────',
+    '// HARD RULES (break these and the recipe silently fails):',
+    '//   • result MUST be an EXACT item name in one of those tables — an undefined',
+    '//     result crafts to a blank stat-less "misc".',
+    '//   • every ingredients[].name MUST be a real MATERIAL that is OBTAINABLE (enemy',
+    '//     loot / dig / salvage / scrap), or the recipe can never be crafted.',
+    '//   • names match by EXACT string (case + spelling). Build items + materials FIRST.',
+    '// OPTIONAL GATE (omit for none):',
+    '//   "intRequirement": 11  — refuses the craft until the player\'s INT meets it.',
+    '// The rows below show ONE of every type — edit/replace them.',
+    '// ═══════════════════════════════════════════════════════════════════════════',
+  ].join('\n'),
+};
+
+// engine_Dev — the Recipes TEMPLATE shows ONE recipe of EVERY type (the kind is set by
+// which item table the result lives in), each commented, plus the optional gate. The
+// generic-game DEFAULT recipes stay minimal (GENERIC_TABLE_ROWS.recipes); this richer
+// teaching set is template-only. Comments are stripped on load, so it still round-trips.
+const RECIPES_EXAMPLE = `[
+  // WEAPON (melee) — define "Iron Spear" in your WEAPONS table for its damage/stats.
+  { "result": "Iron Spear", "ingredients": [{ "name": "Scrap Metal", "quantity": 2 }, { "name": "Stick", "quantity": 1 }] },
+  // WEAPON (ranged) — define "Hunter's Bow" in WEAPONS (weaponKind:"ranged").
+  { "result": "Hunter's Bow", "ingredients": [{ "name": "Tough Fiber", "quantity": 3 }, { "name": "Stick", "quantity": 2 }] },
+  // ARMOR — define "Banded Cuirass" in the ARMOR table with a valid slot (chest).
+  { "result": "Banded Cuirass", "ingredients": [{ "name": "Scrap Metal", "quantity": 4 }, { "name": "Tough Fiber", "quantity": 2 }] },
+  // CONSUMABLE (medicine) — define "Healing Draught" in GEAR, kind:"consumable", effect.healHP.
+  { "result": "Healing Draught", "ingredients": [{ "name": "Common Residue", "quantity": 1 }, { "name": "Raw Crystal", "quantity": 1 }] },
+  // CONSUMABLE (food) — define "Trail Rations" in GEAR, kind:"consumable".
+  { "result": "Trail Rations", "ingredients": [{ "name": "Tough Fiber", "quantity": 1 }, { "name": "Common Residue", "quantity": 1 }] },
+  // ACCESSORY — define "Seeker's Locket" in the AMULETS table (or a ring in RINGS).
+  { "result": "Seeker's Locket", "ingredients": [{ "name": "Worked Crystal", "quantity": 1 }, { "name": "Scrap Metal", "quantity": 1 }] },
+  // TOOL / LIGHT — define "Bright Torch" in the EXPLORATION (or GEAR) table.
+  { "result": "Bright Torch", "ingredients": [{ "name": "Stick", "quantity": 1 }, { "name": "Tough Fiber", "quantity": 1 }] },
+  // COATING — a consumable that buffs a weapon; define "Blade Oil" in GEAR, kind:"consumable".
+  { "result": "Blade Oil", "ingredients": [{ "name": "Common Residue", "quantity": 2 }, { "name": "Scrap Metal", "quantity": 1 }] },
+  // INT-GATED — only craftable once the player's INT >= 11.
+  { "result": "Etched Focus", "ingredients": [{ "name": "Worked Crystal", "quantity": 2 }], "intRequirement": 11 }
+]`;
+
+export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
+  const note = includeTokenNote && TABLE_OPTION_NOTES[id] ? TABLE_OPTION_NOTES[id] + '\n' : '';
+  // The Lore document + Powers ship their FULL set (not a 2-row sample) so the
+  // author sees every section / power to edit. Both carry author prose, so they
+  // get the rename-token note.
+  if (id === 'lore' || id === 'powers') return tokenNote(JSON.stringify(TABLE_ROWS[id], null, 2), includeTokenNote);
+  // engine_Dev — Recipes get a hand-built example showing ONE of every recipe type +
+  // the optional gates (the generic-game DEFAULT recipes stay minimal). The header note
+  // is prepended by `note`; both are stripped on load so it still round-trips.
+  if (id === 'recipes') return note + RECIPES_EXAMPLE;
+  // engine_Dev — the Locations sample shows the optional map x / y (grid column /
+  // row) so authors know they can plot each place on the uploaded world map.
+  if (id === 'locations') {
+    const rows = TABLE_ROWS.locations.slice(0, n).map((row, i) => ({
+      ...(row as Record<string, unknown>),
+      x: (row as { x?: number }).x ?? (i + 1) * 3,
+      y: (row as { y?: number }).y ?? (i + 1) * 2,
+      // engine_Dev — show the optional "hidden" flag on the last sample row so
+      // authors see the shape: a colored "?" on the map until the player visits it.
+      ...(i === Math.min(n, TABLE_ROWS.locations.length) - 1 ? { hidden: false } : {}),
+    }));
+    return note + JSON.stringify(rows, null, 2);
+  }
+  return note + JSON.stringify(TABLE_ROWS[id].slice(0, n), null, 2);
+}
+
+/** A lore-block starter. World shows the CURRENT defaults to edit; faction/race
+ *  show the first couple of built-in rows so the shape is obvious. */
+export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): string {
+  if (id === 'world') {
+    return JSON.stringify(
+      {
+        narrator: NARRATOR_PERSONA_EXAMPLE,
+        // engine_Dev — a one-line example tone; replace with your world's premise.
+        tone: 'A small band scavenges the ruins of a fallen age; a strange power still lingers in the old places.',
+        setting: '',
+        terms: [],
+        vocabulary: [],
+        // engine_Dev — CATCHALL term map. Any built-in narration noun the engine
+        // still names gets rewritten to your word everywhere the player reads it
+        // (pools, one-off lines, and dynamic text). Add a pair per residual term.
+        termMap: { 'REPLACE-with-a-built-in-noun-to-swap': 'REPLACE-with-your-word' },
+        // engine_Dev — rename the CORRUPTION/affliction tiers (the noun itself is the
+        // top-level corruptionName / {corruption}). Built-in tier ids: tainted /
+        // corrupted / hollowed — keep the ids, set your display words.
+        corruptionTiers: { tainted: 'REPLACE (e.g. Touched)', corrupted: 'REPLACE (e.g. Sickened)', hollowed: 'REPLACE (e.g. Lost)' },
+        // engine_Dev — the ENERGY / "magic" concept. Set yours and the whole family is
+        // swapped everywhere (also the {energy} / {energy_adj} / {energy_material}
+        // tokens). slang + factionTerms let each faction name the SAME force differently.
+        energy: {
+          name: 'REPLACE-with-your-energy (e.g. Magic, the Weave)',
+          adjective: 'REPLACE (e.g. arcane / charged)',
+          material: 'REPLACE (e.g. essence / raw crystal)',
+          verb: 'weave',
+          caster: 'Caster',
+          slang: ['the Hum', 'the Glow', 'the Tide', 'the Pull', 'Drift'],
+          factionTerms: { 'REPLACE-faction-id': 'REPLACE-with-that-faction-s-word-for-it' },
+        },
+      },
+      null,
+      2,
+    );
+  }
+  if (id === 'flavor') {
+    return tokenNote(JSON.stringify(buildFlavorTemplate(TEMPLATE_SAMPLE_ROWS), null, 2), includeTokenNote);
+  }
+  // engine_Dev — faction/race LORE is FREE-FORM story text the narrator knows, NOT
+  // the playable rows (those live in the Factions/Races TABLE boxes — and the lore
+  // loader rejects table-shaped arrays). Emit an object of id → a story paragraph so
+  // Template → edit → Load round-trips cleanly.
+  const which = id === 'faction' ? 'FACTION' : 'RACE';
+  const tableBox = id === 'faction' ? 'Factions' : 'Races';
+  const header = [
+    `// ${which} LORE — free-form BACKSTORY the narrator knows about each ${which.toLowerCase()}.`,
+    `// This is STORY TEXT ONLY; it does NOT create playable ${which.toLowerCase()}s — those go in`,
+    `// the "${tableBox}" box under TABLES (character creation). Shape: an OBJECT mapping a`,
+    `// ${which.toLowerCase()} id to one prose paragraph: { "<id>": "the story…" }. Each <id>`,
+    `// SHOULD match an id in your ${tableBox} table so the narrator ties the lore to that`,
+    '// pick; add as many entries as you want. (Loaders strip these // lines on upload.)',
+  ].join('\n');
+  const src = (id === 'faction' ? TABLE_ROWS.factions : TABLE_ROWS.races) as Array<{ id: string; name: string; description?: string; flavor?: string; philosophy?: string; goal?: string }>;
+  const out: Record<string, string> = {};
+  for (const r of src.slice(0, TEMPLATE_SAMPLE_ROWS)) {
+    const blurb = (r.flavor || r.description || r.philosophy || r.goal || `Story the narrator knows about ${r.name}.`).trim();
+    out[r.id] = blurb;
+  }
+  return header + '\n' + JSON.stringify(out, null, 2);
+}
+
+/** engine_Dev — the FULL-FEATURED main-quest template. Shows every action verb and
+ *  every per-step field — including the newer faction GATES (skipForFactions /
+ *  onlyForFactions) — so the TEMPLATE button always reflects the current
+ *  functionality even after an author built a quest before those options existed. */
+export function buildMainQuestTemplate(): string {
+  return [
+    '// MAIN QUEST — steps run in order; the last completes the quest. Actions:',
+    '//   kill (needs bossId) · clear · reach · collect · talk_to · deliver ·',
+    '//   return_to · hand_in · claim. Per step: target?, locationId, reward? (item',
+    '//   collected), bossId? (kill steps), and FACTION GATES:',
+    '//   skipForFactions: [..]  — players of these factions SKIP this step',
+    '//   onlyForFactions: [..]  — step runs ONLY for these factions',
+    JSON.stringify({
+      title: 'Your campaign name',
+      steps: [
+        { id: 'step_1', action: 'kill', target: 'the enemy commander', bossId: 'REPLACE-with-a-boss-id', locationId: 'REPLACE-with-a-location-id', reward: 'the commander\'s dog tags', skipForFactions: ['REPLACE-with-that-commander-s-own-faction-id'] },
+        { id: 'step_2', action: 'collect', target: 'the cipher key', locationId: 'REPLACE-with-a-location-id' },
+        { id: 'step_3', action: 'reach', locationId: 'REPLACE-with-a-location-id' },
+        { id: 'step_4', action: 'talk_to', target: 'the informant', locationId: 'REPLACE-with-a-location-id', onlyForFactions: ['REPLACE-with-a-faction-id-if-this-step-is-faction-specific'] },
+        { id: 'step_5', action: 'return_to', locationId: 'REPLACE-with-your-base-location-id' },
+        { id: 'step_6', action: 'hand_in', target: 'the dog tags', locationId: 'REPLACE-with-your-base-location-id' },
+        { id: 'step_7', action: 'claim', locationId: 'REPLACE-with-your-base-location-id' },
+      ],
+    }, null, 2),
+  ].join('\n');
+}
+
+/** engine_Dev — the FULL bosses template: one of every spawn mode (main_quest /
+ *  location / random) so the TEMPLATE shows the complete schema + spawn options. */
+export function buildBossesTemplate(): string {
+  return [
+    '// BOSSES — named foes a main-quest "kill" step references (by bossId), or a fixed /',
+    '// random world spawn. Shape: { id, name, factionId?, hp, attack, damage, ac?,',
+    '//   abilityPoint?, questItem?, drops?: [names], spawnLocationId?, spawnCondition,',
+    '//   spawnChance? }.',
+    '// DEPENDENCIES — these ids/names must match other tables EXACTLY (case + spelling):',
+    '//   id              — what a main-quest "kill" step points at via its bossId.',
+    '//   factionId       — a real id from your FACTIONS table (omit / null = neutral).',
+    '//   spawnLocationId — a real id from your LOCATIONS table.',
+    '//   questItem + drops[] — SHOULD be EXACT names of items defined in your item tables',
+    '//     (Weapons / Armor / Gear / Amulets / Rings / Exploration). An undefined name',
+    '//     drops as a stat-less "misc". The questItem is what a main-quest collect /',
+    '//     hand_in step looks for BY NAME, so it MUST match. Build factions, locations',
+    '//     and those items FIRST.',
+    '// spawnCondition: "main_quest" (tied to a quest step) | "location" (always at its',
+    '//   spawnLocationId) | "random" (rolls spawnChance % on travel encounters).',
+    '//   damage can carry a type, e.g. "1d10 frost".',
+    JSON.stringify([
+      { id: 'enemy_commander', name: 'The Enemy Commander', factionId: 'REPLACE-with-a-faction-id', hp: 120, attack: 7, damage: '2d8+4', ac: 16, abilityPoint: 7, questItem: 'Commander Dog Tags', drops: ['Field Medal'], spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'main_quest' },
+      { id: 'fortress_warden', name: 'The Fortress Warden', hp: 90, attack: 6, damage: '2d6', ac: 15, spawnLocationId: 'REPLACE-with-a-location-id', spawnCondition: 'location' },
+      { id: 'roaming_horror', name: 'A Roaming Horror', hp: 70, attack: 8, damage: '1d10 frost', ac: 14, spawnCondition: 'random', spawnChance: 8 },
+    ], null, 2),
+  ].join('\n');
+}
+
+/** The Missions template — one object whose keys are the mission sub-tables.
+ *  Hunts/mysteries/faction-quests/storylines are the designed multi-stage
+ *  missions; objectives/complications/rewards are the seeds the engine mixes into
+ *  procedural "lead" quests. A few sample rows of each, from the built-ins. */
+export function buildMissionsTemplate(n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
+  // engine_Dev — GENERIC sample missions (not the built-in Tartaria quests). Same
+  // shapes + the newer faction-quest fields (fetch, staged plan, reward.items).
+  return tokenNote(JSON.stringify({
+    hunts: GENERIC_MISSIONS.hunts.slice(0, n),
+    mysteries: GENERIC_MISSIONS.mysteries.slice(0, n),
+    factionQuests: GENERIC_MISSIONS.quests.slice(0, n),
+    storylines: GENERIC_MISSIONS.storylines.slice(0, 1),
+    objectives: GENERIC_MISSIONS.objectives.slice(0, 3),
+    complications: GENERIC_MISSIONS.complications.slice(0, 3),
+    rewards: GENERIC_MISSIONS.rewards.slice(0, 3),
+  }, null, 2), includeTokenNote);
+}
+
+/** The Wasteland-encounters template — between-locations travel encounters keyed by
+ *  archetype id. A neutral, representative example (NOT the built-in Tartaria set):
+ *  a treasure with statted loot (a consumable, a weapon with statBonuses +
+ *  baseDurability, a material), an npc, and a skirmish. Loot fields rarity /
+ *  description / statBonuses / baseDurability give encounter-ONLY items real stats
+ *  inline. Replace the matchers with YOUR location tags and the enemy with a name
+ *  from your Enemies table. */
+export function buildWastelandTemplate(includeTokenNote = true): string {
+  return tokenNote(JSON.stringify({
+    _comment: "Travel encounters. This is a GROWABLE LIST: each top-level key is ONE encounter — add as many as you want (copy a block, give it a new key). type: treasure|npc|skirmish|mini_dungeon|fusion_bench. matchers = location tags it can fire in (it fires at ANY location whose tags include one of these). weight = how often it's picked vs the others. WILDCARD: a matcher of \"any\" (or \"*\") makes the encounter eligible at EVERY location during travel — use it for encounters that can hit anywhere, alongside ones targeted to specific tags. loot kind: consumable|misc|relic|weapon|armor|currency (currency grants TC = the rolled min..max). statBonuses use ONLY these stats: strength, dexterity, intelligence, wisdom, charisma, stealth. Replace the REPLACE-... placeholders.",
+
+    roadside_cache: {
+      type: 'treasure',
+      weight: 12,
+      matchers: ['REPLACE-with-your-location-tags', 'open', 'ruin'],
+      narration: "Something's been left behind {direction} of here — a pack, a body, a story that ended badly.",
+      loot: [
+        { name: 'Field Rations', weight: 35, min: 1, max: 2, kind: 'consumable', tags: ['food'], rarity: 'Common', description: 'Enough to keep you walking another day.' },
+        { name: 'Scavenged Blade', weight: 12, min: 1, max: 1, kind: 'weapon', tags: ['weapon', 'melee'], rarity: 'Uncommon', description: "Worn, but it'll fight.", statBonuses: [{ stat: 'strength', amount: 2 }], baseDurability: 35 },
+        { name: 'Salvage Scrap', weight: 30, min: 1, max: 3, kind: 'misc', tags: ['metal', 'scrap'], rarity: 'Common', description: 'Worth something to the right buyer, or a crafting input.' },
+        { name: 'Loose Coins', weight: 20, min: 10, max: 40, kind: 'currency', tags: ['currency'], description: 'kind:"currency" grants TC (the rolled min..max), NOT an item.' },
+      ],
+      lore_note: 'A note, half-legible: a direction, a warning, a name.',
+    },
+
+    "_comment_2": "↑ encounter #1.  ↓ a SECOND encounter — same type is fine, just a different key, matchers, and loot.",
+
+    sunken_cache: {
+      type: 'treasure',
+      weight: 8,
+      matchers: ['REPLACE-with-a-different-region-tag', 'water', 'wreck'],
+      narration: 'A half-submerged wreck breaks the surface {direction} of you, cargo still strapped to the deck.',
+      loot: [
+        { name: 'Sealed Field Kit', weight: 30, min: 1, max: 1, kind: 'consumable', tags: ['medical', 'heal'], rarity: 'Uncommon', description: 'A watertight medical kit. Closes wounds the hard way.' },
+        { name: 'Pressure Plate', weight: 12, min: 1, max: 1, kind: 'armor', tags: ['armor'], rarity: 'Uncommon', description: 'A salvaged hull plate, barnacled but sound. Bracing it builds the shoulders.', statBonuses: [{ stat: 'strength', amount: 2 }], baseDurability: 40 },
+        { name: 'Tangled Wiring', weight: 28, min: 1, max: 3, kind: 'misc', tags: ['scrap'], rarity: 'Common', description: 'Copper worth pulling for the forge.' },
+      ],
+      lore_note: 'The water here refuses to lie flat.',
+    },
+
+    wandering_stranger: {
+      type: 'npc',
+      weight: 10,
+      matchers: ['REPLACE-with-your-location-tags', 'open', 'road'],
+      narration: 'A figure crosses toward you {direction}, hands kept where you can see them.',
+      npc_lines: [
+        '"Don\'t go where it\'s loud. I wouldn\'t."',
+        '"You\'re newer than the last one I passed. They didn\'t make it either."',
+      ],
+      lore_note: "They won't say where they're headed.",
+    },
+
+    ambush: {
+      type: 'skirmish',
+      weight: 8,
+      matchers: ['REPLACE-with-your-location-tags', 'ruin', 'hostile'],
+      narration: 'A {enemy} rises from the wreck {direction} of here with your name on it.',
+      enemyPool: ['REPLACE-with-an-enemy-name-from-your-Enemies-table'],
+      lore_note: 'Out here, loyalty lasts as long as the ammunition.',
+    },
+
+    "_comment_3": "↓ a WILDCARD encounter — matchers: [\"any\"] means it can fire at ANY location during travel, not just tagged ones. Keep a few of these so travel anywhere stays alive.",
+
+    lone_drifter: {
+      type: 'npc',
+      weight: 6,
+      matchers: ['any'],
+      narration: 'Somewhere {direction} of the path, a drifter falls into step beside you for a while.',
+      npc_lines: [
+        '"Everyone out here is going somewhere. Few of them arrive."',
+        '"Heard {narrator} talks to folks like you. Lucky you."',
+      ],
+      lore_note: 'They leave the road as quietly as they joined it.',
+    },
+  }, null, 2), includeTokenNote);
+}
+
+/** A small keyword-form example of interaction tags, used inside the whole-game
+ *  template (so the bundle doesn't dump every noun). */
+export function interactionTagsKeywordSample(): string {
+  return JSON.stringify({
+    climbable: ['tower', 'wall', 'ladder', 'scaffolding', 'tank', 'u-boat', 'fuselage', 'pillbox', 'statue'],
+    swimmable: ['water', 'pool', 'sea', 'flood'],
+    breakable: ['window', 'door', 'crate', 'glass'],
+    searchable: ['desk', 'cabinet', 'body', 'logbook'],
+    salvageable: ['wreck', 'engine', 'generator', 'machine'],
+  }, null, 2);
+}
+
+/** The Interaction-tags template — built from the LIVE locations' interactables.
+ *  Lists every unique interactable noun mapped to its tags, so the author tags
+ *  exactly the items in their world. Each noun is pre-filled with the engine's
+ *  current best guess (from the keyword matcher); the author edits the arrays.
+ *  Pass `current` (a prior per-noun map) to PRESERVE the author's edits while
+ *  pulling in any newly-added nouns — that's the "refresh" path. */
+/** engine_Dev — every interactable noun the author has LOADED, unioned + deduped.
+ *  Pulls ONLY from uploaded content (the Locations table you loaded + the Starting
+ *  areas you loaded, each room's interactables) — never the built-in / generic-default
+ *  / template data. So a fresh author with nothing loaded gets an empty list, and the
+ *  list reflects THEIR world, not Tartaria. */
+export function collectInteractableNouns(): string[] {
+  const nouns = new Set<string>();
+  const add = (list: unknown): void => {
+    if (Array.isArray(list)) for (const n of list) if (typeof n === 'string' && n.trim()) nouns.add(n.trim());
+  };
+  // 1) Loaded Locations table (the raw upload — not the built-in / generic default).
+  for (const l of (getTableOverride('locations') ?? []) as Array<{ interactables?: unknown }>) add(l.interactables);
+  // 2) Loaded Starting areas — each room's interactables (raw upload, not the default).
+  for (const a of (getStartingAreasOverride() ?? [])) for (const r of (a.rooms ?? [])) add((r as { interactables?: unknown }).interactables);
+  return [...nouns].sort((a, b) => a.localeCompare(b));
+}
+
+export function buildInteractionTagsTemplate(current?: Record<string, string[]>): string {
+  const nouns = new Set(collectInteractableNouns());
+  const out: Record<string, string[]> = {};
+  for (const noun of [...nouns].sort((a, b) => a.localeCompare(b))) {
+    // Preserve the author's prior tags for this noun; else the engine's guess.
+    const prior = current?.[noun];
+    out[noun] = Array.isArray(prior) ? prior : [...getInteractionTags(noun)];
+  }
+  const header = [
+    '// INTERACTION TAGS — which physical VERBS each interactable noun in YOUR world',
+    '// supports. The object maps a noun → an array of any of these five tags:',
+    '//   climbable  — the player can climb it (needs a rope; ties into the climb system)',
+    '//   swimmable  — the player can swim through/across it',
+    '//   breakable  — the player can smash it open',
+    '//   searchable — the player can search it for loot/clues',
+    '//   salvageable— the player can salvage it for crafting materials',
+    '// This list is BUILT FROM the interactables on the Locations + Starting areas you',
+    '// loaded (empty until you load some), each pre-filled with the engine\'s best guess —',
+    '// edit the arrays to taste. ALTERNATIVE keyword form (added to, not replacing, these):',
+    '//   { "climbable": ["tower","wall",…], "swimmable": ["water",…], … } maps a tag → the',
+    '//   nouns it applies to, so one line tags many nouns at once. (// lines stripped on upload.)',
+  ].join('\n');
+  return header + '\n' + JSON.stringify(out, null, 2);
+}
+
+/** The Starting-areas template — a SEPARATE list of per-faction 4-room instances,
+ *  each PLACED at a location on the map (locationId). The faction's member spawns
+ *  inside it. Every starting area is the SAME generic 4-room layout — armory,
+ *  mess hall, operations, supply — so any faction (any name, any number) gets a
+ *  consistent base. Rooms are a tiny graph: each exit points to another room's id
+ *  (or null). The first room (operations) is the entry. Edit room copy to taste;
+ *  the layout is intentionally faction-neutral. */
+export function buildStartingAreasTemplate(): string {
+  // engine_Dev — one stub per LIVE faction (uploaded factions win over built-in),
+  // each placed at the faction's baseLocationId when set. The four rooms are
+  // GENERIC and identical across every faction so the template scales to any
+  // faction list of any length; only factionId / name / locationId differ.
+  const factions = resolveTable('factions', TABLE_ROWS.factions as unknown[]) as Array<{ id?: string; name?: string; baseLocationId?: string }>;
+  const list = factions.length > 0 ? factions : [{ id: 'REPLACE-with-a-faction-id', name: 'Faction' }];
+  // The shared generic layout. Entry is "operations"; the four rooms form a small
+  // connected graph (operations ↔ armory, operations ↔ mess, operations ↔ supply).
+  // The entry room's free exit uses the sentinel "world" — that exit leaves the
+  // instance and drops the player back onto the world map at `locationId`.
+  const genericRooms = () => [
+    { id: 'operations', name: 'Operations', shortName: 'Ops', description: 'The nerve center — a map table, comms gear, and a duty roster pinned to the wall. The way in and out.', interactables: ['map table', 'radio', 'duty roster', 'door'], exits: { north: 'armory', south: 'supply', east: 'mess', west: 'world' }, anchorNpc: null, missionBoard: true },
+    { id: 'armory', name: 'Armory', shortName: 'Armory', description: 'Racks of weapons and gear, locked behind a steel cage. The smell of oil and cold metal.', interactables: ['weapon rack', 'gun cage', 'workbench', 'ammo crate'], exits: { north: null, south: 'operations', east: null, west: null }, anchorNpc: 'Quartermaster', missionBoard: false },
+    { id: 'mess', name: 'Mess Hall', shortName: 'Mess', description: 'Long tables, a steaming pot, and the low murmur of off-duty talk. Rumors trade hands here.', interactables: ['pot', 'long table', 'coffee urn', 'noticeboard'], exits: { north: null, south: null, east: null, west: 'operations' }, anchorNpc: null, missionBoard: false },
+    { id: 'supply', name: 'Supply', shortName: 'Supply', description: 'Shelves of crates and footlockers — rations, spare kit, and whatever the unit hoards.', interactables: ['supply crate', 'footlocker', 'shelving', 'ledger'], exits: { north: 'operations', south: null, east: null, west: null }, anchorNpc: null, missionBoard: false },
+  ];
+  // missionBoard: flag exactly ONE room (here, Operations) as the board room.
+  // returnable: true = a base you can come back to; false = a one-way prologue that
+  //   vanishes once you leave (its missions then use remote turn-in).
+  // coords: the world-map cell the area sits on — read it off the in-game map planner
+  //   (tap/click a tile to see its x,y), then type it here.
+  const stub = (f: { id?: string; name?: string; baseLocationId?: string }) => ({
+    factionId: f.id ?? 'REPLACE-with-a-faction-id',
+    name: `${f.name ?? 'Faction'} HQ`,
+    locationId: f.baseLocationId ?? 'REPLACE-with-this-faction-s-location-id',
+    coords: { x: 10, y: 10 },
+    returnable: true,
+    rooms: genericRooms(),
+  });
+  return JSON.stringify(list.map(stub), null, 2);
+}
+
+/** The Titles template — IMPORTABLE achievements. Each title ties a trackable
+ *  variable + threshold to a display name. The leading comment lists every
+ *  trackable variable id (stripped on load), so an author can pick one and set a
+ *  number — the same list the dev console's TITLES box shows as checkboxes. */
+export function buildTitlesTemplate(): string {
+  const varList = TRACKABLE_VARS.map((v) => `//   "${v.id}"  —  ${v.label}`).join('\n');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const builtinIds = ((require('../data/lore/arbiter-titles.json') as { titles: Array<{ id: string }> }).titles)
+    .map((t) => `//   "${t.id}"`).join('\n');
+  const body = JSON.stringify([
+    { id: 'veteran', name: 'Veteran of the Fold', description: 'Hardened by too many firefights. +1 STR.', track: 'enemiesDefeated', threshold: 25, perk: { stat: 'strength', amount: 1 } },
+    { id: 'wayfarer', name: 'Wayfarer', description: 'You have crossed more ground than most see in a lifetime.', track: 'travelsCompleted', threshold: 10 },
+    { id: 'war_profiteer', name: 'War Profiteer', track: 'tc', threshold: 1000 },
+    // Re-skin a BUILT-IN title: match its id, give a new name/requirement/description.
+    // No track/threshold needed — the engine still earns it the same way.
+    { id: 'bane_of_constructs', name: 'Machine Breaker', requirement: 'Destroy 5 constructs', description: 'Hits mechanical foes harder.' },
+  ], null, 2);
+  return [
+    '// IMPORTABLE TITLES — an array of achievements. Two kinds of entry, both optional:',
+    '//',
+    '// 1) ADD a new achievement — earned the moment its TRACKABLE VARIABLE reaches the',
+    '//    threshold. Each: { id, name, description?, track, threshold, perk?: { stat, amount } }.',
+    '//    Pick a "track" from this list:',
+    varList,
+    '//    Optional perk applies a flat bonus while held; valid stats: strength, dexterity,',
+    '//    intelligence, wisdom, charisma, stealth — plus derived caps hp (max HP) and',
+    '//    staminaMax (max stamina), e.g. perk: { stat: "staminaMax", amount: 3 }.',
+    '//',
+    '// 2) RE-SKIN a built-in earnable title — give an entry whose "id" matches one of the',
+    '//    20 built-ins below and set any of name / requirement / description to override its',
+    '//    DISPLAY. The engine keeps earning it exactly as before (no track/threshold needed).',
+    '//    Built-in ids you can override:',
+    builtinIds,
+    body,
+  ].join('\n');
+}
+
+/** The Hooks template — an illustrative example of the atmospheric-lead format.
+ *  `plants` are the discovery line(s) + matchable nouns per hook id; `chains` are
+ *  the staged outcomes, each stage carrying a list of effect verbs. The example is
+ *  kept small (the built-in set is ~50 hooks); the author replaces it wholesale.
+ *  Effect verbs: grant_tc {amount} · grant_item {name} · spawn_enemy_tag {tag} ·
+ *  heal {amount} · damage {amount,cause} · unlock_location {locationId} ·
+ *  rep_change {factionId,amount} · advance_time {hours} · memo {text} ·
+ *  spawn_vendor {vendor} . */
+export function buildHooksTemplate(includeTokenNote = true): string {
+  const header = [
+    '// HOOKS — ambient "atmospheric leads" the player can DISCOVER while looking around',
+    '// and then PURSUE. A hook turns a noticed detail into a small staged interaction.',
+    '// The object below has four parts, all keyed by a hook id you choose:',
+    '//   plants  : the discovery line(s) + the "nouns" that let look/investigate <noun>',
+    '//             find this hook. Add as many hook ids as you like.',
+    '//   chains  : the staged outcomes for that hook. Each stage is { line, effects?,',
+    '//             done, addNouns? }. done:false = more stages follow (the player keeps',
+    '//             engaging to advance); done:true = the FINAL stage. So a ONE-STEP hook',
+    '//             is a single done:true stage; a MULTI-STEP hook lists several, the last',
+    '//             one done:true. addNouns reveals new investigate-able words mid-chain.',
+    '//   weights : how often each hook is picked vs the others (bigger = more common).',
+    '//   indoor  : the hook ids that may ONLY plant INSIDE rooms; every other id is outdoor.',
+    '// EFFECT VERBS for a stage\'s effects[]:  { type:"grant_tc", amount } ·',
+    '//   { type:"grant_item", name } · { type:"spawn_enemy_tag", tag } · { type:"heal",',
+    '//   amount } · { type:"damage", amount, cause } · { type:"unlock_location", locationId }',
+    '//   · { type:"rep_change", factionId, amount } · { type:"advance_time", hours } ·',
+    '//   { type:"memo", text } · { type:"spawn_vendor", vendor }.',
+    '// The three hooks below show the variations — a MULTI-STEP outdoor chain, a ONE-STEP',
+    '// outdoor chain, and an INDOOR hook. Edit/replace them (the built-in set is ~50 hooks).',
+  ].join('\n');
+  return tokenNote(header + '\n' + JSON.stringify({
+    plants: {
+      // VARIANT 1 — MULTI-STEP outdoor hook: noticed, then engaged twice for a payoff.
+      strange_vent: [
+        { line: 'A vent in the rock breathes a slow coil of pale mist.', nouns: ['vent', 'mist', 'seam', 'grate'] },
+      ],
+      // VARIANT 2 — ONE-STEP outdoor hook: a single done:true stage, small reward.
+      roadside_marker: [
+        { line: 'A cairn of stones sits just off the path, one flat rock scratched with a crude map.', nouns: ['cairn', 'stones', 'marker', 'map', 'rock'] },
+      ],
+      // VARIANT 3 — INDOOR hook (listed in `indoor` below): only plants inside rooms.
+      loose_floorboard: [
+        { line: 'One floorboard sits proud of the rest, its nails backed half out — lifted before.', nouns: ['floorboard', 'board', 'plank', 'floor', 'nails'] },
+      ],
+    },
+    chains: {
+      strange_vent: [
+        { line: 'You step closer. The air stings; something metal is wedged in the grate.', effects: [], done: false, addNouns: ['grate'] },
+        { line: 'You pry the grate loose. A ticking brass device tumbles into your hand.', effects: [{ type: 'grant_item', name: 'Old Mechanism' }, { type: 'grant_tc', amount: 40 }], done: true },
+      ],
+      roadside_marker: [
+        { line: 'You read the scratched map — a cache, a few tiles on. You note the bearing and pocket the loose coins someone left as a toll.', effects: [{ type: 'grant_tc', amount: 25 }, { type: 'memo', text: 'A scratched cairn-map hinted at a cache nearby.' }], done: true },
+      ],
+      loose_floorboard: [
+        { line: 'You work the board up. Beneath it, a cloth bundle has been hidden a long time.', effects: [], done: false, addNouns: ['bundle', 'cloth'] },
+        { line: 'Inside the bundle: a small purse and a folded letter, its ink long dry.', effects: [{ type: 'grant_item', name: 'Old Letter' }, { type: 'grant_tc', amount: 50 }], done: true },
+      ],
+    },
+    weights: { strange_vent: 6, roadside_marker: 5, loose_floorboard: 4 },
+    indoor: ['loose_floorboard'],
+  }, null, 2), includeTokenNote);
+}
+
+/** The Whispers template — an array of overheard-tip chains. An authored chain
+ *  plants at a plant location (plantLocations), points to a nearby tile in a time
+ *  window, and pays off in one hop via meetLine + meetEffects (the same effect
+ *  verbs hooks use). plantLocations may be a built-in hub-room id (e.g.
+ *  "outpost_messhall") OR one of YOUR location ids — engine_Dev plants the chain
+ *  when the player is in the hub room OR standing at that macro location. */
+export function buildWhispersTemplate(includeTokenNote = true): string {
+  // An ARRAY of whisper missions — each entry is a SEPARATE random-triggered lead.
+  // Two shapes: ONE-HOP (meetLine + meetEffects) and MULTI-STAGE (stages[]).
+  return tokenNote(JSON.stringify([
+    {
+      // ── ONE-HOP whisper: plant → reach the tile → narrate + fire effects → done.
+      id: 'cache_rumor',
+      title: 'The Buried Cache',
+      plantLocations: ['REPLACE-with-a-hub-room-id-or-one-of-your-location-ids'],
+      plantChance: 0.15,
+      plantLines: [
+        'A traveler at the corner table leans in. "Word is there’s a stash in a wreck two, three tiles south. Go after dark. Don’t ask who told you."',
+      ],
+      targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
+      activeHours: [20, 4],
+      meetLine: 'You find the half-sunk wreck. Wedged behind a buckled beam: a brass device, still ticking.',
+      meetEffects: [
+        { type: 'grant_item', name: 'Old Mechanism' },
+        { type: 'grant_tc', amount: 60 },
+      ],
+    },
+    {
+      // ── MULTI-STAGE whisper: a small mission run leg-by-leg. Plant → reach leg 0's
+      //    tile (the chain.targetOffset) → each later leg uses its own targetOffset
+      //    from the previous tile (omit it to resolve on the same tile). A leg with
+      //    enemyName spawns that foe and won't advance until it's defeated. Each
+      //    leg's effects fire when it completes. The LAST leg ends the mission.
+      id: 'dredge_job',
+      title: 'The Dredge Job',
+      plantLocations: ['REPLACE-with-a-hub-room-id-or-one-of-your-location-ids'],
+      plantChance: 0.15,
+      plantLines: [
+        'A figure two tables over keeps their voice low. "There’s salvage out past the old dredge — but you’ll have to deal with whoever’s squatting it first. East of the docks. Bring steel."',
+      ],
+      targetOffset: { dxRange: [1, 2], dyRange: [-1, 1] },
+      stages: [
+        { line: 'You reach the dredge. The hold is chained — and someone’s been here recently.' },
+        { line: 'A squatter rises out of the rust, blade out. They mean to keep what they found.', targetOffset: { dxRange: [1, 1], dyRange: [0, 0] }, enemyName: 'REPLACE-with-an-enemy-from-your-table', effects: [{ type: 'grant_item', name: 'REPLACE-with-a-quest-item' }] },
+        { line: 'You haul the salvage back to safer ground. Word will get around that you can be relied on.', targetOffset: { dxRange: [-2, -1], dyRange: [0, 1] }, effects: [{ type: 'grant_tc', amount: 80 }, { type: 'rep_change', factionId: 'REPLACE-with-a-faction-id', amount: 4 }] },
+      ],
+    },
+  ], null, 2), includeTokenNote);
+}
+
+/** The Collectables template — an array of CHARACTER STORIES. Each story is one
+ *  named character whose tale the player pieces together by finding fragments
+ *  (notes / letters / journal pages / fragments) as loot. The Contracts screen's
+ *  Collectables tab renders per-character completion. A fragment drops in place of
+ *  normal loot when the scene's biome tags overlap the fragment's biomeTags. The
+ *  uploaded array REPLACES the built-in story set wholesale. */
+export function buildCollectablesTemplate(): string {
+  const body = JSON.stringify({
+    stories: [
+      {
+        id: 'story_example_one',
+        characterName: 'A. Whitcombe',
+        characterBlurb: 'A field researcher who vanished chasing the anomaly. Their scattered notes trace the descent from curiosity to dread.',
+        fragments: [
+          {
+            id: 'whitcombe_01',
+            title: 'First Field Note',
+            kind: 'note',
+            body: 'The readings spike near the old substation every night at the same hour. Coincidence does not keep a schedule. Tomorrow I bring the better instruments.',
+            discoveryHint: 'Tucked in a rusted locker near the substation ruins',
+            biomeTags: ['ruin', 'urban'],
+          },
+          {
+            id: 'whitcombe_02',
+            title: 'Torn Letter Home',
+            kind: 'letter',
+            body: 'If you are reading this I did not come back. Do not look for me near the water. Whatever is down there, it knows my name now.',
+            discoveryHint: 'Half-buried in the silt along the waterfront',
+            biomeTags: ['water', 'wreck'],
+          },
+        ],
+      },
+      {
+        id: 'story_example_two',
+        characterName: 'Sgt. Devlin',
+        characterBlurb: 'A soldier left behind when the cordon fell. His journal is a countdown.',
+        fragments: [
+          {
+            id: 'devlin_01',
+            title: 'Journal — Day 3',
+            kind: 'journal',
+            body: 'Rations holding. Radio dead. I keep the door barred and the lamp low. They move when the lamp is bright.',
+            discoveryHint: 'Inside a barricaded room in a collapsed bunker',
+            biomeTags: ['ruin', 'underground'],
+          },
+        ],
+      },
+    ],
+  }, null, 2);
+  return [
+    '// IMPORTABLE COLLECTABLES — character stories the player reassembles from loot.',
+    '// Top level: { "stories": [ ... ] } (a bare array of stories is also accepted).',
+    '// Each story: { id, characterName, characterBlurb, fragments: [...] }.',
+    '// Each fragment: { id, title, kind, body, discoveryHint, biomeTags: [..] }.',
+    '//   kind     — "note" | "letter" | "journal" | "fragment".',
+    '//   body     — the text the player reads once the fragment is found.',
+    '//   hint     — shown for an undiscovered fragment; name the biome/place to look.',
+    '//   biomeTags — a fragment can drop where the scene\'s location.tags overlap these.',
+    '// The uploaded set REPLACES the built-in stories wholesale.',
+    body,
+  ].join('\n');
+}
+
+/** The Summons template — the SUMMONED-SIDEKICK pack (the engine's reskinnable
+ *  companion family). `noun` renames the category the player types after
+ *  "summon" and reads in the summon lines ("sidekick" by default). Each entry in
+ *  `summons` is one buildable sidekick: what it's made of (fuel), its combat
+ *  profile, how hard it is to summon, and the words the player types to call it.
+ *  The uploaded pack REPLACES the built-in sidekicks wholesale. */
+export function buildSummonsTemplate(): string {
+  const body = JSON.stringify({
+    noun: 'automaton',
+    summons: [
+      {
+        kind: 'spark_automaton',
+        name: 'Spark Automaton',
+        aliases: ['spark', 'spark automaton', 'spark bot'],
+        fuel: [
+          { name: 'Spark Core', quantity: 2 },
+          { name: 'Iron Frame', quantity: 1 },
+        ],
+        hpMax: 24,
+        attackDie: '1d10',
+        attackMod: 1,
+        hitBonus: 2,
+        damageType: 'piercing',
+        summonDC: 14,
+        resistBase: 0.20,
+        resistCap: 0.40,
+        elementTags: ['spark'],
+        blurb: 'Nimble striker. Charged limbs hit hard but the frame is light.',
+      },
+      {
+        kind: 'iron_automaton',
+        name: 'Iron Automaton',
+        aliases: ['iron', 'iron automaton', 'iron bot'],
+        fuel: [
+          { name: 'Heavy Cell', quantity: 2 },
+          { name: 'Riveted Plating', quantity: 2 },
+          { name: 'Iron Frame', quantity: 1 },
+        ],
+        hpMax: 44,
+        attackDie: '1d8',
+        attackMod: 2,
+        hitBonus: 1,
+        damageType: 'bludgeoning',
+        summonDC: 17,
+        resistBase: 0.32,
+        resistCap: 0.52,
+        elementTags: ['iron'],
+        blurb: 'Heavy guardian. Plated armor soaks punishment; slow but relentless.',
+      },
+    ],
+  }, null, 2);
+  return [
+    '// SUMMONED SIDEKICKS — the buildable companion family (replaces the built-in',
+    '// sidekicks). Top level: { "noun"?: "automaton", "summons": [ ... ] }.',
+    '//   noun     — what the player types after "summon" and reads in the summon',
+    '//              lines (default "sidekick"). Each summon can also be called by its',
+    '//              own aliases below.',
+    '// Each summon:',
+    '//   kind     — a unique id (also "id" is accepted).',
+    '//   name     — display name ("Phase Automaton").',
+    '//   aliases  — words the player can type, e.g. "summon phase".',
+    '//   fuel     — [{ name, quantity }] consumed on a successful summon. Use item',
+    '//              names that EXIST in your materials/gear catalog.',
+    '//   hpMax / attackDie ("1d10") / attackMod / hitBonus / damageType',
+    '//              (bludgeoning|slashing|piercing|frost) — its combat profile.',
+    '//   summonDC — d20 + INT must meet this to bind it (harder = stronger).',
+    '//   resistBase/resistCap — innate damage resistance (0..1), grows with training.',
+    '//   elementTags — raw-material tags it can mend from when its exact parts run out.',
+    '// The uploaded pack REPLACES the built-in sidekicks.',
+    body,
+  ].join('\n');
+}
+
+/** The Scene-Props template — the curated ambient nouns the engine injects into scenes
+ *  as CLIMB and SALVAGE targets. Replaces the built-in (setting-neutral) pools so the
+ *  props match the author's world. Setting-neutral example rows. */
+export function buildScenePropsTemplate(): string {
+  const body = JSON.stringify({
+    climbables: [
+      { name: 'tall ruined wall', context: 'outside', height: 4 },
+      { name: 'broken ladder shaft', context: 'inside', height: 2 },
+    ],
+    salvageables: [
+      { name: 'wrecked cart', context: 'outside' },
+      { name: 'old storage chest', context: 'inside' },
+    ],
+  }, null, 2);
+  return [
+    '// SCENE PROPS — the ambient nouns the engine sprinkles into scenes as CLIMB and',
+    '// SALVAGE targets. Replaces the built-in (setting-neutral) pools so props fit YOUR',
+    '// world. Shape: { "climbables": [ ... ], "salvageables": [ ... ] }.',
+    '//   climbables   — [{ name, context?: inside|outside|both, height?: 1..8 }]',
+    '//   salvageables — [{ name, context?: inside|outside|both }]',
+    '//   context — where the prop can appear (default "both").',
+    '//   height  — climb tiers/segments (default 2); higher = a taller climb.',
+    '// Omit either array to keep the built-in pool for that kind.',
+    body,
+  ].join('\n');
+}
+
+/** The Vendors template — the named traders the engine spawns at scenes/roadside.
+ *  Replaces the built-in pool so an author ships their own setting's merchants.
+ *  Setting-neutral example rows; itemNames must exist in your catalogs. */
+export function buildVendorsTemplate(): string {
+  const body = JSON.stringify([
+    {
+      id: 'roadside_trader',
+      name: 'Maren the Trader',
+      title: 'Roadside Merchant',
+      faction: 'REPLACE-with-a-faction-id',
+      description: 'A practical trader working the roads between settlements. Buys salvage, sells the basics.',
+      offers: [
+        { itemName: 'Trail Rations', price: 8 },
+        { itemName: 'Worn Sword', price: 20 },
+      ],
+      gender: 'female',
+    },
+    {
+      id: 'town_smith',
+      name: 'Garrick Ironhand',
+      title: 'Blacksmith',
+      faction: null,
+      description: 'A blunt, fair smith. Will repair and sell honest steel.',
+      offers: [{ itemName: 'Banded Cuirass', price: 60 }],
+      gender: 'male',
+    },
+  ], null, 2);
+  return [
+    '// NAMED VENDORS — the traders the engine spawns (scene vendor rolls + roadside).',
+    '// Replaces the built-in trader pool so your merchants fit YOUR setting. A JSON ARRAY',
+    '// of: { "id", "name", "title", "faction"? (a faction id, or null for unaligned),',
+    '//   "description", "offers": [{ "itemName", "price", "quantity"? }], "voiceId"?,',
+    '//   "gender"? ("male"|"female") }.',
+    '//   itemName — must EXIST in your item catalogs (weapons/armor/gear/…).',
+    '//   faction  — gates faction-flavored spawn/hints; null = unaligned roadside trader.',
+    body,
+  ].join('\n');
+}
+
+/** The Roadside-traders template — the wandering market-stall ARCHETYPES the engine
+ *  spawns on the road (each mints a fresh stall with a random pick from its pool).
+ *  Replaces the built-in pool. Setting-neutral example; itemNames must exist in catalogs. */
+export function buildRoadsideTradersTemplate(): string {
+  const body = JSON.stringify([
+    {
+      id: 'road_hawker', name: 'Road Hawker', title: 'wandering trader', demeanor: 'honest',
+      description: 'A stall thrown together from cart-boards and tarpaulin. Watches the road with one eye and the goods with the other.',
+      pool: [
+        { itemName: 'Trail Rations', priceMin: 4, priceMax: 7, weight: 14 },
+        { itemName: 'Worn Sword', priceMin: 16, priceMax: 24, weight: 6 },
+        { itemName: 'Bright Torch', priceMin: 14, priceMax: 22, weight: 8 },
+      ],
+    },
+    {
+      id: 'road_fence', name: 'Road Fence', title: 'fence', demeanor: 'sketchy',
+      description: 'No stall, just a coat full of pockets and a quick way out. Prices are good; provenance is not.',
+      pool: [
+        { itemName: 'Worked Crystal', priceMin: 40, priceMax: 70, weight: 4 },
+        { itemName: 'Scrap Metal', priceMin: 2, priceMax: 5, weight: 12 },
+      ],
+    },
+  ], null, 2);
+  return [
+    '// ROADSIDE TRADERS — wandering market-stall ARCHETYPES spawned on the road. Each',
+    '// mints a fresh stall with a random pick from its pool. A JSON ARRAY of:',
+    '//   { "id", "name", "title", "demeanor": "honest"|"sketchy", "description",',
+    '//     "pool": [{ "itemName", "priceMin", "priceMax", "weight" }] }.',
+    '//   demeanor — drives the steal DC / hostility-flip when the player tries to rob them.',
+    '//   itemName — must EXIST in your item catalogs.',
+    body,
+  ].join('\n');
+}
+
+/** Wrap a hint string into `//` comment lines, soft-wrapped at ~90 chars so the
+ *  template stays readable. */
+function commentBlock(hint: string, width = 90): string {
+  const words = hint.split(/\s+/);
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    if (cur && (cur.length + 1 + w.length) > width) { lines.push(cur); cur = w; }
+    else cur = cur ? `${cur} ${w}` : w;
+  }
+  if (cur) lines.push(cur);
+  return lines.map((l) => `  // ${l}`).join('\n');
+}
+
+/** One `"key": <content>` block, nested one level (2-space indent) and prefixed
+ *  with its reference comment. */
+function bundleSection(key: string, hint: string, content: string): string {
+  const indented = content.split('\n').map((l, i) => (i === 0 ? l : `  ${l}`)).join('\n');
+  return `${commentBlock(hint)}\n  "${key}": ${indented}`;
+}
+
+/** The WHOLE-GAME template: a single JSONC object holding every section (title /
+ *  tagline / narrator, the four lore blocks, then every content table), each with
+ *  an inline `//` reference comment describing what it needs. Comments are legal
+ *  here because loadGameBundle strips them before parsing. Upload this one file to
+ *  build the entire game at once; the per-section boxes then show what loaded. */
+/** engine_Dev — the downloadable BUILD GUIDE: what each section is + the order to
+ *  fill them so a game comes together cleanly. Saved from the dev console's top
+ *  "DEV GUIDE" button. */
+/** The Digging template — generic, setting-neutral dig config: which items/tags dig
+ *  well, the productive-dig cap, and the dig loot table. Author edits + uploads;
+ *  resolves override → generic default → built-in. */
+export function buildDiggingTemplate(): string {
+  return [
+    '// DIGGING — what the player can scrape out of the ground with "dig".',
+    '//   itemScores: per-item dig effectiveness (higher digs better; 0 = can\'t dig).',
+    '//   tagScores : fallback by item tag when an item isn\'t listed.',
+    '//   productiveCap: productive digs one wild tile yields before it\'s worked-out.',
+    '//   loot: the dig table — { name, rarity (Common|Uncommon|Rare), baseWeight }.',
+    '//         Uncommon/Rare weights scale UP with the dig tool\'s score.',
+    JSON.stringify({
+      itemScores: { 'Worn Sword': 3, "Hunter's Bow": 1, 'Scrap Metal': 4, 'Iron Frame': 3 },
+      tagScores: { weapon: 2, melee: 3, metal: 4, food: 0, ring: 0, amulet: 0 },
+      productiveCap: 16,
+      loot: [
+        { name: 'Small Rock', rarity: 'Common', baseWeight: 55 },
+        { name: 'Stick', rarity: 'Common', baseWeight: 50 },
+        { name: 'Common Residue', rarity: 'Common', baseWeight: 14 },
+        { name: 'Scrap Metal', rarity: 'Common', baseWeight: 8 },
+        { name: 'Tough Fiber', rarity: 'Common', baseWeight: 8 },
+        { name: 'Trail Rations', rarity: 'Common', baseWeight: 6 },
+        { name: 'Raw Crystal', rarity: 'Uncommon', baseWeight: 5 },
+        { name: 'Worked Crystal', rarity: 'Rare', baseWeight: 1 },
+      ],
+    }, null, 2),
+  ].join('\n');
+}
+
+/** The Scrap template — generic scrap config: which material each tag-ROLE yields
+ *  when an item is broken down, the raw-mat guards, premium mats, and failure lines. */
+/** The Salvage template — generic per-noun salvage pools (the FIRST pool whose
+ *  pattern matches the salvaged noun wins) + the small-haul junk fallback + lines. */
+/** The Elevated-overlay template — generic mini-scenes surfaced at the top of a tall
+ *  climb. kind: encounter (rolls an enemy from encounterPool) | trader | lookout. */
+export function buildOverlaysTemplate(): string {
+  return [
+    '// ELEVATED OVERLAYS — a mini-scene at the apex of a tall climb (a nook, a vantage,',
+    '// a lookout). The roll/scene RULES stay in the engine. Each: { id, kind',
+    "// (encounter|trader|lookout), arrivalLine, ambientNouns: [...], minTiers? (min climb",
+    '// height to fire), encounterChance? + encounterPool? [enemy names] (kind=encounter),',
+    '// trader? / lookout? templates }.',
+    JSON.stringify([
+      { id: 'ledge_nook', kind: 'encounter', arrivalLine: 'The climb opens onto a wind-scoured ledge — a cracked nook, and something stirring in it.', ambientNouns: ['nook', 'crack', 'nest', 'ledge'], minTiers: 2, encounterChance: 0.6, encounterPool: ['REPLACE-with-an-enemy-name', 'REPLACE-with-another-enemy-name'] },
+      { id: 'high_perch', kind: 'encounter', arrivalLine: 'The top is a narrow perch over a long drop. You are not the only thing that climbed up here.', ambientNouns: ['perch', 'drop', 'rail', 'wind'], minTiers: 3, encounterChance: 0.7, encounterPool: ['REPLACE-with-a-tougher-enemy-name'] },
+      { id: 'open_sky', kind: 'encounter', arrivalLine: 'You reach the top and the sky opens up. Nothing here but wind and a long, clean view.', ambientNouns: ['sky', 'wind', 'view', 'edge'], minTiers: 2, encounterChance: 0.0, encounterPool: [] },
+    ], null, 2),
+  ].join('\n');
+}
+
+export function buildDogScenariosTemplate(): string {
+  return [
+    '// ════════════════════════════════════════════════════════════════════════',
+    '// DOG-RESCUE SCENARIOS  ("the dog hook")  —  how the player finds & frees',
+    '// the one companion dog. Paste a JSON array of scenario objects (or',
+    '// { "scenarios": [ ... ] }). The engine MECHANIC is fixed and never changes;',
+    '// you supply the wording + a few optional combat knobs.',
+    '//',
+    '// HOW IT WORKS (so the fields make sense):',
+    '//   • ONE dog per save. The FIRST rescue you complete kills ALL hooks for good.',
+    '//   • In any scene with no enemies, when the player investigates / attacks /',
+    '//     approaches / travels-to / asks-about a target that matches a hookNoun,',
+    '//     the matching CAPTOR spawns and a fight starts.',
+    '//   • Kill the captor (it costs you NO faction standing) → the narrator runs',
+    '//     the 3-step onboarding: breed → name → sex → the dog is yours.',
+    '//',
+    '// FIELDS — every option explained:',
+    '//   id              Unique slug for this scenario (any text, no spaces needed).',
+    '//   hookNouns       [array] The trigger phrases. Matching is WHOLE-PHRASE +',
+    '//                   whole-word: "ash tree" fires on "the black ash tree" but',
+    '//                   NOT "trash", and "airlock" fires on "the airlock" but NOT',
+    '//                   a bare "lock". A multi-word phrase fires ONLY on the full',
+    '//                   phrase — "black ash tree" does NOT fire on "tree" — so if',
+    '//                   you also want a single word to trigger, list it separately.',
+    '//                   Prefer distinctive phrases tied to that scene.',
+    '//   captorFactionId The faction HOLDING the dog (must equal a faction id from',
+    '//                   your Factions table, EXACT + case-sensitive). When the',
+    '//                   PLAYER belongs to this faction, the engine swaps in the',
+    '//                   unaligned captor so you never fight your own. ► Give',
+    '//                   EXACTLY ONE row "captorFactionId": null — that is the',
+    '//                   unaligned fallback (its captor + combat profile are used',
+    '//                   for the swap, and it can also fire on its own).',
+    '//   captorName      Name shown in the combat log; also fills {captorName} in',
+    '//                   introLine.',
+    '//   defaultBreed    Flavor seed for the dog if the player leaves breed blank.',
+    '//   startingProfile Dog stat baseline — one of:',
+    '//                     "mongrel" (balanced) | "shepherd" (STR/HP) |',
+    '//                     "hound" (DEX) | "mutt" (INT) | "puppy" (weakest).',
+    '//   archetypes      [array] Thematic tags. OPTIONAL / reserved — does NOT',
+    '//                   currently restrict where the scenario fires (placement is',
+    '//                   driven only by hookNouns). Keep for flavor/future use.',
+    '//   rumorVenue      Short phrase for the ~day-5 rumor tip ("a dog held at',
+    '//                   <rumorVenue> to the north"). Optional.',
+    '//   introLine       Shown when the captor first appears. Use {captorName}.',
+    '//   victoryLine     Shown when the captor falls and the dog is freed.',
+    '//',
+    '// OPTIONAL CAPTOR COMBAT (omit any to use the default):',
+    '//   captorHp        Captor max HP.              default 14',
+    '//   captorAttack    Captor to-hit value.        default "4"',
+    '//   captorDamage    Captor damage dice.         default "1d6+1"',
+    '//   captorLoot      [array] Item names dropped on death — define these in',
+    '//                   YOUR item tables so they grant as real items. Default is',
+    '//                   the reference game\'s ["Scrap Metal","Hardtack","Mud Cloth"].',
+    '//',
+    '// TIP: one scenario per faction that might cage a dog, PLUS the single',
+    '//      "captorFactionId": null fallback. Example below: one faction row (with',
+    '//      custom captor combat + loot) and the required unaligned fallback.',
+    '// ════════════════════════════════════════════════════════════════════════',
+    JSON.stringify([
+      {
+        id: 'cage',
+        hookNouns: ['cage', 'kennel', 'holding pen'],
+        captorFactionId: 'REPLACE-with-a-faction-id',
+        captorName: 'REPLACE-with-a-captor-name',
+        defaultBreed: 'mongrel',
+        startingProfile: 'shepherd',
+        archetypes: ['ruin', 'settlement'],
+        rumorVenue: 'a cage at REPLACE-a-place',
+        introLine: 'You find a dog locked in a cage. The {captorName} stands over it. "Walk on. This one’s not yours."',
+        victoryLine: 'The captor goes down. The dog watches you, wary and quiet. They had no right to it. No faction reckoning falls on you for this.',
+        captorHp: 18,
+        captorAttack: '5',
+        captorDamage: '1d8+1',
+        captorLoot: ['REPLACE-with-an-item-from-your-tables', 'REPLACE-with-another'],
+      },
+      {
+        id: 'snare',
+        hookNouns: ['snare', 'snare pit', 'trapper camp'],
+        captorFactionId: null,
+        captorName: 'Unaligned Poacher',
+        defaultBreed: 'mutt',
+        startingProfile: 'mutt',
+        archetypes: ['wilderness', 'camp'],
+        rumorVenue: 'a snare pit at a trapper camp',
+        introLine: 'You crest a snare pit. A mutt is caught in it, growling weak. The {captorName} turns. "That’s my catch. Walk."',
+        victoryLine: 'The poacher folds over their own snare line. The mutt settles. They had no right to it. No faction reckoning falls on you for this.',
+      },
+    ], null, 2),
+  ].join('\n');
+}
+
+export function buildSalvageTemplate(): string {
+  return [
+    '// SALVAGE — what salvaging a noun (a wagon, a blade, a hull…) yields. The match',
+    '// + weighted-pick RULES stay in the engine; this is the data.',
+    '//   pools: ordered most-specific→general; the FIRST pool whose any pattern',
+    '//          (substring of the noun) matches wins. items: weighted material pool',
+    '//          ({ name, rarity, weight, min, max }).',
+    '//   junkPool / junkLines: the ~5% small-haul fallback so salvage never empties.',
+    '//   materialLines: normal-haul narration ({target} = the noun).',
+    JSON.stringify({
+      pools: [
+        { id: 'metal', patterns: ['blade', 'sword', 'axe', 'spear', 'knife', 'hammer', 'gun', 'frame', 'plating', 'wreck', 'machine', 'construct'], items: [
+          { name: 'Scrap Metal', rarity: 'Common', weight: 50, min: 1, max: 3 },
+          { name: 'Raw Crystal', rarity: 'Common', weight: 20, min: 1, max: 2 },
+          { name: 'Worked Crystal', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+        ] },
+        { id: 'cloth', patterns: ['robe', 'sack', 'tent', 'sail', 'cloth', 'rag', 'banner'], items: [
+          { name: 'Tough Fiber', rarity: 'Common', weight: 50, min: 1, max: 2 },
+          { name: 'Common Residue', rarity: 'Common', weight: 20, min: 1, max: 2 },
+        ] },
+        { id: 'wood', patterns: ['cart', 'wagon', 'crate', 'barrel', 'plank', 'beam', 'door', 'chest'], items: [
+          { name: 'Stick', rarity: 'Common', weight: 50, min: 1, max: 3 },
+          { name: 'Scrap Metal', rarity: 'Common', weight: 20, min: 1, max: 1 },
+        ] },
+      ],
+      nothingChance: 0.05,
+      junkPool: [
+        { name: 'Stick', rarity: 'Common', weight: 5, min: 1, max: 1 },
+        { name: 'Smooth Stone', rarity: 'Common', weight: 5, min: 1, max: 1 },
+        { name: 'Cloth Scrap', rarity: 'Common', weight: 4, min: 1, max: 1 },
+      ],
+      materialLines: ['You strip {target} carefully. Something usable comes free.', 'You salvage {target}. The take is small but real.'],
+      junkLines: ['Slim pickings on {target}. You pocket a {item} on the way out.', 'The {target} yields little, though a {item} ends up in your pack.'],
+    }, null, 2),
+  ].join('\n');
+}
+
+export function buildScrapTemplate(): string {
+  return [
+    '// SCRAP — what an item breaks down into. The tag→material RULES are engine logic;',
+    '// this is the data: roles (which material each role yields), rawGuard (mats that',
+    "// can't scrap into themselves), premiumMats (stripped from self-crafted scrap),",
+    '// and failureLines ({item} is replaced with the item name).',
+    JSON.stringify({
+      roles: { metalBulk: 'Scrap Metal', metalPremium: 'Worked Crystal', essencePrimary: 'Raw Crystal', essenceSecondary: 'Common Residue', essenceBonus: 'Common Residue', stone: 'Small Rock', mud: 'Common Residue', cloth: 'Tough Fiber', organic: 'Tough Fiber', wood: 'Stick' },
+      rawGuard: ['Scrap Metal', 'Stick', 'Small Rock', 'Tough Fiber', 'Raw Crystal', 'Worked Crystal', 'Common Residue'],
+      premiumMats: ['Worked Crystal', 'Raw Crystal'],
+      failureLines: [
+        'You work the {item} apart, but the pieces crumble in your hands. Nothing salvageable.',
+        "The {item} comes apart — but the bits are warped past use. Pile it on the scrap heap.",
+        'Too far gone. You open the {item} and find only powdered rot inside. Nothing to keep.',
+      ],
+    }, null, 2),
+  ].join('\n');
+}
+
+export function buildDevGuide(): string {
+  return `# ${getGameTitle()} — Engine Build Guide
+
+This engine is lore-agnostic: a game is just the JSON you upload. The fastest path
+is the WHOLE-GAME file (one file holds every section); the per-section boxes are for
+granular edits. The console is collapsible — tap a header to open a section. Most are
+form builders (text + checkboxes that save to JSON); each also keeps a raw-JSON/file
+strip for power edits.
+
+═══════════════════════════════════════════════════════════════════════════════
+ RECOMMENDED FILL ORDER  (later sections REFERENCE names from earlier ones by
+ exact text — build the lists they pull from FIRST, or those references resolve
+ to nothing)
+═══════════════════════════════════════════════════════════════════════════════
+  1.  Identity & naming — game title, narrator, world name, corruption name,
+      ENERGY / MAGIC name, fusion (Crucible) name. Everything reads these.
+  2.  World lore — narrator persona, tone, the energy concept, termMap.
+  3.  Damage types — define them BEFORE anything that references a type.
+  4.  Materials — the crafting/loot stock. Recipes + Digging/Salvage/Scrap loot all
+      name materials, so they must exist first.
+  5.  Items — Weapons · Armor · Gear · Exploration · Amulets · Rings · Dog gear.
+      Recipes craft these by name, loot pools drop them, races/factions grant them
+      as starting gear, bosses drop them — so the item must be in its table or it
+      resolves to a blank "misc". (Dog gear = armor the COMPANION DOG wears, not the
+      player; a dog-armor recipe's result resolves from the Dog-gear table.)
+  6.  Enemies — referenced by Bosses, Elevated overlays (encounterPool), main-quest
+      "kill" steps, Travel encounters, and Damage resistances (keyed by enemy type).
+  7.  Damage resistances — needs Damage types (4) + Enemies (6).
+  8.  Races · Factions — character creation. Factions are referenced by Starting
+      areas, Faction missions, Bosses, and main-quest faction gates.
+  9.  Locations — give each x/y. Referenced by the Main quest, Starting areas,
+      Bosses (spawn), Whispers/Hooks (plant locations), and the Interaction-tags
+      collector. Build the map before anything placed on it.
+  10. Recipes — needs Materials (4) + the result Items (5).
+  11. Powers (the "magic" disciplines).
+  12. Bosses — needs Enemies/Factions/Locations/Items. Build BEFORE the main quest.
+  13. Main quest — needs Bosses (12) + Locations (9).
+  14. Starting areas — needs Factions (8) + Locations (9). (Tick one room as the
+      Mission Board; "returnable" off = one-way prologue.)
+  15. Faction missions — needs Factions (8) + reward Items (5).
+  16. Hooks · Whispers · Travel encounters — reference Locations (9) + Enemies (6).
+  17. Elevated overlays — reference Enemies (6).
+  18. Digging · Scrap · Salvage — reference Materials (4) + Items (5).
+  19. Interaction tags — PULLS its noun list from your loaded Locations (9) + Starting
+      areas (14), so do this AFTER both. (↻ FROM WORLD)
+  20. Collectables · Summoned sidekicks (+ dog toggle) · Dog-rescue scenarios (the
+      "dog hook" — keyed by the captor's Faction (8); give one row captorFactionId:null
+      as the unaligned fallback) · Titles · Narration flavor.
+  21. Assets — World/faction map images, Music. (Their own uploads, not JSON.)
+
+The thematic detail for each follows.
+
+## 1 · Identity & World (do first — everything else reads these)
+  - Game name / Tagline / Narrator name / Fusion-feature (Crucible) name + on-off
+  - ENERGY / MAGIC name — what this world calls its "magic" (Vril, the Fold, Essence,
+    Mana…); shows on the magic tab + every {energy} token
+  - World name (replaces the built-in world name everywhere) · Corruption/affliction name
+  - World lore: narrator persona ({narrator}/{world}/{energy} tokens work here),
+    tone, setting, terms, vocabulary, and:
+      • energy: name + adjective + material + slang + per-faction terms (your "magic")
+      • termMap: { "any leftover noun": "your word" } — the catch-all swap
+
+## 2 · Character creation
+  - Races (playable) · Factions (playable) — what the creation screen shows.
+    Each race/faction row can carry PERKS + STARTING GEAR + ABILITIES:
+      • racialStatBonuses / factionStatBonuses — always-on stat bumps
+      • racialACBonusRules / factionACBonusRules — conditional AC
+      • startingWeapon (race) + startingGear[] (race & faction) — creation items
+      • abilities[] — once-a-day powers (effect: heal/stat_buff/shield/repair/strike)
+  - Race lore / Faction lore — story notes the narrator knows
+
+## 3 · The world
+  - Locations (give each x/y to plot on your map) — needed before quests/areas.
+    Flag any location "hidden": true to show it as a colored "?" (still routable)
+    that reveals its name only once the player travels there.
+  - Weather · Enemies · Weapons / Armor / Materials / Gear / Exploration / Amulets
+    / Rings / Dog gear (armor the companion DOG wears — a dog-armor recipe resolves
+    its result here) · Recipes · Powers · Lore document
+
+## 4 · Narration flavor
+  - Flavor pools (opening, combat/look/noted/generic remarks, investigation, etc.)
+    + starterItems. Anything you omit keeps a neutral built-in line.
+
+## 5 · Faction bases
+  - Starting areas (form): one walkable instance per faction. Pick the faction,
+    name it, drop it on a map tile (+ optional grid X/Y), add 3-5 rooms and tick
+    ONE as the Mission Board room. "Returnable" off = a one-way prologue that
+    vanishes once you leave (its missions then turn in remotely). Room ids + exits
+    are generated for you (the entry room gets the door out to the map).
+
+## 6 · Main quest (bosses FIRST)
+  - Bosses: name, faction, stats, loot, quest item, spawn mode (main_quest /
+    location / random). Build these BEFORE the quest.
+  - Main quest: line-by-line objective list; "kill" steps pick a main-quest boss.
+    Steps can be faction-GATED (skipForFactions/onlyForFactions).
+
+## 7 · Side content
+  - Faction missions (form): contracts a faction posts on its board. Set the
+    posting faction, the REP GATE (standing where it appears), the rewards
+    (TC + rep + item drops), and the plan — ordered beats (each advances on a
+    kill / travel / anything) or a single "gather N of an item" fetch.
+  - Other missions (hunts / mysteries / storylines + procedural seeds)
+  - Hooks (atmospheric leads) · Whispers (overheard tips) · Travel encounters
+  - Interaction tags (which verbs each noun accepts) — ↻ FROM WORLD pulls the noun
+    list from your LOADED Locations + Starting areas, so populate those first ·
+    Titles (achievements)
+  - Collectables (character stories the player reassembles from loot fragments)
+  - Summoned sidekicks (the buildable companion family — replaces the built-in sidekicks) +
+    the dog companion on/off toggle
+  - Dog-rescue scenarios (the "dog hook" wording — how the player finds & frees the
+    dog): hook nouns, the captor + their faction, the intro/victory lines. The
+    rescue MECHANIC stays fixed; you only reword it. Keyed by the captor's faction,
+    with one captorFactionId:null row as the unaligned fallback.
+  - Advanced rules: add damage types, set enemy resist/weak by type, extend the
+    fusion material tags, rename the weapon coatings
+  - Digging: what "dig" pulls from the ground — the dig loot table, which items make
+    good shovels (item → score), and the productive-dig cap
+  - Scrap: what breaking an item down yields (role → material), plus the failure lines
+  - Salvage: per-noun salvage pools (salvage a wagon → rations/scrap; a blade → metal)
+  - Elevated overlays: mini-scenes at the top of a tall climb (a nook, a vantage, an encounter)
+
+## 8 · Assets (not JSON — their own uploads)
+  - World map image · Per-faction maps · Music (battle + ambient, multi-select)
+
+Tip: EXPORT MY GAME pulls everything you've loaded back into one whole-game file —
+edit it anywhere, re-upload via UPLOAD FILE. Every box shows a ● badge when loaded
+and has a TEMPLATE button with an example to edit.
+`;
+}
+
+/** One whole-game section: its key, reference comment, and the TEMPLATE scaffold. */
+interface BundleEntry { key: string; hint: string; content: string }
+
+/** Every whole-game section in file order, each with its template scaffold. Shared
+ *  by the blank template and the annotated download so the section list can never
+ *  drift between them. */
+function bundleEntries(): BundleEntry[] {
+  const entries: BundleEntry[] = [
+    { key: 'title', hint: 'The game title shown on the start screen.', content: JSON.stringify('My Game') },
+    { key: 'tagline', hint: 'One-line tagline under the title.', content: JSON.stringify('A world of your making.') },
+    { key: 'narrator', hint: 'The narrator\'s display NAME (e.g. "Bob", "The Voice"). Persona/voice is set in the world block below.', content: JSON.stringify('Narrator') },
+    { key: 'worldName', hint: 'Your world\'s proper noun. The built-in narration names a default world in dozens of lines; set yours and the engine swaps it everywhere the player reads it (also callable as the {world} token).', content: JSON.stringify('My World') },
+    { key: 'corruptionName', hint: 'Your name for the build-up affliction the engine calls "Corruption" (Phase-Sickness, Chronal Decay, …). Swapped everywhere the player reads it (also the {corruption} token). Rename the tiers Tainted/Corrupted/Hollowed via the world.termMap.', content: JSON.stringify('Corruption') },
+    { key: 'crucibleName', hint: 'Your name for the fusion/forge feature the engine calls the "Crucible" (also the {crucible}/{fuse}/{forge} token). Set in the GAME IDENTITY section.', content: JSON.stringify('Crucible') },
+    { key: 'energyName', hint: 'What this world calls its "magic" / power source (renames the engine\'s built-in energy concept). Shows on the magic tab + everywhere the {energy} token is used. Set in GAME IDENTITY; the fuller energy concept (adjective/material/slang) is in the World-lore block.', content: JSON.stringify('Magic') },
+    { key: 'crucibleEnabled', hint: 'Whether the fusion/forge feature exists in this game: true (default) keeps it, false removes the Crucible entirely. Toggle it in the GAME IDENTITY section.', content: JSON.stringify(true) },
+    { key: 'weatherEnabled', hint: 'Whether weather exists in this game: true (default) keeps it, false removes it entirely (no atmosphere line, no travel/visibility/stat/tick effects — your Weather table stays but goes dormant). Toggle it in the dev console FEATURES card.', content: JSON.stringify(true) },
+    { key: 'vendorsEnabled', hint: 'Whether merchants exist in this game: true (default) keeps them, false removes ALL vendors (hub, capital, and roadside). With no Vendors table uploaded, the engine spawns five setting-neutral generic vendors (Weaponsmith/Armorer/Quartermaster/Supplier/Trader) stocked LIVE from your weapons/armor/gear/materials, so they only sell items that exist. Toggle in the dev console FEATURES card.', content: JSON.stringify(true) },
+    { key: 'vendorsAppendGeneric', hint: 'What happens to the five generic vendors when YOU upload a Vendors table: false (default) = your vendors REPLACE them (only yours spawn); true = your vendors are ADDED alongside the generic five. Ignored when no Vendors table is uploaded. Toggle in the dev console FEATURES card.', content: JSON.stringify(false) },
+  ];
+  for (const b of LORE_BLOCKS) entries.push({ key: b.id, hint: b.hint, content: getLoreTemplate(b.id, false) });
+  for (const t of CONTENT_TABLES) entries.push({ key: t.id, hint: t.hint, content: getTableTemplate(t.id, TEMPLATE_SAMPLE_ROWS, false) });
+  entries.push({ key: 'missions', hint: 'One object holding your missions: hunts / mysteries / factionQuests / storylines (designed multi-stage quests, accepted from vendors) plus objectives / complications / rewards (seeds the engine mixes into procedural lead quests). Build factionQuests in the dedicated FACTION MISSIONS box: each is { id, factionId (who posts it), title, objective, requirement: { rep } (the GATE where it appears on that faction\'s board), reward: { tc, rep, items?: ["name"] (item drops granted on turn-in) }, and a plan — stages[] (ordered beats) or fetch: { itemName, quantity } }. Omit any sub-table to keep its built-in default.', content: buildMissionsTemplate(TEMPLATE_SAMPLE_ROWS, false) });
+  entries.push({ key: 'hooks', hint: 'Atmospheric multi-stage leads the player stumbles on while exploring. { plants: { <hookId>: [{line, nouns}] }, chains: { <hookId>: [{line, effects, done}] } }. Effect verbs: grant_tc, grant_item, spawn_enemy_tag, heal, damage, unlock_location, rep_change, advance_time, memo, spawn_vendor. Omit to keep the built-in hooks.', content: buildHooksTemplate(false) });
+  entries.push({ key: 'wasteland', hint: 'Random encounters during long-distance travel between locations, keyed by archetype id. Each: { type (treasure|npc|skirmish|mini_dungeon|fusion_bench), weight, matchers: [location tags it fires in], narration, optional loot/npc_lines/lore_note/enemyPool }. A matcher of "any" / "*" makes an encounter fire at ANY location during travel (random-anywhere), alongside tag-targeted ones. Replaces the built-in travel encounters.', content: buildWastelandTemplate(false) });
+  entries.push({ key: 'titles', hint: 'Importable titles/achievements (array). Each: { id, name, description?, track (a trackable variable), threshold, perk?: { stat, amount } }. Earned when the tracked variable reaches the threshold. Hit the TITLES box TEMPLATE for the list of trackable variables.', content: buildTitlesTemplate() });
+  entries.push({ key: 'mainQuest', hint: 'Your win-condition objective list, built in the MAIN QUEST box: { title?, steps: [{ action (kill|clear|reach|collect|talk_to|deliver|return_to|hand_in|claim), target?, locationId, reward?, bossId?, skipForFactions?: ["factionId"] (faction GATE — players of these factions skip this step, e.g. a German isn\'t sent to kill the German boss; can also use onlyForFactions to make a step faction-specific) }] }. Steps run in order; gated steps are skipped per the player\'s faction; the last applicable step completes the quest.', content: buildMainQuestTemplate() });
+  entries.push({ key: 'bosses', hint: 'Named bosses (array) that main-quest kill steps reference: { id, name, factionId?, hp, attack, damage, ac?, abilityPoint?, drops?: [items], questItem?, spawnLocationId?, spawnCondition? (main_quest | location | random), spawnChance? (% for random) }. Build them in the BOSSES box.', content: buildBossesTemplate() });
+  entries.push({ key: 'startingAreas', hint: 'Per-faction starting areas (array). Each is a small instance — factionId, name, locationId (WHERE on the map to place it), optional coords {x,y} (the map cell — read it off the in-game map planner), returnable? (false = one-way prologue that vanishes once you leave; its missions then use remote turn-in), and rooms[] (a tiny graph; each exit points to another room id, null, or "world" to leave to the map; the first room is the entry). Flag exactly one room with missionBoard:true to stand the starter Mission Board there. The faction member spawns inside and walks room-to-room; an exit of "world" steps back onto the world map. Whispers can plant in a room by naming its room id in plantLocations.', content: buildStartingAreasTemplate() });
+  entries.push({ key: 'interactionTags', hint: 'Which interactable nouns each verb accepts. Two forms (mix freely): the 5 tag-name keys (climbable / swimmable / breakable / searchable / salvageable) hold KEYWORD lists added to the built-in generic set; ANY other key is an EXACT noun mapped to its tags. In the dev console, the INTERACTION TAGS box builds a per-noun list from your loaded locations to tag directly.', content: interactionTagsKeywordSample() });
+  entries.push({ key: 'sceneProps', hint: 'The curated ambient nouns the engine injects into scenes as CLIMB and SALVAGE targets: { climbables?: [{ name, context?: inside|outside|both, height?: 1..8 }], salvageables?: [{ name, context? }] }. Replaces the built-in setting-neutral pools so the props match YOUR world. Omit either array to keep its built-in pool.', content: buildScenePropsTemplate() });
+  entries.push({ key: 'vendors', hint: 'Named traders the engine spawns (scene vendor rolls + roadside). A JSON array of { id, name, title, faction? (a faction id, or null for unaligned), description, offers: [{ itemName, price, quantity? }], voiceId?, gender? }. itemNames must exist in your catalogs. Replaces the built-in trader pool.', content: buildVendorsTemplate() });
+  entries.push({ key: 'roadsideTraders', hint: 'Wandering market-stall ARCHETYPES spawned on the road (each mints a fresh stall with a random pick from its pool). A JSON array of { id, name, title, demeanor: "honest"|"sketchy", description, pool: [{ itemName, priceMin, priceMax, weight }] }. itemNames must exist in your catalogs. Replaces the built-in roadside pool.', content: buildRoadsideTradersTemplate() });
+  entries.push({ key: 'summons', hint: 'Summoned-sidekick pack (replaces the built-in sidekicks), built in the SUMMONED SIDEKICKS box: { noun?, summons: [{ kind, name, aliases?, fuel: [{name,quantity}], hpMax, attackDie, attackMod?, hitBonus?, damageType?, summonDC?, resistBase?, resistCap?, elementTags? }] }. The player summons by typing "summon <alias>". Fuel names must exist in your catalog.', content: buildSummonsTemplate() });
+  entries.push({ key: 'dogEnabled', hint: 'The rescuable dog companion: true (default) keeps it, false removes it from this game (no rescue scenarios fire). Toggle it in the SUMMONED SIDEKICKS section of the dev console.', content: JSON.stringify(true) });
+  entries.push({ key: 'damageTypes', hint: 'Author-ADDED damage types beyond the built-in 10. Array of { name, keywords?: [..], onHit?: [{stat,amount}] + onHitRounds (stat +/- to the victim when hit), combat?: { mode "on_hit"|"dot", dice, rounds (dot), baseChance 0..1, weakBonus, strongPenalty } }. combat = a weapon-deals-this-type effect (immediate or ticking), whose apply chance rises vs targets WEAK to it and falls vs STRONG. keywords let the engine infer the type from a bare attack string.', content: JSON.stringify([{ name: 'fire', keywords: ['fire', 'flame', 'burn'], combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.8, weakBonus: 0.2, strongPenalty: 0.3 } }, { name: 'frost', keywords: ['ice', 'freeze'], onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 3, combat: { mode: 'dot', dice: '1d4', rounds: 3 } }], null, 2) });
+  entries.push({ key: 'damageResistances', hint: 'Which damage types each ENEMY TYPE resists / is weak to. Object keyed by YOUR enemy types: { "Marsh Wyrm": { "resist": ["frost"], "weak": ["burn"] }, … }. Weak = 1.5× damage, resist = ½. Replaces the built-in map.', content: JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2) });
+  entries.push({ key: 'fusionTags', hint: 'EXTRA material tags that count toward the Crucible fusion diversity gate, on top of the built-in set (metal/cloth/wood/stone/bone/crystal/…). Array of tag words your items use, e.g. ["clockwork", "glass", "resin"].', content: JSON.stringify(['clockwork', 'glass'], null, 2) });
+  entries.push({ key: 'coatings', hint: 'RENAME the five weapon-coating mechanics (the mechanics stay wired to combat). Object keyed by mechanic — poison / acid / corruption / electrical / burn — each: { label? (coated adjective), blurb? (combat description), lootLabel? (pre-coated loot adjective) }. All five are pre-filled with their generic defaults; edit the words and delete any mechanic you want left at default.', content: JSON.stringify({
+    poison: { label: 'Poisoned', blurb: 'leaks poison into the wound (pure damage over time)', lootLabel: 'Poisoned' },
+    acid: { label: 'Acid-Etched', blurb: "burns and eats the target's armor (damage over time + armor shred)", lootLabel: 'Acid-Etched' },
+    corruption: { label: 'Corrupted', blurb: 'pushes corruption into the target (damage over time + sickening stacks)', lootLabel: 'Corrupted' },
+    electrical: { label: 'Charged', blurb: 'arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)', lootLabel: 'Charged' },
+    burn: { label: 'Burning', blurb: 'sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)', lootLabel: 'Burning' },
+  }, null, 2) });
+  entries.push({ key: 'inventory', hint: 'Inventory presentation: { labels?: { weapon|armor|accessory|consumable|tool|relic|material|loot|quest: "Your name" } (rename the category sections), toolTags?: ["tag"] (extra item tags that read as Tools), repairMaterialPct?: 200 (repair material cost as a % of an item\'s scrap yield; 200 = built-in 2x) }. Category ids + order stay fixed.', content: JSON.stringify({ labels: { loot: 'Salvage', material: 'Components' }, toolTags: ['multitool'], repairMaterialPct: 200 }, null, 2) });
+  entries.push({ key: 'collectables', hint: 'Character stories the player reassembles from loot, built in the COLLECTABLES box: { stories: [{ id, characterName, characterBlurb, fragments: [{ id, title, kind (note|letter|journal|fragment), body, discoveryHint, biomeTags: [..] }] }] }. A fragment drops in place of normal loot where the scene\'s location tags overlap its biomeTags. Replaces the built-in stories wholesale.', content: buildCollectablesTemplate() });
+  entries.push({ key: 'overlays', hint: 'ELEVATED OVERLAYS (array) — a mini-scene at the top of a tall climb. Each: { id, kind (encounter|trader|lookout), arrivalLine, ambientNouns: [...], minTiers? (min climb height), encounterChance? + encounterPool? [enemy names] for kind=encounter, trader? / lookout? }. The roll/scene RULES stay in the engine. Build it in the ELEVATED OVERLAYS box.', content: buildOverlaysTemplate() });
+  entries.push({ key: 'dogScenarios', hint: 'DOG-RESCUE SCENARIOS (array) — the "dog hook": how the player finds & frees the one companion dog. MECHANIC stays in the engine (one dog/save; on an enemy-free scene, investigating/attacking/approaching a target that WHOLE-WORD-matches a hookNoun spawns a faction-neutral captor -> kill it -> breed/name/sex onboarding). Each: { id, hookNouns: [...] (whole-PHRASE match: "ash tree" hits "the black ash tree" not "trash"; a multi-word phrase fires only on the full phrase, NOT its single words), captorFactionId (a faction id from your Factions table; give ONE row null = the unaligned fallback used when the player IS that faction), captorName, defaultBreed, startingProfile ("mongrel"|"shepherd"|"hound"|"mutt"|"puppy"), archetypes: [...] (optional/cosmetic), rumorVenue?, introLine ({captorName} token), victoryLine, and OPTIONAL captor combat: captorHp (14), captorAttack ("4"), captorDamage ("1d6+1"), captorLoot: ["items from your tables"] }. Build it in the DOG-RESCUE SCENARIOS box.', content: buildDogScenariosTemplate() });
+  entries.push({ key: 'salvage', hint: 'The SALVAGE subsystem (what salvaging a noun yields): { pools: [{ id, patterns: ["noun substrings"], items: [{ name, rarity, weight, min, max }] }] (FIRST matching pool wins, ordered specific→general), junkPool, materialLines, junkLines, nothingChance }. The match/pick RULES stay in the engine. Build it in the SALVAGE box.', content: buildSalvageTemplate() });
+  entries.push({ key: 'scrap', hint: 'The SCRAP subsystem (what breaking an item down yields): { roles: { metalBulk, metalPremium, essencePrimary, essenceSecondary, essenceBonus, stone, mud, cloth, organic, wood } (role → material name), rawGuard: ["mats that can\'t scrap into themselves"], premiumMats: ["mats stripped from self-crafted scrap"], failureLines: ["…{item}…"] }. The tag→material RULES stay in the engine; this is the data. Build it in the SCRAP box.', content: buildScrapTemplate() });
+  entries.push({ key: 'digging', hint: 'The DIGGING subsystem (what "dig" pulls from the ground): { itemScores: { "Item": score }, tagScores: { tag: score }, productiveCap: number, loot: [{ name, rarity (Common|Uncommon|Rare), baseWeight }] }. Higher dig score = finds more + better rarity. Build it in the DIGGING box; omit to keep the built-in.', content: buildDiggingTemplate() });
+  entries.push({ key: 'whispers', hint: 'Overheard-tip leads (array) — each entry is a SEPARATE random-triggered mission. It plants at a plant location (plantLocations) with a per-visit chance (plantChance) in a time window (activeHours) and points to a nearby tile (targetOffset). Two shapes: ONE-HOP — pays off via meetLine + meetEffects (same effect verbs as hooks) on arrival; or MULTI-STAGE — a stages[] array runs leg-by-leg (reach a tile, optionally defeat an enemyName foe before advancing, fire that leg’s effects), the last leg ends it. plantLocations may be a built-in hub-room id (e.g. "outpost_messhall") OR one of your own location ids.', content: buildWhispersTemplate(false) });
+  return entries;
+}
+
+const BUNDLE_HEADER = [
+  '  // ============================================================',
+  '  // WHOLE-GAME FILE. Edit every section, delete what you don\'t need,',
+  '  // then upload under "UPLOAD FILE FROM DEVICE". // and block comments are OK.',
+  '  // Any section you omit keeps the built-in default.',
+  '  // ------------------------------------------------------------',
+  '  // CALLABLE TOKENS — drop these in ANY text string (mission arbiter/',
+  '  // narration lines, whispers, hooks, wasteland narration, flavor, lore)',
+  '  // and the engine fills in the name YOU chose, so you never hard-code it:',
+  '  //   {narrator} / {arbiter} / {guide}  -> your narrator name',
+  '  //   {crucible} / {fuse} / {forge}     -> your fusion-feature name',
+  '  //   {title} / {game}                  -> your game title',
+  '  //   {world} / {setting}               -> your world name (replaces the built-in world name)',
+  '  //   {corruption} / {plague}           -> your affliction name (replaces "Corruption")',
+  '  // ============================================================',
+].join('\n');
+
+export function buildGameBundleTemplate(): string {
+  const sections = bundleEntries().map((e, i) => {
+    const sec = bundleSection(e.key, e.hint, e.content);
+    return i === 0 ? `${BUNDLE_HEADER}\n${sec}` : sec;
+  });
+  return `{\n${sections.join(',\n\n')}\n}\n`;
+}
+
+/** The WHOLE-GAME download with a per-section status marker so the author can see
+ *  at a glance what's done. A key present in `uploaded` (the export of the current
+ *  game) emits the author's content under "✅ UPLOADED"; every other section emits
+ *  the TEMPLATE scaffold under "⬜ TEMPLATE — default; fill in or delete". The file
+ *  still parses + re-uploads cleanly (markers are // comments). */
+/** Map of bundle section key → its TEMPLATE content string (the un-customized scaffold the
+ *  annotated export bakes in for sections the author hasn't uploaded). The whole-game loader
+ *  compares each uploaded section against this and SKIPS any that still equals its template, so a
+ *  re-uploaded export can't promote template scaffolding (e.g. the placeholder vendors / roadside
+ *  traders) back into a broken override. */
+export function bundleTemplateMap(): Record<string, string> {
+  const m: Record<string, string> = {};
+  for (const e of bundleEntries()) m[e.key] = e.content;
+  return m;
+}
+
+export function buildAnnotatedGameBundle(uploaded: Record<string, unknown>): string {
+  const upCount = Object.keys(uploaded).length;
+  const entries = bundleEntries();
+  const header = [
+    BUNDLE_HEADER,
+    '  // ------------------------------------------------------------',
+    `  // STATUS MARKERS — ${upCount} of ${entries.length} sections uploaded so far:`,
+    '  //   ✅ UPLOADED  = your content (already customized)',
+    '  //   ⬜ TEMPLATE  = still the default scaffold — fill it in or delete it',
+    '  // ============================================================',
+  ].join('\n');
+  const sections = entries.map((e, i) => {
+    const isUp = Object.prototype.hasOwnProperty.call(uploaded, e.key);
+    const status = isUp
+      ? '  // ✅ UPLOADED — your content'
+      : '  // ⬜ TEMPLATE — default; fill in or delete';
+    const content = isUp ? JSON.stringify(uploaded[e.key], null, 2) : e.content;
+    const sec = `${status}\n${bundleSection(e.key, e.hint, content)}`;
+    return i === 0 ? `${header}\n${sec}` : sec;
+  });
+  return `{\n${sections.join(',\n\n')}\n}\n`;
+}

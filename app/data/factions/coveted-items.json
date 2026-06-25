@@ -1,0 +1,14 @@
+{
+  "_comment": "engine_Dev — Guild Broker faction → coveted-item chart (the brokering mission picks two eligible factions and asks for their lore-coveted low-tier item). This is the reference game's Tartaria data; it lived in engine/locationChallenges.ts but was moved here so the engine carries no hardcoded setting strings. Each name matches an item authored in app/data/items/exploration.json; full artifact lore is in app/data/lore/canon-loot-treasure.json. Keyed by faction id.",
+  "covetedItems": {
+    "mud_monarchs":          { "itemId": "mud_flood_pulse_key",         "name": "Mud Flood Nexus Pulse-Key",     "sourceLocationId": "mud_flood_nexus" },
+    "forgotten_order":       { "itemId": "architects_master_blueprint", "name": "Architect's Master Blueprint",   "sourceLocationId": "red_tower_of_nimari" },
+    "reclaimers_guild":      { "itemId": "fragment_of_endless_stair",   "name": "Fragment of the Endless Stair",  "sourceLocationId": "endless_stair" },
+    "true_tartarians":       { "itemId": "mask_of_the_last_king",       "name": "Mask of Tartaria's Last King",   "sourceLocationId": "buried_cities" },
+    "eternal_dynasty":       { "itemId": "dynasty_blood_signet",        "name": "Eternal Dynasty's Blood-Signet", "sourceLocationId": "asgardar" },
+    "conspiracy_architects": { "itemId": "timeworn_ether_compass",      "name": "Timeworn Ether Compass",         "sourceLocationId": "cradle_of_dusk" },
+    "servants_of_giants":    { "itemId": "entombeds_prayer_tablet",     "name": "The Entombed's Prayer Tablet",   "sourceLocationId": "buried_cities" },
+    "stone_builders":        { "itemId": "obsidian_siphon",            "name": "Obsidian Siphon",                "sourceLocationId": "obsidian_pillars" },
+    "tartarian_revivalists": { "itemId": "aetheric_phoenix_feather",   "name": "Aetheric Phoenix Feather",       "sourceLocationId": "sinking_cathedral" }
+  }
+}

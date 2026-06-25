@@ -10,7 +10,7 @@ function mkPlayer(over: Record<string, unknown> = {}) {
     name: 'Verbal', raceId: 'mud_dweller', factionId: 'forgotten_order',
     hp: 30, hpMax: 30, dead: false, hoursElapsed: 216, currentLocationId: 'builders_survey_camp',
     inventory: [{ id: 'a', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], rarity: 'Common' }],
-    statusEffects: [], golem: null,
+    statusEffects: [], sidekick: null,
     mainQuest: { phase: 'cores', guardiansDefeated: [] },
     dog: {
       id: 'd', name: 'Rocky', status: 'dead', hp: 0, hpMax: 12, loyalty: 0,

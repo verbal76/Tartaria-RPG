@@ -13,6 +13,26 @@
 // reads distinct from the next.
 
 import type { Location } from './types';
+import { getScenePropsOverride } from './contentPack';
+
+/** All active climbables: the author's scene-props override when present, else the
+ *  built-in setting-neutral fallback. Override entries default to context 'both',
+ *  height 2. */
+function allActiveClimbables(): ClimbableSpawn[] {
+  const ov = getScenePropsOverride();
+  return ov?.climbables?.length
+    ? ov.climbables.map((s) => ({ name: s.name, context: s.context ?? 'both', height: s.height ?? 2 }))
+    : [...OUTSIDE_CLIMBABLES, ...INSIDE_CLIMBABLES];
+}
+
+/** Active climbables filtered to the scene context (indoor/outdoor), falling back to the
+ *  full active set if the override supplies none for this context. */
+function activeClimbables(indoor: boolean): ClimbableSpawn[] {
+  const want = indoor ? 'inside' : 'outside';
+  const all = allActiveClimbables();
+  const matched = all.filter((s) => s.context === want || s.context === 'both');
+  return matched.length ? matched : all;
+}
 
 export interface ClimbableSpawn {
   /** Canonical noun as it'll appear in the climb modal. The runtime
@@ -27,32 +47,29 @@ export interface ClimbableSpawn {
 }
 
 // Outside-tagged props — anything that wouldn't make sense inside a
-// vault / observatory / library / armory etc.
+// vault / observatory / library / armory etc. SETTING-NEUTRAL by design:
+// these are the engine FALLBACK pool, used until an author supplies their
+// own via the scene-props override, so they must not fight any setting.
 export const OUTSIDE_CLIMBABLES: ClimbableSpawn[] = [
-  { name: 'ruined skyscraper',          context: 'outside', height: 4 },
-  { name: 'petrified mud wave',         context: 'outside', height: 2 },
-  { name: 'obsidian pillar',            context: 'outside', height: 3 },
-  { name: 'submerged giant statue',     context: 'outside', height: 3 },
-  { name: 'buried strip mall rooftop',  context: 'outside', height: 2 },
-  { name: 'endless stair landing',      context: 'outside', height: 4 },
-  { name: "zharak's teeth spire",       context: 'outside', height: 4 },
-  // 2026-05-25 [CONTENT-1] — watchtower as a 4-step outside climbable.
-  // User reported investigating a watchtower scene and the world text
-  // described it as "half-swallowed" by silt without a climb option.
-  // Authored as 4-step (matches the existing ruined-skyscraper /
-  // endless-stair-landing rung-count for visually-tall structures).
+  { name: 'collapsed tower',            context: 'outside', height: 4 },
+  { name: 'rockslide bank',             context: 'outside', height: 2 },
+  { name: 'broken pillar',              context: 'outside', height: 3 },
+  { name: 'fallen statue',              context: 'outside', height: 3 },
+  { name: 'buried rooftop',             context: 'outside', height: 2 },
+  { name: 'high stair landing',         context: 'outside', height: 4 },
+  { name: 'jagged rock spire',          context: 'outside', height: 4 },
   { name: 'watchtower',                 context: 'outside', height: 4 },
 ];
 
 // Inside-tagged props — for vaults, libraries, engine chambers, etc.
 export const INSIDE_CLIMBABLES: ClimbableSpawn[] = [
-  { name: 'dormant architectural sentinel', context: 'inside', height: 4 },
-  { name: 'grand spire capacitor',          context: 'inside', height: 4 },
-  { name: 'submerged library shelf',        context: 'inside', height: 1 },
-  { name: 'engine chamber scaffolding',     context: 'inside', height: 3 },
-  { name: 'aether-tether grapple point',    context: 'inside', height: 1 },
-  { name: 'maintenance tunnel ladder',      context: 'inside', height: 2 },
-  { name: 'royal vault pedestal',           context: 'inside', height: 1 },
+  { name: 'tall support frame',         context: 'inside', height: 4 },
+  { name: 'tall machine column',        context: 'inside', height: 4 },
+  { name: 'tall shelf stack',           context: 'inside', height: 1 },
+  { name: 'chamber scaffolding',        context: 'inside', height: 3 },
+  { name: 'anchored grapple point',     context: 'inside', height: 1 },
+  { name: 'maintenance tunnel ladder',  context: 'inside', height: 2 },
+  { name: 'tall vault pedestal',        context: 'inside', height: 1 },
 ];
 
 // Adjective prefixes for variety — applied at spawn time so each visit
@@ -110,7 +127,7 @@ export function pickClimbablesForScene(
   rng: () => number = Math.random,
 ): string[] {
   const indoor = isIndoorLocation(loc);
-  const pool = indoor ? INSIDE_CLIMBABLES : OUTSIDE_CLIMBABLES;
+  const pool = activeClimbables(indoor);
   const cap = indoor ? 2 : 3;
   const shuffled = shuffle(pool, rng);
   const picked = shuffled.slice(0, cap);
@@ -128,7 +145,7 @@ export function pickClimbablesForScene(
  *  caller falls back to the existing substring-based climbHeight. */
 export function curatedClimbHeight(noun: string): number | null {
   const n = noun.toLowerCase();
-  for (const spawn of [...OUTSIDE_CLIMBABLES, ...INSIDE_CLIMBABLES]) {
+  for (const spawn of allActiveClimbables()) {
     if (n.includes(spawn.name.toLowerCase())) return spawn.height;
   }
   return null;

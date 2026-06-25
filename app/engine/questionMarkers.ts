@@ -10,7 +10,7 @@
 // both the MapScreen overlay and the route rows read, so they never disagree.
 
 import { canonicalCellOf } from './worldMap';
-import { HIDDEN_LOCATIONS, isLocationRevealed } from './hiddenLocations';
+import { getHiddenLocations, isLocationRevealed } from './hiddenLocations';
 import type { WorldMemory } from './types';
 
 export interface QuestionPlace {
@@ -28,8 +28,9 @@ type QuestionMemory = Pick<WorldMemory, 'discoveredLocationIds' | 'canonLocation
 export function questionMarkerPlaces(wm: QuestionMemory | null | undefined): QuestionPlace[] {
   const discovered = wm?.discoveredLocationIds;
   const list: QuestionPlace[] = [];
-  // Hidden locations that haven't been visited yet still read as "?".
-  for (const id of Object.keys(HIDDEN_LOCATIONS)) {
+  // Hidden locations that haven't been visited yet still read as "?". Only those
+  // that exist in the live location catalog (no phantom "?" for a re-skin).
+  for (const id of Object.keys(getHiddenLocations())) {
     if (isLocationRevealed(id, discovered)) continue;
     const c = canonicalCellOf(id);
     list.push({ id, x: c.x, y: c.y });

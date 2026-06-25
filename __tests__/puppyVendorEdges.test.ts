@@ -50,8 +50,8 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore, tickDogStatus, hasActiveDog } from '../app/state/gameStore';
-import { totalGuardiansCount } from '../app/engine/coreGuardians';
+import { useGameStore, tickDogStatus, hasActiveDog, isMainQuestComplete, isMainQuestNearEnd } from '../app/state/gameStore';
+import { setCustomMainQuestOverride, clearAllOverrides } from '../app/engine/contentPack';
 
 async function bootBase() {
   const store = useGameStore;
@@ -190,53 +190,56 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     });
   });
 
-  describe('rubble-puppy guards — all Guardians cleared requirement', () => {
-    it('with fewer than total Guardians, rubble hook does not fire', async () => {
+  describe('rubble-puppy guard — tied to MAIN QUEST completion (not Guardians)', () => {
+    // engine_Dev — the rubble path used to gate on "all Core Guardians defeated"
+    // (a Tartaria concept dead in any custom game). It now gates on
+    // isMainQuestComplete, which is true for a finished CUSTOM quest OR the
+    // built-in quest reaching its end.
+    it('main quest NOT complete → rubble path closed (vendor path is used instead)', async () => {
       const store = await bootBase();
-      const total = totalGuardiansCount();
-      store.setState((s) => ({
-        worldMemory: {
-          ...s.worldMemory,
-          puppyVendorOwed: true,
-          puppyVendorUsed: false,
-        },
-        player: s.player
-          ? {
-              ...s.player,
-              mainQuest: {
-                ...(s.player.mainQuest ?? {}),
-                guardiansDefeated: [], // none
-              } as never,
-            }
-          : s.player,
-      }));
-      const p = store.getState().player!;
-      const def = (p.mainQuest?.guardiansDefeated ?? []).length;
-      expect(def < total).toBe(true);
+      store.setState((s) => (s.player
+        ? { player: { ...s.player, mainQuest: { ...(s.player.mainQuest ?? {}), phase: 'cores' } as never } }
+        : s));
+      expect(isMainQuestComplete(store.getState().player)).toBe(false);
     });
 
-    it('with ALL Guardians cleared and flag set, rubble path is gated only by the random roll', async () => {
+    it('built-in quest reached its end (phase "ended") → rubble path open', async () => {
       const store = await bootBase();
-      const total = totalGuardiansCount();
-      const fakeDef = Array.from({ length: total }, (_, i) => `guardian_${i}`);
-      store.setState((s) => ({
-        worldMemory: {
-          ...s.worldMemory,
-          puppyVendorOwed: true,
-          puppyVendorUsed: false,
-        },
-        player: s.player
-          ? {
-              ...s.player,
-              mainQuest: {
-                ...(s.player.mainQuest ?? {}),
-                guardiansDefeated: fakeDef,
-              } as never,
-            }
-          : s.player,
-      }));
-      const p = store.getState().player!;
-      expect((p.mainQuest?.guardiansDefeated ?? []).length).toBe(total);
+      store.setState((s) => (s.player
+        ? { player: { ...s.player, mainQuest: { ...(s.player.mainQuest ?? {}), phase: 'ended' } as never } }
+        : s));
+      expect(isMainQuestComplete(store.getState().player)).toBe(true);
+    });
+
+    it('an ending choice also counts as complete', async () => {
+      const store = await bootBase();
+      store.setState((s) => (s.player
+        ? { player: { ...s.player, mainQuest: { ...(s.player.mainQuest ?? {}), ending: 'seal' } as never } }
+        : s));
+      expect(isMainQuestComplete(store.getState().player)).toBe(true);
+    });
+
+    it('custom quest: rubble window opens at the FINAL boss (one boss left), not full completion', async () => {
+      const store = await bootBase();
+      setCustomMainQuestOverride({
+        title: 'x',
+        steps: [
+          { id: 'a', action: 'kill', bossId: 'a' },
+          { id: 'b', action: 'kill', bossId: 'b' },
+          { id: 'c', action: 'return_to', locationId: 'home' },
+        ],
+      } as never);
+      try {
+        const at = (step: number) => {
+          store.setState((s) => (s.player ? { player: { ...s.player, customQuestStep: step } as never } : s));
+          return isMainQuestNearEnd(store.getState().player);
+        };
+        expect(at(0)).toBe(false); // two bosses ahead → vendor net
+        expect(at(1)).toBe(true);  // one boss left → rubble window OPEN
+        expect(at(2)).toBe(true);  // bosses done → still open
+      } finally {
+        clearAllOverrides();
+      }
     });
   });
 

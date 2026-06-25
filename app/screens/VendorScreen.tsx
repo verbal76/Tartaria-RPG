@@ -5,6 +5,7 @@ import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
@@ -16,7 +17,7 @@ function rarityColor(rarity: string | null | undefined): string {
     case 'Legendary': return '#e07a5f';
     case 'Rare': return '#b88ce0';
     case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
+    default: return '#6ab0c9';
   }
 }
 
@@ -288,7 +289,7 @@ export function VendorScreen() {
             is redundant. Mirror the exploration chip's own gate so the two never
             both show. Roadside / wild stalls (no hub, not market) keep it — it's
             the only Crucible there. */}
-        {!(player?.fusionPending
+        {isCrucibleEnabled() && !(player?.fusionPending
           || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market') && (
           <TouchableOpacity
@@ -296,7 +297,7 @@ export function VendorScreen() {
             onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
             activeOpacity={0.7}
           >
-            <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
+            <Text style={styles.crucibleBtnText}>★★ USE {getCrucibleName().toUpperCase()} · 25 TC</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -645,8 +646,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -654,9 +655,9 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   dismissBtn: {
-    backgroundColor: '#1a1714',
+    backgroundColor: '#131c1f',
     borderColor: '#7a4040',
     borderWidth: 1,
     borderRadius: 4,
@@ -673,8 +674,8 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 8,
@@ -682,33 +683,33 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     backgroundColor: '#2a2520',
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
   },
-  tabText: { color: '#7a705c', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
-  tabTextActive: { color: '#c9a86a' },
+  tabText: { color: '#6c8088', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
+  tabTextActive: { color: '#6ab0c9' },
   sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6, paddingHorizontal: 2 },
-  sortLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginRight: 4 },
-  sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },
-  sortTabActive: { borderColor: '#c9a86a' },
+  sortLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginRight: 4 },
+  sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 2 },
+  sortTabActive: { borderColor: '#6ab0c9' },
   // arb121 — text is ALWAYS readable amber; the BORDER (sortTabActive) is the
-  // sole active indicator. Was a dim #7a705c on inactive that the player
+  // sole active indicator. Was a dim #6c8088 on inactive that the player
   // couldn't read.
-  sortTabText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
-  sortTabTextActive: { color: '#c9a86a' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  sortTabText: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
+  sortTabTextActive: { color: '#6ab0c9' },
+  title: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   vendorCard: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
+    backgroundColor: '#0e1618',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     padding: 10,
     marginTop: 4,
     marginBottom: 8,
   },
-  vendorName: { color: '#c9a86a', fontSize: 15, fontWeight: '700', letterSpacing: 1 },
-  vendorTitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 1 },
-  vendorDesc: { color: '#cdbf99', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
+  vendorName: { color: '#6ab0c9', fontSize: 15, fontWeight: '700', letterSpacing: 1 },
+  vendorTitle: { color: '#6c8088', fontSize: 11, letterSpacing: 1, marginTop: 1 },
+  vendorDesc: { color: '#bcd2db', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
   // arb103 — vendor Fusing Crucible offer.
   crucibleBtn: {
     marginTop: 10,
@@ -726,7 +727,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 6,
   },
-  walletLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  walletLabel: { color: '#6c8088', fontSize: 11, letterSpacing: 1 },
   corruptionMarkup: {
     color: '#e07a5f',
     fontSize: 10,
@@ -736,10 +737,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 6,
   },
-  walletValue: { color: '#c9a86a', fontSize: 13, fontWeight: '700' },
+  walletValue: { color: '#6ab0c9', fontSize: 13, fontWeight: '700' },
   tourBanner: {
-    backgroundColor: '#2a1f12',
-    borderColor: '#c9a86a',
+    backgroundColor: '#16242a',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 6,
@@ -747,7 +748,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   tourBannerText: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 10,
     letterSpacing: 1,
     fontWeight: '700',
@@ -757,8 +758,8 @@ const styles = StyleSheet.create({
   listContent: { paddingBottom: 12 },
   offerRow: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 6,
@@ -772,35 +773,35 @@ const styles = StyleSheet.create({
   // offerName from the BUY rows but with quest-specific reward +
   // body styling.
   contractSection: { marginBottom: 10 },
-  contractSectionTitle: { color: '#c9a86a', fontSize: 11, letterSpacing: 2, fontWeight: '700', marginBottom: 6 },
+  contractSectionTitle: { color: '#6ab0c9', fontSize: 11, letterSpacing: 2, fontWeight: '700', marginBottom: 6 },
   contractRow: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 6,
     overflow: 'hidden',
   },
   contractReward: { color: '#9ec96a', fontSize: 13, fontWeight: '700' },
-  contractBody: { color: '#cdbf99', fontSize: 12, marginTop: 2, marginBottom: 4, fontStyle: 'italic' },
+  contractBody: { color: '#bcd2db', fontSize: 12, marginTop: 2, marginBottom: 4, fontStyle: 'italic' },
   contractDesc: { color: '#a89c7a', fontSize: 11, lineHeight: 15 },
-  contractAccept: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1, fontStyle: 'italic' },
+  contractAccept: { color: '#6ab0c9', fontSize: 10, marginTop: 6, letterSpacing: 1, fontStyle: 'italic' },
   offerHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  offerName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
+  offerName: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
   // arb120 — loadout warning tag (bandolier / pouch) on a sellable row.
   loadoutTag: { color: '#e0a85f', fontSize: 11, fontWeight: '700' },
-  offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
-  offerPriceBroke: { color: '#7a705c' },
+  offerPrice: { color: '#6ab0c9', fontSize: 12, fontWeight: '700' },
+  offerPriceBroke: { color: '#6c8088' },
   offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 2 },
-  offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, flex: 1 },
+  offerKind: { color: '#6c8088', fontSize: 10, letterSpacing: 1, flex: 1 },
   // arb-fix — right-hand stack: "×N in stock" over "you have N".
   offerCounts: { alignItems: 'flex-end', gap: 1 },
   offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
-  offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  offerStats: { color: '#bcd2db', fontSize: 11, marginTop: 4 },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
   // OTA 030 — steal button sits at the right edge of every BUY row.
   // Darker tone than BUY so the player reads it as the risky path.
   stealBtn: {

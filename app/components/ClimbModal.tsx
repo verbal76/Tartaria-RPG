@@ -9,6 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { displayStaminaMax } from '../engine/equipment';
 
 interface Props {
   visible: boolean;
@@ -45,7 +46,7 @@ export function ClimbModal({
 }: Props) {
   const tapTo = (target: string) => onSubmit(target);
   const stamina = useGameStore((s) => s.player?.stamina ?? 0);
-  const staminaMax = useGameStore((s) => s.player?.staminaMax ?? 0);
+  const staminaMax = useGameStore((s) => (s.player ? displayStaminaMax(s.player) : 0));
 
   return (
     <Modal
@@ -137,35 +138,35 @@ export function ClimbModal({
 
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  card: { width: '100%', maxWidth: 380, backgroundColor: '#13110f', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 14 },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', paddingVertical: 20, fontSize: 13 },
+  card: { width: '100%', maxWidth: 380, backgroundColor: '#0e1618', borderColor: '#6ab0c9', borderWidth: 1, borderRadius: 4, padding: 14 },
+  title: { color: '#6ab0c9', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  rule: { height: 1, backgroundColor: '#2b3a3e', marginTop: 6, marginBottom: 10 },
+  body: { color: '#d6e4e8', fontSize: 13, lineHeight: 18, marginBottom: 10 },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', paddingVertical: 20, fontSize: 13 },
   scroll: { maxHeight: 280 },
   scrollContent: { paddingVertical: 2 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 6,
   },
-  rowPressed: { borderColor: '#c9a86a', opacity: 0.85 },
-  rowCleared: { backgroundColor: '#13110f', borderColor: '#2a2622' },
-  rowName: { color: '#e6d8b3', fontSize: 14, flex: 1, marginRight: 8 },
-  rowNameCleared: { color: '#c9a86a', fontStyle: 'italic' },
+  rowPressed: { borderColor: '#6ab0c9', opacity: 0.85 },
+  rowCleared: { backgroundColor: '#0e1618', borderColor: '#2a2622' },
+  rowName: { color: '#d6e4e8', fontSize: 14, flex: 1, marginRight: 8 },
+  rowNameCleared: { color: '#6ab0c9', fontStyle: 'italic' },
   rowHeight: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
-  rowHeightCleared: { color: '#c9a86a' },
+  rowHeightCleared: { color: '#6ab0c9' },
   staminaNote: { color: '#8a7a52', fontSize: 12, marginTop: 10, textAlign: 'center', letterSpacing: 1 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
-  btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnNeutral: { backgroundColor: 'transparent', borderColor: '#2b3a3e' },
+  btnTextNeutral: { color: '#bcd2db', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

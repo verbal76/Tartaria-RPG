@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
-import racesData from '../data/races/races.json';
+import { getRaces } from '../engine/character';
 import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { coatedDisplayName } from '../engine/weaponCoating';
-import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, displayStaminaMax } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
+import { getCorruptionName } from '../engine/contentPack';
 import { findFactionQuestById } from '../engine/factionQuests';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
@@ -79,7 +80,7 @@ const coresBadgeStyle = StyleSheet.create({
   badge: { color: '#d8b46a', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
 });
 
-interface Props { player: PlayerCharacter; }
+interface Props { player: PlayerCharacter; fill?: boolean; }
 
 // OTA-632 — health-tinted player card. The HP readout is a tiny number in the
 // top-left card; a playtester died (broken-ladder fall) partly because it's so
@@ -126,8 +127,8 @@ const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
 const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
-export function StatsPanel({ player }: Props) {
-  const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
+export function StatsPanel({ player, fill }: Props) {
+  const race = getRaces().find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
   const hpFrac = player.hpMax > 0 ? player.hp / player.hpMax : 1;
@@ -215,10 +216,10 @@ export function StatsPanel({ player }: Props) {
   // OTA-145 — golem name displays under the dog name, right-aligned.
   // Playtester: "the golem.name.shluld be under the dogs in the
   // character box."
-  const golemShows = !!player.golem && player.golem.hp > 0;
+  const golemShows = !!player.sidekick && player.sidekick.hp > 0;
 
   return (
-    <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
+    <Animated.View style={[styles.container, fill ? styles.fill : null, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
           behind the card content so the text stays readable. */}
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
@@ -230,20 +231,20 @@ export function StatsPanel({ player }: Props) {
           </Text>
         ) : null}
       </View>
-      {golemShows && player.golem ? (
+      {golemShows && player.sidekick ? (
         <View style={styles.golemRow}>
           <Text style={styles.golemName} numberOfLines={1}>
-            {player.golem.name} ({player.golem.hp}/{player.golem.hpMax})
+            {player.sidekick.name} ({player.sidekick.hp}/{player.sidekick.hpMax})
           </Text>
         </View>
       ) : null}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
-        <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
+        <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
-        <Stat label="Corr" value={`${player.corruption}`} />
+        <Stat label={getCorruptionName().slice(0, 4)} value={`${player.corruption}`} />
       </View>
       <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
@@ -303,9 +304,11 @@ function Stat({ label, value, valueColor }: { label: string; value: string; valu
 }
 
 const styles = StyleSheet.create({
+  // engine_Dev — combat arena: let the card fill the tall column so the box runs long.
+  fill: { flex: 1 },
   container: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     padding: 8,
     borderRadius: 4,
@@ -317,24 +320,24 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: HP_PULSE_COLOR,
   },
-  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', flexShrink: 1 },
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  dogName: { color: '#6ab0c9', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
   golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
-  subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
-  equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
+  subline: { color: '#6c8088', fontSize: 10, marginBottom: 2 },
+  equipped: { color: '#6ab0c9', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  tapHint: { color: '#7a705c', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
+  tapHint: { color: '#6c8088', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },
-  label: { color: '#7a705c', fontSize: 9 },
-  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  label: { color: '#6c8088', fontSize: 9 },
+  value: { color: '#d6e4e8', fontSize: 12, fontWeight: '600' },
 });

@@ -20,15 +20,37 @@
 // average, dense enough to be interesting without becoming theme-park.
 
 import data from '../data/world/wasteland_encounters.json';
-import type { Location } from './types';
+import type { Location, Rarity } from './types';
+import { getWastelandOverride, getGenericWasteland } from './contentPack';
 
+/** engine_Dev — wasteland loot. For encounter-ONLY items (not in any table), the
+ *  optional stat fields give them real stats inline instead of relying on the
+ *  name-based backfill: rarity, a description, equip-time statBonuses, and a
+ *  baseDurability for gear. kind broadened to weapon/armor/relic. */
+// engine_Dev — 'currency' grants TC instead of an item (the rolled min..max is the
+// amount). All other kinds grant an inventory item.
+export type WastelandLootKind = 'consumable' | 'misc' | 'relic' | 'weapon' | 'armor' | 'currency';
 export interface WastelandLootEntry {
   name: string;
   weight: number;
   min: number;
   max: number;
-  kind: 'consumable' | 'misc';
+  kind: WastelandLootKind;
   tags: string[];
+  rarity?: Rarity;
+  description?: string;
+  statBonuses?: { stat: string; amount: number }[];
+  baseDurability?: number;
+}
+export interface ResolvedWastelandLoot {
+  name: string;
+  quantity: number;
+  kind: WastelandLootKind;
+  tags: string[];
+  rarity?: Rarity;
+  description?: string;
+  statBonuses?: { stat: string; amount: number }[];
+  baseDurability?: number;
 }
 
 export type WastelandEncounterType = 'treasure' | 'npc' | 'skirmish' | 'mini_dungeon' | 'fusion_bench';
@@ -38,7 +60,11 @@ export interface WastelandArchetype {
   /** Selection weight among archetypes that match the current biome. */
   weight: number;
   /** Location tags the archetype is valid in. ANY-match — if a single
-   *  tag is in the location's tags array, the archetype is eligible. */
+   *  tag is in the location's tags array, the archetype is eligible.
+   *  engine_Dev — a wildcard matcher ("any" or "*") makes the archetype
+   *  eligible at EVERY location during travel (in addition to any tagged
+   *  ones), so an author can have encounters that hit anywhere on the map
+   *  as well as ones targeted to specific biomes/sectors. */
   matchers: string[];
   /** Scene narration template. `{enemy}` substitution for skirmishes. */
   narration: string;
@@ -67,19 +93,34 @@ export interface WastelandArchetype {
 
 // Filter out the "_description" key from the JSON.
 const RAW = data as Record<string, unknown>;
-const ARCHETYPES: Record<string, WastelandArchetype> = Object.fromEntries(
-  Object.entries(RAW).filter(
-    (entry): entry is [string, WastelandArchetype] =>
-      typeof entry[1] === 'object' && entry[1] !== null && 'type' in (entry[1] as object),
-  ),
-);
+function archetypesFrom(raw: Record<string, unknown>): Record<string, WastelandArchetype> {
+  return Object.fromEntries(
+    Object.entries(raw).filter(
+      (entry): entry is [string, WastelandArchetype] =>
+        typeof entry[1] === 'object' && entry[1] !== null && 'type' in (entry[1] as object),
+    ),
+  );
+}
+const ARCHETYPES: Record<string, WastelandArchetype> = archetypesFrom(RAW);
+// engine_Dev — the LIVE archetypes: an uploaded 'wasteland' override replaces the
+// built-in Tartaria set wholesale. Resolved at runtime (not module load) so an
+// upload mirrored after boot is honored.
+function getArchetypes(): Record<string, WastelandArchetype> {
+  // author override → installed GENERIC default → built-in Tartaria set.
+  const ov = getWastelandOverride() ?? getGenericWasteland();
+  if (ov) {
+    const built = archetypesFrom(ov);
+    if (Object.keys(built).length > 0) return built;
+  }
+  return ARCHETYPES;
+}
 
 export interface WastelandEncounter {
   archetypeId: string;
   type: WastelandEncounterType;
   narration: string;
   /** Resolved loot entry (rolled) — null when no loot pool. */
-  loot: { name: string; quantity: number; kind: 'consumable' | 'misc'; tags: string[] } | null;
+  loot: ResolvedWastelandLoot | null;
   /** Resolved NPC line (rolled) — null when no dialogue pool. */
   npcLine: string | null;
   /** Optional follow-up narration appended on a separate log entry. */
@@ -151,7 +192,7 @@ export function pickWastelandEncounter(
   // The player was PROMISED this; we deliver it on the first travel
   // step, not the next eligible roll.
   if (opts.forceArchetype) {
-    const archetype = ARCHETYPES[opts.forceArchetype];
+    const archetype = getArchetypes()[opts.forceArchetype];
     if (archetype) {
       const enemyName = archetype.type === 'skirmish' && archetype.enemyPool && archetype.enemyPool.length > 0
         ? archetype.enemyPool[Math.floor(rng() * archetype.enemyPool.length)] ?? null
@@ -186,9 +227,12 @@ export function pickWastelandEncounter(
 
   // Filter archetypes whose matchers overlap with the location's tags.
   const locTags = new Set((location.tags ?? []).map((t) => t.toLowerCase()));
+  // engine_Dev — a matcher of "any" / "*" is a wildcard: the archetype is eligible
+  // at every location (random-anywhere), on top of the tag-targeted archetypes.
+  const isWildcard = (m: string): boolean => m === '*' || m.toLowerCase() === 'any';
   const eligible: Array<{ id: string; archetype: WastelandArchetype }> = [];
-  for (const [id, archetype] of Object.entries(ARCHETYPES)) {
-    if (archetype.matchers.some((m) => locTags.has(m.toLowerCase()))) {
+  for (const [id, archetype] of Object.entries(getArchetypes())) {
+    if (archetype.matchers.some((m) => isWildcard(m) || locTags.has(m.toLowerCase()))) {
       eligible.push({ id, archetype });
     }
   }
@@ -276,7 +320,7 @@ export function pickWastelandEncounter(
 function rollLoot(
   pool: WastelandLootEntry[],
   rng: () => number,
-): { name: string; quantity: number; kind: 'consumable' | 'misc'; tags: string[] } | null {
+): ResolvedWastelandLoot | null {
   if (pool.length === 0) return null;
   const totalWeight = pool.reduce((acc, p) => acc + p.weight, 0);
   if (totalWeight <= 0) return null;
@@ -289,7 +333,11 @@ function rollLoot(
   }
   const span = picked.max - picked.min;
   const quantity = picked.min + (span > 0 ? Math.floor(rng() * (span + 1)) : 0);
-  return { name: picked.name, quantity, kind: picked.kind, tags: picked.tags };
+  return {
+    name: picked.name, quantity, kind: picked.kind, tags: picked.tags,
+    rarity: picked.rarity, description: picked.description,
+    statBonuses: picked.statBonuses, baseDurability: picked.baseDurability,
+  };
 }
 
 /** Exposed for tests. */

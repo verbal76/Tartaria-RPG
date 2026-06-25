@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Tartaria Realms HAL",
+    "name": "RPG Engine (dev)",
     "slug": "tartaria-",
     "owner": "hot-attic-games",
     "version": "2.4.1",
@@ -15,7 +15,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001",
+      "bundleIdentifier": "com.hotatticgames.tartarprim.engine",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "Tartaria Realms does not access your photo library.",
@@ -29,7 +29,7 @@
       }
     },
     "android": {
-      "package": "com.hotatticgames.tartarprim.hal2001",
+      "package": "com.hotatticgames.tartarprim.engine",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0a0908"
@@ -69,7 +69,7 @@
     "updates": {
       "url": "https://u.expo.dev/af723f5e-e446-4296-aa6e-f1d4a4fbe82a",
       "requestHeaders": {
-        "expo-channel-name": "hal2001"
+        "expo-channel-name": "engine_Dev"
       },
       "checkAutomatically": "ON_LOAD"
     },

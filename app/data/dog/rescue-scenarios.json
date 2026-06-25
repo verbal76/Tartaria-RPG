@@ -1,0 +1,53 @@
+{
+  "_comment": "engine_Dev — Dog-rescue scenarios (the 'dog hook'). The MECHANIC stays in the engine (one dog per save; tap a hookNoun on an investigate/attack/approach intent -> a faction-neutral captor spawns; kill it -> name/breed onboarding). Only the WORDING lives here so authors can reskin it. Each scenario is keyed by the CAPTOR's faction: when the player IS that faction, the engine falls back to the unaligned captor (the scenario whose captorFactionId is null) so you never fight your own. Tokens: {captorName} in introLine resolves to this row's captorName.",
+  "scenarios": [
+    {
+      "id": "smelter",
+      "hookNouns": ["cage", "chain", "anvil post", "smelter", "forge ruin"],
+      "captorFactionId": "reclaimers",
+      "captorName": "Reclaimer Deserter",
+      "defaultBreed": "mongrel",
+      "startingProfile": "mongrel",
+      "archetypes": ["ruin", "forge", "industrial", "wasteland"],
+      "rumorVenue": "a smelter ruin",
+      "introLine": "You step into the smelter's ruin. The {captorName} is here, working a chain that ends in a dog's collar. {captorName} sees you. \"Walk on. This one's not yours.\"",
+      "victoryLine": "The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this."
+    },
+    {
+      "id": "wagon",
+      "hookNouns": ["wagon", "wagon wheel", "wheel", "roadside camp", "overturned wagon"],
+      "captorFactionId": "mud_monarchs",
+      "captorName": "Mud Monarch Enforcer",
+      "defaultBreed": "shepherd",
+      "startingProfile": "shepherd",
+      "archetypes": ["road", "wasteland", "camp"],
+      "rumorVenue": "an overturned wagon at a roadside camp",
+      "introLine": "The overturned wagon shifts as you approach. The {captorName} steps out from behind it, a leash in one hand, the shepherd lashed to the wheel snarling against the cord. \"Walk on, stranger. Or stay, and lose.\"",
+      "victoryLine": "The enforcer breathes wet, then not at all. The shepherd lashed to the wheel finally stops growling at you — starts watching you instead. They were keeping the dog illegally. No faction reckoning falls on you for this."
+    },
+    {
+      "id": "cellar",
+      "hookNouns": ["cellar door", "cellar", "trapdoor", "buried structure", "hatch"],
+      "captorFactionId": "aetherborn",
+      "captorName": "Aetherborn Scavenger",
+      "defaultBreed": "hound",
+      "startingProfile": "hound",
+      "archetypes": ["ruin", "dungeon", "buried", "wasteland"],
+      "rumorVenue": "a cellar door under a buried structure",
+      "introLine": "The cellar door clatters open under your hand. Up out of the dark comes the {captorName}, lantern raised, hound chained at their heel. \"Down door's closed to you. The dog stays.\"",
+      "victoryLine": "The scavenger crumples into the dark below. Up through the cellar floor comes a hound, lean and quiet, that pauses to look you over before it commits. They were keeping the dog illegally. No faction reckoning falls on you for this."
+    },
+    {
+      "id": "snare",
+      "hookNouns": ["snare pit", "snare", "pit", "trapper camp", "trap"],
+      "captorFactionId": null,
+      "captorName": "Unaligned Poacher",
+      "defaultBreed": "mutt",
+      "startingProfile": "mutt",
+      "archetypes": ["wilderness", "wasteland", "camp"],
+      "rumorVenue": "a snare pit at a trapper camp",
+      "introLine": "You crest the snare pit. The {captorName} is checking their lines — and one line holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. \"That's my catch. Walk.\"",
+      "victoryLine": "The poacher folds over the line of their own snare. The mutt in the pit stops snarling, settles. They were keeping the dog illegally. No faction reckoning falls on you for this."
+    }
+  ]
+}

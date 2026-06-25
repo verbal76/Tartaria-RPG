@@ -1,9 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { getCrucibleName } from '../engine/contentPack';
 import {
   CATEGORY_COLORS,
-  CATEGORY_LABEL,
+  getCategoryLabel,
   CATEGORY_ORDER,
   groupInventoryByCategory,
 } from '../components/InventoryCategorize';
@@ -11,6 +12,9 @@ import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types'
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
+import { isBuiltInDefaultItem } from '../engine/builtinCatalogNames';
+import { TEMPLATE_FLAG_COLOR } from '../engine/templatePlaceholders';
+import { useContentPackStore } from '../state/contentPackStore';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -21,7 +25,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon } from '../engine/golems';
+import { isSidekickRepairPart, isSidekickSubstitutePart, isSidekickWeapon } from '../engine/sidekicks';
 import { isQuestLockedItem } from '../engine/questItems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
@@ -130,6 +134,8 @@ export function InventoryScreen() {
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
   const applyCoating = useGameStore((s) => s.applyCoating);
+  const drinkCoating = useGameStore((s) => s.drinkCoating);
+  const applyCoatingToArmor = useGameStore((s) => s.applyCoatingToArmor);
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
   // the equip modal entirely when pouchFilterActive — a single tap
   // on the eligible item stows it and clears the filter.
@@ -180,6 +186,7 @@ export function InventoryScreen() {
   // the second modal lists the coatable weapons in the pack as
   // pick buttons. Cleared on apply or cancel.
   const [coatTarget, setCoatTarget] = useState<InventoryItem | null>(null);
+  const [armorCoatTarget, setArmorCoatTarget] = useState<InventoryItem | null>(null);
 
   if (!player) {
     return (
@@ -409,14 +416,46 @@ export function InventoryScreen() {
     // and the modal's result body shows the combined delta. Clamp to the
     // current stack size in case the inventory shifted while the modal was
     // open (e.g., an autosave dock event).
+    const itemName = pending.item.name;
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
+    const isBulk = reps > 1;
+    // Stop the moment a scrap makes no progress. scrapInventoryItem refuses
+    // (without consuming anything) when the resolved stack is non-scrappable
+    // stock material — without this guard a "Scrap All (22)" on such a stack
+    // fired the "Nothing here to break down" refusal 22 times in a burst
+    // (playtest log). Track the target's total quantity; if an iteration
+    // doesn't reduce it, the call was a no-op/refusal — bail after the first.
+    const nameLc = itemName.toLowerCase();
+    const qtyOf = () => (useGameStore.getState().player?.inventory ?? [])
+      .filter((i) => i.name.toLowerCase() === nameLc)
+      .reduce((n, i) => n + (i.quantity ?? 0), 0);
+    const startQty = qtyOf();
+    let prevQty = startQty;
     for (let i = 0; i < reps; i++) {
-      scrapInventoryItem(pending.item.name);
+      // Bulk scrap runs SILENT — each unit's per-item flavor line is suppressed
+      // so a stack of 20 doesn't spam 20 lines; one aggregated summary is emitted
+      // below. A single scrap keeps its normal per-item narration.
+      scrapInventoryItem(itemName, { silent: isBulk });
+      const nowQty = qtyOf();
+      if (nowQty >= prevQty) break; // refusal / no-op — don't hammer the same line
+      prevQty = nowQty;
     }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);
     setScrapResult(delta);
+    // Bulk summary — one flavored line that NOTES it was a bulk scrap, plus the
+    // combined haul, in place of the suppressed per-unit lines.
+    const consumed = startQty - qtyOf();
+    if (isBulk && consumed > 0) {
+      const haul = delta.length > 0
+        ? delta.map((d) => (d.quantity > 1 ? `${d.name} ×${d.quantity}` : d.name)).join(', ')
+        : 'nothing usable';
+      useGameStore.getState().appendLog(
+        'world',
+        `✦ Bulk scrap — you tear through ${consumed} ${itemName} in one go. That was a lot to break down, and the whole pile gives up: ${haul}.`,
+      );
+    }
   };
 
   // Build the modal's button list based on the item's state.
@@ -574,14 +613,14 @@ export function InventoryScreen() {
     // of the parts it's MADE of, offer a one-tap repair (routes through the same
     // `feed golem <item>` engine path). Mirrors the dog feed affordance.
     {
-      const golem = player?.golem;
+      const golem = player?.sidekick;
       const golemActive = !!golem && golem.hp > 0;
       // arb122 — Heal button shows for a full fuel PART or an element-matched
       // SUBSTITUTE material (both route through `feed golem <item>`; the engine
       // applies the right full / rarity-scaled heal).
       const isGolemFeedable = !!golem && (
-        isGolemRepairPart(golem.kind, pending.item.name)
-        || isGolemSubstitutePart(golem.kind, pending.item)
+        isSidekickRepairPart(golem.kind, pending.item.name)
+        || isSidekickSubstitutePart(golem.kind, pending.item)
       );
       if (golemActive && isGolemFeedable) {
         // arb111 — keep the Heal button visible even when the golem is FULL (player
@@ -603,7 +642,7 @@ export function InventoryScreen() {
       // wieldable by any golem), offer a one-tap arm (routes through `arm golem`).
       if (golemActive) {
         const cat = findWeaponByName(pending.item.name);
-        if (cat && isGolemWeapon(cat.tags)) {
+        if (cat && isSidekickWeapon(cat.tags)) {
           buttons.push({
             label: `Arm ${golem.name}`,
             onPress: () => {
@@ -627,6 +666,27 @@ export function InventoryScreen() {
           const coat = pending.item;
           closeModal();
           setCoatTarget(coat);
+        },
+        tone: 'primary',
+      });
+      // engine_Dev — DRINK the vial to resist its damage type for the rest of the
+      // fight. The type is the coating-kind tag the vial carries.
+      const coatType = (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
+      buttons.push({
+        label: coatType ? `Drink (resist ${coatType})` : 'Drink (resist its type)',
+        onPress: () => {
+          const id = pending.item.id;
+          closeModal();
+          drinkCoating(id);
+        },
+        tone: 'primary',
+      });
+      buttons.push({
+        label: coatType ? `Apply to armor (+${coatType} resist)` : 'Apply to armor',
+        onPress: () => {
+          const coat = pending.item;
+          closeModal();
+          setArmorCoatTarget(coat);
         },
         tone: 'primary',
       });
@@ -759,6 +819,37 @@ export function InventoryScreen() {
     coatPickerButtons.push({ label: 'Cancel', onPress: () => setCoatTarget(null), tone: 'neutral' });
   }
 
+  // engine_Dev — ARMOR-coating picker. Mirror of the weapon picker: lists the
+  // player's armor pieces; applying adds a permanent resist to that piece.
+  let armorPickerBody: string | undefined;
+  let armorPickerButtons: Array<{ label: string; onPress: () => void; tone: 'primary' | 'neutral' | 'destructive' }> = [];
+  if (armorCoatTarget) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+      const coatType = (armorCoatTarget.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t)) ?? 'this';
+      const armorItems = (player.inventory ?? []).filter((i: InventoryItem) => i.kind === 'armor' || i.uniqueStats?.kind === 'armor' || !!findArmorByName(i.name));
+      if (armorItems.length === 0) {
+        armorPickerBody = 'You have no armor to work the vial into. Pick up a piece first.';
+      } else {
+        armorPickerBody = `Work the ${armorCoatTarget.name.toLowerCase()} into which armor? It gains permanent ${coatType} resist until the piece is lost or destroyed.`;
+        armorPickerButtons = armorItems.map((a: InventoryItem) => ({
+          label: (a.addedResists ?? []).map((r) => r.toLowerCase()).includes(coatType.toLowerCase())
+            ? `${a.name} — already resists ${coatType}`
+            : `${a.name}${(a.addedResists ?? []).length ? ` (+${(a.addedResists ?? []).join('/')})` : ''}`,
+          onPress: () => {
+            applyCoatingToArmor(armorCoatTarget.id, a.id);
+            setArmorCoatTarget(null);
+          },
+          tone: 'primary' as const,
+        }));
+      }
+    } catch {
+      armorPickerBody = 'Could not read your armor just now.';
+    }
+    armorPickerButtons.push({ label: 'Cancel', onPress: () => setArmorCoatTarget(null), tone: 'neutral' });
+  }
+
   // OTA-485 — companion-item background stripes. Items the player can FEED or USE
   // ON a companion get faint diagonal hatching in that companion's signature colour
   // (the same hue its name renders in): GOLD for the dog, PURPLE for the golem — so
@@ -769,7 +860,7 @@ export function InventoryScreen() {
   const dogActiveForStripe = !!player.dog
     && player.dog.status !== 'abandoned'
     && player.dog.status !== 'dead';
-  const golemForStripe = player.golem;
+  const golemForStripe = player.sidekick;
   const golemActiveForStripe = !!golemForStripe && golemForStripe.hp > 0;
   const companionStripeColor = (item: InventoryItem): string | null => {
     if (dogActiveForStripe && (item.kind === 'consumable' || item.kind === 'dog_armor')) {
@@ -778,10 +869,10 @@ export function InventoryScreen() {
     if (golemActiveForStripe && golemForStripe) {
       // Full fuel part OR an element-matched SUBSTITUTE material (arb122) — both
       // feed THIS golem (kind-specific, so it never lights for the wrong golem).
-      if (isGolemRepairPart(golemForStripe.kind, item.name)) return COMPANION_STRIPE_GOLEM;
-      if (isGolemSubstitutePart(golemForStripe.kind, item)) return COMPANION_STRIPE_GOLEM;
+      if (isSidekickRepairPart(golemForStripe.kind, item.name)) return COMPANION_STRIPE_GOLEM;
+      if (isSidekickSubstitutePart(golemForStripe.kind, item)) return COMPANION_STRIPE_GOLEM;
       const w = findWeaponByName(item.name);
-      if (w && isGolemWeapon(w.tags)) return COMPANION_STRIPE_GOLEM;
+      if (w && isSidekickWeapon(w.tags)) return COMPANION_STRIPE_GOLEM;
     }
     return null;
   };
@@ -881,7 +972,7 @@ export function InventoryScreen() {
                     {collapsed ? '▾' : '▴'}
                   </Text>
                   <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>
-                    {CATEGORY_LABEL[cat].toUpperCase()}
+                    {getCategoryLabel(cat).toUpperCase()}
                   </Text>
                 </View>
                 <Text style={styles.sectionCount}>
@@ -910,12 +1001,12 @@ export function InventoryScreen() {
           );
         })}
         {player.inventory.length === 0 && (
-          <Text style={styles.empty}>Your pack is empty. Tartaria has not given you anything yet.</Text>
+          <Text style={styles.empty}>Your pack is empty. You haven’t picked anything up yet.</Text>
         )}
         {/* arb-fix — distinct empty copy when the FUSABLE filter hides
             everything, so it doesn't read as a totally empty pack. */}
         {player.inventory.length > 0 && sortKey === 'fusionable' && sorted.length === 0 && (
-          <Text style={styles.empty}>Nothing in your pack qualifies for the Crucible yet. Salvage-grade engine-named items and faction gear can be fused.</Text>
+          <Text style={styles.empty}>Nothing in your pack qualifies for the {getCrucibleName()} yet. Salvage-grade engine-named items and faction gear can be fused.</Text>
         )}
       </ScrollView>
 
@@ -923,7 +1014,7 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => (
           <View key={cat} style={styles.legendItem}>
             <View style={[styles.legendSwatch, { backgroundColor: CATEGORY_COLORS[cat] }]} />
-            <Text style={[styles.legendText, { color: legendTextColor }]}>{CATEGORY_LABEL[cat]}</Text>
+            <Text style={[styles.legendText, { color: legendTextColor }]}>{getCategoryLabel(cat)}</Text>
           </View>
         ))}
       </View>
@@ -978,6 +1069,15 @@ export function InventoryScreen() {
         body={coatPickerBody}
         buttons={coatPickerButtons}
         onRequestClose={() => setCoatTarget(null)}
+      />
+
+      {/* engine_Dev — armor-coating picker: applies a permanent resist to a piece. */}
+      <BrandedModal
+        visible={armorCoatTarget !== null}
+        title={armorCoatTarget ? `Apply ${armorCoatTarget.name} to armor` : ''}
+        body={armorPickerBody}
+        buttons={armorPickerButtons}
+        onRequestClose={() => setArmorCoatTarget(null)}
       />
     </View>
   );
@@ -1059,19 +1159,19 @@ const pouchStyles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     paddingVertical: 8,
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
   },
-  title: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  title: { color: '#6ab0c9', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
+  hint: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6 },
   slot: { flex: 1 },
   slotFilled: {
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 3,
     backgroundColor: '#26201a',
@@ -1088,17 +1188,17 @@ const pouchStyles = StyleSheet.create({
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     alignItems: 'center',
   },
   slotEmptyActive: {
     backgroundColor: '#1a2614',
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
   },
-  slotName: { color: '#e6d8b3', fontSize: 11, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 9, marginTop: 2 },
+  slotName: { color: '#d6e4e8', fontSize: 11, fontWeight: '700' },
+  slotAction: { color: '#6c8088', fontSize: 9, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 10, fontWeight: '600', letterSpacing: 0.5 },
-  slotEmptyTextActive: { color: '#c9a86a' },
+  slotEmptyTextActive: { color: '#6ab0c9' },
 });
 
 // arb110 — BANDOLIER banner. The throwables counterpart to the tool pouch: five
@@ -1169,7 +1269,7 @@ const bandolierStyles = StyleSheet.create({
     borderRadius: 4,
   },
   title: { color: '#e07a5f', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
-  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  hint: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
   row: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   slot: { flexBasis: '18%', flexGrow: 1 },
   slotFilled: {
@@ -1186,18 +1286,18 @@ const bandolierStyles = StyleSheet.create({
     borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     alignItems: 'center',
   },
   slotEmptyActive: { backgroundColor: '#2a1a14', borderColor: '#e07a5f' },
-  slotName: { color: '#e6d8b3', fontSize: 10, fontWeight: '700' },
-  slotAction: { color: '#7a705c', fontSize: 8, marginTop: 2 },
+  slotName: { color: '#d6e4e8', fontSize: 10, fontWeight: '700' },
+  slotAction: { color: '#6c8088', fontSize: 8, marginTop: 2 },
   slotEmptyText: { color: '#9ec96a', fontSize: 9, fontWeight: '600', letterSpacing: 0.3, textAlign: 'center' },
   slotEmptyTextActive: { color: '#e07a5f' },
 });
 
 // OTA-485 — companion signature colours, keyed to the hues each name renders in
-// (StatsPanel: dogName #c9a86a gold, golemName #9888a8 purple).
+// (StatsPanel: dogName #6ab0c9 gold, golemName #9888a8 purple).
 // OTA-489 — player asked to "keep the translucence but bump the saturation": same
 // gold/purple HUES, richer chroma so they read clearly as gold/purple at the
 // unchanged ~0.2 stripe opacity (the name-label hues stay as-is; these brighter
@@ -1301,10 +1401,12 @@ function ItemRow({
           {isInferredInventoryItem(item) && (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           )}
-          <Text style={styles.rowName} numberOfLines={1}>
+          <Text style={[styles.rowName, useContentPackStore.getState().devMode && isBuiltInDefaultItem(item.name) && { color: TEMPLATE_FLAG_COLOR }]} numberOfLines={1}>
             {/* OTA-360 — a coated weapon shows its coated name
                 ("Corrupted Battle Axe"); the underlying name is
                 unchanged for stat lookup. */}
+            {/* engine_Dev — a built-in DEFAULT item name renders PINK: it's un-authored
+                template material the author should replace with their own. */}
             {item.coating ? `${item.coating.label} ${item.name}` : item.name}
           </Text>
           <Text style={styles.rowQty}>×{item.quantity}</Text>
@@ -1406,7 +1508,7 @@ function rarityHexColor(rarity: string | null | undefined): string {
     case 'Legendary': return '#e07a5f';
     case 'Rare': return '#b88ce0';
     case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a'; // Common / undefined
+    default: return '#6ab0c9'; // Common / undefined
   }
 }
 
@@ -1421,8 +1523,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 14,
@@ -1430,9 +1532,9 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  tc: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
+  backText: { color: '#6ab0c9', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  title: { color: '#6ab0c9', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  tc: { color: '#6ab0c9', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
   section: { marginBottom: 12 },
@@ -1457,8 +1559,8 @@ const styles = StyleSheet.create({
   sectionCount: { color: '#9a8e74', fontSize: 11 },
   row: {
     flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     marginBottom: 4,
@@ -1478,11 +1580,11 @@ const styles = StyleSheet.create({
   rowStripe: { width: 4 },
   rowBody: { flex: 1, padding: 8 },
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  rowName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1 },
+  rowName: { color: '#d6e4e8', fontSize: 14, fontWeight: '600', flex: 1 },
   rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
-  rowQty: { color: '#cdbf99', fontSize: 12 },
+  rowQty: { color: '#bcd2db', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
-  rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  rowMeta: { color: '#6c8088', fontSize: 10, letterSpacing: 1 },
   // arb87 — per-item stat line (AC / resists / bonuses / restores).
   rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
   // arb87 — "slot already worn" red ✗ (combat-miss red).
@@ -1495,16 +1597,16 @@ const styles = StyleSheet.create({
   rowDamage: { color: '#9ec96a' },
   // OTA-120 Phase 5 — [fits dog] / [treat] tag styling. Amber so they
   // stand out from the grey rarity / durability metadata.
-  rowDogTag: { color: '#c9a86a', fontWeight: '700' },
+  rowDogTag: { color: '#6ab0c9', fontWeight: '700' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
   // OTA-360 — weapon-coating chip. Sickly green-violet so it reads as
   // an applied toxin distinct from the green damage-dice chip.
   rowCoating: { color: '#b08fd4', fontWeight: '700' },
-  rowPouch: { color: '#c9a86a', fontWeight: '700' },
+  rowPouch: { color: '#6ab0c9', fontWeight: '700' },
   rowBandolier: { color: '#e07a5f', fontWeight: '700' },
-  rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
-  empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
+  rowEquipped: { color: '#6ab0c9', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  rowEquippable: { color: '#6c8088', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
+  empty: { color: '#6c8088', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
   // OTA-269 — callout shown above the inventory list when the player
   // has tapped an empty pouch slot. Tan accent bar + CANCEL chip so
   // the player always has a clear exit from the filter mode.
@@ -1513,33 +1615,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#1a2614',
-    borderColor: '#c9a86a',
+    borderColor: '#6ab0c9',
     borderLeftWidth: 3,
     borderRadius: 3,
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginBottom: 8,
   },
-  pouchFilterText: { color: '#cdbf99', fontSize: 12, flexShrink: 1, flexGrow: 1 },
+  pouchFilterText: { color: '#bcd2db', fontSize: 12, flexShrink: 1, flexGrow: 1 },
   pouchFilterCancel: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderColor: '#3a342c',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 3,
   },
-  pouchFilterCancelText: { color: '#cdbf99', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  pouchFilterCancelText: { color: '#bcd2db', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     paddingVertical: 8,
-    borderTopColor: '#3a342c',
+    borderTopColor: '#2b3a3e',
     borderTopWidth: 1,
     marginTop: 4,
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendSwatch: { width: 10, height: 10, borderRadius: 2 },
-  legendText: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  legendText: { color: '#6c8088', fontSize: 10, letterSpacing: 1 },
+  placeholder: { color: '#6c8088', textAlign: 'center', marginTop: 80 },
 });

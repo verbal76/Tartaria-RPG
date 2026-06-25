@@ -23,9 +23,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { BrandedModal } from './BrandedModal';
-import factionsData from '../data/factions/factions.json';
-import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
+import { getRaces, getFactions } from '../engine/character';
+import { resolveTable, hasTableOverride, getNarratorName } from '../engine/contentPack';
 import timelineData from '../data/events/timeline.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
@@ -34,6 +34,11 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../e
 type Section = 'races' | 'factions' | 'places' | 'timeline';
 
 export function LoreCodexBody() {
+  // engine_Dev — drop the built-in-only Timeline tab once a custom game is loaded.
+  const customGame = hasTableOverride('locations') || hasTableOverride('factions');
+  const SECTIONS: Section[] = customGame
+    ? ['races', 'factions', 'places']
+    : ['races', 'factions', 'places', 'timeline'];
   const [section, setSection] = useState<Section>('races');
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
@@ -74,7 +79,11 @@ export function LoreCodexBody() {
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.tabs}>
-        {(['races', 'factions', 'places', 'timeline'] as Section[]).map((s) => (
+        {/* engine_Dev — the Timeline is the one section with no upload path yet, so
+            it still holds built-in (Tartaria) events. Hide it once a custom game is
+            loaded (locations/factions overridden) so a re-skin never shows the
+            built-in timeline. Races/factions/places are all data-driven. */}
+        {SECTIONS.map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
@@ -86,7 +95,7 @@ export function LoreCodexBody() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 24 }}>
-        {section === 'races' && (racesData as Race[]).map((r) => {
+        {section === 'races' && (getRaces() as Race[]).map((r) => {
           const statBumps = r.racialStatBonuses ?? {};
           const statBumpStrs = Object.entries(statBumps)
             .filter(([, v]) => (v ?? 0) !== 0)
@@ -107,7 +116,7 @@ export function LoreCodexBody() {
             </View>
           );
         })}
-        {section === 'factions' && (factionsData as Faction[]).map((f) => (
+        {section === 'factions' && (getFactions() as Faction[]).map((f) => (
           <View key={f.id} style={styles.entry}>
             <Text style={styles.name}>{f.name}</Text>
             <Text style={styles.subtitle}>{f.subtitle}</Text>
@@ -117,7 +126,7 @@ export function LoreCodexBody() {
             <Text style={styles.meta}>Join: {f.joinRequirements}</Text>
           </View>
         ))}
-        {section === 'places' && (locationsData as Location[]).map((l) => {
+        {section === 'places' && (resolveTable('locations', locationsData as Location[]) as Location[]).map((l) => {
           const atHere = canPlanRoute && l.id === here;
           const hidden = isHiddenLocation(l.id) && !isLocationRevealed(l.id, discoveredIds);
           const content = (
@@ -196,7 +205,7 @@ export function LoreCodexBody() {
         visible={hubRefusalDest !== null}
         title="Leave the outpost first"
         body={hubRefusalDest
-          ? `The Arbiter can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
+          ? `The ${getNarratorName()} can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
           : undefined}
         buttons={[
           {
@@ -220,18 +229,18 @@ export function LoreCodexBody() {
 const styles = StyleSheet.create({
   bodyWrap: { flex: 1 },
   tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
-  tab: { flex: 1, paddingVertical: 6, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
-  tabActive: { borderColor: '#c9a86a' },
-  tabText: { color: '#7a705c', fontSize: 11, letterSpacing: 2 },
-  tabTextActive: { color: '#e6d8b3' },
+  tab: { flex: 1, paddingVertical: 6, borderWidth: 1, borderColor: '#2b3a3e', borderRadius: 4, alignItems: 'center' },
+  tabActive: { borderColor: '#6ab0c9' },
+  tabText: { color: '#6c8088', fontSize: 11, letterSpacing: 2 },
+  tabTextActive: { color: '#d6e4e8' },
   scroll: { flex: 1 },
-  entry: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
-  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  subtitle: { color: '#c9a86a', fontSize: 11, marginBottom: 4 },
-  desc: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginTop: 2 },
-  meta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
+  entry: { backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
+  name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
+  subtitle: { color: '#6ab0c9', fontSize: 11, marginBottom: 4 },
+  desc: { color: '#bcd2db', fontSize: 12, lineHeight: 18, marginTop: 2 },
+  meta: { color: '#6c8088', fontSize: 11, marginTop: 4 },
   trait: { color: '#a89a78', fontSize: 11, marginTop: 2 },
-  tapHint: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1 },
+  tapHint: { color: '#6ab0c9', fontSize: 10, marginTop: 6, letterSpacing: 1 },
   modalScrim: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -239,21 +248,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalCard: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
+    backgroundColor: '#131c1f',
+    borderColor: '#6ab0c9',
     borderWidth: 1,
     borderRadius: 6,
     padding: 16,
   },
   modalTitle: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 3,
     marginBottom: 10,
   },
   modalBody: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 13,
     lineHeight: 19,
     marginBottom: 16,
@@ -270,21 +279,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   modalBtnGhost: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
+    backgroundColor: '#0e1618',
+    borderColor: '#2b3a3e',
   },
   modalBtnGhostText: {
-    color: '#cdbf99',
+    color: '#bcd2db',
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '700',
   },
   modalBtnGo: {
-    backgroundColor: '#c9a86a',
-    borderColor: '#c9a86a',
+    backgroundColor: '#6ab0c9',
+    borderColor: '#6ab0c9',
   },
   modalBtnGoText: {
-    color: '#1a1714',
+    color: '#131c1f',
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '700',

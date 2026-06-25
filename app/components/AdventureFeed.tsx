@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
+import { getNarratorName } from '../engine/contentPack';
+import { TEMPLATE_FLAG_COLOR, splitOnPlaceholders, hasInlinePlaceholder } from '../engine/templatePlaceholders';
 
 interface Props {
   entries: GameLogEntry[];
@@ -17,8 +19,8 @@ interface Props {
 //   - COMBAT = warning red — used both as the combat log color AND as
 //     the inline highlight for enemy names appearing inside world text
 //     so the live threat is easy to scan.
-const WORLD_COLOR = '#cdbf99';
-const ARBITER_COLOR = '#c9a86a';
+const WORLD_COLOR = '#bcd2db';
+const ARBITER_COLOR = '#6ab0c9';
 const PLAYER_COLOR = '#7fb8ff';
 const COMBAT_COLOR = '#e07a5f';
 const REWARD_COLOR = '#9ec96a';
@@ -30,7 +32,7 @@ const channelColors: Record<LogChannel, string> = {
   system: WORLD_COLOR,
   combat: COMBAT_COLOR,
   reward: REWARD_COLOR,
-  cognitive: '#7a705c',
+  cognitive: '#6c8088',
   debug: '#605648',
   // OTA 202 — designer notes from the 📝 button. Distinct accent so
   // a glance distinguishes them from world prose during a long
@@ -58,7 +60,7 @@ const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug'])
 // is rendered as voiceless prose — colored, but without a SYSTEM /
 // WORLD / REWARD chip on top.
 function tagForChannel(channel: LogChannel): string | null {
-  if (channel === 'arbiter') return 'ARBITER';
+  if (channel === 'arbiter') return getNarratorName().toUpperCase();
   if (channel === 'feedback') return 'NOTE';
   // OTA-177 — DOG QUEST tag so the purple beats also carry a
   // chip-label header, matching how ARBITER / NOTE lines render.
@@ -66,17 +68,41 @@ function tagForChannel(channel: LogChannel): string | null {
   return null;
 }
 
-// Split body text into spans, highlighting any occurrence of a known
-// enemy name in the combat color. Case-insensitive match; preserves
-// non-matching text verbatim. When `names` is empty or no match is
-// found, returns a single-text-fragment shortcut for perf.
+// Push a plain string, but first split out any unfilled-TEMPLATE markers (REPLACE…) and
+// tint them PINK so the author spots template material left in their game. Mutates parts.
+function pushWithPlaceholderFlags(parts: React.ReactNode[], str: string, keyRef: { k: number }): void {
+  for (const span of splitOnPlaceholders(str)) {
+    if (!span.text) continue;
+    if (span.flag) {
+      parts.push(
+        <Text key={`p${keyRef.k++}`} style={{ color: TEMPLATE_FLAG_COLOR, fontWeight: '700' }}>
+          {span.text}
+        </Text>,
+      );
+    } else {
+      parts.push(span.text);
+    }
+  }
+}
+
+// Split body text into spans: known enemy names tint to the combat color, and unfilled
+// TEMPLATE markers (REPLACE…) tint pink. Case-insensitive enemy match; case-sensitive
+// REPLACE match (so prose "replace" is never flagged). Single-fragment fast path when
+// there is nothing to mark.
 function renderBodyWithEnemyHighlight(
   text: string,
   baseColor: string,
   names: string[],
 ): React.ReactNode {
-  if (names.length === 0) {
+  if (names.length === 0 && !hasInlinePlaceholder(text)) {
     return <Text style={[styles.body, { color: baseColor }]}>{text}</Text>;
+  }
+  const parts: React.ReactNode[] = [];
+  const keyRef = { k: 0 };
+  if (names.length === 0) {
+    // Only placeholder flagging to do.
+    pushWithPlaceholderFlags(parts, text, keyRef);
+    return <Text style={[styles.body, { color: baseColor }]}>{parts}</Text>;
   }
   // Build a single regex matching any enemy name (longest first so
   // "Mud Goblin" beats "Goblin"). Escape regex metachars.
@@ -85,23 +111,22 @@ function renderBodyWithEnemyHighlight(
     .sort((a, b) => b.length - a.length)
     .map((n) => n.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'));
   const re = new RegExp(`(${escaped.join('|')})`, 'gi');
-  const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
-  let key = 0;
   while ((match = re.exec(text)) !== null) {
     if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
+      // Non-enemy slice — still scan it for template placeholders.
+      pushWithPlaceholderFlags(parts, text.slice(lastIndex, match.index), keyRef);
     }
     parts.push(
-      <Text key={`e${key++}`} style={{ color: COMBAT_COLOR, fontWeight: '700' }}>
+      <Text key={`e${keyRef.k++}`} style={{ color: COMBAT_COLOR, fontWeight: '700' }}>
         {match[0]}
       </Text>,
     );
     lastIndex = match.index + match[0].length;
   }
   if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
+    pushWithPlaceholderFlags(parts, text.slice(lastIndex), keyRef);
   }
   return <Text style={[styles.body, { color: baseColor }]}>{parts}</Text>;
 }
@@ -211,8 +236,8 @@ function renderEnemyMissLine(text: string): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0908',
-    borderColor: '#3a342c',
+    backgroundColor: '#0a1012',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 4,
     padding: 8,

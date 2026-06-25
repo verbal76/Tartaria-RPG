@@ -116,6 +116,12 @@ const TAG_RULES: TagRule[] = [
 
 const TAG_CACHE = new Map<string, Set<InteractionTag>>();
 
+// engine_Dev — drop the per-noun tag cache when the uploaded interaction-tag
+// keyword override changes, so re-skin keyword additions take effect immediately.
+export function invalidateInteractionTagCache(): void {
+  TAG_CACHE.clear();
+}
+
 // v2.4.1 (OTA 023) — word-boundary match.
 //
 // The prior `lower.includes(pat)` was too greedy: short patterns
@@ -150,8 +156,27 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
   const cached = TAG_CACHE.get(lower);
   if (cached) return cached;
   const tags = new Set<InteractionTag>();
+  // engine_Dev — uploaded interaction-tag override. The override object may carry
+  // BOTH forms: the 5 tag-name keys → keyword lists (added to the built-in set),
+  // and any OTHER key → an EXPLICIT per-noun tag list (exact match wins). The
+  // per-noun form is what the "tag your interactables" template produces.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getInteractionTagsOverride() as Record<string, unknown> | null;
+  const TAG_NAMES = new Set<string>(['climbable', 'swimmable', 'breakable', 'searchable', 'salvageable']);
+  if (ov) {
+    // Explicit per-noun tags: a key equal to this noun that isn't a tag-name.
+    const explicit = ov[lower] ?? ov[noun.trim()];
+    if (Array.isArray(explicit)) {
+      for (const t of explicit) if (typeof t === 'string' && TAG_NAMES.has(t)) tags.add(t as InteractionTag);
+      TAG_CACHE.set(lower, tags);
+      return tags;
+    }
+  }
   for (const rule of TAG_RULES) {
-    for (const pat of rule.patterns) {
+    const ovList = ov?.[rule.tag];
+    const extra: string[] = Array.isArray(ovList) ? ovList.filter((x): x is string => typeof x === 'string') : [];
+    const patterns = extra.length > 0 ? [...rule.patterns, ...extra] : rule.patterns;
+    for (const pat of patterns) {
       if (patternMatches(lower, pat)) {
         tags.add(rule.tag);
         break;

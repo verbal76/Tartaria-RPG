@@ -51,7 +51,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 import {
   spawnRescueCaptor,
-  RESCUE_SCENARIOS,
+  getRescueScenario,
   type RescueScenarioId,
 } from '../app/engine/dogCompanion';
 import type { Enemy } from '../app/engine/types';
@@ -134,7 +134,8 @@ describe('OTA-124 vandalistic — rescue scenario × race matrix (engine surface
   describe('RESCUE_SCENARIOS catalog integrity', () => {
     it('all 4 scenarios exist with non-empty hook nouns + victory line', () => {
       for (const id of ['smelter', 'wagon', 'cellar', 'snare'] as RescueScenarioId[]) {
-        const s = RESCUE_SCENARIOS[id];
+        const s = getRescueScenario(id)!;
+        expect(s).toBeTruthy();
         expect(s.hookNouns.length).toBeGreaterThan(0);
         expect(s.victoryLine).toBeTruthy();
         expect(s.captorName).toBeTruthy();

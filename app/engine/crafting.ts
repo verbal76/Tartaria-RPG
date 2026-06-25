@@ -1,6 +1,7 @@
 import type { InventoryItem, Rarity, DamageType } from './types';
 import type { ItemEffect } from './itemEffect';
 import { levenshtein } from './editDistance';
+import { resolveTable } from './contentPack';
 import { resolveItemAlias } from './itemAliases';
 import materialsData from '../data/items/materials.json';
 import weaponsData from '../data/items/weapons.json';
@@ -159,12 +160,6 @@ export interface Recipe {
    *  refuses with an Arbiter line if the player's effective INT is
    *  below the threshold. Omitted recipes have no INT gate. */
   intRequirement?: number;
-  /** OTA-495 — Cores-recovered gate. The golem-armament recipes set this to 4:
-   *  the Arbiter only entrusts the pre-Flood war-forging once the player has
-   *  carried four Cores out of the Lost Capitals (the Core-4 forge beat). When
-   *  set, the craft handler refuses with an Arbiter line until
-   *  mainQuest.coresRecovered.length meets the threshold. Omitted = no gate. */
-  coresRequired?: number;
 }
 
 export const MATERIALS = (materialsData as { materials: CatalogMaterial[] }).materials;
@@ -177,15 +172,41 @@ export const RINGS = (ringsData as { rings: CatalogAccessory[] }).rings;
 /** OTA-120 Phase 5 — dog vest catalog. 4 entries (Burlap / Riveted /
  *  Aetheric / Reclaimer). Read by the dog-equip flow on the Character
  *  screen Companion panel and the Inventory `[fits dog]` tag. */
-export const DOG_GEAR = (dogGearData as { dogGear: CatalogDogGear[] }).dogGear;
+const DOG_GEAR_BUILTIN = (dogGearData as { dogGear: CatalogDogGear[] }).dogGear;
+/** Built-in dog-vest catalog (static). Use {@link getDogGear} for the live,
+ *  override-aware view; this const is the engine's bundled fallback rows. */
+export const DOG_GEAR = DOG_GEAR_BUILTIN;
+/** Live dog-armor catalog — the author's uploaded 'dogGear' table if loaded, else the
+ *  built-in vests. A dog-armor recipe's result resolves here, so authors can now define
+ *  their own dog vests (was built-in only). */
+export function getDogGear(): readonly CatalogDogGear[] {
+  return resolveTable('dogGear', DOG_GEAR_BUILTIN);
+}
 export function findDogGearByName(name: string): CatalogDogGear | undefined {
   const lower = name.toLowerCase();
-  return DOG_GEAR.find((g) => g.name.toLowerCase() === lower);
+  return getDogGear().find((g) => g.name.toLowerCase() === lower);
 }
 // Note: exploration.json is a bare top-level array, unlike the
 // other catalogs which wrap in { weapons: [...] }, { armor: [...] },
 // etc. Don't try to unwrap.
 export const EXPLORATION = explorationData as CatalogExploration[];
+
+// engine_Dev — resolve each table through the content-pack registry so an uploaded
+// override REPLACES the built-in at lookup time (call-time; no module reload). The
+// exported consts above stay the built-in defaults (other modules import them);
+// these getters honor a loaded override, else return the same built-in array.
+const rWeapons = (): readonly CatalogWeapon[] => resolveTable('weapons', WEAPONS);
+const rArmor = (): readonly CatalogArmor[] => resolveTable('armor', ARMOR);
+const rMaterials = (): readonly CatalogMaterial[] => resolveTable('materials', MATERIALS);
+const rGear = (): readonly CatalogGear[] => resolveTable('gear', GEAR);
+const rExploration = (): readonly CatalogExploration[] => resolveTable('exploration', EXPLORATION);
+const rAmulets = (): readonly CatalogAccessory[] => resolveTable('amulets', AMULETS);
+const rRings = (): readonly CatalogAccessory[] => resolveTable('rings', RINGS);
+const rRecipes = (): readonly Recipe[] => resolveTable('recipes', RECIPES);
+/** The LIVE recipe book — the author's uploaded recipes if loaded, else the built-in.
+ *  UI (RecipesView) must use this, NOT the static RECIPES, or it shows the built-in
+ *  set and ignores the author's upload. */
+export function getRecipes(): readonly Recipe[] { return rRecipes(); }
 
 const DEFAULT_DURABILITY = 25;
 
@@ -195,24 +216,24 @@ export function lookupCraftedItem(resultName: string): {
   tags: string[];
   baseDurability?: number;
 } {
-  const w = WEAPONS.find((x) => x.name === resultName);
+  const w = rWeapons().find((x) => x.name === resultName);
   if (w) return { kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
-  const a = ARMOR.find((x) => x.name === resultName);
+  const a = rArmor().find((x) => x.name === resultName);
   if (a) return { kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
-  const g = GEAR.find((x) => x.name === resultName);
+  const g = rGear().find((x) => x.name === resultName);
   if (g) return { kind: g.kind, rarity: g.rarity, tags: g.tags };
   // OTA-603 — dog vests (kind 'dog_armor') were authored in dogGear.json but
   // never resolved here, so a looted/dropped vest minted as a tagless 'misc'
   // and couldn't be equipped on the dog. Resolve them to their real kind so
   // the loot paths grant a proper, wearable vest. (Crafting/fusion still
   // exclude DOG_GEAR via their own guards — this branch is construction-only.)
-  const dg = DOG_GEAR.find((x) => x.name === resultName);
+  const dg = getDogGear().find((x) => x.name === resultName);
   if (dg) return { kind: 'dog_armor', rarity: dg.rarity, tags: dg.tags, baseDurability: dg.baseDurability ?? DEFAULT_DURABILITY };
-  const am = AMULETS.find((x) => x.name === resultName);
+  const am = rAmulets().find((x) => x.name === resultName);
   if (am) return { kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
-  const r = RINGS.find((x) => x.name === resultName);
+  const r = rRings().find((x) => x.name === resultName);
   if (r) return { kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
-  const m = MATERIALS.find((x) => x.name === resultName);
+  const m = rMaterials().find((x) => x.name === resultName);
   if (m) return { kind: 'misc', rarity: m.rarity, tags: m.tags };
   // 2026-05-25 — exploration catalog lookup. Without this branch the
   // MECHANIC-2 Pulse Scanner recipe (added 2026-05-25, OTA-006)
@@ -220,9 +241,70 @@ export function lookupCraftedItem(resultName: string): {
   // Scanner with its effect/faction/tcBuy. Any future exploration
   // recipe (compass, lantern variants, scanner variants) would hit
   // the same fallback.
-  const exp = EXPLORATION.find((x) => x.name === resultName);
+  const exp = rExploration().find((x) => x.name === resultName);
   if (exp) return { kind: 'relic', rarity: exp.rarity, tags: exp.tags };
   return { kind: 'misc', rarity: 'Common', tags: [] };
+}
+
+// engine_Dev — STAT BACKFILL. When a hook / whisper / mission grants an item by a
+// name the author never put in a table, the engine shouldn't hand over a bare,
+// stat-less misc. synthesizeItemFromName infers a sensible item from the NAME:
+// kind (weapon / armor / relic / consumable / misc) by keyword, a default
+// Uncommon rarity, durability for gear, and a modest equip-time stat bonus carried
+// on the instance (instanceStats.statBonuses — honored by aggregateEquippedStatBonuses
+// even with no catalog row). Real catalog items are unaffected; this only fires for
+// off-table names.
+const RARITY_RANK_BF: Record<Rarity, number> = { Common: 1, Uncommon: 2, Rare: 3, Legendary: 4 };
+const RARITY_DURA_BF: Record<Rarity, number> = { Common: 20, Uncommon: 30, Rare: 45, Legendary: 70 };
+
+export interface SynthesizedItem {
+  kind: 'weapon' | 'armor' | 'relic' | 'consumable' | 'misc';
+  rarity: Rarity;
+  tags: string[];
+  baseDurability?: number;
+  statBonuses?: { stat: string; amount: number }[];
+  description: string;
+}
+
+export function synthesizeItemFromName(name: string): SynthesizedItem {
+  const n = name.toLowerCase();
+  // Rarity: a notch above common for authored rewards; "prime/ace/imperial/…" reads rarer.
+  const rarity: Rarity = /\b(legendary|mythic|prime|ace|emperor|imperial|royal|relic|signature)\b/.test(n)
+    ? 'Rare' : 'Uncommon';
+  const rank = RARITY_RANK_BF[rarity];
+  const has = (re: RegExp) => re.test(n);
+
+  // Kind by keyword.
+  if (has(/\b(blade|sword|rifle|gun|pistol|revolver|knife|knuckle|knuckles|bat|slugger|crowbar|axe|hammer|mace|club|spear|bayonet|launcher|cannon|smg|carbine|mp\d|garand|luger|thompson)\b/)) {
+    const ranged = has(/\b(rifle|gun|pistol|revolver|smg|carbine|launcher|cannon|mp\d|garand|luger|thompson)\b/);
+    return {
+      kind: 'weapon', rarity, tags: ['weapon', ranged ? 'ranged' : 'melee'],
+      baseDurability: RARITY_DURA_BF[rarity],
+      statBonuses: [{ stat: ranged ? 'dexterity' : 'strength', amount: rank }],
+      description: `A field-recovered ${ranged ? 'firearm' : 'weapon'}. Worn, but it'll fight.`,
+    };
+  }
+  if (has(/\b(vest|plate|armor|armour|helm|helmet|mask|jacket|coat|padding|guard|kevlar|flak|gauntlet|gauntlets|boots|greaves|shield|cuirass|harness)\b/)) {
+    return {
+      kind: 'armor', rarity, tags: ['armor'],
+      baseDurability: RARITY_DURA_BF[rarity],
+      statBonuses: [{ stat: 'constitution', amount: rank }],
+      description: `A piece of salvaged protective gear. Scuffed, but solid.`,
+    };
+  }
+  if (has(/\b(coil|device|chronometer|compass|locket|amulet|ring|talisman|lens|core|orb|relic|scanner|battery|emitter|gem|charm|sigil|idol|slag|dust)\b/)) {
+    // Relic-ish fringe-tech / occult trinket: an Intelligence edge.
+    return {
+      kind: 'relic', rarity, tags: ['relic', 'detection'],
+      statBonuses: [{ stat: 'intelligence', amount: rank }],
+      description: `An anomalous trinket. It hums faintly when you're not looking at it.`,
+    };
+  }
+  if (has(/\b(ration|kit|medkit|bandage|syrette|morphine|food|drink|water|pill|stim|tonic|serum|canteen|jerky|meal)\b/)) {
+    return { kind: 'consumable', rarity: 'Common', tags: ['consumable'], description: `Field supplies. Use them when you need them.` };
+  }
+  // Default: a material / intel scrap — no stats, but a real description + tag.
+  return { kind: 'misc', rarity, tags: ['material', 'salvage'], description: `Recovered salvage — worth something to the right buyer, or a crafting input.` };
 }
 
 /** Case-insensitive catalog match. Returns the canonical (title-case)
@@ -247,23 +329,23 @@ export function findCatalogItem(name: string): {
   const aliased = resolveItemAlias(name);
   const q = (aliased ?? name).trim().toLowerCase();
   if (!q) return null;
-  const w = WEAPONS.find((x) => x.name.toLowerCase() === q);
+  const w = rWeapons().find((x) => x.name.toLowerCase() === q);
   if (w) return { name: w.name, kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
-  const a = ARMOR.find((x) => x.name.toLowerCase() === q);
+  const a = rArmor().find((x) => x.name.toLowerCase() === q);
   if (a) return { name: a.name, kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
-  const g = GEAR.find((x) => x.name.toLowerCase() === q);
+  const g = rGear().find((x) => x.name.toLowerCase() === q);
   if (g) return { name: g.name, kind: g.kind, rarity: g.rarity, tags: g.tags };
-  const am = AMULETS.find((x) => x.name.toLowerCase() === q);
+  const am = rAmulets().find((x) => x.name.toLowerCase() === q);
   if (am) return { name: am.name, kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
-  const r = RINGS.find((x) => x.name.toLowerCase() === q);
+  const r = rRings().find((x) => x.name.toLowerCase() === q);
   if (r) return { name: r.name, kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
-  const m = MATERIALS.find((x) => x.name.toLowerCase() === q);
+  const m = rMaterials().find((x) => x.name.toLowerCase() === q);
   if (m) return { name: m.name, kind: 'misc', rarity: m.rarity, tags: m.tags };
   // 2026-05-25 — exploration catalog also reachable through
   // findCatalogItem so ambient TAKE of a scanner / compass / etc.
   // grants the real catalog entry with effect + tags instead of
   // redirecting through the "scene feature" fallback.
-  const exp = EXPLORATION.find((x) => x.name.toLowerCase() === q);
+  const exp = rExploration().find((x) => x.name.toLowerCase() === q);
   if (exp) return { name: exp.name, kind: 'relic', rarity: exp.rarity, tags: exp.tags };
   return null;
 }
@@ -279,8 +361,8 @@ export function isInferredItem(name: string): boolean {
   if (!name) return false;
   if (findCatalogItem(name)) return false;
   const q = name.toLowerCase().trim();
-  if (EXPLORATION.some((x) => x.name.toLowerCase() === q)) return false;
-  if (DOG_GEAR.some((x) => x.name.toLowerCase() === q)) return false;
+  if (rExploration().some((x) => x.name.toLowerCase() === q)) return false;
+  if (getDogGear().some((x) => x.name.toLowerCase() === q)) return false;
   return true;
 }
 
@@ -508,14 +590,14 @@ function ingredientShortfall(
 }
 
 export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recipe[] {
-  return RECIPES.filter((r) => canCraft(r, inventory));
+  return rRecipes().filter((r) => canCraft(r, inventory));
 }
 
 export function findRecipeByResult(target: string): Recipe | null {
   const t = target.toLowerCase().trim();
   if (!t) return null;
   // Pass 1 — substring match either direction. Cheap, covers most cases.
-  for (const r of RECIPES) {
+  for (const r of rRecipes()) {
     if (r.result.toLowerCase().includes(t) || t.includes(r.result.toLowerCase())) return r;
   }
   // Pass 2 — Levenshtein fuzzy match per word, so single-letter typos
@@ -526,7 +608,7 @@ export function findRecipeByResult(target: string): Recipe | null {
   const tTokens = t.split(/\s+/).filter(Boolean);
   if (tTokens.length === 0) return null;
   let best: { recipe: Recipe; totalDistance: number } | null = null;
-  for (const r of RECIPES) {
+  for (const r of rRecipes()) {
     const rTokens = r.result.toLowerCase().split(/\s+/).filter(Boolean);
     let totalDistance = 0;
     let allMatched = true;
@@ -577,27 +659,27 @@ export function consumeIngredients(
 function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amulet' | 'ring'): boolean {
   const t = name.toLowerCase().trim();
   if (!t) return false;
-  if (exclude !== 'weapon' && WEAPONS.some((w) => w.name.toLowerCase() === t)) return true;
-  if (exclude !== 'armor' && ARMOR.some((a) => a.name.toLowerCase() === t)) return true;
-  if (exclude !== 'amulet' && AMULETS.some((a) => a.name.toLowerCase() === t)) return true;
-  if (exclude !== 'ring' && RINGS.some((r) => r.name.toLowerCase() === t)) return true;
-  if (MATERIALS.some((m) => m.name.toLowerCase() === t)) return true;
-  if (EXPLORATION.some((x) => x.name.toLowerCase() === t)) return true;
-  if (GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  if (exclude !== 'weapon' && rWeapons().some((w) => w.name.toLowerCase() === t)) return true;
+  if (exclude !== 'armor' && rArmor().some((a) => a.name.toLowerCase() === t)) return true;
+  if (exclude !== 'amulet' && rAmulets().some((a) => a.name.toLowerCase() === t)) return true;
+  if (exclude !== 'ring' && rRings().some((r) => r.name.toLowerCase() === t)) return true;
+  if (rMaterials().some((m) => m.name.toLowerCase() === t)) return true;
+  if (rExploration().some((x) => x.name.toLowerCase() === t)) return true;
+  if (rGear().some((g) => g.name.toLowerCase() === t)) return true;
   // OTA-133 — defensive add: DOG_GEAR is a separate catalog (4 vests
   // in OTA-122). Current vest names (Burlap / Riveted Leather /
   // Aetheric Padded / Reclaimer Pattern) don't trip the weapon/
   // armor inference regex today, but a future vest named e.g.
   // "Plated Vest" or "Bladed Harness" would slip past the guard.
   // Including DOG_GEAR closes that path before authoring opens it.
-  if (DOG_GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  if (getDogGear().some((g) => g.name.toLowerCase() === t)) return true;
   return false;
 }
 
 export function findWeaponByName(name: string): CatalogWeapon | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  const direct = rWeapons().find((w) => w.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'weapon')) return null;
   // Inference fallback — only fires for names that READ as a weapon,
@@ -695,7 +777,7 @@ export function fusedArmorResistances(name: string, rarity: Rarity, resistance?:
 export function findArmorByName(name: string): CatalogArmor | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = ARMOR.find((a) => a.name.toLowerCase() === t);
+  const direct = rArmor().find((a) => a.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'armor')) return null;
   return inferArmor(name);
@@ -704,7 +786,7 @@ export function findArmorByName(name: string): CatalogArmor | null {
 export function findAmuletByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = AMULETS.find((a) => a.name.toLowerCase() === t);
+  const direct = rAmulets().find((a) => a.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'amulet')) return null;
   if (/\b(amulet|locket|necklace|pendant|medallion|charm|talisman|brooch)\b/i.test(name)) {
@@ -716,7 +798,7 @@ export function findAmuletByName(name: string): CatalogAccessory | null {
 export function findRingByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  const direct = RINGS.find((r) => r.name.toLowerCase() === t);
+  const direct = rRings().find((r) => r.name.toLowerCase() === t);
   if (direct) return direct;
   if (isCataloguedElsewhere(name, 'ring')) return null;
   if (/\b(ring|band|signet)\b/i.test(name)) {
@@ -734,7 +816,7 @@ export function findRingByName(name: string): CatalogAccessory | null {
 export function findExplorationItemByName(name: string): CatalogExploration | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return EXPLORATION.find((e) => e.name.toLowerCase() === t) ?? null;
+  return rExploration().find((e) => e.name.toLowerCase() === t) ?? null;
 }
 
 /** Same for materials. The 13 orphan materials from the OTA 192
@@ -743,7 +825,7 @@ export function findExplorationItemByName(name: string): CatalogExploration | nu
 export function findMaterialByName(name: string): CatalogMaterial | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return MATERIALS.find((m) => m.name.toLowerCase() === t) ?? null;
+  return rMaterials().find((m) => m.name.toLowerCase() === t) ?? null;
 }
 
 /** Same for gear — small catalog (6 items as of OTA 192) but the
@@ -751,23 +833,23 @@ export function findMaterialByName(name: string): CatalogMaterial | null {
 export function findGearByName(name: string): CatalogGear | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return GEAR.find((g) => g.name.toLowerCase() === t) ?? null;
+  return rGear().find((g) => g.name.toLowerCase() === t) ?? null;
 }
 
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  const exact = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  const exact = rWeapons().find((w) => w.name.toLowerCase() === t);
   if (exact) return exact;
-  return WEAPONS.find((w) => w.name.toLowerCase().includes(t) || t.includes(w.name.toLowerCase())) ?? null;
+  return rWeapons().find((w) => w.name.toLowerCase().includes(t) || t.includes(w.name.toLowerCase())) ?? null;
 }
 
 export function fuzzyFindArmor(text: string): CatalogArmor | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
-  const exact = ARMOR.find((a) => a.name.toLowerCase() === t);
+  const exact = rArmor().find((a) => a.name.toLowerCase() === t);
   if (exact) return exact;
-  return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
+  return rArmor().find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
@@ -781,13 +863,21 @@ const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> 
 
 export type DamageMatch = 'normal' | 'weak' | 'resist';
 
-/** Macro type-resistance for an enemy type (the `TYPE_RESISTANCE_MAP` row).
+/** engine_Dev — the active enemy-type → resist/weak map: an uploaded one (keyed by
+ *  the re-skin's own enemy types) REPLACES the built-in Tartaria map; else built-in. */
+function resolveTypeResistances(): Record<string, { resist: string[]; weak: string[] }> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ov = (require('./contentPack') as typeof import('./contentPack')).getDamageResistancesOverride();
+  return ov ?? TYPE_RESISTANCE_MAP;
+}
+
+/** Macro type-resistance for an enemy type (a `resolveTypeResistances()` row).
  *  Returns the resisted + weak-to damage-type lists, or empty arrays when the
  *  type has no entry. Used by the EnemyPanel to surface defenses to the player. */
 export function enemyTypeDefenses(
   enemyType: string | null | undefined,
 ): { resist: string[]; weak: string[] } {
-  const map = enemyType ? TYPE_RESISTANCE_MAP[enemyType] : undefined;
+  const map = enemyType ? resolveTypeResistances()[enemyType] : undefined;
   return { resist: map?.resist ?? [], weak: map?.weak ?? [] };
 }
 
@@ -798,7 +888,7 @@ export function applyDamageTypeModifier(
   enemyType: string | null | undefined,
 ): { damage: number; match: DamageMatch } {
   if (!weaponDamageType || !enemyType) return { damage: rawDamage, match: 'normal' };
-  const map = TYPE_RESISTANCE_MAP[enemyType];
+  const map = resolveTypeResistances()[enemyType];
   if (!map) return { damage: rawDamage, match: 'normal' };
   const wt = weaponDamageType.toLowerCase();
   if (map.weak.includes(wt)) return { damage: Math.ceil(rawDamage * 1.5), match: 'weak' };

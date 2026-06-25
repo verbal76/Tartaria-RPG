@@ -23,10 +23,11 @@ import { BrandedModal } from './BrandedModal';
  *  panel so the player can see what's ticking and how many combat turns
  *  it has left. */
 export interface EnemyStatusView {
-  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'dt_dot' | 'exposed';
   turnsRemaining: number;
   dmgPerTurn: number;
   sourceName: string;
+  acPenalty?: number;
 }
 
 export interface EnemyView {
@@ -50,6 +51,8 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   electrical_coat: { label: 'SHOCK', color: '#6ac9e0' },
   burn_coat: { label: 'BURN', color: '#e0915f' },
   infected: { label: 'INFECTED', color: '#c97a5f' },
+  dt_dot: { label: 'DOT', color: '#d9b35f' },
+  exposed: { label: 'EXPOSED', color: '#e0c46a' },
 };
 
 interface Props {
@@ -60,6 +63,9 @@ interface Props {
    *  measured by ExplorationScreen). The card scrolls vertically past this so a
    *  tall enemy never grows the row — it stays in the corner like the feed. */
   maxHeight?: number;
+  /** engine_Dev — combat arena: fill the (tall) column instead of capping at maxHeight, so the
+   *  enemy box runs long like the character box. */
+  fill?: boolean;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -89,7 +95,7 @@ function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } 
   };
 }
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: Props) {
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fill }: Props) {
   // Measure the column we actually live in so cards fit the top-right corner
   // (portrait), instead of being sized to the full screen width and spilling
   // out into a left/right-scrolling "landscape" strip.
@@ -107,9 +113,11 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
+  // engine_Dev — combat arena: when `fill`, take the whole tall column (flex:1) instead of capping
+  // at maxHeight, so the enemy box runs long like the character box.
   const scrollWrap = (card: React.ReactNode) => (
     <ScrollView
-      style={{ maxHeight: capH }}
+      style={fill ? { flex: 1 } : { maxHeight: capH }}
       showsVerticalScrollIndicator
       nestedScrollEnabled
     >
@@ -136,7 +144,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   const [detailView, setDetailView] = useState<EnemyView | null>(null);
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
-    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)}>
+    <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
       {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
     </TouchableOpacity>
   );
@@ -145,12 +153,12 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   // instant combat starts; render the (empty) wrap and bail on the list.
   return (
     <>
-    <View style={styles.wrap} onLayout={onLayout}>
+    <View style={[styles.wrap, fill ? styles.wrapFill : null]} onLayout={onLayout}>
       {enemies.length === 0 ? null : enemies.length === 1 ? (
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
-        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
           {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
         </TouchableOpacity>
       ) : (
@@ -243,7 +251,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
   const attackNum = parseInt(String(view.enemy.attack), 10);
   const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
-  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#c9a86a' : '#e07a5f';
+  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#6ab0c9' : '#e07a5f';
   // Range indicator. Engine doesn't track per-enemy positioning yet —
   // anyone staged in the scene is in arm's reach. Once positioning is
   // added this becomes view.inRange.
@@ -315,7 +323,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
       {view.statuses && view.statuses.length > 0 && (
         <View style={styles.statusCol}>
           {view.statuses.map((st, i) => {
-            const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#c9a86a' };
+            const meta = STATUS_META[st.kind] ?? { label: st.kind.toUpperCase(), color: '#6ab0c9' };
             const turns = `${st.turnsRemaining}t left`;
             const dmg = st.dmgPerTurn > 0 ? ` · ${st.dmgPerTurn}/turn` : '';
             return (
@@ -351,8 +359,13 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   wrap: { width: '100%' },
+  // engine_Dev — combat arena: the enemy column becomes a tall filled box (matches the char box),
+  // and every link in the flex chain (wrap → TouchableOpacity → ScrollView) fills so it doesn't
+  // collapse to zero height.
+  wrapFill: { flex: 1, backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 6, overflow: 'hidden' },
+  fillTouch: { flex: 1 },
   card: {
-    backgroundColor: '#13110f',
+    backgroundColor: '#0e1618',
     borderColor: '#5a2a26',
     borderWidth: 1,
     borderRadius: 4,
@@ -364,7 +377,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
-  rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
+  rarity: { color: '#6c8088', fontSize: 10, letterSpacing: 1, marginLeft: 6 },
   subhead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -373,12 +386,12 @@ const styles = StyleSheet.create({
   },
   range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1, marginLeft: 6 },
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
-  rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
-  subline: { color: '#7a705c', fontSize: 11, flexShrink: 1 },
+  rangeOut: { color: '#6c8088', borderColor: '#2b3a3e' },
+  subline: { color: '#6c8088', fontSize: 11, flexShrink: 1 },
   hpBarBg: {
     height: 6,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    backgroundColor: '#131c1f',
+    borderColor: '#2b3a3e',
     borderWidth: 1,
     borderRadius: 2,
     overflow: 'hidden',
@@ -388,8 +401,8 @@ const styles = StyleSheet.create({
   // the narrow column rather than spreading into a wide single row.
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 },
   stat: { width: '50%', paddingVertical: 1 },
-  statLabel: { color: '#7a705c', fontSize: 9, letterSpacing: 1 },
-  statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  statLabel: { color: '#6c8088', fontSize: 9, letterSpacing: 1 },
+  statValue: { color: '#d6e4e8', fontSize: 12, fontWeight: '600' },
   defs: { marginTop: 4, gap: 1 },
   defLine: { fontSize: 10, letterSpacing: 0.5 },
   defResist: { color: '#9ec96a', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
@@ -411,7 +424,7 @@ const styles = StyleSheet.create({
   statusVal: { color: '#c9b89a', fontSize: 9 },
   traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   traitBadge: {
-    color: '#c9a86a',
+    color: '#6ab0c9',
     fontSize: 9,
     letterSpacing: 1,
     paddingHorizontal: 4,
@@ -427,7 +440,7 @@ const styles = StyleSheet.create({
     gap: 4,
     marginTop: 4,
   },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#3a342c' },
-  dotActive: { backgroundColor: '#c9a86a' },
-  hint: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#2b3a3e' },
+  dotActive: { backgroundColor: '#6ab0c9' },
+  hint: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
 });

@@ -1,6 +1,78 @@
 # Tartaria Realms — Session Handoff
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
+     ⛔ THIS BRANCH IS `engine_Dev` — A SEPARATE APP. READ THIS BEFORE ANYTHING.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+> # ⛔ STOP — `engine_Dev` IS A DIFFERENT APPLICATION FROM THE TARTARIA GAME
+>
+> This branch (`engine_Dev`) is **NOT** the Tartaria game. It is a **separate,
+> standalone app**: a **lore-agnostic, content-pack-driven RPG engine**. Tartaria
+> is merely its built-in DEFAULT content; the first game actually being authored
+> on it is **"The Philadelphia Experiment"** (WWII / USS Eldridge / fringe-science).
+>
+> ## ☠️ DO NOT CROSS THE STREAMS — hard rules
+> - **NEVER merge / cherry-pick / propagate `engine_Dev` into `HaL2001`** (the live
+>   Tartaria game) or any of the other branches (steam_Dev, golem-line, linux_dev,
+>   mac_dev, html_dev, apple_ios, arbiters-line). It is a different app and would
+>   **destroy the live game**. Likewise do NOT bring those branches' commits here.
+> - **Isolation is already wired and must stay that way:**
+>   - **Package / bundle id:** `com.hotatticgames.tartarprim.engine` (app.json)
+>     — installs side-by-side with the real game, never over it.
+>   - **OTA channel:** `engine_Dev` only (`app.json` `expo-channel-name`). The
+>     `eas-update.yml` `case "$BRANCH"` block publishes engine_Dev → the
+>     `engine_Dev` channel ONLY (android), no cross-branch broadcast.
+>   - **APK / release naming:** "Text RPG Engine" slug, GitHub Release made with
+>     `--latest=false` (see build-apk.yml `app_slug`/`app_name`/`app_channel`).
+>   - **APKs are manual-only:** build-apk.yml builds engine_Dev only on a push
+>     whose commit message contains `[build-apk]` (bump `.github/engine-apk-trigger`).
+>     `workflow_dispatch` is blocked for the integration (403), so the marker
+>     commit is the trigger.
+> - **OTAs:** every app-only push to `engine_Dev` auto-publishes a JS OTA to the
+>   `engine_Dev` channel (build id in `app/buildInfo.ts`, currently the
+>   `engine_Dev-6NN` series). That is correct and isolated — the live game never
+>   sees it.
+>
+> ## What this engine IS (the architecture)
+> Everything game-defining loads from uploaded JSON via the dev console, with the
+> built-in Tartaria data as the fallback default. The seam:
+> - **`app/engine/contentPack.ts`** — the registry. `resolveTable<T>(id, builtin)`
+>   returns an uploaded override or the built-in. Tables: weapons, armor, materials,
+>   gear, exploration, amulets, rings, recipes, enemies, races, factions, locations,
+>   **lore** (keyworded world-bible passages), **powers** (the magic/ability system).
+>   Lore blocks (objects): world (tone/setting/terms/vocabulary/narrator), faction,
+>   race, **flavor** (narrator canned-line pools). Plus narrator-name, game-title,
+>   game-tagline renames; publish/devMode flags.
+> - **`app/state/contentPackStore.ts`** — zustand store; validates + persists
+>   uploads to AsyncStorage `tartaria.contentPack.v1`; `hydrate()` on boot mirrors
+>   them into the registry; `reapply()` re-mirrors (APPLY ALL + char-creation mount).
+> - **Dev access:** create a character named **`Verbal`** → Settings → **DEV** tab
+>   (devMode default on). Upload boxes per table/lore block with TEMPLATE /
+>   EDIT-CURRENT / COPY / LOAD / RESET, APPLY ALL, COPY DIAGNOSTICS, publish.
+> - **Wired consumers:** crafting (items/recipes/amulets/rings), vendors, loot,
+>   salvage, takeable spawns, encounters (enemies), world map + quests (locations),
+>   character creation (races/factions), starter weapon, the data-driven **tutorial
+>   props**, the LLM prompt (world tone/setting/vocabulary + lore-document canon +
+>   "ask the narrator"), narration flavor pools, the **powers** dispatch
+>   (`runAethercraft` + custom effects: coat_enemies / heal_self), narrator name,
+>   game title/tagline, splash, icon.
+> - **A common authoring pitfall (documented in-app):** the playable **Races /
+>   Factions** go in the **TABLE** boxes (character creation reads those), NOT the
+>   **Race lore / Faction lore** LORE boxes (freeform story). A guard + banner
+>   enforce this.
+>
+> ## Still hardcoded / TODO (next passes, all OTA-able on engine_Dev)
+> Faction LOGIC (relationships/contracts/faction-gear vendors still use built-in
+> `factions.ts`), the climb-beat climbable noun, shared starter items (torch /
+> rations / locket) + faction knife, deeper UI/codex strings, quests/NPC tables,
+> a smart-article pass for proper-name narrators ("the Bob"). The **map-image
+> upload** is the one BUILD-only item (needs a native image picker) — parked.
+>
+> **Everything below this banner is INHERITED HaL/arbiters-line context from the
+> fork point. It describes the OTHER app. Use it only for shared engine internals
+> (Qwen, voice, combat); ignore its branch/OTA/promotion policy for engine_Dev.**
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
      CURRENT SESSION STATE — 2026-06-14 (READ THIS FIRST; it supersedes the older
      "ONE branch HaL2001" guidance in the §P block below for THIS work phase)
      ═══════════════════════════════════════════════════════════════════════════ -->

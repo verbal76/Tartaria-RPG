@@ -7,6 +7,7 @@ import materialsData from '../data/items/materials.json';
 import gearData from '../data/items/gear.json';
 import dogGearData from '../data/items/dogGear.json';
 import { pickWeighted } from './rng';
+import { resolveTable } from './contentPack';
 import type { Enemy } from './types';
 import type { StallCategory } from './buildings';
 
@@ -23,35 +24,47 @@ export interface VendorOffer {
 // arb92 — food / material stocking. Traders carry multiples of perishables
 // and crafting stock so the player can buy a handful at once; weapons /
 // armor / relics stay one-of. Caps per the player's spec: ≤5 food, ≤10
-// material. Lookup sets are built once from the catalogs.
-const FOOD_NAMES = new Set(
-  (((gearData as unknown as { gear?: { name: string; tags?: string[] }[] }).gear ?? []))
-    .filter((g) => (g.tags ?? []).includes('food'))
-    .map((g) => g.name.toLowerCase()),
-);
-const MATERIAL_NAMES = new Set(
-  (((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []))
-    .map((m) => m.name.toLowerCase()),
-);
+// material.
+// engine_Dev — these read through resolveTable() at CALL time (not import time),
+// so an uploaded gear/material/weapon/armor override actually reaches vendor
+// stocking instead of the built-in Tartaria catalog. Built-in arrays below are
+// the defaults handed to resolveTable.
+const BUILTIN_GEAR = ((gearData as unknown as { gear?: { name: string; tags?: string[] }[] }).gear ?? []);
+const BUILTIN_MATERIALS = ((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []);
+function foodNames(): Set<string> {
+  return new Set(
+    resolveTable('gear', BUILTIN_GEAR)
+      .filter((g) => (g.tags ?? []).includes('food'))
+      .map((g) => g.name.toLowerCase()),
+  );
+}
+function materialNames(): Set<string> {
+  return new Set(resolveTable('materials', BUILTIN_MATERIALS).map((m) => m.name.toLowerCase()));
+}
 export function rollOfferQuantity(itemName: string): number {
   const n = itemName.toLowerCase();
-  if (FOOD_NAMES.has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
-  if (MATERIAL_NAMES.has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
+  if (foodNames().has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
+  if (materialNames().has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
   return 1;
 }
 
 // arb104 — faction-issue armor + weapons (tagged `faction_gear` + faction)
 // stocked by the outpost Armory for the player's own faction.
 interface FactionGearRow { name: string; faction?: string; tc?: number; rarity?: string; tags?: string[] }
-const FACTION_GEAR: FactionGearRow[] = [
-  ...(((weaponsData as unknown as { weapons?: FactionGearRow[] }).weapons ?? [])),
-  ...(((armorData as unknown as { armor?: FactionGearRow[] }).armor ?? [])),
-  // OTA-497 — faction-issue RINGS (perk-only, one per faction) now stock at the
-  // player's own faction armory alongside its weapons + armor.
-  ...(((ringsData as unknown as { rings?: FactionGearRow[] }).rings ?? [])),
-].filter((it) => (it.tags ?? []).includes('faction_gear'));
+const BUILTIN_WEAPONS = ((weaponsData as unknown as { weapons?: FactionGearRow[] }).weapons ?? []);
+const BUILTIN_ARMOR = ((armorData as unknown as { armor?: FactionGearRow[] }).armor ?? []);
+// Rings aren't an overridable table; keep the built-in list.
+const BUILTIN_RINGS = ((ringsData as unknown as { rings?: FactionGearRow[] }).rings ?? []);
+function factionGear(): FactionGearRow[] {
+  return [
+    ...resolveTable('weapons', BUILTIN_WEAPONS),
+    ...resolveTable('armor', BUILTIN_ARMOR),
+    // OTA-497 — faction-issue RINGS (perk-only, one per faction) stock alongside.
+    ...resolveTable('rings', BUILTIN_RINGS),
+  ].filter((it) => (it.tags ?? []).includes('faction_gear'));
+}
 export function factionGearOffers(factionId: string): VendorOffer[] {
-  return FACTION_GEAR
+  return factionGear()
     .filter((it) => it.faction === factionId)
     .map((it) => ({ itemName: it.name, price: Math.max(2, Math.round(it.tc ?? 50)), quantity: 1 }));
 }
@@ -74,6 +87,29 @@ interface RoadsideArchetype {
   pool: RoadsidePoolEntry[];
 }
 const ROADSIDE = (roadsideData as { archetypes: RoadsideArchetype[] });
+
+/** The live roadside-trader archetypes: author override → installed GENERIC default →
+ *  built-in pool. Malformed rows (missing name/pool) are dropped so a bad upload can't
+ *  crash the spawner. */
+export function getActiveRoadside(): RoadsideArchetype[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('./contentPack') as typeof import('./contentPack');
+  const clean = (list: unknown): RoadsideArchetype[] => (Array.isArray(list) ? list : []).filter(
+    (a): a is RoadsideArchetype =>
+      !!a && typeof a === 'object' &&
+      typeof (a as RoadsideArchetype).name === 'string' &&
+      Array.isArray((a as RoadsideArchetype).pool) && (a as RoadsideArchetype).pool.length > 0,
+  );
+  const ov = clean(cp.getRoadsideOverride());
+  if (ov.length > 0) return cp.isVendorsAppendGeneric() ? [...ov, ...buildGenericRoadside()] : ov;
+  // No author override: a custom/generic game uses the DATA-DRIVEN roadside pool (sampled from the
+  // loaded catalog, like the named vendors); stock Tartaria keeps its authored archetypes.
+  if (cp.getGenericRoadside() != null) {
+    const g = buildGenericRoadside();
+    return g.length > 0 ? g : ROADSIDE.archetypes;
+  }
+  return ROADSIDE.archetypes;
+}
 
 export interface VendorTemplate {
   id: string;
@@ -120,10 +156,110 @@ export interface VendorInstance {
 
 export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;
 
+// ── Data-driven generic storefront (engine_Dev) ─────────────────────
+// Five SETTING-NEUTRAL vendors whose wares are SAMPLED from the LOADED catalogs
+// (resolveTable weapons/armor/gear/materials) at spawn time — so they only ever
+// sell items that exist in THIS game. No hardcoded item names, no dangling refs
+// (the failure mode the old hardcoded GENERIC_VENDORS had). They restock — i.e.
+// re-sample — each time the pool is built, so the same vendor offers vary per
+// encounter. faction:null → they can roll on any tile during travel.
+interface CatRow { name: string; rarity?: string; tags?: string[]; tc?: number; tcBuy?: number; kind?: string }
+const RARITY_PRICE: Record<string, number> = { common: 12, uncommon: 35, rare: 80, epic: 160, legendary: 300 };
+function priceFor(it: CatRow): number {
+  const tc = typeof it.tcBuy === 'number' ? it.tcBuy : typeof it.tc === 'number' ? it.tc : null;
+  if (tc != null) return Math.max(2, Math.round(tc));
+  return RARITY_PRICE[(it.rarity ?? 'common').toLowerCase()] ?? 15;
+}
+function sampleRows(rows: CatRow[], n: number): CatRow[] {
+  const pool = rows.filter((r) => r && typeof r.name === 'string' && r.name.trim());
+  if (pool.length <= n) return pool.slice();
+  const picked: CatRow[] = []; const used = new Set<number>(); let safety = 0;
+  while (picked.length < n && used.size < pool.length && safety++ < 200) {
+    const i = Math.floor(Math.random() * pool.length);
+    if (used.has(i)) continue; used.add(i); picked.push(pool[i]!);
+  }
+  return picked;
+}
+function offersFrom(rows: CatRow[], n: number): VendorOffer[] {
+  return sampleRows(rows, n).map((it) => ({ itemName: it.name, price: priceFor(it), quantity: rollOfferQuantity(it.name) }));
+}
+/** Five generic vendors built from the effective item catalogs. Empty tables are
+ *  skipped, so a game with (say) no materials simply has no Supplier. */
+export function buildGenericStorefront(): VendorTemplate[] {
+  const weapons = resolveTable('weapons', BUILTIN_WEAPONS) as CatRow[];
+  const armor = resolveTable('armor', BUILTIN_ARMOR) as CatRow[];
+  const gear = resolveTable('gear', BUILTIN_GEAR) as CatRow[];
+  const materials = resolveTable('materials', BUILTIN_MATERIALS) as CatRow[];
+  const consumables = gear.filter((g) => g.kind === 'consumable' || (g.tags ?? []).some((t) => ['food', 'medical', 'heal', 'drink', 'consumable'].includes(t)));
+  const supplies = consumables.length ? consumables : gear;
+  const v: VendorTemplate[] = [];
+  if (weapons.length) v.push({ id: 'gen_weapons_dealer', name: 'Weapons Dealer', title: 'Arms Dealer', faction: null, description: 'Deals in weapons of every make. Buys blades, sells worse ones for more.', offers: offersFrom(weapons, 6) });
+  if (armor.length) v.push({ id: 'gen_blacksmith', name: 'Blacksmith', title: 'Armorer', faction: null, description: 'Plates, vests, and whatever will keep you breathing a little longer.', offers: offersFrom(armor, 6) });
+  if (supplies.length) v.push({ id: 'gen_quartermaster', name: 'Quartermaster', title: 'Quartermaster', faction: null, description: 'Field supplies — rations, kits, and the small things that save a life.', offers: offersFrom(supplies, 6) });
+  if (materials.length) v.push({ id: 'gen_supplier', name: 'Supplier', title: 'Materials Supplier', faction: null, description: 'Raw stock and crafting components by the crate.', offers: offersFrom(materials, 8) });
+  const mixed = [...offersFrom(weapons, 2), ...offersFrom(armor, 2), ...offersFrom(supplies, 2), ...offersFrom(materials, 2)];
+  if (mixed.length) v.push({ id: 'gen_trader', name: 'General Trader', title: 'Travelling Trader', faction: null, description: 'Carries a bit of everything and an opinion on all of it.', offers: mixed });
+  return v;
+}
+
+/** Two data-driven roadside archetypes (honest + sketchy) whose pools are sampled from the loaded
+ *  catalog at spawn, so they only ever stock items that exist. demeanor drives the steal DC. */
+export function buildGenericRoadside(): RoadsideArchetype[] {
+  const weapons = resolveTable('weapons', BUILTIN_WEAPONS) as CatRow[];
+  const armor = resolveTable('armor', BUILTIN_ARMOR) as CatRow[];
+  const gear = resolveTable('gear', BUILTIN_GEAR) as CatRow[];
+  const materials = resolveTable('materials', BUILTIN_MATERIALS) as CatRow[];
+  const consumables = gear.filter((g) => g.kind === 'consumable' || (g.tags ?? []).some((t) => ['food', 'medical', 'heal', 'drink', 'consumable'].includes(t)));
+  const supplies = consumables.length ? consumables : gear;
+  const entry = (it: CatRow, weight: number): RoadsidePoolEntry => {
+    const p = priceFor(it);
+    return { itemName: it.name, priceMin: Math.max(1, Math.round(p * 0.8)), priceMax: Math.max(2, Math.round(p * 1.25)), weight };
+  };
+  const pool = (rows: CatRow[], n: number, w: number) => sampleRows(rows, n).map((it) => entry(it, w));
+  const arch: RoadsideArchetype[] = [];
+  const honest = [...pool(supplies, 4, 12), ...pool(materials, 3, 10), ...pool(weapons, 2, 5)];
+  if (honest.length) arch.push({ id: 'gen_roadside_vendor', name: 'Roadside Vendor', title: 'wandering trader', demeanor: 'honest', description: 'A stall thrown together from cart-boards and tarp. Watches the road with one eye and the goods with the other.', pool: honest });
+  const sketchy = [...pool(materials, 3, 8), ...pool(weapons, 2, 6), ...pool(armor, 2, 5)];
+  if (sketchy.length) arch.push({ id: 'gen_fence', name: 'Black-Market Fence', title: 'fence', demeanor: 'sketchy', description: 'No stall, just a coat full of pockets and a quick way out. Prices are good; provenance is not.', pool: sketchy });
+  return arch;
+}
+
+function cleanVendorList(list: unknown): VendorTemplate[] {
+  return (Array.isArray(list) ? list : []).filter(
+    (v): v is VendorTemplate =>
+      !!v && typeof v === 'object' &&
+      typeof (v as VendorTemplate).name === 'string' &&
+      Array.isArray((v as VendorTemplate).offers),
+  );
+}
+
+/** The live vendor pool. FEATURES toggle off → no vendors at all. Otherwise:
+ *  author override REPLACES the generic storefront (default) or is APPENDED to it
+ *  (vendorsAppendGeneric); with no author vendors a custom/generic game uses the
+ *  data-driven storefront, while the built-in Tartaria game keeps its authored pool. */
+export function getActiveVendors(): VendorTemplate[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('./contentPack') as typeof import('./contentPack');
+  if (!cp.isVendorsEnabled()) return []; // vendors switched off
+  const ov = cleanVendorList(cp.getVendorsOverride());
+  if (ov.length > 0) {
+    return cp.isVendorsAppendGeneric() ? [...ov, ...buildGenericStorefront()] : ov;
+  }
+  // No author vendors: generic pack installed (a custom game) → data-driven storefront;
+  // otherwise (stock Tartaria) → the built-in authored pool.
+  if (cp.getGenericVendors() != null) {
+    const generic = buildGenericStorefront();
+    return generic.length > 0 ? generic : VENDORS;
+  }
+  return VENDORS;
+}
+
 // Random vendor pick. Used when a peaceful scene rolls a vendor encounter.
 // Returns a fresh VendorInstance (mutable offers, decoupled from template).
 export function pickRandomVendor(): VendorInstance {
-  const v = VENDORS[Math.floor(Math.random() * VENDORS.length)]!;
+  const active = getActiveVendors();
+  const pool = active.length > 0 ? active : VENDORS; // vendors-off pools are empty; never index undefined
+  const v = pool[Math.floor(Math.random() * pool.length)]!;
   return {
     id: v.id,
     name: v.name,
@@ -145,7 +281,8 @@ export function pickRandomVendor(): VendorInstance {
 // outdoor (non-hub) peaceful scenes so the player has somewhere cheap
 // to spend small TC drops.
 export function pickRoadsideTrader(): VendorInstance {
-  const arch = ROADSIDE.archetypes[Math.floor(Math.random() * ROADSIDE.archetypes.length)]!;
+  const pool = getActiveRoadside();
+  const arch = pool[Math.floor(Math.random() * pool.length)]!;
   const n = 3 + Math.floor(Math.random() * 4); // 3-6 offers
   const picked = new Set<string>();
   const offers: VendorOffer[] = [];
@@ -347,7 +484,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
 // or null if no template matches.
 export function findVendorByName(name: string): VendorInstance | null {
   const lowered = name.toLowerCase();
-  const v = VENDORS.find((vt) => vt.name.toLowerCase() === lowered);
+  const v = getActiveVendors().find((vt) => vt.name.toLowerCase() === lowered);
   if (!v) return null;
   return {
     id: v.id,
