@@ -491,8 +491,11 @@ export function effectiveStats(
     intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0)),
     wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0)),
     charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0)),
-    // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player.
-    stealth: Math.max(1, (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0)),
+    // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player. Floored at 0, not 1: unlike the
+    // five core attributes (which always have a positive base, so the ≥1 clamp only ever catches debuff
+    // overshoot), an untrained character legitimately has 0 stealth — clamping it to 1 would fabricate a
+    // phantom point. 0 still blocks debuffs from driving it negative.
+    stealth: Math.max(0, (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0)),
   };
 }
 
