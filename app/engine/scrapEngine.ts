@@ -11,8 +11,18 @@
 // roughly one common dig.
 
 import type { InventoryItem } from './types';
-import { resolveScrap } from './contentPack';
+import { resolveScrap, resolveTable } from './contentPack';
 import scrapData from '../data/scrap/scrap.json';
+import materialsData from '../data/items/materials.json';
+
+// engine_Dev — the live materials pool (author override → built-in). Drives both
+// the "is this already raw stock?" guard and the random-material scrap fallback,
+// so an UNRECOGNIZED item yields a REAL material name pulled from the data file —
+// never an invented one.
+interface MaterialRow { name: string; rarity?: string; tags?: string[] }
+function allMaterials(): MaterialRow[] {
+  return resolveTable('materials', (materialsData as { materials: MaterialRow[] }).materials) as MaterialRow[];
+}
 
 // engine_Dev — the scrap DATA (material roles, raw guards, premium mats, failure
 // lines) is now app/data/scrap/scrap.json and author-uploadable; the tag→material
@@ -39,28 +49,62 @@ export interface ScrapOutput {
 /** True if the item can be scrapped — weapons, armor, relics, and
  *  durable gear all qualify. Materials (`misc` / `consumable`) are
  *  already stock and refuse scrapping. */
-export function canScrap(item: InventoryItem): boolean {
-  // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
-  // bound to the character until the final act. Block scrap up
-  // front so the player can't accidentally feed a Core to the
-  // forge.
+/** Is this item already raw stock — a material itself (present in the resolved
+ *  materials pool) or a declared scrap output (rawGuard)? Such items can't be
+ *  broken down into themselves, so scrap refuses them with "it already IS stock
+ *  material". */
+export function isStockMaterial(item: InventoryItem): boolean {
+  const lc = item.name.toLowerCase();
+  if (allMaterials().some((m) => m.name.toLowerCase() === lc)) return true;
+  return scfg().rawGuard.some((n) => n.toLowerCase() === lc);
+}
+
+/** Does this item have a real, TAG-DRIVEN scrap output (recognized gear)? This is
+ *  the original canScrap rule set — weapons/armor/relics + material-tagged misc.
+ *  When false, the item is unrecognized and scrap rolls a random material from the
+ *  pool instead (randomMaterialScrap). */
+export function hasTagScrapOutput(item: InventoryItem): boolean {
   if ((item.tags ?? []).includes('quest')) return false;
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
-  // Some gear (compass, torch, rope) carries useful base materials —
-  // allow scrap as long as the item isn't a raw commodity.
-  // OTA-191 — 'improvised' added to the gate so misc items the
-  // OTA-191 inferGear default-tags as improvised (no specific material
-  // keyword in the name) still pass the scrap predicate. scrapOutputFor
-  // already routes 'improvised' to Small Rock; this just keeps the
-  // gate consistent with the output table.
+  // OTA-191 — 'improvised' keeps misc items inferGear default-tags pass the gate.
   if (item.kind === 'misc' && (item.tags ?? []).some((t) =>
     /metal|wood|stone|aether|crystal|fiber|cloth|plate|scaled|improvised|organic/i.test(t),
   )) {
-    // Materials that already ARE the scrap output refuse to scrap into
-    // themselves (the rawGuard list in the scrap config).
     return !new Set(scfg().rawGuard).has(item.name);
   }
   return false;
+}
+
+export function canScrap(item: InventoryItem): boolean {
+  // v2.4.1 (OTA 052) — quest items (main-quest keys etc.) are bound to the
+  // character until the final act. Block scrap up front so the player can't
+  // accidentally feed one to the forge.
+  if ((item.tags ?? []).includes('quest')) return false;
+  // Raw stock — a material itself or a declared scrap output — can't be broken
+  // down further. (Keeps "already IS stock material" accurate and stops a
+  // material→material money pump.)
+  if (isStockMaterial(item)) return false;
+  // engine_Dev — everything else scraps. Recognized gear yields its tag-driven
+  // output (scrapOutputFor); anything the engine DOESN'T recognize still yields a
+  // random material from the pool (randomMaterialScrap), so no author item ever
+  // dead-ends at "nothing to break down".
+  return true;
+}
+
+/** RNG-roll a single COMMON material from the resolved materials pool — the scrap
+ *  yield for an UNRECOGNIZED item. We never invent a material; we pull a real name
+ *  from the (author-overridable) materials JSON. Common-only keeps it cheap so
+ *  scrapping a stack of rations can't be laundered into high-value mats. */
+export function randomMaterialScrap(): ScrapOutput {
+  const all = allMaterials();
+  const common = all.filter((m) => (m.rarity ?? 'Common') === 'Common');
+  const pool = common.length > 0 ? common : all;
+  if (pool.length === 0) {
+    // No materials defined at all — basic stone so the click isn't wasted.
+    return { grants: [{ name: scfg().roles.stone, quantity: 1 }], summary: scfg().roles.stone };
+  }
+  const pick = pool[Math.floor(Math.random() * pool.length)]!;
+  return { grants: [{ name: pick.name, quantity: 1 }], summary: pick.name };
 }
 
 /** OTA-443 — scrap output scales with the scrapped item's rarity. A

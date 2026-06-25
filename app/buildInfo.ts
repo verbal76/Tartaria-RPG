@@ -16100,4 +16100,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // — it already IS stock material" arbiter line — 22 identical lines in one burst (the
 // dedup only suppressed the log echo). doScrap now tracks the target's total quantity and
 // breaks the instant a scrap makes no progress, so a refusal fires at most once. tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-860';
+//
+// engine_Dev-861 — bulk-scrap summary + unrecognized-item scrap. (1) "Scrap All" now
+// runs SILENT and emits ONE flavored summary line that notes it was a bulk scrap and
+// lists the combined haul, instead of one flavor line per unit (a stack of 20 was 20+
+// lines). (2) An UNRECOGNIZED item (consumable / plain misc — no tag-driven scrap
+// output) no longer dead-ends at "nothing to break down"; it RNG-rolls a single COMMON
+// material pulled from the resolved materials JSON (real names only, never invented;
+// Common-only so it can't be laundered into high-value mats). Quest items and genuine
+// raw stock materials still refuse. New scrapEngine exports: isStockMaterial,
+// hasTagScrapOutput, randomMaterialScrap; scrapInventoryItem takes { silent }. tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-861';

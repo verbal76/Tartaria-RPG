@@ -416,21 +416,27 @@ export function InventoryScreen() {
     // and the modal's result body shows the combined delta. Clamp to the
     // current stack size in case the inventory shifted while the modal was
     // open (e.g., an autosave dock event).
+    const itemName = pending.item.name;
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
+    const isBulk = reps > 1;
     // Stop the moment a scrap makes no progress. scrapInventoryItem refuses
     // (without consuming anything) when the resolved stack is non-scrappable
     // stock material — without this guard a "Scrap All (22)" on such a stack
     // fired the "Nothing here to break down" refusal 22 times in a burst
     // (playtest log). Track the target's total quantity; if an iteration
     // doesn't reduce it, the call was a no-op/refusal — bail after the first.
-    const nameLc = pending.item.name.toLowerCase();
+    const nameLc = itemName.toLowerCase();
     const qtyOf = () => (useGameStore.getState().player?.inventory ?? [])
       .filter((i) => i.name.toLowerCase() === nameLc)
       .reduce((n, i) => n + (i.quantity ?? 0), 0);
-    let prevQty = qtyOf();
+    const startQty = qtyOf();
+    let prevQty = startQty;
     for (let i = 0; i < reps; i++) {
-      scrapInventoryItem(pending.item.name);
+      // Bulk scrap runs SILENT — each unit's per-item flavor line is suppressed
+      // so a stack of 20 doesn't spam 20 lines; one aggregated summary is emitted
+      // below. A single scrap keeps its normal per-item narration.
+      scrapInventoryItem(itemName, { silent: isBulk });
       const nowQty = qtyOf();
       if (nowQty >= prevQty) break; // refusal / no-op — don't hammer the same line
       prevQty = nowQty;
@@ -438,6 +444,18 @@ export function InventoryScreen() {
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);
     setScrapResult(delta);
+    // Bulk summary — one flavored line that NOTES it was a bulk scrap, plus the
+    // combined haul, in place of the suppressed per-unit lines.
+    const consumed = startQty - qtyOf();
+    if (isBulk && consumed > 0) {
+      const haul = delta.length > 0
+        ? delta.map((d) => (d.quantity > 1 ? `${d.name} ×${d.quantity}` : d.name)).join(', ')
+        : 'nothing usable';
+      useGameStore.getState().appendLog(
+        'world',
+        `✦ Bulk scrap — you tear through ${consumed} ${itemName} in one go. That was a lot to break down, and the whole pile gives up: ${haul}.`,
+      );
+    }
   };
 
   // Build the modal's button list based on the item's state.
