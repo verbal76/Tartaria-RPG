@@ -15212,4 +15212,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
 // already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
 // green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
-export const OTA_BUILD_ID = '2026-06-18-635';
+// OTA-636 (Bitrihexium Tempo) — [combat parity, Tartaria-native — NO JSON plumbing] bring HaL's combat closer to the
+// Dev-engine's typed combat, hardcoded. TWO parts. (A) STAT GLOSSARY: the built-in item catalog authored ~100 stat
+// bonuses under names the engine never tracked (constitution / acrobatics / investigation / aetheria / perception …) and
+// silently DROPPED them. equipment.canonicalStatKey now maps each synonym to the real engine stat (or the hp pool) at
+// every equipped stat-read — at aggregation, both hp-filter sites, AND the durability instance-perk roll — so the bonuses
+// finally count (constitution→hp, acrobatics→dexterity, investigation/aetheria→intelligence, perception→wisdom, …). Plus a
+// stat floor: effectiveStats clamps the five core attributes ≥1 so stacked debuffs can't zero a roll; stealth floors at 0
+// (an untrained 0 is legitimate, not a phantom +1). (B) TYPED DAMAGE-TYPE PROCS: each built-in type (piercing/slashing/
+// bludgeoning/electrical/aetheric/stun/cold/burn/poison/radiation) now carries a small on-hit bonus or a timed DOT, gated
+// by an apply chance (raised vs a target WEAK to the type, lowered vs RESISTANT), hardcoded as BUILTIN_DT_COMBAT and
+// reusing the existing coating-DOT (enemyStatuses) + enemyArmorShred infra — no contentPack/JSON getters added. Both
+// directions: player→enemy folds the bonus / seeds a typed_dot and an on-hit debuff becomes an "exposed" AC shred (shares
+// the proc roll); enemy→player lands only the on-hit/DOT bonus (1d3 vs the player's 1d4 — a deliberate player-favouring
+// asymmetry; NO player stat penalty), at full chance for EXPLICITLY-typed enemies and 0.4× for inferred bare-dice types so
+// the ~95 untyped enemies don't silently tax the player. Damage-type aliases (force/psychic→aetheric, frost→cold,
+// shock→electrical) via canonDT. EnemyPanel surfaces the typed_dot status (DOT badge). Balanced by a multi-agent stress +
+// balance-probe pass (probe holds ~90% win at the Common tier real early-game players fight). tsc clean; full combat suite
+// green. JS-only. app/state/gameStore.ts, app/engine/{equipment,durability}.ts, app/components/EnemyPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-26-636';

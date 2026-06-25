@@ -201,6 +201,25 @@ type StatKey = keyof Stats;
 // + ~16 other authored pieces) actually apply through aggregateEquippedStatBonuses.
 const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
 
+// engine_Dev — STAT GLOSSARY. Tartaria's built-in catalog authored ~100 stat bonuses with names the
+// engine doesn't track (constitution / acrobatics / investigation / aetheria / perception …), which
+// were silently dropped. This maps those synonyms to the real engine stat (or the hp pool) so the
+// bonuses finally count. Lowercased keys; aligned to the closest real stat.
+const STAT_ALIAS: Record<string, string> = {
+  str: 'strength', power: 'strength', might: 'strength', brawn: 'strength',
+  dex: 'dexterity', agility: 'dexterity', acrobatics: 'dexterity', reflexes: 'dexterity', finesse: 'dexterity', sleight: 'dexterity',
+  int: 'intelligence', logic: 'intelligence', investigation: 'intelligence', knowledge: 'intelligence', arcana: 'intelligence', aetheria: 'intelligence', aether: 'intelligence',
+  wis: 'wisdom', perception: 'wisdom', awareness: 'wisdom', insight: 'wisdom', intuition: 'wisdom', willpower: 'wisdom',
+  cha: 'charisma', presence: 'charisma', persuasion: 'charisma', charm: 'charisma',
+  ste: 'stealth', sneak: 'stealth', sneaking: 'stealth',
+  constitution: 'hp', con: 'hp', vitality: 'hp', endurance: 'hp', toughness: 'hp', health: 'hp', fortitude: 'hp',
+};
+/** Canonicalize a stat name: lowercase + map a known synonym to the engine stat / hp pool key. */
+export function canonicalStatKey(raw: string | null | undefined): string {
+  const lc = (raw ?? '').toLowerCase();
+  return STAT_ALIAS[lc] ?? lc;
+}
+
 // Shared resolver list — the effect system can be backed by any
 // catalog row that carries an `effect` field. As of OTA 192 that's
 // exploration / gear / material rows in addition to the existing
@@ -281,7 +300,7 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   const bonus: Partial<Record<StatKey, number>> = {};
   const eq = player.equipped ?? {};
   const add = (stat: string, amount: number) => {
-    const key = stat as StatKey;
+    const key = canonicalStatKey(stat) as StatKey; // map synonyms (acrobatics→dexterity…); hp falls out here and routes to the pool
     if (!STAT_KEYS.includes(key)) return;
     bonus[key] = (bonus[key] ?? 0) + amount;
   };
@@ -396,7 +415,7 @@ export function armorHpBonus(name: string | null | undefined): number {
   if (!piece) return 0;
   const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
   return bonuses
-    .filter((b) => b.stat === 'hp')
+    .filter((b) => canonicalStatKey(b.stat) === 'hp')
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
@@ -410,7 +429,7 @@ export function weaponHpBonus(name: string | null | undefined): number {
   if (!wpn) return 0;
   const bonuses = wpn.statBonuses ?? [];
   return bonuses
-    .filter((b) => b.stat === 'hp')
+    .filter((b) => canonicalStatKey(b.stat) === 'hp')
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
@@ -464,14 +483,19 @@ export function effectiveStats(
   // aether under your skin actually costs you something.
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
+  // engine_Dev — floor every effective stat at 1 so stacked debuffs (weather + corruption + damage-
+  // type onHit) can't drive a roll stat to 0 or negative.
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0),
-    // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player.
-    stealth: (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0),
+    strength: Math.max(1, player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0)),
+    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0)),
+    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0)),
+    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0)),
+    charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0)),
+    // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player. Floored at 0, not 1: unlike the
+    // five core attributes (which always have a positive base, so the ≥1 clamp only ever catches debuff
+    // overshoot), an untrained character legitimately has 0 stealth — clamping it to 1 would fabricate a
+    // phantom point. 0 still blocks debuffs from driving it negative.
+    stealth: Math.max(0, (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0)),
   };
 }
 
