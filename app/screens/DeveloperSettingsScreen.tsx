@@ -2607,7 +2607,48 @@ function DamageTypesBuilder() {
 }
 const RESISTANCES_TEMPLATE = JSON.stringify({ 'REPLACE-with-your-enemy-type': { resist: ['piercing'], weak: ['frost'] } }, null, 2);
 const FUSION_TAGS_TEMPLATE = JSON.stringify(['servo', 'fold-core', 'bakelite'], null, 2);
-const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', blurb: 'seeps phase-rot into the wound (damage over time + worsening stacks)', lootLabel: 'Phase-etched' } }, null, 2);
+// engine_Dev — RENAME template for the five built-in weapon-coating MECHANICS. The combat
+// effects stay wired (poison=pure DOT, acid=DOT+armor shred, corruption=DOT+sickening stacks,
+// electrical=counts as electrical dmg, burn=counts as burn dmg) — you are only re-skinning the
+// words the player reads. All five are pre-filled with their generic defaults below; edit the
+// strings to your setting and DELETE any mechanic you want to leave at its default. Per mechanic:
+//   label     — the adjective shown when a weapon is coated ("Poisoned Battle Axe")
+//   blurb     — the one-line combat/inventory description of what the coating does
+//   lootLabel — the adjective on a weapon that turns up already-coated as loot (usually = label)
+const COATINGS_TEMPLATE = [
+  '{',
+  '  // poison — pure damage over time, nothing extra.',
+  '  "poison": {',
+  '    "label": "Poisoned",',
+  '    "blurb": "leaks poison into the wound (pure damage over time)",',
+  '    "lootLabel": "Poisoned"',
+  '  },',
+  '  // acid — damage over time AND shreds the target\'s armor (AC) the more you hit.',
+  '  "acid": {',
+  '    "label": "Acid-Etched",',
+  '    "blurb": "burns and eats the target\'s armor (damage over time + armor shred)",',
+  '    "lootLabel": "Acid-Etched"',
+  '  },',
+  '  // corruption — damage over time that ticks harder per stack (worst against tough foes).',
+  '  "corruption": {',
+  '    "label": "Corrupted",',
+  '    "blurb": "pushes corruption into the target (damage over time + sickening stacks)",',
+  '    "lootLabel": "Corrupted"',
+  '  },',
+  '  // electrical — counts as electrical damage (extra-effective vs constructs/automatons).',
+  '  "electrical": {',
+  '    "label": "Charged",',
+  '    "blurb": "arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)",',
+  '    "lootLabel": "Charged"',
+  '  },',
+  '  // burn — counts as burn damage (extra-effective vs mud creatures and other burn-weak foes).',
+  '  "burn": {',
+  '    "label": "Burning",',
+  '    "blurb": "sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)",',
+  '    "lootLabel": "Burning"',
+  '  }',
+  '}',
+].join('\n');
 const INVENTORY_TEMPLATE = JSON.stringify({ labels: { loot: 'Salvage', material: 'Components', weapon: 'Arsenal' }, toolTags: ['multitool', 'spanner'], repairMaterialPct: 200 }, null, 2);
 
 const BUILTIN_DAMAGE_TYPES = ['bludgeoning', 'slashing', 'piercing', 'burn', 'electrical', 'poison', 'radiation', 'stun', 'degradation', 'aetheric'];

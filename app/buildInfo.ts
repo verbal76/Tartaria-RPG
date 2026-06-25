@@ -16169,4 +16169,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // vests/collars used as recipe results stop false-flagging as "isn't in any item table"). Plus a
 // multi-part COPY VALIDATION button (mirrors LogScreen's 25k chunking) so big reports paste through
 // length-limited channels. Engine wiring + validation only — no content touched. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-867';
+// OTA-868 — Coatings rename template now ships ALL FIVE mechanics pre-filled with their generic
+// defaults + an instruction header (what each field is for, edit/delete to taste), instead of a
+// single corruption example. Both the standalone coatings.json template and the whole-game bundle
+// entry. Template/wording only — combat mechanics unchanged. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-868';
