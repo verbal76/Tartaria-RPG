@@ -7,7 +7,7 @@
 
 import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride, getDiggingOverride, getSalvageOverride, resolveFlavor } from './contentPack';
 import { getFactions } from './character';
-import { findCatalogItem } from './crafting';
+import { findCatalogItem, getDogGear } from './crafting';
 import locationsBuiltin from '../data/locations/locations.json';
 import enemiesBuiltin from '../data/enemies/enemies.json';
 
@@ -38,9 +38,22 @@ export interface ValidationReport {
 const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() ? v.trim() : null);
 const rows = (v: unknown): Record<string, unknown>[] =>
   Array.isArray(v) ? v.filter((r): r is Record<string, unknown> => !!r && typeof r === 'object') : [];
+// dogGear (dog vests/collars, kind 'dog_armor') lives in its own table that findCatalogItem
+// doesn't scan — but lookupCraftedItem (the real craft path) DOES resolve it (OTA-603). Mirror
+// that here so dog-armor items aren't false-flagged as "isn't in any item table".
+const dogGearNames = (): Set<string> => {
+  const s = new Set<string>();
+  for (const g of getDogGear()) {
+    const n = str((g as { name?: unknown }).name);
+    if (n) s.add(n.toLowerCase());
+  }
+  return s;
+};
 const itemExists = (name: unknown): boolean => {
   const n = str(name);
-  return !!n && !!findCatalogItem(n);
+  if (!n) return false;
+  if (findCatalogItem(n)) return true;
+  return dogGearNames().has(n.toLowerCase());
 };
 
 // Engine-known effect verbs (hooks / whispers). An effect with any other `type` won't run.
@@ -114,7 +127,7 @@ export function validateGame(): ValidationIssue[] {
   const ingLootOnly = new Set<string>();  // obtainable as loot/drop but in no item table (→ blank misc)
   for (const r of rows(resolveTable('recipes', []))) {
     const result = str(r.result);
-    if (result && !findCatalogItem(result)) err('recipe.result.missing', 'Crafting recipes', `Recipe result "${result}" isn't in any item table — it will craft to a blank "misc".`, { id: result, suggestion: 'Add it to Weapons/Armor/Gear/Exploration/Amulets/Rings.' });
+    if (result && !itemExists(result)) err('recipe.result.missing', 'Crafting recipes', `Recipe result "${result}" isn't in any item table — it will craft to a blank "misc".`, { id: result, suggestion: 'Add it to Weapons/Armor/Gear/Exploration/Amulets/Rings/DogGear.' });
     for (const ing of rows(r.ingredients)) {
       const name = str(ing.name);
       if (!name) continue;

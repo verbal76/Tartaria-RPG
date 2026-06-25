@@ -16164,4 +16164,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // but absent from every item table → WARNING ("define it in Materials", blank-misc otherwise);
 // one defined+obtainable nowhere → ERROR. Two aggregated info lines name exactly what to add
 // to Materials. No content touched — engine wiring + validation only. tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-866';
+// OTA-867 — Validate Game: dogGear-aware item-existence check (findCatalogItem doesn't scan the
+// dog-armor table, but lookupCraftedItem does — OTA-603; the validator now mirrors it so dog
+// vests/collars used as recipe results stop false-flagging as "isn't in any item table"). Plus a
+// multi-part COPY VALIDATION button (mirrors LogScreen's 25k chunking) so big reports paste through
+// length-limited channels. Engine wiring + validation only — no content touched. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-867';

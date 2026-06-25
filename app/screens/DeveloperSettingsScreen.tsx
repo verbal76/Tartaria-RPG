@@ -490,6 +490,9 @@ function GameBundleBox() {
   // engine_Dev — the FULL validation report text (all lines, not the 20-line preview),
   // captured on the last Validate run so it can be copied to the clipboard.
   const [validationText, setValidationText] = useState<string | null>(null);
+  // engine_Dev — multi-part copy for big reports (mirrors LogScreen): when the report is larger
+  // than one paste-safe chunk, the copy button cycles PART 1..N on each tap.
+  const [vChunk, setVChunk] = useState(1);
   // engine_Dev — multi-part save: uploaded parts collect here until every 1..N is in, then knit.
   const [pendingParts, setPendingParts] = useState<GameSavePart[]>([]);
   // engine_Dev — soft export gate: a SAVE with hard validation errors asks for a second tap.
@@ -633,12 +636,13 @@ function GameBundleBox() {
               : `⚠ Validate Game: ${counts} (safe to export).`;
             // Full report captured for the COPY button; on-screen status shows a 20-line preview.
             setValidationText(`${head}\n\n${s.lines.join('\n')}`);
+            setVChunk(1);
             setStatus({ kind: r.errorCount > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more — tap COPY for the full list.` : ''}` });
           }}
         >
           <Text style={styles.copyBtnText}>✓ VALIDATE GAME</Text>
         </TouchableOpacity>
-        {validationText !== null && (
+        {validationText !== null && validationText.length <= VALIDATION_CHUNK_SIZE && (
           <TouchableOpacity
             style={[styles.copyBtn, styles.stackBtn]}
             onPress={() => { void Clipboard.setStringAsync(validationText); setStatus({ kind: 'ok', msg: 'Validation output copied to clipboard.' }); }}
@@ -646,6 +650,24 @@ function GameBundleBox() {
             <Text style={styles.copyBtnText}>⧉ COPY VALIDATION OUTPUT</Text>
           </TouchableOpacity>
         )}
+        {validationText !== null && validationText.length > VALIDATION_CHUNK_SIZE && (() => {
+          const total = Math.max(1, Math.ceil(validationText.length / VALIDATION_CHUNK_SIZE));
+          return (
+            <TouchableOpacity
+              style={[styles.copyBtn, styles.stackBtn]}
+              onPress={() => {
+                const start = (vChunk - 1) * VALIDATION_CHUNK_SIZE;
+                const slice = validationText.slice(start, start + VALIDATION_CHUNK_SIZE);
+                const wrapped = `=== VALIDATION · PART ${vChunk} of ${total} · ${slice.length} CHARS · BEGIN ===\n${slice}\n=== VALIDATION · PART ${vChunk} of ${total} · END ===`;
+                void Clipboard.setStringAsync(wrapped);
+                setStatus({ kind: 'ok', msg: `Copied validation PART ${vChunk} of ${total} — paste it, then tap again for the next part.` });
+                setVChunk((i) => (i >= total ? 1 : i + 1));
+              }}
+            >
+              <Text style={styles.copyBtnText}>{`⧉ COPY VALIDATION · PART ${vChunk} / ${total} — TAP FOR EACH`}</Text>
+            </TouchableOpacity>
+          );
+        })()}
         <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
           <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
         </TouchableOpacity>
@@ -2589,6 +2611,9 @@ const COATINGS_TEMPLATE = JSON.stringify({ corruption: { label: 'Phase-etched', 
 const INVENTORY_TEMPLATE = JSON.stringify({ labels: { loot: 'Salvage', material: 'Components', weapon: 'Arsenal' }, toolTags: ['multitool', 'spanner'], repairMaterialPct: 200 }, null, 2);
 
 const BUILTIN_DAMAGE_TYPES = ['bludgeoning', 'slashing', 'piercing', 'burn', 'electrical', 'poison', 'radiation', 'stun', 'degradation', 'aetheric'];
+
+// engine_Dev — paste-safe chunk size for the multi-part validation copy (matches LogScreen's 25k).
+const VALIDATION_CHUNK_SIZE = 25_000;
 
 // engine_Dev — ENEMY damage-relations builder. Pulls the live damage-type list
 // (built-in + the ones you defined above) and lets you set, per enemy, what it
