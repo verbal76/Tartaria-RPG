@@ -16217,4 +16217,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // its pools from the loaded catalog too — Roadside Vendor (honest) + Black-Market Fence (sketchy),
 // pulled from gear/materials/weapons/armor, respecting the append/replace + enabled toggles. Generic
 // demo hub anchor → "Quartermaster". No content baked — wares derive from whatever catalog loads. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-875';
+// OTA-876 — round-trip guard: re-uploading your own annotated export no longer promotes
+// un-customized TEMPLATE sections into broken overrides. The whole-game export bakes the template
+// scaffold into every ⬜ section the author hasn't customized, and the ⬜/✅ markers are comments
+// (stripped on load) — so re-uploading reinstated the placeholder vendors ("Maren the Trader") and
+// roadside ("Road Hawker") selling items the custom catalog lacks, every single round. loadGameBundle
+// now drops any section whose value still equals its template (via bundleTemplateMap) → treated as
+// "not uploaded" → built-in/generic default. An all-template (blank) bundle still loads OK. Load-path
+// only — no content edited. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-876';

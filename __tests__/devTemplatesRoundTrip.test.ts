@@ -167,3 +167,21 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     for (const key of required) expect(t).toContain(`"${key}"`);
   });
 });
+
+describe('engine_Dev — re-uploading a baked annotated export ignores un-customized template sections', () => {
+  beforeEach(() => { store().clearAll(); clearAllOverrides(); });
+  test('a baked ⬜ vendors/roadside template is NOT promoted to an override on re-upload', () => {
+    // A game that customized ONLY weapons; vendors + roadside stay the ⬜ template scaffold.
+    const bundle = buildAnnotatedGameBundle({ weapons: [{ name: 'My Gun', rarity: 'Common', tags: [], damageDice: '1d6' }] });
+    // sanity — the export DID bake the placeholder vendor + roadside templates
+    expect(bundle).toContain('Maren the Trader');
+    expect(bundle).toContain('Road Hawker');
+    const r = store().loadGameBundle(bundle, { persist: false });
+    expect(r.ok).toBe(true);
+    // the un-customized template sections are skipped → no broken override promoted
+    expect(store().vendors).toEqual([]);
+    expect(store().roadsideTraders).toEqual([]);
+    // the genuinely-customized section still loads
+    expect((store().tables.weapons ?? []).some((w) => (w as { name?: string }).name === 'My Gun')).toBe(true);
+  });
+});

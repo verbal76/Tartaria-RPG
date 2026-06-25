@@ -64,6 +64,7 @@ const MISSION_KEYS: MissionTableId[] = ['hunts', 'mysteries', 'factionQuests', '
 import { invalidateLocationCaches } from '../engine/worldMap';
 import { invalidateInteractionTagCache } from '../engine/interactionTags';
 import { reconcileStamps, staleKeys, type TemplateStamps } from '../engine/templateVersioning';
+import { bundleTemplateMap } from '../engine/contentTemplates';
 
 const INTERACTION_TAG_KEYS = ['climbable', 'swimmable', 'breakable', 'searchable', 'salvageable'] as const;
 
@@ -1379,6 +1380,27 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       return { ok: false, error: 'A whole-game file must be a JSON OBJECT whose keys are the section names (weapons, races, factions, locations, world, lore, …).' };
     }
     const obj = parsed as Record<string, unknown>;
+
+    // engine_Dev — ROUND-TRIP GUARD. The annotated export bakes the TEMPLATE scaffold into every
+    // section the author hasn't uploaded (the ⬜ blocks), and the ⬜/✅ markers are comments, stripped
+    // on load. Without this, re-uploading your own export promotes those un-customized templates into
+    // real overrides — e.g. the placeholder vendors ("Maren the Trader" selling items your catalog
+    // doesn't have) reappear every round. Drop any section whose value still equals its template, so
+    // a baked scaffold is treated as "not uploaded" → the built-in/generic default is used instead.
+    const skippedTemplateSections: string[] = [];
+    try {
+      const tmpl = bundleTemplateMap();
+      for (const [key, content] of Object.entries(tmpl)) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+        let tmplVal: unknown;
+        try { tmplVal = JSON.parse(stripJsonComments(content)); } catch { continue; }
+        if (JSON.stringify(obj[key]) === JSON.stringify(tmplVal)) {
+          delete obj[key];
+          skippedTemplateSections.push(key);
+        }
+      }
+    } catch { /* template map unavailable — proceed without the guard */ }
+
     const tableIds = new Set<string>(CONTENT_TABLES.map((t) => t.id));
     const loreIds = new Set<string>(LORE_BLOCKS.map((b) => b.id));
 
@@ -1588,7 +1610,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       }
     }
 
-    if (applied.length === 0) {
+    if (applied.length === 0 && skippedTemplateSections.length === 0) {
       return { ok: false, error: `No recognised sections found. Keys must be section names like: ${[...tableIds, ...loreIds, 'title', 'tagline', 'narrator'].join(', ')}.` };
     }
 
@@ -1678,7 +1700,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, roadsideTraders: nextRoadside, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, weatherEnabled: nextWeatherEnabled, vendorsEnabled: nextVendorsEnabled, vendorsAppendGeneric: nextVendorsAppendGeneric, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
     }
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
-    const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
+    const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}${skippedTemplateSections.length ? ` Ignored ${skippedTemplateSections.length} un-customized template section(s) (${skippedTemplateSections.join(', ')}) — they use the built-in defaults.` : ''}`;
     return { ok: true, summary };
   },
 
