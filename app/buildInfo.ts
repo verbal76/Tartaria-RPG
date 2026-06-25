@@ -15096,4 +15096,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resumed save is past first-run onboarding. Fix: loadSlotIntoGame now clears tutorialStep/awaitingTutorialName/
 // tutorialExploreChosen and sets hasSeenIntro:true; saveAndExitToTitle clears the same on the way out. Locked by
 // sessionResume tests. JS-only → 290. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-12-623';
+// COMBAT-PARITY I (Tartaria-native, no JSON plumbing) — STAT GLOSSARY: the built-in catalog authored
+// ~100 stat bonuses with names the engine doesn't track (constitution / acrobatics / investigation /
+// aetheria / perception …) that were silently dropped. equipment.canonicalStatKey now maps those
+// synonyms to the real engine stat (or the hp pool) at every equipped stat-read, so the bonuses
+// finally count. Plus a stat floor (effectiveStats clamped ≥1) so stacked debuffs can't zero a roll.
+// Hardcoded — no contentPack/JSON getters added. (Dev: set official OTA number/codename.)
+export const OTA_BUILD_ID = '2026-06-25-624-combatI';
