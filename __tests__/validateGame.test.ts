@@ -12,6 +12,7 @@ import {
 const errs = () => validateGame().filter((i) => i.severity === 'error');
 const errText = () => errs().map((e) => e.message).join('\n');
 const warnText = () => validateGame().filter((i) => i.severity === 'warning').map((e) => e.message).join('\n');
+const infoText = () => validateGame().filter((i) => i.severity === 'info').map((e) => e.message).join('\n');
 
 afterEach(() => clearAllOverrides());
 
@@ -170,6 +171,22 @@ describe('validateGame — pre-export reference checks', () => {
     const w = warnText();
     expect(w).toMatch(/fragment "stranded".*can never drop/s);
     expect(w).not.toMatch(/"reachable"/);
+  });
+
+  it('a recipe ingredient that is only a LOOT drop is a warning (define in Materials), not an error', () => {
+    setTableOverride('enemies', [{ name: 'Glass Hound', hp: 10, attack: 4, damage: '1d6', loot: ['Shiny Shard'] }]);
+    setTableOverride('weapons', [{ name: 'Shard Blade', rarity: 'Common', tags: [], damageDice: '1d6' }]);
+    setTableOverride('recipes', [{ result: 'Shard Blade', ingredients: [{ name: 'Shiny Shard', quantity: 1 }] }]);
+    expect(errText()).not.toMatch(/Shiny Shard/); // obtainable → not an error
+    expect(warnText()).toMatch(/Shiny Shard.*obtainable as loot/s);
+    expect(infoText()).toMatch(/DEFINE in Materials.*Shiny Shard/s);
+  });
+
+  it('a recipe ingredient obtainable nowhere is an error + listed under "Materials to ADD"', () => {
+    setTableOverride('weapons', [{ name: 'Mystery Blade', rarity: 'Common', tags: [], damageDice: '1d6' }]);
+    setTableOverride('recipes', [{ result: 'Mystery Blade', ingredients: [{ name: 'Phantom Dust', quantity: 1 }] }]);
+    expect(errText()).toMatch(/Phantom Dust.*isn't a known item/s);
+    expect(infoText()).toMatch(/Materials to ADD.*Phantom Dust/s);
   });
 
   it('runValidation returns a structured report (ok=false with errors, counts add up)', () => {

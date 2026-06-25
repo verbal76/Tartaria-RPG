@@ -5,7 +5,7 @@
 // effect verbs, and duplicate ids. Errors = will break play; warnings = soft; info = FYI. Pure reads
 // through the content-pack resolvers, so it validates the EFFECTIVE game that will ship.
 
-import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride } from './contentPack';
+import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, resolveWhispers, getSummonsOverride, getWastelandOverride, getDogScenariosOverride, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride, getDiggingOverride, getSalvageOverride, resolveFlavor } from './contentPack';
 import { getFactions } from './character';
 import { findCatalogItem } from './crafting';
 import locationsBuiltin from '../data/locations/locations.json';
@@ -81,14 +81,55 @@ export function validateGame(): ValidationIssue[] {
     for (const d of dupes) err('table.duplicate-id', t.label, `Duplicate id/name "${d}" — two rows share it, so one will shadow the other.`, { id: d });
   }
 
-  // 2) Recipes: result must be a defined catalog item; every ingredient must exist.
+  // engine_Dev — OBTAINABLE-ITEM INDEX. Every item NAME the game can put in a player's
+  // pack from any source (so a recipe ingredient that's a loot drop isn't falsely called
+  // "doesn't exist" — it's real, it just may need a Materials row for stats). Lowercased.
+  const lootNames = new Set<string>();
+  const addLoot = (n: unknown) => { const s = str(n)?.toLowerCase(); if (s) lootNames.add(s); };
+  const addLootList = (v: unknown) => { for (const x of (Array.isArray(v) ? v : [])) addLoot(typeof x === 'string' ? x : (x && typeof x === 'object' ? (x as Record<string, unknown>).name : undefined)); };
+  for (const e of rows(resolveTable('enemies', enemiesBuiltin as unknown[]))) addLootList(e.loot);     // enemy drops
+  for (const b of rows(getCustomBosses())) { addLootList(b.drops); addLoot(b.questItem); }              // boss drops + quest item
+  { const dig = getDiggingOverride() as { loot?: unknown[] } | null; if (dig) for (const l of rows(dig.loot)) addLoot(l.name); } // digging
+  { const sal = getSalvageOverride() as { pools?: { items?: unknown[] }[]; junkPool?: unknown[] } | null; // salvage pools + junk
+    if (sal) { for (const p of (Array.isArray(sal.pools) ? sal.pools : [])) for (const it of rows(p?.items)) addLoot(it.name); for (const it of rows(sal.junkPool)) addLoot(it.name); } }
+  { const waste = getWastelandOverride() as Record<string, { loot?: unknown }> | null;                 // travel-encounter loot (string[] or {name}[])
+    if (waste) for (const arch of Object.values(waste)) addLootList(arch?.loot); }
+  { const hk = getHooksOverride(); if (hk?.chains) for (const stages of Object.values(hk.chains)) for (const st of rows(stages)) for (const ef of rows(st.effects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); } // hook grants
+  for (const w of rows(resolveWhispers([]))) { for (const ef of rows(w.meetEffects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); for (const st of rows(w.stages)) for (const ef of rows(st.effects)) if (str(ef.type) === 'grant_item') addLoot(ef.name); } // whisper grants
+  for (const v of rows(getVendorsOverride())) for (const o of rows(v.offers)) addLoot(o.itemName);      // vendor offers (buyable)
+  for (const v of rows(getRoadsideOverride())) for (const o of rows(v.pool)) addLoot(o.itemName);       // roadside stall
+  for (const d of rows(getDogScenariosOverride())) addLootList(d.captorLoot);                            // dog-captor loot
+  for (const q of rows(resolveMissions('factionQuests', []))) { const rw = q.reward as { items?: unknown } | undefined; addLootList(rw?.items); } // quest rewards
+  for (const k of ['hunts', 'mysteries', 'storylines'] as const) for (const m of rows(resolveMissions(k, []))) addLoot(m.rewardItem);
+  for (const s of rows(getCustomMainQuest()?.steps)) addLoot(s.reward);                                  // main-quest step rewards
+  for (const r of rows(resolveTable('races', []))) { addLoot(r.startingWeapon); addLootList(r.startingGear); } // starting gear
+  for (const f of rows(resolveTable('factions', []))) addLootList(f.startingGear);
+  for (const it of rows(resolveFlavor('starterItems', []))) addLoot(it.name);                            // starter inventory
+
+  // 2) Recipes: result must be a defined catalog item; ingredients must exist — cross-checked
+  // against BOTH the item tables and every loot/drop source so a loot-only ingredient is named
+  // as "define it in Materials", not "doesn't exist". Aggregated lists at the end say exactly
+  // what to add to the Materials table.
+  const ingMissing = new Set<string>();   // referenced by a recipe, defined NOWHERE + not obtainable
+  const ingLootOnly = new Set<string>();  // obtainable as loot/drop but in no item table (→ blank misc)
   for (const r of rows(resolveTable('recipes', []))) {
     const result = str(r.result);
     if (result && !findCatalogItem(result)) err('recipe.result.missing', 'Crafting recipes', `Recipe result "${result}" isn't in any item table — it will craft to a blank "misc".`, { id: result, suggestion: 'Add it to Weapons/Armor/Gear/Exploration/Amulets/Rings.' });
     for (const ing of rows(r.ingredients)) {
-      if (!itemExists(ing.name)) err('recipe.ingredient.missing', 'Crafting recipes', `Recipe "${result ?? '?'}" needs ingredient "${str(ing.name) ?? '?'}", which isn't a known item/material.`, { id: str(ing.name) ?? undefined });
+      const name = str(ing.name);
+      if (!name) continue;
+      if (itemExists(name)) continue; // in a catalog table → fine
+      if (lootNames.has(name.toLowerCase())) {
+        ingLootOnly.add(name);
+        warn('recipe.ingredient.lootonly', 'Crafting recipes', `Recipe "${result ?? '?'}" uses "${name}", which is obtainable as loot but isn't in any item table — add a Materials row so it has stats (otherwise it grants/crafts as a blank "misc").`, { id: name });
+      } else {
+        ingMissing.add(name);
+        err('recipe.ingredient.missing', 'Crafting recipes', `Recipe "${result ?? '?'}" needs ingredient "${name}", which isn't a known item/material and isn't dropped or obtainable anywhere — add it to your Materials table.`, { id: name });
+      }
     }
   }
+  if (ingMissing.size > 0) info('recipe.materials.add', 'Crafting recipes', `Materials to ADD (recipe ingredients defined nowhere): ${[...ingMissing].sort().join(', ')}.`);
+  if (ingLootOnly.size > 0) info('recipe.materials.define', 'Crafting recipes', `Loot-only recipe ingredients to DEFINE in Materials (currently blank "misc"): ${[...ingLootOnly].sort().join(', ')}.`);
 
   // 3) Vendors + roadside traders: offered items must exist; declared faction must be real.
   const checkOffers = (label: string, list: unknown[] | null) => {
