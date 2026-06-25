@@ -528,7 +528,9 @@ interface CurrentScene {
    *  status list; ticks each combat round. Empty array when no
    *  status is active. Initialized empty by beginScene. */
   enemyStatuses?: Array<Array<{
-    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+    // engine_Dev (Combat-Parity II) — 'typed_dot' is a generic built-in-damage-type DOT (burn/poison/
+    // radiation weapon procs), ticking like the coating DOTs.
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'typed_dot';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
@@ -7101,7 +7103,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   || st.kind === 'acid_coat'
                   || st.kind === 'corruption_coat'
                   || st.kind === 'electrical_coat'
-                  || st.kind === 'burn_coat';
+                  || st.kind === 'burn_coat'
+                  || st.kind === 'typed_dot';
                 if (isDot && st.turnsRemaining > 0) {
                   const dmg = st.dmgPerTurn;
                   const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
@@ -7117,7 +7120,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                           ? `${enemyName} convulses — arcing current bites ${dmg}.`
                           : st.kind === 'burn_coat'
                             ? `${enemyName} blisters — clinging fire sears ${dmg}.`
-                            : `${enemyName} convulses — infection bleeds ${dmg}.`;
+                            : st.kind === 'typed_dot'
+                              ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
+                              : `${enemyName} convulses — infection bleeds ${dmg}.`;
                   get().appendLog(
                     'combat',
                     `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
@@ -14046,6 +14051,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (surgeBonus > 0) {
         get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
       }
+      // engine_Dev (Combat-Parity II) — TYPED damage-type proc. The weapon's type rolls a small
+      // on-hit bonus (folds into this strike) or stages a DOT, gated by apply-chance (raised vs weak,
+      // lowered vs resistant); a debuff type also stages an "exposed" AC shred. Seeded below.
+      let typedDot: { dmgPerTurn: number; rounds: number; source: string } | null = null;
+      let typedShred = 0;
+      if (weaponType) {
+        const tp = BUILTIN_DT_COMBAT[canonDT(weaponType)];
+        if (tp) {
+          const tMatch: 'weak' | 'resist' | 'normal' =
+            (mod.match === 'weak' || traitMod.match === 'vulnerable') ? 'weak'
+            : (mod.match === 'resist' || traitMod.match === 'resist') ? 'resist' : 'normal';
+          if (Math.random() < dtProcChance(tp, tMatch)) {
+            const roll = rollDie(4);
+            if (tp.mode === 'on_hit') { dmg += roll; get().appendLog('combat', `${weaponType} flares — +${roll} on hit${tMatch === 'weak' ? ' (weak — bites deep!)' : ''}.`); }
+            else typedDot = { dmgPerTurn: roll, rounds: Math.max(1, tp.rounds ?? 2), source: weaponType };
+            // The "exposed" AC shred is part of the SAME proc (mirrors Dev-engine onHit firing with the
+            // combat block's apply-roll) — gated by the chance, not applied on every landing hit.
+            if (tp.debuffAmt) typedShred = Math.abs(tp.debuffAmt);
+          }
+        }
+      }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       let newEnemyHp = prevHp - dmg;
 
@@ -14327,6 +14353,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
             { combatOutcome: 'player_dmg' },
           );
+        }
+        // engine_Dev (Combat-Parity II) — seed the typed DOT + "exposed" AC shred (reuses the acid
+        // enemyArmorShred lever; capped). Only runs if the proc above staged one.
+        if (typedDot || typedShred > 0) {
+          const td = typedDot; const ts = typedShred;
+          set((s) => {
+            if (!s.currentScene) return s;
+            const n = s.currentScene.enemies.length;
+            const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
+            while (statuses.length < n) statuses.push([]);
+            if (td) {
+              const list = (statuses[activeIdx] ?? []).filter((st) => !(st.kind === 'typed_dot' && st.sourceName === td.source));
+              list.push({ kind: 'typed_dot', turnsRemaining: td.rounds, dmgPerTurn: td.dmgPerTurn, sourceName: td.source });
+              statuses[activeIdx] = list;
+            }
+            let shred = s.currentScene.enemyArmorShred;
+            if (ts > 0) {
+              shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
+              while (shred.length < n) shred.push(0);
+              shred[activeIdx] = Math.min(acidShredCap(s.currentScene.enemies[activeIdx]), (shred[activeIdx] ?? 0) + ts);
+            }
+            const next: typeof s.currentScene = { ...s.currentScene, enemyStatuses: statuses };
+            if (shred) next.enemyArmorShred = shred;
+            return { currentScene: next };
+          });
+          if (typedDot) get().appendLog('combat', `${typedDot.source} sets in — ${typedDot.dmgPerTurn}/turn for ${typedDot.rounds} turns.`, { combatOutcome: 'player_dmg' });
+          if (typedShred > 0) get().appendLog('combat', `${enemy.name} is left exposed — easier to hit.`, { combatOutcome: 'player_dmg' });
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
@@ -22921,6 +22974,35 @@ function runEnemyGroupCounters(
   }
 }
 
+// engine_Dev (Combat-Parity II) — Tartaria-native typed damage-type combat procs (NO JSON plumbing).
+// Each built-in type carries a small on-hit bonus or a DOT, gated by an apply chance (raised vs a
+// target WEAK to the type, lowered vs RESISTANT), plus an optional onHit debuff. Player→enemy the
+// debuff becomes an "exposed" AC shred (easier to hit, reuses enemyArmorShred). Enemy→player only the
+// on-hit/DOT bonus lands — no player stat-debuff/DOT — and at full chance only for EXPLICITLY-typed
+// enemies (inferred bare-dice types proc at 0.4×). Balanced by the 3-agent pass. All procs roll 1d4.
+// Mirrors how Dev-engine's author damageTypes behave, hardcoded.
+type DTProc = { mode: 'on_hit' | 'dot'; rounds?: number; baseChance: number; weakBonus: number; strongPenalty: number; debuffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma'; debuffAmt?: number; debuffRounds?: number };
+const BUILTIN_DT_COMBAT: Record<string, DTProc> = {
+  piercing:    { mode: 'on_hit', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 },
+  slashing:    { mode: 'on_hit', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 },
+  degradation: { mode: 'on_hit', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 },
+  bludgeoning: { mode: 'on_hit', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2, debuffStat: 'dexterity', debuffAmt: -1, debuffRounds: 2 },
+  electrical:  { mode: 'on_hit', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3, debuffStat: 'strength', debuffAmt: -1, debuffRounds: 2 },
+  aetheric:    { mode: 'on_hit', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3, debuffStat: 'dexterity', debuffAmt: -2, debuffRounds: 1 },
+  stun:        { mode: 'on_hit', baseChance: 0.4, weakBonus: 0.2, strongPenalty: 0.2, debuffStat: 'dexterity', debuffAmt: -2, debuffRounds: 2 },
+  cold:        { mode: 'on_hit', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3, debuffStat: 'dexterity', debuffAmt: -1, debuffRounds: 2 }, // chill slows → exposed
+  burn:        { mode: 'dot', rounds: 2, baseChance: 0.45, weakBonus: 0.2, strongPenalty: 0.3 },
+  poison:      { mode: 'dot', rounds: 2, baseChance: 0.45, weakBonus: 0.2, strongPenalty: 0.3 },
+  radiation:   { mode: 'dot', rounds: 3, baseChance: 0.45, weakBonus: 0.2, strongPenalty: 0.4 },
+};
+// Damage-type synonyms → canonical proc key. NOTE every alias TARGET must exist in BUILTIN_DT_COMBAT
+// above (e.g. frost→cold requires a `cold` entry) or the proc silently never fires for that type.
+const DT_ALIAS_G: Record<string, string> = { force: 'aetheric', psychic: 'aetheric', frost: 'cold', shock: 'electrical' };
+function canonDT(name: string | null | undefined): string { const lc = (name ?? '').toLowerCase(); return DT_ALIAS_G[lc] ?? lc; }
+function dtProcChance(p: DTProc, match: 'weak' | 'resist' | 'normal'): number {
+  return Math.max(0, Math.min(1, p.baseChance + (match === 'weak' ? p.weakBonus : match === 'resist' ? -p.strongPenalty : 0)));
+}
+
 function applyEnemyCounter(
   enemy: Enemy,
   player: PlayerCharacter,
@@ -23179,6 +23261,23 @@ function applyEnemyCounter(
     if (dmg > 1 && (player.statusEffects ?? []).some((e) => e.kind === 'shielded')) {
       dmg = Math.max(1, Math.ceil(dmg / 2));
       shieldTag = ' (Defensive Protocols shield)';
+    }
+    // engine_Dev (Combat-Parity II) — enemy TYPED on-hit proc on the player. Only EXPLICITLY-typed
+    // enemies proc at full chance; an inferred (bare-dice) type procs at 0.4× — so the ~95 enemies
+    // that authored no type word don't silently tax the player. Folds a small bonus into this hit
+    // (parryable below); no player stat-debuff/DOT (kept conservative per the balancing pass). The
+    // bonus is 1d3 vs the player's own 1d4 offense — a deliberate player-favoring asymmetry: the
+    // balance probe showed symmetric 1d4 both ways converted stalls into deaths at the Uncommon tier
+    // (the tier a real early-game player fights), because a weak character's procs roll off a low base
+    // while enemy procs land reliably. 1d3 keeps typed combat decisive without over-taxing the player.
+    {
+      const ep = BUILTIN_DT_COMBAT[canonDT(enemyDamageType)];
+      if (ep) {
+        const epMatch: 'weak' | 'resist' | 'normal' = (resisted.blocked || raceResistTag) ? 'resist' : 'normal';
+        if (Math.random() < dtProcChance(ep, epMatch) * (explicitDamageType ? 1 : 0.4)) {
+          dmg += rollDie(3);
+        }
+      }
     }
 
     // ACTIVE PARRY — the player committed a dodge before this swing
