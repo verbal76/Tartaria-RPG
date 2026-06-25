@@ -367,7 +367,18 @@ export function validateGame(): ValidationIssue[] {
   if (rows(resolveTable('races', [])).length === 0) warn('tables.races.empty', 'Tables', 'No Races uploaded — character creation will use the bland generic races.');
   if (rows(resolveTable('factions', [])).length === 0) warn('tables.factions.empty', 'Tables', 'No Factions uploaded — character creation will use the bland generic factions.');
 
-  return issues;
+  // Dedupe identical issues. A few checks can surface the SAME finding twice — e.g. an item that
+  // carries a perk in both `statBonus` (singular) and `statBonuses` (plural) gets the same
+  // stat.unknown warning from each — which reads as two separate problems. Collapse on the fields
+  // the reader sees (severity + code + section + message + id) so each distinct finding lists once.
+  const seenIssue = new Set<string>();
+  const deduped = issues.filter((i) => {
+    const k = `${i.severity}|${i.code}|${i.section}|${i.message}|${i.id ?? ''}`;
+    if (seenIssue.has(k)) return false;
+    seenIssue.add(k);
+    return true;
+  });
+  return deduped;
 }
 
 /** Structured pre-export report: errors block, warnings/info don't. */
