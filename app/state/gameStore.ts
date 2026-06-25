@@ -581,10 +581,14 @@ interface CurrentScene {
     // engine_Dev — 'dt_dot' is a generic, author-configured damage-type DOT (a
     // weapon whose damage type is set to 'dot' mode). Ticks dmgPerTurn like the
     // coating DOTs; sourceName carries the damage-type name for its lines.
-    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'dt_dot';
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'dt_dot' | 'exposed';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
+    /** engine_Dev — 'exposed' only: an AC reduction translated from a player weapon damage-type
+     *  onHit debuff. Enemies have no stats, so a stat debuff ("−2 DEX") becomes "−2 AC for N turns"
+     *  (easier to hit). Fed into buildCombatSteps' acReduction; ticks down and expires. */
+    acPenalty?: number;
   }>>;
   /** OTA-362 — accumulated acid armor shred per enemy (parallel to
    *  enemies). Each acid-coated hit drops the enemy's AC by
@@ -7189,6 +7193,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                       `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
                     );
                   }
+                } else if (st.kind === 'exposed' && st.turnsRemaining > 0) {
+                  // engine_Dev — timed AC debuff: no damage, just tick down and expire.
+                  if (st.turnsRemaining - 1 > 0) {
+                    remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
+                  } else {
+                    get().appendLog('combat', `${sceneNow.enemies[i]!.name} recovers its footing — no longer exposed.`);
+                  }
                 } else {
                   remaining.push(st);
                 }
@@ -7343,8 +7354,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             weatherMod: weatherStatModifiers(currentScene.weather),
             statusMods,
             pointBlankBonus,
-            // OTA-362 — acid-coating armor shred on the active enemy.
-            acReduction: currentScene.enemyArmorShred?.[currentScene.activeEnemyIdx] ?? 0,
+            // OTA-362 — acid-coating armor shred + engine_Dev onHit "exposed" debuff on the active enemy.
+            acReduction: (currentScene.enemyArmorShred?.[currentScene.activeEnemyIdx] ?? 0)
+              + (currentScene.enemyStatuses?.[currentScene.activeEnemyIdx] ?? []).reduce((a, st) => a + (st.kind === 'exposed' ? (st.acPenalty ?? 0) : 0), 0),
           });
           // Drop one-shot status effects consumed by this roll (aiming
           // burns on use).
@@ -14191,6 +14203,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : (mod.match === 'resist' || traitMod.match === 'resist') ? 'resist'
         : 'normal';
       let dtDotProc: { dmgPerTurn: number; rounds: number; source: string } | null = null;
+      // engine_Dev — DAMAGE-TYPE onHit DEBUFF → enemy "exposed". A damage type's onHit stat debuff
+      // (e.g. cold −DEX, dimensional −WIS) has no enemy stat to subtract, so on a landed hit it
+      // translates to an AC reduction of the same magnitude for onHitRounds (enemy easier to hit).
+      // Ungated by the combat proc-chance — it applies whenever the typed hit lands, mirroring the
+      // enemy→player onHit path.
+      let exposedProc: { acPenalty: number; rounds: number } | null = null;
       if (weaponType) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const cpMod = require('../engine/contentPack') as typeof import('../engine/contentPack');
@@ -14203,6 +14221,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else {
             dtDotProc = { dmgPerTurn: roll, rounds: Math.max(1, dtc.rounds ?? 3), source: weaponType };
           }
+        }
+        const oh = cpMod.getDamageTypeOnHit(weaponType);
+        if (oh) {
+          const mag = oh.mods.reduce((a, m) => a + Math.abs(typeof m.amount === 'number' ? m.amount : 0), 0);
+          if (mag > 0) exposedProc = { acPenalty: mag, rounds: oh.rounds };
         }
       }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
@@ -14501,6 +14524,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return { currentScene: { ...s.currentScene, enemyStatuses: statuses } };
           });
           get().appendLog('combat', `${p.source} sets in — ${p.dmgPerTurn}/turn for ${p.rounds} turns.`, { combatOutcome: 'player_dmg' });
+        }
+        // engine_Dev — seed the onHit "exposed" AC debuff (refresh-by-replacing any prior one).
+        if (exposedProc) {
+          const p = exposedProc;
+          set((s) => {
+            if (!s.currentScene) return s;
+            const n = s.currentScene.enemies.length;
+            const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
+            while (statuses.length < n) statuses.push([]);
+            const list = (statuses[activeIdx] ?? []).filter((st) => st.kind !== 'exposed');
+            list.push({ kind: 'exposed', turnsRemaining: p.rounds, dmgPerTurn: 0, sourceName: weaponType ?? 'debuff', acPenalty: p.acPenalty });
+            statuses[activeIdx] = list;
+            return { currentScene: { ...s.currentScene, enemyStatuses: statuses } };
+          });
+          get().appendLog('combat', `${enemy.name} is left exposed — −${p.acPenalty} AC for ${p.rounds} turns (easier to hit).`, { combatOutcome: 'player_dmg' });
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).

@@ -16237,4 +16237,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // full burn HP. The enemy→player damage path now reads playerRaceFactionResists and applies weak
 // ×1.5 / resist ×0.5 to the HP loss (mirroring the enemy side), stacking after armor/title/race.
 // The 3 hardcoded Tartaria-race multipliers stay. Combat wiring only — no content edited. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-878';
+// OTA-879 — player damage-type onHit DEBUFFS now affect enemies ("easier to hit"). The audit found
+// a weapon's onHit stat debuff (cold −DEX, dimensional −WIS) only applied enemy→player — enemies
+// have no stats, so a player throwing a debuff grenade did nothing to the target. On a landed typed
+// hit, the engine now translates the onHit debuff magnitude into a TIMED "exposed" AC reduction on
+// the enemy for onHitRounds (reusing the existing buildCombatSteps acReduction path that acid-shred
+// uses), so subsequent attacks land more often, then it ticks down and expires. New 'exposed' enemy
+// status + EnemyPanel badge. Design picked by the author (AC penalty vs miss/damage). tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-879';

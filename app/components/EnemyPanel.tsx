@@ -23,10 +23,11 @@ import { BrandedModal } from './BrandedModal';
  *  panel so the player can see what's ticking and how many combat turns
  *  it has left. */
 export interface EnemyStatusView {
-  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'dt_dot';
+  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'dt_dot' | 'exposed';
   turnsRemaining: number;
   dmgPerTurn: number;
   sourceName: string;
+  acPenalty?: number;
 }
 
 export interface EnemyView {
@@ -51,6 +52,7 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   burn_coat: { label: 'BURN', color: '#e0915f' },
   infected: { label: 'INFECTED', color: '#c97a5f' },
   dt_dot: { label: 'DOT', color: '#d9b35f' },
+  exposed: { label: 'EXPOSED', color: '#e0c46a' },
 };
 
 interface Props {
