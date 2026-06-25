@@ -16182,4 +16182,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ~60 KB paste limit the file path never hits) needlessly fractured a 525 KB game into ~12 parts.
 // Raised SAFE_PART_CHARS to 750 KB → a normal game exports as ONE file. Knit-on-upload is
 // size-agnostic, so old multi-part saves still load. Export/IO only — no content touched. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-870';
+// OTA-871 — Validate Game: recipe-ingredient findings now aggregate per UNIQUE material instead of
+// one line per recipe usage. The same material referenced by 20 recipes used to print 20 near-
+// identical warnings, burying the report (209 warnings for ~38 real materials). Now it's one line
+// per material with a "needed by N recipe(s)" note — the count reflects the real punch-list. The
+// fix is per-material anyway (define once → all recipes work). Validation only — no content. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-871';
