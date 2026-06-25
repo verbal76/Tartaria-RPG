@@ -418,8 +418,22 @@ export function InventoryScreen() {
     // open (e.g., an autosave dock event).
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
+    // Stop the moment a scrap makes no progress. scrapInventoryItem refuses
+    // (without consuming anything) when the resolved stack is non-scrappable
+    // stock material — without this guard a "Scrap All (22)" on such a stack
+    // fired the "Nothing here to break down" refusal 22 times in a burst
+    // (playtest log). Track the target's total quantity; if an iteration
+    // doesn't reduce it, the call was a no-op/refusal — bail after the first.
+    const nameLc = pending.item.name.toLowerCase();
+    const qtyOf = () => (useGameStore.getState().player?.inventory ?? [])
+      .filter((i) => i.name.toLowerCase() === nameLc)
+      .reduce((n, i) => n + (i.quantity ?? 0), 0);
+    let prevQty = qtyOf();
     for (let i = 0; i < reps; i++) {
       scrapInventoryItem(pending.item.name);
+      const nowQty = qtyOf();
+      if (nowQty >= prevQty) break; // refusal / no-op — don't hammer the same line
+      prevQty = nowQty;
     }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);

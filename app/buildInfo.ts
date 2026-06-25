@@ -16093,4 +16093,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the panel up after the fight; it now follows `arenaActive` too, so the crest returns
 // the instant the last foe is down — exactly as the corner looked before combat. The
 // KO'd body stays lootable via the "loot" button in the input row. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-859';
+//
+// engine_Dev-860 — fix Scrap-All refusal spam. "Scrap All (N)" loops scrapInventoryItem
+// N times; when the resolved stack is non-scrappable stock material (e.g. a stack of 22
+// Trail Rations / Water Bottles), every iteration fired the "Nothing here to break down
+// — it already IS stock material" arbiter line — 22 identical lines in one burst (the
+// dedup only suppressed the log echo). doScrap now tracks the target's total quantity and
+// breaks the instant a scrap makes no progress, so a refusal fires at most once. tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-860';
