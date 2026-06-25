@@ -276,6 +276,13 @@ export function CharacterScreen() {
               // and perks show (mirrored off-hand resolves the main 2H weapon).
               const inst = resolveEquippedItem(player, (isMirrored ? 'main' : slot) as EquipSlot);
               const preview = inst ? getItemPreviewForInstance(inst) : getItemPreview(name);
+              // Weapon damage line — for a weapon in hand, show what it actually
+              // deals: dice + damage type + the stat it scales off. Resolves the
+              // real catalog weapon (mirrored off-hand uses the main 2H weapon).
+              const wpn = findWeaponByName(isMirrored ? mainName! : name);
+              const damageLine = wpn
+                ? `⚔ ${wpn.damageDice} ${wpn.damageType} · scales ${STAT_LABEL[wpn.stat as keyof Stats]}`
+                : null;
               return (
                 <View key={slot} style={styles.slotRow}>
                   <Text style={styles.slotLabel}>{SLOT_LABEL[slot]}</Text>
@@ -283,6 +290,9 @@ export function CharacterScreen() {
                     <Text style={styles.slotName}>
                       {name}{isMirrored ? '  (two-handed grip)' : ''}
                     </Text>
+                    {damageLine && (
+                      <Text style={styles.slotDmg}>{damageLine}</Text>
+                    )}
                     {preview.stats.length > 0 && (
                       <Text style={styles.slotMeta}>{preview.stats.join(' · ')}</Text>
                     )}
@@ -758,6 +768,7 @@ const styles = StyleSheet.create({
   slotBody: { flex: 1 },
   slotEmpty: { color: '#2b3a3e', fontSize: 12 },
   slotName: { color: '#d6e4e8', fontSize: 13, fontWeight: '700' },
+  slotDmg: { color: '#e0a35f', fontSize: 10, marginTop: 2 },
   slotMeta: { color: '#9ec96a', fontSize: 10, marginTop: 2 },
 
   effectRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },

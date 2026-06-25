@@ -16072,4 +16072,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // out-of-combat navigation; over a live arena it was just clutter. Suppressed
 // while enemies are present (inCombat) on ExplorationScreen; returns the instant
 // the fight ends. tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-856';
+//
+// engine_Dev-857 — Character screen EQUIPPED now shows each weapon's damage line:
+// dice + damage type + the stat it scales off (e.g. "⚔ 1d8 slashing · scales STR"),
+// resolved from the catalog weapon (mirrored off-hand uses the main 2H weapon).
+// Core stats (STR/DEX/INT/WIS/CHA/STE) already render in the CORE STATS card.
+// tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-857';
