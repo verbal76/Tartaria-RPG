@@ -1,6 +1,6 @@
 // Scrap engine — disassemble built items into stock materials.
 
-import { canScrap, scrapOutputFor, hasTagScrapOutput, isStockMaterial, randomMaterialScrap } from '../app/engine/scrapEngine';
+import { canScrap, scrapOutputFor, hasTagScrapOutput, isStockMaterial, randomMaterialScrap, realizeScrapOutput } from '../app/engine/scrapEngine';
 import type { InventoryItem } from '../app/engine/types';
 
 function mk(name: string, kind: InventoryItem['kind'], tags: string[] = []): InventoryItem {
@@ -56,6 +56,28 @@ describe('engine_Dev — stock-material guard + random-material fallback', () =>
     expect(typeof out.grants[0]!.name).toBe('string');
     expect(out.grants[0]!.name.length).toBeGreaterThan(0);
     expect(out.summary).toBe(out.grants[0]!.name);
+    expect(isStockMaterial(mk(out.grants[0]!.name, 'misc'))).toBe(true); // it IS a real pool material
+  });
+
+  it('realizeScrapOutput leaves real (built-in) materials untouched', () => {
+    const out = realizeScrapOutput({ grants: [{ name: 'Scrap Metal', quantity: 2 }, { name: 'Stick', quantity: 1 }], summary: 'Scrap Metal x2, Stick' });
+    const names = out.grants.map((g) => g.name).sort();
+    expect(names).toEqual(['Scrap Metal', 'Stick']);
+  });
+
+  it('realizeScrapOutput swaps a PHANTOM material (not in this game\'s pool) for a real one', () => {
+    const out = realizeScrapOutput({ grants: [{ name: 'Imaginarium Widget', quantity: 1 }], summary: 'Imaginarium Widget' });
+    expect(out.grants.length).toBe(1);
+    expect(out.grants[0]!.name).not.toBe('Imaginarium Widget');
+    expect(isStockMaterial(mk(out.grants[0]!.name, 'misc'))).toBe(true); // real pool material
+    expect(out.summary).toBe(out.grants[0]!.name);
+  });
+
+  it('pickRandomMaterial avoids immediate repeats across a run (pool is large enough)', () => {
+    const picks: string[] = [];
+    for (let i = 0; i < 8; i++) picks.push(randomMaterialScrap().grants[0]!.name);
+    // No two consecutive picks identical (the built-in pool has many Commons).
+    for (let i = 1; i < picks.length; i++) expect(picks[i]).not.toBe(picks[i - 1]);
   });
 });
 

@@ -91,20 +91,69 @@ export function canScrap(item: InventoryItem): boolean {
   return true;
 }
 
-/** RNG-roll a single COMMON material from the resolved materials pool — the scrap
- *  yield for an UNRECOGNIZED item. We never invent a material; we pull a real name
- *  from the (author-overridable) materials JSON. Common-only keeps it cheap so
- *  scrapping a stack of rations can't be laundered into high-value mats. */
-export function randomMaterialScrap(): ScrapOutput {
+/** Is this name a real material in the resolved pool? */
+function isRealMaterial(name: string): boolean {
+  const lc = name.toLowerCase();
+  return allMaterials().some((m) => m.name.toLowerCase() === lc);
+}
+
+// engine_Dev — anti-repeat memory for random material picks. Consecutive scraps
+// shouldn't keep handing out the same material; we avoid the last few picks and
+// only allow a repeat once the (Common) pool is exhausted. Runtime-only.
+let recentMats: string[] = [];
+const RECENT_MAT_MEMORY = 3;
+
+/** RNG-roll a single material NAME from the resolved pool, preferring Common rarity
+ *  and avoiding the last few awarded (so a run of scraps doesn't repeat). Pulls real
+ *  names from the (author-overridable) materials JSON — never invents one. Returns
+ *  null only when no materials are defined at all. */
+export function pickRandomMaterial(): string | null {
   const all = allMaterials();
+  if (all.length === 0) return null;
   const common = all.filter((m) => (m.rarity ?? 'Common') === 'Common');
-  const pool = common.length > 0 ? common : all;
-  if (pool.length === 0) {
+  const base = common.length > 0 ? common : all;
+  let choices = base.filter((m) => !recentMats.includes(m.name));
+  if (choices.length === 0) choices = base; // whole pool is recent — allow a repeat
+  const pick = choices[Math.floor(Math.random() * choices.length)]!.name;
+  recentMats.push(pick);
+  if (recentMats.length > RECENT_MAT_MEMORY) recentMats.shift();
+  return pick;
+}
+
+/** The scrap yield for an UNRECOGNIZED item — one random (Common, non-repeating)
+ *  material from the pool. Common-only keeps it cheap so scrapping a stack of
+ *  rations can't be laundered into high-value mats. */
+export function randomMaterialScrap(): ScrapOutput {
+  const pick = pickRandomMaterial();
+  if (!pick) {
     // No materials defined at all — basic stone so the click isn't wasted.
     return { grants: [{ name: scfg().roles.stone, quantity: 1 }], summary: scfg().roles.stone };
   }
-  const pick = pool[Math.floor(Math.random() * pool.length)]!;
-  return { grants: [{ name: pick.name, quantity: 1 }], summary: pick.name };
+  return { grants: [{ name: pick, quantity: 1 }], summary: pick };
+}
+
+/** Ensure every grant names a REAL material in the current game's pool. A built-in
+ *  role default (Stick / Small Rock / Scrap Metal …) that THIS game's materials JSON
+ *  doesn't define is swapped for a random real material — so scrap never hands out an
+ *  item the game doesn't actually use ("don't give me Stick and Rock unless they're
+ *  real items here"). No-op for the built-in game, where every role material exists.
+ *  De-dupes and rebuilds the summary; keeps quantities. */
+export function realizeScrapOutput(output: ScrapOutput): ScrapOutput {
+  if (allMaterials().length === 0) return output; // nothing to map onto
+  let changed = false;
+  const merged = new Map<string, number>();
+  for (const g of output.grants) {
+    let name = g.name;
+    if (!isRealMaterial(name)) {
+      const sub = pickRandomMaterial();
+      if (sub) { name = sub; changed = true; }
+    }
+    merged.set(name, (merged.get(name) ?? 0) + g.quantity);
+  }
+  if (!changed) return output;
+  const grants = Array.from(merged.entries()).map(([name, quantity]) => ({ name, quantity }));
+  const summary = grants.map((g) => (g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)).join(', ');
+  return { grants, summary };
 }
 
 /** OTA-443 — scrap output scales with the scrapped item's rarity. A

@@ -16110,4 +16110,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Common-only so it can't be laundered into high-value mats). Quest items and genuine
 // raw stock materials still refuse. New scrapEngine exports: isStockMaterial,
 // hasTagScrapOutput, randomMaterialScrap; scrapInventoryItem takes { silent }. tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-861';
+//
+// engine_Dev-862 — scrap/salvage realness + anti-repeat + splash +15%. (1) Random
+// material picks now AVOID the last few awarded (recentMats memory), so a run of
+// scraps doesn't keep handing out the same thing — it re-rolls. (2) realizeScrapOutput
+// swaps any built-in role default (Stick / Small Rock …) this game's materials JSON
+// doesn't actually define for a real pool material, so scrap never yields an item the
+// game doesn't use (no-op for the built-in game where every role mat exists). (3) Open
+// log issue: salvageAllAmbient no longer dead-ends on an unmatched noun — it RNG-rolls
+// a real pool material so SALVAGE ALL always pays out. (4) Splash poster +15% (0.84→0.966
+// W, 0.81→0.932 H). tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-862';

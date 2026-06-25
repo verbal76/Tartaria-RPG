@@ -205,6 +205,8 @@ import {
   scrapOutputFor,
   hasTagScrapOutput,
   randomMaterialScrap,
+  realizeScrapOutput,
+  pickRandomMaterial,
   repairCostMaterials,
   scrapSuccessChance,
   scrapHasSecondChance,
@@ -19342,9 +19344,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       const outcome = rollSalvagePool(noun);
       if (!outcome) {
-        // No pool matched. Track for the fallback emit + breadcrumb
-        // so the player doesn't see a silent no-op.
-        unmatchedNouns.push(noun);
+        // engine_Dev — no authored salvage pool matched this noun. Rather than
+        // dead-end (the old "nothing your tools can break down" + breadcrumb),
+        // RNG-roll a real material from the pool so SALVAGE ALL always pays out.
+        const matName = pickRandomMaterial();
+        if (!matName) {
+          unmatchedNouns.push(noun); // no materials defined at all — keep old fallback
+          continue;
+        }
+        staminaSpent += STAMINA_COSTS.skillCheck;
+        hoursAdded += 0.25;
+        narrationLines.push(`You strip the ${noun} for parts.`);
+        const itemCat = lookupCraftedItem(matName);
+        const newItem: InventoryItem = stampDurability({
+          id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: matName,
+          kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+          rarity: 'Common',
+          quantity: 1,
+          tags: itemCat.tags,
+        });
+        const grantResult = grantItem(liveInv, newItem);
+        liveInv = grantResult.inventory;
+        if (grantResult.accepted > 0) {
+          const prev = itemTotals.get(matName);
+          itemTotals.set(matName, {
+            quantity: (prev?.quantity ?? 0) + grantResult.accepted,
+            rarity: prev?.rarity ?? 'Common',
+          });
+          consumedNouns.push(harvestLowered);
+        } else {
+          narrationLines.push(
+            `Your pack is too full to take the ${matName.toLowerCase()} from the ${noun}. Drop something and try again.`,
+          );
+        }
         continue;
       }
 
@@ -20797,7 +20830,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // Recognized gear → tag-driven output; an UNRECOGNIZED item rolls a single
     // random material from the pool (real names only — see randomMaterialScrap).
-    const fullOutput = hasTagScrapOutput(item) ? scrapOutputFor(item) : randomMaterialScrap();
+    // realizeScrapOutput then swaps any built-in role default (Stick / Small Rock)
+    // this game's materials JSON doesn't actually define for a real pool material.
+    const fullOutput = realizeScrapOutput(
+      hasTagScrapOutput(item) ? scrapOutputFor(item) : randomMaterialScrap(),
+    );
     let output: typeof fullOutput | null;
     if (rolled) {
       output = fullOutput;
