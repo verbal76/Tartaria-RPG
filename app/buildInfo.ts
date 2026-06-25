@@ -16173,4 +16173,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // defaults + an instruction header (what each field is for, edit/delete to taste), instead of a
 // single corruption example. Both the standalone coatings.json template and the whole-game bundle
 // entry. Template/wording only — combat mechanics unchanged. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-868';
+// OTA-869 — Validate Game: dedupe identical findings before the report. checkStatBonuses reads
+// both `statBonus` (singular) and `statBonuses` (plural), so an item carrying a perk in both keys
+// emitted the SAME stat.unknown warning twice (read as two problems). A final pass collapses
+// issues identical in severity+code+section+message+id. Validation only — no content touched. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-869';
