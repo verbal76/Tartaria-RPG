@@ -16177,4 +16177,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // both `statBonus` (singular) and `statBonuses` (plural), so an item carrying a perk in both keys
 // emitted the SAME stat.unknown warning twice (read as two problems). A final pass collapses
 // issues identical in severity+code+section+message+id. Validation only — no content touched. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-869';
+// OTA-870 — Game SAVE no longer over-splits. The whole-game export writes/reads DEVICE FILES
+// (SAF + readAsStringAsync), never the clipboard/paste box, so the old 45 KB ceiling (sized for a
+// ~60 KB paste limit the file path never hits) needlessly fractured a 525 KB game into ~12 parts.
+// Raised SAFE_PART_CHARS to 750 KB → a normal game exports as ONE file. Knit-on-upload is
+// size-agnostic, so old multi-part saves still load. Export/IO only — no content touched. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-870';

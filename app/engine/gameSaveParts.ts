@@ -8,9 +8,15 @@
 // irrelevant. Each written part is kept at or under SAFE_PART_CHARS by measuring the wrapped
 // (JSON-escaped) size, so a part can always be pasted / re-read under the limit.
 
-// Per-part ceiling in characters. Sized with headroom under the ~60 KB device clipboard/paste +
-// file-read hard limits the author hits. Tunable: lower it if a share channel chokes sooner.
-export const SAFE_PART_CHARS = 45000;
+// Per-part ceiling in characters. SAVE writes the bundle to DEVICE FILES (StorageAccessFramework /
+// documentDirectory) and UPLOAD reads them back with FileSystem.readAsStringAsync — neither path
+// goes through the clipboard or the in-app paste box, so the old ~60 KB clipboard/paste ceiling
+// never applied here. readAsStringAsync + JSON.parse handle a multi-hundred-KB string comfortably,
+// so the split only needs to keep a single part within easy file-read/parse range. Raised so a
+// normal whole-game bundle exports as ONE file (or a couple) instead of a dozen tiny fragments —
+// a 525 KB game is now a single file. Tunable: lower it only if a specific device/share channel
+// chokes sooner; the knit-on-upload logic is size-agnostic, so any value loads fine.
+export const SAFE_PART_CHARS = 750000;
 
 export interface GameSavePart {
   __gameSavePart: number; // 1..N
