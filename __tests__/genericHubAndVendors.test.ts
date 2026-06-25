@@ -47,7 +47,7 @@ describe('engine_Dev — generic game hub + vendors', () => {
     const names = getActiveVendors().map((v) => v.name);
     // engine_Dev — the generic vendor pool is now the five data-driven storefront vendors,
     // stocked live from the loaded catalogs. The hub anchor resolves to "the Quartermaster".
-    expect(names).toContain('the Quartermaster');     // the hub anchor (data-driven storefront)
+    expect(names).toContain('Quartermaster');         // the hub anchor (data-driven storefront)
     expect(names).not.toContain('Tellin Mak');        // a built-in Tartaria vendor
   });
 

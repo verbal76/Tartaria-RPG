@@ -94,15 +94,21 @@ const ROADSIDE = (roadsideData as { archetypes: RoadsideArchetype[] });
 export function getActiveRoadside(): RoadsideArchetype[] {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const cp = require('./contentPack') as typeof import('./contentPack');
-  const ov = cp.getRoadsideOverride() ?? cp.getGenericRoadside();
-  if (!ov || ov.length === 0) return ROADSIDE.archetypes;
-  const valid = ov.filter(
+  const clean = (list: unknown): RoadsideArchetype[] => (Array.isArray(list) ? list : []).filter(
     (a): a is RoadsideArchetype =>
       !!a && typeof a === 'object' &&
       typeof (a as RoadsideArchetype).name === 'string' &&
       Array.isArray((a as RoadsideArchetype).pool) && (a as RoadsideArchetype).pool.length > 0,
   );
-  return valid.length > 0 ? valid : ROADSIDE.archetypes;
+  const ov = clean(cp.getRoadsideOverride());
+  if (ov.length > 0) return cp.isVendorsAppendGeneric() ? [...ov, ...buildGenericRoadside()] : ov;
+  // No author override: a custom/generic game uses the DATA-DRIVEN roadside pool (sampled from the
+  // loaded catalog, like the named vendors); stock Tartaria keeps its authored archetypes.
+  if (cp.getGenericRoadside() != null) {
+    const g = buildGenericRoadside();
+    return g.length > 0 ? g : ROADSIDE.archetypes;
+  }
+  return ROADSIDE.archetypes;
 }
 
 export interface VendorTemplate {
@@ -187,13 +193,35 @@ export function buildGenericStorefront(): VendorTemplate[] {
   const consumables = gear.filter((g) => g.kind === 'consumable' || (g.tags ?? []).some((t) => ['food', 'medical', 'heal', 'drink', 'consumable'].includes(t)));
   const supplies = consumables.length ? consumables : gear;
   const v: VendorTemplate[] = [];
-  if (weapons.length) v.push({ id: 'gen_weaponsmith', name: 'the Weaponsmith', title: 'Arms Dealer', faction: null, description: 'Deals in weapons of every make. Buys blades, sells worse ones for more.', offers: offersFrom(weapons, 6) });
-  if (armor.length) v.push({ id: 'gen_armorer', name: 'the Armorer', title: 'Armorer', faction: null, description: 'Plates, vests, and whatever will keep you breathing a little longer.', offers: offersFrom(armor, 6) });
-  if (supplies.length) v.push({ id: 'gen_quartermaster', name: 'the Quartermaster', title: 'Quartermaster', faction: null, description: 'Field supplies — rations, kits, and the small things that save a life.', offers: offersFrom(supplies, 6) });
-  if (materials.length) v.push({ id: 'gen_supplier', name: 'the Supplier', title: 'Materials Supplier', faction: null, description: 'Raw stock and crafting components by the crate.', offers: offersFrom(materials, 8) });
+  if (weapons.length) v.push({ id: 'gen_weapons_dealer', name: 'Weapons Dealer', title: 'Arms Dealer', faction: null, description: 'Deals in weapons of every make. Buys blades, sells worse ones for more.', offers: offersFrom(weapons, 6) });
+  if (armor.length) v.push({ id: 'gen_blacksmith', name: 'Blacksmith', title: 'Armorer', faction: null, description: 'Plates, vests, and whatever will keep you breathing a little longer.', offers: offersFrom(armor, 6) });
+  if (supplies.length) v.push({ id: 'gen_quartermaster', name: 'Quartermaster', title: 'Quartermaster', faction: null, description: 'Field supplies — rations, kits, and the small things that save a life.', offers: offersFrom(supplies, 6) });
+  if (materials.length) v.push({ id: 'gen_supplier', name: 'Supplier', title: 'Materials Supplier', faction: null, description: 'Raw stock and crafting components by the crate.', offers: offersFrom(materials, 8) });
   const mixed = [...offersFrom(weapons, 2), ...offersFrom(armor, 2), ...offersFrom(supplies, 2), ...offersFrom(materials, 2)];
-  if (mixed.length) v.push({ id: 'gen_trader', name: 'the Trader', title: 'Travelling Trader', faction: null, description: 'Carries a bit of everything and an opinion on all of it.', offers: mixed });
+  if (mixed.length) v.push({ id: 'gen_trader', name: 'General Trader', title: 'Travelling Trader', faction: null, description: 'Carries a bit of everything and an opinion on all of it.', offers: mixed });
   return v;
+}
+
+/** Two data-driven roadside archetypes (honest + sketchy) whose pools are sampled from the loaded
+ *  catalog at spawn, so they only ever stock items that exist. demeanor drives the steal DC. */
+export function buildGenericRoadside(): RoadsideArchetype[] {
+  const weapons = resolveTable('weapons', BUILTIN_WEAPONS) as CatRow[];
+  const armor = resolveTable('armor', BUILTIN_ARMOR) as CatRow[];
+  const gear = resolveTable('gear', BUILTIN_GEAR) as CatRow[];
+  const materials = resolveTable('materials', BUILTIN_MATERIALS) as CatRow[];
+  const consumables = gear.filter((g) => g.kind === 'consumable' || (g.tags ?? []).some((t) => ['food', 'medical', 'heal', 'drink', 'consumable'].includes(t)));
+  const supplies = consumables.length ? consumables : gear;
+  const entry = (it: CatRow, weight: number): RoadsidePoolEntry => {
+    const p = priceFor(it);
+    return { itemName: it.name, priceMin: Math.max(1, Math.round(p * 0.8)), priceMax: Math.max(2, Math.round(p * 1.25)), weight };
+  };
+  const pool = (rows: CatRow[], n: number, w: number) => sampleRows(rows, n).map((it) => entry(it, w));
+  const arch: RoadsideArchetype[] = [];
+  const honest = [...pool(supplies, 4, 12), ...pool(materials, 3, 10), ...pool(weapons, 2, 5)];
+  if (honest.length) arch.push({ id: 'gen_roadside_vendor', name: 'Roadside Vendor', title: 'wandering trader', demeanor: 'honest', description: 'A stall thrown together from cart-boards and tarp. Watches the road with one eye and the goods with the other.', pool: honest });
+  const sketchy = [...pool(materials, 3, 8), ...pool(weapons, 2, 6), ...pool(armor, 2, 5)];
+  if (sketchy.length) arch.push({ id: 'gen_fence', name: 'Black-Market Fence', title: 'fence', demeanor: 'sketchy', description: 'No stall, just a coat full of pockets and a quick way out. Prices are good; provenance is not.', pool: sketchy });
+  return arch;
 }
 
 function cleanVendorList(list: unknown): VendorTemplate[] {
