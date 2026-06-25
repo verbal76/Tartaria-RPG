@@ -16078,4 +16078,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resolved from the catalog weapon (mirrored off-hand uses the main 2H weapon).
 // Core stats (STR/DEX/INT/WIS/CHA/STE) already render in the CORE STATS card.
 // tsc baseline 142.
-export const OTA_BUILD_ID = '2026-06-24-857';
+//
+// engine_Dev-858 — fix the combat arena not collapsing after the fight ends. The
+// arena layout (tall char|enemy split, hidden feed, stretched StatsPanel) was keyed on
+// raw enemy PRESENCE (enemyViews.length>0), so a knocked-out foe lingering in the scene
+// to be looted kept the character box stretched full-height — "completed combat but it
+// didn't revert." Now the layout tracks a LIVE threat (an enemy with hp>0 that isn't
+// KO'd) via `arenaActive`; the moment the last foe is down the screen collapses back to
+// the peaceful layout. `inCombat` still drives the controls + enemy panel so the "loot"
+// button and the downed body stay on screen. tsc baseline 142.
+export const OTA_BUILD_ID = '2026-06-24-858';
