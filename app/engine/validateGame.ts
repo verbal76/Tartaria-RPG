@@ -5,8 +5,9 @@
 // effect verbs, and duplicate ids. Errors = will break play; warnings = soft; info = FYI. Pure reads
 // through the content-pack resolvers, so it validates the EFFECTIVE game that will ship.
 
-import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, getGenericHooks, resolveWhispers, getSummonsOverride, resolveSummons, getWastelandOverride, getGenericWasteland, getDogScenariosOverride, resolveDogScenarios, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride, getDiggingOverride, getSalvageOverride, resolveFlavor } from './contentPack';
+import { CONTENT_TABLES, resolveTable, resolveMissions, getCustomBosses, getCustomMainQuest, getStartingAreas, getVendorsOverride, getRoadsideOverride, getHooksOverride, getGenericHooks, resolveWhispers, getSummonsOverride, resolveSummons, getWastelandOverride, getGenericWasteland, getDogScenariosOverride, resolveDogScenarios, getCustomTitles, getExtraDamageTypes, getDamageResistancesOverride, getCollectablesOverride, getDiggingOverride, getSalvageOverride, resolveFlavor, canonicalDamageType } from './contentPack';
 import { getFactions } from './character';
+import { canonicalStatKey } from './equipment';
 import { findCatalogItem, getDogGear } from './crafting';
 import locationsBuiltin from '../data/locations/locations.json';
 import enemiesBuiltin from '../data/enemies/enemies.json';
@@ -282,7 +283,8 @@ export function validateGame(): ValidationIssue[] {
   // bonuses). Any other stat on a race/faction/item/title bonus is silently dropped (does nothing).
   const VALID_STATS = new Set(['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth', 'hp', 'staminamax']);
   const checkStat = (section: string, who: string, statName: unknown) => {
-    const s = str(statName)?.toLowerCase();
+    const raw = str(statName);
+    const s = raw ? canonicalStatKey(raw) : null; // synonyms (constitution→hp, acrobatics→dexterity, …) now resolve
     if (s && !VALID_STATS.has(s)) warn('stat.unknown', section, `${who} grants stat "${str(statName)}", which the engine doesn't track (only STR/DEX/INT/WIS/CHA/STE, plus hp/staminaMax on gear) — the bonus does nothing.`, { id: str(statName) ?? undefined });
   };
   const checkStatBonuses = (section: string, who: string, row: Record<string, unknown>) => {
@@ -363,7 +365,7 @@ export function validateGame(): ValidationIssue[] {
   const BUILTIN_DMG = ['degradation', 'bludgeoning', 'burn', 'aetheric', 'electrical', 'piercing', 'poison', 'radiation', 'slashing', 'stun'];
   const definedDmg = new Set<string>([...BUILTIN_DMG, ...getExtraDamageTypes().map((d) => str(d.name)?.toLowerCase()).filter(Boolean) as string[]]);
   for (const wpn of rows(resolveTable('weapons', []))) {
-    const dt = str(wpn.damageType)?.toLowerCase();
+    const dt = str(wpn.damageType) ? canonicalDamageType(str(wpn.damageType)) : null; // force/psychic/frost/shock now alias to a real type
     if (dt && !definedDmg.has(dt)) warn('damage.type.undefined', 'Weapons', `Weapon "${str(wpn.name) ?? '?'}" deals damage type "${str(wpn.damageType)}", which isn't a built-in type or a defined Damage Types entry — its on-hit effect won't fire and resist/weak won't line up. Add it to Damage Types or use a defined one.`, { id: str(wpn.damageType) ?? undefined });
   }
   const resMap = getDamageResistancesOverride();
@@ -372,7 +374,7 @@ export function validateGame(): ValidationIssue[] {
       const row = e && typeof e === 'object' ? (e as Record<string, unknown>) : {};
       for (const side of ['resist', 'weak'] as const) {
         for (const t of (Array.isArray(row[side]) ? row[side] as unknown[] : [])) {
-          const lc = str(t)?.toLowerCase();
+          const lc = str(t) ? canonicalDamageType(str(t)) : null;
           if (lc && !definedDmg.has(lc)) warn('damage.resist.undefined', 'Damage resistances', `"${enemy}" lists ${side} "${str(t)}", which isn't a defined damage type — it can never match (e.g. use "cold" not "frost", "electrical" not "shock").`, { id: str(t) ?? undefined });
         }
       }

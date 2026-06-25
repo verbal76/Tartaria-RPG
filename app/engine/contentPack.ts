@@ -722,12 +722,39 @@ export interface DamageCombatEffect {
   strongPenalty?: number;
 }
 export interface ExtraDamageType { name: string; keywords?: string[]; onHit?: DamageStatMod[]; onHitRounds?: number; combat?: DamageCombatEffect }
-/** The combat effect for a damage type (author-defined), or null when none. */
+// engine_Dev — DEFAULT combat behavior for the BUILT-IN damage types, so a game on the built-in
+// catalog (Tartaria + any reskin that doesn't author its own damageTypes) gets the same
+// bidirectional typed-damage procs + onHit debuffs an author-defined type gets. An uploaded
+// damageTypes entry for the same name OVERRIDES this (author wins). Conservative starting values;
+// tuned by the balancing pass.
+const BUILTIN_DT_DEFAULTS: Record<string, { combat?: DamageCombatEffect; onHit?: DamageStatMod[]; onHitRounds?: number }> = {
+  piercing:    { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
+  slashing:    { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
+  bludgeoning: { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 }, onHit: [{ stat: 'dexterity', amount: -1 }], onHitRounds: 2 },
+  burn:        { combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.6, weakBonus: 0.2, strongPenalty: 0.3 } },
+  electrical:  { combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.5, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'strength', amount: -1 }], onHitRounds: 2 },
+  poison:      { combat: { mode: 'dot', dice: '1d4', rounds: 3, baseChance: 0.6, weakBonus: 0.2, strongPenalty: 0.3 } },
+  radiation:   { combat: { mode: 'dot', dice: '1d4', rounds: 4, baseChance: 0.7, weakBonus: 0.1, strongPenalty: 0.4 } },
+  stun:        { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.4, weakBonus: 0.2, strongPenalty: 0.2 }, onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 1 },
+  degradation: { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
+  aetheric:    { combat: { mode: 'on_hit', dice: '1d6', baseChance: 0.5, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'wisdom', amount: -2 }], onHitRounds: 2 },
+};
+// Off-catalog type words that appear in built-in content → mapped to the closest real type so they
+// stop being inert. force/psychic read as "otherworldly energy" → aetheric; common spelling variants.
+const DT_ALIAS: Record<string, string> = { force: 'aetheric', psychic: 'aetheric', frost: 'cold', shock: 'electrical' };
+/** Normalize a damage-type word: lowercased, with off-catalog aliases mapped to a real type. */
+export function canonicalDamageType(name: string | null | undefined): string {
+  const lc = (name ?? '').toLowerCase();
+  return DT_ALIAS[lc] ?? lc;
+}
+
+/** The combat effect for a damage type: author override → built-in default → null. */
 export function getDamageTypeCombat(typeName: string | null | undefined): DamageCombatEffect | null {
   if (!typeName) return null;
-  const lc = typeName.toLowerCase();
+  const lc = canonicalDamageType(typeName);
   const t = getExtraDamageTypes().find((e) => e.name.toLowerCase() === lc);
-  return t?.combat ?? null;
+  if (t?.combat) return t.combat; // author-uploaded type wins
+  return BUILTIN_DT_DEFAULTS[lc]?.combat ?? null;
 }
 /** The apply chance (0..1) for a combat effect against a target with the given
  *  weak/strong relationship to the type. `match`: 'weak' raises it, 'resist' lowers
@@ -743,10 +770,12 @@ export function damageTypeApplyChance(cfg: DamageCombatEffect, match: 'weak' | '
  *  carry no stat effect). Resolved against the author's uploaded damage types. */
 export function getDamageTypeOnHit(typeName: string | null | undefined): { mods: DamageStatMod[]; rounds: number } | null {
   if (!typeName) return null;
-  const lc = typeName.toLowerCase();
+  const lc = canonicalDamageType(typeName);
   const t = getExtraDamageTypes().find((e) => e.name.toLowerCase() === lc);
-  if (!t || !Array.isArray(t.onHit) || t.onHit.length === 0) return null;
-  return { mods: t.onHit, rounds: Math.max(1, t.onHitRounds ?? 3) };
+  if (t && Array.isArray(t.onHit) && t.onHit.length > 0) return { mods: t.onHit, rounds: Math.max(1, t.onHitRounds ?? 3) };
+  const d = BUILTIN_DT_DEFAULTS[lc]; // built-in default debuff (author types with no onHit fall through to null)
+  if (d?.onHit && d.onHit.length > 0) return { mods: d.onHit, rounds: Math.max(1, d.onHitRounds ?? 3) };
+  return null;
 }
 let damageTypesOverride: ExtraDamageType[] | null = null;
 export function setDamageTypesOverride(rows: readonly ExtraDamageType[] | null): void {

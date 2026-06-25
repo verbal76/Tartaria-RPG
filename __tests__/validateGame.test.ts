@@ -131,12 +131,17 @@ describe('validateGame — pre-export reference checks', () => {
     expect(t).not.toMatch(/scenario "fallback"/);
   });
 
-  it('warns on a stat name the engine does not track (e.g. constitution / perception)', () => {
+  it('warns only on a genuinely-untracked stat; ACCEPTS synonyms (constitution→hp, perception→wisdom)', () => {
+    // a stat with no alias still warns
+    setTableOverride('armor', [{ name: 'Luck Vest', slot: 'chest', rarity: 'Common', tags: [], statBonus: { stat: 'luck', amount: 2 } }]);
+    setCustomTitlesOverride([]);
+    expect(warnText()).toMatch(/luck/);
+    // engine_Dev stat-alias map — common synonyms now resolve to a tracked stat → NO warning
     setTableOverride('armor', [{ name: 'Con Vest', slot: 'chest', rarity: 'Common', tags: [], statBonus: { stat: 'constitution', amount: 2 } }]);
     setCustomTitlesOverride([{ id: 't', name: 'Eagle Eye', track: 'kills', threshold: 5, perk: { stat: 'perception', amount: 1 } }]);
-    const w = warnText();
-    expect(w).toMatch(/constitution/);
-    expect(w).toMatch(/perception/);
+    const w2 = warnText();
+    expect(w2).not.toMatch(/constitution/);
+    expect(w2).not.toMatch(/perception/);
     // hp / staminaMax gear bonuses are valid and must NOT warn
     setTableOverride('armor', [{ name: 'Tough Vest', slot: 'chest', rarity: 'Common', tags: [], statBonuses: [{ stat: 'hp', amount: 5 }, { stat: 'strength', amount: 1 }] }]);
     setCustomTitlesOverride([]);
