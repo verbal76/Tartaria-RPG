@@ -16143,4 +16143,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // power coat_enemies coatings outside the 5 DOT kinds (never ticks → error), and collectable
 // fragment biomeTags that match no location (story uncompletable → warning). No content
 // coercion — the dev fixes their input; the engine just surfaces it. tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-864';
+//
+// engine_Dev-865 — WEATHER feature pass (lore-agnostic). (1) A WEATHER ON/OFF toggle:
+// new weatherEnabled flag — bundle field "weatherEnabled": false, dev-console FEATURES
+// card, full contentPackStore plumbing (state/parse/persist/apply), and a runtime gate
+// (scenes get no weather, no atmosphere line, no effects). CurrentScene.weather is now
+// nullable; all readers guard it. (2) The generic (non-Tartaria) DEFAULT weather is a
+// proper 6-row set with real ids incl a benign Clear Skies (was 2 placeholder rows) —
+// used as both the default game's weather and the template. (3) Template + hint updated
+// to document the data-driven fields and the toggle (WEATHER_NOTE on the weather box,
+// weatherEnabled in the whole-game template). tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-865';

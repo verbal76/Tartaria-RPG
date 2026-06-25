@@ -31,6 +31,7 @@ import {
   setCollectablesOverride,
   setSummonsOverride,
   setDogEnabled,
+  setWeatherEnabled as setWeatherEnabledEngine,
   setSidekickWeaponQuestPct as setSidekickWeaponQuestPctEngine,
   setDamageTypesOverride,
   setDamageResistancesOverride,
@@ -133,6 +134,8 @@ interface PersistShape {
   summons?: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off. Absent → on (the built-in default). */
   dogEnabled?: boolean;
+  /** Weather on/off. Absent → on. */
+  weatherEnabled?: boolean;
   /** Main-mission % the player must reach before sidekick weapons unlock. Absent → 0. */
   sidekickWeaponQuestPct?: number;
   /** Author-added damage types (extend the built-in 10). */
@@ -203,6 +206,8 @@ interface ContentPackState {
   summons: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off (default true). */
   dogEnabled: boolean;
+  /** Weather on/off (default true). When false, scenes get no weather. */
+  weatherEnabled: boolean;
   /** engine_Dev — global gate: the player must be at least this % through the main
    *  mission before SIDEKICK WEAPONS (golem_weapon recipes) can be crafted. 0 = no
    *  gate (the default). Set in the Sidekicks authoring box. */
@@ -325,6 +330,7 @@ interface ContentPackState {
   clearSummons: () => void;
   /** Toggle the rescuable dog companion on/off for this game. */
   setDogCompanionEnabled: (on: boolean) => void;
+  setWeatherEnabled: (on: boolean) => void;
   /** Set the main-mission % the player must reach before sidekick weapons unlock
    *  (0..100; 0 = no gate). Set from the Sidekicks authoring box. */
   setSidekickWeaponQuestPct: (pct: number) => void;
@@ -387,7 +393,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode' | 'templateStamps'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'weatherEnabled' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode' | 'templateStamps'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -406,6 +412,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     collectables: state.collectables.length > 0 ? state.collectables : undefined,
     summons: state.summons ?? undefined,
     dogEnabled: state.dogEnabled === false ? false : undefined,
+    weatherEnabled: state.weatherEnabled === false ? false : undefined,
     sidekickWeaponQuestPct: state.sidekickWeaponQuestPct > 0 ? state.sidekickWeaponQuestPct : undefined,
     damageTypes: state.damageTypes.length > 0 ? state.damageTypes : undefined,
     damageResistances: state.damageResistances && Object.keys(state.damageResistances).length > 0 ? state.damageResistances : undefined,
@@ -502,6 +509,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   collectables: [],
   summons: null,
   dogEnabled: true,
+  weatherEnabled: true,
   sidekickWeaponQuestPct: 0,
   damageTypes: [],
   damageResistances: null,
@@ -553,6 +561,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCollectablesOverride(s.collectables.length > 0 ? s.collectables : null);
     setSummonsOverride(s.summons ?? null);
     setDogEnabled(s.dogEnabled !== false);
+    setWeatherEnabledEngine(s.weatherEnabled !== false);
     setSidekickWeaponQuestPctEngine(s.sidekickWeaponQuestPct ?? 0);
     setDamageTypesOverride(s.damageTypes.length > 0 ? (s.damageTypes as { name: string; keywords?: string[] }[]) : null);
     setDamageResistancesOverride(s.damageResistances && Object.keys(s.damageResistances).length > 0 ? (s.damageResistances as Record<string, { resist: string[]; weak: string[] }>) : null);
@@ -1132,6 +1141,12 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     persist({ ...get(), dogEnabled: on });
   },
 
+  setWeatherEnabled(on) {
+    setWeatherEnabledEngine(on);
+    set({ weatherEnabled: on, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), weatherEnabled: on });
+  },
+
   setSidekickWeaponQuestPct(pct) {
     const clamped = Number.isFinite(pct) ? Math.max(0, Math.min(100, Math.round(pct))) : 0;
     setSidekickWeaponQuestPctEngine(clamped);
@@ -1358,6 +1373,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     let nextCollectables: unknown[] = get().collectables;
     let nextSummons: { noun?: string; defs: unknown[] } | null = get().summons;
     let nextDogEnabled = get().dogEnabled;
+    let nextWeatherEnabled = get().weatherEnabled;
     let nextSidekickWeaponQuestPct = get().sidekickWeaponQuestPct;
     let nextDamageTypes: unknown[] = get().damageTypes;
     let nextDamageResistances: Record<string, unknown> | null = get().damageResistances;
@@ -1451,6 +1467,9 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       } else if (key === 'dogEnabled' || key === 'dogCompanion') {
         if (typeof value === 'boolean') { nextDogEnabled = value; applied.push(`dogEnabled (${value})`); }
         else skipped.push('dogEnabled (not a boolean)');
+      } else if (key === 'weatherEnabled') {
+        if (typeof value === 'boolean') { nextWeatherEnabled = value; applied.push(`weatherEnabled (${value})`); }
+        else skipped.push('weatherEnabled (not a boolean)');
       } else if (key === 'sidekickWeaponQuestPct' || key === 'sidekickWeaponPct') {
         if (typeof value === 'number' && Number.isFinite(value)) {
           nextSidekickWeaponQuestPct = Math.max(0, Math.min(100, Math.round(value)));
@@ -1592,6 +1611,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
       collectables: nextCollectables,
       summons: nextSummons,
       dogEnabled: nextDogEnabled,
+      weatherEnabled: nextWeatherEnabled,
       sidekickWeaponQuestPct: nextSidekickWeaponQuestPct,
       damageTypes: nextDamageTypes,
       damageResistances: nextDamageResistances,
@@ -1617,7 +1637,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     // the build, re-derived each launch, so it must not be written into AsyncStorage (which would
     // shadow a later rebuild's baked game). Normal dev uploads persist as before.
     if (opts?.persist !== false) {
-      persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, roadsideTraders: nextRoadside, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
+      persist({ ...get(), tables: nextTables, lore: nextLore, missions: nextMissions, hooks: nextHooks, whispers: nextWhispers, wasteland: nextWasteland, sceneProps: nextSceneProps, vendors: nextVendors, roadsideTraders: nextRoadside, interactionTags: nextInteractionTags, startingAreas: nextStartingAreas, customTitles: nextCustomTitles, customMainQuest: nextMainQuest, customBosses: nextBosses, collectables: nextCollectables, summons: nextSummons, dogEnabled: nextDogEnabled, weatherEnabled: nextWeatherEnabled, sidekickWeaponQuestPct: nextSidekickWeaponQuestPct, damageTypes: nextDamageTypes, damageResistances: nextDamageResistances, fusionTags: nextFusionTags, coatings: nextCoatings, digging: nextDigging, scrap: nextScrap, salvage: nextSalvage, overlays: nextOverlays, dogScenarios: nextDogScenarios, inventory: nextInventory, narratorName: nextNarrator, gameTitle: nextTitle, gameTagline: nextTagline, crucibleName: nextCrucibleName, crucibleEnabled: nextCrucibleEnabled, worldName: nextWorldName, corruptionName: nextCorruptionName, energyName: nextEnergyName });
     }
     invalidateLocationCaches(); // a bundle may have replaced the locations table / placements
     const summary = `Loaded: ${applied.join(', ')}.${skipped.length ? ` Skipped: ${skipped.join(', ')}.` : ''}`;
@@ -1664,6 +1684,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.collectables.length > 0) out.collectables = s.collectables;
     if (s.summons && Array.isArray(s.summons.defs) && s.summons.defs.length > 0) out.summons = s.summons;
     if (s.dogEnabled === false) out.dogEnabled = false;
+    if (s.weatherEnabled === false) out.weatherEnabled = false;
     if (s.sidekickWeaponQuestPct > 0) out.sidekickWeaponQuestPct = s.sidekickWeaponQuestPct;
     if (s.damageTypes.length > 0) out.damageTypes = s.damageTypes;
     if (s.damageResistances && Object.keys(s.damageResistances).length > 0) out.damageResistances = s.damageResistances;
@@ -1764,7 +1785,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, sceneProps: {}, vendors: [], roadsideTraders: [], interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, sidekickWeaponQuestPct: 0, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, sceneProps: {}, vendors: [], roadsideTraders: [], interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, weatherEnabled: true, sidekickWeaponQuestPct: 0, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1814,6 +1835,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setSummonsOverride(summons as { noun?: string; defs: never[] } | null);
         const dogEnabled = shape.dogEnabled !== false;
         setDogEnabled(dogEnabled);
+        const weatherEnabled = shape.weatherEnabled !== false;
+        setWeatherEnabledEngine(weatherEnabled);
         const sidekickWeaponQuestPct = typeof shape.sidekickWeaponQuestPct === 'number' && Number.isFinite(shape.sidekickWeaponQuestPct)
           ? Math.max(0, Math.min(100, Math.round(shape.sidekickWeaponQuestPct))) : 0;
         setSidekickWeaponQuestPctEngine(sidekickWeaponQuestPct);
@@ -1859,7 +1882,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         const devMode = shape.devMode !== false;
         const templateStamps = shape.templateStamps && typeof shape.templateStamps === 'object' ? shape.templateStamps : {};
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
+        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, weatherEnabled, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */

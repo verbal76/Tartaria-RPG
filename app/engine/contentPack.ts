@@ -35,7 +35,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'races', label: 'Races (playable — character creation)', hint: 'JSON array of race rows. THIS is what the race-selection screen shows. (Not the "Race lore" box up in LORE — that\'s freeform story text.) PERKS + GEAR per race: "racialStatBonuses" {strength?,…} (always-on stat bumps), "racialACBonusRules" [{condition,delta}] (conditional AC), "startingWeapon" (item name for the starter primary), "startingGear" ["item names"] (extra creation items from your catalogs), "abilities" [{id,name,description,combatOnly?,effect:{type:heal|stat_buff|shield|repair|strike, amount?|dice?, stat?, rounds?, damageType?}}] (once-a-day powers). "resist": ["<damage type>"] / "weak": ["<damage type>"] — lower/raise the chance the member suffers that type\'s on-hit effect (the player has NO weakness unless granted here).' },
   { id: 'factions', label: 'Factions (playable — character creation)', hint: 'JSON array of faction rows. THIS is what the faction-selection screen shows. (Not the "Faction lore" box up in LORE.) Optional per faction: "flavor" (2-3 sentence blurb), "baseName" (STARTER COMPLEX title), "baseLocationId" (spawn location id). PERKS + GEAR: "startingGear" ["item names"] (creation items from your catalogs — replaces the built-in faction knife), "factionStatBonuses" {strength?,…} (always-on stat bumps while a member), "factionACBonusRules" [{condition,delta}] (conditional AC), "abilities" [{id,name,description,combatOnly?,effect:{type:heal|stat_buff|shield|repair|strike,…}}] (once-a-day powers). "resist"/"weak": ["<damage type>"] — member resists/is weak to that type\'s on-hit effect.' },
   { id: 'locations', label: 'Locations', hint: 'JSON array of locations (data/locations/locations.json). Optional per row: "x" / "y" — the spot to plot this location on your uploaded world map, in the world size set under MAPS (0,0 = top-left). Optional "hidden": true — the place shows as a colored "?" on the map and in the travel list (still fully routable) and reveals its real name only after the player travels there once.' },
-  { id: 'weather', label: 'Weather / atmosphere', hint: 'JSON array of weather rows (data/weather/weather.json). Drives the "<name> presses on the world" atmosphere line + travel/visibility effects. Each: { "id", "name", "description", "visibility", "travelPenalty", "corruptionChance", "tags": [...] }.' },
+  { id: 'weather', label: 'Weather / atmosphere', hint: 'JSON array of weather rows (data/weather/weather.json). Drives the "<name> presses on the world" atmosphere line AND mechanics, straight from the DATA fields (ids are free-form): visibility (negative → attack penalty), travelPenalty (3+ → slower repositioning), corruptionChance + hostile tags (storm/ash/hazardous → per-action tick), cold/snow tags → -1 DEX, fog/ash/smoke → -1 WIS. Each: { "id", "name", "description", "visibility", "travelPenalty", "corruptionChance", "tags": [...] }. Add a benign row (visibility 0, travelPenalty 0, no hostile tags) for fair weather. To disable weather entirely set top-level "weatherEnabled": false (or the dev-console FEATURES toggle).' },
   { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
   { id: 'powers', label: 'Powers (magic / abilities)', hint: 'Your castable powers. Each: { "discipline": "shape|summon|mend" (the engine effect it runs), "name", "title", "body", "stat": "intelligence|wisdom", "dcBase", "fuels": ["item names"], "examples": ["cast phrases"] }. Replaces the built-in power set. Hit TEMPLATE for the shape.' },
 ];
@@ -671,6 +671,13 @@ let dogEnabled = true;
 export function setDogEnabled(on: boolean): void { dogEnabled = on !== false; }
 export function isDogEnabled(): boolean { return dogEnabled; }
 
+// engine_Dev — WEATHER on/off. When false, scenes get no weather: no atmosphere line,
+// no travel/visibility/stat/tick effects. Lets an author run a setting where weather
+// isn't a mechanic without deleting their weather table. Default on.
+let weatherEnabled = true;
+export function setWeatherEnabled(on: boolean): void { weatherEnabled = on !== false; }
+export function isWeatherEnabled(): boolean { return weatherEnabled; }
+
 // engine_Dev — global gate: the player must be at least this % (0..100) through the
 // data-driven main mission before SIDEKICK WEAPONS (golem_weapon recipes) can be
 // crafted. 0 = no gate. Authored in the Sidekicks box; read by the craft handler.
@@ -1146,6 +1153,7 @@ export function clearAllOverrides(): void {
   collectablesOverride = null;
   summonsOverride = null;
   dogEnabled = true;
+  weatherEnabled = true;
   sidekickWeaponQuestPct = 0;
   damageTypesOverride = null;
   damageResistancesOverride = null;

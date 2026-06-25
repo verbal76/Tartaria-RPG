@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, resolveTable, resolveFlavor } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, resolveTable, resolveFlavor } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -485,7 +485,8 @@ function buildingApproachLine(buildingId: string, autoTraveling = false): string
 }
 
 interface CurrentScene {
-  weather: WeatherEntry;
+  // null when weatherEnabled is false (no weather at all) — all weather readers guard it.
+  weather: WeatherEntry | null;
   location: Location;
   hazard: Hazard | null;
   /** All enemies engaged in this scene. Empty when peaceful. */
@@ -659,7 +660,7 @@ function collectSceneNouns(scene: CurrentScene): string[] {
   // suggestions like "use torch on tartarian outskirts." The parser still
   // gets the Location name separately via ParseContext.currentLocationName
   // so it can recognize the name without treating it as a noun.
-  const nouns = [scene.weather.name];
+  const nouns = scene.weather ? [scene.weather.name] : [];
   if (scene.hazard) nouns.push(scene.hazard.name);
   for (const e of scene.enemies) {
     nouns.push(e.name, e.type);
@@ -4338,7 +4339,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
-    const weather = pickWeather(worldMemory);
+    // engine_Dev — weatherEnabled=false → no weather at all (no atmosphere line, no effects).
+    const weather = isWeatherEnabled() ? pickWeather(worldMemory) : null;
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND
     // has a hubRoomId set (or default to entry), render the hub room
@@ -5716,7 +5718,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // description is woven into the opening paragraph instead, so a
     // brand-new player isn't greeted with a mechanical line break.
     const weatherMods = describeWeatherStatModifiers(weather);
-    if (weatherMods && !opts?.isOpening) {
+    if (weather && weatherMods && !opts?.isOpening) {
       get().appendLog('system', `Weather effect — ${weather.name}: ${weatherMods}`);
     }
     // Phase 4 §3.3 — the "Radar" block. Deterministic compass summary so
@@ -5957,7 +5959,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     set((s) => {
       const taggedMem = recordTags(
-        recordTags(recordTags(s.worldMemory, weather.tags), location.tags),
+        recordTags(recordTags(s.worldMemory, weather?.tags ?? []), location.tags),
         hazard?.tags ?? [],
       );
       // Combat cooldown counter — bump every peaceful scene, reset to 0
@@ -17997,7 +17999,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // hit the crash. Fix: use the already-imported pickWeather
         // reference, no require needed.
         const liveWorldMem = get().worldMemory;
-        const newWeather = pickWeather(liveWorldMem);
+        const newWeather = isWeatherEnabled() ? pickWeather(liveWorldMem) : null;
         set((s) => s.currentScene
           ? { currentScene: { ...s.currentScene, weather: newWeather } }
           : s);

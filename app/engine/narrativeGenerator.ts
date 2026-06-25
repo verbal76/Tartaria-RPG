@@ -71,7 +71,7 @@ export function buildOpeningNarrative(input: {
    *  appended to P1 so the opening tells the player what THEIR faction is walking
    *  into, not just the world at large. Empty/absent → skipped. */
   factionFlavor?: string | null;
-  weather: WeatherEntry;
+  weather: WeatherEntry | null;
   weatherDescriptor: string;
   location: Location;
   hubRoomName?: string | null;
@@ -160,7 +160,7 @@ export function buildOpeningNarrative(input: {
   const arbiterLine = isHubScene
     ? pick(resolveFlavor('hubOpening', HUB_OPENING_LINES))
     : pick(resolveFlavor('opening', openingsList));
-  const weatherClause = weatherDescriptor
+  const weatherClause = weather && weatherDescriptor
     ? ` ${aOrAn(weather.name)} ${weather.name.toLowerCase()} presses on the world — ${weatherDescriptor}.`
     : '';
   const p3 = `${arbiterLine}${weatherClause} What you do here is yours to choose.`;
@@ -214,7 +214,7 @@ const HUB_OPENING_LINES = [
 ];
 
 export interface SceneInput {
-  weather: WeatherEntry;
+  weather: WeatherEntry | null;
   location: Location;
   hazard?: Hazard | null;
   enemy?: Enemy | null;
@@ -463,7 +463,7 @@ function getSceneFlavors(): Record<string, string[]> {
 // hazard / weather / location tags; `atmospheric` is the gentle default.
 function pickSceneFlavorCategory(input: SceneInput): string | null {
   const tagBag = new Set<string>();
-  for (const t of input.weather.tags ?? []) tagBag.add(t.toLowerCase());
+  for (const t of input.weather?.tags ?? []) tagBag.add(t.toLowerCase());
   for (const t of input.location.tags ?? []) tagBag.add(t.toLowerCase());
   if (input.hazard) {
     for (const t of input.hazard.tags ?? []) tagBag.add(t.toLowerCase());
@@ -494,7 +494,7 @@ function pickSceneFlavorCategory(input: SceneInput): string | null {
 export function buildScene(input: SceneInput): string {
   const parts: string[] = [];
 
-  parts.push(`${input.weather.description}`);
+  if (input.weather) parts.push(`${input.weather.description}`);
   parts.push(`You are at ${input.location.name}. ${input.location.description}`);
 
   if (input.hazard) {
