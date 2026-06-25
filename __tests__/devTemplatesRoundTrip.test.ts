@@ -156,7 +156,7 @@ describe('dev-console TEMPLATE → LOAD round-trips', () => {
     const t = buildGameBundleTemplate();
     const required = [
       // identity
-      'title', 'tagline', 'narrator', 'worldName', 'corruptionName', 'crucibleName', 'crucibleEnabled', 'energyName',
+      'title', 'tagline', 'narrator', 'worldName', 'corruptionName', 'crucibleName', 'crucibleEnabled', 'weatherEnabled', 'energyName',
       // tables + lore (data-driven from the registries)
       ...CONTENT_TABLES.map((x) => x.id), ...LORE_BLOCKS.map((x) => x.id),
       // special content

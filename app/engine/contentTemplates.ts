@@ -142,10 +142,24 @@ const STAT_BONUS_NOTE = [
   '//   pools instead, e.g. { "stat": "staminaMax", "amount": 4 }.',
 ].join('\n');
 
+const WEATHER_NOTE = [
+  '// Weather is DATA-DRIVEN — these fields drive the mechanics (ids are free-form,',
+  '// nothing references them):',
+  '//   visibility (0 or negative) — lower = a bigger attack-roll penalty (capped at 3)',
+  '//   travelPenalty (0+)         — 3 or more = repositioning costs 2 turns per band',
+  '//   corruptionChance (0+)      — chance per action to tick corruption',
+  '//   tags                       — hostile tags (storm/ash/hazardous) add a stamina/HP',
+  '//                                bite; cold/snow → -1 DEX; fog/ash/smoke → -1 WIS',
+  '// Add a benign row (visibility 0, travelPenalty 0, no hostile tags) for fair weather.',
+  '// To turn weather OFF entirely, set "weatherEnabled": false at the top level (or use the',
+  '// Weather toggle in the dev console FEATURES card) — scenes then get no weather at all.',
+].join('\n');
+
 const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   weapons: STAT_BONUS_NOTE,
   armor: STAT_BONUS_NOTE,
   gear: STAT_BONUS_NOTE,
+  weather: WEATHER_NOTE,
   races: [
     '// Optional per RACE row (perks + gear + abilities):',
     '//   racialStatBonuses: { strength?, dexterity?, intelligence?, wisdom?, charisma? }  — always-on stat bumps',
@@ -1318,6 +1332,7 @@ function bundleEntries(): BundleEntry[] {
     { key: 'crucibleName', hint: 'Your name for the fusion/forge feature the engine calls the "Crucible" (also the {crucible}/{fuse}/{forge} token). Set in the GAME IDENTITY section.', content: JSON.stringify('Crucible') },
     { key: 'energyName', hint: 'What this world calls its "magic" / power source (renames the engine\'s built-in energy concept). Shows on the magic tab + everywhere the {energy} token is used. Set in GAME IDENTITY; the fuller energy concept (adjective/material/slang) is in the World-lore block.', content: JSON.stringify('Magic') },
     { key: 'crucibleEnabled', hint: 'Whether the fusion/forge feature exists in this game: true (default) keeps it, false removes the Crucible entirely. Toggle it in the GAME IDENTITY section.', content: JSON.stringify(true) },
+    { key: 'weatherEnabled', hint: 'Whether weather exists in this game: true (default) keeps it, false removes it entirely (no atmosphere line, no travel/visibility/stat/tick effects — your Weather table stays but goes dormant). Toggle it in the dev console FEATURES card.', content: JSON.stringify(true) },
   ];
   for (const b of LORE_BLOCKS) entries.push({ key: b.id, hint: b.hint, content: getLoreTemplate(b.id, false) });
   for (const t of CONTENT_TABLES) entries.push({ key: t.id, hint: t.hint, content: getTableTemplate(t.id, TEMPLATE_SAMPLE_ROWS, false) });

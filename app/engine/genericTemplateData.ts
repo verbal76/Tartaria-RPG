@@ -69,9 +69,18 @@ export const GENERIC_TABLE_ROWS = {
     { id: 'REPLACE-with-a-location-id', name: 'The Old Plains', type: 'region', description: 'A vast open expanse of broken ground. Strange weather, old markers, sightlines to the horizon.', danger: 4, tags: ['region', 'open'], discoverable: true, aliases: ['plains', 'the plains', 'wastes'], interactables: ['horizon', 'marker', 'pillar', 'crater', 'mud', 'flat'] },
     { id: 'REPLACE-with-a-location-id-2', name: 'Crossroads', type: 'settlement', description: 'A waystation where the roads meet. Traders, rumors, and a place to resupply before the next stretch.', danger: 1, tags: ['settlement', 'safe', 'market'], discoverable: true, aliases: ['the crossroads', 'town', 'waystation'], interactables: ['well', 'notice board', 'stall', 'gate', 'lantern'] },
   ],
+  // engine_Dev — GENERIC, setting-neutral weather. Real ids (not REPLACE-…) so this
+  // doubles as the default game's weather AND a working template. The engine drives
+  // mechanics from the DATA fields: visibility → attack penalty, travelPenalty →
+  // reposition cost, corruptionChance + hostile tags → the per-action tick, cold/fog
+  // tags → a stat nerf. Ids are free-form (nothing references them); rename/extend at will.
   weather: [
-    { id: 'REPLACE-with-a-weather-id', name: 'Lightning Storm', description: 'Lightning crackles across the horizon in unnatural colors. The air tastes like copper, and small mechanisms fail.', visibility: -3, travelPenalty: 4, corruptionChance: 3, tags: ['lightning', 'tech_disruption'], source: 'manual' },
-    { id: 'REPLACE-with-a-weather-id-2', name: 'Ash Wind', description: 'A wall of grey ash rolls across the open ground. Breathing burns; the skin gathers a film of dead land.', visibility: -3, travelPenalty: 4, corruptionChance: 2, tags: ['ash', 'respiratory'], source: 'manual' },
+    { id: 'clear_skies', name: 'Clear Skies', description: 'The clouds thin out and the light comes clean. Easy going, but nowhere to hide.', visibility: 0, travelPenalty: 0, corruptionChance: 0, tags: ['clear', 'mild'], source: 'manual' },
+    { id: 'lightning_storm', name: 'Lightning Storm', description: 'Lightning crackles across the horizon. The air tastes like copper, and small mechanisms fail.', visibility: -3, travelPenalty: 4, corruptionChance: 3, tags: ['lightning', 'storm', 'tech_disruption'], source: 'manual' },
+    { id: 'ash_wind', name: 'Ash Wind', description: 'A wall of grey ash rolls across the open ground. Breathing burns; the skin gathers a film of dead land.', visibility: -3, travelPenalty: 4, corruptionChance: 2, tags: ['ash', 'respiratory', 'hazardous'], source: 'manual' },
+    { id: 'cold_snap', name: 'Cold Snap', description: 'The temperature drops hard and fast. Fingers stiffen; footing turns treacherous on the frost.', visibility: -1, travelPenalty: 3, corruptionChance: 0, tags: ['cold', 'frost'], source: 'manual' },
+    { id: 'thick_fog', name: 'Thick Fog', description: 'A dense fog swallows the ground whole. You can barely see your own hands, let alone what is coming.', visibility: -4, travelPenalty: 2, corruptionChance: 0, tags: ['fog', 'mist'], source: 'manual' },
+    { id: 'hard_rain', name: 'Hard Rain', description: 'A cold, drumming downpour turns the ground to mud and soaks through everything you carry.', visibility: -2, travelPenalty: 3, corruptionChance: 0, tags: ['rain', 'mud'], source: 'manual' },
   ],
 } satisfies Record<string, unknown[]>;
 

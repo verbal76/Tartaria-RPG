@@ -72,7 +72,7 @@ export interface ContextInputs {
 
 export interface SceneSlice {
   location: Location;
-  weather: WeatherEntry;
+  weather: WeatherEntry | null;
   hazard: Hazard | null;
   enemies: readonly Enemy[];
   enemyHps: readonly number[];

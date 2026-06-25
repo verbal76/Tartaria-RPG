@@ -162,6 +162,8 @@ function GameIdentitySection() {
   const crucibleEnabled = useContentPackStore((s) => s.crucibleEnabled);
   const setCrucibleName = useContentPackStore((s) => s.setCrucibleName);
   const setCrucibleEnabledFn = useContentPackStore((s) => s.setCrucibleEnabled);
+  const weatherEnabled = useContentPackStore((s) => s.weatherEnabled);
+  const setWeatherEnabledFn = useContentPackStore((s) => s.setWeatherEnabled);
   const worldName = useContentPackStore((s) => s.worldName);
   const setWorldName = useContentPackStore((s) => s.setWorldName);
   const corruptionName = useContentPackStore((s) => s.corruptionName);
@@ -269,6 +271,29 @@ function GameIdentitySection() {
         >
           <Text style={crucibleEnabled ? styles.applyBtnText : styles.resetBtnText}>
             {crucibleEnabled ? `✓ ${getCrucibleName()} ENABLED — tap to DISABLE` : `✕ DISABLED — tap to ENABLE`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <View style={styles.cardHead}>
+          <Text style={styles.cardTitle}>Weather</Text>
+          <Text style={weatherEnabled ? styles.badgeOn : styles.badgeOff}>
+            {weatherEnabled ? '● on' : '○ disabled'}
+          </Text>
+        </View>
+        <Text style={styles.hint}>
+          Weather presses on each scene — an atmosphere line plus mechanical pressure driven by
+          your Weather rows (visibility → harder to hit, travelPenalty → slower repositioning,
+          corruptionChance + tags → a per-action tick). Turn it off for a setting where weather
+          isn’t a mechanic: scenes get no weather line and no weather effects (your Weather table
+          can stay; it’s just dormant). Also settable per game as “weatherEnabled”: false in JSON.
+        </Text>
+        <TouchableOpacity
+          style={[styles.applyBtn, !weatherEnabled && styles.resetBtn]}
+          onPress={() => setWeatherEnabledFn(!weatherEnabled)}
+        >
+          <Text style={weatherEnabled ? styles.applyBtnText : styles.resetBtnText}>
+            {weatherEnabled ? '✓ WEATHER ENABLED — tap to DISABLE' : '✕ DISABLED — tap to ENABLE'}
           </Text>
         </TouchableOpacity>
       </View>
