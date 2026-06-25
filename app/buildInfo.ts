@@ -16210,4 +16210,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (always valid). New section.placeholder check: any loaded section still carrying a "REPLACE-…"
 // placeholder (template scaffolding promoted to a real override on a bundle round-trip) is flagged
 // to customize or delete. Validation only — no content edited. tsc 142.
-export const OTA_BUILD_ID = '2026-06-25-874';
+// OTA-875 — generic vendor/roadside names genericized + roadside made data-driven. Vendor names are
+// now plain roles: Weapons Dealer (weapons.json), Blacksmith (armor.json), Quartermaster (gear),
+// Supplier (materials.json), General Trader (mixed). The ROADSIDE pool was still hardcoded (Road
+// Hawker selling "Trail Rations" → phantom in a custom catalog); now buildGenericRoadside() samples
+// its pools from the loaded catalog too — Roadside Vendor (honest) + Black-Market Fence (sketchy),
+// pulled from gear/materials/weapons/armor, respecting the append/replace + enabled toggles. Generic
+// demo hub anchor → "Quartermaster". No content baked — wares derive from whatever catalog loads. tsc 142.
+export const OTA_BUILD_ID = '2026-06-25-875';

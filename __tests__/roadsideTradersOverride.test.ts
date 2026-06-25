@@ -35,7 +35,7 @@ describe('engine_Dev — roadside traders override + generic default', () => {
     installGenericDefaults(GENERIC_GAME);
     expect(getGenericRoadside()).toBeTruthy();
     const names = getActiveRoadside().map((a) => a.name);
-    expect(names).toContain('Road Hawker'); // generic archetype
+    expect(names).toContain('Roadside Vendor'); // data-driven generic archetype (sampled from catalog)
     expect(JSON.stringify(getActiveRoadside())).not.toMatch(/tartar|aether/i);
   });
 
