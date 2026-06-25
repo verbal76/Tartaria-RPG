@@ -15102,4 +15102,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // synonyms to the real engine stat (or the hp pool) at every equipped stat-read, so the bonuses
 // finally count. Plus a stat floor (effectiveStats clamped ≥1) so stacked debuffs can't zero a roll.
 // Hardcoded — no contentPack/JSON getters added. (Dev: set official OTA number/codename.)
-export const OTA_BUILD_ID = '2026-06-25-624-combatI';
+// COMBAT-PARITY II (Tartaria-native, no JSON plumbing) — TYPED DAMAGE-TYPE PROCS: each built-in
+// damage type (piercing/slashing/bludgeoning/electrical/aetheric/stun/burn/poison/radiation/…) now
+// carries a small on-hit bonus or a timed DOT, gated by an apply chance (raised vs a target WEAK to
+// the type, lowered vs RESISTANT), mirroring how Dev-engine author damageTypes behave — hardcoded as
+// BUILTIN_DT_COMBAT, reusing the existing coating-DOT (enemyStatuses) + enemyArmorShred infra. Both
+// directions: player→enemy folds an on-hit bonus / seeds a typed_dot and an on-hit debuff becomes an
+// "exposed" AC shred (easier to hit); enemy→player lands only the on-hit/DOT bonus (no player stat
+// penalty), at full chance for EXPLICITLY-typed enemies and 0.4× for inferred bare-dice types so the
+// ~95 untyped enemies don't silently tax the player. Damage-type aliases (force/psychic→aetheric,
+// frost→cold, shock→electrical) via canonDT. Post-audit (multi-agent stress + balance probe) fixes:
+// (1) added the `cold` proc entry so the frost→cold alias isn't dead; (2) the player→enemy "exposed"
+// AC shred now shares the proc-chance roll (was applied every hit); (3) enemy→player bonus is 1d3 vs
+// the player's 1d4 — a player-favoring asymmetry, since the probe showed symmetric procs convert
+// stalls into deaths at the Uncommon tier; (4) the stat glossary now also covers the durability
+// instance-perk roll (acrobatics/aetheria synonyms were dropped from rolled perks); (5) effectiveStats
+// floors stealth at 0 (untrained), not 1. Common tier (real early-game) holds ~90% win. (Dev: OTA #.)
+export const OTA_BUILD_ID = '2026-06-25-625-combatII';
