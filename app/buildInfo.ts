@@ -16153,4 +16153,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // used as both the default game's weather and the template. (3) Template + hint updated
 // to document the data-driven fields and the toggle (WEATHER_NOTE on the weather box,
 // weatherEnabled in the whole-game template). tsc 142.
-export const OTA_BUILD_ID = '2026-06-24-865';
+//
+// engine_Dev-866 — Validate Game UX + recipe/loot cross-check. (1) COPY button: the full
+// validation report (every line, not the 20-line preview) is captured and a "⧉ COPY
+// VALIDATION OUTPUT" button copies it to the clipboard. (2) Recipe ingredients are now
+// cross-checked against an OBTAINABLE-ITEM INDEX built from every loot/drop source (enemy
+// loot, boss drops + questItem, digging, salvage pools + junk, travel-encounter loot, hook/
+// whisper grant_item, vendor/roadside offers, dog-captor loot, quest/main-quest rewards,
+// starting gear, starter items), not just the item tables. An ingredient that's a loot drop
+// but absent from every item table → WARNING ("define it in Materials", blank-misc otherwise);
+// one defined+obtainable nowhere → ERROR. Two aggregated info lines name exactly what to add
+// to Materials. No content touched — engine wiring + validation only. tsc 142.
+export const OTA_BUILD_ID = '2026-06-24-866';

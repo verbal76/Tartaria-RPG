@@ -487,6 +487,9 @@ function GameBundleBox() {
   const loadGameBundle = useContentPackStore((s) => s.loadGameBundle);
   const [status, setStatus] = useState<Status>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  // engine_Dev — the FULL validation report text (all lines, not the 20-line preview),
+  // captured on the last Validate run so it can be copied to the clipboard.
+  const [validationText, setValidationText] = useState<string | null>(null);
   // engine_Dev — multi-part save: uploaded parts collect here until every 1..N is in, then knit.
   const [pendingParts, setPendingParts] = useState<GameSavePart[]>([]);
   // engine_Dev — soft export gate: a SAVE with hard validation errors asks for a second tap.
@@ -623,16 +626,26 @@ function GameBundleBox() {
             setConfirmReset(false);
             const r = runValidation();
             const s = summarizeValidation([...r.errors, ...r.warnings, ...r.info]);
-            if (r.errorCount === 0 && r.warningCount === 0 && r.infoCount === 0) { setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
+            if (r.errorCount === 0 && r.warningCount === 0 && r.infoCount === 0) { setValidationText('✓ Validate Game: no problems found — ready to export.'); setStatus({ kind: 'ok', msg: '✓ Validate Game: no problems found — ready to export.' }); return; }
             const counts = `${r.errorCount} error${r.errorCount === 1 ? '' : 's'}, ${r.warningCount} warning${r.warningCount === 1 ? '' : 's'}, ${r.infoCount} info`;
             const head = r.errorCount > 0
               ? `✗ Validate Game: ${counts} — fix the errors before you bake.`
               : `⚠ Validate Game: ${counts} (safe to export).`;
-            setStatus({ kind: r.errorCount > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more.` : ''}` });
+            // Full report captured for the COPY button; on-screen status shows a 20-line preview.
+            setValidationText(`${head}\n\n${s.lines.join('\n')}`);
+            setStatus({ kind: r.errorCount > 0 ? 'err' : 'ok', msg: `${head}\n\n${s.lines.slice(0, 20).join('\n')}${s.lines.length > 20 ? `\n…and ${s.lines.length - 20} more — tap COPY for the full list.` : ''}` });
           }}
         >
           <Text style={styles.copyBtnText}>✓ VALIDATE GAME</Text>
         </TouchableOpacity>
+        {validationText !== null && (
+          <TouchableOpacity
+            style={[styles.copyBtn, styles.stackBtn]}
+            onPress={() => { void Clipboard.setStringAsync(validationText); setStatus({ kind: 'ok', msg: 'Validation output copied to clipboard.' }); }}
+          >
+            <Text style={styles.copyBtnText}>⧉ COPY VALIDATION OUTPUT</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={[styles.copyBtn, styles.stackBtn]} onPress={() => { setConfirmReset(false); void saveToDevice(); }}>
           <Text style={styles.copyBtnText}>⬇ SAVE FILE TO DEVICE</Text>
         </TouchableOpacity>
