@@ -1973,7 +1973,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         // (now comment-insensitive) + the instruction-block housekeeping pass never flag existing
         // uploads yellow. The override CONTENT hash is preserved, so a genuinely-changed upload later
         // still re-stamps and real staleness still surfaces.
-        if (shape.stampScheme !== STAMP_SCHEME) {
+        const migrated = shape.stampScheme !== STAMP_SCHEME;
+        if (migrated) {
           const rebased: TemplateStamps = {};
           for (const [k, st] of Object.entries(templateStamps)) {
             if (st && typeof st === 'object') rebased[k] = { content: (st as { content: string }).content, tmpl: templateVersionFor(k) };
@@ -1982,6 +1983,11 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         }
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
         set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, weatherEnabled, vendorsEnabled, vendorsAppendGeneric, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
+        // engine_Dev — persist immediately on a scheme migration so STAMP_SCHEME is written and the
+        // re-baseline runs EXACTLY ONCE. Without this, reconcile keeps the (unchanged) stamps without
+        // writing, the scheme never updates, and every boot would re-baseline → yellow would never fire
+        // again. Persisting here makes the next boot a normal scheme — genuine staleness resumes.
+        if (migrated) persist({ ...useContentPackStore.getState() });
       }
     } catch {
       /* corrupt pack — ignore, run on the built-in Tartaria defaults */
