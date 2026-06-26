@@ -16293,4 +16293,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fixed a stale raceStarterItems assertion (Aetheric Torch/Locket → Hand Torch/Finder's Locket). tsc
 // clean; startingLoadout + raceStarter + creation/content-pack suites green. app/engine/{character,
 // contentPack,contentTemplates}.ts, __tests__/startingLoadout.test.ts.
-export const OTA_BUILD_ID = '2026-06-26-884';
+// OTA-885 — startingLoadout becomes the SOLE source for re-skins + per-faction loadouts. (1) In a
+// re-skin (isReskinActive), creation gear now comes ONLY from the uploaded startingLoadout: if the
+// pack authored none, a new character starts with NOTHING — the engine no longer leaks ANY built-in
+// starter (survival kit / faction knife / race weapon+gear) into a re-skin. The bare built-in
+// Tartaria game (no re-skin) keeps its native starter untouched (so the base game + ~120 creation
+// tests are unaffected). (2) PER-FACTION loadouts: a loadout row may carry an optional "faction" —
+// rows with no faction go to every character, a faction-tagged row only to that faction — so one
+// array holds shared kit + a different sidearm/knife per faction (resolveStartingLoadout filters by
+// faction.id). (3) Template/docs: any catalog (weapons/armor/materials/gear) is fair game; food
+// sample qty 3→5; knives are weapon+knife+THROWABLE (held weapon or bandolier-thrown, never a
+// "tool"); grenades are weapon+throwable+grenade (one-shot, consumed on throw). tsc clean;
+// startingLoadout suite (faction-filter + reskin-empty + built-in-kept) + creation suites green.
+// app/engine/{character,contentTemplates,contentPack}.ts, __tests__/startingLoadout.test.ts.
+export const OTA_BUILD_ID = '2026-06-26-885';
