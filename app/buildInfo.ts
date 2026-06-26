@@ -16437,4 +16437,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // instead of the old named items. Behavior in a re-skin is unchanged (prefer was already ignored there). No
 // code change — JSON + test only. devGiftReskin updated (built-in now asserts 5 distinct real consumables
 // resolved by tag, exact JSON quantities) — 6 green; tsc clean. app/data/devKit.json.
-export const OTA_BUILD_ID = '2026-06-26-899';
+// OTA-900 — [re-skin leak] climb-top loot goes content-agnostic. Player report (Philadelphia pack): cresting
+// a climb during the intro dropped a "charged Shard" — i.e. CLIMB_TOP_LOOT (Aetheric Shard, Aether Crystal,
+// Aetheric Locket, …) is a hardcoded TARTARIA pool that doesn't exist in an uploaded game, so the drop
+// resolved to an inert/improvised item. Same leak class as the area-search fix (OTA-894). Now, when
+// isReskinActive(), rollClimbTopLoot draws a real MATERIAL from the game's OWN materials catalog
+// (rarity-weighted, Uncommon-skewed like the built-in pool, Epic/Legendary excluded); an empty materials
+// table drops nothing (never a Tartaria fallback). Built-in Tartaria keeps its curated pool unchanged. tsc
+// clean; new climbTopLootReskin suite (re-skin drops only uploaded materials; built-in unchanged; empty ->
+// nothing) + all climb suites green (62). app/engine/climbHeight.ts. (Dev tracks only — not the Tartaria line.)
+export const OTA_BUILD_ID = '2026-06-26-900';

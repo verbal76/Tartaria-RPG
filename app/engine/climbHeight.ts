@@ -165,12 +165,41 @@ const TALL_CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] = 
   { name: "Reclaimer's Rope", rarity: 'Uncommon', weight: 2 },
 ];
 
+// engine_Dev — in a RE-SKIN the hardcoded CLIMB_TOP_LOOT pool above is all
+// Tartaria names (Aetheric Shard, Aether Crystal, …) that don't exist in the
+// uploaded game, so cresting a climb handed the player an inert "improvised"
+// item. When a re-skin is active the climb-top drop is instead a real MATERIAL
+// pulled from the game's OWN materials catalog — rarity-weighted, Uncommon-skewed
+// like the built-in pool, Epic/Legendary excluded (a climb shouldn't cough up a
+// top-tier mat). Built-in Tartaria keeps its curated pool unchanged.
+function reskinClimbTopLoot(): { name: string; rarity: Rarity; weight: number }[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { resolveTable } = require('./contentPack') as typeof import('./contentPack');
+  const mats = resolveTable('materials', [] as Array<{ name?: string; rarity?: string }>) as ReadonlyArray<{ name?: string; rarity?: string }>;
+  const out: { name: string; rarity: Rarity; weight: number }[] = [];
+  for (const m of mats) {
+    if (!m.name) continue;
+    const r = (m.rarity ?? 'Common') as Rarity;
+    const w = r === 'Common' ? 5 : r === 'Uncommon' ? 6 : r === 'Rare' ? 2 : 0;
+    if (w > 0) out.push({ name: m.name, rarity: r, weight: w });
+  }
+  return out;
+}
+
 export function rollClimbTopLoot(totalTiers?: number): { name: string; rarity: Rarity } | null {
   if (Math.random() < 0.5) return null;
-  const pool =
-    typeof totalTiers === 'number' && totalTiers >= 4
-      ? [...CLIMB_TOP_LOOT, ...TALL_CLIMB_TOP_LOOT]
-      : CLIMB_TOP_LOOT;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isReskinActive } = require('./contentPack') as typeof import('./contentPack');
+  let pool: { name: string; rarity: Rarity; weight: number }[];
+  if (isReskinActive()) {
+    pool = reskinClimbTopLoot();
+    if (pool.length === 0) return null; // re-skin with no materials → nothing (never a Tartaria fallback)
+  } else {
+    pool =
+      typeof totalTiers === 'number' && totalTiers >= 4
+        ? [...CLIMB_TOP_LOOT, ...TALL_CLIMB_TOP_LOOT]
+        : CLIMB_TOP_LOOT;
+  }
   const total = pool.reduce((s, x) => s + x.weight, 0);
   // OTA 036 — guard against an empty/zero-weight pool. Without this,
   // r = Math.random() * 0 = 0 and the loop's r -= weight never satisfies
