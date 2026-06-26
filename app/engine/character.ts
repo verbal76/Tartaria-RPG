@@ -184,6 +184,73 @@ function resolveStarterByName(name: string, id: string): InventoryItem | null {
   return { id, name: name.trim(), kind: 'misc', rarity: 'Common', quantity: 1, tags: ['starter'], description: 'A starter item.' };
 }
 
+// engine_Dev — infer an item kind from a loadout row's behavior tags, used when the named
+// item isn't in any catalog (so there's no authored kind to borrow).
+function inferKindFromTags(tags: string[]): InventoryItem['kind'] {
+  const t = tags.map((x) => x.toLowerCase());
+  if (t.includes('weapon')) return 'weapon';
+  if (t.includes('food') || t.includes('drink') || t.includes('consumable')) return 'consumable';
+  // light + detection items are 'relic' in the built-in kit (Hand Torch / Finder's Locket), so a
+  // re-skin's Flashlight / Geiger Counter sorts + behaves the same.
+  if (t.includes('relic') || t.includes('light') || t.includes('detection')) return 'relic';
+  if (t.includes('armor')) return 'armor';
+  return 'misc';
+}
+
+// engine_Dev — build ONE startingLoadout row into a creation InventoryItem. Catalog-backed when
+// the name matches a catalog item (real rarity / description / durability / kind), else built from
+// the row's own tags (kind inferred). The row's tags are merged in so behavior tags ('food'/'climb'
+// /…) always stick, and explicit quantity / rarity / description on the row win.
+function loadoutRowToItem(row: Record<string, unknown>, name: string, idx: number): InventoryItem {
+  const authorTags = Array.isArray(row.tags) ? (row.tags as unknown[]).filter((t): t is string => typeof t === 'string') : [];
+  const qty = typeof row.quantity === 'number' && row.quantity > 0 ? Math.floor(row.quantity) : 1;
+  const base = resolveStarterByName(name, `loadout_${idx}_${Date.now()}`)!; // never null for a non-empty name
+  const tags = Array.from(new Set([...(base.tags ?? []), ...authorTags]));
+  // Catalog gave a real kind → keep it; a generic 'misc' fallback → honor the row's explicit
+  // kind, else infer from the behavior tags (so an authored "K-Ration" with tag food → consumable).
+  let kind = base.kind;
+  if (kind === 'misc') kind = (typeof row.kind === 'string' ? (row.kind as InventoryItem['kind']) : null) ?? inferKindFromTags(authorTags);
+  let item: InventoryItem = {
+    ...base,
+    kind,
+    tags,
+    quantity: qty,
+    ...(typeof row.rarity === 'string' ? { rarity: row.rarity as InventoryItem['rarity'] } : {}),
+    ...(typeof row.description === 'string' ? { description: row.description } : {}),
+  };
+  // A weapon/armor not catalog-stamped (unknown name upgraded to weapon/armor by tags) still
+  // needs durability tracking.
+  if ((kind === 'weapon' || kind === 'armor') && !item.durability) item = stampDurability(item);
+  return item;
+}
+
+// engine_Dev — the uploaded `startingLoadout` table, if any: ONE source of truth for creation gear
+// that REPLACES the built-in survival kit + faction knife + race starter weapon/gear. Returns the
+// granted items + which slots to auto-equip (explicit `equip`, else the first weapon → main hand),
+// or null when no loadout is uploaded (keep the built-in behavior untouched).
+export function resolveStartingLoadout(): { items: InventoryItem[]; equipped: Partial<Record<string, string>> } | null {
+  const rows = resolveTable('startingLoadout', [] as unknown[]) as Array<Record<string, unknown>>;
+  if (!Array.isArray(rows) || rows.length === 0) return null;
+  const items: InventoryItem[] = [];
+  const equipped: Partial<Record<string, string>> = {};
+  rows.forEach((row, i) => {
+    const name = row && typeof row.name === 'string' ? row.name.trim() : '';
+    if (!name) return;
+    const item = loadoutRowToItem(row, name, i);
+    items.push(item);
+    const eq = typeof row.equip === 'string' ? row.equip.trim().toLowerCase() : '';
+    if (eq && !equipped[eq]) equipped[eq] = item.name;
+  });
+  if (items.length === 0) return null;
+  // No explicit equip anywhere → arm the player with the first weapon in the main hand, so they
+  // never spawn bare-handed (mirrors the built-in "auto-equip the starter weapon").
+  if (!equipped.main) {
+    const firstWeapon = items.find((it) => it.kind === 'weapon');
+    if (firstWeapon) equipped.main = firstWeapon.name;
+  }
+  return { items, equipped };
+}
+
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   // Clone so per-character inventory never shares object refs with the template.
   const items: InventoryItem[] = resolveFlavor('starterItems', DEFAULT_STARTER_ITEMS).map(
@@ -435,6 +502,11 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   // and the canon grid cell all agree.
   const startLocationId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
 
+  // engine_Dev — an uploaded `startingLoadout` table is ONE source of truth for creation gear and
+  // REPLACES the scattered defaults (survival kit + faction knife + race starter weapon/gear). Null
+  // when no loadout is uploaded → keep the built-in behavior exactly.
+  const loadout = resolveStartingLoadout();
+
   return {
     name: input.name,
     raceId: race.id,
@@ -446,12 +518,13 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     staminaMax,
     milestones: { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     // Auto-equip the starter weapon (resolved from the live weapons table for
-    // custom races) so the player starts combat-ready holding a real weapon.
-    equipped: { main: starterWeaponName(race) },
+    // custom races) so the player starts combat-ready holding a real weapon. A
+    // startingLoadout overrides BOTH the equip set and the inventory below.
+    equipped: (loadout ? loadout.equipped : { main: starterWeaponName(race) }) as PlayerCharacter['equipped'],
     ac: race.baseAC,
     tc: rollFromTCFormula(race.startingTCFormula),
     corruption: 0,
-    inventory: buildStarterInventory(race, faction),
+    inventory: loadout ? loadout.items : buildStarterInventory(race, faction),
     factionStanding,
     // v2.4.1 (OTA 029) — explicit startingLocationId wins; otherwise
     // fall back to the canonical per-faction start tile.

@@ -96,6 +96,17 @@ const LORE_DOCUMENT_SCAFFOLD: unknown[] = [
   },
 ];
 
+// engine_Dev — generic starter loadout (NOT Tartaria / NOT any specific setting): a
+// primary, a small utility knife, a climb line, a food, a full drink, and a light.
+const STARTING_LOADOUT_TEMPLATE: ReadonlyArray<Record<string, unknown>> = [
+  { name: 'Sidearm', tags: ['weapon'], equip: 'main' },
+  { name: 'Utility Knife', tags: ['weapon', 'knife', 'tool'] },
+  { name: 'Climbing Line', tags: ['climb', 'rope', 'fiber'] },
+  { name: 'Field Ration', tags: ['food'], quantity: 3 },
+  { name: 'Full Canteen', tags: ['drink', 'water', 'container'] },
+  { name: 'Lantern', tags: ['light'] },
+];
+
 const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   // engine_Dev — GENERIC, setting-neutral sample rows (NOT the built-in Tartaria
   // tables). Same shapes + optional fields, bland "light fantasy" flavor, so an
@@ -123,6 +134,10 @@ const TABLE_ROWS: Record<ContentTableId, unknown[]> = {
   lore: LORE_DOCUMENT_SCAFFOLD,
   // The built-in power set + custom-effect examples (fog / heal) — edit/replace.
   powers: POWERS_TEMPLATE as unknown[],
+  // engine_Dev — generic, setting-neutral starting-loadout sample (the items every
+  // new character begins with). Tags carry the behavior; the engine infers kind +
+  // pulls catalog rarity/durability when the name matches a catalog item.
+  startingLoadout: STARTING_LOADOUT_TEMPLATE as unknown[],
 };
 
 /** How many sample rows to export per table — enough to show the shape, not the

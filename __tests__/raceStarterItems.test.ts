@@ -100,9 +100,11 @@ describe('createCharacter — race-themed starter inventory', () => {
       factionId: 'true_tartarians',
     });
     const names = player.inventory.map((i) => i.name);
-    expect(names).toContain('Aetheric Torch');
+    // engine_Dev — the shared kit was renamed to setting-neutral names (Aetheric Torch → Hand
+    // Torch, Aetheric Locket → Finder's Locket) so a re-skin doesn't inherit Tartaria proper nouns.
+    expect(names).toContain('Hand Torch');
     expect(names).toContain('Trail Rations');
-    expect(names).toContain('Aetheric Locket');
+    expect(names).toContain("Finder's Locket");
   });
 
   it('two characters of the same race get the same race items (deterministic mapping)', () => {
