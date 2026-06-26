@@ -103,6 +103,7 @@ export function ExplorationScreen() {
   const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
+  const fusionKindPrompt = useGameStore((s) => s.fusionKindPrompt);
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
   // arb-fix — race-ability picker (activatable once/day race powers).
   const raceAbilityPickerOpen = useGameStore((s) => s.raceAbilityPickerOpen);
@@ -1663,6 +1664,33 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => useGameStore.getState().cancelFusionCatalystPrompt()}
+      />
+
+      {/* engine_Dev — once a fusion passes every gate, ask the player what the
+          Crucible should forge: a weapon or a piece of armor. Each button forges
+          that kind; cancel leaves the inputs reserved so they can fire again. */}
+      <BrandedModal
+        visible={fusionKindPrompt}
+        title="What should the Crucible forge?"
+        body={'Your reserved pieces are ready. Choose what comes out of the Crucible — a weapon or a piece of armor.'}
+        buttons={[
+          {
+            label: 'Weapon',
+            onPress: () => useGameStore.getState().chooseFusionKind('weapon'),
+            tone: 'primary',
+          },
+          {
+            label: 'Armor',
+            onPress: () => useGameStore.getState().chooseFusionKind('armor'),
+            tone: 'primary',
+          },
+          {
+            label: 'Not yet',
+            onPress: () => useGameStore.getState().cancelFusionKindPrompt(),
+            tone: 'neutral',
+          },
+        ]}
+        onRequestClose={() => useGameStore.getState().cancelFusionKindPrompt()}
       />
 
       {/* OTA-439 — [audit #23] confirm before a craft consumes material
