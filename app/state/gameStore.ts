@@ -814,6 +814,35 @@ function recordTitleProgress(
   awardNewTitles(getStore, setStore);
 }
 
+// engine_Dev — salt ONE low-tier armor piece into a take so the loot stream isn't
+// weapon-heavy (it feeds the sell/scrap → coin + materials economy). Shared by the
+// single-noun take and the take-all batch, which grants it just ONCE for the whole
+// pile (not once per item). No-op when the active armor table is empty (a re-skin
+// with no armor) or the pack is too full to accept the piece.
+function grantTakeBonusArmor(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): void {
+  const player = getStore().player;
+  if (!player) return;
+  const bonusArmorCat = pickTakeBonusArmor();
+  if (!bonusArmorCat) return;
+  const bonusArmor: InventoryItem = stampDurability({
+    id: `take_armor_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    name: bonusArmorCat.name,
+    kind: 'armor',
+    rarity: bonusArmorCat.rarity,
+    quantity: 1,
+    tags: bonusArmorCat.tags,
+  });
+  const bonusGrant = grantItem(player.inventory, bonusArmor);
+  if (bonusGrant.accepted > 0) {
+    setStore((s) => (s.player ? { player: { ...s.player, inventory: bonusGrant.inventory } } : s));
+    getStore().appendLog('world', `Snagged alongside it: a ${bonusArmorCat.name}.`);
+    getStore().appendLog('reward', `✦ ${bonusArmorCat.name} (${bonusArmorCat.rarity}).`);
+  }
+}
+
 // engine_Dev — DATA-DRIVEN MAIN QUEST execution. Advance one step + announce; fire
 // the win line on completion.
 function advanceCustomQuest(
@@ -2353,8 +2382,15 @@ interface GameStore {
    *  parser. Resolves the noun via findCatalogItem (with alias
    *  layer), checks per-room dedupe, grants the canonical item.
    *  Used by the TAKE quick-action chip modal so the player gets
-   *  100% certainty their tap lands the thing in their pack. */
-  takeAmbientNoun: (noun: string) => void;
+   *  100% certainty their tap lands the thing in their pack.
+   *  engine_Dev — grants a bonus low-tier armor piece by default; the take-all
+   *  batch passes { bonusArmor: false } and grants ONE for the whole pile.
+   *  Returns true when the primary item actually landed in the pack. */
+  takeAmbientNoun: (noun: string, opts?: { bonusArmor?: boolean }) => boolean;
+  /** engine_Dev — take every grabbable noun in one tap (the TakeModal "take all"
+   *  button). Suppresses the per-item bonus armor and grants exactly ONE bonus
+   *  armor piece for the whole batch when at least one item was taken. */
+  takeAllAmbientNouns: (nouns: string[]) => void;
   /** Stealth variant of takeAmbientNoun — pickpocket / sleight of
    *  hand. When a vendor is present, routes to stealFromVendor for
    *  real theft. Otherwise rolls DEX vs DC 10 against the ambient
@@ -3197,13 +3233,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  takeAmbientNoun(noun) {
+  takeAmbientNoun(noun, opts) {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
-    if (!player || !scene) return;
+    if (!player || !scene) return false;
     const trimmed = noun.trim();
-    if (!trimmed) return;
+    if (!trimmed) return false;
     // Match the noun against the scene's full ambient pool (not just
     // the displayed 8) so e.g. 'rusted blade' resolves whether or
     // not it's currently surfaced. Strict via matchAmbientNoun for
@@ -3214,7 +3250,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The ${getNarratorName()} looks around. "I don't see ${trimmed} here. Choose words carefully — try one of the visible interactables."`,
       );
-      return;
+      return false;
     }
     const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
     const room = state.worldMemory.visitedRooms?.[roomKey];
@@ -3225,7 +3261,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // you can't put them in a backpack.
     if (isOversized(ambientHit)) {
       get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
-      return;
+      return false;
     }
     const cat = findCatalogItem(ambientHit);
     if (!cat) {
@@ -3234,7 +3270,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // 2026-05-24 — use the in-character refusal line instead of the
       // old diagnostic "is part of the scene" string.
       get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
-      return;
+      return false;
     }
     // Self-healing dedup: a noun is "really consumed" only when the
     // matching catalog item is currently in inventory. Without that,
@@ -3253,7 +3289,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (ownsCatalogItem) {
         get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-        return;
+        return false;
       }
       // Fall through to grant — the entry is corrupt / stale.
     }
@@ -3280,7 +3316,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `Your pack is too full to take the ${cat.name.toLowerCase()} from the ${ambientHit}. Drop something or upgrade and try again.`,
       );
       void get().persist();
-      return;
+      return false;
     }
     // Mark consumed so re-take AND re-salvage on the same ambient
     // in this room hit the dedupe gate.
@@ -3307,29 +3343,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // we only reach here when the grant landed.
     get().appendLog('world', `You take the ${cat.name} from where it lay.`);
     get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
-    // engine_Dev — salt one low-tier armor piece into every successful take.
-    // Takes skew weapon-heavy and the drop economy runs on cheap kit the player
-    // sells/scraps for coin + materials; this guarantees a steady armor trickle
-    // for that same base. Skipped silently if the active armor table is empty
-    // (a re-skin with no armor) or the pack is too full to accept it.
-    const bonusArmorCat = pickTakeBonusArmor();
-    if (bonusArmorCat) {
-      const bonusArmor: InventoryItem = stampDurability({
-        id: `take_armor_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: bonusArmorCat.name,
-        kind: 'armor',
-        rarity: bonusArmorCat.rarity,
-        quantity: 1,
-        tags: bonusArmorCat.tags,
-      });
-      const bonusGrant = grantItem(get().player?.inventory ?? grantResult.inventory, bonusArmor);
-      if (bonusGrant.accepted > 0) {
-        set((s) => (s.player ? { player: { ...s.player, inventory: bonusGrant.inventory } } : s));
-        get().appendLog('world', `Snagged alongside it: a ${bonusArmorCat.name}.`);
-        get().appendLog('reward', `✦ ${bonusArmorCat.name} (${bonusArmorCat.rarity}).`);
-      }
-    }
+    // engine_Dev — salt one low-tier armor piece in beside the take so the loot
+    // stream isn't weapon-heavy (feeds the sell/scrap economy). The take-all
+    // batch passes { bonusArmor: false } and grants ONE for the whole pile, so a
+    // big grab doesn't rain armor.
+    if (opts?.bonusArmor !== false) grantTakeBonusArmor(get, set);
     void get().persist();
+    return true;
+  },
+
+  takeAllAmbientNouns(nouns) {
+    // Suppress the per-item bonus armor, count what actually landed, then grant
+    // exactly ONE bonus armor for the whole batch when at least one item was taken.
+    let took = 0;
+    for (const n of nouns) {
+      if (get().takeAmbientNoun(n, { bonusArmor: false })) took += 1;
+    }
+    if (took > 0) {
+      grantTakeBonusArmor(get, set);
+      void get().persist();
+    }
   },
 
   stealthTakeAmbientNoun(noun) {

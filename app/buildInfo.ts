@@ -16364,4 +16364,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and re-enters with the chosen kind; the reward line names the right kind. tsc clean (non-test 0);
 // fusion/take/ambient suites green + 2 new behavior tests. app/engine/{crafting,itemFusion}.ts,
 // app/state/gameStore.ts, app/screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-26-891';
+// OTA-892 — [loot mix follow-up] cap the OTA-891 bonus armor at ONE per "Take All" tap. Before, the
+// TakeModal "take all" button looped takeAmbientNoun per noun and EACH take salted in its own bonus
+// armor, so grabbing a pile rained armor. The bonus-armor grant is now a shared helper
+// (grantTakeBonusArmor); takeAmbientNoun takes an opts.bonusArmor flag (default on, so single takes are
+// unchanged) and returns whether the primary item landed; the new takeAllAmbientNouns action suppresses
+// the per-item bonus, counts what actually landed, and grants exactly ONE bonus for the whole batch when
+// >=1 item was taken. ExplorationScreen's onTakeAll routes through it. tsc clean (non-test 0); 3 new cap
+// tests + existing take/fusion suites green. app/state/gameStore.ts, app/screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-26-892';
