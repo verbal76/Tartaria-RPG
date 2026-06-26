@@ -86,11 +86,33 @@ const _versionCache = new Map<string, string>();
 /** The current template version (content hash) for a section key. Cached — templates are
  *  pure functions of the engine build, so the version is constant within a run. Returns ''
  *  for keys with no template (callers treat '' as "no versioning / never stale"). */
+// engine_Dev — strip // line + /* */ block comments so the template VERSION reflects only the DATA
+// shape (sample rows / fields), NOT the prose instructions or option-notes. Changing a template's
+// instruction block or hints therefore never moves the version → never trips the yellow "stale
+// upload" diamond; only an actual change to the sample/schema does. (Local copy — engine must not
+// import from the store, which imports this module.)
+function stripTemplateComments(src: string): string {
+  let out = '';
+  let inStr = false, quote = '', inLine = false, inBlock = false;
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i], next = src[i + 1];
+    if (inLine) { if (c === '\n') { inLine = false; out += c; } continue; }
+    if (inBlock) { if (c === '*' && next === '/') { inBlock = false; i++; } continue; }
+    if (inStr) { out += c; if (c === '\\') { out += next ?? ''; i++; } else if (c === quote) inStr = false; continue; }
+    if (c === '"' || c === "'") { inStr = true; quote = c; out += c; continue; }
+    if (c === '/' && next === '/') { inLine = true; i++; continue; }
+    if (c === '/' && next === '*') { inBlock = true; i++; continue; }
+    out += c;
+  }
+  // collapse the blank lines the stripped comments leave so whitespace-only edits don't matter either
+  return out.replace(/[ \t]+$/gm, '').replace(/\n{2,}/g, '\n').trim();
+}
+
 export function templateVersionFor(key: string): string {
   const cached = _versionCache.get(key);
   if (cached !== undefined) return cached;
   const tmpl = buildTemplateFor(key);
-  const v = tmpl == null ? '' : hashStr(tmpl);
+  const v = tmpl == null ? '' : hashStr(stripTemplateComments(tmpl));
   _versionCache.set(key, v);
   return v;
 }
