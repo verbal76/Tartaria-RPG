@@ -16456,4 +16456,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // DAMAGE TYPE as a resist (so a Frost coating gives `cold` resist, matching incoming cold), capped at 3
 // worked-in resists per piece. The 5 built-ins are byte-for-byte unchanged. tsc clean; customCoatings suite
 // + all coating suites green (49). types.ts, itemEffect.ts, contentPack.ts, weaponCoating.ts, gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-26-901';
+// OTA-902 — [coatings UX] make the inventory coating menu read the coating's REAL damage type for CUSTOM
+// coatings, not just the built-in 5. drinkCoating now grants a resist of coatingDamageType(spec.kind) (a Frost
+// vial gives a 'cold' temporary resist, not an inert 'frost'); the InventoryScreen 'Drink (resist X)' /
+// 'Apply to armor (+X resist)' labels resolve the type from the coating spec too, so a custom vial reads
+// '+cold resist' instead of a generic label. Built-in vials unchanged (fall back to the kind tag). tsc clean;
+// coating suites green (49). app/state/gameStore.ts, app/screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-26-902';

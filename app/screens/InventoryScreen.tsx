@@ -670,8 +670,21 @@ export function InventoryScreen() {
         tone: 'primary',
       });
       // engine_Dev — DRINK the vial to resist its damage type for the rest of the
-      // fight. The type is the coating-kind tag the vial carries.
-      const coatType = (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
+      // fight. Resolve the coating's REAL damage type from its spec (so a custom
+      // "Frost" coating reads "+cold resist", not the kind id), falling back to a
+      // built-in coating-kind tag for the legacy vials.
+      const coatType = (() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { resolveItemEffect } = require('../engine/itemEffect') as typeof import('../engine/itemEffect');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findGearByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+        const fx = resolveItemEffect(pending.item.name, [findGearByName]);
+        const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+        if (spec) return coatingDamageType(String(spec.kind));
+        return (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
+      })();
       buttons.push({
         label: coatType ? `Drink (resist ${coatType})` : 'Drink (resist its type)',
         onPress: () => {

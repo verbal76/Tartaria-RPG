@@ -20365,7 +20365,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const fx = resolveItemEffect(coatItem.name, [findGearByName]);
     const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
     if (!spec) { get().appendLog('world', `The ${coatItem.name} isn't something you can drink for protection.`); return; }
-    const type = String(spec.kind);
+    // engine_Dev — resist the coating's DAMAGE TYPE (custom "frost" → cold), so the
+    // temporary resist actually matches incoming damage.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    const type = coatingDamageType(String(spec.kind));
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { applyEffect } = require('../engine/statusEffects') as typeof import('../engine/statusEffects');
     set((s) => {
