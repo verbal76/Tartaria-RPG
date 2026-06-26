@@ -1,11 +1,7 @@
-// engine_Dev — two authored behaviors:
-//   1. pickTakeBonusArmor(): every TAKE salts in one LOW-TIER armor piece so the
-//      loot stream isn't weapon-heavy (sell/scrap economy). Pulls from the ACTIVE
-//      armor table, rarity-weighted to Common/Uncommon.
-//   2. synthesizeFusionDeterministic(preferKind): the Crucible forges the kind the
-//      player chose (weapon OR armor), overriding the dominant-tag inference.
+// engine_Dev — synthesizeFusionDeterministic(preferKind): the Crucible forges the
+// kind the player chose (weapon OR armor), overriding the dominant-tag inference.
+// (The take-list armor guarantee is covered in takeableGearSpawns.test.ts.)
 
-import { pickTakeBonusArmor } from '../app/engine/crafting';
 import { synthesizeFusionDeterministic } from '../app/engine/itemFusion';
 import type { InventoryItem } from '../app/engine/types';
 
@@ -16,21 +12,6 @@ const mk = (name: string, tags: string[]): InventoryItem => ({
   rarity: 'Common',
   quantity: 1,
   tags,
-});
-
-describe('engine_Dev — take bonus armor', () => {
-  it('returns a low-tier (Common/Uncommon) armor piece from the active table', () => {
-    // Sweep many picks — the table has higher tiers too, but the picker must only
-    // ever surface Common/Uncommon fodder (Rare+ filtered out).
-    for (let i = 0; i < 60; i++) {
-      const a = pickTakeBonusArmor();
-      expect(a).not.toBeNull();
-      expect(['Common', 'Uncommon']).toContain(a!.rarity);
-      // It's a real armor catalog row (has a slot + AC).
-      expect(typeof a!.slot).toBe('string');
-      expect(typeof a!.acBonus).toBe('number');
-    }
-  });
 });
 
 describe('engine_Dev — Crucible kind choice', () => {

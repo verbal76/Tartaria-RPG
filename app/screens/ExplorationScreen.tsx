@@ -257,7 +257,6 @@ export function ExplorationScreen() {
   // OTA-180 — appendFeedback selector dropped; store action still
   // exists for any non-UI emit site.
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
-  const takeAllAmbientNouns = useGameStore((s) => s.takeAllAmbientNouns);
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
 
@@ -1426,14 +1425,14 @@ export function ExplorationScreen() {
           stealthTakeAmbientNoun(noun);
         }}
         onTakeAll={(nouns) => {
-          // OTA 222 — fire each take in sequence then close. Each take runs
-          // through the same gating (already-taken dedup, inventory cap, etc.)
-          // that an individual chip tap would, so partial success is handled
-          // per-item by the store. engine_Dev — routed through takeAllAmbientNouns
-          // so the bonus armor is capped at ONE for the whole batch (not per item).
+          // OTA 222 — fire each take in sequence then close. Each
+          // takeAmbientNoun call runs through the same gating
+          // (already-taken dedup, inventory cap, etc.) that an
+          // individual chip tap would, so partial success is
+          // handled per-item by the store.
           Keyboard.dismiss();
           setTakeOpen(false);
-          takeAllAmbientNouns(nouns);
+          for (const n of nouns) takeAmbientNoun(n);
         }}
         onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}
       />

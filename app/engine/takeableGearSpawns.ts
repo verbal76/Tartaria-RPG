@@ -52,6 +52,20 @@ function uncommonGear(): string[] {
     ...namesOf(resolveTable('armor', BUILTIN_ARMOR), 'Uncommon'),
   ];
 }
+// engine_Dev — the low-tier ARMOR pool on its own. The combined gear pool is
+// weapon-heavy (the weapon catalog dwarfs armor), so a plain random draw rarely
+// surfaces armor; we use this to GUARANTEE one armor piece on every take list.
+// Common preferred (sell/scrap fodder), Uncommon as fallback. Resolves through
+// the active armor table so re-skins stay on-theme.
+function lowTierArmor(): string[] {
+  return namesOf(resolveTable('armor', BUILTIN_ARMOR), 'Common');
+}
+function anyArmor(): string[] {
+  return [
+    ...namesOf(resolveTable('armor', BUILTIN_ARMOR), 'Common'),
+    ...namesOf(resolveTable('armor', BUILTIN_ARMOR), 'Uncommon'),
+  ];
+}
 
 // ── tiny seeded PRNG (string → deterministic stream) ────────────────────────
 // OTA-611 — exported so the climbable/salvageable spawn pickers can seed off
@@ -94,6 +108,31 @@ export function pickTakeableGearForScene(seedKey: string): string[] {
     if (!name || seen.has(name)) continue;
     seen.add(name);
     picks.push(name);
+  }
+  // engine_Dev — GUARANTEE one armor piece on the take list. Takes skew
+  // weapon-heavy and the drop economy runs on cheap kit the player sells/scraps
+  // for coin + materials, so armor was under-supplied. If none of the rolled
+  // picks is armor, fold one low-tier armor piece in: ADD it when there's room
+  // (a 1-weapon scene becomes weapon + armor), or REPLACE the last pick when the
+  // list is already at the 1–3 cap (so a weapon still leads). Seeded off the same
+  // key → stable per tile (not farmable). Skipped only when the active armor
+  // table has no low-tier entries (a re-skin that ships no armor).
+  const armorNames = anyArmor();
+  if (armorNames.length > 0) {
+    const armorSet = new Set(armorNames);
+    if (!picks.some((n) => armorSet.has(n))) {
+      const pool = lowTierArmor().length > 0 ? lowTierArmor() : armorNames;
+      let armorName = pool[Math.floor(rng() * pool.length)];
+      let g2 = 0;
+      while (armorName && seen.has(armorName) && g2 < 20) {
+        armorName = pool[Math.floor(rng() * pool.length)];
+        g2++;
+      }
+      if (armorName && !seen.has(armorName)) {
+        if (picks.length >= 3) picks[picks.length - 1] = armorName;
+        else picks.push(armorName);
+      }
+    }
   }
   return picks;
 }

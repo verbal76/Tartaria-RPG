@@ -16372,4 +16372,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the per-item bonus, counts what actually landed, and grants exactly ONE bonus for the whole batch when
 // >=1 item was taken. ExplorationScreen's onTakeAll routes through it. tsc clean (non-test 0); 3 new cap
 // tests + existing take/fusion suites green. app/state/gameStore.ts, app/screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-26-892';
+// OTA-893 — [loot mix redesign] the guaranteed armor is now a real TAKE-LIST ITEM, not a hidden post-take
+// bonus. Player feedback: "the armor isn't really a bonus, it should be listed with the rest of the items
+// on the take list." So OTA-891/892's post-take grant is removed entirely (pickTakeBonusArmor + the
+// grantTakeBonusArmor helper + takeAllAmbientNouns + the takeAmbientNoun opts/boolean changes all reverted)
+// and the guarantee moves UP into pickTakeableGearForScene: after rolling its 1–3 gear names, if none is
+// armor it folds one low-tier armor piece in (ADD when there's room → a 1-weapon scene becomes weapon +
+// armor; REPLACE the last pick at the 1–3 cap so a weapon still leads). Seeded off the same room key →
+// stable per tile (not farmable); resolves through the active armor table so re-skins stay on-theme; skipped
+// only when the table ships no armor. Now the armor shows as a normal take chip and is grabbed like anything
+// else. tsc clean (non-test 0); new takeableArmorGuarantee suite + take/gear/fusion suites green.
+// app/engine/takeableGearSpawns.ts, app/engine/crafting.ts, app/state/gameStore.ts, app/screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-26-893';
