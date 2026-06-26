@@ -426,6 +426,49 @@ function freshInstanceId(prefix: string): string {
 // Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
 const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
 
+// engine_Dev — the dev crash-test supply kit (OTA-461) granted to DEV_REVIVE_NAMES.
+// Defined by ROLE, not by hardcoded Tartaria item names, so a re-skin substitutes
+// its OWN consumables instead of injecting "improvised" Tartaria items. Each role
+// keeps its built-in name when that exact name is a real row in the LOADED catalog
+// (built-in Tartaria → the original kit, unchanged); otherwise it takes the first
+// active-catalog consumable matching the role tags, deduped across roles. A role
+// with no match in the pack is dropped — never an improvised fallback.
+const DEV_GIFT_ROLES: Array<{ builtin: string; qty: number; tags: string[] }> = [
+  { builtin: 'First Aid Kit',           qty: 10, tags: ['healing', 'medicine', 'medical', 'medkit'] },
+  { builtin: 'Trail Rations',           qty: 20, tags: ['food', 'ration'] },
+  { builtin: 'Smoke-Cured Jerky Strip', qty: 20, tags: ['food', 'treat'] },
+  { builtin: 'Bioluminescent Fungus',   qty: 20, tags: ['light', 'food', 'stimulant'] },
+  { builtin: 'Water Bottle',            qty: 1,  tags: ['drink', 'water'] },
+];
+
+export function buildDevGiftItems(): Array<{ name: string; qty: number }> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findGearByName, findMaterialByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+  const pools: Array<ReadonlyArray<{ name?: string; tags?: string[] }>> = [
+    resolveTable('gear', GEAR) as ReadonlyArray<{ name?: string; tags?: string[] }>,
+    resolveTable('materials', MATERIALS) as ReadonlyArray<{ name?: string; tags?: string[] }>,
+    resolveTable('exploration', []) as ReadonlyArray<{ name?: string; tags?: string[] }>,
+  ];
+  const used = new Set<string>();
+  const out: Array<{ name: string; qty: number }> = [];
+  for (const role of DEV_GIFT_ROLES) {
+    let pick: string | null = null;
+    // 1. exact built-in name when it's a real row in the active catalog
+    if (!used.has(role.builtin) && (findGearByName(role.builtin) || findMaterialByName(role.builtin))) {
+      pick = role.builtin;
+    } else {
+      // 2. first active-catalog consumable matching a role tag (distinct)
+      for (const pool of pools) {
+        const row = pool.find((r) => !!r.name && !used.has(r.name)
+          && (r.tags ?? []).some((t) => role.tags.includes(String(t).toLowerCase())));
+        if (row?.name) { pick = row.name; break; }
+      }
+    }
+    if (pick) { used.add(pick); out.push({ name: pick, qty: role.qty }); }
+  }
+  return out;
+}
+
 /** True only when the player is genuinely STANDING IN their current named
  *  location — on its map anchor (or inside one of its hub rooms), and not
  *  mid-journey.
@@ -3729,28 +3772,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         });
       }
-      // OTA-461 — one-time playtest-supply gift for the dev character "Verbal".
-      // A standing crash-test kit so the dog-fungus repro (and general testing)
-      // doesn't burn the player's own consumables. Idempotent per slot via
-      // grantTestSupplyGiftOnce — resuming the same save never restacks it. No
-      // effect for any other name.
-      if (player.name.trim().toLowerCase() === 'verbal') {
-        void grantTestSupplyGiftOnce(`${slotId}:verbal`).then((res) => {
+      // OTA-461 — one-time playtest-supply gift for the dev characters (Verbal /
+      // Sasmooch). A standing crash-test kit so general testing doesn't burn the
+      // player's own consumables. Idempotent per name+slot via grantTestSupplyGiftOnce
+      // — resuming the same save never restacks it. No effect for any other name.
+      // engine_Dev — the kit is now resolved against the ACTIVE catalogs (buildDevGiftItems)
+      // so a re-skin substitutes its own consumables instead of injecting Tartaria items.
+      const devName = player.name.trim().toLowerCase();
+      if (DEV_REVIVE_NAMES.includes(devName)) {
+        void grantTestSupplyGiftOnce(`${slotId}:${devName}`).then((res) => {
           if (!res.granted) return;
-          const gift: Array<{ name: string; qty: number }> = [
-            { name: 'First Aid Kit', qty: 10 },
-            { name: 'Trail Rations', qty: 20 },
-            { name: 'Smoke-Cured Jerky Strip', qty: 20 },
-            { name: 'Bioluminescent Fungus', qty: 20 },
-            { name: 'Water Bottle', qty: 1 },
-          ];
+          const gift = buildDevGiftItems();
+          if (gift.length === 0) return; // pack has no matching consumables — nothing to gift
           set((s) => {
             if (!s.player) return s;
             let inv = s.player.inventory;
             for (const { name, qty } of gift) {
               const look = lookupCraftedItem(name);
               inv = grantItem(inv, {
-                id: `verbalgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
+                id: `devgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
                 name,
                 kind: look.kind,
                 rarity: look.rarity,
@@ -3760,9 +3800,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
             return { player: { ...s.player, inventory: inv } };
           });
+          const summary = gift.map((g) => `${g.qty}× ${g.name}`).join(', ');
           get().appendLog(
             'reward',
-            `✦ A crash-test kit lands in ${player.name}'s pack: 10 First Aid Kits, 20 Trail Rations, 20 Smoke-Cured Jerky Strips, 20 Bioluminescent Fungus, 1 Water Bottle. Test freely.`,
+            `✦ A crash-test kit lands in ${player.name}'s pack: ${summary}. Test freely.`,
           );
           void get().persist();
         });

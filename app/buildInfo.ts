@@ -16403,4 +16403,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that omits startingTCFormula no longer crashes creation ("Cannot read 'trim' of undefined") — it defaults
 // to a sane 2d6 x 10 purse. tsc clean; new startingLoadoutSoleSource suite + creation suites green.
 // app/engine/character.ts.
-export const OTA_BUILD_ID = '2026-06-26-895';
+// OTA-896 — [dev kit · re-skin] the dev crash-test supply kit (OTA-461) goes content-agnostic. It was
+// hardcoded to Tartaria items (First Aid Kit, Trail Rations, Smoke-Cured Jerky Strip, Bioluminescent Fungus,
+// Water Bottle), so loading a re-skin as a dev character injected 5 "improvised" items. Now defined by ROLE
+// (buildDevGiftItems / DEV_GIFT_ROLES): each role keeps its built-in name when that exact name is a real row
+// in the LOADED catalog (built-in Tartaria → the original kit, unchanged), else takes the first active-catalog
+// consumable matching the role tags (healing/food/light/drink), deduped; a role with no pack match is dropped
+// (never an improvised fallback). Also EXTENDED the kit from "verbal" only to both DEV_REVIVE_NAMES
+// (verbal + sasmooch), idempotent per name+slot. tsc clean; new devGiftReskin suite (built-in kit unchanged;
+// re-skin substitutes pack consumables, no Tartaria names) + save/creation suites green. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-26-896';
