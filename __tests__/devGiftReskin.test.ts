@@ -37,6 +37,29 @@ jest.mock('expo-updates', () => ({}));
 
 import { buildDevGiftItems, buildDevGearItems } from '../app/state/gameStore';
 import { setTableOverride, clearAllOverrides } from '../app/engine/contentPack';
+import devKit from '../app/data/devKit.json';
+
+describe('engine_Dev — dev kit is data-driven from devKit.json (not hardcoded)', () => {
+  afterEach(() => clearAllOverrides());
+
+  it('the consumable kit matches the JSON spec (one item per role, JSON quantities)', () => {
+    const gift = buildDevGiftItems();
+    // built-in resolves every role, so the count == the JSON's consumable rows...
+    expect(gift.length).toBe(devKit.consumables.length);
+    // ...and each role's quantity comes straight from the JSON (order preserved).
+    expect(gift.map((g) => g.qty)).toEqual(devKit.consumables.map((c) => c.qty));
+  });
+
+  it('the gear loadout honors the JSON rules (Rare armor perSlot + Rare weapon perRange)', () => {
+    // The JSON drives both kind + rarity; assert the file actually declares them.
+    const kinds = devKit.gear.map((r) => r.kind);
+    expect(kinds).toContain('armor');
+    expect(kinds).toContain('weapon');
+    for (const rule of devKit.gear) expect(rule.rarity).toBe('Rare');
+    // And the builder produces only qty-1 gear entries.
+    expect(buildDevGearItems().every((g) => g.qty === 1)).toBe(true);
+  });
+});
 
 describe('engine_Dev — dev crash-test kit is content-agnostic', () => {
   afterEach(() => clearAllOverrides());

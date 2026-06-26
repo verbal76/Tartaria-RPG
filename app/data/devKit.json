@@ -1,0 +1,14 @@
+{
+  "_doc": "Engine dev test kit. Spawned ONCE per name+slot the first time a dev character (names in DEV_REVIVE_NAMES) loads a save, in ANY game built on this engine. ITEM NAMES ARE NOT HARDCODED: every entry resolves against the ACTIVE game's catalogs, so the kit adapts to any re-skin. Edit this file to change the kit — no code change needed. 'consumables': each row grants 'qty' of an item matching its role 'tags'; the optional 'prefer' name is used only when that exact name is a real row in the loaded catalog (so built-in games keep their named kit, re-skins substitute their own). 'gear': rule-based rare equipment — perSlot grants one item of 'rarity' for each armor slot; perRange grants one weapon of 'rarity' for each combat distance band (ranged->distant, throwable->far, long->mid, melee->close). A slot/range/role with no match in the loaded game is skipped (never an improvised fallback).",
+  "consumables": [
+    { "qty": 10, "prefer": "First Aid Kit", "tags": ["healing", "medicine", "medical", "medkit"] },
+    { "qty": 20, "prefer": "Trail Rations", "tags": ["food", "ration"] },
+    { "qty": 20, "prefer": "Smoke-Cured Jerky Strip", "tags": ["food", "treat"] },
+    { "qty": 20, "prefer": "Bioluminescent Fungus", "tags": ["light", "food", "stimulant"] },
+    { "qty": 1, "prefer": "Water Bottle", "tags": ["drink", "water"] }
+  ],
+  "gear": [
+    { "kind": "armor", "rarity": "Rare", "perSlot": true },
+    { "kind": "weapon", "rarity": "Rare", "perRange": true }
+  ]
+}

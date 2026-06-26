@@ -141,6 +141,7 @@ import {
 } from '../engine/worldDirections';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
+import devKitData from '../data/devKit.json';
 // OTA-298 — concepts.json (~73 KB) lazy-loaded via require() in
 // findConcept() instead of top-level import. Only used when the
 // player types "what is X / explain X / tell me about X" — a rare
@@ -426,20 +427,14 @@ function freshInstanceId(prefix: string): string {
 // Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
 const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
 
-// engine_Dev — the dev crash-test supply kit (OTA-461) granted to DEV_REVIVE_NAMES.
-// Defined by ROLE, not by hardcoded Tartaria item names, so a re-skin substitutes
-// its OWN consumables instead of injecting "improvised" Tartaria items. Each role
-// keeps its built-in name when that exact name is a real row in the LOADED catalog
-// (built-in Tartaria → the original kit, unchanged); otherwise it takes the first
-// active-catalog consumable matching the role tags, deduped across roles. A role
-// with no match in the pack is dropped — never an improvised fallback.
-const DEV_GIFT_ROLES: Array<{ builtin: string; qty: number; tags: string[] }> = [
-  { builtin: 'First Aid Kit',           qty: 10, tags: ['healing', 'medicine', 'medical', 'medkit'] },
-  { builtin: 'Trail Rations',           qty: 20, tags: ['food', 'ration'] },
-  { builtin: 'Smoke-Cured Jerky Strip', qty: 20, tags: ['food', 'treat'] },
-  { builtin: 'Bioluminescent Fungus',   qty: 20, tags: ['light', 'food', 'stimulant'] },
-  { builtin: 'Water Bottle',            qty: 1,  tags: ['drink', 'water'] },
-];
+// engine_Dev — the dev crash-test kit is DATA-DRIVEN from app/data/devKit.json, NOT
+// hardcoded here, so it works for ANY game built on the engine and can be changed by
+// editing the JSON alone. The spec is role/rule-based; item NAMES resolve against the
+// ACTIVE game's catalogs at grant time, so nothing game-specific is baked into code.
+interface DevKitConsumable { qty: number; prefer?: string; tags: string[] }
+interface DevKitGearRule { kind: 'armor' | 'weapon'; rarity: string; perSlot?: boolean; perRange?: boolean }
+interface DevKitSpec { consumables?: DevKitConsumable[]; gear?: DevKitGearRule[] }
+const DEV_KIT = devKitData as DevKitSpec;
 
 export function buildDevGiftItems(): Array<{ name: string; qty: number }> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -451,16 +446,17 @@ export function buildDevGiftItems(): Array<{ name: string; qty: number }> {
   ];
   const used = new Set<string>();
   const out: Array<{ name: string; qty: number }> = [];
-  for (const role of DEV_GIFT_ROLES) {
+  for (const role of DEV_KIT.consumables ?? []) {
+    const roleTags = (role.tags ?? []).map((t) => t.toLowerCase());
     let pick: string | null = null;
-    // 1. exact built-in name when it's a real row in the active catalog
-    if (!used.has(role.builtin) && (findGearByName(role.builtin) || findMaterialByName(role.builtin))) {
-      pick = role.builtin;
+    // 1. the role's 'prefer' name when it's a real row in the active catalog
+    if (role.prefer && !used.has(role.prefer) && (findGearByName(role.prefer) || findMaterialByName(role.prefer))) {
+      pick = role.prefer;
     } else {
       // 2. first active-catalog consumable matching a role tag (distinct)
       for (const pool of pools) {
         const row = pool.find((r) => !!r.name && !used.has(r.name)
-          && (r.tags ?? []).some((t) => role.tags.includes(String(t).toLowerCase())));
+          && (r.tags ?? []).some((t) => roleTags.includes(String(t).toLowerCase())));
         if (row?.name) { pick = row.name; break; }
       }
     }
@@ -473,28 +469,34 @@ export function buildDevGiftItems(): Array<{ name: string; qty: number }> {
 // weapon per distance range, pulled from the ACTIVE catalogs (re-skin or built-in).
 // A slot / range with no Rare item in the loaded pack is simply skipped (this WWII
 // pack, e.g., only ships head + chest armor and ranged + melee weapons, so that's
-// what it grants). Weapons are bucketed by their OUTERMOST reach band so each band
-// gets a weapon that can fight there.
+// what it grants). The rules (which kind, which rarity, perSlot / perRange) come
+// from app/data/devKit.json — nothing here is hardcoded. Weapons are bucketed by
+// their OUTERMOST reach band so each band gets a weapon that can fight there.
 export function buildDevGearItems(): Array<{ name: string; qty: number }> {
   const out: Array<{ name: string; qty: number }> = [];
   const used = new Set<string>();
-  // 1 Rare armor per slot.
-  const armor = resolveTable('armor', ARMOR) as ReadonlyArray<{ name?: string; rarity?: string; slot?: string }>;
-  for (const slot of ARMOR_SLOTS) {
-    const row = armor.find((a) => !!a.name && a.rarity === 'Rare' && a.slot === slot && !used.has(a.name));
-    if (row?.name) { used.add(row.name); out.push({ name: row.name, qty: 1 }); }
-  }
-  // 1 Rare weapon per distance band (by the weapon's outermost reach band).
-  const weapons = resolveTable('weapons', WEAPONS) as ReadonlyArray<{ name?: string; rarity?: string; weaponKind?: 'melee' | 'ranged' | 'runecaster'; tags?: string[] }>;
-  const bandPick = new Map<string, string>();
-  for (const w of weapons) {
-    if (!w.name || w.rarity !== 'Rare' || used.has(w.name)) continue;
-    const band = reachBandsFor(reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags }))[0];
-    if (band && !bandPick.has(band)) bandPick.set(band, w.name);
-  }
-  for (const band of RANGE_ORDER) {
-    const nm = bandPick.get(band);
-    if (nm && !used.has(nm)) { used.add(nm); out.push({ name: nm, qty: 1 }); }
+  for (const rule of DEV_KIT.gear ?? []) {
+    if (rule.kind === 'armor' && rule.perSlot) {
+      // one armor of `rule.rarity` per equip slot
+      const armor = resolveTable('armor', ARMOR) as ReadonlyArray<{ name?: string; rarity?: string; slot?: string }>;
+      for (const slot of ARMOR_SLOTS) {
+        const row = armor.find((a) => !!a.name && a.rarity === rule.rarity && a.slot === slot && !used.has(a.name));
+        if (row?.name) { used.add(row.name); out.push({ name: row.name, qty: 1 }); }
+      }
+    } else if (rule.kind === 'weapon' && rule.perRange) {
+      // one weapon of `rule.rarity` per distance band (by outermost reach band)
+      const weapons = resolveTable('weapons', WEAPONS) as ReadonlyArray<{ name?: string; rarity?: string; weaponKind?: 'melee' | 'ranged' | 'runecaster'; tags?: string[] }>;
+      const bandPick = new Map<string, string>();
+      for (const w of weapons) {
+        if (!w.name || w.rarity !== rule.rarity || used.has(w.name)) continue;
+        const band = reachBandsFor(reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags }))[0];
+        if (band && !bandPick.has(band)) bandPick.set(band, w.name);
+      }
+      for (const band of RANGE_ORDER) {
+        const nm = bandPick.get(band);
+        if (nm && !used.has(nm)) { used.add(nm); out.push({ name: nm, qty: 1 }); }
+      }
+    }
   }
   return out;
 }
