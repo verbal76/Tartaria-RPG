@@ -215,9 +215,13 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
     expect(stalls).toBe(0);
   });
 
-  it('three-way retaliation split (dog+golem) lands roughly 30/30/40 across 200 trials', async () => {
+  it('companion command (dog+golem active) lands the full volley on the COMMANDER, not the companions (arb169)', async () => {
     // Drive 200 dog-bite actions vs a single high-HP enemy with both
     // dog AND golem active. Count which target eats the retaliation.
+    // arb169 — commanding a companion provokes the FULL enemy volley against the
+    // PLAYER (the commander), the same retaliation a real player attack draws —
+    // closing the old exploit where spamming the dog dodged the group counter.
+    // The dog/golem are NOT hit by command-retaliation, so the player eats it.
     const store = await boot('both', 500, 1);
     let dogHits = 0, golemHits = 0, playerHits = 0;
     for (let i = 0; i < 200; i++) {
@@ -259,23 +263,19 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
         : s);
     }
     const total = dogHits + golemHits + playerHits;
-    expect(total).toBeGreaterThan(50); // at least some retaliation landed
-    // Spec: dog 30, golem 30, player 40 (with broad tolerance ±15 pts for RNG).
-    const dogPct = (dogHits / Math.max(1, total)) * 100;
-    const golemPct = (golemHits / Math.max(1, total)) * 100;
+    expect(total).toBeGreaterThan(50); // retaliation landed on someone
+    // arb169 — the commander (player) eats essentially the entire volley; the
+    // companions are not targeted by command-retaliation.
     const playerPct = (playerHits / Math.max(1, total)) * 100;
     retaliationCounts.dog = dogHits;
     retaliationCounts.golem = golemHits;
     retaliationCounts.player = playerHits;
-    expect(dogPct).toBeGreaterThan(15);
-    expect(dogPct).toBeLessThan(45);
-    expect(golemPct).toBeGreaterThan(15);
-    expect(golemPct).toBeLessThan(45);
-    expect(playerPct).toBeGreaterThan(25);
-    expect(playerPct).toBeLessThan(55);
+    expect(playerPct).toBeGreaterThan(90);
+    expect(dogHits).toBe(0);
+    expect(golemHits).toBe(0);
   });
 
-  it('two-way retaliation split (dog only, no golem) lands roughly 40/60 across 200 trials', async () => {
+  it('dog-command (no golem) lands the volley on the COMMANDER, not the dog (arb169)', async () => {
     const store = await boot('dog', 500, 1);
     let dogHits = 0, playerHits = 0;
     for (let i = 0; i < 200; i++) {
@@ -313,9 +313,11 @@ describe('OTA-124 vandalistic — dog+golem combat combo chaos (500 trials)', ()
     }
     const total = dogHits + playerHits;
     expect(total).toBeGreaterThan(50);
-    const dogPct = (dogHits / Math.max(1, total)) * 100;
-    expect(dogPct).toBeGreaterThan(25); // 40 - 15
-    expect(dogPct).toBeLessThan(55);    // 40 + 15
+    // arb169 — the player (commander) eats the volley; the dog is not hit by
+    // command-retaliation.
+    const playerPct = (playerHits / Math.max(1, total)) * 100;
+    expect(playerPct).toBeGreaterThan(90);
+    expect(dogHits).toBe(0);
   });
 
   it('dog HP never goes below 0 visible — clamps at 0', async () => {
