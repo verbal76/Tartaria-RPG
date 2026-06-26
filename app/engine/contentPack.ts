@@ -13,7 +13,8 @@
 export type ContentTableId =
   | 'weapons' | 'armor' | 'materials' | 'gear' | 'exploration'
   | 'amulets' | 'rings' | 'dogGear'
-  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore' | 'powers' | 'weather';
+  | 'recipes' | 'enemies' | 'races' | 'factions' | 'locations' | 'lore' | 'powers' | 'weather'
+  | 'startingLoadout';
 
 export type LoreBlockId = 'world' | 'faction' | 'race' | 'flavor';
 
@@ -38,6 +39,7 @@ export const CONTENT_TABLES: ContentTableDef[] = [
   { id: 'weather', label: 'Weather / atmosphere', hint: 'JSON array of weather rows (data/weather/weather.json). Drives the "<name> presses on the world" atmosphere line AND mechanics, straight from the DATA fields (ids are free-form): visibility (negative → attack penalty), travelPenalty (3+ → slower repositioning), corruptionChance + hostile tags (storm/ash/hazardous → per-action tick), cold/snow tags → -1 DEX, fog/ash/smoke → -1 WIS. Each: { "id", "name", "description", "visibility", "travelPenalty", "corruptionChance", "tags": [...] }. Add a benign row (visibility 0, travelPenalty 0, no hostile tags) for fair weather. To disable weather entirely set top-level "weatherEnabled": false (or the dev-console FEATURES toggle).' },
   { id: 'lore', label: 'Lore document', hint: 'Your world bible as keyworded passages: [{ "tags": ["uss eldridge","fog"], "text": "..." }]. The narrator surfaces the passage whose tags match the scene; replaces the built-in canon. Write the big dump once — the engine pulls the right slice.' },
   { id: 'powers', label: 'Powers (magic / abilities)', hint: 'Your castable powers. Each: { "discipline": "shape|summon|mend" (the engine effect it runs), "name", "title", "body", "stat": "intelligence|wisdom", "dcBase", "fuels": ["item names"], "examples": ["cast phrases"] }. Replaces the built-in power set. Hit TEMPLATE for the shape.' },
+  { id: 'startingLoadout', label: 'Starting loadout (creation gear)', hint: 'JSON array of the items EVERY new character begins with — ONE place that replaces the scattered defaults (the built-in survival kit + faction knife + race starter weapon/gear). Each row: { "name", "tags": [...], "quantity"?, "equip"? }. Only "name" is required. The engine infers the item KIND from the tags (weapon → weapon, food/drink/consumable → consumable, relic → relic, armor → armor, else misc), defaults quantity to 1, and — if the name matches one of your catalog items — pulls its real rarity / description / durability. KEEP the behavior tags to keep behavior: "food"/"drink" (eat/drink for stamina; a "drink"+"water" vessel starts full), "light" (reveal hooks), "rope"/"climb" (the climb beat), "detection" (relic finder). "equip": "main" | "off" | "head" | "chest" | "legs" | "feet" | "cloak" | "amulet" | "ring" auto-equips that row (default: the first weapon goes to the main hand). Omit this table entirely to keep the built-in starter behavior. Hit TEMPLATE for the shape.' },
 ];
 
 /** Lore blocks, split the way the game uses them. */

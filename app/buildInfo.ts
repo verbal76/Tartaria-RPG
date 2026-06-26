@@ -16280,4 +16280,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // to a named room); the EXIT chip remains the single way out. Operations now reads ARMORY · SUPPLY ·
 // MESS · EXIT instead of …· WEST · EXIT. Engine wiring only — content's `"world"` exit is correct.
 // tsc clean; hub suites green (45). app/components/InputBox.tsx.
-export const OTA_BUILD_ID = '2026-06-26-883';
+// OTA-884 — STARTING LOADOUT table. New content-pack table `startingLoadout`: ONE place an author
+// defines every item a new character begins with, replacing the four scattered surfaces (the built-in
+// survival kit / `flavor.starterItems`, the per-faction knife, and the per-race startingWeapon/gear).
+// Each row is just { name, tags?, quantity?, equip? } — the engine infers the item KIND from the
+// behavior tags (weapon→weapon, food/drink/consumable→consumable, relic/light/detection→relic,
+// armor→armor, else misc), defaults quantity to 1, pulls real rarity/description/durability when the
+// name matches a catalog item, and auto-equips per `equip` (or the first weapon → main hand). Solves
+// the re-skin "pink bleed" starter items (Pocket Knife / Trail Rations / Climbing Rope / Water Bottle):
+// the author authors their own loadout (M1911A1, Trench Knife, Grapnel Line, K-Ration, full Canteen,
+// Flashlight) and the engine grants exactly that. Omit the table → built-in behavior unchanged. Also
+// fixed a stale raceStarterItems assertion (Aetheric Torch/Locket → Hand Torch/Finder's Locket). tsc
+// clean; startingLoadout + raceStarter + creation/content-pack suites green. app/engine/{character,
+// contentPack,contentTemplates}.ts, __tests__/startingLoadout.test.ts.
+export const OTA_BUILD_ID = '2026-06-26-884';
