@@ -26,6 +26,6 @@
     "files": ["main.js", "preload.js", "web-build/**/*"],
     "win": { "target": "portable" },
     "mac": { "target": "dir" },
-    "linux": { "target": "dir" }
+    "linux": { "target": "AppImage", "category": "Game" }
   }
 }

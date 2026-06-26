@@ -1,0 +1,54 @@
+name: Build · Linux / Steam Deck (AppImage)
+
+# Linux/Steam Deck build for the linux_dev line. Same Expo web export +
+# Electron wrapper as the Windows build, packaged as a single portable
+# AppImage that runs on SteamOS (Steam Deck Desktop Mode) and most distros.
+# Fires on push to linux_dev + manual dispatch. Isolated: builds an artifact
+# only, touches no EAS channel / store. Cannot affect the mobile lines.
+on:
+  push:
+    branches:
+      - linux_dev
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  build-appimage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install app deps (root)
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Export web bundle (react-native-web)
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Stage web bundle into the Electron wrapper
+        run: |
+          mkdir -p desktop/web-build
+          cp -r dist/* desktop/web-build/
+
+      - name: Install desktop (Electron) deps
+        working-directory: desktop
+        run: npm install --no-audit --no-fund
+
+      - name: Package Linux AppImage (electron-builder)
+        working-directory: desktop
+        run: npx electron-builder --linux AppImage --publish never
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-linux-appimage
+          path: desktop/release/*.AppImage
+          if-no-files-found: error
