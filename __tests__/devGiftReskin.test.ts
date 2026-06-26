@@ -35,7 +35,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn() }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { buildDevGiftItems } from '../app/state/gameStore';
+import { buildDevGiftItems, buildDevGearItems } from '../app/state/gameStore';
 import { setTableOverride, clearAllOverrides } from '../app/engine/contentPack';
 
 describe('engine_Dev — dev crash-test kit is content-agnostic', () => {
@@ -75,5 +75,43 @@ describe('engine_Dev — dev crash-test kit is content-agnostic', () => {
     expect(byName['British Char (Tea Flask)']).toBe(1); // drink role, qty preserved
     // ...and picks are distinct (no duplicate gifts).
     expect(new Set(gift.map((g) => g.name)).size).toBe(gift.length);
+  });
+});
+
+describe('engine_Dev — dev rare-gear loadout is content-agnostic', () => {
+  afterEach(() => clearAllOverrides());
+
+  it('built-in Tartaria grants Rare armor across slots + a Rare weapon per range', () => {
+    const gear = buildDevGearItems();
+    expect(gear.length).toBeGreaterThan(0);
+    for (const g of gear) expect(g.qty).toBe(1);
+    expect(new Set(gear.map((g) => g.name)).size).toBe(gear.length); // distinct
+  });
+
+  it('a re-skin pulls Rare gear ONLY from the uploaded catalogs, by slot + range', () => {
+    setTableOverride('armor', [
+      { name: 'M12 Flak Vest', slot: 'chest', acBonus: 4, resistances: [], rarity: 'Rare', tags: ['armor', 'chest'], description: 'x' },
+      { name: 'Fallschirmjäger Helmet', slot: 'head', acBonus: 2, resistances: [], rarity: 'Rare', tags: ['armor', 'head'], description: 'x' },
+      { name: 'Common Cap', slot: 'head', acBonus: 1, resistances: [], rarity: 'Common', tags: ['armor', 'head'], description: 'x' }, // not Rare → ignored
+    ]);
+    setTableOverride('weapons', [
+      { name: 'M1918A2 BAR', weaponKind: 'ranged', damageType: 'ballistic', damageDice: '2d8', stat: 'dexterity', rarity: 'Rare', tags: ['weapon', 'ranged'], description: 'x' },
+      { name: 'Trench Knife', weaponKind: 'melee', damageType: 'slashing', damageDice: '1d6', stat: 'strength', rarity: 'Rare', tags: ['weapon', 'melee'], description: 'x' },
+      { name: 'Plain Pistol', weaponKind: 'ranged', damageType: 'ballistic', damageDice: '1d6', stat: 'dexterity', rarity: 'Common', tags: ['weapon'], description: 'x' }, // not Rare → ignored
+    ]);
+    const gear = buildDevGearItems();
+    const names = gear.map((g) => g.name);
+    // Rare armor for the two slots the pack defines (head + chest)...
+    expect(names).toContain('M12 Flak Vest');
+    expect(names).toContain('Fallschirmjäger Helmet');
+    // ...a Rare ranged (distant) + Rare melee (close) weapon...
+    expect(names).toContain('M1918A2 BAR');
+    expect(names).toContain('Trench Knife');
+    // ...nothing below Rare, and no built-in Tartaria names leak in.
+    expect(names).not.toContain('Common Cap');
+    expect(names).not.toContain('Plain Pistol');
+    const packNames = new Set(['M12 Flak Vest', 'Fallschirmjäger Helmet', 'M1918A2 BAR', 'Trench Knife']);
+    for (const n of names) expect(packNames.has(n)).toBe(true);
+    expect(gear.every((g) => g.qty === 1)).toBe(true);
   });
 });

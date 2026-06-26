@@ -469,6 +469,72 @@ export function buildDevGiftItems(): Array<{ name: string; qty: number }> {
   return out;
 }
 
+// engine_Dev — the dev RARE-GEAR loadout: 1 Rare armor per equip slot + 1 Rare
+// weapon per distance range, pulled from the ACTIVE catalogs (re-skin or built-in).
+// A slot / range with no Rare item in the loaded pack is simply skipped (this WWII
+// pack, e.g., only ships head + chest armor and ranged + melee weapons, so that's
+// what it grants). Weapons are bucketed by their OUTERMOST reach band so each band
+// gets a weapon that can fight there.
+export function buildDevGearItems(): Array<{ name: string; qty: number }> {
+  const out: Array<{ name: string; qty: number }> = [];
+  const used = new Set<string>();
+  // 1 Rare armor per slot.
+  const armor = resolveTable('armor', ARMOR) as ReadonlyArray<{ name?: string; rarity?: string; slot?: string }>;
+  for (const slot of ARMOR_SLOTS) {
+    const row = armor.find((a) => !!a.name && a.rarity === 'Rare' && a.slot === slot && !used.has(a.name));
+    if (row?.name) { used.add(row.name); out.push({ name: row.name, qty: 1 }); }
+  }
+  // 1 Rare weapon per distance band (by the weapon's outermost reach band).
+  const weapons = resolveTable('weapons', WEAPONS) as ReadonlyArray<{ name?: string; rarity?: string; weaponKind?: 'melee' | 'ranged' | 'runecaster'; tags?: string[] }>;
+  const bandPick = new Map<string, string>();
+  for (const w of weapons) {
+    if (!w.name || w.rarity !== 'Rare' || used.has(w.name)) continue;
+    const band = reachBandsFor(reachClassFor({ weaponKind: w.weaponKind, name: w.name, tags: w.tags }))[0];
+    if (band && !bandPick.has(band)) bandPick.set(band, w.name);
+  }
+  for (const band of RANGE_ORDER) {
+    const nm = bandPick.get(band);
+    if (nm && !used.has(nm)) { used.add(nm); out.push({ name: nm, qty: 1 }); }
+  }
+  return out;
+}
+
+// engine_Dev — grant one keyed, idempotent dev batch. Gear kinds (weapon/armor)
+// are durability-stamped so they equip as real instances; consumables grant flat.
+async function grantDevKitBatch(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+  key: string,
+  items: Array<{ name: string; qty: number }>,
+  label: string,
+): Promise<void> {
+  if (items.length === 0) return;
+  const res = await grantTestSupplyGiftOnce(key);
+  if (!res.granted) return;
+  setStore((s) => {
+    if (!s.player) return s;
+    let inv = s.player.inventory;
+    for (const { name, qty } of items) {
+      const look = lookupCraftedItem(name);
+      let item: InventoryItem = {
+        id: `devgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
+        name,
+        kind: look.kind,
+        rarity: look.rarity,
+        quantity: qty,
+        tags: [...look.tags, 'gift'],
+      };
+      if (look.kind === 'weapon' || look.kind === 'armor') item = stampDurability(item);
+      inv = grantItem(inv, item).inventory;
+    }
+    return { player: { ...s.player, inventory: inv } };
+  });
+  const who = getStore().player?.name ?? 'the dev';
+  const summary = items.map((g) => `${g.qty}× ${g.name}`).join(', ');
+  getStore().appendLog('reward', `✦ ${label} lands in ${who}'s pack: ${summary}. Test freely.`);
+  void getStore().persist();
+}
+
 /** True only when the player is genuinely STANDING IN their current named
  *  location — on its map anchor (or inside one of its hub rooms), and not
  *  mid-journey.
@@ -3776,37 +3842,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Sasmooch). A standing crash-test kit so general testing doesn't burn the
       // player's own consumables. Idempotent per name+slot via grantTestSupplyGiftOnce
       // — resuming the same save never restacks it. No effect for any other name.
-      // engine_Dev — the kit is now resolved against the ACTIVE catalogs (buildDevGiftItems)
-      // so a re-skin substitutes its own consumables instead of injecting Tartaria items.
+      // engine_Dev — both batches resolve against the ACTIVE catalogs so a re-skin
+      // substitutes its own items instead of injecting Tartaria names. Granted under
+      // SEPARATE idempotency keys so adding the gear batch reaches an existing dev
+      // save (which already consumed the consumable key) without re-stacking it.
       const devName = player.name.trim().toLowerCase();
       if (DEV_REVIVE_NAMES.includes(devName)) {
-        void grantTestSupplyGiftOnce(`${slotId}:${devName}`).then((res) => {
-          if (!res.granted) return;
-          const gift = buildDevGiftItems();
-          if (gift.length === 0) return; // pack has no matching consumables — nothing to gift
-          set((s) => {
-            if (!s.player) return s;
-            let inv = s.player.inventory;
-            for (const { name, qty } of gift) {
-              const look = lookupCraftedItem(name);
-              inv = grantItem(inv, {
-                id: `devgift_${Date.now()}_${name.replace(/\s+/g, '').toLowerCase()}`,
-                name,
-                kind: look.kind,
-                rarity: look.rarity,
-                quantity: qty,
-                tags: [...look.tags, 'gift'],
-              }).inventory;
-            }
-            return { player: { ...s.player, inventory: inv } };
-          });
-          const summary = gift.map((g) => `${g.qty}× ${g.name}`).join(', ');
-          get().appendLog(
-            'reward',
-            `✦ A crash-test kit lands in ${player.name}'s pack: ${summary}. Test freely.`,
-          );
-          void get().persist();
-        });
+        void grantDevKitBatch(get, set, `${slotId}:${devName}`, buildDevGiftItems(), 'A crash-test kit');
+        // 1 Rare armor per slot + 1 Rare weapon per distance range (per the pack's content).
+        void grantDevKitBatch(get, set, `${slotId}:${devName}:raregear`, buildDevGearItems(), 'A rare test loadout');
       }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
