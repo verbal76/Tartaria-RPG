@@ -1756,8 +1756,10 @@ const styles = StyleSheet.create({
   // clipped the bottom rows behind the scene bar. Letting the row grow
   // to fit content keeps every stat visible.
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
-  // engine_Dev — combat arena: the top row fills the world-window so the char + enemy boxes run long.
-  topRowCombat: { flex: 1, minHeight: 0 },
+  // engine_Dev — combat arena: the top row fills the world-window AND stacks the boxes vertically
+  // (character band on top, enemy band below) instead of side-by-side columns. Both children are
+  // flex:1, so column direction splits the height into equal player/enemy bands.
+  topRowCombat: { flex: 1, minHeight: 0, flexDirection: 'column' },
   combatColFill: { flex: 1 },
   combatColEqual: { flex: 1 }, // equal halves during combat (override statsCol's 1.2)
   statsCol: { flex: 1.2 },

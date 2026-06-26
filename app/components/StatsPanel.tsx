@@ -219,7 +219,7 @@ export function StatsPanel({ player, fill }: Props) {
   const golemShows = !!player.sidekick && player.sidekick.hp > 0;
 
   return (
-    <Animated.View style={[styles.container, fill ? styles.fill : null, { backgroundColor: animBg }]}>
+    <Animated.View style={[styles.container, fill ? styles.fill : null, fill ? styles.combatOutline : null, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
           behind the card content so the text stays readable. */}
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
@@ -306,6 +306,9 @@ function Stat({ label, value, valueColor }: { label: string; value: string; valu
 const styles = StyleSheet.create({
   // engine_Dev — combat arena: let the card fill the tall column so the box runs long.
   fill: { flex: 1 },
+  // engine_Dev — combat arena: a light outline around the player band for a clean divide from the
+  // enemy band stacked below it (matches the enemy box's combat outline).
+  combatOutline: { borderColor: '#8fa6ac', borderWidth: 1.5 },
   container: {
     backgroundColor: '#0e1618',
     borderColor: '#2b3a3e',
