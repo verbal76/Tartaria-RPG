@@ -1,11 +1,11 @@
 {
-  "_doc": "Engine dev test kit. Spawned ONCE per name+slot the first time a dev character (names in DEV_REVIVE_NAMES) loads a save, in ANY game built on this engine. ITEM NAMES ARE NOT HARDCODED: every entry resolves against the ACTIVE game's catalogs, so the kit adapts to any re-skin. Edit this file to change the kit — no code change needed. 'consumables': each row grants 'qty' of an item matching its role 'tags'; the optional 'prefer' name is used only when that exact name is a real row in the loaded catalog (so built-in games keep their named kit, re-skins substitute their own). 'gear': rule-based rare equipment — perSlot grants one item of 'rarity' for each armor slot; perRange grants one weapon of 'rarity' for each combat distance band (ranged->distant, throwable->far, long->mid, melee->close). A slot/range/role with no match in the loaded game is skipped (never an improvised fallback).",
+  "_doc": "Engine dev test kit. Spawned ONCE per name+slot the first time a dev character (names in DEV_REVIVE_NAMES) loads a save, in ANY game built on this engine. NO ITEM NAMES ARE HARDCODED: every entry is resolved against the ACTIVE game's catalogs by WHAT THE ITEM IS, so the kit adapts to any re-skin. Edit this file to change the kit — no code change needed. 'consumables': each row grants 'qty' of the first item whose tags match the role 'tags', read from the active gear/materials/exploration catalogs (deduped across roles). 'gear': rule-based rare equipment read from the active armor/weapons catalogs — perSlot grants one item of 'rarity' for each armor slot; perRange grants one weapon of 'rarity' for each combat distance band (ranged->distant, throwable->far, long->mid, melee->close). A role/slot/range with no match in the loaded game is skipped (never an improvised fallback). OPTIONAL: a consumable row may add \"prefer\": \"<exact item name>\" to pin a specific item when that name exists in the loaded catalog; omitted here so resolution stays purely tag/type-based.",
   "consumables": [
-    { "qty": 10, "prefer": "First Aid Kit", "tags": ["healing", "medicine", "medical", "medkit"] },
-    { "qty": 20, "prefer": "Trail Rations", "tags": ["food", "ration"] },
-    { "qty": 20, "prefer": "Smoke-Cured Jerky Strip", "tags": ["food", "treat"] },
-    { "qty": 20, "prefer": "Bioluminescent Fungus", "tags": ["light", "food", "stimulant"] },
-    { "qty": 1, "prefer": "Water Bottle", "tags": ["drink", "water"] }
+    { "qty": 10, "tags": ["healing", "medicine", "medical", "medkit"] },
+    { "qty": 20, "tags": ["food", "ration"] },
+    { "qty": 20, "tags": ["food", "treat"] },
+    { "qty": 20, "tags": ["light", "food", "stimulant"] },
+    { "qty": 1, "tags": ["drink", "water"] }
   ],
   "gear": [
     { "kind": "armor", "rarity": "Rare", "perSlot": true },

@@ -16430,4 +16430,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // baked into code. Behavior is identical to OTA-897 for built-in + the Philadelphia pack. tsc clean;
 // devGiftReskin extended with data-driven assertions (kit count + quantities track the JSON) — 6 green.
 // app/data/devKit.json (new), app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-26-898';
+// OTA-899 — [dev kit] strip the Tartaria 'prefer' item names from devKit.json so the kit resolves PURELY by
+// what each item is (tags/type) from the active catalogs — the last hardcoded item names are gone. The engine
+// still SUPPORTS an optional per-row "prefer" pin (handled in buildDevGiftItems) for anyone who wants it, but
+// the bundled kit omits it, so built-in games now pick the first catalog consumable matching each role's tags
+// instead of the old named items. Behavior in a re-skin is unchanged (prefer was already ignored there). No
+// code change — JSON + test only. devGiftReskin updated (built-in now asserts 5 distinct real consumables
+// resolved by tag, exact JSON quantities) — 6 green; tsc clean. app/data/devKit.json.
+export const OTA_BUILD_ID = '2026-06-26-899';
