@@ -16271,4 +16271,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // DEALS, so the player always has both lists. (4) LIGHT OUTLINE: a light 1.5px outline (#8fa6ac)
 // around both bands for a clean divide. Presentational only; tsc clean; healthCardTint suite green.
 // app/screens/ExplorationScreen.tsx, app/components/{StatsPanel,EnemyPanel}.tsx.
-export const OTA_BUILD_ID = '2026-06-26-882';
+// OTA-883 — starting-area exit chip fix. In an uploaded starting area (e.g. the WWII packs) the
+// "exit room" marks its way out with a `"world"` exit (STARTING_AREA_WORLD_EXIT) on one cardinal —
+// e.g. Operations' `west: "world"`. The hub travel row built a room chip per non-null exit, falling
+// back to the CARDINAL name when the target wasn't a real room — so the `"world"` exit rendered as a
+// bare "WEST" chip ALONGSIDE the dedicated EXIT chip: the same leave action shown twice, one of them
+// mislabeled. Now the chip builder skips the world-exit sentinel (and any exit that doesn't resolve
+// to a named room); the EXIT chip remains the single way out. Operations now reads ARMORY · SUPPLY ·
+// MESS · EXIT instead of …· WEST · EXIT. Engine wiring only — content's `"world"` exit is correct.
+// tsc clean; hub suites green (45). app/components/InputBox.tsx.
+export const OTA_BUILD_ID = '2026-06-26-883';

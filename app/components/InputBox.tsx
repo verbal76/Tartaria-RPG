@@ -18,6 +18,7 @@ import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
 import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
+import { STARTING_AREA_WORLD_EXIT } from '../engine/contentPack';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachClassFor } from '../engine/combatRules';
 import { reachBandsFor } from '../engine/types';
@@ -254,9 +255,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     for (const dir of ['north', 'south', 'east', 'west'] as const) {
       const targetId = hubRoom.exits[dir];
       if (!targetId) continue;
+      // engine_Dev — a `"world"` exit (STARTING_AREA_WORLD_EXIT) is the author's "this is the way
+      // OUT" marker, not a room. Skip it here: the dedicated EXIT chip already leaves the building, so
+      // rendering it ALSO as a bare cardinal ("WEST") was a redundant, mislabeled duplicate. Likewise
+      // skip any exit that doesn't resolve to a real room — only named rooms get a room chip.
+      if (targetId === STARTING_AREA_WORLD_EXIT) continue;
       const targetRoom = hubRoomFor(targetId, factionId);
-      const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
-      out.push({ label, submit: `go ${dir}` });
+      if (!targetRoom) continue;
+      out.push({ label: targetRoom.shortName.toUpperCase(), submit: `go ${dir}` });
     }
     return out;
   }, [hubRoom, factionId]);
