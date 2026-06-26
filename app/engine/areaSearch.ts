@@ -8,7 +8,7 @@
 // nothing dominate.
 
 import type { Rarity } from './types';
-import { resolveFlavor } from './contentPack';
+import { resolveFlavor, resolveTable, isReskinActive } from './contentPack';
 
 // Phrases that count as a generic area / surface / direction search.
 // Anything in here triggers an outcome roll instead of "I don't see X".
@@ -262,6 +262,65 @@ function rarityRank(r: Rarity): number {
   return RARITY_RANK[r] ?? 0;
 }
 
+// ── engine_Dev — content-agnostic area-search loot ──────────────────────────
+// SMALL_FINDS / RARE_FINDS above are the built-in TARTARIA pools. In a re-skin
+// those names don't exist in the uploaded catalogs, so searching an area handed
+// the player inert "improvised" junk (no stats, nothing to do with it). When a
+// re-skin is active the search loot is instead drawn from the PACK'S OWN
+// catalogs: routine searches pull Common/Uncommon MATERIALS (rarity-weighted,
+// Common-heavy), and investigate's rarer find adds Uncommon/Rare materials plus
+// a sprinkle of low-tier gear/weapons/armor so a lucky look can surface real
+// kit. Built-in Tartaria keeps its curated pools untouched.
+interface FindRow { name: string; rarity: Rarity; weight: number }
+
+type CatalogRow = { name?: string; rarity?: string };
+function catalogRows(id: 'materials' | 'gear' | 'weapons' | 'armor'): readonly CatalogRow[] {
+  return resolveTable<CatalogRow>(id, []);
+}
+
+function reskinSmallFinds(): FindRow[] {
+  const out: FindRow[] = [];
+  for (const m of catalogRows('materials')) {
+    if (!m.name) continue;
+    const r = (m.rarity ?? 'Common') as Rarity;
+    const w = r === 'Common' ? 10 : r === 'Uncommon' ? 4 : r === 'Rare' ? 1 : 0; // Epic/Legendary excluded
+    if (w > 0) out.push({ name: m.name, rarity: r, weight: w });
+  }
+  return out;
+}
+
+function reskinRareFinds(): FindRow[] {
+  const out: FindRow[] = [];
+  for (const m of catalogRows('materials')) {
+    if (!m.name) continue;
+    const r = (m.rarity ?? 'Common') as Rarity;
+    const w = r === 'Uncommon' ? 6 : r === 'Rare' ? 3 : 0;
+    if (w > 0) out.push({ name: m.name, rarity: r, weight: w });
+  }
+  for (const id of ['gear', 'weapons', 'armor'] as const) {
+    for (const g of catalogRows(id)) {
+      if (!g.name) continue;
+      const r = (g.rarity ?? 'Common') as Rarity;
+      const w = r === 'Common' ? 3 : r === 'Uncommon' ? 2 : r === 'Rare' ? 1 : 0; // Epic/Legendary excluded
+      if (w > 0) out.push({ name: g.name, rarity: r, weight: w });
+    }
+  }
+  return out;
+}
+
+// The ACTIVE pools: pack-sourced under a re-skin (falling back to the built-in
+// only if the pack somehow ships no usable rows), else the built-in Tartaria pool.
+function activeSmallFinds(): FindRow[] {
+  if (!isReskinActive()) return SMALL_FINDS;
+  const pool = reskinSmallFinds();
+  return pool.length > 0 ? pool : [];
+}
+function activeRareFinds(): FindRow[] {
+  if (!isReskinActive()) return RARE_FINDS;
+  const pool = reskinRareFinds();
+  return pool.length > 0 ? pool : [];
+}
+
 // OTA-216 — directional-find pool. Each entry describes a specific
 // "go [dir] and find a [thing]" promise. The investigate handler
 // picks one at random when this outcome fires; the player gets the
@@ -396,14 +455,20 @@ export function rollAreaSearch(
     return { kind: 'nothing', line: format(pick(resolveFlavor('searchNothing', NOTHING_LINES)), target) };
   }
   if (r < findCutoff) {
-    const pool = isInvestigate ? RARE_FINDS : SMALL_FINDS;
+    const rarePool = activeRareFinds();
+    const pool = isInvestigate ? rarePool : activeSmallFinds();
+    // engine_Dev — a re-skin with no usable catalog rows leaves the pool empty;
+    // yield 'nothing' rather than crashing or leaking a built-in Tartaria name.
+    if (pool.length === 0) {
+      return { kind: 'nothing', line: format(pick(resolveFlavor('searchNothing', NOTHING_LINES)), target) };
+    }
     let found = pickWeighted(pool);
     // arb-fix — race loot-luck quality bias. On a plain search there's a
-    // chance to surface the rare Aetheric gear pool outright; otherwise keep
-    // the rarer of two draws so finds skew toward Aetheric loot.
+    // chance to surface the rarer pool outright; otherwise keep the rarer of
+    // two draws so finds skew toward better loot.
     if (loot > 0) {
-      if (!isInvestigate && Math.random() < loot * 2) {
-        found = pickWeighted(RARE_FINDS);
+      if (!isInvestigate && rarePool.length > 0 && Math.random() < loot * 2) {
+        found = pickWeighted(rarePool);
       } else {
         const alt = pickWeighted(pool);
         if (rarityRank(alt.rarity) > rarityRank(found.rarity)) found = alt;
