@@ -16383,4 +16383,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // only when the table ships no armor. Now the armor shows as a normal take chip and is grabbed like anything
 // else. tsc clean (non-test 0); new takeableArmorGuarantee suite + take/gear/fusion suites green.
 // app/engine/takeableGearSpawns.ts, app/engine/crafting.ts, app/state/gameStore.ts, app/screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-26-893';
+// OTA-894 — [re-skin leak] area-search loot goes content-agnostic. Player report (Philadelphia Experiment
+// pack): "the majority of items have no stats… when I click it says improvised." Root cause: areaSearch.ts
+// hardcoded the TARTARIA loot pools (SMALL_FINDS / RARE_FINDS = Aether Mud, Trail Rations, Pocket Knife,
+// Empty Water Bottle, Aetheric Locket, Cudgel…), so SEARCHING an area in a re-skin handed the player Tartaria
+// names that don't exist in the uploaded catalog → they resolve to inert "improvised" items with no stats.
+// Now, when isReskinActive(), the search loot is drawn from the PACK'S OWN catalogs: routine search/harvest
+// pulls Common/Uncommon MATERIALS (rarity-weighted Common-heavy, Epic/Legendary excluded); investigate's
+// rarer find adds Uncommon/Rare materials + a sprinkle of low-tier gear/weapons/armor. Empty pool → 'nothing'
+// (never a Tartaria fallback). Built-in Tartaria keeps its curated pools untouched. tsc clean; new
+// areaSearchReskin suite + search/investigate/forage suites green. app/engine/areaSearch.ts.
+export const OTA_BUILD_ID = '2026-06-26-894';
