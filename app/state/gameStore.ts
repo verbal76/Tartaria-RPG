@@ -25101,6 +25101,22 @@ function handleGolemCommand(
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
     dmg += golem.attackMod + Math.floor(golemPower / 2);
+    // Combat-Parity (companion) — honor the enemy's resist/weakness + creature-trait multipliers for
+    // the golem's INNATE damage type (only the coating bonus respected resists before; the base swing
+    // was typeless). Applied to the base hit BEFORE the coating bonus is added (the coating is already
+    // type-modified for elementals below), then roll the on-hit typed proc for the golem's type.
+    {
+      const gMod = applyDamageTypeModifier(dmg, dmgType, target.type);
+      const gTrait = traitDamageMultiplier(target.traits, dmgType);
+      dmg = Math.max(1, Math.round(gMod.damage * gTrait.multiplier));
+      const gTp = BUILTIN_DT_COMBAT[canonDT(dmgType)];
+      if (gTp && gTp.mode === 'on_hit') {
+        const gMatch: 'weak' | 'resist' | 'normal' =
+          (gMod.match === 'weak' || gTrait.match === 'vulnerable') ? 'weak'
+          : (gMod.match === 'resist' || gTrait.match === 'resist') ? 'resist' : 'normal';
+        if (Math.random() < dtProcChance(gTp, gMatch)) dmg += rollDie(4);
+      }
+    }
     // OTA-479 — a COATED golem weapon adds its bite to the hit AND seeds the
     // coating's shred/stack/DOT on the enemy (the armor-breaker payoff). Mirrors
     // the player's coated-strike math.
@@ -25619,6 +25635,20 @@ function handleDogCombat(
     if (hit) {
       let dmg = rollDie(6) + Math.floor(dog.stats.strength / 2);
       if (nat20) dmg *= 2;
+      // Combat-Parity (companion) — the dog's bite is PIERCING. It was flat/typeless before, so a
+      // pierce-resistant enemy soaked nothing and a pierce-weak one took no extra. Now honor the
+      // enemy's resist/weakness + creature-trait multipliers (same applyDamageTypeModifier +
+      // traitDamageMultiplier the player's swing uses), then roll the piercing on-hit typed proc.
+      const dMod = applyDamageTypeModifier(dmg, 'piercing', target.type);
+      const dTrait = traitDamageMultiplier(target.traits, 'piercing');
+      dmg = Math.max(1, Math.round(dMod.damage * dTrait.multiplier));
+      const dTp = BUILTIN_DT_COMBAT[canonDT('piercing')];
+      if (dTp && dTp.mode === 'on_hit') {
+        const dMatch: 'weak' | 'resist' | 'normal' =
+          (dMod.match === 'weak' || dTrait.match === 'vulnerable') ? 'weak'
+          : (dMod.match === 'resist' || dTrait.match === 'resist') ? 'resist' : 'normal';
+        if (Math.random() < dtProcChance(dTp, dMatch)) dmg += rollDie(4);
+      }
       const newHp = Math.max(0, targetHp - dmg);
       get().appendLog(
         'reward',
