@@ -1,0 +1,27 @@
+{
+  "name": "rpg-engine-dev-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron desktop wrapper for the RPG Engine (dev). Loads the Expo web export (react-native-web) so the full dev engine — narrator included — runs on PC. Separate npm package from the mobile app so it never affects the RN build. Mirrors the live-Tartaria steam_Dev wrapper, minus the Steam/store integration.",
+  "main": "main.js",
+  "scripts": {
+    "_comment": "From repo root: `npx expo export --platform web --output-dir dist` produces dist/, then `bash scripts/harden-web-bundle.sh dist`, then copy dist/* into desktop/web-build/. Then run these. The build-engine-exe.yml workflow does all of this automatically on push to Dev_engine_PC.",
+    "start": "electron .",
+    "start:dev": "cross-env ENGINE_DEV_URL=http://localhost:8081 electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.hotatticgames.tartarprim.engine.desktop",
+    "productName": "RPG Engine (dev)",
+    "directories": { "output": "release" },
+    "files": ["main.js", "preload.js", "web-build/**/*"],
+    "win": { "target": "portable" },
+    "mac": { "target": "dir" },
+    "linux": { "target": "dir" }
+  }
+}
