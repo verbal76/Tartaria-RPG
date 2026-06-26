@@ -16421,4 +16421,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // kit so it reaches an existing dev save without re-stacking consumables; both refactored through one
 // grantDevKitBatch helper. tsc clean; devGiftReskin suite extended (built-in coverage + re-skin slot/range
 // resolution, no Tartaria leak) — 4 green. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-26-897';
+// OTA-898 — [dev kit] the kit is now DATA-DRIVEN from a JSON file (app/data/devKit.json), not hardcoded in
+// code, so it spawns for the dev names in ANY game built on the engine and can be changed by editing the JSON
+// alone. The file defines: 'consumables' (per-role qty + tags, optional 'prefer' name used only when that
+// exact name exists in the loaded catalog) and 'gear' (rules: { kind: armor|weapon, rarity, perSlot|perRange }).
+// buildDevGiftItems / buildDevGearItems read DEV_KIT (= devKit.json) instead of in-code role/rule constants;
+// item NAMES still resolve against each game's ACTIVE catalogs at grant time, so nothing game-specific is
+// baked into code. Behavior is identical to OTA-897 for built-in + the Philadelphia pack. tsc clean;
+// devGiftReskin extended with data-driven assertions (kit count + quantities track the JSON) — 6 green.
+// app/data/devKit.json (new), app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-26-898';
