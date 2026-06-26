@@ -16346,4 +16346,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // All headers are comments → stripped on LOAD + excluded from the version hash (never trip yellow). tsc
 // clean; content/template/versioning/round-trip suites green (90). app/engine/contentTemplates.ts,
 // app/screens/DeveloperSettingsScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-26-889';
+// OTA-890 — make the stamp-scheme migration persist ONCE so the yellow diamond reliably comes back.
+// OTA-888's re-baseline cleared the false-positive yellow from the comment-insensitive version change,
+// but it never WROTE the new STAMP_SCHEME (reconcile keeps unchanged stamps without persisting). So on
+// a device that never re-uploaded, every boot would re-baseline → genuine staleness would be absorbed
+// and yellow would never fire again. Now hydrate persists immediately when it migrates, so the
+// re-baseline runs exactly once; the next boot is a normal scheme and real template/data changes turn
+// the box yellow again as designed (instruction/comment edits still never do). app/state/contentPackStore.ts.
+export const OTA_BUILD_ID = '2026-06-26-890';
