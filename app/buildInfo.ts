@@ -16393,4 +16393,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rarer find adds Uncommon/Rare materials + a sprinkle of low-tier gear/weapons/armor. Empty pool → 'nothing'
 // (never a Tartaria fallback). Built-in Tartaria keeps its curated pools untouched. tsc clean; new
 // areaSearchReskin suite + search/investigate/forage suites green. app/engine/areaSearch.ts.
-export const OTA_BUILD_ID = '2026-06-26-894';
+// OTA-895 — [creation robustness] confirm + lock the startingLoadout-as-sole-source contract, and fix a
+// creation crash. Verified end-to-end that in a re-skin a new character's kit comes ONLY from the uploaded
+// startingLoadout (faction-filtered, resolved to real catalog items) with NONE of the built-in Tartaria
+// starter kit (Hand Torch / Trail Rations / Water Bottle / Finder's Locket) leaking in — the gate in
+// createCharacter already does this, now covered by the startingLoadoutSoleSource suite. (A player still
+// HOLDING those built-ins is a legacy save created before the loadout gate / before the pack's overrides
+// were active at creation time; new characters are clean.) Also hardened rollFromTCFormula: a re-skin race
+// that omits startingTCFormula no longer crashes creation ("Cannot read 'trim' of undefined") — it defaults
+// to a sane 2d6 x 10 purse. tsc clean; new startingLoadoutSoleSource suite + creation suites green.
+// app/engine/character.ts.
+export const OTA_BUILD_ID = '2026-06-26-895';

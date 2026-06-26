@@ -402,9 +402,12 @@ export function rollRaceStealth(raceId: string): number {
 }
 
 function rollFromTCFormula(formula: string): number {
+  // engine_Dev — a re-skin race may omit startingTCFormula; don't crash creation.
+  // Fall back to a sane starting purse formula when it's missing/blank.
+  const src = typeof formula === 'string' && formula.trim().length > 0 ? formula.trim() : '2d6 x 10';
   // "Nd6 x 10"
-  const m = /^(\d+)d6\s*x\s*10$/i.exec(formula.trim());
-  if (!m) return rollFromNotation(formula);
+  const m = /^(\d+)d6\s*x\s*10$/i.exec(src);
+  if (!m) return rollFromNotation(src);
   const count = parseInt(m[1]!, 10);
   return rollDice(count, 6) * 10;
 }
