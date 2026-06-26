@@ -16306,4 +16306,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "tool"); grenades are weapon+throwable+grenade (one-shot, consumed on throw). tsc clean;
 // startingLoadout suite (faction-filter + reskin-empty + built-in-kept) + creation suites green.
 // app/engine/{character,contentTemplates,contentPack}.ts, __tests__/startingLoadout.test.ts.
-export const OTA_BUILD_ID = '2026-06-26-885';
+// OTA-886 — per-JSON authoring diamonds in the content console. The section-header bar already
+// showed the authoring/stale diamonds (green ◆ all authored · pink ◇ some still on template · yellow
+// ◆ a stale upload), but only as the section AGGREGATE. Now each TableBox / LoreBox shows ITS OWN
+// diamonds next to its title when the section is expanded — green ◆ if that JSON is authored, pink ◇
+// if still on the built-in template, yellow ◆ if its upload was built against an older template — so
+// you can see exactly WHICH json needs attention, not just that something in the section does. New
+// BoxStatusDiamonds helper + a templateStamps subscription per box for live updates. Presentational
+// only; tsc clean. app/screens/DeveloperSettingsScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-26-886';

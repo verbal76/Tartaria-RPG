@@ -3187,11 +3187,27 @@ function MainQuestBox() {
   );
 }
 
+// engine_Dev — per-JSON authoring status diamonds, mirrored from the section-header bar so each
+// table / lore box shows ITS OWN state next to the title (when the section is expanded), not just the
+// section's aggregate: green ◆ = this JSON is authored (uploaded override), pink ◇ = still on the
+// built-in template, and a yellow ◆ when the upload was built against an OLDER template than the
+// engine now ships (re-grab the template + re-load).
+function BoxStatusDiamonds({ authored, stale }: { authored: boolean; stale: boolean }) {
+  return (
+    <>
+      <Text style={[styles.boxDiamond, { color: authored ? '#56d364' : '#ff4fb0' }]}>{authored ? '◆' : '◇'}</Text>
+      {stale && <Text style={[styles.boxDiamond, { color: '#e3b341' }]}>◆</Text>}
+    </>
+  );
+}
+
 function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint: string }) {
   const loadTableJson = useContentPackStore((s) => s.loadTableJson);
   const clearTable = useContentPackStore((s) => s.clearTable);
   const count = useContentPackStore((s) => s.tables[id]?.length ?? 0);
   const current = useContentPackStore((s) => s.tables[id]);
+  // engine_Dev — re-render when stale stamps reconcile so the per-box yellow diamond stays live.
+  useContentPackStore((s) => s.templateStamps);
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
   // engine_Dev — TEMPLATE shows YOUR current upload (full, editable) when one is
@@ -3202,7 +3218,12 @@ function TableBox({ id, label, hint }: { id: ContentTableId; label: string; hint
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>{label}</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>{label}</Text>
+          {/* engine_Dev — same authoring diamonds the section header shows, but for THIS json:
+              green ◆ authored · pink ◇ still on template · yellow ◆ upload is stale. */}
+          <BoxStatusDiamonds authored={count > 0} stale={getStaleSectionKeys().has(`table:${id}`)} />
+        </View>
         <Text style={count > 0 ? styles.badgeOn : styles.badgeOff}>
           {count > 0 ? `● override · ${count} rows` : '○ built-in'}
         </Text>
@@ -3278,6 +3299,8 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
   const clearLore = useContentPackStore((s) => s.clearLore);
   const current = useContentPackStore((s) => s.lore[id]);
   const on = current != null;
+  // engine_Dev — re-render when stale stamps reconcile so the per-box yellow diamond stays live.
+  useContentPackStore((s) => s.templateStamps);
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
   // engine_Dev — show YOUR current upload (full, editable) when one is loaded.
@@ -3285,7 +3308,11 @@ function LoreBox({ id, label, hint }: { id: LoreBlockId; label: string; hint: st
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>{label}</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>{label}</Text>
+          {/* engine_Dev — per-block authoring diamonds, mirroring the section header. */}
+          <BoxStatusDiamonds authored={on} stale={getStaleSectionKeys().has(`lore:${id}`)} />
+        </View>
         <Text style={on ? styles.badgeOn : styles.badgeOff}>{on ? '● override' : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>{hint}</Text>
@@ -3751,7 +3778,11 @@ const styles = StyleSheet.create({
   sectionBody: { marginTop: 6 },
   card: { backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4, padding: 10, marginBottom: 10 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  // engine_Dev — title + its per-JSON status diamonds, grouped on the left so the override/built-in
+  // badge stays pinned to the right edge.
+  cardTitleGroup: { flexDirection: 'row', alignItems: 'baseline', flexShrink: 1 },
   cardTitle: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
+  boxDiamond: { fontSize: 13, fontWeight: '700', marginLeft: 6 },
   badgeOn: { color: '#9ec96a', fontSize: 10, fontWeight: '700' },
   badgeOff: { color: '#6c8088', fontSize: 10 },
   hint: { color: '#6c8088', fontSize: 10, marginTop: 3, lineHeight: 14 },
