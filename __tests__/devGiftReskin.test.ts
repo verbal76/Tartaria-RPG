@@ -64,13 +64,15 @@ describe('engine_Dev — dev kit is data-driven from devKit.json (not hardcoded)
 describe('engine_Dev — dev crash-test kit is content-agnostic', () => {
   afterEach(() => clearAllOverrides());
 
-  it('built-in Tartaria yields the original hardcoded kit', () => {
+  it('built-in resolves every role to a distinct real consumable (purely by tag/type)', () => {
     const gift = buildDevGiftItems();
-    const byName = Object.fromEntries(gift.map((g) => [g.name, g.qty]));
-    expect(byName['First Aid Kit']).toBe(10);
-    expect(byName['Trail Rations']).toBe(20);
-    expect(byName['Water Bottle']).toBe(1);
+    // One item per consumable role, all distinct, quantities straight from the JSON.
     expect(gift.length).toBe(5);
+    expect(new Set(gift.map((g) => g.name)).size).toBe(gift.length);
+    expect(gift.map((g) => g.qty)).toEqual([10, 20, 20, 20, 1]);
+    // Every pick is a real built-in catalog item (resolved by what the item is).
+    const { findGearByName, findMaterialByName } = require('../app/engine/crafting');
+    for (const g of gift) expect(findGearByName(g.name) || findMaterialByName(g.name)).toBeTruthy();
   });
 
   it('a re-skin substitutes the pack\'s own consumables — no Tartaria names', () => {
