@@ -25,7 +25,7 @@
     "directories": { "output": "release" },
     "files": ["main.js", "preload.js", "web-build/**/*"],
     "win": { "target": "portable" },
-    "mac": { "target": "dir" },
+    "mac": { "target": "dmg" },
     "linux": { "target": "dir" }
   }
 }
