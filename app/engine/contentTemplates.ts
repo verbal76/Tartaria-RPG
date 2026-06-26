@@ -178,6 +178,23 @@ const CONSUMABLE_EFFECT_NOTE = [
   '//   coating: { kind:"poison|acid|corruption|electrical|burn", dice, label }  — weapon-coating oil',
 ].join('\n');
 
+// engine_Dev — MATERIAL "tags" reference. Materials only carry name / rarity / tags / description, so
+// the tags ARE the mechanics: they decide what a material counts as across three systems.
+const MATERIAL_TAGS_NOTE = [
+  '// MATERIAL "tags" — a material is just name / rarity / tags / description, so the TAGS carry all',
+  '// the mechanics. They drive three systems:',
+  '//   • FUSION (the Crucible): a fuse needs inputs spanning >=3 DIFFERENT material tags, so give your',
+  '//     materials varied, meaningful tags (e.g. metal / crystal / organic / fiber). A tag only COUNTS',
+  '//     toward that diversity if the engine recognizes it — add your own setting\'s tag words via the',
+  '//     "Fusion material tags" section so they count too.',
+  '//   • SCRAP / SALVAGE: tags map to the ROLE a broken-down item yields (metal / essence / stone /',
+  '//     organic / wood / …) — the tag→material wiring lives in the SCRAP section.',
+  '//   • CRAFTING + inventory: recipe ingredients match by exact NAME, but the tags also sort the',
+  '//     material into the inventory "Materials" group and let tag-based recipe/tool rules find it.',
+  '//   Common built-in tags: essence, crystal, metal, stone, bone, wood, organic, fiber, herb, scrap,',
+  '//   junk, tech, automation, casing, alchemy, thrown / throwable. Use whatever fits your setting.',
+].join('\n');
+
 const GEAR_NOTE = [STAT_BONUS_NOTE, CONSUMABLE_EFFECT_NOTE].join('\n');
 
 const WEATHER_NOTE = [
@@ -196,6 +213,7 @@ const WEATHER_NOTE = [
 const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   weapons: STAT_BONUS_NOTE,
   armor: STAT_BONUS_NOTE,
+  materials: MATERIAL_TAGS_NOTE,
   gear: GEAR_NOTE,
   weather: WEATHER_NOTE,
   races: [

@@ -16314,4 +16314,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // you can see exactly WHICH json needs attention, not just that something in the section does. New
 // BoxStatusDiamonds helper + a templateStamps subscription per box for live updates. Presentational
 // only; tsc clean. app/screens/DeveloperSettingsScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-26-886';
+// OTA-887 — Materials template now explains the "tags" field. The Materials table had option notes
+// for weapons/armor/gear/races/factions/enemies/… but NONE for materials, so its tags showed in the
+// sample with no explanation. Added MATERIAL_TAGS_NOTE (TABLE_OPTION_NOTES.materials): a material is
+// just name/rarity/tags/description, so the TAGS carry the mechanics — (1) FUSION (Crucible needs
+// inputs spanning >=3 different tags; a tag counts only if recognized — add custom ones via the Fusion
+// material tags section), (2) SCRAP/SALVAGE roles (tag→yielded material), (3) crafting + the inventory
+// Materials group — plus the common built-in tag vocabulary. tsc clean; the note now renders in the
+// materials TEMPLATE. app/engine/contentTemplates.ts.
+export const OTA_BUILD_ID = '2026-06-26-887';
