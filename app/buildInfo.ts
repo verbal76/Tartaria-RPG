@@ -15118,4 +15118,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stalls into deaths at the Uncommon tier; (4) the stat glossary now also covers the durability
 // instance-perk roll (acrobatics/aetheria synonyms were dropped from rolled perks); (5) effectiveStats
 // floors stealth at 0 (untrained), not 1. Common tier (real early-game) holds ~90% win. (Dev: OTA #.)
-export const OTA_BUILD_ID = '2026-06-25-625-combatII';
+// COMBAT-PARITY III (companions) — the dog's bite and the golem's INNATE attack were typeless flat
+// damage: a pierce-resistant enemy soaked nothing off the dog, a slash-weak one took no extra off the
+// golem, and neither rolled the typed on-hit proc. Now both route their hit through
+// applyDamageTypeModifier + traitDamageMultiplier (the same resist/weak/creature-trait math the
+// player's swing uses) and roll the on-hit typed proc for their damage type — closing the companion
+// half of the typed-combat parity. (The golem's coating bonus already respected resists; untouched.)
+// tsc clean; dogGolemCombatStress 9/9, golemCompanion + combat + coating suites green. (Dev: OTA #.)
+export const OTA_BUILD_ID = '2026-06-26-626-combatIII';
