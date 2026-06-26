@@ -16412,4 +16412,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (never an improvised fallback). Also EXTENDED the kit from "verbal" only to both DEV_REVIVE_NAMES
 // (verbal + sasmooch), idempotent per name+slot. tsc clean; new devGiftReskin suite (built-in kit unchanged;
 // re-skin substitutes pack consumables, no Tartaria names) + save/creation suites green. app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-26-896';
+// OTA-897 — [dev kit] add a RARE-GEAR loadout to the dev kit: 1 Rare armor per equip slot + 1 Rare weapon
+// per distance range, pulled from the ACTIVE catalogs (buildDevGearItems). Weapons are bucketed by their
+// OUTERMOST reach band (ranged→distant, throwable→far, long→mid, melee→close) so each band gets a weapon that
+// can fight there; a slot/range with no Rare item in the loaded pack is skipped (the Philadelphia pack only
+// ships head+chest armor and ranged+melee weapons, so it grants those). Gear is durability-stamped on grant
+// so it equips as a real instance. Granted under a SEPARATE idempotency key (:raregear) from the consumable
+// kit so it reaches an existing dev save without re-stacking consumables; both refactored through one
+// grantDevKitBatch helper. tsc clean; devGiftReskin suite extended (built-in coverage + re-skin slot/range
+// resolution, no Tartaria leak) — 4 green. app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-26-897';
