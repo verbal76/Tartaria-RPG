@@ -44,7 +44,7 @@ describe('engine_Dev — content templates', () => {
   });
 
   it('world lore template is the current narrator + tone, editable', () => {
-    const w = JSON.parse(getLoreTemplate('world')) as Record<string, unknown>;
+    const w = JSON.parse(stripComments(getLoreTemplate('world'))) as Record<string, unknown>;
     expect(typeof w.narrator).toBe('string');
     expect(typeof w.tone).toBe('string');
   });

@@ -291,7 +291,56 @@ const RECIPES_EXAMPLE = `[
   { "result": "Etched Focus", "ingredients": [{ "name": "Worked Crystal", "quantity": 2 }], "intRequirement": 11 }
 ]`;
 
+// engine_Dev — a self-explaining INSTRUCTION HEADER prepended to a template's TEMPLATE output, so the
+// JSON can be handed to anyone and they can begin immediately: it names the section + explains what it
+// is FOR (the same purpose text the dev console shows as the box hint). It's a // comment block, so it
+// is stripped on LOAD (round-trips cleanly) AND excluded from the template VERSION hash (editing it
+// never trips the yellow stale diamond — see templateVersioning.stripTemplateComments).
+function wrapAsComments(text: string, width = 96): string[] {
+  const out: string[] = [];
+  for (const para of text.split('\n')) {
+    let line = '';
+    for (const w of para.split(/\s+/)) {
+      if (w === '') continue;
+      if (line.length + w.length + 1 > width) { out.push(`// ${line}`); line = w; }
+      else line = line ? `${line} ${w}` : w;
+    }
+    out.push(`// ${line}`);
+  }
+  return out;
+}
+export function instructionHeader(label: string, purpose: string): string {
+  const bar = `// ${'═'.repeat(76)}`;
+  const rule = `// ${'─'.repeat(76)}`;
+  return [
+    bar,
+    `// ${label.toUpperCase()}`,
+    rule,
+    ...wrapAsComments(purpose),
+    rule,
+    '// HOW TO USE: edit the sample below to fit your game, then LOAD. You can hand this whole block',
+    '// to anyone and they can start immediately. (These // notes are auto-stripped when you LOAD.)',
+    bar,
+    '',
+  ].join('\n');
+}
+function tableInstructionHeader(id: ContentTableId): string {
+  const t = CONTENT_TABLES.find((x) => x.id === id);
+  return t ? instructionHeader(t.label, t.hint) : '';
+}
+function loreInstructionHeader(id: LoreBlockId): string {
+  const b = LORE_BLOCKS.find((x) => x.id === id);
+  return b ? instructionHeader(b.label, b.hint) : '';
+}
+
+// engine_Dev — public wrapper: prepends the instruction header for the DISPLAY/copy path (the box
+// TEMPLATE button, where includeTokenNote is true). Versioning + the game-bundle pass includeTokenNote
+// = false → no header (and the header is comment-stripped from the version hash anyway).
 export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
+  const body = getTableTemplateBody(id, n, includeTokenNote);
+  return includeTokenNote ? tableInstructionHeader(id) + body : body;
+}
+function getTableTemplateBody(id: ContentTableId, n: number = TEMPLATE_SAMPLE_ROWS, includeTokenNote = true): string {
   const note = includeTokenNote && TABLE_OPTION_NOTES[id] ? TABLE_OPTION_NOTES[id] + '\n' : '';
   // The Lore document + Powers ship their FULL set (not a 2-row sample) so the
   // author sees every section / power to edit. Both carry author prose, so they
@@ -320,6 +369,10 @@ export function getTableTemplate(id: ContentTableId, n: number = TEMPLATE_SAMPLE
 /** A lore-block starter. World shows the CURRENT defaults to edit; faction/race
  *  show the first couple of built-in rows so the shape is obvious. */
 export function getLoreTemplate(id: LoreBlockId, includeTokenNote = true): string {
+  const body = getLoreTemplateBody(id, includeTokenNote);
+  return includeTokenNote ? loreInstructionHeader(id) + body : body;
+}
+function getLoreTemplateBody(id: LoreBlockId, includeTokenNote = true): string {
   if (id === 'world') {
     return JSON.stringify(
       {

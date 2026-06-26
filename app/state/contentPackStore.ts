@@ -63,7 +63,13 @@ const MISSION_KEYS: MissionTableId[] = ['hunts', 'mysteries', 'factionQuests', '
 
 import { invalidateLocationCaches } from '../engine/worldMap';
 import { invalidateInteractionTagCache } from '../engine/interactionTags';
-import { reconcileStamps, staleKeys, type TemplateStamps } from '../engine/templateVersioning';
+import { reconcileStamps, staleKeys, templateVersionFor, type TemplateStamps } from '../engine/templateVersioning';
+
+// engine_Dev — bumped whenever the template-VERSION hashing scheme changes (e.g. OTA-888 made it
+// comment-insensitive). On hydrate, a persisted pack from an older scheme re-baselines every recorded
+// stamp's template version to the CURRENT one, so the scheme change (and the one-time instruction-block
+// pass) never spuriously turns existing uploads yellow. Normal staleness resumes afterward.
+const STAMP_SCHEME = 2;
 import { bundleTemplateMap } from '../engine/contentTemplates';
 
 const INTERACTION_TAG_KEYS = ['climbable', 'swimmable', 'breakable', 'searchable', 'salvageable'] as const;
@@ -142,6 +148,7 @@ function dropBakedTemplateSections(obj: Record<string, unknown>): string[] {
 }
 
 interface PersistShape {
+  stampScheme?: number;
   tables: Partial<Record<ContentTableId, unknown[]>>;
   lore: Partial<Record<LoreBlockId, unknown>>;
   missions?: Partial<Record<MissionTableId, unknown[]>>;
@@ -470,6 +477,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     energyName: state.energyName || undefined,
     devMode: state.devMode,
     templateStamps: state.templateStamps && Object.keys(state.templateStamps).length > 0 ? state.templateStamps : undefined,
+    stampScheme: STAMP_SCHEME,
   };
   void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(shape)).catch(() => { /* best effort */ });
 }
@@ -1959,7 +1967,19 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setEnergyNameOverride(energyName.length > 0 ? energyName : null);
         // Absent → true (engine dev build defaults to dev mode on).
         const devMode = shape.devMode !== false;
-        const templateStamps = shape.templateStamps && typeof shape.templateStamps === 'object' ? shape.templateStamps : {};
+        let templateStamps = shape.templateStamps && typeof shape.templateStamps === 'object' ? shape.templateStamps : {};
+        // engine_Dev — one-time migration: a pack persisted under an older STAMP_SCHEME re-baselines
+        // each recorded stamp's template version to the current one, so the version-hash scheme change
+        // (now comment-insensitive) + the instruction-block housekeeping pass never flag existing
+        // uploads yellow. The override CONTENT hash is preserved, so a genuinely-changed upload later
+        // still re-stamps and real staleness still surfaces.
+        if (shape.stampScheme !== STAMP_SCHEME) {
+          const rebased: TemplateStamps = {};
+          for (const [k, st] of Object.entries(templateStamps)) {
+            if (st && typeof st === 'object') rebased[k] = { content: (st as { content: string }).content, tmpl: templateVersionFor(k) };
+          }
+          templateStamps = rebased;
+        }
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
         set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, weatherEnabled, vendorsEnabled, vendorsAppendGeneric, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
       }

@@ -16322,4 +16322,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // material tags section), (2) SCRAP/SALVAGE roles (tag→yielded material), (3) crafting + the inventory
 // Materials group — plus the common built-in tag vocabulary. tsc clean; the note now renders in the
 // materials TEMPLATE. app/engine/contentTemplates.ts.
-export const OTA_BUILD_ID = '2026-06-26-887';
+// OTA-888 — template instruction headers (phase 1) + the version hash goes comment-insensitive.
+// (1) The template VERSION now hashes the COMMENT-STRIPPED template (templateVersioning.
+// stripTemplateComments), so editing a template's instructions / hints NEVER moves the version → never
+// trips the yellow "stale" diamond; only a real change to the sample/schema does. A one-time stamp
+// migration (STAMP_SCHEME) re-baselines existing uploads on hydrate so this scheme change + the
+// instruction pass don't flag anyone. (2) Every TABLE (21) + LORE block (4) template now opens with a
+// self-explaining INSTRUCTION HEADER (section name + what it's for, from the box hint) so the JSON can
+// be handed to someone and worked immediately — added via instructionHeader() in getTableTemplate /
+// getLoreTemplate (display path only; the game-bundle + versioning skip it). The ~20 ADVANCED sections
+// (missions/hooks/whispers/… ) + extending the per-box diamonds to those boxes is the next pass. tsc
+// clean; template/versioning/round-trip suites green. app/engine/{templateVersioning,contentTemplates}.ts,
+// app/state/contentPackStore.ts.
+export const OTA_BUILD_ID = '2026-06-26-888';
