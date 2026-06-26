@@ -17,6 +17,10 @@ import { describeTrait, traitACBonus, traitDefenses } from '../engine/enemyTrait
 import { enemyTypeDefenses } from '../engine/crafting';
 import { enemyDamageType } from '../engine/damageTypes';
 import { BrandedModal } from './BrandedModal';
+// engine_Dev — combat arena: tint the enemy band by ITS health, using the SAME health→color ramp
+// the player's StatsPanel uses (green when full → amber → red near death), so both bands read at a
+// glance and stay visually consistent.
+import { healthCardBg } from './StatsPanel';
 
 /** OTA-401 — a single active status (coating DOT / infection) on an
  *  enemy, mirrored from `currentScene.enemyStatuses[i]`. Surfaced on the
@@ -107,6 +111,13 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
 
   const cardWidth = panelW > 0 ? panelW : FALLBACK_W;
   const hpBarWidth = Math.max(0, cardWidth - CARD_CHROME);
+  // engine_Dev — combat arena: tint the whole enemy band by the ACTIVE enemy's health (the one
+  // staged/targeted), so the band reads green→red as you wear it down — no HP bar needed. The inner
+  // card goes transparent in `fill` so this band tint shows through full-height.
+  const activeEnemy = enemies[activeIndex] ?? enemies[0];
+  const bandHpFrac = activeEnemy
+    ? Math.max(0, Math.min(1, activeEnemy.currentHp / Math.max(1, activeEnemy.enemy.hp)))
+    : 1;
   // Cap the card to the corner height; taller content scrolls vertically (like
   // the exploration feed) rather than growing the top row. Leave a little room
   // below for the paging dots when more than one enemy is staged.
@@ -145,7 +156,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
     <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
-      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
+      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} />)}
     </TouchableOpacity>
   );
 
@@ -153,13 +164,16 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
   // instant combat starts; render the (empty) wrap and bail on the list.
   return (
     <>
-    <View style={[styles.wrap, fill ? styles.wrapFill : null]} onLayout={onLayout}>
+    <View
+      style={[styles.wrap, fill ? styles.wrapFill : null, fill ? { backgroundColor: healthCardBg(bandHpFrac) } : null]}
+      onLayout={onLayout}
+    >
       {enemies.length === 0 ? null : enemies.length === 1 ? (
         // Single enemy: no pager (nothing to scroll horizontally), just the card —
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
         <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
-          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} />)}
+          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} />)}
         </TouchableOpacity>
       ) : (
         <FlatList
@@ -239,7 +253,7 @@ function enemyDetailBody(view: EnemyView): string {
   return lines.join('\n');
 }
 
-function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth: number; hpBarWidth: number }) {
+function EnemyCard({ view, cardWidth, hpBarWidth, fill }: { view: EnemyView; cardWidth: number; hpBarWidth: number; fill?: boolean }) {
   // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
@@ -263,7 +277,7 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
   const dealsType = enemyDamageType(view.enemy);
 
   return (
-    <View style={[styles.card, { width: cardWidth }]}>
+    <View style={[styles.card, { width: cardWidth }, fill ? styles.cardFill : null]}>
       <View style={styles.head}>
         <Text style={styles.name} numberOfLines={1}>
           {view.enemy.name}
@@ -280,17 +294,21 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
             : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
         </Text>
       </View>
-      <View style={[styles.hpBarBg, { width: hpBarWidth }]}>
-        {/* OTA-081 — numeric pixel width (was percent string): RN sometimes
-            skipped the layout pass when only the percent changed, leaving the
-            bar stuck full while the HP number ticked down. */}
-        <View
-          style={[
-            styles.hpBarFill,
-            { width: Math.max(0, Math.round(hpBarWidth * hpPct)), backgroundColor: hpColor },
-          ]}
-        />
-      </View>
+      {/* engine_Dev — combat arena: no HP bar during combat; the band BACKGROUND tints by health
+          instead (see EnemyPanel bandHpFrac). Outside the arena (corner portrait) the bar stays. */}
+      {!fill && (
+        <View style={[styles.hpBarBg, { width: hpBarWidth }]}>
+          {/* OTA-081 — numeric pixel width (was percent string): RN sometimes
+              skipped the layout pass when only the percent changed, leaving the
+              bar stuck full while the HP number ticked down. */}
+          <View
+            style={[
+              styles.hpBarFill,
+              { width: Math.max(0, Math.round(hpBarWidth * hpPct)), backgroundColor: hpColor },
+            ]}
+          />
+        </View>
+      )}
       {/* Portrait stat grid: two rows of two so it fits the narrow column. */}
       <View style={styles.statGrid}>
         <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />
@@ -299,18 +317,16 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
         <Stat label="DMG" value={String(view.enemy.damage)} />
       </View>
       <View style={styles.defs}>
-        {defenses.resists.length > 0 && (
-          <Text style={styles.defLine} numberOfLines={2}>
-            <Text style={styles.defResist}>RESIST </Text>
-            <Text style={styles.defVal}>{defenses.resists.map(cap).join(', ')}</Text>
-          </Text>
-        )}
-        {defenses.weaknesses.length > 0 && (
-          <Text style={styles.defLine} numberOfLines={2}>
-            <Text style={styles.defWeak}>WEAK </Text>
-            <Text style={styles.defVal}>{defenses.weaknesses.map(cap).join(', ')}</Text>
-          </Text>
-        )}
+        {/* engine_Dev — always show RESIST and WEAK (with a "—" when the type has none) so the
+            player always has both lists, not just DEALS. */}
+        <Text style={styles.defLine} numberOfLines={2}>
+          <Text style={styles.defResist}>RESIST </Text>
+          <Text style={styles.defVal}>{defenses.resists.length ? defenses.resists.map(cap).join(', ') : '—'}</Text>
+        </Text>
+        <Text style={styles.defLine} numberOfLines={2}>
+          <Text style={styles.defWeak}>WEAK </Text>
+          <Text style={styles.defVal}>{defenses.weaknesses.length ? defenses.weaknesses.map(cap).join(', ') : '—'}</Text>
+        </Text>
         {/* arb119 — what the enemy DEALS, so armor choices have a target. */}
         <Text style={styles.defLine} numberOfLines={1}>
           <Text style={styles.defDeals}>DEALS </Text>
@@ -362,7 +378,9 @@ const styles = StyleSheet.create({
   // engine_Dev — combat arena: the enemy column becomes a tall filled box (matches the char box),
   // and every link in the flex chain (wrap → TouchableOpacity → ScrollView) fills so it doesn't
   // collapse to zero height.
-  wrapFill: { flex: 1, backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 6, overflow: 'hidden' },
+  // engine_Dev — combat arena: light outline (matches the player band) for a clean divide; the
+  // backgroundColor is overridden inline with the health-tinted band color (healthCardBg).
+  wrapFill: { flex: 1, backgroundColor: '#0e1618', borderColor: '#8fa6ac', borderWidth: 1.5, borderRadius: 6, overflow: 'hidden' },
   fillTouch: { flex: 1 },
   card: {
     backgroundColor: '#0e1618',
@@ -371,6 +389,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
   },
+  // engine_Dev — combat arena: the inner card goes transparent + borderless so the health-tinted
+  // band (wrapFill) shows through the full height instead of a small dark card floating on it.
+  cardFill: { backgroundColor: 'transparent', borderColor: 'transparent' },
   head: {
     flexDirection: 'row',
     justifyContent: 'space-between',

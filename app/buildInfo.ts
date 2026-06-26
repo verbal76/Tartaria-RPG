@@ -16261,4 +16261,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chance when inferred; only EXPLICITLY-typed enemies get the full proc/debuff. (3) stun debuff now
 // 2 rounds, aetheric debuff −2 WIS → −2 DEX (a combat stat) @1 round. (4) effectiveStats floored at
 // 1 so stacked debuffs can't zero a roll stat. Values only + one gate — tsc 142; suites green (73).
-export const OTA_BUILD_ID = '2026-06-25-881';
+// OTA-882 — combat-arena redesign (presentational). (1) STACK: the arena now stacks the boxes
+// VERTICALLY — character band on top, enemy band below (equal halves) — instead of side-by-side
+// columns (ExplorationScreen topRowCombat → flexDirection:'column'). (2) REACTIVE BANDS, NO BARS:
+// during combat both bands tint by health (the shared healthCardBg ramp: green→amber→red) and the
+// enemy HP BAR is removed — the enemy band now tints by its own HP like the player card already did;
+// the inner enemy card goes transparent so the band tint fills full-height. (3) RESIST/WEAK ALWAYS
+// SHOWN: the enemy box now always renders RESIST and WEAK (a "—" when the type has none), not just
+// DEALS, so the player always has both lists. (4) LIGHT OUTLINE: a light 1.5px outline (#8fa6ac)
+// around both bands for a clean divide. Presentational only; tsc clean; healthCardTint suite green.
+// app/screens/ExplorationScreen.tsx, app/components/{StatsPanel,EnemyPanel}.tsx.
+export const OTA_BUILD_ID = '2026-06-26-882';
