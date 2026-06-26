@@ -171,7 +171,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating, coatingFamily, coatingDamageType } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, getActiveVendors, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
@@ -14232,7 +14232,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // also seeds an ongoing DOT (applied below, only if the enemy
       // survives the blow). The instance is resolved off the equipped
       // slot id for the hand that swung.
-      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; label: string; source: string } | null = null;
+      let coatingProc: { kind: string; rolled: number; label: string; source: string } | null = null;
       if (!barehand) {
         const coatSlotId = usedOffHandForDmg
           ? (player.equipped?.offId ?? null)
@@ -14259,25 +14259,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // built-in behavior is unchanged).
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const cpc = require('../engine/contentPack') as typeof import('../engine/contentPack');
-          const coatCombat = cpc.getDamageTypeCombat(coating.kind);
+          // engine_Dev — a coating's DAMAGE TYPE (built-in = its kind; custom =
+          // the override's damageType) drives all resistance math; its FAMILY
+          // drives behavior. So a "Frost" coating (family burn, damageType cold)
+          // earns cold weakness/resistance and lands a burn-family DOT.
+          const coatDT = coatingDamageType(coating.kind);
+          const coatCombat = cpc.getDamageTypeCombat(coatDT);
           let coatingLands = true;
           if (coatCombat) {
             const cMatch: 'weak' | 'resist' | 'normal' =
-              (applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'weak' || traitDamageMultiplier(enemy.traits, coating.kind).match === 'vulnerable') ? 'weak'
-              : (applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'resist' || traitDamageMultiplier(enemy.traits, coating.kind).match === 'resist') ? 'resist'
+              (applyDamageTypeModifier(1, coatDT, enemy.type).match === 'weak' || traitDamageMultiplier(enemy.traits, coatDT).match === 'vulnerable') ? 'weak'
+              : (applyDamageTypeModifier(1, coatDT, enemy.type).match === 'resist' || traitDamageMultiplier(enemy.traits, coatDT).match === 'resist') ? 'resist'
               : 'normal';
             coatingLands = Math.random() < cpc.damageTypeApplyChance(coatCombat, cMatch);
           }
           if (!coatingLands) {
             get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}${'.'}`);
           } else {
-          const isElemental = coating.kind === 'electrical' || coating.kind === 'burn';
+          // Elemental families (and any custom coating, which always carries a real
+          // damage type) earn the enemy's weakness/resistance to that type.
+          const isElemental = coatingFamily(coating.kind) === 'electrical' || coatingFamily(coating.kind) === 'burn' || coatDT !== coating.kind;
           const rolled = isElemental
             ? Math.max(
                 1,
                 Math.round(
-                  applyDamageTypeModifier(rawRolled, coating.kind, enemy.type).damage
-                  * traitDamageMultiplier(enemy.traits, coating.kind).multiplier,
+                  applyDamageTypeModifier(rawRolled, coatDT, enemy.type).damage
+                  * traitDamageMultiplier(enemy.traits, coatDT).multiplier,
                 ),
               )
             : rawRolled;
@@ -14566,7 +14573,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const n = s.currentScene.enemies.length;
             let stacksAfter = 0;
             let corr = s.currentScene.enemyCorruptionStacks;
-            if (proc.kind === 'corruption') {
+            if (coatingFamily(proc.kind) === 'corruption') {
               corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
               while (corr.length < n) corr.push(0);
               // arb118 — CAP the stack (was uncapped → unbounded DOT exploit).
@@ -14577,7 +14584,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               stacksAfter = corr[activeIdx]!;
             }
             let shred = s.currentScene.enemyArmorShred;
-            if (proc.kind === 'acid') {
+            if (coatingFamily(proc.kind) === 'acid') {
               shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
               while (shred.length < n) shred.push(0);
               shred[activeIdx] = Math.min(acidShredCap(s.currentScene.enemies[activeIdx]), (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
@@ -14595,14 +14602,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (shred) next.enemyArmorShred = shred;
             return { currentScene: next };
           });
-          const extra = proc.kind === 'acid'
+          const extra = coatingFamily(proc.kind) === 'acid'
             ? ` Its guard pits and hisses — easier to hit now (−${ACID_SHRED_PER_HIT} AC, ${(get().currentScene?.enemyArmorShred?.[activeIdx] ?? 0)} total).`
-            : proc.kind === 'corruption'
+            : coatingFamily(proc.kind) === 'corruption'
               ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[activeIdx] ?? 1} stack${(get().currentScene?.enemyCorruptionStacks?.[activeIdx] ?? 1) === 1 ? '' : 's'}).`
               : '';
           get().appendLog(
             'combat',
-            `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
+            `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${coatingDamageType(proc.kind)} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
             { combatOutcome: 'player_dmg' },
           );
         }
@@ -20390,9 +20397,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!spec) { get().appendLog('debug', `applyCoatingToArmor: ${coatItem.name} carries no coating spec`); return; }
     const isArmor = armor.kind === 'armor' || (armor.uniqueStats?.kind === 'armor') || !!findArmorByName(armor.name);
     if (!isArmor) { get().appendLog('world', `You can only work a vial's resist into ARMOR — the ${armor.name} won't hold it.`); return; }
-    const type = String(spec.kind);
-    if ((armor.addedResists ?? []).map((r) => r.toLowerCase()).includes(type.toLowerCase())) {
+    // engine_Dev — the resist a coating grants is its DAMAGE TYPE (a custom "Frost"
+    // coating grants a `cold` resist, not "frost"), so it matches incoming damage.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    const type = coatingDamageType(String(spec.kind));
+    const already = (armor.addedResists ?? []).map((r) => r.toLowerCase());
+    if (already.includes(type.toLowerCase())) {
       get().appendLog('world', `The ${armor.name} already turns aside ${type}. No need to waste another vial on it.`);
+      return;
+    }
+    // OTA — cap worked-in resists so one piece can't become a god-vest.
+    const ADDED_RESIST_CAP = 3;
+    if (already.length >= ADDED_RESIST_CAP) {
+      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down or use a different piece.`);
       return;
     }
     set((s) => {
@@ -25530,21 +25548,21 @@ function runAethercraft(
 function applyWeaponCoatingProc(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   activeIdx: number,
-  proc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string },
+  proc: { kind: string; rolled: number; source?: string },
 ): void {
   set((s) => {
     if (!s.currentScene) return s;
     const n = s.currentScene.enemies.length;
     let stacksAfter = 0;
     let corr = s.currentScene.enemyCorruptionStacks;
-    if (proc.kind === 'corruption') {
+    if (coatingFamily(proc.kind) === 'corruption') {
       corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
       while (corr.length < n) corr.push(0);
       corr[activeIdx] = (corr[activeIdx] ?? 0) + 1;
       stacksAfter = corr[activeIdx]!;
     }
     let shred = s.currentScene.enemyArmorShred;
-    if (proc.kind === 'acid') {
+    if (coatingFamily(proc.kind) === 'acid') {
       shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
       while (shred.length < n) shred.push(0);
       shred[activeIdx] = Math.min(acidShredCap(s.currentScene.enemies[activeIdx]), (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
@@ -25661,7 +25679,7 @@ function handleSidekickCommand(
     // coating's shred/stack/DOT on the enemy (the armor-breaker payoff). Mirrors
     // the player's coated-strike math.
     const golemCoating = workingGolem.weapon?.coating;
-    let golemCoatProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string } | null = null;
+    let golemCoatProc: { kind: string; rolled: number; source?: string } | null = null;
     if (golemCoating) {
       const rawRolled = Math.max(1, rollFromNotation(golemCoating.dice));
       const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn';
@@ -25723,9 +25741,9 @@ function handleSidekickCommand(
     if (golemCoatProc) {
       applyWeaponCoatingProc(set, targetIdx, golemCoatProc);
       const total = get().currentScene?.enemyArmorShred?.[targetIdx] ?? 0;
-      const extra = golemCoatProc.kind === 'acid'
+      const extra = coatingFamily(golemCoatProc.kind) === 'acid'
         ? ` Its guard pits — easier to hit now (−${ACID_SHRED_PER_HIT} AC, ${total} total).`
-        : golemCoatProc.kind === 'corruption'
+        : coatingFamily(golemCoatProc.kind) === 'corruption'
           ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[targetIdx] ?? 1} stacks).`
           : '';
       get().appendLog(

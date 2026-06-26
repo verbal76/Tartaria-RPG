@@ -18,8 +18,35 @@
 // reads coating.kind to land a differentiated enemy status: poison =
 // pure DOT, acid = DOT + armor shred, corruption = DOT + corruption stacks.
 
-import type { InventoryItem, WeaponCoating } from './types';
+import type { InventoryItem, WeaponCoating, BuiltinCoatingKind } from './types';
 import { findWeaponByName } from './crafting';
+
+// engine_Dev — the five built-in coating BEHAVIOR families. Any coating kind NOT
+// in this set is a custom (author-defined) coating resolved via the `coatings`
+// override: it reuses one of these families for its combat behavior + status, and
+// carries its own damage type for resistances / armor resists.
+const BUILTIN_COATING_KINDS: readonly BuiltinCoatingKind[] = ['poison', 'acid', 'corruption', 'electrical', 'burn'];
+function isBuiltinCoating(kind: string): kind is BuiltinCoatingKind {
+  return (BUILTIN_COATING_KINDS as readonly string[]).includes(kind);
+}
+/** The built-in behavior family a coating uses (poison/acid/corruption/electrical/
+ *  burn). Built-ins map to themselves; a custom kind reads `family` from the
+ *  override (default 'burn' = elemental on-hit). Drives the `_coat` status + DOT. */
+export function coatingFamily(kind: string): BuiltinCoatingKind {
+  if (isBuiltinCoating(kind)) return kind;
+  return coatingSkin(kind).family ?? 'burn';
+}
+/** The damage type a coating counts as — for combat resistance math AND for the
+ *  resist it grants when worked into armor. Built-ins are their own type; a custom
+ *  kind reads `damageType` from the override (default = the kind id itself). */
+export function coatingDamageType(kind: string): string {
+  if (isBuiltinCoating(kind)) return kind;
+  return coatingSkin(kind).damageType ?? kind;
+}
+/** On-hit dice for a coating (override `dice`, else 1d4). */
+export function coatingDice(kind: string): string {
+  return coatingSkin(kind).dice ?? '1d4';
+}
 
 /** True iff a weapon by this name can carry a coating. Resolves the
  *  weapon via the same catalog/inference path combat uses, then
@@ -71,7 +98,7 @@ export function coatedDisplayName(item: Pick<InventoryItem, 'name' | 'coating'>)
 // combat (poison=DOT, acid=DOT+shred, corruption=DOT+stacks, electrical, burn); a
 // re-skin can RENAME them (label/blurb/loot label) via the coatings override so the
 // player reads "Brine" / "Phase-rot" instead of "Acid" / "Corruption".
-const BUILTIN_COATING_BLURB: Record<WeaponCoating['kind'], string> = {
+const BUILTIN_COATING_BLURB: Record<BuiltinCoatingKind, string> = {
   poison: 'leaks poison into the wound (pure damage over time)',
   acid: 'burns and eats the target\'s armor (damage over time + armor shred)',
   corruption: 'pushes corruption into the target (damage over time + sickening stacks)',
@@ -79,7 +106,7 @@ const BUILTIN_COATING_BLURB: Record<WeaponCoating['kind'], string> = {
   burn: 'sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)',
 };
 
-function coatingSkin(kind: WeaponCoating['kind']): { label?: string; blurb?: string; lootLabel?: string } {
+function coatingSkin(kind: WeaponCoating['kind']): import('./contentPack').CoatingSkin {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ov = (require('./contentPack') as typeof import('./contentPack')).getCoatingsOverride();
   return ov?.[kind] ?? {};
@@ -88,14 +115,14 @@ function coatingSkin(kind: WeaponCoating['kind']): { label?: string; blurb?: str
 /** The author-facing ADJECTIVE for a coating ("Poisoned" / "Brine-soaked"). Used
  *  when stamping a coating so coatedDisplayName reads the re-skin's word. */
 export function coatingLabel(kind: WeaponCoating['kind']): string {
-  return coatingSkin(kind).label ?? LOOT_COATING_LABELS[kind];
+  return coatingSkin(kind).label ?? LOOT_COATING_LABELS[coatingFamily(kind)];
 }
 
 /** Short combat/log description of what a coating does, keyed by
  *  kind. Used by the apply confirmation and the inventory detail.
  *  engine_Dev — an uploaded coatings override can replace the wording. */
 export function coatingBlurb(kind: WeaponCoating['kind']): string {
-  return coatingSkin(kind).blurb ?? BUILTIN_COATING_BLURB[kind];
+  return coatingSkin(kind).blurb ?? BUILTIN_COATING_BLURB[coatingFamily(kind)];
 }
 
 // ─── OTA-362 — coating combat tuning + on-hit math ──────────────────
@@ -149,7 +176,9 @@ export function corruptionStackCap(enemy: { boss?: boolean } | null | undefined)
 export function coatingStatusKind(
   kind: WeaponCoating['kind'],
 ): 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' {
-  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+  // Custom coatings resolve to their behavior FAMILY's status, so the combat
+  // status-tick (which handles exactly the five `_coat` kinds) never dangles.
+  return `${coatingFamily(kind)}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
 }
 
 // ─── OTA-363 — occasional coated-weapon loot ───────────────────────
@@ -163,7 +192,7 @@ export function coatingStatusKind(
 /** Default chance a looted coatable weapon arrives pre-coated. */
 export const LOOT_COATING_CHANCE = 0.18;
 
-const LOOT_COATING_LABELS: Record<WeaponCoating['kind'], string> = {
+const LOOT_COATING_LABELS: Record<BuiltinCoatingKind, string> = {
   poison: 'Poisoned',
   acid: 'Acid-Etched',
   corruption: 'Corrupted',
@@ -183,7 +212,7 @@ export function rollLootCoating(
   if (!isCoatableWeapon(weaponName)) return null;
   const rng = opts?.rng ?? Math.random;
   if (rng() >= (opts?.chance ?? LOOT_COATING_CHANCE)) return null;
-  const kinds: WeaponCoating['kind'][] = ['poison', 'acid', 'corruption'];
+  const kinds: BuiltinCoatingKind[] = ['poison', 'acid', 'corruption'];
   const kind = kinds[Math.min(kinds.length - 1, Math.floor(rng() * kinds.length))]!;
   // engine_Dev — re-skin loot label (lootLabel) wins, else the renamed apply label,
   // else the built-in.
@@ -199,7 +228,7 @@ export function coatingDotPerTurn(
   rolled: number,
   stacksAfter: number,
 ): number {
-  if (kind === 'corruption') {
+  if (coatingFamily(kind) === 'corruption') {
     return rolled + Math.max(0, stacksAfter - 1) * CORRUPTION_STACK_BONUS;
   }
   return rolled;

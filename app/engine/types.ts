@@ -572,10 +572,17 @@ export interface InventoryItem {
   addedResists?: string[];
 }
 
+/** The five built-in coating BEHAVIOR families. A custom (author-defined) coating
+ *  reuses one of these for its combat behavior + status, while carrying its own
+ *  damage type (see the `coatings` content override). */
+export type BuiltinCoatingKind = 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
+
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */
 export interface WeaponCoating {
-  /** Coating family — drives the on-hit enemy status that lands. */
-  kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
+  /** Coating id. One of the five built-ins, OR an author-defined custom kind (a
+   *  key in the `coatings` override) which resolves its behavior family + damage
+   *  type via weaponCoating.ts (coatingFamily / coatingDamageType). */
+  kind: string;
   /** Damage dice rolled on a landing hit ("1d4"). */
   dice: string;
   /** Display adjective used by coatedDisplayName ("Corrupted"). */
