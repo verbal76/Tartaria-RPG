@@ -41,7 +41,7 @@ import {
   type ContentTableId,
   type LoreBlockId,
 } from '../engine/contentPack';
-import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
+import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, instructionHeader, sectionInstructionHeader, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
 import { validateGame, runValidation, summarizeValidation } from '../engine/validateGame';
 import { TRACKABLE_VARS } from '../engine/customTitles';
@@ -757,7 +757,10 @@ function MissionsBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Missions</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Missions</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('missions')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded} types` : '○ built-in'}
         </Text>
@@ -792,7 +795,7 @@ function MissionsBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildMissionsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the missions template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('missions', 'Missions') + buildMissionsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the missions template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -839,7 +842,10 @@ function HooksBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Hooks (atmospheric leads)</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Hooks (atmospheric leads)</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('hooks')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded} hooks` : '○ built-in'}
         </Text>
@@ -873,7 +879,7 @@ function HooksBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildHooksTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the hooks template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('hooks', 'Hooks (atmospheric leads)') + buildHooksTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the hooks template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -989,7 +995,10 @@ function WhispersBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Whispers (overheard tips)</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Whispers (overheard tips)</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('whispers')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded} mission(s)` : '○ built-in'}
         </Text>
@@ -1067,7 +1076,7 @@ function WhispersBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildWhispersTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the whispers template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('whispers', 'Whispers (overheard tips)') + buildWhispersTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the whispers template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -1114,7 +1123,10 @@ function WastelandBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Travel encounters</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Travel encounters</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('wasteland')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded}` : '○ built-in'}
         </Text>
@@ -1154,7 +1166,7 @@ function WastelandBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildWastelandTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the encounters template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('wasteland', 'Travel encounters') + buildWastelandTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the encounters template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -1234,7 +1246,10 @@ function InteractionTagsBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Interaction tags</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Interaction tags</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('interactionTags')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● +${loaded} words` : '○ built-in'}
         </Text>
@@ -1461,7 +1476,10 @@ function StartingAreasBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Starting areas</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Starting areas</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('startingAreas')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded}` : '○ none'}
         </Text>
@@ -1538,7 +1556,7 @@ function StartingAreasBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildStartingAreasTemplate()); setStatus({ kind: 'ok', msg: 'Loaded a 4-room example — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('startingAreas', 'Starting areas') + buildStartingAreasTemplate()); setStatus({ kind: 'ok', msg: 'Loaded a 4-room example — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -1718,7 +1736,10 @@ function FactionMissionsBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Faction missions</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Faction missions</Text>
+          <BoxStatusDiamonds authored={existing.length > 0} stale={false} />
+        </View>
         <Text style={existing.length > 0 ? styles.badgeOn : styles.badgeOff}>
           {existing.length > 0 ? `● ${existing.length}` : '○ none'}
         </Text>
@@ -1839,7 +1860,10 @@ function DiggingBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Digging</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Digging</Text>
+          <BoxStatusDiamonds authored={loaded} stale={getStaleSectionKeys().has('digging')} />
+        </View>
         <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? `● override · ${digging?.loot?.length ?? 0}` : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -1888,7 +1912,7 @@ function DiggingBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a digging JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDiggingJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded digging (${r.count} loot).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDiggingTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('digging', 'Digging') + buildDiggingTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(digging, null, 2) : buildDiggingTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
       </View>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
@@ -1908,7 +1932,10 @@ function ScrapBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Scrap</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Scrap</Text>
+          <BoxStatusDiamonds authored={loaded} stale={getStaleSectionKeys().has('scrap')} />
+        </View>
         <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? '● override' : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -1921,7 +1948,7 @@ function ScrapBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scrap JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadScrapJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded scrap (${r.count} roles).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildScrapTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('scrap', 'Scrap') + buildScrapTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(scrap, null, 2) : buildScrapTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearScrap(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
       </View>
@@ -1941,7 +1968,10 @@ function SalvageBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Salvage</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Salvage</Text>
+          <BoxStatusDiamonds authored={loaded} stale={getStaleSectionKeys().has('salvage')} />
+        </View>
         <Text style={loaded ? styles.badgeOn : styles.badgeOff}>{loaded ? `● override · ${salvage?.pools?.length ?? 0}` : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -1953,7 +1983,7 @@ function SalvageBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a salvage JSON object" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadSalvageJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded salvage (${r.count} pools).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSalvageTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('salvage', 'Salvage') + buildSalvageTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded ? JSON.stringify(salvage, null, 2) : buildSalvageTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         {loaded && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearSalvage(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
       </View>
@@ -1973,7 +2003,10 @@ function OverlaysBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Elevated overlays</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Elevated overlays</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('overlays')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -1985,7 +2018,7 @@ function OverlaysBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste an overlays array (or { overlays: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadOverlaysJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} overlay(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildOverlaysTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('overlays', 'Elevated overlays') + buildOverlaysTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded > 0 ? JSON.stringify(overlays, null, 2) : buildOverlaysTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         {loaded > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearOverlays(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
       </View>
@@ -2007,7 +2040,10 @@ function DogScenariosBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Dog-rescue scenarios (the “dog hook”)</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Dog-rescue scenarios (the “dog hook”)</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('dogScenarios')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>{loaded > 0 ? `● override · ${loaded}` : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -2028,7 +2064,7 @@ function DogScenariosBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…paste a scenarios array (or { scenarios: [...] })" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadDogScenariosJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} scenario(s).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildDogScenariosTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('dogScenarios', 'Dog-rescue scenarios') + buildDogScenariosTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the example — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim() || (loaded > 0 ? JSON.stringify(dogScenarios, null, 2) : buildDogScenariosTemplate())); setStatus({ kind: 'ok', msg: 'Copied.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         {loaded > 0 && <TouchableOpacity style={styles.resetBtn} onPress={() => { useContentPackStore.getState().clearDogScenarios(); setStatus({ kind: 'ok', msg: 'Reset to built-in.' }); }}><Text style={styles.resetBtnText}>RESET</Text></TouchableOpacity>}
       </View>
@@ -2068,7 +2104,10 @@ function TitlesBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Titles (achievements)</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Titles (achievements)</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('titles')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded}` : '○ built-in'}
         </Text>
@@ -2152,7 +2191,7 @@ function TitlesBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildTitlesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the template (lists every trackable variable).' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('titles', 'Titles / achievements') + buildTitlesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the template (lists every trackable variable).' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -2211,7 +2250,10 @@ function CollectablesBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Collectables (character stories)</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Collectables (character stories)</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('collectables')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded} stories / ${fragCount} fragments` : '○ built-in'}
         </Text>
@@ -2246,7 +2288,7 @@ function CollectablesBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildCollectablesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the collectables template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('collectables', 'Collectables') + buildCollectablesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the collectables template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -2320,7 +2362,10 @@ function SummonsBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Summoned Sidekicks</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Summoned Sidekicks</Text>
+          <BoxStatusDiamonds authored={loaded > 0} stale={getStaleSectionKeys().has('summons')} />
+        </View>
         <Text style={loaded > 0 ? styles.badgeOn : styles.badgeOff}>
           {loaded > 0 ? `● override · ${loaded} ${noun}${loaded === 1 ? '' : 's'}` : '○ built-in sidekicks'}
         </Text>
@@ -2392,7 +2437,7 @@ function SummonsBox() {
         >
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildSummonsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the summons template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('summons', 'Summoned sidekicks') + buildSummonsTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the summons template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {loaded > 0 && (
@@ -2443,7 +2488,7 @@ function SummonsBox() {
 // (damage types, enemy resistances, fusion tags, coatings). Same LOAD / TEMPLATE /
 // SAVE FILE / UPLOAD FILE / RESET contract as the other boxes, parameterised by the
 // store loader/clearer so each rule set is one short declaration below.
-function RulesBox({ title, hint, badge, hasData, currentJson, template, filename, onLoad, onClear }: {
+function RulesBox({ title, hint, badge, hasData, currentJson, template, filename, onLoad, onClear, sectionKey }: {
   title: string;
   hint: React.ReactNode;
   badge: string | null;
@@ -2453,14 +2498,23 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
   filename: string;
   onLoad: (json: string) => LoadResult;
   onClear: () => void;
+  sectionKey?: string;
 }) {
   const [text, setText] = useState('');
   const [status, setStatus] = useState<Status>(null);
-  const editOrTemplate = () => (hasData ? currentJson() : template);
+  useContentPackStore((s) => s.templateStamps); // live yellow diamond
+  // engine_Dev — prepend the self-explaining instruction header so the template is hand-off-ready:
+  // from the central section registry when we have a key, else from a plain-string hint.
+  const header = sectionKey ? sectionInstructionHeader(sectionKey, title) : (typeof hint === 'string' ? instructionHeader(title, hint) : '');
+  const templateWithHeader = header + template;
+  const editOrTemplate = () => (hasData ? currentJson() : templateWithHeader);
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>{title}</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>{title}</Text>
+          <BoxStatusDiamonds authored={hasData} stale={sectionKey ? getStaleSectionKeys().has(sectionKey) : false} />
+        </View>
         <Text style={hasData ? styles.badgeOn : styles.badgeOff}>{hasData ? (badge ?? '● override') : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>{hint}</Text>
@@ -2482,7 +2536,7 @@ function RulesBox({ title, hint, badge, hasData, currentJson, template, filename
         }}>
           <Text style={styles.loadBtnText}>LOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(template); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(templateWithHeader); setStatus({ kind: 'ok', msg: 'Loaded the template — edit, then LOAD.' }); }}>
           <Text style={styles.tmplBtnText}>TEMPLATE</Text>
         </TouchableOpacity>
         {hasData && (
@@ -2571,7 +2625,10 @@ function DamageTypesBuilder() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Damage types (define)</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Damage types (define)</Text>
+          <BoxStatusDiamonds authored={damageTypes.length > 0} stale={false} />
+        </View>
         <Text style={damageTypes.length > 0 ? styles.badgeOn : styles.badgeOff}>{damageTypes.length > 0 ? `● ${damageTypes.length} added` : '○ built-in 10'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -2755,7 +2812,10 @@ function EnemyRelationsBuilder() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Enemy damage relations</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Enemy damage relations</Text>
+          <BoxStatusDiamonds authored={enemies.length > 0} stale={false} />
+        </View>
         <Text style={enemies.length > 0 ? styles.badgeOn : styles.badgeOff}>{enemies.length > 0 ? `● ${enemies.length} enemies` : '○ built-in'}</Text>
       </View>
       <Text style={styles.hint}>
@@ -2817,6 +2877,7 @@ function AdvancedRulesBoxes() {
         filename="enemy-resistances.json"
         currentJson={() => JSON.stringify(damageResistances ?? {}, null, 2)}
         template={RESISTANCES_TEMPLATE}
+        sectionKey="damageResistances"
         onLoad={(j) => store.getState().loadDamageResistancesJson(j)}
         onClear={() => store.getState().clearDamageResistances()}
         hint={<>Which damage types each <Text style={{ fontWeight: 'bold' }}>enemy type</Text> resists (½ damage) or is weak to (1.5×). Object keyed by YOUR enemy types. Replaces the built-in Tartaria map.</>}
@@ -2828,6 +2889,7 @@ function AdvancedRulesBoxes() {
         filename="fusion-tags.json"
         currentJson={() => JSON.stringify(fusionTags, null, 2)}
         template={FUSION_TAGS_TEMPLATE}
+        sectionKey="fusionTags"
         onLoad={(j) => store.getState().loadFusionTagsJson(j)}
         onClear={() => store.getState().clearFusionTags()}
         hint={<>Extra material tag words that count toward the Crucible’s fusion-diversity gate, on top of the built-ins (metal/cloth/wood/stone/bone/crystal/…). Array of strings.</>}
@@ -2839,6 +2901,7 @@ function AdvancedRulesBoxes() {
         filename="coatings.json"
         currentJson={() => JSON.stringify(coatings ?? {}, null, 2)}
         template={COATINGS_TEMPLATE}
+        sectionKey="coatings"
         onLoad={(j) => store.getState().loadCoatingsJson(j)}
         onClear={() => store.getState().clearCoatings()}
         hint={<>Rename the five coating mechanics (the combat effects stay). Object keyed by mechanic — <Text style={{ fontWeight: 'bold' }}>poison / acid / corruption / electrical / burn</Text> — each {'{ label?, blurb?, lootLabel? }'}.</>}
@@ -2850,6 +2913,7 @@ function AdvancedRulesBoxes() {
         filename="inventory.json"
         currentJson={() => JSON.stringify(inventory ?? {}, null, 2)}
         template={INVENTORY_TEMPLATE}
+        sectionKey="inventory"
         onLoad={(j) => store.getState().loadInventoryJson(j)}
         onClear={() => store.getState().clearInventory()}
         hint={<>Rename the inventory category sections (<Text style={{ fontWeight: 'bold' }}>labels</Text>: weapon/armor/accessory/consumable/tool/relic/material/loot/quest → your names), add <Text style={{ fontWeight: 'bold' }}>toolTags</Text> that read as Tools, and set <Text style={{ fontWeight: 'bold' }}>repairMaterialPct</Text> (repair material cost as a % of an item's scrap yield; 200 = built-in). Category ids + order stay fixed.</>}
@@ -2910,7 +2974,10 @@ function BossesBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Bosses</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Bosses</Text>
+          <BoxStatusDiamonds authored={customBosses.length > 0} stale={getStaleSectionKeys().has('bosses')} />
+        </View>
         <Text style={customBosses.length > 0 ? styles.badgeOn : styles.badgeOff}>
           {customBosses.length > 0 ? `● ${customBosses.length}` : '○ none'}
         </Text>
@@ -2953,7 +3020,7 @@ function BossesBox() {
       <TextInput style={styles.input} value={text} onChangeText={setText} placeholder="…or paste a bosses JSON array" placeholderTextColor="#46555a" multiline autoCapitalize="none" autoCorrect={false} />
       <View style={styles.row}>
         <TouchableOpacity style={styles.loadBtn} onPress={() => { const r = loadBossesJson(text); setStatus(r.ok ? { kind: 'ok', msg: `Loaded ${r.count} boss(es).` } : { kind: 'err', msg: r.error ?? 'Failed.' }); if (r.ok) setText(''); }}><Text style={styles.loadBtnText}>LOAD</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(buildBossesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the FULL bosses template (every spawn mode). Edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(sectionInstructionHeader('bosses', 'Bosses') + buildBossesTemplate()); setStatus({ kind: 'ok', msg: 'Loaded the FULL bosses template (every spawn mode). Edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>TEMPLATE</Text></TouchableOpacity>
         {customBosses.length > 0 && <TouchableOpacity style={styles.tmplBtn} onPress={() => { setText(JSON.stringify(customBosses, null, 2)); setStatus({ kind: 'ok', msg: 'Loaded your bosses — edit, then LOAD.' }); }}><Text style={styles.tmplBtnText}>EDIT CURRENT</Text></TouchableOpacity>}
         <TouchableOpacity style={styles.copyBtn} onPress={() => { void Clipboard.setStringAsync(text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2)); setStatus({ kind: 'ok', msg: 'Copied to clipboard.' }); }}><Text style={styles.copyBtnText}>COPY</Text></TouchableOpacity>
         <TouchableOpacity style={styles.copyBtn} onPress={async () => { const content = text.trim().length > 0 ? text : JSON.stringify(customBosses, null, 2); const r = await saveJsonToFile('bosses.json', content); setStatus({ kind: r.ok ? 'ok' : 'err', msg: r.msg }); }}><Text style={styles.copyBtnText}>⬇ SAVE FILE</Text></TouchableOpacity>
@@ -3018,7 +3085,10 @@ function MainQuestBox() {
   return (
     <View style={styles.card}>
       <View style={styles.cardHead}>
-        <Text style={styles.cardTitle}>Main quest</Text>
+        <View style={styles.cardTitleGroup}>
+          <Text style={styles.cardTitle}>Main quest</Text>
+          <BoxStatusDiamonds authored={steps.length > 0} stale={getStaleSectionKeys().has('mainQuest')} />
+        </View>
         <Text style={steps.length > 0 ? styles.badgeOn : styles.badgeOff}>
           {steps.length > 0 ? `● ${steps.length} step(s)` : '○ built-in'}
         </Text>
@@ -3140,7 +3210,7 @@ function MainQuestBox() {
         <TouchableOpacity
           style={styles.tmplBtn}
           onPress={() => {
-            setText(buildMainQuestTemplate());
+            setText(sectionInstructionHeader('mainQuest', 'Main quest') + buildMainQuestTemplate());
             setStatus({ kind: 'ok', msg: 'Loaded the FULL template — shows every action + the faction-gate options (skipForFactions / onlyForFactions). Edit, then LOAD.' });
           }}
         >
