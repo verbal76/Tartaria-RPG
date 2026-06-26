@@ -10,13 +10,16 @@ import { setTableOverride } from '../app/engine/contentPack';
 const RACE = () => getRaces()[0]!.id;
 const FACTION = 'reclaimers_guild';
 
-afterEach(() => setTableOverride('startingLoadout', null));
+afterEach(() => {
+  setTableOverride('startingLoadout', null);
+  setTableOverride('enemies', null); // some tests flip on a re-skin via an enemies override
+});
 
 describe('startingLoadout — uploaded creation gear', () => {
   it('grants exactly the loadout rows, infers kind from tags, defaults/honors quantity, keeps behavior tags, auto-equips', () => {
     setTableOverride('startingLoadout', [
       { name: 'M1911A1 Pistol', tags: ['weapon', 'ranged'], equip: 'main' },
-      { name: 'Trench Knife', tags: ['weapon', 'knife', 'tool'] },
+      { name: 'Trench Knife', tags: ['weapon', 'knife', 'throwable'] },
       { name: 'Grapnel Line', tags: ['climb', 'rope'] },
       { name: 'K-Ration', tags: ['food'], quantity: 3 },
       { name: 'Filled Canteen', tags: ['drink', 'water', 'container'] },
@@ -61,8 +64,31 @@ describe('startingLoadout — uploaded creation gear', () => {
     expect(pc.equipped.main).toBe('Service Rifle');
   });
 
-  it('no loadout uploaded → built-in starter behavior is untouched', () => {
-    // (override cleared by afterEach; not set here)
+  it('faction rows go only to that faction; un-tagged rows go to everyone', () => {
+    setTableOverride('startingLoadout', [
+      { name: 'Field Flashlight', tags: ['light'] },                                   // everyone
+      { name: 'US Sidearm', tags: ['weapon'], equip: 'main', faction: 'reclaimers_guild' },
+      { name: 'German Sidearm', tags: ['weapon'], equip: 'main', faction: 'forgotten_order' },
+    ]);
+    const us = createCharacter({ name: 'A', raceId: RACE(), factionId: 'reclaimers_guild' });
+    const names = us.inventory.map((i) => i.name);
+    expect(names).toContain('Field Flashlight');   // shared
+    expect(names).toContain('US Sidearm');         // own faction
+    expect(names).not.toContain('German Sidearm'); // other faction filtered out
+    expect(us.equipped.main).toBe('US Sidearm');
+  });
+
+  it('RE-SKIN active + no loadout → the character starts with NOTHING (no Tartaria leak)', () => {
+    // Flip on a re-skin (an enemies-table override is enough for isReskinActive) but author NO
+    // startingLoadout → empty pack, nothing equipped.
+    setTableOverride('enemies', [{ id: 'x', name: 'X', type: 'beast', hp: 1 }] as never);
+    const pc = createCharacter({ name: 'Tester', raceId: RACE(), factionId: FACTION });
+    expect(pc.inventory).toEqual([]);
+    expect(pc.equipped.main).toBeUndefined();
+  });
+
+  it('NO re-skin + no loadout → the built-in Tartaria starter is untouched', () => {
+    // (no overrides at all) — the bare built-in game keeps its native kit.
     const pc = createCharacter({ name: 'Tester', raceId: RACE(), factionId: FACTION });
     expect(pc.inventory.length).toBeGreaterThan(0);
     expect(pc.equipped.main).toBeTruthy();

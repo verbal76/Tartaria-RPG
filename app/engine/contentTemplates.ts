@@ -99,12 +99,17 @@ const LORE_DOCUMENT_SCAFFOLD: unknown[] = [
 // engine_Dev — generic starter loadout (NOT Tartaria / NOT any specific setting): a
 // primary, a small utility knife, a climb line, a food, a full drink, and a light.
 const STARTING_LOADOUT_TEMPLATE: ReadonlyArray<Record<string, unknown>> = [
-  { name: 'Sidearm', tags: ['weapon'], equip: 'main' },
-  { name: 'Utility Knife', tags: ['weapon', 'knife', 'tool'] },
+  // Shared rows (no "faction") go to EVERY new character.
+  { name: 'Utility Knife', tags: ['weapon', 'knife', 'throwable'] }, // a knife is a held weapon, or a thrown weapon from the bandolier — never a "tool"
   { name: 'Climbing Line', tags: ['climb', 'rope', 'fiber'] },
-  { name: 'Field Ration', tags: ['food'], quantity: 3 },
+  { name: 'Field Ration', tags: ['food'], quantity: 5 },
   { name: 'Full Canteen', tags: ['drink', 'water', 'container'] },
   { name: 'Lantern', tags: ['light'] },
+  { name: 'Frag Grenade', tags: ['weapon', 'throwable', 'grenade'], quantity: 2 }, // grenades are one-shot thrown weapons (consumed on throw)
+  // Faction-specific rows: add "faction": "<factionId>" so only that faction's members get the row.
+  // Here each faction starts with its OWN sidearm, auto-equipped to the main hand.
+  { name: 'Vanguard Sidearm', tags: ['weapon', 'ranged'], equip: 'main', faction: 'vanguard' },
+  { name: 'Coalition Carbine', tags: ['weapon', 'ranged'], equip: 'main', faction: 'coalition' },
 ];
 
 const TABLE_ROWS: Record<ContentTableId, unknown[]> = {

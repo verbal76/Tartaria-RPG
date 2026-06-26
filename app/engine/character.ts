@@ -1,6 +1,6 @@
 import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryItem } from './types';
 import { rollDie, rollDice, rollFromNotation } from './rng';
-import { resolveTable, resolveFlavor, startingAreaForFaction } from './contentPack';
+import { resolveTable, resolveFlavor, startingAreaForFaction, isReskinActive } from './contentPack';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
@@ -224,13 +224,20 @@ function loadoutRowToItem(row: Record<string, unknown>, name: string, idx: numbe
   return item;
 }
 
-// engine_Dev — the uploaded `startingLoadout` table, if any: ONE source of truth for creation gear
-// that REPLACES the built-in survival kit + faction knife + race starter weapon/gear. Returns the
-// granted items + which slots to auto-equip (explicit `equip`, else the first weapon → main hand),
-// or null when no loadout is uploaded (keep the built-in behavior untouched).
-export function resolveStartingLoadout(): { items: InventoryItem[]; equipped: Partial<Record<string, string>> } | null {
-  const rows = resolveTable('startingLoadout', [] as unknown[]) as Array<Record<string, unknown>>;
-  if (!Array.isArray(rows) || rows.length === 0) return null;
+// engine_Dev — the uploaded `startingLoadout` table, if any: the author's single source of creation
+// gear. A row may carry an optional `faction` — rows with no faction are granted to EVERY new
+// character, a faction-tagged row only to a member of that faction — so ONE array describes both
+// shared kit and per-faction kit. Returns the (faction-filtered) granted items + which slots to
+// auto-equip (explicit `equip`, else the first weapon → main hand), or null when the pack authored
+// no loadout rows for this faction.
+export function resolveStartingLoadout(factionId: string): { items: InventoryItem[]; equipped: Partial<Record<string, string>> } | null {
+  const all = resolveTable('startingLoadout', [] as unknown[]) as Array<Record<string, unknown>>;
+  if (!Array.isArray(all) || all.length === 0) return null;
+  const rows = all.filter((r) => {
+    const fac = r && typeof r.faction === 'string' ? r.faction.trim() : '';
+    return !fac || fac === factionId;
+  });
+  if (rows.length === 0) return null;
   const items: InventoryItem[] = [];
   const equipped: Partial<Record<string, string>> = {};
   rows.forEach((row, i) => {
@@ -502,10 +509,13 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   // and the canon grid cell all agree.
   const startLocationId = input.startingLocationId ?? startingLocationForFaction(input.factionId);
 
-  // engine_Dev — an uploaded `startingLoadout` table is ONE source of truth for creation gear and
-  // REPLACES the scattered defaults (survival kit + faction knife + race starter weapon/gear). Null
-  // when no loadout is uploaded → keep the built-in behavior exactly.
-  const loadout = resolveStartingLoadout();
+  // engine_Dev — creation gear resolution, in priority order:
+  //   1. an uploaded `startingLoadout` (faction-filtered) → grant EXACTLY that, nothing else;
+  //   2. else a RE-SKIN is active but its pack authored no loadout → grant NOTHING (the author must
+  //      provide a loadout; the engine never leaks the built-in Tartaria starter into a re-skin);
+  //   3. else the bare built-in Tartaria game (no re-skin) → its native per-race/faction starter kit.
+  const loadout = resolveStartingLoadout(faction.id);
+  const reskinNoLoadout = !loadout && isReskinActive();
 
   return {
     name: input.name,
@@ -517,14 +527,13 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     stamina: staminaMax,
     staminaMax,
     milestones: { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
-    // Auto-equip the starter weapon (resolved from the live weapons table for
-    // custom races) so the player starts combat-ready holding a real weapon. A
-    // startingLoadout overrides BOTH the equip set and the inventory below.
-    equipped: (loadout ? loadout.equipped : { main: starterWeaponName(race) }) as PlayerCharacter['equipped'],
+    // Loadout wins; a re-skin without a loadout spawns empty-handed; the built-in game keeps its
+    // native starter weapon + kit.
+    equipped: (loadout ? loadout.equipped : reskinNoLoadout ? {} : { main: starterWeaponName(race) }) as PlayerCharacter['equipped'],
     ac: race.baseAC,
     tc: rollFromTCFormula(race.startingTCFormula),
     corruption: 0,
-    inventory: loadout ? loadout.items : buildStarterInventory(race, faction),
+    inventory: loadout ? loadout.items : reskinNoLoadout ? [] : buildStarterInventory(race, faction),
     factionStanding,
     // v2.4.1 (OTA 029) — explicit startingLocationId wins; otherwise
     // fall back to the canonical per-faction start tile.
