@@ -508,6 +508,11 @@ function buildNamePrompt(
 export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
+  // engine_Dev — the player can tell the Crucible what to forge. When set, it
+  // FORCES the output kind; the theme/stats still flow from the dominant tag, so
+  // an armor-tagged input set forced to 'weapon' still reads on-theme. Omitted =
+  // legacy behavior (kind inferred from the dominant material tag).
+  preferKind?: 'weapon' | 'armor',
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
   // Dominant material — first match wins. Drives kind + theme.
@@ -525,9 +530,11 @@ export function synthesizeFusionDeterministic(
     : tagSet.has('wood') ? 'wood'
     : tagSet.has('stone') ? 'stone'
     : 'improvised';
-  // Kind from the dominant tag.
+  // Kind: the player's explicit choice wins; otherwise infer from the dominant tag.
   const kind: 'weapon' | 'armor' | 'dog_armor' =
-    dominantTag === 'metal' || dominantTag === 'wood' || dominantTag === 'stone'
+    preferKind === 'weapon' ? 'weapon'
+    : preferKind === 'armor' ? 'armor'
+    : dominantTag === 'metal' || dominantTag === 'wood' || dominantTag === 'stone'
       ? 'weapon'
       : dominantTag === 'cloth'
         ? (tagSet.has('aether') ? 'armor' : 'dog_armor')

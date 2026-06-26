@@ -13,6 +13,7 @@ import ringsData from '../data/items/rings.json';
 import explorationData from '../data/items/exploration.json';
 import dogGearData from '../data/items/dogGear.json';
 import { inferWeapon, inferArmor, inferAccessory } from './itemDefaults';
+import { pickWeighted } from './rng';
 
 export interface CatalogMaterial {
   name: string;
@@ -203,6 +204,23 @@ const rExploration = (): readonly CatalogExploration[] => resolveTable('explorat
 const rAmulets = (): readonly CatalogAccessory[] => resolveTable('amulets', AMULETS);
 const rRings = (): readonly CatalogAccessory[] => resolveTable('rings', RINGS);
 const rRecipes = (): readonly Recipe[] => resolveTable('recipes', RECIPES);
+
+/** engine_Dev — a LOW-TIER armor piece to salt into every TAKE drop so the loot
+ *  stream isn't weapon-heavy. The drop economy is built on cheap kit the player
+ *  sells or scraps for coin + materials, and takes skew toward weapons; this
+ *  guarantees a steady trickle of armor for that same sell/scrap base. Pulls
+ *  from the ACTIVE armor table (re-skin override or built-in) so it stays
+ *  on-theme, and is rarity-weighted to Common/Uncommon (Rare+ filtered out;
+ *  if the table has only higher tiers it falls back to the whole table).
+ *  Returns null when the active armor table is empty (e.g. a re-skin that
+ *  ships no armor) — callers simply skip the bonus. */
+export function pickTakeBonusArmor(): CatalogArmor | null {
+  const all = rArmor();
+  if (all.length === 0) return null;
+  const lowTier = all.filter((a) => a.rarity === 'Common' || a.rarity === 'Uncommon');
+  const pool = lowTier.length > 0 ? lowTier : all;
+  return pickWeighted(pool, (a) => (a.rarity === 'Common' ? 10 : a.rarity === 'Uncommon' ? 4 : 1));
+}
 /** The LIVE recipe book — the author's uploaded recipes if loaded, else the built-in.
  *  UI (RecipesView) must use this, NOT the static RECIPES, or it shows the built-in
  *  set and ignores the author's upload. */

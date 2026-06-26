@@ -16353,4 +16353,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and yellow would never fire again. Now hydrate persists immediately when it migrates, so the
 // re-baseline runs exactly once; the next boot is a normal scheme and real template/data changes turn
 // the box yellow again as designed (instruction/comment edits still never do). app/state/contentPackStore.ts.
-export const OTA_BUILD_ID = '2026-06-26-890';
+// OTA-891 — [loot mix + Crucible choice] two playability changes. (1) Every TAKE now salts in ONE
+// low-tier armor piece alongside whatever you grabbed: takes skew weapon-heavy, and the drop economy
+// runs on cheap kit you sell/scrap for coin + materials, so armor was under-supplied. pickTakeBonusArmor
+// pulls from the ACTIVE armor table (re-skin override or built-in), rarity-weighted to Common/Uncommon
+// (Rare+ filtered), and is skipped silently if the table is empty or the pack is full. (2) The Crucible
+// now ASKS what to forge — a weapon or a piece of armor — once a fusion has passed every gate. The choice
+// threads a preferKind through synthesizeFusionDeterministic, which FORCES the output kind (theme/stats
+// still flow from the dominant material tag, so it stays on-theme). fuseAtCrucible raises a fusionKindPrompt
+// and re-enters with the chosen kind; the reward line names the right kind. tsc clean (non-test 0);
+// fusion/take/ambient suites green + 2 new behavior tests. app/engine/{crafting,itemFusion}.ts,
+// app/state/gameStore.ts, app/screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-26-891';

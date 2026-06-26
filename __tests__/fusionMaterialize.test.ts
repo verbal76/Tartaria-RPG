@@ -66,12 +66,18 @@ describe('OTA-631 — materializing fusion', () => {
       gameLog: [],
     });
 
+    // engine_Dev — firing the Crucible now raises the weapon/armor picker first
+    // (the gates have passed); the choice forges with that kind.
     await store.getState().fuseAtCrucible();
+    expect(store.getState().fusionKindPrompt).toBe(true);
+    store.getState().chooseFusionKind('weapon');
     await new Promise((r) => setTimeout(r, 50)); // let the background namer settle
 
     const after = store.getState();
+    expect(after.fusionKindPrompt).toBe(false);
     const fused = after.player!.inventory.find((i) => i.id.startsWith('fused_'));
     expect(fused).toBeTruthy();
+    expect(fused!.kind).toBe('weapon');
     // Settled: no longer the placeholder, materializing flag cleared.
     expect(fused!.name).not.toBe('Cooling Crucible-Work');
     expect(fused!.name.length).toBeGreaterThan(0);

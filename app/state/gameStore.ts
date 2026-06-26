@@ -235,6 +235,7 @@ import {
   RINGS,
   findCatalogItem,
   synthesizeItemFromName,
+  pickTakeBonusArmor,
 } from '../engine/crafting';
 import {
   liveFactions,
@@ -2689,7 +2690,7 @@ interface GameStore {
    *  ≥3 distinct material tags). Calls Qwen for a balanced unique
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
-  fuseAtCrucible: () => Promise<void>;
+  fuseAtCrucible: (preferKind?: 'weapon' | 'armor') => Promise<void>;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -2729,6 +2730,14 @@ interface GameStore {
   confirmEquippedCatalystFusion: () => void;
   /** Dismiss the equipped-catalyst prompt without fusing. */
   cancelFusionCatalystPrompt: () => void;
+  /** engine_Dev — once a fusion has passed every gate, the Crucible asks the
+   *  player what to forge: a weapon or a piece of armor. True while that choice
+   *  is pending; the picker calls chooseFusionKind to forge with that kind. */
+  fusionKindPrompt: boolean;
+  /** Forge the pending fusion as the chosen kind (re-enters fuseAtCrucible). */
+  chooseFusionKind: (kind: 'weapon' | 'armor') => void;
+  /** Dismiss the weapon/armor choice without forging (inputs stay reserved). */
+  cancelFusionKindPrompt: () => void;
   /** OTA-439 — [audit #23] when a craft would CONSUME material substitutes
    *  (a misc/inferred item standing in for a named ingredient via its tags),
    *  ask before stripping them instead of silently eating them. `subsList` is
@@ -2908,6 +2917,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingHookContinue: null,
   pendingWhisperComplete: null,
   fusionCatalystPrompt: null,
+  fusionKindPrompt: false,
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
   discoveryReveal: null,
@@ -3297,6 +3307,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // we only reach here when the grant landed.
     get().appendLog('world', `You take the ${cat.name} from where it lay.`);
     get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
+    // engine_Dev — salt one low-tier armor piece into every successful take.
+    // Takes skew weapon-heavy and the drop economy runs on cheap kit the player
+    // sells/scraps for coin + materials; this guarantees a steady armor trickle
+    // for that same base. Skipped silently if the active armor table is empty
+    // (a re-skin with no armor) or the pack is too full to accept it.
+    const bonusArmorCat = pickTakeBonusArmor();
+    if (bonusArmorCat) {
+      const bonusArmor: InventoryItem = stampDurability({
+        id: `take_armor_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: bonusArmorCat.name,
+        kind: 'armor',
+        rarity: bonusArmorCat.rarity,
+        quantity: 1,
+        tags: bonusArmorCat.tags,
+      });
+      const bonusGrant = grantItem(get().player?.inventory ?? grantResult.inventory, bonusArmor);
+      if (bonusGrant.accepted > 0) {
+        set((s) => (s.player ? { player: { ...s.player, inventory: bonusGrant.inventory } } : s));
+        get().appendLog('world', `Snagged alongside it: a ${bonusArmorCat.name}.`);
+        get().appendLog('reward', `✦ ${bonusArmorCat.name} (${bonusArmorCat.rarity}).`);
+      }
+    }
     void get().persist();
   },
 
@@ -20311,7 +20343,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  async fuseAtCrucible() {
+  async fuseAtCrucible(preferKind) {
     const player = get().player;
     if (!player) return;
     // engine_Dev — fusion can be turned OFF entirely for games that don't want it.
@@ -20376,6 +20408,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // engine_Dev — every gate has passed: this fusion WILL succeed. Before
+    // forging, let the player decide what comes out — a weapon or a piece of
+    // armor. Without a choice yet, raise the picker and bail; each button
+    // re-enters fuseAtCrucible(kind) (gates are pure reads, so re-running is
+    // safe and idempotent — fusionPending isn't cleared until the forge below).
+    if (preferKind !== 'weapon' && preferKind !== 'armor') {
+      set({ fusionKindPrompt: true });
+      return;
+    }
     // Gate 3 — Qwen readiness. The static-inference path can't design
     // OTA-195 → OTA-221 — Qwen path PREFERRED but no longer required.
     // Playtest log: player tapped fuse 20+ times after meeting every
@@ -20398,7 +20439,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If Qwen is slow / dormant / unavailable, the deterministic name settles
     // instead. The loot is mechanically identical either way — Qwen only adds
     // bespoke flavor, so nothing of value is lost when it doesn't land.
-    const det = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
+    const det = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile, preferKind);
 
     const livePlayer = get().player;
     if (!livePlayer) return;
@@ -20445,9 +20486,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : s);
     // arb45 — Master of Aethercraft: the fusion IS complete mechanically.
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
+    const forgedKindWord = det.stats.kind === 'armor' ? 'piece of armor' : det.stats.kind === 'dog_armor' ? 'dog vest' : 'weapon';
     get().appendLog(
       'reward',
-      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} weapon from your reserved pieces — and it's in your pack, still cooling.`,
+      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${forgedKindWord} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
@@ -20543,6 +20585,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   cancelFusionCatalystPrompt() {
     set({ fusionCatalystPrompt: null });
+  },
+  // engine_Dev — player picked weapon or armor at the Crucible: clear the
+  // prompt and re-run the forge with that kind forced. The inputs are still
+  // reserved and every gate still passes, so this lands the chosen item.
+  chooseFusionKind(kind) {
+    set({ fusionKindPrompt: false });
+    void get().fuseAtCrucible(kind);
+  },
+  cancelFusionKindPrompt() {
+    set({ fusionKindPrompt: false });
   },
 
   // OTA-439 — [audit #23] confirm: latch the recipe so the re-dispatched craft
