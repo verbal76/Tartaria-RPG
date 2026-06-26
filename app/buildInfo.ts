@@ -16446,4 +16446,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // table drops nothing (never a Tartaria fallback). Built-in Tartaria keeps its curated pool unchanged. tsc
 // clean; new climbTopLootReskin suite (re-skin drops only uploaded materials; built-in unchanged; empty ->
 // nothing) + all climb suites green (62). app/engine/climbHeight.ts. (Dev tracks only — not the Tartaria line.)
-export const OTA_BUILD_ID = '2026-06-26-900';
+// OTA-901 — [coatings] weapon coatings are now AUTHOR-EXTENSIBLE + work on ARMOR as resists. A pack can
+// define NEW coating kinds in the `coatings` override (key beyond the built-in 5) carrying { family (which
+// built-in BEHAVIOR it reuses for combat + status), damageType (what it counts as for resistance AND the
+// resist it grants on armor), dice }. WeaponCoating.kind widened to string; weaponCoating.ts adds
+// coatingFamily / coatingDamageType / coatingDice; coatingStatusKind maps custom→family's `_coat` status so
+// the combat tick never dangles; combat damage math + acid-shred/corruption-stack branches now key on
+// coatingDamageType / coatingFamily (player AND golem blocks). applyCoatingToArmor grants the coating's
+// DAMAGE TYPE as a resist (so a Frost coating gives `cold` resist, matching incoming cold), capped at 3
+// worked-in resists per piece. The 5 built-ins are byte-for-byte unchanged. tsc clean; customCoatings suite
+// + all coating suites green (49). types.ts, itemEffect.ts, contentPack.ts, weaponCoating.ts, gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-26-901';

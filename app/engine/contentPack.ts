@@ -816,8 +816,23 @@ export function getFusionTagsOverride(): string[] { return fusionTagsOverride ??
 // corruption=DOT+stacks, electrical, burn) stay wired into combat; this override
 // only RENAMES them (label/blurb/loot label) so a re-skin reads "Brine" / "Phase-
 // rot" instead of "Acid" / "Corruption". Keyed by mechanic; null = built-in names.
-export interface CoatingSkin { label?: string; blurb?: string; lootLabel?: string }
-export type CoatingSkinMap = Partial<Record<'poison' | 'acid' | 'corruption' | 'electrical' | 'burn', CoatingSkin>>;
+export interface CoatingSkin {
+  label?: string;
+  blurb?: string;
+  lootLabel?: string;
+  // engine_Dev — fields below define a CUSTOM coating (a key beyond the built-in
+  // five). `family` = which built-in BEHAVIOR it reuses in combat (poison = pure
+  // DOT, acid = DOT+shred, corruption = DOT+stacks, electrical/burn = elemental
+  // on-hit). `damageType` = what it counts as for resistances AND what resist it
+  // grants when worked into armor (e.g. 'cold' for a Frost coating). `dice` = its
+  // on-hit roll (default 1d4). Built-in five ignore these.
+  family?: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
+  damageType?: string;
+  dice?: string;
+}
+// engine_Dev — keyed by coating id. The built-in five may be RENAMED (label/blurb/
+// lootLabel); any OTHER key defines a NEW custom coating (family + damageType).
+export type CoatingSkinMap = Record<string, CoatingSkin>;
 let coatingsOverride: CoatingSkinMap | null = null;
 export function setCoatingsOverride(map: CoatingSkinMap | null): void {
   coatingsOverride = map && Object.keys(map).length > 0 ? map : null;
