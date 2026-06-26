@@ -15230,4 +15230,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shock→electrical) via canonDT. EnemyPanel surfaces the typed_dot status (DOT badge). Balanced by a multi-agent stress +
 // balance-probe pass (probe holds ~90% win at the Common tier real early-game players fight). tsc clean; full combat suite
 // green. JS-only. app/state/gameStore.ts, app/engine/{equipment,durability}.ts, app/components/EnemyPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-26-636';
+// OTA-637 (Bitriseptium Pack) — three fixes, one OTA. (1) CRASH FIX (was missing on HaL — every other
+// line had it): background-teardown of the neural TTS. A player backgrounded the app, got a text, came
+// back, tapped Main Quest → the process died to the home screen. Nothing listened to AppState, so audio
+// was never stopped on background and the next spoken line played into a disrupted native audio session
+// (SIGSEGV). TTSController now tears the voice down the instant it loses the foreground and resyncs to the
+// log tail so the backlog isn't re-spoken on return. Locked by ttsBackgroundTeardown.test. (2) COMPANION
+// COMBAT PARITY: the dog's bite and the golem's innate attack were typeless flat damage — a pierce-
+// resistant enemy soaked nothing off the dog, a slash-weak one took no extra off the golem, and neither
+// rolled the typed on-hit proc. Both now route their hit through applyDamageTypeModifier +
+// traitDamageMultiplier (same resist/weak/creature-trait math the player's swing uses) and roll the
+// on-hit typed proc — the companion half of OTA-636's typed combat. (3) TEST REFRESH: dogGolemCombatStress's
+// two "retaliation split" cases asserted the pre-arb169 30/30/40 dog/golem/player split that was removed
+// (commanding a companion now provokes the FULL volley against the player; companions aren't hit by
+// command-retaliation) — updated to assert the arb169 design. tsc clean; dogGolemCombatStress 9/9,
+// companion + combat + coating suites + combatStress green. (golemStressSweep — golem power can't level
+// within a summon's lifespan — is a separate design call, deferred.) app/voice/TTSController.ts,
+// app/state/gameStore.ts, __tests__/{ttsBackgroundTeardown,dogGolemCombatStress}.test.ts.
+export const OTA_BUILD_ID = '2026-06-26-637';
