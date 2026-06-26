@@ -1428,6 +1428,25 @@ and has a TEMPLATE button with an example to edit.
 /** One whole-game section: its key, reference comment, and the TEMPLATE scaffold. */
 interface BundleEntry { key: string; hint: string; content: string }
 
+// engine_Dev — the purpose text for any section, reused from the single bundleEntries() registry so the
+// instruction headers never drift from the box hints. Cached (templates are constant within a run).
+let _sectionHintCache: Record<string, string> | null = null;
+function sectionHint(key: string): string {
+  if (!_sectionHintCache) {
+    _sectionHintCache = {};
+    for (const e of bundleEntries()) _sectionHintCache[e.key] = e.hint;
+  }
+  return _sectionHintCache[key] ?? '';
+}
+
+/** engine_Dev — the self-explaining instruction header for ANY dev-panel section, by key. Lets the
+ *  bespoke advanced boxes (Missions / Hooks / … ) prepend the same header the table/lore templates get,
+ *  built from that section's purpose hint. Empty string for an unknown key. */
+export function sectionInstructionHeader(key: string, label: string): string {
+  const hint = sectionHint(key);
+  return hint ? instructionHeader(label, hint) : '';
+}
+
 /** Every whole-game section in file order, each with its template scaffold. Shared
  *  by the blank template and the annotated download so the section list can never
  *  drift between them. */

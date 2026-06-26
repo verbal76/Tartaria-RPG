@@ -16334,4 +16334,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (missions/hooks/whispers/… ) + extending the per-box diamonds to those boxes is the next pass. tsc
 // clean; template/versioning/round-trip suites green. app/engine/{templateVersioning,contentTemplates}.ts,
 // app/state/contentPackStore.ts.
-export const OTA_BUILD_ID = '2026-06-26-888';
+// OTA-889 — instruction headers + per-box diamonds across the WHOLE dev panel (phase 2, completes the
+// pass). (1) HEADERS: every advanced section template now opens with the same self-explaining header
+// the tables/lore got — RulesBox (resistances / fusion tags / coatings / inventory) builds it from its
+// title+hint, and the 15 bespoke boxes (Missions / Hooks / Whispers / Travel encounters / Starting
+// areas / Titles / Collectables / Summons / Main quest / Bosses / Digging / Scrap / Salvage / Overlays
+// / Dog scenarios) prepend sectionInstructionHeader(key,label) — a new central helper that reuses the
+// existing bundleEntries() hints (no duplication). (2) DIAMONDS: the per-JSON authoring diamonds now
+// appear on EVERY box (green ◆ authored · pink ◇ template · yellow ◆ stale), not just Table/Lore —
+// RulesBox + all 19 bespoke boxes, using each box's own authored state + its versioned section key.
+// All headers are comments → stripped on LOAD + excluded from the version hash (never trip yellow). tsc
+// clean; content/template/versioning/round-trip suites green (90). app/engine/contentTemplates.ts,
+// app/screens/DeveloperSettingsScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-26-889';
