@@ -15141,4 +15141,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the native context can't be freed while a prediction is still running on the native thread. That
 // use-after-free was the Play Console / 2.4.1-internal-testing Java_com_rnllama_LlamaContext_isPredicting
 // segfault. tsc clean; qwen/ml-lifecycle suites green (41). app/ai/generation/LlamaRuntime.ts.
-export const OTA_BUILD_ID = '2026-06-26-626-combatIII-mission-llamacrash';
+export const OTA_BUILD_ID = '2026-06-26-626-combatIII-mission-llamacrash-equipquiet';

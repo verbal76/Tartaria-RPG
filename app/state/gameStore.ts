@@ -19701,14 +19701,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
     }
-    if (previousInSlot && previousInSlot !== item.name) {
-      get().appendLog(
-        'world',
-        `You stow the ${previousInSlot} and equip ${item.name} (${SLOT_LABEL[slot]}).`,
-      );
-    } else {
-      get().appendLog('world', `You equip ${item.name} (${SLOT_LABEL[slot]}).`);
-    }
+    // A routine equip no longer narrates to the story feed. It's a deliberate
+    // menu action the player just performed, already confirmed by the inventory
+    // screen and the HUD's "Equipped:" line — and echoing "You equip X" for each
+    // of 8-10 slots buried the scene's arrival dialogue (playtester report). NOTE
+    // the 2-handed auto-displace line above still fires: that's a CONSEQUENCE the
+    // player can't otherwise see, so it stays. (previousInSlot is still used above
+    // for the HP-bonus delta.)
     // OTA-352 — loadout snapshot on equip change, so a log review can confirm
     // the piece's bonuses (incl. weapon/cloak/fused stealth) landed in effectiveStats.
     { const live = get().player; if (live) get().appendLog('debug', debugLoadout(live)); }
@@ -19745,7 +19744,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog('world', `You set aside what was in your ${SLOT_LABEL[slot]} slot.`);
+    // Routine unequip no longer narrates to the story feed (see equipItem) — the
+    // inventory screen + HUD already reflect the empty slot. Suppressed so gear
+    // management doesn't bury the scene.
     void get().persist();
   },
 
