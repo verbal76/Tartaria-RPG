@@ -15125,4 +15125,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player's swing uses) and roll the on-hit typed proc for their damage type — closing the companion
 // half of the typed-combat parity. (The golem's coating bonus already respected resists; untouched.)
 // tsc clean; dogGolemCombatStress 9/9, golemCompanion + combat + coating suites green. (Dev: OTA #.)
-export const OTA_BUILD_ID = '2026-06-26-626-combatIII';
+// MISSION FOCUS + ROUTING + EXIT GATE (ported from engine_Dev, adapted Tartaria-native). (1) EXIT chip is
+// gated to the gate room (outpost_gate, tagged 'entrance' + the spawn room) instead of showing in every hub
+// room — you leave the outpost through the gate, not the armory; legacy layouts with no gate keep EXIT
+// everywhere. (2) SINGLE-ACTIVE faction missions: a 'tracked' flag (absent/true = active); activating one
+// pauses every other; deactivate parks just that one (never drops it — ABANDON does); accepting while already
+// on one adds it paused. advanceActiveFactionQuests skips paused. (3) AUTO-ROUTING: ROUTE TO courses to the
+// objective (derived from mission text vs the locations table; gather-quests with no named place route straight
+// to the faction turn-in), then auto-chains to turn-in on completion; chain drops on divert/abandon/deactivate.
+// New: app/engine/missionRouting.ts, player.routedMission, store actions setFactionQuestActive + routeMission,
+// hub.ts roomIsExit/hubDefinesExitRoom. Touched: hub.ts, InputBox.tsx, types.ts, factionQuests.ts, gameStore.ts,
+// ContractsScreen.tsx. tsc clean (0 app errors); hub/faction/contract/combat suites green (78) + new tests (7).
+export const OTA_BUILD_ID = '2026-06-26-626-combatIII-mission';
