@@ -2650,6 +2650,10 @@ interface GameStore {
    *  `active` omitted → toggle. Lets the player hold many contracts but drive
    *  only the one(s) they're actually running. */
   setFactionQuestActive: (id: string, active?: boolean) => void;
+  /** OTA-907 — start an auto-routing chain for a faction contract: course to the
+   *  objective, then auto-course to the turn-in once the work is done. Stops on
+   *  turn-in, abandon, deactivate, or when the player sets a different course. */
+  routeMission: (id: string) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
@@ -14825,6 +14829,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // standing here, at FULL reward, with a completion popup (player ask:
     // "submission should happen as soon as you arrive at the spot it routed").
     autoSubmitReadyFactionQuests(get, set);
+    // OTA-907 — advance the mission route chain on ARRIVAL. Deferred a microtask so
+    // it runs AFTER continueTravel finishes clearing travelTarget (otherwise the
+    // next leg's course would be wiped by the just-arrived leg's cleanup).
+    void Promise.resolve().then(() => advanceMissionRoute(get, set));
     // engine_Dev — the built-in (Tartaria) Lost-Capital / Core-Guardian main quest
     // was removed; main-quest content is now entirely data-driven (customMainQuest).
     void get().persist();
@@ -15156,6 +15164,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // here later — the same guard covers it.
     if (!enemy.factionNeutralFight) {
       advanceActiveFactionQuests(get, set, 'kill');
+      // OTA-907 — a kill may complete the objective; re-evaluate the route chain
+      // so it auto-courses to the turn-in.
+      advanceMissionRoute(get, set);
     }
     // OTA-120 — Dog Companion rescue scenario completion. If the
     // killed enemy was a rescue captor (factionNeutralFight is the
@@ -16262,6 +16273,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `Contract paused — ${title}. ${party.map((e) => e.name).join(', ')} stand down to safety and wait; they'll rejoin when you re-activate it.`
         : `Contract paused — ${title}. It won't advance until you re-activate it.`);
     }
+    // Deactivating a contract drops any active route chain pointed at it.
+    if (!nextActive && get().player?.routedMission?.id === id) {
+      set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+    }
+    void get().persist();
+  },
+
+  routeMission(id) {
+    const player = get().player;
+    if (!player) return;
+    const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
+    if (!rec) { get().appendLog('arbiter', "That contract isn't on your slate."); return; }
+    if (rec.tracked === false) {
+      get().appendLog('arbiter', 'That contract is paused — re-activate it before routing.');
+      return;
+    }
+    const def = findFactionQuestById(id);
+    if (!def) return;
+    const want = desiredMissionLeg(player, def, rec);
+    if (player.currentLocationId === want.loc) {
+      // Already at this leg's target — seed the chain so it continues after the
+      // deed / turn-in, then let advanceMissionRoute settle it.
+      set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
+      get().appendLog('world', want.phase === 'to_turnin'
+        ? `You're already at ${safeLocName(want.loc)} — hand ${def.title} in here.`
+        : `You're already at the objective for ${def.title}.`);
+      advanceMissionRoute(get, set);
+      void get().persist();
+      return;
+    }
+    set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
+    _chainRouting = true;
+    try { get().setTravelCourse(want.loc); } finally { _chainRouting = false; }
+    get().appendLog('world', want.phase === 'to_turnin'
+      ? `✦ Course set — ${def.title}. Heading to turn in at ${safeLocName(want.loc)}.`
+      : `✦ Course set — ${def.title}. Heading to the objective: ${safeLocName(want.loc)}.`);
     void get().persist();
   },
 
@@ -17686,6 +17733,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ...s.player,
           activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== id),
           activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== id),
+          // OTA-907 — drop the route chain if it was pointed at this contract.
+          routedMission: s.player.routedMission?.id === id ? null : s.player.routedMission,
         },
       } : s));
       get().appendLog('world', `You hand the ${def.title} contract back to the wind. The ${getNarratorName()} shrugs.`);
@@ -17743,7 +17792,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-126 — snapshot tile count at travel-start so the badge
     // counts down monotonically regardless of which location is
     // currently centered on the regenerated world map.
-    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null } } : s));
+    // OTA-907 — a MANUAL course (not one the mission chain set) means the player
+    // diverted; drop any active route chain so it doesn't yank them back.
+    const dropChain = !_chainRouting;
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
     get().appendLog(
       'world',
       `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
@@ -22561,6 +22613,76 @@ function failEscortQuests(
       get().appendLog('combat', `${who} ${verb}. The escort "${title}" has failed — you couldn't keep them alive.`),
     );
   }
+}
+
+// OTA-907 — MISSION ROUTE CHAIN. When the player taps ROUTE TO on a contract,
+// `player.routedMission` is set and the engine courses to the objective, then —
+// once the work is done — auto-courses to the turn-in. `_chainRouting` lets the
+// engine's own setTravelCourse calls bypass the "player diverted, drop the chain"
+// guard in setTravelCourse.
+let _chainRouting = false;
+
+function safeLocName(id: string): string {
+  try { return getLocationById(id).name ?? id; } catch { return id; }
+}
+
+/** The destination + leg this contract should be heading to right now. */
+function desiredMissionLeg(
+  player: PlayerCharacter,
+  def: import('../engine/factionQuests').FactionQuestDef,
+  rec: { stage: number },
+): { loc: string; phase: 'to_objective' | 'to_turnin' } {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { factionQuestReady } = require('../engine/factionQuests') as typeof import('../engine/factionQuests');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { startingLocationForFaction } = require('../engine/character') as typeof import('../engine/character');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { missionObjectiveLocationId } = require('../engine/missionRouting') as typeof import('../engine/missionRouting');
+  const countItem = (name: string) =>
+    (player.inventory ?? []).filter((i) => i.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, i) => n + (i.quantity ?? 1), 0);
+  const ready = factionQuestReady(def, rec.stage, countItem);
+  const home = startingLocationForFaction(def.factionId);
+  if (ready) return { loc: home, phase: 'to_turnin' };
+  return { loc: missionObjectiveLocationId(def) ?? home, phase: 'to_objective' };
+}
+
+// Re-evaluate the active route chain: (re)course toward the current leg's target,
+// transition objective→turn-in when the work completes, and clear the chain when
+// the contract is gone / paused. Safe to call after any travel arrival or kill.
+function advanceMissionRoute(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const rm = player.routedMission;
+  if (!rm) return;
+  const clear = () => set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+  const rec = (player.activeFactionQuests ?? []).find((q) => q.id === rm.id);
+  if (!rec || rec.tracked === false) { clear(); return; } // turned in / abandoned / paused
+  const def = findFactionQuestById(rm.id);
+  if (!def) { clear(); return; }
+  const want = desiredMissionLeg(player, def, rec);
+  const here = player.currentLocationId;
+  if (here === want.loc) {
+    // Standing at the leg's target. If it's the turn-in leg, autoSubmit handles
+    // the hand-in (and the chain self-clears next tick when the record is gone).
+    // If it's the objective and the work isn't done yet, wait for the deed.
+    if (rm.phase !== want.phase) {
+      set((s) => (s.player ? { player: { ...s.player, routedMission: { id: rm.id, phase: want.phase } } } : s));
+    }
+    return;
+  }
+  // Already walking toward the right place → let it run.
+  if (player.travelTarget?.locationId === want.loc) return;
+  // (Re)start the course toward the current leg.
+  set((s) => (s.player ? { player: { ...s.player, routedMission: { id: rm.id, phase: want.phase } } } : s));
+  _chainRouting = true;
+  try { get().setTravelCourse(want.loc); } finally { _chainRouting = false; }
+  get().appendLog('world', want.phase === 'to_turnin'
+    ? `✦ Objective complete — ${def.title}. Auto-routing to turn in at ${safeLocName(want.loc)}.`
+    : `Auto-routing to the objective for ${def.title}: ${safeLocName(want.loc)}.`);
 }
 
 // Burst tracker — transient (not persisted). When the player chip-taps

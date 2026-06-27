@@ -16496,4 +16496,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // active, back-compat with old saves); livingEscortees + applyEscortDamage + advanceActiveFactionQuests all
 // skip tracked===false. New store action setFactionQuestActive(id, active?). Touched: types.ts, factionQuests.ts,
 // escort.ts, gameStore.ts, ContractsScreen.tsx. tsc clean; escort/faction/contract/combat suites green (48).
-export const OTA_BUILD_ID = '2026-06-27-906';
+// OTA-907 — [contracts] mission ROUTE CHAIN: route to the objective, then auto-route to turn-in. Tapping ROUTE
+// TO on a faction contract now courses to the OBJECTIVE (derived content-agnostically from the mission text →
+// the matching live location, e.g. "...in Rome-Milan" → sector_rome_milan; 70/105 staged missions resolve, the
+// rest fall back to the turn-in home). On arrival + completion it AUTO-courses to the faction turn-in; arriving
+// there auto-submits. The chain stops when the player sets a different course (diverts), abandons, deactivates,
+// or turns in. New: app/engine/missionRouting.ts (missionObjectiveLocationId, article/sector-aware fuzzy match).
+// New player field `routedMission {id, phase}` + store action routeMission(id); advanceMissionRoute hooked into
+// travel-arrival (deferred a microtask past travelTarget cleanup) and kill resolution; setTravelCourse drops the
+// chain on a manual divert. Faction card shows ROUTE TO <objective> / live "Auto-routing…" status. Optional
+// author field FactionQuestDef.objectiveLocationId overrides the text guess. Touched: types.ts, factionQuests.ts,
+// gameStore.ts, ContractsScreen.tsx, +missionRouting.ts. tsc clean; escort/faction/contract/combat suites green (51).
+export const OTA_BUILD_ID = '2026-06-27-907';

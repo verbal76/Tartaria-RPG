@@ -49,6 +49,11 @@ export interface FactionQuestDef {
    *  the default 2-3 party size. Content-agnostic: escortee names come from
    *  data/escortNames.json or a pack's `flavor.escortNames`. */
   escort?: { count?: number };
+  /** OTA-907 — optional explicit ROUTE destination for this contract's objective
+   *  (a location id in the active world). When present it overrides the engine's
+   *  text-derived guess for "ROUTE TO". Absent → the engine infers the objective
+   *  location from the mission text, falling back to the faction home/turn-in. */
+  objectiveLocationId?: string;
   /** OTA-450 — a literal FETCH requirement. When present, turn-in is gated
    *  on the player actually holding `quantity` of `itemName`, and those
    *  items are consumed on turn-in. Used by the generic per-faction starter

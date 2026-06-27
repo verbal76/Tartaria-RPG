@@ -1252,6 +1252,12 @@ export interface PlayerCharacter {
   // Optional so older saves don't crash; missing field falls back
   // to the legacy Manhattan calc in the ExplorationScreen badge.
   travelTarget?: { locationId: string; distanceRemaining?: number };
+  /** OTA-907 — an in-progress faction-mission ROUTE CHAIN. Set when the player
+   *  taps ROUTE TO on a contract: the engine courses to the objective, then
+   *  auto-courses to the turn-in once the work is done. `phase` tracks which leg
+   *  is underway. Cleared on turn-in, abandon, deactivate, or when the player
+   *  manually sets a different course (exits the route). */
+  routedMission?: { id: string; phase: 'to_objective' | 'to_turnin' } | null;
   /** OTA-465 — intra-area "set course" to a whisper/lead objective TILE
    *  (mapX/mapY), distinct from travelTarget (which routes to a named
    *  location). Drives the same travel-row continue/stop UX, but steps

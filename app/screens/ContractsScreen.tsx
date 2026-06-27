@@ -9,6 +9,7 @@ import { findFactionQuestById, getFactionQuests, factionQuestReady } from '../en
 import { findFaction } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
+import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { computeAllProgress, getCharacterStories, allFragments } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
@@ -69,6 +70,7 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
+  const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
@@ -76,7 +78,7 @@ export function ContractsScreen() {
   const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
   const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
   const appendLog = useGameStore((s) => s.appendLog);
-  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string } | null>(null);
+  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
@@ -847,14 +849,45 @@ export function ContractsScreen() {
                           : (escortParty.length > 0 ? `▶ ACTIVATE (recall ${escortParty.length})` : '▶ ACTIVATE')}
                       </Text>
                     </Pressable>
-                    {/* engine_Dev — faction quests were the ONLY contract family missing
-                        the always-visible ROUTE TO button (hunts/mysteries/storylines/
-                        leads all render contractRoute right under the head). Without it,
-                        tapping a mission only expanded it and never offered to set a
-                        course. The anchor is the posting faction's home outpost (mission
-                        board + same-faction agents = pickup/turn-in hub). Tapping it opens
-                        the same "Set course?" confirm prompt as every other contract. */}
-                    {contractRoute(key)}
+                    {/* OTA-907 — mission-aware ROUTE TO. Routes to the OBJECTIVE
+                        (derived from the mission text, or the turn-in home if the
+                        work is already done), then auto-chains to the turn-in once
+                        the objective is complete. Shows live route status while the
+                        chain is active, and a "you're here" note when already on the
+                        target tile. Tapping opens the same "Set course?" prompt. */}
+                    {(() => {
+                      const home = startingLocationForFaction(def.factionId);
+                      const objId = readyToTurnIn ? home : (missionObjectiveLocationId(def) ?? home);
+                      let objName = objId;
+                      try { objName = getLocationById(objId).name ?? objId; } catch { /* keep id */ }
+                      const routed = player?.routedMission?.id === def.id;
+                      const here = player?.currentLocationId === objId;
+                      if (routed) {
+                        const phase = player?.routedMission?.phase;
+                        return (
+                          <Text style={styles.routeHereNote}>
+                            ▸ Auto-routing — {phase === 'to_turnin' ? `turn in at ${objName}` : `objective: ${objName}`}. Keep traveling; it chains to turn-in.
+                          </Text>
+                        );
+                      }
+                      if (here) {
+                        return (
+                          <Text style={styles.routeHereNote}>
+                            ▸ You're at {objName}{readyToTurnIn ? ' — hand it in here.' : ' — the objective. Do the work; it then routes you to turn-in.'}
+                          </Text>
+                        );
+                      }
+                      return (
+                        <Pressable
+                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          onPress={() => setPendingRoute({ id: objId, name: objName, missionId: def.id })}
+                        >
+                          <Text style={styles.routeBtnText}>
+                            ▸ {readyToTurnIn ? `ROUTE TO TURN-IN (${objName.toUpperCase()})` : `ROUTE TO ${objName.toUpperCase()}`}
+                          </Text>
+                        </Pressable>
+                      );
+                    })()}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
                     {!readyToTurnIn && stageDef && !open && (
@@ -1093,7 +1126,15 @@ export function ContractsScreen() {
                   if (!pendingRoute || !player) return;
                   const id = pendingRoute.id;
                   const name = pendingRoute.name;
+                  const missionId = pendingRoute.missionId;
                   setPendingRoute(null);
+                  // OTA-907 — a mission route starts the auto-chain (objective →
+                  // turn-in) rather than a one-shot course.
+                  if (missionId) {
+                    routeMission(missionId);
+                    setScreen('exploration');
+                    return;
+                  }
                   // 2026-05-25 OTA-035 — outpost-aware confirmation.
                   // Was a hard refusal ("leave the outpost first, then
                   // come back"); now a Yes/No prompt: confirm to leave
