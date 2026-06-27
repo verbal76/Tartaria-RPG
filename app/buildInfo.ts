@@ -15255,4 +15255,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // detaches the context, stops any in-flight prediction, and releases THROUGH the same runExclusiveNativeMl lock,
 // serializing the free behind the running prediction. JS-only → OTA-safe. tsc clean; same fix verified green on
 // the golem line (41 qwen/ml/tts-lifecycle tests). app/ai/generation/LlamaRuntime.ts.
-export const OTA_BUILD_ID = '2026-06-27-639';
+export const OTA_BUILD_ID = '2026-06-27-640';
