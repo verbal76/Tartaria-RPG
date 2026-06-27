@@ -15247,4 +15247,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // companion + combat + coating suites + combatStress green. (golemStressSweep — golem power can't level
 // within a summon's lifespan — is a separate design call, deferred.) app/voice/TTSController.ts,
 // app/state/gameStore.ts, __tests__/{ttsBackgroundTeardown,dogGolemCombatStress}.test.ts.
-export const OTA_BUILD_ID = '2026-06-26-637';
+// OTA-638 — [crash] librnllama isPredicting SIGSEGV on background. The app disposes Qwen when it backgrounds
+// (App.tsx AppState → shutdownQwen → LlamaRuntime.dispose); release() ran OUTSIDE the native-ML lock that
+// completion() runs under, so backgrounding the game mid-narration freed the llama context while a prediction
+// was still running on the native thread — use-after-free → Java_com_rnllama_LlamaContext_isPredicting segfault
+// (the "switched to YouTube / answered a text mid-sentence, came back to a dead game" crash). dispose() now
+// detaches the context, stops any in-flight prediction, and releases THROUGH the same runExclusiveNativeMl lock,
+// serializing the free behind the running prediction. JS-only → OTA-safe. tsc clean; same fix verified green on
+// the golem line (41 qwen/ml/tts-lifecycle tests). app/ai/generation/LlamaRuntime.ts.
+export const OTA_BUILD_ID = '2026-06-27-638';
