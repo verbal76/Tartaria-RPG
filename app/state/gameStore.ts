@@ -16155,6 +16155,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const factionId = acceptFaction;
     const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
       && (player.completedFactionQuestIds?.length ?? 0) === 0;
+    // "A real escort mission" — an escort contract spawns 2-3 live, same-faction
+    // escortees attached to this quest. They take real combat damage; losing one
+    // fails the contract (handled in applyEscortDamage / checkEscortFailures).
+    const acceptedAt = Date.now();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const escortMod = require('../engine/escort') as typeof import('../engine/escort');
+    const escortSpec = escortMod.escortSpecForQuest(quest);
+    const escortees = escortSpec
+      ? escortMod.spawnEscortees(escortSpec.count, player.hpMax ?? 20, acceptedAt)
+      : undefined;
     set((s) =>
       s.player
         ? {
@@ -16163,12 +16173,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt, ...(escortees ? { escortees } : {}) },
               ],
             },
           }
         : s,
     );
+    if (escortees && escortees.length > 0) {
+      const roster = escortees.map((e) => `${e.name} (${e.hp} HP)`).join(', ');
+      get().appendLog(
+        'reward',
+        `${escortees.length} ${factionId.replace(/_/g, ' ')} ${escortees.length === 1 ? 'charge falls' : 'charges fall'} in beside you: ${roster}. Keep them alive — if any of them dies, the escort fails.`,
+      );
+    }
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
     // contract you took" later. Fires only on the first accept of
@@ -16421,6 +16438,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}${itemSuffix}.`,
     );
     logRepChanges(get, repResult.changed);
+    // "A real escort mission" — delivered the party alive. Name the survivors
+    // so the win lands as a real escort, not a paperwork close.
+    const survivors = (activeRecord?.escortees ?? []).filter((e) => e.hp > 0);
+    if (survivors.length > 0) {
+      const who = survivors.map((e) => e.name).join(', ');
+      get().appendLog('reward', `You delivered ${survivors.length === 1 ? 'your charge' : 'all ' + survivors.length + ' charges'} safely — ${who}. They peel off with a nod.`);
+    }
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
     void get().persist();
   },
@@ -22419,6 +22443,87 @@ function advanceActiveFactionQuests(
   );
 }
 
+// "A real escort mission" — every enemy swing that connects on the player has a
+// chance to also catch each living escortee. A downed escortee FAILS its escort
+// contract on the spot. Called from applyEnemyCounter with the final per-swing
+// player damage so escortee danger tracks the enemy's actual threat (a clean
+// parry that zeroes the hit also spares the party).
+function applyEscortDamage(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  baseDmg: number,
+  enemyName: string,
+): void {
+  const player = get().player;
+  if (!player || baseDmg <= 0) return;
+  const active = player.activeFactionQuests ?? [];
+  if (!active.some((q) => (q.escortees?.length ?? 0) > 0)) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { ESCORT_HIT_CHANCE } = require('../engine/escort') as typeof import('../engine/escort');
+
+  const hurt: { name: string; dmg: number; hp: number; hpMax: number }[] = [];
+  const failed: { id: string; dead: string[] }[] = [];
+
+  const next = active.map((q) => {
+    if (!q.escortees || q.escortees.length === 0) return q;
+    const dead: string[] = [];
+    const escortees = q.escortees.map((e) => {
+      if (e.hp <= 0) return e; // already down
+      if (Math.random() >= ESCORT_HIT_CHANCE) return e;
+      const frac = 0.4 + Math.random() * 0.3; // 40-70% of the player-facing hit
+      const d = Math.max(1, Math.round(baseDmg * frac));
+      const hp = Math.max(0, e.hp - d);
+      if (hp <= 0) dead.push(e.name);
+      else hurt.push({ name: e.name, dmg: d, hp, hpMax: e.hpMax });
+      return { ...e, hp };
+    });
+    if (dead.length > 0) failed.push({ id: q.id, dead });
+    return { ...q, escortees };
+  });
+
+  if (hurt.length === 0 && failed.length === 0) return; // nothing connected
+
+  set((s) => (s.player ? { player: { ...s.player, activeFactionQuests: next } } : s));
+
+  for (const h of hurt) {
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `${enemyName} catches ${h.name} — ${h.dmg} damage (${h.hp}/${h.hpMax} HP).`),
+    );
+  }
+
+  if (failed.length > 0) failEscortQuests(get, set, failed);
+}
+
+// Drop one or more failed escort contracts: pull them from the active lists
+// (NOT marked completed), and announce who fell. The party is gone with the
+// quest record, so the HUD clears automatically.
+function failEscortQuests(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  failed: { id: string; dead: string[] }[],
+): void {
+  const ids = new Set(failed.map((f) => f.id));
+  set((s) => {
+    if (!s.player) return {};
+    return {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => !ids.has(q.id)),
+        activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => !ids.has(id)),
+      },
+    };
+  });
+  for (const f of failed) {
+    const def = findFactionQuestById(f.id);
+    const title = def?.title ?? f.id;
+    const who = f.dead.join(' and ');
+    const verb = f.dead.length > 1 ? 'fall' : 'falls';
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `${who} ${verb}. The escort "${title}" has failed — you couldn't keep them alive.`),
+    );
+  }
+}
+
 // Burst tracker — transient (not persisted). When the player chip-taps
 // through 6 contracts in 4 seconds at the same vendor we don't want 6
 // Arbiter lines reacting to each individual quest description; the
@@ -23976,6 +24081,11 @@ function applyEnemyCounter(
       if (dtcDotEffect) effects = applyEffect(effects ?? [], dtcDotEffect);
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
+
+    // "A real escort mission" — the same connecting swing can catch the live
+    // escortees the player is protecting. Uses the final post-mitigation/parry
+    // damage, so a clean parry (dmg 0) shields them too.
+    applyEscortDamage(get, set, dmg, enemy.name);
 
     if (parryNarration) {
       void Promise.resolve().then(() => get().appendLog('combat', parryNarration!));

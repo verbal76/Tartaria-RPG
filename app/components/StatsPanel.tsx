@@ -8,6 +8,7 @@ import { ARMOR_SLOTS, effectiveStats, displayStaminaMax } from '../engine/equipm
 import { formatEffectSummary } from '../engine/statusEffects';
 import { getCorruptionName } from '../engine/contentPack';
 import { findFactionQuestById } from '../engine/factionQuests';
+import { livingEscortees } from '../engine/escort';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
 // readout: when the player has any item granting the detect_aether
@@ -238,6 +239,26 @@ export function StatsPanel({ player, fill }: Props) {
           </Text>
         </View>
       ) : null}
+      {(() => {
+        // "A real escort mission" — live escortees the player is protecting,
+        // listed directly under the player's name with their current HP. They
+        // take real combat damage; losing one fails the escort contract.
+        const escortees = livingEscortees(player.activeFactionQuests);
+        if (escortees.length === 0) return null;
+        return (
+          <View style={styles.escortBlock}>
+            {escortees.map((e) => {
+              const frac = e.hpMax > 0 ? e.hp / e.hpMax : 0;
+              const color = frac <= 0.34 ? '#e07a5f' : frac <= 0.67 ? '#d9b15f' : '#7fae8a';
+              return (
+                <Text key={e.id} style={[styles.escortName, { color }]} numberOfLines={1}>
+                  ↳ {e.name} ({e.hp}/{e.hpMax})
+                </Text>
+              );
+            })}
+          </View>
+        );
+      })()}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
@@ -333,6 +354,11 @@ const styles = StyleSheet.create({
   // companion vs the dog's warm-gold.
   golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
+  // Escort party — sits directly under the player's name. Color shifts
+  // green→amber→red with each escortee's remaining HP so the player can see
+  // at a glance who's in danger and needs the fight ended fast.
+  escortBlock: { marginTop: 1, marginLeft: 4 },
+  escortName: { fontSize: 11, fontWeight: '600', letterSpacing: 0.3 },
   subline: { color: '#6c8088', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#6ab0c9', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },

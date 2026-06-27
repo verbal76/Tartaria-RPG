@@ -16462,4 +16462,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 'Apply to armor (+X resist)' labels resolve the type from the coating spec too, so a custom vial reads
 // '+cold resist' instead of a generic label. Built-in vials unchanged (fall back to the kind tag). tsc clean;
 // coating suites green (49). app/state/gameStore.ts, app/screens/InventoryScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-26-902';
+// OTA-903 — [escort missions] "a real escort mission." An escort faction contract (explicit `escort` field,
+// or an `_escort` quest id) now spawns 2-3 live, same-faction escortees on accept. They sit under the player's
+// name in the HUD (color-coded by HP), and take REAL combat damage on every enemy swing that connects (35%
+// chance each, 40-70% of the player-facing hit). If any escortee hits 0 HP the escort contract FAILS on the
+// spot (pulled from the active slate, not completed). Reaching the destination with survivors delivers them
+// by name. Escortee names are content-agnostic — drawn from data/escortNames.json or a pack's
+// `flavor.escortNames`, never hardcoded to a setting. New: app/engine/escort.ts, app/data/escortNames.json.
+// Touched: types.ts (Escortee + activeFactionQuests.escortees), factionQuests.ts (escort field), gameStore.ts
+// (spawn on accept, applyEscortDamage/failEscortQuests in combat, survivor delivery on turn-in),
+// StatsPanel.tsx (HUD party rows). tsc clean on all touched source files.
+export const OTA_BUILD_ID = '2026-06-27-903';

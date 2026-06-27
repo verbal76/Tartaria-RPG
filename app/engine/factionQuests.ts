@@ -43,6 +43,12 @@ export interface FactionQuestDef {
    *  stages.length. When omitted (legacy data), the engine treats it as
    *  a single objective whose narration is the existing description. */
   stages?: FactionQuestStageDef[];
+  /** ESCORT contract. When present (or when the quest id ends in `_escort`),
+   *  accepting the quest spawns live escortee NPCs that take real combat damage
+   *  — keep them alive to the destination or the quest fails. `count` overrides
+   *  the default 2-3 party size. Content-agnostic: escortee names come from
+   *  data/escortNames.json or a pack's `flavor.escortNames`. */
+  escort?: { count?: number };
   /** OTA-450 — a literal FETCH requirement. When present, turn-in is gated
    *  on the player actually holding `quantity` of `itemName`, and those
    *  items are consumed on turn-in. Used by the generic per-faction starter

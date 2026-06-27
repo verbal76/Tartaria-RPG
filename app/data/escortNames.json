@@ -1,0 +1,10 @@
+{
+  "_comment": "Content-agnostic escortee name pool. Lore-neutral surnames so escortees never leak a specific setting's flavor. A content pack can override this by setting `flavor.escortNames` to its own array of names (e.g. faction-themed). The engine draws 2-3 of these when an escort faction quest is accepted.",
+  "names": [
+    "Harper", "Reyes", "Okafor", "Lindqvist", "Tran", "Bauer", "Sokolov",
+    "Mendez", "Falk", "Doyle", "Nakamura", "Ortega", "Vasquez", "Keller",
+    "Ivanov", "Park", "Hassan", "Romano", "Sayer", "Brandt", "Cole",
+    "Mara", "Quill", "Renn", "Strand", "Vance", "Wren", "Yusuf", "Zane",
+    "Adler", "Beck", "Cho", "Dane", "Eskil", "Frost", "Garza", "Holt"
+  ]
+}
