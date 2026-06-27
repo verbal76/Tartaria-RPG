@@ -77,10 +77,20 @@ describe('cleanForSpeech', () => {
     expect(cleanForSpeech('roll −1 to attack')).toBe('roll negative 1 to attack');
   });
 
-  it('leaves word-internal hyphens alone', () => {
-    expect(cleanForSpeech('well-known scholar')).toBe('well-known scholar');
-    expect(cleanForSpeech('Mud-fist Wraps')).toBe('Mud-fist Wraps');
-    expect(cleanForSpeech('e-mail')).toBe('e-mail');
+  it('reads compound hyphens as natural spaced words (no spoken dash)', () => {
+    // Player report: Kokoro reads a compound's bare hyphen as a dead micro-gap /
+    // artifact, not a connected word. A LETTER before the hyphen marks a compound
+    // (place/item names + dictionary compounds) → speak it as the spaced words.
+    expect(cleanForSpeech('Sector Phila-Wash')).toBe('Sector Phila Wash');
+    expect(cleanForSpeech('a unified-field generator')).toBe('a unified field generator');
+    expect(cleanForSpeech('Zero-Point Core and U-Boat pens')).toBe('Zero Point Core and U Boat pens');
+    expect(cleanForSpeech('Rome-Milan, Mos-Grad, Toky-Osaka')).toBe('Rome Milan, Mos Grad, Toky Osaka');
+    expect(cleanForSpeech('a well-known T-34 tank')).toBe('a well known T 34 tank');
+  });
+
+  it('still protects negatives and pure-digit ranges from the compound rule', () => {
+    expect(cleanForSpeech('-2 AC')).toBe('negative 2 AC');     // no letter before the hyphen
+    expect(cleanForSpeech('roll 1d6-1')).toBe('roll 1d6-1');   // digit-digit dice range left as-is
   });
 
   it('rewrites middle-dot separator as comma', () => {

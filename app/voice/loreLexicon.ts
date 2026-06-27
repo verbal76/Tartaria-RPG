@@ -202,6 +202,17 @@ export function cleanForSpeech(text: string): string {
   // the next word. Only a hyphen with whitespace on BOTH sides matches, so
   // compound words ("well-known") and "-2" negatives are left untouched.
   out = out.replace(/\s+-\s+/g, ', ');
+  // Compound-word hyphens (Phila-Wash, unified-field, Zero-Point, U-Boat, T-34,
+  // well-known). A LETTER on the left of an in-word hyphen means it's joining a
+  // compound, not punctuating a clause — Kokoro reads the bare hyphen as an
+  // artifact / dead micro-gap rather than a connected word (player report: "no
+  // dashes in the spoken words; it doesn't pause properly"). Replace with a
+  // SPACE (NOT a comma — you don't want a pause inside a single place/item name)
+  // so the parts read as the natural two-word name. The lookahead leaves the
+  // right-hand char unconsumed so chains ("a-b-c") fully collapse. Leaves "-2"
+  // negatives (no letter before the hyphen — handled below) and pure digit dice
+  // ranges ("1d6-1") untouched.
+  out = out.replace(/([A-Za-z])-(?=[A-Za-z0-9])/g, '$1 ');
   // Unicode "minus sign" (U+2212) shows up in combat lines emitted by
   // the dice/roll formatter and weapon-effect narration. Normalize it
   // to the ASCII "-" so the negative-number rule below catches it.

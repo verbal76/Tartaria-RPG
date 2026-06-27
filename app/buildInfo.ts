@@ -16524,4 +16524,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `world` exit (the built-in outpost) keep EXIT everywhere so no one is stranded. New hub.ts exports
 // roomHasWorldExit / hubDefinesWorldExit. Touched: app/engine/hub.ts, app/components/InputBox.tsx,
 // +__tests__/hubWorldExitGate.test.ts. tsc clean; hub suites green (45) + new gate test (2). NO pack change.
-export const OTA_BUILD_ID = '2026-06-27-909';
+// OTA-910 — [TTS] no spoken dashes. cleanForSpeech already turned CLAUSE dashes (em/en dash, spaced hyphen)
+// into commas for a clean pause; this adds COMPOUND-name hyphens (Phila-Wash, unified-field, Zero-Point, U-Boat,
+// T-34, well-known) → a SPACE, because Kokoro reads the bare in-word hyphen as a dead micro-gap/artifact, not a
+// connected word (player: "no dashes in the spoken words; it doesn't pause properly"). Rule: a LETTER before the
+// hyphen + alnum after → space (lookahead so chains collapse); leaves "-2" negatives and pure digit dice ranges
+// ("1d6-1") alone. Display log keeps the typographic dashes — speech-only. Commas (not ellipses) remain the pause
+// char: Kokoro gives a reliable short beat on a comma; ellipses read as a longer/inconsistent trail-off. Touched:
+// app/voice/loreLexicon.ts, __tests__/loreLexicon.test.ts (updated). tsc clean; loreLexicon suite green (17).
+export const OTA_BUILD_ID = '2026-06-27-910';
