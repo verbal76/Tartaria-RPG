@@ -124,6 +124,24 @@ export function hubEntryRoomId(): string {
   return HUB.rooms[0]?.id ?? '';
 }
 
+/** True when this room is the hub's way OUT — the gate/entrance (tagged
+ *  "entrance" in the layout; the Gate is the only one). The EXIT chip
+ *  belongs only here: you leave the outpost through the gate, not the
+ *  armory or the mess. Tags survive the per-faction string overrides
+ *  (hubRoomFor only re-skins name/description), so this holds for every
+ *  faction's hub. */
+export function roomIsExit(room: HubRoom | null | undefined): boolean {
+  return !!room && Array.isArray(room.tags) && room.tags.includes('entrance');
+}
+
+/** True when the hub layout marks an explicit exit/gate room at all. When it
+ *  does, the EXIT chip is gated to that room; when it doesn't (a legacy layout
+ *  that never tagged a gate), EXIT stays available from every room so no one
+ *  is ever stranded. */
+export function hubDefinesExitRoom(): boolean {
+  return HUB.rooms.some((r) => Array.isArray(r.tags) && r.tags.includes('entrance'));
+}
+
 /** Resolve a player input against the current hub room's exits. Returns
  *  the target room id, or null if no exit matches. Supports:
  *    - Cardinal direction in the input ('go north')
