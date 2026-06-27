@@ -2644,6 +2644,12 @@ interface GameStore {
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
+  /** Activate / deactivate an accepted faction contract. A deactivated contract
+   *  is parked: its stages don't auto-advance and, for escort contracts, the
+   *  escort party stands down (off the HUD, no combat damage) until re-activated.
+   *  `active` omitted → toggle. Lets the player hold many contracts but drive
+   *  only the one(s) they're actually running. */
+  setFactionQuestActive: (id: string, active?: boolean) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
@@ -16230,6 +16236,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  setFactionQuestActive(id, active) {
+    const player = get().player;
+    if (!player) return;
+    const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
+    if (!rec) return;
+    // tracked absent/true = active; resolve the new state (explicit arg, else toggle).
+    const nextActive = active != null ? active : rec.tracked === false;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
+          q.id === id ? { ...q, tracked: nextActive } : q),
+      },
+    } : s));
+    const def = findFactionQuestById(id);
+    const title = def?.title ?? id;
+    const party = (rec.escortees ?? []).filter((e) => e.hp > 0);
+    if (nextActive) {
+      get().appendLog('world', party.length > 0
+        ? `Contract re-activated — ${title}. ${party.map((e) => e.name).join(', ')} fall back in beside you.`
+        : `Contract re-activated — ${title}. It advances again as you play.`);
+    } else {
+      get().appendLog('world', party.length > 0
+        ? `Contract paused — ${title}. ${party.map((e) => e.name).join(', ')} stand down to safety and wait; they'll rejoin when you re-activate it.`
+        : `Contract paused — ${title}. It won't advance until you re-activate it.`);
+    }
+    void get().persist();
+  },
+
   turnInFactionQuest(titleOrId, remote = false) {
     const state = get();
     const player = state.player;
@@ -22404,6 +22439,9 @@ function advanceActiveFactionQuests(
   if (active.length === 0) return;
   let mutated = false;
   const next = active.map((rec) => {
+    // A DEACTIVATED contract is parked — it doesn't advance on unrelated
+    // kills/travels. Re-activate it (Contracts screen) to resume progress.
+    if (rec.tracked === false) return rec;
     const def = findFactionQuestById(rec.id);
     if (!def?.stages || def.stages.length === 0) return rec;
     if (rec.stage >= def.stages.length) return rec; // already done
@@ -22466,6 +22504,7 @@ function applyEscortDamage(
 
   const next = active.map((q) => {
     if (!q.escortees || q.escortees.length === 0) return q;
+    if (q.tracked === false) return q; // parked party takes no damage while deactivated
     const dead: string[] = [];
     const escortees = q.escortees.map((e) => {
       if (e.hp <= 0) return e; // already down

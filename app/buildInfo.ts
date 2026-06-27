@@ -16487,4 +16487,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // faction-quest card head; it resolves the posting faction's home outpost (a real, distinct per-faction
 // location in the active world via startingLocationForFaction — content-agnostic, no Tartaria fallback) and
 // opens the same "Set course?" confirm prompt as every other contract. Touched: app/screens/ContractsScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-27-905';
+// OTA-906 — [contracts] ACTIVATE / DEACTIVATE per faction contract. Accepting many missions used to leave them
+// all live at once — most visibly, an escort party trailed the player onto unrelated missions. Each faction
+// contract card now has an activate/deactivate toggle (+ an ACTIVE/⏸ PAUSED pill and a dimmed card when
+// paused). A DEACTIVATED contract is parked: its stages no longer auto-advance on unrelated kills/travels, and
+// an escort contract's party STANDS DOWN — off the HUD and immune to combat damage — until re-activated (the
+// button shows "stand down N" / "recall N"). New flag `tracked` on each active-quest record (absent/true =
+// active, back-compat with old saves); livingEscortees + applyEscortDamage + advanceActiveFactionQuests all
+// skip tracked===false. New store action setFactionQuestActive(id, active?). Touched: types.ts, factionQuests.ts,
+// escort.ts, gameStore.ts, ContractsScreen.tsx. tsc clean; escort/faction/contract/combat suites green (48).
+export const OTA_BUILD_ID = '2026-06-27-906';

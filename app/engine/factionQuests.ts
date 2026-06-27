@@ -67,6 +67,12 @@ export interface ActiveFactionQuest {
    *  turn-in (you turn in to someone of the same faction). */
   postedByFaction: string;
   acceptedAt: number;
+  /** Whether this contract is ACTIVE (being worked) vs DEACTIVATED (parked).
+   *  Absent/true → active. When false: its stages don't auto-advance and, for
+   *  escort contracts, the escort party is parked (off the HUD, no combat
+   *  damage) until re-activated. Lets the player accept many quests but only
+   *  drive the one(s) they're actually running. */
+  tracked?: boolean;
 }
 
 const FACTION_QUESTS_BUILTIN = (factionQuestsData as { quests: FactionQuestDef[] }).quests;

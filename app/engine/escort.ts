@@ -93,13 +93,16 @@ function pickDistinct(pool: string[], n: number): string[] {
   return out;
 }
 
-/** All living escortees across every active escort quest, flattened for the HUD. */
+/** All living escortees across every ACTIVE-and-TRACKED escort quest, flattened
+ *  for the HUD. A deactivated (tracked === false) escort contract parks its party
+ *  — they don't show in the HUD and don't take combat damage — until re-activated. */
 export function livingEscortees(
-  active: readonly { id: string; escortees?: Escortee[] }[] | undefined,
+  active: readonly { id: string; escortees?: Escortee[]; tracked?: boolean }[] | undefined,
 ): Escortee[] {
   if (!active) return [];
   const out: Escortee[] = [];
   for (const q of active) {
+    if (q.tracked === false) continue; // parked while deactivated
     for (const e of q.escortees ?? []) {
       if (e.hp > 0) out.push(e);
     }

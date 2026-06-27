@@ -68,6 +68,7 @@ export function ContractsScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
+  const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
   const discardLead = useGameStore((s) => s.discardLead);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
@@ -184,7 +185,7 @@ export function ContractsScreen() {
   // and fall back to the legacy id list. The legacy list will be empty
   // after backfillPlayer runs on load, but the dual read keeps the
   // screen safe across mid-session migrations.
-  const factionQuestRecords =
+  const factionQuestRecords: NonNullable<typeof player.activeFactionQuests> =
     player.activeFactionQuests ??
     (player.activeFactionQuestIds ?? []).map((id) => ({
       id,
@@ -811,20 +812,41 @@ export function ContractsScreen() {
                 const readyToTurnIn = factionQuestReady(def, rec.stage, countItem);
                 const staged = !!(def.stages && def.stages.length > 0);
                 const fetchHeld = def.fetch ? countItem(def.fetch.itemName) : 0;
+                // ACTIVE vs PAUSED. A deactivated contract is parked — its stages
+                // don't advance and its escort party (if any) stands down. tracked
+                // absent/true = active (back-compat with pre-toggle saves).
+                const tracked = rec.tracked !== false;
+                const escortParty = (rec.escortees ?? []).filter((e) => e.hp > 0);
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady]}>
-                        {readyToTurnIn
-                          ? 'READY TO SUBMIT'
-                          : staged
-                            ? `stage ${rec.stage + 1} / ${def.stages!.length}`
-                            : def.fetch
-                              ? `${fetchHeld} / ${def.fetch.quantity}`
-                              : 'OPEN'}
+                      <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady, !tracked && styles.stagePillPaused]}>
+                        {!tracked
+                          ? '⏸ PAUSED'
+                          : readyToTurnIn
+                            ? 'READY TO SUBMIT'
+                            : staged
+                              ? `stage ${rec.stage + 1} / ${def.stages!.length}`
+                              : def.fetch
+                                ? `${fetchHeld} / ${def.fetch.quantity}`
+                                : 'ACTIVE'}
                       </Text>
                     </View>
+                    {/* Activate / deactivate. Deactivating parks the contract: its
+                        stages stop advancing and an escort party stands down (off the
+                        HUD, no combat damage) so escortees don't trail you onto
+                        unrelated missions. Re-activate to resume. */}
+                    <Pressable
+                      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      onPress={() => setFactionQuestActive(def.id, !tracked)}
+                    >
+                      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+                        {tracked
+                          ? (escortParty.length > 0 ? `▮▮ DEACTIVATE (stand down ${escortParty.length})` : '▮▮ DEACTIVATE')
+                          : (escortParty.length > 0 ? `▶ ACTIVATE (recall ${escortParty.length})` : '▶ ACTIVATE')}
+                      </Text>
+                    </Pressable>
                     {/* engine_Dev — faction quests were the ONLY contract family missing
                         the always-visible ROUTE TO button (hunts/mysteries/storylines/
                         leads all render contractRoute right under the head). Without it,
@@ -1459,6 +1481,23 @@ const styles = StyleSheet.create({
   routeBtnPressed: { opacity: 0.7 },
   routeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   routeHereNote: { marginTop: 10, color: '#9ec96a', fontSize: 11, fontStyle: 'italic' },
+  // Activate / deactivate toggle. Active = teal outline; paused = muted grey.
+  trackBtn: {
+    marginTop: 8,
+    backgroundColor: 'transparent',
+    borderColor: '#54d6c4',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  trackBtnOff: { borderColor: '#5a6a6e' },
+  trackBtnPressed: { opacity: 0.7 },
+  trackBtnText: { color: '#54d6c4', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  trackBtnTextOff: { color: '#8aa0a4' },
+  // A paused contract's card is dimmed so it reads as stood-down at a glance.
+  cardPaused: { opacity: 0.6, borderColor: '#3a4a4e' },
+  stagePillPaused: { color: '#8aa0a4', borderColor: '#5a6a6e' },
   // 2026-05-26 OTA-054 — ABANDON button. Ghost/outlined style with
   // a warning border, distinct from the filled-amber COMPLETE.
   abandonBtn: {
