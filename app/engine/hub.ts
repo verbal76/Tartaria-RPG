@@ -146,6 +146,23 @@ export function findHubRoom(
   return activeRooms(factionId).find((r) => r.id === roomId) ?? null;
 }
 
+/** True when this room carries the `world` exit — i.e. it's the room you can
+ *  actually LEAVE the instance from (the authored "way in and out"). */
+export function roomHasWorldExit(room: HubRoom | null | undefined): boolean {
+  if (!room) return false;
+  return (['north', 'south', 'east', 'west'] as const).some(
+    (d) => room.exits[d] === STARTING_AREA_WORLD_EXIT,
+  );
+}
+
+/** True when the ACTIVE hub uses the `world`-exit convention at all (any room
+ *  declares a `world` exit). Authored starting areas do; legacy hubs that never
+ *  marked an exit don't — for those, leaving stays available from any room so we
+ *  don't strand the player. */
+export function hubDefinesWorldExit(factionId?: string | null): boolean {
+  return activeRooms(factionId).some((r) => roomHasWorldExit(r));
+}
+
 // v2.4.1 (OTA 031) — per-faction room name + description overrides.
 // hub_faction_variants.json holds the 8 non-Reclaimer factions' room
 // re-skins (same exits, same anchorNpc, same interactables — only

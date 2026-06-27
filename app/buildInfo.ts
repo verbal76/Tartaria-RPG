@@ -16516,4 +16516,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // single active one (routing = committing to it) and a route chain that no longer matches the active mission is
 // dropped. Button reads SET ACTIVE / DEACTIVATE. Touched: app/state/gameStore.ts, app/screens/ContractsScreen.tsx.
 // tsc clean; escort/faction/contract/combat suites green (48).
-export const OTA_BUILD_ID = '2026-06-27-908';
+// OTA-909 — [starter areas] the EXIT chip now appears ONLY in the room that actually holds the way out. The
+// authored HQs are hub-and-spoke: Operations (Ops) is the spawn room, the mission-board room, AND the only room
+// with the `world` exit; armory/mess/supply are dead-end spokes off Ops. The InputBox rendered the EXIT chip in
+// EVERY hub room, so the player could leave through the armory — unrealistic. EXIT is now gated to the world-exit
+// room when the active hub uses the `world` convention (authored starting areas); legacy hubs that never marked a
+// `world` exit (the built-in outpost) keep EXIT everywhere so no one is stranded. New hub.ts exports
+// roomHasWorldExit / hubDefinesWorldExit. Touched: app/engine/hub.ts, app/components/InputBox.tsx,
+// +__tests__/hubWorldExitGate.test.ts. tsc clean; hub suites green (45) + new gate test (2). NO pack change.
+export const OTA_BUILD_ID = '2026-06-27-909';

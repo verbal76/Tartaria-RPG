@@ -17,7 +17,7 @@ import { visibleBuildingRooms } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
-import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
+import { hubRoomFor, isLeaveHubCommand, roomHasWorldExit, hubDefinesWorldExit } from '../engine/hub';
 import { STARTING_AREA_WORLD_EXIT } from '../engine/contentPack';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import { reachClassFor } from '../engine/combatRules';
@@ -267,6 +267,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     return out;
   }, [hubRoom, factionId]);
 
+  // engine_Dev — the EXIT chip belongs ONLY in the room that actually holds the
+  // way out (the authored `world` exit — Operations in the WWII HQs). Showing it
+  // in every room let the player leave through the armory/mess/supply, which
+  // isn't how the place is laid out. When the active hub uses the world-exit
+  // convention, gate EXIT to the world-exit room; legacy hubs that never marked
+  // an exit keep EXIT everywhere so no one gets stranded.
+  const showExitChip = useMemo(() => {
+    if (!hubRoom) return false;
+    if (hubDefinesWorldExit(factionId)) return roomHasWorldExit(hubRoom);
+    return true;
+  }, [hubRoom, factionId]);
+
   // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the
   // real picker menu so the player learns the actual interaction — the demo
   // prop (cudgel / broken chest plate / door) is injected into the matching
@@ -411,7 +423,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // choice (the player's way out of the outpost + the tutorial).
                 <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
-              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              {showExitChip ? (
+                <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
+              ) : null}
             </>
           ) : sceneBuilding ? (
             // arb36 — a structure stands on this tile: offer ENTER alongside
