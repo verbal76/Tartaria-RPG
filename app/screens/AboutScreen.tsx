@@ -121,6 +121,10 @@ export function AboutScreen() {
   // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
   const [saveCopied, setSaveCopied] = useState(false);
   const [saveCharCount, setSaveCharCount] = useState(0);
+  // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
+  // Tartaria save into the Golem build) and load it as a new playable slot.
+  const [importBusy, setImportBusy] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
   // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
   // long sessions (>~25 KB, the silent paste cap on most chat
   // clients) can be sent in parts the way the dead-character log
@@ -234,6 +238,33 @@ export function AboutScreen() {
       setSaveCopied(true);
       setTimeout(() => setSaveCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
+  }
+  // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
+  // parse it, write it to a new slot, and drop into the game. Lets a save from
+  // another install (e.g. the Tartaria build) be played here in Golem.
+  async function handleImportSave() {
+    if (importBusy) return;
+    setImportBusy(true);
+    setImportMsg('Reading clipboard…');
+    try {
+      const text = await Clipboard.getStringAsync();
+      if (!text || text.trim().length === 0) {
+        setImportMsg('Clipboard is empty — copy a COPY SAVE export first, then tap Import.');
+        return;
+      }
+      const res = await useGameStore.getState().importSaveFromText(text);
+      if (res.ok) {
+        setImportMsg(`Imported ${res.name || 'character'} — loading…`);
+        useGameStore.getState().setScreen('exploration');
+      } else {
+        setImportMsg(res.error ?? 'Import failed.');
+      }
+    } catch (e) {
+      setImportMsg(`Import failed (${e instanceof Error ? e.message : 'unknown error'}).`);
+    } finally {
+      setImportBusy(false);
+      setTimeout(() => setImportMsg(null), 6000);
+    }
   }
   async function handleClearLog() {
     useGameStore.getState().clearGameLog();
@@ -725,9 +756,22 @@ export function AboutScreen() {
                 activeOpacity={0.7}
               >
                 <Text style={styles.sessionBtnSecondaryText}>
-                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (brick repro)'}
+                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (download / export)'}
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleImportSave(); }}
+                activeOpacity={0.7}
+                disabled={importBusy}
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (upload / paste)'}
+                </Text>
+              </TouchableOpacity>
+              {importMsg ? (
+                <Text style={styles.sessionFootnote}>{importMsg}</Text>
+              ) : null}
               <TouchableOpacity
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
                 onPress={() => { void handleCopyInventory(); }}

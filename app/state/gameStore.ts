@@ -2252,6 +2252,12 @@ interface GameStore {
 
   refreshSlots: () => Promise<void>;
   loadSlotIntoGame: (slotId: string) => Promise<void>;
+  /** Import a save exported by COPY SAVE (the "FULL STATE JSON" blob, with or
+   *  without the surrounding === markers). Parses {player, worldMemory}, backfills
+   *  the player, writes it to a NEW slot, and loads it — so a save from another
+   *  install (e.g. the Tartaria build) becomes a playable Golem slot. Returns a
+   *  result so the UI can report success/failure. */
+  importSaveFromText: (text: string) => Promise<{ ok: boolean; error?: string; name?: string }>;
   clearSlotLoadError: () => void;
   /** Tutorial controls — called by the overlay component. */
   startTutorial: () => void;
@@ -3841,6 +3847,74 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null }
         : {}),
     });
+  },
+
+  async importSaveFromText(text) {
+    // Pull the {player, worldMemory} JSON out of a COPY SAVE export — tolerant of
+    // the === markers + the highlights preamble around it, or just the bare JSON.
+    const extractJson = (raw: string): string | null => {
+      const start = raw.indexOf('{"player"');
+      const from = start >= 0 ? start : raw.indexOf('{');
+      if (from < 0) return null;
+      let depth = 0; let inStr = false; let esc = false;
+      for (let i = from; i < raw.length; i++) {
+        const ch = raw[i];
+        if (inStr) {
+          if (esc) esc = false;
+          else if (ch === '\\') esc = true;
+          else if (ch === '"') inStr = false;
+        } else if (ch === '"') inStr = true;
+        else if (ch === '{') depth++;
+        else if (ch === '}') { depth--; if (depth === 0) return raw.slice(from, i + 1); }
+      }
+      return null;
+    };
+    let parsed: { player?: PlayerCharacter | null; worldMemory?: unknown };
+    try {
+      const jsonStr = extractJson(text ?? '');
+      if (!jsonStr) return { ok: false, error: 'No save data found in the pasted text. Copy a full COPY SAVE export first, then tap Import.' };
+      parsed = JSON.parse(jsonStr) as { player?: PlayerCharacter | null; worldMemory?: unknown };
+    } catch (e) {
+      return { ok: false, error: `Could not parse the save (${e instanceof Error ? e.message : 'invalid JSON'}).` };
+    }
+    if (!parsed.player) return { ok: false, error: 'That save has no character record.' };
+    let player: PlayerCharacter;
+    try { player = backfillPlayer(parsed.player); }
+    catch (e) { return { ok: false, error: `Save couldn't be loaded (${e instanceof Error ? e.message : 'backfill failed'}).` }; }
+    if (player.dead === true) {
+      return { ok: false, error: `${player.name || 'That character'} is dead — revive them on the original install first.` };
+    }
+    const worldMemory = (parsed.worldMemory && typeof parsed.worldMemory === 'object')
+      ? (parsed.worldMemory as WorldMemory)
+      : discoverLocation(emptyMemory(), player.currentLocationId);
+    // Write it to a NEW slot, mirroring the new-character path so it registers in
+    // the slot picker and persists.
+    const slotId = newSlotId();
+    try { await setActiveSlot(slotId); } catch { /* best effort */ }
+    set({
+      player,
+      worldMemory,
+      gameLog: [],
+      currentScreen: 'exploration',
+      currentScene: null,
+      pendingRolls: null,
+      pendingHookContinue: null,
+      pendingGolemNaming: false,
+      activeSlotId: slotId,
+      slotLoadError: null,
+      // Imported mid-game saves have already seen the intro — never re-arm the
+      // tutorial for them.
+      tutorialStep: null,
+      awaitingTutorialName: false,
+      tutorialExploreChosen: false,
+      activeBuildingId: null,
+      activeBuildingRoomId: null,
+      buildingRevealed: [],
+      callDogModalOpen: false,
+    });
+    try { get().beginScene({}); } catch { /* scene paints on the next action if this throws */ }
+    try { await get().persist(); } catch { /* best effort — state is live regardless */ }
+    return { ok: true, name: player.name };
   },
 
   setScreen(screen) {
