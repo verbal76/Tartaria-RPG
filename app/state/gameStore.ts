@@ -308,6 +308,7 @@ import {
   reapExpiredWhispers,
   spawnChainEnemy,
   makeStolenDiscs,
+  describeWhisperStage,
 } from '../engine/whispers';
 import { TUTORIAL_STEPS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
@@ -24700,6 +24701,31 @@ function narrateCasualLook(
   }
 
   get().appendLog('world', parts.join(' '));
+
+  // ACTIVE-THREAD REMINDERS — pull the player back to "why am I here" without a
+  // scroll-up. Each is the CONCRETE authored objective (not paraphrased), routed
+  // to its SOURCE channel so the color matches the original line: a whisper lead
+  // reads in the Arbiter's gold, a dog rescue in the dog-quest purple.
+  {
+    // Whispers — the emergent NPC leads. describeWhisperStage carries the exact
+    // step objective (target + action + location), the same source the Contracts
+    // screen uses. Skip the bare "Stage: X" fallback (a chain with no authored
+    // per-stage line) so we never print a useless reminder.
+    let threadsShown = 0;
+    for (const w of player?.activeWhispers ?? []) {
+      if (threadsShown >= 3) break; // don't wall off the feed if many are open
+      const obj = describeWhisperStage(w);
+      if (obj && !/^Stage:\s/.test(obj)) {
+        get().appendLog('arbiter', `▸ Still open — ${obj}`);
+        threadsShown += 1;
+      }
+    }
+    // Dog rescue in progress — captors (factionNeutralFight) are holding a dog in
+    // this scene. Re-surfaced on the dog-quest channel so it stays purple.
+    if (scene.enemies.some((e) => e.factionNeutralFight)) {
+      get().appendLog('dog_quest', `▸ A dog is held here — put down its captors to free it.`);
+    }
+  }
 
   // 6. Optional hook plant — 30% chance, only if no hook is already active.
   // Kept separate from the description so the look-summary always reads
