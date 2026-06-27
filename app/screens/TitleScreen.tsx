@@ -780,16 +780,25 @@ export function TitleScreen() {
       <Text style={styles.subtitle}>REALMS</Text>
       <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
       {(() => {
-        // arb132 — build-line marker, right above the gem line, so the two
-        // side-by-side installs are instantly distinguishable. ARBITER = the
-        // isolated arbiters-line test build (.arbiters package); GOLEM = the
-        // live HaL2001 / production line. Uses the App ID so it's correct
-        // regardless of OTA-channel state.
+        // arb132 — build-line marker, right above the gem line, so the
+        // side-by-side installs are instantly distinguishable. Derived from the
+        // App ID (correct regardless of OTA-channel state) and mapped PER LINE,
+        // since each line is now its own package: .arbiters → ARBITER,
+        // .golem → GOLEM, .engine → ENGINE, base (.tartarprim) → TARTARIA.
+        // (Previously everything that wasn't .arbiters fell through to "GOLEM",
+        // so the HaL / Tartaria build mislabeled itself as GOLEM.)
         const appId = Application.applicationId ?? '';
         const isArb = appId.endsWith('.arbiters');
+        const isGolem = appId.endsWith('.golem');
+        const isEngine = appId.endsWith('.engine');
+        const buildLine = isArb ? '⟁ ARBITER BUILD'
+          : isGolem ? '⟁ GOLEM BUILD'
+          : isEngine ? '⟁ ENGINE BUILD'
+          : '⟁ TARTARIA BUILD';
+        const buildColor = isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
         return (
-          <Text style={[styles.buildMarker, { color: isArb ? '#7ec8e3' : '#c9a86a' }]}>
-            {isArb ? '⟁ ARBITER BUILD' : '⟁ GOLEM BUILD'}
+          <Text style={[styles.buildMarker, { color: buildColor }]}>
+            {buildLine}
           </Text>
         );
       })()}
