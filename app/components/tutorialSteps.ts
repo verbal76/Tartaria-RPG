@@ -141,6 +141,20 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '"The north door is locked. Tap INVESTIGATE."',
   },
   {
+    // The orientation tool — taught here, just before the explore/leave choice,
+    // because it's the player's "I'm lost, re-read it for me" button. The look
+    // handler calls maybeAdvanceTutorial('look') and InputBox lights this chip
+    // green for currentBeatId === 'look', so tapping LOOK AROUND YOU advances.
+    id: 'look',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Look Around',
+    body: 'One more tool before you decide: tap LOOK AROUND YOU any time you lose the thread. It re-reads the room — what\'s here, your exits, and any open leads you\'re still chasing.',
+    arbiter:
+      '"One more thing. When you lose the thread, tap LOOK AROUND YOU — I\'ll re-read the room, your exits, and whatever you\'re still chasing."',
+  },
+  {
     // Door-open branch. Replaces the old look → move_north → read_note
     // beats: when the door opens the player chooses, via a popup, to keep
     // poking around the outpost or to head out and begin the journey.

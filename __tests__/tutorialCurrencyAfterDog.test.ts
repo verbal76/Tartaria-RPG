@@ -32,7 +32,7 @@ const EXPECTED_BEAT_IDS = [
   // Door-open branch (arb4): the old look / move_north / read_note beats
   // were replaced by a single explore_or_leave choice popup.
   'name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate',
-  'explore_or_leave', 'main_quest', 'pick_city',
+  'look', 'explore_or_leave', 'main_quest', 'pick_city',
 ] as const;
 
 function readGameStoreSource(): string {

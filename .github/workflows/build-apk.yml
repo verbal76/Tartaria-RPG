@@ -64,11 +64,11 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
-      # golem-line — the isolated Tartaria testing line. A push here builds a
-      # PREVIEW APK artifact only (falls through to the else → preview profile;
-      # NOT a v* tag, NOT [build-aab], NOT HaL2001), so it never touches the Play
-      # Store / OTA / iOS. Gives the Golem line an automatic sideload build.
-      - 'golem-line'
+      # golem-line is intentionally NOT auto-built anymore — it now ships JS via
+      # the isolated eas-update-golem.yml OTA (golem-line channel only). APKs for
+      # golem (native / version changes) are built manually via workflow_dispatch
+      # against the golem-line ref, so we stop burning build minutes on every JS
+      # tweak.
     tags:
       - 'v*'
     paths-ignore:

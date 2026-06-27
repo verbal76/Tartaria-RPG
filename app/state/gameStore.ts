@@ -18884,6 +18884,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     if (state.tutorialStep === null) return;
     const step = TUTORIAL_STEPS[state.tutorialStep];
+    // Leaving the outpost during the LOOK beat (the door is already open by then)
+    // should also finish the arc — advance past look so the explore_or_leave
+    // handoff fires, instead of stranding the player outside on a stuck 'look'.
+    if (step?.id === 'look') {
+      get().advanceTutorial();      // look → explore_or_leave
+      get().finishOutpostTutorial(); // now on explore_or_leave → completes below
+      return;
+    }
     if (step?.id !== 'explore_or_leave') return;
     // Starter note — kept for inventory parity with the skip path. Its
     // main-quest framing is delivered by the main_quest beat's Arbiter
