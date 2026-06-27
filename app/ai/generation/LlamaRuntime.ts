@@ -246,14 +246,31 @@ export class LlamaRuntime {
   }
 
   async dispose(): Promise<void> {
-    if (this.context) {
-      try {
-        await this.context.release();
-      } catch {
-        // best effort — native side may already be torn down
-      }
-      this.context = null;
-    }
+    // CRASH FIX (librnllama isPredicting SIGSEGV, Play Console / 2.4.1 internal
+    // testing). `completion()` runs under the native-ML lock, but release() did
+    // NOT — so if dispose() fired while a prediction was still running on the
+    // native thread (model switch, screen unmount, app backgrounding, OTA-apply
+    // teardown), release() freed the llama context out from under the running
+    // completion. llama.rn's internal isPredicting() check then dereferenced the
+    // freed context and SIGSEGV'd (Java_com_rnllama_LlamaContext_isPredicting).
+    //
+    // The fix: (1) detach the context first so no NEW completion can start on it;
+    // (2) ask any in-flight prediction to stop so the lock frees promptly; (3)
+    // release THROUGH the same runExclusiveNativeMl lock as completion(), so the
+    // free is serialized behind the running prediction and the window is closed.
+    const ctx = this.context;
+    this.context = null;
     this.modelPath = null;
+    if (!ctx) return;
+    try {
+      await (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
+    } catch {
+      // stopCompletion unsupported / nothing running — fine; the lock still guards us.
+    }
+    try {
+      await runExclusiveNativeMl(() => Promise.resolve(ctx.release()));
+    } catch {
+      // best effort — native side may already be torn down
+    }
   }
 }

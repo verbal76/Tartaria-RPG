@@ -1,5 +1,8 @@
 name: Android Build (Tartaria Realms)
 
+# trigger-touch 2026-06-27: golem-line preview build incl. the librnllama
+# isPredicting crash fix. app/** is paths-ignored, so this non-ignored edit is
+# what fires the build for an app-code-only change on golem-line.
 # OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
 # build-apk's paths-ignore skips app/**, so an OTA bump alone won't fire the

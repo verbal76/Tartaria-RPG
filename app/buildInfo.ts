@@ -15136,4 +15136,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New: app/engine/missionRouting.ts, player.routedMission, store actions setFactionQuestActive + routeMission,
 // hub.ts roomIsExit/hubDefinesExitRoom. Touched: hub.ts, InputBox.tsx, types.ts, factionQuests.ts, gameStore.ts,
 // ContractsScreen.tsx. tsc clean (0 app errors); hub/faction/contract/combat suites green (78) + new tests (7).
-export const OTA_BUILD_ID = '2026-06-26-626-combatIII-mission';
+// CRASH FIX (librnllama isPredicting SIGSEGV) — LlamaRuntime.dispose() now releases the llama context
+// THROUGH the same runExclusiveNativeMl lock as completion() (and stops any in-flight prediction first), so
+// the native context can't be freed while a prediction is still running on the native thread. That
+// use-after-free was the Play Console / 2.4.1-internal-testing Java_com_rnllama_LlamaContext_isPredicting
+// segfault. tsc clean; qwen/ml-lifecycle suites green (41). app/ai/generation/LlamaRuntime.ts.
+export const OTA_BUILD_ID = '2026-06-26-626-combatIII-mission-llamacrash';
