@@ -825,6 +825,14 @@ export function ContractsScreen() {
                               : 'OPEN'}
                       </Text>
                     </View>
+                    {/* engine_Dev — faction quests were the ONLY contract family missing
+                        the always-visible ROUTE TO button (hunts/mysteries/storylines/
+                        leads all render contractRoute right under the head). Without it,
+                        tapping a mission only expanded it and never offered to set a
+                        course. The anchor is the posting faction's home outpost (mission
+                        board + same-faction agents = pickup/turn-in hub). Tapping it opens
+                        the same "Set course?" confirm prompt as every other contract. */}
+                    {contractRoute(key)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
                     {!readyToTurnIn && stageDef && !open && (

@@ -16480,4 +16480,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // directly (missing entry => resolved) instead of enemyViews' `?? e.hp` display fallback, so the arena
 // reliably collapses and the enemy box reverts to the crest the moment the last real threat is gone.
 // Touched: app/components/StatsPanel.tsx, app/screens/ExplorationScreen.tsx. tsc clean; combat suites green.
-export const OTA_BUILD_ID = '2026-06-27-904';
+// OTA-905 — [contracts] faction missions now offer ROUTE TO, like every other contract. The FACTION QUESTS
+// cards were the ONLY contract family that never rendered contractRoute() under the head — hunts, mysteries,
+// storylines and leads all did — so tapping a faction mission only expanded it and never offered to set a
+// course (the route-to-turn-in button was buried inside the expanded view). Added contractRoute(key) to the
+// faction-quest card head; it resolves the posting faction's home outpost (a real, distinct per-faction
+// location in the active world via startingLocationForFaction — content-agnostic, no Tartaria fallback) and
+// opens the same "Set course?" confirm prompt as every other contract. Touched: app/screens/ContractsScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-27-905';
