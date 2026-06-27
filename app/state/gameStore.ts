@@ -16182,6 +16182,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const escortees = escortSpec
       ? escortMod.spawnEscortees(escortSpec.count, player.hpMax ?? 20, acceptedAt)
       : undefined;
+    // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already on
+    // one; otherwise it's parked so batch-accepting from the board doesn't make
+    // everything live at once (the original complaint). You activate it when
+    // you're ready to run it.
+    const hasActiveOther = (player.activeFactionQuests ?? []).some((q) => q.tracked !== false);
+    const newTracked = !hasActiveOther;
     set((s) =>
       s.player
         ? {
@@ -16190,7 +16196,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt, ...(escortees ? { escortees } : {}) },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt, tracked: newTracked, ...(escortees ? { escortees } : {}) },
               ],
             },
           }
@@ -16200,8 +16206,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const roster = escortees.map((e) => `${e.name} (${e.hp} HP)`).join(', ');
       get().appendLog(
         'reward',
-        `${escortees.length} ${factionId.replace(/_/g, ' ')} ${escortees.length === 1 ? 'charge falls' : 'charges fall'} in beside you: ${roster}. Keep them alive — if any of them dies, the escort fails.`,
+        newTracked
+          ? `${escortees.length} ${factionId.replace(/_/g, ' ')} ${escortees.length === 1 ? 'charge falls' : 'charges fall'} in beside you: ${roster}. Keep them alive — if any of them dies, the escort fails.`
+          : `${escortees.length} ${factionId.replace(/_/g, ' ')} escortee${escortees.length === 1 ? '' : 's'} stand by for ${quest.title}: ${roster}. They'll fall in when you ACTIVATE this contract (you're already on another).`,
       );
+    } else if (!newTracked) {
+      get().appendLog('world', `${quest.title} added to your slate (paused — you're on another contract). Activate it in Contracts when you're ready.`);
     }
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
@@ -16250,30 +16260,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setFactionQuestActive(id, active) {
     const player = get().player;
     if (!player) return;
-    const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
+    const list = player.activeFactionQuests ?? [];
+    const rec = list.find((q) => q.id === id);
     if (!rec) return;
     // tracked absent/true = active; resolve the new state (explicit arg, else toggle).
     const nextActive = active != null ? active : rec.tracked === false;
+    // SINGLE-ACTIVE — "the mission you're on." Activating one PAUSES every other
+    // contract (it stays on the slate; deactivate never drops it). Deactivating
+    // just parks this one (zero active = you're between missions).
+    const othersPaused = nextActive
+      ? list.filter((q) => q.id !== id && q.tracked !== false).length
+      : 0;
     set((s) => (s.player ? {
       player: {
         ...s.player,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
-          q.id === id ? { ...q, tracked: nextActive } : q),
+          q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
       },
     } : s));
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
     const party = (rec.escortees ?? []).filter((e) => e.hp > 0);
+    const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
     if (nextActive) {
-      get().appendLog('world', party.length > 0
-        ? `Contract re-activated — ${title}. ${party.map((e) => e.name).join(', ')} fall back in beside you.`
-        : `Contract re-activated — ${title}. It advances again as you play.`);
+      get().appendLog('world', (party.length > 0
+        ? `Now on ${title}. ${party.map((e) => e.name).join(', ')} fall in beside you.`
+        : `Now on ${title}. It's the contract you're running.`) + pausedNote);
     } else {
       get().appendLog('world', party.length > 0
-        ? `Contract paused — ${title}. ${party.map((e) => e.name).join(', ')} stand down to safety and wait; they'll rejoin when you re-activate it.`
-        : `Contract paused — ${title}. It won't advance until you re-activate it.`);
+        ? `Stood down from ${title}. ${party.map((e) => e.name).join(', ')} fall back to safety and wait; they'll rejoin when you re-activate it.`
+        : `Paused ${title}. It won't advance until you re-activate it.`);
     }
-    // Deactivating a contract drops any active route chain pointed at it.
+    // Switching the active contract (or deactivating the routed one) drops a
+    // route chain that no longer matches the mission you're on.
+    if (get().player?.routedMission && get().player?.routedMission?.id !== id) {
+      set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+    }
     if (!nextActive && get().player?.routedMission?.id === id) {
       set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
     }
@@ -16285,13 +16307,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
     if (!rec) { get().appendLog('arbiter', "That contract isn't on your slate."); return; }
-    if (rec.tracked === false) {
-      get().appendLog('arbiter', 'That contract is paused — re-activate it before routing.');
-      return;
+    // Routing to a contract IS choosing to run it — make it the single active
+    // mission (pausing any other) so the escort party + stage progress follow it.
+    if (rec.tracked === false || (player.activeFactionQuests ?? []).some((q) => q.id !== id && q.tracked !== false)) {
+      get().setFactionQuestActive(id, true);
     }
     const def = findFactionQuestById(id);
     if (!def) return;
-    const want = desiredMissionLeg(player, def, rec);
+    const want = desiredMissionLeg(get().player ?? player, def, rec);
     if (player.currentLocationId === want.loc) {
       // Already at this leg's target — seed the chain so it continues after the
       // deed / turn-in, then let advanceMissionRoute settle it.

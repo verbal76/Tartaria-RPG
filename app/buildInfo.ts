@@ -16507,4 +16507,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chain on a manual divert. Faction card shows ROUTE TO <objective> / live "Auto-routing…" status. Optional
 // author field FactionQuestDef.objectiveLocationId overrides the text guess. Touched: types.ts, factionQuests.ts,
 // gameStore.ts, ContractsScreen.tsx, +missionRouting.ts. tsc clean; escort/faction/contract/combat suites green (51).
-export const OTA_BUILD_ID = '2026-06-27-907';
+// OTA-908 — [contracts] SINGLE-ACTIVE missions, per player intent ("activate = the mission you're on; deactivate
+// just turns it off, doesn't drop it"). setFactionQuestActive(id,true) now PAUSES every other contract (one
+// active at a time); deactivate parks just that one (zero active = between missions); neither ever removes a
+// contract (abandon still does that). Accepting a contract while you're already on one adds it PAUSED (fixes the
+// "batch-accept made them all live" complaint) — escortees on a parked accept stand by until you activate it;
+// the first contract you take with nothing active still goes active. routeMission() now makes its contract the
+// single active one (routing = committing to it) and a route chain that no longer matches the active mission is
+// dropped. Button reads SET ACTIVE / DEACTIVATE. Touched: app/state/gameStore.ts, app/screens/ContractsScreen.tsx.
+// tsc clean; escort/faction/contract/combat suites green (48).
+export const OTA_BUILD_ID = '2026-06-27-908';

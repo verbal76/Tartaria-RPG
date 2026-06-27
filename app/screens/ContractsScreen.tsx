@@ -846,7 +846,7 @@ export function ContractsScreen() {
                       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
                         {tracked
                           ? (escortParty.length > 0 ? `▮▮ DEACTIVATE (stand down ${escortParty.length})` : '▮▮ DEACTIVATE')
-                          : (escortParty.length > 0 ? `▶ ACTIVATE (recall ${escortParty.length})` : '▶ ACTIVATE')}
+                          : (escortParty.length > 0 ? `▶ SET ACTIVE (recall ${escortParty.length})` : '▶ SET ACTIVE — the mission you’re on')}
                       </Text>
                     </Pressable>
                     {/* OTA-907 — mission-aware ROUTE TO. Routes to the OBJECTIVE
