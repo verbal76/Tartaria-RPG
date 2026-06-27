@@ -477,8 +477,14 @@ export function ExplorationScreen() {
   // even though a KO'd body lingers in the scene to be looted — otherwise the character
   // box stays stretched full-height after you "complete" the combat. `inCombat` still
   // drives the controls + enemy panel so the "loot" button and the downed foe stay shown.
-  const arenaActive = COMBAT_ARENA_VIEW && enemyViews.some(
-    (v, i) => (v.currentHp ?? 0) > 0 && currentScene?.enemyKnockedOut?.[i] !== true,
+  // engine_Dev — read the LIVE hp array directly (missing entry => 0 => resolved),
+  // not enemyViews' `?? e.hp` display fallback. A scene that ends up with an enemy
+  // whose hp entry is missing/cleared used to read as full-HP through that fallback,
+  // pinning arenaActive true so the arena never collapsed and the enemy box never
+  // reverted to the crest. Treating a missing entry as 0 makes the collapse
+  // deterministic the moment the last real threat is gone.
+  const arenaActive = COMBAT_ARENA_VIEW && !!currentScene && currentScene.enemies.some(
+    (_e, i) => (currentScene.enemyHps[i] ?? 0) > 0 && currentScene.enemyKnockedOut?.[i] !== true,
   );
   // engine_Dev — when a roll sequence finishes resolving (pendingRolls goes null) during combat,
   // surface the FINAL output line in the result popup (the feed is hidden behind the arena). Only
@@ -551,8 +557,12 @@ export function ExplorationScreen() {
               Sheet. Wrapped INSIDE the TutorialTarget so the overlay
               still measures the same layout box. */}
           <TouchableOpacity
-            onPress={() => setScreen('character')}
-            activeOpacity={0.75}
+            // In combat the panel shows lean vitals + the escort party, not the
+            // full sheet — so tapping it to open the character screen is disabled
+            // until the fight is over (it stays a live, glanceable combat readout).
+            onPress={() => { if (!arenaActive) setScreen('character'); }}
+            activeOpacity={arenaActive ? 1 : 0.75}
+            disabled={arenaActive}
             style={arenaActive ? styles.combatColFill : undefined}
             onLayout={(e) => {
               const h = e.nativeEvent.layout.height;

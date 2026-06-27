@@ -219,8 +219,70 @@ export function StatsPanel({ player, fill }: Props) {
   // character box."
   const golemShows = !!player.sidekick && player.sidekick.hp > 0;
 
+  // Escortees the player is currently protecting — rendered in both modes.
+  const escortees = livingEscortees(player.activeFactionQuests);
+  const escortRows = escortees.length > 0 ? (
+    <View style={styles.escortBlock}>
+      {escortees.map((e) => {
+        const frac = e.hpMax > 0 ? e.hp / e.hpMax : 0;
+        const color = frac <= 0.34 ? '#e07a5f' : frac <= 0.67 ? '#d9b15f' : '#7fae8a';
+        return (
+          <Text key={e.id} style={[styles.escortName, { color }]} numberOfLines={1}>
+            ↳ {e.name} ({e.hp}/{e.hpMax})
+          </Text>
+        );
+      })}
+    </View>
+  ) : null;
+
+  // COMBAT MODE (`fill`) — the panel becomes the top half of the tall combat
+  // column. It deliberately does NOT show the full stat sheet (that's clutter
+  // mid-fight and the tap-to-open-sheet is disabled in combat); instead it
+  // shows the player's name + companions, the live vitals line, the escort
+  // party (the thing the player has to actively keep alive), and any active
+  // effects. Content is vertically centered so the tall box reads as
+  // intentional rather than "writing jammed at the top, empty below."
+  if (fill) {
+    return (
+      <Animated.View style={[styles.container, styles.fill, styles.combatOutline, styles.combatCenter, { backgroundColor: animBg }]}>
+        <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
+        <View style={styles.nameRow}>
+          <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
+          {dogShows && player.dog ? (
+            <Text style={styles.dogName} numberOfLines={1}>
+              {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+            </Text>
+          ) : null}
+        </View>
+        {golemShows && player.sidekick ? (
+          <View style={styles.golemRow}>
+            <Text style={styles.golemName} numberOfLines={1}>
+              {player.sidekick.name} ({player.sidekick.hp}/{player.sidekick.hpMax})
+            </Text>
+          </View>
+        ) : null}
+        <View style={styles.row}>
+          <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
+          <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
+          <Stat label="AC" value={`${effectiveAc}`} />
+        </View>
+        {escortRows ? (
+          <View style={styles.escortCombatWrap}>
+            <Text style={styles.escortHeader}>Escorting — keep them alive</Text>
+            {escortRows}
+          </View>
+        ) : null}
+        {player.statusEffects && player.statusEffects.length > 0 && (
+          <Text style={styles.effects} numberOfLines={1}>
+            Effects: {formatEffectSummary(player.statusEffects)}
+          </Text>
+        )}
+      </Animated.View>
+    );
+  }
+
   return (
-    <Animated.View style={[styles.container, fill ? styles.fill : null, fill ? styles.combatOutline : null, { backgroundColor: animBg }]}>
+    <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
           behind the card content so the text stays readable. */}
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
@@ -239,26 +301,8 @@ export function StatsPanel({ player, fill }: Props) {
           </Text>
         </View>
       ) : null}
-      {(() => {
-        // "A real escort mission" — live escortees the player is protecting,
-        // listed directly under the player's name with their current HP. They
-        // take real combat damage; losing one fails the escort contract.
-        const escortees = livingEscortees(player.activeFactionQuests);
-        if (escortees.length === 0) return null;
-        return (
-          <View style={styles.escortBlock}>
-            {escortees.map((e) => {
-              const frac = e.hpMax > 0 ? e.hp / e.hpMax : 0;
-              const color = frac <= 0.34 ? '#e07a5f' : frac <= 0.67 ? '#d9b15f' : '#7fae8a';
-              return (
-                <Text key={e.id} style={[styles.escortName, { color }]} numberOfLines={1}>
-                  ↳ {e.name} ({e.hp}/{e.hpMax})
-                </Text>
-              );
-            })}
-          </View>
-        );
-      })()}
+      {/* "A real escort mission" — live escortees under the player's name. */}
+      {escortRows}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
@@ -359,6 +403,11 @@ const styles = StyleSheet.create({
   // at a glance who's in danger and needs the fight ended fast.
   escortBlock: { marginTop: 1, marginLeft: 4 },
   escortName: { fontSize: 11, fontWeight: '600', letterSpacing: 0.3 },
+  // Combat mode — center the lean vitals+escort block so the tall arena box
+  // doesn't read as "content jammed at top, empty below."
+  combatCenter: { justifyContent: 'center' },
+  escortCombatWrap: { marginTop: 8, borderTopWidth: 1, borderTopColor: '#2b3a3e', paddingTop: 6 },
+  escortHeader: { color: '#8fa6ac', fontSize: 9, fontWeight: '700', letterSpacing: 0.6, marginBottom: 2, marginLeft: 4 },
   subline: { color: '#6c8088', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#6ab0c9', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },

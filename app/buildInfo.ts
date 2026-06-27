@@ -16472,4 +16472,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Touched: types.ts (Escortee + activeFactionQuests.escortees), factionQuests.ts (escort field), gameStore.ts
 // (spawn on accept, applyEscortDamage/failEscortQuests in combat, survivor delivery on turn-in),
 // StatsPanel.tsx (HUD party rows). tsc clean on all touched source files.
-export const OTA_BUILD_ID = '2026-06-27-903';
+// OTA-904 — [combat screen] three fixes to the arena layout. (1) The player panel now has a dedicated
+// COMBAT MODE: while the arena is up it shows name + companions + a lean HP/STA/AC vitals line + the escort
+// party (centered so the tall box doesn't read as "writing jammed at top, empty below") instead of the full
+// stat sheet. (2) Tapping the player panel no longer opens the character sheet mid-fight (disabled while the
+// arena is active) — it stays a live combat readout. (3) `arenaActive` now reads the live enemyHps array
+// directly (missing entry => resolved) instead of enemyViews' `?? e.hp` display fallback, so the arena
+// reliably collapses and the enemy box reverts to the crest the moment the last real threat is gone.
+// Touched: app/components/StatsPanel.tsx, app/screens/ExplorationScreen.tsx. tsc clean; combat suites green.
+export const OTA_BUILD_ID = '2026-06-27-904';
