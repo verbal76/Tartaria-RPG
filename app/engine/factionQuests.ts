@@ -46,6 +46,11 @@ export interface FactionQuestDef {
    *  quests (a real "gather N, bring them back" on-ramp). Quests with a
    *  `fetch` requirement carry no stages — the fetch IS the objective. */
   fetch?: { itemName: string; quantity: number };
+  /** Optional explicit ROUTE destination for this contract's objective (a
+   *  location id). When present it overrides the engine's text-derived guess for
+   *  "ROUTE TO"; absent → the engine infers it from the mission text, falling
+   *  back to the faction home / turn-in. */
+  objectiveLocationId?: string;
 }
 
 /** A faction quest the player has accepted. Mirrors ActiveHunt /
@@ -58,6 +63,11 @@ export interface ActiveFactionQuest {
    *  turn-in (you turn in to someone of the same faction). */
   postedByFaction: string;
   acceptedAt: number;
+  /** Whether this contract is ACTIVE (the one you're running) vs PAUSED.
+   *  Absent/true → active. SINGLE-ACTIVE: activating one pauses the rest. A
+   *  paused contract stays on the slate (never dropped — that's ABANDON) but
+   *  doesn't auto-advance until re-activated. */
+  tracked?: boolean;
 }
 
 export const FACTION_QUESTS = (factionQuestsData as { quests: FactionQuestDef[] }).quests;

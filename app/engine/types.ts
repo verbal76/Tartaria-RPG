@@ -1026,7 +1026,11 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[];
+  /** Mission ROUTE CHAIN in progress (set by ROUTE TO on a contract). The engine
+   *  courses to the objective, then auto-courses to the turn-in once the work is
+   *  done. Cleared on turn-in, abandon, deactivate, or a manual divert. */
+  routedMission?: { id: string; phase: 'to_objective' | 'to_turnin' } | null;
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
   /** Active monster hunts with per-stage progress. */
