@@ -16546,4 +16546,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Rest→combat was already at Tartaria parity (straight into combat, no trigger) — the
 // missing fights were the hunger-lock + hub confinement starving the roll (1+2).
 // tsc clean; combat/equip/faction/armor suites green (121) + new bareHand test (3).
-export const OTA_BUILD_ID = '2026-06-28-911';
+// 2026-06-28-912 — next 4 fixes from the Philadelphia Experiment playthrough:
+// (1) dev crash-test kit no longer re-grants every resume — the three dev grants
+//     raced on the same global stash (concurrent void calls, last-write-wins clobbered
+//     each other's "granted" keys → rations climbed to 41/40/40 and re-piled the
+//     full-Rare armor); now serialized so each sees the prior's committed write;
+// (2) title re-announce / perk-flicker — storm-survival titles awarded AFTER the
+//     submitPlayerAction player snapshot got discarded by the action's writebacks and
+//     re-announced next action; the storm tick now defers its award (skipAward) to the
+//     pre-snapshot catch-all so it announces once and the passive applies steadily;
+// (3) new-game first room read "(visit 2)" — the in-pass investigation-table seed
+//     pre-creates the room record, so the recorder re-reading state double-counted;
+//     it now uses the pre-pass priorVisit snapshot → true first visit reads "visit 1";
+// (4) no OUTDOOR weather (or its -1 DEX/WIS penalties) inside an outpost interior —
+//     pickWeather re-rolled on every beginScene so room-to-room moves in one HQ flipped
+//     the weather each step; suppressed while hubRoomId is set.
+// (#29 duplicate "Cyborg Plating" contracts is content-pack data, fixed in the pack JSON.)
+// tsc clean; titles/weather/hub/scene/save-load suites green (116).
+export const OTA_BUILD_ID = '2026-06-28-912';

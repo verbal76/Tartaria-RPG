@@ -911,6 +911,15 @@ function recordTitleProgress(
   setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
   delta?: Record<string, number>,
   maxes?: Record<string, number>,
+  // skipAward — bump the counters but DON'T award/announce here. For call sites
+  // that run AFTER submitPlayerAction's `player` snapshot (e.g. the storm-survival
+  // tick): awarding there appends earnedTitles, which the action body's writebacks
+  // then discard (they spread the pre-award snapshot), so the title re-announces on
+  // the next action's catch-all and its passive flickers for an action. The counter
+  // bump here is a FUNCTIONAL set so it persists; deferring the award to the
+  // pre-snapshot catch-all (awardNewTitles at the top of submitPlayerAction) lets it
+  // fold into the snapshot and announce exactly once.
+  skipAward = false,
 ): void {
   const player = getStore().player;
   if (!player) return;
@@ -921,7 +930,7 @@ function recordTitleProgress(
   if (delta) for (const k of Object.keys(delta)) n[k] = (n[k] ?? 0) + (delta[k] ?? 0);
   if (maxes) for (const k of Object.keys(maxes)) n[k] = Math.max(n[k] ?? 0, maxes[k] ?? 0);
   setStore((s) => (s.player ? { player: { ...s.player, titleProgress: next } } : s));
-  awardNewTitles(getStore, setStore);
+  if (!skipAward) awardNewTitles(getStore, setStore);
 }
 
 // engine_Dev — DATA-DRIVEN MAIN QUEST execution. Advance one step + announce; fire
@@ -3844,30 +3853,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // dying. Idempotent per slot (grantDevGemOnce records the key), so
       // resuming the same save never stacks more. No effect for other
       // names.
-      if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
-        void grantDevGemOnce(`${slotId}:${player.name.trim().toLowerCase()}`).then((res) => {
-          if (res.granted) {
-            set({ resurrectionGems: res.gems });
-            get().appendLog(
-              'reward',
-              `✦ A Resurrection Gem is set aside for ${player.name} — the buried world keeps its own. (${res.gems} held)`,
-            );
-          }
-        });
-      }
-      // OTA-461 — one-time playtest-supply gift for the dev characters (Verbal /
-      // Sasmooch). A standing crash-test kit so general testing doesn't burn the
-      // player's own consumables. Idempotent per name+slot via grantTestSupplyGiftOnce
-      // — resuming the same save never restacks it. No effect for any other name.
-      // engine_Dev — both batches resolve against the ACTIVE catalogs so a re-skin
-      // substitutes its own items instead of injecting Tartaria names. Granted under
-      // SEPARATE idempotency keys so adding the gear batch reaches an existing dev
-      // save (which already consumed the consumable key) without re-stacking it.
+      // OTA-461 — one-time dev playtest-supply gift (Verbal / Sasmooch): a
+      // Resurrection Gem + a crash-test kit (consumables) + a rare test loadout,
+      // each idempotent per name+slot so resuming never restacks. SERIALIZED: all
+      // three read-modify-write the SAME global stash, and firing them concurrently
+      // (the old `void` calls) let last-write-win clobber each other's "already
+      // granted" keys — so the kit re-granted every resume and rations climbed to
+      // 41/40/40 (this also re-piled the full-Rare armor that pushed AC out of the
+      // hittable band). Chaining them with await makes each grant see the prior's
+      // committed write, so every key persists and later resumes are true no-ops.
+      // Still non-blocking (the IIFE is voided) and resilient (a stash hiccup can't
+      // break the resume). engine_Dev — batches resolve against the ACTIVE catalogs
+      // so a re-skin substitutes its own items. No effect for any other name.
       const devName = player.name.trim().toLowerCase();
       if (DEV_REVIVE_NAMES.includes(devName)) {
-        void grantDevKitBatch(get, set, `${slotId}:${devName}`, buildDevGiftItems(), 'A crash-test kit');
-        // 1 Rare armor per slot + 1 Rare weapon per distance range (per the pack's content).
-        void grantDevKitBatch(get, set, `${slotId}:${devName}:raregear`, buildDevGearItems(), 'A rare test loadout');
+        void (async () => {
+          try {
+            const res = await grantDevGemOnce(`${slotId}:${devName}`);
+            if (res.granted) {
+              set({ resurrectionGems: res.gems });
+              get().appendLog(
+                'reward',
+                `✦ A Resurrection Gem is set aside for ${player.name} — the buried world keeps its own. (${res.gems} held)`,
+              );
+            }
+            await grantDevKitBatch(get, set, `${slotId}:${devName}`, buildDevGiftItems(), 'A crash-test kit');
+            // 1 Rare armor per slot + 1 Rare weapon per distance range (per the pack's content).
+            await grantDevKitBatch(get, set, `${slotId}:${devName}:raregear`, buildDevGearItems(), 'A rare test loadout');
+          } catch {
+            // dev-only grants — never let a stash hiccup break the resume.
+          }
+        })();
       }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
@@ -4455,7 +4471,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
     // engine_Dev — weatherEnabled=false → no weather at all (no atmosphere line, no effects).
-    const weather = isWeatherEnabled() ? pickWeather(worldMemory) : null;
+    // No OUTDOOR weather inside an outpost interior (hubRoomId set): a sealed HQ
+    // shouldn't carry a downpour, and — because pickWeather re-rolls on every
+    // beginScene — room-to-room moves inside one building were flipping the weather
+    // (and its -1 DEX/WIS penalties) every step. null is safe for all consumers
+    // (weatherStatModifiers(null)={}, tickWeather(null)=no-op, no atmosphere line).
+    const weather = (isWeatherEnabled() && !player.hubRoomId) ? pickWeather(worldMemory) : null;
     const hazard = pickHazardForLocation(location);
     // HANDOFF #15b — hub mode. When player is at the hub location AND
     // has a hubRoomId set (or default to entry), render the hub room
@@ -5719,8 +5740,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // visits to the SAME room get the same key, but two different
     // micro-micros within the same Macro stay distinct.
     const roomKey = candidateKey;
-    const prevVisits = get().worldMemory.visitedRooms ?? {};
-    const existing = prevVisits[roomKey];
+    // Use the PRE-PASS snapshot (priorVisit, captured at the top of _beginSceneCore
+    // BEFORE any in-function seed writes), NOT a fresh re-read. The OTA-071
+    // investigation-table seed earlier in this same pass pre-creates this room's
+    // record with visitCount:1, so re-reading get().worldMemory made a brand-new
+    // room look already-visited — "(visit 2)" on a new game. priorVisit reflects
+    // only genuine prior visits, so a true first visit reads as undefined → visit 1.
+    const existing = priorVisit;
     if (existing) {
       const tag = existing.visitCount >= 5 ? 'many times' : existing.visitCount >= 2 ? 'again' : 'before';
       const clearedNote = recentlyCleared
@@ -6692,6 +6718,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set,
           withCompanion ? { stormsSurvived: 1, stormsSurvivedWithCompanion: 1 } : { stormsSurvived: 1 },
           { maxCorruption: survivor?.corruption ?? 0 },
+          true, // skipAward — this runs AFTER the player snapshot; defer the award to
+                // the pre-snapshot catch-all so it doesn't double-announce / perk-flicker.
         );
       }
     }
