@@ -64,14 +64,11 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
-      # golem-line ships JS via the isolated eas-update-golem.yml OTA (golem-line
-      # channel only), so it must NOT auto-build an APK on every JS tweak. It IS
-      # listed here, but the build job below is gated so golem-line only builds
-      # when the commit message carries the [golem-apk] marker — the escape hatch
-      # for the rare golem push that needs a native rebuild (a new native module
-      # like expo-document-picker, or a version bump). Without the marker the
-      # trigger fires but the job no-ops, preserving the OTA-only default.
-      - 'golem-line'
+      # golem-line is intentionally NOT auto-built anymore — it now ships JS via
+      # the isolated eas-update-golem.yml OTA (golem-line channel only). APKs for
+      # golem (native / version changes) are built manually via workflow_dispatch
+      # against the golem-line ref, so we stop burning build minutes on every JS
+      # tweak.
     tags:
       - 'v*'
     paths-ignore:
@@ -107,10 +104,6 @@ jobs:
   build:
     name: Build & Release Tartaria Realms APK
     runs-on: ubuntu-latest
-    # golem-line is OTA-only by default (see trigger comment above). Only build
-    # it when the commit message opts in with [golem-apk] — the native-rebuild
-    # escape hatch. Every other branch builds unconditionally as before.
-    if: github.ref_name != 'golem-line' || contains(github.event.head_commit.message, '[golem-apk]')
     # arb155 — bound the job so a hung/disconnected runner fails fast with a red
     # X instead of spinning until GitHub's 6-hour default.
     timeout-minutes: 60
