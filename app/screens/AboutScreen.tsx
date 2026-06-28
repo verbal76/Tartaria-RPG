@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import * as FileSystem from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
@@ -114,17 +116,19 @@ export function AboutScreen() {
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
   const [invCharCount, setInvCharCount] = useState(0);
-  // arb172 — Session-tab declutter: the rarely-used clipboard dumps (COPY SAVE,
-  // COPY INVENTORY) hide behind this toggle. (COPY AI HEALTH was removed — its
-  // output is already inside COPY LOG / REPORT A BUG's device summary.)
+  // arb172 — Session-tab declutter: the rarely-used save tools (DOWNLOAD /
+  // UPLOAD CHARACTER FILE, COPY INVENTORY) hide behind this toggle. (COPY AI
+  // HEALTH was removed — its output is already inside COPY LOG / REPORT A BUG's
+  // device summary.)
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
-  const [saveCopied, setSaveCopied] = useState(false);
-  const [saveCharCount, setSaveCharCount] = useState(0);
-  // IMPORT SAVE: paste a COPY SAVE export (from this or another install — e.g. a
-  // Tartaria save into the Golem build) and load it as a new playable slot.
-  const [importBusy, setImportBusy] = useState(false);
-  const [importMsg, setImportMsg] = useState<string | null>(null);
+  // DOWNLOAD / UPLOAD CHARACTER FILE: write the loadable save (player +
+  // worldMemory, inventory rides along) to a real .json file you pick a folder
+  // for (SAF on Android), and read one back via the system file picker. This
+  // replaces the old clipboard COPY/PASTE SAVE — a file round-trips the whole
+  // save without the chat-paste truncation. Mirrors the dev-engine JSON I/O.
+  // Golem-only (Golem bundles expo-document-picker; the Tartaria line does not).
+  const [saveFileBusy, setSaveFileBusy] = useState(false);
+  const [saveFileMsg, setSaveFileMsg] = useState<string | null>(null);
   // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
   // long sessions (>~25 KB, the silent paste cap on most chat
   // clients) can be sent in parts the way the dead-character log
@@ -223,47 +227,93 @@ export function AboutScreen() {
       setTimeout(() => setInvCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
   }
-  // OTA-341 — COPY SAVE. Exports the loadable save state (player +
-  // worldMemory, minus the narration log) so a crashing/bricked save can be
-  // pasted back and reproduced EXACTLY via loadSlotIntoGame. Player ask after
-  // the OTA-338 brick, where we had no way to capture the fatal state before
-  // the character had to be deleted to recover.
-  async function handleCopySave() {
+  // DOWNLOAD CHARACTER FILE — write the loadable save (player + worldMemory;
+  // the inventory rides inside player) to a real .json file. On Android you
+  // pick a folder via SAF (Downloads works), so the file is visible in Files
+  // and can be moved to another device. Replaces the old clipboard COPY SAVE:
+  // a file carries the whole save with no chat-paste truncation. Mirrors the
+  // dev-engine saveJsonToFile() helper.
+  async function handleDownloadSave() {
+    if (saveFileBusy) return;
+    setSaveFileBusy(true);
+    setSaveFileMsg('Preparing character file…');
     try {
       const s = useGameStore.getState();
       const snapshot = buildSaveSnapshot(s.player, s.worldMemory);
       const stamped = stampSaveExport(snapshot, buildBasicDeviceSummary(), s.player?.name);
-      await Clipboard.setStringAsync(stamped);
-      setSaveCharCount(stamped.length);
-      setSaveCopied(true);
-      setTimeout(() => setSaveCopied(false), 2500);
-    } catch { /* clipboard rarely fails on Android */ }
-  }
-  // IMPORT SAVE — read the clipboard (the user copies a COPY SAVE export first),
-  // parse it, write it to a new slot, and drop into the game. Lets a save from
-  // another install (e.g. the Tartaria build) be played here in Golem.
-  async function handleImportSave() {
-    if (importBusy) return;
-    setImportBusy(true);
-    setImportMsg('Reading clipboard…');
-    try {
-      const text = await Clipboard.getStringAsync();
-      if (!text || text.trim().length === 0) {
-        setImportMsg('Clipboard is empty — copy a COPY SAVE export first, then tap Import.');
-        return;
-      }
-      const res = await useGameStore.getState().importSaveFromText(text);
-      if (res.ok) {
-        setImportMsg(`Imported ${res.name || 'character'} — loading…`);
-        useGameStore.getState().setScreen('exploration');
+      const safeName = (s.player?.name || 'character').replace(/[^a-z0-9_-]+/gi, '_').toLowerCase();
+      const filename = `tartaria-${safeName}-${OTA_BUILD_ID}.save.json`;
+      if (Platform.OS === 'android') {
+        const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (!perm.granted) {
+          setSaveFileMsg('Download cancelled — no folder chosen.');
+          return;
+        }
+        const uri = await FileSystem.StorageAccessFramework.createFileAsync(
+          perm.directoryUri,
+          filename,
+          'application/json',
+        );
+        await FileSystem.writeAsStringAsync(uri, stamped);
+        setSaveFileMsg(`Saved ${filename} (${(stamped.length / 1024).toFixed(0)} KB, inventory included) to the folder you picked. Move it to the other phone, then UPLOAD CHARACTER FILE.`);
       } else {
-        setImportMsg(res.error ?? 'Import failed.');
+        const uri = `${FileSystem.documentDirectory}${filename}`;
+        await FileSystem.writeAsStringAsync(uri, stamped);
+        setSaveFileMsg(`Saved to ${uri}`);
       }
     } catch (e) {
-      setImportMsg(`Import failed (${e instanceof Error ? e.message : 'unknown error'}).`);
+      setSaveFileMsg(`Download failed (${e instanceof Error ? e.message : 'unknown error'}).`);
     } finally {
-      setImportBusy(false);
-      setTimeout(() => setImportMsg(null), 6000);
+      setSaveFileBusy(false);
+      setTimeout(() => setSaveFileMsg(null), 9000);
+    }
+  }
+  // UPLOAD CHARACTER FILE — open the system file picker, read the chosen .json,
+  // parse it into a new playable slot, and drop into the game. Lets a save from
+  // another install (e.g. the Tartaria build) be played here in Golem. Uses
+  // expo-document-picker (a native module Golem bundles; the Tartaria line
+  // does not), mirroring the dev-engine pickJsonFile() helper.
+  async function handleUploadSave() {
+    if (saveFileBusy) return;
+    // The picker is a native module that only exists in an APK built after this
+    // feature ([golem-apk]). This screen can also arrive via OTA on an older
+    // APK that predates the module — detect that and guide the player instead of
+    // throwing a cryptic native error. (DOWNLOAD still works there — it's SAF.)
+    if (typeof DocumentPicker?.getDocumentAsync !== 'function') {
+      setSaveFileMsg('UPLOAD needs the newest app build. Install the latest Golem APK, then try again. (DOWNLOAD works now.)');
+      setTimeout(() => setSaveFileMsg(null), 9000);
+      return;
+    }
+    setSaveFileBusy(true);
+    setSaveFileMsg('Opening file picker…');
+    try {
+      const res = await DocumentPicker.getDocumentAsync({
+        type: ['application/json', 'text/plain', '*/*'],
+        copyToCacheDirectory: true,
+        multiple: false,
+      });
+      if (res.canceled) {
+        setSaveFileMsg('Upload cancelled.');
+        return;
+      }
+      const asset = res.assets?.[0];
+      if (!asset) {
+        setSaveFileMsg('No file was returned by the picker.');
+        return;
+      }
+      const content = await FileSystem.readAsStringAsync(asset.uri);
+      const imported = await useGameStore.getState().importSaveFromText(content);
+      if (imported.ok) {
+        setSaveFileMsg(`Loaded ${imported.name || 'character'} — entering the world…`);
+        useGameStore.getState().setScreen('exploration');
+      } else {
+        setSaveFileMsg(imported.error ?? 'That file is not a valid character save.');
+      }
+    } catch (e) {
+      setSaveFileMsg(`Upload failed (${e instanceof Error ? e.message : 'unknown error'}).`);
+    } finally {
+      setSaveFileBusy(false);
+      setTimeout(() => setSaveFileMsg(null), 9000);
     }
   }
   async function handleClearLog() {
@@ -736,9 +786,10 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
-          {/* arb172 — rarely-needed clipboard dumps tucked behind a toggle so the
-              page isn't a wall of COPY buttons. COPY SAVE = the loadable save for
-              brick-repro; COPY INVENTORY = the pack snapshot for balance reports. */}
+          {/* arb172 — rarely-needed save tools tucked behind a toggle so the
+              page isn't a wall of buttons. DOWNLOAD / UPLOAD CHARACTER FILE move
+              a whole save (inventory included) between installs via a real .json
+              file; COPY INVENTORY = the pack snapshot for balance reports. */}
           <TouchableOpacity
             style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
             onPress={() => setAdvancedOpen((v) => !v)}
@@ -752,25 +803,26 @@ export function AboutScreen() {
             <>
               <TouchableOpacity
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-                onPress={() => { void handleCopySave(); }}
+                onPress={() => { void handleDownloadSave(); }}
                 activeOpacity={0.7}
+                disabled={saveFileBusy}
               >
                 <Text style={styles.sessionBtnSecondaryText}>
-                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (download / export)'}
+                  {saveFileBusy ? 'WORKING…' : 'DOWNLOAD CHARACTER FILE'}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-                onPress={() => { void handleImportSave(); }}
+                onPress={() => { void handleUploadSave(); }}
                 activeOpacity={0.7}
-                disabled={importBusy}
+                disabled={saveFileBusy}
               >
                 <Text style={styles.sessionBtnSecondaryText}>
-                  {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (upload / paste)'}
+                  {saveFileBusy ? 'WORKING…' : 'UPLOAD CHARACTER FILE'}
                 </Text>
               </TouchableOpacity>
-              {importMsg ? (
-                <Text style={styles.sessionFootnote}>{importMsg}</Text>
+              {saveFileMsg ? (
+                <Text style={styles.sessionFootnote}>{saveFileMsg}</Text>
               ) : null}
               <TouchableOpacity
                 style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
