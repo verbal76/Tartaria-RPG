@@ -66,7 +66,12 @@ export function spawnEscortPool(count: number, playerHpMax: number, label: strin
   let hpMax = 0;
   for (let i = 0; i < count; i++) hpMax += escorteeMaxHp(playerHpMax);
   hpMax = Math.max(1, hpMax);
-  return { label: (label && label.trim()) || DEFAULT_ESCORT_LABEL, hp: hpMax, hpMax };
+  return { label: (label && label.trim()) || DEFAULT_ESCORT_LABEL, hp: hpMax, hpMax, count };
+}
+
+/** Singular/plural verb helper for escort log lines, by party size. */
+export function escortVerb(count: number | undefined, singular: string, plural: string): string {
+  return count === 1 ? singular : plural;
 }
 
 /** The live escort pools across every ACTIVE-and-TRACKED escort quest, for the HUD.

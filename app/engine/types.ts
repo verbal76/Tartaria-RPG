@@ -1396,6 +1396,9 @@ export interface EscortPool {
   label: string;
   hp: number;
   hpMax: number;
+  /** Party size — drives singular/plural verb agreement in escort log lines
+   *  ("Your Courier falls in" vs "Your Scientists fall in"). */
+  count?: number;
 }
 
 export interface Companion {

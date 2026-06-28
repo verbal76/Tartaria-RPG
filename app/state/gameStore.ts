@@ -16314,11 +16314,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     if (escort) {
+      const fallsV = escort.count === 1 ? 'falls' : 'fall';
+      const standsV = escort.count === 1 ? 'stands' : 'stand';
       get().appendLog(
         'reward',
         newTracked
-          ? `Your ${escort.label} fall in beside you (${escort.hp} HP). Keep the party alive — if they're cut down, the escort fails.`
-          : `Your ${escort.label} (${escort.hp} HP) stand by for ${quest.title}. They'll fall in when you ACTIVATE this contract (you're already on another).`,
+          ? `Your ${escort.label} ${fallsV} in beside you (${escort.hp} HP). Keep them alive — if the party is cut down, the escort fails.`
+          : `Your ${escort.label} (${escort.hp} HP) ${standsV} by for ${quest.title}. They'll fall in when you ACTIVATE this contract (you're already on another).`,
       );
     } else if (!newTracked) {
       get().appendLog('world', `${quest.title} added to your slate (paused — you're on another contract). Activate it in Contracts when you're ready.`);
@@ -16392,13 +16394,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const title = def?.title ?? id;
     const party = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
     const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
+    const partyFalls = party && party.count === 1 ? 'falls' : 'fall';
+    const partyWaits = party && party.count === 1 ? 'waits' : 'wait';
     if (nextActive) {
       get().appendLog('world', (party
-        ? `Now on ${title}. Your ${party.label} fall in beside you.`
+        ? `Now on ${title}. Your ${party.label} ${partyFalls} in beside you.`
         : `Now on ${title}. It's the contract you're running.`) + pausedNote);
     } else {
       get().appendLog('world', party
-        ? `Stood down from ${title}. Your ${party.label} fall back to safety and wait; they'll rejoin when you re-activate it.`
+        ? `Stood down from ${title}. Your ${party.label} ${partyFalls} back to safety and ${partyWaits}; they'll rejoin when you re-activate it.`
         : `Paused ${title}. It won't advance until you re-activate it.`);
       // Zero-active nudge — if pausing this leaves NO active contract while you
       // still hold accepted ones, nothing advances until you pick the next
@@ -22743,8 +22747,9 @@ function failEscortQuests(
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
     const label = def?.escort?.label ?? 'escort party';
+    const isAre = def?.escort?.count === 1 ? 'is' : 'are';
     void Promise.resolve().then(() =>
-      get().appendLog('combat', `Your ${label} are cut down. The escort "${title}" has failed — you couldn't keep them alive.`),
+      get().appendLog('combat', `Your ${label} ${isAre} cut down. The escort "${title}" has failed — you couldn't keep them alive.`),
     );
   }
 }

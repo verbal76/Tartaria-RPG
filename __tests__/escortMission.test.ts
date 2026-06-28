@@ -47,6 +47,7 @@ describe('escort mission mechanic (shared pool)', () => {
   it('spawns a single shared pool at full HP = sum of the party', () => {
     const pool = spawnEscortPool(3, 40, 'Scientists');
     expect(pool.label).toBe('Scientists');
+    expect(pool.count).toBe(3); // drives verb agreement
     expect(pool.hp).toBe(pool.hpMax); // spawns at full
     // 3 members, each 8-45 → pool max in [24, 135].
     expect(pool.hpMax).toBeGreaterThanOrEqual(3 * 8);
