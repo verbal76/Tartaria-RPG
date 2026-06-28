@@ -9979,6 +9979,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
             }
           }
+          // Escort party patches up while you rest — modest (≈10% of their pool max,
+          // capped at the deficit), kept well below combat bleed so a careless player
+          // still loses them. Only ACTIVE (tracked) escorts heal; a rest can still be
+          // interrupted by an ambush that bleeds them right back.
+          {
+            const restEscPlayer = get().player;
+            const escActive = restEscPlayer?.activeFactionQuests ?? [];
+            if (restEscPlayer && escActive.some((q) => q.escort && q.tracked !== false && q.escort.hp < q.escort.hpMax)) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { ESCORT_REST_HEAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
+              let healedLabel: string | null = null;
+              const nextEsc = escActive.map((q) => {
+                if (!q.escort || q.tracked === false || q.escort.hp >= q.escort.hpMax) return q;
+                const heal = Math.min(q.escort.hpMax - q.escort.hp, Math.max(1, Math.round(q.escort.hpMax * ESCORT_REST_HEAL_FRACTION)));
+                healedLabel = q.escort.label;
+                return { ...q, escort: { ...q.escort, hp: q.escort.hp + heal } };
+              });
+              set((s) => (s.player ? { player: { ...s.player, activeFactionQuests: nextEsc } } : s));
+              if (healedLabel) get().appendLog('world', `Your ${healedLabel} patch their wounds while you rest.`);
+            }
+          }
           // OTA 039 — tier-cross line on rest decay.
           if (corrDecay > 0) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -16269,8 +16290,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const escortMod = require('../engine/escort') as typeof import('../engine/escort');
     const escortSpec = escortMod.escortSpecForQuest(quest);
-    const escortees = escortSpec
-      ? escortMod.spawnEscortees(escortSpec.count, player.hpMax ?? 20, acceptedAt)
+    const escort = escortSpec
+      ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
       : undefined;
     // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already on
     // one; otherwise it's parked so batch-accepting from the board doesn't make
@@ -16286,19 +16307,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt, tracked: newTracked, ...(escortees ? { escortees } : {}) },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt, tracked: newTracked, ...(escort ? { escort } : {}) },
               ],
             },
           }
         : s,
     );
-    if (escortees && escortees.length > 0) {
-      const roster = escortees.map((e) => `${e.name} (${e.hp} HP)`).join(', ');
+    if (escort) {
       get().appendLog(
         'reward',
         newTracked
-          ? `${escortees.length} ${factionId.replace(/_/g, ' ')} ${escortees.length === 1 ? 'charge falls' : 'charges fall'} in beside you: ${roster}. Keep them alive — if any of them dies, the escort fails.`
-          : `${escortees.length} ${factionId.replace(/_/g, ' ')} escortee${escortees.length === 1 ? '' : 's'} stand by for ${quest.title}: ${roster}. They'll fall in when you ACTIVATE this contract (you're already on another).`,
+          ? `Your ${escort.label} fall in beside you (${escort.hp} HP). Keep the party alive — if they're cut down, the escort fails.`
+          : `Your ${escort.label} (${escort.hp} HP) stand by for ${quest.title}. They'll fall in when you ACTIVATE this contract (you're already on another).`,
       );
     } else if (!newTracked) {
       get().appendLog('world', `${quest.title} added to your slate (paused — you're on another contract). Activate it in Contracts when you're ready.`);
@@ -16370,15 +16390,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } : s));
     const def = findFactionQuestById(id);
     const title = def?.title ?? id;
-    const party = (rec.escortees ?? []).filter((e) => e.hp > 0);
+    const party = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
     const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
     if (nextActive) {
-      get().appendLog('world', (party.length > 0
-        ? `Now on ${title}. ${party.map((e) => e.name).join(', ')} fall in beside you.`
+      get().appendLog('world', (party
+        ? `Now on ${title}. Your ${party.label} fall in beside you.`
         : `Now on ${title}. It's the contract you're running.`) + pausedNote);
     } else {
-      get().appendLog('world', party.length > 0
-        ? `Stood down from ${title}. ${party.map((e) => e.name).join(', ')} fall back to safety and wait; they'll rejoin when you re-activate it.`
+      get().appendLog('world', party
+        ? `Stood down from ${title}. Your ${party.label} fall back to safety and wait; they'll rejoin when you re-activate it.`
         : `Paused ${title}. It won't advance until you re-activate it.`);
       // Zero-active nudge — if pausing this leaves NO active contract while you
       // still hold accepted ones, nothing advances until you pick the next
@@ -16643,10 +16663,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     logRepChanges(get, repResult.changed);
     // "A real escort mission" — delivered the party alive. Name the survivors
     // so the win lands as a real escort, not a paperwork close.
-    const survivors = (activeRecord?.escortees ?? []).filter((e) => e.hp > 0);
-    if (survivors.length > 0) {
-      const who = survivors.map((e) => e.name).join(', ');
-      get().appendLog('reward', `You delivered ${survivors.length === 1 ? 'your charge' : 'all ' + survivors.length + ' charges'} safely — ${who}. They peel off with a nod.`);
+    const deliveredParty = activeRecord?.escort && activeRecord.escort.hp > 0 ? activeRecord.escort : null;
+    if (deliveredParty) {
+      get().appendLog('reward', `You delivered your ${deliveredParty.label} safely (${deliveredParty.hp}/${deliveredParty.hpMax} HP). They peel off with a nod.`);
     }
     plantNextContractHint(get, candidate.factionId, 'faction_quest');
     void get().persist();
@@ -22668,38 +22687,33 @@ function applyEscortDamage(
   const player = get().player;
   if (!player || baseDmg <= 0) return;
   const active = player.activeFactionQuests ?? [];
-  if (!active.some((q) => (q.escortees?.length ?? 0) > 0)) return;
+  if (!active.some((q) => q.escort && q.escort.hp > 0 && q.tracked !== false)) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { ESCORT_HIT_CHANCE } = require('../engine/escort') as typeof import('../engine/escort');
+  const { ESCORT_COLLATERAL_FRACTION } = require('../engine/escort') as typeof import('../engine/escort');
 
-  const hurt: { name: string; dmg: number; hp: number; hpMax: number }[] = [];
-  const failed: { id: string; dead: string[] }[] = [];
+  // Shared-pool COLLATERAL — the party in the fight takes a fixed fraction of the
+  // damage the player just took. EXTRA (the player still took their full hit), not
+  // absorbed. Deterministic, all-or-nothing: when the pool hits 0 the escort fails.
+  // Parked (deactivated) parties are out of the fight and take nothing.
+  const collateral = Math.max(1, Math.round(baseDmg * ESCORT_COLLATERAL_FRACTION));
+  const hurt: { label: string; dmg: number; hp: number; hpMax: number }[] = [];
+  const failed: string[] = [];
 
   const next = active.map((q) => {
-    if (!q.escortees || q.escortees.length === 0) return q;
-    if (q.tracked === false) return q; // parked party takes no damage while deactivated
-    const dead: string[] = [];
-    const escortees = q.escortees.map((e) => {
-      if (e.hp <= 0) return e; // already down
-      if (Math.random() >= ESCORT_HIT_CHANCE) return e;
-      const frac = 0.4 + Math.random() * 0.3; // 40-70% of the player-facing hit
-      const d = Math.max(1, Math.round(baseDmg * frac));
-      const hp = Math.max(0, e.hp - d);
-      if (hp <= 0) dead.push(e.name);
-      else hurt.push({ name: e.name, dmg: d, hp, hpMax: e.hpMax });
-      return { ...e, hp };
-    });
-    if (dead.length > 0) failed.push({ id: q.id, dead });
-    return { ...q, escortees };
+    if (!q.escort || q.tracked === false || q.escort.hp <= 0) return q;
+    const hp = Math.max(0, q.escort.hp - collateral);
+    if (hp <= 0) failed.push(q.id);
+    else hurt.push({ label: q.escort.label, dmg: collateral, hp, hpMax: q.escort.hpMax });
+    return { ...q, escort: { ...q.escort, hp } };
   });
 
-  if (hurt.length === 0 && failed.length === 0) return; // nothing connected
+  if (hurt.length === 0 && failed.length === 0) return;
 
   set((s) => (s.player ? { player: { ...s.player, activeFactionQuests: next } } : s));
 
   for (const h of hurt) {
     void Promise.resolve().then(() =>
-      get().appendLog('combat', `${enemyName} catches ${h.name} — ${h.dmg} damage (${h.hp}/${h.hpMax} HP).`),
+      get().appendLog('combat', `${enemyName} catches your ${h.label} — ${h.dmg} damage (${h.hp}/${h.hpMax} HP).`),
     );
   }
 
@@ -22712,9 +22726,9 @@ function applyEscortDamage(
 function failEscortQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  failed: { id: string; dead: string[] }[],
+  failedIds: string[],
 ): void {
-  const ids = new Set(failed.map((f) => f.id));
+  const ids = new Set(failedIds);
   set((s) => {
     if (!s.player) return {};
     return {
@@ -22725,13 +22739,12 @@ function failEscortQuests(
       },
     };
   });
-  for (const f of failed) {
-    const def = findFactionQuestById(f.id);
-    const title = def?.title ?? f.id;
-    const who = f.dead.join(' and ');
-    const verb = f.dead.length > 1 ? 'fall' : 'falls';
+  for (const id of failedIds) {
+    const def = findFactionQuestById(id);
+    const title = def?.title ?? id;
+    const label = def?.escort?.label ?? 'escort party';
     void Promise.resolve().then(() =>
-      get().appendLog('combat', `${who} ${verb}. The escort "${title}" has failed — you couldn't keep them alive.`),
+      get().appendLog('combat', `Your ${label} are cut down. The escort "${title}" has failed — you couldn't keep them alive.`),
     );
   }
 }

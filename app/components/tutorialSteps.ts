@@ -161,12 +161,12 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'main_quest',
     screen: 'exploration',
-    area: 'objective-chip',
+    area: 'quick-row',
     pulse: true,
-    title: 'Your Main Quest',
-    body: 'Your main quest is your through-line. Tap the MAIN QUEST objective chip to open your contracts.',
+    title: 'Your Missions',
+    body: 'Your storyline and every contract live on the mission board. Tap the amber ALL MISSIONS button to open it.',
     arbiter:
-      '"Nine Cores, nine Guardians, nine Lost Capitals. That\'s the road. Tap MAIN QUEST to start."',
+      '"Everything you\'re chasing is on the board. Tap ALL MISSIONS — your storyline\'s at the top."',
   },
   {
     id: 'pick_city',

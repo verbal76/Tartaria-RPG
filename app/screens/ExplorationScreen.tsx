@@ -673,96 +673,39 @@ export function ExplorationScreen() {
           Visible whenever the player exists, suppressed only in
           the 'ended' phase (no live quest to point at). */}
       {(() => {
-        if (!player) return null;
-        // The main-quest / objective chip is out-of-combat navigation; during a
-        // fight it's just clutter over the arena, so suppress it while a live
-        // threat is up (it returns the moment the arena collapses, i.e. the last
-        // foe is down — matching the rest of the peaceful-layout revert).
-        if (arenaActive) return null;
-        // engine_Dev — a DATA-DRIVEN main quest (uploaded, or the generic default)
-        // drives the chip. The built-in Tartaria main quest was removed.
+        // engine_Dev — the always-on MAIN QUEST objective chip was removed to reclaim
+        // exploration-feed space (escortee rows + the chip were squeezing the feed).
+        // The storyline objective now lives in the mission board, reached via the
+        // amber ALL MISSIONS quick button. What stays here is a CONDITIONAL ★ SUMMON
+        // button: shown only while standing at the active kill-step boss's location
+        // with no copy already in the scene (re-engages it after a death-revive /
+        // scene rebuild). Nothing renders the rest of the time, so the row is free.
+        if (!player || arenaActive) return null;
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { liveMainQuest } = require('../engine/customMainQuest');
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { currentObjectiveLine, questIsComplete, questStepIndex, questBossAt } = require('../engine/customMainQuestEngine');
+        const { questIsComplete, questBossAt } = require('../engine/customMainQuestEngine');
         const customQ = liveMainQuest();
-        if (customQ) {
-          // engine_Dev — the chip leads with the QUEST TITLE (the author's name for
-          // the campaign) and carries a small parts-completed progress count, so the
-          // player sees both what they're chasing and how far along they are.
-          const complete = questIsComplete(player);
-          const total = customQ.steps.length;
-          const done = Math.max(0, Math.min(questStepIndex(player), total));
-          const title = (customQ.title ?? 'Main quest').trim() || 'Main quest';
-          const objLine = complete ? 'Complete.' : (currentObjectiveLine(player) ?? 'No active objective.');
-          // engine_Dev — SUMMON chip for the active KILL step. The kill-step boss
-          // auto-spawns on arrival; this re-engages it after a death-revive / scene
-          // rebuild clears the field. Shown only while STANDING at the boss's location
-          // with no copy already in the scene (the summon action re-checks the same).
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { WORLD_MAP_CENTER_X: scx, WORLD_MAP_CENTER_Y: scy } = require('../engine/worldMap');
-          const stationedHere = !player.travelTarget
-            && (player.hubRoomId != null || (player.mapX === scx && player.mapY === scy));
-          const bossHere = !complete && stationedHere ? questBossAt(player, player.currentLocationId) : null;
-          const bossInScene = !!bossHere && (currentScene?.enemies ?? []).some(
-            (e: { name: string }) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
-          );
-          const canSummonBoss = !!bossHere && !bossInScene;
-          return (
-            <TutorialTarget area="objective-chip">
-              <TouchableOpacity
-                style={styles.objectiveChip}
-                onPress={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
-                activeOpacity={0.7}
-                hitSlop={6}
-              >
-                <View style={styles.objectiveChipRow}>
-                  <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={2}>
-                    <Text style={styles.objectiveChipStar}>★ </Text>
-                    <Text style={styles.objectiveChipLabel}>{title.toUpperCase()} · </Text>
-                    {objLine}
-                    <Text style={styles.objectiveChipProgress}>{`   ${done}/${total} parts`}</Text>
-                  </Text>
-                  {canSummonBoss && (
-                    <TouchableOpacity
-                      style={styles.objectiveChipSummon}
-                      onPress={() => useGameStore.getState().summonMainQuestBoss()}
-                      activeOpacity={0.7}
-                      hitSlop={8}
-                    >
-                      <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </TouchableOpacity>
-            </TutorialTarget>
-          );
-        }
-        // engine_Dev — no data-driven quest loaded: the chip is just the menu
-        // entry into the full Contracts screen (side quests, hunts, collectibles).
+        if (!customQ) return null;
+        const complete = questIsComplete(player);
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { WORLD_MAP_CENTER_X: scx, WORLD_MAP_CENTER_Y: scy } = require('../engine/worldMap');
+        const stationedHere = !player.travelTarget
+          && (player.hubRoomId != null || (player.mapX === scx && player.mapY === scy));
+        const bossHere = !complete && stationedHere ? questBossAt(player, player.currentLocationId) : null;
+        const bossInScene = !!bossHere && (currentScene?.enemies ?? []).some(
+          (e: { name: string }) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
+        );
+        if (!bossHere || bossInScene) return null;
         return (
-          <TutorialTarget area="objective-chip">
           <TouchableOpacity
-            style={styles.objectiveChip}
-            onPress={() => {
-              // Tungsten Spire — advance the main_quest tutorial beat
-              // when the player taps the MAIN QUEST chip, then route
-              // to the Contracts screen as normal.
-              useGameStore.getState().maybeAdvanceTutorial('main_quest');
-              setScreen('contracts');
-            }}
+            style={[styles.objectiveChipSummon, { alignSelf: 'flex-start', marginBottom: 4 }]}
+            onPress={() => useGameStore.getState().summonMainQuestBoss()}
             activeOpacity={0.7}
-            hitSlop={6}
+            hitSlop={8}
           >
-            <View style={styles.objectiveChipRow}>
-              <Text style={[styles.objectiveChipTitle, styles.objectiveChipBody]} numberOfLines={1}>
-                <Text style={styles.objectiveChipStar}>★ </Text>
-                <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
-                No main quest set — build one in the dev console.
-              </Text>
-            </View>
+            <Text style={styles.objectiveChipSummonText}>★ SUMMON {String(bossHere.name).toUpperCase()}</Text>
           </TouchableOpacity>
-          </TutorialTarget>
         );
       })()}
 

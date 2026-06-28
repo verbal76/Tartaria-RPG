@@ -582,7 +582,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             )}
             <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
             <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
-            <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
+            <QuickBtn label="all missions" tone="amber" onPress={onOpenMissions} blocked={tutLock} />
           </>
         )}
       </TutorialTarget>
@@ -663,7 +663,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   );
 }
 
-type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
+type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive' | 'unavailable' | 'amber';
 
 function QuickBtn({
   label,
@@ -697,6 +697,7 @@ function QuickBtn({
     resolvedTone === 'ready' && styles.quickReady,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
     resolvedTone === 'unavailable' && styles.quickUnavailable,
+    resolvedTone === 'amber' && styles.quickAmber,
     blocked && styles.quickDisabled,
   ];
   const textStyle = [
@@ -705,6 +706,7 @@ function QuickBtn({
     resolvedTone === 'ready' && styles.quickReadyText,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
     resolvedTone === 'unavailable' && styles.quickUnavailableText,
+    resolvedTone === 'amber' && styles.quickAmberText,
     // arb86 — dim the LABEL on disabled chips (replaces the old whole-chip
     // opacity:0.4 so the fill stays opaque against any tuned background).
     blocked && styles.quickDisabledText,
@@ -845,6 +847,8 @@ const styles = StyleSheet.create({
   quickReady: { borderColor: '#9ec96a', backgroundColor: '#1b2417' },
   quickNeedsApproach: { borderColor: '#6ab0c9' },
   quickUnavailable: { borderColor: '#e07a5f' },
+  // engine_Dev — amber standout for ALL MISSIONS, so it reads as a menu, not a move.
+  quickAmber: { borderColor: '#e0a44f', backgroundColor: '#241d10' },
   // Disabled (e.g. TAKE during the typed-input rope beat) — muted so it reads
   // as "not now" without the red 'unavailable' alarm color. arb86 — was
   // opacity 0.4, which made the whole chip (fill included) translucent so the
@@ -857,6 +861,7 @@ const styles = StyleSheet.create({
   quickReadyText: { color: '#9ec96a' },
   quickNeedsApproachText: { color: '#6ab0c9' },
   quickUnavailableText: { color: '#e07a5f' },
+  quickAmberText: { color: '#e0a44f' },
   inputRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   // Tungsten Spire — Animated.View wrapper so the input border can
   // pulse during the name + rope beats. Border lives on the wrapper;

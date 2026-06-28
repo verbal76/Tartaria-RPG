@@ -305,8 +305,7 @@ export function ContractsScreen() {
               onPress={() => setMqExpanded((v) => !v)}
               activeOpacity={0.85}
             >
-              <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
-              <Text style={styles.mainQuestPhase}>{title}</Text>
+              <Text style={styles.mainQuestTag}>STORYLINE MISSION — {title.toUpperCase()}  {mqExpanded ? '▴' : '▾'}</Text>
               <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
               {canSummonBoss && (
                 <TouchableOpacity
@@ -818,7 +817,7 @@ export function ContractsScreen() {
                 // don't advance and its escort party (if any) stands down. tracked
                 // absent/true = active (back-compat with pre-toggle saves).
                 const tracked = rec.tracked !== false;
-                const escortParty = (rec.escortees ?? []).filter((e) => e.hp > 0);
+                const escortParty = rec.escort && rec.escort.hp > 0 ? rec.escort : null;
                 return (
                   <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
@@ -845,8 +844,8 @@ export function ContractsScreen() {
                     >
                       <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
                         {tracked
-                          ? (escortParty.length > 0 ? `▮▮ DEACTIVATE (stand down ${escortParty.length})` : '▮▮ DEACTIVATE')
-                          : (escortParty.length > 0 ? `▶ SET ACTIVE (recall ${escortParty.length})` : '▶ SET ACTIVE — the mission you’re on')}
+                          ? (escortParty ? `▮▮ DEACTIVATE (stand down your ${escortParty.label})` : '▮▮ DEACTIVATE')
+                          : (escortParty ? `▶ SET ACTIVE (recall your ${escortParty.label})` : '▶ SET ACTIVE — the mission you’re on')}
                       </Text>
                     </Pressable>
                     {/* OTA-907 — mission-aware ROUTE TO. Routes to the OBJECTIVE

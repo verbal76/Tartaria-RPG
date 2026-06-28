@@ -1,43 +1,41 @@
-// Escort-contract mechanic — "a real escort mission."
+// Escort-contract mechanic — "a real escort mission" (shared-pool model).
 //
-// An escort faction quest spawns 2-3 same-faction low-level NPC escortees on
-// accept. They live on the active-quest record (`escortees`), show under the
-// player's name in the HUD, and take REAL combat damage every round an enemy
-// connects. If any escortee's hp reaches 0 the escort quest FAILS; delivering
-// the party (any survivor) to the destination completes it.
+// An escort faction quest spawns a SHARED-POOL escort party on accept. The party
+// lives on the active-quest record (`escort`: { label, hp, hpMax }), shows as ONE
+// row under the player's name in the HUD, and takes COLLATERAL combat damage when
+// the player is hit (a fraction of the player's damage — EXTRA, not absorbed off
+// the player). When the pool reaches 0 the escort FAILS; delivering the party
+// (pool > 0) completes it. All-or-nothing — no individual escortee tracking.
 //
-// Everything here is content-agnostic: escortee names come from
-// data/escortNames.json or a pack's `flavor.escortNames`, never hardcoded to a
-// setting. Detection is by an explicit `escort` field on the quest OR an
-// `_escort` id suffix, so authored packs opt in without re-writing every quest.
+// Content-agnostic: detection is by an explicit `escort` field on the quest OR an
+// `_escort` id suffix; the display name comes from `escort.label` (one word, e.g.
+// "Scientists"), defaulting to "Escort party".
 
-import type { Escortee } from './types';
+import type { EscortPool } from './types';
 import type { FactionQuestDef } from './factionQuests';
-import { resolveFlavor } from './contentPack';
-import escortNamesData from '../data/escortNames.json';
 
-const DEFAULT_ESCORT_NAMES: string[] = (escortNamesData as { names: string[] }).names;
+const DEFAULT_ESCORT_LABEL = 'Escort party';
 
-/** Chance, per enemy hit that connects, that a given living escortee gets caught
- *  in the exchange and takes damage. Tuned so a 2-3 turn fight rarely kills an
- *  escortee outright but a drawn-out brawl genuinely threatens them. */
-export const ESCORT_HIT_CHANCE = 0.35;
+/** Fraction of the player's combat damage the escort party takes as collateral each
+ *  time the player is hit. EXTRA damage on the party pool — never subtracted from
+ *  the player's own hit. Tune here. */
+export const ESCORT_COLLATERAL_FRACTION = 0.30;
+
+/** Fraction of the party's MAX pool restored per rest (capped at the deficit). Kept
+ *  modest so it can't outpace combat bleed — a careless player still loses them. */
+export const ESCORT_REST_HEAL_FRACTION = 0.10;
 
 /** Resolve the escort spec for a quest, or null if it isn't an escort contract.
- *  Explicit `escort` field wins; otherwise an `_escort` id suffix opts in with
- *  defaults (matches the bundled Philadelphia faction-quest ids). */
-export function escortSpecForQuest(def: FactionQuestDef | null | undefined): { count: number } | null {
+ *  Explicit `escort` field OR an `_escort` id suffix opts in; an authored
+ *  `escort.count` (clamped 1-5) sets party size, else a random 2-3; `escort.label`
+ *  is the one-word display name. */
+export function escortSpecForQuest(def: FactionQuestDef | null | undefined): { count: number; label: string } | null {
   if (!def) return null;
-  // A quest is an escort if it carries an explicit `escort` field OR its id ends
-  // in `_escort`. EITHER way, an authored `escort.count` is honored (clamped 1-5);
-  // only when no count is given do we roll a random 2-3 party. Previously the
-  // id-suffix path ignored count entirely and always rolled 2-3, so a quest
-  // authored as a single-courier run (singular "keep him safe" flavor) still
-  // spawned 2-3 escortees. A single courier is now possible via `escort.count: 1`.
   const isEscort = !!def.escort || /_escort$/.test(def.id);
   if (!isEscort) return null;
   const c = def.escort?.count;
-  return { count: clampCount(typeof c === 'number' ? c : randomPartySize()) };
+  const label = (def.escort?.label && def.escort.label.trim()) || DEFAULT_ESCORT_LABEL;
+  return { count: clampCount(typeof c === 'number' ? c : randomPartySize()), label };
 }
 
 export function isEscortQuest(def: FactionQuestDef | null | undefined): boolean {
@@ -45,7 +43,7 @@ export function isEscortQuest(def: FactionQuestDef | null | undefined): boolean 
 }
 
 function randomPartySize(): number {
-  // "two or three random low-level characters."
+  // "two or three" when the quest doesn't pin a count.
   return Math.random() < 0.5 ? 2 : 3;
 }
 
@@ -53,63 +51,35 @@ function clampCount(n: number): number {
   return Math.max(1, Math.min(5, Math.round(n)));
 }
 
-/** Per-escortee max HP. Derived from the player's own max HP so escortees scale
- *  with progression but stay clearly squishier than the player (~35%, floored so
- *  early-game escortees aren't one-shot, capped so they don't become tanks). */
+/** Per-member HP contribution, summed across the party for the pool max. Derived
+ *  from the player's own max HP so the party scales with progression but stays
+ *  clearly squishier than the player (~35% each). */
 export function escorteeMaxHp(playerHpMax: number): number {
   const base = Math.round((playerHpMax || 20) * 0.35);
-  // ±3 jitter so the party members aren't identical.
   const jitter = Math.floor(Math.random() * 7) - 3;
   return Math.max(8, Math.min(45, base + jitter));
 }
 
-/** Build a fresh escort party for an accepted quest. Names are drawn without
- *  repetition from the active pack's escort-name pool. */
-export function spawnEscortees(count: number, playerHpMax: number, acceptedAt: number): Escortee[] {
-  const pool = escortNamePool();
-  const chosen = pickDistinct(pool, count);
-  const party: Escortee[] = [];
-  for (let i = 0; i < count; i++) {
-    const hpMax = escorteeMaxHp(playerHpMax);
-    party.push({
-      id: `esc_${acceptedAt}_${i}`,
-      name: chosen[i] ?? `Escortee ${i + 1}`,
-      hp: hpMax,
-      hpMax,
-    });
-  }
-  return party;
+/** Build a fresh shared-pool escort party for an accepted quest. The pool max is
+ *  the SUM of `count` members' HP, so a 3-person party is ~3× one member. */
+export function spawnEscortPool(count: number, playerHpMax: number, label: string): EscortPool {
+  let hpMax = 0;
+  for (let i = 0; i < count; i++) hpMax += escorteeMaxHp(playerHpMax);
+  hpMax = Math.max(1, hpMax);
+  return { label: (label && label.trim()) || DEFAULT_ESCORT_LABEL, hp: hpMax, hpMax };
 }
 
-function escortNamePool(): string[] {
-  const override = resolveFlavor<string[]>('escortNames', DEFAULT_ESCORT_NAMES);
-  const pool = Array.isArray(override) && override.length > 0 ? override : DEFAULT_ESCORT_NAMES;
-  return pool.filter((n) => typeof n === 'string' && n.trim().length > 0);
-}
-
-function pickDistinct(pool: string[], n: number): string[] {
-  const copy = [...pool];
-  const out: string[] = [];
-  for (let i = 0; i < n && copy.length > 0; i++) {
-    const idx = Math.floor(Math.random() * copy.length);
-    out.push(copy.splice(idx, 1)[0]!);
-  }
-  return out;
-}
-
-/** All living escortees across every ACTIVE-and-TRACKED escort quest, flattened
- *  for the HUD. A deactivated (tracked === false) escort contract parks its party
- *  — they don't show in the HUD and don't take combat damage — until re-activated. */
-export function livingEscortees(
-  active: readonly { id: string; escortees?: Escortee[]; tracked?: boolean }[] | undefined,
-): Escortee[] {
+/** The live escort pools across every ACTIVE-and-TRACKED escort quest, for the HUD.
+ *  A deactivated (tracked === false) escort contract parks its party — hidden, no
+ *  combat damage — until re-activated. */
+export function livingEscortPools(
+  active: readonly { escort?: EscortPool; tracked?: boolean }[] | undefined,
+): EscortPool[] {
   if (!active) return [];
-  const out: Escortee[] = [];
+  const out: EscortPool[] = [];
   for (const q of active) {
     if (q.tracked === false) continue; // parked while deactivated
-    for (const e of q.escortees ?? []) {
-      if (e.hp > 0) out.push(e);
-    }
+    if (q.escort && q.escort.hp > 0) out.push(q.escort);
   }
   return out;
 }

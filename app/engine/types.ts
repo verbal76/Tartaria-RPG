@@ -1166,7 +1166,7 @@ export interface PlayerCharacter {
   /** Active faction quests with per-stage progress. Mirrors activeHunts
    *  / activeMysteries / activeStorylines so all four contract types
    *  share the same accept / advance / turn-in flow. */
-  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escortees?: Escortee[]; tracked?: boolean }[];
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number; escort?: EscortPool; tracked?: boolean }[];
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
   /** Active monster hunts with per-stage progress. */
@@ -1384,6 +1384,16 @@ export type SidekickStatKey = 'power' | 'resilience';
 export interface Escortee {
   id: string;
   name: string;
+  hp: number;
+  hpMax: number;
+}
+
+/** A SHARED-POOL escort party (replaces per-escortee tracking). All-or-nothing: one
+ *  health bar for the whole group; it bleeds collateral in fights and the escort
+ *  fails when it hits 0. `label` is the one-word cargo name shown in the HUD
+ *  ("Scientists", "Courier", …). */
+export interface EscortPool {
+  label: string;
   hp: number;
   hpMax: number;
 }

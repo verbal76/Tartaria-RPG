@@ -1,11 +1,12 @@
 import {
   escortSpecForQuest,
   isEscortQuest,
-  spawnEscortees,
+  spawnEscortPool,
   escorteeMaxHp,
-  livingEscortees,
+  livingEscortPools,
 } from '../app/engine/escort';
 import type { FactionQuestDef } from '../app/engine/factionQuests';
+import type { EscortPool } from '../app/engine/types';
 
 function quest(partial: Partial<FactionQuestDef>): FactionQuestDef {
   return {
@@ -20,17 +21,22 @@ function quest(partial: Partial<FactionQuestDef>): FactionQuestDef {
   };
 }
 
-describe('escort mission mechanic', () => {
+describe('escort mission mechanic (shared pool)', () => {
   it('detects escort quests by _escort id suffix', () => {
     expect(isEscortQuest(quest({ id: 'onr_t1_escort' }))).toBe(true);
     expect(isEscortQuest(quest({ id: 'onr_t1_fetch' }))).toBe(false);
     expect(isEscortQuest(null)).toBe(false);
   });
 
-  it('detects escort quests by explicit escort field and honors count', () => {
-    const spec = escortSpecForQuest(quest({ id: 'plain', escort: { count: 4 } }));
+  it('detects escort quests by explicit escort field and honors count + label', () => {
+    const spec = escortSpecForQuest(quest({ id: 'plain', escort: { count: 4, label: 'Scientists' } }));
     expect(spec).not.toBeNull();
     expect(spec!.count).toBe(4);
+    expect(spec!.label).toBe('Scientists');
+  });
+
+  it('defaults the label when none is authored', () => {
+    expect(escortSpecForQuest(quest({ id: 'p_escort' }))!.label).toBe('Escort party');
   });
 
   it('clamps an absurd authored count into a sane party size', () => {
@@ -38,38 +44,38 @@ describe('escort mission mechanic', () => {
     expect(escortSpecForQuest(quest({ id: 'p', escort: { count: 0 } }))!.count).toBe(1);
   });
 
-  it('spawns a party with distinct names and full HP', () => {
-    const party = spawnEscortees(3, 40, 1234);
-    expect(party).toHaveLength(3);
-    const names = new Set(party.map((e) => e.name));
-    expect(names.size).toBe(3); // distinct
-    for (const e of party) {
-      expect(e.hp).toBe(e.hpMax); // spawns at full
-      expect(e.hpMax).toBeGreaterThanOrEqual(8);
-      expect(e.id).toContain('1234');
-    }
+  it('spawns a single shared pool at full HP = sum of the party', () => {
+    const pool = spawnEscortPool(3, 40, 'Scientists');
+    expect(pool.label).toBe('Scientists');
+    expect(pool.hp).toBe(pool.hpMax); // spawns at full
+    // 3 members, each 8-45 → pool max in [24, 135].
+    expect(pool.hpMax).toBeGreaterThanOrEqual(3 * 8);
+    expect(pool.hpMax).toBeLessThanOrEqual(3 * 45);
   });
 
-  it('keeps escortees clearly squishier than the player', () => {
+  it('keeps the per-member contribution clearly squishier than the player', () => {
     for (let i = 0; i < 50; i++) {
       const hp = escorteeMaxHp(100);
       expect(hp).toBeGreaterThanOrEqual(8);
       expect(hp).toBeLessThanOrEqual(45);
-      expect(hp).toBeLessThan(100); // never tankier than the player
+      expect(hp).toBeLessThan(100); // a single member never tankier than the player
     }
   });
 
-  it('flattens only living escortees across active quests for the HUD', () => {
+  it('returns only ACTIVE, living escort pools for the HUD', () => {
+    const a: EscortPool = { label: 'Scientists', hp: 5, hpMax: 10 };
+    const dead: EscortPool = { label: 'Dead', hp: 0, hpMax: 10 }; // pool down — excluded
+    const parked: EscortPool = { label: 'Parked', hp: 8, hpMax: 10 };
+    const c: EscortPool = { label: 'Couriers', hp: 3, hpMax: 9 };
     const active = [
-      { id: 'a', escortees: [
-        { id: 'a0', name: 'A', hp: 5, hpMax: 10 },
-        { id: 'a1', name: 'B', hp: 0, hpMax: 10 }, // down — excluded
-      ] },
-      { id: 'b' }, // no escortees
-      { id: 'c', escortees: [{ id: 'c0', name: 'C', hp: 3, hpMax: 9 }] },
+      { escort: a },
+      { escort: dead },
+      { escort: parked, tracked: false }, // deactivated — excluded
+      {}, // no escort
+      { escort: c },
     ];
-    const live = livingEscortees(active);
-    expect(live.map((e) => e.name).sort()).toEqual(['A', 'C']);
-    expect(livingEscortees(undefined)).toEqual([]);
+    const live = livingEscortPools(active);
+    expect(live.map((p) => p.label).sort()).toEqual(['Couriers', 'Scientists']);
+    expect(livingEscortPools(undefined)).toEqual([]);
   });
 });

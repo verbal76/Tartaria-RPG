@@ -16591,4 +16591,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // regression green (97). app/engine/contentPack.ts, customMainQuest.ts, types.ts,
 // state/contentPackStore.ts, state/gameStore.ts, screens/DeveloperSettingsScreen.tsx,
 // screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-28-914';
+// 2026-06-28-915 — ESCORT shared-pool rework + exploration-screen cleanup.
+// Escort: N individually-HP'd escortees → ONE shared pool {label,hp,hpMax}=sum of the
+// party. Each player hit bleeds the party 30% collateral (extra, not absorbed); rest
+// heals ~10% of pool max (capped, below combat bleed so they can still die — and a rest
+// can be ambushed, bleeding them back); pool→0 = escort fails (all-or-nothing). One HUD
+// row "<label> hp/hpMax"; per-quest escort.label ("Scientists"). Screen: removed the
+// always-on MAIN QUEST objective chip (reclaims feed space), storyline now reached via a
+// new AMBER "ALL MISSIONS" quick button; board header "Primary Objective" → "Storyline
+// Mission — <title>"; ★ SUMMON relocated to a conditional standalone button (only at the
+// boss's tile); tutorial main_quest beat repointed to the quick-row + reworded (dropped a
+// Tartaria leak). tsc clean; escort/combat/faction/contract/save/dog suites green (66 +
+// rewritten escortMission). app/engine/escort.ts, types.ts, factionQuests.ts,
+// state/gameStore.ts, components/StatsPanel.tsx, components/InputBox.tsx,
+// screens/ExplorationScreen.tsx, screens/ContractsScreen.tsx, components/tutorialSteps.ts.
+export const OTA_BUILD_ID = '2026-06-28-915';

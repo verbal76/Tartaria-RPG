@@ -8,7 +8,7 @@ import { ARMOR_SLOTS, effectiveStats, displayStaminaMax } from '../engine/equipm
 import { formatEffectSummary } from '../engine/statusEffects';
 import { getCorruptionName } from '../engine/contentPack';
 import { findFactionQuestById } from '../engine/factionQuests';
-import { livingEscortees } from '../engine/escort';
+import { livingEscortPools } from '../engine/escort';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
 // readout: when the player has any item granting the detect_aether
@@ -221,16 +221,17 @@ export function StatsPanel({ player, fill }: Props) {
   // character box."
   const golemShows = !!player.sidekick && player.sidekick.hp > 0;
 
-  // Escortees the player is currently protecting — rendered in both modes.
-  const escortees = livingEscortees(player.activeFactionQuests);
-  const escortRows = escortees.length > 0 ? (
+  // Escort party the player is protecting — ONE row per active escort (shared pool),
+  // rendered in both modes.
+  const escortPools = livingEscortPools(player.activeFactionQuests);
+  const escortRows = escortPools.length > 0 ? (
     <View style={styles.escortBlock}>
-      {escortees.map((e) => {
-        const frac = e.hpMax > 0 ? e.hp / e.hpMax : 0;
+      {escortPools.map((p, i) => {
+        const frac = p.hpMax > 0 ? p.hp / p.hpMax : 0;
         const color = frac <= 0.34 ? '#e07a5f' : frac <= 0.67 ? '#d9b15f' : '#7fae8a';
         return (
-          <Text key={e.id} style={[styles.escortName, { color }]} numberOfLines={1}>
-            ↳ {e.name} ({e.hp}/{e.hpMax})
+          <Text key={`esc_${i}`} style={[styles.escortName, { color }]} numberOfLines={1}>
+            ↳ {p.label} ({p.hp}/{p.hpMax})
           </Text>
         );
       })}

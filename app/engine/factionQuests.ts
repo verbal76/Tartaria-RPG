@@ -48,7 +48,7 @@ export interface FactionQuestDef {
    *  — keep them alive to the destination or the quest fails. `count` overrides
    *  the default 2-3 party size. Content-agnostic: escortee names come from
    *  data/escortNames.json or a pack's `flavor.escortNames`. */
-  escort?: { count?: number };
+  escort?: { count?: number; label?: string };
   /** OTA-907 — optional explicit ROUTE destination for this contract's objective
    *  (a location id in the active world). When present it overrides the engine's
    *  text-derived guess for "ROUTE TO". Absent → the engine infers the objective
