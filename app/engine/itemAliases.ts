@@ -14,6 +14,8 @@
 // Anything NOT in this map AND not in the catalog directly stays
 // as a scene feature → salvage redirect path.
 
+import { isReskinActive } from './contentPack';
+
 const ALIAS_MAP: Record<string, string> = {
   // Light / illumination — all variants collapse to Aetheric Torch
   'lantern': 'Aetheric Torch',
@@ -141,6 +143,11 @@ const ALIAS_MAP: Record<string, string> = {
 /** Returns the canonical catalog item name for an alias, or null. */
 export function resolveItemAlias(name: string): string | null {
   if (!name) return null;
+  // engine_Dev — these aliases all resolve to Tartaria catalog items (lantern →
+  // Aetheric Torch, etc.). For a non-Tartaria pack, skip them entirely so a scene
+  // noun resolves against the loaded pack's own catalog (or falls through to the
+  // salvage path) instead of leaking a Tartaria item name.
+  if (isReskinActive()) return null;
   const q = name.trim().toLowerCase();
   return ALIAS_MAP[q] ?? null;
 }

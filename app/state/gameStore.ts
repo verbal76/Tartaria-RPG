@@ -72,7 +72,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName } from '../engine/contentPack';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -4114,7 +4114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().beginScene();
       get().appendLog(
         'reward',
-        `✦ Resurrection. ${revived.name} returns to Tartaria, restored. The Aetherstone hums in recognition.`,
+        `✦ Resurrection. ${revived.name} returns to ${getWorldName()}, restored. The ${getEnergyMaterial()} hums in recognition.`,
       );
       recordMemorableEvent(get, set, {
         kind: 'death_revive',
@@ -8047,9 +8047,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           && !get().currentScene?.investigateAmbushUsed   // arb168 — one per room visit
           && Math.random() < 0.06
         ) {
+          // engine_Dev — for a non-Tartaria pack, draw the ambush from the pack's
+          // OWN low-tier (Common/Uncommon) enemies rather than the hardcoded
+          // Tartaria names (which simply never spawned in another pack — the
+          // feature was silently dead there, and the names would leak if they did).
           const LOW_TIER = ['Gutter Rat', 'Mudling', 'Aetheric Leech', 'Mud Wasp'];
-          const pickName = LOW_TIER[Math.floor(Math.random() * LOW_TIER.length)]!;
-          const spawned = findEnemyByName(pickName);
+          const ambushPool: string[] = isReskinActive()
+            ? resolveTable('enemies', [] as Array<{ name?: string; rarity?: string }>)
+                .filter((e) => !!e.name && (e.rarity === 'Common' || e.rarity === 'Uncommon'))
+                .map((e) => e.name as string)
+            : LOW_TIER;
+          const pickName = ambushPool.length > 0
+            ? ambushPool[Math.floor(Math.random() * ambushPool.length)]!
+            : undefined;
+          const spawned = pickName ? findEnemyByName(pickName) : undefined;
           if (spawned) {
             const finalSpawn = JSON.parse(JSON.stringify(spawned)) as typeof spawned;
             set((s) => {
@@ -8876,9 +8887,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     { name: 'Hardened Mudstone', qty: [1, 1], rarity: 'Rare' },
                     { name: 'Mud Gem',         qty: [1, 1], rarity: 'Rare' },
                   ];
-                  const pool = req.scannerBias === 'pulse' ? PULSE_FINDS
-                    : req.scannerBias === 'aetheric' ? AETHER_FINDS
-                    : MUD_FINDS;
+                  // engine_Dev — for a non-Tartaria pack, build the scanner pool
+                  // from the pack's OWN materials (tiered by rarity) instead of the
+                  // hardcoded Aether/Mud/Pulse lists, so a scan never grants a
+                  // Tartaria item. The bias families are Tartaria flavor; reskinned
+                  // packs scan their full material catalog.
+                  const pool: ScanFind[] = isReskinActive()
+                    ? resolveTable('materials', [] as Array<{ name?: string; rarity?: string }>)
+                        .filter((m) => !!m.name)
+                        .map((m) => {
+                          const r: 'Common' | 'Uncommon' | 'Rare' =
+                            m.rarity === 'Uncommon' || m.rarity === 'Rare' ? m.rarity : 'Common';
+                          return { name: m.name as string, qty: (r === 'Common' ? [1, 2] : [1, 1]) as [number, number], rarity: r };
+                        })
+                    : req.scannerBias === 'pulse' ? PULSE_FINDS
+                      : req.scannerBias === 'aetheric' ? AETHER_FINDS
+                      : MUD_FINDS;
                   const tier: 'Common' | 'Uncommon' | 'Rare' = roll === 20 ? 'Rare'
                     : roll >= 18 ? 'Uncommon'
                     : 'Common';
@@ -8893,6 +8917,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     candidates = pool.filter((f) => f.rarity === t);
                     if (candidates.length > 0) break;
                   }
+                  // engine_Dev — a pack with no materials yields an empty pool;
+                  // read flat rather than crash on a non-null pick.
+                  if (candidates.length === 0) {
+                    get().appendLog('world', `${scannerLabel} reads flat. Nothing in the ${ambient}.`);
+                  } else {
                   const pick = candidates[Math.floor(Math.random() * candidates.length)]!;
                   const qty = pick.qty[0] === pick.qty[1]
                     ? pick.qty[0]
@@ -8912,6 +8941,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
                   get().appendLog('reward', `✦ ${pick.name}${qtyLabel} (${pick.rarity}).`);
                   scannerProduced = true;
+                  }
                 } else {
                   get().appendLog('world', `${scannerLabel} reads flat. Nothing in the ${ambient}.`);
                 }
@@ -9812,14 +9842,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // arb102 — rest while elevated needs a Reclaimer's Rope (belay
             // loops) OR a worn Hardened Climbing Strap (a harness you can hang
             // and doze in).
-            const wearsClimbStrapForRest = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+            // engine_Dev — belay gear is detected by Tartaria name OR a content-
+            // agnostic tag ('climb_harness' worn, 'climb_anchor' carried) so a pack's
+            // own gear qualifies; the prompt drops the Tartaria item names when a
+            // non-Tartaria pack is loaded.
+            const cloakName = (player.equipped?.cloak ?? '').toLowerCase();
+            const cloakItem = player.inventory.find((i) => i.name.toLowerCase() === cloakName);
+            const wearsClimbStrapForRest = cloakName === 'hardened climbing strap'
+              || (cloakItem?.tags ?? []).some((t) => /^climb_harness$/i.test(t));
             const hasReclaimersRopeForRest = player.inventory.some(
-              (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
+              (i) => (i.name === "Reclaimer's Rope" || (i.tags ?? []).some((t) => /^climb_anchor$/i.test(t))) && i.quantity > 0,
             ) || wearsClimbStrapForRest;
             if (!hasReclaimersRopeForRest) {
               get().appendLog(
                 'arbiter',
-                `The ${getNarratorName()} looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
+                isReskinActive()
+                  ? `The ${getNarratorName()} looks up. "You can't sleep on a wall. Climb down, or rig an anchor you can hang from to doze."`
+                  : `The ${getNarratorName()} looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
               );
               break;
             }
@@ -10602,9 +10641,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             .filter((l): l is NonNullable<typeof l> => !!l && l.id !== player.currentLocationId)
             .slice(0, 6)
             .map((l) => l.name);
-          const fallback = [
-            'Asgardar', 'Samarran', 'Nimari', 'Drakova', 'Voronov',
-          ];
+          // engine_Dev — for a non-Tartaria pack, pad from the LOADED pack's own
+          // locations rather than the hardcoded Tartaria place names (which leaked
+          // into every other pack early-game, before 3 places were discovered).
+          // The unmodified Tartaria game keeps its canonical suggestion list.
+          const fallback = isReskinActive()
+            ? allLocations
+                .filter((l) => l.id !== player.currentLocationId)
+                .slice(0, 5)
+                .map((l) => l.name)
+            : ['Asgardar', 'Samarran', 'Nimari', 'Drakova', 'Voronov'];
           const list = discovered.length >= 3 ? discovered : fallback;
           get().appendLog(
             'arbiter',
@@ -11683,12 +11729,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // pathway (handled in the rest case below). Plain Climbing
         // Rope still works; it just costs full stamina and locks
         // out rest while elevated.
+        // engine_Dev — the premium-rope tier (half stamina + mid-climb rest) is
+        // detected by Tartaria name OR a content-agnostic 'climb_anchor' tag, so a
+        // pack's own anchor rope earns the upgrade. Basic climbing is already
+        // tag-driven above; this is just the upgrade.
         const hasReclaimersRope = player.inventory.some(
-          (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
+          (i) => (i.name === "Reclaimer's Rope" || (i.tags ?? []).some((t) => /^climb_anchor$/i.test(t))) && i.quantity > 0,
         );
-        // arb102 — Hardened Climbing Strap (worn in the cloak slot) takes the
-        // whole weight off your arms: climbing costs 0 stamina while it's worn.
-        const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+        // arb102 — a climbing harness (worn in the cloak slot) takes the whole
+        // weight off your arms: climbing costs 0 stamina while it's worn. Detected
+        // by Tartaria name OR a 'climb_harness' tag.
+        const cloakNameC = (player.equipped?.cloak ?? '').toLowerCase();
+        const cloakItemC = player.inventory.find((i) => i.name.toLowerCase() === cloakNameC);
+        const wearsClimbStrap = cloakNameC === 'hardened climbing strap'
+          || (cloakItemC?.tags ?? []).some((t) => /^climb_harness$/i.test(t));
         const climbStaminaCost = wearsClimbStrap ? 0 : (hasReclaimersRope ? 1 : 2);
         // Active rope instance for wear/snap tracking. Reclaimer's takes
         // precedence; falls back to Climbing Rope. We pick the highest-
@@ -11699,8 +11753,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const inv = player.inventory;
           const matches = inv.filter(
             (i) =>
-              ((hasReclaimersRope && i.name === "Reclaimer's Rope") ||
-                (!hasReclaimersRope && i.name === 'Climbing Rope')) &&
+              ((hasReclaimersRope && (i.name === "Reclaimer's Rope" || (i.tags ?? []).some((t) => /^climb_anchor$/i.test(t)))) ||
+                (!hasReclaimersRope && (i.name === 'Climbing Rope' || (i.tags ?? []).some((t) => /\b(rope|climb)\b/i.test(String(t)))))) &&
               i.quantity > 0 &&
               i.durability != null,
           );
@@ -14664,7 +14718,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // scene.enemyStatuses[activeEnemyIdx]; tickEnemyStatuses
             // (called at the top of the next player attack) applies
             // the DoT and decrements turns.
-            if (equippedItem.name.toLowerCase() === 'disease sample') {
+            // engine_Dev — name OR a content-agnostic 'infect_on_throw' tag, so a
+            // pack's own infectious throwable (a tainted vial, a gas grenade) lands
+            // the same DoT without the engine hardcoding "Disease Sample".
+            if (equippedItem.name.toLowerCase() === 'disease sample'
+              || (equippedItem.tags ?? []).some((t) => /^infect_on_throw$/i.test(t))) {
               const idx = currentScene.activeEnemyIdx;
               set((s) => {
                 if (!s.currentScene) return s;
@@ -15207,7 +15265,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //   Legendary → 3-4 items
     // Picks WITH replacement so we can roll dupes (a wagon-driver
     // dropping two patched cloths reads honest).
-    const lootPool = enemy.loot.length > 0 ? enemy.loot : ['Aether dust'];
+    // engine_Dev — an enemy with no authored loot falls back to a neutral scrap
+    // name when a non-Tartaria pack is loaded (the old 'Aether dust' literal leaked
+    // Tartaria flavor into every pack's empty-loot kills).
+    const lootPool = enemy.loot.length > 0 ? enemy.loot : [isReskinActive() ? 'Salvage' : 'Aether dust'];
     const lootRollCount = enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Rare' ? 2 + Math.floor(Math.random() * 2)
       : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
@@ -19539,7 +19600,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       const floorPool = [
-        { name: 'Worn Tartarian Coin', kind: 'misc' as const, qty: 1 },
+        // engine_Dev — neutral coin name for non-Tartaria packs ('Worn Tartarian
+        // Coin' leaked into any pack's hub-floor dig).
+        { name: isReskinActive() ? 'Old Coin' : 'Worn Tartarian Coin', kind: 'misc' as const, qty: 1 },
         { name: 'Cloth Scrap',          kind: 'misc' as const, qty: 1 },
         { name: 'Bent Nail',            kind: 'misc' as const, qty: 1 },
         { name: 'Small Rock',           kind: 'misc' as const, qty: 1 },
@@ -21250,11 +21313,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The ${getNarratorName()} looks at your pack. "No ${foodName} on you."`);
       return;
     }
+    // engine_Dev — name OR a content-agnostic 'infusion_fuel' tag, so a pack's own
+    // stat-laced reagent works without the engine hardcoding "Aether Dust".
     const dust = player.inventory.find(
-      (i) => i.name.toLowerCase() === 'aether dust' && i.quantity > 0,
+      (i) => (i.name.toLowerCase() === 'aether dust' || (i.tags ?? []).some((t) => /^infusion_fuel$/i.test(t))) && i.quantity > 0,
     );
     if (!dust) {
-      get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "You'd need Aether Dust to lace it. Find some first."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} raises a brow. "You'd need ${getEnergyName()} Dust to lace it. Find some first."`);
       return;
     }
     // Open the picker — the actual consume + buff happens when
@@ -21272,7 +21337,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const food = player.inventory.find((i) => i.id === foodId);
-    const dust = player.inventory.find((i) => i.name.toLowerCase() === 'aether dust' && i.quantity > 0);
+    const dust = player.inventory.find((i) => (i.name.toLowerCase() === 'aether dust' || (i.tags ?? []).some((t) => /^infusion_fuel$/i.test(t))) && i.quantity > 0);
     if (!food || !dust) {
       set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
       get().appendLog('arbiter', `The ${getNarratorName()} shrugs. "Lost the moment. Try again."`);
@@ -24881,6 +24946,34 @@ const HIDDEN_TEXT_LINES = [
   `You catch a finger-smear of red mortar on the ${`{noun}`}. The Reclaimers paint this colour on the back of every relic they catalog. Someone tagged this and walked away.`,
 ];
 
+// engine_Dev — content-neutral hidden-text beats for NON-Tartaria packs. The
+// pool above is steeped in Tartaria proper nouns (old Tartarian, the Aetheric
+// eye, Reclaimers, Forgotten Order, Mud Monarch, pre-flood), which leaked into
+// every other pack's wall/tablet searches. These carry the same "secret writing"
+// payoff with zero setting-specific vocabulary, so they read fine in a WWII pack
+// or any other. A pack can still fully override via the 'hiddenText' flavor key.
+const GENERIC_HIDDEN_TEXT_LINES = [
+  `You run a hand along the ${`{noun}`}. Etched faint under the dust: three lines in a script you don't recognise, the first word a name.`,
+  `You crouch low. A symbol surfaces under the dust on the ${`{noun}`} — an open eye. Whoever marked it left in a hurry.`,
+  `You feel the ${`{noun}`} with the flat of your palm. Carved into it, fine as a knife-cut: a date older than anything that should be here.`,
+  `You catch a glint on the ${`{noun}`}. A single character pressed deep, then crossed out by a second hand. Someone disagreed with the first.`,
+  `You wipe the ${`{noun}`}. Underneath, a child's name written badly, then a second hand has added 'rest now' beneath it.`,
+  `You brush dust off the ${`{noun}`}. Tally marks — fourteen of them. The fifteenth scratch starts but doesn't finish.`,
+  `You read the ${`{noun}`}: a name list, twenty-three entries. Twenty-two are struck through. The twenty-third has a fresh question mark beside it.`,
+  `You tilt your head. Light strikes the ${`{noun}`} at an angle the casual pass missed — a map fragment scratched in, four lines, a route to nowhere named.`,
+  `You tap the ${`{noun}`}. Hollow. The space behind it carries a void someone meant to find — they marked it with a single dot.`,
+  `You find a seam in the ${`{noun}`}. A folded slip of paper has been pressed into it, edge-first, where it would survive almost anything.`,
+];
+
+// Pick the active hidden-text pool: when a non-Tartaria pack is loaded, use the
+// pack's 'hiddenText' flavor override if present, otherwise the neutral pool;
+// the built-in Tartaria pool stays the default for the unmodified game.
+function activeHiddenText(): readonly string[] {
+  return isReskinActive()
+    ? resolveFlavor('hiddenText', GENERIC_HIDDEN_TEXT_LINES)
+    : resolveFlavor('hiddenText', HIDDEN_TEXT_LINES);
+}
+
 // 2026-05-25 OTA-040 — narration for the salvage → collectable
 // substitution path. When the salvage roll lands a character-story
 // fragment instead of normal loot, one of these lines fires with the
@@ -25277,7 +25370,7 @@ function narrateAmbientFind(
   // Hidden-text — 35% on any searchable noun (the searchable pool
   // is much wider after OTA-039).
   if (isSearchable(noun) && chance(35)) {
-    const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
+    const hiddenLine = pick(activeHiddenText()).replace('{noun}', noun);
     get().appendLog('world', hiddenLine);
     producedSubstantive = true;
   }
@@ -25346,7 +25439,7 @@ function narrateAmbientFind(
       );
       producedSubstantive = true;
     } else if (isSearchable(noun)) {
-      const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
+      const hiddenLine = pick(activeHiddenText()).replace('{noun}', noun);
       get().appendLog('world', hiddenLine);
       producedSubstantive = true;
     } else {

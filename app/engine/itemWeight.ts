@@ -13,7 +13,20 @@
 // the same weight do slightly more), but for throwing we keep it simple.
 
 import type { InventoryItem } from './types';
-import { rollDie } from './rng';
+import { rollDie, rollFromNotation } from './rng';
+
+/** engine_Dev — a content pack declares a throwable's special throw damage with a
+ *  `throw:<dice>` tag (e.g. `throw:2d20`, `throw:1d10+2`). This is the pack-facing,
+ *  content-agnostic replacement for the hardcoded Tartaria name overrides below —
+ *  any pack's heavy/special throwable gets authored damage without the engine
+ *  knowing its name. Returns the dice notation, or null if the item has no such tag. */
+function throwTagNotation(item: InventoryItem): string | null {
+  for (const t of item.tags ?? []) {
+    const m = /^throw:(.+)$/i.exec(t.trim());
+    if (m && m[1]) return m[1].trim();
+  }
+  return null;
+}
 
 export type ItemWeight = 1 | 2 | 3 | 4 | 5;
 
@@ -52,6 +65,9 @@ export function itemWeight(item: InventoryItem): ItemWeight {
  *  Single-use is enforced by the throw-consume path. */
 export function rollThrowDamage(item: InventoryItem | null): number {
   if (!item) return 1; // bare rock
+  // engine_Dev — pack-authored throw damage wins (content-agnostic).
+  const tagDice = throwTagNotation(item);
+  if (tagDice) return Math.max(1, rollFromNotation(tagDice));
   const lower = (item.name ?? '').toLowerCase();
   if (lower === 'shaped aetheric shard' || lower === 'aetheric shard') {
     return rollDie(20) + rollDie(20);
@@ -78,6 +94,9 @@ export function rollThrowDamage(item: InventoryItem | null): number {
  *  uses, so the two paths stay aligned. */
 export function throwDamageNotation(item: InventoryItem | null): string {
   if (!item) return '1';
+  // engine_Dev — pack-authored throw damage wins (content-agnostic).
+  const tagDice = throwTagNotation(item);
+  if (tagDice) return tagDice;
   const lower = (item.name ?? '').toLowerCase();
   if (lower === 'shaped aetheric shard' || lower === 'aetheric shard') return '2d20';
   // OTA-209 — Sentinel Core Plate is the heaviest Aetheric ceramic

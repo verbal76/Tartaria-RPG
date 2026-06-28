@@ -16636,4 +16636,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // throw-hit sites (improvised throw + equipped-throwable consume), resolved in
 // resolveEnemyDefeat when the last enemy falls. thrownWeaponRecovery (6) green;
 // tsc app-clean. engine/throwRecovery.ts, state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-28-921';
+//
+// 2026-06-28-922 — CONTENT-PACK LEAK SWEEP. Routed hardcoded Tartaria item/place
+// names through the pack-override pattern so they no longer leak into other packs;
+// the unmodified Tartaria game is preserved (every change is gated on
+// isReskinActive() or is additive). A) unconditional leaks: location fallback,
+// enemy-loot fallback ('Aether dust'), item-alias map (lantern->Aetheric Torch),
+// floor-dig coin, resurrection narration (tokenized), hidden-text wall pool. B)
+// gated grant pools routed to pack catalogs: scanner finds (built from pack
+// materials, empty-guarded), investigate-ambush enemies. C) additive content-
+// agnostic tags (Tartaria names still work): throw:<dice>, infect_on_throw,
+// climb_anchor / climb_harness, infusion_fuel. Review agent: no correctness bugs.
+// contentLeakSweep (5) green; 185/186 relevant tests pass (the 1 failure +
+// dogGolem OOM are pre-existing, confirmed head-to-head). tsc app-clean.
+// engine/itemAliases.ts, engine/itemWeight.ts, state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-28-922';
