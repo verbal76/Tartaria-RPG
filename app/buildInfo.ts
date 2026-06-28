@@ -16563,4 +16563,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     the weather each step; suppressed while hubRoomId is set.
 // (#29 duplicate "Cyborg Plating" contracts is content-pack data, fixed in the pack JSON.)
 // tsc clean; titles/weather/hub/scene/save-load suites green (116).
-export const OTA_BUILD_ID = '2026-06-28-912';
+// 2026-06-28-913 — final Philadelphia Experiment fixes:
+// (1) escort party count now honors an authored escort.count even on the _escort
+//     id-suffix path (was always rolling a random 2-3, so a single-courier run got 3);
+//     a pack can set escort.count:1 for a lone courier — engine spawn/fail text already
+//     adapts to the count;
+// (2) interior-room visit counter de-fragmented — the entry room (the world exit) was
+//     keyed to the bare macro tile on auto-entry but to ...@room on interior nav, so one
+//     room had two counters (display climbed to 11 while the save kept 3, and respawn/
+//     dropped-item/anchor state read the wrong key); now keyed by the resolved hubRoomId;
+// (3) leaving an outpost is exempt from the no-stamina travel gate — an exhausted player
+//     could get trapped inside (only `rest` worked); spendTravelStamina clamps to 0;
+// (4) hoursElapsed rounded on store to stop float drift (296.4000000000002) — cosmetic.
+// NOT engine (handed back): #29 duplicate "Cyborg Plating" contracts + #33 Snapback/7-min
+// intro lore are both content-pack data; salvage->investigate label and INT-on-substantive
+// training are working as designed.
+// tsc clean; escort/hub/scene/leave-hub suites green (56).
+export const OTA_BUILD_ID = '2026-06-28-913';

@@ -2039,7 +2039,11 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
       dog = { ...dog, loyalty: newLoyalty };
     }
   }
-  return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger, dog };
+  // Round to 2 decimals so float accumulation (0.1h attacks, 0.25h checks) can't
+  // drift the persisted clock to 296.4000000000002. All deltas are quarter-hour or
+  // coarser, so 2 decimals preserves exact granularity — this only cleans the saved
+  // number; every UI already floors/rounds for display.
+  return { ...player, hoursElapsed: Math.round(newHours * 100) / 100, hungerStaminaPenalty: newHunger, dog };
 }
 
 // arb47 — the player's authoritative ABSOLUTE cell on the canon grid. Reads the
@@ -4544,7 +4548,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // long ago) repopulate normally — Tartaria doesn't stay quiet
     // forever. Pulls from the visitedRooms MapGraph + player.hoursElapsed.
     const RESPAWN_QUIET_HOURS = 6;
-    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, player.hubRoomId);
+    // Use the RESOLVED local `hubRoomId` (set to the entry room on world->outpost
+    // auto-entry just above), NOT the stale `player.hubRoomId` destructured at the
+    // top of this pass (still null on auto-entry). With player.hubRoomId the entry
+    // room (Operations — the only world exit) was keyed to the bare macro tile on
+    // auto-entry but to `...@operations` on interior nav, so one physical room had
+    // two visit counters (display climbed to 11 while the save persisted 3) — and
+    // respawn / dropped-item / anchor-NPC state read off the mis-built key too.
+    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, hubRoomId);
     const priorVisit = worldMemory.visitedRooms?.[candidateKey];
     const hoursElapsed = player.hoursElapsed ?? 0;
     // arb107 — macro-location visit sequence. Bumps whenever the player's
@@ -10170,7 +10181,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // No interior exit matched (e.g. 'go to drakova') — fall through
           // to the overland gate + wider location index below.
         }
-        if (player.stamina < TRAVEL_MIN_STAMINA) {
+        // Leaving an outpost is exempt from the stamina gate — stepping OUT to open
+        // ground must always be possible, or an exhausted player is trapped inside
+        // the HQ (the leave handler below clears hubRoomId; spendTravelStamina
+        // clamps to 0 so it can't go negative). Without this exemption a player who
+        // ran their legs out inside the outpost could only `rest`, never walk out.
+        if (player.stamina < TRAVEL_MIN_STAMINA && !(player.hubRoomId && isLeaveHubCommand(trimmed))) {
           // A REFUSED overland move (no stamina, no movement) no longer advances
           // the clock. The old OTA-163 anti-stuck tick (+15 min per refusal) let a
           // player spam-tapping directions on empty legs bleed real hours for moves

@@ -28,12 +28,16 @@ export const ESCORT_HIT_CHANCE = 0.35;
  *  defaults (matches the bundled Philadelphia faction-quest ids). */
 export function escortSpecForQuest(def: FactionQuestDef | null | undefined): { count: number } | null {
   if (!def) return null;
-  if (def.escort) {
-    const c = def.escort.count;
-    return { count: clampCount(typeof c === 'number' ? c : randomPartySize()) };
-  }
-  if (/_escort$/.test(def.id)) return { count: randomPartySize() };
-  return null;
+  // A quest is an escort if it carries an explicit `escort` field OR its id ends
+  // in `_escort`. EITHER way, an authored `escort.count` is honored (clamped 1-5);
+  // only when no count is given do we roll a random 2-3 party. Previously the
+  // id-suffix path ignored count entirely and always rolled 2-3, so a quest
+  // authored as a single-courier run (singular "keep him safe" flavor) still
+  // spawned 2-3 escortees. A single courier is now possible via `escort.count: 1`.
+  const isEscort = !!def.escort || /_escort$/.test(def.id);
+  if (!isEscort) return null;
+  const c = def.escort?.count;
+  return { count: clampCount(typeof c === 'number' ? c : randomPartySize()) };
 }
 
 export function isEscortQuest(def: FactionQuestDef | null | undefined): boolean {
