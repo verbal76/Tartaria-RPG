@@ -725,6 +725,14 @@ interface CurrentScene {
    *  fires only on the first counter; the +2 bonus is consumed and
    *  the flag set true. Initialized empty in beginScene. */
   enemyAmbushUsed?: boolean[];
+  /** engine_Dev — durable thrown weapons buried in the enemy this fight.
+   *  A tomahawk / hand axe / throwing knife / javelin doesn't shatter on
+   *  impact (unlike a grenade or a coating vial), so when it lands a HIT we
+   *  stash the full item instance here instead of letting it vanish. When the
+   *  fight is WON (all enemies down) each one rolls THROW_RECOVERY_CHANCE to be
+   *  pulled back out and dropped into loot; a failed roll narrates the loss.
+   *  Cleared on a new scene, so fleeing the fight forfeits them (by design). */
+  thrownRecoverables?: InventoryItem[];
   /** OTA 031 — what the player is currently elevated on (climbed at
    *  least one tier). Set on every successful climb tier, cleared by
    *  climb down or by leaving the scene. Drives the CLIMB / CLIMB
@@ -931,6 +939,60 @@ function recordTitleProgress(
   if (maxes) for (const k of Object.keys(maxes)) n[k] = Math.max(n[k] ?? 0, maxes[k] ?? 0);
   setStore((s) => (s.player ? { player: { ...s.player, titleProgress: next } } : s));
   if (!skipAward) awardNewTitles(getStore, setStore);
+}
+
+// engine_Dev — recoverable thrown weapons. embedThrownWeapon stashes a durable
+// thrown weapon onto the scene the moment it lands a HIT (one-shot munitions are
+// filtered out by isRecoverableThrowable, so grenades / vials / shards still
+// vanish). resolveThrownRecovery rolls each buried weapon when the fight is WON
+// and drops the survivors back into the pack, preserving each instance.
+function embedThrownWeapon(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+  item: InventoryItem,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tr = require('../engine/throwRecovery') as typeof import('../engine/throwRecovery');
+  if (!tr.isRecoverableThrowable(item)) return;
+  const snap = tr.snapshotThrownWeapon(item);
+  setStore((s) => (s.currentScene
+    ? { currentScene: { ...s.currentScene, thrownRecoverables: [...(s.currentScene.thrownRecoverables ?? []), snap] } }
+    : s));
+}
+
+function resolveThrownRecovery(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): void {
+  const buried = getStore().currentScene?.thrownRecoverables ?? [];
+  if (buried.length === 0) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tr = require('../engine/throwRecovery') as typeof import('../engine/throwRecovery');
+  const recovered: InventoryItem[] = [];
+  const lost: InventoryItem[] = [];
+  for (const w of buried) {
+    if (Math.random() < tr.THROW_RECOVERY_CHANCE) recovered.push(w);
+    else lost.push(w);
+  }
+  // Grant survivors with fresh ids, preserving each instance (durability /
+  // instanceStats / coating). Clear the buried list either way — fight's over.
+  setStore((s) => {
+    if (!s.player) return s;
+    let inv = s.player.inventory;
+    recovered.forEach((w, i) => {
+      inv = mergeOrPushItem(inv, { ...w, id: `recovered_${Date.now()}_${i}`, quantity: 1, tags: [...(w.tags ?? [])] });
+    });
+    return {
+      player: { ...s.player, inventory: inv },
+      currentScene: s.currentScene ? { ...s.currentScene, thrownRecoverables: [] } : s.currentScene,
+    };
+  });
+  for (const w of recovered) {
+    getStore().appendLog('reward', `You wrench your ${w.name} free and take it back. [recovered]`);
+  }
+  for (const w of lost) {
+    getStore().appendLog('world', `Your ${w.name} is lost — the haft snapped, or it's buried out of reach.`);
+  }
 }
 
 // engine_Dev — DATA-DRIVEN MAIN QUEST execution. Advance one step + announce; fire
@@ -11388,6 +11450,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
             get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
+            // engine_Dev — a durable thrown weapon (axe / knife / javelin) buries
+            // in the target instead of vanishing; it rolls to be pulled back out
+            // when the fight is won. One-shot munitions (grenade / vial) don't qualify.
+            if (itemUsed) embedThrownWeapon(get, set, itemUsed);
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the dust.`);
@@ -14554,6 +14620,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           const isThrowable = (equippedItem?.tags ?? []).some((t) => /throwable/i.test(t));
           if (isThrowable && equippedItem) {
+            // engine_Dev — a durable thrown weapon buries in the enemy it just
+            // hit and rolls to be recovered when the fight is won; one-shot
+            // munitions (grenade / vial / shard) are filtered out by the helper.
+            embedThrownWeapon(get, set, equippedItem);
             set((s) => {
               if (!s.player) return s;
               const newQuantity = Math.max(0, equippedItem.quantity - 1);
@@ -15254,6 +15324,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         || tr.includes('architectural_sentinel') || /sentinel/i.test(enemy.name ?? '');
       if (isMechanical) recordTitleProgress(get, set, { sentinelsDefeated: 1 });
     }
+    // engine_Dev — fight's won: roll recovery for any durable weapons you threw
+    // and buried this scene. Only when the LAST enemy is down, so you don't pull
+    // your axe back mid-fight; fleeing instead forfeits them (the scene resets).
+    if (!stillFighting) resolveThrownRecovery(get, set);
     if (stillFighting) {
       const next = remainingEnemies[nextActiveIdx]!;
       get().appendLog(

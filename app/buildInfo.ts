@@ -16624,4 +16624,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it in. tutorialLookBeat (2) green + tutorialCurrencyAfterDog beat-order updated
 // to 10; tsc app-clean. components/tutorialSteps.ts, components/InputBox.tsx,
 // state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-28-920';
+//
+// 2026-06-28-921 — RECOVERABLE THROWN WEAPONS. A durable thrown weapon (tomahawk
+// / hand axe / throwing knife / javelin) no longer vanishes on throw — when it
+// lands a HIT it buries in the target, and when the fight is WON it rolls a 50%
+// chance (THROW_RECOVERY_CHANCE) to be pulled back into your pack, instance
+// preserved (durability / instanceStats / coating). One-shot munitions (grenade
+// / coating vial / shaped-aether shard) still vanish, filtered by tag/kind
+// (isRecoverableThrowable). Fleeing forfeits buried weapons (scene resets).
+// New engine/throwRecovery.ts + CurrentScene.thrownRecoverables; embedded at both
+// throw-hit sites (improvised throw + equipped-throwable consume), resolved in
+// resolveEnemyDefeat when the last enemy falls. thrownWeaponRecovery (6) green;
+// tsc app-clean. engine/throwRecovery.ts, state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-28-921';
