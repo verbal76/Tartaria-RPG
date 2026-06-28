@@ -15255,4 +15255,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // detaches the context, stops any in-flight prediction, and releases THROUGH the same runExclusiveNativeMl lock,
 // serializing the free behind the running prediction. JS-only → OTA-safe. tsc clean; same fix verified green on
 // the golem line (41 qwen/ml/tts-lifecycle tests). app/ai/generation/LlamaRuntime.ts.
-export const OTA_BUILD_ID = '2026-06-27-641';
+// OTA-642 — single-active mission pause + objective auto-routing, adapted from the
+// golem line (commit bd698b8). One contract is "the mission you're on": activating
+// one parks every other (DEACTIVATE parks just that one; ABANDON is the only thing
+// that drops a contract); only the active quest advances. routeMission courses to
+// the objective then auto-chains to the turn-in. Plus a load-time single-active
+// backfill so legacy saves with 2+ contracts establish single-active on load.
+// JS-only → OTA-safe. tsc clean; mission/faction/contract suites green (127) +
+// new backfill test (4); zero new failures vs clean HaL2001 across the full suite.
+// app/state/gameStore.ts, ContractsScreen.tsx, factionQuests.ts, types.ts,
+// +missionRouting.ts.
+export const OTA_BUILD_ID = '2026-06-28-642';
