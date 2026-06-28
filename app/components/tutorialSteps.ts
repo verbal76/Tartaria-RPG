@@ -90,6 +90,22 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'The Arbiter looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
+    // The orientation tool — taught FIRST, before the player picks anything up,
+    // because it's the "where am I / re-read the room" button. Tapping LOOK
+    // AROUND YOU calls maybeAdvanceTutorial('look') and InputBox lights this
+    // chip green for currentBeatId === 'look', so it advances to the cudgel beat.
+    // Looking around at the very start also surfaces the props (cudgel, rope,
+    // plate, locked door) the next beats walk the player through.
+    id: 'look',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Look Around',
+    body: 'Start here. Tap LOOK AROUND YOU to get your bearings — it re-reads the room: what\'s here, your exits, and any open leads you\'re chasing. Use it any time you lose the thread.',
+    arbiter:
+      '"First, get your bearings. Tap LOOK AROUND YOU — I\'ll read the room for you: what\'s here, your way out, and whatever you\'re still chasing. Use it any time you\'re lost."',
+  },
+  {
     id: 'cudgel',
     screen: 'exploration',
     area: 'quick-row',
@@ -139,20 +155,6 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body: 'The door north is locked. Tap INVESTIGATE to look it over.',
     arbiter:
       '"The north door is locked. Tap INVESTIGATE."',
-  },
-  {
-    // The orientation tool — taught here, just before the explore/leave choice,
-    // because it's the player's "I'm lost, re-read it for me" button. The look
-    // handler calls maybeAdvanceTutorial('look') and InputBox lights this chip
-    // green for currentBeatId === 'look', so tapping LOOK AROUND YOU advances.
-    id: 'look',
-    screen: 'exploration',
-    area: 'quick-row',
-    pulse: true,
-    title: 'Look Around',
-    body: 'One more tool before you decide: tap LOOK AROUND YOU any time you lose the thread. It re-reads the room — what\'s here, your exits, and any open leads you\'re still chasing.',
-    arbiter:
-      '"One more thing. When you lose the thread, tap LOOK AROUND YOU — I\'ll re-read the room, your exits, and whatever you\'re still chasing."',
   },
   {
     // Door-open branch. Replaces the old look → move_north → read_note

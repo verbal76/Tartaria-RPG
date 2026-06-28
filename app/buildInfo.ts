@@ -15149,4 +15149,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ContractsScreen SET ACTIVE / DEACTIVATE toggle. This bump just gives the OTA a
 // distinct marker so the device's About screen can prove the update landed.
 // Pure JS → ships over the isolated golem-line OTA, no APK.
-export const OTA_BUILD_ID = '2026-06-28-628-mission-activate-deactivate-single-active';
+// 2026-06-28 — TUTORIAL reorder: the LOOK AROUND YOU beat now comes FIRST,
+// before the cudgel "take" — the player learns the get-your-bearings / re-read-
+// the-room button before handling any prop (and looking around at the start
+// surfaces the very props the next beats walk through). New order:
+// name → look → cudgel → rope → scrap → climb → investigate → explore_or_leave
+// → main_quest → pick_city. Dropped the now-obsolete finishOutpostTutorial
+// look special-case (look is no longer adjacent to the door-open handoff) and
+// added a 'look' nudge hint. tutorialSteps.ts, gameStore.ts; tutorial suite
+// green (34). Pure JS → golem-line OTA, no APK.
+export const OTA_BUILD_ID = '2026-06-28-629-tutorial-look-first';

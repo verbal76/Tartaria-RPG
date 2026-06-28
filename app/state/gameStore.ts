@@ -18958,14 +18958,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     if (state.tutorialStep === null) return;
     const step = TUTORIAL_STEPS[state.tutorialStep];
-    // Leaving the outpost during the LOOK beat (the door is already open by then)
-    // should also finish the arc — advance past look so the explore_or_leave
-    // handoff fires, instead of stranding the player outside on a stuck 'look'.
-    if (step?.id === 'look') {
-      get().advanceTutorial();      // look → explore_or_leave
-      get().finishOutpostTutorial(); // now on explore_or_leave → completes below
-      return;
-    }
+    // LOOK is now the FIRST beat (before the cudgel take, before the door opens),
+    // so it's no longer adjacent to the explore/leave handoff — leaving the
+    // outpost can only finish the arc from the explore_or_leave beat, same as
+    // every other early beat.
     if (step?.id !== 'explore_or_leave') return;
     // Starter note — kept for inventory parity with the skip path. Its
     // main-quest framing is delivered by the main_quest beat's Arbiter
@@ -18983,6 +18979,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const id = TUTORIAL_STEPS[state.tutorialStep]?.id ?? '';
     const hint: Record<string, string> = {
       name: 'type your name in the box, then tap ACT.',
+      look: 'tap the glowing LOOK AROUND YOU button to get your bearings.',
       cudgel: 'tap the glowing TAKE button and lift the cudgel.',
       rope: "type 'take rope' in the box, then tap ACT.",
       scrap: 'tap the glowing SALVAGE button and break the chest plate.',
