@@ -70,6 +70,7 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
+  const setMainQuestActive = useGameStore((s) => s.setMainQuestActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
@@ -299,6 +300,7 @@ export function ContractsScreen() {
             (e) => e.name.trim().toLowerCase() === bossHere.name.trim().toLowerCase(),
           );
           const canSummonBoss = !!bossHere && !bossInScene;
+          const storyActive = player.mainQuestActive !== false;
           return (
             <TouchableOpacity
               style={styles.mainQuestCard}
@@ -307,6 +309,18 @@ export function ContractsScreen() {
             >
               <Text style={styles.mainQuestTag}>STORYLINE MISSION — {title.toUpperCase()}  {mqExpanded ? '▴' : '▾'}</Text>
               <Text style={styles.mainQuestHint}>{objLine}  ·  {done}/{total} parts</Text>
+              {/* engine_Dev — single-active toggle for the storyline (peer of the
+                  contract toggles). Activating it stands every contract down; off just
+                  unfocuses it — the story keeps advancing either way. Nested Pressable
+                  handles its own tap so it doesn't expand/collapse the card. */}
+              <Pressable
+                style={[styles.trackBtn, { marginTop: 8 }, !storyActive && styles.trackBtnOff]}
+                onPress={() => setMainQuestActive(!storyActive)}
+              >
+                <Text style={[styles.trackBtnText, !storyActive && styles.trackBtnTextOff]}>
+                  {storyActive ? '▮▮ DEACTIVATE — unfocus the storyline' : '▶ SET ACTIVE — make the storyline the mission you’re on'}
+                </Text>
+              </Pressable>
               {canSummonBoss && (
                 <TouchableOpacity
                   style={styles.summonChip}

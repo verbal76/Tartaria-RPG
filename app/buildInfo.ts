@@ -16605,4 +16605,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rewritten escortMission). app/engine/escort.ts, types.ts, factionQuests.ts,
 // state/gameStore.ts, components/StatsPanel.tsx, components/InputBox.tsx,
 // screens/ExplorationScreen.tsx, screens/ContractsScreen.tsx, components/tutorialSteps.ts.
-export const OTA_BUILD_ID = '2026-06-28-918';
+//
+// 2026-06-28-919 — STORYLINE ACTIVATE/DEACTIVATE. The storyline main quest now joins
+// the single-active focus pool: a SET ACTIVE / DEACTIVATE toggle on the storyline box
+// in Contracts. Activating it stands every contract down; activating a contract (or
+// accepting one that goes active) unfocuses the storyline. "Unfocus only" — the
+// storyline always keeps advancing regardless; the flag only drives focus + the toggle
+// UI. New PlayerCharacter.mainQuestActive flag + setMainQuestActive store action.
+// storylineSingleActive (4) + questProgressionAudit + faction/starter suites green; tsc
+// app-clean. state/gameStore.ts, engine/types.ts, screens/ContractsScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-28-919';

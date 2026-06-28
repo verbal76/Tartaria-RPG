@@ -2668,6 +2668,10 @@ interface GameStore {
    *  `active` omitted → toggle. Lets the player hold many contracts but drive
    *  only the one(s) they're actually running. */
   setFactionQuestActive: (id: string, active?: boolean) => void;
+  /** engine_Dev — single-active for the STORYLINE. Activating it stands every contract
+   *  down (you're on the story); deactivating just unfocuses it (it keeps advancing).
+   *  Toggles when `active` is omitted. */
+  setMainQuestActive: (active?: boolean) => void;
   /** OTA-907 — start an auto-routing chain for a faction contract: course to the
    *  objective, then auto-course to the turn-in once the work is done. Stops on
    *  turn-in, abandon, deactivate, or when the player sets a different course. */
@@ -16294,9 +16298,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? escortMod.spawnEscortPool(escortSpec.count, player.hpMax ?? 20, escortSpec.label)
       : undefined;
     // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already on
-    // one; otherwise it's parked so batch-accepting from the board doesn't make
-    // everything live at once (the original complaint). You activate it when
-    // you're ready to run it.
+    // another CONTRACT; otherwise it's parked so batch-accepting from the board
+    // doesn't make everything live at once (the original complaint). A contract that
+    // becomes active unfocuses the storyline below (the single-active invariant), but
+    // the storyline being active does NOT park a freshly-accepted contract — the
+    // first contract you take still goes active so it advances right away.
     const hasActiveOther = (player.activeFactionQuests ?? []).some((q) => q.tracked !== false);
     const newTracked = !hasActiveOther;
     set((s) =>
@@ -16309,6 +16315,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ...(s.player.activeFactionQuests ?? []),
                 { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt, tracked: newTracked, ...(escort ? { escort } : {}) },
               ],
+              // The newly-active contract takes the single-active focus from the
+              // storyline (which still advances; this only drives focus + the toggle UI).
+              ...(newTracked ? { mainQuestActive: false } : {}),
             },
           }
         : s,
@@ -16388,6 +16397,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...s.player,
         activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
           q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
+        // Single-active spans the STORYLINE too: making a contract the one you're on
+        // unfocuses the storyline (it still advances — see setMainQuestActive).
+        ...(nextActive ? { mainQuestActive: false } : {}),
       },
     } : s));
     const def = findFactionQuestById(id);
@@ -16420,6 +16432,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     if (!nextActive && get().player?.routedMission?.id === id) {
       set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+    }
+    void get().persist();
+  },
+
+  setMainQuestActive(active) {
+    const player = get().player;
+    if (!player) return;
+    const nextActive = active != null ? active : (player.mainQuestActive === false);
+    if (nextActive) {
+      // Make the STORYLINE the mission you're on: stand every contract down (single-
+      // active). The storyline keeps advancing either way — this just focuses on it.
+      const parked = (player.activeFactionQuests ?? []).filter((q) => q.tracked !== false).length;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          mainQuestActive: true,
+          activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) => ({ ...q, tracked: false })),
+          routedMission: null,
+        },
+      } : s));
+      const note = parked > 0 ? ` (${parked} contract${parked > 1 ? 's' : ''} paused.)` : '';
+      get().appendLog('world', `Now on the storyline — it's the mission you're running.${note}`);
+    } else {
+      // Unfocus the storyline. It STILL advances (the user's choice) — this just frees
+      // a contract to be the one you're routing to.
+      set((s) => (s.player ? { player: { ...s.player, mainQuestActive: false } } : s));
+      get().appendLog('world', `Storyline stood down from focus — it still advances; SET ACTIVE a contract to run one.`);
     }
     void get().persist();
   },

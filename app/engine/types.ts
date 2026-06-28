@@ -1003,6 +1003,11 @@ export interface PlayerCharacter {
   /** engine_Dev — campaign time-limit: set once when the ~90% "Fold is collapsing"
    *  deadline warning has fired, so it doesn't repeat every action. */
   snapbackWarned?: boolean;
+  /** engine_Dev — single-active focus: is the STORYLINE the mission you're on?
+   *  Absent/true = active (default — the story is your through-line); false = a
+   *  contract is the active one. The storyline advances regardless; this only drives
+   *  focus + the contract-parking single-active rule + the toggle UI. */
+  mainQuestActive?: boolean;
   /** OTA-625 — weather-damage cooldown. After a damaging weather tick this is
    *  set to WEATHER_TICK_GAP and counts down one per action; while > 0 the
    *  per-action weather roll is skipped, so hostile weather can't chip the
