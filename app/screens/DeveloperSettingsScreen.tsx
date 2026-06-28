@@ -4,7 +4,7 @@
 // built-in Tartaria pack. (Paste-JSON works on every platform with no native file
 // dependency; a real file picker can be layered on the web/desktop builds later.)
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform, type StyleProp, type TextStyle } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as FileSystem from 'expo-file-system';
@@ -40,6 +40,7 @@ import {
   DEFAULT_CORRUPTION_NAME,
   type ContentTableId,
   type LoreBlockId,
+  type MainQuestPackShape,
 } from '../engine/contentPack';
 import { getTableTemplate, getLoreTemplate, buildAnnotatedGameBundle, buildMissionsTemplate, buildHooksTemplate, buildWhispersTemplate, buildWastelandTemplate, buildInteractionTagsTemplate, buildStartingAreasTemplate, buildTitlesTemplate, buildCollectablesTemplate, buildSummonsTemplate, buildMainQuestTemplate, buildBossesTemplate, buildDiggingTemplate, buildScrapTemplate, buildSalvageTemplate, buildOverlaysTemplate, buildDogScenariosTemplate, buildDevGuide, instructionHeader, sectionInstructionHeader, TEMPLATE_SAMPLE_ROWS } from '../engine/contentTemplates';
 import { buildSaveParts, isGameSavePart, addSavePart, fileStamp, SAFE_PART_CHARS, type GameSavePart } from '../engine/gameSaveParts';
@@ -302,6 +303,7 @@ function GameIdentitySection() {
           </Text>
         </TouchableOpacity>
       </View>
+      <CampaignTimerCard />
       <View style={styles.card}>
         <View style={styles.cardHead}>
           <Text style={styles.cardTitle}>Vendors</Text>
@@ -741,6 +743,100 @@ function GameBundleBox() {
         </TouchableOpacity>
       </View>
       {status && <Text style={status.kind === 'ok' ? styles.ok : styles.err}>{status.msg}</Text>}
+    </View>
+  );
+}
+
+// engine_Dev — GAME TIME TO COMPLETE THE MAIN QUEST. A countdown to finish the main
+// quest. ON = if the in-game clock reaches the limit before the quest is complete, the
+// run ends with the failure ending below. Value in days OR years. Rides inside the
+// whole-game file (on the main-quest config) so it exports/imports with everything.
+function CampaignTimerCard() {
+  const mqRaw = useContentPackStore((s) => s.customMainQuest) as MainQuestPackShape | null;
+  const setMainQuestTimer = useContentPackStore((s) => s.setMainQuestTimer);
+  const tl = mqRaw?.timeLimit;
+  const te = mqRaw?.timeoutEnding;
+  const [enabled, setEnabled] = useState(tl?.enabled === true);
+  const [value, setValue] = useState(String(tl?.value ?? 7));
+  const [unit, setUnit] = useState<'days' | 'years'>(tl?.unit === 'days' ? 'days' : 'years');
+  const [endTitle, setEndTitle] = useState(te?.title ?? '');
+  const [endBody, setEndBody] = useState(te?.body ?? '');
+  const [status, setStatus] = useState<string | null>(null);
+  // Re-sync the inputs when a new whole-game file is imported.
+  useEffect(() => {
+    setEnabled(tl?.enabled === true);
+    setValue(String(tl?.value ?? 7));
+    setUnit(tl?.unit === 'days' ? 'days' : 'years');
+    setEndTitle(te?.title ?? '');
+    setEndBody(te?.body ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mqRaw]);
+
+  const input: StyleProp<TextStyle> = [styles.input, { minHeight: 0, height: 40 }];
+  const save = () => {
+    const v = Math.max(0, parseInt(value, 10) || 0);
+    setMainQuestTimer({
+      timeLimit: { enabled, value: v, unit },
+      timeoutEnding: { title: endTitle.trim() || undefined, body: endBody.trim() || undefined },
+    });
+    setStatus(enabled
+      ? `Saved — ${v} ${unit} to finish the main quest, then the failure ending fires.`
+      : 'Saved — timer off (no limit).');
+    setTimeout(() => setStatus(null), 4000);
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHead}>
+        <Text style={styles.cardTitle}>Game time to complete main quest</Text>
+        <Text style={enabled ? styles.badgeOn : styles.badgeOff}>{enabled ? '● on' : '○ off'}</Text>
+      </View>
+      <Text style={styles.hint}>
+        A countdown to finish the main quest. When ON, if the in-game clock reaches the limit
+        before the quest is done, the run ends with the failure ending below (e.g. "dragged back
+        to the real world, the war reignites…"). OFF = no limit. Shows as "Year X of N" up top,
+        and the narrator warns when you're nearly out of time. Saved inside your whole-game file.
+      </Text>
+      <TouchableOpacity style={[styles.applyBtn, !enabled && styles.resetBtn]} onPress={() => setEnabled((e) => !e)}>
+        <Text style={enabled ? styles.applyBtnText : styles.resetBtnText}>
+          {enabled ? '✓ TIMER ON — tap to turn OFF' : '✕ TIMER OFF — tap to turn ON'}
+        </Text>
+      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+        <TextInput
+          style={[input, { flex: 1 }]}
+          value={value}
+          onChangeText={setValue}
+          keyboardType="numeric"
+          placeholder="amount (e.g. 7)"
+          placeholderTextColor="#46555a"
+        />
+        <TouchableOpacity
+          style={[styles.applyBtn, { flex: 1.4, justifyContent: 'center' }]}
+          onPress={() => setUnit((u) => (u === 'years' ? 'days' : 'years'))}
+        >
+          <Text style={styles.applyBtnText}>{unit === 'years' ? 'YEARS' : 'DAYS'} — tap to switch</Text>
+        </TouchableOpacity>
+      </View>
+      <TextInput
+        style={[input, { marginTop: 8 }]}
+        value={endTitle}
+        onChangeText={setEndTitle}
+        placeholder="failure ending — title (optional)"
+        placeholderTextColor="#46555a"
+      />
+      <TextInput
+        style={[styles.input, { marginTop: 8, minHeight: 90, textAlignVertical: 'top' }]}
+        value={endBody}
+        onChangeText={setEndBody}
+        placeholder="failure ending — body text (what the player reads when time runs out)"
+        placeholderTextColor="#46555a"
+        multiline
+      />
+      <TouchableOpacity style={[styles.applyBtn, { marginTop: 8 }]} onPress={save}>
+        <Text style={styles.applyBtnText}>SAVE TIMER</Text>
+      </TouchableOpacity>
+      {status ? <Text style={styles.ok}>{status}</Text> : null}
     </View>
   );
 }

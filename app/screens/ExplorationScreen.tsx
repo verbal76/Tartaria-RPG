@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
-import { getNarratorName, getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
+import { getNarratorName, getCrucibleName, isCrucibleEnabled, campaignTimeLimitConfig } from '../engine/contentPack';
 import { hubNameForFaction } from '../engine/hub';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -63,7 +63,18 @@ function describeTime(hours: number): string {
   else if (hourOfDay < 12) part = 'morning';
   else if (hourOfDay < 18) part = 'afternoon';
   else part = 'evening';
-  return `Day ${day} · ${part}`;
+  const base = `Day ${day} · ${part}`;
+  // engine_Dev — campaign deadline readout. When the "time to complete the main
+  // quest" timer is on, show how deep into the clock you are so the deadline is felt.
+  const limit = campaignTimeLimitConfig();
+  if (limit) {
+    if (limit.unit === 'years') {
+      const yr = Math.min(Math.floor(hours / (365 * 24)) + 1, limit.value);
+      return `${base} · Year ${yr} of ${limit.value}`;
+    }
+    return `${base} · Day ${Math.min(day, limit.value)} of ${limit.value}`;
+  }
+  return base;
 }
 
 /** arb95 — danger readout for the scene-bar location line. Surfaces the

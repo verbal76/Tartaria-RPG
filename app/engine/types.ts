@@ -1000,6 +1000,9 @@ export interface PlayerCharacter {
    *  Eating any food consumable resets to 0. Absent for legacy saves,
    *  backfilled to 0 in backfillPlayer. */
   hungerStaminaPenalty?: number;
+  /** engine_Dev — campaign time-limit: set once when the ~90% "Fold is collapsing"
+   *  deadline warning has fired, so it doesn't repeat every action. */
+  snapbackWarned?: boolean;
   /** OTA-625 — weather-damage cooldown. After a damaging weather tick this is
    *  set to WEATHER_TICK_GAP and counts down one per action; while > 0 the
    *  per-action weather roll is skipped, so hostile weather can't chip the

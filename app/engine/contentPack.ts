@@ -83,7 +83,7 @@ interface GenericDefaultPack {
   missions: Partial<Record<MissionTableId, readonly unknown[]>>;
   flavor?: Record<string, unknown>;
   startingAreas?: StartingArea[];
-  mainQuest?: { title?: string; steps?: unknown[] };
+  mainQuest?: MainQuestPackShape;
   bosses?: unknown[];
   collectables?: unknown[];
   digging?: unknown;
@@ -603,12 +603,52 @@ export function getCustomTitles(): unknown[] { return customTitlesOverride ?? []
 // engine_Dev — a DATA-DRIVEN main quest: an ordered list of objective steps, each
 // { action, target, locationId, reward? }, built line-by-line in the dev console.
 // null = the built-in main quest. Shape lives in customMainQuest.ts.
-let customMainQuestOverride: { title?: string; steps?: unknown[] } | null = null;
-export function setCustomMainQuestOverride(obj: { title?: string; steps?: unknown[] } | null): void {
+// engine_Dev — the pack-uploadable main-quest shape. `timeLimit` + `timeoutEnding`
+// drive the optional CAMPAIGN TIME LIMIT ("time to complete the main quest"): when
+// enabled, the run ends with the Snapback failure ending if the in-game clock reaches
+// the limit before the quest is complete. Off unless the pack/dev-panel sets enabled,
+// so the engine stays lore-agnostic. Extra fields ride through ingestion (loaders cast,
+// never strip) and persistence untouched. Value is authored in days OR years.
+export type MainQuestPackShape = {
+  title?: string;
+  steps?: unknown[];
+  timeLimit?: { enabled?: boolean; value?: number; unit?: 'days' | 'years' };
+  timeoutEnding?: { title?: string; body?: string };
+};
+
+const HOURS_PER_DAY = 24;
+const DAYS_PER_YEAR = 365;
+
+/** The campaign time limit ("time to complete the main quest") as in-game HOURS,
+ *  or null when disabled/unset. Reads the live main-quest config. */
+export function campaignTimeLimitHours(): number | null {
+  const tl = getCustomMainQuest()?.timeLimit;
+  if (!tl || tl.enabled !== true) return null;
+  const v = typeof tl.value === 'number' ? tl.value : 0;
+  if (v <= 0) return null;
+  return tl.unit === 'days' ? v * HOURS_PER_DAY : v * DAYS_PER_YEAR * HOURS_PER_DAY;
+}
+
+/** The limit's authored value + unit (for the HUD readout), or null when disabled. */
+export function campaignTimeLimitConfig(): { value: number; unit: 'days' | 'years' } | null {
+  const tl = getCustomMainQuest()?.timeLimit;
+  if (!tl || tl.enabled !== true) return null;
+  const v = typeof tl.value === 'number' ? tl.value : 0;
+  if (v <= 0) return null;
+  return { value: v, unit: tl.unit === 'days' ? 'days' : 'years' };
+}
+
+/** Pack-overridable text for the time-limit failure ending, or null. */
+export function campaignTimeoutEnding(): { title?: string; body?: string } | null {
+  const te = getCustomMainQuest()?.timeoutEnding;
+  return te && typeof te === 'object' ? te : null;
+}
+let customMainQuestOverride: MainQuestPackShape | null = null;
+export function setCustomMainQuestOverride(obj: MainQuestPackShape | null): void {
   customMainQuestOverride = obj && Array.isArray(obj.steps) && obj.steps.length > 0 ? obj : null;
 }
 export function hasCustomMainQuestOverride(): boolean { return customMainQuestOverride != null; }
-export function getCustomMainQuest(): { title?: string; steps?: unknown[] } | null { return customMainQuestOverride ?? genericDefaults.mainQuest ?? null; }
+export function getCustomMainQuest(): MainQuestPackShape | null { return customMainQuestOverride ?? genericDefaults.mainQuest ?? null; }
 /** engine_Dev — a DATA-DRIVEN main quest exists (an uploaded one OR the generic-
  *  default pack's). When true, the engine runs THAT quest (customMainQuestEngine)
  *  and the legacy built-in Tartaria main quest + Core Guardians are disabled. At

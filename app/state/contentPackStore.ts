@@ -27,6 +27,8 @@ import {
   setStartingAreasOverride,
   setCustomTitlesOverride,
   setCustomMainQuestOverride,
+  getCustomMainQuest,
+  type MainQuestPackShape,
   setCustomBossesOverride,
   setCollectablesOverride,
   setSummonsOverride,
@@ -356,6 +358,9 @@ interface ContentPackState {
   clearTitles: () => void;
   loadMainQuestJson: (json: string) => LoadResult;
   setMainQuest: (q: { title?: string; steps?: unknown[] } | null) => void;
+  /** engine_Dev — patch the campaign time-limit timer ("time to complete the main
+   *  quest") + its failure-ending text onto the live main-quest config. */
+  setMainQuestTimer: (patch: Pick<MainQuestPackShape, 'timeLimit' | 'timeoutEnding'>) => void;
   clearMainQuest: () => void;
   loadBossesJson: (json: string) => LoadResult;
   setBosses: (rows: unknown[]) => void;
@@ -1080,6 +1085,19 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCustomMainQuestOverride(valid);
     set({ customMainQuest: valid, contentVersion: get().contentVersion + 1 });
     persist({ ...get(), customMainQuest: valid });
+  },
+
+  setMainQuestTimer(patch) {
+    // Merge the timer config onto the live main-quest object (which already round-
+    // trips via persist + the whole-game bundle). The timer rides as extra fields
+    // read by campaignTimeLimitHours()/campaignTimeoutEnding(). If no custom quest
+    // is uploaded yet, fall back to the live (generic-default) quest as the base so
+    // the timer can still be enabled.
+    const base = (get().customMainQuest ?? getCustomMainQuest() ?? { steps: [] }) as MainQuestPackShape;
+    const next: MainQuestPackShape = { ...base, ...patch };
+    setCustomMainQuestOverride(next as { title?: string; steps?: unknown[] });
+    set({ customMainQuest: next as { title?: string; steps?: unknown[] }, contentVersion: get().contentVersion + 1 });
+    persist({ ...get(), customMainQuest: next as { title?: string; steps?: unknown[] } });
   },
 
   clearMainQuest() {

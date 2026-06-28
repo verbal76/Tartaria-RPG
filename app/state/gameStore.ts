@@ -13419,6 +13419,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // while at 32 loyalty drops to 30 and emits the 30-beat) fires
     // exactly once.
     dogThresholdCheck(get, set, dogLoyaltyBefore);
+    // engine_Dev — campaign time-limit check (fires the Snapback failure ending if
+    // the clock passed the deadline before the quest is done). Once-per-action, after
+    // all time has settled; gated on !silent like the time-passed log so a silent
+    // re-dispatch can't double-fire. No-op unless a pack enabled the timer.
+    if (!_opts?.silent) maybeFireCampaignTimeout(get, set);
     void get().persist();
   },
 
@@ -24575,6 +24580,80 @@ function handlePlayerDeath(
       activeSlotId: null,
     }));
   }, 3500);
+}
+
+// engine_Dev — CAMPAIGN TIME LIMIT ("time to complete the main quest"). When a pack
+// enables the timer (dev-panel card → main-quest config), the run ends with a
+// Snapback FAILURE ending if the in-game clock reaches the limit before the quest is
+// complete. Lore-agnostic: off unless a pack opts in; the failure text is pack-
+// overridable, with this generic default.
+const DEFAULT_TIMEOUT_ENDING = {
+  title: 'Time runs out.',
+  body: 'The clock you were racing reaches zero. The way out tears open and drags you back the way you came — but your work is unfinished, and everything you left behind comes apart without you. There is no second run.',
+};
+
+function handleCampaignTimeout(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const state = get();
+  const player = state.player;
+  if (!player || player.dead) return; // fire-once (the dead flag ends the run)
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { campaignTimeoutEnding } = require('../engine/contentPack') as typeof import('../engine/contentPack');
+  const ending = campaignTimeoutEnding();
+  const title = (ending?.title && ending.title.trim()) || DEFAULT_TIMEOUT_ENDING.title;
+  const body = (ending?.body && ending.body.trim()) || DEFAULT_TIMEOUT_ENDING.body;
+
+  state.appendLog('system', `⏳ ${title}`);
+  state.appendLog('arbiter', body);
+
+  // End the run via the same machinery as death (so input is swallowed + the slot
+  // is preserved), but with the snapback narration above — the player wasn't killed,
+  // they ran out of time.
+  set((s) => (s.player
+    ? { player: { ...s.player, dead: true, hp: 0, sidekick: null }, pendingRolls: null, pendingHookContinue: null }
+    : s));
+  void get().persist();
+
+  setTimeout(() => {
+    void get().refreshSlots();
+    set(() => ({
+      currentScreen: 'title',
+      player: null,
+      currentScene: null,
+      pendingRolls: null,
+      pendingHookContinue: null,
+      activeSlotId: null,
+    }));
+  }, 3500);
+}
+
+/** Once-per-action deadline check. Fires the timeout ending if the clock passed the
+ *  limit and the quest isn't done; warns once at ~90%. No-op when the timer is off. */
+function maybeFireCampaignTimeout(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player || player.dead) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('../engine/contentPack') as typeof import('../engine/contentPack');
+  const limit = cp.campaignTimeLimitHours();
+  if (limit == null) return;                 // timer disabled
+  if (isMainQuestComplete(player)) return;   // already won — no failure
+  const h = player.hoursElapsed ?? 0;
+  if (h >= limit) { handleCampaignTimeout(get, set); return; }
+  // Deadline-approaching warning, once, in the last ~10% of the clock.
+  if (h >= limit * 0.9 && !player.snapbackWarned) {
+    set((s) => (s.player ? { player: { ...s.player, snapbackWarned: true } } : s));
+    get().appendLog(
+      'arbiter',
+      `The ${getNarratorName()} looks up sharply. "The Fold is collapsing — you're nearly out of time. Finish what you came for, or be dragged back with the work undone."`,
+    );
+    void get().persist();
+  }
 }
 
 // ---------------------------------------------------------------------------

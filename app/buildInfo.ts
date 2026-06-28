@@ -16579,4 +16579,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // intro lore are both content-pack data; salvage->investigate label and INT-on-substantive
 // training are working as designed.
 // tsc clean; escort/hub/scene/leave-hub suites green (56).
-export const OTA_BUILD_ID = '2026-06-28-913';
+// 2026-06-28-914 — NEW FEATURE: campaign time limit ("game time to complete the main
+// quest"). A pack-configurable countdown: when ON, if the in-game clock reaches the
+// limit before the main quest is complete, the run ends with a Snapback FAILURE ending
+// (pack-overridable text — "dragged back, the war reignites, millions die"). Value in
+// DAYS or YEARS. Off by default + lore-agnostic (only fires when a pack enables it).
+// New dev-panel card "Game time to complete main quest" (on/off + amount + days/years +
+// failure title/body), a ~90% "the Fold is collapsing" narrator warning, and a
+// "Year X of N" readout next to the Day counter. Rides inside the whole-game file on the
+// main-quest config. tsc clean; new campaignTimer suite (5) + content-pack/quest/save/hub
+// regression green (97). app/engine/contentPack.ts, customMainQuest.ts, types.ts,
+// state/contentPackStore.ts, state/gameStore.ts, screens/DeveloperSettingsScreen.tsx,
+// screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-28-914';
