@@ -16532,4 +16532,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ("1d6-1") alone. Display log keeps the typographic dashes — speech-only. Commas (not ellipses) remain the pause
 // char: Kokoro gives a reliable short beat on a comma; ellipses read as a longer/inconsistent trail-off. Touched:
 // app/voice/loreLexicon.ts, __tests__/loreLexicon.test.ts (updated). tsc clean; loreLexicon suite green (17).
-export const OTA_BUILD_ID = '2026-06-27-910';
+// 2026-06-28-911 — six fixes from the Philadelphia Experiment playthrough:
+// (1) hunger-capped rest now auto-eats a held ration so the 8h sleep recovers
+//     stamina (was a 20-rests-for-nothing near-softlock) — also restores rest-combat;
+// (2) a refused overland move (no stamina) no longer burns 15 min on either travel
+//     path (was bleeding hours on spam-tapped directions);
+// (3) pausing the last active contract now nudges "No active contract — SET ACTIVE…"
+//     instead of silently stalling all progress;
+// (4) AC ceiling (20) in combat + display — a full Rare-armor stack hit AC 24 and an
+//     Epic enemy whiffed all fight for 0 damage; now beatable, nat-20 still auto-hits;
+// (5) "attack with the off-hand <weapon>" no longer force-swaps it to main hand or
+//     resolves as "Bare hands" (the unarmed regex matched "Tungsten-Punch").
+// Rest→combat was already at Tartaria parity (straight into combat, no trigger) — the
+// missing fights were the hunger-lock + hub confinement starving the roll (1+2).
+// tsc clean; combat/equip/faction/armor suites green (121) + new bareHand test (3).
+export const OTA_BUILD_ID = '2026-06-28-911';

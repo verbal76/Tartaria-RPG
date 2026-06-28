@@ -242,7 +242,12 @@ type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
 // "fist", etc. — these always route through bare hands regardless of what
 // the player has equipped, and never wear down the equipped weapon.
 export function isBareHandAttack(actionText: string): boolean {
-  return /\b(punch|kick|fist|knee|headbutt|elbow|bare[- ]?hand)\b/.test(actionText.toLowerCase());
+  // The leading (^|[^-\w]) guard stops a verb that's part of a hyphenated WEAPON
+  // NAME from triggering the unarmed path — e.g. "attack with the Tungsten-Punch
+  // Power Gauntlet" must NOT match on the "punch" inside "Tungsten-Punch". A real
+  // unarmed verb is at the start or preceded by whitespace, never a hyphen.
+  // (Plain char-class, not a lookbehind, so it's safe on Hermes.)
+  return /(^|[^-\w])(punch|kick|fist|knee|headbutt|elbow|bare[- ]?hands?)\b/.test(actionText.toLowerCase());
 }
 
 // Resolve the player's currently-equipped weapon to a catalog entry, if any.

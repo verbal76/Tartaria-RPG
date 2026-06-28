@@ -178,7 +178,9 @@ export function StatsPanel({ player, fill }: Props) {
     if (!name) continue;
     armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
   }
-  const effectiveAc = player.ac + armorAc;
+  // Match the combat-side AC ceiling (gameStore AC_CEILING = 20) so the number the
+  // player sees is the number combat uses — no "displayed 24 but hit as 20" gap.
+  const effectiveAc = Math.min(20, player.ac + armorAc);
 
   // Stats with accessory + armor bonuses folded in so the player sees the
   // numbers combat will actually use.

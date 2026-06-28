@@ -1400,6 +1400,11 @@ const BODY_VERB_PART: Record<string, string> = {
  *  remarks were authored to react to). */
 const CORRUPTION_MAX = 50;
 const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
+// Upper bound on the player's effective combat AC. Without it, a full stack of
+// high-tier armor drove AC to 24+, out of the band any enemy could hit (an Epic
+// ATK-6 foe needed an 18). Capping here keeps even a maxed loadout beatable while
+// the nat-20 auto-hit stays the hard floor. See the effectiveAc clamp below.
+const AC_CEILING = 20;
 
 // arb41 — short "you can't do that" buzz for refused-movement feedback,
 // mirroring the InputBox quick-action buzz (Vibration.vibrate(30)). The
@@ -7354,9 +7359,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (instrumentArg?.resolvedItemId) {
             const swapTo = player.inventory.find((i) => i.id === instrumentArg.resolvedItemId);
             const currentMain = player.equipped?.main;
+            const currentOff = player.equipped?.off;
             if (
               swapTo &&
               swapTo.name !== currentMain &&
+              // Already in the OFF hand → don't yank it to main. The player asked to
+              // swing the off-hand weapon (e.g. "attack with the off-hand gauntlet");
+              // the offHandSwing reach routing below handles it in place. Force-
+              // swapping it to main left the single item displayed in BOTH hands.
+              swapTo.name !== currentOff &&
               (swapTo.kind === 'weapon' || swapTo.kind === 'runecaster')
             ) {
               get().appendLog('world', `You shift grip and bring up the ${swapTo.name}.`);
@@ -9704,6 +9715,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
           }
+          // AUTO-EAT before sleeping — breaks the hunger-capped rest loop. If
+          // hunger has capped your wind AND you're carrying food, eat one ration
+          // before bedding down: it lifts the hunger cap so the 8h sleep actually
+          // recovers stamina, and feeds you. Without this a hungry player could
+          // rest 20+ times, burning 8h each for +0 stamina, with 100+ rations in
+          // the pack (real bug report). Only fires when hunger is actually capping
+          // recovery and a food item is held; otherwise rest is unchanged.
+          let restHungerPenalty = player.hungerStaminaPenalty ?? 0;
+          let restInventory = player.inventory;
+          let restStartStamina = player.stamina;
+          let restStartHp = player.hp;
+          if (restHungerPenalty > 0) {
+            const foodItem = player.inventory.find(
+              (i) => i.kind === 'consumable' && (i.tags ?? []).includes('food') && i.quantity > 0,
+            );
+            if (foodItem) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { resolveItemEffect } = require('../engine/itemEffect');
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
+              const foodFxRaw = resolveItemEffect(foodItem.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+              const foodFx = foodFxRaw && foodFxRaw.kind === 'consumable' ? foodFxRaw : null;
+              restInventory = player.inventory
+                .map((i) => (i.id === foodItem.id ? { ...i, quantity: i.quantity - 1 } : i))
+                .filter((i) => i.quantity > 0);
+              restHungerPenalty = 0; // eating lifts the hunger cap immediately
+              const restoredCap = effectiveStaminaMax({ ...player, hungerStaminaPenalty: 0 });
+              restStartStamina = Math.min(restoredCap, player.stamina + (foodFx?.restoreStamina ?? 0));
+              restStartHp = Math.min(player.hpMax, player.hp + (foodFx?.healHP ?? 0));
+              get().appendLog('world', `You break out a ${foodItem.name} before bedding down — hunger won't choke your rest now.`);
+            }
+          }
           // Deterministic 8-hour rest. The old d4+3 prompt had no
           // gameplay surface — the player couldn't influence or fail the
           // roll, and the only difference between 4h and 7h was time
@@ -9714,7 +9757,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // (food → health), so food markets and food lore carry real
           // weight and the player tops HP to full by eating, never by
           // sleeping. hpRoom is no longer consulted by rest.
-          const stamRoom = effectiveStaminaMax(player) - player.stamina;
+          // Uses the post-auto-eat values: cap reflects the (possibly cleared)
+          // hunger penalty, and the room is measured from the post-meal stamina.
+          const stamRoom = effectiveStaminaMax({ ...player, hungerStaminaPenalty: restHungerPenalty }) - restStartStamina;
           // OTA-238 — block rest when already fully whole. Playtester:
           // "there should be a block on resting if you're already
           // fully rested, that way I don't just spam that button to
@@ -9844,7 +9889,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // syncs Tired/Exhausted based on the new stamina value.
           const restedPlayer = tickPlayerStaminaStatuses(
             advanceTime(
-              { ...player, hp: player.hp + heal, stamina: player.stamina + stamGain, corruption: newCorrRest },
+              { ...player, hp: restStartHp + heal, stamina: restStartStamina + stamGain, corruption: newCorrRest, hungerStaminaPenalty: restHungerPenalty, inventory: restInventory },
               hours,
             ),
           );
@@ -10098,17 +10143,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // to the overland gate + wider location index below.
         }
         if (player.stamina < TRAVEL_MIN_STAMINA) {
-          // OTA-163 — refused-travel time tick. Stress sweep
-          // (cartographer) found a 387-turn stuck-state where every
-          // attempted cardinal step was refused for stamina AND time
-          // never advanced — the player was frozen in a single
-          // minute. Real-world fix: even a failed attempt costs you
-          // ~15 minutes of fumbling. Time passes; the player can
-          // type `rest` to recover and the clock now keeps moving
-          // through the stretch instead of stopping dead. (This guard
-          // is overland-only — interior outpost moves are handled free
-          // above and never reach it.)
-          set({ player: advanceTime(player, 0.25) });
+          // A REFUSED overland move (no stamina, no movement) no longer advances
+          // the clock. The old OTA-163 anti-stuck tick (+15 min per refusal) let a
+          // player spam-tapping directions on empty legs bleed real hours for moves
+          // that never happened (bug report: ~20 refused taps, hours lost). A real
+          // player can't be frozen here — this message sends them to `rest`, which
+          // advances 8h on its own. (The 387-turn freeze OTA-163 guarded against was
+          // an automated cartographer sweep, not a human; not worth taxing players.)
           // OTA-187 → arb40 — refused-overland-move wording. The old
           // "You take one step and stop" read as a partial move, so a
           // player on empty legs didn't realize they hadn't moved. Now a
@@ -16290,6 +16331,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', party.length > 0
         ? `Stood down from ${title}. ${party.map((e) => e.name).join(', ')} fall back to safety and wait; they'll rejoin when you re-activate it.`
         : `Paused ${title}. It won't advance until you re-activate it.`);
+      // Zero-active nudge — if pausing this leaves NO active contract while you
+      // still hold accepted ones, nothing advances until you pick the next
+      // mission. Without this the player can silently pause everything and wonder
+      // why progress stalled (real save: all 5 contracts tracked:false).
+      const fqAfterPause = get().player?.activeFactionQuests ?? [];
+      if (fqAfterPause.length > 0 && fqAfterPause.every((q) => q.tracked === false)) {
+        get().appendLog('world', 'No active contract — open Contracts and SET ACTIVE the mission you want to run.');
+      }
     }
     // Switching the active contract (or deactivating the routed one) drops a
     // route chain that no longer matches the mission you're on.
@@ -17890,10 +17939,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // continueTravel path was bypassing it, which let depleted
     // characters cross the continent for free.
     if (player.stamina < STAMINA_COSTS.wander) {
-      // OTA-163 — refused-travel time tick. See `case 'travel':` for
-      // rationale. Continuing a course while depleted still ticks
-      // ~15 minutes of fumbling so the clock doesn't freeze.
-      set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
+      // A refused course-continuation (no stamina) no longer advances the clock —
+      // same fix as `case 'travel':`. The arbiter line below points the player at
+      // rest, which advances the night on its own; no time is bled for a step that
+      // didn't happen.
       // OTA-187 — line rewritten from "Out of legs" (clinical) to a
       // warmer human read of fatigue. Player ask: "don't say your
       // out of legs tell me I look exhausted and I should rest the
@@ -23907,7 +23956,16 @@ function applyEnemyCounter(
   }
   // racialAC already includes player.ac; add the gear stack on top.
   const acFromGear = racialAC + armorPieces.acBonus + titleRuinsAc;
-  const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
+  // AC CEILING — the model had no upper bound, so a full stack of high-tier armor
+  // (e.g. three Rare pieces at +5/+5/+1 on top of an ~11-13 base = 24) pushed AC
+  // out of the hittable band: an Epic enemy (ATK ~+6) needed an 18 to land and
+  // whiffed all fight, dealing 0 damage. Cap at AC_CEILING so even a maxed loadout
+  // stays beatable (a +6 enemy still hits on ~14+, ~35%); the nat-20 auto-hit below
+  // remains the hard floor. Defensive titles/status can't exceed the cap either.
+  const effectiveAc = Math.min(
+    AC_CEILING,
+    Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects)),
+  );
   // Natural 1 / natural 20 rule — same floor and ceiling that applies
   // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20
   // forces a hit AND doubles the damage roll below.
