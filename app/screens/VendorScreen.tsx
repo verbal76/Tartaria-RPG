@@ -194,7 +194,6 @@ export function VendorScreen() {
   // confirmation modal can show DEX vs DC up-front.
   const stealDc = vendor.demeanor === 'sketchy' ? 11 : vendor.demeanor === 'honest' ? 14 : 16;
   const openSteal = (itemName: string) => setPending({ mode: 'steal', itemName, dc: stealDc });
-  const openDismiss = () => setPending({ mode: 'dismiss' });
   const cancel = () => setPending(null);
   const confirmAction = () => {
     if (!pending) return;
@@ -268,14 +267,9 @@ export function VendorScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>SHOP</Text>
-        <TouchableOpacity
-          onPress={openDismiss}
-          style={styles.dismissBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.dismissText}>DISMISS</Text>
-        </TouchableOpacity>
+        {/* engine_Dev — the in-stall DISMISS button moved to a ✕ on the vendor chip
+            (exploration screen). Empty spacer keeps SHOP centered in the 3-col row. */}
+        <View style={{ width: 64 }} />
       </View>
 
       <View style={styles.vendorCard}>
