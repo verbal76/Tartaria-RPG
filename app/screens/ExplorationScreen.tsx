@@ -725,6 +725,18 @@ export function ExplorationScreen() {
             <Text style={styles.vendorBannerHint}>tap to approach · {currentScene.vendor.offers.length} offers</Text>
           </View>
           <Text style={styles.vendorBannerArrow}>›</Text>
+          {/* engine_Dev — dismiss the vendor right from the chip (like the Crucible
+              chip's ✕), instead of opening the stall just to tap DISMISS. The vendor
+              leaves the scene; a new one comes from the next vendor who shows up.
+              Nested touchable handles its own tap, so it doesn't open the stall. */}
+          <TouchableOpacity
+            style={styles.crucibleDismiss}
+            onPress={() => useGameStore.getState().dismissVendor()}
+            hitSlop={10}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.crucibleDismissText}>✕</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
       )}
 
