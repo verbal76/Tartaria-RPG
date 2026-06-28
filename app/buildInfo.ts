@@ -16614,4 +16614,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // UI. New PlayerCharacter.mainQuestActive flag + setMainQuestActive store action.
 // storylineSingleActive (4) + questProgressionAudit + faction/starter suites green; tsc
 // app-clean. state/gameStore.ts, engine/types.ts, screens/ContractsScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-28-919';
+//
+// 2026-06-28-920 — TUTORIAL "LOOK AROUND YOU" FIRST BEAT. The look-around beat
+// is now the first ACTION the player takes — inserted after the name beat and
+// before TAKE (cudgel), per design ("the look-around button should be the first
+// thing done, even before take"). The beat's UI (InputBox green-light + lockdown
+// unblock) and advance hook (narrateCasualLook → maybeAdvanceTutorial('look'))
+// were already built but the step itself was never in TUTORIAL_STEPS — this wires
+// it in. tutorialLookBeat (2) green + tutorialCurrencyAfterDog beat-order updated
+// to 10; tsc app-clean. components/tutorialSteps.ts, components/InputBox.tsx,
+// state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-28-920';

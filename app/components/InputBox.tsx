@@ -125,7 +125,7 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
 // current beat's instructed control works; everything else buzzes. The lock
 // lifts once the player chooses (tutorialExploreChosen) or the beat advances
 // past explore_or_leave (main_quest / pick_city are post-choice).
-const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
+const TUT_LOCK_BEATS = ['name', 'look', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
 
 // arb132 — STABLE empty-array sentinel for the bandolier selector. A NEW character
 // has no `player.equipped.bandolierIds` yet, so `?? []` returned a FRESH array on
@@ -540,7 +540,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // a static, unlit button with nothing drawing the player to
                 // it (playtest: "nothing's drawing you to that button").
                 tone={currentBeatId === 'look' && qa.submit === 'look' ? 'ready' : undefined}
-                blocked={tutLock}
+                // The look beat is the one beat where this button must stay
+                // tappable — it's the instructed action. Every other locked
+                // beat blocks it (and "rest" stays blocked even on the look beat).
+                blocked={tutLock && !(currentBeatId === 'look' && qa.submit === 'look')}
               />
             ))}
             {raceAbilityReady && onOpenRaceAbilities && !tutLock ? (

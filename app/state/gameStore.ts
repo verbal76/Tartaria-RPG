@@ -6275,14 +6275,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     through), and explore_or_leave lets the leave command through.
       const lockBeatId = tStep?.id ?? '';
       if (
-        ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(lockBeatId)
+        ['name', 'look', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(lockBeatId)
         && !tState.tutorialExploreChosen
       ) {
         const isClimbCmd = /\bclimb\b/i.test(trimmed);
+        // The look beat passes the look command through to the real handler
+        // (narrateCasualLook), which advances the beat via maybeAdvanceTutorial.
+        const isLookCmd = /\blook\b/i.test(trimmed);
         const isLeaveCmd = isLeaveHubCommand(trimmed)
           || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
         const beatAllows =
           (lockBeatId === 'climb' && isClimbCmd)
+          || (lockBeatId === 'look' && isLookCmd)
           || (lockBeatId === 'explore_or_leave' && isLeaveCmd);
         if (!beatAllows) {
           if (!_opts?.silent) get().appendLog('player', trimmed);

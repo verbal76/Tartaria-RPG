@@ -91,6 +91,20 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'The {narrator} looks up. "Your name, traveler. Type it, then tap ACT."',
   },
   {
+    // First action the player takes — before TAKE. Teaches the most-used verb
+    // (look around you) and gives the new arrival their bearings. The button is
+    // lit green during this beat (InputBox) and the look handler advances the
+    // beat (gameStore narrateCasualLook → maybeAdvanceTutorial('look')).
+    id: 'look',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Get Your Bearings',
+    body: 'Before anything else, get your bearings. Tap LOOK AROUND YOU to take in where you are.',
+    arbiter:
+      '"First, get your bearings. Tap LOOK AROUND YOU — take in where you stand."',
+  },
+  {
     id: 'cudgel',
     screen: 'exploration',
     area: 'quick-row',
