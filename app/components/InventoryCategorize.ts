@@ -9,6 +9,9 @@ export type InventoryCategory =
   | 'armor'
   | 'accessory'
   | 'consumable'
+  // engine_Dev — weapon coatings (damage-type reagents) get their own section so
+  // combat-prep doesn't hide among food in Consumables.
+  | 'coating'
   | 'tool'
   | 'relic'
   | 'material'
@@ -23,6 +26,7 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   armor: '#6a9bbf',
   accessory: '#d4a55a',
   consumable: '#9ec96a',
+  coating: '#c75b9c', // venom magenta — weapon/armor damage-type reagents
   tool: '#7fb0a8', // teal — utility implements (pry bar, lockpick, scanner…)
   relic: '#b88ce0',
   material: '#6ab0c9',
@@ -35,6 +39,7 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   armor: 'Armor',
   accessory: 'Amulets & Rings',
   consumable: 'Consumables',
+  coating: 'Coatings',
   tool: 'Tools',
   relic: 'Relics',
   material: 'Materials',
@@ -58,6 +63,7 @@ export const CATEGORY_ORDER: InventoryCategory[] = [
   'armor',
   'accessory',
   'consumable',
+  'coating', // engine_Dev — combat-prep reagents, right after the things you eat
   'tool',
   'relic',
   'material',
@@ -80,6 +86,11 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // Quest Items section, ahead of every other bucket, regardless of their other
   // tags/kind (a Core is kind 'misc'; a whisper token also carries 'aether').
   if (isQuestLockedItem(item)) return 'quest';
+  // engine_Dev — weapon coatings (Poison Vial / Acid Flask / Corruption Tonic +
+  // any author-defined coating) carry the `weapon_coating` tag. Pull them into their
+  // own Coatings section ahead of the catalog/kind heuristics, which would otherwise
+  // file these (kind 'consumable') under Consumables among food and potions.
+  if (item.tags.some((t) => /^weapon_coating$/i.test(t))) return 'coating';
   // Catalog name matches take precedence over kind/tag heuristics — if a
   // crafted Aetheric Torch shows up with kind='relic', it should still
   // resolve to 'relic' via the GEAR catalog.
@@ -167,6 +178,7 @@ export function groupInventoryByCategory(
     armor: [],
     accessory: [],
     consumable: [],
+    coating: [],
     tool: [],
     relic: [],
     material: [],

@@ -16660,4 +16660,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the reorganization; the enemy card is now driven by a plain `hasLiveEnemy` so it
 // still shows in-place during a fight and reverts to the crest when the fight ends.
 // Presentational only (no combat logic touched). tsc app-clean. screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-28-923';
+//
+// 2026-06-28-924 — COATINGS INVENTORY SECTION. Weapon coatings (Poison Vial / Acid
+// Flask / Corruption Tonic + any author-defined coating) were buried in Consumables
+// among food and potions. They now get their own top-level "Coatings" inventory
+// category (venom-magenta), driven entirely off the weapon_coating tag so built-in
+// AND custom coatings land there automatically. Section + legend render generically
+// off CATEGORY_ORDER; empty section is hidden; the Coat-a-weapon / Apply-to-armor /
+// Drink tap actions are unchanged (tag-driven, independent of category).
+// dualCategoryItems coating cases (3) + inventory regression green; tsc app-clean.
+// components/InventoryCategorize.ts.
+export const OTA_BUILD_ID = '2026-06-28-924';
