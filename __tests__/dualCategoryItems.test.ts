@@ -39,3 +39,27 @@ describe('dual-category items (weapon + material)', () => {
     expect(groups.weapon[0]).toBe(groups.material[0]); // literally the same reference
   });
 });
+
+describe('weapon coatings get their own Coatings section', () => {
+  it('a weapon_coating item categorizes as coating, not consumable', () => {
+    expect(categoriesForItem(mk('Poison Vial', ['weapon_coating', 'consumable']))).toEqual(['coating']);
+    expect(categoriesForItem(mk('Acid Flask', ['weapon_coating']))).toEqual(['coating']);
+    expect(categoriesForItem(mk('Frostbite Oil', ['weapon_coating', 'cold']))).toEqual(['coating']);
+  });
+
+  it('ordinary food/potions stay in Consumables', () => {
+    expect(categoriesForItem(mk('Trail Rations', ['food', 'ration'], 'consumable'))).toEqual(['consumable']);
+    expect(categoriesForItem(mk('Healing Draught', ['potion', 'healing'], 'consumable'))).toEqual(['consumable']);
+  });
+
+  it('grouping buckets coatings under coating and keeps food under consumable', () => {
+    const groups = groupInventoryByCategory([
+      mk('Poison Vial', ['weapon_coating'], 'consumable', 3),
+      mk('Trail Rations', ['food'], 'consumable', 2),
+    ]);
+    expect(groups.coating).toHaveLength(1);
+    expect(groups.coating[0]!.name).toBe('Poison Vial');
+    expect(groups.consumable).toHaveLength(1);
+    expect(groups.consumable[0]!.name).toBe('Trail Rations');
+  });
+});
