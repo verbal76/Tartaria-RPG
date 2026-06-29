@@ -15167,4 +15167,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // generically off CATEGORY_ORDER; empty section hidden; Coat-a-weapon / Apply-to-armor
 // / Drink tap actions unchanged. dualCategoryItems coating cases (8) green; tsc clean.
 // Pure JS → golem-line OTA, no APK. app/components/InventoryCategorize.ts.
-export const OTA_BUILD_ID = '2026-06-29-630-coatings-section';
+//
+// 2026-06-29 — COAT ARMOR FOR DAMAGE RESISTS (ported from engine_Dev). A weapon-
+// coating vial can now be worked into an ARMOR piece for a PERMANENT damage-type
+// resist (the vial's damage type) instead of onto a weapon. New "Apply to armor
+// (+<type> resist)" action in the coating modal + an armor picker. Stored on the
+// armor instance's addedResists[]; aggregateArmor adds it to the worn slot so the
+// EXISTING applyArmorResistance combat path reduces incoming damage of that type
+// (multiplicative per-slot stack, capped at 80% — never immunity). Capped at 3
+// worked-in resists per piece; duplicates refused (no wasted vial). Builds on the
+// armor-resistance system already present on golem; the delta is the addedResists
+// field + coatingDamageType helper + the applyCoatingToArmor action + UI.
+// armorCoating test (6) green; weaponCoating / armorResistanceLadder / coatingNotARing
+// suites green (43); tsc app-clean. types.ts, weaponCoating.ts, gameStore.ts,
+// screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-29-631-coat-armor-resists';
