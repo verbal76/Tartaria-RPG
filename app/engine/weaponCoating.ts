@@ -42,6 +42,16 @@ export function isCoatableWeapon(name: string): boolean {
   return w.damageType === 'piercing';
 }
 
+/** engine_Dev (armor coating) — the damage type a coating's ARMOR resist counts
+ *  as, so it matches incoming enemy damage. Tartaria's coatings are all built-in
+ *  (poison / acid / corruption / electrical / burn), where the kind already IS the
+ *  damage-type string, so this is identity. Kept as a single helper so the armor-
+ *  coating path reads the resist type in one place (and a future custom-coating
+ *  layer can override the mapping here without touching call sites). */
+export function coatingDamageType(kind: string): string {
+  return kind.toLowerCase();
+}
+
 /** OTA-453 — instance-aware coatability. A FUSED weapon is unique and
  *  catalog-absent — its stats live on the InventoryItem (`uniqueStats`), so
  *  findWeaponByName (and therefore isCoatableWeapon) misses it entirely, and a
