@@ -8,10 +8,14 @@ import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, 
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
 
-// engine_Dev — during a fight, the top char + enemy panels grow tall to fill the world-window
-// (one long box each side) and the feed hides. Uses the ORIGINAL StatsPanel (reactive HP color) +
-// EnemyPanel. Set false to revert to the normal compact combat layout.
-const COMBAT_ARENA_VIEW = true;
+// engine_Dev — the "combat arena" grew the top char + enemy panels tall to fill the
+// world-window (tried side-by-side AND top/bottom) and hid the feed. Per player call,
+// reverted to the ORIGINAL Tartaria combat layout: the panels keep their normal
+// orientation + size and DON'T move when a fight starts — the enemy card simply appears
+// in the existing top-right box (replacing the crest), and the feed stays put. Left as a
+// flag in case the arena is ever revisited; OFF restores the original. The enemy card is
+// driven by `hasLiveEnemy` (below) so it still shows in-place during a fight regardless.
+const COMBAT_ARENA_VIEW = false;
 
 // engine_Dev — flash the just-resolved roll result in a transient popup just above the controls
 // (below the action buttons). Shows the LAST roll only, holds ~2s, then fades. Set false to remove.
@@ -494,9 +498,14 @@ export function ExplorationScreen() {
   // pinning arenaActive true so the arena never collapsed and the enemy box never
   // reverted to the crest. Treating a missing entry as 0 makes the collapse
   // deterministic the moment the last real threat is gone.
-  const arenaActive = COMBAT_ARENA_VIEW && !!currentScene && currentScene.enemies.some(
+  // A real threat is on the board (living, not knocked out). Drives the in-place
+  // enemy card in the top-right box: it shows while the fight is live and reverts to
+  // the crest the moment the last foe is down/KO'd — exactly the original behavior,
+  // independent of the (now-off) arena reorganization.
+  const hasLiveEnemy = !!currentScene && currentScene.enemies.some(
     (_e, i) => (currentScene.enemyHps[i] ?? 0) > 0 && currentScene.enemyKnockedOut?.[i] !== true,
   );
+  const arenaActive = COMBAT_ARENA_VIEW && hasLiveEnemy;
   // engine_Dev — when a roll sequence finishes resolving (pendingRolls goes null) during combat,
   // surface the FINAL output line in the result popup (the feed is hidden behind the arena). Only
   // the latest log line, only in combat, only once per sequence — no per-step dice-math duplication.
@@ -584,7 +593,7 @@ export function ExplorationScreen() {
           </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
-          {arenaActive ? (
+          {hasLiveEnemy ? (
             <EnemyPanel
               enemies={enemyViews}
               activeIndex={activeIdx}

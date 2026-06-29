@@ -16650,4 +16650,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // contentLeakSweep (5) green; 185/186 relevant tests pass (the 1 failure +
 // dogGolem OOM are pre-existing, confirmed head-to-head). tsc app-clean.
 // engine/itemAliases.ts, engine/itemWeight.ts, state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-28-922';
+//
+// 2026-06-28-923 — REVERT COMBAT-ARENA LAYOUT. Per player call, dropped the
+// "combat arena" (panels grew tall to fill the world-window — tried side-by-side
+// AND top/bottom, both disliked) and restored the ORIGINAL Tartaria combat layout:
+// the stats + enemy panels keep their normal orientation/size and DON'T move when a
+// fight starts; the enemy card simply appears in the existing top-right box
+// (replacing the crest) and the feed stays put. COMBAT_ARENA_VIEW=false disables all
+// the reorganization; the enemy card is now driven by a plain `hasLiveEnemy` so it
+// still shows in-place during a fight and reverts to the crest when the fight ends.
+// Presentational only (no combat logic touched). tsc app-clean. screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-28-923';
