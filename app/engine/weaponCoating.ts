@@ -112,6 +112,11 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
 
 /** Ongoing DOT duration (turns) after the immediate on-hit tick. */
 export const COATING_DOT_TURNS = 3;
+/** engine_Dev (design call) — chance a coating still "takes" when the enemy RESISTS
+ *  its damage type. A coating ALWAYS lands vs a weak or neutral foe; only a resisted
+ *  type gets gated to this small chance (a weakness is a guaranteed opening; a resisted
+ *  type rarely slips through). Tunable in one place across all lines. */
+export const COATING_RESIST_LAND_CHANCE = 0.15;
 /** AC reduction an acid coating inflicts per landing hit. */
 export const ACID_SHRED_PER_HIT = 1;
 /** Base cap on accumulated acid armor shred per enemy (normal foes). */
