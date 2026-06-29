@@ -468,6 +468,12 @@ export interface InventoryItem {
    *  status: poison = pure DOT, acid = DOT + armor shred (−AC),
    *  corruption = DOT + corruption stacks. */
   coating?: WeaponCoating;
+  /** engine_Dev — damage-type resists worked into THIS ARMOR instance from a
+   *  coating vial (the "apply to armor" use). Permanent for the piece's life;
+   *  aggregateArmor adds these to the slot's resistances while it's worn, so the
+   *  existing applyArmorResistance combat path reduces incoming damage of that
+   *  type. Lower-cased damage-type strings (e.g. ['poison', 'cold']). */
+  addedResists?: string[];
 }
 
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */

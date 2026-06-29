@@ -2553,6 +2553,11 @@ interface GameStore {
    *  the prior coating. Returns nothing; surfaces success/refusal
    *  via the log. */
   applyCoating: (coatingItemId: string, weaponId: string) => void;
+  /** engine_Dev — work a coating vial into an ARMOR piece for a permanent
+   *  damage-type resist (the vial's damage type). Stored on the armor instance's
+   *  addedResists; aggregateArmor + applyArmorResistance reduce incoming damage of
+   *  that type while it's worn. Capped at 3 resists per piece. */
+  applyCoatingToArmor: (coatingItemId: string, armorId: string) => void;
   /** OTA-361 — loot a knocked-out humanoid. Transfers the enemy's
    *  `carries` kit (weapons + armor, DAMAGED — durability scaled to how
    *  hurt they were), the full `loot` drop list, and a little TC into
@@ -20227,6 +20232,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
   },
 
+  applyCoatingToArmor(coatingItemId, armorId) {
+    const player = get().player;
+    if (!player) return;
+    const coatItem = player.inventory.find((i) => i.id === coatingItemId);
+    const armor = player.inventory.find((i) => i.id === armorId);
+    if (!coatItem || !armor) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveItemEffect } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findGearByName, findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+    const fx = resolveItemEffect(coatItem.name, [findGearByName]);
+    const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+    if (!spec) { get().appendLog('debug', `applyCoatingToArmor: ${coatItem.name} carries no coating spec`); return; }
+    const isArmor = armor.kind === 'armor' || (armor.uniqueStats?.kind === 'armor') || !!findArmorByName(armor.name);
+    if (!isArmor) { get().appendLog('world', `You can only work a vial's resist into ARMOR — the ${armor.name} won't hold it.`); return; }
+    // engine_Dev — the resist a coating grants is its DAMAGE TYPE, so it matches
+    // incoming damage. aggregateArmor adds it to the worn slot; the existing
+    // applyArmorResistance combat path then reduces incoming damage of that type.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    const type = coatingDamageType(String(spec.kind));
+    const already = (armor.addedResists ?? []).map((r) => r.toLowerCase());
+    if (already.includes(type.toLowerCase())) {
+      get().appendLog('world', `The ${armor.name} already turns aside ${type}. No need to waste another vial on it.`);
+      return;
+    }
+    // Cap worked-in resists so one piece can't become a god-vest.
+    const ADDED_RESIST_CAP = 3;
+    if (already.length >= ADDED_RESIST_CAP) {
+      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down or use a different piece.`);
+      return;
+    }
+    set((s) => {
+      if (!s.player) return s;
+      const inv = s.player.inventory
+        .map((i) => (i.id === armorId ? { ...i, addedResists: [...(i.addedResists ?? []), type] } : i))
+        .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
+      return { player: { ...s.player, inventory: inv } };
+    });
+    get().appendLog('reward', `You work the ${coatItem.name.toLowerCase()} into the ${armor.name}. It now turns aside ${type} damage — for good, until the piece is lost or destroyed.`);
+    void get().persist();
+  },
+
   async fuseAtCrucible() {
     const player = get().player;
     if (!player) return;
@@ -23150,6 +23199,8 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
         resistances.push(r);
         resistSlots.push({ type: r, slot });
       }
+      // engine_Dev — coating-vial resists worked into this fused armor instance.
+      for (const r of unique.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
       continue;
     }
     const piece = findArmorByName(name);
@@ -23164,6 +23215,8 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
       resistances.push(r);
       resistSlots.push({ type: r, slot });
     }
+    // engine_Dev — coating-vial resists worked into this armor instance.
+    for (const r of inst?.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
   }
   return { acBonus, resistances, resistSlots };
 }
