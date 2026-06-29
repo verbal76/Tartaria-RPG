@@ -15181,4 +15181,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armorCoating test (6) green; weaponCoating / armorResistanceLadder / coatingNotARing
 // suites green (43); tsc app-clean. types.ts, weaponCoating.ts, gameStore.ts,
 // screens/InventoryScreen.tsx.
-export const OTA_BUILD_ID = '2026-06-29-631-coat-armor-resists';
+//
+// 2026-06-29 — ARMOR COATING SHOWS ON THE ITEM. A coating-applied armor resist
+// (addedResists) wasn't reflected in the item's stat preview, so a coated piece read
+// identically to an uncoated one. getItemPreviewForInstance now folds addedResists
+// into the "Resists:" line, tagged "(coated)" to read distinct from native/laddered
+// resists (inserts a Resists line if the piece had none). Feeds every screen that
+// shows item stats (inventory list/detail, vendor, character sheet). armorResistPreview
+// test (4) green; tsc app-clean. components/itemPreview.ts.
+export const OTA_BUILD_ID = '2026-06-29-632-coat-resist-shows';
