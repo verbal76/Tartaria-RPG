@@ -15158,4 +15158,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // look special-case (look is no longer adjacent to the door-open handoff) and
 // added a 'look' nudge hint. tutorialSteps.ts, gameStore.ts; tutorial suite
 // green (34). Pure JS → golem-line OTA, no APK.
-export const OTA_BUILD_ID = '2026-06-28-629-tutorial-look-first';
+//
+// 2026-06-29 — COATINGS inventory section (ported from engine_Dev). Weapon coatings
+// (Poison Vial / Acid Flask / Corruption Tonic + any author-defined coating, the
+// `weapon_coating` tag) were buried in Consumables among food/potions; they now get
+// their own top-level "Coatings" category (venom-magenta), driven purely off the tag
+// so built-in AND custom coatings land there automatically. Section + legend render
+// generically off CATEGORY_ORDER; empty section hidden; Coat-a-weapon / Apply-to-armor
+// / Drink tap actions unchanged. dualCategoryItems coating cases (8) green; tsc clean.
+// Pure JS → golem-line OTA, no APK. app/components/InventoryCategorize.ts.
+export const OTA_BUILD_ID = '2026-06-29-630-coatings-section';
