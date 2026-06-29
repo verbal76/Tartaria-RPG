@@ -16670,4 +16670,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Drink tap actions are unchanged (tag-driven, independent of category).
 // dualCategoryItems coating cases (3) + inventory regression green; tsc app-clean.
 // components/InventoryCategorize.ts.
-export const OTA_BUILD_ID = '2026-06-28-924';
+//
+// 2026-06-28-925 — ARMOR COATING SHOWS ON THE ITEM. A coating-applied armor resist
+// (addedResists) wasn't reflected in the item's stat preview, so a coated piece read
+// identically to an uncoated one. getItemPreviewForInstance now folds addedResists
+// into the "Resists:" line, tagged "(coated)" to read distinct from native/laddered
+// resists (inserts a Resists line if the piece had none). Feeds every screen that
+// shows item stats (inventory list/detail, vendor, character sheet). armorResistPreview
+// test (4) green; tsc app-clean. components/itemPreview.ts.
+export const OTA_BUILD_ID = '2026-06-28-925';
