@@ -15298,4 +15298,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resists (inserts a Resists line if the piece had none). Feeds every screen that
 // shows item stats (inventory list/detail, vendor, character sheet). armorResistPreview
 // test (4) green; tsc app-clean. JS-only → OTA-safe. components/itemPreview.ts.
-export const OTA_BUILD_ID = '2026-06-29-645-coat-resist-shows';
+//
+// OTA-646 — COATING-LANDING RULE (design call, ported from engine_Dev). A weapon
+// coating now ALWAYS "takes" on a landing hit UNLESS the enemy RESISTS its damage type,
+// in which case it gets only a small chance (COATING_RESIST_LAND_CHANCE = 0.15) to slip
+// through. Weak AND neutral both always land. HaL2001 had NO coating gate before
+// (coatings always landed), so this ADDS a resisted-coating miss chance — wraps the
+// unconditional coating-on-hit block with a resist-RELATIONSHIP gate (applyDamageTypeModifier
+// + resist:/vulnerable: traits). New shared COATING_RESIST_LAND_CHANCE constant.
+// coatingLandRule test (6) green (resisted ~0.15, neutral/weak 200/200); weaponCoating /
+// weaponCoatingCombat / coatingNotARing (38) unbroken; tsc app-clean. JS-only → OTA-safe.
+// engine/weaponCoating.ts, state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-29-646-coating-land-rule';
