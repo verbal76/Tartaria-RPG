@@ -15275,4 +15275,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Apply-to-armor / Drink tap actions are unchanged (tag-driven). JS-only → OTA-safe.
 // dualCategoryItems coating cases (8) green; tsc clean on touched files.
 // app/components/InventoryCategorize.ts.
-export const OTA_BUILD_ID = '2026-06-29-643';
+//
+// OTA-644 — COAT ARMOR FOR DAMAGE RESISTS (ported from engine_Dev, after a verified
+// test run on the golem line). A weapon-coating vial can now be worked into an ARMOR
+// piece for a PERMANENT damage-type resist (the vial's damage type) instead of onto a
+// weapon: new "Apply to armor (+<type> resist)" action + armor picker in the coating
+// modal. Stored on the armor instance's addedResists[]; aggregateArmor adds it to the
+// worn slot so the EXISTING applyArmorResistance combat path reduces incoming damage of
+// that type (multiplicative per-slot stack — chest 35% … cloak 10% — capped at 80%,
+// never immunity). Capped at 3 resists per piece; duplicates refused. Builds on the
+// armor-resistance system already present on HaL2001; the delta is the addedResists
+// field + coatingDamageType helper + applyCoatingToArmor action + UI. JS-only → OTA-safe.
+// armorCoating test (6) green; combat math re-verified on HaL2001's OWN combat via live-
+// combat sims (weapon DOTs incl. poison firing every hit / no 45% gate; acid shred +
+// corruption stacks with boss scaling; armor resist in real enemy counters). tsc app-clean.
+// types.ts, weaponCoating.ts, gameStore.ts, screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-06-29-644-coat-armor-resists';
