@@ -26382,6 +26382,19 @@ function handleSidekickCommand(
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
     dmg += golem.attackMod + Math.floor(golemPower / 2);
+    // Combat-Parity (companion) — honor the enemy's resist/weakness + creature-trait
+    // multipliers for the golem's INNATE damage type. Restored from golem-line: the
+    // engine_Dev refactor dropped it, so the base swing punched FLAT damage that
+    // ignored enemy resistances (a piercing golem got no edge on a piercing-weak foe,
+    // and full damage through a resistant one). Same helpers the player's swing uses;
+    // applied to the base hit BEFORE the coating bonus (already type-modified below).
+    // (The hardcoded on-hit +1d4 typed proc is intentionally NOT restored — it ties
+    // into the content-pack proc-gating that's still under review.)
+    {
+      const gMod = applyDamageTypeModifier(dmg, dmgType, target.type);
+      const gTrait = traitDamageMultiplier(target.traits, dmgType);
+      dmg = Math.max(1, Math.round(gMod.damage * gTrait.multiplier));
+    }
     // OTA-479 — a COATED golem weapon adds its bite to the hit AND seeds the
     // coating's shred/stack/DOT on the enemy (the armor-breaker payoff). Mirrors
     // the player's coated-strike math.
@@ -26896,6 +26909,17 @@ function handleDogCombat(
     if (hit) {
       let dmg = rollDie(6) + Math.floor(dog.stats.strength / 2);
       if (nat20) dmg *= 2;
+      // Combat-Parity (companion) — the dog's bite is PIERCING; honor the enemy's
+      // resist/weakness + creature-trait multipliers (restored from golem-line; the
+      // engine_Dev refactor dropped it so the bite punched flat/typeless damage that
+      // ignored resistances). Same helpers the player's swing uses; applied after the
+      // crit double, matching the player's crit-then-resist order. (On-hit typed proc
+      // intentionally not restored — same reasoning as the golem swing.)
+      {
+        const dMod = applyDamageTypeModifier(dmg, 'piercing', target.type);
+        const dTrait = traitDamageMultiplier(target.traits, 'piercing');
+        dmg = Math.max(1, Math.round(dMod.damage * dTrait.multiplier));
+      }
       const newHp = Math.max(0, targetHp - dmg);
       get().appendLog(
         'reward',

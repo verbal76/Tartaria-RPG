@@ -780,6 +780,11 @@ const BUILTIN_DT_DEFAULTS: Record<string, { combat?: DamageCombatEffect; onHit?:
   stun:        { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.4, weakBonus: 0.2, strongPenalty: 0.2 }, onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 2 },
   degradation: { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.5, weakBonus: 0.2, strongPenalty: 0.2 } },
   aetheric:    { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'dexterity', amount: -2 }], onHitRounds: 1 },
+  // engine_Dev — cold was dropped in the content-pack refactor, leaving cold/frost
+  // weapons & coatings INERT (getDamageTypeCombat('cold') returned null → no proc, no
+  // DOT, no log — silent dead type). Restored to its Tartaria config: a chilling
+  // on-hit that saps DEX (the DT_ALIAS 'frost'->'cold' mapping now resolves to it).
+  cold:        { combat: { mode: 'on_hit', dice: '1d4', baseChance: 0.45, weakBonus: 0.3, strongPenalty: 0.3 }, onHit: [{ stat: 'dexterity', amount: -1 }], onHitRounds: 2 },
 };
 // Off-catalog type words that appear in built-in content → mapped to the closest real type so they
 // stop being inert. force/psychic read as "otherworldly energy" → aetheric; common spelling variants.

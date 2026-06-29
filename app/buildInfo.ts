@@ -16678,4 +16678,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resists (inserts a Resists line if the piece had none). Feeds every screen that
 // shows item stats (inventory list/detail, vendor, character sheet). armorResistPreview
 // test (4) green; tsc app-clean. components/itemPreview.ts.
-export const OTA_BUILD_ID = '2026-06-28-925';
+//
+// 2026-06-28-926 — COMBAT-AUDIT FIXES (companion parity + cold restored). A full
+// cross-branch combat-math audit (live-combat sims) found the player lines clean but
+// flagged two engine_Dev-only regressions from the content-pack refactor:
+//   (1) COMPANION DAMAGE ignored enemy resistances — golem swing + dog bite punched
+//       FLAT/typeless damage (no edge vs weak foes, full damage through resistant
+//       ones). Restored the "Combat-Parity (companion)" resist/weak modifier
+//       (applyDamageTypeModifier × traitDamageMultiplier — the same helpers the
+//       player's swing uses) to both. The hardcoded on-hit +1d4 typed proc is
+//       intentionally NOT restored (it routes through the coating proc-gate that's
+//       still under review). Verified: golem 5/10/15, dog 4/9/14 vs resist/neutral/weak.
+//   (2) COLD/FROST was dropped from BUILTIN_DT_DEFAULTS → cold gear/coatings were
+//       silently INERT. Restored cold's on-hit config (−1 DEX); frost alias resolves.
+// companionTypeParity (3) + coldTypeRestored (4) green; golemCompanion / dogRescue /
+// companionAssist (70) unbroken; tsc app-clean. state/gameStore.ts, engine/contentPack.ts.
+export const OTA_BUILD_ID = '2026-06-28-926';
