@@ -171,7 +171,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating, coatingFamily, coatingDamageType } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating, coatingFamily, coatingDamageType } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, getActiveVendors, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
@@ -14501,27 +14501,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // type — both the macro type map AND the enemy's own resist:/vulnerable:
           // traits — even when the base weapon isn't that type. Poison/acid/
           // corruption deal flat typeless bonus damage (their bite is the DOT).
-          // engine_Dev — UNIFIED apply-chance: if the author configured a combat
-          // effect for this coating's matching damage type, the coating now lands on
-          // a weak/strong-gated roll (more likely vs weak foes, less vs strong) just
-          // like a damage-type proc. No config → applies every hit as before (the
-          // built-in behavior is unchanged).
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const cpc = require('../engine/contentPack') as typeof import('../engine/contentPack');
-          // engine_Dev — a coating's DAMAGE TYPE (built-in = its kind; custom =
-          // the override's damageType) drives all resistance math; its FAMILY
-          // drives behavior. So a "Frost" coating (family burn, damageType cold)
-          // earns cold weakness/resistance and lands a burn-family DOT.
+          // engine_Dev — a coating's DAMAGE TYPE (built-in = its kind; custom = the
+          // override's damageType) drives all resistance math; its FAMILY drives
+          // behavior. So a "Frost" coating (family burn, damageType cold) earns cold
+          // weakness/resistance and lands a burn-family DOT.
           const coatDT = coatingDamageType(coating.kind);
-          const coatCombat = cpc.getDamageTypeCombat(coatDT);
-          let coatingLands = true;
-          if (coatCombat) {
-            const cMatch: 'weak' | 'resist' | 'normal' =
-              (applyDamageTypeModifier(1, coatDT, enemy.type).match === 'weak' || traitDamageMultiplier(enemy.traits, coatDT).match === 'vulnerable') ? 'weak'
-              : (applyDamageTypeModifier(1, coatDT, enemy.type).match === 'resist' || traitDamageMultiplier(enemy.traits, coatDT).match === 'resist') ? 'resist'
-              : 'normal';
-            coatingLands = Math.random() < cpc.damageTypeApplyChance(coatCombat, cMatch);
-          }
+          // engine_Dev (design call) — a coating ALWAYS takes UNLESS the enemy RESISTS
+          // its damage type, in which case it gets only a small chance to slip through.
+          // Weakness AND neutral both always land ("drop your hands and you get hit").
+          // Keys off the resist RELATIONSHIP (the same applyDamageTypeModifier +
+          // resist:/vulnerable: traits the damage math uses), so the rule is uniform
+          // across every coating type — not just ones with a damage-type config.
+          const coatResists = applyDamageTypeModifier(1, coatDT, enemy.type).match === 'resist'
+            || traitDamageMultiplier(enemy.traits, coatDT).match === 'resist';
+          const coatingLands = !coatResists || Math.random() < COATING_RESIST_LAND_CHANCE;
           if (!coatingLands) {
             get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}${'.'}`);
           } else {

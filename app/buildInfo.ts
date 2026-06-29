@@ -16693,4 +16693,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       silently INERT. Restored cold's on-hit config (−1 DEX); frost alias resolves.
 // companionTypeParity (3) + coldTypeRestored (4) green; golemCompanion / dogRescue /
 // companionAssist (70) unbroken; tsc app-clean. state/gameStore.ts, engine/contentPack.ts.
-export const OTA_BUILD_ID = '2026-06-28-926';
+//
+// 2026-06-28-927 — COATING-LANDING RULE (design call). A weapon coating now ALWAYS
+// "takes" on a landing hit UNLESS the enemy RESISTS its damage type, in which case it
+// gets only a small chance (COATING_RESIST_LAND_CHANCE = 0.15) to slip through. Weak AND
+// neutral both always land — kills the old "fails ~55% on a normal foe" frustration
+// while keeping resistance meaningful (a weakness is a guaranteed opening; a resisted
+// type rarely sticks). Replaced the old proc-chance gate (which gated even neutral hits
+// and only fired for types with a damage-type config) with a uniform resist-RELATIONSHIP
+// gate (applyDamageTypeModifier + resist:/vulnerable: traits), so it covers every coating
+// type. coatingLandRule test (6) green — resisted ~0.15, neutral 200/200, weak 200/200;
+// tsc app-clean. engine/weaponCoating.ts (shared constant), state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-28-927';
