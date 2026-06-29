@@ -166,7 +166,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
@@ -14044,6 +14044,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const coatInst = coatSlotId ? player.inventory.find((i) => i.id === coatSlotId) : null;
         const coating = coatInst?.coating;
         if (coating) {
+          // engine_Dev (design call) — a coating ALWAYS takes UNLESS the enemy RESISTS
+          // its damage type, in which case it gets only a small chance
+          // (COATING_RESIST_LAND_CHANCE) to slip through. Weak AND neutral both always
+          // land ("drop your hands and you get hit"). Keys off the resist RELATIONSHIP
+          // (the same applyDamageTypeModifier + resist:/vulnerable: traits the damage
+          // math uses). Ported from engine_Dev; these lines had no coating gate before.
+          const coatResists = applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'resist'
+            || traitDamageMultiplier(enemy.traits, coating.kind).match === 'resist';
+          if (coatResists && Math.random() >= COATING_RESIST_LAND_CHANCE) {
+            get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}.`);
+          } else {
           // OTA-403 — prefer the player's MANUAL coating roll (the new
           // 'coating' RollStep) when present; fall back to an internal
           // roll only for legacy paths that didn't stage the step.
@@ -14068,6 +14079,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : rawRolled;
           coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
           dmg += rolled;
+          }
         }
       }
       if (surgeBonus > 0) {
