@@ -16704,4 +16704,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // gate (applyDamageTypeModifier + resist:/vulnerable: traits), so it covers every coating
 // type. coatingLandRule test (6) green — resisted ~0.15, neutral 200/200, weak 200/200;
 // tsc app-clean. engine/weaponCoating.ts (shared constant), state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-28-927';
+//
+// 2026-06-30-931 — summon-noun leak sweep. The player-facing word "golem" was
+// hardcoded in two engine spots no content pack could override: the combat
+// QuickBtn label (shown every turn an active sidekick is out) and the salvage
+// core dropped when a trained sidekick crumbles ("Inert Golem Core"). A reskin
+// whose summons noun is "mechanoid" leaked "golem" regardless. The button now
+// labels with the sidekick's own name (parity with the dog button) and the core
+// name is built from the title-cased summon noun (summonNounCap → the pack's
+// noun, e.g. "Inert Mechanoid Core"). Backward-compat: "use golem"/"command
+// golem" input still parses; the golemCore field (not the name) drives feed-back.
+// summonNounLeak test (5) green; tsc app-clean. components/InputBox.tsx,
+// state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-30-931-mechanoid-noun';

@@ -26522,7 +26522,7 @@ function handleSidekickCommand(
         if (hadTraining) {
           const res = grantItem(player.inventory, {
             id: `golemcore_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            name: 'Inert Golem Core',
+            name: `Inert ${summonNounCap()} Core`,
             kind: 'misc',
             rarity: 'Uncommon',
             quantity: 1,
@@ -26535,7 +26535,7 @@ function handleSidekickCommand(
         return { player };
       });
       if (hadTraining) {
-        get().appendLog('reward', `✦ Inert Golem Core recovered — feed it to your next ${summonNoun()} to pass on half of ${golem.name}'s training.`);
+        get().appendLog('reward', `✦ Inert ${summonNounCap()} Core recovered — feed it to your next ${summonNoun()} to pass on half of ${golem.name}'s training.`);
       }
     } else {
       // OTA-467 — surviving a hit trains RESILIENCE; carry the turn's POWER too.
@@ -27258,7 +27258,7 @@ function applyItemToGolem(
         stats: { power: stats.power + c.power, resilience: stats.resilience + c.resilience },
         hpMax: g.hpMax + c.bonusHp, hp: g.hp + c.bonusHp } } };
     });
-    get().appendLog('reward', `✦ You seat the Inert Golem Core into ${golem.name}'s frame. It remembers old fights — +${c.power} power, +${c.resilience} resilience, +${c.bonusHp} max HP.`);
+    get().appendLog('reward', `✦ You seat the Inert ${summonNounCap()} Core into ${golem.name}'s frame. It remembers old fights — +${c.power} power, +${c.resilience} resilience, +${c.bonusHp} max HP.`);
     return true;
   }
   // arb121 — a full FUEL PART heals full; an elemental MATERIAL substitute (e.g.
@@ -27792,6 +27792,14 @@ export function hasActiveDog(player: PlayerCharacter | null | undefined): boolea
 function summonNoun(): string {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return (require('../engine/sidekicks') as typeof import('../engine/sidekicks')).getSummonNoun();
+}
+
+// engine_Dev — Title-cased summon noun for item proper-names (e.g. the salvage
+// "Inert Mechanoid Core"), so the engine carries no hardcoded "Golem" lore — the
+// active summons pack's noun drives it just like the live combat lines.
+function summonNounCap(): string {
+  const n = summonNoun();
+  return n ? n.charAt(0).toUpperCase() + n.slice(1) : n;
 }
 
 // engine_Dev — regex alternation of the active summon noun + the legacy alias

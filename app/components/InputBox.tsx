@@ -472,7 +472,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
 
             <View style={styles.quickRowLine}>
               {golem && golem.hp > 0 ? (
-                <QuickBtn label={`golem (${golem.hp}/${golem.hpMax})`} onPress={() => onSubmit('use golem')} tone="ready" />
+                <QuickBtn label={`${golem.name.toLowerCase()} (${golem.hp}/${golem.hpMax})`} onPress={() => onSubmit('use golem')} tone="ready" />
               ) : null}
               {dog && dog.hp > 0 ? (
                 <QuickBtn
