@@ -1,4 +1,4 @@
-name: EAS Update (OTA - Tartaria Realms)
+name: Publish · OTA update (mobile)
 
 on:
   push:

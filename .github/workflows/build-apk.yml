@@ -1,4 +1,4 @@
-name: Android Build (Tartaria Realms)
+name: Build · Android APK
 
 # OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.

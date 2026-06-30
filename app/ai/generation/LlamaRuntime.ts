@@ -246,14 +246,31 @@ export class LlamaRuntime {
   }
 
   async dispose(): Promise<void> {
-    if (this.context) {
-      try {
-        await this.context.release();
-      } catch {
-        // best effort — native side may already be torn down
-      }
-      this.context = null;
-    }
+    // CRASH FIX (librnllama isPredicting SIGSEGV). The app disposes Qwen on
+    // BACKGROUND (App.tsx AppState → shutdownQwen → this.dispose()). completion()
+    // runs under the native-ML lock, but release() did NOT — so backgrounding the
+    // game mid-narration freed the llama context out from under the running
+    // completion. llama.rn's internal isPredicting() check then dereferenced the
+    // freed context and SIGSEGV'd (Java_com_rnllama_LlamaContext_isPredicting) —
+    // the "switched away mid-sentence, came back to a dead game" crash.
+    //
+    // Fix: detach the context first (no new completion can start), stop any
+    // in-flight prediction, then release THROUGH the same runExclusiveNativeMl
+    // lock as completion() so the free is serialized behind the running
+    // prediction and the window is closed.
+    const ctx = this.context;
+    this.context = null;
     this.modelPath = null;
+    if (!ctx) return;
+    try {
+      await (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
+    } catch {
+      // stopCompletion unsupported / nothing running — fine; the lock still guards us.
+    }
+    try {
+      await runExclusiveNativeMl(() => Promise.resolve(ctx.release()));
+    } catch {
+      // best effort — native side may already be torn down
+    }
   }
 }

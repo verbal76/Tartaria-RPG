@@ -189,6 +189,10 @@ export function speak(text: string, channel?: string, voiceId?: string | null, o
     recordTtsRoute('system-expo-speech', getKokoroState().phase, trimmed);
   }
   const id = nextId++;
+  // OTA-635 — front: an urgent line (the welcome-back greeting) clears the queued
+  // backlog so it's heard immediately. currentlySpeaking isn't in `queue`, so the
+  // line in progress finishes its chunk (no jarring mid-word cut), then this plays.
+  if (opts?.front) queue.length = 0;
   // OTA 226 + arb5 — Arbiter queue cap. Rapid-tapping a direction can
   // fire many flavor lines; without a bound the player gets lectured
   // for minutes. The original rule dropped EVERY queued arbiter line on

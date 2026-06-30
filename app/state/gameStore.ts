@@ -166,7 +166,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor } from '../engine/combatRules';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, acidShredCap, corruptionStackCap, rollLootCoating } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
@@ -308,6 +308,7 @@ import {
   reapExpiredWhispers,
   spawnChainEnemy,
   makeStolenDiscs,
+  describeWhisperStage,
 } from '../engine/whispers';
 import { TUTORIAL_STEPS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
@@ -1477,7 +1478,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // Migrate legacy flat-id list into the new staged shape. We don't
     // know the original posting faction; pull it from the FactionQuestDef
     // catalog. Saves that already wrote activeFactionQuests pass through.
-    activeFactionQuests: p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
+    activeFactionQuests: ((p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
       const def = findFactionQuestById(id);
       return {
         id,
@@ -1485,7 +1486,14 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         postedByFaction: def?.factionId ?? 'unknown',
         acceptedAt: Date.now(),
       };
-    }),
+    })) as { id: string; stage: number; postedByFaction: string; acceptedAt: number; tracked?: boolean }[])
+      // SINGLE-ACTIVE backfill — records written before the `tracked` field
+      // existed have tracked === undefined, so every accepted contract would
+      // read as active until the player taps SET ACTIVE. Establish single-active
+      // on load: the FIRST untracked record becomes the active one, the rest
+      // park. Records that already carry `tracked` (post-feature saves) are left
+      // exactly as the player set them — we never re-pick an explicit choice.
+      .map((q, i) => (q.tracked === undefined ? { ...q, tracked: i === 0 } : q)),
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
     collectables: p.collectables ?? [],
     activeHunts: p.activeHunts ?? [],
@@ -2401,6 +2409,15 @@ interface GameStore {
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
+  /** Activate / deactivate an accepted faction contract. SINGLE-ACTIVE:
+   *  activating one pauses every other; deactivate parks just this one (zero
+   *  active = between missions). A paused contract stays on the slate and its
+   *  stages don't auto-advance until re-activated. `active` omitted → toggle. */
+  setFactionQuestActive: (id: string, active?: boolean) => void;
+  /** Start an auto-routing chain for a faction contract: course to the objective,
+   *  then auto-course to the turn-in once the work is done. Stops on turn-in,
+   *  abandon, deactivate, or a manual divert. */
+  routeMission: (id: string) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
   readMissionBoard: () => void;
@@ -2537,6 +2554,11 @@ interface GameStore {
    *  the prior coating. Returns nothing; surfaces success/refusal
    *  via the log. */
   applyCoating: (coatingItemId: string, weaponId: string) => void;
+  /** engine_Dev — work a coating vial into an ARMOR piece for a permanent
+   *  damage-type resist (the vial's damage type). Stored on the armor instance's
+   *  addedResists; aggregateArmor + applyArmorResistance reduce incoming damage of
+   *  that type while it's worn. Capped at 3 resists per piece. */
+  applyCoatingToArmor: (coatingItemId: string, armorId: string) => void;
   /** OTA-361 — loot a knocked-out humanoid. Transfers the enemy's
    *  `carries` kit (weapons + armor, DAMAGED — durability scaled to how
    *  hurt they were), the full `loot` drop list, and a little TC into
@@ -14022,6 +14044,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const coatInst = coatSlotId ? player.inventory.find((i) => i.id === coatSlotId) : null;
         const coating = coatInst?.coating;
         if (coating) {
+          // engine_Dev (design call) — a coating ALWAYS takes UNLESS the enemy RESISTS
+          // its damage type, in which case it gets only a small chance
+          // (COATING_RESIST_LAND_CHANCE) to slip through. Weak AND neutral both always
+          // land ("drop your hands and you get hit"). Keys off the resist RELATIONSHIP
+          // (the same applyDamageTypeModifier + resist:/vulnerable: traits the damage
+          // math uses). Ported from engine_Dev; these lines had no coating gate before.
+          const coatResists = applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'resist'
+            || traitDamageMultiplier(enemy.traits, coating.kind).match === 'resist';
+          if (coatResists && Math.random() >= COATING_RESIST_LAND_CHANCE) {
+            get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}.`);
+          } else {
           // OTA-403 — prefer the player's MANUAL coating roll (the new
           // 'coating' RollStep) when present; fall back to an internal
           // roll only for legacy paths that didn't stage the step.
@@ -14046,6 +14079,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : rawRolled;
           coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
           dmg += rolled;
+          }
         }
       }
       if (surgeBonus > 0) {
@@ -14557,6 +14591,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // standing here, at FULL reward, with a completion popup (player ask:
     // "submission should happen as soon as you arrive at the spot it routed").
     autoSubmitReadyFactionQuests(get, set);
+    // Advance the mission route chain on ARRIVAL. Deferred a microtask so it runs
+    // AFTER continueTravel finishes clearing travelTarget (otherwise the next
+    // leg's course would be wiped by the just-arrived leg's cleanup).
+    void Promise.resolve().then(() => advanceMissionRoute(get, set));
     // v2.4.1 (OTA 035 — Phase 2) — Lost Capital arrival logs the
     // faction's recovery hint; the Core itself only grants after the
     // player performs the faction's gate verb (see canRecoverCore
@@ -14915,6 +14953,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // here later — the same guard covers it.
     if (!enemy.factionNeutralFight) {
       advanceActiveFactionQuests(get, set, 'kill');
+      // A kill may complete the objective; re-evaluate the route chain so it
+      // auto-courses to the turn-in.
+      advanceMissionRoute(get, set);
     }
     // OTA-120 — Dog Companion rescue scenario completion. If the
     // killed enemy was a rescue captor (factionNeutralFight is the
@@ -16007,6 +16048,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const factionId = acceptFaction;
     const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
       && (player.completedFactionQuestIds?.length ?? 0) === 0;
+    // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already
+    // running one; otherwise it's parked, so batch-accepting from the board
+    // doesn't make everything live at once. You activate it when you're ready.
+    const hasActiveOther = (player.activeFactionQuests ?? []).some((q) => q.tracked !== false);
+    const newTracked = !hasActiveOther;
     set((s) =>
       s.player
         ? {
@@ -16015,12 +16061,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
               activeFactionQuests: [
                 ...(s.player.activeFactionQuests ?? []),
-                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now(), tracked: newTracked },
               ],
             },
           }
         : s,
     );
+    if (!newTracked) {
+      get().appendLog('world', `${quest.title} added to your slate (paused — you're already on another contract). Activate it in Contracts when you're ready.`);
+    }
     bumpQuestsAccepted(get, set);
     // First-quest milestone — Arbiter can reference "the first
     // contract you took" later. Fires only on the first accept of
@@ -16062,6 +16111,75 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-057 — accepting a contract is an active CHA push; the
       // matching WIS train fires on the completion path, not on accept.
     }
+    void get().persist();
+  },
+
+  setFactionQuestActive(id, active) {
+    const player = get().player;
+    if (!player) return;
+    const list = player.activeFactionQuests ?? [];
+    const rec = list.find((q) => q.id === id);
+    if (!rec) return;
+    const nextActive = active != null ? active : rec.tracked === false;
+    // SINGLE-ACTIVE — "the mission you're on." Activating one PAUSES every other
+    // contract (it stays on the slate; ABANDON is the only thing that drops one).
+    const othersPaused = nextActive
+      ? list.filter((q) => q.id !== id && q.tracked !== false).length
+      : 0;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeFactionQuests: (s.player.activeFactionQuests ?? []).map((q) =>
+          q.id === id ? { ...q, tracked: nextActive } : (nextActive ? { ...q, tracked: false } : q)),
+      },
+    } : s));
+    const def = findFactionQuestById(id);
+    const title = def?.title ?? id;
+    const pausedNote = othersPaused > 0 ? ` (${othersPaused} other contract${othersPaused > 1 ? 's' : ''} paused.)` : '';
+    get().appendLog('world', nextActive
+      ? `Now on ${title}. It's the contract you're running.${pausedNote}`
+      : `Paused ${title}. It won't advance until you re-activate it.`);
+    // Switching the active contract (or pausing the routed one) drops a route
+    // chain that no longer matches the mission you're on.
+    if (get().player?.routedMission && get().player?.routedMission?.id !== id) {
+      set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+    }
+    if (!nextActive && get().player?.routedMission?.id === id) {
+      set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+    }
+    void get().persist();
+  },
+
+  routeMission(id) {
+    const player = get().player;
+    if (!player) return;
+    const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
+    if (!rec) { get().appendLog('arbiter', "That contract isn't on your slate."); return; }
+    // Routing to a contract IS choosing to run it — make it the single active one.
+    if (rec.tracked === false || (player.activeFactionQuests ?? []).some((q) => q.id !== id && q.tracked !== false)) {
+      get().setFactionQuestActive(id, true);
+    }
+    const def = findFactionQuestById(id);
+    if (!def) return;
+    const live = get().player ?? player;
+    const want = desiredMissionLeg(live, def, rec);
+    if (live.currentLocationId === want.loc) {
+      // Already at this leg's target — seed the chain so it continues after the
+      // deed / turn-in, then let advanceMissionRoute settle it.
+      set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
+      get().appendLog('world', want.phase === 'to_turnin'
+        ? `You're already at ${safeLocName(want.loc)} — hand ${def.title} in here.`
+        : `You're already at the objective for ${def.title}.`);
+      advanceMissionRoute(get, set);
+      void get().persist();
+      return;
+    }
+    set((s) => (s.player ? { player: { ...s.player, routedMission: { id, phase: want.phase } } } : s));
+    _chainRouting = true;
+    try { get().setTravelCourse(want.loc); } finally { _chainRouting = false; }
+    get().appendLog('world', want.phase === 'to_turnin'
+      ? `✦ Course set — ${def.title}. Heading to turn in at ${safeLocName(want.loc)}.`
+      : `✦ Course set — ${def.title}. Heading to the objective: ${safeLocName(want.loc)}.`);
     void get().persist();
   },
 
@@ -17452,6 +17570,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ...s.player,
           activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== id),
           activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== id),
+          // Drop the route chain if it was pointed at this contract.
+          routedMission: s.player.routedMission?.id === id ? null : s.player.routedMission,
         },
       } : s));
       get().appendLog('world', `You hand the ${def.title} contract back to the wind. The Arbiter shrugs.`);
@@ -17509,7 +17629,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-126 — snapshot tile count at travel-start so the badge
     // counts down monotonically regardless of which location is
     // currently centered on the regenerated world map.
-    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null } } : s));
+    // A MANUAL course (not one the mission chain set) means the player diverted;
+    // drop any active route chain so it doesn't yank them back.
+    const dropChain = !_chainRouting;
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles }, whisperCourse: null, ...(dropChain ? { routedMission: null } : {}) } } : s));
     get().appendLog(
       'world',
       `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
@@ -19603,14 +19726,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
     }
-    if (previousInSlot && previousInSlot !== item.name) {
-      get().appendLog(
-        'world',
-        `You stow the ${previousInSlot} and equip ${item.name} (${SLOT_LABEL[slot]}).`,
-      );
-    } else {
-      get().appendLog('world', `You equip ${item.name} (${SLOT_LABEL[slot]}).`);
-    }
+    // A routine equip no longer narrates to the story feed. It's a deliberate
+    // menu action the player just performed, already confirmed by the inventory
+    // screen and the HUD's "Equipped:" line — and echoing "You equip X" for each
+    // of 8-10 slots buried the scene's arrival dialogue (playtester report). NOTE
+    // the 2-handed auto-displace line above still fires: that's a CONSEQUENCE the
+    // player can't otherwise see, so it stays. (previousInSlot is still used above
+    // for the HP-bonus delta.)
     // OTA-352 — loadout snapshot on equip change, so a log review can confirm
     // the piece's bonuses (incl. weapon/cloak/fused stealth) landed in effectiveStats.
     { const live = get().player; if (live) get().appendLog('debug', debugLoadout(live)); }
@@ -19647,7 +19769,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog('world', `You set aside what was in your ${SLOT_LABEL[slot]} slot.`);
+    // Routine unequip no longer narrates to the story feed (see equipItem) — the
+    // inventory screen + HUD already reflect the empty slot. Suppressed so gear
+    // management doesn't bury the scene.
     void get().persist();
   },
 
@@ -20046,6 +20170,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `You scrape off the old ${hadCoating.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
         : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
     );
+  },
+
+  applyCoatingToArmor(coatingItemId, armorId) {
+    const player = get().player;
+    if (!player) return;
+    const coatItem = player.inventory.find((i) => i.id === coatingItemId);
+    const armor = player.inventory.find((i) => i.id === armorId);
+    if (!coatItem || !armor) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveItemEffect } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findGearByName, findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+    const fx = resolveItemEffect(coatItem.name, [findGearByName]);
+    const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+    if (!spec) { get().appendLog('debug', `applyCoatingToArmor: ${coatItem.name} carries no coating spec`); return; }
+    const isArmor = armor.kind === 'armor' || (armor.uniqueStats?.kind === 'armor') || !!findArmorByName(armor.name);
+    if (!isArmor) { get().appendLog('world', `You can only work a vial's resist into ARMOR — the ${armor.name} won't hold it.`); return; }
+    // engine_Dev — the resist a coating grants is its DAMAGE TYPE, so it matches
+    // incoming damage. aggregateArmor adds it to the worn slot; the existing
+    // applyArmorResistance combat path then reduces incoming damage of that type.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    const type = coatingDamageType(String(spec.kind));
+    const already = (armor.addedResists ?? []).map((r) => r.toLowerCase());
+    if (already.includes(type.toLowerCase())) {
+      get().appendLog('world', `The ${armor.name} already turns aside ${type}. No need to waste another vial on it.`);
+      return;
+    }
+    // Cap worked-in resists so one piece can't become a god-vest.
+    const ADDED_RESIST_CAP = 3;
+    if (already.length >= ADDED_RESIST_CAP) {
+      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down or use a different piece.`);
+      return;
+    }
+    set((s) => {
+      if (!s.player) return s;
+      const inv = s.player.inventory
+        .map((i) => (i.id === armorId ? { ...i, addedResists: [...(i.addedResists ?? []), type] } : i))
+        .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
+      return { player: { ...s.player, inventory: inv } };
+    });
+    get().appendLog('reward', `You work the ${coatItem.name.toLowerCase()} into the ${armor.name}. It now turns aside ${type} damage — for good, until the piece is lost or destroyed.`);
+    void get().persist();
   },
 
   async fuseAtCrucible() {
@@ -21910,6 +22078,9 @@ function advanceActiveFactionQuests(
   if (active.length === 0) return;
   let mutated = false;
   const next = active.map((rec) => {
+    // A PAUSED contract doesn't advance on unrelated kills/travels. Re-activate
+    // it (Contracts screen) to resume progress.
+    if (rec.tracked === false) return rec;
     const def = findFactionQuestById(rec.id);
     if (!def?.stages || def.stages.length === 0) return rec;
     if (rec.stage >= def.stages.length) return rec; // already done
@@ -21947,6 +22118,74 @@ function advanceActiveFactionQuests(
   set((s) =>
     s.player ? { player: { ...s.player, activeFactionQuests: next } } : s,
   );
+}
+
+// MISSION ROUTE CHAIN. When the player taps ROUTE TO on a contract,
+// `player.routedMission` is set and the engine courses to the objective, then —
+// once the work is done — auto-courses to the turn-in. `_chainRouting` lets the
+// engine's own setTravelCourse calls bypass the "player diverted, drop the chain"
+// guard in setTravelCourse.
+let _chainRouting = false;
+
+function safeLocName(id: string): string {
+  try { return getLocationById(id).name ?? id; } catch { return id; }
+}
+
+/** The destination + leg this contract should be heading to right now. */
+function desiredMissionLeg(
+  player: PlayerCharacter,
+  def: import('../engine/factionQuests').FactionQuestDef,
+  rec: { stage: number },
+): { loc: string; phase: 'to_objective' | 'to_turnin' } {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { factionQuestReady } = require('../engine/factionQuests') as typeof import('../engine/factionQuests');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { startingLocationForFaction } = require('../engine/character') as typeof import('../engine/character');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { missionObjectiveLocationId } = require('../engine/missionRouting') as typeof import('../engine/missionRouting');
+  const countItem = (name: string) =>
+    (player.inventory ?? []).filter((i) => i.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, i) => n + (i.quantity ?? 1), 0);
+  const ready = factionQuestReady(def, rec.stage, countItem);
+  const home = startingLocationForFaction(def.factionId);
+  if (ready) return { loc: home, phase: 'to_turnin' };
+  return { loc: missionObjectiveLocationId(def) ?? home, phase: 'to_objective' };
+}
+
+// Re-evaluate the active route chain: (re)course toward the current leg's target,
+// transition objective→turn-in when the work completes, and clear the chain when
+// the contract is gone / paused. Safe to call after any travel arrival or kill.
+function advanceMissionRoute(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const rm = player.routedMission;
+  if (!rm) return;
+  const clear = () => set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
+  const rec = (player.activeFactionQuests ?? []).find((q) => q.id === rm.id);
+  if (!rec || rec.tracked === false) { clear(); return; } // turned in / abandoned / paused
+  const def = findFactionQuestById(rm.id);
+  if (!def) { clear(); return; }
+  const want = desiredMissionLeg(player, def, rec);
+  const here = player.currentLocationId;
+  if (here === want.loc) {
+    // At the leg's target. Turn-in leg → autoSubmit handles the hand-in (and the
+    // chain self-clears next tick when the record is gone). Objective leg with
+    // the work not done → wait for the deed.
+    if (rm.phase !== want.phase) {
+      set((s) => (s.player ? { player: { ...s.player, routedMission: { id: rm.id, phase: want.phase } } } : s));
+    }
+    return;
+  }
+  if (player.travelTarget?.locationId === want.loc) return; // already en route
+  set((s) => (s.player ? { player: { ...s.player, routedMission: { id: rm.id, phase: want.phase } } } : s));
+  _chainRouting = true;
+  try { get().setTravelCourse(want.loc); } finally { _chainRouting = false; }
+  get().appendLog('world', want.phase === 'to_turnin'
+    ? `✦ Objective complete — ${def.title}. Auto-routing to turn in at ${safeLocName(want.loc)}.`
+    : `Auto-routing to the objective for ${def.title}: ${safeLocName(want.loc)}.`);
 }
 
 // Burst tracker — transient (not persisted). When the player chip-taps
@@ -22900,6 +23139,8 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
         resistances.push(r);
         resistSlots.push({ type: r, slot });
       }
+      // engine_Dev — coating-vial resists worked into this fused armor instance.
+      for (const r of unique.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
       continue;
     }
     const piece = findArmorByName(name);
@@ -22914,6 +23155,8 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
       resistances.push(r);
       resistSlots.push({ type: r, slot });
     }
+    // engine_Dev — coating-vial resists worked into this armor instance.
+    for (const r of inst?.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
   }
   return { acBonus, resistances, resistSlots };
 }
@@ -24530,6 +24773,25 @@ function narrateCasualLook(
   }
 
   get().appendLog('world', parts.join(' '));
+
+  // ACTIVE-THREAD REMINDERS — pull the player back to "why am I here" without a
+  // scroll-up. Each is the CONCRETE authored objective (not paraphrased), routed
+  // to its SOURCE channel so the color matches the original line: a whisper lead
+  // reads in the Arbiter's gold, a dog rescue in the dog-quest purple.
+  {
+    let threadsShown = 0;
+    for (const w of player?.activeWhispers ?? []) {
+      if (threadsShown >= 3) break; // don't wall off the feed if many are open
+      const obj = describeWhisperStage(w);
+      if (obj && !/^Stage:\s/.test(obj)) {
+        get().appendLog('arbiter', `▸ Still open — ${obj}`);
+        threadsShown += 1;
+      }
+    }
+    if (scene.enemies.some((e) => e.factionNeutralFight)) {
+      get().appendLog('dog_quest', `▸ A dog is held here — put down its captors to free it.`);
+    }
+  }
 
   // 6. Optional hook plant — 30% chance, only if no hook is already active.
   // Kept separate from the description so the look-summary always reads
