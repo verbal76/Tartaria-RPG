@@ -24779,6 +24779,17 @@ function narrateCasualLook(
     parts.push(exitLine.join(' '));
   }
 
+  // v2.4.1 — surface an ENTERABLE structure on this tile in EVERY look-around, not
+  // just the first-arrival buildingApproachLine. Playtester walked up to a building
+  // (its ENTER button live on screen), did other things, then `look`ed and saw only
+  // "You're in <place>" with no reminder — and thought they were already inside it.
+  // Now every look names the structure + the ENTER affordance, unless they've
+  // actually stepped in (activeBuildingId set) — then it's their current interior.
+  if (scene.sceneBuilding && !get().activeBuildingId) {
+    const bLabel = getBuilding(scene.sceneBuilding)?.hookLabel ?? 'a structure';
+    parts.push(`You're near ${bLabel} — a way in stands clear. (Tap ENTER, or type 'enter', to step inside.)`);
+  }
+
   get().appendLog('world', parts.join(' '));
 
   // ACTIVE-THREAD REMINDERS — pull the player back to "why am I here" without a

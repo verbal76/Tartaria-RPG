@@ -15319,4 +15319,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // literal command ("address the keepers"). No gate LOGIC change — the right verbs
 // already worked ('address' → diplomacy). mainQuest guidance tests added (43 green);
 // tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, engine/mainQuest.ts.
-export const OTA_BUILD_ID = '2026-06-30-647-core-gate-guidance';
+//
+// OTA-648 — LOOK surfaces enterable structures. buildingApproachLine only fired on
+// first ARRIVAL, so a player who walked up to a structure (its ENTER button live on
+// screen), did other things, then `look`ed saw only "You're in <place>" and thought
+// they were already inside — playtester: "it told me I was IN the vaults when I was
+// just NEAR it... if I'm near the entrance to something enterable it should tell me."
+// The look-around now appends "You're near <structure> — a way in stands clear.
+// (Tap ENTER…)" whenever scene.sceneBuilding is set AND the player hasn't stepped in
+// (activeBuildingId null). buildingDiscovery tests added (5 green); tsc app-clean.
+// JS-only → OTA-safe. state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-06-30-648-look-enterable-structures';
