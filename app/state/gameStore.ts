@@ -561,8 +561,16 @@ function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
  *  the distance, a giant on the ridge, a submerged steeple — so none of them may
  *  be planted here. Investigating a candle in a house must not surface "a figure
  *  too tall to be human watches you from the far ridge" (the player's report). */
-function indoorsForOutdoorHooks(get: () => GameStore): boolean {
-  return !!get().player?.hubRoomId || !!get().activeBuildingId;
+export function indoorsForOutdoorHooks(get: () => GameStore): boolean {
+  const p = get().player;
+  // engine_Dev — an active overland journey is OUTDOORS by definition: you're
+  // crossing open wasteland between locations, even when you set course from inside
+  // a hub room without stepping out first (hubRoomId then lingers). Without this
+  // guard the wandering-journey narration leaked "you move from room to room" indoor
+  // framing into open travel — playtester: "why am I seeing indoor prompts when I'm
+  // traveling in the open?" A travelTarget to a DIFFERENT location = mid-transit.
+  if (p?.travelTarget && p.travelTarget.locationId !== p.currentLocationId) return false;
+  return !!p?.hubRoomId || !!get().activeBuildingId;
 }
 
 /** arb36 — "you stumble on a structure" line for an enterable building

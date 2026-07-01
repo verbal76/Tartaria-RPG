@@ -16768,4 +16768,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // locally so an in-flight completion keeps a valid handle. nativeMlLockPriority (4)
 // green incl. a release-after-completion guard; tsc app-clean.
 // ai/generation/LlamaRuntime.ts.
-export const OTA_BUILD_ID = '2026-07-01-938-bg-dispose-crash-fix';
+//
+// 2026-07-01-939 — indoor prompts leaked into open travel. indoorsForOutdoorHooks
+// returned true whenever hubRoomId/activeBuildingId was set, but setting course for
+// a long overland journey FROM inside a hub room left hubRoomId set, so the
+// wandering-journey narration kept emitting "you move from room to room" while you
+// crossed open wasteland (playtester: "why indoor prompts when travelling in the
+// open?"). Now an active mid-transit journey (travelTarget to a DIFFERENT location)
+// reads as OUTDOORS. indoorHooksTravel test (5) green; tsc app-clean.
+// state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-07-01-939-travel-outdoors-framing';
