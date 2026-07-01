@@ -209,6 +209,11 @@ export class LlamaRuntime implements ILlamaRuntime {
     opts: LlamaGenerateOptions = {},
   ): Promise<string> {
     if (!this.context) throw new Error('LlamaRuntime not initialized');
+    // arb-fix — capture the context locally so an in-flight completion keeps a
+    // valid native handle even if dispose() nulls this.context mid-flight. The
+    // release() in dispose() is serialized behind this completion by the shared
+    // native-ML lock, so the two never touch the context concurrently.
+    const ctx = this.context;
     const prompt = renderChatML(messages);
     let assembled = '';
     // OTA-351 — completion-crash breadcrumb. On newer high-end ARM cores
@@ -228,7 +233,7 @@ export class LlamaRuntime implements ILlamaRuntime {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
       // contending crashed the process on Tensor G5).
-      const result = await runExclusiveNativeMl(() => this.context!.completion(
+      const result = await runExclusiveNativeMl(() => ctx.completion(
         {
           prompt,
           n_predict: opts.maxTokens ?? 120,
@@ -257,14 +262,25 @@ export class LlamaRuntime implements ILlamaRuntime {
   }
 
   async dispose(): Promise<void> {
-    if (this.context) {
+    // Detach synchronously first, so any concurrent generate() hits the
+    // not-initialized guard instead of starting a completion on a context we're
+    // about to release.
+    const ctx = this.context;
+    this.context = null;
+    this.modelPath = null;
+    if (ctx) {
       try {
-        await this.context.release();
+        // arb-fix (Tensor G5 background crash) — release the llama context THROUGH
+        // the shared native-ML lock, exactly like completion() + Kokoro synth. On
+        // background the app calls shutdownQwen() → dispose(); if a [cognitive]
+        // completion (or a TTS synth) is still running on the native thread,
+        // releasing the ~400MB context out from under it SIGSEGVs the process —
+        // the crash-to-home on ~80% of minimizes. The lock makes release wait for
+        // the in-flight native op to finish first.
+        await runExclusiveNativeMl(() => ctx.release());
       } catch {
         // best effort — native side may already be torn down
       }
-      this.context = null;
     }
-    this.modelPath = null;
   }
 }

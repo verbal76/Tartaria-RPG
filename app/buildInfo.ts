@@ -16756,4 +16756,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on the dark near-death red — always legible on whatever the card shows. Also
 // darkened the leftover green status lines (companion/contracts #9ec96a→#33521f).
 // healthTextInk guard added; health tests 11 green. components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-30-937-hp-ink-adaptive';
+//
+// 2026-07-01-938 — FIX the ~80%-on-minimize crash-to-home (Tensor G5). On
+// background the app calls shutdownQwen() → LlamaRuntime.dispose(), which released
+// the ~400MB llama context via context.release() OUTSIDE the shared native-ML lock
+// (arb159) that serializes completion()/Kokoro synth. So a release could overlap an
+// in-flight [cognitive] completion still on the native thread → SIGSEGV. Now dispose
+// nulls this.context synchronously (new generate() hits the guard), captures the
+// context locally, and releases it THROUGH runExclusiveNativeMl so it waits for any
+// in-flight completion/synth to settle first. generate() also captures the context
+// locally so an in-flight completion keeps a valid handle. nativeMlLockPriority (4)
+// green incl. a release-after-completion guard; tsc app-clean.
+// ai/generation/LlamaRuntime.ts.
+export const OTA_BUILD_ID = '2026-07-01-938-bg-dispose-crash-fix';

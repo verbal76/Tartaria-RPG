@@ -58,4 +58,32 @@ describe('OTA-634 — priority native-ML lock', () => {
     const v = await runExclusiveNativeMl(async () => 42);
     expect(v).toBe(42);
   });
+
+  // Tensor G5 background crash: LlamaRuntime.dispose() releases the llama context
+  // THROUGH this lock so it can't overlap an in-flight completion. Model that: a
+  // "release" queued while a "completion" is running must run strictly after it,
+  // and the context must never be released while the completion is still touching it.
+  it('a queued release waits for an in-flight completion (no release-during-completion)', async () => {
+    const events: string[] = [];
+    let contextAlive = true;
+    const gate = defer();
+
+    const completion = runExclusiveNativeMl(async () => {
+      events.push('completion:start');
+      await gate.promise;            // native call still running / touching the context
+      expect(contextAlive).toBe(true); // must not have been released mid-completion
+      events.push('completion:end');
+    });
+    // dispose() enqueues the release while the completion is mid-flight.
+    const release = runExclusiveNativeMl(async () => {
+      events.push('release');
+      contextAlive = false;          // the context is torn down only here
+    });
+
+    await tick();
+    gate.resolve();
+    await Promise.all([completion, release]);
+
+    expect(events).toEqual(['completion:start', 'completion:end', 'release']);
+  });
 });
