@@ -128,6 +128,21 @@ const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
 const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
+// engine_Dev — the health tint now rides on a flat WHITE base layer (styles.healthWhiteBase)
+// instead of being blended into the near-black card, so the red/amber/green reads clean and
+// bright rather than the dark base bleeding through and muddying it. The tint is a translucent
+// wash over that white: alpha grows as HP drops, so a full bar is a bright, unmistakable green
+// and a near-death bar is a strong red. Text is left unchanged (playtester call). Tune the two
+// alphas to taste.
+const HP_TINT_ALPHA_FULL = 0.58; // healthy — bright green over white
+const HP_TINT_ALPHA_LOW = 0.82;  // near death — strong red over white
+export function healthTintRGBA(frac: number): string {
+  const f = Math.max(0, Math.min(1, frac));
+  const [r, g, b] = healthHue(f);
+  const a = HP_TINT_ALPHA_FULL + (1 - f) * (HP_TINT_ALPHA_LOW - HP_TINT_ALPHA_FULL);
+  return `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
+}
+
 export function StatsPanel({ player, fill }: Props) {
   const race = getRaces().find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
@@ -158,7 +173,7 @@ export function StatsPanel({ player, fill }: Props) {
   const animBg = React.useMemo(
     () => animFrac.interpolate({
       inputRange: [0, 0.25, 0.5, 0.75, 1],
-      outputRange: [healthCardBg(0), healthCardBg(0.25), healthCardBg(0.5), healthCardBg(0.75), healthCardBg(1)],
+      outputRange: [healthTintRGBA(0), healthTintRGBA(0.25), healthTintRGBA(0.5), healthTintRGBA(0.75), healthTintRGBA(1)],
     }),
     [animFrac],
   );
@@ -247,7 +262,9 @@ export function StatsPanel({ player, fill }: Props) {
   // intentional rather than "writing jammed at the top, empty below."
   if (fill) {
     return (
-      <Animated.View style={[styles.container, styles.fill, styles.combatOutline, styles.combatCenter, { backgroundColor: animBg }]}>
+      <Animated.View style={[styles.container, styles.fill, styles.combatOutline, styles.combatCenter]}>
+        <View pointerEvents="none" style={styles.healthWhiteBase} />
+        <Animated.View pointerEvents="none" style={[styles.healthTintFill, { backgroundColor: animBg }]} />
         <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
         <View style={styles.nameRow}>
           <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
@@ -285,7 +302,11 @@ export function StatsPanel({ player, fill }: Props) {
   }
 
   return (
-    <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
+    <Animated.View style={styles.container}>
+      {/* engine_Dev — flat white base so the health tint reads bright, not muddied by the dark card. */}
+      <View pointerEvents="none" style={styles.healthWhiteBase} />
+      {/* translucent red/amber/green health wash, riding on the white base. */}
+      <Animated.View pointerEvents="none" style={[styles.healthTintFill, { backgroundColor: animBg }]} />
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
           behind the card content so the text stays readable. */}
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
@@ -391,6 +412,11 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: HP_PULSE_COLOR,
   },
+  // engine_Dev — flat white bottom layer under the health tint; stops the dark card base bleeding
+  // through the red/amber/green. Clipped to the card's rounded corners by the container's overflow.
+  healthWhiteBase: { ...StyleSheet.absoluteFillObject, backgroundColor: '#ffffff' },
+  // the translucent health wash sits on the white base, below the damage pulse + card content.
+  healthTintFill: { ...StyleSheet.absoluteFillObject },
   name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', flexShrink: 1 },
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.

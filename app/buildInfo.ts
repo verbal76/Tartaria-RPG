@@ -16716,4 +16716,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // golem" input still parses; the golemCore field (not the name) drives feed-back.
 // summonNounLeak test (5) green; tsc app-clean. components/InputBox.tsx,
 // state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-30-931-mechanoid-noun';
+//
+// 2026-06-30-932 — player card: flat white base under the health tint. The
+// red/amber/green health tint was blended into the near-black card base, so the
+// dark bled through and muddied it (worse while the card fades + the damage pulse
+// flashes). The tint now rides on a flat WHITE bottom layer as a translucent wash
+// (healthTintRGBA): white shows through so the colour reads bright/clean — a full
+// bar is an unmistakable green, near-death a strong red (alpha grows as HP drops).
+// Text left unchanged (playtester call). Both render paths (corner + arena) get the
+// white base + tint layers below the pulse + content. healthTintWhiteBase test (4)
+// + healthCardTint (5) green; tsc app-clean. components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-30-932-white-health-base';
