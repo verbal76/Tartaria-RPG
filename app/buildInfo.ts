@@ -16732,4 +16732,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // HP_TINT_ALPHA_FULL 0.58→0.79, HP_TINT_ALPHA_LOW 0.82→0.91 (white contribution
 // 1−alpha, halved at both ends). Red/amber/green now read richer over the white
 // base. components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-30-933-health-tint-opacity';
+//
+// 2026-06-30-934 — still washed out; push the wash near-solid.
+// HP_TINT_ALPHA_FULL 0.79→0.92, HP_TINT_ALPHA_LOW 0.91→0.98 (only ~8%/2% white
+// lift left). Stoplight colours now read vivid/near-solid. components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-30-934-health-tint-solid';

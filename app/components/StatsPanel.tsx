@@ -134,8 +134,8 @@ const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 // wash over that white: alpha grows as HP drops, so a full bar is a bright, unmistakable green
 // and a near-death bar is a strong red. Text is left unchanged (playtester call). Tune the two
 // alphas to taste.
-const HP_TINT_ALPHA_FULL = 0.79; // healthy — green over white (white bleed halved: was 0.58)
-const HP_TINT_ALPHA_LOW = 0.91;  // near death — strong red (white bleed halved: was 0.82)
+const HP_TINT_ALPHA_FULL = 0.92; // healthy — near-solid green (only ~8% white lift left)
+const HP_TINT_ALPHA_LOW = 0.98;  // near death — essentially solid red
 export function healthTintRGBA(frac: number): string {
   const f = Math.max(0, Math.min(1, frac));
   const [r, g, b] = healthHue(f);
