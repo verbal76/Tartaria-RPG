@@ -15309,4 +15309,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coatingLandRule test (6) green (resisted ~0.15, neutral/weak 200/200); weaponCoating /
 // weaponCoatingCombat / coatingNotARing (38) unbroken; tsc app-clean. JS-only → OTA-safe.
 // engine/weaponCoating.ts, state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-29-646-coating-land-rule';
+//
+// OTA-647 — CORE-GATE GUIDANCE. A playtester (Eternal Dynasty, whose Core gate is
+// diplomacy/ask) got stuck at a Lost Capital typing `salvage core` a dozen times:
+// the gate correctly refuses (investigate isn't a Dynasty intent), but the refusal
+// only showed the terse next-action ("address the keepers") and never a usable
+// command — a guidance dead-end. The refusal now ALSO surfaces coreGateHint, which
+// spells out each route's concrete verbs; the Dynasty hint is tightened to name the
+// literal command ("address the keepers"). No gate LOGIC change — the right verbs
+// already worked ('address' → diplomacy). mainQuest guidance tests added (43 green);
+// tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, engine/mainQuest.ts.
+export const OTA_BUILD_ID = '2026-06-30-647-core-gate-guidance';

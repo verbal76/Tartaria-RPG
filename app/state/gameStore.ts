@@ -7091,6 +7091,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'arbiter',
             `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
           );
+          // v2.4.1 — surface the faction's CONCRETE recovery instructions, not just
+          // the terse next-action. Playtester (Eternal Dynasty, whose gate is
+          // diplomacy/ask) spammed `salvage core` a dozen times and was never shown
+          // the actual verb — a guidance dead-end. coreGateHint names the route's
+          // real commands (SALVAGE / ASK / READ / ATTACK / address the keepers / …).
+          const hint = mqMod.coreGateHint(player.factionId, player.currentLocationId);
+          if (hint) get().appendLog('system', hint);
           return;
         }
       }
