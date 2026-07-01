@@ -7158,6 +7158,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'arbiter',
             `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
           );
+          // v2.4.1 — surface the faction's CONCRETE recovery instructions, not just
+          // the terse next-action. Playtester (Eternal Dynasty, whose gate is
+          // diplomacy/ask) spammed `salvage core` a dozen times and was never shown
+          // the actual verb — a guidance dead-end. coreGateHint names the route's
+          // real commands (SALVAGE / ASK / READ / ATTACK / address the keepers / …).
+          const hint = mqMod.coreGateHint(player.factionId, player.currentLocationId);
+          if (hint) get().appendLog('system', hint);
           return;
         }
       }
@@ -24842,6 +24849,17 @@ function narrateCasualLook(
     }
     exitLine.push(`Cardinal travel: north, east, south, west.`);
     parts.push(exitLine.join(' '));
+  }
+
+  // v2.4.1 — surface an ENTERABLE structure on this tile in EVERY look-around, not
+  // just the first-arrival buildingApproachLine. Playtester walked up to a building
+  // (its ENTER button live on screen), did other things, then `look`ed and saw only
+  // "You're in <place>" with no reminder — and thought they were already inside it.
+  // Now every look names the structure + the ENTER affordance, unless they've
+  // actually stepped in (activeBuildingId set) — then it's their current interior.
+  if (scene.sceneBuilding && !get().activeBuildingId) {
+    const bLabel = getBuilding(scene.sceneBuilding)?.hookLabel ?? 'a structure';
+    parts.push(`You're near ${bLabel} — a way in stands clear. (Tap ENTER, or type 'enter', to step inside.)`);
   }
 
   get().appendLog('world', parts.join(' '));

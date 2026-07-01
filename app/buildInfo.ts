@@ -15200,4 +15200,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coatingLandRule test (6) green (resisted ~0.15, neutral/weak 200/200); weaponCoating /
 // weaponCoatingCombat / coatingNotARing (38) unbroken; tsc app-clean. JS-only → OTA-safe.
 // engine/weaponCoating.ts, state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-29-633-coating-land-rule';
+//
+// OTA-634 — CORE-GATE GUIDANCE + LOOK ENTERABLE STRUCTURES (both ported from the
+// Tartaria line, OTA-647/648; golem shares this engine). (1) The Tartarian-Core
+// refusal now ALSO surfaces coreGateHint, so a stuck player sees the route's concrete
+// verbs instead of only the terse next-action; the Eternal Dynasty hint names the
+// literal command ("address the keepers"). (2) The look-around now appends "You're
+// near <structure> — a way in stands clear. (Tap ENTER…)" whenever an enterable
+// structure is on the tile and the player hasn't stepped in — buildingApproachLine
+// only fired on first arrival before. mainQuest + buildingDiscovery tests (48 green);
+// tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, engine/mainQuest.ts.
+export const OTA_BUILD_ID = '2026-06-30-634-coregate-look-guidance';
