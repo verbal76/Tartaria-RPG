@@ -93,9 +93,9 @@ interface Props { player: PlayerCharacter; fill?: boolean; }
 // out) once it rides the white base. Kept the green g-dominant / amber r+g-high / red
 // r-dominant relationships the tint + card tests lock, and red ≤216 so healthCardBg stays
 // text-legible-dark for the (untouched) enemy arena band.
-const HP_GREEN: readonly [number, number, number] = [56, 184, 88];
-const HP_AMBER: readonly [number, number, number] = [220, 166, 44];
-const HP_RED: readonly [number, number, number] = [210, 46, 40];
+const HP_GREEN: readonly [number, number, number] = [49, 162, 77];
+const HP_AMBER: readonly [number, number, number] = [194, 146, 39];
+const HP_RED: readonly [number, number, number] = [185, 40, 35];
 const CARD_BASE: readonly [number, number, number] = [0x13, 0x11, 0x0f];
 
 function lerp(a: number, b: number, t: number): number {
@@ -421,11 +421,11 @@ const styles = StyleSheet.create({
   healthWhiteBase: { ...StyleSheet.absoluteFillObject, backgroundColor: '#ffffff' },
   // the translucent health wash sits on the white base, below the damage pulse + card content.
   healthTintFill: { ...StyleSheet.absoluteFillObject },
-  name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  name: { color: '#17231f', fontSize: 14, fontWeight: '700', flexShrink: 1 },
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  dogName: { color: '#6ab0c9', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  dogName: { color: '#1f4a52', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
@@ -441,14 +441,14 @@ const styles = StyleSheet.create({
   combatCenter: { justifyContent: 'center' },
   escortCombatWrap: { marginTop: 8, borderTopWidth: 1, borderTopColor: '#2b3a3e', paddingTop: 6 },
   escortHeader: { color: '#8fa6ac', fontSize: 9, fontWeight: '700', letterSpacing: 0.6, marginBottom: 2, marginLeft: 4 },
-  subline: { color: '#6c8088', fontSize: 10, marginBottom: 2 },
-  equipped: { color: '#6ab0c9', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
+  subline: { color: '#2e3c3a', fontSize: 10, marginBottom: 2 },
+  equipped: { color: '#1f4a52', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  tapHint: { color: '#6c8088', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
+  tapHint: { color: '#2e3c3a', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },
-  label: { color: '#6c8088', fontSize: 9 },
-  value: { color: '#d6e4e8', fontSize: 12, fontWeight: '600' },
+  label: { color: '#2e3c3a', fontSize: 9 },
+  value: { color: '#17231f', fontSize: 12, fontWeight: '600' },
 });

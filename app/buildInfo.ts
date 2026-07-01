@@ -16742,4 +16742,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // RED 196,64,52→210,46,40) AND cut the remaining white bleed ~50% again
 // (ALPHA_FULL 0.92→0.96, ALPHA_LOW 0.98→0.99). Hue relationships + healthCardBg
 // darkness (enemy arena band) preserved; both health tests green. StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-30-935-health-tint-saturated';
+//
+// 2026-06-30-936 — dim the tint a touch + darken the card writing. Hues pulled
+// down ~12% (GREEN→49,162,77; AMBER→194,146,39; RED→185,40,35). Primary card text
+// flipped to dark ink so it reads on the vivid card: name/stat values #d6e4e8→
+// #17231f, labels/subline/tapHint #6c8088→#2e3c3a, dog/equipped #6ab0c9→#1f4a52.
+// The HP number keeps its bright health colour (healthTextColor) so it still pops.
+// components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-30-936-health-tint-dim-darktext';
