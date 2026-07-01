@@ -16726,4 +16726,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Text left unchanged (playtester call). Both render paths (corner + arena) get the
 // white base + tint layers below the pulse + content. healthTintWhiteBase test (4)
 // + healthCardTint (5) green; tsc app-clean. components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-30-932-white-health-base';
+//
+// 2026-06-30-933 — the white was bleeding through the health tint too much
+// (colours washed out). Halved the white bleed by raising the wash opacity:
+// HP_TINT_ALPHA_FULL 0.58→0.79, HP_TINT_ALPHA_LOW 0.82→0.91 (white contribution
+// 1−alpha, halved at both ends). Red/amber/green now read richer over the white
+// base. components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-30-933-health-tint-opacity';
