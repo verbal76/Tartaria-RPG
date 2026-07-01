@@ -16736,4 +16736,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-06-30-934 — still washed out; push the wash near-solid.
 // HP_TINT_ALPHA_FULL 0.79→0.92, HP_TINT_ALPHA_LOW 0.91→0.98 (only ~8%/2% white
 // lift left). Stoplight colours now read vivid/near-solid. components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-30-934-health-tint-solid';
+//
+// 2026-06-30-935 — still washed out at near-solid alpha, so the raw hues were the
+// culprit: saturated them (GREEN 88,168,96→56,184,88; AMBER 200,158,64→220,166,44;
+// RED 196,64,52→210,46,40) AND cut the remaining white bleed ~50% again
+// (ALPHA_FULL 0.92→0.96, ALPHA_LOW 0.98→0.99). Hue relationships + healthCardBg
+// darkness (enemy arena band) preserved; both health tests green. StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-30-935-health-tint-saturated';

@@ -89,9 +89,13 @@ interface Props { player: PlayerCharacter; fill?: boolean; }
 // green at full HP → amber at half → a strong dark red as you bleed out, and the
 // HP number itself takes the matching colour, so your health reads at a glance
 // without parsing digits. Both stay dark enough to keep the cream text legible.
-const HP_GREEN: readonly [number, number, number] = [88, 168, 96];
-const HP_AMBER: readonly [number, number, number] = [200, 158, 64];
-const HP_RED: readonly [number, number, number] = [196, 64, 52];
+// engine_Dev — more-saturated stoplight hues so the health tint reads vivid (not washed
+// out) once it rides the white base. Kept the green g-dominant / amber r+g-high / red
+// r-dominant relationships the tint + card tests lock, and red ≤216 so healthCardBg stays
+// text-legible-dark for the (untouched) enemy arena band.
+const HP_GREEN: readonly [number, number, number] = [56, 184, 88];
+const HP_AMBER: readonly [number, number, number] = [220, 166, 44];
+const HP_RED: readonly [number, number, number] = [210, 46, 40];
 const CARD_BASE: readonly [number, number, number] = [0x13, 0x11, 0x0f];
 
 function lerp(a: number, b: number, t: number): number {
@@ -134,8 +138,8 @@ const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 // wash over that white: alpha grows as HP drops, so a full bar is a bright, unmistakable green
 // and a near-death bar is a strong red. Text is left unchanged (playtester call). Tune the two
 // alphas to taste.
-const HP_TINT_ALPHA_FULL = 0.92; // healthy — near-solid green (only ~8% white lift left)
-const HP_TINT_ALPHA_LOW = 0.98;  // near death — essentially solid red
+const HP_TINT_ALPHA_FULL = 0.96; // healthy — white bleed halved again (was 0.92 → ~4% left)
+const HP_TINT_ALPHA_LOW = 0.99;  // near death — solid red (~1% white)
 export function healthTintRGBA(frac: number): string {
   const f = Math.max(0, Math.min(1, frac));
   const [r, g, b] = healthHue(f);
