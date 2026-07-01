@@ -16777,4 +16777,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // open?"). Now an active mid-transit journey (travelTarget to a DIFFERENT location)
 // reads as OUTDOORS. indoorHooksTravel test (5) green; tsc app-clean.
 // state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-07-01-939-travel-outdoors-framing';
+//
+// 2026-07-01-940 — LOOK surfaces enterable structures (ported from Tartaria OTA-648;
+// shared engine). buildingApproachLine only fired on first arrival, so a later `look`
+// said only "You're in <place>" with no reminder a structure on the tile was
+// enterable — playtester (Tartaria) "thought I was IN the vaults when I was near it".
+// The look-around now appends "You're near <structure> — a way in stands clear. (Tap
+// ENTER…)" whenever scene.sceneBuilding is set AND the player hasn't stepped in.
+// (The Tartaria core-gate guidance fix does NOT port — engine_Dev has no Tartarian-
+// Core gate.) buildingDiscovery tests (5 green); tsc app-clean. state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-07-01-940-look-enterable-structures';

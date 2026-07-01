@@ -86,4 +86,27 @@ describe('arb36 — organic building entry', () => {
     store.getState().submitPlayerAction('go inside');
     expect(store.getState().activeBuildingId).toBe('flooded_house');
   });
+
+  // Playtester (Tartaria, same engine) walked up to an enterable structure, did other
+  // things, then `look`ed and saw no reminder it was enterable — thought they were
+  // already inside. The look-around now surfaces the ENTER affordance when a structure
+  // stands on the tile, unless they've stepped in.
+  it('LOOK surfaces the ENTER affordance when a structure stands on this tile', async () => {
+    const store = await boot();
+    const scene = store.getState().currentScene!;
+    store.setState({ currentScene: { ...scene, sceneBuilding: 'shack' }, activeBuildingId: null });
+    store.getState().submitPlayerAction('look');
+    const feed = store.getState().gameLog.map((e) => e.text).join('\n');
+    expect(feed).toMatch(/near .+ a way in stands clear/i);
+    expect(feed.toLowerCase()).toContain('to step inside');
+  });
+
+  it('LOOK does NOT claim you are "near" a structure once you have entered it', async () => {
+    const store = await boot();
+    const scene = store.getState().currentScene!;
+    store.setState({ currentScene: { ...scene, sceneBuilding: 'shack' }, activeBuildingId: 'shack' });
+    store.getState().submitPlayerAction('look');
+    const feed = store.getState().gameLog.map((e) => e.text).join('\n');
+    expect(feed).not.toMatch(/a way in stands clear/i);
+  });
 });
