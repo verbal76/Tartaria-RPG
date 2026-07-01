@@ -10,7 +10,7 @@ jest.mock('react-native', () => ({
   StyleSheet: { create: (s: unknown) => s },
 }));
 
-import { healthTintRGBA } from '../app/components/StatsPanel';
+import { healthTintRGBA, healthTextInk } from '../app/components/StatsPanel';
 
 const parse = (s: string): { r: number; g: number; b: number; a: number } => {
   const m = s.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/)!;
@@ -45,5 +45,21 @@ describe('engine_Dev — white-base health tint (healthTintRGBA)', () => {
   it('clamps out-of-range fractions instead of producing garbage', () => {
     expect(healthTintRGBA(2)).toBe(healthTintRGBA(1));
     expect(healthTintRGBA(-1)).toBe(healthTintRGBA(0));
+  });
+});
+
+describe('engine_Dev — HP-number ink adapts to the tint (healthTextInk)', () => {
+  // The HP number rides on the health tint, so it must not be the same hue (green
+  // washing out green-on-green). Dark ink on the lighter green/amber, light ink on
+  // the dark near-death red.
+  it('is dark on the lighter full/mid tints and light on the dark near-death tint', () => {
+    expect(healthTextInk(1)).toBe('#17231f');   // full HP → dark on green
+    expect(healthTextInk(0.5)).toBe('#17231f');  // half → dark on amber
+    expect(healthTextInk(0)).toBe('#eef3f0');    // dead → light on dark red
+  });
+  it('never returns the health hue itself (no same-colour-on-same-colour wash)', () => {
+    for (const f of [1, 0.75, 0.5, 0.25, 0]) {
+      expect(['#17231f', '#eef3f0']).toContain(healthTextInk(f));
+    }
   });
 });

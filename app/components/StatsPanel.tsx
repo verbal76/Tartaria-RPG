@@ -146,6 +146,21 @@ export function healthTintRGBA(frac: number): string {
   const a = HP_TINT_ALPHA_FULL + (1 - f) * (HP_TINT_ALPHA_LOW - HP_TINT_ALPHA_FULL);
   return `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
 }
+// engine_Dev — the HP number rides ON the health tint, so a same-hue colour (the old
+// healthTextColor) washed out green-on-green at full HP. Pick a dark or light ink by
+// the shown tint's luminance instead: dark on the lighter green/amber, light on the
+// dark near-death red — always legible, whatever the card colour underneath.
+export function healthTextInk(frac: number): string {
+  const f = Math.max(0, Math.min(1, frac));
+  const [hr, hg, hb] = healthHue(f);
+  const a = HP_TINT_ALPHA_FULL + (1 - f) * (HP_TINT_ALPHA_LOW - HP_TINT_ALPHA_FULL);
+  // the tint as actually shown: the health hue over the flat white base.
+  const r = hr * a + 255 * (1 - a);
+  const g = hg * a + 255 * (1 - a);
+  const b = hb * a + 255 * (1 - a);
+  const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+  return lum > 120 ? '#17231f' : '#eef3f0';
+}
 
 export function StatsPanel({ player, fill }: Props) {
   const race = getRaces().find((r) => r.id === player.raceId);
@@ -286,7 +301,7 @@ export function StatsPanel({ player, fill }: Props) {
           </View>
         ) : null}
         <View style={styles.row}>
-          <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
+          <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextInk(hpFrac)} />
           <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
           <Stat label="AC" value={`${effectiveAc}`} />
         </View>
@@ -333,7 +348,7 @@ export function StatsPanel({ player, fill }: Props) {
       {escortRows}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
-        <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
+        <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextInk(hpFrac)} />
         <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
@@ -445,8 +460,8 @@ const styles = StyleSheet.create({
   equipped: { color: '#1f4a52', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   tapHint: { color: '#2e3c3a', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
-  companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
-  contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
+  companion: { color: '#33521f', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
+  contracts: { color: '#33521f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },
   label: { color: '#2e3c3a', fontSize: 9 },

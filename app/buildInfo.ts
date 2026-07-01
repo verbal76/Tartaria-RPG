@@ -16749,4 +16749,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // #17231f, labels/subline/tapHint #6c8088→#2e3c3a, dog/equipped #6ab0c9→#1f4a52.
 // The HP number keeps its bright health colour (healthTextColor) so it still pops.
 // components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-06-30-936-health-tint-dim-darktext';
+//
+// 2026-06-30-937 — the HP number was still health-HUED (green at full HP), so it
+// washed green-on-green riding the green card. Swapped it to a luminance-adaptive
+// ink (healthTextInk): dark #17231f on the lighter green/amber tints, light #eef3f0
+// on the dark near-death red — always legible on whatever the card shows. Also
+// darkened the leftover green status lines (companion/contracts #9ec96a→#33521f).
+// healthTextInk guard added; health tests 11 green. components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-06-30-937-hp-ink-adaptive';
