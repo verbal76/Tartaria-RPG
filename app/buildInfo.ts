@@ -16786,4 +16786,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ENTER…)" whenever scene.sceneBuilding is set AND the player hasn't stepped in.
 // (The Tartaria core-gate guidance fix does NOT port — engine_Dev has no Tartarian-
 // Core gate.) buildingDiscovery tests (5 green); tsc app-clean. state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-07-01-940-look-enterable-structures';
+//
+// 2026-07-01-941 — REVERT the player-portrait health-coloring experiment (OTA-932→
+// 937: white base layer + translucent tint wash, alpha/hue tuning, darkened card
+// text, adaptive HP-number ink). Per playtester call, StatsPanel.tsx is restored
+// byte-for-byte to its pre-white-base state (the original OTA-632/633 health-tinted
+// dark card — healthCardBg over the dark base + healthTextColor HP number). Removed
+// the healthTintWhiteBase test; healthCardTint (5) green; tsc app-clean. The 938
+// crash fix, 939 travel framing, and 940 LOOK fix are untouched (different files).
+// components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-07-01-941-revert-portrait-coloring';

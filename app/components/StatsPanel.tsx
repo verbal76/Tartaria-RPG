@@ -89,13 +89,9 @@ interface Props { player: PlayerCharacter; fill?: boolean; }
 // green at full HP → amber at half → a strong dark red as you bleed out, and the
 // HP number itself takes the matching colour, so your health reads at a glance
 // without parsing digits. Both stay dark enough to keep the cream text legible.
-// engine_Dev — more-saturated stoplight hues so the health tint reads vivid (not washed
-// out) once it rides the white base. Kept the green g-dominant / amber r+g-high / red
-// r-dominant relationships the tint + card tests lock, and red ≤216 so healthCardBg stays
-// text-legible-dark for the (untouched) enemy arena band.
-const HP_GREEN: readonly [number, number, number] = [49, 162, 77];
-const HP_AMBER: readonly [number, number, number] = [194, 146, 39];
-const HP_RED: readonly [number, number, number] = [185, 40, 35];
+const HP_GREEN: readonly [number, number, number] = [88, 168, 96];
+const HP_AMBER: readonly [number, number, number] = [200, 158, 64];
+const HP_RED: readonly [number, number, number] = [196, 64, 52];
 const CARD_BASE: readonly [number, number, number] = [0x13, 0x11, 0x0f];
 
 function lerp(a: number, b: number, t: number): number {
@@ -132,36 +128,6 @@ const HP_PULSE_FALL_MS = 320;    // settle slower — can't be missed
 const HP_PULSE_MAX_OPACITY = 0.45;
 const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
-// engine_Dev — the health tint now rides on a flat WHITE base layer (styles.healthWhiteBase)
-// instead of being blended into the near-black card, so the red/amber/green reads clean and
-// bright rather than the dark base bleeding through and muddying it. The tint is a translucent
-// wash over that white: alpha grows as HP drops, so a full bar is a bright, unmistakable green
-// and a near-death bar is a strong red. Text is left unchanged (playtester call). Tune the two
-// alphas to taste.
-const HP_TINT_ALPHA_FULL = 0.96; // healthy — white bleed halved again (was 0.92 → ~4% left)
-const HP_TINT_ALPHA_LOW = 0.99;  // near death — solid red (~1% white)
-export function healthTintRGBA(frac: number): string {
-  const f = Math.max(0, Math.min(1, frac));
-  const [r, g, b] = healthHue(f);
-  const a = HP_TINT_ALPHA_FULL + (1 - f) * (HP_TINT_ALPHA_LOW - HP_TINT_ALPHA_FULL);
-  return `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
-}
-// engine_Dev — the HP number rides ON the health tint, so a same-hue colour (the old
-// healthTextColor) washed out green-on-green at full HP. Pick a dark or light ink by
-// the shown tint's luminance instead: dark on the lighter green/amber, light on the
-// dark near-death red — always legible, whatever the card colour underneath.
-export function healthTextInk(frac: number): string {
-  const f = Math.max(0, Math.min(1, frac));
-  const [hr, hg, hb] = healthHue(f);
-  const a = HP_TINT_ALPHA_FULL + (1 - f) * (HP_TINT_ALPHA_LOW - HP_TINT_ALPHA_FULL);
-  // the tint as actually shown: the health hue over the flat white base.
-  const r = hr * a + 255 * (1 - a);
-  const g = hg * a + 255 * (1 - a);
-  const b = hb * a + 255 * (1 - a);
-  const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-  return lum > 120 ? '#17231f' : '#eef3f0';
-}
-
 export function StatsPanel({ player, fill }: Props) {
   const race = getRaces().find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
@@ -192,7 +158,7 @@ export function StatsPanel({ player, fill }: Props) {
   const animBg = React.useMemo(
     () => animFrac.interpolate({
       inputRange: [0, 0.25, 0.5, 0.75, 1],
-      outputRange: [healthTintRGBA(0), healthTintRGBA(0.25), healthTintRGBA(0.5), healthTintRGBA(0.75), healthTintRGBA(1)],
+      outputRange: [healthCardBg(0), healthCardBg(0.25), healthCardBg(0.5), healthCardBg(0.75), healthCardBg(1)],
     }),
     [animFrac],
   );
@@ -281,9 +247,7 @@ export function StatsPanel({ player, fill }: Props) {
   // intentional rather than "writing jammed at the top, empty below."
   if (fill) {
     return (
-      <Animated.View style={[styles.container, styles.fill, styles.combatOutline, styles.combatCenter]}>
-        <View pointerEvents="none" style={styles.healthWhiteBase} />
-        <Animated.View pointerEvents="none" style={[styles.healthTintFill, { backgroundColor: animBg }]} />
+      <Animated.View style={[styles.container, styles.fill, styles.combatOutline, styles.combatCenter, { backgroundColor: animBg }]}>
         <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
         <View style={styles.nameRow}>
           <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
@@ -301,7 +265,7 @@ export function StatsPanel({ player, fill }: Props) {
           </View>
         ) : null}
         <View style={styles.row}>
-          <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextInk(hpFrac)} />
+          <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
           <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
           <Stat label="AC" value={`${effectiveAc}`} />
         </View>
@@ -321,11 +285,7 @@ export function StatsPanel({ player, fill }: Props) {
   }
 
   return (
-    <Animated.View style={styles.container}>
-      {/* engine_Dev — flat white base so the health tint reads bright, not muddied by the dark card. */}
-      <View pointerEvents="none" style={styles.healthWhiteBase} />
-      {/* translucent red/amber/green health wash, riding on the white base. */}
-      <Animated.View pointerEvents="none" style={[styles.healthTintFill, { backgroundColor: animBg }]} />
+    <Animated.View style={[styles.container, { backgroundColor: animBg }]}>
       {/* OTA-633 — damage pulse: a red wash that flashes in fast and fades out,
           behind the card content so the text stays readable. */}
       <Animated.View pointerEvents="none" style={[styles.pulseOverlay, { opacity: pulseOpacity }]} />
@@ -348,7 +308,7 @@ export function StatsPanel({ player, fill }: Props) {
       {escortRows}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
-        <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextInk(hpFrac)} />
+        <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
         <Stat label="STA" value={`${player.stamina}/${displayStaminaMax(player)}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
@@ -431,16 +391,11 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: HP_PULSE_COLOR,
   },
-  // engine_Dev — flat white bottom layer under the health tint; stops the dark card base bleeding
-  // through the red/amber/green. Clipped to the card's rounded corners by the container's overflow.
-  healthWhiteBase: { ...StyleSheet.absoluteFillObject, backgroundColor: '#ffffff' },
-  // the translucent health wash sits on the white base, below the damage pulse + card content.
-  healthTintFill: { ...StyleSheet.absoluteFillObject },
-  name: { color: '#17231f', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700', flexShrink: 1 },
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  dogName: { color: '#1f4a52', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  dogName: { color: '#6ab0c9', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
@@ -456,14 +411,14 @@ const styles = StyleSheet.create({
   combatCenter: { justifyContent: 'center' },
   escortCombatWrap: { marginTop: 8, borderTopWidth: 1, borderTopColor: '#2b3a3e', paddingTop: 6 },
   escortHeader: { color: '#8fa6ac', fontSize: 9, fontWeight: '700', letterSpacing: 0.6, marginBottom: 2, marginLeft: 4 },
-  subline: { color: '#2e3c3a', fontSize: 10, marginBottom: 2 },
-  equipped: { color: '#1f4a52', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
+  subline: { color: '#6c8088', fontSize: 10, marginBottom: 2 },
+  equipped: { color: '#6ab0c9', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
-  tapHint: { color: '#2e3c3a', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
-  companion: { color: '#33521f', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
-  contracts: { color: '#33521f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
+  tapHint: { color: '#6c8088', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
+  companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
+  contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },
-  label: { color: '#2e3c3a', fontSize: 9 },
-  value: { color: '#17231f', fontSize: 12, fontWeight: '600' },
+  label: { color: '#6c8088', fontSize: 9 },
+  value: { color: '#d6e4e8', fontSize: 12, fontWeight: '600' },
 });
