@@ -43,10 +43,19 @@ export function FusionPickerModal() {
 
   const pickedItems = scraps.filter((i) => picked.includes(i.id));
   const catalystItem = catalystId ? catalysts.find((c) => c.id === catalystId) ?? null : null;
+  const pickedMats = new Set(pickedItems.flatMap((i) => fusionMaterialTags(i)));
   const distinctMats = Array.from(new Set(
     [...pickedItems, ...(catalystItem ? [catalystItem] : [])].flatMap((i) => fusionMaterialTags(i)),
   ));
   const nMats = distinctMats.length;
+  // Every fusion needs DIFFERENT materials, so once you pick an item, hide the other
+  // reserved pieces that would add no NEW material (same-material duplicates). You can
+  // never assemble a same-type-only batch that fails the diversity gate. A picked item
+  // always stays visible (so you can deselect it); an item that still adds at least one
+  // uncovered material stays too.
+  const visibleScraps = scraps.filter(
+    (it) => picked.includes(it.id) || fusionMaterialTags(it).some((m) => !pickedMats.has(m)),
+  );
   const predicted = nMats >= 4 ? 'Legendary' : nMats >= 3 ? 'Rare' : null;
   const canFuse = picked.length >= MIN_PICK && picked.length <= MAX_PICK;
 
@@ -75,7 +84,7 @@ export function FusionPickerModal() {
                 <Text style={styles.empty}>No reserved (♥) materials. Heart items in your inventory first.</Text>
               ) : (
                 <ScrollView style={styles.list} nestedScrollEnabled>
-                  {scraps.map((it) => {
+                  {visibleScraps.map((it) => {
                     const on = picked.includes(it.id);
                     const dim = !on && picked.length >= MAX_PICK;
                     return (

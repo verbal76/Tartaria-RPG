@@ -15369,4 +15369,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armor recipes with rarity-matched materials (Legendary outputs need Legendary mats
 // like Aetherstone Heart / Behemoth Heart / Iron Core / Wyrm Fang). weapons now
 // 9C/8U/12R/6L, armor 12C/3U/7R/2L. recipe tests green; tsc clean.
-export const OTA_BUILD_ID = '2026-07-02-654-collapse-default-hitier-recipes';
+// OTA-655 — fusion picker DROPS same-material duplicates once you pick an item: after a
+// selection, other reserved pieces that add no NEW material leave the list, so you can
+// never assemble a same-type-only batch that fails the diversity gate. Picked items stay
+// visible (deselectable). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-655-fusion-drop-same-kind';
