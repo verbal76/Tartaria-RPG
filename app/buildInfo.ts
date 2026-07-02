@@ -15355,4 +15355,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outpost, etc.) the room buttons now highlight the room you're standing in
 // (activeBuildingRoomId) with a gold border + '▸' marker, so you can tell where you
 // are among the rooms. UI-only. components/InputBox.tsx.
-export const OTA_BUILD_ID = '2026-07-02-651-room-highlight';
+// OTA-652 — drink-water clarity (hunger-capped vs already-full message) + fusion info
+// block: reservable items name their material contribution, the item modal explains
+// diversity → rarity (3 different materials = Rare, 4+ = Legendary; NOT input rarity),
+// and the picker shows a live 'N materials → predicted rarity' readout.
+// fusionMaterialTags test + full fusion suite green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-652-drink-clarity-fusion-infoblock';
