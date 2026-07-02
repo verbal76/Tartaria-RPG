@@ -34,6 +34,16 @@ and its own full `HANDOFF.md` (read that branch's handoff once you're on it).
 > promote the same change to **HaL2001** when the user approves. An engine change
 > belongs on **engine_Dev** and stands alone.
 
+## Every line is isolated — no cross-pollination
+
+Each line publishes ONLY to its own channel / app id: **Tartaria (HaL2001) → the
+`hal2001` channel only, golem → `golem-line` only, engine → `engine_Dev` only.** A
+push to one line can never reach another line's testers. This is enforced in CI
+(the shared `eas-update.yml` gates on a per-pushed-branch `case`, defaulting to
+_skip_; golem has its own firewall workflow `eas-update-golem.yml`), and the
+desktop/web builds are isolated by their own build workflows + app ids. Never copy
+one line's publish step into another. (Full detail is in each line's own HANDOFF.)
+
 ## Other branches (not the three mains)
 
 Downstream / packaging lines forked from the above — **`steam_Dev`**, **`mac_dev`**,
