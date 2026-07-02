@@ -16842,4 +16842,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Matched by kind 'dog_armor', the 'dog_armor' tag, or DOG_GEAR catalog name (shared-
 // component parity with the Tartaria/golem lines). categorize tests green; tsc clean.
 // JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-950-dog-armor-inventory-section';
+// 2026-07-02-951 — native-ML crash hardening (square-button / recents SIGSEGV family).
+// Kokoro voice frees (disposeVoice / disposeStickyArbiterVoice / disposePiperEngine)
+// called module.delete() OUTSIDE the native-ML lock while a synth (model.forward) runs
+// under it — the SAME free-during-native-op class as the Qwen release-during-completion
+// crash — now every free is serialized through runExclusiveNativeMl. (generate() already
+// captured ctx locally here.) tts + lock suites green; tsc clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-951-native-ml-teardown-hardening';

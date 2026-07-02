@@ -170,6 +170,20 @@ function inferSerial(model: any, text: string, rate: number): Promise<Float32Arr
   // behind). The lock still guarantees one-at-a-time, so the crash guard holds.
   return runExclusiveNativeMl(() => model.forward(text, rate), ML_PRIORITY_VOICE) as Promise<Float32Array | null>;
 }
+
+// arb159/OTA — free a native voice module THROUGH the shared native-ML lock. A
+// synth (model.forward, above) runs under this SAME lock; calling module.delete()
+// unsynchronized while a forward pass is in flight frees native memory the compute
+// is mid-read on — the exact SIGSEGV class the Qwen release-during-completion fix
+// closed (LlamaRuntime.dispose). Serializing the free behind any running synth shuts
+// the window. Best-effort — never throws (the native side may already be torn down).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lockedDeleteModule(module: any): Promise<void> {
+  if (!module || typeof module.delete !== 'function') return Promise.resolve();
+  return runExclusiveNativeMl(() => Promise.resolve(module.delete()), ML_PRIORITY_VOICE)
+    .then(() => undefined)
+    .catch(() => { /* native may already be torn down */ });
+}
 let currentlySpeaking: QueuedUtterance | null = null;
 let currentSound: Audio.Sound | null = null;
 // Backwards-compat: TTSController checks isPiperAvailable / getKokoroState
@@ -544,10 +558,10 @@ export async function warmVoice(voiceId: string): Promise<void> {
 export function disposeVoice(voiceId: string): void {
   const entry = VOICE_POOL.get(voiceId);
   if (!entry || entry.sticky) return;
-  try {
-    if (typeof entry.module?.delete === 'function') entry.module.delete();
-  } catch { /* ignore */ }
+  const mod = entry.module;
   VOICE_POOL.delete(voiceId);
+  // Free through the shared lock so a running synth isn't cut out from under.
+  void lockedDeleteModule(mod);
 }
 
 /** Drop the currently-loaded Arbiter voice (and clear sticky flag).
@@ -556,13 +570,15 @@ export function disposeVoice(voiceId: string): void {
  *  is unevictable and the pool leaks ~100 MB per swap. The new
  *  voice loads on the next speak() call. */
 export function disposeStickyArbiterVoice(): void {
+  // Snapshot the sticky entries first, then remove + free — freeing each native
+  // module THROUGH the shared lock so it can't race a running synth.
+  const sticky: Array<[string, unknown]> = [];
   for (const [vid, entry] of VOICE_POOL) {
-    if (entry.sticky) {
-      try {
-        if (typeof entry.module?.delete === 'function') entry.module.delete();
-      } catch { /* ignore */ }
-      VOICE_POOL.delete(vid);
-    }
+    if (entry.sticky) sticky.push([vid, entry.module]);
+  }
+  for (const [vid, mod] of sticky) {
+    VOICE_POOL.delete(vid);
+    void lockedDeleteModule(mod);
   }
   // Reset the latch so prewarmKokoro can re-fire for the new voice.
   prewarmStarted = false;
@@ -777,16 +793,15 @@ export async function stopAndClear(): Promise<void> {
 
 export async function disposePiperEngine(): Promise<void> {
   await stopAndClear();
-  // Drop every loaded voice in the pool — Arbiter + any vendor still
-  // resident. The next prewarm() call will re-load the Arbiter slot.
-  for (const [, entry] of VOICE_POOL) {
-    try {
-      if (typeof entry.module?.delete === 'function') entry.module.delete();
-    } catch { /* ignore */ }
-  }
+  // Drop every loaded voice in the pool — Arbiter + any vendor still resident.
+  // Snapshot the modules and clear the pool FIRST so no new speak() reuses a slot
+  // we're about to free, then free each native module THROUGH the shared lock so a
+  // free never races an in-flight synth. The next prewarm() re-loads the Arbiter.
+  const mods = Array.from(VOICE_POOL.values()).map((e) => e.module);
   VOICE_POOL.clear();
   LOADING.clear();
   prewarmStarted = false;
+  await Promise.all(mods.map((m) => lockedDeleteModule(m)));
 }
 
 /** Force a model refresh: dispose the loaded engine, wipe the
