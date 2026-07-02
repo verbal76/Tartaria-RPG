@@ -63,3 +63,28 @@ describe('weapon coatings get their own Coatings section', () => {
     expect(groups.consumable[0]!.name).toBe('Trail Rations');
   });
 });
+
+describe('dog companion vests get their own Dog Armor section', () => {
+  it('a kind:dog_armor vest categorizes as dog_armor (not player armor/loot)', () => {
+    expect(categoriesForItem(mk('Burlap Vest', ['dog_armor', 'vest'], 'dog_armor'))).toEqual(['dog_armor']);
+  });
+
+  it('the Aetheric Padded Vest (carries the aether tag) stays dog_armor, not material', () => {
+    // Before the dedicated category this fell into Materials because 'aether'
+    // tripped the material heuristic.
+    expect(categoriesForItem(mk('Aetheric Padded Vest', ['dog_armor', 'vest', 'aether'], 'dog_armor'))).toEqual(['dog_armor']);
+  });
+
+  it('a DOG_GEAR catalog name lands under dog_armor even with a mis-stamped kind', () => {
+    expect(categoriesForItem(mk('Riveted Leather Vest', [], 'misc'))).toEqual(['dog_armor']);
+  });
+
+  it('grouping buckets vests under dog_armor, separate from the player Armor section', () => {
+    const groups = groupInventoryByCategory([
+      mk('Burlap Vest', ['dog_armor', 'vest'], 'dog_armor', 1),
+    ]);
+    expect(groups.dog_armor).toHaveLength(1);
+    expect(groups.dog_armor[0]!.name).toBe('Burlap Vest');
+    expect(groups.armor).toHaveLength(0);
+  });
+});

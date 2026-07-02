@@ -15242,4 +15242,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // action (weather damage) each pass until the player died mid-craft with no "Crafted"
 // line. Now hyphenated recipes resolve on the first pass. recipeFuzzy + craft suite
 // green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-641-craft-hyphen-recipe-resolve';
+// OTA-642 — dog companion vests now get their own collapsible "Dog Armor" inventory
+// section (right after Armor) instead of scattering into Loot/Materials (the Aetheric
+// Padded Vest's 'aether' tag had been filing it under Materials). Matched by kind
+// 'dog_armor', the 'dog_armor' tag, or DOG_GEAR catalog name. Craftable dog vests
+// (Burlap/Riveted Leather/Aetheric Padded; Reclaimer Pattern stays drop-only) already
+// group under the crafting screen's DOG ARMOR banner. categorize tests green; tsc
+// app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-642-dog-armor-inventory-section';
