@@ -15221,4 +15221,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armor, instead of consuming the whole reserved pool) + you-are-here room highlight
 // inside buildings. Both ported from Tartaria (OTA-650/651); shared engine.
 // fusionPickerSelection + fusion suite green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-636-fusion-picker-room-highlight';
+// OTA-637 — drink-water clarity (hunger-capped vs already-full message) + fusion info
+// block: each reservable item now names the material it contributes, and the picker
+// shows a live 'N materials → Rare/Legendary' readout (output quality = material
+// DIVERSITY, not input rarity). fusionMaterialTags test + fusion suite green; tsc clean.
+export const OTA_BUILD_ID = '2026-07-02-637-drink-clarity-fusion-infoblock';

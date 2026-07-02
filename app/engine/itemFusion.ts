@@ -87,6 +87,16 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
+/** OTA — the material tag(s) an item contributes to a fusion, for the info block.
+ *  Output RARITY is driven by how many DISTINCT materials the chosen inputs span
+ *  (3 different \u2192 Rare, 4+ \u2192 Legendary), NOT by the inputs' own rarity. */
+export function fusionMaterialTags(item: { name: string; tags?: readonly string[] }): string[] {
+  const out = new Set<string>();
+  for (const t of item.tags ?? []) { const k = t.toLowerCase(); if (MATERIAL_TAG_SET.has(k)) out.add(k); }
+  for (const t of inferGearTagPack(item.name)) { if (MATERIAL_TAG_SET.has(t)) out.add(t); }
+  return Array.from(out);
+}
+
 export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {

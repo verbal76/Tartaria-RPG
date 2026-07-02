@@ -11069,13 +11069,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ?? (sceneNouns.find((sn) => sn.includes('water')));
         const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
         if (drinkSource && wantsWater) {
-          const stamGained = Math.min(3, effectiveStaminaMax(player) - player.stamina);
+          const effMax = effectiveStaminaMax(player);
+          const stamGained = Math.min(3, effMax - player.stamina);
           set({ player: advanceTime(restoreStamina(player, 3), 0.083) }); // 5 min
+          // A 0-gain drink has two very different causes: you're genuinely full, OR
+          // hunger has capped your effective max below your real max (water can't lift
+          // that — only food does). Spell out the hunger case so it never reads as broken.
+          const hungerCapped = stamGained <= 0 && effMax < (player.staminaMax ?? effMax);
           get().appendLog(
             'world',
             stamGained > 0
               ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
-              : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
+              : hungerCapped
+                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (5 min)`
+                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
           );
           // OTA-619 — a combat sip is a FAST action now (player ruling): drinking
           // from a water source mid-fight no longer draws a free enemy swing,
