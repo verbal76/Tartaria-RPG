@@ -15210,4 +15210,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // structure is on the tile and the player hasn't stepped in — buildingApproachLine
 // only fired on first arrival before. mainQuest + buildingDiscovery tests (48 green);
 // tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, engine/mainQuest.ts.
-export const OTA_BUILD_ID = '2026-06-30-634-coregate-look-guidance';
+// OTA-635 — SCRAP/EQUIP resolve the exact instance by unique id (ported from Tartaria
+// OTA-649; shared engine). scrapInventoryItem/equipItem resolved by NAME (first row),
+// so with several same-name items of different durability, scrap broke the wrong one
+// and equip picked the wrong instance. Both now take an optional itemId and resolve by
+// it (the inventory UI passes pending.item.id); name-match stays the fallback for
+// typed/legacy callers. scrapEquipByInstanceId (3) + existing equip/scrap suites (28)
+// green; tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-07-02-635-scrap-equip-by-id';

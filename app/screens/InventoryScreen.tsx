@@ -380,7 +380,7 @@ export function InventoryScreen() {
   }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
-    equipItem(pending.item.name, slot);
+    equipItem(pending.item.name, slot, pending.item.id);
     setPending(null);
   };
   const unequipFromSlot = (slot: EquipSlot) => {
@@ -415,7 +415,7 @@ export function InventoryScreen() {
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
     for (let i = 0; i < reps; i++) {
-      scrapInventoryItem(pending.item.name);
+      scrapInventoryItem(pending.item.name, pending.item.id);
     }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);

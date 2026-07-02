@@ -2503,7 +2503,7 @@ interface GameStore {
    *  then charges + fuses. */
   useVendorCrucible: () => void;
   joinFaction: (factionId: string) => void;
-  equipItem: (itemName: string, slot: EquipSlot) => void;
+  equipItem: (itemName: string, slot: EquipSlot, itemId?: string) => void;
   unequipSlot: (slot: EquipSlot) => void;
   /** OTA-239 — Tool Pouch. Stow an inventory item by name into the
    *  pouch (max 3). Pouched items stay in player.inventory but
@@ -2532,7 +2532,7 @@ interface GameStore {
   useInventoryItem: (itemName: string) => void;
   /** Disassemble a built item (weapon / armor / relic / built gear)
    *  into stock materials via scrapEngine. Refuses raw materials. */
-  scrapInventoryItem: (itemName: string) => void;
+  scrapInventoryItem: (itemName: string, itemId?: string) => void;
   /** OTA-194 — toggle the heart/reserve flag on an inferred item. Only
    *  inferred items (catalog-absent) can be reserved; the UI gates the
    *  tap on `isInferredItem`. Reserved items are excluded from the
@@ -19642,13 +19642,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  equipItem(itemName, slot) {
+  equipItem(itemName, slot, itemId) {
     const state = get();
     const player = state.player;
     if (!player) return;
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
+    // OTA — resolve the EXACT instance the caller picked by its unique id when
+    // given (the inventory UI passes it), so a stack of same-name items with
+    // different durability/instance stats equips the ONE the player selected — not
+    // just the first row that happens to share the name. Falls back to name-match
+    // for typed commands / legacy callers that don't carry an id.
+    const item =
+      (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : null)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
       return;
@@ -20712,12 +20719,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
   },
 
-  scrapInventoryItem(itemName) {
+  scrapInventoryItem(itemName, itemId) {
     const player = get().player;
     if (!player) return;
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
+    // OTA — scrap the EXACT instance the caller picked by its unique id when given
+    // (the inventory UI passes it). A player with several same-name items of
+    // different durability who selects the worst must break down THAT one — not
+    // whichever row sorts first by name. Falls back to name-match for typed commands.
+    const item =
+      (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : null)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
       return;
