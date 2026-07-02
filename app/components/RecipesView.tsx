@@ -288,14 +288,14 @@ export function RecipesView({
           </Text>
         ) : (
           groups.map((g) => {
-            const isCollapsed = !!collapsed[g.kind];
+            const isCollapsed = collapsed[g.kind] ?? true; // default collapsed
             const readyN = g.items.filter((x) => x.available).length;
             return (
               <View key={g.kind}>
                 <TouchableOpacity
                   style={styles.catBanner}
                   activeOpacity={0.7}
-                  onPress={() => setCollapsed((c) => ({ ...c, [g.kind]: !c[g.kind] }))}
+                  onPress={() => setCollapsed((c) => ({ ...c, [g.kind]: !(c[g.kind] ?? true) }))}
                 >
                   <Text style={styles.catChevron}>{isCollapsed ? '▸' : '▾'}</Text>
                   <Text style={styles.catLabel}>{g.label}</Text>

@@ -16824,4 +16824,6 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (like inventory). (Armor-recipe balance is NOT applied here — engine_Dev's recipes
 // are content-pack driven, so armor balance belongs in the uploaded pack, not the base.)
 // recipe tests green; tsc clean.
-export const OTA_BUILD_ID = '2026-07-02-946-craft-categories';
+// 2026-07-02-947 — crafting + inventory categories default COLLAPSED (open the one you
+// want). (High-tier recipes not added here — engine_Dev recipes are pack-driven.)
+export const OTA_BUILD_ID = '2026-07-02-947-collapse-default';
