@@ -25,4 +25,16 @@ describe('findRecipeByResult — fuzzy / typo tolerance', () => {
   it('rejects unrelated words', () => {
     expect(findRecipeByResult('banana bread')).toBeNull();
   });
+
+  it('resolves hyphen-stripped input (parser folds "-" to a space)', () => {
+    // Regression: "craft Aether-Shard Spear" reaches the engine as
+    // "aether shard spear" (the input normalizer strips hyphens). Before the
+    // punctuation fold this returned null for EVERY hyphenated recipe, spinning
+    // the craft into an infinite cognitive re-dispatch loop that killed the
+    // player with weather damage and never showed a "Crafted" line.
+    expect(findRecipeByResult('aether shard spear')?.result).toBe('Aether-Shard Spear');
+    expect(findRecipeByResult('aether purge tonic')?.result).toBe('Aether-Purge Tonic');
+    // And it does not mis-resolve to a shorter aether recipe.
+    expect(findRecipeByResult('aether shard spear')?.result).not.toBe('Aether Dust');
+  });
 });
