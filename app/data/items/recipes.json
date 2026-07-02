@@ -506,7 +506,7 @@
       ]
     },
     {
-      "_note": "OTA-603 — dog-vest (kind 'dog_armor') craft recipes. The vests were authored in dogGear.json but had no source; these make the three open-market tiers craftable (the Legendary Reclaimer Pattern Vest stays drop-only from Reclaimer-aligned kills, per its catalog note). Result names match DOG_GEAR; lookupCraftedItem resolves them to kind 'dog_armor' so the crafted item is equippable on the dog.",
+      "_note": "OTA-603 \u2014 dog-vest (kind 'dog_armor') craft recipes. The vests were authored in dogGear.json but had no source; these make the three open-market tiers craftable (the Legendary Reclaimer Pattern Vest stays drop-only from Reclaimer-aligned kills, per its catalog note). Result names match DOG_GEAR; lookupCraftedItem resolves them to kind 'dog_armor' so the crafted item is equippable on the dog.",
       "result": "Burlap Vest",
       "ingredients": [
         {
@@ -918,7 +918,7 @@
       ]
     },
     {
-      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool — OTA-033.",
+      "_note": "MECHANIC-2 (2026-05-25) \u2014 scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool \u2014 OTA-033.",
       "result": "Pulse Scanner",
       "ingredients": [
         {
@@ -1320,12 +1320,220 @@
       ]
     },
     {
-      "_note": "arb119 — REFINE path. Mudstone is Rare and was the hard wall on the starter mud golem + Mud Scanner (both re-tiered to Common mud). Compressing 3 Common Mud Fragments into 1 Mudstone gives every higher-tier mud recipe (Mudstone Bulwark, Hardened-Mudstone gear) a craftable path from the mud you actually forage, instead of an RNG wall.",
+      "_note": "arb119 \u2014 REFINE path. Mudstone is Rare and was the hard wall on the starter mud golem + Mud Scanner (both re-tiered to Common mud). Compressing 3 Common Mud Fragments into 1 Mudstone gives every higher-tier mud recipe (Mudstone Bulwark, Hardened-Mudstone gear) a craftable path from the mud you actually forage, instead of an RNG wall.",
       "result": "Mudstone",
       "ingredients": [
         {
           "name": "Mud Fragment",
           "quantity": 3
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Reclaimer's Salvage Cap",
+      "ingredients": [
+        {
+          "name": "Cloth Scrap",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Reclaimer's Salvage Vest",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Reclaimer's Trousers",
+      "ingredients": [
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Reclaimer's Boots",
+      "ingredients": [
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Reclaimer's Gloves",
+      "ingredients": [
+        {
+          "name": "Cloth Scrap",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Reclaimer's Cloak",
+      "ingredients": [
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Scrap-Forged Breastplate",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 3
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Mud-Stalker Leggings",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Mud-Lurker Boots",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Mud-Seer's Hood",
+      "ingredients": [
+        {
+          "name": "Cloth Scrap",
+          "quantity": 2
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Mud-Claw Gloves",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Mud-Bound Cloak",
+      "ingredients": [
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Aether-Reinforced Armor",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 armor-recipe balance pass (crafting was weapon-heavy; low-tier armor across all slots from gatherable mats).",
+      "result": "Aetheric Swiftstep Greaves",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
         }
       ]
     }

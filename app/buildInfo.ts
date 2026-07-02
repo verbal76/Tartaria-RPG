@@ -15225,4 +15225,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // block: each reservable item now names the material it contributes, and the picker
 // shows a live 'N materials → Rare/Legendary' readout (output quality = material
 // DIVERSITY, not input rarity). fusionMaterialTags test + fusion suite green; tsc clean.
-export const OTA_BUILD_ID = '2026-07-02-637-drink-clarity-fusion-infoblock';
+// OTA-638 — armor-recipe balance (crafting was 30 weapon vs 5 armor; +14 low-tier
+// armor across all 6 slots from gatherable mats → 19 armor) + crafting screen now
+// GROUPS recipes by category (Weapons/Armor/Relics/Food/Gear…) with collapsible
+// banners like inventory. recipe tests green; tsc clean.
+export const OTA_BUILD_ID = '2026-07-02-638-armor-recipes-craft-categories';
