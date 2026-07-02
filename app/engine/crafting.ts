@@ -594,11 +594,21 @@ export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recip
 }
 
 export function findRecipeByResult(target: string): Recipe | null {
-  const t = target.toLowerCase().trim();
+  // Fold hyphens (and any punctuation) to spaces on BOTH sides before comparing.
+  // The input normalizer (parser.ts) strips hyphens to spaces, so a typed
+  // "craft Aether-Reinforced Armor" arrives here as "aether reinforced armor".
+  // Without this fold, Pass 1's substring test failed (space ≠ hyphen) and Pass 2
+  // tokenized the recipe as ["aether-reinforced","armor"] which no input token could
+  // match — so EVERY hyphenated recipe returned null, kicking the craft into an
+  // infinite cognitive re-dispatch loop that burned an action (and weather damage) per
+  // pass until the player died mid-craft with no "Crafted" line ever shown.
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const t = norm(target);
   if (!t) return null;
   // Pass 1 — substring match either direction. Cheap, covers most cases.
   for (const r of rRecipes()) {
-    if (r.result.toLowerCase().includes(t) || t.includes(r.result.toLowerCase())) return r;
+    const rn = norm(r.result);
+    if (rn.includes(t) || t.includes(rn)) return r;
   }
   // Pass 2 — Levenshtein fuzzy match per word, so single-letter typos
   // resolve without needing the cognitive layer. "aethetic vest" → "Aetheric Vest"
@@ -609,7 +619,7 @@ export function findRecipeByResult(target: string): Recipe | null {
   if (tTokens.length === 0) return null;
   let best: { recipe: Recipe; totalDistance: number } | null = null;
   for (const r of rRecipes()) {
-    const rTokens = r.result.toLowerCase().split(/\s+/).filter(Boolean);
+    const rTokens = norm(r.result).split(/\s+/).filter(Boolean);
     let totalDistance = 0;
     let allMatched = true;
     for (const it of tTokens) {
