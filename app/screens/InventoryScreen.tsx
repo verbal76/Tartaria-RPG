@@ -384,7 +384,7 @@ export function InventoryScreen() {
   }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
-    equipItem(pending.item.name, slot);
+    equipItem(pending.item.name, slot, pending.item.id);
     setPending(null);
   };
   const unequipFromSlot = (slot: EquipSlot) => {
@@ -436,7 +436,7 @@ export function InventoryScreen() {
       // Bulk scrap runs SILENT — each unit's per-item flavor line is suppressed
       // so a stack of 20 doesn't spam 20 lines; one aggregated summary is emitted
       // below. A single scrap keeps its normal per-item narration.
-      scrapInventoryItem(itemName, { silent: isBulk });
+      scrapInventoryItem(itemName, { silent: isBulk, itemId: pending.item.id });
       const nowQty = qtyOf();
       if (nowQty >= prevQty) break; // refusal / no-op — don't hammer the same line
       prevQty = nowQty;

@@ -16800,4 +16800,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // card text out), so healthHue now lerps HP_RED↔HP_GREEN in one step (HP_AMBER
 // removed). green + red endpoints unchanged. healthCardTint (5) green; tsc app-clean.
 // components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-07-02-942-health-green-to-red';
+// 2026-07-02-943 — SCRAP/EQUIP resolve the exact instance by unique id (ported from
+// Tartaria OTA-649; shared engine). Both actions resolved by NAME (first row), so with
+// several same-name items of different durability, scrap broke the wrong one and equip
+// picked the wrong instance. equipItem gains an optional itemId; scrapInventoryItem
+// carries itemId in its opts (engine_Dev's scrap already took an opts arg). Both resolve
+// by id first, name-match as fallback; the inventory UI passes pending.item.id.
+// scrapEquipByInstanceId (3) + equippedIds/equipSwap green; tsc app-clean. JS-only →
+// OTA-safe. state/gameStore.ts, screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-07-02-943-scrap-equip-by-id';
