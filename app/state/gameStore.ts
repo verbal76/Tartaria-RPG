@@ -2573,6 +2573,10 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
+  fusionPickerOpen: boolean;
+  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor'; catalystId?: string } | null;
+  closeFusionPicker: () => void;
+  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor', catalystId?: string) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -2817,6 +2821,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lowHpWarned: false,
   weaponResistStreak: null,
   aetherStatPickerOpen: false,
+  fusionPickerOpen: false,
+  pendingFusionSelection: null,
   pendingAetherFoodId: null,
   surgeCombatToken: null,
   raceAbilityPickerOpen: false,
@@ -20360,6 +20366,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const sel = get().pendingFusionSelection;
+    if (!sel) { set({ fusionPickerOpen: true }); return; }
+    const selCatalyst = sel.catalystId ? (player.inventory.find((i) => i.id === sel.catalystId) ?? null) : null;
+    const selChosen = sel.itemIds
+      .map((id) => player.inventory.find((i) => i.id === id && i.reservedForFusion && i.quantity > 0))
+      .filter(Boolean) as InventoryItem[];
+    const selGate = fusion.gateFusion(player.inventory, selCatalyst, selChosen) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
+    if (selChosen.length < 3 || selChosen.length > 5 || !selGate.ok) {
+      set({ pendingFusionSelection: null });
+      get().appendLog('arbiter', `The Crucible cools. "${selGate.reason ?? 'Pick 3 to 5 reserved pieces spanning different materials.'}"`);
+      return;
+    }
     // Gate 3 — Qwen readiness. The static-inference path can't design
     // OTA-195 → OTA-221 — Qwen path PREFERRED but no longer required.
     // Playtest log: player tapped fuse 20+ times after meeting every
@@ -20382,7 +20400,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If Qwen is slow / dormant / unavailable, the deterministic name settles
     // instead. The loot is mechanically identical either way — Qwen only adds
     // bespoke flavor, so nothing of value is lost when it doesn't land.
-    const det = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
+    const det = fusion.synthesizeFusionDeterministic(selGate.inputs, selGate.tagProfile, sel.kind);
 
     const livePlayer = get().player;
     if (!livePlayer) return;
@@ -20391,12 +20409,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // item alongside their scraps, theme the output as a unique faction item; the
     // catalyst is consumed by applyFusion. arb107 — catalyst bumps rarity to
     // Legendary at 4+ material tags, else Rare.
-    const catalyst = fusion.findFactionCatalyst(livePlayer.inventory, equippedIdSet) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
+    const catalyst = selCatalyst;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
       const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
       if (fac) {
-        const facRarity: 'Rare' | 'Legendary' = gate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
+        const facRarity: 'Rare' | 'Legendary' = selGate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
       }
     }
@@ -20414,7 +20432,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
     const { inventory: newInv, fused } = fusion.applyFusion(
       livePlayer.inventory,
-      gate.inputs,
+      selGate.inputs,
       formingResult,
       seed,
       factionTheme,
@@ -20428,6 +20446,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? { player: { ...s.player, inventory: newInvForming, fusionPending: false } }
       : s);
     // arb45 — Master of Aethercraft: the fusion IS complete mechanically.
+    set({ pendingFusionSelection: null, fusionPickerOpen: false });
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(
       'reward',
@@ -20449,7 +20468,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       try {
         if (qwen.isReady()) {
           const named = await Promise.race([
-            fusion.synthesizeFusionNameViaQwen(det.stats, gate.inputs, gate.tagProfile, qwen),
+            fusion.synthesizeFusionNameViaQwen(det.stats, selGate.inputs, selGate.tagProfile, qwen),
             new Promise<null>((resolve) => setTimeout(() => resolve(null), FUSE_NAME_TIMEOUT_MS)),
           ]);
           if (named) {
@@ -20462,6 +20481,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       get().settleFusion(fusedId, finalName, finalDesc);
     })();
+  },
+
+  closeFusionPicker() { set({ fusionPickerOpen: false, pendingFusionSelection: null }); },
+
+  confirmFusionSelection(itemIds, kind, catalystId) {
+    set({ pendingFusionSelection: { itemIds, kind, catalystId }, fusionPickerOpen: false });
+    void get().fuseAtCrucible();
   },
 
   settleFusion(itemId, name, description) {

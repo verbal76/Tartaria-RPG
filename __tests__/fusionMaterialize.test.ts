@@ -66,7 +66,7 @@ describe('OTA-631 — materializing fusion', () => {
       gameLog: [],
     });
 
-    await store.getState().fuseAtCrucible();
+    store.getState().confirmFusionSelection(['i_Aetheric_Cog', 'i_Mud_Cloth', 'i_Tortoise_Shell'], 'weapon');
     await new Promise((r) => setTimeout(r, 50)); // let the background namer settle
 
     const after = store.getState();

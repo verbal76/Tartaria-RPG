@@ -15217,4 +15217,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it (the inventory UI passes pending.item.id); name-match stays the fallback for
 // typed/legacy callers. scrapEquipByInstanceId (3) + existing equip/scrap suites (28)
 // green; tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, screens/InventoryScreen.tsx.
-export const OTA_BUILD_ID = '2026-07-02-635-scrap-equip-by-id';
+// OTA-636 — FUSION PICKER (choose 3–5 reserved pieces + optional catalyst + weapon/
+// armor, instead of consuming the whole reserved pool) + you-are-here room highlight
+// inside buildings. Both ported from Tartaria (OTA-650/651); shared engine.
+// fusionPickerSelection + fusion suite green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-636-fusion-picker-room-highlight';
