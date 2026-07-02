@@ -380,7 +380,9 @@ export function InventoryScreen() {
   }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
-    equipItem(pending.item.name, slot);
+    // Pass the selected instance's unique id so equipping picks THIS item (its
+    // durability / instance stats), not the first inventory row of the same name.
+    equipItem(pending.item.name, slot, pending.item.id);
     setPending(null);
   };
   const unequipFromSlot = (slot: EquipSlot) => {
@@ -415,7 +417,10 @@ export function InventoryScreen() {
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
     for (let i = 0; i < reps; i++) {
-      scrapInventoryItem(pending.item.name);
+      // Scrap THIS exact instance by id (a same-name item with different durability
+      // must not be scrapped in its place). For a true stack (one id, quantity N)
+      // the id is stable as the quantity decrements, so the batch loop still works.
+      scrapInventoryItem(pending.item.name, pending.item.id);
     }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);

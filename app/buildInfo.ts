@@ -15329,4 +15329,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (Tap ENTER…)" whenever scene.sceneBuilding is set AND the player hasn't stepped in
 // (activeBuildingId null). buildingDiscovery tests added (5 green); tsc app-clean.
 // JS-only → OTA-safe. state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-30-648-look-enterable-structures';
+// OTA-649 — SCRAP/EQUIP resolve the exact instance by unique id. Every InventoryItem
+// already has a unique id, but scrapInventoryItem/equipItem resolved by NAME (first
+// row that matched), so with several same-name items of different durability, scrap
+// broke the wrong one and equip picked the wrong instance (playtester: 5 headbands,
+// equipped the low-durability one, "equip" on the good one did nothing). Both actions
+// now take an optional itemId and resolve by it (the inventory UI passes
+// pending.item.id); name-match stays as the fallback for typed/legacy callers. The
+// equipped-slot id + resolveEquippedItem/aggregateEquippedStatBonuses already read
+// per-instance, so the right stats/durability now follow. scrapEquipByInstanceId (3)
+// + 34 existing equip/scrap tests green; tsc app-clean. JS-only → OTA-safe.
+// state/gameStore.ts, screens/InventoryScreen.tsx.
+export const OTA_BUILD_ID = '2026-07-02-649-scrap-equip-by-id';
