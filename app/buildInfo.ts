@@ -15387,4 +15387,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (Burlap/Riveted Leather/Aetheric Padded; Reclaimer Pattern stays drop-only) already
 // group under the crafting screen's DOG ARMOR banner. categorize tests green; tsc
 // app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-657-dog-armor-inventory-section';
+// OTA-658 — native-ML crash hardening (square-button / recents SIGSEGV family). Two
+// unsynchronized-native-free windows of the SAME class as the fixed Qwen release-
+// during-completion crash: (1) generate() read this.context! INSIDE the lock lambda,
+// which dispose() (fired on background) could null first → now captures ctx locally;
+// (2) Kokoro voice frees (disposeVoice / disposeStickyArbiterVoice / disposePiperEngine)
+// called module.delete() OUTSIDE the native-ML lock while a synth (model.forward) runs
+// under it → now every free is serialized through runExclusiveNativeMl. tts + lock
+// suites green; tsc app-clean. JS-only → OTA-safe. (Native SIGSEGVs carry no JS trace,
+// so this closes the known race windows rather than a stack-confirmed root cause.)
+export const OTA_BUILD_ID = '2026-07-02-658-native-ml-teardown-hardening';

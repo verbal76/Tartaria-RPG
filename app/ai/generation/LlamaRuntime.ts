@@ -198,6 +198,13 @@ export class LlamaRuntime {
     opts: LlamaGenerateOptions = {},
   ): Promise<string> {
     if (!this.context) throw new Error('LlamaRuntime not initialized');
+    // Capture the context locally. dispose() (fired on BACKGROUND) sets
+    // this.context = null BEFORE it acquires the native-ML lock, so a lambda that
+    // read `this.context!` at execution time could dereference null once dispose has
+    // run — right when the app is being backgrounded (the square-button path). The
+    // captured ctx is the same one that passed the guard above; release() is still
+    // serialized behind this completion by the shared lock.
+    const ctx = this.context;
     const prompt = renderChatML(messages);
     let assembled = '';
     // OTA-351 — completion-crash breadcrumb. On newer high-end ARM cores
@@ -217,7 +224,7 @@ export class LlamaRuntime {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
       // contending crashed the process on Tensor G5).
-      const result = await runExclusiveNativeMl(() => this.context!.completion(
+      const result = await runExclusiveNativeMl(() => ctx.completion(
         {
           prompt,
           n_predict: opts.maxTokens ?? 120,
