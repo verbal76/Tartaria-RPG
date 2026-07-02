@@ -16837,4 +16837,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // action (weather damage) each pass until the player died mid-craft with no "Crafted"
 // line. Now hyphenated recipes resolve on the first pass. recipeFuzzy + craft suite
 // green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-949-craft-hyphen-recipe-resolve';
+// 2026-07-02-950 — dog companion vests now get their own collapsible "Dog Armor"
+// inventory section (right after Armor) instead of scattering into Loot/Materials.
+// Matched by kind 'dog_armor', the 'dog_armor' tag, or DOG_GEAR catalog name (shared-
+// component parity with the Tartaria/golem lines). categorize tests green; tsc clean.
+// JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-950-dog-armor-inventory-section';
