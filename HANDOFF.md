@@ -1,6 +1,6 @@
 # Tartaria Realms — Session Handoff
 
-**This checkout:** branch `claude/handoff-review-gI5Ve` — Docs-review checkout off main; not a product line.
+**This checkout:** branch `claude/handoff-review-gI5Ve` — Ephemeral feature branch (usually merged or abandoned). Not a standing line.
 
 > **This doc was rewritten & de-bloated on 2026-07-02.** The previous 5,400-line
 > HANDOFF (with the full open/closed issue tracker and the entire OTA changelog)
@@ -40,9 +40,9 @@ one line is applied **per-line, code-specifically** (see §4).
 
 | Line (branch) | app name | package / bundle id | OTA channel | Role |
 |---|---|---|---|---|
-| **HaL2001** | Tartaria Realms HAL | `…tartarprim.hal2001` | `hal2001` + `preview` + `ios-preview` | **LIVE** — the Tartaria game with real testers |
-| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | Test-phone mobile line (side-by-side w/ HAL) |
-| **engine_Dev** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | Lore-agnostic engine; content is upload-driven |
+| **HaL2001** | Tartaria Realms HAL | `…tartarprim.hal2001` | `hal2001` + `preview` + `ios-preview` | **LIVE Tartaria game** — the build at real testers (production) |
+| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | **HAL's testing branch** — trial HAL improvements here, then promote to HaL2001 (installs side-by-side) |
+| **engine_Dev** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | **Separate project** — lore-agnostic engine (upload-driven content), NOT the Tartaria game |
 | **steam_Dev** | Tartaria Realms PC (Steam Dev) | `…tartarprim.steamdev` | `steam-dev` | Windows/Electron; updates via Steam depot, not OTA |
 | **mac_dev** | Tartaria Realms (Mac Dev) | `…tartarprim.macdev` | `mac-dev` | macOS `.dmg` (Electron) |
 | **linux_dev** | Tartaria Realms (Linux Dev) | `…tartarprim.linuxdev` | `linux-dev` | Linux/Steam Deck AppImage (Electron) |
@@ -51,7 +51,14 @@ one line is applied **per-line, code-specifically** (see §4).
 | **Dev_engine_PC** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | engine_Dev's Windows `.exe` standing branch |
 | **arbiters-line** | Tartaria Realms ARB | `…tartarprim.arbiters` | `arbiters-line` (dead channel) | Isolated APK scratch line — publishes nothing |
 
-Utility / parked branches: **`main`** (base; the standing dev→prod PR target),
+**The three MAIN lines are `HaL2001`, `golem-line`, and `engine_Dev`.** HAL and
+golem are the SAME game — golem is HAL's testing branch, so a HAL improvement is
+built/tested on golem and then promoted to HaL2001 when the user approves.
+`engine_Dev` is a DIFFERENT product that only shares engine code. Everything else
+in the table is downstream packaging of these three. (On `main`, the handoff is a
+short router that names these three and asks which to work on.)
+
+Utility / parked branches: **`main`** (base + start-here router; the standing dev→prod PR target),
 **`iOS-initial`** / **`release/**`** / **`revert`** / **`submit-workflow-to-main`**
 (one-off/utility), **`claude/*`** (ephemeral feature branches — usually merged or
 abandoned). Don't develop on these unless explicitly told to.
