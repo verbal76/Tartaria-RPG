@@ -1,4 +1,4 @@
-name: PEPK Encrypt Upload Key (Play App Signing)
+name: Setup · Play signing key (PEPK)
 
 # Produces the encrypted ZIP that Play Console's
 # "Export and upload a key from Java keystore" flow requires.

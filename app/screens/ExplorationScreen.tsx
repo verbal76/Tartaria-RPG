@@ -33,6 +33,7 @@ import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
+import { FusionPickerModal } from '../components/FusionPickerModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -1111,15 +1112,22 @@ export function ExplorationScreen() {
               if (typeof player.travelTarget.distanceRemaining === 'number') {
                 return player.travelTarget.distanceRemaining;
               }
+              // GRID-EXACT fallback (older saves whose travelTarget predates the
+              // stored counter). The OLD fallback measured Manhattan on the
+              // re-centered VISUAL map, which UNDERCOUNTS from an outdoor tile and
+              // warps when you cross a location boundary — the "8 → 16" jump. Now it
+              // measures the same install-fixed canon grid the step loop uses, from
+              // the player's absolute cell (gridX/gridY, or the location cell +
+              // in-transit offset for legacy saves). Never warps, never undercounts.
               // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const { generateWorldMap, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } = require('../engine/worldMap');
-              const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
-              const map = generateWorldMap(seed, player.currentLocationId);
-              const tgtPos = map.positions[player.travelTarget.locationId];
-              if (!tgtPos) return null;
-              const fromX = typeof player.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
-              const fromY = typeof player.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
-              return Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
+              const { canonicalDistanceFromGrid, canonicalCellOf, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } = require('../engine/worldMap');
+              const gx = typeof player.gridX === 'number'
+                ? player.gridX
+                : canonicalCellOf(player.currentLocationId).x + ((player.mapX ?? WORLD_MAP_CENTER_X) - WORLD_MAP_CENTER_X);
+              const gy = typeof player.gridY === 'number'
+                ? player.gridY
+                : canonicalCellOf(player.currentLocationId).y + ((player.mapY ?? WORLD_MAP_CENTER_Y) - WORLD_MAP_CENTER_Y);
+              return canonicalDistanceFromGrid(gx, gy, player.travelTarget.locationId);
             })()}
             onContinueTravel={() => {
               const st = useGameStore.getState();
@@ -1398,6 +1406,8 @@ export function ExplorationScreen() {
         visible={missionBoardOpen}
         onClose={() => setMissionBoardOpen(false)}
       />
+
+      <FusionPickerModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}
