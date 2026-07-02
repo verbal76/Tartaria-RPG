@@ -18056,7 +18056,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
       const tgtName = locs.find((l) => l.id === pending.locationId)?.name ?? pending.locationId;
-      set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId } } } : s));
+      // arb47 — seed the GRID-EXACT distance now, even though we skip the first
+      // step (vendor on the road). Leaving distanceRemaining undefined dropped the
+      // travel badge onto the legacy re-centered-visual-map fallback, which
+      // UNDERCOUNTS from the outdoor tile — so the badge read low until the first
+      // continue self-healed it up to the true grid distance, looking like the
+      // counter "jumped up mid-travel". Seed it from the player's absolute cell.
+      const vendGrid = playerGridCell(player);
+      const vendTiles = canonicalDistanceFromGrid(vendGrid.x, vendGrid.y, pending.locationId);
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId, distanceRemaining: vendTiles } } } : s));
       get().appendLog(
         'world',
         `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap the → ${tgtName.toUpperCase()} button on the travel row when you're ready to move on.`,
