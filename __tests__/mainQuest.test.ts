@@ -344,6 +344,46 @@ describe('mainQuest phase machine', () => {
       expect(canRecoverCore(p, 'attack')).toBe(false);
     });
 
+    // Playtester (Eternal Dynasty) spammed `salvage core` (→ investigate) a dozen
+    // times against a diplomacy/ask gate and was never shown a usable command. The
+    // gate correctly rejects investigate; the FIX is that the refusal now surfaces
+    // coreGateHint, which must name a concrete, typeable verb for every route.
+    it('Eternal Dynasty gate rejects salvage/investigate but accepts diplomacy + ask', () => {
+      const p = makePlayer({
+        factionId: 'eternal_dynasty',
+        currentLocationId: 'nimari',
+        mainQuest: { phase: 'cores', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'investigate')).toBe(false); // `salvage core` path
+      expect(canRecoverCore(p, 'diplomacy')).toBe(true);     // `address the keepers`
+      expect(canRecoverCore(p, 'ask')).toBe(true);
+    });
+
+    it("the Dynasty hint names the concrete command (\"address the keepers\")", () => {
+      const hint = coreGateHint('eternal_dynasty', 'nimari')!;
+      expect(hint.toLowerCase()).toContain('address the keepers');
+    });
+
+    // No faction may be a guidance dead-end: every gate hint must reference at least
+    // one of its own intents' verbs so a stuck player can always learn a real move.
+    it('every faction gate hint points at a usable verb (no dead-ends)', () => {
+      const VERBS_BY_INTENT: Record<string, string[]> = {
+        investigate: ['salvage', 'investigate', 'examine', 'scout', 'read', 'shape'],
+        ask: ['ask', 'read'],
+        attack: ['attack', 'force', 'threat'],
+        diplomacy: ['address', 'speak', 'talk', 'tongue'],
+        steal: ['steal'],
+        rest: ['rest', 'vigil', 'sit', 'watch'],
+        cast: ['cast', 'shape', 'binding', 'aethercraft'],
+      };
+      for (const [faction, gate] of Object.entries(FACTION_CORE_GATES)) {
+        const hint = coreGateHint(faction, 'asgardar')!.toLowerCase();
+        const ok = gate.intents.some((intent) =>
+          (VERBS_BY_INTENT[intent] ?? []).some((v) => hint.includes(v)));
+        expect(ok).toBe(true);
+      }
+    });
+
     it('canRecoverCore returns false outside revelation/cores phase', () => {
       const p = makePlayer({
         currentLocationId: 'asgardar',

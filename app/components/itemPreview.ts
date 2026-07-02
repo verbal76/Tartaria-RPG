@@ -33,6 +33,27 @@ export type ItemPreview = {
   stats: string[];
 };
 
+// engine_Dev — coating-vial resists worked into an ARMOR instance (addedResists)
+// weren't reflected in the item's stat preview, so a coated piece read identically
+// to an uncoated one. Fold them into the "Resists:" line, tagged "(coated)" so they
+// read distinct from the piece's native/laddered resists. Inserts a Resists line if
+// the piece had none (placed before Durability). Returns a NEW array.
+function withAddedResists(stats: string[], added?: string[]): string[] {
+  if (!added || added.length === 0) return stats;
+  const out = [...stats];
+  const tag = added.map((r) => `${r} (coated)`).join(', ');
+  const idx = out.findIndex((s) => s.startsWith('Resists:'));
+  if (idx >= 0) {
+    out[idx] = `${out[idx]}, ${tag}`;
+  } else {
+    const line = `Resists: ${tag}`;
+    const durIdx = out.findIndex((s) => s.startsWith('Durability:'));
+    if (durIdx >= 0) out.splice(durIdx, 0, line);
+    else out.push(line);
+  }
+  return out;
+}
+
 // OTA-195 — uniqueStats-aware preview. When the caller has the
 // InventoryItem (most call sites do), prefer this entry point so a
 // fused item renders its unique stats instead of falling through to
@@ -42,6 +63,7 @@ export function getItemPreviewForInstance(item: {
   uniqueStats?: import('../engine/types').UniqueItemStats;
   durability?: { current: number; max: number };
   instanceStats?: { acBonus?: number; statBonuses?: { stat: string; amount: number }[] };
+  addedResists?: string[];
   description?: string;
   rarity?: string;
 }): ItemPreview {
@@ -70,13 +92,16 @@ export function getItemPreviewForInstance(item: {
       kindLabel,
       rarity: u.rarity,
       description: item.description ?? '',
-      stats,
+      stats: withAddedResists(stats, item.addedResists),
     };
   }
 
   const base = getItemPreview(item.name);
-  // No per-instance roll → plain catalog preview (legacy saves, non-gear).
-  if (!item.instanceStats && !item.durability) return base;
+  // No per-instance roll → plain catalog preview (legacy saves, non-gear), but
+  // still fold in any coating-applied resists.
+  if (!item.instanceStats && !item.durability) {
+    return item.addedResists?.length ? { ...base, stats: withAddedResists(base.stats, item.addedResists) } : base;
+  }
 
   const isAcLine = (s: string) => /^AC \+\d+$/.test(s);
   const isStatLine = (s: string) => /^[A-Za-z]{3} \+\d+$/.test(s); // "DEX +1", "STE +2"
@@ -107,7 +132,7 @@ export function getItemPreviewForInstance(item: {
     : catalogDur;
   if (durLine) stats.push(durLine);
 
-  return { ...base, stats };
+  return { ...base, stats: withAddedResists(stats, item.addedResists) };
 }
 
 // Resolve an item name to a previewable summary. Used by the buy / equip /

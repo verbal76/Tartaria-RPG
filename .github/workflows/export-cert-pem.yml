@@ -1,4 +1,4 @@
-name: Export Upload Cert PEM
+name: Setup · Export cert PEM
 
 # Decodes ANDROID_KEYSTORE_BASE64, exports the public cert as PEM,
 # uploads it as a workflow artifact for download. The PEM is what
