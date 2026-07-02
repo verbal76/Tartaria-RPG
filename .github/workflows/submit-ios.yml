@@ -1,4 +1,4 @@
-name: Submit iOS to TestFlight (manual)
+name: Publish · iOS → TestFlight
 
 # Manually trigger a TestFlight submission of an EXISTING EAS iOS build.
 # Use this when:

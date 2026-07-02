@@ -42,6 +42,16 @@ export function isCoatableWeapon(name: string): boolean {
   return w.damageType === 'piercing';
 }
 
+/** engine_Dev (armor coating) — the damage type a coating's ARMOR resist counts
+ *  as, so it matches incoming enemy damage. Tartaria's coatings are all built-in
+ *  (poison / acid / corruption / electrical / burn), where the kind already IS the
+ *  damage-type string, so this is identity. Kept as a single helper so the armor-
+ *  coating path reads the resist type in one place (and a future custom-coating
+ *  layer can override the mapping here without touching call sites). */
+export function coatingDamageType(kind: string): string {
+  return kind.toLowerCase();
+}
+
 /** OTA-453 — instance-aware coatability. A FUSED weapon is unique and
  *  catalog-absent — its stats live on the InventoryItem (`uniqueStats`), so
  *  findWeaponByName (and therefore isCoatableWeapon) misses it entirely, and a
@@ -102,6 +112,11 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
 
 /** Ongoing DOT duration (turns) after the immediate on-hit tick. */
 export const COATING_DOT_TURNS = 3;
+/** engine_Dev (design call) — chance a coating still "takes" when the enemy RESISTS
+ *  its damage type. A coating ALWAYS lands vs a weak or neutral foe; only a resisted
+ *  type gets gated to this small chance (a weakness is a guaranteed opening; a resisted
+ *  type rarely slips through). Tunable in one place across all lines. */
+export const COATING_RESIST_LAND_CHANCE = 0.15;
 /** AC reduction an acid coating inflicts per landing hit. */
 export const ACID_SHRED_PER_HIT = 1;
 /** Base cap on accumulated acid armor shred per enemy (normal foes). */
