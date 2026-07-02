@@ -15360,4 +15360,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // diversity → rarity (3 different materials = Rare, 4+ = Legendary; NOT input rarity),
 // and the picker shows a live 'N materials → predicted rarity' readout.
 // fusionMaterialTags test + full fusion suite green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-652-drink-clarity-fusion-infoblock';
+// OTA-653 — armor-recipe balance (crafting was 30 weapon vs 5 armor; +14 low-tier
+// armor across all 6 slots from gatherable mats → 19 armor) + crafting screen now
+// GROUPS recipes by category (Weapons/Armor/Relics/Food/Gear…) with collapsible
+// banners like inventory. recipe tests green; tsc clean.
+export const OTA_BUILD_ID = '2026-07-02-653-armor-recipes-craft-categories';
