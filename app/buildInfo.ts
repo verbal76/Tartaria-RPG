@@ -16826,4 +16826,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // recipe tests green; tsc clean.
 // 2026-07-02-947 — crafting + inventory categories default COLLAPSED (open the one you
 // want). (High-tier recipes not added here — engine_Dev recipes are pack-driven.)
-export const OTA_BUILD_ID = '2026-07-02-947-collapse-default';
+// 2026-07-02-948 — fusion picker DROPS same-material duplicates once you pick an item:
+// after a selection, other reserved pieces that add no NEW material leave the list, so
+// you can never assemble a same-type-only batch that fails the diversity gate. Picked
+// items stay visible (deselectable). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-948-fusion-drop-same-kind';
