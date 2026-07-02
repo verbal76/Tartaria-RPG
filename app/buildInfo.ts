@@ -15396,4 +15396,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // under it → now every free is serialized through runExclusiveNativeMl. tts + lock
 // suites green; tsc app-clean. JS-only → OTA-safe. (Native SIGSEGVs carry no JS trace,
 // so this closes the known race windows rather than a stack-confirmed root cause.)
-export const OTA_BUILD_ID = '2026-07-02-658-native-ml-teardown-hardening';
+// OTA-659 — travel distance no longer jumps UP mid-journey after a reload. On save
+// resume, backfillPlayer re-seeded the travel counter from canonicalDistance(current
+// location, target) — the FULL departure-city→target distance — throwing away the
+// tiles already walked. Backgrounding mid-travel (the recents/square button dumps the
+// ~400 MB Qwen model, so the OS often reclaims the process → relaunch → hydrate →
+// backfill) then made the counter leap back to the full trip. It now re-seeds from the
+// player's LIVE absolute cell (gridX/gridY via playerGridCell), so the badge resumes
+// exactly where the walk left off; legacy saves without gridX/gridY still fall back to
+// the location cell. travelResumeKeepsProgress + travel/grid suites green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-659-travel-resume-keeps-progress';

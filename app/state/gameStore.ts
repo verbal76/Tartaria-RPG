@@ -1577,12 +1577,19 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      // OTA-499 — re-seed the resumed journey from the EXACT canonical grid
-      // distance (install-fixed, player-independent) so the badge is stable
-      // across loads. A 0 to a different location means the bearing is lost.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { canonicalDistance } = require('../engine/worldMap');
-      const tiles = canonicalDistance(p.currentLocationId, t.locationId) as number;
+      // OTA — re-seed the resumed journey from the player's LIVE absolute cell
+      // (gridX/gridY via playerGridCell), NOT the departure city. The old
+      // canonicalDistance(currentLocationId, target) re-seeded the FULL
+      // city→target distance every load, so if the OS reclaimed the process
+      // mid-journey (Android background / the recents "square" button dumps the
+      // 400 MB Qwen model → the app is often evicted) the counter JUMPED UP on
+      // relaunch — the tiles already walked were thrown away. playerGridCell
+      // reads the persisted in-transit cell, so the badge now resumes exactly
+      // where the walk left off. Legacy saves without gridX/gridY fall back
+      // through playerGridCell to the location cell (same as before). A 0 to a
+      // different location still means the bearing is lost — drop it.
+      const g = playerGridCell(p);
+      const tiles = canonicalDistanceFromGrid(g.x, g.y, t.locationId) as number;
       if (tiles === 0 && p.currentLocationId !== t.locationId) return undefined;
       return { locationId: t.locationId, distanceRemaining: tiles };
     })(),
