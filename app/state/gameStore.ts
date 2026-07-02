@@ -1577,12 +1577,19 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      // OTA-499 — re-seed the resumed journey from the EXACT canonical grid
-      // distance (install-fixed, player-independent) so the badge is stable
-      // across loads. A 0 to a different location means the bearing is lost.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { canonicalDistance } = require('../engine/worldMap');
-      const tiles = canonicalDistance(p.currentLocationId, t.locationId) as number;
+      // OTA — re-seed the resumed journey from the player's LIVE absolute cell
+      // (gridX/gridY via playerGridCell), NOT the departure city. The old
+      // canonicalDistance(currentLocationId, target) re-seeded the FULL
+      // city→target distance every load, so if the OS reclaimed the process
+      // mid-journey (Android background / the recents "square" button dumps the
+      // 400 MB Qwen model → the app is often evicted) the counter JUMPED UP on
+      // relaunch — the tiles already walked were thrown away. playerGridCell
+      // reads the persisted in-transit cell, so the badge now resumes exactly
+      // where the walk left off. Legacy saves without gridX/gridY fall back
+      // through playerGridCell to the location cell (same as before). A 0 to a
+      // different location still means the bearing is lost — drop it.
+      const g = playerGridCell(p);
+      const tiles = canonicalDistanceFromGrid(g.x, g.y, t.locationId) as number;
       if (tiles === 0 && p.currentLocationId !== t.locationId) return undefined;
       return { locationId: t.locationId, distanceRemaining: tiles };
     })(),
@@ -2504,7 +2511,7 @@ interface GameStore {
    *  then charges + fuses. */
   useVendorCrucible: () => void;
   joinFaction: (factionId: string) => void;
-  equipItem: (itemName: string, slot: EquipSlot) => void;
+  equipItem: (itemName: string, slot: EquipSlot, itemId?: string) => void;
   unequipSlot: (slot: EquipSlot) => void;
   /** OTA-239 — Tool Pouch. Stow an inventory item by name into the
    *  pouch (max 3). Pouched items stay in player.inventory but
@@ -2533,7 +2540,7 @@ interface GameStore {
   useInventoryItem: (itemName: string) => void;
   /** Disassemble a built item (weapon / armor / relic / built gear)
    *  into stock materials via scrapEngine. Refuses raw materials. */
-  scrapInventoryItem: (itemName: string) => void;
+  scrapInventoryItem: (itemName: string, itemId?: string) => void;
   /** OTA-194 — toggle the heart/reserve flag on an inferred item. Only
    *  inferred items (catalog-absent) can be reserved; the UI gates the
    *  tap on `isInferredItem`. Reserved items are excluded from the
@@ -2574,6 +2581,12 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
+  /** OTA — fusion picker: choose 3–5 of your reserved (♥) pieces + weapon/armor,
+   *  instead of the Crucible consuming your WHOLE reserved pool on one item. */
+  fusionPickerOpen: boolean;
+  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor'; catalystId?: string } | null;
+  closeFusionPicker: () => void;
+  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor', catalystId?: string) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -2818,6 +2831,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lowHpWarned: false,
   weaponResistStreak: null,
   aetherStatPickerOpen: false,
+  fusionPickerOpen: false,
+  pendingFusionSelection: null,
   pendingAetherFoodId: null,
   surgeCombatToken: null,
   raceAbilityPickerOpen: false,
@@ -7091,6 +7106,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'arbiter',
             `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
           );
+          // v2.4.1 — surface the faction's CONCRETE recovery instructions, not just
+          // the terse next-action. Playtester (Eternal Dynasty, whose gate is
+          // diplomacy/ask) spammed `salvage core` a dozen times and was never shown
+          // the actual verb — a guidance dead-end. coreGateHint names the route's
+          // real commands (SALVAGE / ASK / READ / ATTACK / address the keepers / …).
+          const hint = mqMod.coreGateHint(player.factionId, player.currentLocationId);
+          if (hint) get().appendLog('system', hint);
           return;
         }
       }
@@ -10989,13 +11011,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ?? (sceneNouns.find((sn) => sn.includes('water')));
         const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
         if (drinkSource && wantsWater) {
-          const stamGained = Math.min(3, effectiveStaminaMax(player) - player.stamina);
+          const effMax = effectiveStaminaMax(player);
+          const stamGained = Math.min(3, effMax - player.stamina);
           set({ player: advanceTime(restoreStamina(player, 3), 0.083) }); // 5 min
+          // A 0-gain drink has two very different causes: you're genuinely full, OR
+          // hunger has capped your effective max below your real max (water can't lift
+          // that — only food does). Spell out the hunger case so it never reads as broken.
+          const hungerCapped = stamGained <= 0 && effMax < (player.staminaMax ?? effMax);
           get().appendLog(
             'world',
             stamGained > 0
               ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
-              : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
+              : hungerCapped
+                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (5 min)`
+                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
           );
           // OTA-619 — a combat sip is a FAST action now (player ruling): drinking
           // from a water source mid-fight no longer draws a free enemy swing,
@@ -17962,7 +17991,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
       const tgtName = locs.find((l) => l.id === pending.locationId)?.name ?? pending.locationId;
-      set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId } } } : s));
+      // arb47 — seed the GRID-EXACT distance now, even though we skip the first
+      // step (vendor on the road). Leaving distanceRemaining undefined dropped the
+      // travel badge onto the legacy re-centered-visual-map fallback, which
+      // UNDERCOUNTS from the outdoor tile — so the badge read low (e.g. 8) until
+      // the first continue self-healed it up to the true grid distance (16),
+      // looking like the counter "jumped up mid-travel". Seed it from the player's
+      // absolute cell so the badge is honest from the moment the course is set.
+      const vendGrid = playerGridCell(player);
+      const vendTiles = canonicalDistanceFromGrid(vendGrid.x, vendGrid.y, pending.locationId);
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId, distanceRemaining: vendTiles } } } : s));
       get().appendLog(
         'world',
         `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap the → ${tgtName.toUpperCase()} button on the travel row when you're ready to move on.`,
@@ -19563,13 +19601,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  equipItem(itemName, slot) {
+  equipItem(itemName, slot, itemId) {
     const state = get();
     const player = state.player;
     if (!player) return;
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
+    // OTA — resolve the EXACT instance the caller picked by its unique id when
+    // given (the inventory UI passes it), so a stack of same-name items with
+    // different durability/instance stats equips the ONE the player selected — not
+    // just the first row that happens to share the name. Falls back to name-match
+    // for typed commands / legacy callers that don't carry an id.
+    const item =
+      (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : null)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
       return;
@@ -20274,6 +20319,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // OTA — FUSION PICKER. Unless the player has already chosen which reserved
+    // pieces to spend (3–5) and whether to forge a weapon or armor, open the picker
+    // rather than consuming the ENTIRE reserved pool on one item (the old bug: 11
+    // reserved → all 11 eaten). confirmFusionSelection sets pendingFusionSelection
+    // and calls back here.
+    const sel = get().pendingFusionSelection;
+    if (!sel) { set({ fusionPickerOpen: true }); return; }
+    // Re-gate against the player's EXACT picks (+ optional separate faction catalyst).
+    const selCatalyst = sel.catalystId ? (player.inventory.find((i) => i.id === sel.catalystId) ?? null) : null;
+    const selChosen = sel.itemIds
+      .map((id) => player.inventory.find((i) => i.id === id && i.reservedForFusion && i.quantity > 0))
+      .filter(Boolean) as InventoryItem[];
+    const selGate = fusion.gateFusion(player.inventory, selCatalyst, selChosen) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
+    if (selChosen.length < 3 || selChosen.length > 5 || !selGate.ok) {
+      set({ pendingFusionSelection: null });
+      get().appendLog('arbiter', `The Crucible cools. "${selGate.reason ?? 'Pick 3 to 5 reserved pieces spanning different materials.'}"`);
+      return;
+    }
     // Gate 3 — Qwen readiness. The static-inference path can't design
     // OTA-195 → OTA-221 — Qwen path PREFERRED but no longer required.
     // Playtest log: player tapped fuse 20+ times after meeting every
@@ -20296,7 +20359,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If Qwen is slow / dormant / unavailable, the deterministic name settles
     // instead. The loot is mechanically identical either way — Qwen only adds
     // bespoke flavor, so nothing of value is lost when it doesn't land.
-    const det = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
+    const det = fusion.synthesizeFusionDeterministic(selGate.inputs, selGate.tagProfile, sel.kind);
 
     const livePlayer = get().player;
     if (!livePlayer) return;
@@ -20305,12 +20368,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // item alongside their scraps, theme the output as a unique faction item; the
     // catalyst is consumed by applyFusion. arb107 — catalyst bumps rarity to
     // Legendary at 4+ material tags, else Rare.
-    const catalyst = fusion.findFactionCatalyst(livePlayer.inventory, equippedIdSet) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
+    const catalyst = selCatalyst;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
       const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
       if (fac) {
-        const facRarity: 'Rare' | 'Legendary' = gate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
+        const facRarity: 'Rare' | 'Legendary' = selGate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
         factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
       }
     }
@@ -20328,7 +20391,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
     const { inventory: newInv, fused } = fusion.applyFusion(
       livePlayer.inventory,
-      gate.inputs,
+      selGate.inputs,
       formingResult,
       seed,
       factionTheme,
@@ -20342,6 +20405,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? { player: { ...s.player, inventory: newInvForming, fusionPending: false } }
       : s);
     // arb45 — Master of Aethercraft: the fusion IS complete mechanically.
+    set({ pendingFusionSelection: null, fusionPickerOpen: false });
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(
       'reward',
@@ -20363,7 +20427,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       try {
         if (qwen.isReady()) {
           const named = await Promise.race([
-            fusion.synthesizeFusionNameViaQwen(det.stats, gate.inputs, gate.tagProfile, qwen),
+            fusion.synthesizeFusionNameViaQwen(det.stats, selGate.inputs, selGate.tagProfile, qwen),
             new Promise<null>((resolve) => setTimeout(() => resolve(null), FUSE_NAME_TIMEOUT_MS)),
           ]);
           if (named) {
@@ -20376,6 +20440,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       get().settleFusion(fusedId, finalName, finalDesc);
     })();
+  },
+
+  closeFusionPicker() { set({ fusionPickerOpen: false, pendingFusionSelection: null }); },
+
+  confirmFusionSelection(itemIds, kind, catalystId) {
+    set({ pendingFusionSelection: { itemIds, kind, catalystId }, fusionPickerOpen: false });
+    void get().fuseAtCrucible();
   },
 
   settleFusion(itemId, name, description) {
@@ -20633,12 +20704,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
   },
 
-  scrapInventoryItem(itemName) {
+  scrapInventoryItem(itemName, itemId) {
     const player = get().player;
     if (!player) return;
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
+    // OTA — scrap the EXACT instance the caller picked by its unique id when given
+    // (the inventory UI passes it). A player with three same-name items of different
+    // durability who selects the worst one must break down THAT one — not whichever
+    // row happens to sort first by name. Falls back to name-match for typed commands.
+    const item =
+      (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : null)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
       return;
@@ -24770,6 +24847,17 @@ function narrateCasualLook(
     }
     exitLine.push(`Cardinal travel: north, east, south, west.`);
     parts.push(exitLine.join(' '));
+  }
+
+  // v2.4.1 — surface an ENTERABLE structure on this tile in EVERY look-around, not
+  // just the first-arrival buildingApproachLine. Playtester walked up to a building
+  // (its ENTER button live on screen), did other things, then `look`ed and saw only
+  // "You're in <place>" with no reminder — and thought they were already inside it.
+  // Now every look names the structure + the ENTER affordance, unless they've
+  // actually stepped in (activeBuildingId set) — then it's their current interior.
+  if (scene.sceneBuilding && !get().activeBuildingId) {
+    const bLabel = getBuilding(scene.sceneBuilding)?.hookLabel ?? 'a structure';
+    parts.push(`You're near ${bLabel} — a way in stands clear. (Tap ENTER, or type 'enter', to step inside.)`);
   }
 
   get().appendLog('world', parts.join(' '));

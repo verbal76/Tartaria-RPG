@@ -15343,4 +15343,108 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coatingLandRule test (6) green (resisted ~0.15, neutral/weak 200/200); weaponCoating /
 // weaponCoatingCombat / coatingNotARing (38) unbroken; tsc app-clean. JS-only → OTA-safe.
 // engine/weaponCoating.ts, state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-06-30-steam-646-merge';
+//
+// OTA-647 — CORE-GATE GUIDANCE. A playtester (Eternal Dynasty, whose Core gate is
+// diplomacy/ask) got stuck at a Lost Capital typing `salvage core` a dozen times:
+// the gate correctly refuses (investigate isn't a Dynasty intent), but the refusal
+// only showed the terse next-action ("address the keepers") and never a usable
+// command — a guidance dead-end. The refusal now ALSO surfaces coreGateHint, which
+// spells out each route's concrete verbs; the Dynasty hint is tightened to name the
+// literal command ("address the keepers"). No gate LOGIC change — the right verbs
+// already worked ('address' → diplomacy). mainQuest guidance tests added (43 green);
+// tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, engine/mainQuest.ts.
+//
+// OTA-648 — LOOK surfaces enterable structures. buildingApproachLine only fired on
+// first ARRIVAL, so a player who walked up to a structure (its ENTER button live on
+// screen), did other things, then `look`ed saw only "You're in <place>" and thought
+// they were already inside — playtester: "it told me I was IN the vaults when I was
+// just NEAR it... if I'm near the entrance to something enterable it should tell me."
+// The look-around now appends "You're near <structure> — a way in stands clear.
+// (Tap ENTER…)" whenever scene.sceneBuilding is set AND the player hasn't stepped in
+// (activeBuildingId null). buildingDiscovery tests added (5 green); tsc app-clean.
+// JS-only → OTA-safe. state/gameStore.ts.
+// OTA-649 — SCRAP/EQUIP resolve the exact instance by unique id. Every InventoryItem
+// already has a unique id, but scrapInventoryItem/equipItem resolved by NAME (first
+// row that matched), so with several same-name items of different durability, scrap
+// broke the wrong one and equip picked the wrong instance (playtester: 5 headbands,
+// equipped the low-durability one, "equip" on the good one did nothing). Both actions
+// now take an optional itemId and resolve by it (the inventory UI passes
+// pending.item.id); name-match stays as the fallback for typed/legacy callers. The
+// equipped-slot id + resolveEquippedItem/aggregateEquippedStatBonuses already read
+// per-instance, so the right stats/durability now follow. scrapEquipByInstanceId (3)
+// + 34 existing equip/scrap tests green; tsc app-clean. JS-only → OTA-safe.
+// state/gameStore.ts, screens/InventoryScreen.tsx.
+// OTA-650 — FUSION PICKER. The Crucible consumed the player's ENTIRE reserved (♥)
+// pool on one fusion (11 reserved → all 11 eaten). Firing it now opens a picker:
+// choose 3–5 reserved pieces, optionally add a reserved faction catalyst (separate
+// theme slot), and pick WEAPON or ARMOR — spending only what you selected. Engine:
+// gateFusion accepts an explicit chosen subset; synthesizeFusionDeterministic takes a
+// forced kind; eligibleInputs exported for the picker. Store: fuseAtCrucible opens the
+// picker unless a pendingFusionSelection exists, then re-gates on the exact picks +
+// forced kind; confirmFusionSelection / closeFusionPicker added. New FusionPickerModal.
+// fusionPickerSelection (2) + 200 fusion-suite tests green; tsc app-clean. JS-only →
+// OTA-safe. engine/itemFusion.ts, state/gameStore.ts, components/FusionPickerModal.tsx,
+// screens/ExplorationScreen.tsx.
+// OTA-651 — YOU-ARE-HERE room highlight. Inside a discoverable building (abandoned
+// outpost, etc.) the room buttons now highlight the room you're standing in
+// (activeBuildingRoomId) with a gold border + '▸' marker, so you can tell where you
+// are among the rooms. UI-only. components/InputBox.tsx.
+// OTA-652 — drink-water clarity (hunger-capped vs already-full message) + fusion info
+// block: reservable items name their material contribution, the item modal explains
+// diversity → rarity (3 different materials = Rare, 4+ = Legendary; NOT input rarity),
+// and the picker shows a live 'N materials → predicted rarity' readout.
+// fusionMaterialTags test + full fusion suite green; tsc app-clean. JS-only → OTA-safe.
+// OTA-653 — armor-recipe balance (crafting was 30 weapon vs 5 armor; +14 low-tier
+// armor across all 6 slots from gatherable mats → 19 armor) + crafting screen now
+// GROUPS recipes by category (Weapons/Armor/Relics/Food/Gear…) with collapsible
+// banners like inventory. recipe tests green; tsc clean.
+// OTA-654 — crafting + inventory categories now DEFAULT COLLAPSED (open the one you
+// want, no scroll-and-fold). + High-tier crafting: added Rare/Legendary weapon export const OTA_BUILD_ID = '2026-07-02-653-armor-recipes-craft-categories';
+// armor recipes with rarity-matched materials (Legendary outputs need Legendary mats
+// like Aetherstone Heart / Behemoth Heart / Iron Core / Wyrm Fang). weapons now
+// 9C/8U/12R/6L, armor 12C/3U/7R/2L. recipe tests green; tsc clean.
+// OTA-655 — fusion picker DROPS same-material duplicates once you pick an item: after a
+// selection, other reserved pieces that add no NEW material leave the list, so you can
+// never assemble a same-type-only batch that fails the diversity gate. Picked items stay
+// visible (deselectable). JS-only → OTA-safe.
+// OTA-656 — craft recipe resolution now folds hyphens/punctuation to spaces on both
+// sides. The input normalizer strips hyphens ("Aether-Reinforced Armor" → "aether
+// reinforced armor"), which made findRecipeByResult return null for EVERY hyphenated
+// recipe → the craft spun into an infinite cognitive re-dispatch loop, burning an
+// action (Silent-snow weather −1HP) each pass until the player died mid-craft with no
+// "Crafted" line. Now hyphenated recipes resolve on the first pass. recipeFuzzy +
+// craft suite green; tsc app-clean. JS-only → OTA-safe.
+// OTA-657 — dog companion vests now get their own collapsible "Dog Armor" inventory
+// section (right after Armor) instead of scattering into Loot/Materials (the Aetheric
+// Padded Vest's 'aether' tag had been filing it under Materials). Matched by kind
+// 'dog_armor', the 'dog_armor' tag, or DOG_GEAR catalog name. Craftable dog vests
+// (Burlap/Riveted Leather/Aetheric Padded; Reclaimer Pattern stays drop-only) already
+// group under the crafting screen's DOG ARMOR banner. categorize tests green; tsc
+// app-clean. JS-only → OTA-safe.
+// OTA-658 — native-ML crash hardening (square-button / recents SIGSEGV family). Two
+// unsynchronized-native-free windows of the SAME class as the fixed Qwen release-
+// during-completion crash: (1) generate() read this.context! INSIDE the lock lambda,
+// which dispose() (fired on background) could null first → now captures ctx locally;
+// (2) Kokoro voice frees (disposeVoice / disposeStickyArbiterVoice / disposePiperEngine)
+// called module.delete() OUTSIDE the native-ML lock while a synth (model.forward) runs
+// under it → now every free is serialized through runExclusiveNativeMl. tts + lock
+// suites green; tsc app-clean. JS-only → OTA-safe. (Native SIGSEGVs carry no JS trace,
+// so this closes the known race windows rather than a stack-confirmed root cause.)
+// OTA-659 — travel distance no longer jumps UP mid-journey after a reload. On save
+// resume, backfillPlayer re-seeded the travel counter from canonicalDistance(current
+// location, target) — the FULL departure-city→target distance — throwing away the
+// tiles already walked. Backgrounding mid-travel (the recents/square button dumps the
+// ~400 MB Qwen model, so the OS often reclaims the process → relaunch → hydrate →
+// backfill) then made the counter leap back to the full trip. It now re-seeds from the
+// player's LIVE absolute cell (gridX/gridY via playerGridCell), so the badge resumes
+// exactly where the walk left off; legacy saves without gridX/gridY still fall back to
+// the location cell. travelResumeKeepsProgress + travel/grid suites green; tsc app-clean.
+// OTA-660 — travel badge is now grid-exact from the moment a course is set, even on
+// the vendor-on-the-road departure. confirmLeaveAndTravel skipped the first step and
+// left travelTarget WITHOUT distanceRemaining, so the badge fell to the legacy
+// re-centered-visual-map fallback, which UNDERCOUNTS from an outdoor tile — the badge
+// read low (e.g. 8) until the first continue self-healed it to the true grid distance
+// (16), looking like the counter "jumped up mid-travel". Now it seeds the grid-exact
+// distance up front, and the display fallback is grid-exact too (never the visual map).
+// travelBadgeGridExact + travel suites green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-660-travel-badge-grid-exact';

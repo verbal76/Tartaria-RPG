@@ -804,7 +804,7 @@ export const FACTION_CORE_GATES: Record<string, CoreGate> = {
   },
   eternal_dynasty: {
     intents: ['diplomacy', 'ask'],
-    hint: (cap) => `(Dynasty route — speak to the ${cap} keepers in the old voice. Prove the lineage and the Core lifts.)`,
+    hint: (cap) => `(Dynasty route — ADDRESS the ${cap} keepers in the old voice (try "address the keepers"). Prove the lineage and the Core lifts.)`,
     nextAction: 'address the keepers',
   },
   conspiracy_architects: {

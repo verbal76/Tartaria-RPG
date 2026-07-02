@@ -17,6 +17,7 @@ import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
+import { fusionMaterialTags } from '../engine/itemFusion';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -380,7 +381,9 @@ export function InventoryScreen() {
   }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
-    equipItem(pending.item.name, slot);
+    // Pass the selected instance's unique id so equipping picks THIS item (its
+    // durability / instance stats), not the first inventory row of the same name.
+    equipItem(pending.item.name, slot, pending.item.id);
     setPending(null);
   };
   const unequipFromSlot = (slot: EquipSlot) => {
@@ -415,7 +418,10 @@ export function InventoryScreen() {
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
     for (let i = 0; i < reps; i++) {
-      scrapInventoryItem(pending.item.name);
+      // Scrap THIS exact instance by id (a same-name item with different durability
+      // must not be scrapped in its place). For a true stack (one id, quantity N)
+      // the id is stable as the quantity decrements, so the batch loop still works.
+      scrapInventoryItem(pending.item.name, pending.item.id);
     }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);
@@ -738,6 +744,20 @@ export function InventoryScreen() {
     : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
       ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
       : undefined;
+  // OTA — fusion info block: for a fusable/reservable item, name the material it
+  // contributes and how diversity drives output rarity (a common playtest question:
+  // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
+  const fusionHint = pending && (isInferredInventoryItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+    ? (() => {
+        if ((pending.item.tags ?? []).includes('faction_gear')) {
+          return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
+        }
+        const mats = fusionMaterialTags(pending.item);
+        const matStr = mats.length ? mats.join(', ') : 'no distinct material';
+        return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
+      })()
+    : null;
+  const modalBodyFull = [modalBody, fusionHint].filter(Boolean).join('\n\n') || undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦
@@ -936,7 +956,7 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
-          const collapsed = !!collapsedSections[cat];
+          const collapsed = collapsedSections[cat] ?? true; // default collapsed
           return (
             <View key={cat} style={styles.section}>
               {/* arb108 — semi-transparent backing so the label reads over any
@@ -945,7 +965,7 @@ export function InventoryScreen() {
               <TouchableOpacity
                 style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
                 activeOpacity={0.7}
-                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !s[cat] }))}
+                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !(s[cat] ?? true) }))}
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
@@ -1012,7 +1032,7 @@ export function InventoryScreen() {
               ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
               : undefined
         }
-        body={scrapResultBody ?? modalBody}
+        body={scrapResultBody ?? modalBodyFull}
         // OTA-286 — quantity stepper appears when the player is
         // looking at a stack of 2+ scrap-able items AND we're still
         // in the action phase (not the post-salvage result view) AND
