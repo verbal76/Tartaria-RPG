@@ -15351,4 +15351,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fusionPickerSelection (2) + 200 fusion-suite tests green; tsc app-clean. JS-only →
 // OTA-safe. engine/itemFusion.ts, state/gameStore.ts, components/FusionPickerModal.tsx,
 // screens/ExplorationScreen.tsx.
-export const OTA_BUILD_ID = '2026-07-02-650-fusion-picker';
+// OTA-651 — YOU-ARE-HERE room highlight. Inside a discoverable building (abandoned
+// outpost, etc.) the room buttons now highlight the room you're standing in
+// (activeBuildingRoomId) with a gold border + '▸' marker, so you can tell where you
+// are among the rooms. UI-only. components/InputBox.tsx.
+export const OTA_BUILD_ID = '2026-07-02-651-room-highlight';
