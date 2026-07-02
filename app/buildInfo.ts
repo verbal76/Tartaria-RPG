@@ -15257,4 +15257,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // called module.delete() OUTSIDE the native-ML lock while a synth (model.forward) runs
 // under it → now every free is serialized through runExclusiveNativeMl. tts + lock
 // suites green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-643-native-ml-teardown-hardening';
+// OTA-644 — travel distance no longer jumps UP mid-journey after a reload. On save
+// resume, backfillPlayer re-seeded the travel counter from canonicalDistance(current
+// location, target) — the FULL departure-city→target distance — throwing away the
+// tiles already walked. Backgrounding mid-travel (recents/square button dumps the
+// ~400 MB Qwen model → the OS often reclaims the process → relaunch → hydrate →
+// backfill) then made the counter leap back to the full trip. It now re-seeds from the
+// player's LIVE absolute cell (gridX/gridY via playerGridCell). travelResumeKeepsProgress
+// green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-644-travel-resume-keeps-progress';
