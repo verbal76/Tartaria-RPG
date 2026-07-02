@@ -1536,6 +1536,186 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Aether Bolt-Caster",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 3
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Aetherstone Gauntlet",
+      "ingredients": [
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Mire Stave",
+      "ingredients": [
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Gravity Pike",
+      "ingredients": [
+        {
+          "name": "Iron Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Aetheric Spear (Legendary)",
+      "ingredients": [
+        {
+          "name": "Wyrm Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Aether-Seeker's Hood",
+      "ingredients": [
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Aetheric Analyzer Helm",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Pelt",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Helm of the Great Architect",
+      "ingredients": [
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Crown of the Deep",
+      "ingredients": [
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "OTA \u2014 high-tier crafting: Rare/Legendary weapon & armor with rarity-matched materials.",
+      "result": "Aetheric Crown of the Giants",
+      "ingredients": [
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }

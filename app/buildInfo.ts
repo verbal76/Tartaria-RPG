@@ -15229,4 +15229,6 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armor across all 6 slots from gatherable mats → 19 armor) + crafting screen now
 // GROUPS recipes by category (Weapons/Armor/Relics/Food/Gear…) with collapsible
 // banners like inventory. recipe tests green; tsc clean.
-export const OTA_BUILD_ID = '2026-07-02-638-armor-recipes-craft-categories';
+// OTA-639 — categories default collapsed (crafting + inventory) + Rare/Legendary
+// weapon export const OTA_BUILD_ID = '2026-07-02-638-armor-recipes-craft-categories'; armor recipes with rarity-matched materials (ported from Tartaria OTA-654).
+export const OTA_BUILD_ID = '2026-07-02-639-collapse-default-hitier-recipes';
