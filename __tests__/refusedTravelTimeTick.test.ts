@@ -73,15 +73,20 @@ describe('OTA-163 — depleted travel attempts still advance the clock', () => {
     console.error = () => {};
   });
 
-  it('case `travel`: `go north` refusal ticks ~15 min', async () => {
+  it('a depleted `go north` is a HARD STOP — refuses, no move, and burns NO time', async () => {
+    // engine_Dev intentionally dropped the old +15-min "fumble" tick on a
+    // stamina-depleted overland move: spam-tapping directions on empty legs was
+    // bleeding real hours for moves that never happened. Now it's a clean "no
+    // stamina — go rest" refusal that costs nothing and points the player at rest.
     await bootstrapDrained();
-    const hoursBefore = useGameStore.getState().player!.hoursElapsed ?? 0;
+    const before = useGameStore.getState().player!;
+    const hoursBefore = before.hoursElapsed ?? 0;
     useGameStore.getState().submitPlayerAction('go north');
-    const hoursAfter = useGameStore.getState().player!.hoursElapsed ?? 0;
-    const delta = hoursAfter - hoursBefore;
-    // Should advance by ~0.25 (15 min). Allow 0.2 – 0.5 range.
-    expect(delta).toBeGreaterThanOrEqual(0.2);
-    expect(delta).toBeLessThanOrEqual(0.6);
+    const after = useGameStore.getState().player!;
+    expect((after.hoursElapsed ?? 0) - hoursBefore).toBe(0); // no time bled
+    expect({ x: after.mapX, y: after.mapY }).toEqual({ x: before.mapX, y: before.mapY }); // no move
+    const feed = useGameStore.getState().gameLog.map((e) => e.text).join('\n').toLowerCase();
+    expect(feed).toContain('no stamina'); // clear refusal that sends them to rest
   });
 
   // OTA-615 — setting a course is PLANNING and no longer requires stamina.
@@ -102,7 +107,7 @@ describe('OTA-163 — depleted travel attempts still advance the clock', () => {
     expect({ x: after.mapX, y: after.mapY }).toEqual({ x: before.mapX, y: before.mapY });
   });
 
-  it('100 consecutive depleted travel attempts each tick the clock', async () => {
+  it('100 consecutive depleted travel attempts bleed NO time (anti-stuck: spam can\'t lose hours)', async () => {
     await bootstrapDrained();
     const start = useGameStore.getState().player!.hoursElapsed ?? 0;
     for (let i = 0; i < 100; i++) {
@@ -113,8 +118,9 @@ describe('OTA-163 — depleted travel attempts still advance the clock', () => {
       useGameStore.getState().submitPlayerAction('go north');
     }
     const end = useGameStore.getState().player!.hoursElapsed ?? 0;
-    // 100 refusals × ~0.25h = ~25h advanced. Pre-fix this was 0.
-    expect(end - start).toBeGreaterThanOrEqual(20);
+    // The whole point of the hard stop: no move happened, so no time is spent —
+    // a player mashing directions on empty legs can't accidentally lose the day.
+    expect(end - start).toBe(0);
   });
 
   // arb40 — interior outpost movement is free. The OTA-163 overland tick
