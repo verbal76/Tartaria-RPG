@@ -17,6 +17,7 @@ import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
+import { fusionMaterialTags } from '../engine/itemFusion';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -130,6 +131,7 @@ export function InventoryScreen() {
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
   const applyCoating = useGameStore((s) => s.applyCoating);
+  const applyCoatingToArmor = useGameStore((s) => s.applyCoatingToArmor);
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
   // the equip modal entirely when pouchFilterActive — a single tap
   // on the eligible item stows it and clears the filter.
@@ -180,6 +182,8 @@ export function InventoryScreen() {
   // the second modal lists the coatable weapons in the pack as
   // pick buttons. Cleared on apply or cancel.
   const [coatTarget, setCoatTarget] = useState<InventoryItem | null>(null);
+  // engine_Dev — armor-coating picker: the vial being worked into a piece of armor.
+  const [armorCoatTarget, setArmorCoatTarget] = useState<InventoryItem | null>(null);
 
   if (!player) {
     return (
@@ -377,7 +381,9 @@ export function InventoryScreen() {
   }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
-    equipItem(pending.item.name, slot);
+    // Pass the selected instance's unique id so equipping picks THIS item (its
+    // durability / instance stats), not the first inventory row of the same name.
+    equipItem(pending.item.name, slot, pending.item.id);
     setPending(null);
   };
   const unequipFromSlot = (slot: EquipSlot) => {
@@ -412,7 +418,10 @@ export function InventoryScreen() {
     const stack = pending.item.quantity ?? 1;
     const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
     for (let i = 0; i < reps; i++) {
-      scrapInventoryItem(pending.item.name);
+      // Scrap THIS exact instance by id (a same-name item with different durability
+      // must not be scrapped in its place). For a true stack (one id, quantity N)
+      // the id is stable as the quantity decrements, so the batch loop still works.
+      scrapInventoryItem(pending.item.name, pending.item.id);
     }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);
@@ -630,6 +639,32 @@ export function InventoryScreen() {
         },
         tone: 'primary',
       });
+      // engine_Dev — APPLY TO ARMOR. The same vial can instead be worked into an
+      // armor piece for a permanent damage-type resist (the vial's damage type).
+      // Opens a second picker (armorCoatTarget) listing the player's armor.
+      const armorCoatType = (() => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { findGearByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { resolveItemEffect } = require('../engine/itemEffect');
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+          const fx = resolveItemEffect(pending.item.name, [findGearByName]);
+          const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+          if (spec) return coatingDamageType(String(spec.kind));
+        } catch { /* fall through to tag */ }
+        return (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
+      })();
+      buttons.push({
+        label: armorCoatType ? `Apply to armor (+${armorCoatType} resist)` : 'Apply to armor',
+        onPress: () => {
+          const coat = pending.item;
+          closeModal();
+          setArmorCoatTarget(coat);
+        },
+        tone: 'primary',
+      });
     }
     // SCRAP — only for built items with material content. Hidden for
     // raw stock (already material) and for items currently equipped
@@ -709,6 +744,20 @@ export function InventoryScreen() {
     : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
       ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
       : undefined;
+  // OTA — fusion info block: for a fusable/reservable item, name the material it
+  // contributes and how diversity drives output rarity (a common playtest question:
+  // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
+  const fusionHint = pending && (isInferredInventoryItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+    ? (() => {
+        if ((pending.item.tags ?? []).includes('faction_gear')) {
+          return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
+        }
+        const mats = fusionMaterialTags(pending.item);
+        const matStr = mats.length ? mats.join(', ') : 'no distinct material';
+        return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
+      })()
+    : null;
+  const modalBodyFull = [modalBody, fusionHint].filter(Boolean).join('\n\n') || undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦
@@ -757,6 +806,48 @@ export function InventoryScreen() {
       coatPickerBody = 'Could not read your weapons just now.';
     }
     coatPickerButtons.push({ label: 'Cancel', onPress: () => setCoatTarget(null), tone: 'neutral' });
+  }
+
+  // engine_Dev — armor-coating picker. When armorCoatTarget is set, list the
+  // player's armor pieces; tapping one works the vial's resist (its damage type)
+  // permanently into that piece. Pieces that already resist the type are flagged.
+  let armorPickerBody: string | undefined;
+  let armorPickerButtons: Array<{ label: string; onPress: () => void; tone: 'primary' | 'neutral' | 'destructive' }> = [];
+  if (armorCoatTarget) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findArmorByName, findGearByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolveItemEffect } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+      const fx = resolveItemEffect(armorCoatTarget.name, [findGearByName]);
+      const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+      const coatType = (spec
+        ? coatingDamageType(String(spec.kind))
+        : (armorCoatTarget.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t))) ?? 'this';
+      const armorItems = (player.inventory ?? []).filter(
+        (i: InventoryItem) => i.kind === 'armor' || i.uniqueStats?.kind === 'armor' || !!findArmorByName(i.name),
+      );
+      if (armorItems.length === 0) {
+        armorPickerBody = 'You have no armor to work the vial into. Pick up a piece first.';
+      } else {
+        armorPickerBody = `Work the ${armorCoatTarget.name.toLowerCase()} into which armor? It gains permanent ${coatType} resist until the piece is lost or destroyed.`;
+        armorPickerButtons = armorItems.map((a: InventoryItem) => ({
+          label: (a.addedResists ?? []).map((r) => r.toLowerCase()).includes(coatType.toLowerCase())
+            ? `${a.name} — already resists ${coatType}`
+            : `${a.name}${(a.addedResists ?? []).length ? ` (+${(a.addedResists ?? []).join('/')})` : ''}`,
+          onPress: () => {
+            applyCoatingToArmor(armorCoatTarget.id, a.id);
+            setArmorCoatTarget(null);
+          },
+          tone: 'primary' as const,
+        }));
+      }
+    } catch {
+      armorPickerBody = 'Could not read your armor just now.';
+    }
+    armorPickerButtons.push({ label: 'Cancel', onPress: () => setArmorCoatTarget(null), tone: 'neutral' });
   }
 
   // OTA-485 — companion-item background stripes. Items the player can FEED or USE
@@ -865,7 +956,7 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
-          const collapsed = !!collapsedSections[cat];
+          const collapsed = collapsedSections[cat] ?? true; // default collapsed
           return (
             <View key={cat} style={styles.section}>
               {/* arb108 — semi-transparent backing so the label reads over any
@@ -874,7 +965,7 @@ export function InventoryScreen() {
               <TouchableOpacity
                 style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
                 activeOpacity={0.7}
-                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !s[cat] }))}
+                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !(s[cat] ?? true) }))}
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>
@@ -941,7 +1032,7 @@ export function InventoryScreen() {
               ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
               : undefined
         }
-        body={scrapResultBody ?? modalBody}
+        body={scrapResultBody ?? modalBodyFull}
         // OTA-286 — quantity stepper appears when the player is
         // looking at a stack of 2+ scrap-able items AND we're still
         // in the action phase (not the post-salvage result view) AND
@@ -978,6 +1069,14 @@ export function InventoryScreen() {
         body={coatPickerBody}
         buttons={coatPickerButtons}
         onRequestClose={() => setCoatTarget(null)}
+      />
+      {/* engine_Dev — armor-coating picker: works a vial's resist into a piece. */}
+      <BrandedModal
+        visible={armorCoatTarget !== null}
+        title={armorCoatTarget ? `Apply ${armorCoatTarget.name} to armor` : ''}
+        body={armorPickerBody}
+        buttons={armorPickerButtons}
+        onRequestClose={() => setArmorCoatTarget(null)}
       />
     </View>
   );

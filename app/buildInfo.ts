@@ -15096,33 +15096,321 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resumed save is past first-run onboarding. Fix: loadSlotIntoGame now clears tutorialStep/awaitingTutorialName/
 // tutorialExploreChosen and sets hasSeenIntro:true; saveAndExitToTitle clears the same on the way out. Locked by
 // sessionResume tests. JS-only → 290. app/state/gameStore.ts.
-// COMBAT-PARITY I (Tartaria-native, no JSON plumbing) — STAT GLOSSARY: the built-in catalog authored
-// ~100 stat bonuses with names the engine doesn't track (constitution / acrobatics / investigation /
-// aetheria / perception …) that were silently dropped. equipment.canonicalStatKey now maps those
-// synonyms to the real engine stat (or the hp pool) at every equipped stat-read, so the bonuses
-// finally count. Plus a stat floor (effectiveStats clamped ≥1) so stacked debuffs can't zero a roll.
-// Hardcoded — no contentPack/JSON getters added. (Dev: set official OTA number/codename.)
-// COMBAT-PARITY II (Tartaria-native, no JSON plumbing) — TYPED DAMAGE-TYPE PROCS: each built-in
-// damage type (piercing/slashing/bludgeoning/electrical/aetheric/stun/burn/poison/radiation/…) now
-// carries a small on-hit bonus or a timed DOT, gated by an apply chance (raised vs a target WEAK to
-// the type, lowered vs RESISTANT), mirroring how Dev-engine author damageTypes behave — hardcoded as
-// BUILTIN_DT_COMBAT, reusing the existing coating-DOT (enemyStatuses) + enemyArmorShred infra. Both
-// directions: player→enemy folds an on-hit bonus / seeds a typed_dot and an on-hit debuff becomes an
-// "exposed" AC shred (easier to hit); enemy→player lands only the on-hit/DOT bonus (no player stat
-// penalty), at full chance for EXPLICITLY-typed enemies and 0.4× for inferred bare-dice types so the
-// ~95 untyped enemies don't silently tax the player. Damage-type aliases (force/psychic→aetheric,
-// frost→cold, shock→electrical) via canonDT. Post-audit (multi-agent stress + balance probe) fixes:
-// (1) added the `cold` proc entry so the frost→cold alias isn't dead; (2) the player→enemy "exposed"
-// AC shred now shares the proc-chance roll (was applied every hit); (3) enemy→player bonus is 1d3 vs
-// the player's 1d4 — a player-favoring asymmetry, since the probe showed symmetric procs convert
-// stalls into deaths at the Uncommon tier; (4) the stat glossary now also covers the durability
-// instance-perk roll (acrobatics/aetheria synonyms were dropped from rolled perks); (5) effectiveStats
-// floors stealth at 0 (untrained), not 1. Common tier (real early-game) holds ~90% win. (Dev: OTA #.)
-// COMBAT-PARITY III (companions) — the dog's bite and the golem's INNATE attack were typeless flat
-// damage: a pierce-resistant enemy soaked nothing off the dog, a slash-weak one took no extra off the
-// golem, and neither rolled the typed on-hit proc. Now both route their hit through
-// applyDamageTypeModifier + traitDamageMultiplier (the same resist/weak/creature-trait math the
-// player's swing uses) and roll the on-hit typed proc for their damage type — closing the companion
-// half of the typed-combat parity. (The golem's coating bonus already respected resists; untouched.)
-// tsc clean; dogGolemCombatStress 9/9, golemCompanion + combat + coating suites green. (Dev: OTA #.)
-export const OTA_BUILD_ID = '2026-06-26-626-combatIII';
+// OTA-624 (Bibiquadium Amber) — [bug · playtester] tapped "salvage scraps of cloth" a dozen times; it kept replying
+// "already examined… nothing more to find" while the SALVAGE and INVESTIGATE buttons stayed green ("live") and never
+// dropped to amber, blocking both slots. Cause: the engine records the noun consumed/flavor-exhausted under the
+// parser-normalized "scraps cloth" (the parser drops the connective "of"), but the live chip keeps the display form
+// "scraps of cloth" — and the chip-greying matcher (isFuzzyConsumed) normalized apostrophes but NOT "of", so neither
+// "scraps of cloth".includes("scraps cloth") nor the reverse matched and the chip never registered as consumed. Both the
+// SALVAGE and INVESTIGATE tab-tone counts route through that matcher, so BOTH stayed green. Fix: isFuzzyConsumed now also
+// strips the connective "of" and collapses the resulting whitespace on both sides (same shape as the existing apostrophe
+// fix), so an exhausted noun drops its chip and both buttons fall to amber. tsc clean. JS-only → 290.
+// app/screens/ExplorationScreen.tsx.
+// OTA-625 (Bibipentium Respite) — [3 bugs · playtester] (1) FRAYED-ROPE FALL LOOP: a rope at/below the wear-per-tier
+// threshold (durability ≤ 15) is a guaranteed snap, but CLIMB stayed available and every tap dropped the player for ~7
+// fall damage (log: fell tier-2 back-to-back, 23→16→9, with a rope that could never make it). Fix: apply the same
+// ground-rule as the empty-stamina case — on the GROUND (not elevated) the climb now REFUSES + warns (no fall, no damage,
+// rope left intact to mend/replace); only a snap while ALREADY UP (committed mid-climb) actually falls. (2) 0-HP ZOMBIE
+// ENEMY: the Elemental Control (mud_golem) proc set the target to 0 HP but never ran the defeat resolver, so the enemy
+// lingered at 0 HP until the player's NEXT attack tripped the death check (~14s later). Fix: call resolveEnemyDefeat()
+// when the proc is the killing blow (same guard pattern the normal attack paths use). (3) ENDLESS WEATHER CHIP DAMAGE:
+// glass_hail (p=0.5) / etheric_storm could nick the player on back-to-back actions with no breather (log: "mud-glass
+// nicks you" on nearly every step). Fix: a weather-damage cooldown (new player.weatherTickCooldown) — after any damaging
+// tick the next WEATHER_TICK_GAP=2 actions are weather-free, so the hazard is periodic, not a per-step tax. Locked by
+// climbWeatherDefeatFixes.test (+ existing climb/weather/race suites green). tsc clean. JS-only → 290.
+// app/state/gameStore.ts, app/engine/types.ts.
+// OTA-626 (Bibihexium Verdant) — [polish · playtester] when a recipe is craftable the row + stripe light green, but the
+// "Needs: 2× Broken Rope, 1× Cloth Scrap" ingredient line stayed muted gray, so it wasn't obvious that you actually HOLD
+// every listed item. Now each ingredient in a ready recipe renders green (#9ec96a, the same green as the row), matching
+// the lit block — "the items in the recipe should be highlighted green too." Per-token spans so the "Needs:" label stays
+// gray and only the ingredients are green. Also fixed the long-standing tsc error in this file (RecipeStatus.kind didn't
+// include 'dog_armor', which lookupCraftedItem can return) so the file is clean again. recipesFilter suite green. JS-only
+// → 290. app/components/RecipesView.tsx.
+// OTA-627 (Bibiseptium Anchor) — [crash · playtester] app "dropped to desktop after crafting Spark Strike"; device log
+// showed a persist STORM — `slot … FAILED — staged save did not verify — readback mismatch (got 147484 chars vs 147251)`
+// repeating every ~5ms for hundreds of lines. Root cause: persist() is fired `void`-style from ~120 call sites with NO
+// concurrency control, so several concurrent saveSlot() writes raced on the 8 rotating temp keys (OTA-421's `& 7` window
+// is too small under a burst) — each verify read back a DIFFERENT concurrent writer's bytes → mismatch →
+// emergencyReclaimDiskSpace() (heavy getAllKeys + multiRemove) → retry, in a tight loop that hammered AsyncStorage hard
+// enough to ANR the app. Fix: serialize persist() — only ONE write runs at a time, and a burst coalesces to the in-flight
+// write plus at most one trailing write (which captures the latest state, so nothing is lost). With no concurrent writer,
+// each stage verifies its OWN bytes: the mismatch, the reclaim, and the storm all vanish. New module guard
+// (persistInFlight / persistTrailingQueued) wrapping the existing body as runPersistOnce; bounded 64-iter drain as a
+// livelock valve. Locked by persistCoalescing.test (maxSaveSlotInFlight==1, 25-call burst → ≤2 writes); 30 existing
+// save/persist tests green. tsc clean. JS-only → 290. app/state/gameStore.ts.
+// OTA-628 (Bibioctium Crimson) — [polish · playtester] the CLIMB button stayed GREEN while the engine would refuse the
+// climb (e.g. tapped CLIMB 4× on 0 stamina, each a text-only "rest first" with no tactile cue). Now the button's colour +
+// haptics track the engine's actual refusal: a new pure helper climbBlockReason() mirrors the engine's order (no rope →
+// empty stamina → frayed rope) and ExplorationScreen feeds the result to InputBox. RED ('unavailable') now covers EVERY
+// blocked case (was no-rope only); and the recoverable empty-tank case ALSO buzzes on tap (single 40ms pulse, no modal) so
+// mashing CLIMB on an empty tank gives feedback — while broken/frayed/no-rope stays red WITHOUT a buzz (a gear problem the
+// colour + climb-modal explanation already conveys; a nag would be wrong). Frayed-but-not-broken ropes get the same
+// red/no-buzz as fully broken (engine refuses them identically, OTA-625). Locked by climbReadiness.test (10 cases). tsc
+// clean. JS-only → 290. app/engine/climbReadiness.ts, app/screens/ExplorationScreen.tsx, app/components/InputBox.tsx.
+// OTA-629 (Bibiennium Tether) — [polish · playtester] two things. (1) CLIMB nudge: tapping a RED (blocked) CLIMB now drops
+// a one-line Arbiter nudge saying WHY (no rope / frayed rope / empty stamina) instead of opening a dead-end modal; the
+// empty-tank case still buzzes (40ms) on top of the nudge, gear problems are nudge-only. Arbiter dedup keeps repeat taps
+// from spamming. (2) Golem summon: tapping a golem went card→copy "summon golem" into the input→hit ACT. The per-golem
+// VARIANT rows already opened a confirm (OTA-571), but the big SUMMON CARD tap still did the copy. Now BOTH the card tap
+// (defaults to the first golem you can afford, else Mud) and each variant row open the same "Summon a golem?" confirm →
+// Summon dispatches and jumps straight to exploration where the d20+INT roll plays out. No clipboard/input step anywhere
+// in the golem flow; shared buildGolemConfirm() builds the popup payload; misleading 'tap → "phrase"' hints corrected.
+// climbReadiness suite green; tsc clean. (Pre-existing, unrelated: aethercraftDispatch "summon golem" test is red on the
+// live branch — a harness artifact; bare 'summon golem' works in-app.) JS-only → 290.
+// app/components/InputBox.tsx, app/screens/CraftingScreen.tsx.
+// OTA-630 (Bitrinilium Quench) — [perf+test] (1) FUSE took >1 min. fuseAtCrucible AWAITED the on-device Qwen synth with no
+// timeout; on slow phones a 200-token completion runs 30-55s (playtest: Crucible "took a long breath in" ~37s before the
+// INSTANT deterministic fallback ran). Now the Qwen synth is raced against FUSE_QWEN_TIMEOUT_MS (6s) — if it doesn't land,
+// forge deterministically NOW; the abandoned Qwen promise settles + is discarded in the background (it never rejects and
+// writes no cache, so no side effect). Fast phones still get LLM-flavored loot inside the window. (2) Repaired the stale
+// aethercraftDispatch "summon golem" test (the sweep): the mud-golem recipe changed (arb119: Mudstone → 2 Aether Mud + 2
+// Mud Fragment + 1 Aether Crystal), so the test stocked the wrong fuel and the gate refused before the discipline header
+// logged. Stocked the correct recipe + fixed the consume deltas — dispatch itself was always fine (confirms the OTA-629
+// golem popup works). All 7 aethercraftDispatch + 59 fuse-suite tests green; tsc clean. JS-only → 290.
+// app/state/gameStore.ts, __tests__/aethercraftDispatch.test.ts.
+// OTA-631 (Bitrinunium Settling) — [feature · playtester design] the Crucible fuse no longer BLOCKS on Qwen at all. The
+// weapon TYPE + STATS are forged deterministically and the item is minted INSTANTLY (placeholder name "Cooling
+// Crucible-Work", materializing flag) — the player keeps playing with zero wait. A BACKGROUND Qwen call (name +
+// description ONLY — ~64 tokens vs ~200, and it can't touch balance) then "settles" the item's true name, and a reveal
+// pops ("Your forging has formed: <name>") with a View-in-inventory CTA that deep-links to the pack. The whole
+// materialization is now lore ("let the Aether finish it; it announces itself when fully formed"), so the name appearing a
+// beat later reads as intentional, not a glitch. Falls back to the deterministic name on slow/dormant/failed Qwen or after
+// a 120s safety cap; reload-robust — backfillPlayer settles any item left materializing when the app was killed mid-forge
+// (stashed formingName/Desc), so nothing is ever stuck nameless. New synthesizeFusionNameViaQwen() + settleFusion();
+// materializing/formingName/formingDesc on InventoryItem. Locked by fusionMaterialize.test (3) + 80 fuse-suite tests green;
+// tsc clean. JS-only → 290. app/engine/itemFusion.ts, app/engine/types.ts, app/state/gameStore.ts.
+// OTA-632 (Bitribium Vitals) — [polish · playtester] HP is a tiny number in the top-left card and easy to miss (it
+// contributed to a broken-ladder fall death — player didn't register how low they were). The player card BACKGROUND now
+// tints by HP fraction: a subtle dark green at full → amber at half → a strong (still text-legible) dark red as you bleed
+// out, so the card visibly "fills with red" — and the HP number itself takes a matching brighter colour so it pops. Pure
+// presentational; cream text stays readable at every level (tint blended over the dark base, capped). Locked by
+// healthCardTint.test (5 — gradient direction, darkness/legibility cap, clamping). tsc clean. JS-only → 290.
+// app/components/StatsPanel.tsx.
+// OTA-633 (Bitritrium Pulse) — [polish · playtester] animate the OTA-632 health tint. (1) FADE: the card colour now slides
+// toward the new HP level over 300ms (an Animated fraction following the gradient) instead of snapping. (2) PULSE: on
+// damage a red overlay flashes — asymmetric on purpose (rise 90ms so a hit registers instantly even mid-combat, fall 320ms
+// so it lingers and can't be missed; a flat 150ms can flicker past). Overlay sits behind the card content so the stats
+// text stays readable; interruptible so rapid hits restart cleanly. All timings are tunable constants. tsc clean;
+// healthCardTint.test still green (colour math unchanged). JS-only → 290. app/components/StatsPanel.tsx.
+// OTA-634 (Bitriquadium Cadence) — [perf · playtester] responses felt slow + the voice fell rounds behind ("said welcome
+// back five rounds late"). Root cause: on a slow/thermally-throttled phone the on-device LLM (Qwen, 20-55s/call) and the
+// Kokoro voice share ONE serialized native-ML lock (arb159, to stop them crashing each other), and it was pure FIFO with
+// the voice queue capped on the ARBITER channel only — so world/combat speech piled up uncapped and slow synths sat ahead
+// of interactive narration. Three fixes, exclusivity preserved (still one op at a time, crash guard intact): (1) the lock
+// is now PRIORITY-aware — LLM narration jumps ahead of queued voice synth (FIFO within a priority); (2) the voice queue
+// caps TOTAL queued lines across ALL channels (drop oldest, keep newest 3) so speech can't fall rounds behind; (3) ambient
+// idle musings throttled 45s → 90s to free the shared lock. Locked by nativeMlLockPriority.test (exclusivity / priority
+// order / no-wedge); existing TTS test green; tsc clean. JS-only → 290.
+// app/ai/nativeMlLock.ts, app/voice/PiperTTSManager.ts, app/state/gameStore.ts.
+// OTA-635 (Bitripentium Namesake) — [housekeeping · playtester] name + voice polish. (1) NAME HYGIENE: the in-game name
+// prompt now sanitizes the typed name — letters (any script) + space / hyphen / apostrophe only, emoji/digits/symbols
+// stripped, whitespace collapsed, hard-capped at 24 chars — because the name is SPOKEN by Kokoro (no more emoji-salad
+// mispronunciations or "175 J's" read for half an hour). All-junk input re-prompts. (2) NAME SPOKEN MORE: arbiterAddress
+// names the player 0.34 → 0.6 of the time ("I want to hear the name more — it brings them in"). (3) WELCOME-BACK JUMPS THE
+// QUEUE: the named greeting carries meta.speakFront, threaded TTSController → TTSManager → PiperTTSManager, which clears the
+// queued voice backlog so "Welcome back, <name>" is heard immediately on entering the world (not 5 rounds late). Side
+// benefit: that clear also flushes any lingering title "Choose your character" so it can't bleed into exploration (it's
+// already title-screen-only). New app/engine/playerName.ts; locked by playerNameHygiene.test (6) + existing TTS/lock tests
+// green; tsc clean. JS-only → 290. app/engine/playerName.ts, app/state/gameStore.ts, app/voice/{TTSController,TTSManager,PiperTTSManager}.ts.
+// OTA-636 (Bitrihexium Tempo) — [combat parity, Tartaria-native — NO JSON plumbing] bring HaL's combat closer to the
+// Dev-engine's typed combat, hardcoded. TWO parts. (A) STAT GLOSSARY: the built-in item catalog authored ~100 stat
+// bonuses under names the engine never tracked (constitution / acrobatics / investigation / aetheria / perception …) and
+// silently DROPPED them. equipment.canonicalStatKey now maps each synonym to the real engine stat (or the hp pool) at
+// every equipped stat-read — at aggregation, both hp-filter sites, AND the durability instance-perk roll — so the bonuses
+// finally count (constitution→hp, acrobatics→dexterity, investigation/aetheria→intelligence, perception→wisdom, …). Plus a
+// stat floor: effectiveStats clamps the five core attributes ≥1 so stacked debuffs can't zero a roll; stealth floors at 0
+// (an untrained 0 is legitimate, not a phantom +1). (B) TYPED DAMAGE-TYPE PROCS: each built-in type (piercing/slashing/
+// bludgeoning/electrical/aetheric/stun/cold/burn/poison/radiation) now carries a small on-hit bonus or a timed DOT, gated
+// by an apply chance (raised vs a target WEAK to the type, lowered vs RESISTANT), hardcoded as BUILTIN_DT_COMBAT and
+// reusing the existing coating-DOT (enemyStatuses) + enemyArmorShred infra — no contentPack/JSON getters added. Both
+// directions: player→enemy folds the bonus / seeds a typed_dot and an on-hit debuff becomes an "exposed" AC shred (shares
+// the proc roll); enemy→player lands only the on-hit/DOT bonus (1d3 vs the player's 1d4 — a deliberate player-favouring
+// asymmetry; NO player stat penalty), at full chance for EXPLICITLY-typed enemies and 0.4× for inferred bare-dice types so
+// the ~95 untyped enemies don't silently tax the player. Damage-type aliases (force/psychic→aetheric, frost→cold,
+// shock→electrical) via canonDT. EnemyPanel surfaces the typed_dot status (DOT badge). Balanced by a multi-agent stress +
+// balance-probe pass (probe holds ~90% win at the Common tier real early-game players fight). tsc clean; full combat suite
+// green. JS-only. app/state/gameStore.ts, app/engine/{equipment,durability}.ts, app/components/EnemyPanel.tsx.
+// OTA-637 (Bitriseptium Pack) — three fixes, one OTA. (1) CRASH FIX (was missing on HaL — every other
+// line had it): background-teardown of the neural TTS. A player backgrounded the app, got a text, came
+// back, tapped Main Quest → the process died to the home screen. Nothing listened to AppState, so audio
+// was never stopped on background and the next spoken line played into a disrupted native audio session
+// (SIGSEGV). TTSController now tears the voice down the instant it loses the foreground and resyncs to the
+// log tail so the backlog isn't re-spoken on return. Locked by ttsBackgroundTeardown.test. (2) COMPANION
+// COMBAT PARITY: the dog's bite and the golem's innate attack were typeless flat damage — a pierce-
+// resistant enemy soaked nothing off the dog, a slash-weak one took no extra off the golem, and neither
+// rolled the typed on-hit proc. Both now route their hit through applyDamageTypeModifier +
+// traitDamageMultiplier (same resist/weak/creature-trait math the player's swing uses) and roll the
+// on-hit typed proc — the companion half of OTA-636's typed combat. (3) TEST REFRESH: dogGolemCombatStress's
+// two "retaliation split" cases asserted the pre-arb169 30/30/40 dog/golem/player split that was removed
+// (commanding a companion now provokes the FULL volley against the player; companions aren't hit by
+// command-retaliation) — updated to assert the arb169 design. tsc clean; dogGolemCombatStress 9/9,
+// companion + combat + coating suites + combatStress green. (golemStressSweep — golem power can't level
+// within a summon's lifespan — is a separate design call, deferred.) app/voice/TTSController.ts,
+// app/state/gameStore.ts, __tests__/{ttsBackgroundTeardown,dogGolemCombatStress}.test.ts.
+// OTA-638 — [crash] librnllama isPredicting SIGSEGV on background. The app disposes Qwen when it backgrounds
+// (App.tsx AppState → shutdownQwen → LlamaRuntime.dispose); release() ran OUTSIDE the native-ML lock that
+// completion() runs under, so backgrounding the game mid-narration freed the llama context while a prediction
+// was still running on the native thread — use-after-free → Java_com_rnllama_LlamaContext_isPredicting segfault
+// (the "switched to YouTube / answered a text mid-sentence, came back to a dead game" crash). dispose() now
+// detaches the context, stops any in-flight prediction, and releases THROUGH the same runExclusiveNativeMl lock,
+// serializing the free behind the running prediction. JS-only → OTA-safe. tsc clean; same fix verified green on
+// the golem line (41 qwen/ml/tts-lifecycle tests). app/ai/generation/LlamaRuntime.ts.
+// OTA-642 — single-active mission pause + objective auto-routing, adapted from the
+// golem line (commit bd698b8). One contract is "the mission you're on": activating
+// one parks every other (DEACTIVATE parks just that one; ABANDON is the only thing
+// that drops a contract); only the active quest advances. routeMission courses to
+// the objective then auto-chains to the turn-in. Plus a load-time single-active
+// backfill so legacy saves with 2+ contracts establish single-active on load.
+// JS-only → OTA-safe. tsc clean; mission/faction/contract suites green (127) +
+// new backfill test (4); zero new failures vs clean HaL2001 across the full suite.
+// app/state/gameStore.ts, ContractsScreen.tsx, factionQuests.ts, types.ts,
+// +missionRouting.ts.
+//
+// OTA-643 — Coatings inventory section (ported from engine_Dev). Weapon coatings
+// (Poison Vial / Acid Flask / Corruption Tonic + any author-defined coating, the
+// `weapon_coating` tag) were buried in Consumables among food and potions; they now
+// get their own top-level "Coatings" category (venom-magenta), driven purely off the
+// tag so built-in AND custom coatings land there automatically. Section + legend
+// render generically off CATEGORY_ORDER; empty section hidden; the Coat-a-weapon /
+// Apply-to-armor / Drink tap actions are unchanged (tag-driven). JS-only → OTA-safe.
+// dualCategoryItems coating cases (8) green; tsc clean on touched files.
+// app/components/InventoryCategorize.ts.
+//
+// OTA-644 — COAT ARMOR FOR DAMAGE RESISTS (ported from engine_Dev, after a verified
+// test run on the golem line). A weapon-coating vial can now be worked into an ARMOR
+// piece for a PERMANENT damage-type resist (the vial's damage type) instead of onto a
+// weapon: new "Apply to armor (+<type> resist)" action + armor picker in the coating
+// modal. Stored on the armor instance's addedResists[]; aggregateArmor adds it to the
+// worn slot so the EXISTING applyArmorResistance combat path reduces incoming damage of
+// that type (multiplicative per-slot stack — chest 35% … cloak 10% — capped at 80%,
+// never immunity). Capped at 3 resists per piece; duplicates refused. Builds on the
+// armor-resistance system already present on HaL2001; the delta is the addedResists
+// field + coatingDamageType helper + applyCoatingToArmor action + UI. JS-only → OTA-safe.
+// armorCoating test (6) green; combat math re-verified on HaL2001's OWN combat via live-
+// combat sims (weapon DOTs incl. poison firing every hit / no 45% gate; acid shred +
+// corruption stacks with boss scaling; armor resist in real enemy counters). tsc app-clean.
+// types.ts, weaponCoating.ts, gameStore.ts, screens/InventoryScreen.tsx.
+//
+// OTA-645 — ARMOR COATING SHOWS ON THE ITEM. A coating-applied armor resist
+// (addedResists) wasn't reflected in the item's stat preview, so a coated piece read
+// identically to an uncoated one. getItemPreviewForInstance now folds addedResists
+// into the "Resists:" line, tagged "(coated)" to read distinct from native/laddered
+// resists (inserts a Resists line if the piece had none). Feeds every screen that
+// shows item stats (inventory list/detail, vendor, character sheet). armorResistPreview
+// test (4) green; tsc app-clean. JS-only → OTA-safe. components/itemPreview.ts.
+//
+// OTA-646 — COATING-LANDING RULE (design call, ported from engine_Dev). A weapon
+// coating now ALWAYS "takes" on a landing hit UNLESS the enemy RESISTS its damage type,
+// in which case it gets only a small chance (COATING_RESIST_LAND_CHANCE = 0.15) to slip
+// through. Weak AND neutral both always land. HaL2001 had NO coating gate before
+// (coatings always landed), so this ADDS a resisted-coating miss chance — wraps the
+// unconditional coating-on-hit block with a resist-RELATIONSHIP gate (applyDamageTypeModifier
+// + resist:/vulnerable: traits). New shared COATING_RESIST_LAND_CHANCE constant.
+// coatingLandRule test (6) green (resisted ~0.15, neutral/weak 200/200); weaponCoating /
+// weaponCoatingCombat / coatingNotARing (38) unbroken; tsc app-clean. JS-only → OTA-safe.
+// engine/weaponCoating.ts, state/gameStore.ts.
+//
+// OTA-647 — CORE-GATE GUIDANCE. A playtester (Eternal Dynasty, whose Core gate is
+// diplomacy/ask) got stuck at a Lost Capital typing `salvage core` a dozen times:
+// the gate correctly refuses (investigate isn't a Dynasty intent), but the refusal
+// only showed the terse next-action ("address the keepers") and never a usable
+// command — a guidance dead-end. The refusal now ALSO surfaces coreGateHint, which
+// spells out each route's concrete verbs; the Dynasty hint is tightened to name the
+// literal command ("address the keepers"). No gate LOGIC change — the right verbs
+// already worked ('address' → diplomacy). mainQuest guidance tests added (43 green);
+// tsc app-clean. JS-only → OTA-safe. state/gameStore.ts, engine/mainQuest.ts.
+//
+// OTA-648 — LOOK surfaces enterable structures. buildingApproachLine only fired on
+// first ARRIVAL, so a player who walked up to a structure (its ENTER button live on
+// screen), did other things, then `look`ed saw only "You're in <place>" and thought
+// they were already inside — playtester: "it told me I was IN the vaults when I was
+// just NEAR it... if I'm near the entrance to something enterable it should tell me."
+// The look-around now appends "You're near <structure> — a way in stands clear.
+// (Tap ENTER…)" whenever scene.sceneBuilding is set AND the player hasn't stepped in
+// (activeBuildingId null). buildingDiscovery tests added (5 green); tsc app-clean.
+// JS-only → OTA-safe. state/gameStore.ts.
+// OTA-649 — SCRAP/EQUIP resolve the exact instance by unique id. Every InventoryItem
+// already has a unique id, but scrapInventoryItem/equipItem resolved by NAME (first
+// row that matched), so with several same-name items of different durability, scrap
+// broke the wrong one and equip picked the wrong instance (playtester: 5 headbands,
+// equipped the low-durability one, "equip" on the good one did nothing). Both actions
+// now take an optional itemId and resolve by it (the inventory UI passes
+// pending.item.id); name-match stays as the fallback for typed/legacy callers. The
+// equipped-slot id + resolveEquippedItem/aggregateEquippedStatBonuses already read
+// per-instance, so the right stats/durability now follow. scrapEquipByInstanceId (3)
+// + 34 existing equip/scrap tests green; tsc app-clean. JS-only → OTA-safe.
+// state/gameStore.ts, screens/InventoryScreen.tsx.
+// OTA-650 — FUSION PICKER. The Crucible consumed the player's ENTIRE reserved (♥)
+// pool on one fusion (11 reserved → all 11 eaten). Firing it now opens a picker:
+// choose 3–5 reserved pieces, optionally add a reserved faction catalyst (separate
+// theme slot), and pick WEAPON or ARMOR — spending only what you selected. Engine:
+// gateFusion accepts an explicit chosen subset; synthesizeFusionDeterministic takes a
+// forced kind; eligibleInputs exported for the picker. Store: fuseAtCrucible opens the
+// picker unless a pendingFusionSelection exists, then re-gates on the exact picks +
+// forced kind; confirmFusionSelection / closeFusionPicker added. New FusionPickerModal.
+// fusionPickerSelection (2) + 200 fusion-suite tests green; tsc app-clean. JS-only →
+// OTA-safe. engine/itemFusion.ts, state/gameStore.ts, components/FusionPickerModal.tsx,
+// screens/ExplorationScreen.tsx.
+// OTA-651 — YOU-ARE-HERE room highlight. Inside a discoverable building (abandoned
+// outpost, etc.) the room buttons now highlight the room you're standing in
+// (activeBuildingRoomId) with a gold border + '▸' marker, so you can tell where you
+// are among the rooms. UI-only. components/InputBox.tsx.
+// OTA-652 — drink-water clarity (hunger-capped vs already-full message) + fusion info
+// block: reservable items name their material contribution, the item modal explains
+// diversity → rarity (3 different materials = Rare, 4+ = Legendary; NOT input rarity),
+// and the picker shows a live 'N materials → predicted rarity' readout.
+// fusionMaterialTags test + full fusion suite green; tsc app-clean. JS-only → OTA-safe.
+// OTA-653 — armor-recipe balance (crafting was 30 weapon vs 5 armor; +14 low-tier
+// armor across all 6 slots from gatherable mats → 19 armor) + crafting screen now
+// GROUPS recipes by category (Weapons/Armor/Relics/Food/Gear…) with collapsible
+// banners like inventory. recipe tests green; tsc clean.
+// OTA-654 — crafting + inventory categories now DEFAULT COLLAPSED (open the one you
+// want, no scroll-and-fold). + High-tier crafting: added Rare/Legendary weapon export const OTA_BUILD_ID = '2026-07-02-653-armor-recipes-craft-categories';
+// armor recipes with rarity-matched materials (Legendary outputs need Legendary mats
+// like Aetherstone Heart / Behemoth Heart / Iron Core / Wyrm Fang). weapons now
+// 9C/8U/12R/6L, armor 12C/3U/7R/2L. recipe tests green; tsc clean.
+// OTA-655 — fusion picker DROPS same-material duplicates once you pick an item: after a
+// selection, other reserved pieces that add no NEW material leave the list, so you can
+// never assemble a same-type-only batch that fails the diversity gate. Picked items stay
+// visible (deselectable). JS-only → OTA-safe.
+// OTA-656 — craft recipe resolution now folds hyphens/punctuation to spaces on both
+// sides. The input normalizer strips hyphens ("Aether-Reinforced Armor" → "aether
+// reinforced armor"), which made findRecipeByResult return null for EVERY hyphenated
+// recipe → the craft spun into an infinite cognitive re-dispatch loop, burning an
+// action (Silent-snow weather −1HP) each pass until the player died mid-craft with no
+// "Crafted" line. Now hyphenated recipes resolve on the first pass. recipeFuzzy +
+// craft suite green; tsc app-clean. JS-only → OTA-safe.
+// OTA-657 — dog companion vests now get their own collapsible "Dog Armor" inventory
+// section (right after Armor) instead of scattering into Loot/Materials (the Aetheric
+// Padded Vest's 'aether' tag had been filing it under Materials). Matched by kind
+// 'dog_armor', the 'dog_armor' tag, or DOG_GEAR catalog name. Craftable dog vests
+// (Burlap/Riveted Leather/Aetheric Padded; Reclaimer Pattern stays drop-only) already
+// group under the crafting screen's DOG ARMOR banner. categorize tests green; tsc
+// app-clean. JS-only → OTA-safe.
+// OTA-658 — native-ML crash hardening (square-button / recents SIGSEGV family). Two
+// unsynchronized-native-free windows of the SAME class as the fixed Qwen release-
+// during-completion crash: (1) generate() read this.context! INSIDE the lock lambda,
+// which dispose() (fired on background) could null first → now captures ctx locally;
+// (2) Kokoro voice frees (disposeVoice / disposeStickyArbiterVoice / disposePiperEngine)
+// called module.delete() OUTSIDE the native-ML lock while a synth (model.forward) runs
+// under it → now every free is serialized through runExclusiveNativeMl. tts + lock
+// suites green; tsc app-clean. JS-only → OTA-safe. (Native SIGSEGVs carry no JS trace,
+// so this closes the known race windows rather than a stack-confirmed root cause.)
+// OTA-659 — travel distance no longer jumps UP mid-journey after a reload. On save
+// resume, backfillPlayer re-seeded the travel counter from canonicalDistance(current
+// location, target) — the FULL departure-city→target distance — throwing away the
+// tiles already walked. Backgrounding mid-travel (the recents/square button dumps the
+// ~400 MB Qwen model, so the OS often reclaims the process → relaunch → hydrate →
+// backfill) then made the counter leap back to the full trip. It now re-seeds from the
+// player's LIVE absolute cell (gridX/gridY via playerGridCell), so the badge resumes
+// exactly where the walk left off; legacy saves without gridX/gridY still fall back to
+// the location cell. travelResumeKeepsProgress + travel/grid suites green; tsc app-clean.
+// OTA-660 — travel badge is now grid-exact from the moment a course is set, even on
+// the vendor-on-the-road departure. confirmLeaveAndTravel skipped the first step and
+// left travelTarget WITHOUT distanceRemaining, so the badge fell to the legacy
+// re-centered-visual-map fallback, which UNDERCOUNTS from an outdoor tile — the badge
+// read low (e.g. 8) until the first continue self-healed it to the true grid distance
+// (16), looking like the counter "jumped up mid-travel". Now it seeds the grid-exact
+// distance up front, and the display fallback is grid-exact too (never the visual map).
+// travelBadgeGridExact + travel suites green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-660-travel-badge-grid-exact';

@@ -1,4 +1,4 @@
-name: iOS Build (Tartaria Realms)
+name: Build · iOS (EAS)
 
 # OTA-302 submit pass — rebuild + AUTO-SUBMIT to TestFlight. The earlier
 # [build-ios] run built the IPA but with submit:false, and the manual

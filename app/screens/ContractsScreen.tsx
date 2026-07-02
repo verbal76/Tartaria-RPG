@@ -8,6 +8,7 @@ import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS, factionQuestReady } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
 import { startingLocationForFaction } from '../engine/character';
+import { missionObjectiveLocationId } from '../engine/missionRouting';
 import { getLocationById } from '../engine/encounter';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
@@ -76,6 +77,8 @@ export function ContractsScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
+  const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
+  const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
@@ -83,7 +86,7 @@ export function ContractsScreen() {
   const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
   const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);
   const appendLog = useGameStore((s) => s.appendLog);
-  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string } | null>(null);
+  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string; missionId?: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
   const [tab, setTab] = useState<Tab>('contracts');
@@ -191,7 +194,7 @@ export function ContractsScreen() {
   // and fall back to the legacy id list. The legacy list will be empty
   // after backfillPlayer runs on load, but the dual read keeps the
   // screen safe across mid-session migrations.
-  const factionQuestRecords =
+  const factionQuestRecords: NonNullable<typeof player.activeFactionQuests> =
     player.activeFactionQuests ??
     (player.activeFactionQuestIds ?? []).map((id) => ({
       id,
@@ -869,20 +872,73 @@ export function ContractsScreen() {
                 const readyToTurnIn = factionQuestReady(def, rec.stage, countItem);
                 const staged = !!(def.stages && def.stages.length > 0);
                 const fetchHeld = def.fetch ? countItem(def.fetch.itemName) : 0;
+                // SINGLE-ACTIVE — tracked absent/true = active (the one you're on);
+                // false = paused (parked, doesn't auto-advance, never dropped).
+                const tracked = rec.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady]}>
-                        {readyToTurnIn
-                          ? 'READY TO SUBMIT'
-                          : staged
-                            ? `stage ${rec.stage + 1} / ${def.stages!.length}`
-                            : def.fetch
-                              ? `${fetchHeld} / ${def.fetch.quantity}`
-                              : 'OPEN'}
+                      <Text style={[styles.stagePill, readyToTurnIn && styles.stagePillReady, !tracked && styles.stagePillPaused]}>
+                        {!tracked
+                          ? '⏸ PAUSED'
+                          : readyToTurnIn
+                            ? 'READY TO SUBMIT'
+                            : staged
+                              ? `stage ${rec.stage + 1} / ${def.stages!.length}`
+                              : def.fetch
+                                ? `${fetchHeld} / ${def.fetch.quantity}`
+                                : 'ACTIVE'}
                       </Text>
                     </View>
+                    {/* Mission-aware ROUTE TO: courses to the objective (derived from
+                        the mission text, or the turn-in home if the work is done),
+                        then auto-chains to turn-in. Routing makes this the single
+                        active mission. */}
+                    {(() => {
+                      const home = startingLocationForFaction(def.factionId);
+                      const objId = readyToTurnIn ? home : (missionObjectiveLocationId(def) ?? home);
+                      let objName = objId;
+                      try { objName = getLocationById(objId).name ?? objId; } catch { /* keep id */ }
+                      const routed = player?.routedMission?.id === def.id;
+                      const atObj = player?.currentLocationId === objId;
+                      if (routed) {
+                        const phase = player?.routedMission?.phase;
+                        return (
+                          <Text style={styles.routeHereNote}>
+                            ▸ Auto-routing — {phase === 'to_turnin' ? `turn in at ${objName}` : `objective: ${objName}`}. Keep traveling; it chains to turn-in.
+                          </Text>
+                        );
+                      }
+                      if (atObj) {
+                        return (
+                          <Text style={styles.routeHereNote}>
+                            ▸ You're at {objName}{readyToTurnIn ? ' — hand it in here.' : ' — the objective. Do the work; it then routes you to turn-in.'}
+                          </Text>
+                        );
+                      }
+                      return (
+                        <Pressable
+                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          onPress={() => setPendingRoute({ id: objId, name: objName, missionId: def.id })}
+                        >
+                          <Text style={styles.routeBtnText}>
+                            ▸ {readyToTurnIn ? `ROUTE TO TURN-IN (${objName.toUpperCase()})` : `ROUTE TO ${objName.toUpperCase()}`}
+                          </Text>
+                        </Pressable>
+                      );
+                    })()}
+                    {/* Activate / deactivate (single-active). Deactivating parks the
+                        contract: stays on the slate but stops auto-advancing until
+                        re-activated. Activating it pauses every other contract. */}
+                    <Pressable
+                      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+                      onPress={() => setFactionQuestActive(def.id, !tracked)}
+                    >
+                      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+                        {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE — the mission you’re on'}
+                      </Text>
+                    </Pressable>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
                     {!readyToTurnIn && stageDef && !open && (
@@ -936,34 +992,6 @@ export function ContractsScreen() {
                         </Text>
                       </View>
                     )}
-                    {open && def.factionId && (() => {
-                      // OTA-458 — route-to-turn-in. Players kept losing the agent
-                      // they need to hand a faction quest to. The home outpost holds
-                      // the mission board + same-faction vendors, so it's always a
-                      // valid turn-in point. Reuses the existing pendingRoute confirm
-                      // modal (hub-aware travel).
-                      const dest = startingLocationForFaction(def.factionId);
-                      const destName = getLocationById(dest).name;
-                      const here = player?.currentLocationId === dest;
-                      // arb100 — the faction quest's pin sits on this same home
-                      // outpost, so prefix the turn-in route with its number.
-                      const fNum = contractMarkerByKey[`faction:${def.id}`]?.number;
-                      if (here) {
-                        return (
-                          <Text style={styles.routeHereNote}>
-                            ▸ {fNum ? `${fNum}◆ ` : ''}You're at {destName} — turn in at the mission board or a same-faction agent.
-                          </Text>
-                        );
-                      }
-                      return (
-                        <Pressable
-                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
-                          onPress={() => setPendingRoute({ id: dest, name: destName })}
-                        >
-                          <Text style={styles.routeBtnText}>▸ {fNum ? `${fNum}◆ ` : ''}ROUTE TO TURN-IN ({destName})</Text>
-                        </Pressable>
-                      );
-                    })()}
                     {open && readyToTurnIn && (
                       <Pressable
                         style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
@@ -1121,7 +1149,15 @@ export function ContractsScreen() {
                   if (!pendingRoute || !player) return;
                   const id = pendingRoute.id;
                   const name = pendingRoute.name;
+                  const missionId = pendingRoute.missionId;
                   setPendingRoute(null);
+                  // A mission route starts the auto-chain (objective → turn-in)
+                  // and makes that contract the single active mission.
+                  if (missionId) {
+                    routeMission(missionId);
+                    setScreen('exploration');
+                    return;
+                  }
                   // 2026-05-25 OTA-035 — outpost-aware confirmation.
                   // Was a hard refusal ("leave the outpost first, then
                   // come back"); now a Yes/No prompt: confirm to leave
@@ -1509,6 +1545,18 @@ const styles = StyleSheet.create({
   routeBtnPressed: { opacity: 0.7 },
   routeBtnText: { color: '#9ec0ef', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
   routeHereNote: { marginTop: 10, color: '#9ec96a', fontSize: 11, fontStyle: 'italic' },
+  // Activate / deactivate toggle (single-active). Active = teal; paused = grey.
+  trackBtn: {
+    marginTop: 8, backgroundColor: 'transparent', borderColor: '#54d6c4',
+    borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center',
+  },
+  trackBtnOff: { borderColor: '#5a6a6e' },
+  trackBtnPressed: { opacity: 0.7 },
+  trackBtnText: { color: '#54d6c4', fontWeight: '700', letterSpacing: 1, fontSize: 11 },
+  trackBtnTextOff: { color: '#8aa0a4' },
+  // A paused contract's card is dimmed so it reads as stood-down at a glance.
+  cardPaused: { opacity: 0.6, borderColor: '#3a4a4e' },
+  stagePillPaused: { color: '#8aa0a4', borderColor: '#5a6a6e' },
   // 2026-05-26 OTA-054 — ABANDON button. Ghost/outlined style with
   // a warning border, distinct from the filled-amber COMPLETE.
   abandonBtn: {

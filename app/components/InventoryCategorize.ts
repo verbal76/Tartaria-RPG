@@ -1,5 +1,5 @@
 import type { InventoryItem } from '../engine/types';
-import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS, findWeaponByName } from '../engine/crafting';
+import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS, DOG_GEAR, findWeaponByName } from '../engine/crafting';
 import { inferGearTagPack } from '../engine/itemDefaults';
 import { itemIsTool } from '../engine/pouchEligibility';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -7,8 +7,14 @@ import { isQuestLockedItem } from '../engine/questItems';
 export type InventoryCategory =
   | 'weapon'
   | 'armor'
+  // Dog companion vests (kind 'dog_armor'). Their own section so a stray vest
+  // never hides among the player's own Armor or scatters into Loot/Materials.
+  | 'dog_armor'
   | 'accessory'
   | 'consumable'
+  // engine_Dev — weapon coatings (damage-type reagents) get their own section so
+  // combat-prep doesn't hide among food in Consumables.
+  | 'coating'
   | 'tool'
   | 'relic'
   | 'material'
@@ -21,8 +27,10 @@ export type InventoryCategory =
 export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   weapon: '#e07a5f',
   armor: '#6a9bbf',
+  dog_armor: '#b5764a', // leather brown — dog companion vests
   accessory: '#d4a55a',
   consumable: '#9ec96a',
+  coating: '#c75b9c', // venom magenta — weapon/armor damage-type reagents
   tool: '#7fb0a8', // teal — utility implements (pry bar, lockpick, scanner…)
   relic: '#b88ce0',
   material: '#c9a86a',
@@ -33,8 +41,10 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
 export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   weapon: 'Weapons',
   armor: 'Armor',
+  dog_armor: 'Dog Armor',
   accessory: 'Amulets & Rings',
   consumable: 'Consumables',
+  coating: 'Coatings',
   tool: 'Tools',
   relic: 'Relics',
   material: 'Materials',
@@ -48,8 +58,10 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
 export const CATEGORY_ORDER: InventoryCategory[] = [
   'weapon',
   'armor',
+  'dog_armor', // right after the player's own armor
   'accessory',
   'consumable',
+  'coating', // engine_Dev — combat-prep reagents, right after the things you eat
   'tool',
   'relic',
   'material',
@@ -72,6 +84,23 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // Quest Items section, ahead of every other bucket, regardless of their other
   // tags/kind (a Core is kind 'misc'; a whisper token also carries 'aether').
   if (isQuestLockedItem(item)) return 'quest';
+  // engine_Dev — weapon coatings (Poison Vial / Acid Flask / Corruption Tonic +
+  // any author-defined coating) carry the `weapon_coating` tag. Pull them into their
+  // own Coatings section ahead of the catalog/kind heuristics, which would otherwise
+  // file these (kind 'consumable') under Consumables among food and potions.
+  if (item.tags.some((t) => /^weapon_coating$/i.test(t))) return 'coating';
+  // Dog companion vests get their own section. Match by kind ('dog_armor'), the
+  // canonical 'dog_armor' tag, or the DOG_GEAR catalog name (so crafted/looted
+  // copies land here too) — BEFORE the material/loot heuristics below, which would
+  // otherwise file an Aetheric Padded Vest (carries the 'aether' tag) under Materials
+  // and the plainer vests under Loot.
+  if (
+    item.kind === 'dog_armor' ||
+    item.tags.some((t) => t.toLowerCase() === 'dog_armor') ||
+    DOG_GEAR.some((g) => g.name.toLowerCase() === nameLower)
+  ) {
+    return 'dog_armor';
+  }
   // Catalog name matches take precedence over kind/tag heuristics — if a
   // crafted Aetheric Torch shows up with kind='relic', it should still
   // resolve to 'relic' via the GEAR catalog.
@@ -157,8 +186,10 @@ export function groupInventoryByCategory(
   const groups: Record<InventoryCategory, InventoryItem[]> = {
     weapon: [],
     armor: [],
+    dog_armor: [],
     accessory: [],
     consumable: [],
+    coating: [],
     tool: [],
     relic: [],
     material: [],
