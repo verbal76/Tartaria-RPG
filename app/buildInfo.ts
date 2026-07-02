@@ -15272,4 +15272,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // self-healed it to the true grid distance, looking like the counter "jumped up
 // mid-travel". Now it seeds the grid-exact distance up front, and the display fallback
 // is grid-exact too. travelBadgeGridExact + travel suites green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-02-645-travel-badge-grid-exact';
+// OTA-646 — Aetheric crafting: shape (Aetherstone Manipulation) and mend (Aetheric
+// Healing) now open a CONFIRM POPUP on tap — same UX as the golem summon — instead of
+// copying a phrase to the clipboard for the player to paste back. Tap card → confirm
+// (fuel + affordability) → casts and bounces to exploration so the roll plays out
+// live. Removed the dead clipboard/queue staging path. aethercraft suites green;
+// tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-646-aethercraft-confirm-popups';
