@@ -16808,4 +16808,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // by id first, name-match as fallback; the inventory UI passes pending.item.id.
 // scrapEquipByInstanceId (3) + equippedIds/equipSwap green; tsc app-clean. JS-only →
 // OTA-safe. state/gameStore.ts, screens/InventoryScreen.tsx.
-export const OTA_BUILD_ID = '2026-07-02-943-scrap-equip-by-id';
+// 2026-07-02-944 — FUSION PICKER (choose 3–5 reserved pieces + optional catalyst; the
+// weapon/armor choice already existed here via preferKind) + you-are-here room
+// highlight. Firing the Crucible now opens the picker instead of raising just the
+// kind prompt; only the selected pieces are spent (was: the whole reserved pool).
+// The old fusionKindPrompt path is superseded (left inert). Ported from Tartaria
+// OTA-650/651. fusionPickerSelection + fusion suite green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-944-fusion-picker-room-highlight';

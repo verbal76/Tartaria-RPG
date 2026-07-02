@@ -388,6 +388,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <TravelBtn
                   key={r.id}
                   label={r.shortName}
+                  active={r.id === activeBuildingRoomId}
                   onPress={() => goBuildingRoom(r.id)}
                 />
               ))}
@@ -737,7 +738,7 @@ function QuickBtn({
   );
 }
 
-function TravelBtn({ label, onPress, blocked }: { label: string; onPress: () => void; blocked?: boolean }) {
+function TravelBtn({ label, onPress, blocked, active }: { label: string; onPress: () => void; blocked?: boolean; active?: boolean }) {
   const isDestination = label.startsWith('→');
   // arb108/arb109 — during the outpost tutorial lockdown, travel/room buttons
   // buzz (double-pulse) + drop an Arbiter nudge instead of moving, so the
@@ -748,18 +749,18 @@ function TravelBtn({ label, onPress, blocked }: { label: string; onPress: () => 
   };
   return (
     <TouchableOpacity
-      style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked]}
+      style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked, active && styles.travelBtnActive]}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
     >
       <Text
-        style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest]}
+        style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest, active && styles.travelBtnTextActive]}
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
         minimumFontScale={0.55}
       >
-        {label}
+        {active ? `▸ ${label}` : label}
       </Text>
     </TouchableOpacity>
   );
@@ -819,6 +820,8 @@ const styles = StyleSheet.create({
   travelBtnText: { color: '#6ab0c9', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
   travelBtnDest: { paddingVertical: 8 },
   travelBtnBlocked: { borderColor: '#1d262a', backgroundColor: '#141210', opacity: 0.5 },
+  travelBtnActive: { borderColor: '#c9a86a', backgroundColor: '#2a2418' },
+  travelBtnTextActive: { color: '#f0dca8' },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
   movesBadge: {
     backgroundColor: '#0e1618',

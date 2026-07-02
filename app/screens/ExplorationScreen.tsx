@@ -50,6 +50,7 @@ import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
+import { FusionPickerModal } from '../components/FusionPickerModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -1476,6 +1477,8 @@ export function ExplorationScreen() {
         visible={missionBoardOpen}
         onClose={() => setMissionBoardOpen(false)}
       />
+
+      <FusionPickerModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}

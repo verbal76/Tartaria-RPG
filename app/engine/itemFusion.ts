@@ -108,7 +108,7 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
-function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
+export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
     if (it.stolen) continue;
@@ -132,8 +132,9 @@ function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
 export function gateFusion(
   inventory: readonly InventoryItem[],
   factionCatalyst?: InventoryItem | null,
+  explicitInputs?: readonly InventoryItem[],
 ): FusionGate {
-  const inputs = eligibleInputs(inventory);
+  const inputs = explicitInputs ? [...explicitInputs] : eligibleInputs(inventory);
   // arb-fix — a reserved faction CATALYST now COUNTS as the third item. Player
   // expectation: "2 inferred items + a faction item should fuse into a faction
   // piece." With a catalyst present the bar is 2 inferred inputs (the catalyst
