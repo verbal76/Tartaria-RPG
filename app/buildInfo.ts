@@ -15231,4 +15231,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // banners like inventory. recipe tests green; tsc clean.
 // OTA-639 — categories default collapsed (crafting + inventory) + Rare/Legendary
 // weapon export const OTA_BUILD_ID = '2026-07-02-638-armor-recipes-craft-categories'; armor recipes with rarity-matched materials (ported from Tartaria OTA-654).
-export const OTA_BUILD_ID = '2026-07-02-639-collapse-default-hitier-recipes';
+// OTA-640 — fusion picker DROPS same-material duplicates once you pick an item: after a
+// selection, other reserved pieces that add no NEW material leave the list, so you can
+// never assemble a same-type-only batch that fails the diversity gate. Picked items stay
+// visible (deselectable). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-640-fusion-drop-same-kind';
