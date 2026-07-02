@@ -21,6 +21,7 @@ import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
+import { fusionMaterialTags, isFusionReservable } from '../engine/itemFusion';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -52,7 +53,7 @@ const INV_SORT_OPTIONS = [
 // Mirrors the eligibility gate in gameStore.toggleReserveForFusion exactly.
 function isFusionEligible(item: InventoryItem): boolean {
   if ((item.tags ?? []).includes('faction_gear')) return true;
-  return isInferredItem(item.name);
+  return isFusionReservable(item);
 }
 const RARITY_RANK: Record<string, number> = {
   Common: 0,
@@ -782,6 +783,17 @@ export function InventoryScreen() {
     : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
       ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
       : undefined;
+  const fusionHint = pending && (isInferredInventoryItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+    ? (() => {
+        if ((pending.item.tags ?? []).includes('faction_gear')) {
+          return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
+        }
+        const mats = fusionMaterialTags(pending.item);
+        const matStr = mats.length ? mats.join(', ') : 'no distinct material';
+        return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
+      })()
+    : null;
+  const modalBodyFull = [modalBody, fusionHint].filter(Boolean).join('\n\n') || undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦
@@ -1045,7 +1057,7 @@ export function InventoryScreen() {
               ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
               : undefined
         }
-        body={scrapResultBody ?? modalBody}
+        body={scrapResultBody ?? modalBodyFull}
         // OTA-286 — quantity stepper appears when the player is
         // looking at a stack of 2+ scrap-able items AND we're still
         // in the action phase (not the post-salvage result view) AND

@@ -16814,4 +16814,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // kind prompt; only the selected pieces are spent (was: the whole reserved pool).
 // The old fusionKindPrompt path is superseded (left inert). Ported from Tartaria
 // OTA-650/651. fusionPickerSelection + fusion suite green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-02-944-fusion-picker-room-highlight';
+// 2026-07-02-945 — drink-water clarity (hunger-capped vs already-full) + fusion info
+// block (material-contribution line + picker 'N materials → Rare/Legendary' readout)
+// + WIDENED reservable rule: engine_Dev catalogs most reskin loot, so the old
+// inferred-only gate left nothing to fuse; now material-kind/misc items with a
+// material tag are reservable too (isFusionReservable across the 3 gates). fusion
+// suites + widening test green; tsc clean.
+export const OTA_BUILD_ID = '2026-07-02-945-drink-fusion-infoblock-reservable';

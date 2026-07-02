@@ -103,20 +103,20 @@ describe('OTA-195 gateFusion — input rules', () => {
     expect(gate.ok).toBe(false);
   });
 
-  it('ignores catalog items even when marked reserved (defense in depth)', () => {
+  it('engine_Dev — material-tagged catalog items ARE fusable (widened reservable rule)', () => {
     const inv = [
       inferred('Brass Sextant', ['metal']),
       inferred("Reclaimer's Cord", ['fiber']),
       inferred('Wyrm Femur Fragment', ['organic']),
-      // 'Scrap Metal' is a real MATERIALS catalog row — isInferredItem
-      // returns false, so it should NEVER count as a fusion input.
+      // 'Scrap Metal' is a real MATERIALS catalog row (isInferredItem === false). A
+      // lore-agnostic reskin catalogs most of its loot, so the old inferred-only gate
+      // left players with almost nothing to fuse. engine_Dev now also accepts a
+      // material-kind/misc item carrying a material tag, so cataloged scrap counts.
       { ...inferred('Scrap Metal', ['metal']), name: 'Scrap Metal' },
     ];
     const gate = gateFusion(inv);
-    // The 3 real inferred items pass gate ok regardless of the catalog
-    // ringer; ensure the catalog item is NOT in the inputs array.
     expect(gate.ok).toBe(true);
-    expect(gate.inputs.find((i) => i.name === 'Scrap Metal')).toBeUndefined();
+    expect(gate.inputs.find((i) => i.name === 'Scrap Metal')).toBeDefined();
   });
 });
 

@@ -108,12 +108,37 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
+/** OTA — the material tag(s) an item contributes to a fusion, for the info block.
+ *  Output RARITY is driven by how many DISTINCT materials the chosen inputs span
+ *  (3 different \u2192 Rare, 4+ \u2192 Legendary), NOT by the inputs' own rarity. */
+/** engine_Dev — is an item eligible to be RESERVED for fusion? A lore-agnostic
+ *  reskin catalogs most of its loot, so almost nothing is "inferred" (catalog-
+ *  absent) and the old inferred-only gate left players with nothing to fuse. Now a
+ *  material-kind / misc item that carries a fusion material tag also qualifies, so
+ *  cataloged scrap (metal / bone / stone / cloth / aether / …) can be reserved too.
+ *  Faction catalysts are handled separately by the reserve UI. */
+export function isFusionReservable(item: { name: string; kind?: string; tags?: readonly string[] }): boolean {
+  if (isInferredItem(item.name)) return true;
+  const k = item.kind ?? '';
+  if (k === 'material' || k === 'misc') {
+    return (item.tags ?? []).some((t) => MATERIAL_TAG_SET.has(t.toLowerCase()));
+  }
+  return false;
+}
+
+export function fusionMaterialTags(item: { name: string; tags?: readonly string[] }): string[] {
+  const out = new Set<string>();
+  for (const t of item.tags ?? []) { const k = t.toLowerCase(); if (MATERIAL_TAG_SET.has(k)) out.add(k); }
+  for (const t of inferGearTagPack(item.name)) { if (MATERIAL_TAG_SET.has(t)) out.add(t); }
+  return Array.from(out);
+}
+
 export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
     if (it.stolen) continue;
     if (!it.reservedForFusion) continue;
-    if (!isInferredItem(it.name)) continue;
+    if (!isFusionReservable(it)) continue;
     if (it.quantity <= 0) continue;
     if (FUSION_EQUIP_KINDS.includes(it.kind)) continue;
     if ((it.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) continue;

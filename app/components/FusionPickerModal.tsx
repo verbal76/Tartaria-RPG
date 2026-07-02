@@ -6,7 +6,7 @@
 import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { eligibleInputs } from '../engine/itemFusion';
+import { eligibleInputs, fusionMaterialTags } from '../engine/itemFusion';
 import type { InventoryItem } from '../engine/types';
 
 const MIN_PICK = 3;
@@ -41,6 +41,13 @@ export function FusionPickerModal() {
     });
   };
 
+  const pickedItems = scraps.filter((i) => picked.includes(i.id));
+  const catalystItem = catalystId ? catalysts.find((c) => c.id === catalystId) ?? null : null;
+  const distinctMats = Array.from(new Set(
+    [...pickedItems, ...(catalystItem ? [catalystItem] : [])].flatMap((i) => fusionMaterialTags(i)),
+  ));
+  const nMats = distinctMats.length;
+  const predicted = nMats >= 4 ? 'Legendary' : nMats >= 3 ? 'Rare' : null;
   const canFuse = picked.length >= MIN_PICK && picked.length <= MAX_PICK;
 
   const onFuse = () => {
@@ -59,6 +66,9 @@ export function FusionPickerModal() {
               <Text style={styles.title}>Fusing Crucible</Text>
               <Text style={styles.sub}>
                 Pick {MIN_PICK}–{MAX_PICK} reserved pieces to spend ({picked.length} chosen), then forge.
+              </Text>
+              <Text style={styles.readout}>
+                {nMats} material{nMats === 1 ? '' : 's'}{distinctMats.length ? ` (${distinctMats.join(', ')})` : ''} → {predicted ? `${predicted} result` : 'need 3+ DIFFERENT materials'}
               </Text>
 
               {scraps.length === 0 ? (
@@ -124,7 +134,8 @@ const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20 },
   card: { backgroundColor: '#141c1e', borderColor: '#8fa6ac', borderWidth: 1.5, borderRadius: 8, padding: 16, maxHeight: '82%' },
   title: { color: '#d8b46a', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
-  sub: { color: '#9db2b8', fontSize: 12, marginTop: 4, marginBottom: 8 },
+  sub: { color: '#9db2b8', fontSize: 12, marginTop: 4, marginBottom: 2 },
+  readout: { color: '#d8b46a', fontSize: 11, fontWeight: '700', marginBottom: 8 },
   empty: { color: '#9db2b8', fontSize: 13, fontStyle: 'italic', paddingVertical: 16, textAlign: 'center' },
   list: { maxHeight: 260, marginBottom: 6 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 8, borderRadius: 4, borderWidth: 1, borderColor: 'transparent' },
