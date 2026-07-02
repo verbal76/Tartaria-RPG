@@ -1,46 +1,220 @@
-# Tartaria Realms — START HERE (main branch pointer)
+# Tartaria Realms — Session Handoff
 
-> **You are on the `main` branch. Active development does NOT happen here.**
+**This checkout:** branch `claude/handoff-review-gI5Ve` — Docs-review checkout off main; not a product line.
 
-`main` is a stale snapshot. **All live work — engine code, OTA updates,
-the canonical issue tracker, and the build timeline — is on the
-`HaL2001` branch.** That is the branch the OTA update server publishes
-from and the branch every recent commit lands on.
-
-## What to do first
-
-1. **Switch to the working branch:**
-   ```
-   git fetch origin HaL2001
-   git checkout HaL2001
-   ```
-2. **Read the real handoff there:** `HANDOFF.md` on `HaL2001` is the
-   full source of truth — the **⚡ ACTIVE TASK block at the top of
-   Section 0.A** tells you exactly what the current session is doing and
-   where the cursor is, followed by the canonical Open / Closed issue
-   tracker.
-3. **Read `CLAUDE.md`** (also on `HaL2001`) for the working rules —
-   canon precedence, the OTA-only shipping flow, and the HANDOFF.md
-   timeline discipline.
-
-## Current active task (as of 2026-05-31)
-
-Getting a signed iOS build onto **TestFlight External Testing** for
-the user's Apple playtesters. The one remaining blocker is the
-interactive iOS **Distribution Certificate** creation, being done via
-`eas credentials --platform ios` on the user's Windows laptop. Full
-state — what's done, the menu route, and the steps after the cert
-lands — is in the ACTIVE TASK block of `HANDOFF.md` on `HaL2001`.
-
-## Key facts
-
-- **Working/OTA branch:** `HaL2001`
-- **App version (rt floor):** `2.4.1` — pinned for OTA delivery; visible
-  version is `3.0.0` via the `DISPLAY_VERSION` constant (cosmetic, OTA-able).
-- **OTA channel:** `hal2001`
-- **Project:** Expo account `hot-attic-games`, slug `tartaria-`.
+> **This doc was rewritten & de-bloated on 2026-07-02.** The previous 5,400-line
+> HANDOFF (with the full open/closed issue tracker and the entire OTA changelog)
+> is preserved verbatim in **`HANDOFF-ARCHIVE.md`** next to this file — nothing
+> was deleted, only summarized here. Read this file first; reach for the archive
+> only when you need the full historical "why" of a specific old issue/OTA.
 
 ---
 
-*This file exists only to redirect a fresh session to `HaL2001`. Do not
-treat it as the issue tracker — the real `HANDOFF.md` is on `HaL2001`.*
+## 1. What this is
+
+**Tartaria Realms** — an Android-first, on-device (Hermes/Expo/React Native)
+procedural narrative RPG. The engine is lore-agnostic; content (world, items,
+recipes, factions, tone) is authored data. On-device ML stack: **MiniLM** (intent
+classifier, onnxruntime-react-native), **Qwen 2.5 0.5B** (Arbiter narration,
+llama.rn), **Kokoro-82M** (neural TTS, react-native-executorch). State lives in a
+single Zustand store, `app/state/gameStore.ts` (~28k lines) — the spine.
+
+## 2. Operating model — MULTIPLE independent product lines (READ FIRST)
+
+The old "ONE branch, ONE codename" model is **retired**. The project now ships as
+several **independent lines**, each on its own git branch, its own app identity,
+and (for the mobile lines) its own OTA channel. A change that belongs on more than
+one line is applied **per-line, code-specifically** (see §4).
+
+- **OTA ids are descriptive slugs**, not periodic-table codenames. Format:
+  **`YYYY-MM-DD-NNN-short-desc`** in `app/buildInfo.ts` `OTA_BUILD_ID`, where `NNN`
+  is that line's own running counter. (The `<Element> <Process>` codename scheme
+  and the "batch ≥5 before pushing" rule from older handoffs are **abandoned**.)
+- **Push cadence: each OTA is pushed as it lands.** A push to a mobile line's
+  branch fires that line's `eas-update.yml` and publishes the OTA to that line's
+  channel — so pushing IS shipping for the mobile lines.
+- **Never push to a line the user didn't authorize.** Blanket "push these as you
+  go" authorization is granted per-session and does **not** carry over.
+
+### Line identity table
+
+| Line (branch) | app name | package / bundle id | OTA channel | Role |
+|---|---|---|---|---|
+| **HaL2001** | Tartaria Realms HAL | `…tartarprim.hal2001` | `hal2001` + `preview` + `ios-preview` | **LIVE** — the Tartaria game with real testers |
+| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | Test-phone mobile line (side-by-side w/ HAL) |
+| **engine_Dev** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | Lore-agnostic engine; content is upload-driven |
+| **steam_Dev** | Tartaria Realms PC (Steam Dev) | `…tartarprim.steamdev` | `steam-dev` | Windows/Electron; updates via Steam depot, not OTA |
+| **mac_dev** | Tartaria Realms (Mac Dev) | `…tartarprim.macdev` | `mac-dev` | macOS `.dmg` (Electron) |
+| **linux_dev** | Tartaria Realms (Linux Dev) | `…tartarprim.linuxdev` | `linux-dev` | Linux/Steam Deck AppImage (Electron) |
+| **html_dev** | Tartaria Realms (Web) | `…tartarprim.htmldev` | `html-dev` | Pure web export (no Electron) |
+| **apple_ios** | Tartaria Realms (Apple iOS Dev) | `…tartarprim.appleios` | `apple-ios` | Native iOS (forked from golem-line) |
+| **Dev_engine_PC** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | engine_Dev's Windows `.exe` standing branch |
+| **arbiters-line** | Tartaria Realms ARB | `…tartarprim.arbiters` | `arbiters-line` (dead channel) | Isolated APK scratch line — publishes nothing |
+
+Utility / parked branches: **`main`** (base; the standing dev→prod PR target),
+**`iOS-initial`** / **`release/**`** / **`revert`** / **`submit-workflow-to-main`**
+(one-off/utility), **`claude/*`** (ephemeral feature branches — usually merged or
+abandoned). Don't develop on these unless explicitly told to.
+
+### Which lines actually publish an OTA on push?
+
+Each branch carries **its own copy** of `.github/workflows/*`, so the trigger
+list is per-branch. The mobile lines (**HaL2001**, **golem-line**, **engine_Dev**)
+publish an OTA to their channel on a code push. The desktop/web lines
+(**steam_Dev/mac_dev/linux_dev/html_dev/Dev_engine_PC**) build **native/web
+artifacts** (via `build-steam-exe`, `build-mac`, `build-linux`, `build-web`,
+`build-engine-exe`) and update through Steam/artifact download, **not** OTA;
+several are deliberately absent from any push trigger. **`arbiters-line`** targets
+a dead channel and ships nothing.
+
+### `app.json` guard
+
+`app.json` holds each line's live channel/package/name and **must never be
+edited** during normal work — it's at the repo root, not under `app/`, so ordinary
+edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
+
+## 3. The change loop (every code change)
+
+1. Edit code under `app/` in that line's worktree.
+2. `npx tsc --noEmit` — the **app/** source must be clean. (The repo has many
+   pre-existing **test-file** type errors — `stealth` stat drift, `createAsync`
+   self-ref, etc. — that are NOT yours; filter to `app/…` when judging clean.)
+3. Run the touched jest suites. Heavy stress probes (`combatBalanceProbe`,
+   `dogGolemCombatStress`, `*Stress`) **OOM the ~8 GB CI container** — that's
+   environmental, not a regression; exclude them.
+4. Bump `app/buildInfo.ts` `OTA_BUILD_ID` to the next `YYYY-MM-DD-NNN-desc` for
+   that line, with a short comment block explaining the change.
+5. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
+   the change is notable.
+6. Commit with the trailers in §6, then push that line's branch (`git push -u
+   origin <branch>`; for the detached HaL2001 worktree, `git push -u origin
+   HEAD:HaL2001`). Retry network failures with exponential backoff.
+7. After pushing, ensure an **open draft PR** exists for the branch (create one if
+   not). PRs already exist for the standing lines (#2 HaL2001, #7 golem-line,
+   #13 engine_Dev, etc.).
+
+**Docs-only safety:** `**.md`, `docs/**`, `.github/**`, `app.json`, lockfiles etc.
+are in every `eas-update.yml`'s `paths-ignore`, so a HANDOFF/docs-only push does
+**NOT** publish an OTA — safe to push freely, even on the live line.
+
+## 4. Cross-line parity rule
+
+Most engine code is shared byte-for-byte across lines, but the lines live on
+separate branches/worktrees. When a fix applies to more than one line, apply it
+**code-specifically in each line's worktree** and ship it per line — do not assume
+a push to one reaches the others. Watch for per-line divergence:
+- `engine_Dev`/`Dev_engine_PC` are content-pack-driven (recipes/tables load from
+  uploads) and carry extras like `contentPack` label overrides and a widened
+  fusion-reservable rule; some Tartaria/golem data edits (e.g. armor recipes in
+  `recipes.json`) belong in the uploaded pack there, not the base.
+- Spin-off lines (steam/mac/linux/html) swap native modules for web stubs via
+  `metro.config.js` on the `web` target.
+Typecheck + run the relevant suite in **each** worktree before pushing it.
+
+Worktrees used this session: `/tmp/hal-main-fix` (HaL2001, detached — push
+`HEAD:HaL2001`), `/tmp/hal-golem` (golem-line), `/tmp/hal-eng7` (engine_Dev).
+
+## 5. Native / artifact builds (rare — confirm first)
+
+OTA covers everything in the JS bundle (engine, screens, JSON, bundled assets). A
+native rebuild is needed ONLY for: a new native module / Expo plugin, an
+`app.json`/runtime-version change, edits under `ios/`/`android/`, an Expo SDK bump,
+or Hermes/permission changes. **Confirm with the user first.** Commit-title markers
+lead the title: `[build-aab]` / `[build-ios]` / `[submit-ios]` (mobile native),
+and the desktop/web lines build via their own workflows on push. **Do not put
+`[build-aab]` / `[golem-apk]` / native markers in a commit unless a native build
+is actually intended.**
+
+## 6. Commit & PR conventions
+
+- End every commit body with the two trailers:
+  ```
+  Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+  Claude-Session: https://claude.ai/code/…
+  ```
+- **Never** put the model identifier/id string in commit messages, PR titles/bodies,
+  code comments, or any pushed artifact — chat only.
+- PRs are created as **drafts**. Mirror a PR template if one exists.
+- GitHub MCP is scoped to `verbal76/tartaria-rpg`.
+
+## 7. Architecture cheat-sheet
+
+```
+app/
+  ai/          MiniLM + Qwen orchestrators; nativeMlLock.ts (serializes ALL native
+               ML — Qwen completion + Kokoro synth + their native frees — via
+               runExclusiveNativeMl; prevents Tensor-G5 SIGSEGVs)
+  audio/       AudioManager / controller / settings
+  components/  UI primitives; InventoryCategorize.ts, RecipesView.tsx,
+               FusionPickerModal.tsx, StatsPanel.tsx, InputBox.tsx
+  data/        Authored JSON (items/weapons/armor/gear/dogGear/recipes/…)
+  engine/      Pure logic — parser, crafting, itemFusion, equipment, worldMap
+               (canonical grid + travel distance), durability, combat, …
+  screens/     Exploration / Inventory / Crafting / Vendor / Character / Map / …
+  state/       gameStore.ts — Zustand, the spine (~28k lines)
+  updates/     checkAndApplyOTA.ts
+  voice/       TTSManager / PiperTTSManager (Kokoro) / TTSController
+buildInfo.ts   OTA_BUILD_ID marker (per line)
+```
+
+Key invariants worth knowing:
+- **Every inventory item has a unique `id`.** Scrap/equip resolve by `id` first,
+  then name, so multiples of the same item with different durability act on the
+  exact instance selected.
+- **World map is grid-exact.** Locations have fixed canonical cells
+  (`worldMap.canonicalPositions()`); the player carries an absolute
+  `gridX/gridY`; travel distance = `canonicalDistanceFromGrid`. The visual atlas
+  is a thematic overlay (`atlasCoords.ts`, IDW interpolation) and must never drive
+  real distance/movement.
+- **Fusion output rarity = number of DISTINCT material tags** (3 → Rare, 4+ →
+  Legendary), NOT input rarity. Variety matters, not rarity.
+
+## 8. Open issues / watch list (current)
+
+- **Android recents/square-button SIGSEGV** — hardened across all lines (native ML
+  frees + Qwen `generate()` ctx-capture now serialized through the lock; OTA
+  658/643/951). Native crashes carry no JS stack, so this closes the known race
+  windows rather than a stack-confirmed root cause. **Retest on-device with TTS
+  on**; report residual if it recurs.
+- **Travel distance** — fixed for both the reload path (659/644/952) and the
+  vendor-departure/undefined-counter path (660/645/953). If a distance ever
+  climbs again, capture the log line at that moment (especially whether a vendor
+  was on the road at course-set).
+- **Spin-off lines are behind HaL2001** — steam/mac/linux/html/apple_ios/
+  Dev_engine_PC/arbiters-line do NOT have this session's fixes; port on request
+  (cherry-pick the specific edits; they're stale, don't merge).
+- **CI OOM** — full jest suite + stress probes exceed the container's ~8 GB; run
+  targeted suites. A handful of long-standing Tartaria test failures
+  (defensiveTurnAdvances / fleeFailCounter wording drift, armorMultiStat data
+  drift, directionalFind flake, movementStress) are stale/flaky, not live bugs.
+
+## 9. Recent OTA highlights (this session)
+
+Full changelog is in `HANDOFF-ARCHIVE.md`. Latest per line: **HaL2001
+`…-660`**, **golem-line `…-645`**, **engine_Dev `…-953`**.
+
+| HaL2001 | golem | engine_Dev | Change |
+|---|---|---|---|
+| 660 | 645 | 953 | Travel badge grid-exact from course-set (vendor-departure fix) |
+| 659 | 644 | 952 | Travel counter keeps progress across a mid-journey reload |
+| 658 | 643 | 951 | Native-ML teardown hardening (recents/background SIGSEGV) |
+| 657 | 642 | 950 | Dedicated collapsible "Dog Armor" inventory section |
+| 656 | 641 | 949 | Craft: fold hyphens in recipe match (infinite-loop/death fix) |
+| 655 | 640 | 948 | Fusion picker drops same-material duplicates once picked |
+| 654 | 639 | — | Default-collapsed categories + Rare/Legendary recipes |
+| 653 | 638 | 946 | Armor-recipe balance + collapsible crafting categories |
+| 652 | 637 | 945 | Drink-water clarity + fusion material info block |
+
+## 10. Reference (quick) — full detail in `HANDOFF-ARCHIVE.md`
+
+- **Quick-start:** `npx tsc --noEmit` (judge app/ only) · `npx jest <suite>` ·
+  bump `app/buildInfo.ts` · commit w/ trailers · `git push -u origin <branch>`.
+- **Combat:** nat-1 always misses, nat-20 always crits; combat loot lands in
+  `player.inventory` (not `droppedItems`); `gameLog` capped at 500 with
+  same-channel merge.
+- **Stamina-gated statuses** (`tired`/`exhausted`) auto-clear above 25% stamina
+  and are stamped with sentinel `remainingRounds: 99` — never show that counter.
+- **Hotspots:** `gameStore.ts` (travel/craft/fusion/equip dispatch), `worldMap.ts`
+  (grid + distance), `itemFusion.ts` (rarity/material tags), `crafting.ts`
+  (`findRecipeByResult`, `lookupCraftedItem`), `PiperTTSManager.ts` +
+  `LlamaRuntime.ts` + `nativeMlLock.ts` (the crash-sensitive native ML layer).
