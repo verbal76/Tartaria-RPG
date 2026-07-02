@@ -16855,4 +16855,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // relaunch mid-travel made the counter leap back to the full trip. It now re-seeds from
 // the player's LIVE absolute cell (gridX/gridY via playerGridCell).
 // travelResumeKeepsProgress green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-02-952-travel-resume-keeps-progress';
+// 2026-07-02-953 — travel badge is now grid-exact from the moment a course is set, even
+// on the vendor-on-the-road departure. confirmLeaveAndTravel left travelTarget WITHOUT
+// distanceRemaining, so the badge fell to the legacy re-centered-visual-map fallback,
+// which UNDERCOUNTS from an outdoor tile — reading low until the first continue
+// self-healed it to the true grid distance, looking like the counter "jumped up
+// mid-travel". Now it seeds the grid-exact distance up front, and the display fallback
+// is grid-exact too. travelBadgeGridExact + travel suites green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-953-travel-badge-grid-exact';
