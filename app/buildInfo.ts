@@ -15340,4 +15340,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // per-instance, so the right stats/durability now follow. scrapEquipByInstanceId (3)
 // + 34 existing equip/scrap tests green; tsc app-clean. JS-only → OTA-safe.
 // state/gameStore.ts, screens/InventoryScreen.tsx.
-export const OTA_BUILD_ID = '2026-07-02-649-scrap-equip-by-id';
+// OTA-650 — FUSION PICKER. The Crucible consumed the player's ENTIRE reserved (♥)
+// pool on one fusion (11 reserved → all 11 eaten). Firing it now opens a picker:
+// choose 3–5 reserved pieces, optionally add a reserved faction catalyst (separate
+// theme slot), and pick WEAPON or ARMOR — spending only what you selected. Engine:
+// gateFusion accepts an explicit chosen subset; synthesizeFusionDeterministic takes a
+// forced kind; eligibleInputs exported for the picker. Store: fuseAtCrucible opens the
+// picker unless a pendingFusionSelection exists, then re-gates on the exact picks +
+// forced kind; confirmFusionSelection / closeFusionPicker added. New FusionPickerModal.
+// fusionPickerSelection (2) + 200 fusion-suite tests green; tsc app-clean. JS-only →
+// OTA-safe. engine/itemFusion.ts, state/gameStore.ts, components/FusionPickerModal.tsx,
+// screens/ExplorationScreen.tsx.
+export const OTA_BUILD_ID = '2026-07-02-650-fusion-picker';

@@ -87,7 +87,7 @@ export interface FusionGate {
  *  so a reserved material you could SEE (♥) didn't actually count. */
 const FUSION_EQUIP_KINDS = ['weapon', 'armor', 'accessory', 'amulet', 'ring'];
 const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ration|alcohol|treat|forag/i;
-function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
+export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
     if (it.stolen) continue;
@@ -111,8 +111,11 @@ function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
 export function gateFusion(
   inventory: readonly InventoryItem[],
   factionCatalyst?: InventoryItem | null,
+  explicitInputs?: readonly InventoryItem[],
 ): FusionGate {
-  const inputs = eligibleInputs(inventory);
+  // When the player has hand-picked a subset in the fusion picker, validate THOSE
+  // exact items (still reserved/eligible) instead of the whole reserved pool.
+  const inputs = explicitInputs ? [...explicitInputs] : eligibleInputs(inventory);
   // arb-fix — a reserved faction CATALYST now COUNTS as the third item. Player
   // expectation: "2 inferred items + a faction item should fuse into a faction
   // piece." With a catalyst present the bar is 2 inferred inputs (the catalyst
@@ -486,6 +489,7 @@ function buildNamePrompt(
 export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
+  forcedKind?: 'weapon' | 'armor',
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
   // Dominant material — first match wins. Drives kind + theme.
@@ -503,8 +507,10 @@ export function synthesizeFusionDeterministic(
     : tagSet.has('wood') ? 'wood'
     : tagSet.has('stone') ? 'stone'
     : 'improvised';
-  // Kind from the dominant tag.
-  const kind: 'weapon' | 'armor' | 'dog_armor' =
+  // Kind from the dominant tag — OVERRIDDEN by the player's explicit weapon/armor
+  // choice from the fusion picker when provided (the material still drives theme +
+  // stats, but the SHAPE is the player's call).
+  const derivedKind: 'weapon' | 'armor' | 'dog_armor' =
     dominantTag === 'metal' || dominantTag === 'wood' || dominantTag === 'stone'
       ? 'weapon'
       : dominantTag === 'cloth'
@@ -512,6 +518,7 @@ export function synthesizeFusionDeterministic(
         : dominantTag === 'aether'
           ? 'weapon'
           : 'armor';
+  const kind: 'weapon' | 'armor' | 'dog_armor' = forcedKind ?? derivedKind;
   // OTA-445 — [playability] fusion is an INVESTMENT (collect + reserve 3+ inferred
   // pieces + fire the Crucible), so the payoff should out-class anything you'd
   // just find. Legendary now lands at 4+ tags (was 5+); the 3-tag floor is still
