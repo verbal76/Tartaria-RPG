@@ -956,7 +956,7 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
-          const collapsed = !!collapsedSections[cat];
+          const collapsed = collapsedSections[cat] ?? true; // default collapsed
           return (
             <View key={cat} style={styles.section}>
               {/* arb108 — semi-transparent backing so the label reads over any
@@ -965,7 +965,7 @@ export function InventoryScreen() {
               <TouchableOpacity
                 style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
                 activeOpacity={0.7}
-                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !s[cat] }))}
+                onPress={() => setCollapsedSections((s) => ({ ...s, [cat]: !(s[cat] ?? true) }))}
               >
                 <View style={styles.sectionHeaderLeft}>
                   <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>

@@ -15364,4 +15364,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armor across all 6 slots from gatherable mats → 19 armor) + crafting screen now
 // GROUPS recipes by category (Weapons/Armor/Relics/Food/Gear…) with collapsible
 // banners like inventory. recipe tests green; tsc clean.
-export const OTA_BUILD_ID = '2026-07-02-653-armor-recipes-craft-categories';
+// OTA-654 — crafting + inventory categories now DEFAULT COLLAPSED (open the one you
+// want, no scroll-and-fold). + High-tier crafting: added Rare/Legendary weapon export const OTA_BUILD_ID = '2026-07-02-653-armor-recipes-craft-categories';
+// armor recipes with rarity-matched materials (Legendary outputs need Legendary mats
+// like Aetherstone Heart / Behemoth Heart / Iron Core / Wyrm Fang). weapons now
+// 9C/8U/12R/6L, armor 12C/3U/7R/2L. recipe tests green; tsc clean.
+export const OTA_BUILD_ID = '2026-07-02-654-collapse-default-hitier-recipes';
