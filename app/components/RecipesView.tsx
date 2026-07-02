@@ -174,50 +174,19 @@ export function RecipesView({
     onAfterCraft?.(delta);
   };
 
-  if (!player) {
-    return <Text style={styles.placeholder}>No expedition is underway.</Text>;
-  }
-
-  const arbiterLine = kindFilter === 'consumable'
-    ? `The ${getNarratorName()} eyes your pantry. "Food and tonics — what the body remembers."`
-    : kindFilter === 'sidekick-weapon'
-      ? `The ${getNarratorName()} nods at your kit. "Armaments shaped for a ${getSummonNoun()}'s grip. Forge one, then arm your ${getSummonNoun()} with it."`
-      : kindFilter === 'non-consumable'
-        ? `The ${getNarratorName()} looks over your pack. "Every blueprint you carry. The lit ones you can build right now."`
-        : `The ${getNarratorName()} looks over your pack. "These are the things you can — or nearly can — set together."`;
-
-  // engine_Dev — embedded mode drops the inner ScrollView so this list can live
-  // inside a parent ScrollView (the Magic-tab sidekick-armament section).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ListWrap: React.ComponentType<any> = embedded ? View : ScrollView;
-  const listWrapProps = embedded
-    ? { style: styles.scrollContent }
-    : { style: styles.scroll, contentContainerStyle: styles.scrollContent };
-
-  return (
-    <>
-      <Text style={styles.arbiterLine}>{arbiterLine}</Text>
-
-      <View style={styles.countLine}>
-        <Text style={styles.countText}>
-          <Text style={styles.countReady}>{availableCount} ready</Text>
-          <Text style={styles.countDim}> · {evaluated.length} total</Text>
-        </Text>
-      </View>
-
-      <ListWrap {...listWrapProps}>
-        {evaluated.length === 0 ? (
-          <Text style={styles.empty}>
-            {kindFilter === 'consumable'
-              ? 'No food / tonic recipes in the book yet.'
-              : kindFilter === 'sidekick-weapon'
-                ? `No ${getSummonNoun()} armaments in the book yet.`
-                : kindFilter === 'non-consumable'
-                  ? 'No gear blueprints in the book yet.'
-                  : 'Nothing fits together yet.'}
-          </Text>
-        ) : (
-          evaluated.map((e) => {
+  const [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({});
+  const CATEGORY_ORDER: Array<{ kind: RecipeStatus['kind']; label: string }> = [
+    { kind: 'weapon', label: 'WEAPONS' },
+    { kind: 'armor', label: 'ARMOR' },
+    { kind: 'dog_armor', label: 'DOG ARMOR' },
+    { kind: 'relic', label: 'RELICS' },
+    { kind: 'consumable', label: 'FOOD & TONICS' },
+    { kind: 'misc', label: 'GEAR & MISC' },
+  ];
+  const groups = CATEGORY_ORDER
+    .map((c) => ({ ...c, items: evaluated.filter((e) => e.kind === c.kind) }))
+    .filter((g) => g.items.length > 0);
+  const renderRow = (e: RecipeStatus) => {
             const cat = lookupCraftedItem(e.recipe.result);
             const preview = getItemPreview(e.recipe.result);
             const stripeColor = e.available ? '#9ec96a' : '#2b3a3e';
@@ -273,6 +242,68 @@ export function RecipesView({
                 </View>
               </TouchableOpacity>
             );
+  };
+
+  if (!player) {
+    return <Text style={styles.placeholder}>No expedition is underway.</Text>;
+  }
+
+  const arbiterLine = kindFilter === 'consumable'
+    ? `The ${getNarratorName()} eyes your pantry. "Food and tonics — what the body remembers."`
+    : kindFilter === 'sidekick-weapon'
+      ? `The ${getNarratorName()} nods at your kit. "Armaments shaped for a ${getSummonNoun()}'s grip. Forge one, then arm your ${getSummonNoun()} with it."`
+      : kindFilter === 'non-consumable'
+        ? `The ${getNarratorName()} looks over your pack. "Every blueprint you carry. The lit ones you can build right now."`
+        : `The ${getNarratorName()} looks over your pack. "These are the things you can — or nearly can — set together."`;
+
+  // engine_Dev — embedded mode drops the inner ScrollView so this list can live
+  // inside a parent ScrollView (the Magic-tab sidekick-armament section).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ListWrap: React.ComponentType<any> = embedded ? View : ScrollView;
+  const listWrapProps = embedded
+    ? { style: styles.scrollContent }
+    : { style: styles.scroll, contentContainerStyle: styles.scrollContent };
+
+  return (
+    <>
+      <Text style={styles.arbiterLine}>{arbiterLine}</Text>
+
+      <View style={styles.countLine}>
+        <Text style={styles.countText}>
+          <Text style={styles.countReady}>{availableCount} ready</Text>
+          <Text style={styles.countDim}> · {evaluated.length} total</Text>
+        </Text>
+      </View>
+
+      <ListWrap {...listWrapProps}>
+        {evaluated.length === 0 ? (
+          <Text style={styles.empty}>
+            {kindFilter === 'consumable'
+              ? 'No food / tonic recipes in the book yet.'
+              : kindFilter === 'sidekick-weapon'
+                ? `No ${getSummonNoun()} armaments in the book yet.`
+                : kindFilter === 'non-consumable'
+                  ? 'No gear blueprints in the book yet.'
+                  : 'Nothing fits together yet.'}
+          </Text>
+        ) : (
+          groups.map((g) => {
+            const isCollapsed = !!collapsed[g.kind];
+            const readyN = g.items.filter((x) => x.available).length;
+            return (
+              <View key={g.kind}>
+                <TouchableOpacity
+                  style={styles.catBanner}
+                  activeOpacity={0.7}
+                  onPress={() => setCollapsed((c) => ({ ...c, [g.kind]: !c[g.kind] }))}
+                >
+                  <Text style={styles.catChevron}>{isCollapsed ? '▸' : '▾'}</Text>
+                  <Text style={styles.catLabel}>{g.label}</Text>
+                  <Text style={styles.catCount}>{readyN} ready · {g.items.length}</Text>
+                </TouchableOpacity>
+                {!isCollapsed && g.items.map((e) => renderRow(e))}
+              </View>
+            );
           })
         )}
       </ListWrap>
@@ -288,6 +319,10 @@ const styles = StyleSheet.create({
   countDim: { color: '#6c8088' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },
+  catBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1c1813', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingVertical: 8, paddingHorizontal: 10, marginBottom: 6, marginTop: 4 },
+  catChevron: { color: '#cdbf99', fontSize: 12, width: 18 },
+  catLabel: { color: '#cdbf99', fontSize: 12, fontWeight: '700', letterSpacing: 2, flex: 1 },
+  catCount: { color: '#7a705c', fontSize: 11 },
   recipeRow: {
     flexDirection: 'row',
     backgroundColor: '#0e1618',

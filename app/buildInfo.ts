@@ -16820,4 +16820,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inferred-only gate left nothing to fuse; now material-kind/misc items with a
 // material tag are reservable too (isFusionReservable across the 3 gates). fusion
 // suites + widening test green; tsc clean.
-export const OTA_BUILD_ID = '2026-07-02-945-drink-fusion-infoblock-reservable';
+// 2026-07-02-946 — crafting screen GROUPS recipes by category with collapsible banners
+// (like inventory). (Armor-recipe balance is NOT applied here — engine_Dev's recipes
+// are content-pack driven, so armor balance belongs in the uploaded pack, not the base.)
+// recipe tests green; tsc clean.
+export const OTA_BUILD_ID = '2026-07-02-946-craft-categories';
