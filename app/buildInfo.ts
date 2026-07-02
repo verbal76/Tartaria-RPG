@@ -15405,4 +15405,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player's LIVE absolute cell (gridX/gridY via playerGridCell), so the badge resumes
 // exactly where the walk left off; legacy saves without gridX/gridY still fall back to
 // the location cell. travelResumeKeepsProgress + travel/grid suites green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-02-659-travel-resume-keeps-progress';
+// OTA-660 — travel badge is now grid-exact from the moment a course is set, even on
+// the vendor-on-the-road departure. confirmLeaveAndTravel skipped the first step and
+// left travelTarget WITHOUT distanceRemaining, so the badge fell to the legacy
+// re-centered-visual-map fallback, which UNDERCOUNTS from an outdoor tile — the badge
+// read low (e.g. 8) until the first continue self-healed it to the true grid distance
+// (16), looking like the counter "jumped up mid-travel". Now it seeds the grid-exact
+// distance up front, and the display fallback is grid-exact too (never the visual map).
+// travelBadgeGridExact + travel suites green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-02-660-travel-badge-grid-exact';
