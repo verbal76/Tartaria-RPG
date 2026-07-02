@@ -15373,4 +15373,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // selection, other reserved pieces that add no NEW material leave the list, so you can
 // never assemble a same-type-only batch that fails the diversity gate. Picked items stay
 // visible (deselectable). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-655-fusion-drop-same-kind';
+// OTA-656 — craft recipe resolution now folds hyphens/punctuation to spaces on both
+// sides. The input normalizer strips hyphens ("Aether-Reinforced Armor" → "aether
+// reinforced armor"), which made findRecipeByResult return null for EVERY hyphenated
+// recipe → the craft spun into an infinite cognitive re-dispatch loop, burning an
+// action (Silent-snow weather −1HP) each pass until the player died mid-craft with no
+// "Crafted" line. Now hyphenated recipes resolve on the first pass. recipeFuzzy +
+// craft suite green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-02-656-craft-hyphen-recipe-resolve';
