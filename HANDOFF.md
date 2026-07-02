@@ -63,16 +63,40 @@ Utility / parked branches: **`main`** (base + start-here router; the standing de
 (one-off/utility), **`claude/*`** (ephemeral feature branches — usually merged or
 abandoned). Don't develop on these unless explicitly told to.
 
-### Which lines actually publish an OTA on push?
+### OTA & build ISOLATION — every line is a sealed silo (verified 2026-07-02)
 
-Each branch carries **its own copy** of `.github/workflows/*`, so the trigger
-list is per-branch. The mobile lines (**HaL2001**, **golem-line**, **engine_Dev**)
-publish an OTA to their channel on a code push. The desktop/web lines
-(**steam_Dev/mac_dev/linux_dev/html_dev/Dev_engine_PC**) build **native/web
-artifacts** (via `build-steam-exe`, `build-mac`, `build-linux`, `build-web`,
-`build-engine-exe`) and update through Steam/artifact download, **not** OTA;
-several are deliberately absent from any push trigger. **`arbiters-line`** targets
-a dead channel and ships nothing.
+**No line can cross-pollinate another's OTAs or builds.** A push publishes ONLY to
+that line's own channel — Tartaria pushes only to Tartaria, golem only to golem,
+engine only to engine. Nothing broadcasts across lines. Concretely:
+
+- **HaL2001 → `hal2001` only** (Android; plus the `hal2001`/`preview` **iOS** route
+  for the TestFlight build). Never touches golem or engine.
+- **golem-line → `golem-line` only.** golem has a DEDICATED firewall workflow,
+  **`eas-update-golem.yml`**, that runs only for `refs/heads/golem-line` and
+  literally only ever knows the string `"golem-line"` — it is structurally unable
+  to publish to `hal2001`/`preview`.
+- **engine_Dev → `engine_Dev` only** (Android). Different app
+  (`…tartarprim.engine`); its preview build polls only the `engine_Dev` channel.
+
+How it's enforced: each branch carries **its own copy** of `.github/workflows/*`,
+and GitHub runs the workflow file **from the pushed branch**. The shared
+`eas-update.yml` gates publishing on a `case "$BRANCH"` keyed to the PUSHED branch;
+the **default arm is _skip_** (`"not mapped to an OTA channel — no cross-branch
+broadcast"`), so any unmapped branch (e.g. a `claude/*` feature branch) publishes
+nothing. golem is additionally carved into its own file as belt-and-suspenders.
+
+Native / desktop / web builds are isolated the same way: each spin-off has its OWN
+build workflow **and** its OWN app id, so no two lines produce the same
+installable — `steam_Dev`→`build-steam-exe` (`…steamdev`), `mac_dev`→`build-mac`
+(`…macdev`), `linux_dev`→`build-linux` (`…linuxdev`), `html_dev`→`build-web`
+(`…htmldev`), `Dev_engine_PC`→`build-engine-exe` (`…engine`). Several are absent
+from any push trigger (build on demand only). **`arbiters-line`** targets a dead
+channel and ships nothing.
+
+> **Do not "fix" a line's workflow by copying HAL's multi-channel publish into it.**
+> The per-branch `case` gate + golem's separate file ARE the firewall. If you ever
+> see a line's `eas-update.yml` publish to `hal2001`/`preview` unconditionally,
+> that's the isolation bug — restore the branch-gated `case`.
 
 ### `app.json` guard
 
