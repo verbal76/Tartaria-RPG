@@ -16795,4 +16795,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the healthTintWhiteBase test; healthCardTint (5) green; tsc app-clean. The 938
 // crash fix, 939 travel framing, and 940 LOOK fix are untouched (different files).
 // components/StatsPanel.tsx.
-export const OTA_BUILD_ID = '2026-07-01-941-revert-portrait-coloring';
+// 2026-07-02-942 — health card fades GREEN → RED directly, no amber midpoint. The
+// bright yellow at half HP read weird (it got vivid again mid-range and washed the
+// card text out), so healthHue now lerps HP_RED↔HP_GREEN in one step (HP_AMBER
+// removed). green + red endpoints unchanged. healthCardTint (5) green; tsc app-clean.
+// components/StatsPanel.tsx.
+export const OTA_BUILD_ID = '2026-07-02-942-health-green-to-red';

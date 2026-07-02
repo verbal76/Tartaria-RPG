@@ -86,11 +86,11 @@ interface Props { player: PlayerCharacter; fill?: boolean; }
 // OTA-632 — health-tinted player card. The HP readout is a tiny number in the
 // top-left card; a playtester died (broken-ladder fall) partly because it's so
 // easy to miss how low you are. The card BACKGROUND now fades from a subtle dark
-// green at full HP → amber at half → a strong dark red as you bleed out, and the
-// HP number itself takes the matching colour, so your health reads at a glance
-// without parsing digits. Both stay dark enough to keep the cream text legible.
+// green at full HP straight down to a strong dark red as you bleed out (no amber
+// midpoint — the bright yellow read weird and washed the text), and the HP number
+// itself takes the matching colour, so your health reads at a glance without parsing
+// digits. Both stay dark enough to keep the cream text legible.
 const HP_GREEN: readonly [number, number, number] = [88, 168, 96];
-const HP_AMBER: readonly [number, number, number] = [200, 158, 64];
 const HP_RED: readonly [number, number, number] = [196, 64, 52];
 const CARD_BASE: readonly [number, number, number] = [0x13, 0x11, 0x0f];
 
@@ -103,7 +103,10 @@ function mix(a: readonly [number, number, number], b: readonly [number, number, 
 /** Health hue for `frac` (0..1): red → amber → green. */
 export function healthHue(frac: number): [number, number, number] {
   const f = Math.max(0, Math.min(1, frac));
-  return f >= 0.5 ? mix(HP_AMBER, HP_GREEN, (f - 0.5) / 0.5) : mix(HP_RED, HP_AMBER, f / 0.5);
+  // engine_Dev — direct green↔red fade, no amber waypoint. The bright yellow midpoint
+  // read weird (it got vivid again at half HP and washed out the card text), so full
+  // health just dims straight down toward red as you bleed.
+  return mix(HP_RED, HP_GREEN, f);
 }
 /** Card background: the health hue blended over the dark base, intensifying as
  *  HP drops (subtle green when full, the card "fills" red near death). */

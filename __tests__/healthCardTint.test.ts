@@ -16,17 +16,22 @@ const parseRgb = (s: string): [number, number, number] => {
 };
 
 describe('OTA-632 — health card tint', () => {
-  it('hue is green at full, amber at half, red at empty', () => {
+  it('hue fades green → red directly (no bright amber midpoint)', () => {
     const [fr, fg, fb] = healthHue(1);
     expect(fg).toBeGreaterThan(fr); // green dominant when healthy
     expect(fg).toBeGreaterThan(fb);
 
-    const [hr, hg] = healthHue(0.5);
-    expect(hr).toBeGreaterThan(120); // amber = high red + high green
-    expect(hg).toBeGreaterThan(120);
-
     const [er, eg] = healthHue(0);
     expect(er).toBeGreaterThan(eg); // red dominant when dying
+
+    // Half HP is a straight red↔green blend — each channel sits BETWEEN the two
+    // endpoints (redder than full, greener than death) and must NOT spike bright, so
+    // there's no vivid-yellow midpoint that washes the card text.
+    const [hr, hg] = healthHue(0.5);
+    expect(hr).toBeGreaterThan(fr);
+    expect(hr).toBeLessThan(er);
+    expect(hg).toBeGreaterThan(eg);
+    expect(hg).toBeLessThan(fg);
   });
 
   it('card background is dark (text-legible) at every HP level', () => {
