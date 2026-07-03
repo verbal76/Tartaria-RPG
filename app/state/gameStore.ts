@@ -1450,10 +1450,11 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     inventory,
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
-    // 2026-05-24 — hunger penalty defaults to 0 on legacy saves; ticks
-    // up every 8 in-game hours without eating, capped at 5. Eating any
-    // food consumable resets to 0.
-    hungerStaminaPenalty: p.hungerStaminaPenalty ?? 0,
+    // HUNGER REMOVED — always load at 0 so a save that was mid-hunger before this
+    // change comes back with a full, uncapped stamina bar and no stale "capped your
+    // wind" nags. The field is retained for type/save compatibility only; nothing
+    // reads it for the cap anymore (effectiveStaminaMax ignores it).
+    hungerStaminaPenalty: 0,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     // OTA 058 — initialize stat progress for legacy saves so the
     // use-based growth system has a clean baseline.
@@ -1691,7 +1692,12 @@ function debugEnemy(e: Record<string, unknown>): string {
 // capping restoreStamina / showing remaining headroom / computing
 // tired-status thresholds.
 function effectiveStaminaMax(player: PlayerCharacter): number {
-  return Math.max(1, player.staminaMax - (player.hungerStaminaPenalty ?? 0));
+  // HUNGER REMOVED — the hunger stat (hungerStaminaPenalty) was a hidden, unexplained
+  // mechanic whose ONLY effect was shrinking this cap; food already tops off HP and
+  // water already tops off stamina, so it just added invisible friction. The usable
+  // stamina cap is now simply staminaMax. The penalty field is left on the type for
+  // save compatibility but is ignored everywhere; nothing grows it anymore.
+  return Math.max(1, player.staminaMax);
 }
 
 // 2026-05-24 — keep tired / exhausted statuses in sync with current
@@ -1775,7 +1781,8 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const oldBucket = Math.floor(oldHours / 8);
   const newBucket = Math.floor(newHours / 8);
   const ticks = Math.max(0, newBucket - oldBucket);
-  const newHunger = Math.min(5, (player.hungerStaminaPenalty ?? 0) + ticks);
+  void ticks; // HUNGER REMOVED — no longer accrues a stamina-cap penalty over time.
+  const newHunger = 0;
   // OTA-120 Phase 4 — dog loyalty decay. Every 4 in-game hours WITHOUT
   // a feed costs the dog 1 loyalty. Crossing thresholds 50/30/15/0
   // fires escalating Arbiter beats; 0 = abandonment. Threshold beats
@@ -20946,13 +20953,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // somewhere for a while. 4-7 hours per rest, rolled randomly.
     const hoursSlept = rollDie(4) + 3;
     const newHours = (player.hoursElapsed ?? 0) + hoursSlept;
-    // 2026-05-24 — hunger ticks via advanceTime below. For the
-    // pre-recovery log + arbiter warning we need to know how many
-    // hunger ticks WILL fire, so peek at the bucket boundaries.
-    const oldHungerBucket = Math.floor((player.hoursElapsed ?? 0) / 8);
-    const newHungerBucket = Math.floor(newHours / 8);
-    const hungerTicks = Math.max(0, newHungerBucket - oldHungerBucket);
-    const newHungerPenalty = Math.min(5, (player.hungerStaminaPenalty ?? 0) + hungerTicks);
+    // HUNGER REMOVED — rest no longer accrues a hunger penalty, so there is no
+    // "hunger +N" log line, no ≥3 warning, and no cap to reduce.
+    const hungerTicks = 0;
+    const newHungerPenalty = 0;
     // 2026-05-24 — per-hour weather damage during rest. Re-uses the
     // existing tickWeather probabilistic per-action damage by calling
     // it once per hour slept. So sleeping 8 hours in Ash Storm rolls 8

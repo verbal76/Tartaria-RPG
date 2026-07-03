@@ -15440,4 +15440,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (playerHasScannerEquipped checks it). The inventory ✗ no longer fires for a
 // pouch-eligible tool while the belt has room, so you can stow one of each. tsc
 // app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-664-scanners-not-slot-blocked';
+// OTA-665 — HUNGER REMOVED. The hunger stat (hungerStaminaPenalty, 0–5) was a hidden,
+// unexplained mechanic whose ONLY effect was shrinking the usable stamina cap
+// (staminaMax − penalty), which grew +1 per 8 in-game hours (every rest ticked it) —
+// so a max-13 player could get pinned at 8, and food that reset it restored 0 stamina
+// (measured against the hungry cap), making eating look useless. Food already tops off
+// HP and water already tops off stamina, so it just added invisible friction. Now:
+// effectiveStaminaMax = staminaMax, nothing accrues the penalty, stale saves load at 0,
+// and all the "hunger capped your wind" / "hunger +N" lines self-suppress. rest/stamina
+// suites updated + green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-665-hunger-removed';
