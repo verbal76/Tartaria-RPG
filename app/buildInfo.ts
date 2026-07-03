@@ -16868,4 +16868,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // feature, every ground noun greyed "climb down to reach" in the picker yet the count
 // still lit the chip green (the "active chip, no highlighted item" hang). The count now
 // mirrors the modal's elevation gate. investigate/climb suites green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-03-954-investigate-count-elevation-gate';
+// 2026-07-03-955 — completed INVESTIGATE chips now LEAVE the picker instead of
+// lingering greyed with a ✓ (reverses OTA-257 per player request). The pinned surface
+// chip (the ground/floor/mud) stays — permanent per-room affordance — and LOCKED chips
+// (scanner/climb-gated, not yet done) stay so the player sees what's still available;
+// only genuinely-finished nouns disappear. tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-955-investigate-completed-leave-list';
