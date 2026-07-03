@@ -234,10 +234,11 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (this session)
 
 Full changelog is in `HANDOFF-ARCHIVE.md`. Latest per line: **HaL2001
-`…-662`**, **golem-line `…-647`**, **engine_Dev `…-954`**.
+`…-663`**, **golem-line `…-648`**, **engine_Dev `…-955`**.
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 663 | 648 | 955 | Completed INVESTIGATE chips leave the picker (was greyed + ✓); pinned/locked chips stay |
 | 662 | 647 | 954 | INVESTIGATE chip count honors the elevation gate (no phantom-active hang) |
 | 661 | 646 | — | Aethercraft shape/mend open confirm popups (no clipboard copy-paste) |
 | 660 | 645 | 953 | Travel badge grid-exact from course-set (vendor-departure fix) |
