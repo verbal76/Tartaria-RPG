@@ -211,9 +211,21 @@ Key invariants worth knowing:
   vendor-departure/undefined-counter path (660/645/953). If a distance ever
   climbs again, capture the log line at that moment (especially whether a vendor
   was on the road at course-set).
-- **Spin-off lines are behind HaL2001** — steam/mac/linux/html/apple_ios/
-  Dev_engine_PC/arbiters-line do NOT have this session's fixes; port on request
-  (cherry-pick the specific edits; they're stale, don't merge).
+- **INVESTIGATE chip "2 active" residual** — the primary "active chip, nothing to
+  investigate" hang was fixed (elevation gate in the count; 662/647/954). The
+  secondary "tap again → 2 active items" report is unconfirmed and likely a
+  downstream artifact of the same count/modal mismatch. If it recurs, capture the
+  EXACT chip noun that won't clear and whether the player was climbed up.
+- **Spin-off sync status** — steam_Dev / mac_dev / linux_dev / html_dev / apple_ios
+  were merged up to the current Tartaria game code (`git merge -X theirs HaL2001`,
+  identity + platform shims preserved) at the **OTA-660 baseline**; they're now
+  a couple OTAs behind again (661 aethercraft, 662 investigate) — re-run the same
+  merge to top them up. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
+  left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
+  compiled in the SDK container — verify via each line's build workflow.
+- **golem CI hygiene (done)** — the dead inherited `eas-update.yml` (HAL's
+  multi-channel publisher) was deleted from `golem-line`; golem now has ONLY its
+  isolated `eas-update-golem.yml`. Don't re-add a HAL publisher to any line.
 - **CI OOM** — full jest suite + stress probes exceed the container's ~8 GB; run
   targeted suites. A handful of long-standing Tartaria test failures
   (defensiveTurnAdvances / fleeFailCounter wording drift, armorMultiStat data
@@ -222,10 +234,12 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (this session)
 
 Full changelog is in `HANDOFF-ARCHIVE.md`. Latest per line: **HaL2001
-`…-660`**, **golem-line `…-645`**, **engine_Dev `…-953`**.
+`…-662`**, **golem-line `…-647`**, **engine_Dev `…-954`**.
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 662 | 647 | 954 | INVESTIGATE chip count honors the elevation gate (no phantom-active hang) |
+| 661 | 646 | — | Aethercraft shape/mend open confirm popups (no clipboard copy-paste) |
 | 660 | 645 | 953 | Travel badge grid-exact from course-set (vendor-departure fix) |
 | 659 | 644 | 952 | Travel counter keeps progress across a mid-journey reload |
 | 658 | 643 | 951 | Native-ML teardown hardening (recents/background SIGSEGV) |
