@@ -334,10 +334,21 @@ export function InventoryScreen() {
     const worn = (eq as Record<string, unknown>)[slot];
     return typeof worn === 'string' && worn.length > 0;
   };
+  const POUCH_MAX = 4; // mirrors stowInPouch in gameStore
   const itemSlotTaken = (item: InventoryItem): boolean => {
     if (equippedItemIds.has(item.id)) return false;
     const slots = validSlotsForItem(item);
-    return slots.length > 0 && slots.every(slotIsFull);
+    if (slots.length === 0 || !slots.every(slotIsFull)) return false;
+    // A pouch-eligible tool is NOT blocked just because its equip slot is full —
+    // it can still go on the tool belt. Scanners are the case that bit players:
+    // all three (Pulse / Aetheric / Mud) share the single off-hand equip slot, so
+    // equipping one used to red-✗ the other two — making it look like you can only
+    // carry one. But the 4-slot pouch holds all three AND each fires from there
+    // (playerHasScannerEquipped checks the pouch). So while the belt has room and
+    // the item is pouch-eligible, don't mark it "taken".
+    const pouchIds = eq.toolPouchIds ?? [];
+    if (pouchIds.length < POUCH_MAX && isPouchEligible(item, player).eligible) return false;
+    return true;
   };
 
   // ALWAYS show the modal. Auto-equipping silently when there was only one

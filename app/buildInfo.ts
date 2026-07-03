@@ -16873,4 +16873,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chip (the ground/floor/mud) stays — permanent per-room affordance — and LOCKED chips
 // (scanner/climb-gated, not yet done) stay so the player sees what's still available;
 // only genuinely-finished nouns disappear. tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-955-investigate-completed-leave-list';
+// 2026-07-03-956 — scanners no longer red-✗ each other in the inventory. All three
+// scanners (Pulse / Aetheric / Mud) share the single off-hand equip slot, so equipping
+// one marked the other two "slot taken" — making it look like you can only carry one.
+// But the 4-slot tool belt holds all three AND each fires from the pouch. The inventory
+// ✗ no longer fires for a pouch-eligible tool while the belt has room, so you can stow
+// one of each. tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-956-scanners-not-slot-blocked';
