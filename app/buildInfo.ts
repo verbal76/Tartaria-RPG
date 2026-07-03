@@ -15427,4 +15427,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chip green (the "active chip, no highlighted item" hang). The count now mirrors the
 // modal's elevation gate. (Ported from engine_Dev 954.) investigate/climb suites green;
 // tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-662-investigate-count-elevation-gate';
+// OTA-663 — completed INVESTIGATE chips now LEAVE the picker instead of lingering
+// greyed with a ✓ (reverses the OTA-257 "keep a visible record" behavior per player
+// request). The pinned surface chip (the ground/floor/mud) stays — it's a permanent
+// per-room affordance — and LOCKED chips (scanner/climb-gated, not yet done) stay so
+// the player sees what's still available; only genuinely-finished nouns disappear.
+// tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-663-investigate-completed-leave-list';
