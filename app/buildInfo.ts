@@ -16862,4 +16862,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // self-healed it to the true grid distance, looking like the counter "jumped up
 // mid-travel". Now it seeds the grid-exact distance up front, and the display fallback
 // is grid-exact too. travelBadgeGridExact + travel suites green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-02-953-travel-badge-grid-exact';
+// 2026-07-03-954 — INVESTIGATE chip no longer reads "active" with nothing to
+// investigate. The badge count filtered by consumed + scanner requirements but NOT by
+// the elevation gate the SearchModal applies — so while the player was climbed onto a
+// feature, every ground noun greyed "climb down to reach" in the picker yet the count
+// still lit the chip green (the "active chip, no highlighted item" hang). The count now
+// mirrors the modal's elevation gate. investigate/climb suites green; tsc app-clean.
+export const OTA_BUILD_ID = '2026-07-03-954-investigate-count-elevation-gate';
