@@ -16879,4 +16879,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // But the 4-slot tool belt holds all three AND each fires from the pouch. The inventory
 // ✗ no longer fires for a pouch-eligible tool while the belt has room, so you can stow
 // one of each. tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-956-scanners-not-slot-blocked';
+// 2026-07-03-957 — HUNGER REMOVED. The hunger stat (hungerStaminaPenalty, 0–5) was a
+// hidden, unexplained mechanic whose only effect was shrinking the usable stamina cap;
+// it grew +1 per 8 in-game hours (every rest ticked it) and food that reset it restored
+// 0 stamina (measured against the hungry cap). Food already tops off HP and water tops
+// off stamina, so it just added invisible friction. effectiveStaminaMax now keeps the
+// engine bonusStaminaMax but drops the hunger term; nothing accrues the penalty; stale
+// saves load at 0; hunger lines self-suppress. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-957-hunger-removed';
