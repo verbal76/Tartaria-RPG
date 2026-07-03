@@ -15278,4 +15278,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (fuel + affordability) → casts and bounces to exploration so the roll plays out
 // live. Removed the dead clipboard/queue staging path. aethercraft suites green;
 // tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-02-646-aethercraft-confirm-popups';
+// OTA-647 — INVESTIGATE chip no longer reads "active" with nothing to investigate.
+// The badge count filtered by consumed + scanner requirements but NOT by the elevation
+// gate the SearchModal applies — so while climbed onto a feature, every ground noun
+// greyed "climb down to reach" in the picker yet the count still lit the chip green
+// (the "active chip, no highlighted item" hang). The count now mirrors the modal's
+// elevation gate. (Ported from engine_Dev 954.) investigate/climb suites green.
+export const OTA_BUILD_ID = '2026-07-03-647-investigate-count-elevation-gate';

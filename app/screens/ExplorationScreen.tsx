@@ -972,6 +972,22 @@ export function ExplorationScreen() {
                   if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
                     return false;
                   }
+                  // OTA — elevation gate, mirroring the SearchModal chip logic
+                  // (see the chips map ~"climb down to reach"). While the player is
+                  // climbed onto a feature with no elevated overlay, every GROUND
+                  // noun except the climbed one refuses with "climb down to reach"
+                  // and is greyed in the modal — so it is NOT actionable and must
+                  // not light the INVESTIGATE chip green. Without this the count
+                  // and the modal disagreed: the chip read active while every item
+                  // in the picker was greyed — the "active chip, nothing to
+                  // investigate" hang the player hit.
+                  const elev = currentScene?.elevatedOn;
+                  if (elev && !currentScene?.elevatedOverlayMeta) {
+                    const climbedNoun = elev.noun.toLowerCase();
+                    const nl = n.toLowerCase();
+                    const isClimbedNoun = nl.includes(climbedNoun) || climbedNoun.includes(nl);
+                    if (!isClimbedNoun) return false;
+                  }
                   return true;
                 },
               ).length;
