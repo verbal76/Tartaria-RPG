@@ -1453,7 +1453,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // 2026-05-24 — hunger penalty defaults to 0 on legacy saves; ticks
     // up every 8 in-game hours without eating, capped at 5. Eating any
     // food consumable resets to 0.
-    hungerStaminaPenalty: p.hungerStaminaPenalty ?? 0,
+    hungerStaminaPenalty: 0, // HUNGER REMOVED — load stale saves uncapped; field ignored everywhere
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     // OTA 058 — initialize stat progress for legacy saves so the
     // use-based growth system has a clean baseline.
@@ -1684,7 +1684,7 @@ function debugEnemy(e: Record<string, unknown>): string {
 // capping restoreStamina / showing remaining headroom / computing
 // tired-status thresholds.
 function effectiveStaminaMax(player: PlayerCharacter): number {
-  return Math.max(1, player.staminaMax - (player.hungerStaminaPenalty ?? 0));
+  return Math.max(1, player.staminaMax); // HUNGER REMOVED — usable cap is just staminaMax
 }
 
 // 2026-05-24 — keep tired / exhausted statuses in sync with current
@@ -1768,7 +1768,7 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const oldBucket = Math.floor(oldHours / 8);
   const newBucket = Math.floor(newHours / 8);
   const ticks = Math.max(0, newBucket - oldBucket);
-  const newHunger = Math.min(5, (player.hungerStaminaPenalty ?? 0) + ticks);
+  void ticks; const newHunger = 0; // HUNGER REMOVED — no cap penalty accrues over time
   // OTA-120 Phase 4 — dog loyalty decay. Every 4 in-game hours WITHOUT
   // a feed costs the dog 1 loyalty. Crossing thresholds 50/30/15/0
   // fires escalating Arbiter beats; 0 = abandonment. Threshold beats
@@ -21014,8 +21014,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // hunger ticks WILL fire, so peek at the bucket boundaries.
     const oldHungerBucket = Math.floor((player.hoursElapsed ?? 0) / 8);
     const newHungerBucket = Math.floor(newHours / 8);
-    const hungerTicks = Math.max(0, newHungerBucket - oldHungerBucket);
-    const newHungerPenalty = Math.min(5, (player.hungerStaminaPenalty ?? 0) + hungerTicks);
+    const hungerTicks = 0; // HUNGER REMOVED
+    const newHungerPenalty = 0; // HUNGER REMOVED
     // 2026-05-24 — per-hour weather damage during rest. Re-uses the
     // existing tickWeather probabilistic per-action damage by calling
     // it once per hour slept. So sleeping 8 hours in Ash Storm rolls 8

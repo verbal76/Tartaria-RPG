@@ -48,26 +48,30 @@ async function restFrom(patch: { stamina: number; hungerStaminaPenalty: number; 
   return { before, after: useGameStore.getState().player!.stamina };
 }
 
-describe('OTA-614 — rest never reduces stamina', () => {
-  it('restores stamina normally when not hungry and below max', async () => {
+describe('rest never reduces stamina; HUNGER REMOVED (no longer caps the bar)', () => {
+  it('restores stamina normally when below max', async () => {
     await boot();
     const max = useGameStore.getState().player!.staminaMax;
     const { before, after } = await restFrom({ stamina: Math.max(1, max - 5), hungerStaminaPenalty: 0, corruption: 0 });
     expect(after).toBeGreaterThan(before);
+    expect(after).toBeLessThanOrEqual(max);
   });
 
-  it('does NOT drain stamina when hunger has shrunk the cap below current stamina (corruption keeps the rest active)', async () => {
+  it('a formerly-hungry save (penalty 5) now rests to the FULL staminaMax — hunger no longer caps it', async () => {
     await boot();
     const max = useGameStore.getState().player!.staminaMax;
-    // stamina above the hunger-reduced cap (max-5), but below the raw max; corruption>0 so rest proceeds.
-    const { before, after } = await restFrom({ stamina: max - 2, hungerStaminaPenalty: 5, corruption: 2 });
-    expect(after).toBeGreaterThanOrEqual(before); // never negative
+    // A stale hunger penalty of 5 must have zero effect now: resting from low
+    // recovers past the old (max-5) ceiling all the way to the real max.
+    const { before, after } = await restFrom({ stamina: Math.max(1, max - 6), hungerStaminaPenalty: 5, corruption: 0 });
+    expect(after).toBeGreaterThan(before);
+    expect(after).toBeGreaterThan(max - 5); // would have been clamped here under the old hunger cap
   });
 
-  it('refuses a pointless rest (hunger-capped, no corruption) without changing stamina', async () => {
+  it('resting at full stamina never reduces the bar', async () => {
     await boot();
     const max = useGameStore.getState().player!.staminaMax;
-    const { before, after } = await restFrom({ stamina: max - 2, hungerStaminaPenalty: 5, corruption: 0 });
-    expect(after).toBe(before);
+    const { before, after } = await restFrom({ stamina: max, hungerStaminaPenalty: 5, corruption: 0 });
+    expect(after).toBe(before); // already full — no room, no drain
+    expect(after).toBe(max);
   });
 });
