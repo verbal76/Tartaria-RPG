@@ -56,11 +56,17 @@ function lookupBaseDurability(name: string): number | null {
   // 'weapon' / 'armor' as durability-tracked.
   const nameLower = name.toLowerCase();
   const g = GEAR.find((x) => x.name.toLowerCase() === nameLower);
-  if (g && g.kind === 'relic') {
-    // GEAR rows don't currently declare baseDurability, but the door
-    // is open for them to do so. Honor it if present.
+  if (g) {
+    // OTA-677 — honor a GEAR row's DECLARED baseDurability regardless of kind. The
+    // old rule only tracked `relic`-kind rows, so when OTA-666 reclassified the
+    // Climbing Rope relic→misc it stopped resolving its base (150) — leaving the
+    // rope's durability un-anchored (a stale tempered max couldn't be healed, and a
+    // fresh misc rope got no durability at all). A relic row with no declared base
+    // still falls back to DEFAULT_DURABILITY (unchanged); a plain misc row without
+    // baseDurability falls through to null (not durability-tracked).
     const gAny = g as typeof g & { baseDurability?: number };
-    return gAny.baseDurability ?? DEFAULT_DURABILITY;
+    if (gAny.baseDurability != null) return gAny.baseDurability;
+    if (g.kind === 'relic') return DEFAULT_DURABILITY;
   }
   // Exploration catalog: Reclaimer's Rope (and any future durability-tracked
   // exploration item) carries baseDurability now that rope is wear-tracked.
@@ -174,6 +180,16 @@ export function stampDurability(item: InventoryItem): InventoryItem {
   if (item.durability) return item;
   const base = lookupBaseDurability(item.name);
   if (base == null) return item;
+  // OTA-677 — the TEMPER roll (variable durability + rolled perks: the
+  // "glass-cannon vs workhorse" tradeoff) is a WEAPON / ARMOR mechanic. A utility
+  // item that merely carries a baseDurability (a Climbing Rope, a Pry Bar, and other
+  // misc / relic tools) must NOT be tempered: it was getting a RANDOM max of
+  // base × [0.4, 1.8] — a 150-durability rope rolling as high as ~270 ("almost 300")
+  // — plus nonsensical rolled stat perks, and every fresh instance re-rolled it.
+  // Non-weapon/armor items now stamp a FIXED max = base, no perks: stable + sensible.
+  if (item.kind !== 'weapon' && item.kind !== 'armor') {
+    return { ...item, durability: { current: base, max: base } };
+  }
   const temper = Math.random(); // 0 = fragile (strong perks), 1 = sturdy (weak perks)
   const max = Math.max(1, Math.round(base * lerp(0.4, 1.8, temper)));
   const instanceStats = rollInstancePerks(item, temper);
@@ -182,6 +198,19 @@ export function stampDurability(item: InventoryItem): InventoryItem {
     durability: { current: max, max },
     ...(instanceStats ? { instanceStats } : {}),
   };
+}
+
+/** OTA-677 — heal a non-weapon/armor item whose durability MAX drifted off its
+ *  catalog base, from the pre-gate temper roll that never should have applied to a
+ *  utility tool (a Climbing Rope stamped at ~270 instead of 150). Resets max to the
+ *  catalog base and clamps current. Weapons/armor are untouched (their tempered
+ *  band is intended). Idempotent — a correct item is returned unchanged. Run on
+ *  load so existing saves self-correct. */
+export function resealUtilityDurability(item: InventoryItem): InventoryItem {
+  if (!item.durability || item.kind === 'weapon' || item.kind === 'armor') return item;
+  const base = lookupBaseDurability(item.name);
+  if (base == null || item.durability.max === base) return item;
+  return { ...item, durability: { max: base, current: Math.min(item.durability.current, base) } };
 }
 
 // Reduce one inventory item's durability by `amount`. Matches by name; the

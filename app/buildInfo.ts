@@ -15531,4 +15531,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // repair. Now scrapEngine treats `rope` as fiber (→ Patched Cloth), and the Pry Bar carries a
 // `metal` tag (→ Scrap Metal). General fix: any repairable misc/relic tool now mends with its
 // real material. New ropePryScrapMaterial suite. JS+data → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-676-rope-pry-scrap-material';
+// OTA-677 — a Climbing Rope's MAX durability climbed to ~270 ("almost 300"). stampDurability
+// ran the WEAPON/ARMOR temper roll (max = base × [0.4,1.8] + rolled perks) on ANY item with a
+// baseDurability, so a 150-durability utility rope rolled a random 60–270 and drifted on fresh
+// instances. Three fixes: (1) the temper is gated to weapon/armor — misc/relic TOOLS now stamp
+// a FIXED max = base, no perks; (2) lookupBaseDurability honors a GEAR row's declared
+// baseDurability regardless of kind (OTA-666 made the rope misc, which had un-anchored its 150
+// base); (3) resealUtilityDurability heals existing saves' inflated tool durability back to base
+// on load. New utilityDurabilityNoTemper suite; durability/repair/scrap suites green. JS+data.
+export const OTA_BUILD_ID = '2026-07-04-677-utility-durability-fixed-not-tempered';
