@@ -15379,4 +15379,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New entityGuard.ts drops narration sentences naming a multi-word entity not in the world's
 // known set (locations + factions + races + lore-concept titles/keywords + live scene entities);
 // nothing survives → authored template. Wired into both Qwen paths. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-663-narration-offcanon-entity-guard';
+// OTA-664 — Fusing Crucible picker shows each item's MATERIAL TYPE (ported from Tartaria
+// OTA-679). Rows now read name … Type (metal/aether/organic/…) … rarity, Type = the same
+// fusionMaterialTags the diversity gate uses, so you can tell inputs apart. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-664-fusion-picker-shows-material-type';
