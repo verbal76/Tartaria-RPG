@@ -62,6 +62,9 @@ describe('Guild Broker engine', () => {
 
     it('lists both demands with recover-at tiles when the player holds neither relic', () => {
       const line = brokerMissionLine(mission, () => false, tileName)!;
+      // Leads with the mission NAME (matches the CONTRACTS card title) so the
+      // standing reminder and the card agree on what this mission is called.
+      expect(line.startsWith('Broker an Alliance')).toBe(true);
       expect(line).toContain('Reclaimers Guild demands the Fragment of the Endless Stair (recover it at Endless Stair)');
       expect(line).toContain('Stone Builders demands the Obsidian Siphon (recover it at Obsidian Pillars)');
       expect(line).toMatch(/SEAL THE ALLIANCE\.$/);
