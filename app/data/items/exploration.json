@@ -1234,7 +1234,7 @@
   {
     "name": "Reclaimer's Rope",
     "abilityReq": "Dexterity Level 2",
-    "kind": "relic",
+    "kind": "misc",
     "rarity": "Common",
     "faction": "Reclaimers",
     "tcBuy": 15,
