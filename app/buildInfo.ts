@@ -15312,4 +15312,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chip consumed-match (normNoun) stripped only the apostrophe → "messengers post", but
 // the parser records "messenger post" (whole 's dropped), so they never reconciled and
 // the chip stayed live. normNoun now drops the whole possessive 's. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-652-possessive-noun-consumed-match';
+// OTA-653 — persistent "current mission" line (ported from Tartaria OTA-668). A
+// playtester was mid-parley with two faction leaders when a fight broke out; afterward
+// they were lost ("how do I get back into the mission"). The Parley of Factions objective
+// (the same demands text the PARLEY action prints) is now surfaced as a standing
+// "▸ Mission — …" line directly under the scene paragraph on every entry AND in every
+// look-around, so an interrupting fight can never leave the player unsure what they were
+// doing. Extracted broker.brokerMissionLine (pure) as the shared source. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-653-persistent-mission-line';
