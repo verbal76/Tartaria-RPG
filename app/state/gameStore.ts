@@ -1264,13 +1264,10 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
     }
   }
   if (mission.done) { getStore().appendLog('world', 'The alliance you brokered here holds.'); return; }
-  const legs = broker.missionLegs(mission);
-  if (!legs) return;
   const has = (name: string) => player.inventory.some((i) => i.name === name);
-  const line = legs.map((l: any) =>
-    `${l.factionName} demands the ${l.itemName} (${has(l.itemName) ? 'in hand ✓' : `recover it at ${tileName(l.tileId)}`})`).join('; ');
-  getStore().appendLog('world',
-    `Two leaders face off across the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`);
+  const missionLine = broker.brokerMissionLine(mission, has, tileName);
+  if (!missionLine) return;
+  getStore().appendLog('world', missionLine);
 }
 
 // OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen
@@ -1400,6 +1397,23 @@ function welcomeBackLine(player: PlayerCharacter | null | undefined): string {
   const line = WELCOME_BACK_LINES[Math.floor(Math.random() * WELCOME_BACK_LINES.length)]!;
   return line.replace('{name}', name);
 }
+
+// OTA-960 — persistent "current mission" objective line. Playtester was mid-parley
+// with two faction leaders when a fight broke out; after the fight they were unsure
+// what they had been doing or where to go ("how do I get back into the mission").
+// This surfaces the ACTIVE mission's concrete objective — the same demands text the
+// PARLEY action prints — as a standing line under the scene paragraph on entry and
+// in every look-around, so an interruption can never leave the player lost. Covers
+// the Parley of Factions (broker) mission today; returns null when none is active.
+function activeMissionReminder(player: PlayerCharacter | null | undefined): string | null {
+  if (!player?.brokerMission) return null;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const broker = require('../engine/broker');
+  const has = (name: string) => player.inventory.some((i) => i.name === name);
+  const tileName = (id: string) => getLocationById(id)?.name ?? id;
+  return broker.brokerMissionLine(player.brokerMission, has, tileName) as string | null;
+}
+
 // OTA-350 — throttle the Arbiter's "consider stealth" nudge so it's an
 // occasional suggestion in fitting moments, not a per-scene nag.
 const STEALTH_HINT_MIN_MS = 120_000;
@@ -5746,6 +5760,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', arrival);
     } else {
       get().appendLog('world', sceneText);
+    }
+    // OTA-960 — persistent mission line, printed directly under the scene
+    // paragraph on every entry so an interrupting fight can't leave the player
+    // unsure what they were doing. (Same objective the look-around reminder
+    // surfaces; routed to 'world' to sit with the scene text.)
+    {
+      const missionReminder = activeMissionReminder(get().player);
+      if (missionReminder) get().appendLog('world', `▸ Mission — ${missionReminder}`);
     }
     // OTA 207 — encounter range status. When an encounter just
     // spawned, emit a 'combat' line showing which of the player's
@@ -25830,6 +25852,13 @@ function narrateCasualLook(
   }
 
   get().appendLog('world', parts.join(' '));
+
+  // OTA-960 — standing mission objective (Parley of Factions), so a fight that
+  // interrupted the parley can't leave the player wondering what to do next.
+  {
+    const missionReminder = activeMissionReminder(player);
+    if (missionReminder) get().appendLog('world', `▸ Mission — ${missionReminder}`);
+  }
 
   // 6. Optional hook plant — 30% chance, only if no hook is already active.
   // Kept separate from the description so the look-summary always reads

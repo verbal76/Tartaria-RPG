@@ -70,3 +70,24 @@ export function isBrokerSourceTile(m: BrokerMission, tileId: string): BrokerLeg 
   if (!legs) return null;
   return legs.find((l) => l.tileId === tileId) ?? null;
 }
+
+/** One-line objective summary for an active (unsealed) broker mission — the
+ *  same demands string the PARLEY action prints, extracted so it can be
+ *  surfaced persistently as a "current mission" reminder under the scene
+ *  paragraph (playtester got pulled into a fight mid-parley and lost track of
+ *  what they were doing). Returns null when there is no live mission or it's
+ *  already sealed. `has` reports whether the player already carries a relic by
+ *  name; `tileName` resolves a source tile id to its display name. */
+export function brokerMissionLine(
+  m: BrokerMission | null | undefined,
+  has: (itemName: string) => boolean,
+  tileName: (tileId: string) => string,
+): string | null {
+  if (!m || m.done) return null;
+  const legs = missionLegs(m);
+  if (!legs) return null;
+  const line = legs
+    .map((l) => `${l.factionName} demands the ${l.itemName} (${has(l.itemName) ? 'in hand ✓' : `recover it at ${tileName(l.tileId)}`})`)
+    .join('; ');
+  return `Two leaders face off across the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`;
+}
