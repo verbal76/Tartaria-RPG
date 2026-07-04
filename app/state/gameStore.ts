@@ -987,12 +987,12 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
       player: { ...s.player, brokerOfferDeclined: false },
       pendingMissionOffer: {
         kind: 'broker', factionA: picked[0], factionB: picked[1],
-        title: 'Broker an Alliance?',
-        body: `${demands}\n\nAccept the parley to take this on as a contract, or walk away.`,
+        title: 'New mission — Broker an Alliance',
+        body: `${demands}\n\nAccept to take this on as a tracked contract (you'll find it under CONTRACTS), or decline to walk away.`,
       },
     } : s));
-    getStore().appendLog('world',
-      `You come up on the parley stone. ${aName} and ${bName} are both here, willing to talk terms — but brokering their alliance means fetching each faction's coveted relic. Accept the parley, or walk away?`);
+    getStore().appendLog('mission',
+      `Broker an Alliance: ${aName} and ${bName} are both here on the neutral flats, willing to talk terms — but brokering their alliance means fetching each faction's coveted relic. Accept the mission, or walk away?`);
     return;
   }
   if (mission.done) { getStore().appendLog('world', 'The alliance you brokered here holds.'); return; }
@@ -5427,7 +5427,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // surfaces; routed to 'world' to sit with the scene text.)
     {
       const missionReminder = activeMissionReminder(get().player);
-      if (missionReminder) get().appendLog('world', `▸ Mission — ${missionReminder}`);
+      if (missionReminder) get().appendLog('mission', missionReminder);
     }
     // OTA 207 — encounter range status. When an encounter just
     // spawned, emit a 'combat' line showing which of the player's
