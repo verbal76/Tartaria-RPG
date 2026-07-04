@@ -962,24 +962,38 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
     return;
   }
 
-  // Parley (free): open a mission or report its state.
+  // No mission yet — you STUMBLED onto the parley. OTA-656: don't silently take
+  // the contract. Announce the offer + its demands and wait for ACCEPT / DECLINE.
   if (!mission) {
+    const explicit = /\bparley\b/i.test(trimmed);
+    // Already declined this offer? Ambient pokes (approach/examine) get a quiet
+    // reminder, not a re-pop; only an explicit PARLEY re-opens the choice.
+    if (player.brokerOfferDeclined && !explicit) {
+      getStore().appendLog('world', 'The two leaders still wait on the neutral flats. PARLEY when you want to hear their terms.');
+      return;
+    }
+    if (getStore().pendingMissionOffer) return; // offer already on screen
     const picked = broker.pickBrokerFactions(player.factionId, player.factionStanding ?? []);
     if (!picked) { getStore().appendLog('world', 'No two factions will sit with you on neutral ground right now.'); return; }
-    mission = { factionA: picked[0], factionB: picked[1] };
-    setStore((s) => (s.player ? { player: { ...s.player, brokerMission: mission } } : s));
-    // OTA-506 — the parley contract becomes grid events: a yellow "?" at each
-    // faction's relic location (co-located with that static location, different id),
-    // flipped to a red "X" when the alliance is sealed below.
-    for (const l of (broker.missionLegs(mission) ?? [])) {
-      const cell = canonicalCellFor((l as { tileId: string }).tileId);
-      getStore().canonizeLocation({
-        id: `contract_${(l as { factionId: string }).factionId}`,
-        name: `${(l as { factionName: string }).factionName}: ${(l as { itemName: string }).itemName}`,
-        type: 'contract', danger: 2, source: 'contract',
-        gx: cell.x, gy: cell.y, marker: 'pending',
-      });
-    }
+    // Build the demands preview from a provisional mission (NOT stored yet) so the
+    // player can make an informed accept/decline choice.
+    const provisional = { factionA: picked[0], factionB: picked[1] };
+    const has0 = (name: string) => player.inventory.some((i) => i.name === name);
+    const demands = broker.brokerMissionLine(provisional, has0, tileName)
+      ?? `${broker.factionName(picked[0])} and ${broker.factionName(picked[1])} want to talk terms.`;
+    const aName = broker.factionName(picked[0]);
+    const bName = broker.factionName(picked[1]);
+    setStore((s) => (s.player ? {
+      player: { ...s.player, brokerOfferDeclined: false },
+      pendingMissionOffer: {
+        kind: 'broker', factionA: picked[0], factionB: picked[1],
+        title: 'Broker an Alliance?',
+        body: `${demands}\n\nAccept the parley to take this on as a contract, or walk away.`,
+      },
+    } : s));
+    getStore().appendLog('world',
+      `You come up on the parley stone. ${aName} and ${bName} are both here, willing to talk terms — but brokering their alliance means fetching each faction's coveted relic. Accept the parley, or walk away?`);
+    return;
   }
   if (mission.done) { getStore().appendLog('world', 'The alliance you brokered here holds.'); return; }
   const has = (name: string) => player.inventory.some((i) => i.name === name);
@@ -2518,6 +2532,12 @@ interface GameStore {
    *  they confirm or cancel via the BrandedModal. The screen layer
    *  listens for this and renders a Yes/No prompt. */
   pendingTravelConfirm: { locationId: string; locationName: string } | null;
+  /** OTA-656 — a mission you STUMBLED onto (didn't seek out) offers itself for
+   *  accept/decline instead of silently committing you. Currently the Parley of
+   *  Factions: approaching the leaders on the neutral flats now ANNOUNCES the
+   *  offer + its demands and waits for a choice — ACCEPT takes the contract,
+   *  DECLINE walks away. The screen renders this as a BrandedModal. */
+  pendingMissionOffer: { kind: 'broker'; factionA: string; factionB: string; title: string; body: string } | null;
   /** OTA-466 — set true right after a golem is summoned: the next typed input
    *  is captured as the golem's name (or 'skip' to keep the type label), like
    *  the dog onboarding. Transient — not persisted. */
@@ -2528,6 +2548,13 @@ interface GameStore {
   confirmLeaveAndTravel: () => void;
   /** No path: clears pending. Player stays inside the outpost. */
   cancelTravelConfirm: () => void;
+  /** OTA-656 — ACCEPT a stumbled-onto mission offer: commit the contract (create
+   *  the broker mission + its grid markers) and clear the offer. */
+  acceptMissionOffer: () => void;
+  /** OTA-656 — DECLINE a stumbled-onto mission offer: walk away, don't create it,
+   *  and set a soft flag so it doesn't re-prompt on the next ambient action (an
+   *  explicit PARLEY re-opens it). */
+  declineMissionOffer: () => void;
   setActiveEnemyIdx: (idx: number) => void;
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
@@ -2850,6 +2877,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ pendingContractsTab: null });
   },
   pendingTravelConfirm: null,
+  pendingMissionOffer: null,
   pendingGolemNaming: false,
   hydrated: false,
   lowHpWarned: false,
@@ -18197,6 +18225,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   cancelTravelConfirm() {
     set({ pendingTravelConfirm: null });
+  },
+
+  // OTA-656 — accept a stumbled-onto mission offer. Commits the contract that
+  // handleBroker previously created silently: builds the broker mission, canonizes
+  // its two relic-source grid markers, and prints the objective line.
+  acceptMissionOffer() {
+    const offer = get().pendingMissionOffer;
+    const player = get().player;
+    if (!offer || !player) { set({ pendingMissionOffer: null }); return; }
+    if (offer.kind === 'broker') {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const broker = require('../engine/broker');
+      const tileName = (id: string) => getLocationById(id)?.name ?? id;
+      const mission = { factionA: offer.factionA, factionB: offer.factionB };
+      set((s) => (s.player ? {
+        player: { ...s.player, brokerMission: mission, brokerOfferDeclined: false },
+        pendingMissionOffer: null,
+      } : s));
+      // OTA-506 — the parley contract becomes grid events: a yellow "?" at each
+      // faction's relic location, flipped to a red "X" when the alliance is sealed.
+      for (const l of (broker.missionLegs(mission) ?? [])) {
+        const cell = canonicalCellFor((l as { tileId: string }).tileId);
+        get().canonizeLocation({
+          id: `contract_${(l as { factionId: string }).factionId}`,
+          name: `${(l as { factionName: string }).factionName}: ${(l as { itemName: string }).itemName}`,
+          type: 'contract', danger: 2, source: 'contract',
+          gx: cell.x, gy: cell.y, marker: 'pending',
+        });
+      }
+      const has = (name: string) => get().player!.inventory.some((i) => i.name === name);
+      const line = broker.brokerMissionLine(mission, has, tileName);
+      get().appendLog('world', `You sit down at the parley stone — the contract is yours.${line ? ` ${line}` : ''}`);
+      void get().persist();
+      return;
+    }
+    set({ pendingMissionOffer: null });
+  },
+  // OTA-656 — decline a stumbled-onto mission offer. Doesn't create anything; sets
+  // a soft flag so ambient pokes don't re-pop the prompt (explicit PARLEY re-opens).
+  declineMissionOffer() {
+    const offer = get().pendingMissionOffer;
+    if (!offer) { set({ pendingMissionOffer: null }); return; }
+    set((s) => (s.player
+      ? { player: { ...s.player, brokerOfferDeclined: true }, pendingMissionOffer: null }
+      : { pendingMissionOffer: null }));
+    get().appendLog('world', `You give the leaders a nod and step back. They'll keep the flats warm — PARLEY if you change your mind.`);
+    void get().persist();
   },
 
   stepDirection(dir: Direction) {

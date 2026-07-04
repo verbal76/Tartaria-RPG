@@ -121,6 +121,9 @@ export function ExplorationScreen() {
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
   const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
+  const pendingMissionOffer = useGameStore((s) => s.pendingMissionOffer);
+  const acceptMissionOffer = useGameStore((s) => s.acceptMissionOffer);
+  const declineMissionOffer = useGameStore((s) => s.declineMissionOffer);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
@@ -1675,6 +1678,28 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => cancelTravelConfirm()}
+      />
+
+      {/* OTA-656 — stumbled-onto mission offer (Parley of Factions). Approaching
+          the leaders no longer silently takes the contract; it announces the
+          demands and asks. Accept commits it; Decline walks away. */}
+      <BrandedModal
+        visible={pendingMissionOffer !== null}
+        title={pendingMissionOffer?.title ?? 'Accept this mission?'}
+        body={pendingMissionOffer?.body}
+        buttons={[
+          {
+            label: 'Decline',
+            onPress: () => declineMissionOffer(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Accept',
+            onPress: () => acceptMissionOffer(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => declineMissionOffer()}
       />
     </KeyboardAvoidingView>
   );

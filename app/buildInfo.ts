@@ -15333,4 +15333,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ▮▮ DEACTIVATE / ▶ SET ACTIVE button + ⏸ PAUSED styling on every card. Paused staged
 // contracts + leads freeze; paused whispers + parley drop off the standing reminders.
 // Extended abandonContract to drop whispers + the parley. tsc app-clean; suites green. JS-only.
-export const OTA_BUILD_ID = '2026-07-04-655-uniform-contract-activate-deactivate';
+// OTA-656 — stumbled-onto missions now ANNOUNCE + offer accept/decline instead of silently
+// committing you (ported from Tartaria OTA-671). The Parley of Factions was the offender:
+// approaching the leaders auto-created the broker contract with no consent. Now handleBroker
+// raises a pendingMissionOffer (announce + demands preview); a BrandedModal asks ACCEPT
+// (commit the contract + grid markers) or DECLINE (walk away). Declining latches
+// player.brokerOfferDeclined so ambient pokes don't re-pop the prompt; an explicit PARLEY
+// re-opens it. New parleyOfferAcceptDecline suite green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-656-parley-accept-decline-offer';
