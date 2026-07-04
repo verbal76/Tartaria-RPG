@@ -15302,4 +15302,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // off HP and water tops off stamina, so it just added invisible friction. Now
 // effectiveStaminaMax = staminaMax, nothing accrues the penalty, stale saves load at 0,
 // and all the hunger lines self-suppress. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-650-hunger-removed';
+// OTA-651 — Climbing Rope + Reclaimer's Rope are gear, not relics. They were kind:'relic'
+// (a NON_TOOL_KIND), so the inventory filed them under RELICS and the crafting screen
+// grouped the Climbing Rope recipe under the RELICS banner. Now kind:'misc' — their
+// utility/rope tags read them as tools/gear across inventory + crafting. Climb capability
+// is tag-driven so nothing mechanical changes. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-651-rope-is-gear-not-relic';
