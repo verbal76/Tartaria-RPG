@@ -16946,4 +16946,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // recipes whose outputs are existing throwable-tagged, bandolier-eligible weapons: Throwing
 // Knife, Tartarian Hand Axe (Throw), Mud Throwing Knife, Bone Throwing Axe, Shaped Aetheric
 // Shard. New throwableRecipes suite green. Data-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-967-craftable-throwables';
+// 2026-07-04-968 — ropes/tools scrap+repair with their real material (ported from Tartaria
+// OTA-676). repairCostMaterials = scrap × 2, and scrapEngine didn't recognize `rope` as
+// fiber, so a rope-tagged item (and the metal-less Pry Bar) fell through to the bare
+// Stick+Small Rock fallback. scrapEngine now treats `rope` as fiber (→ cloth role); the Pry
+// Bar's built-in row gains a `metal` tag. Engine rule benefits any pack with rope-tagged
+// items. New ropePryScrapMaterial suite. JS + data → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-968-rope-pry-scrap-material';
