@@ -27,6 +27,9 @@ export interface BrokerMission {
   factionB: string;
   /** Set once the alliance is sealed. */
   done?: boolean;
+  /** `true` = the player has DEACTIVATED (paused) the parley: it stays on the
+   *  slate but is dropped from the standing mission reminders until re-activated. */
+  paused?: boolean;
 }
 
 export function factionName(id: string): string {

@@ -1124,7 +1124,7 @@ function welcomeBackLine(player: PlayerCharacter | null | undefined): string {
 // in every look-around, so an interruption can never leave the player lost. Covers
 // the Parley of Factions (broker) mission today; returns null when none is active.
 function activeMissionReminder(player: PlayerCharacter | null | undefined): string | null {
-  if (!player?.brokerMission) return null;
+  if (!player?.brokerMission || player.brokerMission.paused) return null; // paused = deactivated
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const broker = require('../engine/broker');
   const has = (name: string) => player.inventory.some((i) => i.name === name);
@@ -2434,6 +2434,19 @@ interface GameStore {
    *  active = between missions). A paused contract stays on the slate and its
    *  stages don't auto-advance until re-activated. `active` omitted → toggle. */
   setFactionQuestActive: (id: string, active?: boolean) => void;
+  /** OTA-655 — uniform activate / DEACTIVATE (pause) toggle for EVERY contract
+   *  kind, so hunts / mysteries / storylines / whispers / leads / the parley get
+   *  the same reversible pause faction quests already have. Deactivating parks the
+   *  contract on the slate (⏸ PAUSED) and freezes its auto-advance / reminders
+   *  until re-activated; it is NOT dropped (that's abandonContract). PER-CONTRACT
+   *  and independent — pausing one hunt doesn't touch your other hunts. The
+   *  'faction_quest' kind delegates to setFactionQuestActive to preserve its
+   *  existing SINGLE-ACTIVE routing semantics. `active` omitted → toggle. */
+  setContractActive: (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest' | 'whisper' | 'lead' | 'broker',
+    id: string,
+    active?: boolean,
+  ) => void;
   /** Start an auto-routing chain for a faction contract: course to the objective,
    *  then auto-course to the turn-in once the work is done. Stops on turn-in,
    *  abandon, deactivate, or a manual divert. */
@@ -2472,7 +2485,7 @@ interface GameStore {
    *  (it was never completed), emits a one-line confirmation.
    *  Reputation IS NOT refunded — if abandoning had no cost we'd
    *  invite the player to accept-everything-then-drop. */
-  abandonContract: (kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest', id: string) => void;
+  abandonContract: (kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest' | 'whisper' | 'broker', id: string) => void;
   digHere: () => void;
   /** 2026-05-25 — bulk salvage. Run rollSalvagePool for each noun
    *  in sequence but DEFER all logging — emit every narration line
@@ -13422,6 +13435,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           .map((rec) => ({ rec, def: findHuntById(rec.id) }))
           .find(({ rec, def }) => {
             if (!def) return false;
+            if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
             const next = def.stages[rec.stage];
             if (!next) return false;
             // Map intents to the hunt's expected check kinds. Any of these
@@ -13444,6 +13458,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           .map((rec) => ({ rec, def: findMysteryById(rec.id) }))
           .find(({ rec, def }) => {
             if (!def) return false;
+            if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
             const next = def.stages[rec.stage];
             if (!next) return false;
             return (
@@ -13463,6 +13478,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           .map((rec) => ({ rec, def: findStorylineById(rec.id) }))
           .find(({ rec, def }) => {
             if (!def) return false;
+            if (rec.tracked === false) return false; // DEACTIVATED (paused) — frozen
             const next = def.stages[rec.stage];
             if (!next) return false;
             return (
@@ -14889,6 +14905,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const matchingLeads = (player.activeQuests ?? []).filter(
       (q) =>
         (q.state === 'open' || q.state === 'in_progress') &&
+        q.tracked !== false && // DEACTIVATED (paused) leads don't auto-complete
         killVerbs.has(q.objective.verb.toLowerCase()) &&
         q.objective.target.toLowerCase().includes(enemy.name.toLowerCase().replace(/ \(hunted\)$/i, '')),
     );
@@ -16263,6 +16280,71 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!nextActive && get().player?.routedMission?.id === id) {
       set((s) => (s.player ? { player: { ...s.player, routedMission: null } } : s));
     }
+    void get().persist();
+  },
+
+  setContractActive(kind, id, active) {
+    // Faction quests keep their own single-active routing semantics.
+    if (kind === 'faction_quest') { get().setFactionQuestActive(id, active); return; }
+    const player = get().player;
+    if (!player) return;
+    const resolve = (cur: boolean) => (active != null ? active : !cur);
+    let title = id;
+    let nextActive = true;
+    let changed = false;
+    if (kind === 'hunt') {
+      const rec = (player.activeHunts ?? []).find((h) => h.id === id);
+      if (!rec) return;
+      nextActive = resolve(rec.tracked !== false);
+      title = findHuntById(id)?.title ?? id;
+      set((s) => (s.player ? { player: { ...s.player, activeHunts: (s.player.activeHunts ?? []).map((h) => h.id === id ? { ...h, tracked: nextActive } : h) } } : s));
+      changed = true;
+    } else if (kind === 'mystery') {
+      const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
+      if (!rec) return;
+      nextActive = resolve(rec.tracked !== false);
+      title = findMysteryById(id)?.title ?? id;
+      set((s) => (s.player ? { player: { ...s.player, activeMysteries: (s.player.activeMysteries ?? []).map((m) => m.id === id ? { ...m, tracked: nextActive } : m) } } : s));
+      changed = true;
+    } else if (kind === 'storyline') {
+      const rec = (player.activeStorylines ?? []).find((st) => st.id === id);
+      if (!rec) return;
+      nextActive = resolve(rec.tracked !== false);
+      title = findStorylineById(id)?.title ?? id;
+      set((s) => (s.player ? { player: { ...s.player, activeStorylines: (s.player.activeStorylines ?? []).map((st) => st.id === id ? { ...st, tracked: nextActive } : st) } } : s));
+      changed = true;
+    } else if (kind === 'whisper') {
+      const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
+      if (!rec) return;
+      nextActive = resolve(rec.tracked !== false);
+      title = 'the whisper';
+      set((s) => (s.player ? { player: { ...s.player, activeWhispers: (s.player.activeWhispers ?? []).map((w) => w.id === id ? { ...w, tracked: nextActive } : w) } } : s));
+      changed = true;
+    } else if (kind === 'lead') {
+      const rec = (player.activeQuests ?? []).find((q) => q.id === id);
+      if (!rec) return;
+      nextActive = resolve(rec.tracked !== false);
+      title = `${rec.objective.verb} ${rec.objective.target}`;
+      set((s) => (s.player ? { player: { ...s.player, activeQuests: (s.player.activeQuests ?? []).map((q) => q.id === id ? { ...q, tracked: nextActive } : q) } } : s));
+      changed = true;
+    } else if (kind === 'broker') {
+      const m = player.brokerMission;
+      if (!m || m.done) return;
+      // Broker stores the INVERSE flag (`paused`); active === !paused.
+      nextActive = active != null ? active : m.paused === true;
+      title = 'the parley';
+      set((s) => (s.player && s.player.brokerMission ? { player: { ...s.player, brokerMission: { ...s.player.brokerMission, paused: !nextActive } } } : s));
+      changed = true;
+    }
+    if (!changed) return;
+    // Staged contracts + leads truly FREEZE when paused (auto-advance / auto-complete
+    // gated); whispers + the parley just drop off the standing reminders.
+    const reminderOnly = kind === 'whisper' || kind === 'broker';
+    get().appendLog('world', nextActive
+      ? `Re-activated ${title}. It's back in play.`
+      : reminderOnly
+        ? `Deactivated ${title}. It stays on your slate but drops off your reminders until you re-activate it.`
+        : `Deactivated ${title}. It stays on your slate but won't advance until you re-activate it.`);
     void get().persist();
   },
 
@@ -17677,6 +17759,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       } : s));
       get().appendLog('world', `You step away from the ${def.title} chapter. The Arbiter doesn't argue.`);
+    } else if (kind === 'whisper') {
+      const rec = (player.activeWhispers ?? []).find((w) => w.id === id);
+      if (!rec) return;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== id),
+          // Mark it resolved so it isn't re-planted on this character.
+          completedWhisperIds: Array.from(new Set([...(s.player.completedWhisperIds ?? []), id])),
+        },
+      } : s));
+      get().appendLog('world', `You let the rumour go. Some talk is just talk.`);
+    } else if (kind === 'broker') {
+      if (!player.brokerMission || player.brokerMission.done) return;
+      set((s) => (s.player ? {
+        player: { ...s.player, brokerMission: undefined },
+      } : s));
+      get().appendLog('world', `You walk away from the parley. The two leaders can wait on the flats — or not.`);
     } else {
       const def = findFactionQuestById(id);
       const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
@@ -24959,6 +25059,7 @@ function narrateCasualLook(
     let threadsShown = 0;
     for (const w of player?.activeWhispers ?? []) {
       if (threadsShown >= 3) break; // don't wall off the feed if many are open
+      if (w.tracked === false) continue; // DEACTIVATED (paused) — off the reminder feed
       const obj = describeWhisperStage(w);
       if (obj && !/^Stage:\s/.test(obj)) {
         get().appendLog('arbiter', `▸ Still open — ${obj}`);
