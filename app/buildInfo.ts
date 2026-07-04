@@ -15468,4 +15468,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scene paragraph on every entry AND in every look-around, so an interrupting fight can
 // never leave the player unsure what they were doing. Extracted broker.brokerMissionLine
 // (pure) as the shared source; the parley action now reuses it too. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-668-persistent-mission-line';
+// OTA-669 — make the Parley of Factions (broker) mission a first-class, TRACKABLE
+// contract on the CONTRACTS screen. Playtester wandered into the parley by travelling
+// and ended up with a live "mission" (and now a mission line) that appeared NOWHERE on
+// their contract list — "I don't even think that mission is on my list." It now renders
+// an ALLIANCE section like the rest: both demanded relics, their source tiles, in-hand
+// progress (N/2), a SET COURSE to each unmet relic, and a SET COURSE to the Parley Ground
+// for the SEAL step. Reuses broker.missionLegs; counts toward totalActive. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-669-parley-trackable-contract';
