@@ -15539,4 +15539,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // baseDurability regardless of kind (OTA-666 made the rope misc, which had un-anchored its 150
 // base); (3) resealUtilityDurability heals existing saves' inflated tool durability back to base
 // on load. New utilityDurabilityNoTemper suite; durability/repair/scrap suites green. JS+data.
-export const OTA_BUILD_ID = '2026-07-04-677-utility-durability-fixed-not-tempered';
+// OTA-678 — off-canon entity guard on LLM narration. The Qwen narrator is prompt-told never
+// to name a place/faction not in the scene, but nothing ENFORCED it — an invented multi-word
+// proper noun ("the Sunken Choir of Vael") flowed into the logged feed as session canon. New
+// entityGuard.ts drops any narration sentence naming a multi-word place/faction NOT in the
+// world's known set (locations + factions + races + 172 lore-concept titles/keywords + live
+// scene entities); nothing survives → the authored template carries the line. Wired into both
+// the reactive/scene-intro and ambient Qwen paths. Conservative (multi-word only, substring
+// match) to avoid mangling good prose. New entityGuard suite (9). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-678-narration-offcanon-entity-guard';
