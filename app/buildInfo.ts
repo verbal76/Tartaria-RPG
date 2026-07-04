@@ -16891,4 +16891,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // crafting screen grouped the Climbing Rope recipe under the RELICS banner. Now
 // kind:'misc' — utility/rope tags read them as tools/gear across inventory + crafting.
 // Climb capability is tag-driven so nothing mechanical changes. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-958-rope-is-gear-not-relic';
+// 2026-07-03-959 — possessive INVESTIGATE chips ("messenger's post", "Zharak's Teeth")
+// now clear + leave the picker instead of re-tapping forever into "already examined".
+// The chip consumed-match (normNoun) stripped only the apostrophe → "messengers post",
+// but the parser records "messenger post" (whole 's dropped), so they never reconciled.
+// normNoun now drops the whole possessive 's. ambientNounMatch suite green. JS-only.
+export const OTA_BUILD_ID = '2026-07-03-959-possessive-noun-consumed-match';
