@@ -15449,4 +15449,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // effectiveStaminaMax = staminaMax, nothing accrues the penalty, stale saves load at 0,
 // and all the "hunger capped your wind" / "hunger +N" lines self-suppress. rest/stamina
 // suites updated + green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-665-hunger-removed';
+// OTA-666 — Climbing Rope + Reclaimer's Rope are no longer "relics". They were stamped
+// kind:'relic', which is a NON_TOOL_KIND, so itemIsTool refused them and the inventory
+// filed them under the RELICS section (relics are the special detection/lore items).
+// They're now kind:'misc', so their utility/rope tags mark them as tools and they read
+// as ordinary gear. (Climb capability is tag-driven — 'gate' in your pack — so nothing
+// mechanical changes.) JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-666-rope-is-gear-not-relic';
