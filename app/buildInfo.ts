@@ -16923,4 +16923,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ACCEPT (commit the contract + grid markers) or DECLINE (walk away). Declining latches
 // player.brokerOfferDeclined so ambient pokes don't re-pop the prompt; explicit PARLEY
 // re-opens it. New parleyOfferAcceptDecline suite green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-963-parley-accept-decline-offer';
+// 2026-07-04-964 — name the parley mission consistently (ported from Tartaria OTA-672). The
+// standing "▸ Mission —" reminder led with flavor and ended in the all-caps command SEAL THE
+// ALLIANCE, which read as the mission NAME — but the CONTRACTS card titles it "Broker an
+// Alliance". brokerMissionLine now leads with "Broker an Alliance:" so reminder, card, and
+// accept/decline offer name it the same way. broker suite green. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-964-parley-mission-name-consistency';
