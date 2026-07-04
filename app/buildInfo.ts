@@ -15382,4 +15382,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-664 — Fusing Crucible picker shows each item's MATERIAL TYPE (ported from Tartaria
 // OTA-679). Rows now read name … Type (metal/aether/organic/…) … rarity, Type = the same
 // fusionMaterialTags the diversity gate uses, so you can tell inputs apart. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-664-fusion-picker-shows-material-type';
+// OTA-665 — broaden fuse material mapping (ported from Tartaria OTA-680). inferGearTagPack's
+// per-material keyword lists (fiber/metal/organic/crystal/stone/wood/cloth) broadened to common
+// scavenge/junk vocabulary so the SAME loot spans more materials and the Crucible's 3-DISTINCT-
+// materials gate is reachable. Additive-only, word-boundary-anchored. New broadened suite (20).
+// JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-665-broaden-fuse-material-mapping';
