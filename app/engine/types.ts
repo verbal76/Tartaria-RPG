@@ -353,6 +353,10 @@ export interface Quest {
   reward: QuestReward;
   generatedAt: number;
   state: 'open' | 'in_progress' | 'completed' | 'failed';
+  /** `false` = the player has DEACTIVATED (paused) this lead: it stays on the
+   *  slate but won't auto-complete on a matching kill until re-activated.
+   *  Absent/true = active. */
+  tracked?: boolean;
 }
 
 export interface Runecaster {
@@ -639,6 +643,10 @@ export interface WhisperRecord {
    *  carries the thief's tile coords so the chain knows where to
    *  spawn the combat encounter. */
   ctx?: Record<string, number | string>;
+  /** `false` = the player has DEACTIVATED (paused) this whisper: it stays on
+   *  the slate but is dropped from the standing look-around / mission reminders
+   *  and won't advance until re-activated. Absent/true = active. */
+  tracked?: boolean;
 }
 
 export interface PlayerMilestones {
@@ -1039,16 +1047,19 @@ export interface PlayerCharacter {
   routedMission?: { id: string; phase: 'to_objective' | 'to_turnin' } | null;
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
-  /** Active monster hunts with per-stage progress. */
-  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** Active monster hunts with per-stage progress. `tracked === false` = the
+   *  player has DEACTIVATED (paused) this hunt: it stays on the slate but its
+   *  stages don't auto-advance until re-activated (per-contract, independent of
+   *  other hunts). Absent/true = active. */
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
-  /** Active mystery-object quests. */
-  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
   completedMysteryIds?: string[];
-  /** Active long-form faction storylines (5-10 step). */
-  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** Active long-form faction storylines (5-10 step). `tracked === false` = paused. */
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
   /** Active Whispers — informal NPC-to-NPC tips the player has
