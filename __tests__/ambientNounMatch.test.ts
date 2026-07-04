@@ -5,8 +5,9 @@ describe('ambient noun matching (chip consumed/exhausted reconciliation)', () =>
     it('drops the connective "of" and collapses whitespace', () => {
       expect(normNoun('scraps of cloth')).toBe('scraps cloth');
     });
-    it('drops possessive apostrophes', () => {
-      expect(normNoun("Zharak's Teeth Spire")).toBe('zharaks teeth spire');
+    it('drops the WHOLE possessive "’s" (matches the parser), not just the apostrophe', () => {
+      expect(normNoun("Zharak's Teeth Spire")).toBe('zharak teeth spire');
+      expect(normNoun("messenger's post")).toBe('messenger post');
     });
     it('lower-cases and trims', () => {
       expect(normNoun('  Rusted Blade  ')).toBe('rusted blade');
@@ -30,10 +31,13 @@ describe('ambient noun matching (chip consumed/exhausted reconciliation)', () =>
     it('matches in the reverse direction too', () => {
       expect(isNounConsumed('scraps cloth', new Set(['scraps of cloth']))).toBe(true);
     });
-    it('still reconciles the possessive case (apostrophe fix)', () => {
-      expect(
-        isNounConsumed("Zharak's Teeth Spire", new Set(['zharaks teeth spire'])),
-      ).toBe(true);
+    it('reconciles a possessive display chip against the parser-stored form (the "messenger’s post" bug)', () => {
+      // The chip keeps the display form "messenger's post"; the engine records the
+      // consumed noun as the parser-normalized "messenger post" (whole 's dropped).
+      // These MUST match or the chip stays live in the Investigate picker and
+      // re-taps forever into "already examined" (the reported loop).
+      expect(isNounConsumed("messenger's post", new Set(['messenger post']))).toBe(true);
+      expect(isNounConsumed("Zharak's Teeth Spire", new Set(['zharak teeth spire']))).toBe(true);
     });
     it('does not match an unrelated noun', () => {
       expect(isNounConsumed('scraps of cloth', new Set(['rusted blade']))).toBe(false);

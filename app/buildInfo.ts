@@ -15455,4 +15455,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // They're now kind:'misc', so their utility/rope tags mark them as tools and they read
 // as ordinary gear. (Climb capability is tag-driven — 'gate' in your pack — so nothing
 // mechanical changes.) JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-03-666-rope-is-gear-not-relic';
+// OTA-667 — possessive INVESTIGATE chips ("messenger's post", "Zharak's Teeth") now
+// clear + leave the picker instead of re-tapping forever into "already examined". The
+// chip consumed-match (normNoun) stripped only the apostrophe → "messengers post", but
+// the parser records the consumed noun as "messenger post" (whole 's dropped), so they
+// never reconciled and the chip stayed live. normNoun now drops the whole possessive
+// 's, matching the parser. ambientNounMatch suite green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-03-667-possessive-noun-consumed-match';
