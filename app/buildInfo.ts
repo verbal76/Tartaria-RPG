@@ -16969,4 +16969,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // regardless of the loaded pack (and froze getNarratorName at boot). Now a per-call function
 // built from the pack's persona/setting/tone, neutral fallback when absent. entityGuard suite
 // (9) green; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-970-narration-canon-guard-pack-persona';
+// 2026-07-04-971 — Fusing Crucible picker shows each item's MATERIAL TYPE (ported from Tartaria
+// OTA-679). Rows now read name … Type (metal/aether/organic/…) … rarity, Type = the same
+// fusionMaterialTags the diversity gate uses, so you can tell inputs apart. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-971-fusion-picker-shows-material-type';
