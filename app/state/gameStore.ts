@@ -213,7 +213,7 @@ import {
   scrapHasSecondChance,
   pickScrapFailureLine,
 } from '../engine/scrapEngine';
-import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem } from '../engine/durability';
+import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem, resealUtilityDurability } from '../engine/durability';
 import { restampInventoryItem } from '../engine/itemBackfill';
 import {
   type Hook,
@@ -1694,6 +1694,11 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // description onto the saved instance in place. Idempotent on
     // already-restamped items (the merge only fills gaps).
     item = restampInventoryItem(item);
+    // OTA-969 — heal temper bloat: a non-weapon/armor tool (Climbing Rope, Pry Bar)
+    // stamped BEFORE the temper gate carries an inflated random durability max
+    // (a 150-rope at ~270). Reset it to the catalog base so existing saves correct
+    // themselves on load. No-op for weapons/armor and for already-correct items.
+    item = resealUtilityDurability(item);
     // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
     // signed-shift bug produced fused items named "Resonant
     // undefined" / "<Theme> undefined" before OTA-224 fixed the
