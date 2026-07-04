@@ -15547,4 +15547,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scene entities); nothing survives → the authored template carries the line. Wired into both
 // the reactive/scene-intro and ambient Qwen paths. Conservative (multi-word only, substring
 // match) to avoid mangling good prose. New entityGuard suite (9). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-678-narration-offcanon-entity-guard';
+// OTA-679 — Fusing Crucible picker now shows each item's MATERIAL TYPE. Fusion needs
+// DIFFERENT materials, but the picker only showed name + rarity — so a player couldn't tell
+// organic from aether from metal and kept selecting same-type pieces that add no diversity.
+// Each row (and the faction-catalyst rows) now reads: name … Type (metal/aether/organic/…) …
+// rarity, where Type = the same fusionMaterialTags the diversity gate uses (brighter than the
+// now-secondary rarity). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-679-fusion-picker-shows-material-type';

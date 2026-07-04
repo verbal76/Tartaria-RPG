@@ -12,6 +12,15 @@ import type { InventoryItem } from '../engine/types';
 const MIN_PICK = 3;
 const MAX_PICK = 5;
 
+// OTA-679 — the item's material type(s) for the picker row (metal / aether / organic
+// / wood / stone / …), title-cased and joined. Mirrors the fusionMaterialTags the
+// diversity gate uses, so what the player reads is exactly what fusion counts.
+function fusionTypeLabel(item: InventoryItem): string {
+  const mats = fusionMaterialTags(item);
+  if (mats.length === 0) return 'misc';
+  return mats.map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(' · ');
+}
+
 export function FusionPickerModal() {
   const visible = useGameStore((s) => s.fusionPickerOpen);
   const inventory = useGameStore((s) => s.player?.inventory);
@@ -87,10 +96,14 @@ export function FusionPickerModal() {
                   {visibleScraps.map((it) => {
                     const on = picked.includes(it.id);
                     const dim = !on && picked.length >= MAX_PICK;
+                    // OTA-679 — show the item's MATERIAL TYPE (metal / aether / organic /
+                    // wood / …) next to the name. Fusion needs DIFFERENT materials, so the
+                    // type is the info the player actually picks on; rarity is secondary.
                     return (
                       <Pressable key={it.id} onPress={() => toggle(it.id)} style={[styles.row, on && styles.rowOn, dim && styles.rowDim]}>
                         <Text style={[styles.check, on && styles.checkOn]}>{on ? '☑' : '☐'}</Text>
                         <Text style={styles.rowName} numberOfLines={1}>{it.name}</Text>
+                        <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(it)}</Text>
                         <Text style={styles.rowMeta}>{it.rarity}</Text>
                       </Pressable>
                     );
@@ -107,6 +120,7 @@ export function FusionPickerModal() {
                       <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[styles.row, on && styles.rowOn]}>
                         <Text style={[styles.check, on && styles.checkOn]}>{on ? '◉' : '○'}</Text>
                         <Text style={styles.rowName} numberOfLines={1}>{c.name}</Text>
+                        <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(c)}</Text>
                       </Pressable>
                     );
                   })}
@@ -153,6 +167,9 @@ const styles = StyleSheet.create({
   check: { color: '#6c8088', fontSize: 16, width: 26 },
   checkOn: { color: '#9ec96a' },
   rowName: { color: '#d6e4e8', fontSize: 13, flex: 1 },
+  // OTA-679 — material type: the primary decision info, so it reads brighter than
+  // the (secondary) rarity. Right-aligned so the type column lines up down the list.
+  rowType: { color: '#8fbfa8', fontSize: 11, fontWeight: '600', marginLeft: 8, textAlign: 'right' },
   rowMeta: { color: '#6c8088', fontSize: 10, marginLeft: 8 },
   catBlock: { marginTop: 6, borderTopColor: '#2b3a3e', borderTopWidth: 1, paddingTop: 6 },
   catLabel: { color: '#8fa6ac', fontSize: 10, fontWeight: '700', letterSpacing: 0.6, marginTop: 8, marginBottom: 4 },
