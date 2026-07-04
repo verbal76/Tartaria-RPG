@@ -924,9 +924,14 @@ export interface PlayerCharacter {
    *  See engine/titleChallenges.ts. */
   challengeAttempts?: Record<string, 'failed' | 'succeeded'>;
   /** arb53 — active Guild Broker mission (Parley Ground): the two factions
-   *  being brokered. Set when the player first parleys; `done` once the
-   *  alliance is sealed. See engine/broker.ts. */
+   *  being brokered. Set when the player ACCEPTS the parley offer; `done` once
+   *  the alliance is sealed. See engine/broker.ts. */
   brokerMission?: import('./broker').BrokerMission;
+  /** OTA-671 — set when the player DECLINES the stumbled-onto parley offer, so
+   *  approaching the leaders again doesn't re-pop the accept/decline prompt on
+   *  every ambient action. Cleared by an explicit PARLEY (re-opens the offer) or
+   *  by accepting. Transient nudge state. */
+  brokerOfferDeclined?: boolean;
   /** OTA-195 — one-shot fusion permit granted by a Fusing Crucible
    *  travel encounter. Cleared when the player runs the fuse action.
    *  Without this gate, the fuse verb would be usable anywhere; the

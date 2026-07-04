@@ -15485,4 +15485,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // drop off the standing reminders. Extended abandonContract to drop whispers + the parley
 // (they had no removal path). Audit: all 7 contract types now trackable + activatable/
 // deactivatable. tsc app-clean; contract/mission suites + new pause suite green. JS-only.
-export const OTA_BUILD_ID = '2026-07-04-670-uniform-contract-activate-deactivate';
+// OTA-671 — stumbled-onto missions now ANNOUNCE + offer accept/decline instead of silently
+// committing you. The Parley of Factions was the offender: approaching the leaders on the
+// neutral flats (approach/examine/survey/parley) auto-created the broker contract with no
+// consent — "I think I got on this route by just going to the mud seas." Now handleBroker
+// raises a pendingMissionOffer (announce + the two demands as a preview); a BrandedModal
+// asks ACCEPT (commit the contract + grid markers) or DECLINE (walk away). Declining latches
+// player.brokerOfferDeclined so ambient pokes don't re-pop the prompt — an explicit PARLEY
+// re-opens it. New parleyOfferAcceptDecline suite green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-671-parley-accept-decline-offer';
