@@ -15517,4 +15517,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cross-room collision), and cleared rooms stay cleared across reload. Look-around inside a
 // building now orients off the room's transitArea. New buildingRoomClearedPersists suite +
 // updated roomLootPersistence; tsc app-clean. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-674-building-room-cleared-persists';
+// OTA-675 — craftable throwables. Every throwable weapon was loot/vendor-only, so the
+// bandolier had NO crafting supply line (a playtester's only throwable was a looted Disease
+// Sample). Added 5 recipes whose outputs are existing throwable-tagged, bandolier-eligible
+// weapons: Throwing Knife (Scrap Metal+Stick), Tartarian Hand Axe (Throw) (Scrap+Smooth
+// Stone+Stick), Mud Throwing Knife (Hardened Mudstone+Scrap+Cloth Scrap), Bone Throwing Axe
+// (Wyrm Fang+Stick+Cloth Scrap), Shaped Aetheric Shard (Aether Crystal+Aetheric Shard+Aether
+// Dust). New throwableRecipes suite locks the gather→craft→rack contract. Data-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-675-craftable-throwables';
