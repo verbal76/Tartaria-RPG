@@ -15524,4 +15524,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Stone+Stick), Mud Throwing Knife (Hardened Mudstone+Scrap+Cloth Scrap), Bone Throwing Axe
 // (Wyrm Fang+Stick+Cloth Scrap), Shaped Aetheric Shard (Aether Crystal+Aetheric Shard+Aether
 // Dust). New throwableRecipes suite locks the gather→craft→rack contract. Data-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-675-craftable-throwables';
+// OTA-676 — a Climbing Rope repaired with STICKS AND ROCKS. repairCostMaterials = scrap
+// output × 2, and scrapEngine only recognized metal/stone/cloth/fiber/wood/aether/mud — so a
+// `rope`-tagged (not fiber-tagged) rope, plus the "cold iron" Pry Bar (tool/pry/utility, no
+// metal tag), both fell through to the bare Stick+Small Rock fallback for BOTH scrapping and
+// repair. Now scrapEngine treats `rope` as fiber (→ Patched Cloth), and the Pry Bar carries a
+// `metal` tag (→ Scrap Metal). General fix: any repairable misc/relic tool now mends with its
+// real material. New ropePryScrapMaterial suite. JS+data → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-676-rope-pry-scrap-material';
