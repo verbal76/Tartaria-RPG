@@ -81,7 +81,9 @@ describe('arb39 — looted interactables do not respawn on re-entry', () => {
     const entry = buildingEntryRoom('shack')!;
     const consumedNoun = entry.interactables[0]!; // 'stove'
     // Seed the room's terminal-consumption record (what take/salvage write).
-    const roomKey = makeRoomKey('outskirts', null, 5, 5, null);
+    // OTA-966 — building rooms key by a STABLE "building:<id>:<room>" identity
+    // (not the volatile outdoor micro-micro), so seed at that key.
+    const roomKey = makeRoomKey('outskirts', `building:shack:${entry.id}`, 5, 5, null);
     store.setState((s: any) => ({
       worldMemory: {
         ...s.worldMemory,

@@ -16934,4 +16934,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // announcement + accept/decline prompt lead with the name and route to the mission channel;
 // offer modal title reads "New mission — Broker an Alliance", body points at CONTRACTS.
 // JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-965-mission-line-yellow-highlight';
+// 2026-07-04-966 — close the building-room save/exit/rehydrate material FARM (ported from
+// Tartaria OTA-674). Inside a building, each room's cleared (take/salvage/investigate) state
+// was keyed by the VOLATILE outdoor micro-micro id, which re-rolls when the tile's scene
+// rebuilds after a reload — so re-entering refilled every tab. patchSceneForBuildingRoom now
+// stamps a STABLE "building:<id>:<room>" id onto the scene's microMicroId; every handler
+// already keys off that field, so read/write agree with zero call-site changes, each room
+// gets its own key, and cleared rooms stay cleared across reload. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-966-building-room-cleared-persists';
