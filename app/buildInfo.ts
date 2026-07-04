@@ -16928,4 +16928,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ALLIANCE, which read as the mission NAME — but the CONTRACTS card titles it "Broker an
 // Alliance". brokerMissionLine now leads with "Broker an Alliance:" so reminder, card, and
 // accept/decline offer name it the same way. broker suite green. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-964-parley-mission-name-consistency';
+// 2026-07-04-965 — make the mission line SLAP (ported from Tartaria OTA-673). The standing
+// reminder now rides its own yellow 'mission' log channel with a MISSION chip, and the mission
+// NAME ("Broker an Alliance") renders in a brighter accent yellow. The stumbled-onto parley
+// announcement + accept/decline prompt lead with the name and route to the mission channel;
+// offer modal title reads "New mission — Broker an Alliance", body points at CONTRACTS.
+// JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-965-mission-line-yellow-highlight';

@@ -1448,7 +1448,7 @@ export interface Companion {
   weapon?: InventoryItem | null;
 }
 
-export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest';
+export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest' | 'mission';
 
 export interface RollStep {
   id: string;

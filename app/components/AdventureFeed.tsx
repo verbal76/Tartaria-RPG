@@ -24,6 +24,12 @@ const ARBITER_COLOR = '#6ab0c9';
 const PLAYER_COLOR = '#7fb8ff';
 const COMBAT_COLOR = '#e07a5f';
 const REWARD_COLOR = '#9ec96a';
+// OTA-965 — mission reminders get their own clear YELLOW voice (more yellow than
+// the muted world tan) with a MISSION chip, so a tracked mission "slaps you in the
+// face" in the feed. The mission NAME renders in a brighter accent yellow so it
+// reads as a proper title you can find under CONTRACTS.
+const MISSION_COLOR = '#e6c84a';
+const MISSION_ACCENT = '#ffe066';
 
 const channelColors: Record<LogChannel, string> = {
   player: PLAYER_COLOR,
@@ -47,6 +53,8 @@ const channelColors: Record<LogChannel, string> = {
   // quests in a color that is noticably different... let's use
   // purple like the notes."
   dog_quest: '#b88ce0',
+  // OTA-965 — the standing "current mission" reminder, yellow + MISSION chip.
+  mission: MISSION_COLOR,
 };
 
 // `cognitive` (MiniLM emotion/intent) and `debug` (parser, combat range
@@ -65,7 +73,26 @@ function tagForChannel(channel: LogChannel): string | null {
   // OTA-177 — DOG QUEST tag so the purple beats also carry a
   // chip-label header, matching how ARBITER / NOTE lines render.
   if (channel === 'dog_quest') return 'DOG QUEST';
+  // OTA-965 — MISSION chip: the yellow line already stands out; the tag names
+  // the concept so the player learns "this is a mission, it's in my CONTRACTS."
+  if (channel === 'mission') return 'MISSION';
   return null;
+}
+
+// OTA-965 — render a mission reminder with its NAME (everything up to the first
+// ':') in the brighter accent, the rest of the objective in the base mission
+// yellow. Mirrors renderBodyWithEnemyHighlight's span approach.
+function renderMissionBody(text: string, baseColor: string): React.ReactNode {
+  const idx = text.indexOf(':');
+  if (idx <= 0) return <Text style={[styles.body, { color: baseColor }]}>{text}</Text>;
+  const name = text.slice(0, idx);
+  const rest = text.slice(idx);
+  return (
+    <Text style={[styles.body, { color: baseColor }]}>
+      <Text style={{ color: MISSION_ACCENT, fontWeight: '800' }}>{name}</Text>
+      {rest}
+    </Text>
+  );
 }
 
 // Push a plain string, but first split out any unfilled-TEMPLATE markers (REPLACE…) and
@@ -204,9 +231,11 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         return (
           <View key={entry.id} style={styles.entry}>
             {tag ? <Text style={[styles.tag, { color }]}>{tag}</Text> : null}
-            {allowHighlight
-              ? renderBodyWithEnemyHighlight(entry.text, color, names)
-              : <Text style={[styles.body, { color }]}>{entry.text}</Text>}
+            {entry.channel === 'mission'
+              ? renderMissionBody(entry.text, color)
+              : allowHighlight
+                ? renderBodyWithEnemyHighlight(entry.text, color, names)
+                : <Text style={[styles.body, { color }]}>{entry.text}</Text>}
           </View>
         );
       })}
