@@ -71,6 +71,7 @@ import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
 import { stripForeignWords } from '../engine/foreignText';
+import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } from '../engine/entityGuard';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
@@ -27453,6 +27454,52 @@ function trainAcceptCharismaGated(
 // everything up to and including that character. Falls back to the raw
 // text if nothing terminal is present (rare — would only happen on a
 // single-fragment generation that never landed a punctuation mark).
+// OTA-663 — cached allow-list of every canon entity name the Qwen narrator may
+// legitimately say: locations, factions (+ subtitles), races, and lore-concept
+// titles + keywords. Built once from static world data; the per-call set adds the
+// live player name + current scene entities. Feeds the entityGuard so an INVENTED
+// multi-word place/faction name gets dropped from the model's prose (which then
+// falls back to the authored template).
+let _narrationAllowStatic: Set<string> | null = null;
+function narrationAllowStatic(): Set<string> {
+  if (_narrationAllowStatic) return _narrationAllowStatic;
+  const names: string[] = [];
+  for (const l of allLocations) if (l?.name) names.push(l.name);
+  try {
+    const fjson = require('../data/factions/factions.json') as { factions?: Array<{ name?: string; subtitle?: string }> } | Array<{ name?: string; subtitle?: string }>;
+    const farr = Array.isArray(fjson) ? fjson : (fjson.factions ?? []);
+    for (const f of farr) { if (f.name) names.push(f.name); if (f.subtitle) names.push(f.subtitle); }
+  } catch { /* factions optional */ }
+  try {
+    const races = require('../data/races/races.json') as Array<{ name?: string }>;
+    for (const r of races) if (r.name) names.push(r.name);
+  } catch { /* races optional */ }
+  try {
+    const conceptsData = require('../data/lore/concepts.json') as { concepts?: Array<{ title?: string; keywords?: string[] }> };
+    for (const c of (conceptsData.concepts ?? [])) {
+      if (c.title) names.push(c.title);
+      for (const k of (c.keywords ?? [])) names.push(k);
+    }
+  } catch { /* concepts optional */ }
+  names.push('Tartaria', 'Aether', 'Aetheric', 'Aetherstone', 'the Arbiter', 'Arbiter');
+  _narrationAllowStatic = buildEntityAllowList(names);
+  return _narrationAllowStatic;
+}
+function narrationEntityAllow(get: () => GameStore): ReadonlySet<string> {
+  const base = narrationAllowStatic();
+  const p = get().player;
+  const scene = get().currentScene;
+  const dyn: string[] = [];
+  if (p?.name) dyn.push(p.name);
+  if (scene?.location?.name) dyn.push(scene.location.name);
+  for (const e of (scene?.enemies ?? [])) if (e?.name) dyn.push(e.name);
+  if (scene?.vendor?.name) dyn.push(scene.vendor.name);
+  if (dyn.length === 0) return base;
+  const set = new Set(base);
+  for (const n of dyn) { const nn = normalizeEntity(n); if (nn.length >= 2) set.add(nn); }
+  return set;
+}
+
 function trimToLastSentence(raw: string): string {
   const s = (raw ?? '').trim();
   if (!s) return '';
@@ -27629,10 +27676,15 @@ async function narrateViaArbiter(
     // player paused..." despite the prompt. Drop those sentences and
     // fall back to the template if NOTHING usable survives, so the
     // arbiter feed never reads as a recap about someone else.
+    // OTA-663 — off-canon entity guard: drop any sentence naming a multi-word
+    // place/faction the model INVENTED; nothing survives → `|| trimmed` restores
+    // the authored template, so the feed never logs a fake place.
+    const narrationAllow = narrationEntityAllow(get);
     const survivors = capped
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      .filter((s) => !sentenceNamesOffCanonEntity(s, narrationAllow))
       .join(' ')
       .trim();
     let finalText = trimToLastSentence(survivors) || trimmed;
@@ -27794,10 +27846,14 @@ async function maybeGenerateAmbientArbiter(
       },
       { maxNewTokens: 32 },
     );
+    // OTA-663 — off-canon entity guard (ambient path). A dropped line just stays
+    // silent (ambient has no template fallback), which is the safe outcome.
+    const ambientAllow = narrationEntityAllow(get);
     const survivors = clampSentences(stripForeignWords(text), 1)
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
       .trim();
     const finalText = trimToLastSentence(survivors);

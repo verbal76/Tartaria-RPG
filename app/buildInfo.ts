@@ -15374,4 +15374,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // temper is gated to weapon/armor; misc/relic tools stamp a FIXED max = base;
 // lookupBaseDurability honors a GEAR row's declared baseDurability regardless of kind; and
 // resealUtilityDurability heals existing saves' inflated tool durability on load.
-export const OTA_BUILD_ID = '2026-07-04-662-utility-durability-fixed-not-tempered';
+// OTA-663 — off-canon entity guard on LLM narration (ported from Tartaria OTA-678). The Qwen
+// narrator could name an INVENTED place/faction and it flowed into the logged feed as canon.
+// New entityGuard.ts drops narration sentences naming a multi-word entity not in the world's
+// known set (locations + factions + races + lore-concept titles/keywords + live scene entities);
+// nothing survives → authored template. Wired into both Qwen paths. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-663-narration-offcanon-entity-guard';
