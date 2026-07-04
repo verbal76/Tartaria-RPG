@@ -15368,4 +15368,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scrapEngine didn't recognize `rope` as fiber, so it hit the bare fallback. scrapEngine now
 // treats `rope` as fiber (→ Patched Cloth); the "cold iron" Pry Bar gains a `metal` tag (→
 // Scrap Metal). New ropePryScrapMaterial suite. JS + data → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-661-rope-pry-scrap-material';
+// OTA-662 — utility tools get FIXED durability, not the weapon temper roll (ported from
+// Tartaria OTA-677). A Climbing Rope's max climbed to ~270: stampDurability ran the weapon/
+// armor temper (max = base × [0.4,1.8] + rolled perks) on any baseDurability item. Now the
+// temper is gated to weapon/armor; misc/relic tools stamp a FIXED max = base;
+// lookupBaseDurability honors a GEAR row's declared baseDurability regardless of kind; and
+// resealUtilityDurability heals existing saves' inflated tool durability on load.
+export const OTA_BUILD_ID = '2026-07-04-662-utility-durability-fixed-not-tempered';
