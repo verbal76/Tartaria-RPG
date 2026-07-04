@@ -15553,4 +15553,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Each row (and the faction-catalyst rows) now reads: name … Type (metal/aether/organic/…) …
 // rarity, where Type = the same fusionMaterialTags the diversity gate uses (brighter than the
 // now-secondary rarity). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-679-fusion-picker-shows-material-type';
+// OTA-680 — broaden fuse material mapping. The buried world's loot names skew almost entirely
+// organic + aether, with everything else falling through to a bare 'improvised' tag, so a
+// reserved pool collapsed onto a single material and the Crucible's "3 DISTINCT materials"
+// gate was effectively unreachable ("broaden the mapping or otherwise we'll never be able to
+// make anything"). inferGearTagPack's per-material keyword lists (fiber/metal/organic/crystal/
+// stone/wood/cloth) are now broadened to the common scavenge/junk vocabulary — nails, hinges,
+// flint, planks, straps, beads — so the SAME items you already find span more materials and the
+// gate becomes reachable. Additive-only, word-boundary-anchored (no false-matches). New
+// inferGearTagPackBroadened suite (20). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-680-broaden-fuse-material-mapping';

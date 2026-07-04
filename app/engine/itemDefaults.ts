@@ -358,21 +358,32 @@ function consumableEffectFor(
 export function inferGearTagPack(name: string): string[] {
   const lower = name.toLowerCase();
   const out: string[] = [];
-  if (/\b(rope|cord|line|chain|cable|braid|sinew)\b/.test(lower)) out.push('fiber');
+  // arb112 / OTA-680 — the buried world's loot names skew HEAVILY organic +
+  // aether, with everything else falling through to a bare 'improvised' tag, so a
+  // player's reserved pool collapsed to just organic/improvised/aether and the
+  // Crucible's "3 DISTINCT materials" gate was effectively unreachable ("we'll
+  // never be able to make anything"). Each material's keyword list below is now
+  // broadened to the common scavenge/junk vocabulary — nails, hinges, flint,
+  // planks, straps, beads — so the SAME items you already find span more materials.
+  // Additive only (never removes a mapping); word-boundary-anchored so common
+  // substrings ("bandage" ≠ band, "profile" ≠ file) don't false-match.
+  // FIBER — cordage.
+  if (/\b(rope|cord|line|chain|cable|braid|sinew|tether|lash|lashing|rigging|twine|thread|string|yarn|snare|net|netting|fishing line)\b/.test(lower)) out.push('fiber');
   if (/\b(torch|lantern|lamp|candle|brazier|sconce)\b/.test(lower)) { out.push('metal'); out.push('fiber'); }
-  if (/\b(compass|sextant|chronometer|gauge|dial|instrument)\b/.test(lower)) out.push('metal');
-  // arb112 — ORGANIC now covers soft creature-parts too, not just hard bone. The
-  // buried world's loot is mostly blood / mucus / feather / moss / hide, and these
-  // were going untagged (collapsing to just 'improvised'/'aether'), which made the
-  // Crucible's "3 distinct material tags" gate effectively unreachable.
-  if (/\b(bone|skull|tooth|fang|claw|tusk|horn|antler|shell|carapace|chitin)\b/.test(lower)) out.push('organic');
-  if (/\b(blood|mucus|slime|ichor|feather|moss|lichen|hide|pelt|fur|gut|gland|scale|membrane|marrow|spore|fungus|mushroom|wing|organ|flesh|meat|venom|vein|root|leaf|petal|silk|web)\b/.test(lower)) out.push('organic');
-  if (/\b(crystal|shard|gem|geode|prism)\b/.test(lower)) out.push('crystal');
-  if (/\b(plate|sheet|tin|iron|bronze|copper|brass|steel)\b/.test(lower)) out.push('metal');
-  if (/\b(stone|rock|slab|brick)\b/.test(lower)) out.push('stone');
-  if (/\b(wood|stick|haft|plank|timber|log)\b/.test(lower)) out.push('wood');
-  if (/\b(cloth|linen|silk|rag|wrap|fabric|tapestry)\b/.test(lower)) out.push('cloth');
-  if (/\b(glass|vial|flask|bottle|jar|phial)\b/.test(lower)) out.push('crystal');
+  if (/\b(compass|sextant|chronometer|gauge|dial|instrument|clock|watch|meter|astrolabe|gyroscope)\b/.test(lower)) out.push('metal');
+  // ORGANIC — creature parts, hard + soft.
+  if (/\b(bone|skull|tooth|teeth|fang|claw|talon|tusk|horn|antler|shell|carapace|chitin|hoof|beak)\b/.test(lower)) out.push('organic');
+  if (/\b(blood|mucus|slime|ichor|feather|moss|lichen|hide|pelt|fur|gut|gland|scale|membrane|marrow|spore|fungus|mushroom|wing|organ|flesh|meat|venom|vein|root|leaf|petal|silk|web|husk|rind|sap|resin|tendon|cartilage|tail|barb|quill|stinger|egg|nest|hair|whisker|heart|liver|eye)\b/.test(lower)) out.push('organic');
+  // CRYSTAL — gems + glass.
+  if (/\b(crystal|shard|gem|geode|prism|lens|orb|bead|jewel|opal|ruby|emerald|sapphire|diamond|quartz|pearl|amber|jade|onyx|glass|vial|flask|bottle|jar|phial|ampoule|goblet)\b/.test(lower)) out.push('crystal');
+  // METAL — hardware, fittings, small ordnance.
+  if (/\b(plate|sheet|tin|iron|bronze|copper|brass|steel|lead|nickel|alloy|nail|spike|hinge|buckle|rivet|clasp|wire|screw|bolt|nut|cog|gear|spring|latch|hook|key|lock|coin|ingot|chisel|file|pipe|valve|bar|rod|pin|needle|fitting|mesh|grate|gauntlet|foil|shackle|bell|chime|anchor|blade|hammer|nail|filing)\b/.test(lower)) out.push('metal');
+  // STONE — rock + masonry.
+  if (/\b(stone|rock|slab|brick|flint|pebble|gravel|tile|shale|granite|marble|obsidian|boulder|cobble|grit|mortar|slate)\b/.test(lower)) out.push('stone');
+  // WOOD — timber + hafts.
+  if (/\b(wood|wooden|stick|haft|plank|timber|log|branch|board|shaft|pole|splinter|bark|twig|dowel|beam|post|handle|stake|lumber|driftwood|kindling|reed)\b/.test(lower)) out.push('wood');
+  // CLOTH — fabric + wraps.
+  if (/\b(cloth|linen|silk|rag|wrap|fabric|tapestry|canvas|sash|ribbon|bandage|gauze|felt|wool|cotton|leather|patch|sail|tarp|shroud|veil|scarf|weave|quilt|strap|band|cushion|padding|blanket)\b/.test(lower)) out.push('cloth');
   return Array.from(new Set(out));
 }
 
