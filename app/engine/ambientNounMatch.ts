@@ -15,12 +15,22 @@
 // sides before the compare so the variant forms reconcile. Extracted from the
 // inline ExplorationScreen closure so it can be unit-tested directly.
 
-/** Lower-case, drop possessive apostrophes, drop the connective "of", and
- *  collapse whitespace so phrasing variants of the same noun compare equal. */
+/** Lower-case, drop the WHOLE possessive "'s" (not just the apostrophe), drop the
+ *  connective "of", and collapse whitespace so phrasing variants of the same noun
+ *  compare equal.
+ *
+ *  The possessive must drop the trailing `s` too, to match the parser: it normalizes
+ *  a typed/resolved noun like "messenger's post" to "messenger post" (whole `'s`
+ *  gone) before the engine records it consumed. The old rule stripped only the
+ *  apostrophe → "messengers post", which does NOT substring-match the stored
+ *  "messenger post" — so a possessive chip ("messenger's post", "Zharak's Teeth")
+ *  never registered as consumed, never left the Investigate picker, and re-tapped
+ *  forever into "already examined". Dropping `'s` as a unit reconciles both sides. */
 export function normNoun(s: string): string {
   return s
     .toLowerCase()
-    .replace(/['’]/g, '')
+    .replace(/['’]s\b/g, ' ') // possessive "'s" → gone entirely (matches the parser)
+    .replace(/['’]/g, '')      // any remaining stray apostrophes
     .replace(/\bof\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
