@@ -7,6 +7,7 @@ import {
   missionLegs,
   isBrokerSourceTile,
   factionName,
+  brokerMissionLine,
 } from '../app/engine/broker';
 import { FACTION_COVETED_ITEM } from '../app/engine/locationChallenges';
 
@@ -51,5 +52,31 @@ describe('Guild Broker engine', () => {
   it('factionName falls back to the id for unknowns', () => {
     expect(factionName('mud_monarchs')).toBe('Mud Monarchs');
     expect(factionName('not_a_faction')).toBe('not_a_faction');
+  });
+
+  describe('brokerMissionLine (persistent "current mission" reminder — OTA-668)', () => {
+    const mission = { factionA: 'reclaimers_guild', factionB: 'stone_builders' };
+    const tileName = (id: string) => ({
+      endless_stair: 'Endless Stair', obsidian_pillars: 'Obsidian Pillars',
+    } as Record<string, string>)[id] ?? id;
+
+    it('lists both demands with recover-at tiles when the player holds neither relic', () => {
+      const line = brokerMissionLine(mission, () => false, tileName)!;
+      expect(line).toContain('Reclaimers Guild demands the Fragment of the Endless Stair (recover it at Endless Stair)');
+      expect(line).toContain('Stone Builders demands the Obsidian Siphon (recover it at Obsidian Pillars)');
+      expect(line).toMatch(/SEAL THE ALLIANCE\.$/);
+    });
+
+    it('marks a relic already in hand with a check instead of a recover-at tile', () => {
+      const line = brokerMissionLine(mission, (n) => n === 'Fragment of the Endless Stair', tileName)!;
+      expect(line).toContain('Fragment of the Endless Stair (in hand ✓)');
+      expect(line).toContain('Obsidian Siphon (recover it at Obsidian Pillars)');
+    });
+
+    it('returns null for a missing or already-sealed mission', () => {
+      expect(brokerMissionLine(null, () => false, tileName)).toBeNull();
+      expect(brokerMissionLine(undefined, () => false, tileName)).toBeNull();
+      expect(brokerMissionLine({ ...mission, done: true }, () => false, tileName)).toBeNull();
+    });
   });
 });
