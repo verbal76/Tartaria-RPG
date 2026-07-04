@@ -1997,20 +1997,34 @@ function patchSceneForBuildingRoom(
   const stallVendor = room.stallCategory
     ? buildStallVendor(room.stallCategory, room.shortName)
     : null;
+  // OTA-674 — key this building room's consumed-noun state by a STABLE per-room
+  // identity ("building:<buildingId>:<roomId>") stamped onto the scene's
+  // microMicroId, NOT the volatile outdoor micro-micro. The outdoor micro-micro
+  // re-rolls whenever the tile's scene rebuilds after a save→exit→reload (building
+  // state is intentionally transient across load), so the old key stopped matching
+  // the persisted consumed set and EVERY salvage/take/investigate tab refilled on
+  // re-entry — a save→exit→rehydrate material farm. A synthetic per-room id is both
+  // stable across reload AND unique per room (great hall vs armory vs cellar vs
+  // vault no longer collide). Every take/salvage/investigate handler derives its
+  // own room key from currentScene.microMicroId, so stamping it here makes the
+  // whole read/write path agree with zero call-site changes; EXIT still restores
+  // the outdoor scene (with its real micro-micro) from preBuildingScene.
+  const buildingRoomMicroId = `building:${buildingId}:${roomId}`;
   set((s) => {
     if (!s.currentScene) return {};
     // arb39 — drop interactables already taken/salvaged in this building
     // room so they don't respawn on re-entry (no farm loop). Keyed by the
-    // same room key the take/salvage handlers write to.
+    // stable building-room key the take/salvage handlers now also write to.
     const p = s.player;
     const roomKey = p
-      ? makeRoomKey(p.currentLocationId, s.currentScene.microMicroId, p.mapX, p.mapY, p.hubRoomId)
+      ? makeRoomKey(p.currentLocationId, buildingRoomMicroId, p.mapX, p.mapY, p.hubRoomId)
       : null;
     const consumed = roomConsumedSet(s.worldMemory, roomKey);
     const nouns = room.interactables.filter((n) => !isConsumedNoun(consumed, n));
     return {
       currentScene: {
         ...s.currentScene,
+        microMicroId: buildingRoomMicroId,
         ambientNouns: nouns,
         displayedAmbientNouns: nouns,
         transitArea: `${b.name} · ${room.shortName}`,
@@ -24853,16 +24867,23 @@ function narrateCasualLook(
   // bearings without re-reading 70 words of mood prose.
   const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
   const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, player!.factionId) : null;
-  const ladder = !hubRoom && scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
+  // OTA-674 — inside a building the scene's microMicroId is a synthetic
+  // "building:<id>:<room>" key (stable per-room anti-farm id), which never
+  // resolves to a real micro-micro; use the scene's transitArea ("Outpost ·
+  // Great Hall") for orientation instead of an outdoor room name.
+  const inBuilding = !!get().activeBuildingId;
+  const ladder = !hubRoom && !inBuilding && scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
 
   const parts: string[] = [];
 
   // 1. Orientation — "You look around. You're in [name]."
   const placeName = hubRoom
     ? `${hubRoom.name} (${scene.location.name})`
-    : ladder?.microMicro.name
-      ? `${ladder.microMicro.name}, in ${scene.location.name}`
-      : scene.location.name;
+    : inBuilding && scene.transitArea
+      ? `${scene.transitArea} (${scene.location.name})`
+      : ladder?.microMicro.name
+        ? `${ladder.microMicro.name}, in ${scene.location.name}`
+        : scene.location.name;
   // OTA 228 — fold the HP gut-check into the opening sentence as
   // narrative flavor instead of a stark mid-paragraph "wounds (X/Y)"
   // line. Playtester: "you're carrying wounds in the look around —

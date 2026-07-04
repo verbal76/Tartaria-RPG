@@ -15506,4 +15506,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // announcement + accept/decline prompt also lead with the name and route to the mission
 // channel; the offer modal title reads "New mission — Broker an Alliance" and its body
 // points at CONTRACTS. Name is identical across reminder, offer, and card. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-673-mission-line-yellow-highlight';
+// OTA-674 — close the building-room save/exit/rehydrate material FARM. Inside a building,
+// each room's cleared (take/salvage/investigate) state was keyed by the VOLATILE outdoor
+// micro-micro id, which re-rolls when the tile's scene rebuilds after a reload (building
+// state is intentionally transient across load) — so re-entering refilled every tab, and
+// save-exit-rehydrate-re-enter minted infinite materials. patchSceneForBuildingRoom now
+// stamps a STABLE "building:<id>:<room>" id onto the scene's microMicroId; every take/
+// salvage/investigate handler already derives its room key from that field, so the whole
+// read/write path agrees with zero call-site changes, each room gets its own key (no more
+// cross-room collision), and cleared rooms stay cleared across reload. Look-around inside a
+// building now orients off the room's transitArea. New buildingRoomClearedPersists suite +
+// updated roomLootPersistence; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-674-building-room-cleared-persists';
