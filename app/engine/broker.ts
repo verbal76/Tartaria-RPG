@@ -92,5 +92,9 @@ export function brokerMissionLine(
   const line = legs
     .map((l) => `${l.factionName} demands the ${l.itemName} (${has(l.itemName) ? 'in hand ✓' : `recover it at ${tileName(l.tileId)}`})`)
     .join('; ');
-  return `Two leaders face off across the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`;
+  // Lead with the mission's NAME ("Broker an Alliance" — matches the CONTRACTS
+  // card title + the accept/decline offer title) so the standing reminder names
+  // the mission the same way everywhere. "SEAL THE ALLIANCE" is the closing
+  // COMMAND, not the name — capitalized like the game's other typed affordances.
+  return `Broker an Alliance: two leaders wait at the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`;
 }
