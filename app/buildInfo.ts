@@ -16902,4 +16902,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (the same demands text the PARLEY action prints) is now surfaced as a standing
 // "▸ Mission — …" line directly under the scene paragraph on every entry AND in every
 // look-around. Extracted broker.brokerMissionLine (pure) as the shared source. JS-only.
-export const OTA_BUILD_ID = '2026-07-04-960-persistent-mission-line';
+// 2026-07-04-961 — make the Parley of Factions (broker) mission a first-class, TRACKABLE
+// contract on the CONTRACTS screen (ported from Tartaria OTA-669). Playtester wandered
+// into the parley and ended up with a live mission that appeared NOWHERE on their contract
+// list. It now renders an ALLIANCE section like the rest: both demanded relics, source
+// tiles, in-hand progress (N/2), SET COURSE to each unmet relic + to the Parley Ground for
+// the SEAL step. Reuses broker.missionLegs; counts toward totalActive. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-961-parley-trackable-contract';

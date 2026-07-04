@@ -14,6 +14,7 @@ import { computeAllProgress, getCharacterStories, allFragments } from '../engine
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
+import { missionLegs } from '../engine/broker';
 
 function MilestoneStat({
   label,
@@ -60,6 +61,10 @@ function factionLabel(factionId: string | null | undefined): string {
   if (!factionId) return 'Unaffiliated';
   const f = findFaction(factionId);
   return f?.name ?? factionId.replace(/_/g, ' ');
+}
+
+function safeLocName(id: string): string {
+  try { return getLocationById(id).name ?? id; } catch { return id; }
 }
 
 type Tab = 'contracts' | 'collectables';
@@ -223,8 +228,22 @@ export function ContractsScreen() {
     (q) => q.state === 'open' || q.state === 'in_progress',
   );
 
+  // Parley of Factions (broker) — the two-relic alliance mission. Previously it
+  // lived only in the log + as grid "?" markers, so a player who wandered into it
+  // (or parleyed once) had a live mission with NO card here — "I don't even think
+  // that mission is on my list." Now it's a first-class, trackable contract like
+  // the rest: both demanded relics, their source tiles, in-hand progress, a SET
+  // COURSE to each unmet relic, and the SEAL step at the Parley Ground.
+  const brokerMission =
+    player.brokerMission && !player.brokerMission.done ? player.brokerMission : null;
+  const brokerLegs = brokerMission ? (missionLegs(brokerMission) ?? []) : [];
+  const hasRelic = (name: string) =>
+    (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
+  const brokerReady = brokerLegs.length > 0 && brokerLegs.every((l) => hasRelic(l.itemName));
+
   const totalActive =
-    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length;
+    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length
+    + (brokerMission ? 1 : 0);
 
   // Lifetime milestone counters — surfaced here so players have a single
   // place to see progress toward stat bumps (every 10 checks succeeded
@@ -1001,6 +1020,66 @@ export function ContractsScreen() {
                   </Pressable>
                 );
               })}
+            </View>
+          )}
+
+          {brokerMission && brokerLegs.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>ALLIANCE</Text>
+              <Text style={styles.whispersBlurb}>
+                A parley you opened on neutral ground. Recover each faction's
+                demanded relic, then return to the Parley Ground and SEAL THE
+                ALLIANCE.
+              </Text>
+              <View style={styles.card}>
+                <View style={styles.cardHead}>
+                  <Text style={styles.cardTitle}>Broker an Alliance</Text>
+                  <Text style={styles.stagePill}>
+                    {brokerLegs.filter((l) => hasRelic(l.itemName)).length}/{brokerLegs.length}
+                  </Text>
+                </View>
+                <Text style={styles.cardFaction}>Parley of Factions · neutral ground</Text>
+                {brokerLegs.map((l) => {
+                  const inHand = hasRelic(l.itemName);
+                  const here =
+                    player?.currentLocationId === l.tileId;
+                  return (
+                    <View key={`broker_${l.factionId}`} style={{ marginTop: 8 }}>
+                      <Text style={styles.cardStageLabel}>{l.factionName}</Text>
+                      <Text style={styles.cardStageBody}>
+                        {inHand
+                          ? `✓ ${l.itemName} — in hand.`
+                          : `○ ${l.itemName} — recover it at ${safeLocName(l.tileId)}.`}
+                      </Text>
+                      {!inHand && !here && (
+                        <Pressable
+                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          onPress={() => setPendingRoute({ id: l.tileId, name: safeLocName(l.tileId) })}
+                        >
+                          <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(l.tileId).toUpperCase()}</Text>
+                        </Pressable>
+                      )}
+                      {!inHand && here && (
+                        <Text style={styles.routeHereNote}>▸ You're here — recover the {l.itemName}.</Text>
+                      )}
+                    </View>
+                  );
+                })}
+                <Text style={[styles.cardStageLabel, { marginTop: 10 }]}>How to finish</Text>
+                <Text style={styles.cardStageBody}>
+                  {brokerReady
+                    ? 'Both relics in hand. Return to the Parley Ground and SEAL THE ALLIANCE.'
+                    : 'Bring both relics to the Parley Ground, then SEAL THE ALLIANCE.'}
+                </Text>
+                {player?.currentLocationId !== 'parley_ground' && (
+                  <Pressable
+                    style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                    onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
+                  >
+                    <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName('parley_ground').toUpperCase()}</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
           )}
 
