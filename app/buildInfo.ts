@@ -16958,4 +16958,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the temper is gated to weapon/armor; misc/relic tools stamp a FIXED max = base;
 // lookupBaseDurability honors a GEAR row's declared baseDurability regardless of kind; and
 // resealUtilityDurability heals existing saves' inflated tool durability on load.
-export const OTA_BUILD_ID = '2026-07-04-969-utility-durability-fixed-not-tempered';
+// 2026-07-04-970 — two governance fixes to stop the engine writing canon the author didn't
+// authorize. (1) OFF-CANON ENTITY GUARD on Qwen narration (both reactive + ambient paths): a
+// new entityGuard drops any sentence naming a multi-word place/faction NOT in the loaded PACK's
+// entity set (resolveTable locations/factions/races + lore-concept labels + world/narrator
+// identity + live scene) — nothing survives → authored template. Allow-list is pack-sourced &
+// rebuilt per call (reflects a runtime pack reload). (2) PACK-DRIVEN ARBITER PERSONA: the
+// "Ask the Narrator" system prompt was a module const that hard-coded Tartaria lore ("mud-
+// drowned world of Tartaria… before the flood… the buried country appoints witnesses")
+// regardless of the loaded pack (and froze getNarratorName at boot). Now a per-call function
+// built from the pack's persona/setting/tone, neutral fallback when absent. entityGuard suite
+// (9) green; tsc app-clean. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-970-narration-canon-guard-pack-persona';

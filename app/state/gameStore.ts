@@ -72,7 +72,9 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName, getNarratorPersona, getWorldTone, getWorldSetting } from '../engine/contentPack';
+import { sentenceNamesOffCanonEntity, buildEntityAllowList } from '../engine/entityGuard';
+import { loadLoreConceptBank } from '../engine/loreConceptBank';
 import { useContentPackStore } from './contentPackStore';
 import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
@@ -848,25 +850,42 @@ const qwen = new QwenGenerativeEngine();
 // from inventing names / counts / events he cannot know. Returns null when
 // Qwen isn't ready or returns nothing usable, so the caller can fall back to
 // the silent lore line.
-const ARBITER_PERSONA_SYSTEM =
-  `You are the ${getNarratorName()}: the old, mysterious witness who walks the buried, ` +
-  "mud-drowned world of Tartaria beside the traveler. Voice: terse, gruff, " +
-  "weathered, a little cryptic — never cheerful, never modern, never chatty. " +
-  "Canon you may lean on: you had a name before the flood, but it is buried " +
-  "with the city that used it; you do not sleep and do not bleed; you are " +
-  "neither god nor ghost nor relic; the buried country appoints witnesses, " +
-  "and you are one of them. RULES: reply in 1-3 short sentences, in the " +
-  `${getNarratorName()}'s voice. Do NOT invent proper names of people, places, factions, ` +
-  "items, or events, and do NOT state counts or facts you are unsure of — if " +
-  "asked something you cannot know, say it is buried or does not surface. " +
-  "Never mention games, rules, or AI, and never break character.";
+// OTA-970 — pack-driven Arbiter persona. This was a module-level const that hard-coded
+// TARTARIA lore ("mud-drowned world of Tartaria… before the flood… the buried country
+// appoints witnesses") into the "Ask the Narrator" prompt regardless of the loaded pack —
+// a lore leak on any re-skin, AND (being a const) it froze getNarratorName() at boot before
+// any pack loaded. Now it's a function rebuilt per call from the loaded pack's persona /
+// setting / tone, falling back to a NEUTRAL, world-agnostic frame when the pack omits them.
+// The anti-invention rules stay (they align with the entity guard).
+function arbiterPersonaSystem(): string {
+  const narrator = getNarratorName();
+  const world = getWorldName();
+  const persona = (getNarratorPersona() ?? '').trim();
+  const setting = (getWorldSetting() ?? '').trim();
+  const tone = (getWorldTone() ?? '').trim();
+  const flavor = [
+    persona,
+    setting ? `Setting: ${setting}` : '',
+    tone ? `Voice: ${tone}` : '',
+  ].filter(Boolean).join(' ');
+  return (
+    `You are the ${narrator}, the witness who walks the world of ${world} beside the traveler. ` +
+    (flavor
+      ? `${flavor} `
+      : 'Voice: terse, weathered, a little cryptic — never cheerful, never modern, never chatty. ') +
+    `RULES: reply in 1-3 short sentences, in the ${narrator}'s voice. Do NOT invent proper names of ` +
+    'people, places, factions, items, or events, and do NOT state counts or facts you are unsure of — ' +
+    'if asked something you cannot know, say it does not surface. Never mention games, rules, or AI, ' +
+    'and never break character.'
+  );
+}
 
 async function arbiterPersonaAnswer(question: string): Promise<string | null> {
   if (!qwen.isReady()) return null;
   try {
     const out = await qwen.generate(
       [
-        { role: 'system', content: ARBITER_PERSONA_SYSTEM },
+        { role: 'system', content: arbiterPersonaSystem() },
         { role: 'user', content: question },
       ],
       { maxNewTokens: 90, temperature: 0.7 },
@@ -28427,6 +28446,30 @@ function trainAcceptCharismaGated(
 // everything up to and including that character. Falls back to the raw
 // text if nothing terminal is present (rare — would only happen on a
 // single-fragment generation that never landed a punctuation mark).
+// OTA-970 — allow-list of canon entity names the narrator may say, sourced from the
+// LOADED PACK (resolveTable → author override / generic default / built-in), NOT hard-
+// coded — so the entity guard's world is the AUTHOR's world. Rebuilt per call (no cache)
+// so it reflects a pack reloaded at runtime. Pulls pack locations + factions (+subtitles)
+// + races + lore-concept labels + world/narrator identity, plus the live player + scene.
+function narrationEntityAllow(get: () => GameStore): ReadonlySet<string> {
+  const names: string[] = [];
+  for (const l of resolveTable('locations', [] as Array<{ name?: string }>)) if (l?.name) names.push(l.name);
+  for (const f of resolveTable('factions', [] as Array<{ name?: string; subtitle?: string }>)) {
+    if (f?.name) names.push(f.name);
+    if (f?.subtitle) names.push(f.subtitle);
+  }
+  for (const r of resolveTable('races', [] as Array<{ name?: string }>)) if (r?.name) names.push(r.name);
+  try { for (const c of loadLoreConceptBank()) if (c?.label) names.push(c.label); } catch { /* lore optional */ }
+  names.push(getWorldName(), getNarratorName());
+  const p = get().player;
+  const scene = get().currentScene;
+  if (p?.name) names.push(p.name);
+  if (scene?.location?.name) names.push(scene.location.name);
+  for (const e of (scene?.enemies ?? [])) if (e?.name) names.push(e.name);
+  if (scene?.vendor?.name) names.push(scene.vendor.name);
+  return buildEntityAllowList(names);
+}
+
 function trimToLastSentence(raw: string): string {
   const s = (raw ?? '').trim();
   if (!s) return '';
@@ -28603,10 +28646,15 @@ async function narrateViaArbiter(
     // player paused..." despite the prompt. Drop those sentences and
     // fall back to the template if NOTHING usable survives, so the
     // arbiter feed never reads as a recap about someone else.
+    // OTA-970 — off-canon entity guard: drop any sentence naming a multi-word
+    // place/faction the model INVENTED (not in the loaded pack's entity set + live
+    // scene); nothing survives → `|| trimmed` restores the authored template.
+    const narrationAllow = narrationEntityAllow(get);
     const survivors = capped
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      .filter((s) => !sentenceNamesOffCanonEntity(s, narrationAllow))
       .join(' ')
       .trim();
     let finalText = trimToLastSentence(survivors) || trimmed;
@@ -28768,10 +28816,14 @@ async function maybeGenerateAmbientArbiter(
       },
       { maxNewTokens: 32 },
     );
+    // OTA-970 — off-canon entity guard (ambient path). A dropped line just stays
+    // silent (ambient has no template fallback), the safe outcome.
+    const ambientAllow = narrationEntityAllow(get);
     const survivors = clampSentences(stripForeignWords(text), 1)
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
       .trim();
     const finalText = trimToLastSentence(survivors);
