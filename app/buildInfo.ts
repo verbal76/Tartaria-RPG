@@ -16941,4 +16941,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stamps a STABLE "building:<id>:<room>" id onto the scene's microMicroId; every handler
 // already keys off that field, so read/write agree with zero call-site changes, each room
 // gets its own key, and cleared rooms stay cleared across reload. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-966-building-room-cleared-persists';
+// 2026-07-04-967 — craftable throwables (ported from Tartaria OTA-675). engine_Dev already
+// carried the throwable-tagged items + ingredients but had NO recipes for them. Added 5
+// recipes whose outputs are existing throwable-tagged, bandolier-eligible weapons: Throwing
+// Knife, Tartarian Hand Axe (Throw), Mud Throwing Knife, Bone Throwing Axe, Shaped Aetheric
+// Shard. New throwableRecipes suite green. Data-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-04-967-craftable-throwables';

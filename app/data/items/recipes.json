@@ -1324,6 +1324,46 @@
           "quantity": 3
         }
       ]
+    },
+    {
+      "_note": "OTA-967 - craftable throwables: give the bandolier a crafting supply line (previously loot/vendor only). Each output is an existing throwable-tagged, bandolier-eligible weapon.",
+      "result": "Throwing Knife",
+      "ingredients": [
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Stick", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Tartarian Hand Axe (Throw)",
+      "ingredients": [
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Smooth Stone", "quantity": 1 },
+        { "name": "Stick", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Mud Throwing Knife",
+      "ingredients": [
+        { "name": "Hardened Mudstone", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Cloth Scrap", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Bone Throwing Axe",
+      "ingredients": [
+        { "name": "Wyrm Fang", "quantity": 1 },
+        { "name": "Stick", "quantity": 1 },
+        { "name": "Cloth Scrap", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Shaped Aetheric Shard",
+      "ingredients": [
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 },
+        { "name": "Aether Dust", "quantity": 1 }
+      ]
     }
   ]
 }
