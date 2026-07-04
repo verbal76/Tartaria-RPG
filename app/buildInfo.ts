@@ -16908,4 +16908,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // list. It now renders an ALLIANCE section like the rest: both demanded relics, source
 // tiles, in-hand progress (N/2), SET COURSE to each unmet relic + to the Parley Ground for
 // the SEAL step. Reuses broker.missionLegs; counts toward totalActive. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-961-parley-trackable-contract';
+// 2026-07-04-962 — uniform ACTIVATE / DEACTIVATE (pause) across EVERY contract kind (ported
+// from Tartaria OTA-670). Before this only faction quests could be paused; hunts, mysteries,
+// storylines, whispers, leads, and the parley had no way to be set aside. Added a reversible
+// `tracked` (paused) flag to each + a generic setContractActive(kind,id,active?) toggle
+// (PER-CONTRACT, independent; faction quests keep their single-active routing) + a
+// ▮▮ DEACTIVATE / ▶ SET ACTIVE button + ⏸ PAUSED styling on every card. Paused staged
+// contracts + leads freeze; paused whispers + parley drop off the standing reminders.
+// Extended abandonContract to drop whispers + the parley. tsc app-clean; suites green. JS-only.
+export const OTA_BUILD_ID = '2026-07-04-962-uniform-contract-activate-deactivate';

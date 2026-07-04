@@ -75,6 +75,7 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
+  const setContractActive = useGameStore((s) => s.setContractActive);
   const setMainQuestActive = useGameStore((s) => s.setMainQuestActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
@@ -166,6 +167,23 @@ export function ContractsScreen() {
       </Pressable>
     );
   };
+  // Uniform ACTIVATE / DEACTIVATE (pause) toggle for any contract kind, mirroring
+  // the faction-quest button. `tracked` = currently active. Deactivating parks the
+  // contract (⏸ PAUSED) without dropping it; ABANDON is the separate destructive drop.
+  const trackToggle = (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'whisper' | 'lead' | 'broker',
+    id: string,
+    tracked: boolean,
+  ) => (
+    <Pressable
+      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      onPress={() => setContractActive(kind, id, !tracked)}
+    >
+      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+        {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
+      </Text>
+    </Pressable>
+  );
 
   if (!player) {
     return (
@@ -560,15 +578,17 @@ export function ContractsScreen() {
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('hunt', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
                         didn't tell them where to go or what to do.
@@ -705,15 +725,17 @@ export function ContractsScreen() {
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -770,15 +792,17 @@ export function ContractsScreen() {
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -1031,11 +1055,13 @@ export function ContractsScreen() {
                 demanded relic, then return to the Parley Ground and SEAL THE
                 ALLIANCE.
               </Text>
-              <View style={styles.card}>
+              <View style={[styles.card, brokerMission.paused && styles.cardPaused]}>
                 <View style={styles.cardHead}>
                   <Text style={styles.cardTitle}>Broker an Alliance</Text>
-                  <Text style={styles.stagePill}>
-                    {brokerLegs.filter((l) => hasRelic(l.itemName)).length}/{brokerLegs.length}
+                  <Text style={[styles.stagePill, brokerMission.paused && styles.stagePillPaused]}>
+                    {brokerMission.paused
+                      ? '⏸ PAUSED'
+                      : `${brokerLegs.filter((l) => hasRelic(l.itemName)).length}/${brokerLegs.length}`}
                   </Text>
                 </View>
                 <Text style={styles.cardFaction}>Parley of Factions · neutral ground</Text>
@@ -1079,6 +1105,13 @@ export function ContractsScreen() {
                     <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName('parley_ground').toUpperCase()}</Text>
                   </Pressable>
                 )}
+                {trackToggle('broker', 'broker', !brokerMission.paused)}
+                <Pressable
+                  style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                  onPress={() => abandonContract('broker', 'broker')}
+                >
+                  <Text style={styles.abandonBtnText}>ABANDON</Text>
+                </Pressable>
               </View>
             </View>
           )}
@@ -1101,16 +1134,17 @@ export function ContractsScreen() {
                 // arb99 — if this objective is plotted as a numbered "?" on the
                 // atlas, lead the SET COURSE block with the same number.
                 const qNum = route ? questionNumbers[mentionIdForLabel(route.label)] : undefined;
+                const tracked = rec.tracked !== false;
                 return (
-                  <View key={`w_${rec.id}`} style={styles.card}>
+                  <View key={`w_${rec.id}`} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{title}</Text>
-                      <Text style={styles.stagePill}>{rec.stage}</Text>
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : rec.stage}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Whisper · informal</Text>
                     <Text style={styles.cardStageLabel}>Next step</Text>
                     <Text style={styles.cardStageBody}>{stageDesc}</Text>
-                    {route && !here && (
+                    {route && !here && tracked && (
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => {
@@ -1124,6 +1158,13 @@ export function ContractsScreen() {
                     {route && here && (
                       <Text style={styles.routeHereNote}>▸ You're here — {route.label} should be at this tile.</Text>
                     )}
+                    {trackToggle('whisper', rec.id, tracked)}
+                    <Pressable
+                      style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                      onPress={() => abandonContract('whisper', rec.id)}
+                    >
+                      <Text style={styles.abandonBtnText}>ABANDON</Text>
+                    </Pressable>
                   </View>
                 );
               })}
@@ -1145,14 +1186,16 @@ export function ContractsScreen() {
                   : q.reward.label;
                 const key = `lead_${q.id}`;
                 const open = !!expanded[key];
+                const tracked = q.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{title}</Text>
-                      <Text style={styles.stagePill}>{q.state}</Text>
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : q.state}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
                     {contractRoute(key)}
+                    {trackToggle('lead', q.id, tracked)}
                     {!open && (
                       <>
                         <Text style={styles.cardStageLabel}>Complication</Text>
