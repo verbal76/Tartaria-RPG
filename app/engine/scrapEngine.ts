@@ -126,8 +126,10 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
     grants.push({ name: 'Mudstone', quantity: 1 });
   }
   // Cloth / fiber → Patched Cloth, and SPIDER SILK (a 7-recipe fiber) from
-  // organic gear.
-  if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || item.kind === 'armor') {
+  // organic gear. OTA-661 — `rope` is cordage (fiber): a rope-tagged item with no
+  // cloth/fiber tag fell through to the bare Stick+Small Rock fallback, so a
+  // Climbing Rope scrapped/repaired with sticks and rocks. Treat rope as fiber.
+  if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || tags.has('rope') || item.kind === 'armor') {
     grants.push({ name: 'Patched Cloth', quantity: 2 + half });
     if (tags.has('organic')) grants.push({ name: 'Spider Silk', quantity: 1 });
   }
