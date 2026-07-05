@@ -24334,7 +24334,89 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
 // player's single action provoked the whole group. Bail early if the
 // player dies mid-volley so the rest of the group don't pile damage on a
 // corpse.
-function runEnemyGroupCounters(
+// OTA-685 — per-enemy chance to swing at the DOG instead of the commander on a
+// group volley. arb169 had (correctly) closed the "command the dog to dodge the
+// group's retaliation" exploit by routing the WHOLE volley to the player - but it
+// removed the dog from ALL retaliation, so the dog became invulnerable and the
+// entire downed -> benched -> bleed-out system (and the vest's acBonus) went dead.
+// This restores dog vulnerability WITHOUT reopening the exploit: the redirect
+// fires on EVERY volley regardless of what the player did, so commanding the dog
+// gives no defensive edge. ~1-in-4 of each enemy's swings goes to the dog; the
+// vest's AC helps it dodge; a hit that drops it to 0 benches it (waiting_at_base)
+// and starts the existing bleed-out clock.
+const DOG_TARGET_CHANCE = 0.25;
+
+/** AC bonus the dog's equipped vest confers. Catalog vests carry it directly;
+ *  a Crucible-fused vest carries it on the matching inventory item's
+ *  uniqueStats. Returns 0 when no vest / unknown. */
+function dogVestAcBonus(player: PlayerCharacter): number {
+  const name = player.dog?.equipped?.vest;
+  if (!name) return 0;
+  const catalog = findDogGearByName(name);
+  if (catalog) return catalog.acBonus ?? 0;
+  const inst = player.inventory.find((i) => i.kind === 'dog_armor' && i.name === name);
+  return inst?.uniqueStats?.acBonus ?? 0;
+}
+
+/** One enemy spends its swing on the dog. Mirrors applyEnemyCounter's roll but
+ *  against the dog's own AC (10 + DEX mod + vest), with the enemy's damage
+ *  notation. A hit to 0 benches the dog and stamps downedAtHour so tickDogStatus
+ *  runs the 24h bleed-out. No player-only machinery (titles/race/resist) applies. */
+export function applyEnemyCounterToDog(
+  enemy: Enemy,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  const dog = player?.dog;
+  if (!player || !dog || dog.status !== 'with_player' || dog.hp <= 0) return;
+  const atkBonus = parseEnemyAP(enemy) + traitAttackBonus(enemy.traits);
+  const atkRoll = rollDie(20);
+  const atkTotal = atkRoll + atkBonus;
+  const dexMod = Math.floor((dog.stats.dexterity - 10) / 2);
+  const vestAc = dogVestAcBonus(player);
+  const dogAc = Math.max(6, 10 + dexMod + vestAc);
+  const crit = atkRoll === 20;
+  const fumble = atkRoll === 1;
+  const hit = fumble ? false : crit ? true : atkTotal >= dogAc;
+  get().appendLog(
+    'combat',
+    `${enemy.name} turns on ${dog.name} — d20 ${atkRoll} + ATK ${atkBonus} = ${atkTotal} vs ${dog.name}'s AC ${dogAc}${vestAc ? ` (vest +${vestAc})` : ''} — ${fumble ? '✗ FUMBLE' : crit ? '✓ CRIT' : hit ? '✓ HIT' : '✗ MISS'}`,
+    hit ? undefined : { combatOutcome: 'enemy_miss' },
+  );
+  if (!hit) return;
+  let dmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+  if (crit) dmg += rollFromNotation(String(enemy.damage)) || rollDie(6);
+  const newHp = Math.max(0, dog.hp - dmg);
+  const downed = newHp <= 0;
+  const now = player.hoursElapsed ?? 0;
+  set((s) => {
+    if (!s.player?.dog) return s;
+    const dd = s.player.dog;
+    return {
+      player: {
+        ...s.player,
+        dog: {
+          ...dd,
+          hp: newHp,
+          ...(downed ? { status: 'waiting_at_base' as const, downedAtHour: now, bleedWarned: false } : {}),
+        },
+      },
+    };
+  });
+  get().appendLog('combat', `${dog.name} takes ${dmg}. (${newHp}/${dog.hpMax} HP left)`);
+  if (downed) {
+    get().appendLog(
+      'arbiter',
+      applyDogPronouns(
+        `${dog.name} drops under the ${enemy.name} and drags {pronoun}self clear of the fight. {Pronoun} {isOrAre} down — tend {pronoun} within a day or {pronoun} won't get back up.`,
+        dog.sex.pronoun,
+      ),
+    );
+  }
+}
+
+export function runEnemyGroupCounters(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   fallbackPlayer: PlayerCharacter,
@@ -24364,6 +24446,16 @@ function runEnemyGroupCounters(
     // Bail if the player is dead.
     const livePlayer = get().player;
     if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
+    // OTA-685 - chance this enemy swings at the dog instead of the commander.
+    // Only when the dog is actually at the player's side and up; the swing is
+    // then SPENT on the dog (the player is spared it), so the dog genuinely
+    // soaks. Fires on every volley regardless of the player's action, so it
+    // can't be gamed by commanding the dog (the arb169 exploit stays closed).
+    const dogNow = livePlayer.dog;
+    if (dogNow && dogNow.status === 'with_player' && dogNow.hp > 0 && Math.random() < DOG_TARGET_CHANCE) {
+      applyEnemyCounterToDog(enemy, get, set);
+      continue;
+    }
     // Pass live index so applyEnemyCounter can resolve ambush_strike
     // (one-shot +2 to the first counter for enemies with the trait).
     applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);

@@ -324,6 +324,20 @@ export function InventoryScreen() {
     );
     if (owner) equippedItemIds.add(owner.id);
   }
+  // OTA-685 - the dog's vest is worn on the DOG (tracked by name on
+  // dog.equipped.vest, NOT in the player's equip slots), so it never lit the
+  // EQUIPPED badge and you couldn't tell which vest was on him. Mark ONE matching
+  // inventory instance equipped so the Dog Armor row reads "EQUIPPED (on <dog>)".
+  const dogForVest = player.dog;
+  const dogVestName = dogForVest && dogForVest.status !== 'dead' && dogForVest.status !== 'abandoned'
+    ? dogForVest.equipped?.vest ?? null
+    : null;
+  if (dogVestName) {
+    const vestOwner = player.inventory.find(
+      (it) => it.kind === 'dog_armor' && it.name === dogVestName && it.quantity > 0,
+    );
+    if (vestOwner) equippedItemIds.add(vestOwner.id);
+  }
 
   // arb-fix — which SLOT(s) an equipped instance occupies, so the row can show
   // "EQUIPPED (main hand)" / "(off hand)" / "(both hands)" for weapons instead
@@ -343,6 +357,11 @@ export function InventoryScreen() {
     equippedSlotsById.set(id, list);
   }
   const equippedSlotLabelFor = (item: InventoryItem): string => {
+    // OTA-685 - a dog vest reads "(on <dogname>)", since it's worn on the dog,
+    // not in a player slot.
+    if (item.kind === 'dog_armor' && dogVestName && item.name === dogVestName) {
+      return dogForVest?.name ? `on ${dogForVest.name}` : 'on your dog';
+    }
     let slots = equippedSlotsById.get(item.id);
     if (!slots || slots.length === 0) slots = slotsByEquippedName.get(item.name) ?? [];
     if (slots.length === 0) return '';
