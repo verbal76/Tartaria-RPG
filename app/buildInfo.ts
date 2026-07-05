@@ -15409,4 +15409,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sit anywhere in a long list). settleFusion carries the instance id; the Inventory screen records
 // section + row y via onLayout, scrolls the row into view, and pulses it (gold wash + border) for
 // ~2.5s. Best-effort + guarded. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-669-forge-reveal-scrolls-highlights-item';
+// OTA-670 — dog takes combat damage again + dog-vest equipped marker (ported from Tartaria
+// OTA-685). arb169 had removed the dog from all retaliation (invulnerable dog, dead bleed-out
+// system); the volley now redirects ~1-in-4 of each enemy's swings to the dog (uniformly, so the
+// exploit stays closed) with the dog rolling its own AC (10 + DEX mod + vest), a hit to 0 benching
+// it. And the dog vest (worn by name on dog.equipped.vest) now lights the EQUIPPED badge as
+// "(on <dog>)". New dogCombatDamageAndVest suite (4). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-670-dog-takes-damage-and-vest-marker';
