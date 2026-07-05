@@ -123,6 +123,16 @@
     { "name": "Honey-Glazed Knuckle", "kind": "consumable", "rarity": "Rare", "tags": ["food", "treat", "dog_treat", "baker"], "description": "A roasted knuckle bone glazed in dark honey by a hub baker who specialises in scraps for the city's strays. Sticky, sweet, deeply unfair to refuse.",
       "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 3, "dogTreat": true } },
     { "name": "Ash-Cured Tongue", "kind": "consumable", "rarity": "Legendary", "tags": ["food", "treat", "dog_treat", "reclaimer"], "description": "A Reclaimer ceremonial cut — beast tongue cured in cold ash and resin. Believed to carry a sliver of the animal's loyalty into whoever eats it. They feed it to their dogs on the night before a hunt.",
-      "effect": { "kind": "consumable", "healHP": 10, "restoreStamina": 4, "dogTreat": true } }
+      "effect": { "kind": "consumable", "healHP": 10, "restoreStamina": 4, "dogTreat": true } },
+
+    { "name": "Forgotten Order Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "forgotten_order", "keepsake"], "description": "A pendant hammered thin, etched with the Forgotten Order's crest — taken off one of their dead. Return it to their stake at Varakush to honor the fallen (+1 standing)." },
+    { "name": "Mud Monarch Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "mud_monarchs", "keepsake"], "description": "A silt-caked token bearing the Mud Monarchs' crest, pried from a fallen courtier. Return it to their waystation to honor the fallen (+1 standing)." },
+    { "name": "Reclaimer Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "reclaimers_guild", "keepsake"], "description": "A worn Guild token off a dead Reclaimer, its crest still legible under the grime. Return it to their stake to honor the fallen (+1 standing)." },
+    { "name": "True Tartarian Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "true_tartarians", "keepsake"], "description": "A hand-cut crest of the True Tartarians, carried by one who did not make it home. Return it to their waycamp to honor the fallen (+1 standing)." },
+    { "name": "Eternal Dynasty Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "eternal_dynasty", "keepsake"], "description": "A lacquered seal of the Eternal Dynasty, taken from a fallen retainer. Return it to their border post to honor the fallen (+1 standing)." },
+    { "name": "Architect Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "conspiracy_architects", "keepsake"], "description": "A cold-etched Architect glyph-token off a dead operative. Return it to the Architect's Blind to honor the fallen (+1 standing)." },
+    { "name": "Giants' Servant Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "servants_of_giants", "keepsake"], "description": "A bone-carved crest of the Servants of the Giants, kept by one now dead. Return it to the Giant Watch shrine to honor the fallen (+1 standing)." },
+    { "name": "Stone Builder Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "stone_builders", "keepsake"], "description": "A chiselled mason's mark of the Stone Builders, off a fallen surveyor. Return it to their survey camp to honor the fallen (+1 standing)." },
+    { "name": "Revivalist Sigil", "kind": "misc", "rarity": "Common", "tags": ["sigil", "tartarian_revivalists", "keepsake"], "description": "A hand-painted crest of the Tartarian Revivalists, carried by one who fell for the cause. Return it to their field camp to honor the fallen (+1 standing)." }
   ]
 }

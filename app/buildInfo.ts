@@ -17028,4 +17028,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (2) throwFromBandolier prefers a racked instance so the loop you fire is the one that clears.
 // engine_Dev's existing thrown-coating (immediate + 3-turn DOT) is unchanged. New
 // bandolierMultiAndCoatingThrow suite (3). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-982-bandolier-rack-multiple-throwables';
+// 2026-07-05-983 — faction SIGILS turn-in (ported from Tartaria OTA-691). Found faction crests (a
+// `sigil` tag + faction-id tag) returned to that faction's frontier stake honor their dead for +1
+// standing (one-sided). Nine sigil items (built-in fallback content); turnInSigil grants +1 only on
+// the faction's tile + spends the sigil; new SIGILS section at the bottom of Contracts lists each
+// with faction/+1/turn-in tile + auto-routable SET COURSE (RETURN when there). Glint pendant grants
+// a Forgotten Order Sigil. Generic mechanic (works off whatever factions the pack defines). New
+// sigils.ts + sigilTurnIn suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-983-faction-sigil-turnin';

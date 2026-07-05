@@ -396,14 +396,17 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
   ],
   glint: [
     {
-      line: 'You pick the metal out of the rubble. A pendant — old make, hammered thin, etched with a sigil you do not recognise.',
-      effects: [{ type: 'grant_item', name: 'Aetheric Locket' }],
+      line: 'You pick the metal out of the rubble. A pendant — old make, hammered thin, etched with a faction crest.',
+      effects: [{ type: 'grant_item', name: 'Forgotten Order Sigil' }],
       done: false,
     },
     {
       line: 'You turn the pendant over. Whoever wore it last bled out clutching it — a faint rust-brown line still runs along the inside of the chain.',
-      arbiterLine: `"That sigil belongs to someone," the ${getNarratorName()} says. "Someone who is going to want it back."`,
-      effects: [{ type: 'memo', text: 'A bloodstained pendant marks an old debt you have not yet collected.' }],
+      // OTA-983 — the foreshadow now pays off: the crest reads as the Forgotten
+      // Order's; returning the sigil to their stake honors their dead (+1 standing),
+      // tracked + routable in the Contracts SIGILS section.
+      arbiterLine: `"That crest is the Forgotten Order's," the ${getNarratorName()} says. "Carry it to their people and lay it down. They honor the ones who bring their dead home."`,
+      effects: [{ type: 'memo', text: 'A bloodstained Forgotten Order sigil — return it to their stake to honor their dead.' }],
       done: true,
     },
   ],
