@@ -1386,6 +1386,13 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // (a 150-rope at ~270). Reset it to the catalog base so existing saves correct
     // themselves on load. No-op for weapons/armor and for already-correct items.
     item = resealUtilityDurability(item);
+    // OTA-688 — mark older Crucible forges. applyFusion now stamps uniqueStats AND
+    // a 'fused' tag, but pieces forged before the tag existed carry uniqueStats
+    // without it. Backfill the tag on load so every crucible item is marked. uniqueStats
+    // is set ONLY by fusion, so this can't mislabel authored or looted gear.
+    if (item.uniqueStats && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
+      item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
+    }
     // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
     // signed-shift bug produced fused items named "Resonant
     // undefined" / "<Theme> undefined" before OTA-224 fixed the
@@ -20735,7 +20742,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(
       'reward',
-      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} weapon from your reserved pieces — and it's in your pack, still cooling.`,
+      // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon").
+      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
