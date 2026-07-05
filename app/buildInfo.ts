@@ -15621,4 +15621,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // distinct from the ◆ inferred diamond); a load-time backfill adds the 'fused' tag to older forges
 // (detected by uniqueStats, which only fusion sets) so every crucible item is marked. New
 // fusedItemMarkerAndCategory suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-688-fused-item-marker-and-armor-category';
+// OTA-689 — fused marker glyph ✶ → ❖ (a diamond OF diamonds). Materials wear a single ◆ diamond,
+// so a piece fused from them reads as a cluster of those diamonds — thematically right. Glyph +
+// style-name only (rowFusedStar → rowFusedMark); detection/backfill unchanged. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-689-fused-marker-diamond-of-diamonds';
