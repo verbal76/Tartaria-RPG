@@ -15612,4 +15612,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // equippedInstanceIds(player) returns the exact worn instances (id-bound + legacy first-by-name
 // fallback, incl. ring2/ring3); the sell filter now excludes those ids, leaving spares sellable.
 // New equippedInstanceIds suite (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-687-sell-list-excludes-equipped-by-id';
+// OTA-688 — three fused-item fixes. (1) The forge-complete message hard-coded "weapon", so a
+// forged piece of armor was announced as a weapon — now names the chosen kind. (2) categorizeItem
+// trusts a fused item's KIND (uniqueStats/fused tag are authoritative) before the name heuristics,
+// which had misread a fused ARMOR's synthesized name as a weapon and filed it under Weapons — that
+// mismatch also broke the "View in inventory" highlight (reveal opened the Armor section but the
+// piece sat in Weapons). (3) Crucible-forged items now wear a magical ✶ star (rarity-colored,
+// distinct from the ◆ inferred diamond); a load-time backfill adds the 'fused' tag to older forges
+// (detected by uniqueStats, which only fusion sets) so every crucible item is marked. New
+// fusedItemMarkerAndCategory suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-688-fused-item-marker-and-armor-category';
