@@ -15570,4 +15570,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // now gates the intercept to: on-tile + challenge-live + NOT in a labyrinth + NOT inside a
 // building (parley is on the open flats) + NO live enemies (combat verbs win). New
 // parleyInterceptGuard suite (7). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-681-parley-intercept-no-hijack-combat';
+// OTA-682 — fusing crucible picker deadlock. The picker hides reserved pieces that add no NEW
+// material once you've picked (declutter), but a single material-rich input (an Aetheric Cog =
+// metal+improvised+aether) can cover a whole pool's materials in TWO picks — after which the
+// declutter hid ALL remaining filler and the player could never reach the 3-item minimum, so the
+// Fuse button never lit ("how come I still can't fuse?"). The engine gate accepted the pool the
+// whole time — the block was UI-only. New visibleFusionInputs() reveals filler when short of
+// MIN_PICK with nothing left that adds a new material (safe: the picked set already spans every
+// material the pool has, so it already clears the diversity gate). New fusionPickerReachMin suite
+// (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-682-fusion-picker-reach-min-pick';

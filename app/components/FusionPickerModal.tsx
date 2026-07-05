@@ -6,7 +6,7 @@
 import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { eligibleInputs, fusionMaterialTags } from '../engine/itemFusion';
+import { eligibleInputs, fusionMaterialTags, visibleFusionInputs } from '../engine/itemFusion';
 import type { InventoryItem } from '../engine/types';
 
 const MIN_PICK = 3;
@@ -52,19 +52,18 @@ export function FusionPickerModal() {
 
   const pickedItems = scraps.filter((i) => picked.includes(i.id));
   const catalystItem = catalystId ? catalysts.find((c) => c.id === catalystId) ?? null : null;
-  const pickedMats = new Set(pickedItems.flatMap((i) => fusionMaterialTags(i)));
   const distinctMats = Array.from(new Set(
     [...pickedItems, ...(catalystItem ? [catalystItem] : [])].flatMap((i) => fusionMaterialTags(i)),
   ));
   const nMats = distinctMats.length;
-  // Every fusion needs DIFFERENT materials, so once you pick an item, hide the other
-  // reserved pieces that would add no NEW material (same-material duplicates). You can
-  // never assemble a same-type-only batch that fails the diversity gate. A picked item
-  // always stays visible (so you can deselect it); an item that still adds at least one
-  // uncovered material stays too.
-  const visibleScraps = scraps.filter(
-    (it) => picked.includes(it.id) || fusionMaterialTags(it).some((m) => !pickedMats.has(m)),
-  );
+  // Once you pick an item, hide the other reserved pieces that add no NEW material
+  // (same-material duplicates) to steer toward diversity — but never so aggressively
+  // that you can't reach the 3-item MINIMUM. A single material-rich piece (an Aetheric
+  // Cog = metal+improvised+aether) can cover a whole pool's materials in two picks; the
+  // naive declutter then hid ALL remaining filler and the Fuse button could never light
+  // (OTA-682 deadlock read as "I still can't fuse"). visibleFusionInputs reveals filler
+  // when you're short of MIN_PICK with nothing left that adds a new material.
+  const visibleScraps = visibleFusionInputs(scraps, picked, MIN_PICK);
   const predicted = nMats >= 4 ? 'Legendary' : nMats >= 3 ? 'Rare' : null;
   const canFuse = picked.length >= MIN_PICK && picked.length <= MAX_PICK;
 
