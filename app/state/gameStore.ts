@@ -20756,7 +20756,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const BANDOLIER_MAX = 5;
     const player = get().player;
     if (!player) return;
+    const current = player.equipped?.bandolierIds ?? [];
+    // OTA-982 — rack the first UN-RACKED instance of this name. The old find
+    // grabbed the first-by-name instance regardless — so once one throwing knife
+    // was racked, every stow re-found that SAME (already-racked) instance and
+    // bounced off "already on your bandolier", making a second knife un-rackable.
+    // Now each distinct instance racks its own loop; a stack still racks once.
+    const eqNow = player.equipped ?? {};
     const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase()
+        && i.quantity > 0
+        && !current.includes(i.id)
+        && eqNow.offId !== i.id
+        && eqNow.mainId !== i.id,
+    ) ?? player.inventory.find(
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
@@ -20768,7 +20781,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The ${getNarratorName()} looks at the ${item.name}. "${eligibility.reason}."`);
       return;
     }
-    const current = player.equipped?.bandolierIds ?? [];
     if (current.length >= BANDOLIER_MAX) {
       get().appendLog('arbiter', `The ${getNarratorName()} taps the bandolier. "Five loops, five throws. Pull one before you rack another."`);
       return;
@@ -20808,7 +20820,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
+    // OTA-982 — throw a RACKED instance of this name first (so the loop you're
+    // firing is the one that clears), falling back to any matching pack copy.
+    const racked = player.equipped?.bandolierIds ?? [];
     const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && racked.includes(i.id),
+    ) ?? player.inventory.find(
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {

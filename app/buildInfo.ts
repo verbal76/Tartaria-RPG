@@ -17022,4 +17022,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // suite (5). JS-only → OTA-safe.
 // 2026-07-05-981 — fused marker glyph ✶ → ❖ (a diamond OF diamonds; materials wear a single ◆),
 // ported from Tartaria OTA-689. Glyph + style-name only. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-981-fused-marker-diamond-of-diamonds';
+// 2026-07-05-982 — bandolier bug fixes (from Tartaria OTA-690's bandolier pass; engine_Dev already
+// had coatings-eligible + its own thrown-coating). (1) "Only one throwable" fixed: stowInBandolier
+// now racks the next UN-racked instance, so several same-named throwables each take their own loop.
+// (2) throwFromBandolier prefers a racked instance so the loop you fire is the one that clears.
+// engine_Dev's existing thrown-coating (immediate + 3-turn DOT) is unchanged. New
+// bandolierMultiAndCoatingThrow suite (3). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-982-bandolier-rack-multiple-throwables';
