@@ -16,6 +16,7 @@ export function DiscoveryRevealModal() {
   const setScreen = useGameStore((s) => s.setScreen);
   const requestContractsTab = useGameStore((s) => s.requestContractsTab);
   const requestInventoryCategory = useGameStore((s) => s.requestInventoryCategory);
+  const requestInventoryFocusItem = useGameStore((s) => s.requestInventoryFocusItem);
 
   if (!reveal) return null;
 
@@ -32,6 +33,8 @@ export function DiscoveryRevealModal() {
             // OTA-683 — deep-link to an expanded Inventory section (a forged
             // piece → its weapon/armor row, since sections default collapsed).
             if (reveal.cta!.inventoryCategory) requestInventoryCategory(reveal.cta!.inventoryCategory);
+            // OTA-684 — and scroll to + briefly highlight the exact new piece.
+            if (reveal.cta!.inventoryItemId) requestInventoryFocusItem(reveal.cta!.inventoryItemId);
             dismiss();
             setScreen(target);
           },
