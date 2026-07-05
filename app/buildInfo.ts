@@ -15633,4 +15633,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // COATING_DOT_TURNS of its damage type (e.g. 1d4 burn → ~3-12) — applying resistance, consuming one
 // vial, clearing the slot when empty, and provoking the enemy volley like any throw. New
 // bandolierMultiAndCoatingThrow suite (3); existing bandolier/coating suites pass. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-690-bandolier-multi-and-coating-throw';
+// OTA-691 — faction SIGILS turn-in (v1). Sigils are found crests taken off a faction's dead (a
+// `sigil` tag + the faction-id tag); returned to that faction's frontier stake they HONOR their
+// dead for +1 standing (one-sided — you only ever gain). Nine sigil items (one per faction, in
+// gear.json). New turnInSigil(itemId) store action grants +1 via applyRepChange only while standing
+// on the faction's tile, then spends the sigil. New SIGILS section at the BOTTOM of the Contracts
+// screen lists each carried sigil with its faction, the +1, the turn-in tile, and an auto-routable
+// SET COURSE (RETURN button when you're there) — cloning the broker-mission leg pattern. The glint
+// "bloodstained pendant" thread now grants a Forgotten Order Sigil (the "someone will want it back"
+// foreshadowing finally pays off). New sigils.ts engine helper + sigilTurnIn suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-691-faction-sigil-turnin';

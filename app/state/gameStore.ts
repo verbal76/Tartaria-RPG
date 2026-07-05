@@ -2616,6 +2616,11 @@ interface GameStore {
   stowInBandolier: (itemName: string) => void;
   removeFromBandolier: (itemName: string) => void;
   throwFromBandolier: (itemName: string) => void;
+  /** OTA-691 — return a found faction SIGIL (a slain member's crest) to that
+   *  faction's frontier stake to honor their dead: +1 standing, the sigil is
+   *  spent. Only works while standing on the faction's turn-in tile (the
+   *  Contracts screen routes you there). No-op / refusal otherwise. */
+  turnInSigil: (itemId: string) => void;
   /** Drop one of the named item from the player's inventory onto the
    *  ground of the current room (worldMemory.visitedRooms[key].droppedItems).
    *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
@@ -20239,6 +20244,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), bandolierIds: current.filter((id) => id !== item.id) } } }
       : s);
     get().appendLog('world', `You pull ${item.name} off the bandolier and back into your pack.`);
+    void get().persist();
+  },
+
+  // OTA-691 — return a faction sigil to that faction's stake, honoring their dead.
+  turnInSigil(itemId) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isSigilItem, sigilFaction } = require('../engine/sigils') as typeof import('../engine/sigils');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { startingLocationForFaction } = require('../engine/character') as typeof import('../engine/character');
+    const item = player.inventory.find((i) => i.id === itemId && i.quantity > 0);
+    if (!item || !isSigilItem(item)) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "No sigil there to return."`);
+      return;
+    }
+    const fac = sigilFaction(item);
+    if (!fac) {
+      get().appendLog('arbiter', `The Arbiter turns the token over. "This crest belongs to no house I know. Keep it."`);
+      return;
+    }
+    const tile = startingLocationForFaction(fac.id);
+    if (player.currentLocationId !== tile) {
+      const dest = getLocationById(tile)?.name ?? tile;
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Not here. Carry the ${item.name} to ${dest} and lay it down among their own."`);
+      return;
+    }
+    // Honor the dead: +1 standing, spend the sigil.
+    const repResult = applyRepChange(player.factionStanding, fac.id, 1);
+    set((s) => (s.player
+      ? {
+          player: {
+            ...s.player,
+            factionStanding: repResult.standing,
+            inventory: s.player.inventory
+              .map((i) => (i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i))
+              .filter((i) => i.quantity > 0),
+          },
+        }
+      : s));
+    get().appendLog('world', `You lay the ${item.name} down among ${fac.name}'s own. They mark the debt paid — one of their dead comes home.`);
+    logRepChanges(get, repResult.changed);
     void get().persist();
   },
 
