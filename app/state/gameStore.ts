@@ -2611,6 +2611,10 @@ interface GameStore {
    *  faction's frontier stake to honor their dead: +1 standing, the sigil is
    *  spent. Only works while standing on the faction's turn-in tile. */
   turnInSigil: (itemId: string) => void;
+  /** OTA-693 — batch-heal: apply `count` uses of a fixed-heal consumable to the
+   *  target in ONE action. Heal clamped to missing HP (no overheal); `count` spent.
+   *  target: 'self' | 'dog' | 'golem'. */
+  useHealBatch: (itemName: string, target: 'self' | 'dog' | 'golem', count: number) => void;
   /** Drop one of the named item from the player's inventory onto the
    *  ground of the current room (worldMemory.visitedRooms[key].droppedItems).
    *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
@@ -15060,6 +15064,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // flows through the normal grant + summary below.
     const vestDrop = rollDogVestLootName(enemy);
     if (vestDrop) lootDrops.push(vestDrop);
+    // OTA-692 — occasional faction SIGIL off a slain HUMANOID (a member's crest).
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { rollSigilDrop } = require('../engine/sigils') as typeof import('../engine/sigils');
+      const sigilDrop = rollSigilDrop(enemy);
+      if (sigilDrop) lootDrops.push(sigilDrop);
+    }
     const lootSummary = (() => {
       const counts: Record<string, number> = {};
       for (const n of lootDrops) counts[n] = (counts[n] ?? 0) + 1;
@@ -20348,6 +20359,76 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  // OTA-693 — batch-heal one item onto self / dog / golem in one shot.
+  useHealBatch(itemName, target, count) {
+    const player = get().player;
+    if (!player || count <= 0) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveItemEffect } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+    const item = player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
+    if (!item) { get().appendLog('arbiter', `The Arbiter glances at your pack. "No ${itemName} left."`); return; }
+    const use = Math.min(count, item.quantity);
+    const spend = (inv: InventoryItem[]) => inv
+      .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - use } : i))
+      .filter((i) => i.quantity > 0);
+
+    if (target === 'golem') {
+      const golem = player.golem;
+      if (!golem) { get().appendLog('arbiter', `The Arbiter looks around. "No golem to mend."`); return; }
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { isGolemRepairPart, isGolemSubstitutePart, golemRepairHeal, golemSubstituteHeal } = require('../engine/golems') as typeof import('../engine/golems');
+      const perHP = isGolemRepairPart(golem.kind, item.name)
+        ? golemRepairHeal(golem.kind)
+        : isGolemSubstitutePart(golem.kind, item)
+          ? golemSubstituteHeal(golem.kind, item.rarity)
+          : 0;
+      if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter shakes their head. "${item.name} won't feed the Aetherstone."`); return; }
+      const gap = Math.max(0, golem.hpMax - golem.hp);
+      const heal = Math.min(gap, perHP * use);
+      set((s) => (s.player?.golem
+        ? { player: { ...s.player, golem: { ...s.player.golem, hp: s.player.golem.hp + heal }, inventory: spend(s.player.inventory) } }
+        : s));
+      get().appendLog('world', `You pack ${use}× ${item.name} into ${golem.name}'s frame. +${heal} HP (${Math.min(golem.hpMax, golem.hp + heal)}/${golem.hpMax}).`);
+      void get().persist();
+      return;
+    }
+
+    const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+    const perHP = fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+    if (perHP <= 0) { get().appendLog('arbiter', `The Arbiter studies the ${item.name}. "That won't mend anything in bulk."`); return; }
+
+    if (target === 'dog') {
+      const dog = player.dog;
+      if (!dog || dog.status === 'dead' || dog.status === 'abandoned') { get().appendLog('arbiter', `The Arbiter glances at your side. "No dog to tend."`); return; }
+      const gap = Math.max(0, dog.hpMax - dog.hp);
+      const heal = Math.min(gap, perHP * use);
+      const isTreat = (item.tags ?? []).includes('dog_treat');
+      const loyPer = isTreat ? 40 : fx?.kind === 'consumable' ? 20 : 5;
+      const loyalty = Math.min(100, dog.loyalty + loyPer * use);
+      set((s) => (s.player?.dog
+        ? { player: { ...s.player, dog: { ...s.player.dog, hp: s.player.dog.hp + heal, loyalty }, inventory: spend(s.player.inventory) } }
+        : s));
+      get().appendLog('world', `You feed ${dog.name} ${use}× ${item.name}. +${heal} HP (${Math.min(dog.hpMax, dog.hp + heal)}/${dog.hpMax}), +loyalty.`);
+      void get().persist();
+      return;
+    }
+
+    const perStam = fx?.kind === 'consumable' ? (fx.restoreStamina ?? 0) : 0;
+    const hpGap = Math.max(0, player.hpMax - player.hp);
+    const stamGap = Math.max(0, effectiveStaminaMax(player) - player.stamina);
+    const healHP = Math.min(hpGap, perHP * use);
+    const healStam = Math.min(stamGap, perStam * use);
+    set((s) => {
+      if (!s.player) return s;
+      const healed = { ...s.player, hp: s.player.hp + healHP, stamina: s.player.stamina + healStam, inventory: spend(s.player.inventory) };
+      return { player: advanceTime(healed, 0.25) };
+    });
+    get().appendLog('world', `You use ${use}× ${item.name}. +${healHP} HP (${Math.min(player.hpMax, player.hp + healHP)}/${player.hpMax})${healStam > 0 ? `, +${healStam} stamina` : ''}.`);
+    void get().persist();
+  },
+
   // arb110 — hurl one unit of a racked throwable at the active enemy. Reuses the
   // full OTA-208 throw path (synthesized weapon damage + on-hit status + consume +
   // auto-unequip) by transiently equipping the throwable to the off hand, attacking,
@@ -23781,7 +23862,7 @@ export function applyEnemyCounterToDog(
     get().appendLog(
       'arbiter',
       applyDogPronouns(
-        `${dog.name} drops under the ${enemy.name} and drags {pronoun}self clear of the fight. {Pronoun} {isOrAre} down — tend {pronoun} within a day or {pronoun} won't get back up.`,
+        `${dog.name} drops under the ${enemy.name} and drags {reflexive} clear of the fight. {Pronoun} {isOrAre} down — tend {object} within a day or {pronoun} won't get back up.`,
         dog.sex.pronoun,
       ),
     );

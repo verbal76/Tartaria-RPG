@@ -15444,4 +15444,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sigil; new SIGILS section at the bottom of Contracts lists each with faction/+1/turn-in tile and
 // an auto-routable SET COURSE (RETURN when there). Glint pendant now grants a Forgotten Order Sigil.
 // New sigils.ts + sigilTurnIn suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-676-faction-sigil-turnin';
+// OTA-677 — sigil DROPS + dog-pronoun fix + batch-heal (ported from Tartaria OTA-692/693). Defeated
+// humanoids drop faction sigils (own faction ~28% / random ~10%); dog down-in-combat line now reads
+// "drags himself... tend him"; and the item modal gains Use Max / Feed Max / Heal Max — one tap uses
+// the most of a fixed-heal item that fit under max HP without overhealing (self/dog/golem). New
+// healBatch.ts + healBatch suite (8) + sigil-drop suite (6). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-677-sigil-drops-and-batch-heal';
