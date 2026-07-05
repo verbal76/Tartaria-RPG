@@ -17035,4 +17035,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // with faction/+1/turn-in tile + auto-routable SET COURSE (RETURN when there). Glint pendant grants
 // a Forgotten Order Sigil. Generic mechanic (works off whatever factions the pack defines). New
 // sigils.ts + sigilTurnIn suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-983-faction-sigil-turnin';
+// 2026-07-05-984 — sigil drops (pack-toggleable) + dog-pronoun fix + batch-heal (ports Tartaria
+// OTA-692/693, engine-side). Defeated humanoids drop faction sigils, GATED on a new pack config
+// "sigilDropsEnabled" (default on; false disables the drops — wired through the JSON builder's
+// load/save round-trip like dogEnabled/weatherEnabled). Dog down-in-combat line now reads "drags
+// himself... tend him". Item modal gains Use Max / Feed Max / Heal Max (self/dog/sidekick) — one
+// tap uses the most of a fixed-heal item that fits under max HP without overhealing. New healBatch.ts
+// + healBatch suite (8) + sigil-drop suite (6) + sigilDropsToggle suite (3). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-984-sigil-drops-toggle-and-batch-heal';

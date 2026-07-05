@@ -732,6 +732,15 @@ let weatherEnabled = true;
 export function setWeatherEnabled(on: boolean): void { weatherEnabled = on !== false; }
 export function isWeatherEnabled(): boolean { return weatherEnabled; }
 
+// engine_Dev — SIGIL (pendant) DROPS on/off. When false, defeated humanoids never
+// leave a faction sigil, so the "return a crest for +1 standing" loop is disabled
+// for this world (the SIGILS section only ever shows sigils the author places by
+// hand). Default on. Set top-level "sigilDropsEnabled": false in the game JSON to
+// turn the drops off. The turn-in mechanic itself always works if a sigil exists.
+let sigilDropsEnabled = true;
+export function setSigilDropsEnabled(on: boolean): void { sigilDropsEnabled = on !== false; }
+export function isSigilDropsEnabled(): boolean { return sigilDropsEnabled; }
+
 // engine_Dev — global gate: the player must be at least this % (0..100) through the
 // data-driven main mission before SIDEKICK WEAPONS (golem_weapon recipes) can be
 // crafted. 0 = no gate. Authored in the Sidekicks box; read by the craft handler.
@@ -1257,6 +1266,7 @@ export function clearAllOverrides(): void {
   summonsOverride = null;
   dogEnabled = true;
   weatherEnabled = true;
+  sigilDropsEnabled = true;
   vendorsEnabled = true;
   vendorsAppendGeneric = false;
   sidekickWeaponQuestPct = 0;

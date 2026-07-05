@@ -26,7 +26,8 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { isSidekickRepairPart, isSidekickSubstitutePart, isSidekickWeapon } from '../engine/sidekicks';
+import { isSidekickRepairPart, isSidekickSubstitutePart, isSidekickWeapon, sidekickRepairHeal, sidekickSubstituteHeal } from '../engine/sidekicks';
+import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
@@ -142,6 +143,7 @@ export function InventoryScreen() {
   // on the eligible item stows it and clears the filter.
   const stowInPouch = useGameStore((s) => s.stowInPouch);
   const stowInBandolier = useGameStore((s) => s.stowInBandolier);
+  const useHealBatch = useGameStore((s) => s.useHealBatch);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -623,6 +625,15 @@ export function InventoryScreen() {
     // equip. Pure-armor / pure-weapon (no effect, equippable) gets
     // the dedicated Equip button only.
     const useIsRealAction = isConsumable || hasEffect || (offEligible && isThrowableItem);
+    const perItemHP = isConsumable ? (() => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolveItemEffect } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+      const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+      return fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+    })() : 0;
+    const stackQty = pending.item.quantity;
     if (useIsRealAction) {
       // arb106 — show YOUR current HP on the eat/drink button so you can see at a
       // glance whether you actually need it (player ask).
@@ -632,6 +643,16 @@ export function InventoryScreen() {
         onPress: doUse,
         tone: 'primary',
       });
+    }
+    if (isConsumable && perItemHP > 0 && player && player.hp < player.hpMax) {
+      const n = healBatchCount(perItemHP, player.hpMax - player.hp, stackQty);
+      if (n >= 2) {
+        buttons.push({
+          label: `Use Max ×${n} → ${Math.min(player.hpMax, player.hp + perItemHP * n)}/${player.hpMax} (no waste)`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', n); closeModal(); },
+          tone: 'primary',
+        });
+      }
     }
     // OTA-120 Phase 5 — dog-targeted actions. Equip vests on the dog
     // (kind 'dog_armor'); feed consumables to the dog (any consumable
@@ -683,6 +704,16 @@ export function InventoryScreen() {
         },
         tone: 'primary',
       });
+      if (perItemHP > 0 && dog.hp < dog.hpMax) {
+        const n = healBatchCount(perItemHP, dog.hpMax - dog.hp, stackQty);
+        if (n >= 2) {
+          buttons.push({
+            label: `Feed Max ×${n} → ${Math.min(dog.hpMax, dog.hp + perItemHP * n)}/${dog.hpMax}`,
+            onPress: () => { useHealBatch(pending.item.name, 'dog', n); closeModal(); },
+            tone: 'primary',
+          });
+        }
+      }
     }
     // OTA-466 — REPAIR GOLEM. When a golem is active, hurt, and this item is one
     // of the parts it's MADE of, offer a one-tap repair (routes through the same
@@ -712,6 +743,19 @@ export function InventoryScreen() {
           },
           tone: full ? 'neutral' : 'primary',
         });
+        if (!full) {
+          const golemPer = isSidekickRepairPart(golem.kind, pending.item.name)
+            ? sidekickRepairHeal(golem.kind)
+            : sidekickSubstituteHeal(golem.kind, pending.item.rarity);
+          const n = healBatchCount(golemPer, golem.hpMax - golem.hp, stackQty);
+          if (n >= 2) {
+            buttons.push({
+              label: `Heal Max ×${n} → ${Math.min(golem.hpMax, golem.hp + golemPer * n)}/${golem.hpMax}`,
+              onPress: () => { useHealBatch(pending.item.name, 'golem', n); closeModal(); },
+              tone: 'primary',
+            });
+          }
+        }
       }
       // OTA-478/481 — ARM GOLEM. If this is a golem armament (Sledge / Greatsword,
       // wieldable by any golem), offer a one-tap arm (routes through `arm golem`).
@@ -867,7 +911,18 @@ export function InventoryScreen() {
         return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
       })()
     : null;
-  const modalBodyFull = [modalBody, fusionHint].filter(Boolean).join('\n\n') || undefined;
+  const healBatchHint = pending && pending.item.quantity >= 2
+    ? (() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { resolveItemEffect } = require('../engine/itemEffect');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+        const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+        const perHP = fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+        return perHP > 0 ? HEAL_BATCH_NOTE : null;
+      })()
+    : null;
+  const modalBodyFull = [modalBody, fusionHint, healBatchHint].filter(Boolean).join('\n\n') || undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦

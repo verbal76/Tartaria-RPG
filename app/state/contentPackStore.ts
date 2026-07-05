@@ -33,6 +33,7 @@ import {
   setCollectablesOverride,
   setSummonsOverride,
   setDogEnabled,
+  setSigilDropsEnabled as setSigilDropsEnabledEngine,
   setWeatherEnabled as setWeatherEnabledEngine,
   setVendorsEnabled as setVendorsEnabledEngine,
   setVendorsAppendGeneric as setVendorsAppendGenericEngine,
@@ -170,6 +171,8 @@ interface PersistShape {
   summons?: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off. Absent → on (the built-in default). */
   dogEnabled?: boolean;
+  /** Faction sigil (pendant) drops on/off. Absent → on. false disables the drops. */
+  sigilDropsEnabled?: boolean;
   /** Weather on/off. Absent → on. */
   weatherEnabled?: boolean;
   vendorsEnabled?: boolean;
@@ -244,6 +247,8 @@ interface ContentPackState {
   summons: { noun?: string; defs: unknown[] } | null;
   /** Dog companion on/off (default true). */
   dogEnabled: boolean;
+  /** Faction sigil drops on/off (default true). false disables pendant drops. */
+  sigilDropsEnabled: boolean;
   /** Weather on/off (default true). When false, scenes get no weather. */
   weatherEnabled: boolean;
   vendorsEnabled: boolean;
@@ -438,7 +443,7 @@ interface ContentPackState {
   hydrate: () => Promise<void>;
 }
 
-function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'weatherEnabled' | 'vendorsEnabled' | 'vendorsAppendGeneric' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode' | 'templateStamps'>): void {
+function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 'hooks' | 'whispers' | 'wasteland' | 'sceneProps' | 'vendors' | 'roadsideTraders' | 'interactionTags' | 'startingAreas' | 'customTitles' | 'customMainQuest' | 'customBosses' | 'collectables' | 'summons' | 'dogEnabled' | 'sigilDropsEnabled' | 'weatherEnabled' | 'vendorsEnabled' | 'vendorsAppendGeneric' | 'sidekickWeaponQuestPct' | 'damageTypes' | 'damageResistances' | 'fusionTags' | 'coatings' | 'digging' | 'scrap' | 'salvage' | 'overlays' | 'dogScenarios' | 'inventory' | 'published' | 'narratorName' | 'gameTitle' | 'gameTagline' | 'crucibleName' | 'crucibleEnabled' | 'worldName' | 'corruptionName' | 'energyName' | 'devMode' | 'templateStamps'>): void {
   const shape: PersistShape = {
     tables: state.tables,
     lore: state.lore,
@@ -457,6 +462,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     collectables: state.collectables.length > 0 ? state.collectables : undefined,
     summons: state.summons ?? undefined,
     dogEnabled: state.dogEnabled === false ? false : undefined,
+    sigilDropsEnabled: state.sigilDropsEnabled === false ? false : undefined,
     weatherEnabled: state.weatherEnabled === false ? false : undefined,
     vendorsEnabled: state.vendorsEnabled === false ? false : undefined,
     vendorsAppendGeneric: state.vendorsAppendGeneric === true ? true : undefined,
@@ -557,6 +563,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   collectables: [],
   summons: null,
   dogEnabled: true,
+  sigilDropsEnabled: true,
   weatherEnabled: true,
   vendorsEnabled: true,
   vendorsAppendGeneric: false,
@@ -611,6 +618,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setCollectablesOverride(s.collectables.length > 0 ? s.collectables : null);
     setSummonsOverride(s.summons ?? null);
     setDogEnabled(s.dogEnabled !== false);
+    // OTA-984 — top-level "sigilDropsEnabled": false disables faction sigil drops.
+    setSigilDropsEnabledEngine(s.sigilDropsEnabled !== false);
     setWeatherEnabledEngine(s.weatherEnabled !== false);
     setVendorsEnabledEngine(s.vendorsEnabled !== false);
     setVendorsAppendGenericEngine(s.vendorsAppendGeneric === true);
@@ -1779,6 +1788,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.collectables.length > 0) out.collectables = s.collectables;
     if (s.summons && Array.isArray(s.summons.defs) && s.summons.defs.length > 0) out.summons = s.summons;
     if (s.dogEnabled === false) out.dogEnabled = false;
+    if (s.sigilDropsEnabled === false) out.sigilDropsEnabled = false;
     if (s.weatherEnabled === false) out.weatherEnabled = false;
     if (s.vendorsEnabled === false) out.vendorsEnabled = false;
     if (s.vendorsAppendGeneric === true) out.vendorsAppendGeneric = true;
@@ -1936,6 +1946,8 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         setSummonsOverride(summons as { noun?: string; defs: never[] } | null);
         const dogEnabled = shape.dogEnabled !== false;
         setDogEnabled(dogEnabled);
+        const sigilDropsEnabled = shape.sigilDropsEnabled !== false;
+        setSigilDropsEnabledEngine(sigilDropsEnabled);
         const weatherEnabled = shape.weatherEnabled !== false;
         setWeatherEnabledEngine(weatherEnabled);
         const vendorsEnabled = shape.vendorsEnabled !== false;
@@ -2000,7 +2012,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
           templateStamps = rebased;
         }
         invalidateLocationCaches(); // routing positions must reflect the hydrated locations
-        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, weatherEnabled, vendorsEnabled, vendorsAppendGeneric, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
+        set({ tables, lore, missions, hooks, whispers, wasteland, sceneProps, vendors, roadsideTraders, interactionTags, startingAreas, customTitles, customMainQuest, customBosses, collectables, summons, dogEnabled, sigilDropsEnabled, weatherEnabled, vendorsEnabled, vendorsAppendGeneric, sidekickWeaponQuestPct, damageTypes, damageResistances, fusionTags, coatings, digging, scrap, salvage, overlays, dogScenarios, inventory, published, narratorName, gameTitle, gameTagline, crucibleName, crucibleEnabled, worldName, corruptionName, energyName, devMode, templateStamps });
         // engine_Dev — persist immediately on a scheme migration so STAMP_SCHEME is written and the
         // re-baseline runs EXACTLY ONCE. Without this, reconcile keeps the (unchanged) stamps without
         // writing, the scheme never updates, and every boot would re-baseline → yellow would never fire
