@@ -15600,4 +15600,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // starts the bleed-out clock. (2) The dog's vest (worn by NAME on dog.equipped.vest, not a player
 // slot) never lit the EQUIPPED badge — the Dog Armor row now reads "EQUIPPED (on <dog>)". New
 // dogCombatDamageAndVest suite (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-685-dog-takes-damage-and-vest-marker';
+// OTA-686 — vendor BUY / SELL lists organized like the inventory: the same collapsible category
+// sections (Weapons / Armor / Consumables / Tools / …), ALL default CLOSED, so a vendor opens as a
+// tidy category index you expand into instead of one long scroll. SELL rows are real inventory
+// items (categorizeItem direct); BUY offers are names, resolved to their catalog kind + tags via
+// findCatalogItem then filed by categorizeItem, so buy/sell/pack all bucket an item the same way.
+// New vendorCategoryGrouping suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-686-vendor-collapsible-categories';

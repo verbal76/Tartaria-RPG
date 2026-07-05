@@ -8,8 +8,15 @@ import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
-import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
+import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem } from '../engine/crafting';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
+import {
+  CATEGORY_ORDER,
+  CATEGORY_LABEL,
+  CATEGORY_COLORS,
+  categorizeItem,
+  type InventoryCategory,
+} from '../components/InventoryCategorize';
 
 function rarityColor(rarity: string | null | undefined): string {
   switch (rarity) {
@@ -65,6 +72,11 @@ export function VendorScreen() {
   // "Buy & Equip" hand-choice prompt. Set after buying a weapon (which can go
   // in either hand) so the player picks main vs off before it's equipped.
   const [pendingEquip, setPendingEquip] = useState<{ itemName: string; slots: EquipSlot[] } | null>(null);
+  // OTA-686 — the BUY / SELL lists are now organized into the same collapsible
+  // categories as the inventory (Weapons / Armor / Consumables / …). Keyed by
+  // `buy_<cat>` / `sell_<cat>`; ALL sections default CLOSED (?? true), so a
+  // vendor opens as a tidy category index the player expands into.
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const vendor = scene?.vendor ?? null;
 
@@ -255,6 +267,34 @@ export function VendorScreen() {
       return b.price - a.price; // default: most valuable first
     });
 
+  // OTA-686 — file a vendor BUY offer (just a name) into an inventory category.
+  // findCatalogItem resolves the wares' kind + tags so categorizeItem buckets it
+  // exactly like the same item would sit in the player's pack; unknown/inferred
+  // names fall back to categorizeItem's own name heuristics.
+  const categorizeOfferName = (name: string): InventoryCategory => {
+    const cat = findCatalogItem(name);
+    return categorizeItem({
+      id: '', name, quantity: 1,
+      kind: (cat?.kind ?? 'misc') as InventoryItem['kind'],
+      rarity: cat?.rarity,
+      tags: cat?.tags ?? [],
+    } as InventoryItem);
+  };
+  // Shared collapsible category header, styled like the inventory's.
+  const renderSectionHeader = (key: string, cat: InventoryCategory, count: number, collapsed: boolean) => (
+    <TouchableOpacity
+      style={[styles.sectionHeader, { borderLeftColor: CATEGORY_COLORS[cat] }]}
+      activeOpacity={0.7}
+      onPress={() => setCollapsedSections((s) => ({ ...s, [key]: !(s[key] ?? true) }))}
+    >
+      <View style={styles.sectionHeaderLeft}>
+        <Text style={[styles.sectionChevron, { color: CATEGORY_COLORS[cat] }]}>{collapsed ? '▾' : '▴'}</Text>
+        <Text style={[styles.sectionLabel, { color: CATEGORY_COLORS[cat] }]}>{CATEGORY_LABEL[cat].toUpperCase()}</Text>
+      </View>
+      <Text style={styles.sectionCount}>{count}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -353,7 +393,18 @@ export function VendorScreen() {
           vendor.offers.length === 0 ? (
             <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
           ) : (
-            vendor.offers.map((o, i) => {
+            CATEGORY_ORDER.map((cat) => {
+              const catOffers = vendor.offers
+                .map((o, i) => ({ o, i }))
+                .filter(({ o }) => categorizeOfferName(o.itemName) === cat);
+              if (catOffers.length === 0) return null;
+              const secKey = `buy_${cat}`;
+              const collapsed = collapsedSections[secKey] ?? true;
+              const count = catOffers.reduce((sum, { o }) => sum + (o.quantity ?? 1), 0);
+              return (
+                <View key={secKey} style={styles.section}>
+                  {renderSectionHeader(secKey, cat, count, collapsed)}
+                  {!collapsed && catOffers.map(({ o, i }) => {
               // OTA 039 — corruption-tier markup. Show the marked-up
               // price; canAfford / buyFromVendor both compute on the
               // same value so the player never sees a mismatch.
@@ -425,6 +476,9 @@ export function VendorScreen() {
                   )}
                 </View>
               );
+            })}
+                </View>
+              );
             })
           )
         ) : (
@@ -453,7 +507,16 @@ export function VendorScreen() {
                 Inventory tab first, then come back to trade.
               </Text>
             ) : (
-              sellable.map(({ item, price }) => {
+              CATEGORY_ORDER.map((cat) => {
+                const catRows = sellable.filter(({ item }) => categorizeItem(item) === cat);
+                if (catRows.length === 0) return null;
+                const secKey = `sell_${cat}`;
+                const collapsed = collapsedSections[secKey] ?? true;
+                const count = catRows.reduce((sum, { item }) => sum + item.quantity, 0);
+                return (
+                  <View key={secKey} style={styles.section}>
+                    {renderSectionHeader(secKey, cat, count, collapsed)}
+                    {!collapsed && catRows.map(({ item, price }) => {
               // arb150 — instance-aware preview so the row shows THIS copy's
               // rolled stats (AC / attribute perks / damage / resists), not the
               // generic catalog row. Two "Bone Shoes" with different rolls now
@@ -500,7 +563,10 @@ export function VendorScreen() {
                   </View>
                 </TouchableOpacity>
               );
-            })
+            })}
+                  </View>
+                );
+              })
             )}
           </>
         )}
@@ -755,6 +821,25 @@ const styles = StyleSheet.create({
   },
   list: { flex: 1 },
   listContent: { paddingBottom: 12 },
+  // OTA-686 — collapsible category sections, mirroring the inventory screen so a
+  // vendor's BUY / SELL lists read the same way the player's pack does.
+  section: { marginBottom: 12 },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    paddingLeft: 8,
+    paddingRight: 10,
+    paddingVertical: 6,
+    marginBottom: 4,
+    backgroundColor: 'rgba(8,6,4,0.55)',
+    borderRadius: 3,
+  },
+  sectionHeaderLeft: { flexDirection: 'row', alignItems: 'center' },
+  sectionChevron: { fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
+  sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  sectionCount: { color: '#9a8e74', fontSize: 11 },
   offerRow: {
     flexDirection: 'row',
     backgroundColor: '#13110f',
