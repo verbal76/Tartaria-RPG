@@ -17005,4 +17005,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // exploit stays closed) with the dog rolling its own AC (10 + DEX mod + vest), a hit to 0 benching
 // it. And the dog vest (worn by name on dog.equipped.vest) now lights the EQUIPPED badge as
 // "(on <dog>)". New dogCombatDamageAndVest suite (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-977-dog-takes-damage-and-vest-marker';
+// 2026-07-05-978 — vendor BUY / SELL lists organized into collapsible inventory-style categories,
+// all default CLOSED (ported from Tartaria OTA-686). SELL rows group via categorizeItem; BUY offers
+// resolve their catalog kind + tags via findCatalogItem then file with categorizeItem, so buy/sell/
+// pack bucket an item identically. New vendorCategoryGrouping suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-978-vendor-collapsible-categories';
