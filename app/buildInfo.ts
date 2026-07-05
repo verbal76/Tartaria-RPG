@@ -15624,4 +15624,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-689 — fused marker glyph ✶ → ❖ (a diamond OF diamonds). Materials wear a single ◆ diamond,
 // so a piece fused from them reads as a cluster of those diamonds — thematically right. Glyph +
 // style-name only (rowFusedStar → rowFusedMark); detection/backfill unchanged. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-689-fused-marker-diamond-of-diamonds';
+// OTA-690 — bandolier overhaul. (1) "Only one throwable" fixed: stowInBandolier grabbed the first
+// instance by NAME, which — once one knife was racked — kept re-finding that same racked knife and
+// bouncing off "already on your bandolier". It now racks the next UN-racked, un-equipped instance,
+// so 5 knives each take their own loop (a true stack still racks once + throws N). throwFromBandolier
+// prefers a racked instance. (2) Coating vials (weapon_coating) are now bandolier-eligible and show
+// in the load filter; thrown, a vial BURSTS for the coating's full DOT up front — perTurn(dice) ×
+// COATING_DOT_TURNS of its damage type (e.g. 1d4 burn → ~3-12) — applying resistance, consuming one
+// vial, clearing the slot when empty, and provoking the enemy volley like any throw. New
+// bandolierMultiAndCoatingThrow suite (3); existing bandolier/coating suites pass. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-690-bandolier-multi-and-coating-throw';

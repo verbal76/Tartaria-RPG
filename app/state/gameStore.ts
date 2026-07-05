@@ -20184,7 +20184,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const BANDOLIER_MAX = 5;
     const player = get().player;
     if (!player) return;
+    const current = player.equipped?.bandolierIds ?? [];
+    // OTA-690 — rack the first UN-RACKED instance of this name. The old find
+    // grabbed the first-by-name instance regardless — so once one throwing knife
+    // was racked, every "stow Throwing Knife" re-found that SAME (already-racked)
+    // instance and bounced off "already on your bandolier", making it impossible
+    // to rack a second knife. Now each of your 5 knives (5 distinct instances)
+    // racks its own loop; a true stack (one id, quantity N) still racks once and
+    // throws N times. Skips the equipped off/main instance too.
+    const eqNow = player.equipped ?? {};
     const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase()
+        && i.quantity > 0
+        && !current.includes(i.id)
+        && eqNow.offId !== i.id
+        && eqNow.mainId !== i.id,
+    ) ?? player.inventory.find(
+      // Fall back to any matching instance so the eligibility check can surface the
+      // right reason (already racked / equipped) instead of a bare "don't see one".
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
@@ -20196,7 +20213,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter looks at the ${item.name}. "${eligibility.reason}."`);
       return;
     }
-    const current = player.equipped?.bandolierIds ?? [];
     if (current.length >= BANDOLIER_MAX) {
       get().appendLog('arbiter', `The Arbiter taps the bandolier. "Five loops, five throws. Pull one before you rack another."`);
       return;
@@ -20236,11 +20252,75 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
+    // OTA-690 — throw a RACKED instance of this name first (so the loop you're
+    // firing is the one that clears), falling back to any matching pack copy.
+    const racked = player.equipped?.bandolierIds ?? [];
     const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && racked.includes(i.id),
+    ) ?? player.inventory.find(
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
+      return;
+    }
+    // OTA-690 — COATING VIAL thrown as a one-shot burst. A coating painted on a
+    // weapon does perTurn damage for COATING_DOT_TURNS turns; hurled instead, the
+    // whole vial bursts on impact for that full total UP FRONT (perTurn × turns) of
+    // the coating's damage type, then it's spent. (A player ask: "3 burn/turn for 3
+    // turns → 9 burn on the throw.") No lingering DOT / shred / stacks — one and done.
+    if ((item.tags ?? []).some((t) => /^weapon_coating$/i.test(t))) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolveItemEffect: rieThrow } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { coatingDamageType: cdt } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findGearByName: fgbnT, findExplorationItemByName: feibT, findMaterialByName: fmbnT } = require('../engine/crafting');
+      const fxT = rieThrow(item.name, [fgbnT, feibT, fmbnT]);
+      const spec = fxT?.kind === 'consumable' ? fxT.coating : undefined;
+      const idx = Math.max(0, Math.min(scene.activeEnemyIdx ?? 0, scene.enemies.length - 1));
+      const target = scene.enemies[idx];
+      const targetHp = scene.enemyHps[idx] ?? target?.hp ?? 0;
+      if (!spec || !target || targetHp <= 0) {
+        get().appendLog('arbiter', `The Arbiter stays your hand. "No mark for that vial right now."`);
+        return;
+      }
+      const perTurn = Math.max(1, rollFromNotation(spec.dice));
+      const dtype = cdt(String(spec.kind));
+      const rawBurst = perTurn * COATING_DOT_TURNS;
+      const mod = applyDamageTypeModifier(rawBurst, dtype, target.type);
+      const traitMod = traitDamageMultiplier(target.traits, dtype);
+      const burst = Math.max(1, Math.round(mod.damage * traitMod.multiplier));
+      const newHp = Math.max(0, targetHp - burst);
+      // Consume one vial + write the enemy's reduced HP + point the active index at
+      // the target so resolveEnemyDefeat resolves THIS enemy on a kill.
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        const inv = s.player.inventory
+          .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+          .filter((i) => i.quantity > 0);
+        const stillRacked = inv.some((i) => i.id === item.id)
+          ? (s.player.equipped?.bandolierIds ?? [])
+          : (s.player.equipped?.bandolierIds ?? []).filter((id) => id !== item.id);
+        return {
+          player: { ...s.player, inventory: inv, equipped: { ...(s.player.equipped ?? {}), bandolierIds: stillRacked } },
+          currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => (i === idx ? newHp : h)), activeEnemyIdx: idx },
+        };
+      });
+      get().appendLog(
+        'reward',
+        `You hurl the ${item.name}. It bursts across ${target.name} — ${burst} ${dtype} (${perTurn}/turn × ${COATING_DOT_TURNS}). (${newHp} HP left)`,
+        { combatOutcome: 'player_dmg' },
+      );
+      if (newHp <= 0) {
+        get().resolveEnemyDefeat();
+      } else {
+        // A throw is a combat action — the group still swings back (mirrors a
+        // knife/axe throw, which routes through the attack path's volley).
+        const after = get().player;
+        if (after) runEnemyGroupCounters(get, set, after);
+      }
+      void get().persist();
       return;
     }
     const prevOff = player.equipped?.off;
