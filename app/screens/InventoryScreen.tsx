@@ -1476,11 +1476,11 @@ function ItemRow({
               Mutually exclusive: an equipped item isn't "slot-taken by another". */}
           {isEquipped && <Text style={styles.rowEquippedCheck}>✓ </Text>}
           {slotTaken && <Text style={styles.rowSlotTaken}>✗ </Text>}
-          {/* OTA-688 — a Crucible-forged item wears a magical ✶ star (rarity-colored),
+          {/* OTA-688 — a Crucible-forged item wears a magical ❖ star (rarity-colored),
               distinct from the ◆ inferred diamond. Fused items are catalog-absent but
               NOT "inferred", so they never showed the ◆ — now they carry their own mark. */}
           {isFusedInventoryItem(item) ? (
-            <Text style={[styles.rowFusedStar, { color: rarityHexColor(item.rarity) }]}>✶ </Text>
+            <Text style={[styles.rowFusedMark, { color: rarityHexColor(item.rarity) }]}>❖ </Text>
           ) : isInferredInventoryItem(item) ? (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           ) : null}
@@ -1671,8 +1671,8 @@ const styles = StyleSheet.create({
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   rowName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1 },
   rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
-  // OTA-688 — Crucible-forged marker: a magical ✶ star, rarity-colored.
-  rowFusedStar: { fontSize: 12, fontWeight: '700' },
+  // OTA-688 — Crucible-forged marker: a magical ❖ star, rarity-colored.
+  rowFusedMark: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
