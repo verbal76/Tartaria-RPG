@@ -15,6 +15,7 @@ import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarg
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
 import { missionLegs } from '../engine/broker';
+import { carriedSigils } from '../engine/sigils';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -86,6 +87,7 @@ export function ContractsScreen() {
   const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
+  const turnInSigil = useGameStore((s) => s.turnInSigil);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
@@ -1235,6 +1237,53 @@ export function ContractsScreen() {
                       </Pressable>
                     )}
                   </Pressable>
+                );
+              })}
+            </View>
+          )}
+
+          {/* OTA-691 — CARRIED SIGILS. A slain faction member's crest, returnable to
+              that faction's stake to honor their dead (+1 standing). One row per
+              carried sigil: faction, reward, turn-in tile, and an auto-routable
+              SET COURSE — or a RETURN button when you're standing on the tile. */}
+          {player && carriedSigils(player.inventory).length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>SIGILS</Text>
+              <Text style={styles.whispersBlurb}>
+                Crests taken off the fallen. Carry each back to its faction's stake
+                and lay it down among their own — they honor the dead you bring home.
+              </Text>
+              {carriedSigils(player.inventory).map((sg) => {
+                const here = player.currentLocationId === sg.tileId;
+                const qty = sg.item.quantity > 1 ? ` ×${sg.item.quantity}` : '';
+                return (
+                  <View key={`sigil_${sg.item.id}`} style={styles.card}>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{sg.item.name}{qty}</Text>
+                      <Text style={styles.stagePill}>+1</Text>
+                    </View>
+                    <Text style={styles.cardFaction}>{sg.factionName} · honor their dead</Text>
+                    <Text style={styles.cardStageBody}>
+                      {here
+                        ? `You're at ${safeLocName(sg.tileId)}. Lay the sigil down among their own.`
+                        : `○ Return it at ${safeLocName(sg.tileId)} for +1 ${sg.factionName} standing.`}
+                    </Text>
+                    {here ? (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => turnInSigil(sg.item.id)}
+                      >
+                        <Text style={styles.routeBtnText}>▸ RETURN THE SIGIL (+1 {sg.factionName.toUpperCase()})</Text>
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => setPendingRoute({ id: sg.tileId, name: safeLocName(sg.tileId) })}
+                      >
+                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(sg.tileId).toUpperCase()}</Text>
+                      </Pressable>
+                    )}
+                  </View>
                 );
               })}
             </View>

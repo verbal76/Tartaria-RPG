@@ -15438,4 +15438,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // instance. (2) Coating vials (weapon_coating) are bandolier-eligible and, thrown, BURST for the
 // coating's full DOT up front — perTurn(dice) × COATING_DOT_TURNS of its damage type — consuming one
 // vial. New bandolierMultiAndCoatingThrow suite (3). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-675-bandolier-multi-and-coating-throw';
+// OTA-676 — faction SIGILS turn-in (ported from Tartaria OTA-691). Found faction crests (a `sigil`
+// tag + faction-id tag) returned to that faction's frontier stake honor their dead for +1 standing
+// (one-sided). Nine sigil items; turnInSigil grants +1 (only on the faction's tile) + spends the
+// sigil; new SIGILS section at the bottom of Contracts lists each with faction/+1/turn-in tile and
+// an auto-routable SET COURSE (RETURN when there). Glint pendant now grants a Forgotten Order Sigil.
+// New sigils.ts + sigilTurnIn suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-676-faction-sigil-turnin';
