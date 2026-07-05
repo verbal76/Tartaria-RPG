@@ -13,6 +13,59 @@ import { startingLocationForFaction } from './character';
  *  trickle, not a rep faucet). */
 export const SIGIL_STANDING_REWARD = 1;
 
+/** factionId → the sigil item name (authored in gear.json). */
+export const FACTION_SIGIL_NAME: Record<string, string> = {
+  forgotten_order: 'Forgotten Order Sigil',
+  mud_monarchs: 'Mud Monarch Sigil',
+  reclaimers_guild: 'Reclaimer Sigil',
+  true_tartarians: 'True Tartarian Sigil',
+  eternal_dynasty: 'Eternal Dynasty Sigil',
+  conspiracy_architects: 'Architect Sigil',
+  servants_of_giants: "Giants' Servant Sigil",
+  stone_builders: 'Stone Builder Sigil',
+  tartarian_revivalists: 'Revivalist Sigil',
+};
+
+// Distinctive name keywords → faction, so a faction-named humanoid ("Mud Monarch
+// Purifier", "Reclaimer Ambusher") drops ITS OWN crest. First match wins.
+const FACTION_NAME_KEYWORDS: Array<[string, RegExp]> = [
+  ['reclaimers_guild', /reclaimer/i],
+  ['mud_monarchs', /mud monarch|\bmonarch/i],
+  ['forgotten_order', /forgotten|\border\b/i],
+  ['conspiracy_architects', /architect|black cloak|conspiracy/i],
+  ['true_tartarians', /true tartarian|reaver|pilgrim/i],
+  ['eternal_dynasty', /dynasty|eternal/i],
+  ['servants_of_giants', /giant|servant/i],
+  ['stone_builders', /stone builder|mason|\bbuilder/i],
+  ['tartarian_revivalists', /revivalist|reviv/i],
+];
+
+/** Best-guess faction for an enemy from its NAME (a faction-affiliated humanoid).
+ *  Null when the name reads unaffiliated (a plain thief / scavenger). */
+export function inferEnemyFaction(name: string): string | null {
+  for (const [fid, re] of FACTION_NAME_KEYWORDS) if (re.test(name)) return fid;
+  return null;
+}
+
+/** Roll whether a defeated HUMANOID leaves a faction sigil (a slain member's
+ *  crest). A faction-named humanoid drops its OWN faction's sigil at a higher
+ *  rate; a plain humanoid (a thief who looted one) drops a random faction's at a
+ *  lower rate. Returns the sigil item NAME or null. Non-humanoids never drop one.
+ *  `rng` injectable for tests. */
+export function rollSigilDrop(
+  enemy: { type?: string; name?: string },
+  opts?: { chance?: number; rng?: () => number },
+): string | null {
+  if ((enemy.type ?? '').toLowerCase() !== 'human') return null;
+  const rng = opts?.rng ?? Math.random;
+  const fid = inferEnemyFaction(enemy.name ?? '');
+  const chance = opts?.chance ?? (fid ? 0.28 : 0.1);
+  if (rng() >= chance) return null;
+  const ids = Object.keys(FACTION_SIGIL_NAME);
+  const id = fid ?? ids[Math.min(ids.length - 1, Math.floor(rng() * ids.length))]!;
+  return FACTION_SIGIL_NAME[id] ?? null;
+}
+
 /** A sigil is any item tagged `sigil`. */
 export function isSigilItem(item: Pick<InventoryItem, 'tags'>): boolean {
   return (item.tags ?? []).some((t) => t.toLowerCase() === 'sigil');

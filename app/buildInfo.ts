@@ -15642,4 +15642,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SET COURSE (RETURN button when you're there) — cloning the broker-mission leg pattern. The glint
 // "bloodstained pendant" thread now grants a Forgotten Order Sigil (the "someone will want it back"
 // foreshadowing finally pays off). New sigils.ts engine helper + sigilTurnIn suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-691-faction-sigil-turnin';
+// OTA-692 — sigil DROPS wired + a grammar fix. (1) A defeated HUMANOID now has a chance to leave a
+// faction sigil (a slain member's crest): a faction-named humanoid (Mud Monarch Purifier, Reclaimer
+// Ambusher) drops ITS OWN faction's sigil at ~28%, a plain humanoid drops a random faction's at
+// ~10% (looted). Non-humanoids never drop one. rollSigilDrop mirrors the dog-vest loot path; the
+// sigil flows through the normal kill-loot grant + the Contracts SIGILS tracker. (2) Fixed the dog
+// down-in-combat line printing "drags heself... tend he" — now uses {reflexive}/{object} → "drags
+// himself... tend him". New sigil-drop suite (6). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-692-sigil-drops-and-dog-pronoun-fix';

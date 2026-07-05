@@ -15004,6 +15004,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // flows through the normal grant + summary below.
     const vestDrop = rollDogVestLootName(enemy);
     if (vestDrop) lootDrops.push(vestDrop);
+    // OTA-692 — occasional faction SIGIL off a slain HUMANOID (a member's crest).
+    // A faction-named humanoid drops its own faction's sigil; a plain one drops a
+    // random faction's (looted). Flows through the normal grant + tracker.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { rollSigilDrop } = require('../engine/sigils') as typeof import('../engine/sigils');
+      const sigilDrop = rollSigilDrop(enemy);
+      if (sigilDrop) lootDrops.push(sigilDrop);
+    }
     const lootSummary = (() => {
       const counts: Record<string, number> = {};
       for (const n of lootDrops) counts[n] = (counts[n] ?? 0) + 1;
@@ -23723,7 +23732,7 @@ export function applyEnemyCounterToDog(
     get().appendLog(
       'arbiter',
       applyDogPronouns(
-        `${dog.name} drops under the ${enemy.name} and drags {pronoun}self clear of the fight. {Pronoun} {isOrAre} down — tend {pronoun} within a day or {pronoun} won't get back up.`,
+        `${dog.name} drops under the ${enemy.name} and drags {reflexive} clear of the fight. {Pronoun} {isOrAre} down — tend {object} within a day or {pronoun} won't get back up.`,
         dog.sex.pronoun,
       ),
     );

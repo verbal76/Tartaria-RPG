@@ -43,7 +43,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
-import { isSigilItem, sigilFaction, carriedSigils } from '../app/engine/sigils';
+import { isSigilItem, sigilFaction, carriedSigils, rollSigilDrop, inferEnemyFaction, FACTION_SIGIL_NAME } from '../app/engine/sigils';
 import { findCatalogItem } from '../app/engine/crafting';
 import type { InventoryItem } from '../app/engine/types';
 
@@ -79,6 +79,40 @@ describe('sigil helpers (OTA-691)', () => {
     const row = findCatalogItem('Forgotten Order Sigil');
     expect(row).toBeTruthy();
     expect(row!.tags).toEqual(expect.arrayContaining(['sigil', 'forgotten_order']));
+  });
+
+  it('every FACTION_SIGIL_NAME maps to a real catalog sigil row', () => {
+    for (const name of Object.values(FACTION_SIGIL_NAME)) {
+      const row = findCatalogItem(name);
+      expect(row).toBeTruthy();
+      expect((row!.tags ?? []).includes('sigil')).toBe(true);
+    }
+  });
+});
+
+describe('sigil drops (OTA-692)', () => {
+  it('infers a faction from a faction-named humanoid', () => {
+    expect(inferEnemyFaction('Mud Monarch Purifier')).toBe('mud_monarchs');
+    expect(inferEnemyFaction('Reclaimer Ambusher')).toBe('reclaimers_guild');
+    expect(inferEnemyFaction('Silt Thief')).toBeNull();
+  });
+
+  it('a faction humanoid drops ITS OWN sigil (rng forces a hit)', () => {
+    const drop = rollSigilDrop({ type: 'Human', name: 'Mud Monarch Purifier' }, { rng: () => 0 });
+    expect(drop).toBe('Mud Monarch Sigil');
+  });
+
+  it('a non-humanoid never drops a sigil', () => {
+    expect(rollSigilDrop({ type: 'Aetheric Creature', name: 'Aetheric Raven' }, { rng: () => 0 })).toBeNull();
+  });
+
+  it('a plain humanoid can drop a random sigil (rng forces a hit)', () => {
+    const drop = rollSigilDrop({ type: 'Human', name: 'Silt Thief' }, { rng: () => 0 });
+    expect(Object.values(FACTION_SIGIL_NAME)).toContain(drop);
+  });
+
+  it('high rng roll = no drop', () => {
+    expect(rollSigilDrop({ type: 'Human', name: 'Mud Monarch Purifier' }, { rng: () => 0.99 })).toBeNull();
   });
 });
 
