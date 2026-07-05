@@ -17020,4 +17020,6 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inventory" highlight); Crucible items wear a rarity-colored ✶ star (distinct from the ◆ inferred
 // diamond) with a load-time 'fused'-tag backfill on older forges. New fusedItemMarkerAndCategory
 // suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-980-fused-item-marker-and-armor-category';
+// 2026-07-05-981 — fused marker glyph ✶ → ❖ (a diamond OF diamonds; materials wear a single ◆),
+// ported from Tartaria OTA-689. Glyph + style-name only. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-981-fused-marker-diamond-of-diamonds';
