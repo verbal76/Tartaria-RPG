@@ -16983,4 +16983,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the mission reminder. broker.parleyInterceptEligible now gates the intercept to on-tile +
 // challenge-live + not-labyrinth + NOT in a building + NO live enemies. New guard suite (7).
 // JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-973-parley-intercept-no-hijack-combat';
+// 2026-07-05-974 — fusing crucible picker deadlock (ported from Tartaria OTA-682). The picker hid
+// every reserved piece adding no NEW material once you'd picked; a single material-rich input can
+// cover a whole pool's materials in two picks, after which all filler vanished and the 3-item
+// minimum became unreachable — the Fuse button never lit. New visibleFusionInputs() reveals filler
+// when short of MIN_PICK with nothing left that adds a new material. New reach-min suite (5).
+// JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-974-fusion-picker-reach-min-pick';

@@ -133,6 +133,33 @@ export function fusionMaterialTags(item: { name: string; tags?: readonly string[
   return Array.from(out);
 }
 
+/** 2026-07-05-974 — which reserved inputs the Fusing Crucible picker should SHOW
+ *  given the current selection. Hides same-material duplicates (an input that adds
+ *  no material the picked set doesn't already cover) to steer toward diversity — BUT
+ *  never hides so much that the player can't reach `minPick` items. A single
+ *  material-rich input (an Aetheric Cog = metal + improvised + aether) can cover a
+ *  whole reserved pool's materials in just two picks; without this escape hatch the
+ *  remaining filler vanishes and the Fuse button can never light — a hard deadlock
+ *  the player reads as "I still can't fuse." When short of `minPick` with nothing
+ *  left that adds a new material, the redundant filler is revealed so the batch can
+ *  complete. Reaching that state means the picked set already spans every material
+ *  the pool has (so it already clears the diversity gate); the filler only pads the
+ *  count. `pickedIds` may include ids not in `scraps` (already-spent) — harmless. */
+export function visibleFusionInputs(
+  scraps: readonly InventoryItem[],
+  pickedIds: readonly string[],
+  minPick: number,
+): InventoryItem[] {
+  const pickedSet = new Set(pickedIds);
+  const pickedMats = new Set(
+    scraps.filter((i) => pickedSet.has(i.id)).flatMap((i) => fusionMaterialTags(i)),
+  );
+  const addsNew = (it: InventoryItem) => fusionMaterialTags(it).some((m) => !pickedMats.has(m));
+  const freshCount = scraps.filter((it) => !pickedSet.has(it.id) && addsNew(it)).length;
+  const needFiller = pickedIds.length < minPick && freshCount === 0;
+  return scraps.filter((it) => pickedSet.has(it.id) || addsNew(it) || needFiller);
+}
+
 export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
