@@ -3073,10 +3073,19 @@ interface GameStore {
   discoveryReveal: {
     title: string;
     body: string;
-    cta?: { label: string; screen: string; contractsTab?: 'contracts' | 'collectables' };
+    cta?: { label: string; screen: string; contractsTab?: 'contracts' | 'collectables'; inventoryCategory?: string };
   } | null;
   /** Dismiss the discovery reveal overlay. */
   dismissDiscoveryReveal: () => void;
+  /** 2026-07-05-975 — when a deep-link wants the Inventory screen to open with a
+   *  specific category section EXPANDED (sections default collapsed), this
+   *  carries that category id (e.g. a Crucible-forged 'armor' piece). The
+   *  Inventory screen reads it on entry, unfolds that section, and clears it. */
+  pendingInventoryCategory: string | null;
+  /** Request the Inventory screen open with a category expanded (set before nav). */
+  requestInventoryCategory: (cat: string) => void;
+  /** Clear the pending inventory category once consumed by the screen. */
+  clearPendingInventoryCategory: () => void;
   /** OTA-606 — when a deep-link wants the Contracts screen to open on a
    *  specific tab (e.g. the first-collectible popup → Collectibles tab),
    *  this carries the desired tab. ContractsScreen reads it on entry, applies
@@ -3245,6 +3254,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   clearPendingContractsTab() {
     set({ pendingContractsTab: null });
+  },
+  pendingInventoryCategory: null,
+  requestInventoryCategory(cat) {
+    set({ pendingInventoryCategory: cat });
+  },
+  clearPendingInventoryCategory() {
+    set({ pendingInventoryCategory: null });
   },
   pendingTravelConfirm: null,
   pendingMissionOffer: null,
@@ -21372,7 +21388,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       discoveryReveal: {
         title: 'Your forging has formed',
         body: `The Aether settles, and the Crucible's work takes its name:\n\n${name}\n\n${rarity} · it's in your pack now, fully formed.`,
-        cta: { label: 'View in inventory', screen: 'inventory' },
+        // 2026-07-05-975 — inventory sections default COLLAPSED, so "View in inventory"
+        // used to drop the player onto a folded pack with the new piece hidden.
+        // Carry the fused kind (weapon / armor / dog_armor — same id as the
+        // category section) so the screen unfolds that row on arrival.
+        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: item.kind },
       },
     });
     void get().persist();

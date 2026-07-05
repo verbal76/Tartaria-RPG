@@ -16989,4 +16989,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // minimum became unreachable — the Fuse button never lit. New visibleFusionInputs() reveals filler
 // when short of MIN_PICK with nothing left that adds a new material. New reach-min suite (5).
 // JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-974-fusion-picker-reach-min-pick';
+// 2026-07-05-975 — "View in inventory" after a forge unfolds the new piece's section (ported from
+// Tartaria OTA-683). Inventory sections default collapsed, so the reveal CTA dropped the player
+// onto a folded pack with the new item hidden. settleFusion tags the CTA with the forged kind
+// (weapon/armor/dog_armor = category section id); the screen unfolds that section on arrival via
+// pendingInventoryCategory. New fusionRevealDeepLink suite (3). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-975-forge-reveal-expands-inventory-row';

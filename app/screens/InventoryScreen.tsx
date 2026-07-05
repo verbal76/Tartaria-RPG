@@ -182,6 +182,19 @@ export function InventoryScreen() {
   // category away so the player can skip past Weapons/Armor to reach Materials /
   // Food without scrolling through every row. Keyed by category id; default open.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  // 2026-07-05-975 — a deep-link (e.g. "View in inventory" after a Crucible forge) can
+  // ask for a category section to be EXPANDED on arrival. Sections default
+  // collapsed, so without this the player lands on a folded pack and never sees
+  // the new piece. Apply it once on entry, unfold that section, then clear it.
+  const pendingInventoryCategory = useGameStore((s) => s.pendingInventoryCategory);
+  const clearPendingInventoryCategory = useGameStore((s) => s.clearPendingInventoryCategory);
+  useEffect(() => {
+    if (pendingInventoryCategory) {
+      const cat = pendingInventoryCategory;
+      setCollapsedSections((prev) => ({ ...prev, [cat]: false }));
+      clearPendingInventoryCategory();
+    }
+  }, [pendingInventoryCategory, clearPendingInventoryCategory]);
   // OTA-360 — weapon-coating picker. When the player taps "Coat a
   // weapon" on a coating consumable, this holds that consumable and
   // the second modal lists the coatable weapons in the pack as
