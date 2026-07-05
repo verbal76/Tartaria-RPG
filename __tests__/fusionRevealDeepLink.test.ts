@@ -75,6 +75,8 @@ describe('fusion reveal deep-link (OTA-683)', () => {
     expect(reveal).toBeTruthy();
     expect(reveal!.cta?.screen).toBe('inventory');
     expect(reveal!.cta?.inventoryCategory).toBe('armor');
+    // OTA-684 — also carries the instance id so the screen can scroll to + highlight it.
+    expect(reveal!.cta?.inventoryItemId).toBe('forged-1');
   });
 
   it('a forged WEAPON tags the weapon section instead', async () => {
@@ -94,5 +96,14 @@ describe('fusion reveal deep-link (OTA-683)', () => {
     expect(store.getState().pendingInventoryCategory).toBe('armor');
     store.getState().clearPendingInventoryCategory();
     expect(store.getState().pendingInventoryCategory).toBeNull();
+  });
+
+  it('requestInventoryFocusItem / clear round-trips the focus-item field (OTA-684)', async () => {
+    const store = await freshGame();
+    expect(store.getState().pendingInventoryItemId).toBeNull();
+    store.getState().requestInventoryFocusItem('forged-1');
+    expect(store.getState().pendingInventoryItemId).toBe('forged-1');
+    store.getState().clearPendingInventoryFocusItem();
+    expect(store.getState().pendingInventoryItemId).toBeNull();
   });
 });

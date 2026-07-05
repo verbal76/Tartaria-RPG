@@ -15404,4 +15404,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // onto a folded pack with the new item hidden. settleFusion tags the CTA with the forged kind
 // (weapon/armor/dog_armor = category section id); the screen unfolds that section on arrival via
 // pendingInventoryCategory. New fusionRevealDeepLink suite (3). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-668-forge-reveal-expands-inventory-row';
+// OTA-669 — forge reveal also SCROLLS to + briefly HIGHLIGHTS the exact new piece (ported from
+// Tartaria OTA-684). Expanding the section wasn't enough for a forged weapon (sorts by slot, can
+// sit anywhere in a long list). settleFusion carries the instance id; the Inventory screen records
+// section + row y via onLayout, scrolls the row into view, and pulses it (gold wash + border) for
+// ~2.5s. Best-effort + guarded. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-669-forge-reveal-scrolls-highlights-item';
