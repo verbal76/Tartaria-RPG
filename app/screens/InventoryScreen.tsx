@@ -22,7 +22,8 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon } from '../engine/golems';
+import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
+import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
@@ -137,6 +138,7 @@ export function InventoryScreen() {
   // on the eligible item stows it and clears the filter.
   const stowInPouch = useGameStore((s) => s.stowInPouch);
   const stowInBandolier = useGameStore((s) => s.stowInBandolier);
+  const useHealBatch = useGameStore((s) => s.useHealBatch);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -602,6 +604,29 @@ export function InventoryScreen() {
         tone: 'primary',
       });
     }
+    // OTA-693 — the item's fixed per-unit HP heal (First Aid Kit 25, Trail Rations
+    // 6, …), for the "Use Max" batch buttons below. 0 for non-heal / variable-heal.
+    const perItemHP = isConsumable ? (() => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolveItemEffect } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+      const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+      return fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+    })() : 0;
+    const stackQty = pending.item.quantity;
+    // Self "Use Max": the most that fit under your max HP without overhealing.
+    if (isConsumable && perItemHP > 0 && player && player.hp < player.hpMax) {
+      const n = healBatchCount(perItemHP, player.hpMax - player.hp, stackQty);
+      if (n >= 2) {
+        const to = Math.min(player.hpMax, player.hp + perItemHP * n);
+        buttons.push({
+          label: `Use Max ×${n} → ${to}/${player.hpMax} (no waste)`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', n); closeModal(); },
+          tone: 'primary',
+        });
+      }
+    }
     // OTA-120 Phase 5 — dog-targeted actions. Equip vests on the dog
     // (kind 'dog_armor'); feed consumables to the dog (any consumable
     // — the treat-vs-regular delta is calculated in the engine). Only
@@ -652,6 +677,17 @@ export function InventoryScreen() {
         },
         tone: 'primary',
       });
+      // OTA-693 — "Feed Max": the most that fit under the dog's max HP, no overheal.
+      if (perItemHP > 0 && dog.hp < dog.hpMax) {
+        const n = healBatchCount(perItemHP, dog.hpMax - dog.hp, stackQty);
+        if (n >= 2) {
+          buttons.push({
+            label: `Feed Max ×${n} → ${Math.min(dog.hpMax, dog.hp + perItemHP * n)}/${dog.hpMax}`,
+            onPress: () => { useHealBatch(pending.item.name, 'dog', n); closeModal(); },
+            tone: 'primary',
+          });
+        }
+      }
     }
     // OTA-466 — REPAIR GOLEM. When a golem is active, hurt, and this item is one
     // of the parts it's MADE of, offer a one-tap repair (routes through the same
@@ -681,6 +717,20 @@ export function InventoryScreen() {
           },
           tone: full ? 'neutral' : 'primary',
         });
+        // OTA-693 — "Heal Max": the most parts that fit under the golem's max HP.
+        if (!full) {
+          const golemPer = isGolemRepairPart(golem.kind, pending.item.name)
+            ? golemRepairHeal(golem.kind)
+            : golemSubstituteHeal(golem.kind, pending.item.rarity);
+          const n = healBatchCount(golemPer, golem.hpMax - golem.hp, stackQty);
+          if (n >= 2) {
+            buttons.push({
+              label: `Heal Max ×${n} → ${Math.min(golem.hpMax, golem.hp + golemPer * n)}/${golem.hpMax}`,
+              onPress: () => { useHealBatch(pending.item.name, 'golem', n); closeModal(); },
+              tone: 'primary',
+            });
+          }
+        }
       }
       // OTA-478/481 — ARM GOLEM. If this is a golem armament (Sledge / Greatsword,
       // wieldable by any golem), offer a one-tap arm (routes through `arm golem`).
@@ -831,7 +881,20 @@ export function InventoryScreen() {
         return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
       })()
     : null;
-  const modalBodyFull = [modalBody, fusionHint].filter(Boolean).join('\n\n') || undefined;
+  // OTA-693 — when a heal consumable can be batched, explain the "Use Max" rule so
+  // a count that stops short of the whole stack reads as intentional, not broken.
+  const healBatchHint = pending && pending.item.quantity >= 2
+    ? (() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { resolveItemEffect } = require('../engine/itemEffect');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+        const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+        const perHP = fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+        return perHP > 0 ? HEAL_BATCH_NOTE : null;
+      })()
+    : null;
+  const modalBodyFull = [modalBody, fusionHint, healBatchHint].filter(Boolean).join('\n\n') || undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦

@@ -15649,4 +15649,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sigil flows through the normal kill-loot grant + the Contracts SIGILS tracker. (2) Fixed the dog
 // down-in-combat line printing "drags heself... tend he" — now uses {reflexive}/{object} → "drags
 // himself... tend him". New sigil-drop suite (6). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-692-sigil-drops-and-dog-pronoun-fix';
+// OTA-693 — batch-heal ("Use Max"). No more tapping "use First Aid Kit" ten times. The item modal
+// now offers Use Max / Feed Max / Heal Max for self / dog / golem: one tap uses the OPTIMAL number
+// of a fixed-heal item — the most that fit UNDER max HP without overhealing (n = floor(gap/heal),
+// capped at the stack), or the whole stack if even all of it wouldn't fill. New useHealBatch store
+// action applies it in one shot (clamped to the gap, spends exactly n, no per-use log spam). The
+// button shows the count + resulting HP + "(no waste)", and the modal body explains the rule so a
+// count short of the whole stack doesn't read as broken (player ask). New healBatch.ts helper +
+// healBatch suite (8). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-693-batch-heal-use-max';
