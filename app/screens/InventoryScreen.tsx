@@ -11,7 +11,7 @@ import {
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
-import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
+import { findWeaponByName, isInferredItem, isInferredInventoryItem, isFusedInventoryItem } from '../engine/crafting';
 import { isBuiltInDefaultItem } from '../engine/builtinCatalogNames';
 import { TEMPLATE_FLAG_COLOR } from '../engine/templatePlaceholders';
 import { useContentPackStore } from '../state/contentPackStore';
@@ -1510,9 +1510,14 @@ function ItemRow({
               Mutually exclusive: an equipped item isn't "slot-taken by another". */}
           {isEquipped && <Text style={styles.rowEquippedCheck}>✓ </Text>}
           {slotTaken && <Text style={styles.rowSlotTaken}>✗ </Text>}
-          {isInferredInventoryItem(item) && (
+          {/* OTA-688 — a Crucible-forged item wears a magical ✶ star (rarity-colored),
+              distinct from the ◆ inferred diamond. Fused items are catalog-absent but
+              NOT "inferred", so they never showed the ◆ — now they carry their own mark. */}
+          {isFusedInventoryItem(item) ? (
+            <Text style={[styles.rowFusedStar, { color: rarityHexColor(item.rarity) }]}>✶ </Text>
+          ) : isInferredInventoryItem(item) ? (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
-          )}
+          ) : null}
           <Text style={[styles.rowName, useContentPackStore.getState().devMode && isBuiltInDefaultItem(item.name) && { color: TEMPLATE_FLAG_COLOR }]} numberOfLines={1}>
             {/* OTA-360 — a coated weapon shows its coated name
                 ("Corrupted Battle Axe"); the underlying name is
@@ -1702,6 +1707,8 @@ const styles = StyleSheet.create({
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   rowName: { color: '#d6e4e8', fontSize: 14, fontWeight: '600', flex: 1 },
   rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
+  // OTA-688 — Crucible-forged marker: a magical ✶ star, rarity-colored.
+  rowFusedStar: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#bcd2db', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#6c8088', fontSize: 10, letterSpacing: 1 },

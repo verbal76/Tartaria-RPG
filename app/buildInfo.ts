@@ -17014,4 +17014,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // couldn't be sold without unequipping. New equippedInstanceIds(player) returns the exact worn
 // instances (id-bound + legacy fallback, incl. ring2/ring3); the sell filter excludes those ids,
 // leaving spares sellable. New equippedInstanceIds suite (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-979-sell-list-excludes-equipped-by-id';
+// 2026-07-05-980 — fused armor category fix + magical ✶ marker (ported from Tartaria OTA-688; the
+// forge-complete message already named the kind correctly here). categorizeItem trusts a fused
+// item's KIND so a fused ARMOR no longer mis-files under Weapons (which broke the "View in
+// inventory" highlight); Crucible items wear a rarity-colored ✶ star (distinct from the ◆ inferred
+// diamond) with a load-time 'fused'-tag backfill on older forges. New fusedItemMarkerAndCategory
+// suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-980-fused-item-marker-and-armor-category';

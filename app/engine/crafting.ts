@@ -379,6 +379,14 @@ export function isInferredInventoryItem(item: { name: string; uniqueStats?: unkn
   return isInferredItem(item.name);
 }
 
+/** OTA-688 — a Crucible-forged item. applyFusion is the ONLY thing that stamps
+ *  `uniqueStats`, and it also tags the piece `fused`. Used to badge these with a
+ *  magical glyph (distinct from the ◆ inferred diamond) and to backfill the tag. */
+export function isFusedInventoryItem(item: { uniqueStats?: unknown; tags?: readonly string[] }): boolean {
+  if (item.uniqueStats) return true;
+  return (item.tags ?? []).some((t) => t.toLowerCase() === 'fused');
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;

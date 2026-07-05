@@ -97,6 +97,15 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // own Coatings section ahead of the catalog/kind heuristics, which would otherwise
   // file these (kind 'consumable') under Consumables among food and potions.
   if (item.tags.some((t) => /^weapon_coating$/i.test(t))) return 'coating';
+  // OTA-688 — a Crucible-fused item's KIND is authoritative (uniqueStats/'fused'
+  // stamped at the forge). Trust it BEFORE the name-based heuristics, which can
+  // misread a fused ARMOR's synthesized name as a weapon and mis-file it (that
+  // mismatch also broke the "View in inventory" highlight).
+  if (item.uniqueStats || item.tags.some((t) => t.toLowerCase() === 'fused')) {
+    if (item.kind === 'weapon') return 'weapon';
+    if (item.kind === 'armor') return 'armor';
+    if (item.kind === 'dog_armor') return 'dog_armor';
+  }
   // Dog companion vests get their own section. Match by kind ('dog_armor'), the
   // canonical 'dog_armor' tag, or the DOG_GEAR catalog name (so crafted/looted
   // copies land here too) — BEFORE the material/loot heuristics below, which would
