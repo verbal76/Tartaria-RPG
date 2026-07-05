@@ -2727,7 +2727,7 @@ interface GameStore {
   discoveryReveal: {
     title: string;
     body: string;
-    cta?: { label: string; screen: string; contractsTab?: 'contracts' | 'collectables'; inventoryCategory?: string };
+    cta?: { label: string; screen: string; contractsTab?: 'contracts' | 'collectables'; inventoryCategory?: string; inventoryItemId?: string };
   } | null;
   /** Dismiss the discovery reveal overlay. */
   dismissDiscoveryReveal: () => void;
@@ -2740,6 +2740,15 @@ interface GameStore {
   requestInventoryCategory: (cat: string) => void;
   /** Clear the pending inventory category once consumed by the screen. */
   clearPendingInventoryCategory: () => void;
+  /** OTA-684 — deep-link a SPECIFIC inventory item to scroll to + briefly
+   *  highlight on arrival (a forged weapon can sort anywhere in a long list, so
+   *  expanding the section isn't enough to "show it to me"). The Inventory screen
+   *  scrolls the row into view, pulses it, then clears this. */
+  pendingInventoryItemId: string | null;
+  /** Request the Inventory screen scroll to + highlight an item (set before nav). */
+  requestInventoryFocusItem: (id: string) => void;
+  /** Clear the pending inventory focus item once consumed by the screen. */
+  clearPendingInventoryFocusItem: () => void;
   /** OTA-606 — when a deep-link wants the Contracts screen to open on a
    *  specific tab (e.g. the first-collectible popup → Collectibles tab),
    *  this carries the desired tab. ContractsScreen reads it on entry, applies
@@ -2921,6 +2930,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   clearPendingInventoryCategory() {
     set({ pendingInventoryCategory: null });
+  },
+  pendingInventoryItemId: null,
+  requestInventoryFocusItem(id) {
+    set({ pendingInventoryItemId: id });
+  },
+  clearPendingInventoryFocusItem() {
+    set({ pendingInventoryItemId: null });
   },
   pendingTravelConfirm: null,
   pendingMissionOffer: null,
@@ -20731,11 +20747,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       discoveryReveal: {
         title: 'Your forging has formed',
         body: `The Aether settles, and the Crucible's work takes its name:\n\n${name}\n\n${rarity} · it's in your pack now, fully formed.`,
-        // OTA-683 — inventory sections default COLLAPSED, so "View in inventory"
+        // OTA-683/684 — inventory sections default COLLAPSED, so "View in inventory"
         // used to drop the player onto a folded pack with the new piece hidden.
-        // Carry the fused kind (weapon / armor / dog_armor — same id as the
-        // category section) so the screen unfolds that row on arrival.
-        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: item.kind },
+        // Carry the fused kind (weapon / armor / dog_armor — same id as the category
+        // section) so the screen unfolds that row on arrival, AND the instance id so
+        // the screen scrolls to + briefly highlights the exact piece (a forged weapon
+        // can sort anywhere in a long list, so expanding the section isn't enough).
+        cta: { label: 'View in inventory', screen: 'inventory', inventoryCategory: item.kind, inventoryItemId: itemId },
       },
     });
     void get().persist();

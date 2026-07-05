@@ -15586,4 +15586,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // kind (weapon/armor/dog_armor = the category section id); DiscoveryRevealModal requests it and
 // the Inventory screen unfolds that section on arrival (pendingInventoryCategory, mirrors the
 // Contracts-tab deep-link). New fusionRevealDeepLink suite (3). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-683-forge-reveal-expands-inventory-row';
+// OTA-684 — forge reveal now also SCROLLS to + briefly HIGHLIGHTS the exact new piece. Expanding
+// the section wasn't enough for a forged weapon, which sorts by slot and can sit anywhere in a
+// long list. settleFusion also carries the instance id; the Inventory screen records section +
+// row y via onLayout, scrolls the row into view on arrival, and pulses it (gold wash + border)
+// for ~2.5s before clearing. Best-effort + guarded (no-op if refs unavailable). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-684-forge-reveal-scrolls-highlights-item';

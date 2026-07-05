@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
@@ -190,6 +190,37 @@ export function InventoryScreen() {
       clearPendingInventoryCategory();
     }
   }, [pendingInventoryCategory, clearPendingInventoryCategory]);
+  // OTA-684 — scroll to + briefly highlight a specific item on arrival (a forged
+  // weapon can sort anywhere in a long list). We record each section's y (sections
+  // are direct children of the scroll content) and each row's y within its section
+  // via onLayout, then after the expanded section has laid out we scroll to
+  // section.y + row.y and pulse the row for ~2.5s.
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionYRef = useRef<Record<string, number>>({});
+  const rowInfoRef = useRef<Record<string, { y: number; cat: string }>>({});
+  const [focusItemId, setFocusItemId] = useState<string | null>(null);
+  const pendingInventoryItemId = useGameStore((s) => s.pendingInventoryItemId);
+  const clearPendingInventoryFocusItem = useGameStore((s) => s.clearPendingInventoryFocusItem);
+  useEffect(() => {
+    if (pendingInventoryItemId) {
+      setFocusItemId(pendingInventoryItemId);
+      clearPendingInventoryFocusItem();
+    }
+  }, [pendingInventoryItemId, clearPendingInventoryFocusItem]);
+  useEffect(() => {
+    if (!focusItemId) return;
+    // Let the just-expanded section render + lay out before measuring.
+    const scrollTimer = setTimeout(() => {
+      const info = rowInfoRef.current[focusItemId];
+      if (info) {
+        const y = (sectionYRef.current[info.cat] ?? 0) + info.y;
+        scrollRef.current?.scrollTo({ y: Math.max(0, y - 72), animated: true });
+      }
+    }, 280);
+    // Clear the highlight after the pulse so it doesn't stick.
+    const clearTimer = setTimeout(() => setFocusItemId(null), 2600);
+    return () => { clearTimeout(scrollTimer); clearTimeout(clearTimer); };
+  }, [focusItemId]);
   // OTA-360 — weapon-coating picker. When the player taps "Coat a
   // weapon" on a coating consumable, this holds that consumable and
   // the second modal lists the coatable weapons in the pack as
@@ -935,7 +966,7 @@ export function InventoryScreen() {
         onSortChange={(k, d) => { setSortKey(k); setSortDirection(d); }}
       />
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* OTA-239 — Tool Pouch banner. 3 slots above the inventory list
             showing what's stowed (Aetheric Torch, Vision Lens, etc.).
             Pouched items are ready-to-use; the `use <item>` verb
@@ -982,7 +1013,11 @@ export function InventoryScreen() {
           if (items.length === 0) return null;
           const collapsed = collapsedSections[cat] ?? true; // default collapsed
           return (
-            <View key={cat} style={styles.section}>
+            <View
+              key={cat}
+              style={styles.section}
+              onLayout={(e) => { sectionYRef.current[cat] = e.nativeEvent.layout.y; }}
+            >
               {/* arb108 — semi-transparent backing so the label reads over any
                   background; tap anywhere on the header (chevron included) to
                   collapse/expand the whole section. */}
@@ -1004,10 +1039,14 @@ export function InventoryScreen() {
                 </Text>
               </TouchableOpacity>
               {!collapsed && items.map((item) => (
-                <ItemRow
+                <View
                   key={item.id}
+                  onLayout={(e) => { rowInfoRef.current[item.id] = { y: e.nativeEvent.layout.y, cat }; }}
+                >
+                <ItemRow
                   item={item}
                   color={CATEGORY_COLORS[cat]}
+                  highlight={item.id === focusItemId}
                   isEquipped={equippedItemIds.has(item.id)}
                   equippedSlotLabel={equippedSlotLabelFor(item)}
                   fillSlotLabel={slotFillLabelFor(item)}
@@ -1020,6 +1059,7 @@ export function InventoryScreen() {
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                 />
+                </View>
               ))}
             </View>
           );
@@ -1355,6 +1395,7 @@ function CompanionStripes({ color }: { color: string }) {
 function ItemRow({
   item,
   color,
+  highlight,
   isEquipped,
   equippedSlotLabel,
   fillSlotLabel,
@@ -1366,6 +1407,7 @@ function ItemRow({
 }: {
   item: InventoryItem;
   color: string;
+  highlight?: boolean;
   isEquipped: boolean;
   equippedSlotLabel: string;
   fillSlotLabel: string;
@@ -1390,7 +1432,9 @@ function ItemRow({
   })();
   return (
     <TouchableOpacity
-      style={styles.row}
+      // OTA-684 — a just-forged piece arrives highlighted (gold wash + border) so
+      // the eye lands on it after the "View in inventory" jump; it clears itself.
+      style={[styles.row, highlight && styles.rowHighlighted]}
       onPress={onPress}
       activeOpacity={0.7}
     >
@@ -1586,6 +1630,14 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 4,
     overflow: 'hidden',
+  },
+  // OTA-684 — a freshly-forged piece the player deep-linked to: warm gold wash +
+  // bright border so it stands out the moment the list scrolls to it. Transient
+  // (the screen clears the highlight after ~2.5s).
+  rowHighlighted: {
+    backgroundColor: '#2a2411',
+    borderColor: '#d8b46a',
+    borderWidth: 1.5,
   },
   // OTA-485 — companion hatch. `stripeClip` fills the row and clips (the row also
   // has overflow:'hidden'); `stripeField` is an oversized, 45°-rotated flex row of
