@@ -16977,4 +16977,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // scavenge/junk vocabulary so the SAME loot spans more materials and the Crucible's 3-DISTINCT-
 // materials gate is reachable. Additive-only, word-boundary-anchored. New broadened suite (20).
 // JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-972-broaden-fuse-material-mapping';
+// 2026-07-05-973 — parley intercept no longer hijacks combat (ported from Tartaria OTA-681). The
+// broker parley is tile-scoped; its verb list (approach/examine/meet/…) overlaps combat verbs, so
+// a wandering monster or a building on the parley tile turned "approach <foe>" into a re-print of
+// the mission reminder. broker.parleyInterceptEligible now gates the intercept to on-tile +
+// challenge-live + not-labyrinth + NOT in a building + NO live enemies. New guard suite (7).
+// JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-973-parley-intercept-no-hijack-combat';
