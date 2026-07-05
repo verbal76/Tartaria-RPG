@@ -15606,4 +15606,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // items (categorizeItem direct); BUY offers are names, resolved to their catalog kind + tags via
 // findCatalogItem then filed by categorizeItem, so buy/sell/pack all bucket an item the same way.
 // New vendorCategoryGrouping suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-686-vendor-collapsible-categories';
+// OTA-687 — vendor sell list excludes equipped gear by INSTANCE ID, not name. The old filter hid
+// every copy sharing an equipped item's name, so a spare of a worn item couldn't be sold without
+// unequipping (own two Stone-Grip Gloves, wear one → neither listed). New engine helper
+// equippedInstanceIds(player) returns the exact worn instances (id-bound + legacy first-by-name
+// fallback, incl. ring2/ring3); the sell filter now excludes those ids, leaving spares sellable.
+// New equippedInstanceIds suite (4). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-687-sell-list-excludes-equipped-by-id';
