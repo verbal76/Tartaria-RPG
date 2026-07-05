@@ -15419,4 +15419,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // default CLOSED (ported from Tartaria OTA-686). SELL rows group via categorizeItem; BUY offers
 // resolve their catalog kind + tags via findCatalogItem then file with categorizeItem, so buy/sell/
 // pack bucket an item identically. New vendorCategoryGrouping suite (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-671-vendor-collapsible-categories';
+// OTA-672 — vendor sell list excludes equipped gear by INSTANCE ID, not name (ported from Tartaria
+// OTA-687). The old name filter hid every copy sharing an equipped item's name, so a spare couldn't
+// be sold without unequipping. New equippedInstanceIds(player) returns the exact worn instances
+// (id-bound + legacy fallback, incl. ring2/ring3); the sell filter excludes those ids, leaving
+// spares sellable. New equippedInstanceIds suite (4). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-672-sell-list-excludes-equipped-by-id';

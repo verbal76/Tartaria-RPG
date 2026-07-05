@@ -4,7 +4,7 @@ import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
-import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
@@ -237,10 +237,11 @@ export function VendorScreen() {
   const corruptionTier = corruptionTierOf(player.corruption ?? 0);
   const corruptionMult = corruptionPriceMultiplier(corruptionTier);
   const corruptionMarkupPct = Math.round((corruptionMult - 1) * 100);
-  // Inventory items the player can sell — exclude equipped + unsellable.
-  const equippedNames = new Set(
-    Object.values(player.equipped ?? {}).filter((n): n is string => !!n),
-  );
+  // Inventory items the player can sell — exclude the EXACT equipped instances +
+  // unsellable. OTA-687 — exclude by INSTANCE ID (equippedInstanceIds), not name,
+  // so a spare copy of an equipped item's name is a different instance and stays
+  // sellable (before, one equipped "Stone-Grip Gloves" hid every copy you owned).
+  const equippedItemIds = equippedInstanceIds(player);
   // arb120 — bandolier (quick-throwables) and tool-pouch items aren't "equipped"
   // by slot, so they DON'T get filtered out of the sell list — but they're part
   // of the player's working loadout and selling one by accident stings. Flag
@@ -253,7 +254,7 @@ export function VendorScreen() {
   // hunting, or group by rarity for clearing low-tier clutter.
   const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
   const sellable = player.inventory
-    .filter((i) => i.quantity > 0 && !equippedNames.has(i.name) && !isUnsellable(i))
+    .filter((i) => i.quantity > 0 && !equippedItemIds.has(i.id) && !isUnsellable(i))
     .map((i) => ({ item: i, price: sellPriceFor(i, vendor) }))
     .filter((x) => x.price > 0)
     .sort((a, b) => {
