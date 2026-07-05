@@ -15579,4 +15579,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // MIN_PICK with nothing left that adds a new material (safe: the picked set already spans every
 // material the pool has, so it already clears the diversity gate). New fusionPickerReachMin suite
 // (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-682-fusion-picker-reach-min-pick';
+// OTA-683 — "View in inventory" after a forge now unfolds the new piece's section. The
+// "Your forging has formed" popup's CTA dropped the player onto the pack with every category
+// COLLAPSED (sections default folded), so the freshly-forged item was hidden ("it took me to my
+// inventory but didn't expand the armor row"). settleFusion tags the reveal CTA with the forged
+// kind (weapon/armor/dog_armor = the category section id); DiscoveryRevealModal requests it and
+// the Inventory screen unfolds that section on arrival (pendingInventoryCategory, mirrors the
+// Contracts-tab deep-link). New fusionRevealDeepLink suite (3). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-683-forge-reveal-expands-inventory-row';
