@@ -98,3 +98,29 @@ export function brokerMissionLine(
   // COMMAND, not the name — capitalized like the game's other typed affordances.
   return `Broker an Alliance: two leaders wait at the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`;
 }
+
+/** OTA-681 — gate for the store's parley-verb intercept (approach / examine /
+ *  meet / … routed to handleBroker). The parley stone is an OUTDOOR feature of
+ *  the parley_ground tile, and its verb list overlaps combat verbs — most
+ *  dangerously "approach", which is how a player closes on an enemy. Without
+ *  these guards, walking into a shed that happens to sit on the parley tile, or
+ *  getting jumped by a wandering monster there, turns every "approach <foe>"
+ *  into a re-print of the mission reminder (playtest: "approach Aetheric Raven"
+ *  spammed the Broker line five times, un-fightable). Intercept ONLY when:
+ *    • on the parley_ground tile with the challenge live,
+ *    • NOT in a labyrinth run,
+ *    • NOT inside a building (you're not at the stone — parley is on the flats),
+ *    • NO live enemies (combat verbs win; the fight must be resolvable). */
+export function parleyInterceptEligible(args: {
+  labyrinthRun: boolean;
+  insideBuilding: boolean;
+  enemyCount: number;
+  currentLocationId: string;
+  challengeOn: boolean;
+}): boolean {
+  return args.challengeOn
+    && args.currentLocationId === 'parley_ground'
+    && !args.labyrinthRun
+    && !args.insideBuilding
+    && args.enemyCount === 0;
+}

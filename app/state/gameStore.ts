@@ -6097,7 +6097,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // mission; SEAL turns in the two relics. Intercept before the world parser.
     {
       const pl = get().player;
-      if (pl && !pl.labyrinthRun && pl.currentLocationId === 'parley_ground' && challengeActive('parley_of_factions')) {
+      // OTA-681 — the parley stone is an OUTDOOR feature of the parley_ground tile,
+      // and the parley verb list (approach/examine/meet/…) overlaps combat verbs.
+      // broker.parleyInterceptEligible keeps this from hijacking unrelated actions:
+      // it fires only outdoors on the tile, out of combat, and out of a labyrinth
+      // (see the helper for why — a wandering monster or a shed on the tile used to
+      // make "approach <foe>" spam the mission reminder instead of fighting).
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const broker = require('../engine/broker');
+      if (pl && broker.parleyInterceptEligible({
+        labyrinthRun: !!pl.labyrinthRun,
+        insideBuilding: !!get().activeBuildingId,
+        enemyCount: get().currentScene?.enemies?.length ?? 0,
+        currentLocationId: pl.currentLocationId,
+        challengeOn: challengeActive('parley_of_factions'),
+      })) {
         const sealVerb = /\b(seal|forge|complete|finish)\b.*\b(alliance|pact|peace|deal|truce|accord)\b|^(seal|forge)\b|\bbroker\s+(the\s+)?(alliance|pact|peace|deal)\b/i;
         const parleyVerb = /\b(parley|approach|examine|inspect|survey|meet|talk|speak|leaders?|factions?|broker)\b/i;
         if (sealVerb.test(trimmed) || parleyVerb.test(trimmed)) {

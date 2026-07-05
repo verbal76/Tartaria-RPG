@@ -15562,4 +15562,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // flint, planks, straps, beads — so the SAME items you already find span more materials and the
 // gate becomes reachable. Additive-only, word-boundary-anchored (no false-matches). New
 // inferGearTagPackBroadened suite (20). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-04-680-broaden-fuse-material-mapping';
+// OTA-681 — parley intercept no longer hijacks combat. The Guild Broker parley is tile-scoped
+// (parley_ground), and its verb list (approach/examine/meet/…) overlaps combat verbs. A
+// playtester on that tile got jumped by a wandering Aetheric Raven while inside a shed cellar;
+// every "approach Aetheric Raven" was swallowed and re-printed the Broker reminder five times,
+// the fight un-winnable ("spawning the quest I'm already in again"). broker.parleyInterceptEligible
+// now gates the intercept to: on-tile + challenge-live + NOT in a labyrinth + NOT inside a
+// building (parley is on the open flats) + NO live enemies (combat verbs win). New
+// parleyInterceptGuard suite (7). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-681-parley-intercept-no-hijack-combat';
