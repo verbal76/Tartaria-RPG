@@ -1,3 +1,4 @@
+import { withArticle, theCap, theLower } from './grammar';
 // OTA-071 — Per-room investigation table. Every ambient noun
 // added to a scene gets a persistent entry with attributes
 // (category, lore line, yield, hook potential, consumed flag,
@@ -479,30 +480,30 @@ export function resolveLore(entry: InvestigationEntry): string {
 // the variety budget is acceptable.
 
 const CALLBACK_ITEM_LINES: Array<(noun: string, item: string) => string> = [
-  (n, i) => `You've already turned the ${n} over here. The ${i.toLowerCase()} was the only thing of value.`,
-  (n, i) => `The ${n} is empty now — you took the ${i.toLowerCase()} on your first pass.`,
-  (n, i) => `Nothing more in the ${n}. The ${i.toLowerCase()} you found was tucked deep.`,
-  (n, i) => `You've already worked the ${n}. The ${i.toLowerCase()} was the harvest.`,
-  (n, i) => `The ${n} keeps its silence now. The ${i.toLowerCase()} was the prize.`,
+  (n, i) => `You've already turned ${theLower(n)} over here. The ${i.toLowerCase()} was the only thing of value.`,
+  (n, i) => `${theCap(n)} is empty now — you took the ${i.toLowerCase()} on your first pass.`,
+  (n, i) => `Nothing more in ${theLower(n)}. The ${i.toLowerCase()} you found was tucked deep.`,
+  (n, i) => `You've already worked ${theLower(n)}. The ${i.toLowerCase()} was the harvest.`,
+  (n, i) => `${theCap(n)} keeps its silence now. The ${i.toLowerCase()} was the prize.`,
 ];
 
 const CALLBACK_FLAVOR_LINES: Array<(noun: string) => string> = [
-  (n) => `You've already turned the ${n} over here. It keeps its lore but offers nothing new.`,
-  (n) => `The ${n} has surrendered what it can to your attention. Nothing fresh.`,
-  (n) => `You read the ${n} the same way you did before. Same story, no addendum.`,
-  (n) => `Your hands settle on the ${n} again. It's still telling the same quiet story.`,
-  (n) => `The ${n} is familiar now. Whatever it had to say to a stranger, it already said.`,
+  (n) => `You've already turned ${theLower(n)} over here. It keeps its lore but offers nothing new.`,
+  (n) => `${theCap(n)} has surrendered what it can to your attention. Nothing fresh.`,
+  (n) => `You read ${theLower(n)} the same way you did before. Same story, no addendum.`,
+  (n) => `Your hands settle on ${theLower(n)} again. It's still telling the same quiet story.`,
+  (n) => `${theCap(n)} is familiar now. Whatever it had to say to a stranger, it already said.`,
 ];
 
 const CALLBACK_HOOK_LINES: Array<(noun: string) => string> = [
-  (n) => `You've already studied the ${n} carefully. The thread you pulled is still warm in your mind.`,
-  (n) => `Looking at the ${n} again brings the lead back into focus, but nothing new.`,
-  (n) => `The ${n} suggested its thread on your first pass — it isn't suggesting another.`,
+  (n) => `You've already studied ${theLower(n)} carefully. The thread you pulled is still warm in your mind.`,
+  (n) => `Looking at ${theLower(n)} again brings the lead back into focus, but nothing new.`,
+  (n) => `${theCap(n)} suggested its thread on your first pass — it isn't suggesting another.`,
 ];
 
 const CALLBACK_DEFAULT_LINES: Array<(noun: string) => string> = [
-  (n) => `You've already turned the ${n} over here. The lore stays put.`,
-  (n) => `Whatever the ${n} held, you've already pulled it loose.`,
+  (n) => `You've already turned ${theLower(n)} over here. The lore stays put.`,
+  (n) => `Whatever ${theLower(n)} held, you've already pulled it loose.`,
 ];
 
 // Lazy require to avoid circular import. rotatingPick lives in
@@ -567,7 +568,7 @@ export function rollOutcome(
     return {
       kind: 'item',
       detail: entry.yield.itemName,
-      line: `${lore} Tucked into the seam: a ${entry.yield.itemName.toLowerCase()}.`,
+      line: `${lore} Tucked into the seam: ${withArticle(entry.yield.itemName.toLowerCase())}.`,
     };
   }
   return {
@@ -747,7 +748,7 @@ export function buildEchoHookLine(entry: InvestigationEntry): string {
     return `You think back to the ${noun} from earlier — the ${item} you pulled from it. Something here reminds you of it.`;
   }
   if (entry.result?.kind === 'hook') {
-    return `The ${noun} from a room back surfaces in memory. The thread you pulled is still warm — and now it's tugging again.`;
+    return `${theCap(noun)} from a room back surfaces in memory. The thread you pulled is still warm — and now it's tugging again.`;
   }
-  return `The ${noun} from earlier comes back to mind. You're not sure why — but the connection is real.`;
+  return `${theCap(noun)} from earlier comes back to mind. You're not sure why — but the connection is real.`;
 }

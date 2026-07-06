@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { withArticle, withArticleCap, theCap, theLower } from '../engine/grammar';
 import type {
   PlayerCharacter,
   WorldMemory,
@@ -3366,7 +3367,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!cat) {
       get().appendLog(
         'world',
-        `The ${ambientHit} won't come loose silently. Try the SALVAGE button if you mean to break it down.`,
+        `${theCap(ambientHit)} won't come loose silently. Try the SALVAGE button if you mean to break it down.`,
       );
       return;
     }
@@ -3431,7 +3432,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', `You palm the ${cat.name}. It vanishes into your pack — quiet, clean.`);
       get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}). [lifted]`);
     } else {
-      get().appendLog('world', `Your fingers close on a ${cat.name.toLowerCase()}, but your pack is already full.`);
+      get().appendLog('world', `Your fingers close on ${withArticle(cat.name.toLowerCase())}, but your pack is already full.`);
     }
     void get().persist();
   },
@@ -5515,7 +5516,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (enemies.length > 0) {
         const groups = new Map<string, number>();
         for (const e of enemies) groups.set(e.name, (groups.get(e.name) ?? 0) + 1);
-        const labels = Array.from(groups.entries()).map(([n, c]) => (c > 1 ? `${c} ${n}s` : `a ${n.toLowerCase()}`));
+        const labels = Array.from(groups.entries()).map(([n, c]) => (c > 1 ? `${c} ${n}s` : withArticle(n.toLowerCase())));
         presenceLine = `${labels.join(' and ')} ${enemies.length === 1 ? 'is' : 'are'} already here.`;
       } else if (vendor) {
         presenceLine = `${vendor.name} is the only soul in sight.`;
@@ -7879,7 +7880,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               if (grantResult.accepted > 0) {
                 get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
               } else {
-                get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+                get().appendLog('world', `Found ${withArticle(outcome.itemName.toLowerCase())}, but your pack is already full of them.`);
               }
               producedFb = true;
             } else if (outcome.kind === 'tc') {
@@ -8030,7 +8031,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
             get().appendLog(
               'world',
-              `Something shifted while you were turned away — a ${finalSpawn.name} breaks cover, fast and low. (range: close)`,
+              `Something shifted while you were turned away — ${withArticle(finalSpawn.name)} breaks cover, fast and low. (range: close)`,
             );
             get().appendLog(
               'combat',
@@ -8081,7 +8082,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (isGroundNoun && !isClimbedNoun) {
             get().appendLog(
               'arbiter',
-              `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. The ${rawTarget} is down there. Climb down to reach it."`,
+              `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. ${theCap(rawTarget)} is down there. Climb down to reach it."`,
             );
             break;
           }
@@ -8700,7 +8701,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     // we used the pre-deflection isItemOutcome.
                     const wasItemGrant = finalOutcome.kind === 'item';
                     const enrichedLine = wasItemGrant
-                      ? `${enriched} Tucked into the seam: a ${finalOutcome.detail.toLowerCase()}.`
+                      ? `${enriched} Tucked into the seam: ${withArticle(finalOutcome.detail.toLowerCase())}.`
                       : enriched;
                     const patched: typeof existing = {
                       ...existing,
@@ -9134,7 +9135,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             get().appendLog(
               'arbiter',
-              `The Arbiter nods slowly. "Travel ${dirWord}, when you're ready. The ${outcome.hintNoun} will still be there."`,
+              `The Arbiter nods slowly. "Travel ${dirWord}, when you're ready. ${theCap(outcome.hintNoun)} will still be there."`,
             );
             set((s) => s.player
               ? { player: {
@@ -9204,7 +9205,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (grantResult.accepted > 0) {
               get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
             } else {
-              get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+              get().appendLog('world', `Found ${withArticle(outcome.itemName.toLowerCase())}, but your pack is already full of them.`);
             }
             producedInv = true;
           } else if (outcome.kind === 'tc') {
@@ -10015,7 +10016,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 'arbiter',
                 `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
               );
-              get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
+              get().appendLog('world', `${withArticleCap(enemy.name)} closes the distance through the dark. The rest is over.`);
               get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
             } else {
               // No enemy could be spawned — emit a flavor line so the
@@ -12050,7 +12051,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (swimTarget && !isSwimmable(swimTarget)) {
           get().appendLog(
             'arbiter',
-            `The Arbiter shakes their head. "The ${swimTarget} isn't water. Find a current, a tunnel, a flooded chamber — something that takes a stroke."`,
+            `The Arbiter shakes their head. "${theCap(swimTarget)} isn't water. Find a current, a tunnel, a flooded chamber — something that takes a stroke."`,
           );
           break;
         }
@@ -12704,7 +12705,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('world', `You take the ${cat.name} from where it lay.`);
                   get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
                 } else {
-                  get().appendLog('world', `Found a ${cat.name.toLowerCase()}, but your pack is already full of them.`);
+                  get().appendLog('world', `Found ${withArticle(cat.name.toLowerCase())}, but your pack is already full of them.`);
                 }
                 break;
               }
@@ -12772,7 +12773,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
         const key = target.toLowerCase();
         if ((room.containersOpened ?? []).includes(key)) {
-          get().appendLog('world', `The ${target} is already open from earlier. Nothing new inside.`);
+          get().appendLog('world', `${theCap(target)} is already open from earlier. Nothing new inside.`);
           break;
         }
         const opened = [...(room.containersOpened ?? []), key];
@@ -15878,7 +15879,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!offer) {
       get().appendLog(
         'arbiter',
-        `The Arbiter watches you eye the pack. "They are not carrying a ${itemName}."`,
+        `The Arbiter watches you eye the pack. "They are not carrying ${withArticle(itemName)}."`,
       );
       return;
     }
@@ -16260,12 +16261,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
         get().appendLog(
           'arbiter',
-          `The Arbiter looks past you. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to pick it up."`,
+          `The Arbiter looks past you. "${hint.contractTitle} is ${withArticle(hint.kind)} of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to pick it up."`,
         );
       } else if (hint) {
         get().appendLog(
           'arbiter',
-          `The Arbiter shrugs. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find a ${hint.factionLabel} agent."`,
+          `The Arbiter shrugs. "${hint.contractTitle} is ${withArticle(hint.kind)} of the ${hint.factionLabel}. Find ${withArticle(hint.factionLabel)} agent."`,
         );
       } else {
         get().appendLog(
@@ -16556,7 +16557,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
         const list =
           lines.length === 1
-            ? `a ${lines[0]} vendor`
+            ? `${withArticle(lines[0])} vendor`
             : `a vendor from one of: ${lines.join('; ')}`;
         get().appendLog(
           'arbiter',
@@ -19472,7 +19473,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world', `You scan the floor. Something small catches the light, half-kicked under the boards.`);
         get().appendLog('reward', `✦ ${find.name}.`);
       } else {
-        get().appendLog('world', `You spot a ${find.name} on the floor, but your pack is too full to carry it.`);
+        get().appendLog('world', `You spot ${withArticle(find.name)} on the floor, but your pack is too full to carry it.`);
       }
       return;
     }
@@ -19970,7 +19971,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
       );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
     }
     const valid = validSlotsForItem(item);
@@ -20190,7 +20191,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
     }
     // OTA-269 — eligibility check before slot-count check. Lets us
@@ -20281,7 +20282,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
     }
     const eligibility = isBandolierEligible(item, player);
@@ -20494,9 +20495,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => (i === idx ? newHp : h)), activeEnemyIdx: idx },
         };
       });
+      // OTA — the leading number is the ACTUAL damage (after the target's type
+      // weakness/resistance + traits). The parenthetical shows the coating's own
+      // math (perTurn × turns); when the target scaled it, name the reason so the
+      // two numbers reconcile instead of looking like a bug ("5 … (1/turn × 3)").
+      const matchNote =
+        mod.match === 'weak' ? `, ${dtype}-weak`
+        : mod.match === 'resist' ? `, resisted`
+        : burst > rawBurst ? `, vulnerable`
+        : burst < rawBurst ? `, resisted`
+        : '';
       get().appendLog(
         'reward',
-        `You hurl the ${item.name}. It bursts across ${target.name} — ${burst} ${dtype} (${perTurn}/turn × ${COATING_DOT_TURNS}). (${newHp} HP left)`,
+        `You hurl the ${item.name}. It bursts across ${target.name} — ${burst} ${dtype} (${perTurn}/turn × ${COATING_DOT_TURNS}${matchNote}). (${newHp} HP left)`,
         { combatOutcome: 'player_dmg' },
       );
       if (newHp <= 0) {
@@ -20569,7 +20580,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
     );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
     }
     // OTA 024 — items with a consumable-shaped effect route through
@@ -21261,7 +21272,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
       );
     if (!item) {
-      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
     }
     if (!canScrap(item)) {
@@ -25447,7 +25458,7 @@ function narrateCasualLook(
   });
   if (concreteHook) {
     const hookNoun = concreteHook.nouns[0] ?? concreteHook.kind;
-    presenceFragments.push(`The ${hookNoun} is unaddressed.`);
+    presenceFragments.push(`${theCap(hookNoun)} is unaddressed.`);
   }
   if (presenceFragments.length > 0) parts.push(presenceFragments.join(' '));
 
@@ -27008,7 +27019,7 @@ function applyItemToGolem(
   const isSub = !isPart && isGolemSubstitutePart(golem.kind, item);
   if (!isPart && !isSub) {
     const parts = (golemRepairParts(golem.kind) as string[]).join(', ');
-    get().appendLog('arbiter', `The Arbiter shakes their head. "A ${def.name.toLowerCase()} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
+    get().appendLog('arbiter', `The Arbiter shakes their head. "${withArticleCap(def.name.toLowerCase())} mends best from what it's made of — ${parts} — or, at reduced worth, any raw ${(GOLEM_ELEMENT_TAGS[golem.kind]?.[0]) ?? 'matching'} material (more from higher-grade stock). The ${item.name} won't take."`);
     return false;
   }
   if (golem.hp >= golem.hpMax) {
@@ -27196,7 +27207,7 @@ function tryPryBar(
     : (PRYABLE_NOUN_RE.exec(target)?.[0]?.toLowerCase() ?? rawKey);
   const alreadyPried = (room.containersOpened ?? []).some((k) => k === key || k === rawKey);
   if (alreadyPried) {
-    get().appendLog('world', `The ${target} is already pried open — nothing left inside.`);
+    get().appendLog('world', `${theCap(target)} is already pried open — nothing left inside.`);
     return true;
   }
 
@@ -27204,7 +27215,7 @@ function tryPryBar(
   const str = player.stats?.strength ?? 10;
   const chance = Math.max(0.4, Math.min(0.9, 0.6 + (str - 10) * 0.03));
   if (Math.random() >= chance) {
-    get().appendLog('world', `You set the bar's lip under the ${target} and lean. It bites, groans — then slips free. The ${target} holds. (Set it again and lean harder.)`);
+    get().appendLog('world', `You set the bar's lip under ${theLower(target)} and lean. It bites, groans — then slips free. ${theCap(target)} holds. (Set it again and lean harder.)`);
     return true;
   }
 
