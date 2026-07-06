@@ -17085,4 +17085,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (1) The standing look/scene-entry reminder now uses a SHORT broker line (name + progress + next
 // step) instead of the full demands paragraph, which still prints on the offer/accept/parley.
 // (2) '"Not yet." the <narrator> says' → comma before the dialogue tag. New broker short-line tests.
-export const OTA_BUILD_ID = '2026-07-06-991-mission-reminder-short';
+// 2026-07-06-992 — craft-by-exact-name (ports Tartaria OTA-702). "craft Mudstone" matched "Mudstone
+// Bulwark" instead of the recipe whose result IS "Mudstone". findRecipeByResult now returns an EXACT
+// result-name match before any substring/fuzzy pass.
+export const OTA_BUILD_ID = '2026-07-06-992-craft-exact-name-match';
