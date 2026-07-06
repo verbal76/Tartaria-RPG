@@ -15702,4 +15702,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // most recently interacted with (lastInteractedNoun), array-order fallback unchanged. (3) ARBITER
 // REPEAT: the on-target room-flavor line used plain pick() (no anti-repeat) and recurred verbatim;
 // now rotatingPick, sharing the default branch's key. New parser suite (5); 275 parser tests green.
-export const OTA_BUILD_ID = '2026-07-06-699-hook-take-and-parser-polish';
+// OTA-700 — golem-name article, the rest of the family. OTA-697 dropped the stray "the" from the
+// golem KILL line; the same "The ${golem.name}" leak lived in three more combat lines — the MISS
+// ("The Bob's strike sails wide"), the no-enemy brace, and the dismiss/crumble. All now use the
+// bare proper name, consistent with "Bob attacks"/"Bob lands". JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-700-golem-name-article-rest';
