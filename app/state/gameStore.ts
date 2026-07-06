@@ -26961,7 +26961,7 @@ function handleSidekickCommand(
   if (enemies.length === 0) {
     get().appendLog(
       'world',
-      `The ${golem.name} braces, scans the room, finds no enemy. The thrum of its making settles.`,
+      `${golem.name} braces, scans the room, finds no enemy. The thrum of its making settles.`,
     );
     return;
   }
@@ -27124,7 +27124,7 @@ function handleSidekickCommand(
   } else {
     get().appendLog(
       'world',
-      `The ${golem.name}'s strike sails wide of ${target.name}.`,
+      `${golem.name}'s strike sails wide of ${target.name}.`,
     );
   }
 
@@ -27161,7 +27161,7 @@ function handleSidekickCommand(
     if (newGolemHp <= 0) {
       get().appendLog(
         'world',
-        `The ${golem.name} stills, then crumbles back into the parts it was made from.`,
+        `${golem.name} stills, then crumbles back into the parts it was made from.`,
       );
       // arb170 — INERT CORE. If the golem had trained anything, it leaves a core
       // carrying HALF its levels; feed it to a new golem to graft them on. So a
