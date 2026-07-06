@@ -15706,4 +15706,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // golem KILL line; the same "The ${golem.name}" leak lived in three more combat lines — the MISS
 // ("The Bob's strike sails wide"), the no-enemy brace, and the dismiss/crumble. All now use the
 // bare proper name, consistent with "Bob attacks"/"Bob lands". JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-700-golem-name-article-rest';
+// OTA-701 — mission-reminder brevity + dialogue-tag punctuation. (1) Every `look` (and scene
+// entry) reprinted the FULL broker paragraph (both demands + both locations + the SEAL command) —
+// noise on repeat. The standing reminder now uses a SHORT line: name + progress + the single next
+// step ("Broker an Alliance — 1/2 relics. Next: Architect's Master Blueprint at Red Tower of
+// Nimari."), switching to "all N relics in hand. SEAL THE ALLIANCE…" when gathered. The full
+// paragraph still prints on the offer, the accept, and at the parley stone. (2) Grammar: the craft-
+// refusal and concept-lore lines read '"Not yet." the Arbiter says' — a period before a lowercase
+// dialogue tag; now a comma. New broker short-line tests (4). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-701-mission-reminder-short';

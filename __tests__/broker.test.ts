@@ -8,6 +8,7 @@ import {
   isBrokerSourceTile,
   factionName,
   brokerMissionLine,
+  brokerMissionShortLine,
 } from '../app/engine/broker';
 import { FACTION_COVETED_ITEM } from '../app/engine/locationChallenges';
 
@@ -80,6 +81,38 @@ describe('Guild Broker engine', () => {
       expect(brokerMissionLine(null, () => false, tileName)).toBeNull();
       expect(brokerMissionLine(undefined, () => false, tileName)).toBeNull();
       expect(brokerMissionLine({ ...mission, done: true }, () => false, tileName)).toBeNull();
+    });
+  });
+
+  describe('brokerMissionShortLine (SHORT standing reminder — OTA-701)', () => {
+    const mission = { factionA: 'reclaimers_guild', factionB: 'stone_builders' };
+    const tileName = (id: string) => ({
+      endless_stair: 'Endless Stair', obsidian_pillars: 'Obsidian Pillars',
+    } as Record<string, string>)[id] ?? id;
+
+    it('names the mission, progress, and only the NEXT step (holds neither)', () => {
+      const line = brokerMissionShortLine(mission, () => false, tileName)!;
+      expect(line.startsWith('Broker an Alliance — 0/2 relics.')).toBe(true);
+      expect(line).toContain('Next: Fragment of the Endless Stair at Endless Stair (+1 more)');
+      // The whole point: shorter than the full demands paragraph.
+      expect(line.length).toBeLessThan(brokerMissionLine(mission, () => false, tileName)!.length);
+    });
+
+    it('drops the "+N more" once only one relic remains', () => {
+      const line = brokerMissionShortLine(mission, (n) => n === 'Fragment of the Endless Stair', tileName)!;
+      expect(line.startsWith('Broker an Alliance — 1/2 relics.')).toBe(true);
+      expect(line).toContain('Next: Obsidian Siphon at Obsidian Pillars');
+      expect(line).not.toContain('more');
+    });
+
+    it('switches to the SEAL prompt once both relics are in hand', () => {
+      const line = brokerMissionShortLine(mission, () => true, tileName)!;
+      expect(line).toBe('Broker an Alliance — all 2 relics in hand. SEAL THE ALLIANCE at the parley stone.');
+    });
+
+    it('returns null for a missing or already-sealed mission', () => {
+      expect(brokerMissionShortLine(null, () => false, tileName)).toBeNull();
+      expect(brokerMissionShortLine({ ...mission, done: true }, () => false, tileName)).toBeNull();
     });
   });
 });
