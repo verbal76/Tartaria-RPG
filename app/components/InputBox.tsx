@@ -607,7 +607,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             return (
               <Pressable
                 key={it.id}
-                onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name); }}
+                onPress={() => { setBandolierOpen(false); useGameStore.getState().throwFromBandolier(it.name, it.id); }}
                 style={[styles.bandolierPickerBtn, inRange ? styles.bandolierInRange : styles.bandolierOutOfRange]}
               >
                 <Text style={[styles.bandolierPickerLabel, inRange ? null : styles.bandolierOutOfRangeLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>

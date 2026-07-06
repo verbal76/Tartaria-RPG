@@ -2621,7 +2621,7 @@ interface GameStore {
    *  when the stack empties. */
   stowInBandolier: (itemName: string) => void;
   removeFromBandolier: (itemName: string, itemId?: string) => void;
-  throwFromBandolier: (itemName: string) => void;
+  throwFromBandolier: (itemName: string, itemId?: string) => void;
   /** OTA-676 — return a found faction SIGIL (a slain member's crest) to that
    *  faction's frontier stake to honor their dead: +1 standing, the sigil is
    *  spent. Only works while standing on the faction's turn-in tile. */
@@ -11333,13 +11333,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (hit) {
             // Damage scales by the projectile's weight. A locket does 1.
             // A weapon does 1d6. A stone core does 1d8+1.
-            const dmg = Math.max(1, rollThrowDamage(itemUsed ?? null));
+            let dmg = Math.max(1, rollThrowDamage(itemUsed ?? null));
+            // OTA-707 — a COATED throwable lands its coating's on-hit damage too. This
+            // typed-throw path rolled base weight damage ONLY (rollThrowDamage never
+            // reads item.coating), so a Charged/Searing knife thrown by name did nothing
+            // extra — "coatings didn't change the damage of the throwing knives".
+            // Elemental coatings (electrical/burn) earn the enemy's weakness/resist to
+            // that type; poison/acid/corruption add flat bonus damage. (The lingering
+            // DOT is still exclusive to the equipped-attack/bandolier path.)
+            const throwCoat = itemUsed?.coating;
+            let coatBonus = 0;
+            if (throwCoat) {
+              const raw = Math.max(1, rollFromNotation(throwCoat.dice));
+              coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn')
+                ? Math.max(1, Math.round(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).damage * traitDamageMultiplier(enemyHit.traits, throwCoat.kind).multiplier))
+                : raw;
+              dmg += coatBonus;
+            }
             const wLabel = itemUsed ? ` (${weightLabel(itemWeight(itemUsed))})` : '';
             const idx = currentScene.enemies.indexOf(enemyHit);
             const hps = [...currentScene.enemyHps];
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
-            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
+            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}${coatBonus > 0 ? ` (+${coatBonus} ${throwCoat!.kind} coating)` : ''}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
@@ -20482,18 +20498,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // then restoring the player's real off hand. submitPlayerAction resolves combat
   // synchronously, so the equip→attack→restore happens in one tick (no visible
   // churn). When the stack empties, the slot is cleared off the bandolier.
-  throwFromBandolier(itemName) {
+  throwFromBandolier(itemName, itemId) {
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene) return;
     // OTA-690 — throw a RACKED instance of this name first (so the loop you're
     // firing is the one that clears), falling back to any matching pack copy.
+    // OTA-707 — prefer the EXACT slot instance the UI tapped (its id). Throwing
+    // knives can be 5 distinct instances; if the player COATED one and racked it,
+    // a bare name match could throw a DIFFERENT (uncoated) knife, so the coating
+    // never procced. The tapped id guarantees the painted knife is the one hurled.
     const racked = player.equipped?.bandolierIds ?? [];
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && racked.includes(i.id),
-    ) ?? player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0 && racked.includes(i.id)) : undefined)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && racked.includes(i.id),
+      ) ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter looks at the bandolier. "Nothing left of the ${itemName} to throw."`);
       return;
@@ -20817,6 +20838,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `You scrape off the old ${hadCoating.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
         : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
     );
+    // OTA-707 — persist the freshly-painted coating; the action had no explicit save,
+    // so a hard-quit before the next auto-persist lost the coating.
+    void get().persist();
   },
 
   applyCoatingToArmor(coatingItemId, armorId) {

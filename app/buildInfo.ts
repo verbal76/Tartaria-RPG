@@ -15512,4 +15512,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-689 — one-time rename of already-forged fused items whose name cross-kind-collides with a
 // catalog row (ports Tartaria OTA-706). On load, such a fused item is re-minted to a distinct,
 // non-colliding deterministic name (stable per id). Idempotent. Migration helpers + tests.
-export const OTA_BUILD_ID = '2026-07-06-689-fused-name-collision-migration';
+// OTA-690 — coatings now change THROWN damage (ports Tartaria OTA-707). Typed throw now adds the
+// coating's on-hit dice (was base weight only); bandolier throw takes the tapped instance id so a
+// coated racked knife is the one hurled; applyCoating persists; snapshot shows the coating. Test.
+export const OTA_BUILD_ID = '2026-07-06-690-coating-throw-damage';
