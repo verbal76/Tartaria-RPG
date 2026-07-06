@@ -17071,4 +17071,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the Bob's assault" — an article before the golem's proper name. Every other golem line treats
 // the name as a bare noun ("Bob attacks", "Bob lands …"), so drop the "the": "crumbles under
 // Bob's assault". JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-988-golem-name-article';
+// 2026-07-06-989 — three playtest glitches (ports Tartaria OTA-698/699). (1) CRYSTAL HOOK
+// DEAD-END: `take <hook noun>` now falls through to advance an unresolved (non-puzzle) hook when
+// nothing's on the ground, and 'listen'/'hear' map to the investigate (hook-eligible) intent.
+// (2) AMBIGUOUS NOUN RECENCY: resolveContextNoun prefers the noun the player most recently
+// interacted with, so "the hatch" in a two-hatch room resolves to the one just touched.
+// (3) ARBITER REPEAT: on-target room-flavor line now uses rotatingPick (anti-repeat) instead of
+// plain pick(). New parser suite (5).
+export const OTA_BUILD_ID = '2026-07-06-989-hook-take-and-parser-polish';
