@@ -2265,7 +2265,7 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
     }
     case 'rope':
       return {
-        id: `tutorial_rope_${Date.now()}`,
+        id: freshInstanceId('tutorial_rope'),
         name: props.rope,
         kind: 'misc',
         rarity: 'Common',
@@ -2289,7 +2289,7 @@ function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
     }
     case 'note':
       return {
-        id: `tutorial_note_${Date.now()}`,
+        id: freshInstanceId('tutorial_note'),
         name: 'Folded Note',
         kind: 'misc',
         rarity: 'Common',
@@ -24511,12 +24511,17 @@ const DOG_TARGET_CHANCE = 0.25;
 /** AC bonus the dog's equipped vest confers. Catalog vests carry it directly;
  *  a Crucible-fused vest carries it on the matching inventory item's
  *  uniqueStats. Returns 0 when no vest / unknown. */
-function dogVestAcBonus(player: PlayerCharacter): number {
-  const name = player.dog?.equipped?.vest;
+export function dogVestAcBonus(player: PlayerCharacter): number {
+  const eq = player.dog?.equipped;
+  const name = eq?.vest;
   if (!name) return 0;
   const catalog = findDogGearByName(name);
   if (catalog) return catalog.acBonus ?? 0;
-  const inst = player.inventory.find((i) => i.kind === 'dog_armor' && i.name === name);
+  // OTA-696 — a fused vest carries its AC on the instance's uniqueStats. Resolve the
+  // EXACT worn instance by id (so the right fused copy's bonus applies when you own
+  // two same-named vests), falling back to first-by-name for legacy saves.
+  const inst = (eq?.vestId ? player.inventory.find((i) => i.id === eq.vestId) : undefined)
+    ?? player.inventory.find((i) => i.kind === 'dog_armor' && i.name === name);
   return inst?.uniqueStats?.acBonus ?? 0;
 }
 
@@ -26794,7 +26799,7 @@ function runAethercraft(
           .map((i) => i.id === rock.id ? { ...i, quantity: i.quantity - 1 } : i)
           .filter((i) => i.quantity > 0);
         const shard: InventoryItem = stampDurability({
-          id: `aether_shard_${Date.now()}`,
+          id: freshInstanceId('aether_shard'),
           name: 'Shaped Aetheric Shard',
           kind: 'misc',
           // arb121 — was created as Common, contradicting the Rare catalog row,
@@ -28117,7 +28122,7 @@ function tryPryBar(
   const rolled = rollFromPool(matched?.pool ?? GENERIC_PRY_POOL);
   if (rolled) {
     const grantResult = grantItem(get().player?.inventory ?? [], {
-      id: `${rolled.entry.name}_${Date.now()}`,
+      id: freshInstanceId(rolled.entry.name),
       name: rolled.entry.name,
       kind: rolled.entry.kind,
       quantity: rolled.quantity,

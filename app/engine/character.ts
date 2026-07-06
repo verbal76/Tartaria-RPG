@@ -258,14 +258,21 @@ export function resolveStartingLoadout(factionId: string): { items: InventoryIte
   return { items, equipped };
 }
 
+// OTA — unique starter instance ids (was static literals / bare Date.now()). A
+// monotonic counter makes each id unique regardless of clock resolution.
+let _starterSeq = 0;
+function starterId(prefix: string): string {
+  return `${prefix}_${Date.now()}_${(_starterSeq++).toString(36)}`;
+}
+
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   // Clone so per-character inventory never shares object refs with the template.
   const items: InventoryItem[] = resolveFlavor('starterItems', DEFAULT_STARTER_ITEMS).map(
-    (it) => ({ ...it }),
+    (it) => ({ ...it, id: starterId('starter') }),
   );
   const primaryName = starterWeaponName(race);
   items.push(stampDurability({
-    id: `starter_primary_${Date.now()}`,
+    id: starterId('starter_primary'),
     name: primaryName,
     kind: 'weapon',
     rarity: 'Common',
@@ -278,13 +285,13 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   const factionGear = Array.isArray(faction.startingGear) ? faction.startingGear : null;
   if (factionGear && factionGear.length > 0) {
     factionGear.forEach((nm, i) => {
-      const it = resolveStarterByName(nm, `starter_fac_${i}_${Date.now()}`);
+      const it = resolveStarterByName(nm, starterId(`starter_fac_${i}`));
       if (it) items.push(it);
     });
   } else {
     const knifeName = FACTION_KNIFE[faction.id] ?? 'Pocket Knife';
     items.push(stampDurability({
-      id: `starter_knife_${Date.now()}`,
+      id: starterId('starter_knife'),
       name: knifeName,
       kind: 'weapon',
       rarity: 'Common',
@@ -298,7 +305,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   const raceGear = Array.isArray(race.startingGear) ? race.startingGear : null;
   if (raceGear && raceGear.length > 0) {
     raceGear.forEach((nm, i) => {
-      const it = resolveStarterByName(nm, `starter_race_${i}_${Date.now()}`);
+      const it = resolveStarterByName(nm, starterId(`starter_race_${i}`));
       if (it) items.push(it);
     });
     return items;
@@ -311,7 +318,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     if (catalog) {
       const kind = explorationToInventoryKind(catalog);
       const item: InventoryItem = {
-        id: `starter_explore_${i}_${Date.now()}`,
+        id: starterId(`starter_explore_${i}`),
         name: catalog.name,
         kind,
         rarity: 'Common',
@@ -329,7 +336,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     const armorCat = ARMOR_BY_NAME.get(itemName);
     if (armorCat) {
       items.push(stampDurability({
-        id: `starter_armor_${i}_${Date.now()}`,
+        id: starterId(`starter_armor_${i}`),
         name: armorCat.name,
         kind: 'armor',
         rarity: (armorCat.rarity as InventoryItem['rarity']) ?? 'Common',
@@ -342,7 +349,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     const weaponCat = WEAPONS_BY_NAME.get(itemName);
     if (weaponCat) {
       items.push(stampDurability({
-        id: `starter_weapon_${i}_${Date.now()}`,
+        id: starterId(`starter_weapon_${i}`),
         name: weaponCat.name,
         kind: 'weapon',
         rarity: (weaponCat.rarity as InventoryItem['rarity']) ?? 'Common',

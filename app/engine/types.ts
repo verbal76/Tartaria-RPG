@@ -1356,7 +1356,12 @@ export interface DogCompanion {
    *  fires once per crossing, not every tick. undefined = none warned
    *  yet (treated as 101). */
   loyaltyBeatFloor?: number;
-  equipped: { vest: string | null };
+  /** The dog's worn vest. `vest` is the display/catalog name (AC comes from the
+   *  catalog by name); `vestId` (OTA-696) is the exact inventory instance so a
+   *  FUSED vest's uniqueStats resolve to the right copy and the inventory badge
+   *  marks the piece actually worn when you own two same-named vests. Optional —
+   *  legacy saves have only the name and fall back to first-by-name. */
+  equipped: { vest: string | null; vestId?: string | null };
   /** with_player follows; waiting_at_base = at the climb origin or
    *  in 24h auto-heal recovery; abandoned = walked off at loyalty 0;
    *  dead = combat-death (puppyVendorOwed flag flips true). */
