@@ -153,7 +153,7 @@ export function VendorScreen() {
     if (pending?.mode !== 'sell') return;
     const stack = sellStackFor(pending.itemName);
     const reps = Math.max(1, Math.min(repsOverride ?? sellQty, stack));
-    for (let i = 0; i < reps; i++) sellToVendor(pending.itemName);
+    for (let i = 0; i < reps; i++) sellToVendor(pending.itemName, pending.itemId);
     setPending(null);
   };
   // arb92 — buy-quantity helpers. Stock comes from the matching offer; the
@@ -209,7 +209,7 @@ export function VendorScreen() {
   const confirmAction = () => {
     if (!pending) return;
     if (pending.mode === 'buy') buyFromVendor(pending.itemName);
-    else if (pending.mode === 'sell') sellToVendor(pending.itemName);
+    else if (pending.mode === 'sell') sellToVendor(pending.itemName, pending.itemId);
     else if (pending.mode === 'steal') stealFromVendor(pending.itemName);
     else if (pending.mode === 'dismiss') dismissVendor();
     else if (pending.mode === 'accept') {

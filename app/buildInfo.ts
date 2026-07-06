@@ -17050,4 +17050,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // article before re-adding one, killing the "The the old altar" doubling on parser/scene nouns
 // (container, elevated, swim, salvage, presence + investigation callback pools). Both idempotent for
 // clean nouns → no behavior change where the noun was already correct. New grammar suite (8). JS-only.
-export const OTA_BUILD_ID = '2026-07-05-985-grammar-polish';
+// 2026-07-06-986 — operate on the EXACT item instance, not the first-by-name (ports
+// Tartaria OTA-695). Closes the "wrong same-named copy" bug class. (1) stowInPouch pouches
+// the first UN-pouched instance (mirrors OTA-690 bandolier fix) so a SECOND same-named tool
+// can be stowed instead of bouncing off "already on your belt". (2) sellToVendor resolves
+// the exact instance the shop row points at (id-first) and refuses only if THAT instance is
+// worn — a spare sells even while an equipped same-named copy exists. (3) sellToVendor/
+// stowInPouch/unpouchItem/removeFromBandolier take the instance id the UI already holds. New
+// replumb suite (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-986-item-instance-id-replumb';
