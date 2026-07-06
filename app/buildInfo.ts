@@ -17042,4 +17042,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // himself... tend him". Item modal gains Use Max / Feed Max / Heal Max (self/dog/sidekick) — one
 // tap uses the most of a fixed-heal item that fits under max HP without overhealing. New healBatch.ts
 // + healBatch suite (8) + sigil-drop suite (6) + sigilDropsToggle suite (3). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-984-sigil-drops-toggle-and-batch-heal';
+// 2026-07-05-985 — grammar polish (ports Tartaria OTA-694's a/an + "The the" fixes; the coating
+// half is Tartaria-only — engine_Dev's thrown coating is a DOT, not an up-front burst). New shared
+// grammar.ts: withArticle/withArticleCap pick "a"/"an" by leading sound so vowel-named content reads
+// right ("an Aetheric Raven", not "a Aetheric Raven"; "an aether residue") — applied at the
+// spawn/loot/pack-full/arbiter-item/vendor/sidekick-mend name sites. theCap/theLower strip a leading
+// article before re-adding one, killing the "The the old altar" doubling on parser/scene nouns
+// (container, elevated, swim, salvage, presence + investigation callback pools). Both idempotent for
+// clean nouns → no behavior change where the noun was already correct. New grammar suite (8). JS-only.
+export const OTA_BUILD_ID = '2026-07-05-985-grammar-polish';

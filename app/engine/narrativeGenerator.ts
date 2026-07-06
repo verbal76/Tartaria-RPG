@@ -10,6 +10,7 @@ import type {
   PlayerCharacter,
   WorldMemory,
 } from './types';
+import { withArticleCap } from './grammar';
 import { pick, chance, rotatingPick } from './rng';
 import { getNarratorName, resolveFlavor, getWorldSetting, hasLoreOverride, hasWorldLore } from './contentPack';
 import { GENERIC_VARIANTS as INVESTIGATE_GENERIC, CREEPY_VARIANTS as INVESTIGATE_CREEPY, INVESTIGATE_LORE_DEFAULT } from './investigationTable';
@@ -502,7 +503,7 @@ export function buildScene(input: SceneInput): string {
   }
 
   if (input.enemy) {
-    parts.push(`A ${input.enemy.name} (${input.enemy.type}, ${input.enemy.rarity}) emerges. Its ${input.enemy.attack} can deal ${input.enemy.damage}.`);
+    parts.push(`${withArticleCap(input.enemy.name)} (${input.enemy.type}, ${input.enemy.rarity}) emerges. Its ${input.enemy.attack} can deal ${input.enemy.damage}.`);
   }
 
   if (input.quest) {
