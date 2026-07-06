@@ -15750,4 +15750,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // DIFFERENT kind is re-minted to a distinct, structured, non-colliding deterministic name (stable
 // per instance id, so two pieces get two different names). Idempotent — a clean name is left alone.
 // New itemFusion migration helpers + tests (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-706-fused-name-collision-migration';
+// OTA-707 — coatings now change THROWN damage. A coated throwing knife did no extra damage because
+// (1) the typed "throw <knife> at <enemy>" path rolled base weight damage only — rollThrowDamage
+// never read item.coating; it now adds the coating's on-hit dice (elemental coatings earn the
+// enemy's weakness/resist; poison/acid/corruption add flat), and (2) the bandolier throw resolved
+// the throwable BY NAME, so with several racked knives it could hurl a DIFFERENT (uncoated) instance
+// than the one the player painted — throwFromBandolier now takes the tapped slot's instance id
+// (threaded from InputBox) and throws THAT one. Also: applyCoating now persists (was in-memory
+// only), and the inventory snapshot shows the coating (name + "+dice kind coat"). New throw test.
+export const OTA_BUILD_ID = '2026-07-06-707-coating-throw-damage';
