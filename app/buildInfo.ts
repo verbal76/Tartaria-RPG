@@ -15657,4 +15657,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // button shows the count + resulting HP + "(no waste)", and the modal body explains the rule so a
 // count short of the whole stack doesn't read as broken (player ask). New healBatch.ts helper +
 // healBatch suite (8). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-693-batch-heal-use-max';
+// OTA-694 — grammar polish + honest coating-burst display. (1) New shared grammar.ts:
+// withArticle/withArticleCap pick "a"/"an" by leading sound, so vowel-named content reads
+// right ("an Aetheric Raven", not "a Aetheric Raven"; also "an aether residue") — applied at
+// the spawn/loot/pack-full/arbiter-item/vendor/golem-mend name sites. theCap/theLower strip a
+// leading article before re-adding one, killing the "The the old altar" doubling on parser/scene
+// nouns (container, elevated, swim, salvage, presence + investigation callback pools). Both are
+// idempotent for clean nouns, so no behavior change where the noun was already correct. (2) The
+// thrown-coating burst line now names the type match ("5 electrical (1/turn × 3, electrical-weak)")
+// so the leading damage reconciles with the perTurn×turns math instead of looking like a bug.
+// New grammar suite (8). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-05-694-grammar-and-coating-display';

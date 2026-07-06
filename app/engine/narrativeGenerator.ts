@@ -10,6 +10,7 @@ import type {
   PlayerCharacter,
   WorldMemory,
 } from './types';
+import { withArticleCap } from './grammar';
 import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
 // OTA-298 — mood, intent, location, and scene flavor JSON files are
@@ -429,7 +430,7 @@ export function buildScene(input: SceneInput): string {
   }
 
   if (input.enemy) {
-    parts.push(`A ${input.enemy.name} (${input.enemy.type}, ${input.enemy.rarity}) emerges. Its ${input.enemy.attack} can deal ${input.enemy.damage}.`);
+    parts.push(`${withArticleCap(input.enemy.name)} (${input.enemy.type}, ${input.enemy.rarity}) emerges. Its ${input.enemy.attack} can deal ${input.enemy.damage}.`);
   }
 
   if (input.quest) {
