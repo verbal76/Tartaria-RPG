@@ -146,4 +146,20 @@ describe('OTA-191 itemBackfill — restamps pre-OTA inventory items', () => {
     expect(after[1]?.tags).toContain('metal');
     expect(after[2]?.description).not.toMatch(/pending catalog backfill/i);
   });
+
+  it('OTA-704 — a fused item is NEVER restamped from a name-colliding catalog row', () => {
+    // "Aetheric Armor" is a fused ARMOR the namer produced — but it is ALSO an
+    // authored runecaster WEAPON in weapons.json. Pre-fix, restamp merged that
+    // weapon's runecaster/rune_power/ward tags and clobbered the forged description
+    // on every load. The fused guard must leave the piece exactly as forged.
+    const fused: InventoryItem = {
+      id: 'fused_aa', name: 'Aetheric Armor', kind: 'armor', quantity: 1, rarity: 'Legendary',
+      tags: ['fused', 'unique', 'aetheric'],
+      description: 'A legendary armor hammered together from your reserved pieces.',
+      uniqueStats: { kind: 'armor', rarity: 'Legendary', armorSlot: 'head', acBonus: 5, durability: { current: 45, max: 45 } } as unknown as InventoryItem['uniqueStats'],
+    } as InventoryItem;
+    const after = restampInventoryItem(fused);
+    expect(after.tags).toEqual(['fused', 'unique', 'aetheric']); // untouched — no runecaster/ward merged
+    expect(after.description).toBe(fused.description);            // forged copy preserved
+  });
 });

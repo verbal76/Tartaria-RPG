@@ -78,6 +78,17 @@ function resolveCatalogShape(item: InventoryItem):
  *  missing. Returns a fresh InventoryItem with the merged tags +
  *  description; does NOT mutate the input. */
 export function restampInventoryItem(item: InventoryItem): InventoryItem {
+  // OTA-704 — a Crucible-fused piece is catalog-absent BY DESIGN: its name is
+  // Qwen/deterministic flavor and its tags/description/stats are stamped at the
+  // forge. If that name happens to collide with an authored catalog row — e.g. a
+  // fused ARMOR the namer called "Aetheric Armor", which is ALSO a runecaster
+  // WEAPON in weapons.json — the overlay below would merge the wrong kind's tags
+  // (runecaster/rune_power/ward) and clobber the forged description on EVERY load,
+  // scattering the piece toward Weapons. Fused items own their shape; never
+  // restamp them from the catalog.
+  if (item.uniqueStats || (item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
+    return item;
+  }
   const resolved = resolveCatalogShape(item);
   if (!resolved) return item;
   const { shape, source } = resolved;
