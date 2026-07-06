@@ -26,6 +26,16 @@ describe('findRecipeByResult — fuzzy / typo tolerance', () => {
     expect(findRecipeByResult('banana bread')).toBeNull();
   });
 
+  it('OTA-702 — an EXACT result name beats a longer recipe that contains it', () => {
+    // Playtest: "craft Mudstone" resolved to "Mudstone Bulwark" (needs 2× Hardened
+    // Mudstone) instead of the recipe whose result IS "Mudstone" (the 3-Mud-Fragment
+    // refine the player can actually forage toward). Exact match must win.
+    expect(findRecipeByResult('Mudstone')?.result).toBe('Mudstone');
+    expect(findRecipeByResult('mudstone')?.result).toBe('Mudstone');
+    // The longer name still resolves when the player types it in full.
+    expect(findRecipeByResult('Mudstone Bulwark')?.result).toBe('Mudstone Bulwark');
+  });
+
   it('resolves hyphen-stripped input (parser folds "-" to a space)', () => {
     // Regression: "craft Aether-Shard Spear" reaches the engine as
     // "aether shard spear" (the input normalizer strips hyphens). Before the

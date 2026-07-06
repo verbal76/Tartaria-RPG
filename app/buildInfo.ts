@@ -15714,4 +15714,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // paragraph still prints on the offer, the accept, and at the parley stone. (2) Grammar: the craft-
 // refusal and concept-lore lines read '"Not yet." the Arbiter says' — a period before a lowercase
 // dialogue tag; now a comma. New broker short-line tests (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-701-mission-reminder-short';
+// OTA-702 — craft-by-exact-name. "craft Mudstone" resolved to "Mudstone Bulwark" (needs 2×
+// Hardened Mudstone) because findRecipeByResult substring-matched the FIRST recipe containing
+// "mudstone" in array order — never the recipe whose result IS "Mudstone" (the 3-Mud-Fragment
+// refine the player can actually forage toward). Added a Pass 0 that returns an EXACT normalized
+// result-name match before any substring/fuzzy pass, so typing a recipe's exact name always wins
+// over a longer recipe that merely contains the word. New recipeFuzzy case. JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-702-craft-exact-name-match';
