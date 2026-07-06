@@ -15737,4 +15737,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // files under Armor; (3) the Qwen forge-namer rejects a name that ends in the literal kind word
 // ("… Armor") or collides with a catalog item of a DIFFERENT kind, falling back to the distinct
 // deterministic name ("Resonant Aegis"). New/extended fusion tests (11). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-704-fused-armor-name-and-category';
+// OTA-705 — the SAME "Aetheric Armor" collision leaked one more surface: the fused armor's inventory
+// row showed a 1d10 OFFENSIVE line. resolveDisplayWeapon, for a fused piece whose uniqueStats.kind
+// wasn't 'weapon', fell through to findWeaponByName(name) → the authored runecaster WEAPON "Aetheric
+// Armor" (1d10). Fix: a fused item (uniqueStats present) resolves ONLY from uniqueStats and NEVER
+// falls through to the name catalog — so a fused armor shows no weapon dice, and symmetrically a
+// fused weapon named like a catalog armor shows no AC. New display-coverage cases (2). JS-only.
+export const OTA_BUILD_ID = '2026-07-06-705-fused-display-no-catalog-fallthrough';

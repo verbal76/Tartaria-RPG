@@ -100,6 +100,25 @@ describe('OTA-227 — resolveDisplayWeapon returns full stats for fused weapons'
   });
 });
 
+describe('OTA-705 — a fused item never resolves through the name catalog', () => {
+  it('a fused ARMOR named like a catalog WEAPON shows NO offensive stats', () => {
+    // "Aetheric Armor" is a fused head armor here, but it is ALSO an authored
+    // runecaster WEAPON (1d10) in weapons.json. resolveDisplayWeapon must NOT fall
+    // through to that catalog row — the fused armor is not a weapon.
+    const item = mkFusedArmor('Aetheric Armor', 'head');
+    expect(resolveDisplayWeapon(item)).toBeNull();      // was leaking the weapon's 1d10
+    const a = resolveDisplayArmor(item);
+    expect(a!.slot).toBe('head');
+    expect(a!.acBonus).toBe(2);
+  });
+
+  it('a fused WEAPON named like a catalog ARMOR shows NO AC (symmetric)', () => {
+    const item = mkFusedWeapon('Aether-Reinforced Armor'); // a real catalog ARMOR name
+    expect(resolveDisplayArmor(item)).toBeNull();
+    expect(resolveDisplayWeapon(item)!.damageDice).toBe('1d8'); // its own forged stats stand
+  });
+});
+
 describe('OTA-227 — resolveDisplayArmor returns full stats for fused armor', () => {
   it('fused chest armor resolves with acBonus + slot', () => {
     const item = mkFusedArmor('Cinderhalt Brace', 'chest');
