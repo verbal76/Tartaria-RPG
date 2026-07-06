@@ -27067,7 +27067,9 @@ function handleSidekickCommand(
       // reward + progression. resolveEnemyDefeat is a pure resolver (no recursive
       // submitPlayerAction), splices all six per-enemy arrays, awards, and
       // persists; we just point the active index at the golem's target first.
-      get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
+      // OTA — golem.name is a proper noun ("Bob") everywhere else ("Bob attacks",
+      // "Bob lands …"), so no leading article — "Bob's assault", not "the Bob's assault".
+      get().appendLog('world', `${target.name} crumbles under ${golem.name}'s assault.`);
       // OTA-467 — persist the POWER training the killing strike earned BEFORE the
       // kill-resolver returns (the golem survives the fight; keep its growth).
       set((s) => (s.player && s.player.sidekick ? { player: { ...s.player, sidekick: workingGolem } } : s));
