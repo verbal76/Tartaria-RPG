@@ -15687,4 +15687,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // resolver picks the exact fused instance by id (right uniqueStats when you own two same-named
 // vests), and the inventory badge marks the piece actually worn. Legacy saves fall back to
 // first-by-name. New hardening suite (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-696-instance-id-hardening';
+// OTA-697 — grammar: the golem-kill line read "crumbles under the Bob's assault" — an
+// article before the golem's proper name. Every other golem line treats the name as a bare
+// noun ("Bob attacks", "Bob lands …"), so drop the "the": "crumbles under Bob's assault".
+// (Reads right for an unnamed "Mud Golem" too, matching the other lines.) JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-697-golem-name-article';
