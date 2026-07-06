@@ -26,6 +26,12 @@ describe('findRecipeByResult — fuzzy / typo tolerance', () => {
     expect(findRecipeByResult('banana bread')).toBeNull();
   });
 
+  it('OTA-702 — an EXACT result name beats a longer recipe that contains it', () => {
+    expect(findRecipeByResult('Mudstone')?.result).toBe('Mudstone');
+    expect(findRecipeByResult('mudstone')?.result).toBe('Mudstone');
+    expect(findRecipeByResult('Mudstone Bulwark')?.result).toBe('Mudstone Bulwark');
+  });
+
   it('resolves hyphen-stripped input (parser folds "-" to a space)', () => {
     // Regression: "craft Aether-Shard Spear" reaches the engine as
     // "aether shard spear" (the input normalizer strips hyphens). Before the

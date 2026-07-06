@@ -533,6 +533,15 @@ export function findRecipeByResult(target: string): Recipe | null {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const t = norm(target);
   if (!t) return null;
+  // Pass 0 — EXACT normalized-name match wins. OTA-702: "craft Mudstone" used to
+  // substring-match the FIRST recipe containing "mudstone" — "Mudstone Bulwark"
+  // (which needs 2× Hardened Mudstone) — instead of the recipe whose result IS
+  // "Mudstone" (the 3-Mud-Fragment refine the player can actually forage toward).
+  // Any time the player types a recipe's exact result name, that recipe wins over a
+  // longer one that merely contains the word.
+  for (const r of RECIPES) {
+    if (norm(r.result) === t) return r;
+  }
   // Pass 1 — substring match either direction. Cheap, covers most cases.
   for (const r of RECIPES) {
     const rn = norm(r.result);
