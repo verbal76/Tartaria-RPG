@@ -15477,4 +15477,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // act on the wrong copy. (2) The dog vest now tracks a vestId alongside the name: equip writes it,
 // the AC resolver picks the exact fused instance by id, and the inventory badge marks the piece
 // actually worn. Legacy saves fall back to first-by-name. New hardening suite (4). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-680-instance-id-hardening';
+// OTA-681 — grammar: the golem-kill line read "crumbles under the Bob's assault" — an
+// article before the golem's proper name. Every other golem line treats the name as a bare
+// noun ("Bob attacks", "Bob lands …"), so drop the "the": "crumbles under Bob's assault".
+// JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-681-golem-name-article';
