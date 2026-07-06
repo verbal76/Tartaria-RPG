@@ -15691,4 +15691,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // article before the golem's proper name. Every other golem line treats the name as a bare
 // noun ("Bob attacks", "Bob lands …"), so drop the "the": "crumbles under Bob's assault".
 // (Reads right for an unnamed "Mud Golem" too, matching the other lines.) JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-697-golem-name-article';
+// OTA-698/699 — three playtest glitches. (1) CRYSTAL HOOK DEAD-END: the whisper-crystal is a
+// story hook whose chain literally lifts an item ("You pry the crystal loose" → Aether Crystal)
+// and the Arbiter invites "take it", but `take crystal` found no ground item and dead-ended, and
+// `listen to the whispers` wasn't even a verb. Now `take <hook noun>` falls through to advance an
+// unresolved (non-puzzle) hook when nothing's on the ground, and 'listen'/'hear' map to the
+// investigate (hook-eligible) intent. (2) AMBIGUOUS NOUN RECENCY: in a room with a "drain hatch"
+// AND an "observation hatch", a bare "the hatch" resolved to the first in array order — so
+// "look inside the hatch" hit the wrong one. resolveContextNoun now prefers the noun the player
+// most recently interacted with (lastInteractedNoun), array-order fallback unchanged. (3) ARBITER
+// REPEAT: the on-target room-flavor line used plain pick() (no anti-repeat) and recurred verbatim;
+// now rotatingPick, sharing the default branch's key. New parser suite (5); 275 parser tests green.
+export const OTA_BUILD_ID = '2026-07-06-699-hook-take-and-parser-polish';

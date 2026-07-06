@@ -42,6 +42,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
     'observe', 'view', 'read', 'probe', 'survey', 'find', 'scavenge', 'hunt',
     'peruse', 'scrutinise', 'scrutinize', 'comb',
+    // OTA-698 — 'listen'/'hear' are sensory investigation. A whispering-crystal
+    // hook invites "listen to the whispers"; without this it demoted to unknown and
+    // dead-ended. Investigate is hook-eligible, so it now advances the hook.
+    'listen', 'hear',
     // 'salvage' / 'strip' / 'pry' — playtest caught "salvage the
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
@@ -846,19 +850,40 @@ function resolveItem(
   return undefined;
 }
 
-function resolveContextNoun(targetTokens: string[], recentNouns: string[]): string | undefined {
+function resolveContextNoun(
+  targetTokens: string[],
+  recentNouns: string[],
+  preferred?: string | null,
+): string | undefined {
   if (!targetTokens.length || !recentNouns.length) return undefined;
-  for (const noun of recentNouns) {
-    const nounLower = noun.toLowerCase();
-    if (targetTokens.some((t) => nounLower.includes(t))) return noun;
-  }
-  for (const noun of recentNouns) {
-    const words = noun.toLowerCase().split(/\s+/);
-    for (const t of targetTokens) {
-      if (words.some((w) => fuzzyEqual(t, w))) return noun;
+  const preferLower = (preferred ?? '').toLowerCase().trim();
+  // OTA-699 — recency tiebreak. When several scene nouns match the same ambiguous
+  // target (a room with a "drain hatch" AND an "observation hatch", target "hatch"),
+  // the old code returned the FIRST in array order — so "look inside the hatch" hit
+  // the wrong one. Prefer the noun the player MOST RECENTLY interacted with; fall
+  // back to array-order first-match (unchanged behavior when there's no preference).
+  const preferFrom = (matches: string[]): string | undefined => {
+    if (!matches.length) return undefined;
+    if (preferLower) {
+      const recent = matches.find((n) => {
+        const nl = n.toLowerCase();
+        return nl === preferLower || nl.includes(preferLower) || preferLower.includes(nl);
+      });
+      if (recent) return recent;
     }
-  }
-  return undefined;
+    return matches[0];
+  };
+  const substrMatches = recentNouns.filter((noun) => {
+    const nounLower = noun.toLowerCase();
+    return targetTokens.some((t) => nounLower.includes(t));
+  });
+  const substrHit = preferFrom(substrMatches);
+  if (substrHit) return substrHit;
+  const fuzzyMatches = recentNouns.filter((noun) => {
+    const words = noun.toLowerCase().split(/\s+/);
+    return targetTokens.some((t) => words.some((w) => fuzzyEqual(t, w)));
+  });
+  return preferFrom(fuzzyMatches);
 }
 
 export interface ParseContext {
@@ -880,6 +905,10 @@ export interface ParseContext {
   /** Ambient nouns extracted from the scene paragraph. Used to
    *  classify the player's input as a generic-area target. */
   ambientNouns?: string[];
+  /** OTA-699 — the noun the player most recently interacted with (from the
+   *  store's lastInteractedNoun). Recency tiebreak so an ambiguous bare noun
+   *  ("the hatch" in a room with two hatches) resolves to the one just touched. */
+  lastInteractedNoun?: string | null;
   /** Name of the vendor currently in the scene, if any. Lets the
    *  suggester offer 'trade with X' / 'buy from X' style verbs. */
   vendorName?: string;
@@ -1167,7 +1196,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const item = enemyHit || ambientStrongMatch
     ? undefined
     : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
-  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
+  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns, context.lastInteractedNoun));
 
   // Confidence: 1.0 exact verb, falls off with distance; small boost from resolved target.
   const verbConfidence = Math.max(0.4, 1 - bestMatch.distance * 0.18);
