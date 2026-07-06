@@ -115,4 +115,29 @@ describe('bandolier — rack multiple + coating throw (OTA-690)', () => {
     expect(st.player!.inventory.some((i) => i.id === 'sp1')).toBe(false);
     expect((st.player!.equipped!.bandolierIds ?? []).includes('sp1')).toBe(false);
   });
+
+  it('OTA-707 — throws the EXACT racked instance the UI tapped (the coated one), not first-by-name', async () => {
+    const store = await freshGame();
+    const p = store.getState().player!;
+    // Two identical racked knives; only k2 is coated. The UI taps k2.
+    const k1 = knife('k1');
+    const k2 = { ...knife('k2'), coating: { kind: 'electrical', dice: '1d4', label: 'Charged' } } as InventoryItem;
+    store.setState({
+      player: { ...p, inventory: [...p.inventory, k1, k2], equipped: { ...(p.equipped ?? {}), bandolierIds: ['k1', 'k2'] } },
+    });
+    store.setState((s) => ({
+      currentScene: {
+        ...((s.currentScene ?? {}) as any),
+        enemies: [{ name: 'Brute', hp: 40, ac: 5, attack: 'Slam', damage: '1d6', abilityPoint: 'STR 10', rarity: 'Common', traits: [] }],
+        enemyHps: [40], enemyKnockedOut: [false], enemyAmbushUsed: [false], activeEnemyIdx: 0, range: 'close',
+      } as any,
+    }));
+
+    store.getState().throwFromBandolier('Throwing Knife', 'k2'); // tapped the coated instance
+
+    const inv = store.getState().player!.inventory;
+    // k2 (the coated, tapped instance) is the one thrown/consumed; k1 stays racked.
+    expect(inv.some((i) => i.id === 'k2')).toBe(false);
+    expect(inv.some((i) => i.id === 'k1')).toBe(true);
+  });
 });
