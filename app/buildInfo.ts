@@ -15469,4 +15469,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (3) sellToVendor/stowInPouch/unpouchItem/removeFromBandolier all take the instance id the
 // UI already holds, threaded from the vendor row + pouch/bandolier slots. New replumb suite
 // (5). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-679-item-instance-id-replumb';
+// OTA-680 — instance-id hardening (the two items the OTA-679 audit left open). (1) Starter
+// inventory ids are now unique: the first four items shipped with STATIC literal ids identical
+// across every save, and starter primary/knife + several loot/tutorial grants used a bare
+// `${Date.now()}` that could collide in one millisecond. A monotonic starterId()/freshInstanceId()
+// makes each unique, so per-instance ops (equip/sell/pouch/repair-by-id, durability wear) can't
+// act on the wrong copy. (2) The dog vest now tracks a vestId alongside the name: equip writes it,
+// the AC resolver picks the exact fused instance by id, and the inventory badge marks the piece
+// actually worn. Legacy saves fall back to first-by-name. New hardening suite (4). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-680-instance-id-hardening';

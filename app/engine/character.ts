@@ -103,19 +103,26 @@ function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem
   return 'misc';
 }
 
+// OTA — unique starter instance ids (was static literals / bare Date.now()). A
+// monotonic counter makes each id unique regardless of clock resolution.
+let _starterSeq = 0;
+function starterId(prefix: string): string {
+  return `${prefix}_${Date.now()}_${(_starterSeq++).toString(36)}`;
+}
+
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   const items: InventoryItem[] = [
-    { id: 'aetheric_torch', name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
-    { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
+    { id: starterId('starter_torch'), name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+    { id: starterId('starter_rations'), name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
     // OTA-375 — every character starts with a Water Bottle (the cheap,
     // refillable stamina recovery item) so exhaustion in an early fight
     // is never a dead end. Drink it for +10 stamina; refill free at water.
-    { id: 'water_bottle', name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
-    { id: 'aether_locket', name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
+    { id: starterId('starter_water'), name: 'Water Bottle', kind: 'consumable', rarity: 'Common', quantity: 1, tags: ['drink', 'water', 'container'], description: 'A full bottle of water. Drink to get your wind back (+10 stamina). Refill free at any puddle, lake, or crevice-pool.' },
+    { id: starterId('starter_locket'), name: 'Aetheric Locket', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['detection'], description: 'Hums when held close to a relic.' },
   ];
   const primaryName = RACE_PRIMARY[race.id] ?? 'Rusted Blade';
   items.push(stampDurability({
-    id: `starter_primary_${Date.now()}`,
+    id: starterId('starter_primary'),
     name: primaryName,
     kind: 'weapon',
     rarity: 'Common',
@@ -125,7 +132,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   }));
   const knifeName = FACTION_KNIFE[faction.id] ?? 'Pocket Knife';
   items.push(stampDurability({
-    id: `starter_knife_${Date.now()}`,
+    id: starterId('starter_knife'),
     name: knifeName,
     kind: 'weapon',
     rarity: 'Common',
@@ -141,7 +148,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     if (catalog) {
       const kind = explorationToInventoryKind(catalog);
       const item: InventoryItem = {
-        id: `starter_explore_${i}_${Date.now()}`,
+        id: starterId(`starter_explore_${i}`),
         name: catalog.name,
         kind,
         rarity: 'Common',
@@ -159,7 +166,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     const armorCat = ARMOR_BY_NAME.get(itemName);
     if (armorCat) {
       items.push(stampDurability({
-        id: `starter_armor_${i}_${Date.now()}`,
+        id: starterId(`starter_armor_${i}`),
         name: armorCat.name,
         kind: 'armor',
         rarity: (armorCat.rarity as InventoryItem['rarity']) ?? 'Common',
@@ -172,7 +179,7 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     const weaponCat = WEAPONS_BY_NAME.get(itemName);
     if (weaponCat) {
       items.push(stampDurability({
-        id: `starter_weapon_${i}_${Date.now()}`,
+        id: starterId(`starter_weapon_${i}`),
         name: weaponCat.name,
         kind: 'weapon',
         rarity: (weaponCat.rarity as InventoryItem['rarity']) ?? 'Common',

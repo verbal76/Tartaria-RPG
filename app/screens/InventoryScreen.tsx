@@ -331,9 +331,14 @@ export function InventoryScreen() {
     ? dogForVest.equipped?.vest ?? null
     : null;
   if (dogVestName) {
-    const vestOwner = player.inventory.find(
-      (it) => it.kind === 'dog_armor' && it.name === dogVestName && it.quantity > 0,
-    );
+    // OTA-696 — badge the EXACT worn instance (by id) so the right piece reads
+    // "EQUIPPED (on <dog>)" when you own two same-named vests; name-fallback for
+    // legacy saves that predate vestId.
+    const vestId = dogForVest?.equipped?.vestId ?? null;
+    const vestOwner = (vestId ? player.inventory.find((it) => it.id === vestId && it.quantity > 0) : undefined)
+      ?? player.inventory.find(
+        (it) => it.kind === 'dog_armor' && it.name === dogVestName && it.quantity > 0,
+      );
     if (vestOwner) equippedItemIds.add(vestOwner.id);
   }
 
@@ -643,7 +648,7 @@ export function InventoryScreen() {
                   ...s.player,
                   dog: {
                     ...s.player.dog,
-                    equipped: { vest: pending.item.name },
+                    equipped: { vest: pending.item.name, vestId: pending.item.id },
                   },
                 },
               }
