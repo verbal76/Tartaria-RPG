@@ -1330,6 +1330,20 @@
       ]
     },
     {
+      "_note": "OTA-703 — Hardened Mudstone had NO recipe (loot-only), walling Mudstone Bulwark + 8 other Hardened-Mudstone recipes behind drops despite the Mudstone refine note promising a craftable path. Per the material's own lore ('Mudstone fused under Etheric pressure'): 2 Mudstone + 1 Aether Dust → 1 Hardened Mudstone, completing Mud Fragment -> Mudstone -> Hardened Mudstone -> gear.",
+      "result": "Hardened Mudstone",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        }
+      ]
+    },
+    {
       "_note": "OTA \u2014 armor-recipe balance pass (crafting was 30 weapon vs 5 armor; added low-tier armor across all slots from gatherable mats).",
       "result": "Reclaimer's Salvage Cap",
       "ingredients": [

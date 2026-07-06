@@ -15720,4 +15720,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // refine the player can actually forage toward). Added a Pass 0 that returns an EXACT normalized
 // result-name match before any substring/fuzzy pass, so typing a recipe's exact name always wins
 // over a longer recipe that merely contains the word. New recipeFuzzy case. JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-702-craft-exact-name-match';
+// OTA-703 — Hardened Mudstone is now craftable. It was a loot-ONLY material, so the Mudstone
+// Bulwark + 8 other recipes that consume it were walled behind drops — even though the Mudstone
+// refine note promised a forageable path. Per the material's own lore ("Mudstone fused under
+// Etheric pressure"), added: 2 Mudstone + 1 Aether Dust → 1 Hardened Mudstone. Completes the
+// chain Mud Fragment →(×3) Mudstone →(2+1 Aether Dust) Hardened Mudstone → gear. Pairs with the
+// OTA-702 exact-name fix so "craft Mudstone"/"craft Hardened Mudstone" both resolve right. Data-
+// only recipe add + test. JS/JSON-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-703-hardened-mudstone-recipe';
