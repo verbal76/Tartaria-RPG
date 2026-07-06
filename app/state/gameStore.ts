@@ -192,7 +192,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
@@ -2474,7 +2474,7 @@ interface GameStore {
   resolveEnemyDefeat: () => void;
   rest: () => void;
   buyFromVendor: (itemName: string, qty?: number) => void;
-  sellToVendor: (itemName: string) => void;
+  sellToVendor: (itemName: string, itemId?: string) => void;
   giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
@@ -2607,15 +2607,15 @@ interface GameStore {
    *  pouch (max 3). Pouched items stay in player.inventory but
    *  surface in the InventoryScreen TOOL POUCH section + give the
    *  `use <item>` verb a faster resolution path. */
-  stowInPouch: (itemName: string) => void;
-  unpouchItem: (itemName: string) => void;
+  stowInPouch: (itemName: string, itemId?: string) => void;
+  unpouchItem: (itemName: string, itemId?: string) => void;
   /** arb110 — Bandolier (max 5 throwables). Rack a throwable by name; it stays in
    *  inventory but surfaces in the InventoryScreen BANDOLIER section + the combat
    *  bandolier popup. removeFromBandolier pulls it back out. throwFromBandolier
    *  hurls one unit at the active enemy (full attack + status), clearing the slot
    *  when the stack empties. */
   stowInBandolier: (itemName: string) => void;
-  removeFromBandolier: (itemName: string) => void;
+  removeFromBandolier: (itemName: string, itemId?: string) => void;
   throwFromBandolier: (itemName: string) => void;
   /** OTA-691 — return a found faction SIGIL (a slain member's crest) to that
    *  faction's frontier stake to honor their dead: +1 standing, the sigil is
@@ -15645,7 +15645,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  sellToVendor(itemName) {
+  sellToVendor(itemName, itemId) {
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
@@ -15659,16 +15659,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — selling is disabled while the tutorial is running.');
       return;
     }
-    // Refuse if the item is equipped — don't quietly strip the player's
-    // loadout. They have to unequip first.
-    const equipped = player.equipped ?? {};
-    const equippedNames = Object.values(equipped).filter(Boolean) as string[];
-    const item = player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
+    // OTA-695 — sell the EXACT instance the shop row points at. The sell list
+    // (VendorScreen) already excludes worn gear by instance id and hands us that
+    // id; resolve it first so a spare sells even when an equipped copy of the same
+    // name exists, and the correct instance's durability/coating/stolen-flag/price
+    // is the one that leaves your pack. Falls back to first-by-name for typed input.
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : undefined)
+      ?? player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
     if (!item) {
       get().appendLog('system', `You don't have any ${itemName} to sell.`);
       return;
     }
-    if (equippedNames.includes(item.name)) {
+    // Refuse only if THIS instance is worn (by id) — a spare of the same name is
+    // still sellable. (Was: refused if ANY same-named copy was equipped, which
+    // blocked selling spares.)
+    if (equippedInstanceIds(player).has(item.id)) {
       get().appendLog(
         'arbiter',
         `${scene.vendor.name} eyes the ${item.name} on your person. "Take it off first. I don't haggle for what's still on a man."`,
@@ -20126,14 +20131,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Aetheric Torches, Vision Lenses, scanners, etc. so `use <item>`
   // resolves faster and the InventoryScreen surfaces them in a
   // dedicated section.
-  stowInPouch(itemName) {
+  stowInPouch(itemName, itemId) {
     const POUCH_MAX = 4;
     const state = get();
     const player = state.player;
     if (!player) return;
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
+    const current = player.equipped?.toolPouchIds ?? [];
+    // OTA-695 — pouch the first UN-POUCHED instance of this name (mirrors the
+    // OTA-690 bandolier fix). The old first-by-name find re-grabbed an already-
+    // pouched copy, so isPouchEligible bounced with "already on your belt" and you
+    // could never stow a SECOND same-named tool (two Aetheric Torches, two
+    // scanners). Prefer the exact id the UI hands us; else first un-pouched; else
+    // any match so the eligibility check can still explain the refusal.
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : undefined)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && !current.includes(i.id),
+      )
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
       return;
@@ -20149,7 +20165,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const current = player.equipped?.toolPouchIds ?? [];
     if (current.length >= POUCH_MAX) {
       get().appendLog(
         'arbiter',
@@ -20172,14 +20187,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  unpouchItem(itemName) {
+  unpouchItem(itemName, itemId) {
     const state = get();
     const player = state.player;
     if (!player) return;
     const current = player.equipped?.toolPouchIds ?? [];
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
-    );
+    // OTA-695 — pull the EXACT pouched instance the UI tapped (the slot carries its
+    // id), so with two same-named tools pouched you remove the one you meant. Falls
+    // back to first pouched-by-name for typed input.
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && current.includes(i.id)) : undefined)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter looks at the pouch. "${itemName} isn't on your belt."`);
       return;
@@ -20245,13 +20264,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  removeFromBandolier(itemName) {
+  removeFromBandolier(itemName, itemId) {
     const player = get().player;
     if (!player) return;
     const current = player.equipped?.bandolierIds ?? [];
-    const item = player.inventory.find(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
-    );
+    // OTA-695 — pull the EXACT racked instance the UI tapped (the slot carries its
+    // id), so with several same-named throwables racked you unrack the one you
+    // meant. Falls back to first racked-by-name for typed input.
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && current.includes(i.id)) : undefined)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
+      );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter looks at the bandolier. "${itemName} isn't racked."`);
       return;
