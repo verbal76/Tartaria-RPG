@@ -1420,6 +1420,17 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
       const suffix = pool[hash % pool.length]!;
       item = { ...item, name: item.name.replace(/\s*undefined\b/gi, ` ${suffix}`).trim() };
     }
+    // OTA-706 — one-time rename for ALREADY-forged fused items whose stored name
+    // cross-kind-collides with a catalog row: a forged ARMOR named "Aetheric Armor"
+    // is ALSO an authored runecaster WEAPON, so it read as a weapon (1d10 line, wrong
+    // section) before OTA-704/705 sealed the resolution. Those fixes made the collision
+    // harmless, but the ugly/duplicate name persisted — re-mint a distinct, non-
+    // colliding deterministic name. Idempotent: a clean name is left alone next load.
+    if (item.uniqueStats) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { migrateFusedName } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+      item = migrateFusedName(item);
+    }
     return item;
   });
   // Backfill the per-slot instance ids. A pre-refactor save records only

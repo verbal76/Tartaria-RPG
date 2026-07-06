@@ -15509,4 +15509,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-688 — fused armor showed a 1d10 offensive line (ports Tartaria OTA-705). resolveDisplayWeapon
 // fell through to the name catalog for a non-weapon fused piece, hitting the runecaster weapon
 // "Aetheric Armor". Fused items now resolve ONLY from uniqueStats, never the name catalog. Tests (2).
-export const OTA_BUILD_ID = '2026-07-06-688-fused-display-no-catalog-fallthrough';
+// OTA-689 — one-time rename of already-forged fused items whose name cross-kind-collides with a
+// catalog row (ports Tartaria OTA-706). On load, such a fused item is re-minted to a distinct,
+// non-colliding deterministic name (stable per id). Idempotent. Migration helpers + tests.
+export const OTA_BUILD_ID = '2026-07-06-689-fused-name-collision-migration';
