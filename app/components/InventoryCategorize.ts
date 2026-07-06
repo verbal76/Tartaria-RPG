@@ -96,9 +96,17 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // and scatter it into the wrong section — that mismatch also broke the "View in
   // inventory" jump, which opens the item's KIND section but couldn't find it.
   if (item.uniqueStats || item.tags.some((t) => t.toLowerCase() === 'fused')) {
-    if (item.kind === 'weapon') return 'weapon';
-    if (item.kind === 'armor') return 'armor';
-    if (item.kind === 'dog_armor') return 'dog_armor';
+    // OTA-704 — the forge's chosen SHAPE lives on uniqueStats.kind, and that's what
+    // drives the actual stats (acBonus + armorSlot for armor, damageDice for a
+    // weapon). Trust it BEFORE the top-level item.kind: a fused ARMOR whose
+    // item.kind got stamped 'weapon' (name-inferred at some earlier step) still
+    // equips to a head/chest slot, so filing it under Weapons splits it from where
+    // it belongs AND breaks the "View in inventory" jump. uniqueStats.kind is the
+    // ground truth; item.kind is the fallback for tag-only fused items.
+    const fusedKind = item.uniqueStats?.kind ?? item.kind;
+    if (fusedKind === 'weapon') return 'weapon';
+    if (fusedKind === 'armor') return 'armor';
+    if (fusedKind === 'dog_armor') return 'dog_armor';
   }
   // Dog companion vests get their own section. Match by kind ('dog_armor'), the
   // canonical 'dog_armor' tag, or the DOG_GEAR catalog name (so crafted/looted

@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, UniqueItemStats } from './types';
-import { isInferredItem } from './crafting';
+import { isInferredItem, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
@@ -472,6 +472,18 @@ export async function synthesizeFusionNameViaQwen(
     const name = typeof parsed.name === 'string' ? parsed.name.trim() : '';
     const description = typeof parsed.description === 'string' ? parsed.description.trim().slice(0, 200) : '';
     if (!name || name.length > 40 || !description) return null;
+    // OTA-704 — reject a lazy/colliding Qwen name so the distinct deterministic name
+    // (theme + kind suffix, e.g. "Resonant Aegis") stands instead. Two failure modes
+    // seen in play: (a) the model returns a bare "<theme> Armor"/"Weapon" — generic
+    // and, worse, "Aetheric Armor" is ALSO an authored runecaster WEAPON, so the
+    // collision re-typed the forged armor; (b) any name that resolves to a CATALOG
+    // item of a different kind than the forge. Fall back (return null) in both cases.
+    const kindWord = stats.kind === 'weapon' ? 'weapon' : 'armor';
+    const endsWithKindWord = new RegExp(`\\b${kindWord}$`, 'i').test(name);
+    const collidesCrossKind = stats.kind === 'weapon'
+      ? !!findArmorByName(name)
+      : !!findWeaponByName(name); // armor/dog_armor forge must not be named like a catalog weapon
+    if (endsWithKindWord || collidesCrossKind) return null;
     return { name, description };
   } catch {
     return null;

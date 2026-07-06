@@ -31,10 +31,11 @@ import {
   validateFusionResponse,
   synthesizeFusionViaQwen,
   applyFusion,
+  synthesizeFusionNameViaQwen,
   fusionInputHash,
   type FusionSynthEngine,
 } from '../app/engine/itemFusion';
-import type { InventoryItem } from '../app/engine/types';
+import type { InventoryItem, UniqueItemStats } from '../app/engine/types';
 
 function inferred(name: string, tags: string[], opts: Partial<InventoryItem> = {}): InventoryItem {
   return {
@@ -364,5 +365,30 @@ describe('OTA-195 fusionInputHash — deterministic by sorted names', () => {
     const a = [inferred('Alpha', ['metal']), inferred('Beta', ['fiber']), inferred('Gamma', ['organic'])];
     const c = [inferred('Alpha', ['metal']), inferred('Beta', ['fiber']), inferred('Delta', ['stone'])];
     expect(fusionInputHash(a)).not.toBe(fusionInputHash(c));
+  });
+});
+
+describe('OTA-704 — Qwen fusion name is sanitized against generic / cross-kind names', () => {
+  const armorStats: UniqueItemStats = {
+    kind: 'armor', rarity: 'Legendary', acBonus: 5, armorSlot: 'head',
+    durability: { current: 45, max: 45 },
+  } as unknown as UniqueItemStats;
+  const inputs = [inferred('Aetheric Cog', ['aether', 'metal'])];
+  const reply = (name: string) => JSON.stringify({ name, description: 'A ward of humming aether-plate.' });
+
+  it('rejects "Aetheric Armor" (a real runecaster WEAPON) for an armor forge → falls back', async () => {
+    const q = new MockQwen(true, reply('Aetheric Armor'));
+    expect(await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether', 'metal'], q)).toBeNull();
+  });
+
+  it('rejects a bare "<theme> Armor" name (ends with the literal kind word)', async () => {
+    const q = new MockQwen(true, reply('Woven Armor'));
+    expect(await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether'], q)).toBeNull();
+  });
+
+  it('accepts a distinct structured name that does not collide', async () => {
+    const q = new MockQwen(true, reply('Resonant Aegis'));
+    const out = await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether'], q);
+    expect(out?.name).toBe('Resonant Aegis');
   });
 });

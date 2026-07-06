@@ -15727,4 +15727,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chain Mud Fragment →(×3) Mudstone →(2+1 Aether Dust) Hardened Mudstone → gear. Pairs with the
 // OTA-702 exact-name fix so "craft Mudstone"/"craft Hardened Mudstone" both resolve right. Data-
 // only recipe add + test. JS/JSON-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-06-703-hardened-mudstone-recipe';
+// OTA-704 — fused armor mis-named + mis-filed. Two forged armors both came out named the generic
+// "Aetheric Armor" and sat in the WEAPONS section. Root: the Qwen namer emitted that bland name,
+// which is ALSO an authored runecaster WEAPON in weapons.json — so on every load itemBackfill
+// name-matched it, merged the weapon's runecaster/rune_power/ward tags, clobbered the forged
+// description, and name-resolution read it as a weapon. Three fixes: (1) itemBackfill NEVER
+// restamps a fused item from the catalog (protects existing saves on load); (2) categorizeItem
+// trusts uniqueStats.kind (the forge's shape) over a stale top-level item.kind, so a fused armor
+// files under Armor; (3) the Qwen forge-namer rejects a name that ends in the literal kind word
+// ("… Armor") or collides with a catalog item of a DIFFERENT kind, falling back to the distinct
+// deterministic name ("Resonant Aegis"). New/extended fusion tests (11). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-704-fused-armor-name-and-category';
