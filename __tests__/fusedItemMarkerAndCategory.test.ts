@@ -34,6 +34,18 @@ describe('fused item category + marker (OTA-688)', () => {
     expect(categorizeItem(fusedWeapon)).toBe('weapon');
   });
 
+  it('OTA-704 — a fused armor whose top-level kind is stale ("weapon") still files under Armor via uniqueStats.kind', () => {
+    // The reported bug: two "Aetheric Armor" pieces equipped to the head slot
+    // (uniqueStats.kind 'armor', AC bonus) but the top-level item.kind read 'weapon',
+    // so they scattered into Weapons. uniqueStats.kind is the forge's ground truth.
+    const mismatched: InventoryItem = {
+      id: 'fused_mm', name: 'Aetheric Armor', kind: 'weapon', quantity: 1, rarity: 'Legendary',
+      tags: ['fused', 'unique', 'aetheric'],
+      uniqueStats: { kind: 'armor', rarity: 'Legendary', armorSlot: 'head', acBonus: 5, durability: { current: 45, max: 45 } } as unknown as UniqueItemStats,
+    } as InventoryItem;
+    expect(categorizeItem(mismatched)).toBe('armor');
+  });
+
   it('the deep-link category (item.kind) now matches where the item actually renders', () => {
     // settleFusion opens the section by item.kind; categorizeItem must agree or the
     // "View in inventory" highlight lands on an empty section.

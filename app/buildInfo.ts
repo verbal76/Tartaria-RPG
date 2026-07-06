@@ -15501,4 +15501,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-686 — Hardened Mudstone now craftable (ports Tartaria OTA-703). Was loot-only, walling
 // Mudstone Bulwark + other recipes; added 2 Mudstone + 1 Aether Dust -> 1 Hardened Mudstone per
 // the material lore, completing the foraged mud chain. Data-only recipe add + test.
-export const OTA_BUILD_ID = '2026-07-06-686-hardened-mudstone-recipe';
+// OTA-687 — fused armor mis-named/mis-filed (ports Tartaria OTA-704). The Qwen namer emitted the
+// generic "Aetheric Armor", which is ALSO an authored runecaster WEAPON, so itemBackfill re-tagged
+// + re-described the forged armor on load and it filed under Weapons. Fixes: itemBackfill never
+// restamps a fused item from the catalog; categorizeItem trusts uniqueStats.kind; the forge-namer
+// rejects a name ending in the kind word or colliding cross-kind. Fusion tests (11).
+export const OTA_BUILD_ID = '2026-07-06-687-fused-armor-name-and-category';
