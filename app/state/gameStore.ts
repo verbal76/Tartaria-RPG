@@ -26084,7 +26084,7 @@ function handleGolemCommand(
   if (enemies.length === 0) {
     get().appendLog(
       'world',
-      `The ${golem.name} braces, scans the room, finds no enemy. The Aetheric thrum settles.`,
+      `${golem.name} braces, scans the room, finds no enemy. The Aetheric thrum settles.`,
     );
     return;
   }
@@ -26250,7 +26250,7 @@ function handleGolemCommand(
   } else {
     get().appendLog(
       'world',
-      `The ${golem.name}'s strike sails wide of ${target.name}.`,
+      `${golem.name}'s strike sails wide of ${target.name}.`,
     );
   }
 
@@ -26287,7 +26287,7 @@ function handleGolemCommand(
     if (newGolemHp <= 0) {
       get().appendLog(
         'world',
-        `The ${golem.name} stills, then crumbles back into ${golem.kind === 'mud_golem' ? 'mud' : golem.kind === 'iron_golem' ? 'iron filings' : golem.kind === 'aether_golem' ? 'a fading aetheric afterimage' : 'a scatter of crystal shards'}.`,
+        `${golem.name} stills, then crumbles back into ${golem.kind === 'mud_golem' ? 'mud' : golem.kind === 'iron_golem' ? 'iron filings' : golem.kind === 'aether_golem' ? 'a fading aetheric afterimage' : 'a scatter of crystal shards'}.`,
       );
       // arb170 — INERT CORE. If the golem had trained anything, it leaves a core
       // carrying HALF its levels; feed it to a new golem to graft them on. So a

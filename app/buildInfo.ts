@@ -15488,4 +15488,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player most recently interacted with, so "the hatch" in a two-hatch room resolves to the one
 // just touched (array-order fallback unchanged). (3) ARBITER REPEAT: on-target room-flavor line
 // now uses rotatingPick (anti-repeat) instead of plain pick(). New parser suite (5).
-export const OTA_BUILD_ID = '2026-07-06-682-hook-take-and-parser-polish';
+// OTA-683 — golem-name article, the rest of the family (ports Tartaria OTA-700). OTA-681 fixed the
+// KILL line; the same "The ${golem.name}" leak lived in the MISS ("The Bob's strike sails wide"),
+// the no-enemy brace, and the dismiss/crumble line. All now use the bare proper name. JS-only.
+export const OTA_BUILD_ID = '2026-07-06-683-golem-name-article-rest';
