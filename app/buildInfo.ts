@@ -15498,4 +15498,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-685 — craft-by-exact-name (ports Tartaria OTA-702). "craft Mudstone" matched "Mudstone
 // Bulwark" (needs Hardened Mudstone) instead of the recipe whose result IS "Mudstone" (the refine).
 // findRecipeByResult now returns an EXACT result-name match before any substring/fuzzy pass.
-export const OTA_BUILD_ID = '2026-07-06-685-craft-exact-name-match';
+// OTA-686 — Hardened Mudstone now craftable (ports Tartaria OTA-703). Was loot-only, walling
+// Mudstone Bulwark + other recipes; added 2 Mudstone + 1 Aether Dust -> 1 Hardened Mudstone per
+// the material lore, completing the foraged mud chain. Data-only recipe add + test.
+export const OTA_BUILD_ID = '2026-07-06-686-hardened-mudstone-recipe';

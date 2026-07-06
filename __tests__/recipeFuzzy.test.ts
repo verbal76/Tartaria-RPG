@@ -32,6 +32,14 @@ describe('findRecipeByResult — fuzzy / typo tolerance', () => {
     expect(findRecipeByResult('Mudstone Bulwark')?.result).toBe('Mudstone Bulwark');
   });
 
+  it('OTA-703 — Hardened Mudstone is now craftable (was loot-only)', () => {
+    const hm = findRecipeByResult('Hardened Mudstone');
+    expect(hm?.result).toBe('Hardened Mudstone');
+    const ing = Object.fromEntries((hm?.ingredients ?? []).map((i) => [i.name, i.quantity]));
+    expect(ing['Mudstone']).toBe(2);
+    expect(ing['Aether Dust']).toBe(1);
+  });
+
   it('resolves hyphen-stripped input (parser folds "-" to a space)', () => {
     // Regression: "craft Aether-Shard Spear" reaches the engine as
     // "aether shard spear" (the input normalizer strips hyphens). Before the
