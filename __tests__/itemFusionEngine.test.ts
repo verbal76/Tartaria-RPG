@@ -32,6 +32,9 @@ import {
   synthesizeFusionViaQwen,
   applyFusion,
   synthesizeFusionNameViaQwen,
+  fusedNameCollidesCrossKind,
+  deterministicFusedName,
+  migrateFusedName,
   fusionInputHash,
   type FusionSynthEngine,
 } from '../app/engine/itemFusion';
@@ -386,5 +389,30 @@ describe('OTA-704 — Qwen fusion name is sanitized against generic / cross-kind
   it('accepts a distinct structured name', async () => {
     const out = await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether'], new MockQwen(true, reply('Resonant Aegis')));
     expect(out?.name).toBe('Resonant Aegis');
+  });
+});
+
+
+describe('OTA-706 — one-time rename of collided fused item names', () => {
+  const fusedArmor = (id, name) => ({
+    id, name, kind: 'armor', quantity: 1, rarity: 'Legendary', tags: ['fused', 'unique', 'aetheric'],
+    description: 'A legendary armor.',
+    uniqueStats: { kind: 'armor', rarity: 'Legendary', armorSlot: 'head', acBonus: 5, damageType: 'aetheric', durability: { current: 45, max: 45 } },
+  });
+  it('detects a fused armor named like a catalog WEAPON', () => {
+    expect(fusedNameCollidesCrossKind(fusedArmor('a1', 'Aetheric Armor'))).toBe(true);
+    expect(fusedNameCollidesCrossKind(fusedArmor('a2', 'Resonant Aegis'))).toBe(false);
+  });
+  it('deterministicFusedName is stable, distinct, non-colliding', () => {
+    const n1 = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor'));
+    expect(n1).toBe(deterministicFusedName(fusedArmor('a1', 'Aetheric Armor')));
+    expect(n1).not.toBe('Aetheric Armor');
+    expect(n1).not.toBe(deterministicFusedName(fusedArmor('a2', 'Aetheric Armor')));
+    expect(fusedNameCollidesCrossKind({ ...fusedArmor('a1', n1) })).toBe(false);
+  });
+  it('migrateFusedName renames a collider and is idempotent', () => {
+    const m = migrateFusedName(fusedArmor('a1', 'Aetheric Armor'));
+    expect(m.name).not.toBe('Aetheric Armor');
+    expect(migrateFusedName(m)).toBe(m);
   });
 });

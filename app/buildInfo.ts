@@ -17099,4 +17099,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-07-06-995 — fused armor showed a 1d10 offensive line (ports Tartaria OTA-705).
 // resolveDisplayWeapon fell through to the name catalog for a non-weapon fused piece. Fused items
 // now resolve ONLY from uniqueStats, never the name catalog. Tests (2).
-export const OTA_BUILD_ID = '2026-07-06-995-fused-display-no-catalog-fallthrough';
+// 2026-07-06-996 — one-time rename of already-forged fused items whose name cross-kind-collides
+// with a catalog row (ports Tartaria OTA-706). On load, re-minted to a distinct, non-colliding
+// deterministic name (stable per id). Idempotent. Migration helpers + tests.
+export const OTA_BUILD_ID = '2026-07-06-996-fused-name-collision-migration';
