@@ -15506,4 +15506,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // + re-described the forged armor on load and it filed under Weapons. Fixes: itemBackfill never
 // restamps a fused item from the catalog; categorizeItem trusts uniqueStats.kind; the forge-namer
 // rejects a name ending in the kind word or colliding cross-kind. Fusion tests (11).
-export const OTA_BUILD_ID = '2026-07-06-687-fused-armor-name-and-category';
+// OTA-688 — fused armor showed a 1d10 offensive line (ports Tartaria OTA-705). resolveDisplayWeapon
+// fell through to the name catalog for a non-weapon fused piece, hitting the runecaster weapon
+// "Aetheric Armor". Fused items now resolve ONLY from uniqueStats, never the name catalog. Tests (2).
+export const OTA_BUILD_ID = '2026-07-06-688-fused-display-no-catalog-fallthrough';
