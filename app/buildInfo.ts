@@ -17096,4 +17096,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // forged armor on load and it filed under Weapons. Fixes: itemBackfill never restamps a fused item
 // from the catalog; categorizeItem trusts uniqueStats.kind; forge-namer rejects kind-word/cross-kind
 // collisions. Fusion tests (11).
-export const OTA_BUILD_ID = '2026-07-06-994-fused-armor-name-and-category';
+// 2026-07-06-995 — fused armor showed a 1d10 offensive line (ports Tartaria OTA-705).
+// resolveDisplayWeapon fell through to the name catalog for a non-weapon fused piece. Fused items
+// now resolve ONLY from uniqueStats, never the name catalog. Tests (2).
+export const OTA_BUILD_ID = '2026-07-06-995-fused-display-no-catalog-fallthrough';
