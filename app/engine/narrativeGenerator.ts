@@ -807,7 +807,11 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     // actually KNOWING what they're at.
     const locPool = getLocationFlavors()[ctx.location.id];
     if (locPool && locPool.length > 0 && Math.random() < 0.6) {
-      return `The Arbiter glances at the ${n}. "${pick(locPool)}"`;
+      // OTA-699 — was plain pick() (no anti-repeat), so the same room-flavor line
+      // ("This is the room where the disaster was managed…") recurred verbatim on
+      // every investigate. rotatingPick round-robins with an avoid-last guard, and
+      // shares the SAME key as the default branch below so both drain one cursor.
+      return `The Arbiter glances at the ${n}. "${rotatingPick(locPool, `arbiter.loc.${ctx.location.id}`)}"`;
     }
     // Otherwise a short defer-to-player line that names the noun
     // without pretending to know more than it does. Three options

@@ -6664,6 +6664,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .flatMap((h) => h.nouns),
       ambientNouns: currentScene.ambientNouns ?? [],
       vendorName: currentScene.vendor?.name,
+      // OTA-699 — recency tiebreak for ambiguous bare nouns ("the hatch" when the
+      // room has two hatches) → resolve to the one the player just interacted with.
+      lastInteractedNoun: get().lastInteractedNoun,
     };
     // Whisper-chain command short-circuit. The Yulka chain offers
     // three branches when the player meets her ('accept yulka',
@@ -12714,6 +12717,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // 2026-05-24 — flavored refusal line in place of the old
               // diagnostic. Salvage hint included in some lines.
               get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
+              break;
+            }
+          }
+          // OTA-698 — `take <hook noun>` honors the Arbiter's "take it" nudge. A
+          // story HOOK (e.g. the whisper-crystal) isn't a ground/ambient item, so
+          // pickup found nothing and dead-ended — even though the chain literally
+          // lifts an item ("You pry the crystal loose" → Aether Crystal). With no
+          // ground match, advance an unresolved hook one step. Skip PUZZLE hooks
+          // (they need their own verbs) and never fire mid-fight.
+          if (target && currentScene.hooks && currentScene.hooks.length > 0 && currentScene.enemies.length === 0) {
+            const pickupHook = matchHookNoun(target.toLowerCase(), currentScene.hooks);
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { puzzleFor } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
+            if (pickupHook && !pickupHook.resolved && !puzzleFor(pickupHook.kind)) {
+              get().appendLog('debug', `route: hook intercept via pickup (kind=${pickupHook.kind}, target="${target}")`);
+              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+              resolveHookOneStep(pickupHook, get, set, target.toLowerCase());
+              void get().persist();
               break;
             }
           }
