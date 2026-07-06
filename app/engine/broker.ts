@@ -99,6 +99,29 @@ export function brokerMissionLine(
   return `Broker an Alliance: two leaders wait at the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`;
 }
 
+/** OTA-701 — SHORT standing reminder for the look-around / scene-entry feed. The
+ *  full brokerMissionLine (both demands + locations + the SEAL command) is right
+ *  the first time and on the Contracts card, but reprinting the whole paragraph on
+ *  every `look` is noise (playtester: "every look triggers the full mission
+ *  dialogue"). This condenses to name + progress + the single next step. */
+export function brokerMissionShortLine(
+  m: BrokerMission | null | undefined,
+  has: (itemName: string) => boolean,
+  tileName: (tileId: string) => string,
+): string | null {
+  if (!m || m.done) return null;
+  const legs = missionLegs(m);
+  if (!legs) return null;
+  const need = legs.filter((l) => !has(l.itemName));
+  const inHand = legs.length - need.length;
+  if (need.length === 0) {
+    return `Broker an Alliance — all ${legs.length} relics in hand. SEAL THE ALLIANCE at the parley stone.`;
+  }
+  const next = need[0]!;
+  const more = need.length > 1 ? ` (+${need.length - 1} more)` : '';
+  return `Broker an Alliance — ${inHand}/${legs.length} relics. Next: ${next.itemName} at ${tileName(next.tileId)}${more}.`;
+}
+
 /** OTA-681 — gate for the store's parley-verb intercept (approach / examine /
  *  meet / … routed to handleBroker). The parley stone is an OUTDOOR feature of
  *  the parley_ground tile, and its verb list overlaps combat verbs — most

@@ -1445,7 +1445,10 @@ function activeMissionReminder(player: PlayerCharacter | null | undefined): stri
   const broker = require('../engine/broker');
   const has = (name: string) => player.inventory.some((i) => i.name === name);
   const tileName = (id: string) => getLocationById(id)?.name ?? id;
-  return broker.brokerMissionLine(player.brokerMission, has, tileName) as string | null;
+  // OTA-701 — SHORT line for the standing reminder (look-around + scene-entry). The
+  // FULL demands paragraph still prints on the offer, the accept, and the parley
+  // stone; the recurring reminder just names the mission + progress + next step.
+  return broker.brokerMissionShortLine(player.brokerMission, has, tileName) as string | null;
 }
 
 // OTA-350 — throttle the Arbiter's "consider stealth" nudge so it's an
@@ -11335,7 +11338,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Otherwise normal concept lookup.
         const concept = findConcept(lookup);
         if (concept) {
-          get().appendLog('arbiter', `"${concept.title}." the ${getNarratorName()} says. "${concept.answer}"`);
+          get().appendLog('arbiter', `"${concept.title}," the ${getNarratorName()} says. "${concept.answer}"`);
           break;
         }
         // OTA-233 — MiniLM lore lookup. The keyword findConcept covers
@@ -13565,7 +13568,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const list = missing.map((m) => `${m.quantity}× ${m.name}`).join(', ');
           get().appendLog(
             'arbiter',
-            `"Not yet." the ${getNarratorName()} says. "${recipe.result} needs ${list}."`,
+            `"Not yet," the ${getNarratorName()} says. "${recipe.result} needs ${list}."`,
           );
           break;
         }

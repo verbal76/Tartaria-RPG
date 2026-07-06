@@ -17081,4 +17081,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-07-06-990 — golem-name article, the rest of the family (ports Tartaria OTA-700). OTA-988
 // fixed the KILL line; the same "The ${golem.name}" leak lived in the MISS ("The Bob's strike sails
 // wide"), the no-enemy brace, and the dismiss/crumble line. All now use the bare proper name. JS-only.
-export const OTA_BUILD_ID = '2026-07-06-990-golem-name-article-rest';
+// 2026-07-06-991 — mission-reminder brevity + dialogue-tag punctuation (ports Tartaria OTA-701).
+// (1) The standing look/scene-entry reminder now uses a SHORT broker line (name + progress + next
+// step) instead of the full demands paragraph, which still prints on the offer/accept/parley.
+// (2) '"Not yet." the <narrator> says' → comma before the dialogue tag. New broker short-line tests.
+export const OTA_BUILD_ID = '2026-07-06-991-mission-reminder-short';
