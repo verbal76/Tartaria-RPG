@@ -425,7 +425,7 @@ export function InventoryScreen() {
     // Arbiter; we close the filter either way so the player can
     // see the world feed without re-tapping the slot.
     if (pouchFilterActive) {
-      stowInPouch(item.name);
+      stowInPouch(item.name, item.id);
       setPouchFilterActive(false);
       return;
     }
@@ -1256,7 +1256,7 @@ function ToolPouchBanner({
               <TouchableOpacity
                 style={pouchStyles.slotFilled}
                 activeOpacity={0.7}
-                onPress={() => unpouchItem(slot.name!)}
+                onPress={() => unpouchItem(slot.name!, slot.id ?? undefined)}
               >
                 <Text style={pouchStyles.slotName} numberOfLines={1}>{slot.name}</Text>
                 <Text style={pouchStyles.slotAction}>tap to unstow</Text>
@@ -1347,11 +1347,11 @@ function BandolierBanner({
   const BANDOLIER_MAX = 5;
   const ids = player.equipped?.bandolierIds ?? [];
   const removeFromBandolier = useGameStore((s) => s.removeFromBandolier);
-  const slots: Array<{ name: string | null; qty: number }> = [];
+  const slots: Array<{ name: string | null; qty: number; id: string | null }> = [];
   for (let i = 0; i < BANDOLIER_MAX; i++) {
     const id = ids[i];
     const item = id ? player.inventory.find((it) => it.id === id) : undefined;
-    slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0 });
+    slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0, id: id ?? null });
   }
   return (
     <View style={bandolierStyles.banner}>
@@ -1364,7 +1364,7 @@ function BandolierBanner({
               <TouchableOpacity
                 style={bandolierStyles.slotFilled}
                 activeOpacity={0.7}
-                onPress={() => removeFromBandolier(slot.name!)}
+                onPress={() => removeFromBandolier(slot.name!, slot.id ?? undefined)}
               >
                 <Text style={bandolierStyles.slotName} numberOfLines={1}>
                   {slot.name}{slot.qty > 1 ? ` ×${slot.qty}` : ''}

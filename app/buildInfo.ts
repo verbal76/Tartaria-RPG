@@ -15459,4 +15459,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // thrown-coating burst line now names the type match ("5 electrical (1/turn × 3, electrical-weak)")
 // so the leading damage reconciles with the perTurn×turns math instead of looking like a bug.
 // New grammar suite (8). JS-only → OTA-safe.
-export const OTA_BUILD_ID = '2026-07-05-678-grammar-and-coating-display';
+// OTA-679 — operate on the EXACT item instance, not the first-by-name. Closes the
+// "wrong same-named copy" bug class. (1) stowInPouch now pouches the first UN-pouched
+// instance (mirrors the OTA-690 bandolier fix) so a SECOND same-named tool (two torches,
+// two scanners) can be stowed instead of bouncing off "already on your belt". (2)
+// sellToVendor resolves the exact instance the shop row points at (id-first) and refuses
+// only if THAT instance is worn — a spare sells even while an equipped copy of the same
+// name exists (the sell list already excluded worn gear by id; the action now honors it).
+// (3) sellToVendor/stowInPouch/unpouchItem/removeFromBandolier all take the instance id the
+// UI already holds, threaded from the vendor row + pouch/bandolier slots. New replumb suite
+// (5). JS-only → OTA-safe.
+export const OTA_BUILD_ID = '2026-07-06-679-item-instance-id-replumb';
