@@ -131,6 +131,7 @@ import {
   INVENTORY_CATEGORIES,
 } from '../engine/askInventory';
 import { mergeOrPushItem, grantItem } from '../engine/inventory';
+import { maybeCombatBonus, maybeLoreHookBonus } from '../engine/bonusDrops';
 import {
   parseDirectionQuestion,
   findNamedByQuery,
@@ -15316,6 +15317,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
+    // OTA-716 — hard-won spoils. A long/tough fight occasionally coughs up a
+    // GOOD material ON TOP of the normal loot (never instead of it) — a
+    // Fallout-4-ish sprinkle that rewards the grind without touching the
+    // basic-drop flood. isHardWonFight gates on tanky/Rare+/boss enemies.
+    {
+      const combatBonus = maybeCombatBonus(enemy);
+      if (combatBonus) {
+        const look = lookupCraftedItem(combatBonus.name);
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: mergeOrPushItem(s.player.inventory, {
+              id: `bonus_${Date.now()}`,
+              name: combatBonus.name,
+              kind: look.kind,
+              rarity: look.rarity,
+              quantity: 1,
+              tags: [...look.tags, 'loot', 'bonus'],
+            }),
+          },
+        } : s));
+        get().appendLog('reward', `✦ Hard-won spoils — ${combatBonus.name} (${look.rarity}).`);
+      }
+    }
     // arb45 — Bane of Sentinels: count Architectural Sentinel / mechanical
     // kills toward the title (5 needed).
     {
@@ -22559,6 +22584,29 @@ function resolveHookOneStep(
   get().appendLog('world', `${stageLabel} — ${outcome.line}`);
   if (inlineSummaries.length > 0) {
     get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
+  }
+  // OTA-716 — reward for reading. Completing an easy-to-miss STORY THREAD
+  // occasionally yields a GOOD material on top of the thread's own payout —
+  // a sprinkle for the player who followed the lore instead of walking past.
+  if (outcome.done) {
+    const hookBonus = maybeLoreHookBonus();
+    if (hookBonus) {
+      const look = lookupCraftedItem(hookBonus.name);
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          inventory: mergeOrPushItem(s.player.inventory, {
+            id: `hookbonus_${Date.now()}`,
+            name: hookBonus.name,
+            kind: look.kind,
+            rarity: look.rarity,
+            quantity: 1,
+            tags: [...look.tags, 'loot', 'bonus'],
+          }),
+        },
+      } : s));
+      get().appendLog('reward', `✦ For your persistence — ${hookBonus.name} (${look.rarity}).`);
+    }
   }
   if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);
   // Advance hook stage / mark resolved. Fold any newly-revealed nouns

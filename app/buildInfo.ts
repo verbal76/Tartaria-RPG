@@ -15806,4 +15806,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // DISCORD the per-enemy authored trait wins. Applied to every damage path (melee/throw/cast/golem/dog +
 // coatings); one reconciled resist/weak message; the swap-nag now only suggests types the enemy does
 // NOT resist. +10 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-715-damage-type-reconcile';
+// OTA-716 — bonus "good material" sprinkle (reward for engagement, Fallout-4 cadence). ADDITIVE only —
+// never substitutes the basic-drop flood. Two moments: (1) a HARD-WON fight (tanky / Rare+ / boss enemy)
+// has a ~22% chance to cough up a bonus material on top of normal loot ("Hard-won spoils — X"); (2) a
+// COMPLETED story thread has a ~40% chance to reward the reading ("For your persistence — X"). Materials
+// only; tiers skew Uncommon > Rare > rare Legendary. New engine/bonusDrops.ts (tunable knobs) + 11 tests.
+export const OTA_BUILD_ID = '2026-07-07-716-bonus-material-drops';
