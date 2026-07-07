@@ -435,6 +435,32 @@ const GENERIC_VARIANTS: readonly string[] = [
   'The {noun} sits the way ordinary things sit. The Arbiter does not lean in. You move on.',
 ];
 
+// OTA-711 — fixed-feature generic pool. The GENERIC_VARIANTS above lean on
+// HANDHELD phrasing ("turn the {noun} in your hands", "weigh the {noun}",
+// "you let it go") which reads as nonsense on architecture the player can't
+// pick up — playtest log: `investigate stair` → "You turn the stair in your
+// hands." Nouns that classify as fixed features (a stair, wall, hatch,
+// landing, anchor bolt, doorframe …) draw from this posture-agnostic pool
+// instead: every line works whether the thing is a pebble or a staircase.
+const FIXED_FEATURE_VARIANTS: readonly string[] = [
+  'You look the {noun} over where it sits. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.',
+  'You study the {noun} and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
+  'The {noun} reads as ordinary, which down here is a small kind of relief. You leave it be.',
+  'You run a hand along the {noun}. Cold, set fast in place, and about as talkative as the rest of the buried world.',
+  'You give the {noun} a long look. It returns the gesture by being exactly what it appears to be — no more, no less.',
+  'The {noun} resists your reading. Not hostile — just closed. Some things in the buried world don\'t open for the curious.',
+  'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.',
+  'The {noun} keeps its silence, and it isn\'t going anywhere for you to press it. The Arbiter does not lean in. You move on.',
+];
+
+// Architecture / terrain / fixed-in-place features — things you investigate
+// but cannot lift. Substring match on the lowered noun so "mud-glazed engine
+// room toolbench" and "warped hatch frame" both classify. Kept deliberately
+// broad; a false positive just means a fixed-feature-flavored line for a
+// portable object, which still reads fine (the reverse — handheld phrasing on
+// a wall — is the bug we're closing).
+const FIXED_FEATURE_RE = /\b(stair|stairs|stairway|stairwell|step|steps|landing|wall|walls|floor|ceiling|roof|dome|vault|arch|archway|pillar|column|colonnade|buttress|beam|girder|scaffold|scaffolding|rafter|threshold|doorway|doorframe|door|gate|gateway|portcullis|hatch|frame|hinge|lintel|alcove|niche|ledge|shelf|banister|balustrade|railing|rail|ramp|bridge|shaft|well|cistern|basin|trough|hearth|chimney|flue|furnace|forge|kiln|anvil|toolbench|workbench|bench|counter|altar|dais|plinth|pedestal|statue|monument|mural|fresco|relief|carving|engraving|inscription|glyph[- ]?wall|bolt|anchor|rivet|bracket|clamp|coil|pipe|conduit|duct|vent|grate|grille|drain|sluice|gap|crack|fissure|crevice|rubble|masonry|brickwork|stonework|foundation|slab|flagstone|cobble|tile|floortile|paving|road|path|track|trail|ground|earth|silt|mud|bank|embankment|wall-panel|panel|bulkhead|corridor|passage|tunnel|chamber|room|floorplate|platform|tower|spire|steeple|buttress)\b/i;
+
 /** Resolve the lore line for an entry. Returns the cached
  *  loreLine if set; otherwise picks from the category's
  *  CREEPY_VARIANTS at the OTA-080 creepy rate (deterministic
@@ -461,8 +487,14 @@ export function resolveLore(entry: InvestigationEntry): string {
   } else if (entry.category === 'generic') {
     // OTA-125 — generic-category variant pool. Deterministic per
     // noun so the same noun stays consistent across re-reads.
-    const idx = nounSeed(entry.noun.toLowerCase()) % GENERIC_VARIANTS.length;
-    line = GENERIC_VARIANTS[idx]!;
+    // OTA-711 — fixed features (stair, wall, hatch …) draw from the
+    // posture-agnostic pool so we never narrate "you turn the stair in
+    // your hands." Portable/unclassified nouns keep the original pool.
+    const pool = FIXED_FEATURE_RE.test(entry.noun.toLowerCase())
+      ? FIXED_FEATURE_VARIANTS
+      : GENERIC_VARIANTS;
+    const idx = nounSeed(entry.noun.toLowerCase()) % pool.length;
+    line = pool[idx]!;
   } else {
     line = tmpl.fallbackLore;
   }

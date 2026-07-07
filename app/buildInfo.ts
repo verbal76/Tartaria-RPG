@@ -15773,4 +15773,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (ring/pray/touch/tilt/answer/shout/…) plus a fallback so knock + gesture verbs that DON'T land on an
 // active hook emit a thematic backstory-fill line instead of dead-ending — "if there's a call to
 // action, it has to do something." New engine/callToAction.ts + 14 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-710-scene-interaction-dead-ends';
+// OTA-711 — three playtest glitches. (1) INVESTIGATE flavor stopped narrating "you turn the stair in
+// your hands" — fixed features (stair/wall/hatch/landing/…) now draw a posture-agnostic flavor pool
+// instead of the handheld generic one. (2) The aetherkin_mourner travel encounter's dare ("reach for
+// a coin and you will not reach it twice") now MAKES GOOD ON THE THREAT: reach/take/steal/disturb/
+// attack the coins or the kin spawns the hostile Aetherkin + a corruption tick, instead of dead-ending
+// on an unknown verb or resolving the noun to a relic in the pack. (3) The "use <item>" nudge no longer
+// misfires on a loose fuzzy match ("disturb the aetherkin" → "Try: use flame of aether"); it now needs
+// a whole-word overlap. New engine flag aetherkinCoinPending + 16 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-711-aetherkin-and-investigate-flavor';
