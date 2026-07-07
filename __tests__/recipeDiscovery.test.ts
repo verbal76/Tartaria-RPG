@@ -21,9 +21,31 @@ function seq(values: number[]): () => number {
 describe('OTA-718 — isDiscoverableRecipe (rare/legendary results are locked)', () => {
   it('true for a Legendary-result recipe, false for a Common one', () => {
     expect(isDiscoverableRecipe({ result: 'Aetheric Spear (Legendary)' })).toBe(true); // Legendary
-    expect(isDiscoverableRecipe({ result: 'Golem Greatsword' })).toBe(true);           // Rare
+    expect(isDiscoverableRecipe({ result: 'Mudstone' })).toBe(true);                    // Rare (normal loot recipe)
     expect(isDiscoverableRecipe({ result: 'Iron Spear' })).toBe(false);                // Common
     expect(isDiscoverableRecipe({ result: 'First Aid Kit' })).toBe(false);             // basic consumable
+  });
+});
+
+describe('OTA-718 — golem/sidekick weapon route is NOT swept into discovery', () => {
+  it('golem armaments (coresRequired + golem_weapon) stay non-discoverable', () => {
+    // These are Rare, but they unlock via the Core-forge questline, not loot —
+    // gating them behind knownRecipes would double-lock them. Keep them out.
+    for (const n of ['Golem Sledge', 'Golem Greatsword', 'Golem Pike', 'Golem Aether-Lance']) {
+      expect(isDiscoverableRecipe({ result: n })).toBe(false);
+      // ...and therefore always "unlocked" as far as the knowledge gate is concerned.
+      expect(recipeIsUnlockedFor({ result: n }, [])).toBe(true);
+    }
+    // The real recipe rows carry coresRequired:4 — the extra belt-and-suspenders guard.
+    const golem = RECIPES.filter((r) => r.result.startsWith('Golem '));
+    expect(golem.length).toBeGreaterThan(0);
+    for (const r of golem) expect(isDiscoverableRecipe(r)).toBe(false);
+  });
+  it('a hard-won reward never teaches a golem armament', () => {
+    // pickRecipeToLearn draws only from the discoverable pool, so the core-route
+    // weapons can never leak in as a random drop.
+    const pool = unknownDiscoverableRecipes(RECIPES, []);
+    expect(pool.some((n) => n.startsWith('Golem '))).toBe(false);
   });
 });
 
@@ -33,17 +55,20 @@ describe('OTA-718 — recipeIsUnlockedFor', () => {
     expect(recipeIsUnlockedFor({ result: 'Climbing Rope' }, [])).toBe(true);
   });
   it('a discoverable recipe is locked until learned', () => {
-    expect(recipeIsUnlockedFor({ result: 'Golem Greatsword' }, [])).toBe(false);
-    expect(recipeIsUnlockedFor({ result: 'Golem Greatsword' }, ['Golem Greatsword'])).toBe(true);
+    expect(recipeIsUnlockedFor({ result: 'Mudstone' }, [])).toBe(false);
+    expect(recipeIsUnlockedFor({ result: 'Mudstone' }, ['Mudstone'])).toBe(true);
   });
 });
 
 describe('OTA-718 — grandfather + unknown set', () => {
   it('marks an owned discoverable result as known (no retroactive loss)', () => {
-    const known = grandfatheredKnownRecipes(RECIPES, ['Golem Greatsword', 'Scrap Metal'], undefined);
-    expect(known).toContain('Golem Greatsword');
+    const known = grandfatheredKnownRecipes(RECIPES, ['Mudstone', 'Scrap Metal'], undefined);
+    expect(known).toContain('Mudstone');
     // A basic result you own does NOT get added (it was never gated).
     expect(known).not.toContain('Iron Spear');
+    // A golem armament you own is NOT swept in either — it has its own route.
+    const known2 = grandfatheredKnownRecipes(RECIPES, ['Golem Greatsword'], undefined);
+    expect(known2).not.toContain('Golem Greatsword');
   });
   it('unknownDiscoverableRecipes shrinks as you learn', () => {
     const allUnknown = unknownDiscoverableRecipes(RECIPES, []);
