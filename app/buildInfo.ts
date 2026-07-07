@@ -15550,4 +15550,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New combineDamageTypeMatch: type + trait STACK when they agree (x0.25) but on a DISCORD the authored
 // trait wins. Applied to every damage path; one reconciled message; swap-nag only suggests non-resisted
 // types. +10 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-698-damage-type-reconcile';
+// OTA-699 — bonus "good material" sprinkle (ports Tartaria OTA-716). ADDITIVE only: a hard-won fight
+// (~22%) or a completed story thread (~40%) occasionally drops a bonus material on top of normal loot
+// ("Hard-won spoils" / "For your persistence"). Materials only; tiers skew Uncommon > Rare > rare
+// Legendary. New engine/bonusDrops.ts + 11 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-699-bonus-material-drops';
