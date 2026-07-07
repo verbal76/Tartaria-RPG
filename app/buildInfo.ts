@@ -15811,4 +15811,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // has a ~22% chance to cough up a bonus material on top of normal loot ("Hard-won spoils — X"); (2) a
 // COMPLETED story thread has a ~40% chance to reward the reading ("For your persistence — X"). Materials
 // only; tiers skew Uncommon > Rare > rare Legendary. New engine/bonusDrops.ts (tunable knobs) + 11 tests.
-export const OTA_BUILD_ID = '2026-07-07-716-bonus-material-drops';
+// OTA-717 — crafted ropes (and any worn durability TOOL) work again. grantItem treated misc-kind items
+// as "always stackable," but Climbing Rope / Pry Bar / torch / compass are kind:'misc' AND carry
+// durability — so a freshly-crafted 150/150 rope merged into a worn 15/150 stack, the merge kept the
+// worn row's durability, and the new full durability vanished ("I crafted a rope but still can't
+// climb"). Now a durability-tracked item merges ONLY when both copies are full (same rule weapons/armor
+// use), so a fresh tool stays its own row and the climb picks it. Self-heals on next craft. +4 tests.
+export const OTA_BUILD_ID = '2026-07-07-717-durability-tool-merge-fix';
