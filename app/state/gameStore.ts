@@ -1832,9 +1832,20 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // a race-proportional roll (Giants 0, constructs low, Mud Dwellers/Reclaimers
   // high) so existing characters get a sensible Stealth instead of undefined.
   const stats = { ...p.stats, stealth: p.stats?.stealth ?? rrs(p.raceId) };
+  // OTA-1008 — grandfather LEARNED recipes. Any discoverable (rare/legendary-
+  // result) recipe whose result the player already OWNS is marked known, so
+  // the new locked-recipe feature never retroactively removes access to
+  // something they've already made or found. Undiscovered ones stay locked.
+  // Uses the LIVE content-pack recipe table (getRecipes) — lore-agnostic.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getRecipes: _getRecipes } = require('../engine/crafting') as typeof import('../engine/crafting');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { grandfatheredKnownRecipes: _gkr } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+  const knownRecipes = _gkr(_getRecipes(), inventory.map((i) => i.name), p.knownRecipes);
   return {
     ...p,
     stats,
+    knownRecipes,
     currentLocationId: safeLocationId,
     inventory,
     staminaMax: stamMax,
@@ -8268,6 +8279,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
           narratePossibleDirections(get, set, currentScene);
           break;
         }
+        // OTA-1008 — reward for reading: investigating a RECIPE / blueprint /
+        // schematic / notes / plans noun teaches a random cool (rare/legendary)
+        // recipe you don't know yet. Dedup per room-noun (marks it read) so it
+        // isn't farmable; once there's nothing new to learn here it falls
+        // through to the normal investigate flavor. Pulls from the LIVE content-
+        // pack recipe table (getRecipes) — lore-agnostic.
+        {
+          const noteNoun = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { RECIPE_NOTE_RE, pickRecipeToLearn } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+          if (noteNoun && RECIPE_NOTE_RE.test(noteNoun)) {
+            const noteRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+            const noteLower = noteNoun.toLowerCase();
+            const alreadyRead = (get().worldMemory.visitedRooms?.[noteRoomKey]?.flavorExhaustedNouns ?? []).some((n) => n === noteLower);
+            if (!alreadyRead) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { getRecipes } = require('../engine/crafting') as typeof import('../engine/crafting');
+              const learned = pickRecipeToLearn(getRecipes(), get().player?.knownRecipes);
+              if (learned) {
+                set((s) => (s.player ? { player: { ...s.player, knownRecipes: [...(s.player.knownRecipes ?? []), learned] } } : s));
+                set((s) => {
+                  const r = s.worldMemory.visitedRooms?.[noteRoomKey] ?? { firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 1 };
+                  return { worldMemory: { ...s.worldMemory, visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [noteRoomKey]: { ...r, flavorExhaustedNouns: [...(r.flavorExhaustedNouns ?? []), noteLower] } } } };
+                });
+                set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.skillCheck), 0.25) });
+                get().appendLog('world', `You pore over the ${noteNoun}. Faded diagrams, a materials list, a maker's shorthand — enough to reconstruct the working.`);
+                get().appendLog('reward', `✦ Recipe learned: ${learned} (${lookupCraftedItem(learned).rarity})! Open Crafting to forge it.`);
+                void get().persist();
+                break;
+              }
+            }
+          }
+        }
         // OTA-228 — gate everything that follows (ambush + skill check
         // roll) behind the OTA-096 noun-already-exhausted dedup. Pre-
         // fix, the OTA-219 sporadic ambush rolled BEFORE the dedup
@@ -13672,6 +13716,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
+        // OTA-1008 — cool-recipe knowledge gate. A rare/legendary-result recipe
+        // is LOCKED until the player has FOUND it (player.knownRecipes). Basic
+        // (Common/Uncommon-result) recipes always pass. Placed before the INT/
+        // core gates so a locked recipe reads as "undiscovered," not "unmet req."
+        {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { recipeIsUnlockedFor } = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+          if (!recipeIsUnlockedFor(recipe, player.knownRecipes)) {
+            get().appendLog(
+              'arbiter',
+              `The ${getNarratorName()} shakes their head. "${recipe.result} — I know the name, but not the working. Find its recipe out in the ruins, then bring it to me."`,
+            );
+            break;
+          }
+        }
         // OTA-170 — INT-to-craft gate. Runecaster recipes (OTA-169)
         // are scientifically intensive per the Tartaria Prima spec —
         // only INT 11+ can assemble one. Engine reads
@@ -15789,6 +15848,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           },
         } : s));
         get().appendLog('reward', `✦ Hard-won spoils — ${combatBonus.name} (${look.rarity}).`);
+      }
+      // OTA-1008 — a hard-won fight can also cough up a cool RECIPE (rarer than
+      // the material sprinkle). The enemy carried a scrap of maker's shorthand.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { isHardWonFight } = require('../engine/bonusDrops') as typeof import('../engine/bonusDrops');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+      if (isHardWonFight(enemy) && Math.random() < rd.HARD_WON_RECIPE_CHANCE) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { getRecipes } = require('../engine/crafting') as typeof import('../engine/crafting');
+        const learned = rd.pickRecipeToLearn(getRecipes(), get().player?.knownRecipes);
+        if (learned) {
+          set((s) => (s.player ? { player: { ...s.player, knownRecipes: [...(s.player.knownRecipes ?? []), learned] } } : s));
+          get().appendLog('reward', `✦ Recipe recovered from the kill: ${learned} (${lookupCraftedItem(learned).rarity})! Open Crafting to forge it.`);
+        }
       }
     }
     // arb45 — Bane of Sentinels: count Architectural Sentinel / mechanical
@@ -23228,6 +23302,19 @@ function resolveHookOneStep(
         },
       } : s));
       get().appendLog('reward', `✦ For your persistence — ${hookBonus.name} (${look.rarity}).`);
+    }
+    // OTA-1008 — a completed thread can also reveal a cool RECIPE (the note the
+    // story led you to sometimes IS a maker's working). Rarer than the material.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+    if (Math.random() < rd.LORE_HOOK_RECIPE_CHANCE) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getRecipes } = require('../engine/crafting') as typeof import('../engine/crafting');
+      const learned = rd.pickRecipeToLearn(getRecipes(), get().player?.knownRecipes);
+      if (learned) {
+        set((s) => (s.player ? { player: { ...s.player, knownRecipes: [...(s.player.knownRecipes ?? []), learned] } } : s));
+        get().appendLog('reward', `✦ Recipe uncovered: ${learned} (${lookupCraftedItem(learned).rarity})! Open Crafting to forge it.`);
+      }
     }
   }
   if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);

@@ -3,6 +3,7 @@ import { getNarratorName } from '../engine/contentPack';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRecipes, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
+import { recipeIsUnlockedFor } from '../engine/recipeDiscovery';
 import { isSidekickWeapon, getSummonNoun } from '../engine/sidekicks';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
@@ -110,7 +111,11 @@ export function RecipesView({
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
-    const all = getRecipes().map((r) => evaluateRecipe(r, player.inventory));
+    // OTA-1008 — hide LOCKED (undiscovered rare/legendary) recipes entirely;
+    // basic recipes always pass. Learned ones (player.knownRecipes) appear.
+    const all = getRecipes()
+      .filter((r) => recipeIsUnlockedFor(r, player.knownRecipes))
+      .map((r) => evaluateRecipe(r, player.inventory));
     const kindFiltered = kindFilter
       ? all.filter((e) =>
           kindFilter === 'consumable'

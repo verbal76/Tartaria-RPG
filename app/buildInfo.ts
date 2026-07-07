@@ -17152,4 +17152,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (ports Tartaria OTA-717). grantItem treated misc-kind items as always-stackable, but Climbing Rope /
 // Pry Bar / torch carry durability, so a fresh 150/150 rope merged into a worn 15/150 stack and its full
 // durability vanished. Now durability-tracked items merge only when both are full. +4 tests.
-export const OTA_BUILD_ID = '2026-07-07-1007-durability-tool-merge-fix';
+// 2026-07-07-1008 (OTA-1008) — cool rare/legendary recipes are discoverable-only (ports Tartaria OTA-718).
+// Their result-recipes are LOCKED until the player FINDS them (player.knownRecipes): the narrator refuses
+// to forge an undiscovered working, and the Craft/Recipes lists hide it; basic recipes stay always-
+// craftable. Discovery rewards reading + hard play: investigating a recipe/blueprint/schematic/notes noun
+// teaches one (once per noun), a hard-won kill 10%, a completed story thread 18%. Rarity skews Rare >
+// Legendary. Old saves grandfathered by owned result. Fully lore-agnostic: recipes pulled from the LIVE
+// content-pack table (getRecipes), no hardcoded names, flavor via getNarratorName(). New recipeDiscovery.ts + tests.
+export const OTA_BUILD_ID = '2026-07-07-1008-discoverable-rare-recipes';

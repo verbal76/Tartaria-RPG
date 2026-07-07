@@ -1092,6 +1092,11 @@ export interface PlayerCharacter {
     line: string;
     system_line?: string;
   };
+  /** OTA-1008 — recipes the player has DISCOVERED. Rare/legendary-result
+   *  recipes are locked until found (see engine/recipeDiscovery.ts); basic
+   *  recipes ignore this. Lore-agnostic: keyed purely by recipe result name,
+   *  resolved against the live content-pack recipe table. */
+  knownRecipes?: string[];
   /** OTA-211 — Aether Dust food additive. Eating a food laced with
    *  Aether Dust grants a +3 buff to the player's chosen stat for
    *  5 real-world minutes. Stored as a wall-clock expiry (Date.now()

@@ -466,12 +466,20 @@ export function missingIngredientsList(
  *  pack is counted, and mirrors RecipesView's per-tab split + availability rule. */
 export function craftableRecipeCounts(
   inventory: readonly InventoryItem[],
+  // OTA-1008 — recipes the player has learned. A rare/legendary-result recipe
+  // that isn't yet known is LOCKED and doesn't count as makeable. Omit to
+  // count every recipe (legacy behavior).
+  knownRecipes?: readonly string[],
 ): { craft: number; recipes: number } {
+  const known = knownRecipes ? new Set(knownRecipes) : null;
   let craft = 0;
   let recipes = 0;
   for (const r of rRecipes()) {
+    const look = lookupCraftedItem(r.result);
+    // Locked (rare/legendary-result) recipe not yet learned → not makeable.
+    if (known && (look.rarity === 'Rare' || look.rarity === 'Legendary') && !known.has(r.result)) continue;
     if (missingIngredientsList(r.ingredients, inventory).length !== 0) continue;
-    if (lookupCraftedItem(r.result).kind === 'consumable') recipes += 1;
+    if (look.kind === 'consumable') recipes += 1;
     else craft += 1;
   }
   return { craft, recipes };
