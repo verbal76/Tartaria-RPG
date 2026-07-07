@@ -15766,4 +15766,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-709 — grammar: the relic/detection success line read "The the relic responds…" because the
 // no-relic-resolved fallback was 'the relic' (article included) while the template prepends its own
 // "The". Fallback is now the bare 'relic'. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-709-relic-the-the';
+// OTA-710 — scene-interaction dead-ends. (1) TAKE now infers an improvised weapon from a weapon-named
+// scene noun ("take ice axe") instead of the salvage refusal. (2) SALVAGE falls back to the parser's
+// context-resolved noun, so "salvage <thing>" works after the thing was investigated / resolved via a
+// location alias — no more dead-end past matchAmbientNoun. (3) Call-to-action: a new `gesture` intent
+// (ring/pray/touch/tilt/answer/shout/…) plus a fallback so knock + gesture verbs that DON'T land on an
+// active hook emit a thematic backstory-fill line instead of dead-ending — "if there's a call to
+// action, it has to do something." New engine/callToAction.ts + 14 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-710-scene-interaction-dead-ends';
