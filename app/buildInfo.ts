@@ -15763,4 +15763,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // materials in hand — NOT the total that exist. New craftableRecipeCounts() helper mirrors
 // RecipesView's per-tab split (consumable → RECIPES, else CRAFT) + availability. REPAIR's badge also
 // switched to the affordable count (what you can fix right now) for consistency. New helper test (4).
-export const OTA_BUILD_ID = '2026-07-06-708-craftable-tab-counts';
+// OTA-709 — grammar: the relic/detection success line read "The the relic responds…" because the
+// no-relic-resolved fallback was 'the relic' (article included) while the template prepends its own
+// "The". Fallback is now the bare 'relic'. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-709-relic-the-the';
