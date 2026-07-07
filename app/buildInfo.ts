@@ -15787,4 +15787,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // holds no encounter-specific enemy name or prose — it reads player.pendingProvoke (replaces the
 // boolean aetherkinCoinPending). This keeps the engine lore-agnostic (matters for engine_Dev) and lets
 // a content pack author its own provocable encounters. +2 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-712-data-driven-encounter-provoke';
+// OTA-713 — auto-route travel is slightly more eventful + more VARIED, without more fights. On a plotted
+// course the encounter roll chance nudges 0.55 → 0.58, and (the bigger lever) the non-combat archetypes
+// (treasure / npc / fusion_bench) get a 1.3× weight bias in the type pick, so a route brings in more
+// DIFFERENT encounters while the combat FRACTION actually drops a few points (measured ~57% → ~51%).
+// Combat weight + enemy level are untouched — no extra high-level fights. Cardinal travel unchanged.
+// New PickOptions.autoTravel + AUTO_TRAVEL_VARIETY_MULT. +2 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-713-autoroute-variety';

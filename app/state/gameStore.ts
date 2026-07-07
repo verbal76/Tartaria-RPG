@@ -19104,7 +19104,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // step: lively action, not constant. Tune down toward "desolate"
       // (~4-8%) from here once the feel is dialed in.
       const baseThreshold = isAutoTravel ? 1 : 2;
-      const baseRollChance = isAutoTravel ? 0.55 : 0.45;
+      // OTA-713 — auto-route slightly more eventful (0.55 → 0.58). Small on
+      // purpose; the bulk of "more different encounters" comes from the
+      // non-combat variety bias passed to the picker below, so the extra
+      // events skew toward variety (treasure / npc / fusion bench), not
+      // more fights.
+      const baseRollChance = isAutoTravel ? 0.58 : 0.45;
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
       const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
       // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
@@ -19162,6 +19167,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-218 — combat-starvation bias. 3+ peaceful steps → 2×
         // skirmish/mini_dungeon weight. 5+ → 4×.
         stepsSinceCombat: get().stepsSinceCombat,
+        // OTA-713 — on a plotted course, bias the TYPE pick toward non-combat
+        // variety (treasure / npc / fusion bench) so a route brings in more
+        // different encounters without more fights.
+        autoTravel: isAutoTravel,
       }) : null;
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
