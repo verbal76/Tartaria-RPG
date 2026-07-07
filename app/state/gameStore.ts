@@ -8133,7 +8133,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // dead-end behind the "Try SALVAGE" hint. Fall back to the parser's resolved
           // noun so salvage actually breaks the thing down (or fails gracefully) instead.
           const harvestAmbient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
-            ?? (parsed.resolvedNoun && parsed.resolvedNoun.trim() ? parsed.resolvedNoun.trim() : null);
+            // Strip a leading article — matchAmbientNoun returns bare nouns, but the
+            // parser's resolvedNoun can carry "the "/"a " ("salvage the reactor"), and
+            // the salvage line templates prepend their own "The", which produced a
+            // "The the reactor" double article and broke the per-noun dedupe marker.
+            ?? (parsed.resolvedNoun && parsed.resolvedNoun.trim()
+                ? parsed.resolvedNoun.trim().replace(/^(the|a|an)\s+/i, "")
+                : null);
           if (harvestAmbient) {
             const harvestRoomKey = makeRoomKey(
               player.currentLocationId,

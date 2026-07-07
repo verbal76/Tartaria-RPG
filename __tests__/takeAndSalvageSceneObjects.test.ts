@@ -150,26 +150,34 @@ describe('OTA-710 — salvage falls back to the context-resolved noun', () => {
       currentScene: {
         ...scene,
         enemies: [],
+        // hooks cleared + the room's one-per-visit investigate ambush marked
+        // spent, so the salvage deterministically reaches the harvest handler
+        // instead of being preempted by the sporadic ~6% ambush roll (arb168).
+        hooks: [],
+        investigateAmbushUsed: true,
         ambientNouns: ['rubble'],
         displayedAmbientNouns: ['rubble'],
         location: { ...scene.location, aliases: [...(scene.location.aliases ?? []), 'reactor'] },
       },
     });
 
+    const hoursBefore = store.getState().player!.hoursElapsed ?? 0;
     store.getState().submitPlayerAction('salvage reactor');
 
     const log = tailLog(10);
     // The old dead-end phrasing — the salvage attempt landing on the
     // flavor "already examined / nothing to work over" gate — must be gone.
     expect(log).not.toMatch(/don'?t see (a|any)|nothing (here|to)|already examined/i);
-    // And the noun must be marked worked-over so a re-tap dedupes — proof
-    // the harvest handler actually ran on it. Scan every visited room
-    // (the harvest handler keys the room by hubRoomId, which may differ
-    // from the bare-coordinate room record).
-    const rooms = Object.values(store.getState().worldMemory.visitedRooms ?? {});
-    const workedAnywhere = rooms.some((r) =>
-      (r?.searchedAmbientNouns ?? []).some((s) => s.toLowerCase() === 'reactor'),
-    );
-    expect(workedAnywhere).toBe(true);
+    // The fallback strips a leading article so the salvage line templates
+    // (which prepend their own "The") don't emit "The the reactor".
+    expect(log).not.toMatch(/\bthe the\b/i);
+    // Deterministic proof the harvest handler actually RAN (rather than
+    // dead-ending): the harvest branch unconditionally spends the skill-
+    // check time (0.25h) before rolling an outcome, whereas the pre-fix
+    // fall-through advanced the clock by 0. Outcome-independent, so no RNG
+    // flakiness. (The old per-noun marker assertion was produced-gated and
+    // could stay false on some salvage outcomes.)
+    const hoursAfter = store.getState().player!.hoursElapsed ?? 0;
+    expect(hoursAfter - hoursBefore).toBeGreaterThanOrEqual(0.2);
   });
 });
