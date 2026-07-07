@@ -17116,4 +17116,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Call-to-action: new `gesture` intent (ring/pray/touch/tilt/answer/shout/…) + a fallback so knock +
 // gesture verbs that DON'T hit an active hook emit a thematic backstory-fill line instead of dead-
 // ending. New engine/callToAction.ts (lore-neutral for the content-pack engine) + 14 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-1000-scene-interaction-dead-ends';
+// 2026-07-07-1001 (OTA-1001) — three playtest glitches (ports Tartaria OTA-711). (1) INVESTIGATE flavor
+// stopped narrating "you turn the stair in your hands" — fixed features draw a posture-agnostic pool
+// (lore-neutral, content-pack overridable via 'investigateFixed'). (2) The aetherkin_mourner encounter's
+// dare ("reach for a coin and you will not reach it twice") now MAKES GOOD ON THE THREAT: reach/take/
+// steal/disturb/attack the coins or kin spawns the hostile Aetherkin + a corruption tick. (3) The "use
+// <item>" nudge no longer misfires on a loose fuzzy match ("disturb the aetherkin" → "use flame of
+// aether"); it needs a whole-word overlap. +16 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-1001-aetherkin-and-investigate-flavor';

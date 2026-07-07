@@ -1094,7 +1094,18 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       // 'use torch on X' only if the player carries one.
       if (hasTorch) suggestIfAllowed('use torch on');
     }
-    if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
+    // OTA-1001 — guard the "use <item>" suggestion against loose fuzzy
+    // matches. resolveItem will map "aetherkin" → "Flame of Aether" on the
+    // shared "aether" fragment, producing a nonsensical "Try: use flame of
+    // aether" nudge (playtest log). Only offer the item when the player's
+    // noun shares a WHOLE, non-trivial word with the item name.
+    if (item) {
+      const itemWords = new Set(
+        item.name.toLowerCase().split(/\s+/).filter((w) => w.length > 2 && !STOPWORDS.has(w)),
+      );
+      const nounSharesWord = cleanTokens.some((w) => w.length > 2 && itemWords.has(w));
+      if (nounSharesWord) suggestions.push(`use ${item.name.toLowerCase()}`);
+    }
     // arb167 — 'sneak' (not 'hide') so the stealth tactic reads as an offensive
     // setup: mid-range it's the unseen opener, close-range the initiative gamble.
     if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'sneak', 'parley');
