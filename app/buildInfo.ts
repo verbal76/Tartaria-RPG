@@ -17159,4 +17159,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // teaches one (once per noun), a hard-won kill 10%, a completed story thread 18%. Rarity skews Rare >
 // Legendary. Old saves grandfathered by owned result. Fully lore-agnostic: recipes pulled from the LIVE
 // content-pack table (getRecipes), no hardcoded names, flavor via getNarratorName(). New recipeDiscovery.ts + tests.
-export const OTA_BUILD_ID = '2026-07-07-1008-discoverable-rare-recipes';
+// 2026-07-07-1009 (OTA-1009) — keep the sidekick-weapon route OUT of recipe discovery (ports Tartaria
+// OTA-719). The sidekick armaments are Rare and carry the 'golem_weapon' tag, so OTA-1008 was locking them
+// behind knownRecipes even though they have their own MAGIC-tab route and no discovery path — soft-locking
+// them. isDiscoverableRecipe now excludes any recipe with its own unlock route: coresRequired set, or a
+// 'golem_weapon'-tagged result. They fall through to their real route unchanged. +1 test.
+export const OTA_BUILD_ID = '2026-07-07-1009-sidekick-route-not-discoverable';

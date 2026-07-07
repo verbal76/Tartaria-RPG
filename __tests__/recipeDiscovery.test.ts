@@ -38,6 +38,24 @@ describe('OTA-1008 — isDiscoverableRecipe (rare/legendary results are locked)'
   });
 });
 
+describe('OTA-1009 — sidekick weapon route is NOT swept into discovery', () => {
+  it('sidekick armaments (golem_weapon-tagged) stay non-discoverable', () => {
+    // engine_Dev's sidekick weapons are Rare and carry the 'golem_weapon' tag
+    // (no coresRequired in the default pack). They have their own MAGIC-tab
+    // route, so the discoverable gate must leave them out — else they'd be
+    // locked with no discovery path.
+    const sk = RECIPES.filter((r) => (lookupCraftedItem(r.result).tags ?? []).includes('golem_weapon'));
+    expect(sk.length).toBeGreaterThan(0);
+    for (const r of sk) {
+      expect(isDiscoverableRecipe(r)).toBe(false);
+      expect(recipeIsUnlockedFor(r, [])).toBe(true);
+    }
+    // ...and none can leak in as a random "learned recipe" reward.
+    const pool = unknownDiscoverableRecipes(RECIPES, []);
+    expect(pool.some((n) => (lookupCraftedItem(n).tags ?? []).includes('golem_weapon'))).toBe(false);
+  });
+});
+
 describe('OTA-1008 — recipeIsUnlockedFor', () => {
   it('basic recipes are always unlocked', () => {
     expect(recipeIsUnlockedFor({ result: A_COMMON }, undefined)).toBe(true);
