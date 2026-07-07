@@ -15830,4 +15830,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // leak in as a random "learned recipe" reward. isDiscoverableRecipe now excludes any recipe with its own
 // unlock route: coresRequired set, or a 'golem_weapon'-tagged result. They fall through to their real
 // gate unchanged. +2 tests.
-export const OTA_BUILD_ID = '2026-07-07-719-golem-route-not-discoverable';
+// OTA-720 — TIERED golem armaments + the forge-unlock beat now hands you the basics. Each of the 3
+// armament types (Sledge / Greatsword / Pike — the Aether-Lance was retired) now comes in 3 tiers: a
+// CRUDE (Common) pattern, the base (Rare), and an ELDER (Legendary). When the 4th Core lands and the
+// forge opens, the Arbiter's beat now says you've learned the shaping and can hammer out the crude
+// pattern of any type — and hints that stronger master schematics wait out in the dark. The Rare/
+// Legendary tiers are discoverable (found via hard kills / completed hooks), so OTA-719's blanket
+// golem-weapon exclusion is superseded: only the Common tier is auto-available at unlock, the stronger
+// ones are hunted down. 9 recipes + 6 new weapon defs; coreFourForgeGate + recipeDiscovery tests updated.
+export const OTA_BUILD_ID = '2026-07-07-720-tiered-golem-armaments';

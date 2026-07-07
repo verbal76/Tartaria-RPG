@@ -15,23 +15,22 @@
 
 import { lookupCraftedItem } from './crafting';
 
-export interface RecipeLike { result: string; coresRequired?: number }
+export interface RecipeLike { result: string }
 
 /** A recipe is DISCOVERABLE (locked until learned) when its result is a cool,
  *  rare item — Rare or Legendary rarity. Common/Uncommon results stay
  *  always-craftable. Catalog-driven, so no per-recipe flags are needed.
  *
- *  EXCLUDED — recipes that already have their OWN unlock route are never part
- *  of the loot-discovery pool (otherwise this would double-lock them):
- *   - coresRequired: gated by the Core-forge questline.
- *   - 'golem_weapon'-tagged results: the golem / sidekick weapon route, which
- *     has its own progression and its own crafting tab (golem armaments in
- *     Tartaria/golem, sidekick armaments in engine_Dev — same tag). */
+ *  This INCLUDES the Rare/Legendary golem-/sidekick-weapon tiers: those are the
+ *  "stronger armaments you uncover in your travels" (found via kills / hooks /
+ *  vendors), while the COMMON tier of each type is auto-granted at the forge
+ *  unlock beat so you're never left unable to arm your construct. The whole
+ *  category still sits behind its story gate (coresRequired / quest-%), applied
+ *  separately in the craft handler — that gate + this discovery gate stack, by
+ *  design, for the Rare/Legendary tiers. */
 export function isDiscoverableRecipe(recipe: RecipeLike): boolean {
-  if (typeof recipe.coresRequired === 'number') return false;
-  const look = lookupCraftedItem(recipe.result);
-  if ((look.tags ?? []).includes('golem_weapon')) return false;
-  return look.rarity === 'Rare' || look.rarity === 'Legendary';
+  const r = lookupCraftedItem(recipe.result).rarity;
+  return r === 'Rare' || r === 'Legendary';
 }
 
 /** Recipe-KNOWLEDGE gate only (ingredient check is separate). Basic recipes:
