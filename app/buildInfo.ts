@@ -15554,4 +15554,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (~22%) or a completed story thread (~40%) occasionally drops a bonus material on top of normal loot
 // ("Hard-won spoils" / "For your persistence"). Materials only; tiers skew Uncommon > Rare > rare
 // Legendary. New engine/bonusDrops.ts + 11 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-699-bonus-material-drops';
+// OTA-700 — crafted ropes / worn durability tools stop merging away their durability (ports Tartaria
+// OTA-717). grantItem treated misc-kind items as always-stackable, but Climbing Rope / Pry Bar / torch
+// carry durability, so a fresh 150/150 rope merged into a worn 15/150 stack and its full durability
+// vanished. Now durability-tracked items merge only when both are full. +4 tests.
+export const OTA_BUILD_ID = '2026-07-07-700-durability-tool-merge-fix';
