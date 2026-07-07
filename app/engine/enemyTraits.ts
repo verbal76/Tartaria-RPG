@@ -80,6 +80,32 @@ export function traitDamageMultiplier(
   return { multiplier: 1, match: 'normal' };
 }
 
+/** OTA-1005 — reconcile the creature-TYPE damage table with an enemy's
+ *  authored resist/vulnerable TRAIT for the same damage type.
+ *
+ *  The two systems are meant to STACK when they agree — a Construct
+ *  (resist:slashing by type) that ALSO carries a resist:slashing trait
+ *  halves twice (x0.25). But when they DISAGREE — e.g. an Aetheric
+ *  Creature (type resists aetheric) authored vulnerable:aetheric — the
+ *  old code multiplied 0.5 x 1.5 = 0.75 and printed BOTH "shrugs off" and
+ *  "vulnerable" on the same hit, and the swap-nag steered the player away
+ *  from the enemy's real weakness. A per-enemy authored trait is a
+ *  deliberate override, so on a DISCORD the trait wins; otherwise stack. */
+export function combineDamageTypeMatch(
+  typeMatch: 'weak' | 'resist' | 'normal',
+  traitMatch: 'resist' | 'vulnerable' | 'normal',
+): { multiplier: number; match: 'weak' | 'resist' | 'normal' } {
+  const typeMult = typeMatch === 'weak' ? 1.5 : typeMatch === 'resist' ? 0.5 : 1;
+  const traitMult = traitMatch === 'vulnerable' ? 1.5 : traitMatch === 'resist' ? 0.5 : 1;
+  const typeDir = typeMatch === 'weak' ? 1 : typeMatch === 'resist' ? -1 : 0;
+  const traitDir = traitMatch === 'vulnerable' ? 1 : traitMatch === 'resist' ? -1 : 0;
+  if (typeDir !== 0 && traitDir !== 0 && typeDir !== traitDir) {
+    return { multiplier: traitMult, match: traitMatch === 'vulnerable' ? 'weak' : 'resist' };
+  }
+  const multiplier = typeMult * traitMult;
+  return { multiplier, match: multiplier > 1 ? 'weak' : multiplier < 1 ? 'resist' : 'normal' };
+}
+
 /** True if the enemy has a trait that should fire status-effect on its
  *  successful melee hits. Returns the effect kind to apply, or null. */
 export function traitOnHitStatus(
