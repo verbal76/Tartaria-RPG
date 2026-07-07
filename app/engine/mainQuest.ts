@@ -737,14 +737,23 @@ export function shouldFireFourCoreForge(state: MainQuestState): boolean {
   return true;
 }
 
-/** The narrative beat that unlocks golem-armament crafting at the 4th Core. */
+/** The narrative beat that unlocks golem-armament crafting at the 4th Core.
+ *  OTA-703 — the moment the craft opens, the player is handed the CRUDE (basic)
+ *  working for every armament type; the stronger Rare/Legendary schematics are
+ *  left out in the world to be uncovered. */
 export function fourCoreForgeLine(): string {
   return (
     'The Arbiter watches the fourth Core settle into your pack, and something in '
-    + 'the buried country shifts. "Four. The old grid kept a forging from common '
-    + 'hands — war-arms a golem can carry into the dark. Bring its Core and the '
-    + 'metal, and I will guide your hands. You have earned the schematics." '
-    + '(Golem armaments can now be forged.)'
+    + 'the buried country shifts. "Four. That’s the threshold — the old grid '
+    + 'kept this forging from common hands, and now your hands know it. You’ve '
+    + 'learned the shaping of a golem’s war-arms: bring the Core and the metal '
+    + 'and you can hammer out a crude Sledge, Greatsword, or Pike for your '
+    + 'construct. But these are the plain patterns. Somewhere out in the dark lie '
+    + 'the master schematics — sharper, surer, and a few that were never meant for '
+    + 'mortal forges at all. Find them, and your golem will carry something far '
+    + 'worse into the fight." '
+    + '(Golem armaments can now be forged — the basic patterns are yours; uncover '
+    + 'stronger ones in your travels.)'
   );
 }
 
