@@ -17108,4 +17108,5 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-07-06-998 — every crafting tab shows a "makeable NOW" count (ports Tartaria OTA-708). CRAFT/
 // RECIPES/<magic> each show (N) = what you can actually make with materials in hand (uses the LIVE
 // content-pack recipe table); REPAIR badge switched to the affordable count. Helper + test.
-export const OTA_BUILD_ID = '2026-07-06-998-craftable-tab-counts';
+// 2026-07-07-999 — grammar: "The the relic responds…" fallback fix (ports Tartaria OTA-709).
+export const OTA_BUILD_ID = '2026-07-07-999-relic-the-the';

@@ -14408,7 +14408,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // text for the resolved item + target so the narration names
             // what's actually in your hand and what you aimed it at.
             const useParse = parseInput(actionText, { inventory: player.inventory });
-            const itemName = useParse.resolvedNoun ?? 'the relic';
+            // OTA — fallback is the BARE noun (no article): templates prepend "The "/"the"
+            // themselves, so 'the relic' doubled to "The the relic responds…".
+            const itemName = useParse.resolvedNoun ?? 'relic';
             const tgtTokens = (useParse.target ?? '').split(/\s+/).filter(Boolean);
             // Strip the item name's words out of target so "use torch on
             // mud glass" leaves "mud glass" not "torch mud glass".
