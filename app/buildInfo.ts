@@ -15798,4 +15798,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the floorboards in your hands", "investigate ladder" → "you let it go". The generic catch-all pool is
 // now fully POSTURE-NEUTRAL (no "turn in your hands" / "weigh" / "let it go"), so no noun ever reads as
 // held, and the classifier gained floorboard/plank/ladder/peg/bell/cord/lever/valve/etc. +7 test nouns.
-export const OTA_BUILD_ID = '2026-07-07-714-investigate-flavor-neutral';
+// OTA-715 — damage-type contradiction fixed. An enemy whose creature-TYPE resists a damage type but
+// whose authored TRAIT says it is vulnerable to that same type (the Aetheric Banshee: type resists
+// aetheric, trait vulnerable:aetheric) used to multiply BOTH (0.5x1.5=0.75), print "shrugs off" AND
+// "vulnerable" on one hit, and the swap-nag told you to switch to slashing (which it ALSO resists). New
+// combineDamageTypeMatch reconciler: type + trait STACK when they agree (double-resist x0.25) but on a
+// DISCORD the per-enemy authored trait wins. Applied to every damage path (melee/throw/cast/golem/dog +
+// coatings); one reconciled resist/weak message; the swap-nag now only suggests types the enemy does
+// NOT resist. +10 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-715-damage-type-reconcile';
