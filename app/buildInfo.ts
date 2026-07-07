@@ -15531,4 +15531,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // GOOD ON THE THREAT: reach/take/steal/disturb/attack the coins or kin spawns the hostile Aetherkin +
 // a corruption tick. (3) The "use <item>" nudge no longer misfires on a loose fuzzy match ("disturb
 // the aetherkin" → "use flame of aether"); it needs a whole-word overlap. +16 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-694-aetherkin-and-investigate-flavor';
+// OTA-695 — the OTA-694 Aetherkin provoke is now fully DATA-DRIVEN (ports Tartaria OTA-712). The enemy,
+// corruption, trigger nouns, and narration live in the encounter's `provoke` block in
+// wasteland_encounters.json (generic: any type:'npc' archetype can carry one). Engine holds no
+// encounter-specific enemy name or prose — reads player.pendingProvoke (replaces aetherkinCoinPending).
+// +2 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-695-data-driven-encounter-provoke';

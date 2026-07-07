@@ -63,6 +63,30 @@ export interface WastelandArchetype {
    *  user's explicit ask: "we need a way to start quests" that
    *  isn't tied to a faction vendor. */
   quest_hook?: { kind: 'hunt' | 'mystery'; id: string };
+  /** OTA-695 — provocable NPC encounter. When a `type:'npc'` archetype
+   *  carries a `provoke` block, its lore_note is a real dare ("reach for a
+   *  coin and you will not reach it twice"). The engine arms the temptation
+   *  when the encounter lands; a provoking verb (take/reach/steal/disturb/
+   *  attack) aimed at one of `nouns` MAKES GOOD ON THE THREAT — spawns the
+   *  named `enemy` (drawn from the enemies data), applies `corruption`, and
+   *  narrates `line` (+ optional `system_line`). Fully data-driven so the
+   *  engine holds no encounter-specific enemy name or prose — a content
+   *  pack authors the whole thing here. */
+  provoke?: EncounterProvoke;
+}
+
+/** OTA-695 — data-driven provoke payload for a provocable NPC encounter. */
+export interface EncounterProvoke {
+  /** Enemy name to spawn on provocation (resolved via findEnemyByName). */
+  enemy: string;
+  /** Corruption inflicted as "payment" (0 / omitted = none). */
+  corruption?: number;
+  /** Player-noun triggers — the coins / the kin / the silhouettes, etc. */
+  nouns: string[];
+  /** World-channel narration shown when the player provokes it. */
+  line: string;
+  /** Optional system-channel line (e.g. the corruption note). */
+  system_line?: string;
 }
 
 // Filter out the "_description" key from the JSON.
@@ -90,6 +114,8 @@ export interface WastelandEncounter {
   /** Mini-dungeon only — quest to auto-add to the player's active
    *  board. Null when the dungeon is loot-only. */
   questHook: { kind: 'hunt' | 'mystery'; id: string } | null;
+  /** OTA-695 — provoke payload for a provocable NPC encounter, else null. */
+  provoke: EncounterProvoke | null;
 }
 
 interface PickOptions {
@@ -175,6 +201,7 @@ export function pickWastelandEncounter(
         loreNote: archetype.lore_note ?? null,
         enemyName,
         questHook: archetype.quest_hook ?? null,
+        provoke: archetype.provoke ?? null,
       };
     }
     // If the archetype id is unknown (stale save / archetype removed),
@@ -270,6 +297,7 @@ export function pickWastelandEncounter(
     loreNote: archetype.lore_note ?? null,
     enemyName,
     questHook: archetype.quest_hook ?? null,
+    provoke: archetype.provoke ?? null,
   };
 }
 
