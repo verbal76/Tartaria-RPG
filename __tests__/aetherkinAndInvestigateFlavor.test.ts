@@ -60,6 +60,7 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { resolveLore } from '../app/engine/investigationTable';
 import { parseInput } from '../app/engine/parser';
+import { pickWastelandEncounter } from '../app/engine/wastelandEncounters';
 
 const HANDHELD = /in your hands|you weigh the|you let it go/i;
 
@@ -101,6 +102,33 @@ describe('OTA-711 — item-use nudge requires a whole-word overlap', () => {
   });
 });
 
+describe('OTA-712 — provoke is data-driven (pulled from the encounter JSON)', () => {
+  it('the aetherkin_mourner archetype resolves a provoke block with an enemy + nouns + line', () => {
+    // forceArchetype bypasses the biome/roll gates and resolves the named
+    // archetype straight from wasteland_encounters.json — proving the enemy
+    // and prose come from CONTENT, not hardcoded engine strings.
+    const enc = pickWastelandEncounter(
+      { id: 'x', name: 'X', tags: ['buried'] } as any,
+      { stepsSinceLastEncounter: 0, forceArchetype: 'aetherkin_mourner' },
+    );
+    expect(enc).toBeTruthy();
+    expect(enc!.provoke).toBeTruthy();
+    expect(enc!.provoke!.enemy).toBe('Aetherkin');
+    expect(enc!.provoke!.nouns).toEqual(expect.arrayContaining(['coin', 'aetherkin', 'entombed']));
+    expect(enc!.provoke!.line.length).toBeGreaterThan(20);
+    expect((enc!.provoke!.corruption ?? 0)).toBeGreaterThan(0);
+  });
+
+  it('an archetype with no provoke block resolves provoke: null', () => {
+    const enc = pickWastelandEncounter(
+      { id: 'x', name: 'X', tags: ['ruin', 'outskirts', 'buried'] } as any,
+      { stepsSinceLastEncounter: 0, forceArchetype: 'scrap_drone_swarm' },
+    );
+    // scrap_drone_swarm is a skirmish with no provoke.
+    if (enc) expect(enc.provoke).toBeNull();
+  });
+});
+
 describe('OTA-711 — Aetherkin makes good on the threat', () => {
   beforeAll(() => {
     console.log = () => {};
@@ -115,8 +143,15 @@ describe('OTA-711 — Aetherkin makes good on the threat', () => {
     store.getState().skipTutorial?.();
     const scene = store.getState().currentScene!;
     store.setState({ currentScene: { ...scene, enemies: [], enemyHps: [] } });
-    // Arm the temptation as the encounter would.
-    store.setState((s) => (s.player ? { player: { ...s.player, aetherkinCoinPending: true, corruption: 0 } } : s));
+    // Arm the temptation as the encounter would — the payload the
+    // aetherkin_mourner archetype's `provoke` block resolves to.
+    store.setState((s) => (s.player ? { player: { ...s.player, corruption: 0, pendingProvoke: {
+      enemy: 'Aetherkin',
+      corruption: 8,
+      nouns: ['coin', 'coins', 'aetherkin', 'kin', 'entombed', 'silhouette', 'silhouettes', 'pocket', 'pockets', 'payment', 'dead'],
+      line: 'Your fingers close on the cold coin pressed into the Aetherstone — and the Aetherkin turns. "Not twice," it says.',
+      system_line: 'The debt of the Entombed settles on you.',
+    } } } : s));
     return store;
   }
 
@@ -131,9 +166,9 @@ describe('OTA-711 — Aetherkin makes good on the threat', () => {
       expect(scene.enemies.some((e) => /aetherkin/i.test(e.name))).toBe(true);
       // enemyHps stays in lockstep with enemies.
       expect(scene.enemyHps.length).toBe(scene.enemies.length);
-      // Corruption rose; the flag is consumed.
+      // Corruption rose; the temptation is consumed.
       expect(store.getState().player!.corruption ?? 0).toBeGreaterThan(corr0);
-      expect(store.getState().player!.aetherkinCoinPending).toBeFalsy();
+      expect(store.getState().player!.pendingProvoke).toBeFalsy();
       const tail = store.getState().gameLog.slice(-5).map((e) => e.text).join('\n');
       expect(tail).toMatch(/Not twice|Aetherkin/i);
     });
@@ -146,7 +181,7 @@ describe('OTA-711 — Aetherkin makes good on the threat', () => {
     store.getState().skipTutorial?.();
     const scene = store.getState().currentScene!;
     store.setState({ currentScene: { ...scene, enemies: [], enemyHps: [] } });
-    store.setState((s) => (s.player ? { player: { ...s.player, aetherkinCoinPending: false } } : s));
+    store.setState((s) => (s.player ? { player: { ...s.player, pendingProvoke: undefined } } : s));
 
     store.getState().submitPlayerAction('reach for the coin');
     const after = store.getState().currentScene!;

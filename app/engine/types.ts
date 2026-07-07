@@ -943,13 +943,21 @@ export interface PlayerCharacter {
    *  Without this gate, the fuse verb would be usable anywhere; the
    *  encounter is the discovery moment that earns the right. */
   fusionPending?: boolean;
-  /** OTA-711 — a live aetherkin_mourner travel encounter is offering its
-   *  temptation ("reach for a coin and you will not reach it twice"). Set
-   *  when the encounter lands, cleared on the next travel step OR when the
-   *  player provokes it (reach/take/steal/disturb/attack the coin/kin) —
-   *  which spawns the hostile Aetherkin + a corruption tick, making good
-   *  on the narration's threat instead of dead-ending. */
-  aetherkinCoinPending?: boolean;
+  /** OTA-712 — a live provocable NPC travel encounter (e.g. the Aetherkin
+   *  mourner) is offering its temptation ("reach for a coin and you will
+   *  not reach it twice"). Set from the encounter's data-driven `provoke`
+   *  block when it lands; cleared on the next travel step OR when the player
+   *  provokes it — which spawns the named enemy + applies the corruption
+   *  and narration the CONTENT authored. Fully data-driven: the engine
+   *  holds no encounter-specific enemy name or prose. (Replaces the OTA-711
+   *  boolean aetherkinCoinPending — old saves just drop the transient flag.) */
+  pendingProvoke?: {
+    enemy: string;
+    corruption?: number;
+    nouns: string[];
+    line: string;
+    system_line?: string;
+  };
   /** OTA-211 — Aether Dust food additive. Eating a food laced with
    *  Aether Dust grants a +3 buff to the player's chosen stat for
    *  5 real-world minutes. Stored as a wall-clock expiry (Date.now()

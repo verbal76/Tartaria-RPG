@@ -6772,29 +6772,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
-    // OTA-711 — Aetherkin coin provocation. The aetherkin_mourner travel
-    // encounter dares the player: "reach for a coin and you will not reach
-    // it twice." While that temptation is armed, a PROVOKING verb aimed at
-    // the coins / the kin / the Entombed makes good on the threat — the
-    // Aetherkin turns hostile and the mud takes its payment in corruption —
-    // instead of dead-ending on an unknown verb (`reach for the coin`) or
-    // resolving the noun to a random relic in the pack (`attack the
-    // aetherkin` → Flame of Aether). Narrow: only fires while the flag is
-    // set (one travel stop) and no fight is already underway.
+    // OTA-712 — data-driven encounter provocation. A provocable NPC travel
+    // encounter (the Aetherkin mourner: "reach for a coin and you will not
+    // reach it twice") arms `player.pendingProvoke` from the encounter's
+    // authored `provoke` block. While it's armed, a PROVOKING verb aimed at
+    // one of the encounter's trigger nouns makes good on the threat — spawns
+    // the authored enemy, applies the authored corruption, and narrates the
+    // authored line — instead of dead-ending on an unknown verb (`reach for
+    // the coin`) or resolving the noun to a relic in the pack (`attack the
+    // aetherkin` → Flame of Aether). The engine holds NO encounter-specific
+    // enemy name or prose; it all lives in the content data. Narrow: only
+    // fires while armed (one travel stop) and no fight is already underway.
     {
-      const livePlayer = get().player;
+      const pv = get().player?.pendingProvoke;
       const raw = trimmed.toLowerCase();
       const provokeVerb = /\b(take|takes|taking|steal|steals|grab|grabs|reach|reaches|reaching|pry|snatch|pilfer|loot|rob|pocket|seize|grasp|lift|pick|disturb|touch|attack|strike|hit)\b/.test(raw);
-      const provokeNoun = /\b(coin|coins|aetherkin|kin|entombed|silhouette|silhouettes|pocket|pockets|payment|dead)\b/.test(raw);
-      if (livePlayer?.aetherkinCoinPending && provokeVerb && provokeNoun && currentScene.enemies.length === 0) {
-        const kin = findEnemyByName('Aetherkin');
-        const corrGain = 8;
+      const provokeNoun = pv
+        ? pv.nouns.some((n) => new RegExp(`\\b${n.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(raw))
+        : false;
+      if (pv && provokeVerb && provokeNoun && currentScene.enemies.length === 0) {
+        const foe = findEnemyByName(pv.enemy);
+        const corrGain = Math.max(0, pv.corruption ?? 0);
         set((s) => {
           if (!s.player) return s;
           const nextCorr = Math.max(0, Math.min(CORRUPTION_MAX, (s.player.corruption ?? 0) + corrGain));
           let scene = s.currentScene;
-          if (scene && kin) {
-            const spawn = JSON.parse(JSON.stringify(kin)) as Enemy;
+          if (scene && foe) {
+            const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
             scene = {
               ...scene,
               enemies: [...scene.enemies, spawn],
@@ -6805,18 +6809,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           }
           return {
-            player: { ...s.player, corruption: nextCorr, aetherkinCoinPending: false },
+            player: { ...s.player, corruption: nextCorr, pendingProvoke: undefined },
             ...(scene ? { currentScene: scene } : {}),
             stepsSinceCombat: 0,
           };
         });
-        get().appendLog(
-          'world',
-          `Your fingers close on the cold coin pressed into the Aetherstone — and the Aetherkin turns. "Not twice," it says, in a voice that fits between your heartbeats. The silhouettes of the Entombed seem to lean out of the wall, and the mud takes its payment. The air goes to knives.`,
-        );
-        get().appendLog('system', `The debt of the Entombed settles on you. (+${corrGain} corruption)`);
-        if (kin) {
-          get().appendLog('combat', `${kin.name} closes — ${kin.attack} ready, ${kin.damage} damage on a hit. (range: close)`);
+        get().appendLog('world', pv.line);
+        if (pv.system_line) {
+          get().appendLog('system', corrGain > 0 ? `${pv.system_line} (+${corrGain} corruption)` : pv.system_line);
+        }
+        if (foe) {
+          get().appendLog('combat', `${foe.name} closes — ${foe.attack} ready, ${foe.damage} damage on a hit. (range: close)`);
         }
         void get().persist();
         return;
@@ -19140,12 +19143,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // intended wild-tile loot RE-ROLL (theme-park density) is untouched; only
       // the repeatable encounter spawn is gated. `wasteSteps` still accrues on
       // revisits, so resuming genuine forward travel pays out the banked danger.
-      // OTA-711 — a step onward means the player walked past the Aetherkin
-      // without provoking it: "if you pass by without disturbing the
-      // Entombed the Aetherkin lets you go." Clear the temptation before
-      // this step can arm a fresh one.
-      if (get().player?.aetherkinCoinPending) {
-        set((s) => (s.player ? { player: { ...s.player, aetherkinCoinPending: false } } : s));
+      // OTA-712 — a step onward means the player walked past the provocable
+      // encounter without provoking it ("if you pass by without disturbing
+      // the Entombed the Aetherkin lets you go"). Clear the temptation
+      // before this step can arm a fresh one.
+      if (get().player?.pendingProvoke) {
+        set((s) => (s.player ? { player: { ...s.player, pendingProvoke: undefined } } : s));
       }
       const enc = tileIsNovel ? pickWastelandEncounter(liveSceneForEncounter.location, {
         stepsSinceLastEncounter: wasteSteps,
@@ -19175,13 +19178,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         if (enc.npcLine) get().appendLog('arbiter', enc.npcLine);
         if (enc.loreNote) get().appendLog('world', enc.loreNote);
-        // OTA-711 — the Aetherkin mourner's lore_note is a real call to
-        // action ("reach for a coin and you will not reach it twice"). Arm
-        // the temptation so a provoking verb (reach/take/steal/disturb/
-        // attack the coin or the kin) makes good on the threat instead of
-        // dead-ending. Cleared at the top of the next travel step below.
-        if (enc.archetypeId === 'aetherkin_mourner') {
-          set((s) => (s.player ? { player: { ...s.player, aetherkinCoinPending: true } } : s));
+        // OTA-712 — data-driven provocable encounter. When the encounter's
+        // archetype carries a `provoke` block (the Aetherkin mourner's dare,
+        // "reach for a coin and you will not reach it twice"), arm the
+        // temptation so a provoking verb makes good on the threat instead of
+        // dead-ending. The enemy, corruption, trigger nouns, and narration
+        // all come from the CONTENT — the engine holds no encounter-specific
+        // lore. Cleared at the top of the next travel step below.
+        if (enc.provoke) {
+          const pv = enc.provoke;
+          set((s) => (s.player ? { player: { ...s.player, pendingProvoke: pv } } : s));
         }
         if (enc.loot) {
           const livePlayer = get().player;
