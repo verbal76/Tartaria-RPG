@@ -300,7 +300,8 @@ export function CraftingScreen() {
   // OTA-708 — per-tab "craftable NOW" counts for the tab-bar badges (like REPAIR's).
   const craftableCounts = useMemo(() => {
     const inv = player?.inventory ?? [];
-    const { craft, recipes } = craftableRecipeCounts(inv);
+    // OTA-718 — exclude locked (undiscovered) cool recipes from the tab badges.
+    const { craft, recipes } = craftableRecipeCounts(inv, player?.knownRecipes);
     const aetheric = AETHERCRAFT_DISCIPLINES.filter(
       (d) => d.fuels.some((f) => ownedQty(inv, f) >= 1),
     ).length;

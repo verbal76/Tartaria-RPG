@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { RECIPES, lookupCraftedItem, missingIngredientsList, type Recipe } from '../engine/crafting';
+import { recipeIsUnlockedFor } from '../engine/recipeDiscovery';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
@@ -100,7 +101,12 @@ export function RecipesView({
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
-    const all = RECIPES.map((r) => evaluateRecipe(r, player.inventory));
+    // OTA-718 — hide LOCKED cool recipes (rare/legendary results not yet
+    // learned) until the player discovers them by reading a recipe/blueprint
+    // note or pulling one from rare loot. Basic recipes always show.
+    const all = RECIPES
+      .filter((r) => recipeIsUnlockedFor(r, player.knownRecipes))
+      .map((r) => evaluateRecipe(r, player.inventory));
     const kindFiltered = kindFilter
       ? all.filter((e) =>
           kindFilter === 'consumable'

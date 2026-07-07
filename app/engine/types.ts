@@ -957,6 +957,12 @@ export interface PlayerCharacter {
     line: string;
     system_line?: string;
   };
+  /** OTA-718 — recipes the player has LEARNED. Only the "cool" rare/legendary-
+   *  result recipes are gated by this (isDiscoverableRecipe); basic recipes are
+   *  always craftable. Discovered by reading recipe/blueprint notes and from
+   *  rare loot. undefined on a pre-feature save → grandfathered on load from
+   *  owned results so nothing already-earned is ever taken away. */
+  knownRecipes?: string[];
   /** OTA-211 — Aether Dust food additive. Eating a food laced with
    *  Aether Dust grants a +3 buff to the player's chosen stat for
    *  5 real-world minutes. Stored as a wall-clock expiry (Date.now()

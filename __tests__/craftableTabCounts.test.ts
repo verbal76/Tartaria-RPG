@@ -31,4 +31,20 @@ describe('craftableRecipeCounts (OTA-708)', () => {
     const withMats = craftableRecipeCounts([mat('Scrap Metal', 1), mat('Stick', 1)]);
     expect(withMats.craft).toBeGreaterThan(empty.craft);
   });
+
+  // OTA-718 — a discoverable (rare/legendary-result) recipe does NOT count as
+  // craftable while it's still LOCKED, even with its materials in the pack. It
+  // only counts once the player has learned it (player.knownRecipes). Mudstone
+  // (Rare) = 3× Mud Fragment is a clean single-ingredient discoverable recipe.
+  it('a locked discoverable recipe is not counted until learned', () => {
+    const pack = [mat('Mud Fragment', 3)];
+    // A real player always carries a knownRecipes array (empty or grandfathered),
+    // so gating applies. Passing undefined is the legacy "count everything" path.
+    const locked = craftableRecipeCounts(pack, []);            // Mudstone (Rare) locked → excluded
+    const learned = craftableRecipeCounts(pack, ['Mudstone']); // now unlocked
+    expect(learned.craft).toBe(locked.craft + 1);
+    // Basic recipes are unaffected by an empty knownRecipes list: with only Mud
+    // Fragment in hand, Mudstone is the ONLY thing makeable, so locked drops to 0.
+    expect(locked.craft).toBe(0);
+  });
 });
