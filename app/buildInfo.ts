@@ -15824,4 +15824,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (once per noun), a hard-won kill has a 10% chance to cough one up, and a completed story thread an 18%
 // chance. Rarity skews Rare > Legendary. Old saves are grandfathered — any discoverable recipe whose
 // result you already OWN is marked known, so nobody loses access. New engine/recipeDiscovery.ts + tests.
-export const OTA_BUILD_ID = '2026-07-07-718-discoverable-rare-recipes';
+// OTA-719 — keep the golem-weapon route OUT of recipe discovery. The 4 golem armaments are Rare-result,
+// so OTA-718 was double-locking them behind knownRecipes on top of their Core-forge questline
+// (coresRequired:4) — even after recovering all 4 Cores the Arbiter still refused them, and they could
+// leak in as a random "learned recipe" reward. isDiscoverableRecipe now excludes any recipe with its own
+// unlock route: coresRequired set, or a 'golem_weapon'-tagged result. They fall through to their real
+// gate unchanged. +2 tests.
+export const OTA_BUILD_ID = '2026-07-07-719-golem-route-not-discoverable';
