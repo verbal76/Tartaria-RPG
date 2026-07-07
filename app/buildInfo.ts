@@ -17148,4 +17148,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // of normal loot ("Hard-won spoils" / "For your persistence"). engine_Dev version pulls the candidate
 // materials from the LIVE content-pack table by rarity (no hardcoded Tartaria material names in engine
 // code) — lore-agnostic + reskin-safe. Tiers skew Uncommon > Rare > rare Legendary. New bonusDrops.ts + 11 tests.
-export const OTA_BUILD_ID = '2026-07-07-1006-bonus-material-drops';
+// 2026-07-07-1007 (OTA-1007) — crafted ropes / worn durability tools stop merging away their durability
+// (ports Tartaria OTA-717). grantItem treated misc-kind items as always-stackable, but Climbing Rope /
+// Pry Bar / torch carry durability, so a fresh 150/150 rope merged into a worn 15/150 stack and its full
+// durability vanished. Now durability-tracked items merge only when both are full. +4 tests.
+export const OTA_BUILD_ID = '2026-07-07-1007-durability-tool-merge-fix';

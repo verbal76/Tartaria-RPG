@@ -117,6 +117,19 @@ export function grantItem(
     // rolled stats. Never stack a row that carries either marker.
     if (existing.instanceStats || newItem.instanceStats) return false;
     if (existing.uniqueStats || newItem.uniqueStats) return false;
+    // OTA-1007 — a DURABILITY-tracked item is per-instance wear, even when its
+    // KIND is normally "always stackable." A Climbing Rope / Pry Bar / torch /
+    // compass is kind:'misc', but it carries durability, and merging a FRESH
+    // (full) one into a WORN stack silently discards the new durability — the
+    // merge only bumps quantity and keeps the existing worn row's value. That
+    // was the "I crafted a fresh 150/150 rope but still can't climb" bug: the
+    // new rope folded into a 15/150 stack and its full durability vanished.
+    // Treat any durability-tracked item like weapons/armor: merge ONLY when
+    // BOTH are fully durable — which still keeps pristine stacks tidy (×21
+    // full torches merge) but never collapses a fresh copy onto a worn one.
+    if (existing.durability || newItem.durability) {
+      return isFullyDurable(existing) && newItemFull;
+    }
     if (stackable) return true;
     return isFullyDurable(existing) && newItemFull;
   });
