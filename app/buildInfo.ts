@@ -15541,4 +15541,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // archetypes (treasure / npc / fusion_bench) get a 1.3× weight bias so a route brings in more DIFFERENT
 // encounters while the combat FRACTION drops a few points. Combat weight + enemy level untouched;
 // cardinal travel unchanged. +2 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-696-autoroute-variety';
+// OTA-697 — investigate-flavor gaps closed (ports Tartaria OTA-714). The generic catch-all pool is
+// now fully POSTURE-NEUTRAL so nouns the fixed-feature classifier misses (floorboards/pegs/ladder) no
+// longer read as held ('turn in your hands'/'weigh'/'let it go'); classifier gained more fixed nouns.
+export const OTA_BUILD_ID = '2026-07-07-697-investigate-flavor-neutral';

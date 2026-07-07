@@ -424,11 +424,18 @@ function pickCreepyVariant(pool: readonly string[], category: NounCategory): str
 // per noun via nounSeed. Same noun always resolves to the same
 // line (player sanity), different nouns get different beats
 // (immersion).
+// OTA-697 — the catch-all pool is now fully POSTURE-NEUTRAL (ports Tartaria
+// OTA-714). The FIXED_FEATURE classifier can only whitelist so many nouns,
+// and the playtest still caught gaps ("investigate floorboards" → "you turn
+// the floorboards in your hands"). Since this pool is the fallback for
+// UNCLASSIFIED nouns (which skew toward things you look at, not hold), it
+// must never assume the noun is a small held object — no "turn in your
+// hands", "weigh", "let it go".
 const GENERIC_VARIANTS: readonly string[] = [
-  'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.',
-  'You turn the {noun} in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
-  'The {noun} reads as ordinary, which in Tartaria is a small kind of relief. You let it go.',
-  'You weigh the {noun} and consider it. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.',
+  'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.',
+  'You study the {noun} and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
+  'The {noun} reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.',
+  'You take the measure of the {noun}. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.',
   'You give the {noun} your full attention. It returns the gesture by being exactly what it appears to be.',
   'The {noun} resists your reading. Not hostile — just closed. Some things in the buried world don\'t open for the curious.',
   'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.',
@@ -459,7 +466,7 @@ const FIXED_FEATURE_VARIANTS: readonly string[] = [
 // broad; a false positive just means a fixed-feature-flavored line for a
 // portable object, which still reads fine (the reverse — handheld phrasing on
 // a wall — is the bug we're closing).
-const FIXED_FEATURE_RE = /\b(stair|stairs|stairway|stairwell|step|steps|landing|wall|walls|floor|ceiling|roof|dome|vault|arch|archway|pillar|column|colonnade|buttress|beam|girder|scaffold|scaffolding|rafter|threshold|doorway|doorframe|door|gate|gateway|portcullis|hatch|frame|hinge|lintel|alcove|niche|ledge|shelf|banister|balustrade|railing|rail|ramp|bridge|shaft|well|cistern|basin|trough|hearth|chimney|flue|furnace|forge|kiln|anvil|toolbench|workbench|bench|counter|altar|dais|plinth|pedestal|statue|monument|mural|fresco|relief|carving|engraving|inscription|glyph[- ]?wall|bolt|anchor|rivet|bracket|clamp|coil|pipe|conduit|duct|vent|grate|grille|drain|sluice|gap|crack|fissure|crevice|rubble|masonry|brickwork|stonework|foundation|slab|flagstone|cobble|tile|floortile|paving|road|path|track|trail|ground|earth|silt|mud|bank|embankment|wall-panel|panel|bulkhead|corridor|passage|tunnel|chamber|room|floorplate|platform|tower|spire|steeple|buttress)\b/i;
+const FIXED_FEATURE_RE = /\b(stair|stairs|stairway|stairwell|step|steps|landing|wall|walls|floor|ceiling|roof|dome|vault|arch|archway|pillar|column|colonnade|buttress|beam|girder|scaffold|scaffolding|rafter|threshold|doorway|doorframe|door|gate|gateway|portcullis|hatch|frame|hinge|lintel|alcove|niche|ledge|shelf|banister|balustrade|railing|rail|ramp|bridge|shaft|well|cistern|basin|trough|hearth|chimney|flue|furnace|forge|kiln|anvil|toolbench|workbench|bench|counter|altar|dais|plinth|pedestal|statue|monument|mural|fresco|relief|carving|engraving|inscription|glyph[- ]?wall|bolt|anchor|rivet|bracket|clamp|coil|pipe|conduit|duct|vent|grate|grille|drain|sluice|gap|crack|fissure|crevice|rubble|masonry|brickwork|stonework|foundation|slab|flagstone|cobble|tile|floortile|paving|road|path|track|trail|ground|earth|silt|mud|bank|embankment|wall-panel|panel|bulkhead|corridor|passage|tunnel|chamber|room|floorplate|platform|tower|spire|steeple|floorboard|floorboards|board|boards|plank|planks|peg|pegs|ladder|bell|cord|wire|cable|lever|valve|gauge|dial|switch|knob|handle|crank|winch|chain|cog|gear|spindle|pulley|scaffold)\b/i;
 
 /** Resolve the lore line for an entry. Returns the cached
  *  loreLine if set; otherwise picks from the category's
