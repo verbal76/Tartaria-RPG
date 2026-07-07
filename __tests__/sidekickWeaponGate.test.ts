@@ -10,6 +10,7 @@ import {
   clearAllOverrides,
   setSidekickWeaponQuestPct,
   getSidekickWeaponQuestPct,
+  DEFAULT_SIDEKICK_WEAPON_QUEST_PCT,
 } from '../app/engine/contentPack';
 import type { PlayerCharacter } from '../app/engine/types';
 
@@ -50,9 +51,16 @@ describe('engine_Dev — sidekick-weapon main-mission % gate', () => {
     expect(getSidekickWeaponQuestPct()).toBe(43);
   });
 
-  it('clearAllOverrides resets the gate to 0 (no gate)', () => {
+  it('the default gate is 40% (from app/data/sidekick-weapons.json), reset restores it', () => {
+    // OTA-1011 — the built-in default is now a 40%-of-main-quest gate, sourced from
+    // the tunable JSON (not a code literal). An author can still override to 0 (no
+    // gate) or any 1..100; clearAllOverrides falls back to the JSON default.
+    expect(DEFAULT_SIDEKICK_WEAPON_QUEST_PCT).toBe(40);
     setSidekickWeaponQuestPct(60);
     clearAllOverrides();
+    expect(getSidekickWeaponQuestPct()).toBe(DEFAULT_SIDEKICK_WEAPON_QUEST_PCT);
+    // 0 is a valid author choice (no gate) and is NOT overwritten by the default.
+    setSidekickWeaponQuestPct(0);
     expect(getSidekickWeaponQuestPct()).toBe(0);
   });
 

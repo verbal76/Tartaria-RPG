@@ -743,10 +743,17 @@ export function isSigilDropsEnabled(): boolean { return sigilDropsEnabled; }
 
 // engine_Dev — global gate: the player must be at least this % (0..100) through the
 // data-driven main mission before SIDEKICK WEAPONS (golem_weapon recipes) can be
-// crafted. 0 = no gate. Authored in the Sidekicks box; read by the craft handler.
-let sidekickWeaponQuestPct = 0;
+// crafted. 0 = no gate. The DEFAULT lives in app/data/sidekick-weapons.json so it's
+// tunable without touching code; a content pack's Sidekicks box overrides it.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const sidekickWeaponsConfig = require('../data/sidekick-weapons.json') as { questUnlockPercent?: number };
+export const DEFAULT_SIDEKICK_WEAPON_QUEST_PCT: number = (() => {
+  const v = sidekickWeaponsConfig.questUnlockPercent;
+  return typeof v === 'number' && Number.isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : 40;
+})();
+let sidekickWeaponQuestPct = DEFAULT_SIDEKICK_WEAPON_QUEST_PCT;
 export function setSidekickWeaponQuestPct(pct: number): void {
-  sidekickWeaponQuestPct = Number.isFinite(pct) ? Math.max(0, Math.min(100, Math.round(pct))) : 0;
+  sidekickWeaponQuestPct = Number.isFinite(pct) ? Math.max(0, Math.min(100, Math.round(pct))) : DEFAULT_SIDEKICK_WEAPON_QUEST_PCT;
 }
 export function getSidekickWeaponQuestPct(): number { return sidekickWeaponQuestPct; }
 
@@ -1269,7 +1276,7 @@ export function clearAllOverrides(): void {
   sigilDropsEnabled = true;
   vendorsEnabled = true;
   vendorsAppendGeneric = false;
-  sidekickWeaponQuestPct = 0;
+  sidekickWeaponQuestPct = DEFAULT_SIDEKICK_WEAPON_QUEST_PCT;
   damageTypesOverride = null;
   damageResistancesOverride = null;
   fusionTagsOverride = null;

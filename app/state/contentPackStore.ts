@@ -38,6 +38,7 @@ import {
   setVendorsEnabled as setVendorsEnabledEngine,
   setVendorsAppendGeneric as setVendorsAppendGenericEngine,
   setSidekickWeaponQuestPct as setSidekickWeaponQuestPctEngine,
+  DEFAULT_SIDEKICK_WEAPON_QUEST_PCT,
   setDamageTypesOverride,
   setDamageResistancesOverride,
   setFusionTagsOverride,
@@ -466,7 +467,7 @@ function persist(state: Pick<ContentPackState, 'tables' | 'lore' | 'missions' | 
     weatherEnabled: state.weatherEnabled === false ? false : undefined,
     vendorsEnabled: state.vendorsEnabled === false ? false : undefined,
     vendorsAppendGeneric: state.vendorsAppendGeneric === true ? true : undefined,
-    sidekickWeaponQuestPct: state.sidekickWeaponQuestPct > 0 ? state.sidekickWeaponQuestPct : undefined,
+    sidekickWeaponQuestPct: state.sidekickWeaponQuestPct !== DEFAULT_SIDEKICK_WEAPON_QUEST_PCT ? state.sidekickWeaponQuestPct : undefined,
     damageTypes: state.damageTypes.length > 0 ? state.damageTypes : undefined,
     damageResistances: state.damageResistances && Object.keys(state.damageResistances).length > 0 ? state.damageResistances : undefined,
     fusionTags: state.fusionTags.length > 0 ? state.fusionTags : undefined,
@@ -567,7 +568,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
   weatherEnabled: true,
   vendorsEnabled: true,
   vendorsAppendGeneric: false,
-  sidekickWeaponQuestPct: 0,
+  sidekickWeaponQuestPct: DEFAULT_SIDEKICK_WEAPON_QUEST_PCT,
   damageTypes: [],
   damageResistances: null,
   fusionTags: [],
@@ -623,7 +624,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     setWeatherEnabledEngine(s.weatherEnabled !== false);
     setVendorsEnabledEngine(s.vendorsEnabled !== false);
     setVendorsAppendGenericEngine(s.vendorsAppendGeneric === true);
-    setSidekickWeaponQuestPctEngine(s.sidekickWeaponQuestPct ?? 0);
+    setSidekickWeaponQuestPctEngine(s.sidekickWeaponQuestPct ?? DEFAULT_SIDEKICK_WEAPON_QUEST_PCT);
     setDamageTypesOverride(s.damageTypes.length > 0 ? (s.damageTypes as { name: string; keywords?: string[] }[]) : null);
     setDamageResistancesOverride(s.damageResistances && Object.keys(s.damageResistances).length > 0 ? (s.damageResistances as Record<string, { resist: string[]; weak: string[] }>) : null);
     setFusionTagsOverride(s.fusionTags.length > 0 ? s.fusionTags : null);
@@ -1792,7 +1793,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     if (s.weatherEnabled === false) out.weatherEnabled = false;
     if (s.vendorsEnabled === false) out.vendorsEnabled = false;
     if (s.vendorsAppendGeneric === true) out.vendorsAppendGeneric = true;
-    if (s.sidekickWeaponQuestPct > 0) out.sidekickWeaponQuestPct = s.sidekickWeaponQuestPct;
+    if (s.sidekickWeaponQuestPct !== DEFAULT_SIDEKICK_WEAPON_QUEST_PCT) out.sidekickWeaponQuestPct = s.sidekickWeaponQuestPct;
     if (s.damageTypes.length > 0) out.damageTypes = s.damageTypes;
     if (s.damageResistances && Object.keys(s.damageResistances).length > 0) out.damageResistances = s.damageResistances;
     if (s.fusionTags.length > 0) out.fusionTags = s.fusionTags;
@@ -1892,7 +1893,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
     clearAllOverrides();
     setPublishedFlag(false);
     invalidateLocationCaches();
-    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, sceneProps: {}, vendors: [], roadsideTraders: [], interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, weatherEnabled: true, vendorsEnabled: true, vendorsAppendGeneric: false, sidekickWeaponQuestPct: 0, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
+    set({ tables: {}, lore: {}, missions: {}, hooks: {}, whispers: [], wasteland: {}, sceneProps: {}, vendors: [], roadsideTraders: [], interactionTags: {}, startingAreas: [], customTitles: [], customMainQuest: null, customBosses: [], collectables: [], summons: null, dogEnabled: true, weatherEnabled: true, vendorsEnabled: true, vendorsAppendGeneric: false, sidekickWeaponQuestPct: DEFAULT_SIDEKICK_WEAPON_QUEST_PCT, damageTypes: [], damageResistances: null, fusionTags: [], coatings: null, digging: null, scrap: null, salvage: null, overlays: [], dogScenarios: [], inventory: null, published: false, narratorName: '', gameTitle: '', gameTagline: '', crucibleName: '', crucibleEnabled: true, worldName: '', corruptionName: '', energyName: '', devMode: true });
     void AsyncStorage.removeItem(STORAGE_KEY).catch(() => { /* best effort */ });
   },
 
@@ -1955,7 +1956,7 @@ export const useContentPackStore = create<ContentPackState>((set, get) => ({
         const vendorsAppendGeneric = shape.vendorsAppendGeneric === true;
         setVendorsAppendGenericEngine(vendorsAppendGeneric);
         const sidekickWeaponQuestPct = typeof shape.sidekickWeaponQuestPct === 'number' && Number.isFinite(shape.sidekickWeaponQuestPct)
-          ? Math.max(0, Math.min(100, Math.round(shape.sidekickWeaponQuestPct))) : 0;
+          ? Math.max(0, Math.min(100, Math.round(shape.sidekickWeaponQuestPct))) : DEFAULT_SIDEKICK_WEAPON_QUEST_PCT;
         setSidekickWeaponQuestPctEngine(sidekickWeaponQuestPct);
         const damageTypes = Array.isArray(shape.damageTypes) ? shape.damageTypes : [];
         setDamageTypesOverride(damageTypes.length > 0 ? (damageTypes as { name: string; keywords?: string[] }[]) : null);

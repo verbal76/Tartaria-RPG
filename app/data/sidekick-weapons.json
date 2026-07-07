@@ -1,0 +1,4 @@
+{
+  "_README": "engine_Dev — the sidekick/meccanoid weapon-forging route. questUnlockPercent is how far through the MAIN QUEST (0..100) the player must be before sidekick weapons can be crafted; crossing it also fires the one-shot forge-unlock pop-up (the CRUDE/basic patterns become available, and the Rare/Legendary ones are then hunted down in the world). 0 = no gate (forgeable from the start, no pop-up). A content pack's Sidekicks box overrides this per-game.",
+  "questUnlockPercent": 40
+}

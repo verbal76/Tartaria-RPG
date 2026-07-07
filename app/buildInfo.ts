@@ -17173,4 +17173,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // beat ("you've learned the shaping of a <summon>'s war-arms... stronger workings lie out in the ruins"),
 // lore-agnostic via getNarratorName()/getSummonNoun(), latched on player.sidekickForgeAnnounced. No-op when
 // the gate is 0. sidekickWeaponGate + recipeDiscovery tests updated.
-export const OTA_BUILD_ID = '2026-07-07-1010-tiered-sidekick-armaments';
+// 2026-07-07-1011 (OTA-1011) — the sidekick-weapon forge gate now DEFAULTS to 40% of main-quest completion
+// (was 0 / no gate), sourced from a tunable JSON — app/data/sidekick-weapons.json { questUnlockPercent }.
+// So out of the box a game seals sidekick weapons until the player is 40% through the main story, then the
+// OTA-1010 unlock pop-up fires. Editable without touching code; a content pack's Sidekicks box still
+// overrides per-game, and 0 (no gate) is preserved as a valid author choice (round-trips through save/
+// publish; only non-default values are persisted). New DEFAULT_SIDEKICK_WEAPON_QUEST_PCT constant threads
+// the JSON value through contentPack + contentPackStore. +1 test (default + 0 round-trip).
+export const OTA_BUILD_ID = '2026-07-07-1011-sidekick-gate-default-40pct-json';
