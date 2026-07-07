@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
-import { missingIngredientsList } from '../engine/crafting';
+import { missingIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
 import { BrandedModal } from '../components/BrandedModal';
@@ -297,6 +297,17 @@ export function CraftingScreen() {
     return sorted;
   }, [repairable, repairQuery, repairSortKey, repairSortDir]);
 
+  // OTA-708 — per-tab "craftable NOW" counts for the tab-bar badges (like REPAIR's).
+  const craftableCounts = useMemo(() => {
+    const inv = player?.inventory ?? [];
+    const { craft, recipes } = craftableRecipeCounts(inv);
+    const aetheric = AETHERCRAFT_DISCIPLINES.filter(
+      (d) => d.fuels.some((f) => ownedQty(inv, f) >= 1),
+    ).length;
+    return { craft, recipes, aetheric };
+  }, [player?.inventory]);
+  const repairReady = useMemo(() => repairable.filter((r) => r.available).length, [repairable]);
+
   if (!player) {
     return (
       <View style={styles.container}>
@@ -342,7 +353,9 @@ export function CraftingScreen() {
           style={[styles.tabBtn, tab === 'craft' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>CRAFT</Text>
+          <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>
+            CRAFT {craftableCounts.craft > 0 ? `(${craftableCounts.craft})` : ''}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab('repair')}
@@ -350,7 +363,7 @@ export function CraftingScreen() {
           activeOpacity={0.7}
         >
           <Text style={[styles.tabBtnText, tab === 'repair' && styles.tabBtnTextActive]}>
-            REPAIR {repairable.length > 0 ? `(${repairable.length})` : ''}
+            REPAIR {repairReady > 0 ? `(${repairReady})` : ''}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -358,14 +371,18 @@ export function CraftingScreen() {
           style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>RECIPES</Text>
+          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>
+            RECIPES {craftableCounts.recipes > 0 ? `(${craftableCounts.recipes})` : ''}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab('aetheric')}
           style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>AETHERIC</Text>
+          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>
+            AETHERIC {craftableCounts.aetheric > 0 ? `(${craftableCounts.aetheric})` : ''}
+          </Text>
         </TouchableOpacity>
       </View>
 

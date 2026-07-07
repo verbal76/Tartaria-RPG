@@ -15515,4 +15515,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-690 — coatings now change THROWN damage (ports Tartaria OTA-707). Typed throw now adds the
 // coating's on-hit dice (was base weight only); bandolier throw takes the tapped instance id so a
 // coated racked knife is the one hurled; applyCoating persists; snapshot shows the coating. Test.
-export const OTA_BUILD_ID = '2026-07-06-690-coating-throw-damage';
+// OTA-691 — every crafting tab shows a "makeable NOW" count (ports Tartaria OTA-708). CRAFT/RECIPES/
+// AETHERIC each show (N) = blueprints/disciplines you can actually make with materials in hand;
+// REPAIR badge switched to the affordable count. New craftableRecipeCounts() helper + test.
+export const OTA_BUILD_ID = '2026-07-06-691-craftable-tab-counts';
