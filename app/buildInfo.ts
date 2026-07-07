@@ -17109,4 +17109,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // RECIPES/<magic> each show (N) = what you can actually make with materials in hand (uses the LIVE
 // content-pack recipe table); REPAIR badge switched to the affordable count. Helper + test.
 // 2026-07-07-999 — grammar: "The the relic responds…" fallback fix (ports Tartaria OTA-709).
-export const OTA_BUILD_ID = '2026-07-07-999-relic-the-the';
+// 2026-07-07-1000 (OTA-1000) — scene-interaction dead-ends (ports Tartaria OTA-710). (1) TAKE infers
+// an improvised weapon from a weapon-named scene noun ("take ice axe") instead of the salvage refusal.
+// (2) SALVAGE falls back to the parser's context-resolved noun (leading article stripped so the line
+// templates don't emit "The the reactor") so it works after investigate / on a location alias. (3)
+// Call-to-action: new `gesture` intent (ring/pray/touch/tilt/answer/shout/…) + a fallback so knock +
+// gesture verbs that DON'T hit an active hook emit a thematic backstory-fill line instead of dead-
+// ending. New engine/callToAction.ts (lore-neutral for the content-pack engine) + 14 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-1000-scene-interaction-dead-ends';

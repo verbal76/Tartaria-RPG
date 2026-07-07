@@ -7426,6 +7426,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // and gates on intentList — non-puzzle hooks ignore these
       // intents and fall through to the normal verb dispatch.
       'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull',
+      // OTA-1000 — call-to-action gestures route through hooks too, so
+      // "ring the bells" / "touch the pillar" can advance a matching hook.
+      'gesture',
     ];
     // arb59 — combat takes precedence over scene hooks. Without the
     // enemies===0 guard, an 'advance'/'approach'/'cast'/etc. aimed at a
@@ -7550,6 +7553,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     // OTA-149 — `summon guardian` command intercept. Mirror of the
+
+    // OTA-1000 — call-to-action fallback. Evocative verbs the scene prose
+    // invites ("knock on the steeple door", "ring the bells", "touch the
+    // pillar", "pray at the altar", "answer the door", "tilt the statue")
+    // that DIDN'T land on an active hook above used to dead-end: 'knock'
+    // went completely silent (no case in the switch), while ring / pray /
+    // touch / tilt / answer demoted to intent='unknown' and drew the
+    // generic "Try: look around · search · rest" refusal. Per playtest
+    // design — "if there's a call to action, it has to actually DO
+    // something, even if it's only a line of backstory" — every such verb
+    // now resolves to a short backstory-fill flavor line keyed to the verb
+    // family and the named noun. Scoped to knock + gesture (the evocative
+    // call-to-action verbs); the mechanical puzzle verbs (turn / push /
+    // pull / press / twist / rotate) keep their existing puzzle routing.
+    // Guarded on no live enemy — these are exploration beats, not combat.
+    if ((parsed.intent === 'knock' || parsed.intent === 'gesture')
+      && currentScene.enemies.length === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { callToActionLine } = require('../engine/callToAction') as typeof import('../engine/callToAction');
+      const ctaNoun = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
+      // A small stamina/time cost so the gesture reads as a real beat,
+      // matching the hook-engage cost above.
+      set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
+      get().appendLog('world', callToActionLine(parsed.matchedVerb, ctaNoun));
+      void get().persist();
+      return;
+    }
 
     switch (parsed.intent) {
       case 'attack': {
@@ -8381,7 +8411,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? harvestVerbs.has(parsed.matchedVerb.toLowerCase())
           : false;
         if (rawTarget && isHarvestVerb) {
-          const harvestAmbient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
+          // OTA-1000 — salvage must catch a noun even after it was INVESTIGATED first.
+          // matchAmbientNoun only sees the scene's ambientNouns; once you investigate
+          // a thing it resolves via the recency/context path, so a later `salvage X`
+          // missed here and fell through to the flavor "already examined" gate — the
+          // dead-end behind the "Try SALVAGE" hint. Fall back to the parser's resolved
+          // noun so salvage actually breaks the thing down (or fails gracefully) instead.
+          const harvestAmbient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
+            // Strip a leading article — matchAmbientNoun returns bare nouns, but the
+            // parser's resolvedNoun can carry "the "/"a " ("salvage the reactor"), and
+            // the salvage line templates prepend their own "The", which produced a
+            // "The the reactor" double article and broke the per-noun dedupe marker.
+            ?? (parsed.resolvedNoun && parsed.resolvedNoun.trim()
+                ? parsed.resolvedNoun.trim().replace(/^(the|a|an)\s+/i, "")
+                : null);
           if (harvestAmbient) {
             const harvestRoomKey = makeRoomKey(
               player.currentLocationId,
@@ -13143,6 +13186,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
                 } else {
                   get().appendLog('world', `Found ${withArticle(cat.name.toLowerCase())}, but your pack is already full of them.`);
+                }
+                break;
+              }
+              // OTA-1000 — a WEAPON/TOOL-named scene noun that isn't a catalog row
+              // ("axe", "ice axe", "javelin") still reads as a grabbable weapon, but
+              // the catalog-only grant above treated it as immovable scenery ("part of
+              // the ground — try SALVAGE"), and salvage then dead-ended. If the name
+              // INFERS as a weapon (the same inference the display + combat already
+              // use), grant an inferred instance instead of refusing. findWeaponByName
+              // only fires for names that read as weapons, so plain scenery (shelf,
+              // hearth, mildew) still falls through to the refusal below.
+              const inferredWeapon = findWeaponByName(ambientHit);
+              if (inferredWeapon) {
+                const takenName = ambientHit.replace(/\b\w/g, (c) => c.toUpperCase());
+                const newItem: InventoryItem = stampDurability({
+                  id: freshInstanceId('take'),
+                  name: takenName,
+                  kind: 'weapon',
+                  rarity: inferredWeapon.rarity,
+                  quantity: 1,
+                  tags: inferredWeapon.tags,
+                });
+                const grantResult = grantItem(player.inventory, newItem);
+                set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+                set((s) => {
+                  const r = s.worldMemory.visitedRooms?.[ambientRoomKey] ?? { firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 1 };
+                  return { worldMemory: { ...s.worldMemory, visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [ambientRoomKey]: { ...r, searchedAmbientNouns: [...(r.searchedAmbientNouns ?? []), ambientLower] } } } };
+                });
+                if (grantResult.accepted > 0) {
+                  get().appendLog('world', `You work the ${ambientHit} free of the silt and heft it. Improvised, but it'll bite.`);
+                  get().appendLog('reward', `✦ ${takenName} (${newItem.rarity}).`);
+                } else {
+                  get().appendLog('world', `Found ${withArticle(takenName.toLowerCase())}, but your pack is already full of them.`);
                 }
                 break;
               }
