@@ -1265,6 +1265,40 @@
       ]
     },
     {
+      "result": "Crude Sidekick Sledge",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 3
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Elder Sidekick Sledge",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 6
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 3
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
       "result": "Sidekick Greatsword",
       "ingredients": [
         {
@@ -1278,6 +1312,36 @@
         {
           "name": "Aether Crystal",
           "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Crude Sidekick Greatsword",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 4
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Elder Sidekick Greatsword",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 6
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 2
         }
       ]
     },
@@ -1299,18 +1363,35 @@
       ]
     },
     {
-      "result": "Sidekick Aether-Lance",
+      "result": "Crude Sidekick Pike",
       "ingredients": [
         {
-          "name": "Aether Crystal",
-          "quantity": 2
+          "name": "Scrap Metal",
+          "quantity": 3
         },
         {
-          "name": "Aetheric Shard",
+          "name": "Big Rock",
           "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Elder Sidekick Pike",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 5
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 3
         },
         {
           "name": "Golem Core",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
           "quantity": 1
         }
       ]
@@ -1343,40 +1424,82 @@
       "_note": "OTA-967 - craftable throwables: give the bandolier a crafting supply line (previously loot/vendor only). Each output is an existing throwable-tagged, bandolier-eligible weapon.",
       "result": "Throwing Knife",
       "ingredients": [
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Stick", "quantity": 1 }
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Stick",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Tartarian Hand Axe (Throw)",
       "ingredients": [
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Smooth Stone", "quantity": 1 },
-        { "name": "Stick", "quantity": 1 }
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Smooth Stone",
+          "quantity": 1
+        },
+        {
+          "name": "Stick",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Mud Throwing Knife",
       "ingredients": [
-        { "name": "Hardened Mudstone", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Cloth Scrap", "quantity": 1 }
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Bone Throwing Axe",
       "ingredients": [
-        { "name": "Wyrm Fang", "quantity": 1 },
-        { "name": "Stick", "quantity": 1 },
-        { "name": "Cloth Scrap", "quantity": 1 }
+        {
+          "name": "Wyrm Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Shaped Aetheric Shard",
       "ingredients": [
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 1 },
-        { "name": "Aether Dust", "quantity": 1 }
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        }
       ]
     }
   ]

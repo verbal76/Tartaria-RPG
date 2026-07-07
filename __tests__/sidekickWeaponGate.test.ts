@@ -55,4 +55,22 @@ describe('engine_Dev — sidekick-weapon main-mission % gate', () => {
     clearAllOverrides();
     expect(getSidekickWeaponQuestPct()).toBe(0);
   });
+
+  // OTA-1010 — the "you can now forge your sidekick's armaments" beat fires the
+  // first time progress REACHES the gate %. This pins the exact boundary the
+  // store's maybeAnnounceSidekickForge uses (progress >= gatePct, and never when
+  // the gate is 0). The one-shot latch + prose are wired in the store (typechecked).
+  it('unlock condition: progress must REACH the gate %, and gate 0 never fires', () => {
+    setCustomMainQuestOverride(FOUR_STEP);
+    setSidekickWeaponQuestPct(50);
+    const gate = getSidekickWeaponQuestPct();
+    const unlocked = (step: number) => gate > 0 && mainQuestProgressPercent(player(step)) >= gate;
+    expect(unlocked(1)).toBe(false); // 25% — still sealed
+    expect(unlocked(2)).toBe(true);  // 50% — the forge opens
+    expect(unlocked(3)).toBe(true);  // past it — stays open
+    // gate 0 (default / no author threshold) never gates and never announces.
+    setSidekickWeaponQuestPct(0);
+    const g0 = getSidekickWeaponQuestPct();
+    expect(g0 > 0 && mainQuestProgressPercent(player(4)) >= g0).toBe(false);
+  });
 });

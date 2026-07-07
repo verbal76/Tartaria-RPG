@@ -1097,6 +1097,11 @@ export interface PlayerCharacter {
    *  recipes ignore this. Lore-agnostic: keyed purely by recipe result name,
    *  resolved against the live content-pack recipe table. */
   knownRecipes?: string[];
+  /** OTA-1010 — one-shot latch for the "you can now forge your sidekick's
+   *  armaments" beat (engine_Dev analog of Tartaria's 4-Core forge unlock).
+   *  Set the first time main-quest progress crosses the author-set sidekick-
+   *  weapon threshold so the announcement fires exactly once. */
+  sidekickForgeAnnounced?: boolean;
   /** OTA-211 — Aether Dust food additive. Eating a food laced with
    *  Aether Dust grants a +3 buff to the player's chosen stat for
    *  5 real-world minutes. Stored as a wall-clock expiry (Date.now()

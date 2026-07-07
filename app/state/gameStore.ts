@@ -1038,6 +1038,49 @@ function advanceCustomQuest(
   if (!adv) return;
   setStore((s) => (s.player ? { player: { ...s.player, customQuestStep: adv.nextStep } } : s));
   getStore().appendLog(adv.won ? 'reward' : 'arbiter', adv.line);
+  // OTA-1010 — crossing the sidekick-weapon story threshold opens the forge.
+  maybeAnnounceSidekickForge(getStore, setStore);
+}
+
+// OTA-1010 — one-shot "you can now forge your sidekick's armaments" beat, the
+// engine_Dev analog of Tartaria's 4-Core forge unlock (fourCoreForgeLine). Fires
+// the first time main-quest progress reaches the author-set sidekick-weapon
+// threshold (getSidekickWeaponQuestPct). The CRUDE (Common) patterns become
+// craftable at that moment — they're non-discoverable, so the only thing that was
+// holding them was this same story gate — and the beat hints that the stronger
+// Rare/Legendary schematics wait out in the world to be uncovered. No-op when the
+// threshold is 0 (no gate) or the beat already fired. Lore-agnostic: narrator +
+// summon noun come from the content pack.
+function maybeAnnounceSidekickForge(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+): void {
+  const p = getStore().player;
+  if (!p || p.sidekickForgeAnnounced) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cp = require('../engine/contentPack') as typeof import('../engine/contentPack');
+  const gatePct = cp.getSidekickWeaponQuestPct();
+  if (gatePct <= 0) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cmqe = require('../engine/customMainQuestEngine') as typeof import('../engine/customMainQuestEngine');
+  if (cmqe.mainQuestProgressPercent(p) < gatePct) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getSummonNoun } = require('../engine/sidekicks') as typeof import('../engine/sidekicks');
+  const summon = getSummonNoun();
+  const Summon = summon.charAt(0).toUpperCase() + summon.slice(1);
+  const narrator = getNarratorName();
+  setStore((s) => (s.player ? { player: { ...s.player, sidekickForgeAnnounced: true } } : s));
+  getStore().appendLog(
+    'reward',
+    `The ${narrator} sets a hand on your shoulder. "There — you've crossed into it. `
+    + `The shaping of a ${summon}'s war-arms is yours now: bring the metal and you can `
+    + `hammer out a crude Sledge, Greatsword, or Pike for your ${summon}. These are the `
+    + `plain patterns. Stronger workings — sharper, surer, and a few never meant for `
+    + `mortal forges at all — lie out in the ruins for you to uncover. Find them, and `
+    + `your ${summon} will carry something far worse into the fight." `
+    + `(${Summon} armaments can now be forged — the basic patterns are yours; uncover `
+    + `stronger ones in your travels.)`,
+  );
 }
 
 // Location-based steps (reach / return_to / hand_in / claim) complete on arrival;

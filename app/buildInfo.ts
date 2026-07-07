@@ -17164,4 +17164,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // behind knownRecipes even though they have their own MAGIC-tab route and no discovery path — soft-locking
 // them. isDiscoverableRecipe now excludes any recipe with its own unlock route: coresRequired set, or a
 // 'golem_weapon'-tagged result. They fall through to their real route unchanged. +1 test.
-export const OTA_BUILD_ID = '2026-07-07-1009-sidekick-route-not-discoverable';
+// 2026-07-07-1010 (OTA-1010) — TIERED sidekick armaments + a real forge-unlock POP-UP (ports Tartaria
+// OTA-720, plus the announcement engine_Dev never had). Each of the 3 armament types (Sledge / Greatsword
+// / Pike — Aether-Lance retired) now comes in 3 tiers: CRUDE (Common, granted at unlock), base (Rare),
+// ELDER (Legendary) — 9 recipes + 6 new weapon defs. Rare/Legendary are discoverable (hard kills /
+// completed hooks); only the Common tier is granted, so OTA-1009's blanket exclusion is superseded (pure-
+// rarity discovery restored). NEW: crossing the author-set sidekick-weapon story % now fires a one-shot
+// beat ("you've learned the shaping of a <summon>'s war-arms... stronger workings lie out in the ruins"),
+// lore-agnostic via getNarratorName()/getSummonNoun(), latched on player.sidekickForgeAnnounced. No-op when
+// the gate is 0. sidekickWeaponGate + recipeDiscovery tests updated.
+export const OTA_BUILD_ID = '2026-07-07-1010-tiered-sidekick-armaments';
