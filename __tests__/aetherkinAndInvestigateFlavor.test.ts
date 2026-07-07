@@ -67,7 +67,10 @@ const HANDHELD = /in your hands|you weigh the|you let it go/i;
 describe('OTA-711 — investigate flavor never treats architecture as handheld', () => {
   // These nouns fall through to the generic category (no dedicated keyword
   // template) AND classify as fixed features.
-  const FIXED = ['stair', 'landing', 'anchor bolt', 'toolbench', 'ledge', 'scaffold', 'buttress', 'floor'];
+  // OTA-714 — includes the nouns the playtest log caught still slipping
+  // through ("floorboards", "pegs", "ladder") plus the generic catch-all.
+  const FIXED = ['stair', 'landing', 'anchor bolt', 'toolbench', 'ledge', 'scaffold', 'buttress', 'floor',
+    'floorboards', 'pegs', 'ladder', 'descent bell', 'plank', 'lever', 'signal cord'];
   for (const noun of FIXED) {
     it(`\`${noun}\` gets posture-agnostic flavor (no "in your hands")`, () => {
       const line = resolveLore({ noun, category: 'generic', loreLine: null } as any);

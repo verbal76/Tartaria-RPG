@@ -15793,4 +15793,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // DIFFERENT encounters while the combat FRACTION actually drops a few points (measured ~57% → ~51%).
 // Combat weight + enemy level are untouched — no extra high-level fights. Cardinal travel unchanged.
 // New PickOptions.autoTravel + AUTO_TRAVEL_VARIETY_MULT. +2 tests. JS-only.
-export const OTA_BUILD_ID = '2026-07-07-713-autoroute-variety';
+// OTA-714 — investigate-flavor gaps closed. The OTA-711 fixed-feature classifier still let nouns it
+// didn't whitelist slip into handheld phrasing — playtest caught "investigate floorboards" → "you turn
+// the floorboards in your hands", "investigate ladder" → "you let it go". The generic catch-all pool is
+// now fully POSTURE-NEUTRAL (no "turn in your hands" / "weigh" / "let it go"), so no noun ever reads as
+// held, and the classifier gained floorboard/plank/ladder/peg/bell/cord/lever/valve/etc. +7 test nouns.
+export const OTA_BUILD_ID = '2026-07-07-714-investigate-flavor-neutral';
