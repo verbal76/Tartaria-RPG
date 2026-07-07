@@ -263,7 +263,7 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, enemyIsAerial } from '../engine/enemyTraits';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, enemyIsAerial, combineDamageTypeMatch } from '../engine/enemyTraits';
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
@@ -11442,7 +11442,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (throwCoat) {
               const raw = Math.max(1, rollFromNotation(throwCoat.dice));
               coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn')
-                ? Math.max(1, Math.round(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).damage * traitDamageMultiplier(enemyHit.traits, throwCoat.kind).multiplier))
+                ? Math.max(1, Math.round(raw * combineDamageTypeMatch(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).match, traitDamageMultiplier(enemyHit.traits, throwCoat.kind).match).multiplier))
                 : raw;
               dmg += coatBonus;
             }
@@ -14425,6 +14425,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Stacks multiplicatively — an Iron Spider with "resist:slashing"
       // halves AGAIN on top of the Construct type's slashing resist.
       const traitMod = traitDamageMultiplier(enemy.traits, weaponType);
+      // OTA-698 — reconcile the type table with the authored trait. STACK when
+      // they agree (double-resist x0.25); on a DISCORD the per-enemy trait wins.
+      const combinedMod = combineDamageTypeMatch(mod.match, traitMod.match);
       // HANDOFF followup — weapon "Effect" parser. Parses the catalog
       // entry's free-text effect column for patterns like "+1d6 against
       // Large creatures" / "+1d6 against constructs" and rolls the
@@ -14452,7 +14455,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ surgeCombatToken: token });
         }
       }
-      let dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
+      let dmg = Math.max(1, Math.round(rawDmg * combinedMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
       // OTA-362 — weapon coating on-hit. If the weapon that landed this
       // blow carries a coating, roll its dice ONCE: the roll lands as
       // IMMEDIATE bonus damage this strike (folded into `dmg` so it
@@ -14496,8 +14499,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? Math.max(
                 1,
                 Math.round(
-                  applyDamageTypeModifier(rawRolled, coating.kind, enemy.type).damage
-                  * traitDamageMultiplier(enemy.traits, coating.kind).multiplier,
+                  rawRolled * combineDamageTypeMatch(
+                    applyDamageTypeModifier(rawRolled, coating.kind, enemy.type).match,
+                    traitDamageMultiplier(enemy.traits, coating.kind).match,
+                  ).multiplier,
                 ),
               )
             : rawRolled;
@@ -14517,9 +14522,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (weaponType) {
         const tp = BUILTIN_DT_COMBAT[canonDT(weaponType)];
         if (tp) {
-          const tMatch: 'weak' | 'resist' | 'normal' =
-            (mod.match === 'weak' || traitMod.match === 'vulnerable') ? 'weak'
-            : (mod.match === 'resist' || traitMod.match === 'resist') ? 'resist' : 'normal';
+          // OTA-698 — use the reconciled type+trait result for the flare proc.
+          const tMatch: 'weak' | 'resist' | 'normal' = combinedMod.match;
           if (Math.random() < dtProcChance(tp, tMatch)) {
             const roll = rollDie(4);
             if (tp.mode === 'on_hit') { dmg += roll; get().appendLog('combat', `${weaponType} flares — +${roll} on hit${tMatch === 'weak' ? ' (weak — bites deep!)' : ''}.`); }
@@ -14543,15 +14547,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       // Narrate the resistance/weakness modifier on its own line so the
       // player can see WHY the damage changed.
-      if (mod.match === 'weak') {
-        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×1.5 for ${dmg})`);
-      } else if (mod.match === 'resist') {
-        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×0.5 for ${dmg})`);
-      }
-      if (traitMod.match === 'vulnerable') {
-        get().appendLog('combat', `${enemy.name} is vulnerable to ${weaponType}. (trait ×1.5)`);
-      } else if (traitMod.match === 'resist') {
-        get().appendLog('combat', `${enemy.name}'s perks resist ${weaponType}. (trait ×0.5)`);
+      // OTA-698 — ONE reconciled line (was two, which could contradict).
+      if (combinedMod.match === 'weak') {
+        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×${combinedMod.multiplier} for ${dmg})`);
+      } else if (combinedMod.match === 'resist') {
+        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${combinedMod.multiplier} for ${dmg})`);
       }
       // OTA-197 — consecutive-resist nudge. Playtester swung a piercing
       // bolt-caster at a piercing-resistant Silt Serpent + Mud Lurker
@@ -14561,7 +14561,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // suggesting a swap. Resets after firing (so it's a single
       // nudge, not a per-turn lecture).
       if (weaponType !== null) {
-        const isResist = mod.match === 'resist' || traitMod.match === 'resist';
+        // OTA-698 — nag only when the RECONCILED result is a resist (so an
+        // enemy that's actually vulnerable to this type never draws it).
+        const isResist = combinedMod.match === 'resist';
         const prev = get().weaponResistStreak;
         if (isResist) {
           if (prev && prev.enemyName === enemy.name && prev.damageType === weaponType) {
@@ -14569,17 +14571,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (nextCount >= 2) {
               // Build a swap hint — surface the available alternative
               // damage types in the player's pack so the Arbiter's
-              // suggestion is grounded. Bare-bones: just list non-
-              // matching weapon types the player carries.
-              const altTypes = new Set<string>();
+              // suggestion is grounded.
+              // OTA-698 — only suggest types the enemy does NOT resist
+              // (checking both the creature-type table and its traits), so
+              // we never tell the player to "try slashing" against a
+              // slashing-resistant foe. Prefer types it's outright weak to.
+              const weakTypes = new Set<string>();
+              const neutralTypes = new Set<string>();
               try {
                 for (const it of player.inventory) {
                   if (it.kind !== 'weapon') continue;
                   if (it.name === equipped?.name) continue;
                   const w = findWeaponByName(it.name);
-                  if (w && w.damageType !== weaponType) altTypes.add(w.damageType);
+                  if (!w || w.damageType === weaponType) continue;
+                  const alt = combineDamageTypeMatch(
+                    applyDamageTypeModifier(1, w.damageType, enemy.type).match,
+                    traitDamageMultiplier(enemy.traits, w.damageType).match,
+                  );
+                  if (alt.match === 'weak') weakTypes.add(w.damageType);
+                  else if (alt.match === 'normal') neutralTypes.add(w.damageType);
                 }
               } catch { /* ignore — hint stays generic */ }
+              const altTypes = weakTypes.size > 0 ? weakTypes : neutralTypes;
               const hint = altTypes.size > 0
                 ? `Try something ${Array.from(altTypes).slice(0, 2).join(' or ')} — you have it in your pack.`
                 : `Find another weapon — ${weaponType} isn't biting.`;
@@ -20703,7 +20716,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const rawBurst = perTurn * COATING_DOT_TURNS;
       const mod = applyDamageTypeModifier(rawBurst, dtype, target.type);
       const traitMod = traitDamageMultiplier(target.traits, dtype);
-      const burst = Math.max(1, Math.round(mod.damage * traitMod.multiplier));
+      const burst = Math.max(1, Math.round(rawBurst * combineDamageTypeMatch(mod.match, traitMod.match).multiplier));
       const newHp = Math.max(0, targetHp - burst);
       // Consume one vial + write the enemy's reduced HP + point the active index at
       // the target so resolveEnemyDefeat resolves THIS enemy on a kill.
@@ -26356,13 +26369,11 @@ function handleGolemCommand(
     {
       const gMod = applyDamageTypeModifier(dmg, dmgType, target.type);
       const gTrait = traitDamageMultiplier(target.traits, dmgType);
-      dmg = Math.max(1, Math.round(gMod.damage * gTrait.multiplier));
+      const gCombined = combineDamageTypeMatch(gMod.match, gTrait.match);
+      dmg = Math.max(1, Math.round(dmg * gCombined.multiplier));
       const gTp = BUILTIN_DT_COMBAT[canonDT(dmgType)];
       if (gTp && gTp.mode === 'on_hit') {
-        const gMatch: 'weak' | 'resist' | 'normal' =
-          (gMod.match === 'weak' || gTrait.match === 'vulnerable') ? 'weak'
-          : (gMod.match === 'resist' || gTrait.match === 'resist') ? 'resist' : 'normal';
-        if (Math.random() < dtProcChance(gTp, gMatch)) dmg += rollDie(4);
+        if (Math.random() < dtProcChance(gTp, gCombined.match)) dmg += rollDie(4);
       }
     }
     // OTA-479 — a COATED golem weapon adds its bite to the hit AND seeds the
@@ -26375,8 +26386,10 @@ function handleGolemCommand(
       const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn';
       const rolled = isElemental
         ? Math.max(1, Math.round(
-            applyDamageTypeModifier(rawRolled, golemCoating.kind, target.type).damage
-            * traitDamageMultiplier(target.traits, golemCoating.kind).multiplier,
+            rawRolled * combineDamageTypeMatch(
+              applyDamageTypeModifier(rawRolled, golemCoating.kind, target.type).match,
+              traitDamageMultiplier(target.traits, golemCoating.kind).match,
+            ).multiplier,
           ))
         : rawRolled;
       dmg += rolled;
@@ -26891,13 +26904,11 @@ function handleDogCombat(
       // traitDamageMultiplier the player's swing uses), then roll the piercing on-hit typed proc.
       const dMod = applyDamageTypeModifier(dmg, 'piercing', target.type);
       const dTrait = traitDamageMultiplier(target.traits, 'piercing');
-      dmg = Math.max(1, Math.round(dMod.damage * dTrait.multiplier));
+      const dCombined = combineDamageTypeMatch(dMod.match, dTrait.match);
+      dmg = Math.max(1, Math.round(dmg * dCombined.multiplier));
       const dTp = BUILTIN_DT_COMBAT[canonDT('piercing')];
       if (dTp && dTp.mode === 'on_hit') {
-        const dMatch: 'weak' | 'resist' | 'normal' =
-          (dMod.match === 'weak' || dTrait.match === 'vulnerable') ? 'weak'
-          : (dMod.match === 'resist' || dTrait.match === 'resist') ? 'resist' : 'normal';
-        if (Math.random() < dtProcChance(dTp, dMatch)) dmg += rollDie(4);
+        if (Math.random() < dtProcChance(dTp, dCombined.match)) dmg += rollDie(4);
       }
       const newHp = Math.max(0, targetHp - dmg);
       get().appendLog(

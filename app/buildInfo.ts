@@ -15544,4 +15544,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-697 — investigate-flavor gaps closed (ports Tartaria OTA-714). The generic catch-all pool is
 // now fully POSTURE-NEUTRAL so nouns the fixed-feature classifier misses (floorboards/pegs/ladder) no
 // longer read as held ('turn in your hands'/'weigh'/'let it go'); classifier gained more fixed nouns.
-export const OTA_BUILD_ID = '2026-07-07-697-investigate-flavor-neutral';
+// OTA-698 — damage-type contradiction fixed (ports Tartaria OTA-715). An enemy whose creature-TYPE
+// resists a damage type but whose authored TRAIT says it's vulnerable to that same type used to multiply
+// BOTH (0.5x1.5=0.75) with contradictory "shrugs off"/"vulnerable" messaging + backwards swap advice.
+// New combineDamageTypeMatch: type + trait STACK when they agree (x0.25) but on a DISCORD the authored
+// trait wins. Applied to every damage path; one reconciled message; swap-nag only suggests non-resisted
+// types. +10 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-698-damage-type-reconcile';
