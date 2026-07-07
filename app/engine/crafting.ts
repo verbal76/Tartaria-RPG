@@ -460,6 +460,23 @@ export function missingIngredientsList(
   return ingredientShortfall(ingredients, inventory);
 }
 
+/** OTA-708 — how many CRAFT-tab (non-consumable results) and RECIPES-tab
+ *  (consumable results) blueprints the player can make RIGHT NOW (every ingredient/
+ *  substitute in hand). Uses the LIVE recipe table (rRecipes) so an uploaded content
+ *  pack is counted, and mirrors RecipesView's per-tab split + availability rule. */
+export function craftableRecipeCounts(
+  inventory: readonly InventoryItem[],
+): { craft: number; recipes: number } {
+  let craft = 0;
+  let recipes = 0;
+  for (const r of rRecipes()) {
+    if (missingIngredientsList(r.ingredients, inventory).length !== 0) continue;
+    if (lookupCraftedItem(r.result).kind === 'consumable') recipes += 1;
+    else craft += 1;
+  }
+  return { craft, recipes };
+}
+
 /** OTA-193 — list ingredients still short after both name + substitute
  *  drains. Returns the missing-quantity-by-name shape the craft caller
  *  needs to surface a "you still need X" arbiter line. */
