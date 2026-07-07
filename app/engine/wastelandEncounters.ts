@@ -195,7 +195,21 @@ interface PickOptions {
    *  Curve: 1.0× at 0–2 steps, 2.0× at 3–4, 4.0× at 5+. Reset
    *  to 0 in stepDirection when an enemy actually spawns. */
   stepsSinceCombat?: number;
+  /** OTA-1003 — auto-route variety bias. When the player is on a plotted
+   *  course (setTravelCourse / continueTravel), the NON-combat archetypes
+   *  (treasure / npc / fusion_bench — the "different encounters") get a
+   *  small weight multiplier so a route feels a little more eventful and
+   *  varied WITHOUT adding fights. Combat archetypes (skirmish / mini_
+   *  dungeon) are untouched, so this raises variety while nudging the
+   *  combat FRACTION down, not up — no extra high-level fights. */
+  autoTravel?: boolean;
 }
+
+/** OTA-1003 — how hard auto-route favors non-combat variety. Deliberately
+ *  small ("only slightly more"): 1.3× lifts the treasure/npc/fusion-bench
+ *  share a few points without swamping the combat rotation, which the
+ *  combat-starvation curve still pulls back after a peaceful stretch. */
+const AUTO_TRAVEL_VARIETY_MULT = 1.3;
 
 /**
  * Maybe roll an encounter for the current scene's location. Returns
@@ -294,6 +308,9 @@ export function pickWastelandEncounter(
     if (opts.aethericVision && a.type === 'fusion_bench') mult *= 2.0;
     // OTA-218 — combat-starvation bias.
     if (isCombat(a.type)) mult *= combatStarvationMult;
+    // OTA-1003 — auto-route variety bias. Lift the NON-combat archetypes so
+    // a plotted course brings in more different (non-fight) encounters.
+    if (opts.autoTravel && !isCombat(a.type)) mult *= AUTO_TRAVEL_VARIETY_MULT;
     return mult;
   };
   // Weighted pick among eligible archetypes (bias-adjusted).

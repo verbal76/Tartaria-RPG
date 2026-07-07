@@ -17129,4 +17129,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // wasteland_encounters.json (generic: any type:'npc' archetype can carry one). The engine now holds NO
 // encounter-specific enemy name or prose — it reads player.pendingProvoke (replaces the boolean
 // aetherkinCoinPending) and spawns/narrates from the content. A content pack can author its own. +2 tests.
-export const OTA_BUILD_ID = '2026-07-07-1002-data-driven-encounter-provoke';
+// 2026-07-07-1003 (OTA-1003) — auto-route travel slightly more eventful + more VARIED, not more fights
+// (ports Tartaria OTA-713). On a plotted course the encounter roll chance nudges 0.55 → 0.58, and the
+// non-combat archetypes (treasure / npc / fusion_bench) get a 1.3× weight bias so a route brings in more
+// DIFFERENT encounters while the combat FRACTION drops a few points. Combat weight + enemy level
+// untouched; cardinal travel unchanged. +2 tests. JS-only.
+export const OTA_BUILD_ID = '2026-07-07-1003-autoroute-variety';
