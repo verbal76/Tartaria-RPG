@@ -80,6 +80,17 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   press: ['press', 'depress', 'mash'],
   push: ['push', 'shove', 'nudge'],
   pull: ['pull', 'tug', 'yank'],
+  // OTA-693 — call-to-action gestures. Evocative verbs the scene prose
+  // invites but which aren't mechanical puzzle inputs. Kept OUT of this
+  // list: 'greet'/'hail'/'sing'/'play' (already claimed by diplomacy),
+  // 'call' (deliberately removed earlier — too greedy). When one of these
+  // lands on an active hook the resolver runs; otherwise the store emits a
+  // backstory-fill flavor line so the action always DOES something.
+  gesture: [
+    'ring', 'pray', 'touch', 'tilt', 'whistle', 'shout', 'chant', 'kneel',
+    'hum', 'stroke', 'caress', 'salute', 'beckon', 'sound', 'signal',
+    'answer', 'respond', 'feel', 'bang', 'strike a note', 'clap',
+  ],
   inventory: [
     // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"
     // all routed here. 'pack' kept; players who type just "pack" are

@@ -77,6 +77,12 @@ export type Intent =
   | 'press'
   | 'push'
   | 'pull'
+  // OTA-693 — call-to-action gestures. Evocative verbs a scene's prose
+  // invites ("knock on the steeple", "ring the bells", "touch the pillar",
+  // "pray at the altar") that aren't mechanical puzzle inputs. They route
+  // through the hook resolver when an active hook matches; otherwise they
+  // emit a thematic backstory-fill flavor line instead of dead-ending.
+  | 'gesture'
   // OTA-120 — Dog Companion combat verbs. Both intents require an
   // active dog in combat (player.dog.status === 'with_player' AND
   // currentScene.enemies.length > 0). Bite is a direct attack;
