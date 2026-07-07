@@ -15817,4 +15817,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // worn row's durability, and the new full durability vanished ("I crafted a rope but still can't
 // climb"). Now a durability-tracked item merges ONLY when both copies are full (same rule weapons/armor
 // use), so a fresh tool stays its own row and the climb picks it. Self-heals on next craft. +4 tests.
-export const OTA_BUILD_ID = '2026-07-07-717-durability-tool-merge-fix';
+// OTA-718 — cool RARE/LEGENDARY recipes are now discoverable-only. Their result-recipes are LOCKED until
+// you FIND them (player.knownRecipes): the Arbiter refuses to forge one you haven't discovered, and the
+// Craft/Recipes lists hide it. Basic (Common/Uncommon-result) recipes stay always-craftable. Discovery,
+// as a reward for reading + hard play: investigating a recipe/blueprint/schematic/notes noun teaches one
+// (once per noun), a hard-won kill has a 10% chance to cough one up, and a completed story thread an 18%
+// chance. Rarity skews Rare > Legendary. Old saves are grandfathered — any discoverable recipe whose
+// result you already OWN is marked known, so nobody loses access. New engine/recipeDiscovery.ts + tests.
+export const OTA_BUILD_ID = '2026-07-07-718-discoverable-rare-recipes';

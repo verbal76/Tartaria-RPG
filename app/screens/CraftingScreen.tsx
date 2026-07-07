@@ -304,7 +304,8 @@ export function CraftingScreen() {
   // consumable results → RECIPES tab, everything else → CRAFT tab.
   const craftableCounts = useMemo(() => {
     const inv = player?.inventory ?? [];
-    const { craft, recipes } = craftableRecipeCounts(inv);
+    // OTA-718 — exclude locked (undiscovered) cool recipes from the tab badges.
+    const { craft, recipes } = craftableRecipeCounts(inv, player?.knownRecipes);
     // An Aethercraft discipline is fireable when ANY one of its fuels is in the pack.
     const aetheric = AETHERCRAFT_DISCIPLINES.filter(
       (d) => d.fuels.some((f) => ownedQty(inv, f) >= 1),
