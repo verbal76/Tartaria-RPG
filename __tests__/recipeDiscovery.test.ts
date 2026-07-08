@@ -18,7 +18,33 @@ import {
   LORE_HOOK_RECIPE_CHANCE,
   MISSION_RECIPE_CHANCE,
   LOOT_RECIPE_CHANCE,
+  recipeVendorPrice,
+  vendorRecipeOffers,
+  vendorSeed,
 } from '../app/engine/recipeDiscovery';
+import { RECIPES as RECIPES_FOR_VENDOR, lookupCraftedItem as lookupForVendor } from '../app/engine/crafting';
+
+describe('OTA-1015 — vendors sell recipes (gold sink)', () => {
+  it('prices by rarity (Rare 200, Legendary 500)', () => {
+    const rare = RECIPES_FOR_VENDOR.map((r) => r.result).find((n) => lookupForVendor(n).rarity === 'Rare');
+    const leg = RECIPES_FOR_VENDOR.map((r) => r.result).find((n) => lookupForVendor(n).rarity === 'Legendary');
+    if (rare) expect(recipeVendorPrice(rare)).toBe(200);
+    if (leg) expect(recipeVendorPrice(leg)).toBe(500);
+  });
+  it('offers only UNKNOWN discoverable recipes, stable per seed, never already-known', () => {
+    const seed = vendorSeed('Sketchy Stall');
+    const offers = vendorRecipeOffers(RECIPES_FOR_VENDOR, [], seed);
+    expect(offers.length).toBeGreaterThan(0);
+    expect(offers.length).toBeLessThanOrEqual(3);
+    for (const o of offers) {
+      expect(isDiscoverableRecipe({ result: o.result })).toBe(true);
+      expect(o.price).toBe(recipeVendorPrice(o.result));
+    }
+    expect(vendorRecipeOffers(RECIPES_FOR_VENDOR, [], seed)).toEqual(offers);
+    const after = vendorRecipeOffers(RECIPES_FOR_VENDOR, [offers[0]!.result], seed);
+    expect(after.some((o) => o.result === offers[0]!.result)).toBe(false);
+  });
+});
 
 describe('OTA-1013 — found-recipe channels', () => {
   it('every discovery channel has a sane 0..1 chance', () => {

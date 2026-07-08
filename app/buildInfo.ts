@@ -17196,4 +17196,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // VendorScreen dumped a stack by calling sellToVendor once PER UNIT, so unloading a big junk stack trained
 // CHA a level at a time. A bulk sale is ONE negotiation now: sellToVendor takes opts.social (default true)
 // and the bulk loop trains only on the first unit. Single sales unchanged.
-export const OTA_BUILD_ID = '2026-07-07-1014-no-charisma-farm-on-bulk-sell';
+// OTA-1015 — vendors SELL recipes (gold sink, ports Tartaria OTA-726). Every trader teaches a small,
+// stable per-vendor slice of the rare/legendary recipes you haven't learned (200 TC Rare / 500 TC
+// Legendary). "buy <recipe name>" routes through the buy flow into knownRecipes (you still gather mats +
+// forge it). Draws from the LIVE content-pack table (getRecipes) — lore-agnostic. Vendor greeting lists
+// the workings for sale + reminds you any vendor mends worn gear ("repair <item>"). +2 tests.
+export const OTA_BUILD_ID = '2026-07-07-1015-vendors-sell-recipes-gold-sink';
