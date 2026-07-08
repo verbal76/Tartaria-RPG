@@ -5293,10 +5293,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been
     // taken or salvaged in this room, it stays gone on re-entry — closing
-    // the re-enter-a-room-to-farm exploit. Wild tiles are left alone
-    // (their re-roll is intentional). candidateKey is this room's per-room
-    // key (same one the take/salvage handlers write).
-    // arb105/arb107 — the player wanted a renewable outpost, NOT a tight
+    // the re-enter-a-room-to-farm exploit. candidateKey is this room's
+    // per-room key (same one the take/salvage handlers write).
+    // OTA-732 — this "picked-clean" filter now covers WILD TILES too, not
+    // just hub interiors. Previously wild tiles were left to re-roll freely,
+    // so a site never RESOLVED: the player would take/salvage/investigate
+    // everything, the non-seeded re-roll would surface the still-unconsumed
+    // half of the pool as fresh green actionables ("it pops up green again,
+    // one more thing"), and there was no picked-clean state. Filtering the
+    // consumed set out of the display means clearing a site genuinely
+    // depletes it; the same round-trip restock below then repopulates it
+    // when the player leaves to another named location and returns.
+    // arb105/arb107 — the player wanted a renewable world, NOT a tight
     // in/out farm. arb105 used a 48h hour-timer; arb107 changed the reset
     // trigger to "the player traveled to a DIFFERENT named location and
     // returned" (red-team found `rest` could skip the hour-timer for free).
@@ -5305,11 +5313,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // stamp (a real round-trip to another named location), we wipe the
     // room's consumed records so its loot — take, salvage, scanner finds,
     // floor-dig — restocks, and re-arm the dog's nose + investigate flavor.
-    // Walking outpost room-to-room or resting in place keeps the same
+    // Walking room-to-room or resting in place keeps the same
     // currentLocationId, so the seq doesn't move and nothing restocks.
     let sceneAmbientNouns = ambientNouns;
     let sceneDisplayedNouns = displayedAmbientNouns;
-    if (hubRoom) {
+    {
       const consumedHere = roomConsumedSet(get().worldMemory, candidateKey);
       if (consumedHere.size > 0) {
         const roomRec = get().worldMemory.visitedRooms?.[candidateKey];
@@ -5339,7 +5347,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
           get().appendLog(
             'world',
-            `The outpost has restocked since you were last through — supplies have been set out again.`,
+            hubRoom
+              ? `The outpost has restocked since you were last through — supplies have been set out again.`
+              : `Time and the wasteland have worked this place over since you last passed through — there's something worth a second look again.`,
           );
         } else {
           // Still "in residence" — keep the room consumed. Stamp the
