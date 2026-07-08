@@ -533,15 +533,35 @@ const JUNK_NOUNS = new Set([
   'way', 'place', 'side',
 ]);
 
+// OTA-737 — an instrument preposition ends the DIRECT OBJECT: everything after
+// "with" / "using" / "by" is the TOOL, not the target. Without this, "with the"
+// was merely stopword-filtered, so "shatter the rune glass with the prybar"
+// dropped "with"/"the" but KEPT "prybar" — the target resolved to the mangled
+// "rune glass prybar" instead of "rune glass". (The richer OTA-204 arg system
+// already segments these into instrument roles; this is the legacy target/
+// resolvedNoun path that handlers still read.)
+const INSTRUMENT_BOUNDARY_PREPS = new Set(['with', 'using', 'by']);
+
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   const after = tokens.slice(verbIdx + 1);
-  return after.filter(
-    (t) =>
-      !STOPWORDS.has(t) &&
-      !QUESTION_WORDS.has(t) &&
-      !JUNK_NOUNS.has(t) &&
-      !FILLER_DESCRIPTORS.has(t),
-  );
+  const out: string[] = [];
+  for (const t of after) {
+    // Stop collecting the direct object at "with/using/by" — but ONLY once we
+    // already have a target noun, so a tool-only command with no direct object
+    // ("attack with the off-hand blade") keeps its existing behavior (the prep
+    // is just skipped as a stopword and the weapon noun is collected).
+    if (INSTRUMENT_BOUNDARY_PREPS.has(t) && out.length > 0) break;
+    if (
+      STOPWORDS.has(t) ||
+      QUESTION_WORDS.has(t) ||
+      JUNK_NOUNS.has(t) ||
+      FILLER_DESCRIPTORS.has(t)
+    ) {
+      continue;
+    }
+    out.push(t);
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
