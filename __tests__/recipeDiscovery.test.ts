@@ -34,16 +34,27 @@ describe('OTA-718 — isDiscoverableRecipe (rare/legendary results are locked)',
   });
 });
 
-describe('OTA-731 — material-refinement recipes are NEVER locked (they are intermediates)', () => {
-  it('Rare MATERIALS (Mudstone, Hardened Mudstone) stay always-craftable', () => {
-    // These are ingredients in dozens of downstream recipes — locking them would
-    // soft-block the whole crafting tree. Rare rarity, but NOT discoverable.
-    for (const n of ['Mudstone', 'Hardened Mudstone']) {
-      expect(lookupCraftedItem(n).rarity).toBe('Rare');
-      expect(isDiscoverableRecipe({ result: n })).toBe(false);
-      expect(recipeIsUnlockedFor({ result: n }, [])).toBe(true); // always shows in crafting
-    }
-    // ...but a Rare non-material item (armor/weapon) is still found-only.
+describe('OTA-731/734 — base materials always craftable; a flagged upgrade is a found recipe', () => {
+  it('base Mudstone stays always-craftable (refine intermediate)', () => {
+    // The base material is an ingredient in dozens of downstream recipes —
+    // locking it would soft-block the whole tree. Rare rarity, but NOT locked.
+    expect(lookupCraftedItem('Mudstone').rarity).toBe('Rare');
+    expect(isDiscoverableRecipe({ result: 'Mudstone' })).toBe(false);
+    expect(recipeIsUnlockedFor({ result: 'Mudstone' }, [])).toBe(true);
+  });
+  it('Hardened Mudstone is a FOUND recipe (content-tagged), locked until learned', () => {
+    // OTA-734 — the hardened upgrade is tagged 'found-recipe' in materials.json,
+    // so it reads as a discovery while base Mudstone stays always-craftable.
+    expect(isDiscoverableRecipe({ result: 'Hardened Mudstone' })).toBe(true);
+    expect(recipeIsUnlockedFor({ result: 'Hardened Mudstone' }, [])).toBe(false);
+    expect(recipeIsUnlockedFor({ result: 'Hardened Mudstone' }, ['Hardened Mudstone'])).toBe(true);
+  });
+  it('the flagged upgrade is surfaced EARLY — pickRecipeToLearn prioritizes it', () => {
+    // Any successful discovery roll teaches the priority recipe first, so the
+    // hardened chain never stays walled for long.
+    expect(pickRecipeToLearn(RECIPES, [], () => 0)).toBe('Hardened Mudstone');
+  });
+  it('...but a Rare non-material item (armor/weapon) is still found-only', () => {
     expect(isDiscoverableRecipe({ result: 'Aetheric Vest' })).toBe(true);
   });
 });

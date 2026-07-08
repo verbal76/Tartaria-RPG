@@ -18,7 +18,7 @@
     { "name": "Golem Core", "rarity": "Rare", "tags": ["construct", "aether"], "description": "The Aetherstone heart of a Mud Golem. Beats faintly for hours after extraction." },
     { "name": "Mudstone", "rarity": "Rare", "tags": ["mud", "stone"], "description": "Compressed mudstone from deep below the flood. Heavy, dense, oddly warm." },
     { "name": "Patched Cloth", "rarity": "Common", "tags": ["fiber", "cloth"], "description": "A serviceable square of mended cloth. Stitches into bandages, padding, or rough garments." },
-    { "name": "Hardened Mudstone", "rarity": "Rare", "tags": ["mud", "stone", "tartarian"], "description": "Mudstone fused under Etheric pressure — denser than iron, refuses to crack." },
+    { "name": "Hardened Mudstone", "rarity": "Rare", "tags": ["mud", "stone", "tartarian", "found-recipe"], "description": "Mudstone fused under Etheric pressure — denser than iron, refuses to crack." },
     { "name": "Mud Gem", "rarity": "Rare", "tags": ["mud", "gem"], "description": "A nodule of Aetheric mud crystallised into a glassy gem. Pricey in Reclaimer markets." },
     { "name": "Aether Shard", "rarity": "Rare", "tags": ["aether", "crystal"], "description": "A single, clean shard of high-grade Aetheric crystal. Cores rare-tier relic work." },
     { "name": "Aetheric Song", "rarity": "Rare", "tags": ["aether", "psychic"], "description": "A held-still Aetheric resonance, carried in a sealed phial. Plays a single Tartarian phrase when uncapped." },

@@ -28,15 +28,44 @@ export interface RecipeLike { result: string }
  *  category still sits behind its story gate (coresRequired / quest-%), applied
  *  separately in the craft handler — that gate + this discovery gate stack, by
  *  design, for the Rare/Legendary tiers. */
+// OTA-734 — a MATERIAL can opt back INTO discovery with this content tag. By
+// default materials are never locked (see below); tagging one 'found-recipe'
+// makes its recipe a find (e.g. Hardened Mudstone), while the base material it
+// upgrades from stays always-craftable. Lives in the content JSON, so the
+// engine carries no lore — an author sets it per material in their own pack.
+const FOUND_RECIPE_TAG = 'found-recipe';
+
+/** Is this result a material the content has flagged as a found recipe?
+ *  Resolved from the material NAME (via findMaterialByName), so a synthetic
+ *  { result } and a real recipe object always agree. */
+function materialIsFoundRecipe(result: string): boolean {
+  const mat = findMaterialByName(result) as { tags?: readonly string[] } | undefined;
+  return !!mat && (mat.tags ?? []).includes(FOUND_RECIPE_TAG);
+}
+
 export function isDiscoverableRecipe(recipe: RecipeLike): boolean {
-  // OTA-731 — MATERIAL-refinement recipes (Mudstone → Hardened Mudstone, Shaped
-  // Aetheric Shard, …) are crafting INTERMEDIATES, not aspirational loot. Never
-  // lock them behind discovery even at Rare rarity — otherwise the refine chain
-  // soft-blocks everything downstream (e.g. you can't make Mudstone Bulwark
-  // because the Hardened Mudstone recipe is hidden). They stay always-craftable.
-  if (findMaterialByName(recipe.result)) return false;
+  const mat = findMaterialByName(recipe.result);
+  if (mat) {
+    // OTA-731 — MATERIAL-refinement recipes (Mudstone, Shaped Aetheric Shard, …)
+    // are crafting INTERMEDIATES, not aspirational loot. Never lock them behind
+    // discovery even at Rare rarity — otherwise the refine chain soft-blocks
+    // everything downstream. They stay always-craftable BY DEFAULT.
+    // OTA-734 — EXCEPT a material the content tags 'found-recipe' (Hardened
+    // Mudstone): base Mudstone stays always-craftable, but the hardened upgrade
+    // is a find — locked until learned, and weighted to surface EARLY so it
+    // never walls its downstream tree for long (see pickRecipeToLearn).
+    return materialIsFoundRecipe(recipe.result);
+  }
   const r = lookupCraftedItem(recipe.result).rarity;
   return r === 'Rare' || r === 'Legendary';
+}
+
+/** Content-flagged "find this early" recipes (the 'found-recipe' material tag).
+ *  pickRecipeToLearn surfaces these ahead of generic rares so a gating refine
+ *  step (e.g. Hardened Mudstone) is discovered soon, not buried behind a pile
+ *  of legendary weapons. */
+export function isPriorityFoundRecipe(result: string): boolean {
+  return materialIsFoundRecipe(result);
 }
 
 /** Recipe-KNOWLEDGE gate only (ingredient check is separate). Basic recipes:
@@ -88,6 +117,10 @@ export function pickRecipeToLearn(
 ): string | null {
   const pool = unknownDiscoverableRecipes(allRecipes, knownRecipes);
   if (pool.length === 0) return null;
+  // OTA-734 — content-flagged priority recipes (Hardened Mudstone and friends)
+  // surface FIRST, so a gating refine step is found early instead of buried.
+  const priority = pool.filter(isPriorityFoundRecipe);
+  if (priority.length > 0) return priority[Math.floor(rng() * priority.length)]!;
   const rares = pool.filter((n) => lookupCraftedItem(n).rarity === 'Rare');
   const legos = pool.filter((n) => lookupCraftedItem(n).rarity === 'Legendary');
   // 80% a Rare recipe (if any left), else a Legendary.
