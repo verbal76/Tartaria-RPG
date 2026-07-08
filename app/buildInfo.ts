@@ -17192,8 +17192,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cracking a container a 6% chance (rarest, since containers are frequent). Shared maybeTeachRecipeReward
 // helper draws from the LIVE content-pack table (getRecipes) — lore-agnostic, no hardcoded names;
 // additive, still FOUND, never auto-granted. New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
-export const // OTA-1014 — stop bulk sales from farming Charisma (ports Tartaria OTA-727). Selling trains CHA, but the
+// OTA-1014 — stop bulk sales from farming Charisma (ports Tartaria OTA-727). Selling trains CHA, but the
 // VendorScreen dumped a stack by calling sellToVendor once PER UNIT, so unloading a big junk stack trained
 // CHA a level at a time. A bulk sale is ONE negotiation now: sellToVendor takes opts.social (default true)
 // and the bulk loop trains only on the first unit. Single sales unchanged.
-export const OTA_BUILD_ID = '2026-07-07-1014-no-charisma-farm-on-bulk-sell';;
+export const OTA_BUILD_ID = '2026-07-07-1014-no-charisma-farm-on-bulk-sell';
