@@ -13,7 +13,7 @@
 // schematic / formula / notes scene noun teaches one; a hard-won fight or a
 // completed story thread occasionally teaches one (piggybacks OTA-716).
 
-import { lookupCraftedItem } from './crafting';
+import { lookupCraftedItem, findMaterialByName } from './crafting';
 
 export interface RecipeLike { result: string }
 
@@ -29,6 +29,12 @@ export interface RecipeLike { result: string }
  *  separately in the craft handler — that gate + this discovery gate stack, by
  *  design, for the Rare/Legendary tiers. */
 export function isDiscoverableRecipe(recipe: RecipeLike): boolean {
+  // OTA-731 — MATERIAL-refinement recipes (Mudstone → Hardened Mudstone, Shaped
+  // Aetheric Shard, …) are crafting INTERMEDIATES, not aspirational loot. Never
+  // lock them behind discovery even at Rare rarity — otherwise the refine chain
+  // soft-blocks everything downstream (e.g. you can't make Mudstone Bulwark
+  // because the Hardened Mudstone recipe is hidden). They stay always-craftable.
+  if (findMaterialByName(recipe.result)) return false;
   const r = lookupCraftedItem(recipe.result).rarity;
   return r === 'Rare' || r === 'Legendary';
 }

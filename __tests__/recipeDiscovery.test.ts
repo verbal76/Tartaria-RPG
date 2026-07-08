@@ -58,7 +58,7 @@ describe('OTA-1013 — found-recipe channels', () => {
     expect(LOOT_RECIPE_CHANCE).toBeLessThan(HARD_WON_RECIPE_CHANCE);
   });
 });
-import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
+import { RECIPES, lookupCraftedItem, findMaterialByName } from '../app/engine/crafting';
 
 function seq(values: number[]): () => number {
   let i = 0;
@@ -78,6 +78,30 @@ describe('OTA-1008 — isDiscoverableRecipe (rare/legendary results are locked)'
     expect(isDiscoverableRecipe({ result: A_DISCOVERABLE })).toBe(true);
     expect(['Rare', 'Legendary']).toContain(lookupCraftedItem(A_DISCOVERABLE).rarity);
     expect(isDiscoverableRecipe({ result: A_COMMON })).toBe(false);
+  });
+});
+
+describe('OTA-1018 — material-refinement recipes are NEVER locked (they are intermediates)', () => {
+  it('a Rare/Legendary MATERIAL result stays always-craftable, unlike an equal-rarity item', () => {
+    // Derive a material-result recipe from the LIVE table (content-agnostic): a
+    // recipe whose result is itself a material AND rare enough that it WOULD be
+    // discoverable if it weren't a material. Locking these would soft-block the
+    // whole refine chain, so isDiscoverableRecipe must exclude them.
+    const matRecipe = RECIPES.find(
+      (r) => findMaterialByName(r.result) && ['Rare', 'Legendary'].includes(lookupCraftedItem(r.result).rarity),
+    );
+    if (matRecipe) {
+      expect(isDiscoverableRecipe(matRecipe)).toBe(false);
+      expect(recipeIsUnlockedFor(matRecipe, [])).toBe(true); // always shows in crafting
+      // A material you own is never grandfathered — materials aren't discoverable.
+      expect(grandfatheredKnownRecipes(RECIPES, [matRecipe.result], undefined)).not.toContain(matRecipe.result);
+    }
+    // ...but a non-material Rare/Legendary result IS found-only.
+    const itemRecipe = RECIPES.find(
+      (r) => !findMaterialByName(r.result) && ['Rare', 'Legendary'].includes(lookupCraftedItem(r.result).rarity),
+    );
+    expect(itemRecipe).toBeTruthy();
+    expect(isDiscoverableRecipe(itemRecipe!)).toBe(true);
   });
 });
 
