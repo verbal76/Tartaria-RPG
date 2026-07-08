@@ -14,7 +14,24 @@ import {
   grandfatheredKnownRecipes,
   pickRecipeToLearn,
   RECIPE_NOTE_RE,
+  HARD_WON_RECIPE_CHANCE,
+  LORE_HOOK_RECIPE_CHANCE,
+  MISSION_RECIPE_CHANCE,
+  LOOT_RECIPE_CHANCE,
 } from '../app/engine/recipeDiscovery';
+
+describe('OTA-1013 — found-recipe channels', () => {
+  it('every discovery channel has a sane 0..1 chance', () => {
+    for (const c of [HARD_WON_RECIPE_CHANCE, LORE_HOOK_RECIPE_CHANCE, MISSION_RECIPE_CHANCE, LOOT_RECIPE_CHANCE]) {
+      expect(c).toBeGreaterThan(0);
+      expect(c).toBeLessThanOrEqual(1);
+    }
+  });
+  it('a finished mission is the best odds; a cracked container the rarest', () => {
+    expect(MISSION_RECIPE_CHANCE).toBeGreaterThan(HARD_WON_RECIPE_CHANCE);
+    expect(LOOT_RECIPE_CHANCE).toBeLessThan(HARD_WON_RECIPE_CHANCE);
+  });
+});
 import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
 
 function seq(values: number[]): () => number {

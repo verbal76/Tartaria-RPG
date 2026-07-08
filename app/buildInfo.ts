@@ -17186,4 +17186,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // first, WEAPON COATINGS second — and each coating card reads its payload ("Coats weapon: +1d6 poison
 // (Festering)" / "+1d4 burn, +1 STR while coated (Searing)") instead of just its tags, so the stronger
 // variant is obvious. +5 tests.
-export const OTA_BUILD_ID = '2026-07-07-1012-coating-tab-split-and-output';
+// 2026-07-07-1013 (OTA-1013) — rare/legendary recipes can now be FOUND on mission completion + in
+// container loot (ports Tartaria OTA-724). On top of recipe/blueprint notes, hard-won kills, and completed
+// hooks: finishing a faction contract / mystery / storyline / hunt has a 25% chance to teach a recipe, and
+// cracking a container a 6% chance (rarest, since containers are frequent). Shared maybeTeachRecipeReward
+// helper draws from the LIVE content-pack table (getRecipes) — lore-agnostic, no hardcoded names;
+// additive, still FOUND, never auto-granted. New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
+export const OTA_BUILD_ID = '2026-07-07-1013-recipes-from-missions-and-loot';

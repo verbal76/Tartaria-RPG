@@ -13522,6 +13522,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'reward',
             `✦ Recovered ${rolled.entry.name}${actualQty > 1 ? ` x${actualQty}` : ''} from the ${target}.`,
           );
+          // OTA-1013 — a cracked container occasionally hides a recipe among the loot.
+          maybeTeachRecipeReward(get, set, 'LOOT_RECIPE_CHANCE', `Recipe found in the ${target}`);
         } else {
           get().appendLog('world', `Inventory cap reached — the ${rolled.entry.name} stays behind.`);
         }
@@ -17439,6 +17441,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}${itemSuffix}.`
         : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}${itemSuffix}.`,
     );
+    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
     logRepChanges(get, repResult.changed);
     // "A real escort mission" — delivered the party alive. Name the survivors
     // so the win lands as a real escort, not a paperwork close.
@@ -17800,6 +17803,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `✦ Sent word — Hunt closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken)${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy carried back.`
         : `✦ Hunt complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
+    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
     applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     recordMemorableEvent(get, set, {
@@ -18269,6 +18273,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `✦ Sent word — Storyline closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken), +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`
         : `✦ Storyline complete — ${candidate.title}. +${payTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
+    maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
     applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -18333,6 +18338,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
       applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       plantNextContractHint(get, def.factionId ?? null, 'hunt');
@@ -18392,6 +18398,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Mystery resolved — ${def.title}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
       applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       plantNextContractHint(get, def.factionId ?? null, 'mystery');
@@ -18450,6 +18457,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Storyline complete — ${def.title}. +${def.rewardTc} TC, +${def.rewardRep} rep with ${def.factionId.replace(/_/g, ' ')}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
       applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
       applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
@@ -23881,6 +23889,28 @@ function desiredMissionLeg(
 // Re-evaluate the active route chain: (re)course toward the current leg's target,
 // transition objective→turn-in when the work completes, and clear the chain when
 // the contract is gone / paused. Safe to call after any travel arrival or kill.
+// OTA-1013 — a discoverable (rare/legendary) recipe can turn up as a reward for
+// FINISHING things: completing a contract / mystery / storyline / hunt, or
+// cracking open a container. Rolls `chance`, teaches one unknown discoverable
+// recipe from the LIVE content-pack table, logs it. Additive — never replaces the
+// real reward. Lore-agnostic (no hardcoded names).
+function maybeTeachRecipeReward(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  chanceKey: 'MISSION_RECIPE_CHANCE' | 'LOOT_RECIPE_CHANCE',
+  flavor: string,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+  if (Math.random() >= rd[chanceKey]) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getRecipes } = require('../engine/crafting') as typeof import('../engine/crafting');
+  const learned = rd.pickRecipeToLearn(getRecipes(), get().player?.knownRecipes);
+  if (!learned) return;
+  set((s) => (s.player ? { player: { ...s.player, knownRecipes: [...(s.player.knownRecipes ?? []), learned] } } : s));
+  get().appendLog('reward', `✦ ${flavor}: ${learned} (${lookupCraftedItem(learned).rarity})! Open Crafting to forge it.`);
+}
+
 function advanceMissionRoute(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
