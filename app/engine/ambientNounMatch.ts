@@ -32,6 +32,13 @@ export function normNoun(s: string): string {
     .replace(/['’]s\b/g, ' ') // possessive "'s" → gone entirely (matches the parser)
     .replace(/['’]/g, '')      // any remaining stray apostrophes
     .replace(/\bof\b/g, ' ')
+    // OTA-736 — hyphens/dashes → space. The parser resolves a typed/tapped chip
+    // like "rune glass" to the canonical "rune-glass" before the engine records
+    // it consumed, so the raw display noun never substring-matched the stored
+    // hyphenated form and the chip stayed GREEN forever — the player re-tapped an
+    // exhausted rune-glass into an endless "nothing new". Collapsing the hyphen
+    // reconciles both sides (also covers en/em dashes).
+    .replace(/[-–—]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }

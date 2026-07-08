@@ -16,6 +16,13 @@ describe('ambient noun matching (chip consumed/exhausted reconciliation)', () =>
       // "offcut" must NOT lose its leading "of".
       expect(normNoun('offcut')).toBe('offcut');
     });
+    it('OTA-736 — collapses hyphens and dashes to a space', () => {
+      // The parser canonicalizes "rune glass" → "rune-glass"; both forms must
+      // normalize to the same string or the exhausted chip never greys.
+      expect(normNoun('rune-glass')).toBe('rune glass');
+      expect(normNoun('rune glass')).toBe('rune glass');
+      expect(normNoun('crevice–pool')).toBe('crevice pool'); // en-dash
+    });
   });
 
   describe('isNounConsumed', () => {
@@ -38,6 +45,13 @@ describe('ambient noun matching (chip consumed/exhausted reconciliation)', () =>
       // re-taps forever into "already examined" (the reported loop).
       expect(isNounConsumed("messenger's post", new Set(['messenger post']))).toBe(true);
       expect(isNounConsumed("Zharak's Teeth Spire", new Set(['zharak teeth spire']))).toBe(true);
+    });
+    it('OTA-736 — matches a spaced display chip against the stored hyphenated form (the rune-glass loop)', () => {
+      // The rune-glass chip shows "rune glass"; the engine records it consumed as
+      // the canonical "rune-glass". Without hyphen normalization the chip stayed
+      // GREEN and the player re-tapped it forever into "nothing new".
+      expect(isNounConsumed('rune glass', new Set(['rune-glass']))).toBe(true);
+      expect(isNounConsumed('rune-glass', new Set(['rune glass']))).toBe(true);
     });
     it('does not match an unrelated noun', () => {
       expect(isNounConsumed('scraps of cloth', new Set(['rusted blade']))).toBe(false);
