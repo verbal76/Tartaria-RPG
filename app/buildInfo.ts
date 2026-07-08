@@ -15613,4 +15613,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "revive dog" brings a dead/abandoned dog back for 300 TC. (3) PREMIUM STOCK — traders sometimes carry a
 // worth-saving-for ware (strong healing / throwables / Uncommon-Rare gear) from the catalog, full price;
 // construct/faction/not-for-sale rows excluded. New engine/vendorServices.ts + maybePremiumOffer. +10 tests.
-export const OTA_BUILD_ID = '2026-07-07-710-vendor-services-and-premium-stock';
+// OTA-711 — more rings + amulets + defensive +AC accessories (ports Tartaria OTA-730). 3 new rings + 3
+// amulets (Rare/Legendary), all craftable, so their recipes feed the discovery + vendor recipe-sale gold
+// sink. Four are DEFENSIVE: accessories can now carry a flat acBonus (new CatalogAccessory field), summed
+// into AC alongside armor (aggregateArmor folds in the amulet + 3 rings). Safe — a natural-20 enemy attack
+// always hits regardless of AC, so no stack of +AC makes the player unhittable; bonuses are +1 each. Item
+// preview shows the AC line. +4 tests.
+export const OTA_BUILD_ID = '2026-07-07-711-more-accessories-and-ac-rings';
