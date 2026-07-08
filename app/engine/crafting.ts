@@ -136,6 +136,11 @@ export interface CatalogAccessory {
   name: string;
   rarity: Rarity;
   statBonus?: { stat: string; amount: number };
+  /** OTA-730 — optional flat AC bonus, so a ring/amulet can be defensive.
+   *  Summed into the player's AC alongside armor (aggregateArmor). Safe: a
+   *  natural-20 enemy attack always hits regardless of AC, so no stack of these
+   *  makes the player unhittable. */
+  acBonus?: number;
   resistances: string[];
   baseDurability?: number;
   tags: string[];

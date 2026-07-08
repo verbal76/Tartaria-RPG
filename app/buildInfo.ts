@@ -17208,4 +17208,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // getSummonNoun(). (3) PREMIUM STOCK — traders sometimes carry a worth-saving-for ware (strong healing /
 // throwables / Uncommon-Rare gear) drawn from THIS pack's own catalog, full price; construct/faction/not-
 // for-sale rows excluded. New engine/vendorServices.ts + maybePremiumOffer. +10 tests.
-export const OTA_BUILD_ID = '2026-07-07-1016-vendor-services-and-premium-stock';
+// OTA-1017 — defensive accessories, ENGINE-side + JSON-authorable (the engine_Dev take on Tartaria
+// OTA-730). Rings/amulets can now carry a flat acBonus that stacks into the player's AC alongside armor
+// (aggregateArmor folds in the equipped amulet + 3 rings, read from the LIVE content-pack accessory table —
+// so an uploaded ring/amulet with "acBonus" just works). Safe: a natural-20 enemy attack always hits
+// regardless of AC, so no stack makes the player unhittable. No hardcoded content — the dev panel now
+// documents the field: TABLE_OPTION_NOTES gains an ACCESSORY_NOTE for the amulets + rings tables, and the
+// template ships a defensive (+AC) sample ring + amulet. Item preview shows the AC line. +2 tests.
+export const OTA_BUILD_ID = '2026-07-07-1017-defensive-accessories-json-authorable';

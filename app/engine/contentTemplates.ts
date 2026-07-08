@@ -210,9 +210,27 @@ const WEATHER_NOTE = [
   '// Weather toggle in the dev console FEATURES card) — scenes then get no weather at all.',
 ].join('\n');
 
+// OTA-1017 — accessory (amulet / ring) schema note. Documents the full shape,
+// including the DEFENSIVE `acBonus` field so authors can make +AC rings/amulets.
+const ACCESSORY_NOTE = [
+  '// Per AMULET / RING row (all fields but name/rarity/tags/description are OPTIONAL):',
+  '//   name, rarity: Common|Uncommon|Rare|Legendary, tags: ["amulet"|"ring", …], description',
+  '//   statBonus: { stat, amount }    — a stat bump while WORN (strength|dexterity|intelligence|',
+  '//                                     wisdom|charisma|stealth)',
+  '//   acBonus: 1                      — a flat +AC while worn (a DEFENSIVE accessory). SAFE to add:',
+  '//                                     a natural-20 enemy attack always hits regardless of AC, so no',
+  '//                                     stack of +AC ever makes the player unhittable. Keep it modest (1–2).',
+  '//   resistances: ["<damage type>"]  — lowers the chance you suffer that type\'s on-hit effect',
+  '//   baseDurability: 40',
+  '//   Combine freely (e.g. a ring with BOTH statBonus and acBonus). The amulet fills the 1 amulet slot;',
+  '//   rings fill up to 3 ring slots — every equipped accessory\'s statBonus + acBonus stacks.',
+  '//   Rare/Legendary accessories with a RECIPE become discoverable + sellable at vendors (a gold sink).',
+].join('\n');
 const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
   weapons: STAT_BONUS_NOTE,
   armor: STAT_BONUS_NOTE,
+  amulets: ACCESSORY_NOTE,
+  rings: ACCESSORY_NOTE,
   materials: MATERIAL_TAGS_NOTE,
   gear: GEAR_NOTE,
   weather: WEATHER_NOTE,
@@ -250,7 +268,7 @@ const TABLE_OPTION_NOTES: Partial<Record<ContentTableId, string>> = {
     '//   CONSUMABLE → stim / medkit / food / tonic / coating-oil → GEAR table,',
     '//                kind:"consumable" + an effect (healHP/restoreStamina/buff…).',
     '//                These also land on the RECIPES tab instead of the CRAFT tab.',
-    '//   ACCESSORY  → define result in the AMULETS or RINGS table (statBonus/resist)',
+    '//   ACCESSORY  → define result in the AMULETS or RINGS table (statBonus / acBonus / resist)',
     '//   TOOL/LIGHT → define result in the EXPLORATION (or GEAR) table',
     '// ───────────────────────────────────────────────────────────────────────────',
     '// HARD RULES (break these and the recipe silently fails):',

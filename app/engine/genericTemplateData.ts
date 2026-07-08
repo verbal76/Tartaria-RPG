@@ -37,11 +37,13 @@ export const GENERIC_TABLE_ROWS = {
   ],
   amulets: [
     { name: 'Minor Charm', rarity: 'Common', statBonus: { stat: 'wisdom', amount: 1 }, resistances: ['frost'], baseDurability: 30, tags: ['amulet'], description: 'A small shard wrapped in copper wire. Wards off the worst of the cold.' },
+    { name: "Warden's Aegis", rarity: 'Rare', acBonus: 1, statBonus: { stat: 'charisma', amount: 1 }, resistances: [], baseDurability: 40, tags: ['amulet', 'defensive'], description: 'A broad plate worn over the sternum — it has turned more than one blade. (DEFENSIVE: acBonus adds flat AC while worn.)' },
     { name: "Seeker's Locket", rarity: 'Common', statBonus: { stat: 'wisdom', amount: 1 }, resistances: [], baseDurability: 30, tcBuy: 28, tcSell: 11, tags: ['amulet', 'detection', 'relic'], description: 'An old pendant that hums near a relic — the warmer the hum, the closer the find. The bearer reads the world a half-beat clearer.' },
     { name: 'Warden Talisman', rarity: 'Legendary', statBonus: { stat: 'strength', amount: 2 }, resistances: ['bludgeoning', 'piercing'], baseDurability: 50, tcBuy: 380, tcSell: 152, tags: ['amulet', 'boss', 'legendary', 'crafted'], description: 'A fist-sized heart, dried and lacquered. Steadies the bearer’s swing, slows their breath.' },
   ],
   rings: [
     { name: "Engineer's Band", rarity: 'Uncommon', statBonus: { stat: 'intelligence', amount: 1 }, resistances: [], baseDurability: 35, tags: ['ring', 'construct'], description: 'A ring used to issue commands to constructs. Prized by tinkerers and collectors.' },
+    { name: 'Iron Guard Band', rarity: 'Rare', acBonus: 1, statBonus: { stat: 'strength', amount: 1 }, resistances: [], baseDurability: 45, tags: ['ring', 'defensive'], description: 'A heavy band that braces the wrist — blows that should land slide off the guard. (DEFENSIVE: acBonus adds flat AC while worn.)' },
     { name: 'Guild Signet', rarity: 'Rare', statBonus: { stat: 'charisma', amount: 2 }, resistances: [], baseDurability: 40, tags: ['ring', 'seal'], description: 'An old seal that opens doors money usually cannot.' },
     { name: 'Order Band', rarity: 'Uncommon', statBonus: { stat: 'intelligence', amount: 2 }, resistances: [], baseDurability: 35, faction: 'REPLACE-with-a-faction-id', tc: 90, tags: ['ring', 'faction_gear', 'scholarly'], description: 'Order issue. Etched edge-to-edge with proofs only the initiated can read; wearing it keeps them close. (+2 Intelligence)' },
   ],
