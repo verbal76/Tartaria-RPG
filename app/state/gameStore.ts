@@ -5196,10 +5196,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { searchRequirementFor: scannerGateFor } = require('../engine/itemEffect');
     const GATED_NOUN_SURFACE_RATE = 0.3;
+    // OTA-733 — the "does this gated noun surface?" coin is SEEDED per
+    // (tile, noun) instead of Math.random(), so a wild tile's prop set is
+    // stable across re-entries. A raw random re-rolled which gated nouns
+    // surfaced on every scene rebuild, which — together with the display
+    // shuffle below — drip-fed "a different item every time I step back in"
+    // and kept the take/salvage/investigate tab green forever. Deterministic
+    // means what you cleared stays cleared and the tile actually resolves.
     const filteredAmbient = baseAmbient.filter((n: string) => {
       const gated = scannerGateFor(n);
       if (!gated) return true;
-      return Math.random() < GATED_NOUN_SURFACE_RATE;
+      return (_hashSeed(`gated:${candidateKey}:${n}`) % 1000) / 1000 < GATED_NOUN_SURFACE_RATE;
     });
     let keptOneClimbable = false;
     const baseTakeable: string[] = [];
@@ -5256,13 +5263,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return [pool[h % pool.length]!];
     })();
     const ambientNouns = Array.from(new Set([...sceneGearNouns, ...waterSourceNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
-    // Lock the visible subset for THIS scene visit. Look-around and
-    // the chip pool (Search/Approach/Salvage) BOTH read from this
-    // same cache — strict match. If a noun isn't in your look-around,
-    // it isn't in your chips either. Consecutive looks show the same
-    // five; leave and come back to re-roll. Hook primaries get
-    // appended to chips separately because they're active narrative
-    // threads, not ambient props.
+    // Lock the visible subset for THIS tile. Look-around and the chip pool
+    // (Search/Approach/Salvage) BOTH read from this same cache — strict
+    // match. If a noun isn't in your look-around, it isn't in your chips
+    // either. Hook primaries get appended to chips separately because
+    // they're active narrative threads, not ambient props.
+    // OTA-733 — the pick is SEEDED by the tile key (was a non-seeded
+    // shuffle). Re-entering the SAME tile now shows the SAME props, so the
+    // consumed-noun filter below can genuinely retire them: take/salvage/
+    // investigate the shown items, they stay gone, and the tile resolves —
+    // no more "cleared it, stepped back in, a different item is waiting."
+    // The place only re-stocks on a real round-trip to another named
+    // location (the restock block further down), same as hub interiors.
     let displayedAmbientNouns: string[];
     if (ambientNouns.length <= AMBIENT_DISPLAY_CAP) {
       displayedAmbientNouns = [...ambientNouns];
@@ -5270,13 +5282,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Reserve slots so each verb still gets a look-in: 3 take + 1
       // climb + 1 salvage. Dedup overflow, then top up any unused slot
       // allocation from the remainder to fill the cap.
-      const pickedTakes = shuffleSlice(baseTakeable, 3);
-      const pickedClimb = shuffleSlice(allClimbablesPool, 1);
-      const pickedSalv = shuffleSlice(allSalvageablesPool, 1);
+      const pickedTakes = shuffleSliceSeeded(baseTakeable, 3, _hashSeed(`disp-take:${candidateKey}`));
+      const pickedClimb = shuffleSliceSeeded(allClimbablesPool, 1, _hashSeed(`disp-climb:${candidateKey}`));
+      const pickedSalv = shuffleSliceSeeded(allSalvageablesPool, 1, _hashSeed(`disp-salv:${candidateKey}`));
       const reservedPicks = Array.from(new Set([...pickedTakes, ...pickedClimb, ...pickedSalv]));
       const remaining = ambientNouns.filter((n) => !reservedPicks.includes(n));
       const topupCount = Math.max(0, AMBIENT_DISPLAY_CAP - reservedPicks.length);
-      displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, AMBIENT_DISPLAY_CAP);
+      displayedAmbientNouns = [...reservedPicks, ...shuffleSliceSeeded(remaining, topupCount, _hashSeed(`disp-top:${candidateKey}`))].slice(0, AMBIENT_DISPLAY_CAP);
     }
     // arb60 — spawned gear shows under TAKE additively (it must NOT consume the
     // flavor-noun slots investigate/salvage read from, so it's prepended after
