@@ -15887,4 +15887,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // real sink). The pool is built from THIS game's own catalogs (never hardcoded names, so it stays lore-
 // clean per game), and construct-only (golem_weapon) + faction-only (faction_gear) + not-for-sale rows are
 // excluded. New maybePremiumOffer helper injected into buildStallVendor + pickRoadsideTrader. +5 tests.
-export const OTA_BUILD_ID = '2026-07-07-729-premium-vendor-stock';
+// OTA-730 — more rings + amulets (a gold sink: their recipes sell at vendors), and defensive accessories.
+// Added 3 rings + 3 amulets (Rare/Legendary), each craftable — so they auto-enter the discovery + vendor
+// recipe-sale pool. Some are DEFENSIVE: accessories can now carry a flat acBonus (new CatalogAccessory
+// field), summed into the player's AC alongside armor. This is SAFE — a natural-20 enemy attack always
+// hits regardless of AC (gameStore ~24719), so no stack of +AC makes you unhittable; the bonuses are a
+// modest +1 each. aggregateArmor now folds in the equipped amulet + 3 rings' acBonus; the item preview
+// shows the AC line. +4 tests. (Note: AC is gear-driven, never trained — that's by design.)
+export const OTA_BUILD_ID = '2026-07-07-730-more-accessories-and-ac-rings';

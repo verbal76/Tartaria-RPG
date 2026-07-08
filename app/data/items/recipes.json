@@ -2055,6 +2055,108 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "result": "Aetherstone Signet",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Titan's Iron Band",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Ring of the Deep Current",
+      "ingredients": [
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Amulet of the Silt Warden",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Reclaimer's Aegis Pendant",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Heart of the Aetherstorm",
+      "ingredients": [
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }

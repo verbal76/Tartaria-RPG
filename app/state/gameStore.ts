@@ -156,6 +156,8 @@ import {
   lookupCraftedItem,
   RECIPES,
   findArmorByName,
+  findAmuletByName,
+  findRingByName,
   findWeaponByName,
   findDogGearByName,
   DOG_GEAR,
@@ -24363,6 +24365,18 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
     }
     // engine_Dev — coating-vial resists worked into this armor instance.
     for (const r of inst?.addedResists ?? []) { resistances.push(r); resistSlots.push({ type: r, slot }); }
+  }
+  // OTA-730 — defensive accessories: an equipped amulet + up to three rings can
+  // each carry a flat acBonus that stacks onto the armor AC. (A natural-20 enemy
+  // attack still always hits, so this can't make the player unhittable.)
+  if (eq.amulet) {
+    const a = findAmuletByName(eq.amulet);
+    if (a?.acBonus) acBonus += a.acBonus;
+  }
+  for (const ringName of [eq.ring, eq.ring2, eq.ring3]) {
+    if (!ringName) continue;
+    const r = findRingByName(ringName);
+    if (r?.acBonus) acBonus += r.acBonus;
   }
   return { acBonus, resistances, resistSlots };
 }

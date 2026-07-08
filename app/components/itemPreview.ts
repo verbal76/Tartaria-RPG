@@ -227,6 +227,7 @@ function previewArmor(a: CatalogArmor): ItemPreview {
 
 function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPreview {
   const stats: string[] = [];
+  if (x.acBonus) stats.push(`AC +${x.acBonus}`); // OTA-730 — defensive accessories
   if (x.statBonus) stats.push(`${x.statBonus.stat.toUpperCase().slice(0, 3)} +${x.statBonus.amount}`);
   if (x.resistances.length > 0) stats.push(`Resists: ${x.resistances.join(', ')}`);
   if (x.baseDurability !== undefined) stats.push(`Durability: ${x.baseDurability}`);
