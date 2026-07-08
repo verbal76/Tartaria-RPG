@@ -15894,4 +15894,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hits regardless of AC (gameStore ~24719), so no stack of +AC makes you unhittable; the bonuses are a
 // modest +1 each. aggregateArmor now folds in the equipped amulet + 3 rings' acBonus; the item preview
 // shows the AC line. +4 tests. (Note: AC is gear-driven, never trained — that's by design.)
-export const OTA_BUILD_ID = '2026-07-07-730-more-accessories-and-ac-rings';
+// OTA-731 — material-refinement recipes are never locked behind discovery. The "cool rare recipes" system
+// (OTA-718) locked EVERY Rare-result recipe until found — but Mudstone and Hardened Mudstone are Rare
+// MATERIALS used as ingredients in dozens of downstream recipes, so hiding them soft-blocked half the
+// crafting tree (you couldn't see the Hardened Mudstone upgrade even though it exists: 2 Mudstone + 1
+// Aether Dust). isDiscoverableRecipe now excludes any result that IS a material (findMaterialByName) — the
+// refine chain is always craftable again; Rare/Legendary weapons/armor/relics/consumables stay found-only.
+// Recipe-discovery + craftableTabCounts tests reworked off the Mudstone example onto a non-material Rare.
+export const OTA_BUILD_ID = '2026-07-07-731-material-recipes-never-locked';

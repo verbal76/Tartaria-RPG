@@ -28,9 +28,23 @@ function seq(values: number[]): () => number {
 describe('OTA-718 — isDiscoverableRecipe (rare/legendary results are locked)', () => {
   it('true for a Legendary-result recipe, false for a Common one', () => {
     expect(isDiscoverableRecipe({ result: 'Aetheric Spear (Legendary)' })).toBe(true); // Legendary
-    expect(isDiscoverableRecipe({ result: 'Mudstone' })).toBe(true);                    // Rare (normal loot recipe)
+    expect(isDiscoverableRecipe({ result: 'Aetheric Vest' })).toBe(true);              // Rare armor (loot recipe)
     expect(isDiscoverableRecipe({ result: 'Iron Spear' })).toBe(false);                // Common
     expect(isDiscoverableRecipe({ result: 'First Aid Kit' })).toBe(false);             // basic consumable
+  });
+});
+
+describe('OTA-731 — material-refinement recipes are NEVER locked (they are intermediates)', () => {
+  it('Rare MATERIALS (Mudstone, Hardened Mudstone) stay always-craftable', () => {
+    // These are ingredients in dozens of downstream recipes — locking them would
+    // soft-block the whole crafting tree. Rare rarity, but NOT discoverable.
+    for (const n of ['Mudstone', 'Hardened Mudstone']) {
+      expect(lookupCraftedItem(n).rarity).toBe('Rare');
+      expect(isDiscoverableRecipe({ result: n })).toBe(false);
+      expect(recipeIsUnlockedFor({ result: n }, [])).toBe(true); // always shows in crafting
+    }
+    // ...but a Rare non-material item (armor/weapon) is still found-only.
+    expect(isDiscoverableRecipe({ result: 'Aetheric Vest' })).toBe(true);
   });
 });
 
@@ -62,17 +76,19 @@ describe('OTA-718 — recipeIsUnlockedFor', () => {
     expect(recipeIsUnlockedFor({ result: 'Climbing Rope' }, [])).toBe(true);
   });
   it('a discoverable recipe is locked until learned', () => {
-    expect(recipeIsUnlockedFor({ result: 'Mudstone' }, [])).toBe(false);
-    expect(recipeIsUnlockedFor({ result: 'Mudstone' }, ['Mudstone'])).toBe(true);
+    expect(recipeIsUnlockedFor({ result: 'Aetheric Vest' }, [])).toBe(false);
+    expect(recipeIsUnlockedFor({ result: 'Aetheric Vest' }, ['Aetheric Vest'])).toBe(true);
   });
 });
 
 describe('OTA-718 — grandfather + unknown set', () => {
   it('marks an owned discoverable result as known (no retroactive loss)', () => {
-    const known = grandfatheredKnownRecipes(RECIPES, ['Mudstone', 'Scrap Metal'], undefined);
-    expect(known).toContain('Mudstone');
+    const known = grandfatheredKnownRecipes(RECIPES, ['Aetheric Vest', 'Scrap Metal'], undefined);
+    expect(known).toContain('Aetheric Vest');
     // A basic result you own does NOT get added (it was never gated).
     expect(known).not.toContain('Iron Spear');
+    // A MATERIAL you own is never grandfathered — materials aren't discoverable.
+    expect(grandfatheredKnownRecipes(RECIPES, ['Mudstone'], undefined)).not.toContain('Mudstone');
     // A Rare golem armament you already own IS grandfathered (it's discoverable now).
     const known2 = grandfatheredKnownRecipes(RECIPES, ['Golem Greatsword'], undefined);
     expect(known2).toContain('Golem Greatsword');
