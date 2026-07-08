@@ -15577,4 +15577,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-702's blanket golem-weapon exclusion is superseded (pure-rarity discovery restored). The 4-Core
 // forge beat now announces "you've learned the shaping... master schematics wait out in the dark." 9
 // recipes + 6 new weapon defs; coreFourForgeGate + recipeDiscovery tests updated.
-export const OTA_BUILD_ID = '2026-07-07-703-tiered-golem-armaments';
+// OTA-704 — RECIPES tab: split WEAPON COATINGS out of FOOD & HEALTH + show each coating's output (ports
+// Tartaria OTA-721). Coatings (Poison Vial, Incendiary Paste, …) are consumables tagged 'weapon_coating'
+// but were lumped under one "FOOD & TONICS" banner. Now the consumable tab has two collapsible sections —
+// FOOD & HEALTH first, WEAPON COATINGS second — and each coating card reads its payload ("Coats weapon:
+// +1d6 poison (Festering)" / "+1d4 burn, +1 STR while coated (Searing)") instead of just its tags, so the
+// stronger variant is obvious. +5 tests.
+export const OTA_BUILD_ID = '2026-07-07-704-coating-tab-split-and-output';

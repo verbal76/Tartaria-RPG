@@ -267,6 +267,17 @@ function previewGear(g: CatalogGear): ItemPreview {
     }
     if (g.effect.cureBleed) stats.push('Cures: bleed');
     if (g.effect.revealScene) stats.push('Reveals hidden scene hooks');
+    // OTA-704 — surface a WEAPON-COATING's actual output so the RECIPES-tab
+    // card shows what it does, not just "Tags: weapon_coating, burn". Playtester
+    // ask: "you have incendiary AND another fire coating — I can't tell which
+    // has the better output, I'm picking by cooler name." Now each coating row
+    // reads e.g. "Coats weapon: +1d6 poison (Festering)" or "+1d4 burn, +1 STR
+    // while coated (Searing)" so higher-dice / stat-bonus variants are legible.
+    if (g.effect.coating) {
+      const c = g.effect.coating;
+      const bonus = c.statBonus ? `, +${c.statBonus.amount} ${c.statBonus.stat.toUpperCase().slice(0, 3)} while coated` : '';
+      stats.push(`Coats weapon: +${c.dice} ${c.kind}${bonus} (${c.label})`);
+    }
   }
   // arb-fix — effect-LESS food/consumables (Trail Rations and any other
   // consumable authored without a structured effect block) don't declare a
