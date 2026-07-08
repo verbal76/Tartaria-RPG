@@ -17180,4 +17180,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // overrides per-game, and 0 (no gate) is preserved as a valid author choice (round-trips through save/
 // publish; only non-default values are persisted). New DEFAULT_SIDEKICK_WEAPON_QUEST_PCT constant threads
 // the JSON value through contentPack + contentPackStore. +1 test (default + 0 round-trip).
-export const OTA_BUILD_ID = '2026-07-07-1011-sidekick-gate-default-40pct-json';
+// 2026-07-07-1012 (OTA-1012) — RECIPES tab: split WEAPON COATINGS out of FOOD & HEALTH + show each
+// coating's output (ports Tartaria OTA-721). Coatings (consumables tagged 'weapon_coating') were lumped
+// under one "FOOD & TONICS" banner; the consumable tab now has two collapsible sections — FOOD & HEALTH
+// first, WEAPON COATINGS second — and each coating card reads its payload ("Coats weapon: +1d6 poison
+// (Festering)" / "+1d4 burn, +1 STR while coated (Searing)") instead of just its tags, so the stronger
+// variant is obvious. +5 tests.
+export const OTA_BUILD_ID = '2026-07-07-1012-coating-tab-split-and-output';

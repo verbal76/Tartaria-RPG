@@ -180,16 +180,22 @@ export function RecipesView({
   };
 
   const [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({});
-  const CATEGORY_ORDER: Array<{ kind: RecipeStatus['kind']; label: string }> = [
-    { kind: 'weapon', label: 'WEAPONS' },
-    { kind: 'armor', label: 'ARMOR' },
-    { kind: 'dog_armor', label: 'DOG ARMOR' },
-    { kind: 'relic', label: 'RELICS' },
-    { kind: 'consumable', label: 'FOOD & TONICS' },
-    { kind: 'misc', label: 'GEAR & MISC' },
+  // OTA-1012 — a weapon COATING is a consumable tagged 'weapon_coating' (Poison
+  // Vial, Incendiary Paste, …). Split those out from FOOD & HEALTH so the two
+  // don't intermix on the RECIPES tab: food/health first, coatings second.
+  const isCoating = (result: string): boolean =>
+    (lookupCraftedItem(result).tags ?? []).includes('weapon_coating');
+  const CATEGORY_ORDER: Array<{ key: string; label: string; match: (e: RecipeStatus) => boolean }> = [
+    { key: 'weapon', label: 'WEAPONS', match: (e) => e.kind === 'weapon' },
+    { key: 'armor', label: 'ARMOR', match: (e) => e.kind === 'armor' },
+    { key: 'dog_armor', label: 'DOG ARMOR', match: (e) => e.kind === 'dog_armor' },
+    { key: 'relic', label: 'RELICS', match: (e) => e.kind === 'relic' },
+    { key: 'food', label: 'FOOD & HEALTH', match: (e) => e.kind === 'consumable' && !isCoating(e.recipe.result) },
+    { key: 'coating', label: 'WEAPON COATINGS', match: (e) => e.kind === 'consumable' && isCoating(e.recipe.result) },
+    { key: 'misc', label: 'GEAR & MISC', match: (e) => e.kind === 'misc' },
   ];
   const groups = CATEGORY_ORDER
-    .map((c) => ({ ...c, items: evaluated.filter((e) => e.kind === c.kind) }))
+    .map((c) => ({ ...c, items: evaluated.filter(c.match) }))
     .filter((g) => g.items.length > 0);
   const renderRow = (e: RecipeStatus) => {
             const cat = lookupCraftedItem(e.recipe.result);
@@ -293,14 +299,14 @@ export function RecipesView({
           </Text>
         ) : (
           groups.map((g) => {
-            const isCollapsed = collapsed[g.kind] ?? true; // default collapsed
+            const isCollapsed = collapsed[g.key] ?? true; // default collapsed
             const readyN = g.items.filter((x) => x.available).length;
             return (
-              <View key={g.kind}>
+              <View key={g.key}>
                 <TouchableOpacity
                   style={styles.catBanner}
                   activeOpacity={0.7}
-                  onPress={() => setCollapsed((c) => ({ ...c, [g.kind]: !(c[g.kind] ?? true) }))}
+                  onPress={() => setCollapsed((c) => ({ ...c, [g.key]: !(c[g.key] ?? true) }))}
                 >
                   <Text style={styles.catChevron}>{isCollapsed ? '▸' : '▾'}</Text>
                   <Text style={styles.catLabel}>{g.label}</Text>
