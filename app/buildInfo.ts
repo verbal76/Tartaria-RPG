@@ -15901,4 +15901,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aether Dust). isDiscoverableRecipe now excludes any result that IS a material (findMaterialByName) — the
 // refine chain is always craftable again; Rare/Legendary weapons/armor/relics/consumables stay found-only.
 // Recipe-discovery + craftableTabCounts tests reworked off the Mudstone example onto a non-material Rare.
-export const OTA_BUILD_ID = '2026-07-08-735-cleared-rooms-survive-reload';
+export const OTA_BUILD_ID = '2026-07-08-736-hyphen-noun-chips-grey-out';
