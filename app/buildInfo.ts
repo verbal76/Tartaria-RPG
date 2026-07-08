@@ -15838,4 +15838,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Legendary tiers are discoverable (found via hard kills / completed hooks), so OTA-719's blanket
 // golem-weapon exclusion is superseded: only the Common tier is auto-available at unlock, the stronger
 // ones are hunted down. 9 recipes + 6 new weapon defs; coreFourForgeGate + recipeDiscovery tests updated.
-export const OTA_BUILD_ID = '2026-07-07-720-tiered-golem-armaments';
+// OTA-721 — RECIPES tab: split WEAPON COATINGS out of FOOD & HEALTH, and show each coating's real output.
+// Coatings (Poison Vial, Incendiary Paste, …) are consumables tagged 'weapon_coating' but were lumped
+// under one "FOOD & TONICS" banner, so the pantry and the war-paints intermixed. Now the consumable tab
+// has two collapsible sections — FOOD & HEALTH first, WEAPON COATINGS second. And each coating card now
+// reads its actual payload ("Coats weapon: +1d6 poison (Festering)" / "+1d4 burn, +1 STR while coated
+// (Searing)") instead of just "Tags: weapon_coating, burn" — so the stronger variant is obvious rather
+// than a guess by name. Playtester: "I'm picking coatings by the cooler-sounding name, not the output."
+export const OTA_BUILD_ID = '2026-07-07-721-coating-tab-split-and-output';
