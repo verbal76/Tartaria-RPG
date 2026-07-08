@@ -100,3 +100,8 @@ export const RECIPE_NOTE_RE = /\b(recipe|recipes|blueprint|blueprints|schematic|
 // recipe is a bigger deal.
 export const HARD_WON_RECIPE_CHANCE = 0.1;
 export const LORE_HOOK_RECIPE_CHANCE = 0.18;
+// OTA-724 — two more "found" channels. Finishing a contract / mystery / storyline
+// / hunt is a milestone, so it carries the best odds. A cracked container is
+// frequent, so its odds are low — a rare thrill, not a firehose.
+export const MISSION_RECIPE_CHANCE = 0.25;
+export const LOOT_RECIPE_CHANCE = 0.06;

@@ -15590,4 +15590,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Rare/Legendary results, so they stay FOUND recipes (locked until discovered), none auto-granted. dexReq
 // 0 / 'crafted' tag so you can wear what you forge; each Titanforged piece needs a distinct boss-drop
 // heart. +9 tests.
-export const OTA_BUILD_ID = '2026-07-07-705-craftable-armor-all-slots-rare-legendary';
+// OTA-706 — rare/legendary recipes can now be FOUND on mission completion + in container loot (ports
+// Tartaria OTA-724). On top of recipe/blueprint notes, hard-won kills, and completed hooks: finishing a
+// faction contract / mystery / storyline / hunt has a 25% chance to teach a recipe, and cracking a
+// container a 6% chance (rarest, since containers are frequent). Shared maybeTeachRecipeReward helper;
+// additive, still FOUND, never auto-granted. New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
+export const OTA_BUILD_ID = '2026-07-07-706-recipes-from-missions-and-loot';
