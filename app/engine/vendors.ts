@@ -411,7 +411,7 @@ function buildPremiumPool(): PremiumEntry[] {
     pool.push({ name, price: Math.max(20, Math.round(base * 1.1)), weight });
   };
   // Strong healing + throwables (gear/consumables).
-  for (const g of (((gearData as any).gear ?? []) as any[])) {
+  for (const g of (resolveTable('gear', BUILTIN_GEAR) as any[])) {
     const heal = typeof g.effect?.healHP === 'number' ? g.effect.healHP : 0;
     const isThrow = ((g.tags ?? []) as string[]).includes('throwable');
     if (heal >= 20 || isThrow) {
@@ -428,22 +428,23 @@ function buildPremiumPool(): PremiumEntry[] {
     if (r === 'rare') return 2;
     return null;
   };
-  for (const w of (((weaponsData as any).weapons ?? []) as any[])) {
+  for (const w of (resolveTable('weapons', BUILTIN_WEAPONS) as any[])) {
     const wt = grade(w);
     if (wt) add(w.name, w.tc || w.tcBuy || rarityPrice(w.rarity), wt);
   }
-  for (const a of (((armorData as any).armor ?? []) as any[])) {
+  for (const a of (resolveTable('armor', BUILTIN_ARMOR) as any[])) {
     const wt = grade(a);
     if (wt) add(a.name, a.tc || a.tcBuy || rarityPrice(a.rarity), wt);
   }
   return pool;
 }
-const PREMIUM_POOL: PremiumEntry[] = buildPremiumPool();
-
 /** ~45% of the time, one premium ware to add to a trader's stock — a thing worth
- *  banking TC toward. Null when the pool is empty or the roll misses. */
+ *  banking TC toward. Null when the pool is empty or the roll misses. Built at
+ *  CALL time so an uploaded content pack's catalog is reflected. */
 export function maybePremiumOffer(existing: VendorOffer[]): VendorOffer | null {
-  if (PREMIUM_POOL.length === 0 || Math.random() >= 0.45) return null;
+  if (Math.random() >= 0.45) return null;
+  const PREMIUM_POOL = buildPremiumPool();
+  if (PREMIUM_POOL.length === 0) return null;
   const pick = pickWeighted(PREMIUM_POOL, (p) => p.weight);
   if (existing.some((o) => o.itemName.toLowerCase() === pick.name.toLowerCase())) return null;
   return { itemName: pick.name, price: pick.price, quantity: 1 };
