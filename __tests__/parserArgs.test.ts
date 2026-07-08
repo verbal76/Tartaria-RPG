@@ -43,6 +43,20 @@ describe('OTA 204 — argument extraction (J&M §12.3.5 frames)', () => {
     expect(p.resolvedNoun).toMatch(/Drone/i);
   });
 
+  it('OTA-737 — an instrument tool does NOT leak into the legacy target string', () => {
+    // Playtest: "shatter the rune glass with the prybar" resolved the legacy
+    // target to the mangled "rune glass prybar" (the tool merged in) because
+    // extractTargetTokens only stopword-filtered "with the". The direct object
+    // must end at the instrument preposition.
+    const p = parseInput('shatter the drone with the bolt-caster', {
+      inventory: [BOLT],
+      enemyNames: ['Aetheric Drone'],
+      enemyPresent: true,
+    });
+    expect(p.target).toMatch(/drone/i);
+    expect(p.target).not.toMatch(/bolt|caster/i); // tool must not be in the target
+  });
+
   it('attack with implicit target: instrument-only is legal (combat defaults to active enemy)', () => {
     const p = parseInput('attack with the bolt-caster', {
       inventory: [BOLT],
