@@ -7262,6 +7262,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
+    // OTA-1016 — paid vendor services: `train <stat>`, `heal dog|sidekick`, `revive dog`.
+    if (tryVendorServiceVerb(get, set, trimmed)) {
+      return;
+    }
     // OTA-1002 — data-driven encounter provocation. A provocable NPC travel
     // encounter (the Aetherkin mourner: "reach for a coin and you will not
     // reach it twice") arms `player.pendingProvoke` from the encounter's
@@ -23968,8 +23972,139 @@ function vendorWaresBlurb(get: () => GameStore, vendorName: string): string | nu
       `Workings for sale: ${offers.map((o) => `${o.result} (${o.price} TC)`).join(', ')} — "buy <name>" to learn one.`,
     );
   }
-  parts.push('They can also mend worn gear — "repair <item>".');
+  parts.push('They can also mend gear ("repair <item>"), train a stat ("train <stat>"), and tend your dog or sidekick ("heal dog" / "revive dog").');
   return parts.join(' ');
+}
+
+// OTA-1016 — paid vendor SERVICES: train a stat, or heal/revive a companion, for
+// TC. Lore-agnostic: narration via getNarratorName() and the summon noun. Costs
+// scale so money keeps meaning — training is NOT a cheat card.
+const STAT_ALIASES: Record<string, keyof import('../engine/types').Stats> = {
+  str: 'strength', strength: 'strength',
+  dex: 'dexterity', dexterity: 'dexterity',
+  int: 'intelligence', intelligence: 'intelligence', intellect: 'intelligence',
+  wis: 'wisdom', wisdom: 'wisdom',
+  cha: 'charisma', charisma: 'charisma',
+  ste: 'stealth', stealth: 'stealth', sth: 'stealth',
+};
+function tryVendorServiceVerb(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  trimmed: string,
+): boolean {
+  const t = trimmed.toLowerCase().trim();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const vs = require('../engine/vendorServices') as typeof import('../engine/vendorServices');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getSummonNoun } = require('../engine/sidekicks') as typeof import('../engine/sidekicks');
+  const summon = getSummonNoun();
+  const Summon = summon.charAt(0).toUpperCase() + summon.slice(1);
+
+  // train <stat>
+  const trainM = /^train(?:\s+(?:my|up|in))?\s+([a-z]+)\s*$/i.exec(t);
+  if (trainM) {
+    const player = get().player;
+    if (!player) return false;
+    get().appendLog('player', trimmed);
+    const vendor = get().currentScene?.vendor;
+    if (!vendor) {
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "No one here trains. Find a teacher at a settlement or a passing trader."`);
+      return true;
+    }
+    const stat = STAT_ALIASES[trainM[1]!];
+    if (!stat) {
+      get().appendLog('arbiter', `${vendor.name} squints. "Train what? Say strength, dexterity, intelligence, wisdom, charisma, or stealth."`);
+      return true;
+    }
+    const cur = player.stats[stat] ?? 0;
+    if (!vs.canPayTrain(cur)) {
+      get().appendLog('arbiter', `${vendor.name} spreads their hands. "No coin buys ${stat} past ${vs.PAY_TRAIN_CAP} — the last of it you earn in the doing, not the paying."`);
+      return true;
+    }
+    const cost = vs.payTrainCost(cur);
+    if (player.tc < cost) {
+      get().appendLog('arbiter', `${vendor.name} names the fee. "A session on your ${stat} runs ${cost} TC. Come back when your purse is heavier."`);
+      return true;
+    }
+    set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - cost, stats: { ...s.player.stats, [stat]: cur + 1 } } } : s));
+    get().appendLog('reward', `You drill with ${vendor.name}'s trainer. ${cost} TC. ✦ ${stat.charAt(0).toUpperCase() + stat.slice(1)} ${cur} → ${cur + 1}.`);
+    void get().persist();
+    return true;
+  }
+
+  // heal / revive dog|sidekick (paid)
+  const summonWords = Array.from(new Set(['sidekick', 'golem', 'construct', summon.toLowerCase().replace(/[^a-z]/g, '')].filter(Boolean))).join('|');
+  const careRe = new RegExp(`^(heal|mend|revive|restore)\\s+(?:my\\s+|the\\s+)?(dog|hound|pup|${summonWords})\\s*$`, 'i');
+  const careM = careRe.exec(t);
+  if (careM) {
+    const player = get().player;
+    if (!player) return false;
+    get().appendLog('player', trimmed);
+    const vendor = get().currentScene?.vendor;
+    if (!vendor) {
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "No one here tends companions. Find a settlement."`);
+      return true;
+    }
+    const verb = careM[1]!.toLowerCase();
+    const who = careM[2]!.toLowerCase();
+    const isSidekick = who !== 'dog' && who !== 'hound' && who !== 'pup';
+
+    if (isSidekick) {
+      const sk = player.sidekick;
+      if (!sk || sk.hp <= 0) {
+        get().appendLog('arbiter', `${vendor.name} looks past you. "You've no ${summon} bound for me to tend."`);
+        return true;
+      }
+      const missing = Math.max(0, sk.hpMax - sk.hp);
+      if (missing <= 0) {
+        get().appendLog('arbiter', `${vendor.name} runs a hand over the ${summon}. "Sound already. Keep your coin."`);
+        return true;
+      }
+      const cost = vs.companionHealCost(missing, 'golem');
+      if (player.tc < cost) {
+        get().appendLog('arbiter', `${vendor.name} taps the ${summon}'s plating. "A full patching runs ${cost} TC. You're short."`);
+        return true;
+      }
+      set((s) => (s.player && s.player.sidekick ? { player: { ...s.player, tc: s.player.tc - cost, sidekick: { ...s.player.sidekick, hp: s.player.sidekick.hpMax } } } : s));
+      get().appendLog('reward', `${vendor.name} patches your ${sk.name} back to full. ${cost} TC. (${sk.hp} → ${sk.hpMax} HP)`);
+      void get().persist();
+      return true;
+    }
+
+    // dog
+    const dog = player.dog;
+    if (!dog || dog.status === 'abandoned' || dog.status === 'dead') {
+      if (dog && (verb === 'revive' || verb === 'restore') && (dog.status === 'dead' || dog.status === 'abandoned')) {
+        const cost = vs.REVIVE_DOG_COST;
+        if (player.tc < cost) {
+          get().appendLog('arbiter', `${vendor.name} looks at the still form. "Bringing ${dog.name} back is grim work — ${cost} TC. You haven't got it."`);
+          return true;
+        }
+        set((s) => (s.player && s.player.dog ? { player: { ...s.player, tc: s.player.tc - cost, dog: { ...s.player.dog, status: 'with_player', hp: s.player.dog.hpMax } } } : s));
+        get().appendLog('reward', `${vendor.name}'s healer coaxes ${dog.name} back from the edge. ${cost} TC. ${dog.name} is with you again, restored.`);
+        void get().persist();
+        return true;
+      }
+      get().appendLog('arbiter', `${vendor.name} looks around. "You've no dog with you to tend."`);
+      return true;
+    }
+    const missing = Math.max(0, dog.hpMax - dog.hp);
+    if (missing <= 0) {
+      get().appendLog('arbiter', `${vendor.name} scratches the dog's ears. "Hale already. Keep your coin."`);
+      return true;
+    }
+    const cost = vs.companionHealCost(missing, 'dog');
+    if (player.tc < cost) {
+      get().appendLog('arbiter', `${vendor.name} eyes the dog. "Patching ${dog.name} up runs ${cost} TC. You're short."`);
+      return true;
+    }
+    set((s) => (s.player && s.player.dog ? { player: { ...s.player, tc: s.player.tc - cost, dog: { ...s.player.dog, hp: s.player.dog.hpMax } } } : s));
+    get().appendLog('reward', `${vendor.name} tends ${dog.name} back to full. ${cost} TC. (${dog.hp} → ${dog.hpMax} HP)`);
+    void get().persist();
+    return true;
+  }
+
+  return false;
 }
 
 function advanceMissionRoute(

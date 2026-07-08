@@ -17201,4 +17201,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Legendary). "buy <recipe name>" routes through the buy flow into knownRecipes (you still gather mats +
 // forge it). Draws from the LIVE content-pack table (getRecipes) — lore-agnostic. Vendor greeting lists
 // the workings for sale + reminds you any vendor mends worn gear ("repair <item>"). +2 tests.
-export const OTA_BUILD_ID = '2026-07-07-1015-vendors-sell-recipes-gold-sink';
+// OTA-1016 — two more gold sinks (ports Tartaria OTA-728 + OTA-729), lore-agnostic: (1) PAY-TO-TRAIN —
+// "train <stat>" pays TC to raise a stat +1; cost scales (50×) and caps at 15 so it's a sink not a cheat.
+// (2) COMPANION CARE — "heal dog"/"heal <summon>" patches a companion to full (cost scales with missing
+// HP); "revive dog" restores a dead/abandoned dog for 300 TC. Uses player.sidekick + getNarratorName() +
+// getSummonNoun(). (3) PREMIUM STOCK — traders sometimes carry a worth-saving-for ware (strong healing /
+// throwables / Uncommon-Rare gear) drawn from THIS pack's own catalog, full price; construct/faction/not-
+// for-sale rows excluded. New engine/vendorServices.ts + maybePremiumOffer. +10 tests.
+export const OTA_BUILD_ID = '2026-07-07-1016-vendor-services-and-premium-stock';
