@@ -153,7 +153,9 @@ export function VendorScreen() {
     if (pending?.mode !== 'sell') return;
     const stack = sellStackFor(pending.itemName);
     const reps = Math.max(1, Math.min(repsOverride ?? sellQty, stack));
-    for (let i = 0; i < reps; i++) sellToVendor(pending.itemName, pending.itemId);
+    // OTA-1014 — a bulk sale is one negotiation: only the first unit trains CHA,
+    // so dumping a big stack no longer farms Charisma one level at a time.
+    for (let i = 0; i < reps; i++) sellToVendor(pending.itemName, pending.itemId, { social: i === 0 });
     setPending(null);
   };
   // arb92 — buy-quantity helpers. Stock comes from the matching offer; the
