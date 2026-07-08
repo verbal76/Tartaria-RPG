@@ -10,6 +10,10 @@ import {
   grandfatheredKnownRecipes,
   pickRecipeToLearn,
   RECIPE_NOTE_RE,
+  HARD_WON_RECIPE_CHANCE,
+  LORE_HOOK_RECIPE_CHANCE,
+  MISSION_RECIPE_CHANCE,
+  LOOT_RECIPE_CHANCE,
 } from '../app/engine/recipeDiscovery';
 import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
 
@@ -94,6 +98,20 @@ describe('OTA-718 — pickRecipeToLearn', () => {
   it('returns null once every discoverable recipe is known', () => {
     const all = unknownDiscoverableRecipes(RECIPES, []);
     expect(pickRecipeToLearn(RECIPES, all)).toBeNull();
+  });
+});
+
+describe('OTA-724 — found-recipe channels', () => {
+  it('every discovery channel has a sane 0..1 chance', () => {
+    for (const c of [HARD_WON_RECIPE_CHANCE, LORE_HOOK_RECIPE_CHANCE, MISSION_RECIPE_CHANCE, LOOT_RECIPE_CHANCE]) {
+      expect(c).toBeGreaterThan(0);
+      expect(c).toBeLessThanOrEqual(1);
+    }
+  });
+  it('a finished mission is the best odds; a cracked container the rarest', () => {
+    // Milestone (mission) > kills/hooks > frequent container loot.
+    expect(MISSION_RECIPE_CHANCE).toBeGreaterThan(HARD_WON_RECIPE_CHANCE);
+    expect(LOOT_RECIPE_CHANCE).toBeLessThan(HARD_WON_RECIPE_CHANCE);
   });
 });
 

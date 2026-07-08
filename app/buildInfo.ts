@@ -15853,4 +15853,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hooks) — none auto-granted, per "leave the majority as found." Craftable conventions (dexReq 0, no race
 // affinity, 'crafted' tag) so you can always wear what you forge; each Titanforged piece consumes a
 // distinct boss-drop heart, keeping them genuinely end-game. +9 tests (armorRecipeCoverage).
-export const OTA_BUILD_ID = '2026-07-07-722-craftable-armor-all-slots-rare-legendary';
+// OTA-724 — two more "found" channels for rare/legendary recipes. On top of reading recipe/blueprint
+// notes, hard-won kills, and completed hooks, a recipe can now also turn up on MISSION COMPLETION
+// (faction contract / mystery / storyline / hunt turn-in — best odds, 25%) and in CONTAINER LOOT (cracking
+// a chest/crate — rarest, 6%, since containers are frequent). Shared maybeTeachRecipeReward helper draws
+// from the live recipe table; additive, never replaces the real reward; still FOUND, never auto-granted.
+// New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
+export const OTA_BUILD_ID = '2026-07-07-724-recipes-from-missions-and-loot';
