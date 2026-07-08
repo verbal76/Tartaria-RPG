@@ -15845,4 +15845,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reads its actual payload ("Coats weapon: +1d6 poison (Festering)" / "+1d4 burn, +1 STR while coated
 // (Searing)") instead of just "Tags: weapon_coating, burn" — so the stronger variant is obvious rather
 // than a guess by name. Playtester: "I'm picking coatings by the cooler-sounding name, not the output."
-export const OTA_BUILD_ID = '2026-07-07-721-coating-tab-split-and-output';
+// OTA-722 — fill the craftable-armor rarity gaps. Only HEAD had a Rare+Legendary craftable path; legs/
+// hands/feet/cloak topped out at Common/Uncommon and only head had a Legendary. Added a new Aetherforged
+// (Rare) set for legs/hands/feet/cloak and a Titanforged (Legendary) set for those four PLUS a Legendary
+// chest — 9 new armor pieces + 9 recipes, so EVERY slot is now craftable at Rare and Legendary. They're
+// Rare/Legendary results, so the discovery system locks them until FOUND (recipe notes / hard kills /
+// hooks) — none auto-granted, per "leave the majority as found." Craftable conventions (dexReq 0, no race
+// affinity, 'crafted' tag) so you can always wear what you forge; each Titanforged piece consumes a
+// distinct boss-drop heart, keeping them genuinely end-game. +9 tests (armorRecipeCoverage).
+export const OTA_BUILD_ID = '2026-07-07-722-craftable-armor-all-slots-rare-legendary';
