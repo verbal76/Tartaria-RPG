@@ -105,3 +105,42 @@ export const LORE_HOOK_RECIPE_CHANCE = 0.18;
 // frequent, so its odds are low — a rare thrill, not a firehose.
 export const MISSION_RECIPE_CHANCE = 0.25;
 export const LOOT_RECIPE_CHANCE = 0.06;
+
+// OTA-726 — vendors can SELL recipes (a gold sink + a reliable, if pricey, way to
+// learn a working you haven't stumbled on). Priced by rarity of the result.
+export function recipeVendorPrice(result: string): number {
+  switch (lookupCraftedItem(result).rarity) {
+    case 'Legendary': return 500;
+    case 'Rare': return 200;
+    default: return 120; // any other discoverable tier — a safe middle price
+  }
+}
+
+/** A stable per-vendor slice of the recipes this vendor will teach for TC —
+ *  drawn from the player's UNKNOWN discoverable recipes so nothing on offer is
+ *  already owned. Deterministic in `seed` (hash of the vendor name) so the same
+ *  trader shows the same stock all session. Empty once everything's learned. */
+export function vendorRecipeOffers(
+  allRecipes: readonly RecipeLike[],
+  knownRecipes: readonly string[] | undefined,
+  seed: number,
+  count = 3,
+): { result: string; price: number }[] {
+  const pool = unknownDiscoverableRecipes(allRecipes, knownRecipes).slice().sort();
+  if (pool.length === 0) return [];
+  const start = ((seed % pool.length) + pool.length) % pool.length;
+  const n = Math.min(count, pool.length);
+  const out: { result: string; price: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const result = pool[(start + i) % pool.length]!;
+    out.push({ result, price: recipeVendorPrice(result) });
+  }
+  return out;
+}
+
+/** Tiny stable string hash → a vendor seed for vendorRecipeOffers. */
+export function vendorSeed(name: string): number {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}

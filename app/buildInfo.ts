@@ -15864,4 +15864,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries golemName/golemKind (populated on save when a living golem is bound, hp > 0), and the title
 // screen renders a matching golem sub-line under the dog. Purely additive; slots with no golem look
 // unchanged, and a crumbled golem never lingers on the tile.
-export const OTA_BUILD_ID = '2026-07-07-725-char-select-shows-golem';
+// OTA-726 — gold sink #1: vendors SELL recipes. Every trader teaches a small, stable slice of the
+// rare/legendary recipes you haven't learned (200 TC Rare / 500 TC Legendary) — a real early-game money
+// use + a reliable way to get a working you never stumbled on. "buy <recipe name>" routes through the
+// normal buy flow into knownRecipes (you still gather the mats + forge it). The vendor greeting now lists
+// the workings for sale AND reminds you that any vendor mends worn gear ("repair <item>" — which already
+// worked, just wasn't surfaced). New recipeVendorPrice / vendorRecipeOffers / vendorSeed helpers. +3 tests.
+export const OTA_BUILD_ID = '2026-07-07-726-vendors-sell-recipes-gold-sink';

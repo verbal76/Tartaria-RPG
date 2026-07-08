@@ -5810,6 +5810,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
       );
+      const vendorBlurb = vendorWaresBlurb(get, vendor.name); // OTA-726
+      if (vendorBlurb) get().appendLog('world', vendorBlurb);
       }
       // Faction vendors may offer a contract the player qualifies for.
       if (vendor.faction) {
@@ -15797,6 +15799,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // OTA-726 — RECIPE offers. A vendor teaches a small, stable slice of the
+    // rare/legendary recipes you haven't learned yet (a gold sink + a reliable,
+    // pricey way to get a working you never stumbled on). `buy <recipe name>`
+    // routes here before the normal item lookup. Teaches into knownRecipes —
+    // you still have to gather the materials and forge it.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
+      const recipeOffers = rd.vendorRecipeOffers(RECIPES, player.knownRecipes, rd.vendorSeed(scene.vendor.name));
+      const rOffer = recipeOffers.find((o) => o.result.toLowerCase() === itemName.toLowerCase());
+      if (rOffer) {
+        if ((player.knownRecipes ?? []).includes(rOffer.result)) {
+          get().appendLog('system', `You already know the ${rOffer.result} working.`);
+          return;
+        }
+        if (player.tc < rOffer.price) {
+          get().appendLog('system', `${scene.vendor.name} taps the schematic. "The ${rOffer.result} working runs ${rOffer.price} TC. Come back when your purse is heavier."`);
+          return;
+        }
+        set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - rOffer.price, knownRecipes: [...(s.player.knownRecipes ?? []), rOffer.result] } } : s));
+        get().appendLog('reward', `Bought the ${rOffer.result} working for ${rOffer.price} TC. ✦ Recipe learned (${lookupCraftedItem(rOffer.result).rarity})! Open Crafting to forge it — you'll still need the materials.`);
+        void get().persist();
+        return;
+      }
+    }
+
     const offer = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === itemName.toLowerCase());
     if (!offer) return;
     // OTA 039 — corruption-tier price markup. Corrupted players pay
@@ -18979,6 +19009,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
         );
+        const stallBlurb = vendorWaresBlurb(get, stall.name); // OTA-726
+        if (stallBlurb) get().appendLog('world', stallBlurb);
       }
     }
 
@@ -23165,6 +23197,28 @@ function maybeTeachRecipeReward(
   if (!learned) return;
   set((s) => (s.player ? { player: { ...s.player, knownRecipes: [...(s.player.knownRecipes ?? []), learned] } } : s));
   get().appendLog('reward', `✦ ${flavor}: ${learned} (${lookupCraftedItem(learned).rarity})! Open Crafting to forge it.`);
+}
+
+// OTA-726 — one-line "what else this trader offers" blurb for the vendor
+// greeting: the rare/legendary recipes they'll teach for TC (a gold sink) plus a
+// reminder that any vendor mends worn gear. Returns null when there's nothing
+// extra to say (e.g. you've already learned everything they'd sell).
+function vendorWaresBlurb(get: () => GameStore, vendorName: string): string | null {
+  const player = get().player;
+  if (!player) return null;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const rd = require('../engine/recipeDiscovery') as typeof import('../engine/recipeDiscovery');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
+  const offers = rd.vendorRecipeOffers(RECIPES, player.knownRecipes, rd.vendorSeed(vendorName));
+  const parts: string[] = [];
+  if (offers.length > 0) {
+    parts.push(
+      `Workings for sale: ${offers.map((o) => `${o.result} (${o.price} TC)`).join(', ')} — "buy <name>" to learn one.`,
+    );
+  }
+  parts.push('They can also mend worn gear — "repair <item>".');
+  return parts.join(' ');
 }
 
 function advanceMissionRoute(
