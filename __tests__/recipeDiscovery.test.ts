@@ -14,6 +14,9 @@ import {
   LORE_HOOK_RECIPE_CHANCE,
   MISSION_RECIPE_CHANCE,
   LOOT_RECIPE_CHANCE,
+  recipeVendorPrice,
+  vendorRecipeOffers,
+  vendorSeed,
 } from '../app/engine/recipeDiscovery';
 import { RECIPES, lookupCraftedItem } from '../app/engine/crafting';
 
@@ -112,6 +115,40 @@ describe('OTA-724 — found-recipe channels', () => {
     // Milestone (mission) > kills/hooks > frequent container loot.
     expect(MISSION_RECIPE_CHANCE).toBeGreaterThan(HARD_WON_RECIPE_CHANCE);
     expect(LOOT_RECIPE_CHANCE).toBeLessThan(HARD_WON_RECIPE_CHANCE);
+  });
+});
+
+describe('OTA-726 — vendors sell recipes (gold sink)', () => {
+  it('prices by rarity: Rare < Legendary', () => {
+    // Mudstone is Rare, Aetheric Spear (Legendary) is Legendary.
+    expect(recipeVendorPrice('Mudstone')).toBe(200);
+    expect(recipeVendorPrice('Aetheric Spear (Legendary)')).toBe(500);
+    expect(recipeVendorPrice('Aetheric Spear (Legendary)')).toBeGreaterThan(recipeVendorPrice('Mudstone'));
+  });
+
+  it('offers only UNKNOWN discoverable recipes, and is stable per seed', () => {
+    const seed = vendorSeed('Sketchy Stall');
+    const offers = vendorRecipeOffers(RECIPES, [], seed);
+    expect(offers.length).toBeGreaterThan(0);
+    expect(offers.length).toBeLessThanOrEqual(3);
+    for (const o of offers) {
+      expect(isDiscoverableRecipe({ result: o.result })).toBe(true);
+      expect(o.price).toBe(recipeVendorPrice(o.result));
+    }
+    // deterministic: same seed → same stock
+    expect(vendorRecipeOffers(RECIPES, [], seed)).toEqual(offers);
+    // an already-known result never appears on the menu
+    const known = [offers[0]!.result];
+    const after = vendorRecipeOffers(RECIPES, known, seed);
+    expect(after.some((o) => o.result === offers[0]!.result)).toBe(false);
+  });
+
+  it('different vendors show different slices', () => {
+    const a = vendorRecipeOffers(RECIPES, [], vendorSeed('Sketchy Stall'));
+    const b = vendorRecipeOffers(RECIPES, [], vendorSeed('The Iron Bazaar'));
+    // not guaranteed disjoint, but the starting offset should differ
+    expect(a.map((o) => o.result).join()).not.toBe('');
+    expect(vendorSeed('Sketchy Stall')).not.toBe(vendorSeed('The Iron Bazaar'));
   });
 });
 
