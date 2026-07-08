@@ -15859,4 +15859,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a chest/crate — rarest, 6%, since containers are frequent). Shared maybeTeachRecipeReward helper draws
 // from the live recipe table; additive, never replaces the real reward; still FOUND, never auto-granted.
 // New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
-export const OTA_BUILD_ID = '2026-07-07-724-recipes-from-missions-and-loot';
+// OTA-725 — the character-select (save-slot) tiles now show a bound GOLEM, not just the dog. The slot
+// card listed the character + a dog sub-line but silently dropped the golem companion. SlotSummary now
+// carries golemName/golemKind (populated on save when a living golem is bound, hp > 0), and the title
+// screen renders a matching golem sub-line under the dog. Purely additive; slots with no golem look
+// unchanged, and a crumbled golem never lingers on the tile.
+export const OTA_BUILD_ID = '2026-07-07-725-char-select-shows-golem';
