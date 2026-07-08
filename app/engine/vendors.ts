@@ -157,6 +157,9 @@ export function pickRoadsideTrader(): VendorInstance {
     const price = item.priceMin + Math.floor(Math.random() * (item.priceMax - item.priceMin + 1));
     offers.push({ itemName: item.itemName, price, quantity: rollOfferQuantity(item.itemName) });
   }
+  // OTA-729 — the fence/roadside trader sometimes carries a premium ware too.
+  const roadsidePremium = maybePremiumOffer(offers);
+  if (roadsidePremium) offers.push(roadsidePremium);
   return {
     id: `roadside_${arch.demeanor}_${Date.now()}`,
     name: arch.name,
@@ -255,6 +258,60 @@ function estimatedStallValue(it: StallCatalogItem, category: StallCategory): num
   return base;
 }
 
+// OTA-729 — PREMIUM STOCK. Traders sometimes carry one genuinely worth-saving-for
+// ware so money has a purpose: strong healing, throwables, and Uncommon/Rare
+// weapons/armor. Derived from THIS game's own catalogs (never hardcoded names),
+// so it stays lore-clean per game; priced at full value (a real sink), and
+// construct/faction/for-sale-0 rows are excluded.
+interface PremiumEntry { name: string; price: number; weight: number }
+function buildPremiumPool(): PremiumEntry[] {
+  const pool: PremiumEntry[] = [];
+  const seen = new Set<string>();
+  const add = (name: string, base: number, weight: number) => {
+    const key = name.toLowerCase();
+    if (!name || seen.has(key)) return;
+    seen.add(key);
+    pool.push({ name, price: Math.max(20, Math.round(base * 1.1)), weight });
+  };
+  // Strong healing + throwables (gear/consumables).
+  for (const g of (((gearData as any).gear ?? []) as any[])) {
+    const heal = typeof g.effect?.healHP === 'number' ? g.effect.healHP : 0;
+    const isThrow = ((g.tags ?? []) as string[]).includes('throwable');
+    if (heal >= 20 || isThrow) {
+      add(g.name, g.tc || g.tcBuy || rarityPrice(g.rarity), heal >= 40 ? 5 : 3);
+    }
+  }
+  // Uncommon (common-premium) / Rare (aspirational) weapons + armor — skip the
+  // construct-only + faction-only + not-for-open-sale rows.
+  const grade = (it: any): number | null => {
+    const tags = (it.tags ?? []) as string[];
+    if (tags.includes('golem_weapon') || tags.includes('faction_gear')) return null;
+    const r = (it.rarity ?? '').toLowerCase();
+    if (r === 'uncommon') return 4;
+    if (r === 'rare') return 2;
+    return null;
+  };
+  for (const w of (((weaponsData as any).weapons ?? []) as any[])) {
+    const wt = grade(w);
+    if (wt) add(w.name, w.tc || w.tcBuy || rarityPrice(w.rarity), wt);
+  }
+  for (const a of (((armorData as any).armor ?? []) as any[])) {
+    const wt = grade(a);
+    if (wt) add(a.name, a.tc || a.tcBuy || rarityPrice(a.rarity), wt);
+  }
+  return pool;
+}
+const PREMIUM_POOL: PremiumEntry[] = buildPremiumPool();
+
+/** ~45% of the time, one premium ware to add to a trader's stock — a thing worth
+ *  banking TC toward. Null when the pool is empty or the roll misses. */
+export function maybePremiumOffer(existing: VendorOffer[]): VendorOffer | null {
+  if (PREMIUM_POOL.length === 0 || Math.random() >= 0.45) return null;
+  const pick = pickWeighted(PREMIUM_POOL, (p) => p.weight);
+  if (existing.some((o) => o.itemName.toLowerCase() === pick.name.toLowerCase())) return null;
+  return { itemName: pick.name, price: pick.price, quantity: 1 };
+}
+
 export function buildStallVendor(category: StallCategory, stallName: string): VendorInstance {
   const items = stallCatalog(category);
   const n = Math.min(items.length, 3 + Math.floor(Math.random() * 4)); // 3-6
@@ -280,6 +337,9 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
       offers.push({ itemName: vest.name, price: vprice, quantity: 1 });
     }
   }
+  // OTA-729 — sometimes a genuinely worth-saving-for ware among the shelf.
+  const stallPremium = maybePremiumOffer(offers);
+  if (stallPremium) offers.push(stallPremium);
   return {
     id: `stall_${category}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     name: `${stallName} Trader`,
