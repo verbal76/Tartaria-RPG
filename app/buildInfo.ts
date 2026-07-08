@@ -15619,4 +15619,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // into AC alongside armor (aggregateArmor folds in the amulet + 3 rings). Safe — a natural-20 enemy attack
 // always hits regardless of AC, so no stack of +AC makes the player unhittable; bonuses are +1 each. Item
 // preview shows the AC line. +4 tests.
-export const OTA_BUILD_ID = '2026-07-07-711-more-accessories-and-ac-rings';
+// OTA-712 — material-refinement recipes are never locked behind discovery (ports Tartaria OTA-731). The
+// discoverable-recipe system locked every Rare-result recipe until found, but Mudstone/Hardened Mudstone
+// are Rare MATERIALS used as ingredients in dozens of recipes — hiding them soft-blocked the crafting tree
+// (the Hardened Mudstone upgrade stopped showing). isDiscoverableRecipe now excludes any material result
+// (findMaterialByName); Rare/Legendary weapons/armor/relics/consumables stay found-only. Tests reworked. +1 test.
+export const OTA_BUILD_ID = '2026-07-07-712-material-recipes-never-locked';

@@ -34,17 +34,17 @@ describe('craftableRecipeCounts (OTA-708)', () => {
 
   // OTA-718 — a discoverable (rare/legendary-result) recipe does NOT count as
   // craftable while it's still LOCKED, even with its materials in the pack. It
-  // only counts once the player has learned it (player.knownRecipes). Mudstone
-  // (Rare) = 3× Mud Fragment is a clean single-ingredient discoverable recipe.
+  // only counts once the player has learned it (player.knownRecipes). Aetheric
+  // Vest (Rare armor) = 3× Aetheric Shard + 1× Aetheric Cloth — a non-material
+  // discoverable recipe (materials themselves are never locked, OTA-731).
   it('a locked discoverable recipe is not counted until learned', () => {
-    const pack = [mat('Mud Fragment', 3)];
+    const pack = [mat('Aetheric Shard', 3), mat('Aetheric Cloth', 1)];
     // A real player always carries a knownRecipes array (empty or grandfathered),
     // so gating applies. Passing undefined is the legacy "count everything" path.
-    const locked = craftableRecipeCounts(pack, []);            // Mudstone (Rare) locked → excluded
-    const learned = craftableRecipeCounts(pack, ['Mudstone']); // now unlocked
+    const locked = craftableRecipeCounts(pack, []);                 // Aetheric Vest locked → excluded
+    const learned = craftableRecipeCounts(pack, ['Aetheric Vest']); // now unlocked
+    // Learning ONLY Aetheric Vest changes exactly one recipe's lock status, so the
+    // makeable-count rises by exactly one (it's the only newly-unlocked makeable).
     expect(learned.craft).toBe(locked.craft + 1);
-    // Basic recipes are unaffected by an empty knownRecipes list: with only Mud
-    // Fragment in hand, Mudstone is the ONLY thing makeable, so locked drops to 0.
-    expect(locked.craft).toBe(0);
   });
 });
