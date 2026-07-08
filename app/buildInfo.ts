@@ -15870,4 +15870,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // normal buy flow into knownRecipes (you still gather the mats + forge it). The vendor greeting now lists
 // the workings for sale AND reminds you that any vendor mends worn gear ("repair <item>" — which already
 // worked, just wasn't surfaced). New recipeVendorPrice / vendorRecipeOffers / vendorSeed helpers. +3 tests.
-export const OTA_BUILD_ID = '2026-07-07-726-vendors-sell-recipes-gold-sink';
+// OTA-727 — stop bulk sales from farming Charisma. Selling trains CHA ("you named your price and held
+// it"), but the VendorScreen dumped a stack by calling sellToVendor once PER UNIT — so unloading 300 junk
+// coins trained CHA a level at a time (13 → 15 off worthless coins). A bulk sale is ONE negotiation now:
+// sellToVendor takes opts.social (default true) and the bulk loop passes social:true only on the first
+// unit, false for the rest. Single sales are unchanged; real haggling still trains.
+export const OTA_BUILD_ID = '2026-07-07-727-no-charisma-farm-on-bulk-sell';
