@@ -15881,4 +15881,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bought. (2) COMPANION CARE — "heal dog" / "heal golem" pays to patch a companion to full (cost scales
 // with missing HP), and "revive dog" brings back a dead/abandoned dog for a steep 300 TC. Surfaced in the
 // vendor greeting. New pure engine/vendorServices.ts (tuning + cost helpers). +5 tests.
-export const OTA_BUILD_ID = '2026-07-07-728-pay-to-train-and-companion-care';
+// OTA-729 — PREMIUM vendor stock, so money has something to bank toward. Stalls and roadside traders now
+// sometimes (~45%) carry ONE genuinely worth-saving-for ware on top of their usual mix: strong healing
+// (Trauma Kit / First Aid Kit), throwables, or an Uncommon/Rare weapon or armor — priced at full value (a
+// real sink). The pool is built from THIS game's own catalogs (never hardcoded names, so it stays lore-
+// clean per game), and construct-only (golem_weapon) + faction-only (faction_gear) + not-for-sale rows are
+// excluded. New maybePremiumOffer helper injected into buildStallVendor + pickRoadsideTrader. +5 tests.
+export const OTA_BUILD_ID = '2026-07-07-729-premium-vendor-stock';
