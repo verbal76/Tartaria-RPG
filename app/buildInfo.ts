@@ -15583,4 +15583,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // FOOD & HEALTH first, WEAPON COATINGS second — and each coating card reads its payload ("Coats weapon:
 // +1d6 poison (Festering)" / "+1d4 burn, +1 STR while coated (Searing)") instead of just its tags, so the
 // stronger variant is obvious. +5 tests.
-export const OTA_BUILD_ID = '2026-07-07-704-coating-tab-split-and-output';
+// OTA-705 — fill the craftable-armor rarity gaps (ports Tartaria OTA-722). Only HEAD had a Rare+Legendary
+// craftable path; legs/hands/feet/cloak topped out at Common/Uncommon and only head had a Legendary. Added
+// an Aetherforged (Rare) set for legs/hands/feet/cloak and a Titanforged (Legendary) set for those four
+// PLUS a Legendary chest — 9 new armor pieces + 9 recipes, so EVERY slot is craftable at Rare + Legendary.
+// Rare/Legendary results, so they stay FOUND recipes (locked until discovered), none auto-granted. dexReq
+// 0 / 'crafted' tag so you can wear what you forge; each Titanforged piece needs a distinct boss-drop
+// heart. +9 tests.
+export const OTA_BUILD_ID = '2026-07-07-705-craftable-armor-all-slots-rare-legendary';

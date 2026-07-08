@@ -1898,6 +1898,163 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "result": "Aetherforged Greaves",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Gauntlets",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Treads",
+      "ingredients": [
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherforged Mantle",
+      "ingredients": [
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Cuirass",
+      "ingredients": [
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Greaves",
+      "ingredients": [
+        {
+          "name": "Mud-Iron Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Gauntlets",
+      "ingredients": [
+        {
+          "name": "Iron Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Treads",
+      "ingredients": [
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titanforged Mantle",
+      "ingredients": [
+        {
+          "name": "Throne Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }
