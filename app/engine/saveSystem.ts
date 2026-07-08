@@ -47,6 +47,11 @@ export interface SlotSummary {
    *  abandoned / dead dogs leave these fields undefined. */
   dogName?: string;
   dogBreed?: string;
+  /** OTA-707 — golem companion snapshot, mirroring the dog fields. Only
+   *  populated when the save carries a living golem (hp > 0), so the slot tile
+   *  shows the whole party at a glance and never dangles a crumbled golem. */
+  golemName?: string;
+  golemKind?: string;
 }
 
 // Install-wide stash (not per-character). Stores resources that persist
@@ -420,6 +425,11 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
         : undefined,
       dogBreed: state.player.dog && state.player.dog.status !== 'abandoned' && state.player.dog.status !== 'dead'
         ? state.player.dog.breed
+        : undefined,
+      // OTA-707 — golem snapshot. Only when a living golem is bound (hp > 0).
+      golemName: state.player.golem && state.player.golem.hp > 0 ? state.player.golem.name : undefined,
+      golemKind: state.player.golem && state.player.golem.hp > 0
+        ? state.player.golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
         : undefined,
     };
     await upsertIndexEntry(summary);

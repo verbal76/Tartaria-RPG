@@ -15595,4 +15595,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // faction contract / mystery / storyline / hunt has a 25% chance to teach a recipe, and cracking a
 // container a 6% chance (rarest, since containers are frequent). Shared maybeTeachRecipeReward helper;
 // additive, still FOUND, never auto-granted. New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
-export const OTA_BUILD_ID = '2026-07-07-706-recipes-from-missions-and-loot';
+// OTA-707 — character-select (save-slot) tiles now show a bound GOLEM, not just the dog (ports Tartaria
+// OTA-725). SlotSummary carries golemName/golemKind (populated on save when a living golem is bound,
+// hp > 0); the title screen renders a matching golem sub-line under the dog. Additive.
+export const OTA_BUILD_ID = '2026-07-07-707-char-select-shows-golem';

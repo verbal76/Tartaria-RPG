@@ -699,6 +699,12 @@ export function TitleScreen() {
             └─ {item.dogName} ({item.dogBreed ?? 'dog'})
           </Text>
         )}
+        {/* OTA-707 — golem sub-line (mirrors the dog line). */}
+        {item.golemName && (
+          <Text style={styles.slotDogLine}>
+            └─ {item.golemName} ({item.golemKind ?? 'golem'})
+          </Text>
+        )}
         <Text style={styles.slotMeta}>
           HP {item.hp}/{item.hpMax}
         </Text>
