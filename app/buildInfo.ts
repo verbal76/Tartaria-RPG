@@ -15875,4 +15875,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coins trained CHA a level at a time (13 → 15 off worthless coins). A bulk sale is ONE negotiation now:
 // sellToVendor takes opts.social (default true) and the bulk loop passes social:true only on the first
 // unit, false for the rest. Single sales are unchanged; real haggling still trains.
-export const OTA_BUILD_ID = '2026-07-07-727-no-charisma-farm-on-bulk-sell';
+// OTA-728 — two more gold sinks, both paid vendor SERVICES (text commands, same style as "repair"):
+// (1) PAY-TO-TRAIN — "train <stat>" pays TC to raise a chosen stat +1. NOT a cheat card: cost scales with
+// the stat's current value (50 × current) and is CAPPED at 15 — the top points are earned in play, not
+// bought. (2) COMPANION CARE — "heal dog" / "heal golem" pays to patch a companion to full (cost scales
+// with missing HP), and "revive dog" brings back a dead/abandoned dog for a steep 300 TC. Surfaced in the
+// vendor greeting. New pure engine/vendorServices.ts (tuning + cost helpers). +5 tests.
+export const OTA_BUILD_ID = '2026-07-07-728-pay-to-train-and-companion-care';
