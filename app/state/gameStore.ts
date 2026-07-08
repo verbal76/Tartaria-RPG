@@ -1957,12 +1957,10 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // already at the new center pass through untouched.
     // arb29 — the world was recalibrated to canonical 82×41 positions
     // (center 20,20 → 41,20), so old mapX/mapY offsets no longer map to the
-    // new geometry. Snap every loaded save to the new center; the player is
-    // treated as standing at their current location (re-centered model), and
-    // any in-progress journey re-plots from there. New characters + location
+    // new geometry. mapX/mapY are RECONSTRUCTED from the absolute cell in the
+    // IIFE below (OTA-735) — at an anchor tile that is the grid center (the old
+    // behavior), off-anchor it is the true offset. New characters + location
     // arrivals already use the new center via character.ts / travelTo.
-    mapX: WORLD_MAP_CENTER_X,
-    mapY: WORLD_MAP_CENTER_Y,
     // arb47 — the authoritative ABSOLUTE position. Legacy saves (and any save
     // mid-journey, since mapX/mapY snap to center above) are treated as standing
     // AT their current location, so the absolute cell is that location's fixed
@@ -1991,7 +1989,11 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         const vis = gridToVisual(gx, gy, p.currentLocationId);
         return { gridX: gx, gridY: gy, mapX: vis.mapX, mapY: vis.mapY, _placedWestOfHiddenMarket510: true };
       }
-      return { gridX: gx, gridY: gy };
+      // OTA-735 — reconstruct the visual frame from the absolute cell so the
+      // room key stays stable across reload (anchor → center; off-anchor → the
+      // real offset the marks were written under).
+      const vis = gridToVisual(gx, gy, p.currentLocationId);
+      return { gridX: gx, gridY: gy, mapX: vis.mapX, mapY: vis.mapY };
     })(),
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
