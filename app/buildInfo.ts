@@ -15598,4 +15598,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-707 — character-select (save-slot) tiles now show a bound GOLEM, not just the dog (ports Tartaria
 // OTA-725). SlotSummary carries golemName/golemKind (populated on save when a living golem is bound,
 // hp > 0); the title screen renders a matching golem sub-line under the dog. Additive.
-export const OTA_BUILD_ID = '2026-07-07-707-char-select-shows-golem';
+export const // OTA-708 — stop bulk sales from farming Charisma (ports Tartaria OTA-727). Selling trains CHA, but the
+// VendorScreen dumped a stack by calling sellToVendor once PER UNIT, so unloading a big junk stack trained
+// CHA a level at a time. A bulk sale is ONE negotiation now: sellToVendor takes opts.social (default true)
+// and the bulk loop trains only on the first unit. Single sales unchanged.
+export const OTA_BUILD_ID = '2026-07-07-708-no-charisma-farm-on-bulk-sell';;

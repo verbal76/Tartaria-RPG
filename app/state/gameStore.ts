@@ -2490,7 +2490,11 @@ interface GameStore {
   resolveEnemyDefeat: () => void;
   rest: () => void;
   buyFromVendor: (itemName: string, qty?: number) => void;
-  sellToVendor: (itemName: string, itemId?: string) => void;
+  /** OTA-708 — `social` (default true) drives whether this sale trains CHA.
+   *  A BULK sale is one negotiation, so the VendorScreen loop passes social:true
+   *  only on the first unit and false for the rest — otherwise dumping a big stack
+   *  farmed Charisma one level at a time. */
+  sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean }) => void;
   giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
@@ -15991,7 +15995,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  sellToVendor(itemName, itemId) {
+  sellToVendor(itemName, itemId, opts) {
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
@@ -16074,7 +16078,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (isRelicTrade) recordTitleProgress(get, set, { relicsTraded: 1 });
     // OTA 059 — successful SELL trains CHA. Closing the trade
     // counts as social work.
-    {
+    // OTA-708 — but ONE negotiation, not one per unit: a bulk sale passes
+    // social:false for every unit after the first, so dumping a big stack no
+    // longer farms Charisma a level at a time.
+    if (opts?.social !== false) {
       const liveSeller = get().player;
       if (liveSeller) {
         const tr = trainStat(liveSeller, 'charisma', true);
