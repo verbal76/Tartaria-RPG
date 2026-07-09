@@ -26,6 +26,27 @@ describe('findRecipeByResult — fuzzy / typo tolerance', () => {
     expect(findRecipeByResult('banana bread')).toBeNull();
   });
 
+  it('OTA-702 — an EXACT result name beats a longer recipe that contains it', () => {
+    // Playtest: "craft Mudstone" resolved to "Mudstone Bulwark" (needs 2× Hardened
+    // Mudstone) instead of the recipe whose result IS "Mudstone" (the 3-Mud-Fragment
+    // refine the player can actually forage toward). Exact match must win.
+    expect(findRecipeByResult('Mudstone')?.result).toBe('Mudstone');
+    expect(findRecipeByResult('mudstone')?.result).toBe('Mudstone');
+    // The longer name still resolves when the player types it in full.
+    expect(findRecipeByResult('Mudstone Bulwark')?.result).toBe('Mudstone Bulwark');
+  });
+
+  it('OTA-703 — Hardened Mudstone is now craftable (was loot-only), completing the mud chain', () => {
+    // Mud Fragment ->(x3) Mudstone ->(2 Mudstone + 1 Aether Dust) Hardened Mudstone -> gear.
+    const hm = findRecipeByResult('Hardened Mudstone');
+    expect(hm?.result).toBe('Hardened Mudstone');
+    const ing = Object.fromEntries((hm?.ingredients ?? []).map((i) => [i.name, i.quantity]));
+    expect(ing['Mudstone']).toBe(2);
+    expect(ing['Aether Dust']).toBe(1);
+    // And the thing that needs it is still resolvable by its own exact name.
+    expect(findRecipeByResult('Mudstone')?.result).toBe('Mudstone');
+  });
+
   it('resolves hyphen-stripped input (parser folds "-" to a space)', () => {
     // Regression: "craft Aether-Shard Spear" reaches the engine as
     // "aether shard spear" (the input normalizer strips hyphens). Before the

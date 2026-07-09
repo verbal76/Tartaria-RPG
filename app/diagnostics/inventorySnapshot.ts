@@ -85,7 +85,9 @@ function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>
   // OTA-204 — inferred-item ◆ marker matches the OTA-199 row diamond,
   // so the snapshot makes catalog-vs-engine-named obvious at a paste.
   if (isInferredInventoryItem(item)) parts.push('◆');
-  parts.push(item.name);
+  // OTA-707 — show the coating in the name (the in-game row does; the snapshot didn't,
+  // so a coated weapon read as plain and looked like the coating never took).
+  parts.push(item.coating?.label ? `${item.coating.label} ${item.name}` : item.name);
   if (item.quantity > 1) parts.push(`×${item.quantity}`);
   const meta: string[] = [];
   if (item.rarity && item.rarity !== 'Common') meta.push(item.rarity);
@@ -99,6 +101,7 @@ function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>
       if (w) meta.push(`${w.damageDice} ${w.damageType}`);
     } catch { /* tolerate catalog miss */ }
   }
+  if (item.coating) meta.push(`+${item.coating.dice} ${item.coating.kind} coat`);
   if (item.durability) meta.push(`dur ${item.durability.current}/${item.durability.max}`);
   const slot = equippedSlots.get(item.id);
   if (slot) meta.push(`equipped:${slot}`);

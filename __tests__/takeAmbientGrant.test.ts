@@ -97,10 +97,11 @@ describe('TAKE modal → takeAmbientNoun → inventory', () => {
     const ropesAfter = player1.inventory.filter((i) => i.name === 'Climbing Rope');
     expect(ropesAfter.length).toBe(ropeCountBefore + 1);
     expect(ropesAfter[ropesAfter.length - 1]!.quantity).toBe(1);
-    // 2026-05-25 — Climbing Rope migrated to kind:'relic' in
-    // gear.json (for the gate-effect lookup + durability tracking).
-    // Test invariant updated to match the post-migration kind.
-    expect(ropesAfter[ropesAfter.length - 1]!.kind).toBe('relic');
+    // Climbing Rope is kind:'misc' in gear.json — it carries an explicit
+    // baseDurability (150) so lookupBaseDurability honors its wear track
+    // regardless of kind, and the temper roll is gated to weapon/armor so the
+    // rope's max never inflates (the rope-durability fix). It is NOT a relic.
+    expect(ropesAfter[ropesAfter.length - 1]!.kind).toBe('misc');
 
     // Second tap — engine dedup should reject; inventory stays put.
     store.getState().takeAmbientNoun('rope');

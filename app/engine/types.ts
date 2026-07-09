@@ -77,6 +77,12 @@ export type Intent =
   | 'press'
   | 'push'
   | 'pull'
+  // OTA-710 — call-to-action gestures. Evocative verbs a scene's prose
+  // invites ("knock on the steeple", "ring the bells", "touch the pillar",
+  // "pray at the altar") that aren't mechanical puzzle inputs. They route
+  // through the hook resolver when an active hook matches; otherwise they
+  // emit a thematic backstory-fill flavor line instead of dead-ending.
+  | 'gesture'
   // OTA-120 — Dog Companion combat verbs. Both intents require an
   // active dog in combat (player.dog.status === 'with_player' AND
   // currentScene.enemies.length > 0). Bite is a direct attack;
@@ -353,6 +359,10 @@ export interface Quest {
   reward: QuestReward;
   generatedAt: number;
   state: 'open' | 'in_progress' | 'completed' | 'failed';
+  /** `false` = the player has DEACTIVATED (paused) this lead: it stays on the
+   *  slate but won't auto-complete on a matching kill until re-activated.
+   *  Absent/true = active. */
+  tracked?: boolean;
 }
 
 export interface Runecaster {
@@ -639,6 +649,10 @@ export interface WhisperRecord {
    *  carries the thief's tile coords so the chain knows where to
    *  spawn the combat encounter. */
   ctx?: Record<string, number | string>;
+  /** `false` = the player has DEACTIVATED (paused) this whisper: it stays on
+   *  the slate but is dropped from the standing look-around / mission reminders
+   *  and won't advance until re-activated. Absent/true = active. */
+  tracked?: boolean;
 }
 
 export interface PlayerMilestones {
@@ -916,14 +930,40 @@ export interface PlayerCharacter {
    *  See engine/titleChallenges.ts. */
   challengeAttempts?: Record<string, 'failed' | 'succeeded'>;
   /** arb53 — active Guild Broker mission (Parley Ground): the two factions
-   *  being brokered. Set when the player first parleys; `done` once the
-   *  alliance is sealed. See engine/broker.ts. */
+   *  being brokered. Set when the player ACCEPTS the parley offer; `done` once
+   *  the alliance is sealed. See engine/broker.ts. */
   brokerMission?: import('./broker').BrokerMission;
+  /** OTA-671 — set when the player DECLINES the stumbled-onto parley offer, so
+   *  approaching the leaders again doesn't re-pop the accept/decline prompt on
+   *  every ambient action. Cleared by an explicit PARLEY (re-opens the offer) or
+   *  by accepting. Transient nudge state. */
+  brokerOfferDeclined?: boolean;
   /** OTA-195 — one-shot fusion permit granted by a Fusing Crucible
    *  travel encounter. Cleared when the player runs the fuse action.
    *  Without this gate, the fuse verb would be usable anywhere; the
    *  encounter is the discovery moment that earns the right. */
   fusionPending?: boolean;
+  /** OTA-712 — a live provocable NPC travel encounter (e.g. the Aetherkin
+   *  mourner) is offering its temptation ("reach for a coin and you will
+   *  not reach it twice"). Set from the encounter's data-driven `provoke`
+   *  block when it lands; cleared on the next travel step OR when the player
+   *  provokes it — which spawns the named enemy + applies the corruption
+   *  and narration the CONTENT authored. Fully data-driven: the engine
+   *  holds no encounter-specific enemy name or prose. (Replaces the OTA-711
+   *  boolean aetherkinCoinPending — old saves just drop the transient flag.) */
+  pendingProvoke?: {
+    enemy: string;
+    corruption?: number;
+    nouns: string[];
+    line: string;
+    system_line?: string;
+  };
+  /** OTA-718 — recipes the player has LEARNED. Only the "cool" rare/legendary-
+   *  result recipes are gated by this (isDiscoverableRecipe); basic recipes are
+   *  always craftable. Discovered by reading recipe/blueprint notes and from
+   *  rare loot. undefined on a pre-feature save → grandfathered on load from
+   *  owned results so nothing already-earned is ever taken away. */
+  knownRecipes?: string[];
   /** OTA-211 — Aether Dust food additive. Eating a food laced with
    *  Aether Dust grants a +3 buff to the player's chosen stat for
    *  5 real-world minutes. Stored as a wall-clock expiry (Date.now()
@@ -1001,6 +1041,10 @@ export interface PlayerCharacter {
   /** arb107 — the macro location id observed at the previous beginScene,
    *  used to detect a location change and bump `macroVisitSeq`. */
   lastBeganLocationId?: string;
+  /** OTA-739 — the armor slots most recently produced by the Crucible (newest
+   *  first, capped at 2). The deterministic fusion slot picker steps past these
+   *  so consecutive forges rotate through slots instead of repeating one. */
+  recentFusedArmorSlots?: string[];
   /** arb107 — in-game hour at which `rest` last paid out its WIS-train +
    *  trinket reward. Gates those rewards behind a per-day cooldown so the
    *  player can't farm WIS / free trinkets by spamming short rests. */
@@ -1039,16 +1083,19 @@ export interface PlayerCharacter {
   routedMission?: { id: string; phase: 'to_objective' | 'to_turnin' } | null;
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
-  /** Active monster hunts with per-stage progress. */
-  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** Active monster hunts with per-stage progress. `tracked === false` = the
+   *  player has DEACTIVATED (paused) this hunt: it stays on the slate but its
+   *  stages don't auto-advance until re-activated (per-contract, independent of
+   *  other hunts). Absent/true = active. */
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
-  /** Active mystery-object quests. */
-  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
   completedMysteryIds?: string[];
-  /** Active long-form faction storylines (5-10 step). */
-  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** Active long-form faction storylines (5-10 step). `tracked === false` = paused. */
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
   /** Active Whispers — informal NPC-to-NPC tips the player has
@@ -1199,7 +1246,12 @@ export interface DogCompanion {
    *  fires once per crossing, not every tick. undefined = none warned
    *  yet (treated as 101). */
   loyaltyBeatFloor?: number;
-  equipped: { vest: string | null };
+  /** The dog's worn vest. `vest` is the display/catalog name (AC comes from the
+   *  catalog by name); `vestId` (OTA-696) is the exact inventory instance so a
+   *  FUSED vest's uniqueStats resolve to the right copy and the inventory badge
+   *  marks the piece actually worn when you own two same-named vests. Optional —
+   *  legacy saves have only the name and fall back to first-by-name. */
+  equipped: { vest: string | null; vestId?: string | null };
   /** with_player follows; waiting_at_base = at the climb origin or
    *  in 24h auto-heal recovery; abandoned = walked off at loyalty 0;
    *  dead = combat-death (puppyVendorOwed flag flips true). */
@@ -1260,7 +1312,7 @@ export interface Companion {
   weapon?: InventoryItem | null;
 }
 
-export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest';
+export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest' | 'mission';
 
 export interface RollStep {
   id: string;

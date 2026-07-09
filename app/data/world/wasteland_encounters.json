@@ -338,7 +338,14 @@
       "The Aetherkin's voice fits between the breaths you would take. 'Leave them their coin. The mud takes payment in patience.'",
       "The Aetherkin tilts its head a quarter inch and the air pulls toward it. 'You will not need what is in their pockets. They needed it more.'"
     ],
-    "lore_note": "If you pass by without disturbing the Entombed the Aetherkin lets you go. If you reach for a coin, you will not reach it twice."
+    "lore_note": "If you pass by without disturbing the Entombed the Aetherkin lets you go. If you reach for a coin, you will not reach it twice.",
+    "provoke": {
+      "enemy": "Aetherkin",
+      "corruption": 8,
+      "nouns": ["coin", "coins", "aetherkin", "kin", "entombed", "silhouette", "silhouettes", "pocket", "pockets", "payment", "dead"],
+      "line": "Your fingers close on the cold coin pressed into the Aetherstone — and the Aetherkin turns. \"Not twice,\" it says, in a voice that fits between your heartbeats. The silhouettes of the Entombed seem to lean out of the wall, and the mud takes its payment. The air goes to knives.",
+      "system_line": "The debt of the Entombed settles on you."
+    }
   },
 
   "scrap_drone_swarm": {

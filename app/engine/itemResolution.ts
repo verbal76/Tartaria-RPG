@@ -29,36 +29,51 @@ type InventoryLike = ReadonlyArray<ItemRef>;
 // null when the item has neither.
 export function resolveDisplayWeapon(item: ItemRef): CatalogWeapon | null {
   const u = item.uniqueStats;
-  if (u && u.kind === 'weapon' && u.damageDice) {
-    const damageType = (u.damageType ?? 'slashing') as CatalogWeapon['damageType'];
-    return {
-      name: item.name,
-      weaponKind: damageType === 'aetheric' ? 'runecaster' : 'melee',
-      damageType,
-      damageDice: u.damageDice,
-      stat: u.scalesWith ?? 'strength',
-      rarity: u.rarity,
-      baseDurability: u.durability.max,
-      tags: [],
-      description: u.special ?? 'A fused unique weapon.',
-    };
+  // OTA-705 — a fused item (uniqueStats present) is catalog-absent BY DESIGN; its
+  // shape is entirely on uniqueStats. Resolve it ONLY from those stats and NEVER
+  // fall through to findWeaponByName — its name can collide with an unrelated
+  // catalog row (a fused ARMOR named "Aetheric Armor" is also a runecaster WEAPON,
+  // which was leaking that weapon's 1d10 onto the armor's display). Non-weapon
+  // fused pieces simply aren't weapons → null.
+  if (u) {
+    if (u.kind === 'weapon' && u.damageDice) {
+      const damageType = (u.damageType ?? 'slashing') as CatalogWeapon['damageType'];
+      return {
+        name: item.name,
+        weaponKind: damageType === 'aetheric' ? 'runecaster' : 'melee',
+        damageType,
+        damageDice: u.damageDice,
+        stat: u.scalesWith ?? 'strength',
+        rarity: u.rarity,
+        baseDurability: u.durability.max,
+        tags: [],
+        description: u.special ?? 'A fused unique weapon.',
+      };
+    }
+    return null;
   }
   return findWeaponByName(item.name);
 }
 
 export function resolveDisplayArmor(item: ItemRef): CatalogArmor | null {
   const u = item.uniqueStats;
-  if (u && u.kind === 'armor' && u.armorSlot) {
-    return {
-      name: item.name,
-      slot: u.armorSlot,
-      acBonus: u.acBonus ?? 0,
-      resistances: u.resistance ? [u.resistance] : [],
-      rarity: u.rarity,
-      baseDurability: u.durability.max,
-      tags: [],
-      description: u.special ?? 'A fused unique armor piece.',
-    };
+  // OTA-705 — see resolveDisplayWeapon: a fused piece resolves ONLY from uniqueStats,
+  // never from the name catalog. A fused weapon whose name collides with a catalog
+  // armor row must not display that armor's AC.
+  if (u) {
+    if (u.kind === 'armor' && u.armorSlot) {
+      return {
+        name: item.name,
+        slot: u.armorSlot,
+        acBonus: u.acBonus ?? 0,
+        resistances: u.resistance ? [u.resistance] : [],
+        rarity: u.rarity,
+        baseDurability: u.durability.max,
+        tags: [],
+        description: u.special ?? 'A fused unique armor piece.',
+      };
+    }
+    return null;
   }
   return findArmorByName(item.name);
 }

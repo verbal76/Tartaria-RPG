@@ -5932,6 +5932,44 @@
       "tc": 0
     },
     {
+      "name": "Crude Golem Sledge",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "2d6",
+      "stat": "strength",
+      "rarity": "Common",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 30,
+      "description": "A rough wrecking sledge knocked together for a construct's grip — heavy, ugly, and enough to stave in a wall.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
+      "name": "Elder Golem Sledge",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "2d10",
+      "stat": "strength",
+      "rarity": "Legendary",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 60,
+      "description": "A masterwork siege-sledge sized for a construct — perfectly balanced dead weight that turns a swing into a landslide. Takes a coating and carries it clean through.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
       "name": "Golem Greatsword",
       "weaponKind": "melee",
       "damageType": "slashing",
@@ -5951,6 +5989,44 @@
       "tc": 0
     },
     {
+      "name": "Crude Golem Greatsword",
+      "weaponKind": "melee",
+      "damageType": "slashing",
+      "damageDice": "2d6",
+      "stat": "strength",
+      "rarity": "Common",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 30,
+      "description": "A crude scrap greatsword sized for a construct's reach — no finesse, plenty of edge.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
+      "name": "Elder Golem Greatsword",
+      "weaponKind": "melee",
+      "damageType": "slashing",
+      "damageDice": "2d10",
+      "stat": "strength",
+      "rarity": "Legendary",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 60,
+      "description": "An elder greatsword balanced for a construct's tireless arm — a single sweep that shears a line clean. Holds a coating through every cut.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
       "name": "Golem Pike",
       "weaponKind": "melee",
       "damageType": "piercing",
@@ -5966,6 +6042,44 @@
       ],
       "baseDurability": 45,
       "description": "A two-handed pike sized for a construct — a single driving thrust that punches through a guard. Coat the point and the golem carries the bite home.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
+      "name": "Crude Golem Pike",
+      "weaponKind": "melee",
+      "damageType": "piercing",
+      "damageDice": "2d6",
+      "stat": "strength",
+      "rarity": "Common",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 30,
+      "description": "A rough two-handed pike sized for a construct — one blunt driving thrust, and it does the job.",
+      "statRequirement": null,
+      "tc": 0
+    },
+    {
+      "name": "Elder Golem Pike",
+      "weaponKind": "melee",
+      "damageType": "piercing",
+      "damageDice": "2d10",
+      "stat": "strength",
+      "rarity": "Legendary",
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "golem_weapon",
+        "two_handed"
+      ],
+      "baseDurability": 60,
+      "description": "An elder driving pike sized for a construct — a single thrust that punches through any guard and out the far side. Coat the point; it rides home.",
       "statRequirement": null,
       "tc": 0
     },

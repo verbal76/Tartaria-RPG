@@ -29,6 +29,14 @@ export function canScrap(item: InventoryItem): boolean {
   // forge.
   if ((item.tags ?? []).includes('quest')) return false;
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
+  // OTA-742 — a weapon/armor bought from a vendor could mint as kind 'misc'
+  // (buyFromVendor mis-stamp, fixed there + healed on load). Treat anything
+  // TAGGED as gear as scrappable too, so an already-bought Rust Dagger / Bone
+  // Shiv scraps immediately instead of only after the next reload.
+  {
+    const t = item.tags ?? [];
+    if (t.includes('weapon') || t.includes('armor')) return true;
+  }
   // Some gear (compass, torch, rope) carries useful base materials —
   // allow scrap as long as the item isn't a raw commodity.
   // OTA-191 — 'improvised' added to the gate so misc items the
@@ -81,6 +89,11 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   const grants: Array<{ name: string; quantity: number }> = [];
   const rb = rarityScrapBonus(item.rarity);
   const half = Math.floor(rb / 2);
+  // OTA-742 — a bought weapon/armor may be mis-stamped kind 'misc' (see canScrap).
+  // Derive gear-ness from the kind OR the tag so the yield branches below still
+  // fire (a Rust Dagger gives Scrap Metal + Stick, not the bare junk fallback).
+  const isWeaponLike = item.kind === 'weapon' || tags.has('weapon');
+  const isArmorLike = item.kind === 'armor' || tags.has('armor');
   // Metal content → Scrap Metal (the bulk), and on a Rare+ metal piece a
   // GOLEM CORE — the Iron-Golem bottleneck — since a high-grade metal
   // construct plausibly carries one. Representative: only metal gear.
@@ -90,7 +103,7 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // than it cost). Real metal weapons (blade/metal/iron/plate, or a
   // non-improvised weapon) still give it.
   const isMetalTagged = tags.has('metal') || tags.has('plate') || tags.has('iron') || tags.has('blade');
-  if (isMetalTagged || (item.kind === 'weapon' && !tags.has('improvised'))) {
+  if (isMetalTagged || (isWeaponLike && !tags.has('improvised'))) {
     grants.push({ name: 'Scrap Metal', quantity: 2 + rb });
     // OTA-611 — the Golem Core (Iron-Golem bottleneck) drops ONLY from a
     // genuinely metal-tagged piece, never the broad weapon-kind fallback. A
@@ -126,13 +139,17 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
     grants.push({ name: 'Mudstone', quantity: 1 });
   }
   // Cloth / fiber → Patched Cloth, and SPIDER SILK (a 7-recipe fiber) from
-  // organic gear.
-  if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || item.kind === 'armor') {
+  // organic gear. OTA-676 — `rope` is cordage (fiber): a Climbing Rope / Broken
+  // Rope is `rope`-tagged with no cloth/fiber tag, so it used to fall through to
+  // the bare Stick+Small Rock fallback — you mended a ROPE with sticks and rocks,
+  // and repairCostMaterials (= scrap × 2) charged the same. Treat rope as fiber so
+  // it scraps/repairs into Patched Cloth like other cordage.
+  if (tags.has('cloth') || tags.has('fiber') || tags.has('organic') || tags.has('rope') || isArmorLike) {
     grants.push({ name: 'Patched Cloth', quantity: 2 + half });
     if (tags.has('organic')) grants.push({ name: 'Spider Silk', quantity: 1 });
   }
   // Wooden handle / haft → Stick (secondary on weapons; capped at 60 anyway).
-  if (tags.has('wood') || tags.has('haft') || item.kind === 'weapon') {
+  if (tags.has('wood') || tags.has('haft') || isWeaponLike) {
     grants.push({ name: 'Stick', quantity: 1 + half });
   }
   // Fallback — every scrap should give SOMETHING, otherwise the
