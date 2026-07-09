@@ -622,14 +622,8 @@ export function ExplorationScreen() {
               enemy box." Bottom-right keeps the enemy name + range tag
               at top fully visible (no more truncation around the gear)
               and groups the secondary navigation in one corner. */}
-          <TouchableOpacity
-            onPress={() => setScreen('about')}
-            hitSlop={8}
-            style={styles.cornerGear}
-            accessibilityLabel="Settings"
-          >
-            <Text style={styles.gear}>⚙</Text>
-          </TouchableOpacity>
+          {/* OTA-748 — settings gear moved OUT of the enemy card (it covered the
+              trait tags) into the top scene bar next to MAP. */}
         </TutorialTarget>
       </View>
 
@@ -664,6 +658,15 @@ export function ExplorationScreen() {
             style={[styles.sceneBarBtn, tutLock && styles.sceneBarBtnBlocked]}
           >
             <Text style={styles.sceneBarBtnText}>MAP</Text>
+          </TouchableOpacity>
+          {/* OTA-748 — settings gear, relocated here from the enemy card. */}
+          <TouchableOpacity
+            onPress={() => setScreen('about')}
+            hitSlop={8}
+            style={styles.sceneBarBtn}
+            accessibilityLabel="Settings"
+          >
+            <Text style={styles.sceneBarGear}>⚙</Text>
           </TouchableOpacity>
           {/* v2.4.1 (OTA 045) — QUESTS button removed per player
               direction. The main-quest objective chip below the
@@ -1834,20 +1837,7 @@ const styles = StyleSheet.create({
   // ask. EnemyCard's `head` style no longer needs paddingRight
   // reservation since the gear no longer overlaps the enemy name
   // / range tag area.
-  cornerGear: {
-    position: 'absolute',
-    bottom: 4,
-    right: 4,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(26, 23, 20, 0.85)',
-    borderColor: '#2b3a3e',
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
-  },
+  // OTA-748 — settings gear now lives in the scene bar next to MAP (sceneBarGear).
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#0e1618',
@@ -1908,7 +1898,8 @@ const styles = StyleSheet.create({
   rollPopupNeutral: { borderColor: '#2b3a3e' },
   rollPopupKind: { color: '#6c8088', fontSize: 9, fontWeight: '700', letterSpacing: 2 },
   rollPopupText: { color: '#bcd2db', fontSize: 13, fontWeight: '700', letterSpacing: 0.5, marginTop: 1 },
-  gear: { color: '#6ab0c9', fontSize: 16, lineHeight: 18 },
+  // OTA-748 — gear sized to sit inline in the scene bar next to MAP.
+  sceneBarGear: { color: '#6ab0c9', fontSize: 13, lineHeight: 13, fontWeight: '700' },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line
