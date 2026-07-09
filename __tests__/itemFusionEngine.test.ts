@@ -36,6 +36,7 @@ import {
   deterministicFusedName,
   migrateFusedName,
   fusionInputHash,
+  synthesizeFusionDeterministic,
   type FusionSynthEngine,
 } from '../app/engine/itemFusion';
 import type { InventoryItem, UniqueItemStats } from '../app/engine/types';
@@ -354,6 +355,42 @@ describe('OTA-195 applyFusion — mints and drains', () => {
     const { fused } = applyFusion(inputs, inputs, result, 'seed_d');
     expect(fused.kind).toBe('dog_armor');
     expect(fused.uniqueStats?.acBonus).toBe(3);
+  });
+});
+
+describe('OTA-739 — forged armor slot rotates instead of always returning head', () => {
+  // organic-dominant inputs → the slot is hash-seeded (no cloth→chest lean),
+  // so it varies by input set rather than defaulting to head.
+  const organic = (seed: string) => [
+    inferred(`${seed}-a`, ['organic']),
+    inferred(`${seed}-b`, ['bone']),
+    inferred(`${seed}-c`, ['organic']),
+  ];
+  const profile = ['organic', 'bone'];
+
+  it('never returns a slot listed as recently forged (no back-to-back repeat)', () => {
+    const r = synthesizeFusionDeterministic(organic('one'), profile, 'armor', ['head']);
+    expect(r.stats.armorSlot).not.toBe('head');
+  });
+
+  it('avoids the last TWO forged slots so a short run keeps rotating', () => {
+    const r = synthesizeFusionDeterministic(organic('two'), profile, 'armor', ['head', 'chest']);
+    expect(['legs', 'feet']).toContain(r.stats.armorSlot);
+  });
+
+  it('produces more than one distinct slot across different input sets', () => {
+    const slots = new Set<string>();
+    for (const seed of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+      const r = synthesizeFusionDeterministic(organic(seed), profile, 'armor', []);
+      if (r.stats.armorSlot) slots.add(r.stats.armorSlot);
+    }
+    expect(slots.size).toBeGreaterThan(1); // not stuck on head
+  });
+
+  it('cloth-dominant sets still lean chest as their starting slot', () => {
+    const cloth = [inferred('c1', ['cloth']), inferred('c2', ['fiber']), inferred('c3', ['cloth'])];
+    const r = synthesizeFusionDeterministic(cloth, ['cloth', 'fiber'], 'armor', []);
+    expect(r.stats.armorSlot).toBe('chest');
   });
 });
 
