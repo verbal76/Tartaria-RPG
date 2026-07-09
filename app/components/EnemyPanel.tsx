@@ -121,12 +121,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
   // Cap the card to the corner height; taller content scrolls vertically (like
   // the exploration feed) rather than growing the top row. Leave a little room
   // below for the paging dots when more than one enemy is staged.
-  // OTA-750 — floor high enough to always fit the core combat block (stat grid +
-  // RESIST/WEAK/DEALS + traits) without scrolling, even when OTA-749's slimmed
-  // player card shrinks this height cap. DEALS (the enemy's damage type) drives
-  // armor choices and must not fall below the fold.
-  const ENEMY_CARD_MIN_H = 250;
-  const capH = Math.max(ENEMY_CARD_MIN_H, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
+  const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
   // engine_Dev — combat arena: when `fill`, take the whole tall column (flex:1) instead of capping
@@ -356,12 +351,14 @@ function EnemyCard({ view, cardWidth, hpBarWidth, fill }: { view: EnemyView; car
           })}
         </View>
       )}
-      {/* OTA-749 — traits on ONE truncated line (was a wrapping chip grid that ate
-          a second row). Full trait list is one tap away in the enemy pop-up. */}
       {view.enemy.traits && view.enemy.traits.length > 0 && (
-        <Text style={styles.traitLine} numberOfLines={1} ellipsizeMode="tail">
-          {view.enemy.traits.map((t) => describeTrait(t)).join('  ·  ')}
-        </Text>
+        <View style={styles.traitRow}>
+          {view.enemy.traits.map((t) => (
+            <Text key={t} style={styles.traitBadge}>
+              {describeTrait(t)}
+            </Text>
+          ))}
+        </View>
       )}
     </View>
   );
@@ -446,8 +443,17 @@ const styles = StyleSheet.create({
   },
   statusLabel: { fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   statusVal: { color: '#c9b89a', fontSize: 9 },
-  // OTA-749 — single-line trait summary (was a wrapping chip grid).
-  traitLine: { color: '#6ab0c9', fontSize: 9, letterSpacing: 0.5, marginTop: 4 },
+  traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  traitBadge: {
+    color: '#6ab0c9',
+    fontSize: 9,
+    letterSpacing: 1,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderColor: '#5a4a2e',
+    borderWidth: 1,
+    borderRadius: 2,
+  },
   dots: {
     flexDirection: 'row',
     alignItems: 'center',
