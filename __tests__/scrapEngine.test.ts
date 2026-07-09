@@ -19,6 +19,15 @@ describe('canScrap', () => {
     expect(canScrap(mk('Aetheric Compass', 'misc', ['metal']))).toBe(true);
   });
 
+  it('OTA-742 — accepts a weapon/armor mis-stamped as misc (vendor-bought Rust Dagger)', () => {
+    const rustDagger = mk('Rust Dagger', 'misc', ['weapon', 'melee', 'dual_wield', 'knife', 'mud_dwellers']);
+    expect(canScrap(rustDagger)).toBe(true);
+    const out = scrapOutputFor(rustDagger);
+    const names = out.grants.map((g) => g.name);
+    expect(names).toContain('Scrap Metal');
+    expect(canScrap(mk('Aetheric Helm', 'misc', ['armor', 'head', 'cloth']))).toBe(true);
+  });
+
   it('refuses raw stock materials (would scrap into themselves)', () => {
     expect(canScrap(mk('Scrap Metal', 'misc', ['metal']))).toBe(false);
     expect(canScrap(mk('Stick', 'misc', ['wood']))).toBe(false);

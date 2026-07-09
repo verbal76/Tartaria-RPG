@@ -15962,12 +15962,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? findDogGearByName(offer.itemName)
       : null;
     const cat = weapon ?? armor ?? gear ?? material ?? ring ?? amulet ?? dogVest ?? null;
+    // OTA-742 — a bought weapon/armor MUST mint with its real kind. Pre-fix it
+    // was stamped 'misc', which broke canScrap (a misc item only scraps if it
+    // carries a raw-material tag, so a Rust Dagger / Bone Shiv bought from a
+    // trader could never be scrapped). Dug/foraged copies minted 'weapon'
+    // correctly, so the paths disagreed. Now the buy path matches.
     const kind: InventoryItem['kind'] = dogVest
       ? 'dog_armor'
       : weapon
-      ? 'misc'
+      ? 'weapon'
       : armor
-        ? 'misc'
+        ? 'armor'
         : gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc'
           ? gear.kind
           : material
