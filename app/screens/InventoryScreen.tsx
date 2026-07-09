@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
@@ -10,7 +10,7 @@ import {
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
-import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
+import { findWeaponByName, isInferredItem, isInferredInventoryItem, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -22,7 +22,8 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon } from '../engine/golems';
+import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
+import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
 import { isQuestLockedItem } from '../engine/questItems';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
@@ -137,6 +138,7 @@ export function InventoryScreen() {
   // on the eligible item stows it and clears the filter.
   const stowInPouch = useGameStore((s) => s.stowInPouch);
   const stowInBandolier = useGameStore((s) => s.stowInBandolier);
+  const useHealBatch = useGameStore((s) => s.useHealBatch);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -177,6 +179,50 @@ export function InventoryScreen() {
   // category away so the player can skip past Weapons/Armor to reach Materials /
   // Food without scrolling through every row. Keyed by category id; default open.
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  // OTA-683 — a deep-link (e.g. "View in inventory" after a Crucible forge) can
+  // ask for a category section to be EXPANDED on arrival. Sections default
+  // collapsed, so without this the player lands on a folded pack and never sees
+  // the new piece. Apply it once on entry, unfold that section, then clear it.
+  const pendingInventoryCategory = useGameStore((s) => s.pendingInventoryCategory);
+  const clearPendingInventoryCategory = useGameStore((s) => s.clearPendingInventoryCategory);
+  useEffect(() => {
+    if (pendingInventoryCategory) {
+      const cat = pendingInventoryCategory;
+      setCollapsedSections((prev) => ({ ...prev, [cat]: false }));
+      clearPendingInventoryCategory();
+    }
+  }, [pendingInventoryCategory, clearPendingInventoryCategory]);
+  // OTA-684 — scroll to + briefly highlight a specific item on arrival (a forged
+  // weapon can sort anywhere in a long list). We record each section's y (sections
+  // are direct children of the scroll content) and each row's y within its section
+  // via onLayout, then after the expanded section has laid out we scroll to
+  // section.y + row.y and pulse the row for ~2.5s.
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionYRef = useRef<Record<string, number>>({});
+  const rowInfoRef = useRef<Record<string, { y: number; cat: string }>>({});
+  const [focusItemId, setFocusItemId] = useState<string | null>(null);
+  const pendingInventoryItemId = useGameStore((s) => s.pendingInventoryItemId);
+  const clearPendingInventoryFocusItem = useGameStore((s) => s.clearPendingInventoryFocusItem);
+  useEffect(() => {
+    if (pendingInventoryItemId) {
+      setFocusItemId(pendingInventoryItemId);
+      clearPendingInventoryFocusItem();
+    }
+  }, [pendingInventoryItemId, clearPendingInventoryFocusItem]);
+  useEffect(() => {
+    if (!focusItemId) return;
+    // Let the just-expanded section render + lay out before measuring.
+    const scrollTimer = setTimeout(() => {
+      const info = rowInfoRef.current[focusItemId];
+      if (info) {
+        const y = (sectionYRef.current[info.cat] ?? 0) + info.y;
+        scrollRef.current?.scrollTo({ y: Math.max(0, y - 72), animated: true });
+      }
+    }, 280);
+    // Clear the highlight after the pulse so it doesn't stick.
+    const clearTimer = setTimeout(() => setFocusItemId(null), 2600);
+    return () => { clearTimeout(scrollTimer); clearTimeout(clearTimer); };
+  }, [focusItemId]);
   // OTA-360 — weapon-coating picker. When the player taps "Coat a
   // weapon" on a coating consumable, this holds that consumable and
   // the second modal lists the coatable weapons in the pack as
@@ -276,6 +322,25 @@ export function InventoryScreen() {
     );
     if (owner) equippedItemIds.add(owner.id);
   }
+  // OTA-685 — the dog's vest is worn on the DOG (tracked by name on
+  // dog.equipped.vest, NOT in the player's equip slots), so it never lit the
+  // EQUIPPED badge and you couldn't tell which vest was on him. Mark ONE matching
+  // inventory instance equipped so the Dog Armor row reads "EQUIPPED (on <dog>)".
+  const dogForVest = player.dog;
+  const dogVestName = dogForVest && dogForVest.status !== 'dead' && dogForVest.status !== 'abandoned'
+    ? dogForVest.equipped?.vest ?? null
+    : null;
+  if (dogVestName) {
+    // OTA-696 — badge the EXACT worn instance (by id) so the right piece reads
+    // "EQUIPPED (on <dog>)" when you own two same-named vests; name-fallback for
+    // legacy saves that predate vestId.
+    const vestId = dogForVest?.equipped?.vestId ?? null;
+    const vestOwner = (vestId ? player.inventory.find((it) => it.id === vestId && it.quantity > 0) : undefined)
+      ?? player.inventory.find(
+        (it) => it.kind === 'dog_armor' && it.name === dogVestName && it.quantity > 0,
+      );
+    if (vestOwner) equippedItemIds.add(vestOwner.id);
+  }
 
   // arb-fix — which SLOT(s) an equipped instance occupies, so the row can show
   // "EQUIPPED (main hand)" / "(off hand)" / "(both hands)" for weapons instead
@@ -295,6 +360,11 @@ export function InventoryScreen() {
     equippedSlotsById.set(id, list);
   }
   const equippedSlotLabelFor = (item: InventoryItem): string => {
+    // OTA-685 — a dog vest reads "(on <dogname>)", since it's worn on the dog,
+    // not in a player slot.
+    if (item.kind === 'dog_armor' && dogVestName && item.name === dogVestName) {
+      return dogForVest?.name ? `on ${dogForVest.name}` : 'on your dog';
+    }
     let slots = equippedSlotsById.get(item.id);
     if (!slots || slots.length === 0) slots = slotsByEquippedName.get(item.name) ?? [];
     if (slots.length === 0) return '';
@@ -330,10 +400,21 @@ export function InventoryScreen() {
     const worn = (eq as Record<string, unknown>)[slot];
     return typeof worn === 'string' && worn.length > 0;
   };
+  const POUCH_MAX = 4; // mirrors stowInPouch in gameStore
   const itemSlotTaken = (item: InventoryItem): boolean => {
     if (equippedItemIds.has(item.id)) return false;
     const slots = validSlotsForItem(item);
-    return slots.length > 0 && slots.every(slotIsFull);
+    if (slots.length === 0 || !slots.every(slotIsFull)) return false;
+    // A pouch-eligible tool is NOT blocked just because its equip slot is full —
+    // it can still go on the tool belt. Scanners are the case that bit players:
+    // all three (Pulse / Aetheric / Mud) share the single off-hand equip slot, so
+    // equipping one used to red-✗ the other two — making it look like you can only
+    // carry one. But the 4-slot pouch holds all three AND each fires from there
+    // (playerHasScannerEquipped checks the pouch). So while the belt has room and
+    // the item is pouch-eligible, don't mark it "taken".
+    const pouchIds = eq.toolPouchIds ?? [];
+    if (pouchIds.length < POUCH_MAX && isPouchEligible(item, player).eligible) return false;
+    return true;
   };
 
   // ALWAYS show the modal. Auto-equipping silently when there was only one
@@ -349,7 +430,7 @@ export function InventoryScreen() {
     // Arbiter; we close the filter either way so the player can
     // see the world feed without re-tapping the slot.
     if (pouchFilterActive) {
-      stowInPouch(item.name);
+      stowInPouch(item.name, item.id);
       setPouchFilterActive(false);
       return;
     }
@@ -528,6 +609,29 @@ export function InventoryScreen() {
         tone: 'primary',
       });
     }
+    // OTA-693 — the item's fixed per-unit HP heal (First Aid Kit 25, Trail Rations
+    // 6, …), for the "Use Max" batch buttons below. 0 for non-heal / variable-heal.
+    const perItemHP = isConsumable ? (() => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { resolveItemEffect } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+      const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+      return fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+    })() : 0;
+    const stackQty = pending.item.quantity;
+    // Self "Use Max": the most that fit under your max HP without overhealing.
+    if (isConsumable && perItemHP > 0 && player && player.hp < player.hpMax) {
+      const n = healBatchCount(perItemHP, player.hpMax - player.hp, stackQty);
+      if (n >= 2) {
+        const to = Math.min(player.hpMax, player.hp + perItemHP * n);
+        buttons.push({
+          label: `Use Max ×${n} → ${to}/${player.hpMax} (no waste)`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', n); closeModal(); },
+          tone: 'primary',
+        });
+      }
+    }
     // OTA-120 Phase 5 — dog-targeted actions. Equip vests on the dog
     // (kind 'dog_armor'); feed consumables to the dog (any consumable
     // — the treat-vs-regular delta is calculated in the engine). Only
@@ -551,7 +655,7 @@ export function InventoryScreen() {
                   ...s.player,
                   dog: {
                     ...s.player.dog,
-                    equipped: { vest: pending.item.name },
+                    equipped: { vest: pending.item.name, vestId: pending.item.id },
                   },
                 },
               }
@@ -578,6 +682,17 @@ export function InventoryScreen() {
         },
         tone: 'primary',
       });
+      // OTA-693 — "Feed Max": the most that fit under the dog's max HP, no overheal.
+      if (perItemHP > 0 && dog.hp < dog.hpMax) {
+        const n = healBatchCount(perItemHP, dog.hpMax - dog.hp, stackQty);
+        if (n >= 2) {
+          buttons.push({
+            label: `Feed Max ×${n} → ${Math.min(dog.hpMax, dog.hp + perItemHP * n)}/${dog.hpMax}`,
+            onPress: () => { useHealBatch(pending.item.name, 'dog', n); closeModal(); },
+            tone: 'primary',
+          });
+        }
+      }
     }
     // OTA-466 — REPAIR GOLEM. When a golem is active, hurt, and this item is one
     // of the parts it's MADE of, offer a one-tap repair (routes through the same
@@ -607,6 +722,20 @@ export function InventoryScreen() {
           },
           tone: full ? 'neutral' : 'primary',
         });
+        // OTA-693 — "Heal Max": the most parts that fit under the golem's max HP.
+        if (!full) {
+          const golemPer = isGolemRepairPart(golem.kind, pending.item.name)
+            ? golemRepairHeal(golem.kind)
+            : golemSubstituteHeal(golem.kind, pending.item.rarity);
+          const n = healBatchCount(golemPer, golem.hpMax - golem.hp, stackQty);
+          if (n >= 2) {
+            buttons.push({
+              label: `Heal Max ×${n} → ${Math.min(golem.hpMax, golem.hp + golemPer * n)}/${golem.hpMax}`,
+              onPress: () => { useHealBatch(pending.item.name, 'golem', n); closeModal(); },
+              tone: 'primary',
+            });
+          }
+        }
       }
       // OTA-478/481 — ARM GOLEM. If this is a golem armament (Sledge / Greatsword,
       // wieldable by any golem), offer a one-tap arm (routes through `arm golem`).
@@ -757,7 +886,20 @@ export function InventoryScreen() {
         return `Fusion material: ${matStr}. At a Crucible, combine 3–5 reserved pieces — 3 DIFFERENT materials \u2192 Rare, 4+ \u2192 Legendary (variety matters, not rarity).`;
       })()
     : null;
-  const modalBodyFull = [modalBody, fusionHint].filter(Boolean).join('\n\n') || undefined;
+  // OTA-693 — when a heal consumable can be batched, explain the "Use Max" rule so
+  // a count that stops short of the whole stack reads as intentional, not broken.
+  const healBatchHint = pending && pending.item.quantity >= 2
+    ? (() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { resolveItemEffect } = require('../engine/itemEffect');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+        const fx = resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+        const perHP = fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
+        return perHP > 0 ? HEAL_BATCH_NOTE : null;
+      })()
+    : null;
+  const modalBodyFull = [modalBody, fusionHint, healBatchHint].filter(Boolean).join('\n\n') || undefined;
 
   // Post-scrap result body. Overrides the equip/drop/etc body when
   // scrapResult is populated. Lists what landed in the pack with ✦
@@ -911,7 +1053,7 @@ export function InventoryScreen() {
         onSortChange={(k, d) => { setSortKey(k); setSortDirection(d); }}
       />
 
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+      <ScrollView ref={scrollRef} style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* OTA-239 — Tool Pouch banner. 3 slots above the inventory list
             showing what's stowed (Aetheric Torch, Vision Lens, etc.).
             Pouched items are ready-to-use; the `use <item>` verb
@@ -958,7 +1100,11 @@ export function InventoryScreen() {
           if (items.length === 0) return null;
           const collapsed = collapsedSections[cat] ?? true; // default collapsed
           return (
-            <View key={cat} style={styles.section}>
+            <View
+              key={cat}
+              style={styles.section}
+              onLayout={(e) => { sectionYRef.current[cat] = e.nativeEvent.layout.y; }}
+            >
               {/* arb108 — semi-transparent backing so the label reads over any
                   background; tap anywhere on the header (chevron included) to
                   collapse/expand the whole section. */}
@@ -980,10 +1126,14 @@ export function InventoryScreen() {
                 </Text>
               </TouchableOpacity>
               {!collapsed && items.map((item) => (
-                <ItemRow
+                <View
                   key={item.id}
+                  onLayout={(e) => { rowInfoRef.current[item.id] = { y: e.nativeEvent.layout.y, cat }; }}
+                >
+                <ItemRow
                   item={item}
                   color={CATEGORY_COLORS[cat]}
+                  highlight={item.id === focusItemId}
                   isEquipped={equippedItemIds.has(item.id)}
                   equippedSlotLabel={equippedSlotLabelFor(item)}
                   fillSlotLabel={slotFillLabelFor(item)}
@@ -996,6 +1146,7 @@ export function InventoryScreen() {
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                 />
+                </View>
               ))}
             </View>
           );
@@ -1124,7 +1275,7 @@ function ToolPouchBanner({
               <TouchableOpacity
                 style={pouchStyles.slotFilled}
                 activeOpacity={0.7}
-                onPress={() => unpouchItem(slot.name!)}
+                onPress={() => unpouchItem(slot.name!, slot.id ?? undefined)}
               >
                 <Text style={pouchStyles.slotName} numberOfLines={1}>{slot.name}</Text>
                 <Text style={pouchStyles.slotAction}>tap to unstow</Text>
@@ -1215,11 +1366,11 @@ function BandolierBanner({
   const BANDOLIER_MAX = 5;
   const ids = player.equipped?.bandolierIds ?? [];
   const removeFromBandolier = useGameStore((s) => s.removeFromBandolier);
-  const slots: Array<{ name: string | null; qty: number }> = [];
+  const slots: Array<{ name: string | null; qty: number; id: string | null }> = [];
   for (let i = 0; i < BANDOLIER_MAX; i++) {
     const id = ids[i];
     const item = id ? player.inventory.find((it) => it.id === id) : undefined;
-    slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0 });
+    slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0, id: id ?? null });
   }
   return (
     <View style={bandolierStyles.banner}>
@@ -1232,7 +1383,7 @@ function BandolierBanner({
               <TouchableOpacity
                 style={bandolierStyles.slotFilled}
                 activeOpacity={0.7}
-                onPress={() => removeFromBandolier(slot.name!)}
+                onPress={() => removeFromBandolier(slot.name!, slot.id ?? undefined)}
               >
                 <Text style={bandolierStyles.slotName} numberOfLines={1}>
                   {slot.name}{slot.qty > 1 ? ` ×${slot.qty}` : ''}
@@ -1331,6 +1482,7 @@ function CompanionStripes({ color }: { color: string }) {
 function ItemRow({
   item,
   color,
+  highlight,
   isEquipped,
   equippedSlotLabel,
   fillSlotLabel,
@@ -1342,6 +1494,7 @@ function ItemRow({
 }: {
   item: InventoryItem;
   color: string;
+  highlight?: boolean;
   isEquipped: boolean;
   equippedSlotLabel: string;
   fillSlotLabel: string;
@@ -1366,7 +1519,9 @@ function ItemRow({
   })();
   return (
     <TouchableOpacity
-      style={styles.row}
+      // OTA-684 — a just-forged piece arrives highlighted (gold wash + border) so
+      // the eye lands on it after the "View in inventory" jump; it clears itself.
+      style={[styles.row, highlight && styles.rowHighlighted]}
       onPress={onPress}
       activeOpacity={0.7}
     >
@@ -1397,9 +1552,16 @@ function ItemRow({
               Mutually exclusive: an equipped item isn't "slot-taken by another". */}
           {isEquipped && <Text style={styles.rowEquippedCheck}>✓ </Text>}
           {slotTaken && <Text style={styles.rowSlotTaken}>✗ </Text>}
-          {isInferredInventoryItem(item) && (
+          {/* OTA-689 — a Crucible-forged item wears a ❖ (a diamond OF diamonds),
+              rarity-colored. Materials are marked with a single ◆ diamond, so a
+              piece fused from them reads as a cluster of those diamonds. Fused items
+              are catalog-absent but NOT "inferred", so they never showed the ◆ —
+              this is their own mark. */}
+          {isFusedInventoryItem(item) ? (
+            <Text style={[styles.rowFusedMark, { color: rarityHexColor(item.rarity) }]}>❖ </Text>
+          ) : isInferredInventoryItem(item) ? (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
-          )}
+          ) : null}
           <Text style={styles.rowName} numberOfLines={1}>
             {/* OTA-360 — a coated weapon shows its coated name
                 ("Corrupted Battle Axe"); the underlying name is
@@ -1563,6 +1725,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     overflow: 'hidden',
   },
+  // OTA-684 — a freshly-forged piece the player deep-linked to: warm gold wash +
+  // bright border so it stands out the moment the list scrolls to it. Transient
+  // (the screen clears the highlight after ~2.5s).
+  rowHighlighted: {
+    backgroundColor: '#2a2411',
+    borderColor: '#d8b46a',
+    borderWidth: 1.5,
+  },
   // OTA-485 — companion hatch. `stripeClip` fills the row and clips (the row also
   // has overflow:'hidden'); `stripeField` is an oversized, 45°-rotated flex row of
   // bands so the diagonal lines cover the whole box at any width.
@@ -1579,6 +1749,9 @@ const styles = StyleSheet.create({
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   rowName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1 },
   rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
+  // OTA-689 — Crucible-forged marker: ❖, a diamond of diamonds (materials wear a
+  // single ◆), rarity-colored, same weight as the inferred diamond.
+  rowFusedMark: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },

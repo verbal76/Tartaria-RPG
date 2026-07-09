@@ -9,6 +9,7 @@ import {
   isHiddenLocation,
   HIDDEN_LOCATIONS,
 } from '../app/engine/hiddenLocations';
+import { isHubLocation } from '../app/engine/hub';
 import locationsData from '../app/data/locations/locations.json';
 
 describe('OTA-498 — Hidden Market reveal helper', () => {
@@ -50,5 +51,14 @@ describe('OTA-498 — Hidden Market location + atlas data', () => {
     expect(c.fx).toBeGreaterThan(0.41);
     expect(c.fy).toBeGreaterThan(0.09);
     expect(c.fy).toBeLessThan(0.42);
+  });
+
+  // OTA-743 — the market must be PEACEFUL (a neutral truce) so encounters never
+  // spawn there and the market building never gets suppressed. It is NOT a
+  // faction hub, so beginScene's hub check didn't cover it — the 'market' tag is
+  // what suppressEncounter / the investigate-ambush guard key on. Pin both.
+  it('is a market-tagged location but NOT a faction hub (so the tag guard is required)', () => {
+    expect(hm!.tags).toEqual(expect.arrayContaining(['market', 'neutral']));
+    expect(isHubLocation('hidden_market')).toBe(false);
   });
 });

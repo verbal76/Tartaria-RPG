@@ -1,4 +1,4 @@
-import { bestDigTool, digScoreFor, rollDig } from '../app/engine/digging';
+import { bestDigTool, digScoreFor, rollDig, materialMatchesBiome } from '../app/engine/digging';
 import type { InventoryItem } from '../app/engine/types';
 
 function make(name: string, tags: string[] = []): InventoryItem {
@@ -46,5 +46,36 @@ describe('digging', () => {
       if (r.found?.rarity === 'Rare') rare++;
     }
     expect(rare).toBeGreaterThan(5); // probability noticeably above zero
+  });
+
+  // OTA-741 — biome-aware forage. On a 'mud'-tagged tile (the Mud Seas), a
+  // material that shares the biome tag (Mud Fragment / Aether Mud, both tagged
+  // 'mud') is far more common than on an untagged tile. Playtest: "been in the
+  // mud seas twice and still no mud materials" — the pool ignored biome.
+  it('rollDig yields mud materials far more often on a mud-tagged tile', () => {
+    const isMud = (name?: string) => name === 'Mud Fragment' || name === 'Aether Mud';
+    let flat = 0;
+    let mud = 0;
+    for (let i = 0; i < 600; i++) {
+      if (isMud(rollDig(3).found?.name)) flat++;
+      if (isMud(rollDig(3, ['mud']).found?.name)) mud++;
+    }
+    // The mud biome should meaningfully out-yield the flat pool (4× weight).
+    expect(mud).toBeGreaterThan(flat);
+    expect(mud).toBeGreaterThan(flat + 30);
+  });
+});
+
+describe('OTA-741 — materialMatchesBiome', () => {
+  it('matches a mud material against a mud biome, not an aether-only one', () => {
+    expect(materialMatchesBiome('Mud Fragment', ['mud'])).toBe(true);
+    expect(materialMatchesBiome('Mud Fragment', ['aether'])).toBe(false);
+    // Aether Mud is tagged both mud AND aether, so it matches either biome.
+    expect(materialMatchesBiome('Aether Mud', ['aether'])).toBe(true);
+    expect(materialMatchesBiome('Aether Mud', ['mud'])).toBe(true);
+    // A rock is not biome-flagged for mud.
+    expect(materialMatchesBiome('Small Rock', ['mud'])).toBe(false);
+    // No biome tags → never a boost.
+    expect(materialMatchesBiome('Mud Fragment', [])).toBe(false);
   });
 });

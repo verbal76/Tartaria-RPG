@@ -9,6 +9,29 @@
 //      which has a non-zero but small chance of finding anything at all.
 
 import type { InventoryItem, Rarity } from './types';
+import { findMaterialByName } from './crafting';
+
+// OTA-741 — biome-aware forage. On a tile whose location tags name a biome
+// (mud, aether, silt, …), a foraged/dug material that SHARES that tag becomes
+// much more common, so the Mud Seas actually rains mud stock instead of the
+// flat everywhere-pool. Playtest: "been in the mud seas twice and still no mud
+// materials" — because the pool ignored biome entirely. Lore stays in content:
+// we read each pool item's tags from the material catalog, so this works for
+// any pack that tags its materials (mud, aether, etc.).
+export const BIOME_FORAGE_BOOST = 4;
+
+/** True when the named material carries a tag that the current tile's biome
+ *  tags include (e.g. Mud Fragment [mud] on a 'mud'-tagged tile). */
+export function materialMatchesBiome(
+  name: string,
+  biomeTags: readonly string[] | undefined,
+): boolean {
+  if (!biomeTags || biomeTags.length === 0) return false;
+  const mat = findMaterialByName(name);
+  if (!mat) return false;
+  const biome = new Set(biomeTags.map((t) => t.toLowerCase()));
+  return (mat.tags ?? []).some((t) => biome.has(t.toLowerCase()));
+}
 
 // Per-item dig effectiveness. Higher = bigger chance of finding something
 // AND a better chance at higher-rarity buckets. 0 = cannot dig with this
@@ -193,7 +216,10 @@ export const DIG_SPOT_PRODUCTIVE_CAP = 16;
 // Roll the dig outcome. Returns null when nothing was found (always
 // possible, especially with low score). Includes a flat "found nothing"
 // chance that decreases as score increases.
-export function rollDig(score: number): { found: DigEntry | null; nothing: boolean } {
+export function rollDig(
+  score: number,
+  biomeTags?: readonly string[],
+): { found: DigEntry | null; nothing: boolean } {
   // P(nothing) = roughly 55% at score 1 → 18% at score 6.
   const pNothing = Math.max(0.18, 0.55 - score * 0.06);
   if (Math.random() < pNothing) return { found: null, nothing: true };
@@ -203,6 +229,8 @@ export function rollDig(score: number): { found: DigEntry | null; nothing: boole
     let w = e.baseWeight;
     if (e.rarity === 'Uncommon') w *= 1 + (score - 1) * 0.4;
     if (e.rarity === 'Rare') w *= 1 + (score - 1) * 0.8;
+    // OTA-741 — biome boost: mud materials dominate a mud tile, etc.
+    if (materialMatchesBiome(e.name, biomeTags)) w *= BIOME_FORAGE_BOOST;
     return w;
   });
   const total = weights.reduce((a, b) => a + b, 0);

@@ -15447,4 +15447,492 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (16), looking like the counter "jumped up mid-travel". Now it seeds the grid-exact
 // distance up front, and the display fallback is grid-exact too (never the visual map).
 // travelBadgeGridExact + travel suites green; tsc app-clean.
-export const OTA_BUILD_ID = '2026-07-02-660-travel-badge-grid-exact';
+// OTA-661 — Aetheric crafting: shape (Aetherstone Manipulation) and mend (Aetheric
+// Healing) now open a CONFIRM POPUP on tap — same UX as the golem summon — instead of
+// copying a phrase to the clipboard for the player to paste back into the input. Tap
+// the card → confirm (shows fuel + affordability) → it casts and bounces to
+// exploration so the roll plays out live. Removed the dead clipboard/queue staging
+// path (and its misleading "staged for the input box" hint). aethercraft suites green;
+// tsc app-clean. JS-only → OTA-safe.
+// OTA-662 — INVESTIGATE chip no longer reads "active" with nothing to investigate.
+// The badge count filtered by consumed + scanner requirements but NOT by the elevation
+// gate the SearchModal applies — so while the player was climbed onto a feature, every
+// ground noun greyed "climb down to reach" in the picker yet the count still lit the
+// chip green (the "active chip, no highlighted item" hang). The count now mirrors the
+// modal's elevation gate. (Ported from engine_Dev 954.) investigate/climb suites green;
+// tsc app-clean. JS-only → OTA-safe.
+// OTA-663 — completed INVESTIGATE chips now LEAVE the picker instead of lingering
+// greyed with a ✓ (reverses the OTA-257 "keep a visible record" behavior per player
+// request). The pinned surface chip (the ground/floor/mud) stays — it's a permanent
+// per-room affordance — and LOCKED chips (scanner/climb-gated, not yet done) stay so
+// the player sees what's still available; only genuinely-finished nouns disappear.
+// tsc app-clean. JS-only → OTA-safe.
+// OTA-664 — scanners no longer red-✗ each other in the inventory. All three
+// scanners (Pulse / Aetheric / Mud) share the single off-hand equip slot, so
+// equipping one marked the other two "slot taken" — making it look like you can only
+// carry one. But the 4-slot tool belt holds all three AND each fires from the pouch
+// (playerHasScannerEquipped checks it). The inventory ✗ no longer fires for a
+// pouch-eligible tool while the belt has room, so you can stow one of each. tsc
+// app-clean. JS-only → OTA-safe.
+// OTA-665 — HUNGER REMOVED. The hunger stat (hungerStaminaPenalty, 0–5) was a hidden,
+// unexplained mechanic whose ONLY effect was shrinking the usable stamina cap
+// (staminaMax − penalty), which grew +1 per 8 in-game hours (every rest ticked it) —
+// so a max-13 player could get pinned at 8, and food that reset it restored 0 stamina
+// (measured against the hungry cap), making eating look useless. Food already tops off
+// HP and water already tops off stamina, so it just added invisible friction. Now:
+// effectiveStaminaMax = staminaMax, nothing accrues the penalty, stale saves load at 0,
+// and all the "hunger capped your wind" / "hunger +N" lines self-suppress. rest/stamina
+// suites updated + green; tsc app-clean. JS-only → OTA-safe.
+// OTA-666 — Climbing Rope + Reclaimer's Rope are no longer "relics". They were stamped
+// kind:'relic', which is a NON_TOOL_KIND, so itemIsTool refused them and the inventory
+// filed them under the RELICS section (relics are the special detection/lore items).
+// They're now kind:'misc', so their utility/rope tags mark them as tools and they read
+// as ordinary gear. (Climb capability is tag-driven — 'gate' in your pack — so nothing
+// mechanical changes.) JS-only → OTA-safe.
+// OTA-667 — possessive INVESTIGATE chips ("messenger's post", "Zharak's Teeth") now
+// clear + leave the picker instead of re-tapping forever into "already examined". The
+// chip consumed-match (normNoun) stripped only the apostrophe → "messengers post", but
+// the parser records the consumed noun as "messenger post" (whole 's dropped), so they
+// never reconciled and the chip stayed live. normNoun now drops the whole possessive
+// 's, matching the parser. ambientNounMatch suite green; tsc app-clean. JS-only → OTA-safe.
+// OTA-668 — persistent "current mission" line. A playtester was mid-parley with two
+// faction leaders when a fight broke out; afterward they were lost ("how do I get back
+// into the mission"). The Parley of Factions objective (the same demands text the PARLEY
+// action prints) is now surfaced as a standing "▸ Mission — …" line directly under the
+// scene paragraph on every entry AND in every look-around, so an interrupting fight can
+// never leave the player unsure what they were doing. Extracted broker.brokerMissionLine
+// (pure) as the shared source; the parley action now reuses it too. JS-only → OTA-safe.
+// OTA-669 — make the Parley of Factions (broker) mission a first-class, TRACKABLE
+// contract on the CONTRACTS screen. Playtester wandered into the parley by travelling
+// and ended up with a live "mission" (and now a mission line) that appeared NOWHERE on
+// their contract list — "I don't even think that mission is on my list." It now renders
+// an ALLIANCE section like the rest: both demanded relics, their source tiles, in-hand
+// progress (N/2), a SET COURSE to each unmet relic, and a SET COURSE to the Parley Ground
+// for the SEAL step. Reuses broker.missionLegs; counts toward totalActive. JS-only → OTA-safe.
+// OTA-670 — uniform ACTIVATE / DEACTIVATE (pause) across EVERY contract kind. Before this
+// only faction quests could be paused; hunts, mysteries, storylines, whispers, leads, and
+// the parley had no way to be set aside. Added a reversible `tracked` (paused) flag to each,
+// a generic setContractActive(kind,id,active?) toggle (PER-CONTRACT, independent — pausing
+// one hunt doesn't touch your others; faction quests keep their single-active routing), and
+// a ▮▮ DEACTIVATE / ▶ SET ACTIVE button + ⏸ PAUSED styling on every card. Paused staged
+// contracts + leads freeze (auto-advance / auto-complete gated); paused whispers + parley
+// drop off the standing reminders. Extended abandonContract to drop whispers + the parley
+// (they had no removal path). Audit: all 7 contract types now trackable + activatable/
+// deactivatable. tsc app-clean; contract/mission suites + new pause suite green. JS-only.
+// OTA-671 — stumbled-onto missions now ANNOUNCE + offer accept/decline instead of silently
+// committing you. The Parley of Factions was the offender: approaching the leaders on the
+// neutral flats (approach/examine/survey/parley) auto-created the broker contract with no
+// consent — "I think I got on this route by just going to the mud seas." Now handleBroker
+// raises a pendingMissionOffer (announce + the two demands as a preview); a BrandedModal
+// asks ACCEPT (commit the contract + grid markers) or DECLINE (walk away). Declining latches
+// player.brokerOfferDeclined so ambient pokes don't re-pop the prompt — an explicit PARLEY
+// re-opens it. New parleyOfferAcceptDecline suite green; tsc app-clean. JS-only → OTA-safe.
+// OTA-672 — name the parley mission consistently. The standing "▸ Mission —" reminder led
+// with flavor ("Two leaders face off…") and ended in the all-caps command SEAL THE ALLIANCE,
+// which read as the mission's NAME — but the CONTRACTS card titles it "Broker an Alliance".
+// brokerMissionLine now leads with "Broker an Alliance:" so the reminder, the card, and the
+// accept/decline offer all name the mission the same way; SEAL THE ALLIANCE stays as the
+// closing command. broker suite updated + green. JS-only → OTA-safe.
+// OTA-673 — make the mission line SLAP. The standing reminder now rides its own yellow
+// 'mission' log channel with a MISSION chip (like ARBITER / DOG QUEST), and the mission
+// NAME ("Broker an Alliance") renders in a brighter accent yellow so it reads as a real,
+// findable mission — "Mission: <name>, it's in your CONTRACTS." The stumbled-onto parley
+// announcement + accept/decline prompt also lead with the name and route to the mission
+// channel; the offer modal title reads "New mission — Broker an Alliance" and its body
+// points at CONTRACTS. Name is identical across reminder, offer, and card. JS-only → OTA-safe.
+// OTA-674 — close the building-room save/exit/rehydrate material FARM. Inside a building,
+// each room's cleared (take/salvage/investigate) state was keyed by the VOLATILE outdoor
+// micro-micro id, which re-rolls when the tile's scene rebuilds after a reload (building
+// state is intentionally transient across load) — so re-entering refilled every tab, and
+// save-exit-rehydrate-re-enter minted infinite materials. patchSceneForBuildingRoom now
+// stamps a STABLE "building:<id>:<room>" id onto the scene's microMicroId; every take/
+// salvage/investigate handler already derives its room key from that field, so the whole
+// read/write path agrees with zero call-site changes, each room gets its own key (no more
+// cross-room collision), and cleared rooms stay cleared across reload. Look-around inside a
+// building now orients off the room's transitArea. New buildingRoomClearedPersists suite +
+// updated roomLootPersistence; tsc app-clean. JS-only → OTA-safe.
+// OTA-675 — craftable throwables. Every throwable weapon was loot/vendor-only, so the
+// bandolier had NO crafting supply line (a playtester's only throwable was a looted Disease
+// Sample). Added 5 recipes whose outputs are existing throwable-tagged, bandolier-eligible
+// weapons: Throwing Knife (Scrap Metal+Stick), Tartarian Hand Axe (Throw) (Scrap+Smooth
+// Stone+Stick), Mud Throwing Knife (Hardened Mudstone+Scrap+Cloth Scrap), Bone Throwing Axe
+// (Wyrm Fang+Stick+Cloth Scrap), Shaped Aetheric Shard (Aether Crystal+Aetheric Shard+Aether
+// Dust). New throwableRecipes suite locks the gather→craft→rack contract. Data-only → OTA-safe.
+// OTA-676 — a Climbing Rope repaired with STICKS AND ROCKS. repairCostMaterials = scrap
+// output × 2, and scrapEngine only recognized metal/stone/cloth/fiber/wood/aether/mud — so a
+// `rope`-tagged (not fiber-tagged) rope, plus the "cold iron" Pry Bar (tool/pry/utility, no
+// metal tag), both fell through to the bare Stick+Small Rock fallback for BOTH scrapping and
+// repair. Now scrapEngine treats `rope` as fiber (→ Patched Cloth), and the Pry Bar carries a
+// `metal` tag (→ Scrap Metal). General fix: any repairable misc/relic tool now mends with its
+// real material. New ropePryScrapMaterial suite. JS+data → OTA-safe.
+// OTA-677 — a Climbing Rope's MAX durability climbed to ~270 ("almost 300"). stampDurability
+// ran the WEAPON/ARMOR temper roll (max = base × [0.4,1.8] + rolled perks) on ANY item with a
+// baseDurability, so a 150-durability utility rope rolled a random 60–270 and drifted on fresh
+// instances. Three fixes: (1) the temper is gated to weapon/armor — misc/relic TOOLS now stamp
+// a FIXED max = base, no perks; (2) lookupBaseDurability honors a GEAR row's declared
+// baseDurability regardless of kind (OTA-666 made the rope misc, which had un-anchored its 150
+// base); (3) resealUtilityDurability heals existing saves' inflated tool durability back to base
+// on load. New utilityDurabilityNoTemper suite; durability/repair/scrap suites green. JS+data.
+// OTA-678 — off-canon entity guard on LLM narration. The Qwen narrator is prompt-told never
+// to name a place/faction not in the scene, but nothing ENFORCED it — an invented multi-word
+// proper noun ("the Sunken Choir of Vael") flowed into the logged feed as session canon. New
+// entityGuard.ts drops any narration sentence naming a multi-word place/faction NOT in the
+// world's known set (locations + factions + races + 172 lore-concept titles/keywords + live
+// scene entities); nothing survives → the authored template carries the line. Wired into both
+// the reactive/scene-intro and ambient Qwen paths. Conservative (multi-word only, substring
+// match) to avoid mangling good prose. New entityGuard suite (9). JS-only → OTA-safe.
+// OTA-679 — Fusing Crucible picker now shows each item's MATERIAL TYPE. Fusion needs
+// DIFFERENT materials, but the picker only showed name + rarity — so a player couldn't tell
+// organic from aether from metal and kept selecting same-type pieces that add no diversity.
+// Each row (and the faction-catalyst rows) now reads: name … Type (metal/aether/organic/…) …
+// rarity, where Type = the same fusionMaterialTags the diversity gate uses (brighter than the
+// now-secondary rarity). JS-only → OTA-safe.
+// OTA-680 — broaden fuse material mapping. The buried world's loot names skew almost entirely
+// organic + aether, with everything else falling through to a bare 'improvised' tag, so a
+// reserved pool collapsed onto a single material and the Crucible's "3 DISTINCT materials"
+// gate was effectively unreachable ("broaden the mapping or otherwise we'll never be able to
+// make anything"). inferGearTagPack's per-material keyword lists (fiber/metal/organic/crystal/
+// stone/wood/cloth) are now broadened to the common scavenge/junk vocabulary — nails, hinges,
+// flint, planks, straps, beads — so the SAME items you already find span more materials and the
+// gate becomes reachable. Additive-only, word-boundary-anchored (no false-matches). New
+// inferGearTagPackBroadened suite (20). JS-only → OTA-safe.
+// OTA-681 — parley intercept no longer hijacks combat. The Guild Broker parley is tile-scoped
+// (parley_ground), and its verb list (approach/examine/meet/…) overlaps combat verbs. A
+// playtester on that tile got jumped by a wandering Aetheric Raven while inside a shed cellar;
+// every "approach Aetheric Raven" was swallowed and re-printed the Broker reminder five times,
+// the fight un-winnable ("spawning the quest I'm already in again"). broker.parleyInterceptEligible
+// now gates the intercept to: on-tile + challenge-live + NOT in a labyrinth + NOT inside a
+// building (parley is on the open flats) + NO live enemies (combat verbs win). New
+// parleyInterceptGuard suite (7). JS-only → OTA-safe.
+// OTA-682 — fusing crucible picker deadlock. The picker hides reserved pieces that add no NEW
+// material once you've picked (declutter), but a single material-rich input (an Aetheric Cog =
+// metal+improvised+aether) can cover a whole pool's materials in TWO picks — after which the
+// declutter hid ALL remaining filler and the player could never reach the 3-item minimum, so the
+// Fuse button never lit ("how come I still can't fuse?"). The engine gate accepted the pool the
+// whole time — the block was UI-only. New visibleFusionInputs() reveals filler when short of
+// MIN_PICK with nothing left that adds a new material (safe: the picked set already spans every
+// material the pool has, so it already clears the diversity gate). New fusionPickerReachMin suite
+// (5). JS-only → OTA-safe.
+// OTA-683 — "View in inventory" after a forge now unfolds the new piece's section. The
+// "Your forging has formed" popup's CTA dropped the player onto the pack with every category
+// COLLAPSED (sections default folded), so the freshly-forged item was hidden ("it took me to my
+// inventory but didn't expand the armor row"). settleFusion tags the reveal CTA with the forged
+// kind (weapon/armor/dog_armor = the category section id); DiscoveryRevealModal requests it and
+// the Inventory screen unfolds that section on arrival (pendingInventoryCategory, mirrors the
+// Contracts-tab deep-link). New fusionRevealDeepLink suite (3). JS-only → OTA-safe.
+// OTA-684 — forge reveal now also SCROLLS to + briefly HIGHLIGHTS the exact new piece. Expanding
+// the section wasn't enough for a forged weapon, which sorts by slot and can sit anywhere in a
+// long list. settleFusion also carries the instance id; the Inventory screen records section +
+// row y via onLayout, scrolls the row into view on arrival, and pulses it (gold wash + border)
+// for ~2.5s before clearing. Best-effort + guarded (no-op if refs unavailable). JS-only → OTA-safe.
+// OTA-685 — two dog fixes. (1) The dog could no longer take combat damage: arb169 closed the
+// "command the dog to dodge the group volley" exploit by routing the WHOLE volley to the player
+// and removing the dog from all retaliation — so the dog went invulnerable and the entire downed
+// → benched → 24h bleed-out → death system (plus the vest's acBonus) became dead code. The volley
+// now redirects ~1-in-4 of each enemy's swings to the dog (uniformly on EVERY volley, so the
+// exploit stays closed); the dog rolls its own AC (10 + DEX mod + vest), a hit to 0 benches it and
+// starts the bleed-out clock. (2) The dog's vest (worn by NAME on dog.equipped.vest, not a player
+// slot) never lit the EQUIPPED badge — the Dog Armor row now reads "EQUIPPED (on <dog>)". New
+// dogCombatDamageAndVest suite (4). JS-only → OTA-safe.
+// OTA-686 — vendor BUY / SELL lists organized like the inventory: the same collapsible category
+// sections (Weapons / Armor / Consumables / Tools / …), ALL default CLOSED, so a vendor opens as a
+// tidy category index you expand into instead of one long scroll. SELL rows are real inventory
+// items (categorizeItem direct); BUY offers are names, resolved to their catalog kind + tags via
+// findCatalogItem then filed by categorizeItem, so buy/sell/pack all bucket an item the same way.
+// New vendorCategoryGrouping suite (5). JS-only → OTA-safe.
+// OTA-687 — vendor sell list excludes equipped gear by INSTANCE ID, not name. The old filter hid
+// every copy sharing an equipped item's name, so a spare of a worn item couldn't be sold without
+// unequipping (own two Stone-Grip Gloves, wear one → neither listed). New engine helper
+// equippedInstanceIds(player) returns the exact worn instances (id-bound + legacy first-by-name
+// fallback, incl. ring2/ring3); the sell filter now excludes those ids, leaving spares sellable.
+// New equippedInstanceIds suite (4). JS-only → OTA-safe.
+// OTA-688 — three fused-item fixes. (1) The forge-complete message hard-coded "weapon", so a
+// forged piece of armor was announced as a weapon — now names the chosen kind. (2) categorizeItem
+// trusts a fused item's KIND (uniqueStats/fused tag are authoritative) before the name heuristics,
+// which had misread a fused ARMOR's synthesized name as a weapon and filed it under Weapons — that
+// mismatch also broke the "View in inventory" highlight (reveal opened the Armor section but the
+// piece sat in Weapons). (3) Crucible-forged items now wear a magical ✶ star (rarity-colored,
+// distinct from the ◆ inferred diamond); a load-time backfill adds the 'fused' tag to older forges
+// (detected by uniqueStats, which only fusion sets) so every crucible item is marked. New
+// fusedItemMarkerAndCategory suite (5). JS-only → OTA-safe.
+// OTA-689 — fused marker glyph ✶ → ❖ (a diamond OF diamonds). Materials wear a single ◆ diamond,
+// so a piece fused from them reads as a cluster of those diamonds — thematically right. Glyph +
+// style-name only (rowFusedStar → rowFusedMark); detection/backfill unchanged. JS-only → OTA-safe.
+// OTA-690 — bandolier overhaul. (1) "Only one throwable" fixed: stowInBandolier grabbed the first
+// instance by NAME, which — once one knife was racked — kept re-finding that same racked knife and
+// bouncing off "already on your bandolier". It now racks the next UN-racked, un-equipped instance,
+// so 5 knives each take their own loop (a true stack still racks once + throws N). throwFromBandolier
+// prefers a racked instance. (2) Coating vials (weapon_coating) are now bandolier-eligible and show
+// in the load filter; thrown, a vial BURSTS for the coating's full DOT up front — perTurn(dice) ×
+// COATING_DOT_TURNS of its damage type (e.g. 1d4 burn → ~3-12) — applying resistance, consuming one
+// vial, clearing the slot when empty, and provoking the enemy volley like any throw. New
+// bandolierMultiAndCoatingThrow suite (3); existing bandolier/coating suites pass. JS-only → OTA-safe.
+// OTA-691 — faction SIGILS turn-in (v1). Sigils are found crests taken off a faction's dead (a
+// `sigil` tag + the faction-id tag); returned to that faction's frontier stake they HONOR their
+// dead for +1 standing (one-sided — you only ever gain). Nine sigil items (one per faction, in
+// gear.json). New turnInSigil(itemId) store action grants +1 via applyRepChange only while standing
+// on the faction's tile, then spends the sigil. New SIGILS section at the BOTTOM of the Contracts
+// screen lists each carried sigil with its faction, the +1, the turn-in tile, and an auto-routable
+// SET COURSE (RETURN button when you're there) — cloning the broker-mission leg pattern. The glint
+// "bloodstained pendant" thread now grants a Forgotten Order Sigil (the "someone will want it back"
+// foreshadowing finally pays off). New sigils.ts engine helper + sigilTurnIn suite (5). JS-only → OTA-safe.
+// OTA-692 — sigil DROPS wired + a grammar fix. (1) A defeated HUMANOID now has a chance to leave a
+// faction sigil (a slain member's crest): a faction-named humanoid (Mud Monarch Purifier, Reclaimer
+// Ambusher) drops ITS OWN faction's sigil at ~28%, a plain humanoid drops a random faction's at
+// ~10% (looted). Non-humanoids never drop one. rollSigilDrop mirrors the dog-vest loot path; the
+// sigil flows through the normal kill-loot grant + the Contracts SIGILS tracker. (2) Fixed the dog
+// down-in-combat line printing "drags heself... tend he" — now uses {reflexive}/{object} → "drags
+// himself... tend him". New sigil-drop suite (6). JS-only → OTA-safe.
+// OTA-693 — batch-heal ("Use Max"). No more tapping "use First Aid Kit" ten times. The item modal
+// now offers Use Max / Feed Max / Heal Max for self / dog / golem: one tap uses the OPTIMAL number
+// of a fixed-heal item — the most that fit UNDER max HP without overhealing (n = floor(gap/heal),
+// capped at the stack), or the whole stack if even all of it wouldn't fill. New useHealBatch store
+// action applies it in one shot (clamped to the gap, spends exactly n, no per-use log spam). The
+// button shows the count + resulting HP + "(no waste)", and the modal body explains the rule so a
+// count short of the whole stack doesn't read as broken (player ask). New healBatch.ts helper +
+// healBatch suite (8). JS-only → OTA-safe.
+// OTA-694 — grammar polish + honest coating-burst display. (1) New shared grammar.ts:
+// withArticle/withArticleCap pick "a"/"an" by leading sound, so vowel-named content reads
+// right ("an Aetheric Raven", not "a Aetheric Raven"; also "an aether residue") — applied at
+// the spawn/loot/pack-full/arbiter-item/vendor/golem-mend name sites. theCap/theLower strip a
+// leading article before re-adding one, killing the "The the old altar" doubling on parser/scene
+// nouns (container, elevated, swim, salvage, presence + investigation callback pools). Both are
+// idempotent for clean nouns, so no behavior change where the noun was already correct. (2) The
+// thrown-coating burst line now names the type match ("5 electrical (1/turn × 3, electrical-weak)")
+// so the leading damage reconciles with the perTurn×turns math instead of looking like a bug.
+// New grammar suite (8). JS-only → OTA-safe.
+// OTA-695 — operate on the EXACT item instance, not the first-by-name. Closes the
+// "wrong same-named copy" bug class. (1) stowInPouch now pouches the first UN-pouched
+// instance (mirrors the OTA-690 bandolier fix) so a SECOND same-named tool (two torches,
+// two scanners) can be stowed instead of bouncing off "already on your belt". (2)
+// sellToVendor resolves the exact instance the shop row points at (id-first) and refuses
+// only if THAT instance is worn — a spare sells even while an equipped copy of the same
+// name exists (the sell list already excluded worn gear by id; the action now honors it).
+// (3) sellToVendor/stowInPouch/unpouchItem/removeFromBandolier all take the instance id the
+// UI already holds, threaded from the vendor row + pouch/bandolier slots. New replumb suite
+// (5). JS-only → OTA-safe.
+// OTA-696 — instance-id hardening (the two items the OTA-695 audit left open). (1) Starter
+// inventory ids are now unique: the first four items shipped with STATIC literal ids
+// ('aetheric_torch', 'rations', …) identical across every save, and starter primary/knife +
+// several loot/tutorial grants used a bare `${Date.now()}` that could collide when minted in
+// the same millisecond. A monotonic starterId()/freshInstanceId() makes each unique, so
+// per-instance ops (equip/sell/pouch/repair-by-id, durability wear) can't act on the wrong
+// copy. (2) The dog vest now tracks a vestId alongside the name: equip writes it, the AC
+// resolver picks the exact fused instance by id (right uniqueStats when you own two same-named
+// vests), and the inventory badge marks the piece actually worn. Legacy saves fall back to
+// first-by-name. New hardening suite (4). JS-only → OTA-safe.
+// OTA-697 — grammar: the golem-kill line read "crumbles under the Bob's assault" — an
+// article before the golem's proper name. Every other golem line treats the name as a bare
+// noun ("Bob attacks", "Bob lands …"), so drop the "the": "crumbles under Bob's assault".
+// (Reads right for an unnamed "Mud Golem" too, matching the other lines.) JS-only → OTA-safe.
+// OTA-698/699 — three playtest glitches. (1) CRYSTAL HOOK DEAD-END: the whisper-crystal is a
+// story hook whose chain literally lifts an item ("You pry the crystal loose" → Aether Crystal)
+// and the Arbiter invites "take it", but `take crystal` found no ground item and dead-ended, and
+// `listen to the whispers` wasn't even a verb. Now `take <hook noun>` falls through to advance an
+// unresolved (non-puzzle) hook when nothing's on the ground, and 'listen'/'hear' map to the
+// investigate (hook-eligible) intent. (2) AMBIGUOUS NOUN RECENCY: in a room with a "drain hatch"
+// AND an "observation hatch", a bare "the hatch" resolved to the first in array order — so
+// "look inside the hatch" hit the wrong one. resolveContextNoun now prefers the noun the player
+// most recently interacted with (lastInteractedNoun), array-order fallback unchanged. (3) ARBITER
+// REPEAT: the on-target room-flavor line used plain pick() (no anti-repeat) and recurred verbatim;
+// now rotatingPick, sharing the default branch's key. New parser suite (5); 275 parser tests green.
+// OTA-700 — golem-name article, the rest of the family. OTA-697 dropped the stray "the" from the
+// golem KILL line; the same "The ${golem.name}" leak lived in three more combat lines — the MISS
+// ("The Bob's strike sails wide"), the no-enemy brace, and the dismiss/crumble. All now use the
+// bare proper name, consistent with "Bob attacks"/"Bob lands". JS-only → OTA-safe.
+// OTA-701 — mission-reminder brevity + dialogue-tag punctuation. (1) Every `look` (and scene
+// entry) reprinted the FULL broker paragraph (both demands + both locations + the SEAL command) —
+// noise on repeat. The standing reminder now uses a SHORT line: name + progress + the single next
+// step ("Broker an Alliance — 1/2 relics. Next: Architect's Master Blueprint at Red Tower of
+// Nimari."), switching to "all N relics in hand. SEAL THE ALLIANCE…" when gathered. The full
+// paragraph still prints on the offer, the accept, and at the parley stone. (2) Grammar: the craft-
+// refusal and concept-lore lines read '"Not yet." the Arbiter says' — a period before a lowercase
+// dialogue tag; now a comma. New broker short-line tests (4). JS-only → OTA-safe.
+// OTA-702 — craft-by-exact-name. "craft Mudstone" resolved to "Mudstone Bulwark" (needs 2×
+// Hardened Mudstone) because findRecipeByResult substring-matched the FIRST recipe containing
+// "mudstone" in array order — never the recipe whose result IS "Mudstone" (the 3-Mud-Fragment
+// refine the player can actually forage toward). Added a Pass 0 that returns an EXACT normalized
+// result-name match before any substring/fuzzy pass, so typing a recipe's exact name always wins
+// over a longer recipe that merely contains the word. New recipeFuzzy case. JS-only → OTA-safe.
+// OTA-703 — Hardened Mudstone is now craftable. It was a loot-ONLY material, so the Mudstone
+// Bulwark + 8 other recipes that consume it were walled behind drops — even though the Mudstone
+// refine note promised a forageable path. Per the material's own lore ("Mudstone fused under
+// Etheric pressure"), added: 2 Mudstone + 1 Aether Dust → 1 Hardened Mudstone. Completes the
+// chain Mud Fragment →(×3) Mudstone →(2+1 Aether Dust) Hardened Mudstone → gear. Pairs with the
+// OTA-702 exact-name fix so "craft Mudstone"/"craft Hardened Mudstone" both resolve right. Data-
+// only recipe add + test. JS/JSON-only → OTA-safe.
+// OTA-704 — fused armor mis-named + mis-filed. Two forged armors both came out named the generic
+// "Aetheric Armor" and sat in the WEAPONS section. Root: the Qwen namer emitted that bland name,
+// which is ALSO an authored runecaster WEAPON in weapons.json — so on every load itemBackfill
+// name-matched it, merged the weapon's runecaster/rune_power/ward tags, clobbered the forged
+// description, and name-resolution read it as a weapon. Three fixes: (1) itemBackfill NEVER
+// restamps a fused item from the catalog (protects existing saves on load); (2) categorizeItem
+// trusts uniqueStats.kind (the forge's shape) over a stale top-level item.kind, so a fused armor
+// files under Armor; (3) the Qwen forge-namer rejects a name that ends in the literal kind word
+// ("… Armor") or collides with a catalog item of a DIFFERENT kind, falling back to the distinct
+// deterministic name ("Resonant Aegis"). New/extended fusion tests (11). JS-only → OTA-safe.
+// OTA-705 — the SAME "Aetheric Armor" collision leaked one more surface: the fused armor's inventory
+// row showed a 1d10 OFFENSIVE line. resolveDisplayWeapon, for a fused piece whose uniqueStats.kind
+// wasn't 'weapon', fell through to findWeaponByName(name) → the authored runecaster WEAPON "Aetheric
+// Armor" (1d10). Fix: a fused item (uniqueStats present) resolves ONLY from uniqueStats and NEVER
+// falls through to the name catalog — so a fused armor shows no weapon dice, and symmetrically a
+// fused weapon named like a catalog armor shows no AC. New display-coverage cases (2). JS-only.
+// OTA-706 — one-time rename for already-forged fused items whose stored name cross-kind-collides
+// with a catalog row (the two "Aetheric Armor" pieces — a forged armor sharing a name with an
+// authored runecaster weapon). OTA-704/705 made the collision harmless, but the ugly/duplicate name
+// persisted on old saves. On load, any fused item whose name resolves to a catalog item of a
+// DIFFERENT kind is re-minted to a distinct, structured, non-colliding deterministic name (stable
+// per instance id, so two pieces get two different names). Idempotent — a clean name is left alone.
+// New itemFusion migration helpers + tests (5). JS-only → OTA-safe.
+// OTA-707 — coatings now change THROWN damage. A coated throwing knife did no extra damage because
+// (1) the typed "throw <knife> at <enemy>" path rolled base weight damage only — rollThrowDamage
+// never read item.coating; it now adds the coating's on-hit dice (elemental coatings earn the
+// enemy's weakness/resist; poison/acid/corruption add flat), and (2) the bandolier throw resolved
+// the throwable BY NAME, so with several racked knives it could hurl a DIFFERENT (uncoated) instance
+// than the one the player painted — throwFromBandolier now takes the tapped slot's instance id
+// (threaded from InputBox) and throws THAT one. Also: applyCoating now persists (was in-memory
+// only), and the inventory snapshot shows the coating (name + "+dice kind coat"). New throw test.
+// OTA-708 — every crafting tab now shows a "makeable NOW" count, like REPAIR already did. CRAFT,
+// RECIPES, and AETHERIC each show (N) = how many blueprints/disciplines you can actually make with
+// materials in hand — NOT the total that exist. New craftableRecipeCounts() helper mirrors
+// RecipesView's per-tab split (consumable → RECIPES, else CRAFT) + availability. REPAIR's badge also
+// switched to the affordable count (what you can fix right now) for consistency. New helper test (4).
+// OTA-709 — grammar: the relic/detection success line read "The the relic responds…" because the
+// no-relic-resolved fallback was 'the relic' (article included) while the template prepends its own
+// "The". Fallback is now the bare 'relic'. JS-only.
+// OTA-710 — scene-interaction dead-ends. (1) TAKE now infers an improvised weapon from a weapon-named
+// scene noun ("take ice axe") instead of the salvage refusal. (2) SALVAGE falls back to the parser's
+// context-resolved noun, so "salvage <thing>" works after the thing was investigated / resolved via a
+// location alias — no more dead-end past matchAmbientNoun. (3) Call-to-action: a new `gesture` intent
+// (ring/pray/touch/tilt/answer/shout/…) plus a fallback so knock + gesture verbs that DON'T land on an
+// active hook emit a thematic backstory-fill line instead of dead-ending — "if there's a call to
+// action, it has to do something." New engine/callToAction.ts + 14 tests. JS-only.
+// OTA-711 — three playtest glitches. (1) INVESTIGATE flavor stopped narrating "you turn the stair in
+// your hands" — fixed features (stair/wall/hatch/landing/…) now draw a posture-agnostic flavor pool
+// instead of the handheld generic one. (2) The aetherkin_mourner travel encounter's dare ("reach for
+// a coin and you will not reach it twice") now MAKES GOOD ON THE THREAT: reach/take/steal/disturb/
+// attack the coins or the kin spawns the hostile Aetherkin + a corruption tick, instead of dead-ending
+// on an unknown verb or resolving the noun to a relic in the pack. (3) The "use <item>" nudge no longer
+// misfires on a loose fuzzy match ("disturb the aetherkin" → "Try: use flame of aether"); it now needs
+// a whole-word overlap. New engine flag aetherkinCoinPending + 16 tests. JS-only.
+// OTA-712 — the OTA-711 Aetherkin provoke is now fully DATA-DRIVEN. The enemy to spawn, the corruption
+// cost, the trigger nouns, and the narration all live in the encounter's `provoke` block in
+// wasteland_encounters.json (new generic mechanic: any type:'npc' archetype can carry one). The engine
+// holds no encounter-specific enemy name or prose — it reads player.pendingProvoke (replaces the
+// boolean aetherkinCoinPending). This keeps the engine lore-agnostic (matters for engine_Dev) and lets
+// a content pack author its own provocable encounters. +2 tests. JS-only.
+// OTA-713 — auto-route travel is slightly more eventful + more VARIED, without more fights. On a plotted
+// course the encounter roll chance nudges 0.55 → 0.58, and (the bigger lever) the non-combat archetypes
+// (treasure / npc / fusion_bench) get a 1.3× weight bias in the type pick, so a route brings in more
+// DIFFERENT encounters while the combat FRACTION actually drops a few points (measured ~57% → ~51%).
+// Combat weight + enemy level are untouched — no extra high-level fights. Cardinal travel unchanged.
+// New PickOptions.autoTravel + AUTO_TRAVEL_VARIETY_MULT. +2 tests. JS-only.
+// OTA-714 — investigate-flavor gaps closed. The OTA-711 fixed-feature classifier still let nouns it
+// didn't whitelist slip into handheld phrasing — playtest caught "investigate floorboards" → "you turn
+// the floorboards in your hands", "investigate ladder" → "you let it go". The generic catch-all pool is
+// now fully POSTURE-NEUTRAL (no "turn in your hands" / "weigh" / "let it go"), so no noun ever reads as
+// held, and the classifier gained floorboard/plank/ladder/peg/bell/cord/lever/valve/etc. +7 test nouns.
+// OTA-715 — damage-type contradiction fixed. An enemy whose creature-TYPE resists a damage type but
+// whose authored TRAIT says it is vulnerable to that same type (the Aetheric Banshee: type resists
+// aetheric, trait vulnerable:aetheric) used to multiply BOTH (0.5x1.5=0.75), print "shrugs off" AND
+// "vulnerable" on one hit, and the swap-nag told you to switch to slashing (which it ALSO resists). New
+// combineDamageTypeMatch reconciler: type + trait STACK when they agree (double-resist x0.25) but on a
+// DISCORD the per-enemy authored trait wins. Applied to every damage path (melee/throw/cast/golem/dog +
+// coatings); one reconciled resist/weak message; the swap-nag now only suggests types the enemy does
+// NOT resist. +10 tests. JS-only.
+// OTA-716 — bonus "good material" sprinkle (reward for engagement, Fallout-4 cadence). ADDITIVE only —
+// never substitutes the basic-drop flood. Two moments: (1) a HARD-WON fight (tanky / Rare+ / boss enemy)
+// has a ~22% chance to cough up a bonus material on top of normal loot ("Hard-won spoils — X"); (2) a
+// COMPLETED story thread has a ~40% chance to reward the reading ("For your persistence — X"). Materials
+// only; tiers skew Uncommon > Rare > rare Legendary. New engine/bonusDrops.ts (tunable knobs) + 11 tests.
+// OTA-717 — crafted ropes (and any worn durability TOOL) work again. grantItem treated misc-kind items
+// as "always stackable," but Climbing Rope / Pry Bar / torch / compass are kind:'misc' AND carry
+// durability — so a freshly-crafted 150/150 rope merged into a worn 15/150 stack, the merge kept the
+// worn row's durability, and the new full durability vanished ("I crafted a rope but still can't
+// climb"). Now a durability-tracked item merges ONLY when both copies are full (same rule weapons/armor
+// use), so a fresh tool stays its own row and the climb picks it. Self-heals on next craft. +4 tests.
+// OTA-718 — cool RARE/LEGENDARY recipes are now discoverable-only. Their result-recipes are LOCKED until
+// you FIND them (player.knownRecipes): the Arbiter refuses to forge one you haven't discovered, and the
+// Craft/Recipes lists hide it. Basic (Common/Uncommon-result) recipes stay always-craftable. Discovery,
+// as a reward for reading + hard play: investigating a recipe/blueprint/schematic/notes noun teaches one
+// (once per noun), a hard-won kill has a 10% chance to cough one up, and a completed story thread an 18%
+// chance. Rarity skews Rare > Legendary. Old saves are grandfathered — any discoverable recipe whose
+// result you already OWN is marked known, so nobody loses access. New engine/recipeDiscovery.ts + tests.
+// OTA-719 — keep the golem-weapon route OUT of recipe discovery. The 4 golem armaments are Rare-result,
+// so OTA-718 was double-locking them behind knownRecipes on top of their Core-forge questline
+// (coresRequired:4) — even after recovering all 4 Cores the Arbiter still refused them, and they could
+// leak in as a random "learned recipe" reward. isDiscoverableRecipe now excludes any recipe with its own
+// unlock route: coresRequired set, or a 'golem_weapon'-tagged result. They fall through to their real
+// gate unchanged. +2 tests.
+// OTA-720 — TIERED golem armaments + the forge-unlock beat now hands you the basics. Each of the 3
+// armament types (Sledge / Greatsword / Pike — the Aether-Lance was retired) now comes in 3 tiers: a
+// CRUDE (Common) pattern, the base (Rare), and an ELDER (Legendary). When the 4th Core lands and the
+// forge opens, the Arbiter's beat now says you've learned the shaping and can hammer out the crude
+// pattern of any type — and hints that stronger master schematics wait out in the dark. The Rare/
+// Legendary tiers are discoverable (found via hard kills / completed hooks), so OTA-719's blanket
+// golem-weapon exclusion is superseded: only the Common tier is auto-available at unlock, the stronger
+// ones are hunted down. 9 recipes + 6 new weapon defs; coreFourForgeGate + recipeDiscovery tests updated.
+// OTA-721 — RECIPES tab: split WEAPON COATINGS out of FOOD & HEALTH, and show each coating's real output.
+// Coatings (Poison Vial, Incendiary Paste, …) are consumables tagged 'weapon_coating' but were lumped
+// under one "FOOD & TONICS" banner, so the pantry and the war-paints intermixed. Now the consumable tab
+// has two collapsible sections — FOOD & HEALTH first, WEAPON COATINGS second. And each coating card now
+// reads its actual payload ("Coats weapon: +1d6 poison (Festering)" / "+1d4 burn, +1 STR while coated
+// (Searing)") instead of just "Tags: weapon_coating, burn" — so the stronger variant is obvious rather
+// than a guess by name. Playtester: "I'm picking coatings by the cooler-sounding name, not the output."
+// OTA-722 — fill the craftable-armor rarity gaps. Only HEAD had a Rare+Legendary craftable path; legs/
+// hands/feet/cloak topped out at Common/Uncommon and only head had a Legendary. Added a new Aetherforged
+// (Rare) set for legs/hands/feet/cloak and a Titanforged (Legendary) set for those four PLUS a Legendary
+// chest — 9 new armor pieces + 9 recipes, so EVERY slot is now craftable at Rare and Legendary. They're
+// Rare/Legendary results, so the discovery system locks them until FOUND (recipe notes / hard kills /
+// hooks) — none auto-granted, per "leave the majority as found." Craftable conventions (dexReq 0, no race
+// affinity, 'crafted' tag) so you can always wear what you forge; each Titanforged piece consumes a
+// distinct boss-drop heart, keeping them genuinely end-game. +9 tests (armorRecipeCoverage).
+// OTA-724 — two more "found" channels for rare/legendary recipes. On top of reading recipe/blueprint
+// notes, hard-won kills, and completed hooks, a recipe can now also turn up on MISSION COMPLETION
+// (faction contract / mystery / storyline / hunt turn-in — best odds, 25%) and in CONTAINER LOOT (cracking
+// a chest/crate — rarest, 6%, since containers are frequent). Shared maybeTeachRecipeReward helper draws
+// from the live recipe table; additive, never replaces the real reward; still FOUND, never auto-granted.
+// New MISSION_RECIPE_CHANCE / LOOT_RECIPE_CHANCE knobs. +2 tests.
+// OTA-725 — the character-select (save-slot) tiles now show a bound GOLEM, not just the dog. The slot
+// card listed the character + a dog sub-line but silently dropped the golem companion. SlotSummary now
+// carries golemName/golemKind (populated on save when a living golem is bound, hp > 0), and the title
+// screen renders a matching golem sub-line under the dog. Purely additive; slots with no golem look
+// unchanged, and a crumbled golem never lingers on the tile.
+// OTA-726 — gold sink #1: vendors SELL recipes. Every trader teaches a small, stable slice of the
+// rare/legendary recipes you haven't learned (200 TC Rare / 500 TC Legendary) — a real early-game money
+// use + a reliable way to get a working you never stumbled on. "buy <recipe name>" routes through the
+// normal buy flow into knownRecipes (you still gather the mats + forge it). The vendor greeting now lists
+// the workings for sale AND reminds you that any vendor mends worn gear ("repair <item>" — which already
+// worked, just wasn't surfaced). New recipeVendorPrice / vendorRecipeOffers / vendorSeed helpers. +3 tests.
+// OTA-727 — stop bulk sales from farming Charisma. Selling trains CHA ("you named your price and held
+// it"), but the VendorScreen dumped a stack by calling sellToVendor once PER UNIT — so unloading 300 junk
+// coins trained CHA a level at a time (13 → 15 off worthless coins). A bulk sale is ONE negotiation now:
+// sellToVendor takes opts.social (default true) and the bulk loop passes social:true only on the first
+// unit, false for the rest. Single sales are unchanged; real haggling still trains.
+// OTA-728 — two more gold sinks, both paid vendor SERVICES (text commands, same style as "repair"):
+// (1) PAY-TO-TRAIN — "train <stat>" pays TC to raise a chosen stat +1. NOT a cheat card: cost scales with
+// the stat's current value (50 × current) and is CAPPED at 15 — the top points are earned in play, not
+// bought. (2) COMPANION CARE — "heal dog" / "heal golem" pays to patch a companion to full (cost scales
+// with missing HP), and "revive dog" brings back a dead/abandoned dog for a steep 300 TC. Surfaced in the
+// vendor greeting. New pure engine/vendorServices.ts (tuning + cost helpers). +5 tests.
+// OTA-729 — PREMIUM vendor stock, so money has something to bank toward. Stalls and roadside traders now
+// sometimes (~45%) carry ONE genuinely worth-saving-for ware on top of their usual mix: strong healing
+// (Trauma Kit / First Aid Kit), throwables, or an Uncommon/Rare weapon or armor — priced at full value (a
+// real sink). The pool is built from THIS game's own catalogs (never hardcoded names, so it stays lore-
+// clean per game), and construct-only (golem_weapon) + faction-only (faction_gear) + not-for-sale rows are
+// excluded. New maybePremiumOffer helper injected into buildStallVendor + pickRoadsideTrader. +5 tests.
+// OTA-730 — more rings + amulets (a gold sink: their recipes sell at vendors), and defensive accessories.
+// Added 3 rings + 3 amulets (Rare/Legendary), each craftable — so they auto-enter the discovery + vendor
+// recipe-sale pool. Some are DEFENSIVE: accessories can now carry a flat acBonus (new CatalogAccessory
+// field), summed into the player's AC alongside armor. This is SAFE — a natural-20 enemy attack always
+// hits regardless of AC (gameStore ~24719), so no stack of +AC makes you unhittable; the bonuses are a
+// modest +1 each. aggregateArmor now folds in the equipped amulet + 3 rings' acBonus; the item preview
+// shows the AC line. +4 tests. (Note: AC is gear-driven, never trained — that's by design.)
+// OTA-731 — material-refinement recipes are never locked behind discovery. The "cool rare recipes" system
+// (OTA-718) locked EVERY Rare-result recipe until found — but Mudstone and Hardened Mudstone are Rare
+// MATERIALS used as ingredients in dozens of downstream recipes, so hiding them soft-blocked half the
+// crafting tree (you couldn't see the Hardened Mudstone upgrade even though it exists: 2 Mudstone + 1
+// Aether Dust). isDiscoverableRecipe now excludes any result that IS a material (findMaterialByName) — the
+// refine chain is always craftable again; Rare/Legendary weapons/armor/relics/consumables stay found-only.
+// Recipe-discovery + craftableTabCounts tests reworked off the Mudstone example onto a non-material Rare.
+export const OTA_BUILD_ID = '2026-07-09-743-hidden-market-is-peaceful';

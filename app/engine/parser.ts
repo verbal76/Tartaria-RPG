@@ -42,6 +42,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
     'observe', 'view', 'read', 'probe', 'survey', 'find', 'scavenge', 'hunt',
     'peruse', 'scrutinise', 'scrutinize', 'comb',
+    // OTA-698 — 'listen'/'hear' are sensory investigation. A whispering-crystal
+    // hook invites "listen to the whispers"; without this it demoted to unknown and
+    // dead-ended. Investigate is hook-eligible, so it now advances the hook.
+    'listen', 'hear',
     // 'salvage' / 'strip' / 'pry' — playtest caught "salvage the
     // construct" failing to advance the wreck_construct hook because
     // there was no salvage verb. Investigate is hook-eligible, so
@@ -76,6 +80,17 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   press: ['press', 'depress', 'mash'],
   push: ['push', 'shove', 'nudge'],
   pull: ['pull', 'tug', 'yank'],
+  // OTA-710 — call-to-action gestures. Evocative verbs the scene prose
+  // invites but which aren't mechanical puzzle inputs. Kept OUT of this
+  // list: 'greet'/'hail'/'sing'/'play' (already claimed by diplomacy),
+  // 'call' (deliberately removed earlier — too greedy). When one of these
+  // lands on an active hook the resolver runs; otherwise the store emits a
+  // backstory-fill flavor line so the action always DOES something.
+  gesture: [
+    'ring', 'pray', 'touch', 'tilt', 'whistle', 'shout', 'chant', 'kneel',
+    'hum', 'stroke', 'caress', 'salute', 'beckon', 'sound', 'signal',
+    'answer', 'respond', 'feel', 'bang', 'strike a note', 'clap',
+  ],
   inventory: [
     // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"
     // all routed here. 'pack' kept; players who type just "pack" are
@@ -246,6 +261,12 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up', 'take'],
   open: [
     'open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm', 'disable', 'dismantle', 'deactivate', 'take apart',
+    // OTA-741 — "empty"/"dump out"/"clean out" a container routes to the open
+    // (loot) intent. Playtest: "empty the trunk" fell to the LLM as unknown even
+    // though "open the trunk" worked, so a natural phrasing hit a dead-end.
+    // ("rummage" is intentionally NOT here — "rummage in the rubble" reads as
+    // investigate/search, not open a container.)
+    'empty', 'empty out', 'dump out', 'clean out',
     // Lockpicking — multi-word so 'pick' alone doesn't conflict with
     // pickup intent.
     'pick the lock', 'pick a lock', 'lockpick', 'pick lock',
@@ -518,15 +539,35 @@ const JUNK_NOUNS = new Set([
   'way', 'place', 'side',
 ]);
 
+// OTA-737 — an instrument preposition ends the DIRECT OBJECT: everything after
+// "with" / "using" / "by" is the TOOL, not the target. Without this, "with the"
+// was merely stopword-filtered, so "shatter the rune glass with the prybar"
+// dropped "with"/"the" but KEPT "prybar" — the target resolved to the mangled
+// "rune glass prybar" instead of "rune glass". (The richer OTA-204 arg system
+// already segments these into instrument roles; this is the legacy target/
+// resolvedNoun path that handlers still read.)
+const INSTRUMENT_BOUNDARY_PREPS = new Set(['with', 'using', 'by']);
+
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   const after = tokens.slice(verbIdx + 1);
-  return after.filter(
-    (t) =>
-      !STOPWORDS.has(t) &&
-      !QUESTION_WORDS.has(t) &&
-      !JUNK_NOUNS.has(t) &&
-      !FILLER_DESCRIPTORS.has(t),
-  );
+  const out: string[] = [];
+  for (const t of after) {
+    // Stop collecting the direct object at "with/using/by" — but ONLY once we
+    // already have a target noun, so a tool-only command with no direct object
+    // ("attack with the off-hand blade") keeps its existing behavior (the prep
+    // is just skipped as a stopword and the weapon noun is collected).
+    if (INSTRUMENT_BOUNDARY_PREPS.has(t) && out.length > 0) break;
+    if (
+      STOPWORDS.has(t) ||
+      QUESTION_WORDS.has(t) ||
+      JUNK_NOUNS.has(t) ||
+      FILLER_DESCRIPTORS.has(t)
+    ) {
+      continue;
+    }
+    out.push(t);
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -846,19 +887,40 @@ function resolveItem(
   return undefined;
 }
 
-function resolveContextNoun(targetTokens: string[], recentNouns: string[]): string | undefined {
+function resolveContextNoun(
+  targetTokens: string[],
+  recentNouns: string[],
+  preferred?: string | null,
+): string | undefined {
   if (!targetTokens.length || !recentNouns.length) return undefined;
-  for (const noun of recentNouns) {
-    const nounLower = noun.toLowerCase();
-    if (targetTokens.some((t) => nounLower.includes(t))) return noun;
-  }
-  for (const noun of recentNouns) {
-    const words = noun.toLowerCase().split(/\s+/);
-    for (const t of targetTokens) {
-      if (words.some((w) => fuzzyEqual(t, w))) return noun;
+  const preferLower = (preferred ?? '').toLowerCase().trim();
+  // OTA-699 — recency tiebreak. When several scene nouns match the same ambiguous
+  // target (a room with a "drain hatch" AND an "observation hatch", target "hatch"),
+  // the old code returned the FIRST in array order — so "look inside the hatch" hit
+  // the wrong one. Prefer the noun the player MOST RECENTLY interacted with; fall
+  // back to array-order first-match (unchanged behavior when there's no preference).
+  const preferFrom = (matches: string[]): string | undefined => {
+    if (!matches.length) return undefined;
+    if (preferLower) {
+      const recent = matches.find((n) => {
+        const nl = n.toLowerCase();
+        return nl === preferLower || nl.includes(preferLower) || preferLower.includes(nl);
+      });
+      if (recent) return recent;
     }
-  }
-  return undefined;
+    return matches[0];
+  };
+  const substrMatches = recentNouns.filter((noun) => {
+    const nounLower = noun.toLowerCase();
+    return targetTokens.some((t) => nounLower.includes(t));
+  });
+  const substrHit = preferFrom(substrMatches);
+  if (substrHit) return substrHit;
+  const fuzzyMatches = recentNouns.filter((noun) => {
+    const words = noun.toLowerCase().split(/\s+/);
+    return targetTokens.some((t) => words.some((w) => fuzzyEqual(t, w)));
+  });
+  return preferFrom(fuzzyMatches);
 }
 
 export interface ParseContext {
@@ -880,6 +942,10 @@ export interface ParseContext {
   /** Ambient nouns extracted from the scene paragraph. Used to
    *  classify the player's input as a generic-area target. */
   ambientNouns?: string[];
+  /** OTA-699 — the noun the player most recently interacted with (from the
+   *  store's lastInteractedNoun). Recency tiebreak so an ambiguous bare noun
+   *  ("the hatch" in a room with two hatches) resolves to the one just touched. */
+  lastInteractedNoun?: string | null;
   /** Name of the vendor currently in the scene, if any. Lets the
    *  suggester offer 'trade with X' / 'buy from X' style verbs. */
   vendorName?: string;
@@ -1054,7 +1120,18 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       // 'use torch on X' only if the player carries one.
       if (hasTorch) suggestIfAllowed('use torch on');
     }
-    if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
+    // OTA-711 — guard the "use <item>" suggestion against loose fuzzy
+    // matches. resolveItem will map "aetherkin" → "Flame of Aether" on the
+    // shared "aether" fragment, producing a nonsensical "Try: use flame of
+    // aether" nudge (playtest log). Only offer the item when the player's
+    // noun shares a WHOLE, non-trivial word with the item name.
+    if (item) {
+      const itemWords = new Set(
+        item.name.toLowerCase().split(/\s+/).filter((w) => w.length > 2 && !STOPWORDS.has(w)),
+      );
+      const nounSharesWord = cleanTokens.some((w) => w.length > 2 && itemWords.has(w));
+      if (nounSharesWord) suggestions.push(`use ${item.name.toLowerCase()}`);
+    }
     // arb167 — 'sneak' (not 'hide') so the stealth tactic reads as an offensive
     // setup: mid-range it's the unseen opener, close-range the initiative gamble.
     if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'sneak', 'parley');
@@ -1167,7 +1244,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const item = enemyHit || ambientStrongMatch
     ? undefined
     : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
-  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
+  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns, context.lastInteractedNoun));
 
   // Confidence: 1.0 exact verb, falls off with distance; small boost from resolved target.
   const verbConfidence = Math.max(0.4, 1 - bestMatch.distance * 0.18);

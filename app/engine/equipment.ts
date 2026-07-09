@@ -194,6 +194,28 @@ export function resolveEquippedItem(
   ) ?? null;
 }
 
+/** OTA-687 — the exact inventory instance ids the player currently has equipped.
+ *  Built on resolveEquippedItem per slot, so it honors the id-bound instance AND
+ *  the legacy first-by-name fallback, plus the extra ring2/ring3 instance slots.
+ *  Lets the vendor sell list exclude ONLY worn gear (by instance) without hiding
+ *  spare copies of the same name — before, one equipped "Stone-Grip Gloves" hid
+ *  every copy you owned from the shop. */
+export function equippedInstanceIds(player: PlayerCharacter): Set<string> {
+  const ids = new Set<string>();
+  const eq = player.equipped;
+  if (!eq) return ids;
+  for (const slot of Object.keys(SLOT_ID_KEY) as EquipSlot[]) {
+    const it = resolveEquippedItem(player, slot);
+    if (it) ids.add(it.id);
+  }
+  // ring2 / ring3 are id-only extra ring slots (no name field / SLOT_ID_KEY entry).
+  for (const idKey of ['ring2Id', 'ring3Id'] as const) {
+    const id = eq[idKey];
+    if (id) ids.add(id);
+  }
+  return ids;
+}
+
 // Stat names the equipment system can boost. Includes 'constitution' for
 // future use (some accessories grant it) — it routes to HP/stamina math.
 type StatKey = keyof Stats;

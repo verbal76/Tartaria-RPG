@@ -135,6 +135,11 @@ export interface CatalogAccessory {
   name: string;
   rarity: Rarity;
   statBonus?: { stat: string; amount: number };
+  /** OTA-730 — optional flat AC bonus, so a ring/amulet can be defensive.
+   *  Summed into the player's AC alongside armor (aggregateArmor). Safe: a
+   *  natural-20 enemy attack always hits regardless of AC, so no stack of these
+   *  makes the player unhittable. */
+  acBonus?: number;
   resistances: string[];
   baseDurability?: number;
   tags: string[];
@@ -297,6 +302,15 @@ export function isInferredInventoryItem(item: { name: string; uniqueStats?: unkn
   return isInferredItem(item.name);
 }
 
+/** OTA-688 — a Crucible-forged item. applyFusion is the ONLY thing that stamps
+ *  `uniqueStats`, and it also tags the piece `fused`; either marks a one-of-a-kind
+ *  forge. Used to badge these with a magical glyph in the inventory (distinct from
+ *  the ◆ inferred diamond) and to backfill the `fused` tag on older forges. */
+export function isFusedInventoryItem(item: { uniqueStats?: unknown; tags?: readonly string[] }): boolean {
+  if (item.uniqueStats) return true;
+  return (item.tags ?? []).some((t) => t.toLowerCase() === 'fused');
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;
@@ -368,6 +382,33 @@ export function missingIngredientsList(
   // OTA-613 — allocation-aware, mirroring the drain (see ingredientShortfall),
   // so the "you still need X" line matches what the craft would actually pay.
   return ingredientShortfall(ingredients, inventory);
+}
+
+/** OTA-708 — how many CRAFT-tab (non-consumable results) and RECIPES-tab
+ *  (consumable results) blueprints the player can make RIGHT NOW, i.e. with every
+ *  ingredient/substitute already in hand. Mirrors RecipesView's exact per-tab split
+ *  (result kind === 'consumable' → recipes, else craft) + its availability rule
+ *  (missing list empty), so the crafting-screen tab badges show what's actually
+ *  makeable — not the total blueprint count. */
+export function craftableRecipeCounts(
+  inventory: readonly InventoryItem[],
+  // OTA-718 — recipes the player has learned. A rare/legendary-result recipe
+  // that isn't yet known is LOCKED and doesn't count as makeable. Omit to
+  // count every recipe (legacy behavior).
+  knownRecipes?: readonly string[],
+): { craft: number; recipes: number } {
+  const known = knownRecipes ? new Set(knownRecipes) : null;
+  let craft = 0;
+  let recipes = 0;
+  for (const r of RECIPES) {
+    const look = lookupCraftedItem(r.result);
+    // Locked (rare/legendary-result) recipe not yet learned → not makeable.
+    if (known && (look.rarity === 'Rare' || look.rarity === 'Legendary') && !known.has(r.result)) continue;
+    if (missingIngredientsList(r.ingredients, inventory).length !== 0) continue;
+    if (look.kind === 'consumable') recipes += 1;
+    else craft += 1;
+  }
+  return { craft, recipes };
 }
 
 /** OTA-193 — list ingredients still short after both name + substitute
@@ -524,6 +565,15 @@ export function findRecipeByResult(target: string): Recipe | null {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const t = norm(target);
   if (!t) return null;
+  // Pass 0 — EXACT normalized-name match wins. OTA-702: "craft Mudstone" used to
+  // substring-match the FIRST recipe containing "mudstone" — "Mudstone Bulwark"
+  // (which needs 2× Hardened Mudstone) — instead of the recipe whose result IS
+  // "Mudstone" (the 3-Mud-Fragment refine the player can actually forage toward).
+  // Any time the player types a recipe's exact result name, that recipe wins over a
+  // longer one that merely contains the word.
+  for (const r of RECIPES) {
+    if (norm(r.result) === t) return r;
+  }
   // Pass 1 — substring match either direction. Cheap, covers most cases.
   for (const r of RECIPES) {
     const rn = norm(r.result);

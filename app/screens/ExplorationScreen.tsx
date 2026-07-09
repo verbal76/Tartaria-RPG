@@ -121,6 +121,9 @@ export function ExplorationScreen() {
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
   const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
+  const pendingMissionOffer = useGameStore((s) => s.pendingMissionOffer);
+  const acceptMissionOffer = useGameStore((s) => s.acceptMissionOffer);
+  const declineMissionOffer = useGameStore((s) => s.declineMissionOffer);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
@@ -972,6 +975,22 @@ export function ExplorationScreen() {
                   if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
                     return false;
                   }
+                  // OTA — elevation gate, mirroring the SearchModal chip logic
+                  // (see the chips map ~"climb down to reach"). While the player is
+                  // climbed onto a feature with no elevated overlay, every GROUND
+                  // noun except the climbed one refuses with "climb down to reach"
+                  // and is greyed in the modal — so it is NOT actionable and must
+                  // not light the INVESTIGATE chip green. Without this the count
+                  // and the modal disagreed: the chip read active while every item
+                  // in the picker was greyed — the "active chip, nothing to
+                  // investigate" hang the player hit.
+                  const elev = currentScene?.elevatedOn;
+                  if (elev && !currentScene?.elevatedOverlayMeta) {
+                    const climbedNoun = elev.noun.toLowerCase();
+                    const nl = n.toLowerCase();
+                    const isClimbedNoun = nl.includes(climbedNoun) || climbedNoun.includes(nl);
+                    if (!isClimbedNoun) return false;
+                  }
                   return true;
                 },
               ).length;
@@ -1661,6 +1680,28 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => cancelTravelConfirm()}
+      />
+
+      {/* OTA-671 — stumbled-onto mission offer (Parley of Factions). Approaching
+          the leaders no longer silently takes the contract; it announces the
+          demands and asks. Accept commits it; Decline walks away. */}
+      <BrandedModal
+        visible={pendingMissionOffer !== null}
+        title={pendingMissionOffer?.title ?? 'Accept this mission?'}
+        body={pendingMissionOffer?.body}
+        buttons={[
+          {
+            label: 'Decline',
+            onPress: () => declineMissionOffer(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Accept',
+            onPress: () => acceptMissionOffer(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => declineMissionOffer()}
       />
     </KeyboardAvoidingView>
   );

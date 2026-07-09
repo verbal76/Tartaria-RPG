@@ -699,6 +699,14 @@ export function TitleScreen() {
             └─ {item.dogName} ({item.dogBreed ?? 'dog'})
           </Text>
         )}
+        {/* OTA-725 — golem sub-line. Mirrors the dog line so a bound golem shows
+            on the slot tile too (the char-select screen used to list only the
+            character + dog and drop the golem). */}
+        {item.golemName && (
+          <Text style={styles.slotDogLine}>
+            └─ {item.golemName} ({item.golemKind ?? 'golem'})
+          </Text>
+        )}
         <Text style={styles.slotMeta}>
           HP {item.hp}/{item.hpMax}
         </Text>

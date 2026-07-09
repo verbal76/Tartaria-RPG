@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, UniqueItemStats } from './types';
-import { isInferredItem } from './crafting';
+import { isInferredItem, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
@@ -95,6 +95,33 @@ export function fusionMaterialTags(item: { name: string; tags?: readonly string[
   for (const t of item.tags ?? []) { const k = t.toLowerCase(); if (MATERIAL_TAG_SET.has(k)) out.add(k); }
   for (const t of inferGearTagPack(item.name)) { if (MATERIAL_TAG_SET.has(t)) out.add(t); }
   return Array.from(out);
+}
+
+/** OTA-682 — which reserved inputs the Fusing Crucible picker should SHOW given
+ *  the current selection. Hides same-material duplicates (an input that adds no
+ *  material the picked set doesn't already cover) to steer toward diversity — BUT
+ *  never hides so much that the player can't reach `minPick` items. A single
+ *  material-rich input (an Aetheric Cog = metal + improvised + aether) can cover a
+ *  whole reserved pool's materials in just two picks; without this escape hatch the
+ *  remaining filler vanishes and the Fuse button can never light — a hard deadlock
+ *  the player reads as "I still can't fuse." When short of `minPick` with nothing
+ *  left that adds a new material, the redundant filler is revealed so the batch can
+ *  complete. Reaching that state means the picked set already spans every material
+ *  the pool has (so it already clears the diversity gate); the filler only pads the
+ *  count. `pickedIds` may include ids not in `scraps` (already-spent) — harmless. */
+export function visibleFusionInputs(
+  scraps: readonly InventoryItem[],
+  pickedIds: readonly string[],
+  minPick: number,
+): InventoryItem[] {
+  const pickedSet = new Set(pickedIds);
+  const pickedMats = new Set(
+    scraps.filter((i) => pickedSet.has(i.id)).flatMap((i) => fusionMaterialTags(i)),
+  );
+  const addsNew = (it: InventoryItem) => fusionMaterialTags(it).some((m) => !pickedMats.has(m));
+  const freshCount = scraps.filter((it) => !pickedSet.has(it.id) && addsNew(it)).length;
+  const needFiller = pickedIds.length < minPick && freshCount === 0;
+  return scraps.filter((it) => pickedSet.has(it.id) || addsNew(it) || needFiller);
 }
 
 export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
@@ -445,6 +472,18 @@ export async function synthesizeFusionNameViaQwen(
     const name = typeof parsed.name === 'string' ? parsed.name.trim() : '';
     const description = typeof parsed.description === 'string' ? parsed.description.trim().slice(0, 200) : '';
     if (!name || name.length > 40 || !description) return null;
+    // OTA-704 — reject a lazy/colliding Qwen name so the distinct deterministic name
+    // (theme + kind suffix, e.g. "Resonant Aegis") stands instead. Two failure modes
+    // seen in play: (a) the model returns a bare "<theme> Armor"/"Weapon" — generic
+    // and, worse, "Aetheric Armor" is ALSO an authored runecaster WEAPON, so the
+    // collision re-typed the forged armor; (b) any name that resolves to a CATALOG
+    // item of a different kind than the forge. Fall back (return null) in both cases.
+    const kindWord = stats.kind === 'weapon' ? 'weapon' : 'armor';
+    const endsWithKindWord = new RegExp(`\\b${kindWord}$`, 'i').test(name);
+    const collidesCrossKind = stats.kind === 'weapon'
+      ? !!findArmorByName(name)
+      : !!findWeaponByName(name); // armor/dog_armor forge must not be named like a catalog weapon
+    if (endsWithKindWord || collidesCrossKind) return null;
     return { name, description };
   } catch {
     return null;
@@ -500,6 +539,11 @@ export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
   forcedKind?: 'weapon' | 'armor',
+  // OTA-739 — the armor slots forged most recently (newest first). The slot
+  // picker steps past these so the Crucible rotates through slots instead of
+  // handing back the same one twice in a row (playtest: three forges → three
+  // head pieces, because the slot used a fixed cloth?chest:head default).
+  recentSlots?: readonly string[],
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
   // Dominant material — first match wins. Drives kind + theme.
@@ -630,7 +674,25 @@ export function synthesizeFusionDeterministic(
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
     baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
     if (kind === 'armor') {
-      baseStats.armorSlot = dominantTag === 'cloth' ? 'chest' : 'head';
+      // OTA-739 — rotate the forged slot across all four positions instead of the
+      // old fixed cloth?chest:head (which sent every non-cloth fusion to head).
+      // Start from the input hash (so different reserved sets favor different
+      // slots), then step past any slot forged in the last couple of fusions so
+      // the Crucible never returns the same slot back-to-back. A soft material
+      // lean is kept: cloth/fiber sets bias toward chest as the starting point.
+      const startIdx = dominantTag === 'cloth'
+        ? VALID_ARMOR_SLOTS.indexOf('chest')
+        : Math.abs(hash) % VALID_ARMOR_SLOTS.length;
+      const avoid = new Set((recentSlots ?? []).map((s) => s.toLowerCase()));
+      let slotIdx = startIdx < 0 ? 0 : startIdx;
+      for (
+        let step = 0;
+        step < VALID_ARMOR_SLOTS.length && avoid.has(VALID_ARMOR_SLOTS[slotIdx]!);
+        step++
+      ) {
+        slotIdx = (slotIdx + 1) % VALID_ARMOR_SLOTS.length;
+      }
+      baseStats.armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
     }
   }
   // OTA-445 — a fused piece always carries a real perk: +2 (Legendary) / +1
@@ -654,6 +716,73 @@ export function synthesizeFusionDeterministic(
   baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
   const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
   return { name, description, stats: baseStats };
+}
+
+// OTA-706 — compact theme/suffix banks for RE-naming already-forged fused items whose
+// stored name collides with a catalog row. Kept separate from the synth's richer banks
+// so this migration path is self-contained; every entry is fantasy flavor that won't
+// itself equal a catalog weapon/armor name.
+const RENAME_THEME: Record<string, string[]> = {
+  aether: ['Resonant', 'Humming', 'Aether-Veined', 'Stormcalled', 'Pulse-Woven', 'Ghost-Charged', 'Witchlit', 'Halcyon'],
+  metal: ['Iron-Bound', 'Tempered', 'Forge-Black', 'Anvil-Struck', 'Slag-Cast', 'Galvanized', 'Foundry-Born', 'Cold-Drawn'],
+  cloth: ['Woven', 'Veil-Stitched', 'Shroud-Spun', 'Loom-Bound', 'Quilted', 'Weft-Knit', 'Gauze-Wrapped'],
+  organic: ['Marrow-Etched', 'Sinew-Wrapped', 'Chitin-Plated', 'Hide-Bound', 'Vein-Threaded', 'Scale-Lapped', 'Tendon-Lashed'],
+  stone: ['Cairn', 'Slate', 'Granite-Cut', 'Flint-Knapped', 'Basalt', 'Quarry-Hewn', 'Shale-Split'],
+  wood: ['Hardwood', 'Rooted', 'Knot-Grained', 'Bog-Oak', 'Bark-Lashed', 'Timberbound', 'Sap-Sealed'],
+  improvised: ['Field-Forged', 'Reclaimed', 'Salt-Worn', 'Jury-Rigged', 'Roadworn', 'Cobbled', 'Pieced', 'Castoff'],
+};
+const RENAME_SUFFIX: Record<string, string[]> = {
+  weapon: ['Cleaver', 'Edge', 'Reaver', 'Render', 'Brand', 'Gouge', 'Talon', 'Sunder'],
+  armor: ['Brace', 'Vigil', 'Mantle', 'Bulwark', 'Ward', 'Aegis', 'Bastion', 'Cuirass'],
+  dog_armor: ['Wrap', 'Pattern', 'Barding', 'Hide', 'Collar', 'Cover'],
+};
+function fnvHash(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h >>> 0;
+}
+
+type NamedFusedRef = { id: string; name: string; tags?: string[]; uniqueStats?: UniqueItemStats };
+
+/** True when a fused item's stored name resolves to a CATALOG item of a DIFFERENT
+ *  kind than the forge chose — the "Aetheric Armor" trap (a forged armor sharing a
+ *  name with an authored runecaster weapon). */
+export function fusedNameCollidesCrossKind(item: NamedFusedRef): boolean {
+  const u = item.uniqueStats;
+  if (!u) return false;
+  return u.kind === 'weapon' ? !!findArmorByName(item.name) : !!findWeaponByName(item.name);
+}
+
+/** OTA-706 — a distinct, structured, catalog-safe name for a fused item, derived
+ *  deterministically from its id (so it's stable across loads) + its uniqueStats
+ *  theme/kind. Salts until the generated name does NOT itself cross-kind-collide, so
+ *  the load migration is idempotent. */
+export function deterministicFusedName(item: NamedFusedRef): string {
+  const u = item.uniqueStats;
+  const kind = u?.kind === 'weapon' ? 'weapon' : u?.kind === 'dog_armor' ? 'dog_armor' : 'armor';
+  const tags = new Set((item.tags ?? []).map((t) => t.toLowerCase()));
+  const themeKey =
+    (u?.damageType === 'aetheric' || u?.resistance === 'aetheric' || tags.has('aether') || tags.has('aetheric') || tags.has('crystal')) ? 'aether'
+    : (u?.damageType === 'slashing' || u?.resistance === 'degradation' || tags.has('metal') || tags.has('iron')) ? 'metal'
+    : (tags.has('cloth') || tags.has('fiber')) ? 'cloth'
+    : (tags.has('organic') || tags.has('bone')) ? 'organic'
+    : tags.has('stone') ? 'stone'
+    : tags.has('wood') ? 'wood'
+    : 'improvised';
+  const theme = RENAME_THEME[themeKey]!;
+  const suffix = RENAME_SUFFIX[kind]!;
+  for (let salt = 0; salt < 12; salt++) {
+    const h = fnvHash(salt ? `${item.id}#${salt}` : item.id);
+    const candidate = `${theme[h % theme.length]!} ${suffix[(h >>> 5) % suffix.length]!}`;
+    if (!fusedNameCollidesCrossKind({ ...item, name: candidate })) return candidate;
+  }
+  return `${theme[0]!} ${suffix[0]!}`;
+}
+
+/** OTA-706 — one-time load migration: rename a fused item whose stored name
+ *  cross-kind-collides with the catalog. Idempotent (a clean name is returned as-is). */
+export function migrateFusedName(item: InventoryItem): InventoryItem {
+  return fusedNameCollidesCrossKind(item) ? { ...item, name: deterministicFusedName(item) } : item;
 }
 
 export function applyFusion(

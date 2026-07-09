@@ -27,6 +27,14 @@ describe('classifyContainer', () => {
     expect(classifyContainer('cache')?.archetypeId).toBe('crate');
     expect(classifyContainer('an old box')?.archetypeId).toBe('crate');
     expect(classifyContainer('a barrel of dust')?.archetypeId).toBe('crate');
+    // OTA-740 — a trunk / footlocker / cask is a chest-like container. The
+    // flooded-house attic authors a `trunk` interactable, but it wasn't in any
+    // matcher, so `open trunk` fell through to a hollow "It stays open" with no
+    // loot (playtest dead-end: 4 attempts to loot the trunk, no payoff).
+    expect(classifyContainer('trunk')?.archetypeId).toBe('crate');
+    expect(classifyContainer('the trunk')?.archetypeId).toBe('crate');
+    expect(classifyContainer('a footlocker')?.archetypeId).toBe('crate');
+    expect(classifyContainer('cask')?.archetypeId).toBe('crate');
   });
 
   it('matches automaton-family nouns', () => {
