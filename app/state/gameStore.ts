@@ -4551,7 +4551,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (priorVisit.enemiesCleared?.length ?? 0) > 0 &&
       hoursSinceLastVisit < RESPAWN_QUIET_HOURS;
     // Hub is universally peaceful — never roll encounters here.
-    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom;
+    // OTA-743 — a NEUTRAL MARKET (The Hidden Market: "agents of every faction
+    // trade under an unspoken truce") is peaceful too. It isn't a faction hub,
+    // so it wasn't caught by the hub check and rolled wilderness encounters like
+    // any tile — a swamp crab on arrival then SUPPRESSED the market building
+    // (below), so the player stood in "The Hidden Market" with no market. A
+    // 'market'-tagged location is a safe trade ground; never spawn a fight there.
+    const isNeutralMarket = location.id === 'hidden_market'
+      || (location.tags ?? []).some((t) => String(t).toLowerCase() === 'market');
+    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom || isNeutralMarket;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -5046,9 +5054,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const onAnchorTile = bX === WORLD_MAP_CENTER_X && bY === WORLD_MAP_CENTER_Y;
     // OTA-498 — the Hidden Market location HOSTS the 4-stall market building at its
     // own anchor (it IS the market), so force it here rather than leaving the anchor
-    // building-less like other named tiles. Still suppressed if a fight is underway.
+    // building-less like other named tiles.
+    // OTA-743 — no longer gated on !hasEnemies. The market IS the place; if a
+    // stray ambush fires, the market must stay visible so the player can trade the
+    // moment the scene clears, instead of being stranded with no way to the stalls.
     const sceneBuilding: string | null =
-      location.id === 'hidden_market' && !hasEnemies
+      location.id === 'hidden_market'
         ? 'market'
         : !hasEnemies && !hubRoom && !onAnchorTile
           ? buildingForTile(location.id, bX, bY)
@@ -8184,10 +8195,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // so it doesn't pile onto an active combat. Resets the
         // OTA-218 stepsSinceCombat counter so the wasteland encounter
         // bias drops back to baseline once the player engages.
+        // OTA-743 — never ambush in a safe zone: a faction hub or a neutral
+        // market ("unspoken truce"). The arrival-encounter roll already skips
+        // these; this closes the investigate-ambush loophole that let a leech
+        // spring on the player mid-trade at The Hidden Market.
+        const ambushLoc = currentScene?.location;
+        const inSafeZone = isHubLocation(ambushLoc?.id)
+          || ambushLoc?.id === 'hidden_market'
+          || (ambushLoc?.tags ?? []).some((t) => String(t).toLowerCase() === 'market');
         if (
           currentScene.enemies.length === 0
           && !get().pendingRolls
           && !get().currentScene?.investigateAmbushUsed   // arb168 — one per room visit
+          && !inSafeZone
           && Math.random() < 0.06
         ) {
           const LOW_TIER = ['Gutter Rat', 'Mudling', 'Aetheric Leech', 'Mud Wasp'];
