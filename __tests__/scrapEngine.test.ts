@@ -19,6 +19,20 @@ describe('canScrap', () => {
     expect(canScrap(mk('Aetheric Compass', 'misc', ['metal']))).toBe(true);
   });
 
+  it('OTA-742 — accepts a weapon/armor mis-stamped as misc (vendor-bought Rust Dagger)', () => {
+    // buyFromVendor used to mint weapons as kind 'misc'. A Rust Dagger carries no
+    // raw-material tag, so the old misc-branch refused it — the player could never
+    // scrap a bought dagger. It's tagged 'weapon', so canScrap now accepts it, and
+    // scrapOutputFor gives real weapon stock (not just the junk fallback).
+    const rustDagger = mk('Rust Dagger', 'misc', ['weapon', 'melee', 'dual_wield', 'knife', 'mud_dwellers']);
+    expect(canScrap(rustDagger)).toBe(true);
+    const out = scrapOutputFor(rustDagger);
+    const names = out.grants.map((g) => g.name);
+    expect(names).toContain('Scrap Metal'); // weapon-like → real metal, not Stick+Rock fallback
+    // Armor mis-stamped misc is also covered.
+    expect(canScrap(mk('Aetheric Helm', 'misc', ['armor', 'head', 'cloth']))).toBe(true);
+  });
+
   it('refuses raw stock materials (would scrap into themselves)', () => {
     expect(canScrap(mk('Scrap Metal', 'misc', ['metal']))).toBe(false);
     expect(canScrap(mk('Stick', 'misc', ['wood']))).toBe(false);
