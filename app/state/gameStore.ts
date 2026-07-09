@@ -8249,6 +8249,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // arb-fix — race loot-luck (Reclaimer/Aetherborn always; Mud
               // Dweller indoors/underground) surfaces rarer Aetheric finds.
               rareLootBias: raceLootBias(player, get().currentScene),
+              // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
+              biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
             });
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
             // OTA-200 — visible lens cue. When the player carries the
@@ -8666,6 +8668,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const outcome = salvage ?? rollAreaSearch(harvestAmbient, {
               hookBonus: hasAethericVision(player) ? 0.15 : 0,
               rareLootBias: raceLootBias(player, get().currentScene),
+              // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
+              biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
             });
             // OTA 23-015 — `kind: 'nothing'` no longer leaves the noun
             // unconsumed. Playtest log: a player typed `salvage gate`
@@ -9611,6 +9615,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // hook keenness stack (clamped to 0.4 inside rollAreaSearch).
             hookBonus: (investigateLensActive ? 0.15 : 0) + raceSearchHookBonus(player, get().currentScene),
             rareLootBias: raceLootBias(player, get().currentScene),
+            // OTA-741 — biome-aware forage: mud tiles boost mud materials, etc.
+            biomeTags: (get().currentScene?.location?.tags ?? []).map((t) => String(t)),
           });
           if (investigateLensActive && outcome.kind === 'hook') {
             get().appendLog(
@@ -20494,7 +20500,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Lock the spot up-front so even failed digs count as "worked".
     set((s) => (s.player ? { player: { ...s.player, lastDugSpot: spotKey } } : s));
     const toolLabel = item ? `the ${item.name.toLowerCase()}` : 'your bare hands';
-    const result = rollDig(score);
+    // OTA-741 — pass the tile's biome tags so a mud/aether/etc. tile boosts the
+    // matching foraged materials (a mud region actually yields mud stock).
+    const digBiomeTags = (get().currentScene?.location?.tags ?? []).map((t) => String(t));
+    const result = rollDig(score, digBiomeTags);
     // Dig damage scales with tool — a brittle knife loses 3 durability,
     // a beefy spear loses 1. Bare hands cost nothing but find less. The
     // tradeoff: digging with your best weapon is fast, but breaks it.
