@@ -17,6 +17,14 @@ export function itemIsThrowable(item: InventoryItem): boolean {
   return (item.tags ?? []).some((t) => /^throwable$/i.test(t));
 }
 
+/** OTA-690 — a weapon-coating vial (poison / acid / burn / electrical / corruption)
+ *  is also rackable as a ONE-SHOT throwable: hurled, it bursts for the coating's
+ *  full damage-over-time up front (per-turn × COATING_DOT_TURNS) instead of being
+ *  painted onto a weapon. Detected by the `weapon_coating` tag. */
+export function itemIsThrowableCoating(item: InventoryItem): boolean {
+  return (item.tags ?? []).some((t) => /^weapon_coating$/i.test(t));
+}
+
 export interface BandolierEligibility {
   eligible: boolean;
   reason: string;
@@ -30,8 +38,8 @@ export function isBandolierEligible(
   if ((eq.bandolierIds ?? []).includes(item.id)) {
     return { eligible: false, reason: "that's already on your bandolier" };
   }
-  if (!itemIsThrowable(item)) {
-    return { eligible: false, reason: "that's not a throwable — the bandolier only holds one-shot throwables" };
+  if (!itemIsThrowable(item) && !itemIsThrowableCoating(item)) {
+    return { eligible: false, reason: "that's not a throwable — the bandolier holds one-shot throwables and coating vials" };
   }
   // OTA-605 — a bandolier racks SMALL ordnance (throwing knives, hand axes,
   // shards, vials). Long thrown shafts — javelins and throwing spears, which

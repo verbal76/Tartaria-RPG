@@ -14,6 +14,8 @@ import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/
 import { describeWhisperStage, describeWhisperTitle, findChain, whisperRouteTarget } from '../engine/whispers';
 import { questionMarkerNumbers, mentionIdForLabel } from '../engine/questionMarkers';
 import { openContractMarkers } from '../engine/contractMarkers';
+import { missionLegs } from '../engine/broker';
+import { carriedSigils } from '../engine/sigils';
 import {
   ensureMainQuest,
   phaseLabel,
@@ -70,6 +72,10 @@ function factionLabel(factionId: string | null | undefined): string {
   return f?.name ?? factionId.replace(/_/g, ' ');
 }
 
+function safeLocName(id: string): string {
+  try { return getLocationById(id).name ?? id; } catch { return id; }
+}
+
 type Tab = 'contracts' | 'collectables';
 
 export function ContractsScreen() {
@@ -78,8 +84,10 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const setFactionQuestActive = useGameStore((s) => s.setFactionQuestActive);
+  const setContractActive = useGameStore((s) => s.setContractActive);
   const routeMission = useGameStore((s) => s.routeMission);
   const discardLead = useGameStore((s) => s.discardLead);
+  const turnInSigil = useGameStore((s) => s.turnInSigil);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
@@ -167,6 +175,23 @@ export function ContractsScreen() {
       </Pressable>
     );
   };
+  // Uniform ACTIVATE / DEACTIVATE (pause) toggle for any contract kind, mirroring
+  // the faction-quest button. `tracked` = currently active. Deactivating parks the
+  // contract (⏸ PAUSED) without dropping it; ABANDON is the separate destructive drop.
+  const trackToggle = (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'whisper' | 'lead' | 'broker',
+    id: string,
+    tracked: boolean,
+  ) => (
+    <Pressable
+      style={({ pressed }) => [styles.trackBtn, !tracked && styles.trackBtnOff, pressed && styles.trackBtnPressed]}
+      onPress={() => setContractActive(kind, id, !tracked)}
+    >
+      <Text style={[styles.trackBtnText, !tracked && styles.trackBtnTextOff]}>
+        {tracked ? '▮▮ DEACTIVATE' : '▶ SET ACTIVE'}
+      </Text>
+    </Pressable>
+  );
 
   if (!player) {
     return (
@@ -229,8 +254,22 @@ export function ContractsScreen() {
     (q) => q.state === 'open' || q.state === 'in_progress',
   );
 
+  // Parley of Factions (broker) — the two-relic alliance mission. Previously it
+  // lived only in the log + as grid "?" markers, so a player who wandered into it
+  // (or parleyed once) had a live mission with NO card here — "I don't even think
+  // that mission is on my list." Now it's a first-class, trackable contract like
+  // the rest: both demanded relics, their source tiles, in-hand progress, a SET
+  // COURSE to each unmet relic, and the SEAL step at the Parley Ground.
+  const brokerMission =
+    player.brokerMission && !player.brokerMission.done ? player.brokerMission : null;
+  const brokerLegs = brokerMission ? (missionLegs(brokerMission) ?? []) : [];
+  const hasRelic = (name: string) =>
+    (player.inventory ?? []).some((i) => i.name === name && (i.quantity ?? 1) > 0);
+  const brokerReady = brokerLegs.length > 0 && brokerLegs.every((l) => hasRelic(l.itemName));
+
   const totalActive =
-    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length;
+    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length
+    + (brokerMission ? 1 : 0);
 
   // Lifetime milestone counters — surfaced here so players have a single
   // place to see progress toward stat bumps (every 10 checks succeeded
@@ -586,15 +625,17 @@ export function ContractsScreen() {
                 const key = `h_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('hunt', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {/* 2026-05-26 OTA-053 — playtester ask: hunt card
                         didn't tell them where to go or what to do.
@@ -731,15 +772,17 @@ export function ContractsScreen() {
                 const key = `m_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('mystery', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -796,15 +839,17 @@ export function ContractsScreen() {
                 const key = `s_${run.id}`;
                 const open = !!expanded[key];
                 const ready = run.stage >= def.stages.length;
+                const tracked = run.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{def.title}</Text>
-                      <Text style={styles.stagePill}>
-                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>
+                        {!tracked ? '⏸ PAUSED' : ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     {contractRoute(key)}
+                    {trackToggle('storyline', def.id, tracked)}
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     {!open && def.stages[run.stage] && !ready && (
                       <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -1014,6 +1059,75 @@ export function ContractsScreen() {
             </View>
           )}
 
+          {brokerMission && brokerLegs.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>ALLIANCE</Text>
+              <Text style={styles.whispersBlurb}>
+                A parley you opened on neutral ground. Recover each faction's
+                demanded relic, then return to the Parley Ground and SEAL THE
+                ALLIANCE.
+              </Text>
+              <View style={[styles.card, brokerMission.paused && styles.cardPaused]}>
+                <View style={styles.cardHead}>
+                  <Text style={styles.cardTitle}>Broker an Alliance</Text>
+                  <Text style={[styles.stagePill, brokerMission.paused && styles.stagePillPaused]}>
+                    {brokerMission.paused
+                      ? '⏸ PAUSED'
+                      : `${brokerLegs.filter((l) => hasRelic(l.itemName)).length}/${brokerLegs.length}`}
+                  </Text>
+                </View>
+                <Text style={styles.cardFaction}>Parley of Factions · neutral ground</Text>
+                {brokerLegs.map((l) => {
+                  const inHand = hasRelic(l.itemName);
+                  const here =
+                    player?.currentLocationId === l.tileId;
+                  return (
+                    <View key={`broker_${l.factionId}`} style={{ marginTop: 8 }}>
+                      <Text style={styles.cardStageLabel}>{l.factionName}</Text>
+                      <Text style={styles.cardStageBody}>
+                        {inHand
+                          ? `✓ ${l.itemName} — in hand.`
+                          : `○ ${l.itemName} — recover it at ${safeLocName(l.tileId)}.`}
+                      </Text>
+                      {!inHand && !here && (
+                        <Pressable
+                          style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                          onPress={() => setPendingRoute({ id: l.tileId, name: safeLocName(l.tileId) })}
+                        >
+                          <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(l.tileId).toUpperCase()}</Text>
+                        </Pressable>
+                      )}
+                      {!inHand && here && (
+                        <Text style={styles.routeHereNote}>▸ You're here — recover the {l.itemName}.</Text>
+                      )}
+                    </View>
+                  );
+                })}
+                <Text style={[styles.cardStageLabel, { marginTop: 10 }]}>How to finish</Text>
+                <Text style={styles.cardStageBody}>
+                  {brokerReady
+                    ? 'Both relics in hand. Return to the Parley Ground and SEAL THE ALLIANCE.'
+                    : 'Bring both relics to the Parley Ground, then SEAL THE ALLIANCE.'}
+                </Text>
+                {player?.currentLocationId !== 'parley_ground' && (
+                  <Pressable
+                    style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                    onPress={() => setPendingRoute({ id: 'parley_ground', name: safeLocName('parley_ground') })}
+                  >
+                    <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName('parley_ground').toUpperCase()}</Text>
+                  </Pressable>
+                )}
+                {trackToggle('broker', 'broker', !brokerMission.paused)}
+                <Pressable
+                  style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                  onPress={() => abandonContract('broker', 'broker')}
+                >
+                  <Text style={styles.abandonBtnText}>ABANDON</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+
           {whispers.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>WHISPERS</Text>
@@ -1032,16 +1146,17 @@ export function ContractsScreen() {
                 // arb99 — if this objective is plotted as a numbered "?" on the
                 // atlas, lead the SET COURSE block with the same number.
                 const qNum = route ? questionNumbers[mentionIdForLabel(route.label)] : undefined;
+                const tracked = rec.tracked !== false;
                 return (
-                  <View key={`w_${rec.id}`} style={styles.card}>
+                  <View key={`w_${rec.id}`} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{title}</Text>
-                      <Text style={styles.stagePill}>{rec.stage}</Text>
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : rec.stage}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Whisper · informal</Text>
                     <Text style={styles.cardStageLabel}>Next step</Text>
                     <Text style={styles.cardStageBody}>{stageDesc}</Text>
-                    {route && !here && (
+                    {route && !here && tracked && (
                       <Pressable
                         style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
                         onPress={() => {
@@ -1055,6 +1170,13 @@ export function ContractsScreen() {
                     {route && here && (
                       <Text style={styles.routeHereNote}>▸ You're here — {route.label} should be at this tile.</Text>
                     )}
+                    {trackToggle('whisper', rec.id, tracked)}
+                    <Pressable
+                      style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                      onPress={() => abandonContract('whisper', rec.id)}
+                    >
+                      <Text style={styles.abandonBtnText}>ABANDON</Text>
+                    </Pressable>
                   </View>
                 );
               })}
@@ -1076,14 +1198,16 @@ export function ContractsScreen() {
                   : q.reward.label;
                 const key = `lead_${q.id}`;
                 const open = !!expanded[key];
+                const tracked = q.tracked !== false;
                 return (
-                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={[styles.card, !tracked && styles.cardPaused]}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{contractBadge(key)}{title}</Text>
-                      <Text style={styles.stagePill}>{q.state}</Text>
+                      <Text style={[styles.stagePill, !tracked && styles.stagePillPaused]}>{!tracked ? '⏸ PAUSED' : q.state}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
                     {contractRoute(key)}
+                    {trackToggle('lead', q.id, tracked)}
                     {!open && (
                       <>
                         <Text style={styles.cardStageLabel}>Complication</Text>
@@ -1113,6 +1237,53 @@ export function ContractsScreen() {
                       </Pressable>
                     )}
                   </Pressable>
+                );
+              })}
+            </View>
+          )}
+
+          {/* OTA-691 — CARRIED SIGILS. A slain faction member's crest, returnable to
+              that faction's stake to honor their dead (+1 standing). One row per
+              carried sigil: faction, reward, turn-in tile, and an auto-routable
+              SET COURSE — or a RETURN button when you're standing on the tile. */}
+          {player && carriedSigils(player.inventory).length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>SIGILS</Text>
+              <Text style={styles.whispersBlurb}>
+                Crests taken off the fallen. Carry each back to its faction's stake
+                and lay it down among their own — they honor the dead you bring home.
+              </Text>
+              {carriedSigils(player.inventory).map((sg) => {
+                const here = player.currentLocationId === sg.tileId;
+                const qty = sg.item.quantity > 1 ? ` ×${sg.item.quantity}` : '';
+                return (
+                  <View key={`sigil_${sg.item.id}`} style={styles.card}>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{sg.item.name}{qty}</Text>
+                      <Text style={styles.stagePill}>+1</Text>
+                    </View>
+                    <Text style={styles.cardFaction}>{sg.factionName} · honor their dead</Text>
+                    <Text style={styles.cardStageBody}>
+                      {here
+                        ? `You're at ${safeLocName(sg.tileId)}. Lay the sigil down among their own.`
+                        : `○ Return it at ${safeLocName(sg.tileId)} for +1 ${sg.factionName} standing.`}
+                    </Text>
+                    {here ? (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => turnInSigil(sg.item.id)}
+                      >
+                        <Text style={styles.routeBtnText}>▸ RETURN THE SIGIL (+1 {sg.factionName.toUpperCase()})</Text>
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        style={({ pressed }) => [styles.routeBtn, pressed && styles.routeBtnPressed]}
+                        onPress={() => setPendingRoute({ id: sg.tileId, name: safeLocName(sg.tileId) })}
+                      >
+                        <Text style={styles.routeBtnText}>▸ SET COURSE TO {safeLocName(sg.tileId).toUpperCase()}</Text>
+                      </Pressable>
+                    )}
+                  </View>
                 );
               })}
             </View>

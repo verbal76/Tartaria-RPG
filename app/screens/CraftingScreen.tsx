@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
-import { missingIngredientsList } from '../engine/crafting';
+import { missingIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
 import { BrandedModal } from '../components/BrandedModal';
@@ -150,6 +149,19 @@ function ownedQty(inventory: InventoryItem[], name: string): number {
     .reduce((s, i) => s + i.quantity, 0);
 }
 
+// OTA — confirm popup for the NON-golem disciplines (shape / mend), mirroring the
+// golem summon confirm. Tapping the card no longer copies a phrase to the clipboard
+// for the player to paste back — it opens this confirm, and on Cast it dispatches
+// the action and bounces to exploration so the roll plays out live.
+type DisciplineConfirm = { title: string; phrase: string; body: string; fuel: string; afford: boolean };
+function buildDisciplineConfirm(d: AethercraftDiscipline, inventory: InventoryItem[]): DisciplineConfirm {
+  const phrase = d.examples[0] ?? d.id;
+  // Aethercraft fuels are an "any ONE of" list — affordable if the player holds ≥1.
+  const afford = d.fuels.some((f) => ownedQty(inventory, f) >= 1);
+  const fuel = `any one of: ${d.fuels.join(', ')}`;
+  return { title: d.title, phrase, body: d.body, fuel, afford };
+}
+
 function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): RepairStatus {
   const cost = repairCostMaterials(item);
   const short = missingIngredientsList(cost, inventory);
@@ -201,7 +213,6 @@ export function CraftingScreen() {
   // prompt "only appeared after hitting back." Render it here too.
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
-  const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   const [tab, setTab] = useState<Tab>('craft');
   // OTA-264 — post-craft confirmation modal state. Non-null after a
   // successful craft (RecipesView's inventory diff produced items);
@@ -211,23 +222,15 @@ export function CraftingScreen() {
   // Empty / null delta = craft failed or no-op'd — the world feed
   // narrates the failure; no popup, screen stays on tab.
   const [craftResult, setCraftResult] = useState<InventoryDelta[] | null>(null);
-  // OTA-095 — Aethercraft tab state. cycleIdx maps a discipline
-  // id → which example phrase to surface next on repeat taps;
-  // pulseAt timestamps a card so its "queued" pulse can fade.
-  const [aetherCycleIdx, setAetherCycleIdx] = useState<Record<string, number>>({});
-  const [aetherPulseAt, setAetherPulseAt] = useState<Record<string, number>>({});
-  // OTA-111 — last phrase staged per discipline card. Lets the
-  // summon card's per-golem variants drive the "✓ staged" hint
-  // line with the SPECIFIC summon phrase ("summon iron golem"),
-  // not just whatever generic discipline example was last in
-  // play. Falls back to the cycled example phrase when nothing
-  // variant-specific has been staged yet.
-  const [aetherLastStaged, setAetherLastStaged] = useState<Record<string, string>>({});
   // arb147 — golem summon confirm. Tapping a golem variant used to only copy
   // "summon X golem" to the clipboard and make the player paste it back in
   // exploration. Now it opens a confirm → on Summon it dispatches the action and
   // bounces to exploration, where the d20+INT roll plays out live.
   const [golemConfirm, setGolemConfirm] = useState<GolemConfirm | null>(null);
+  // OTA — confirm popup for shape/mend (Aetherstone Manipulation / Aetheric
+  // Healing). Same UX as the golem summon: tap the card → confirm → cast (no
+  // clipboard copy-paste).
+  const [disciplineConfirm, setDisciplineConfirm] = useState<DisciplineConfirm | null>(null);
   // OTA-087 — per-tab search + sort state. Each tab keeps its
   // own so switching tabs doesn't clobber the user's filter.
   // Defaults are tuned per category: craft/recipes default to
@@ -294,6 +297,24 @@ export function CraftingScreen() {
     return sorted;
   }, [repairable, repairQuery, repairSortKey, repairSortDir]);
 
+  // OTA-708 — per-tab "craftable NOW" counts for the tab-bar badges (like REPAIR's).
+  // Counts only what the player can ACTUALLY make/do with materials in hand (the
+  // missing-ingredient list is empty) — matching the green "ready" highlight inside
+  // each list — NOT every blueprint that exists. Same split RecipesView uses:
+  // consumable results → RECIPES tab, everything else → CRAFT tab.
+  const craftableCounts = useMemo(() => {
+    const inv = player?.inventory ?? [];
+    // OTA-718 — exclude locked (undiscovered) cool recipes from the tab badges.
+    const { craft, recipes } = craftableRecipeCounts(inv, player?.knownRecipes);
+    // An Aethercraft discipline is fireable when ANY one of its fuels is in the pack.
+    const aetheric = AETHERCRAFT_DISCIPLINES.filter(
+      (d) => d.fuels.some((f) => ownedQty(inv, f) >= 1),
+    ).length;
+    return { craft, recipes, aetheric };
+  }, [player?.inventory]);
+  // Repair badge = what you can fix RIGHT NOW (materials in hand), not every worn item.
+  const repairReady = useMemo(() => repairable.filter((r) => r.available).length, [repairable]);
+
   if (!player) {
     return (
       <View style={styles.container}>
@@ -339,7 +360,9 @@ export function CraftingScreen() {
           style={[styles.tabBtn, tab === 'craft' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>CRAFT</Text>
+          <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>
+            CRAFT {craftableCounts.craft > 0 ? `(${craftableCounts.craft})` : ''}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab('repair')}
@@ -347,7 +370,7 @@ export function CraftingScreen() {
           activeOpacity={0.7}
         >
           <Text style={[styles.tabBtnText, tab === 'repair' && styles.tabBtnTextActive]}>
-            REPAIR {repairable.length > 0 ? `(${repairable.length})` : ''}
+            REPAIR {repairReady > 0 ? `(${repairReady})` : ''}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -355,14 +378,18 @@ export function CraftingScreen() {
           style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>RECIPES</Text>
+          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>
+            RECIPES {craftableCounts.recipes > 0 ? `(${craftableCounts.recipes})` : ''}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setTab('aetheric')}
           style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>AETHERIC</Text>
+          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>
+            AETHERIC {craftableCounts.aetheric > 0 ? `(${craftableCounts.aetheric})` : ''}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -422,42 +449,23 @@ export function CraftingScreen() {
               clipboard. Player then hits BACK and the phrase is
               already staged in the input — they just submit. */}
           <Text style={styles.arbiterLine}>
-            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a golem to summon it on the spot; shape and mend stage their phrase for the input box."
+            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap any of them — golem, shape, or mend — and confirm; the roll plays out in the world view."
           </Text>
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {AETHERCRAFT_DISCIPLINES.map((d) => {
-              const queuedIdx = aetherCycleIdx[d.id];
-              const queuedPhrase = aetherLastStaged[d.id]
-                ?? (queuedIdx !== undefined ? d.examples[queuedIdx] : null);
-              const pulse = aetherPulseAt[d.id];
-              const queued = !!pulse && Date.now() - pulse < 1400;
-              // OTA-111 — stage a phrase on the input draft +
-              // clipboard, set the pulse, and remember which phrase
-              // is "current" for the queued-hint line. Used by both
-              // the discipline card's example-cycling tap and (when
-              // showGolemVariants is true) by each golem variant row.
-              const stageDraft = (phrase: string, exampleIdx: number | null) => {
-                queueInputDraft(phrase);
-                void Clipboard.setStringAsync(phrase).catch(() => { /* ignore */ });
-                setAetherPulseAt((prev) => ({ ...prev, [d.id]: Date.now() }));
-                setAetherLastStaged((prev) => ({ ...prev, [d.id]: phrase }));
-                if (exampleIdx !== null) {
-                  setAetherCycleIdx((prev) => ({ ...prev, [d.id]: exampleIdx }));
-                }
-              };
               return (
                 <Pressable
                   key={d.id}
                   style={({ pressed }) => [
                     styles.aetherCard,
                     pressed && styles.aetherCardPressed,
-                    queued && styles.aetherCardQueued,
                   ]}
                   onPress={() => {
-                    // OTA-629 — the SUMMON card now opens the confirm popup
-                    // (default: first golem you can afford, else Mud) instead of
-                    // copying a phrase into the input. Shape/mend keep the
-                    // tap-to-stage cycling — they have no per-variant confirm.
+                    // OTA-629 — the SUMMON card opens the golem confirm popup.
+                    // OTA — shape (Aetherstone Manipulation) and mend (Aetheric
+                    // Healing) now open their OWN confirm popup too, instead of
+                    // copying a phrase to the clipboard for the player to paste
+                    // back. No copy-paste anywhere in the aetheric flow.
                     if (d.showGolemVariants) {
                       const pick = GOLEM_VARIANTS.find(
                         (g) => missingIngredientsList(g.fuel, player.inventory).length === 0,
@@ -465,10 +473,7 @@ export function CraftingScreen() {
                       setGolemConfirm(buildGolemConfirm(pick, player.inventory));
                       return;
                     }
-                    if (d.examples.length === 0) return;
-                    const nextIdx = ((aetherCycleIdx[d.id] ?? -1) + 1) % d.examples.length;
-                    const phrase = d.examples[nextIdx]!;
-                    stageDraft(phrase, nextIdx);
+                    setDisciplineConfirm(buildDisciplineConfirm(d, player.inventory));
                   }}
                 >
                   <Text style={styles.aetherCardTitle}>{d.title}</Text>
@@ -526,21 +531,14 @@ export function CraftingScreen() {
                     </View>
                   )}
                   <Text style={styles.aetherCardExamples}>
-                    {/* OTA-629 — the summon card opens the confirm popup on tap,
-                        so it doesn't "queue" a phrase; the phrasings are shown as
-                        type-it alternatives. Shape/mend still queue on tap. */}
+                    {/* OTA — every discipline card opens a confirm popup on tap
+                        (golem, shape, mend). No copy-to-input; the phrasings are
+                        just the equivalent things you could type. */}
                     <Text style={styles.aetherCardExamplesLabel}>
-                      {d.showGolemVariants ? 'Or type: ' : 'Tap card to queue: '}
+                      Tap card to cast · or type:{' '}
                     </Text>
-                    {d.examples.map((ex, i) =>
-                      i === queuedIdx ? `[${ex}]` : `"${ex}"`,
-                    ).join(' · ')}
+                    {d.examples.map((ex) => `"${ex}"`).join(' · ')}
                   </Text>
-                  {queued && queuedPhrase && (
-                    <Text style={styles.aetherCardQueuedHint}>
-                      ✓ "{queuedPhrase}" staged for the input box
-                    </Text>
-                  )}
                 </Pressable>
               );
             })}
@@ -694,6 +692,35 @@ export function CraftingScreen() {
           { label: 'Cancel', tone: 'neutral', onPress: () => setGolemConfirm(null) },
         ]}
         onRequestClose={() => setGolemConfirm(null)}
+      />
+
+      {/* OTA — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
+          Same UX as the golem summon: confirm dispatches the cast and returns to
+          exploration so the roll plays out live. No clipboard copy-paste. */}
+      <BrandedModal
+        visible={disciplineConfirm !== null}
+        title={disciplineConfirm?.title ?? 'Aethercraft'}
+        body={disciplineConfirm
+          ? `${disciplineConfirm.body}\n\nFuel — ${disciplineConfirm.fuel}\n\n${disciplineConfirm.afford
+              ? 'You have fuel for it. Casting rolls against the discipline’s DC — watch it play out in the world view.'
+              : 'You’re short on fuel — the attempt will name exactly what’s missing.'}`
+          : undefined}
+        buttons={[
+          {
+            label: 'Cast',
+            tone: 'primary',
+            onPress: () => {
+              const phrase = disciplineConfirm?.phrase;
+              setDisciplineConfirm(null);
+              if (phrase) {
+                useGameStore.getState().submitPlayerAction(phrase);
+                setScreen('exploration');
+              }
+            },
+          },
+          { label: 'Cancel', tone: 'neutral', onPress: () => setDisciplineConfirm(null) },
+        ]}
+        onRequestClose={() => setDisciplineConfirm(null)}
       />
     </View>
   );
