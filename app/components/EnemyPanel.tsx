@@ -113,7 +113,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   // the enemy hits with) is what armor choices key on, so the floor is now high
   // enough to always fit the core combat block (stat grid + RESIST/WEAK/DEALS +
   // traits) without scrolling, even when the player card is short.
-  const ENEMY_CARD_MIN_H = 190;
+  const ENEMY_CARD_MIN_H = 250;
   const capH = Math.max(ENEMY_CARD_MIN_H, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
