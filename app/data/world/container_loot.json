@@ -24,7 +24,7 @@
   },
 
   "crate": {
-    "matchers": ["crate", "chest", "box", "cache", "stash", "barrel"],
+    "matchers": ["crate", "chest", "box", "cache", "stash", "barrel", "trunk", "footlocker", "cask"],
     "narration": "The {target} swings open. The contents are humble.",
     "pool": [
       { "name": "Scrap Metal",        "weight": 25, "min": 1, "max": 2, "tags": ["metal"], "kind": "misc" },
