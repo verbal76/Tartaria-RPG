@@ -244,8 +244,9 @@ export function StatsPanel({ player }: Props) {
           cell more room, and the values now shrink-to-fit instead of wrapping. */}
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
-        <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
-        <Stat label="AC" value={`${effectiveAc}`} />
+        {/* OTA-745 — nudge STA + AC right (AC a bit, STA half as much) for alignment. */}
+        <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} nudge={4} />
+        <Stat label="AC" value={`${effectiveAc}`} nudge={8} />
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
       <Text style={styles.wallet} numberOfLines={1}>◈ {player.tc} TC</Text>
@@ -297,9 +298,11 @@ function formatStat(base: number, effective: number): string {
   return effective > base ? `${effective} (+${effective - base})` : `${base}`;
 }
 
-function Stat({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) {
+function Stat({ label, value, valueColor, nudge }: { label: string; value: string; valueColor?: string; nudge?: number }) {
   return (
-    <View style={styles.stat}>
+    // OTA-745 — `nudge` insets a single stat's label+value to the right (px), for
+    // fine visual alignment of the vitals row without moving the other cells.
+    <View style={[styles.stat, nudge ? { paddingLeft: nudge } : null]}>
       <Text style={styles.label}>{label}</Text>
       {/* OTA-744 — one line always; a wide value (e.g. "109/109") scales down to
           fit its cell instead of wrapping a digit onto a second row. */}
