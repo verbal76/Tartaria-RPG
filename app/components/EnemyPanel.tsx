@@ -125,7 +125,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
   // RESIST/WEAK/DEALS + traits) without scrolling, even when OTA-749's slimmed
   // player card shrinks this height cap. DEALS (the enemy's damage type) drives
   // armor choices and must not fall below the fold.
-  const ENEMY_CARD_MIN_H = 190;
+  const ENEMY_CARD_MIN_H = 250;
   const capH = Math.max(ENEMY_CARD_MIN_H, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
