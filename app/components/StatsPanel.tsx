@@ -238,13 +238,17 @@ export function StatsPanel({ player }: Props) {
         </View>
       ) : null}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
+      {/* OTA-744 — vitals row. TC moved OUT to its own wallet line below: with 5
+          cells a 3-digit HP ("109/109") overflowed its 1/5 slot and wrapped a
+          digit onto a second line ("65/10" + a stray "9"). Four vitals give each
+          cell more room, and the values now shrink-to-fit instead of wrapping. */}
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} valueColor={healthTextColor(hpFrac)} />
         <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
         <Stat label="AC" value={`${effectiveAc}`} />
-        <Stat label="TC" value={`${player.tc}`} />
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
+      <Text style={styles.wallet} numberOfLines={1}>◈ {player.tc} TC</Text>
       <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
       <CoresProgressBadge player={player} />
@@ -297,7 +301,14 @@ function Stat({ label, value, valueColor }: { label: string; value: string; valu
   return (
     <View style={styles.stat}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.value, valueColor ? { color: valueColor } : null]}>{value}</Text>
+      {/* OTA-744 — one line always; a wide value (e.g. "109/109") scales down to
+          fit its cell instead of wrapping a digit onto a second row. */}
+      <Text
+        style={[styles.value, valueColor ? { color: valueColor } : null]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >{value}</Text>
     </View>
   );
 }
@@ -335,6 +346,8 @@ const styles = StyleSheet.create({
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },
+  // OTA-744 — the wallet gets its own gold line, off the cramped vitals row.
+  wallet: { color: '#e0b84a', fontSize: 12, fontWeight: '700', marginTop: 4, letterSpacing: 0.5 },
   label: { color: '#7a705c', fontSize: 9 },
   value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
 });
