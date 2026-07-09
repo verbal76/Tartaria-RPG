@@ -324,16 +324,9 @@ export function StatsPanel({ player, fill }: Props) {
       <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
       <CoresProgressBadge player={player} />
-      <View style={styles.row}>
-        <Stat label="STR" value={formatStat(player.stats.strength, eff.strength)} />
-        <Stat label="DEX" value={formatStat(player.stats.dexterity, eff.dexterity)} />
-        <Stat label="INT" value={formatStat(player.stats.intelligence, eff.intelligence)} />
-        <Stat label="WIS" value={formatStat(player.stats.wisdom, eff.wisdom)} />
-        <Stat label="CHA" value={formatStat(player.stats.charisma, eff.charisma)} />
-      </View>
-      <Text style={styles.equipped} numberOfLines={4} ellipsizeMode="tail">
-        Equipped: {equippedLabel}
-      </Text>
+      {/* OTA-749 — attributes, Equipped list, and faction standing MOVED to the
+          full Player Sheet ("tap for full sheet ›") — reference info that was
+          duplicating the sheet and squeezing the narration feed. */}
       {player.statusEffects && player.statusEffects.length > 0 && (
         <Text style={styles.effects} numberOfLines={1}>
           Effects: {formatEffectSummary(player.statusEffects)}
@@ -355,7 +348,6 @@ export function StatsPanel({ player, fill }: Props) {
           </Text>
         );
       })()}
-      <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
       {/* OTA 040 — affordance for the new Player Sheet screen. Tap
           handler lives on the parent TouchableOpacity in
           ExplorationScreen.tsx; this is the visual cue. */}

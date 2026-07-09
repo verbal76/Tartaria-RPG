@@ -161,6 +161,8 @@ export function ExplorationScreen() {
   // Measured height of the left stats panel — the enemy panel caps to this so a
   // tall enemy card scrolls within the top-right corner instead of growing the row.
   const [statsColH, setStatsColH] = useState(0);
+  // OTA-749 — reading mode: collapse both header cards to one line.
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
   // engine_Dev — transient combat-RESULT popup (above the controls). During a fight the feed is
   // hidden by the arena, so when a roll sequence resolves we surface the FINAL output line (the one
   // that would normally show in the feed) here for ~2s — NOT the dice math (the roller shows that).
@@ -575,6 +577,23 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {headerCollapsed ? (
+        // OTA-749 — reading mode: both cards collapse to one tappable line.
+        <TouchableOpacity
+          style={styles.collapsedHeader}
+          activeOpacity={0.7}
+          onPress={() => setHeaderCollapsed(false)}
+          accessibilityLabel="Expand status panel"
+        >
+          <Text style={styles.collapsedHeaderText} numberOfLines={1} ellipsizeMode="tail">
+            {player.name}  ·  HP {player.hp}/{player.hpMax}  ·  STA {player.stamina}/{player.staminaMax}
+            {inCombat && enemyViews[activeIdx]
+              ? `    ⚔ ${enemyViews[activeIdx]!.enemy.name} ${enemyViews[activeIdx]!.currentHp}/${enemyViews[activeIdx]!.enemy.hp}`
+              : ''}
+          </Text>
+          <Text style={styles.collapsedHeaderChevron}>▾</Text>
+        </TouchableOpacity>
+      ) : (
       <View style={[styles.topRow, arenaActive && styles.topRowCombat]}>
         <TutorialTarget area="top-left-stats" style={[styles.statsCol, arenaActive && styles.combatColEqual]}>
           {/* OTA 040 — tap the stats panel to open the full Player
@@ -626,6 +645,7 @@ export function ExplorationScreen() {
               trait tags) into the top scene bar next to MAP. */}
         </TutorialTarget>
       </View>
+      )}
 
       <TutorialTarget area="scene-bar" style={styles.sceneBar}>
         <View style={{ flex: 1, minWidth: 0 }}>
@@ -660,6 +680,15 @@ export function ExplorationScreen() {
             <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
           {/* OTA-748 — settings gear, relocated here from the enemy card. */}
+          {/* OTA-749 — reading-mode toggle: collapse/expand the header cards. */}
+          <TouchableOpacity
+            onPress={() => setHeaderCollapsed((c) => !c)}
+            hitSlop={8}
+            style={styles.sceneBarBtn}
+            accessibilityLabel={headerCollapsed ? 'Expand status panel' : 'Collapse status panel'}
+          >
+            <Text style={styles.sceneBarGear}>{headerCollapsed ? '▾' : '▴'}</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setScreen('about')}
             hitSlop={8}
@@ -1844,6 +1873,14 @@ const styles = StyleSheet.create({
     borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
     gap: 6,
   },
+  // OTA-749 — reading-mode collapsed header.
+  collapsedHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 4,
+    paddingHorizontal: 8, paddingVertical: 5, gap: 8,
+  },
+  collapsedHeaderText: { color: '#6ab0c9', fontSize: 11, letterSpacing: 0.5, flex: 1, minWidth: 0 },
+  collapsedHeaderChevron: { color: '#4a6870', fontSize: 12, fontWeight: '700' },
   sceneText: { color: '#6ab0c9', fontSize: 10, letterSpacing: 1 },
   timeText: { color: '#6c8088', fontSize: 9, letterSpacing: 1, marginTop: 1 },
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
