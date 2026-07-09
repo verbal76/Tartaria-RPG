@@ -107,7 +107,14 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight }: 
   // Cap the card to the corner height; taller content scrolls vertically (like
   // the exploration feed) rather than growing the top row. Leave a little room
   // below for the paging dots when more than one enemy is staged.
-  const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
+  // OTA-750 — the enemy card is capped to the PLAYER card's height for symmetry,
+  // but OTA-749 slimmed the player card, which shrank this cap and pushed WEAK +
+  // DEALS below the fold — leaving only RESIST visible. DEALS (the damage type
+  // the enemy hits with) is what armor choices key on, so the floor is now high
+  // enough to always fit the core combat block (stat grid + RESIST/WEAK/DEALS +
+  // traits) without scrolling, even when the player card is short.
+  const ENEMY_CARD_MIN_H = 190;
+  const capH = Math.max(ENEMY_CARD_MIN_H, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
   const scrollWrap = (card: React.ReactNode) => (
