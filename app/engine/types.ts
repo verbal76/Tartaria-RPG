@@ -1041,6 +1041,10 @@ export interface PlayerCharacter {
   /** arb107 — the macro location id observed at the previous beginScene,
    *  used to detect a location change and bump `macroVisitSeq`. */
   lastBeganLocationId?: string;
+  /** OTA-739 — the armor slots most recently produced by the Crucible (newest
+   *  first, capped at 2). The deterministic fusion slot picker steps past these
+   *  so consecutive forges rotate through slots instead of repeating one. */
+  recentFusedArmorSlots?: string[];
   /** arb107 — in-game hour at which `rest` last paid out its WIS-train +
    *  trinket reward. Gates those rewards behind a per-day cooldown so the
    *  player can't farm WIS / free trinkets by spamming short rests. */

@@ -539,6 +539,11 @@ export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
   forcedKind?: 'weapon' | 'armor',
+  // OTA-739 — the armor slots forged most recently (newest first). The slot
+  // picker steps past these so the Crucible rotates through slots instead of
+  // handing back the same one twice in a row (playtest: three forges → three
+  // head pieces, because the slot used a fixed cloth?chest:head default).
+  recentSlots?: readonly string[],
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
   // Dominant material — first match wins. Drives kind + theme.
@@ -669,7 +674,25 @@ export function synthesizeFusionDeterministic(
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
     baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
     if (kind === 'armor') {
-      baseStats.armorSlot = dominantTag === 'cloth' ? 'chest' : 'head';
+      // OTA-739 — rotate the forged slot across all four positions instead of the
+      // old fixed cloth?chest:head (which sent every non-cloth fusion to head).
+      // Start from the input hash (so different reserved sets favor different
+      // slots), then step past any slot forged in the last couple of fusions so
+      // the Crucible never returns the same slot back-to-back. A soft material
+      // lean is kept: cloth/fiber sets bias toward chest as the starting point.
+      const startIdx = dominantTag === 'cloth'
+        ? VALID_ARMOR_SLOTS.indexOf('chest')
+        : Math.abs(hash) % VALID_ARMOR_SLOTS.length;
+      const avoid = new Set((recentSlots ?? []).map((s) => s.toLowerCase()));
+      let slotIdx = startIdx < 0 ? 0 : startIdx;
+      for (
+        let step = 0;
+        step < VALID_ARMOR_SLOTS.length && avoid.has(VALID_ARMOR_SLOTS[slotIdx]!);
+        step++
+      ) {
+        slotIdx = (slotIdx + 1) % VALID_ARMOR_SLOTS.length;
+      }
+      baseStats.armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
     }
   }
   // OTA-445 — a fused piece always carries a real perk: +2 (Legendary) / +1
