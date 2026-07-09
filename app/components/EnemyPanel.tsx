@@ -330,14 +330,13 @@ function EnemyCard({ view, cardWidth, hpBarWidth }: { view: EnemyView; cardWidth
           })}
         </View>
       )}
+      {/* OTA-749 — traits on ONE truncated line instead of a wrapping chip grid
+          that ate a second row of the enemy card. The full trait list (with
+          descriptions) is one tap away in the enemy pop-up. */}
       {view.enemy.traits && view.enemy.traits.length > 0 && (
-        <View style={styles.traitRow}>
-          {view.enemy.traits.map((t) => (
-            <Text key={t} style={styles.traitBadge}>
-              {describeTrait(t)}
-            </Text>
-          ))}
-        </View>
+        <Text style={styles.traitLine} numberOfLines={1} ellipsizeMode="tail">
+          {view.enemy.traits.map((t) => describeTrait(t)).join('  ·  ')}
+        </Text>
       )}
     </View>
   );
@@ -412,17 +411,9 @@ const styles = StyleSheet.create({
   },
   statusLabel: { fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   statusVal: { color: '#c9b89a', fontSize: 9 },
-  traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
-  traitBadge: {
-    color: '#c9a86a',
-    fontSize: 9,
-    letterSpacing: 1,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderColor: '#5a4a2e',
-    borderWidth: 1,
-    borderRadius: 2,
-  },
+  // OTA-749 — single-line trait summary (was a wrapping chip grid, styles
+  // traitRow/traitBadge). Muted gold, dot-separated, truncates with an ellipsis.
+  traitLine: { color: '#c9a86a', fontSize: 9, letterSpacing: 0.5, marginTop: 4 },
   dots: {
     flexDirection: 'row',
     alignItems: 'center',
