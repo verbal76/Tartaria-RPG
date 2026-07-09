@@ -261,6 +261,12 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up', 'take'],
   open: [
     'open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm', 'disable', 'dismantle', 'deactivate', 'take apart',
+    // OTA-741 — "empty"/"dump out"/"clean out" a container routes to the open
+    // (loot) intent. Playtest: "empty the trunk" fell to the LLM as unknown even
+    // though "open the trunk" worked, so a natural phrasing hit a dead-end.
+    // ("rummage" is intentionally NOT here — "rummage in the rubble" reads as
+    // investigate/search, not open a container.)
+    'empty', 'empty out', 'dump out', 'clean out',
     // Lockpicking — multi-word so 'pick' alone doesn't conflict with
     // pickup intent.
     'pick the lock', 'pick a lock', 'lockpick', 'pick lock',

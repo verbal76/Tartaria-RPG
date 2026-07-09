@@ -32,6 +32,13 @@ describe('parseInput — basic intents', () => {
   it('detects investigate intent', () => {
     expect(parseInput('examine the obelisk').intent).toBe('investigate');
   });
+  it('OTA-741 — routes "empty"/"rummage" a container to the open (loot) intent', () => {
+    // Playtest: "empty the trunk" fell to the LLM as unknown while "open the
+    // trunk" worked. Both should reach the container-loot handler.
+    expect(parseInput('empty the trunk').intent).toBe('open');
+    expect(parseInput('dump out the crate').intent).toBe('open');
+    expect(parseInput('open the chest').intent).toBe('open');
+  });
 });
 
 describe('parseInput — typo correction', () => {
