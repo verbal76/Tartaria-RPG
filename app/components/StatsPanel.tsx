@@ -347,9 +347,12 @@ const styles = StyleSheet.create({
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
-  stat: { flex: 1, minWidth: 0 },
+  // OTA-747 — each stat CENTERS its label+value in its equal-width cell, so the
+  // columns read as evenly distributed regardless of how wide the value is
+  // (a wide "35/109" no longer crowds the left while "20"/"34" leave big gaps).
+  stat: { flex: 1, minWidth: 0, alignItems: 'center' },
   // OTA-744 — the wallet gets its own gold line, off the cramped vitals row.
   wallet: { color: '#e0b84a', fontSize: 12, fontWeight: '700', marginTop: 4, letterSpacing: 0.5 },
-  label: { color: '#7a705c', fontSize: 9 },
-  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  label: { color: '#7a705c', fontSize: 9, textAlign: 'center' },
+  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600', textAlign: 'center' },
 });
