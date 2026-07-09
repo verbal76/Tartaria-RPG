@@ -121,7 +121,12 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
   // Cap the card to the corner height; taller content scrolls vertically (like
   // the exploration feed) rather than growing the top row. Leave a little room
   // below for the paging dots when more than one enemy is staged.
-  const capH = Math.max(80, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
+  // OTA-750 — floor high enough to always fit the core combat block (stat grid +
+  // RESIST/WEAK/DEALS + traits) without scrolling, even when OTA-749's slimmed
+  // player card shrinks this height cap. DEALS (the enemy's damage type) drives
+  // armor choices and must not fall below the fold.
+  const ENEMY_CARD_MIN_H = 190;
+  const capH = Math.max(ENEMY_CARD_MIN_H, (maxHeight && maxHeight > 0 ? maxHeight : FALLBACK_H) - (enemies.length > 1 ? 16 : 0));
 
   // Wrap a card so it scrolls vertically inside the corner instead of overflowing.
   // engine_Dev — combat arena: when `fill`, take the whole tall column (flex:1) instead of capping
