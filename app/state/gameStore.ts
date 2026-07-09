@@ -8841,7 +8841,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // dedup reads, so engine + UI stay aligned: searched →
         // removed from Search modal AND refused at the parser.
         if (rawTarget) {
-          const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
+          const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
+            // OTA-738 — fall back to the parser's already-fuzzy-resolved noun so a
+            // TYPO variant can't slip past the dedup. A raw match on "rine glass"
+            // fails (rine≠rune) and returns null, which skipped EVERY
+            // already-investigated / table / flavor-exhausted check below — so the
+            // consumed rune-glass re-ran a fresh skill check (INT train + 15 min),
+            // a micro-exploit (retype the noun slightly wrong to re-roll). The
+            // parser already resolved "rine glass" → "rune-glass"; matching on that
+            // (hyphen-normalized) lands the canonical scene noun so the dedup fires.
+            ?? (parsed.resolvedNoun && parsed.resolvedNoun.trim()
+              ? matchAmbientNoun(
+                  parsed.resolvedNoun.trim().replace(/^(the|a|an)\s+/i, ''),
+                  currentScene.ambientNouns ?? [],
+                )
+              : null);
           if (ambient) {
             const ambientLower = ambient.toLowerCase();
             // 2026-05-27 OTA-079 — resolved-hook short-circuit.
@@ -21893,7 +21907,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // If Qwen is slow / dormant / unavailable, the deterministic name settles
     // instead. The loot is mechanically identical either way — Qwen only adds
     // bespoke flavor, so nothing of value is lost when it doesn't land.
-    const det = fusion.synthesizeFusionDeterministic(selGate.inputs, selGate.tagProfile, effKind);
+    // OTA-739 — pass recently forged armor slots so the slot picker rotates
+    // instead of returning the same slot every time. Armor-only; safe for weapons.
+    const det = fusion.synthesizeFusionDeterministic(
+      selGate.inputs,
+      selGate.tagProfile,
+      effKind,
+      get().player?.recentFusedArmorSlots ?? [],
+    );
 
     const livePlayer = get().player;
     if (!livePlayer) return;
@@ -21935,8 +21956,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { ...i, materializing: true, formingName: detName, formingDesc: detDesc }
         : i,
     );
+    // OTA-739 — remember the slot we just forged (armor only) so the next forge
+    // rotates off it. Keep the last 2 so a 4-slot set can't immediately repeat.
+    const forgedSlot = det.stats.kind === 'armor' ? det.stats.armorSlot : undefined;
+    const nextRecentSlots = forgedSlot
+      ? [forgedSlot, ...(livePlayer.recentFusedArmorSlots ?? [])].slice(0, 2)
+      : livePlayer.recentFusedArmorSlots;
     set((s) => s.player
-      ? { player: { ...s.player, inventory: newInvForming, fusionPending: false } }
+      ? { player: { ...s.player, inventory: newInvForming, fusionPending: false, recentFusedArmorSlots: nextRecentSlots } }
       : s);
     // arb45 — Master of Aethercraft: the fusion IS complete mechanically.
     set({ pendingFusionSelection: null, fusionPickerOpen: false });
