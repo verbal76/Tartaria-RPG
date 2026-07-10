@@ -364,7 +364,7 @@ const allLocations = locationsData as Location[];
  *  INVESTIGATE into a tap-grind with no "investigate all" escape hatch.
  *  Fewer props = fewer taps to clear; the per-noun find chance is
  *  unchanged, so the odds a room shows the player something still hold. */
-const AMBIENT_DISPLAY_CAP = 5;
+const AMBIENT_DISPLAY_CAP = 8;
 
 // OTA-434 — unique inventory instance ids. Many grant sites minted ids as
 // `${prefix}_${Date.now()}`, so two items granted in the SAME millisecond (craft
@@ -4918,11 +4918,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       displayedAmbientNouns = [...ambientNouns];
     } else {
       // Reserve slots so each verb still gets a look-in: 3 take + 1
-      // climb + 1 salvage. Dedup overflow, then top up any unused slot
-      // allocation from the remainder to fill the cap.
+      // climb + 3 salvage. Dedup overflow, then top up any unused slot
+      // allocation from the remainder to fill the cap. OTA-753 — salvage
+      // was reserved at 1, so a tile only ever surfaced a SINGLE salvage
+      // target (and with the cap at 5, the buildChipPool re-slice often
+      // dropped even that). Widened cap 5→8 + salvage 1→3 so take/salvage
+      // both show real variety; the pick stays seeded per tile so a
+      // cleared site still resolves and doesn't re-roll fresh loot.
       const pickedTakes = shuffleSliceSeeded(baseTakeable, 3, _hashSeed(`disp-take:${candidateKey}`));
       const pickedClimb = shuffleSliceSeeded(allClimbablesPool, 1, _hashSeed(`disp-climb:${candidateKey}`));
-      const pickedSalv = shuffleSliceSeeded(allSalvageablesPool, 1, _hashSeed(`disp-salv:${candidateKey}`));
+      const pickedSalv = shuffleSliceSeeded(allSalvageablesPool, 3, _hashSeed(`disp-salv:${candidateKey}`));
       const reservedPicks = Array.from(new Set([...pickedTakes, ...pickedClimb, ...pickedSalv]));
       const remaining = ambientNouns.filter((n) => !reservedPicks.includes(n));
       const topupCount = Math.max(0, AMBIENT_DISPLAY_CAP - reservedPicks.length);

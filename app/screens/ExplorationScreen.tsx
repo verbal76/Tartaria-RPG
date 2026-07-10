@@ -905,7 +905,12 @@ export function ExplorationScreen() {
               // interactionTags.isSalvageable, which diverged in both
               // directions and lit SALVAGE green when modal was empty
               // (and vice versa).
-              return buildChipPool(currentScene).filter(
+              // OTA-753 — read displayedAmbientNouns directly (like TAKE),
+              // NOT buildChipPool. buildChipPool re-slices to 5 for the
+              // investigate row, which dropped reserved salvage nouns off
+              // the end and left this count (and the SALVAGE modal) empty.
+              const salvSource = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
+              return salvSource.filter(
                 (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
               ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
             })()}
@@ -1385,7 +1390,7 @@ export function ExplorationScreen() {
         chips={
           tutBeat === 'scrap'
             ? [{ noun: 'broken chest plate', consumed: false }]
-            : buildChipPool(currentScene).map((n) => ({
+            : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []).map((n) => ({
                 noun: n,
                 // OTA-167 — salvage chip greys on the engine's per-room
                 // consumed state directly (searched + flavor-exhausted),
