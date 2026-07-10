@@ -233,8 +233,29 @@ export function RecipesView({
                       <Text style={styles.recipeCta}>tap to craft</Text>
                     </>
                   ) : (
-                    <Text style={styles.recipeMissing}>
-                      Missing: {e.missing.map((m) => `${m.short}× ${m.name}`).join(', ')}
+                    <Text style={styles.recipeIng}>
+                      <Text style={styles.recipeIngLabel}>Needs: </Text>
+                      {/* OTA-736 — even for recipes you can't complete yet, color
+                          each ingredient you ALREADY hold green; short ones stay
+                          red with the remaining count. Lets the player see how
+                          close a blueprint is and decide whether to save toward it
+                          (mirrors the all-green line on a ready recipe). */}
+                      {e.recipe.ingredients.map((ing, idx) => {
+                        const shortEntry = e.missing.find((m) => m.name === ing.name);
+                        return (
+                          <Text key={ing.name}>
+                            <Text style={shortEntry ? styles.recipeIngShort : styles.recipeIngHave}>
+                              {ing.quantity}× {ing.name}
+                            </Text>
+                            {shortEntry ? (
+                              <Text style={styles.recipeIngShortNote}> (need {shortEntry.short} more)</Text>
+                            ) : null}
+                            {idx < e.recipe.ingredients.length - 1 ? (
+                              <Text style={styles.recipeIngLabel}>, </Text>
+                            ) : null}
+                          </Text>
+                        );
+                      })}
                     </Text>
                   )}
                 </View>
@@ -330,6 +351,8 @@ const styles = StyleSheet.create({
   recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeIngLabel: { color: '#7a705c' },
   recipeIngHave: { color: '#9ec96a', fontWeight: '600' },
+  recipeIngShort: { color: '#e07a5f', fontWeight: '600' },
+  recipeIngShortNote: { color: '#7a705c' },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
