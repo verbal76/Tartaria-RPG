@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, UniqueItemStats } from './types';
-import { isInferredItem, findWeaponByName, findArmorByName } from './crafting';
+import { isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 
 /** Minimal Qwen interface — matches itemSynthesisQwen.ts so tests can
@@ -124,15 +124,52 @@ export function visibleFusionInputs(
   return scraps.filter((it) => pickedSet.has(it.id) || addsNew(it) || needFiller);
 }
 
+/** OTA-756 (1a) — an AUTHORED catalog reagent that the forge should accept.
+ *  The Crucible was inferred-only, so junk loot with a real catalog row (Rat Fur,
+ *  Crystalline Echo, …) could never be reserved even though it's exactly the kind
+ *  of throwaway material a player wants to melt. Opt those in — but ONLY 'loot'-
+ *  tagged reagents that (a) aren't equip gear / edible / throwable / keepsake and
+ *  (b) are NOT used in any recipe, so recipe-critical loot (Aetheric Cloth, Drone
+ *  Core, …) stays protected and fusing never cannibalizes crafting. */
+const FORGE_LOOT_BLOCK_TAGS = /throwable|keepsake|quest|sigil|currency|relic/i;
+export function isForgeableLootReagent(item: { name: string; kind?: string; tags?: readonly string[] }): boolean {
+  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
+  if (!tags.includes('loot')) return false;
+  if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
+  if (tags.some((t) => FUSION_EDIBLE_TAG.test(t) || FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
+  if (isRecipeIngredientName(item.name)) return false;
+  return true;
+}
+
+/** OTA-756 — the single source of truth for "can this item be reserved for and
+ *  consumed by the Fusing Crucible?". Every fusion surface (the reserve toggle,
+ *  the ◆ diamond, the save-for-fusion action, eligibleInputs) routes through this
+ *  so what the UI advertises and what the bench accepts can never drift apart.
+ *   - a fused one-of-a-kind (uniqueStats) is never re-fusible;
+ *   - (2a) equip kinds — weapon / armor / accessory / amulet / ring — are OUT, so
+ *     reserving a weapon no longer shows a ♥ the Crucible then silently ignores;
+ *   - edible items are OUT;
+ *   - catalog-absent inferred junk is IN (the original path);
+ *   - (1a) authored 'loot' reagents with no recipe use are IN.
+ *  Faction catalysts are handled separately by callers (they theme output rather
+ *  than count as a normal input). */
+export function isForgeReservableItem(
+  item: { name: string; kind?: string; tags?: readonly string[]; uniqueStats?: unknown },
+): boolean {
+  if (item.uniqueStats) return false;
+  if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
+  if ((item.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
+  if (isInferredItem(item.name)) return true;
+  return isForgeableLootReagent(item);
+}
+
 export function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
   const out: InventoryItem[] = [];
   for (const it of inventory) {
     if (it.stolen) continue;
     if (!it.reservedForFusion) continue;
-    if (!isInferredItem(it.name)) continue;
     if (it.quantity <= 0) continue;
-    if (FUSION_EQUIP_KINDS.includes(it.kind)) continue;
-    if ((it.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) continue;
+    if (!isForgeReservableItem(it)) continue;
     out.push(it);
   }
   return out;

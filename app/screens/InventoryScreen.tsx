@@ -10,14 +10,14 @@ import {
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
-import { findWeaponByName, isInferredItem, isInferredInventoryItem, isFusedInventoryItem } from '../engine/crafting';
+import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
-import { fusionMaterialTags } from '../engine/itemFusion';
+import { fusionMaterialTags, isForgeReservableItem } from '../engine/itemFusion';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -50,7 +50,7 @@ const INV_SORT_OPTIONS = [
 // Mirrors the eligibility gate in gameStore.toggleReserveForFusion exactly.
 function isFusionEligible(item: InventoryItem): boolean {
   if ((item.tags ?? []).includes('faction_gear')) return true;
-  return isInferredItem(item.name);
+  return isForgeReservableItem(item);
 }
 const RARITY_RANK: Record<string, number> = {
   Common: 0,
@@ -830,7 +830,11 @@ export function InventoryScreen() {
     // CATALYST: reserving one themes the next Crucible output into a
     // unique faction item (it doesn't count toward the 3-scrap gate).
     const isFactionCatalyst = (pending.item.tags ?? []).includes('faction_gear');
-    if (isInferredInventoryItem(pending.item) || isFactionCatalyst) {
+    // OTA-756 — show the reserve toggle when the item is forge-reservable (2a: no
+    // weapons/armor; 1a: 'loot' reagents included) OR it's already reserved (so a
+    // piece stranded by the new rule can still be released) OR it's a faction catalyst.
+    const alreadyReserved = pending.item.reservedForFusion === true;
+    if (isForgeReservableItem(pending.item) || alreadyReserved || isFactionCatalyst) {
       const reserved = pending.item.reservedForFusion === true;
       const label = isFactionCatalyst
         ? (reserved ? '♥ Reserved as faction catalyst' : '♡ Save as faction catalyst')
@@ -876,7 +880,7 @@ export function InventoryScreen() {
   // OTA — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
-  const fusionHint = pending && (isInferredInventoryItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+  const fusionHint = pending && (isForgeReservableItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
     ? (() => {
         if ((pending.item.tags ?? []).includes('faction_gear')) {
           return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
@@ -1559,7 +1563,7 @@ function ItemRow({
               this is their own mark. */}
           {isFusedInventoryItem(item) ? (
             <Text style={[styles.rowFusedMark, { color: rarityHexColor(item.rarity) }]}>❖ </Text>
-          ) : isInferredInventoryItem(item) ? (
+          ) : isForgeReservableItem(item) ? (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           ) : null}
           <Text style={styles.rowName} numberOfLines={1}>
