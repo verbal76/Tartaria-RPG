@@ -311,6 +311,23 @@ export function isFusedInventoryItem(item: { uniqueStats?: unknown; tags?: reado
   return (item.tags ?? []).some((t) => t.toLowerCase() === 'fused');
 }
 
+/** OTA-737 — is this name used as a recipe INGREDIENT anywhere in the book?
+ *  Drives the forge's "junk loot only" gate (1a): an authored 'loot' reagent
+ *  that feeds a recipe stays protected from the Crucible, so fusing can never
+ *  cannibalize your crafting stock. Name-exact + lowercased; memoized because
+ *  RECIPES is static. */
+let _recipeIngredientNames: Set<string> | null = null;
+export function isRecipeIngredientName(name: string): boolean {
+  if (!name) return false;
+  if (!_recipeIngredientNames) {
+    _recipeIngredientNames = new Set();
+    for (const r of RECIPES) {
+      for (const ing of r.ingredients) _recipeIngredientNames.add(ing.name.toLowerCase());
+    }
+  }
+  return _recipeIngredientNames.has(name.toLowerCase().trim());
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;

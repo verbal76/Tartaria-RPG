@@ -152,7 +152,6 @@ import {
   consumeIngredients,
   missingIngredients,
   previewCraftSubstitutions,
-  isInferredItem,
   lookupCraftedItem,
   RECIPES,
   findArmorByName,
@@ -21135,7 +21134,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // output into a unique faction item (see findFactionCatalyst /
     // applyFusion). They still don't count toward the 3-scrap gate.
     const isFactionCatalyst = (item.tags ?? []).includes('faction_gear');
-    if (!isInferredItem(item.name) && !isFactionCatalyst) return;
+    // OTA-737 — forge reservability is now one shared predicate (isForgeReservableItem):
+    // (2a) a weapon/armor can't be freshly reserved anymore — reserving one used to
+    // show a ♥ the Crucible then silently ignored; (1a) a 'loot' reagent with no
+    // recipe use now CAN be reserved. An already-reserved item can always be toggled
+    // OFF regardless, so anything stranded by the rule change can still be freed.
+    const { isForgeReservableItem } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    if (!isForgeReservableItem(item) && !isFactionCatalyst && !item.reservedForFusion) return;
     const reserving = !item.reservedForFusion;
     const qty = item.quantity ?? 1;
     // arb107 — a SINGLE-unit stack just flips the flag in place.

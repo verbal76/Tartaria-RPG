@@ -93,7 +93,31 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // Derive gear-ness from the kind OR the tag so the yield branches below still
   // fire (a Rust Dagger gives Scrap Metal + Stick, not the bare junk fallback).
   const isWeaponLike = item.kind === 'weapon' || tags.has('weapon');
-  const isArmorLike = item.kind === 'armor' || tags.has('armor');
+  const isArmorLike = item.kind === 'armor' || tags.has('armor') || item.kind === 'dog_armor';
+  // OTA-737 — a FUSED weapon/armor is a one-of-a-kind Crucible forge. Breaking one
+  // down should never hand back Commons: the player spent scarce reserved inputs to
+  // make it, so it yields Uncommon/Rare aether stock scaled by the forge's rarity.
+  // Detected inline (uniqueStats OR the 'fused' tag — same rule as isFusedInventoryItem)
+  // to avoid an engine import cycle. Returns early: bypasses the Common tag table AND
+  // the selfCrafted trim, both of which would drag the output back down to Commons.
+  const isFused = !!item.uniqueStats || tags.has('fused');
+  if (isFused && (isWeaponLike || isArmorLike)) {
+    const fusedGrants: Array<{ name: string; quantity: number }> = [
+      { name: 'Aetheric Shard', quantity: 2 + rb },   // Uncommon — always
+      { name: 'Aetheric Dust', quantity: 1 + half },  // Uncommon — always
+    ];
+    // A Rare+ forge (every real fusion is Rare/Legendary) also yields one Rare mat:
+    // fiber for armor, the scarce Golem Core for a weapon.
+    if (rb >= 2) {
+      fusedGrants.push(isArmorLike
+        ? { name: 'Aetheric Cloth', quantity: 1 }   // Rare fiber
+        : { name: 'Golem Core', quantity: 1 });     // Rare (Iron-Golem bottleneck)
+    }
+    const fusedSummary = fusedGrants
+      .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
+      .join(', ');
+    return { grants: fusedGrants, summary: fusedSummary };
+  }
   // Metal content → Scrap Metal (the bulk), and on a Rare+ metal piece a
   // GOLEM CORE — the Iron-Golem bottleneck — since a high-grade metal
   // construct plausibly carries one. Representative: only metal gear.
