@@ -195,8 +195,28 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
   // Derive gear-ness from the kind OR the tag so the yield branches below still
   // fire (a Rust Dagger gives Scrap Metal + Stick, not the bare junk fallback).
   const isWeaponLike = item.kind === 'weapon' || tags.has('weapon');
-  const isArmorLike = item.kind === 'armor' || tags.has('armor');
+  const isArmorLike = item.kind === 'armor' || tags.has('armor') || item.kind === 'dog_armor';
   const role = scfg().roles; // role → material name (data-driven)
+  // OTA-1043 — a FUSED weapon/armor is a one-of-a-kind Crucible forge. Breaking one
+  // down should never hand back Commons: the player spent scarce reserved inputs to
+  // make it, so it yields the higher-tier role mats (essence + premium) scaled by the
+  // forge's rarity. Content-agnostic: which concrete mats those roles map to is the
+  // pack's call — the engine only promises "premium roles, not the common bulk". Detected
+  // inline (uniqueStats OR the 'fused' tag) to avoid an engine import cycle. Returns
+  // early: bypasses the common tag table AND the selfCrafted trim.
+  const isFused = !!item.uniqueStats || tags.has('fused');
+  if (isFused && (isWeaponLike || isArmorLike)) {
+    const fusedGrants: Array<{ name: string; quantity: number }> = [
+      { name: role.essencePrimary, quantity: 2 + rb },
+      { name: role.essenceBonus, quantity: 1 + half },
+    ];
+    // A Rare+ forge (every real fusion is Rare/Legendary) also yields the premium role.
+    if (rb >= 2) fusedGrants.push({ name: role.metalPremium, quantity: 1 });
+    const fusedSummary = fusedGrants
+      .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
+      .join(', ');
+    return { grants: fusedGrants, summary: fusedSummary };
+  }
   // Metal content → Scrap Metal (the bulk), and on a Rare+ metal piece a
   // GOLEM CORE — the Iron-Golem bottleneck — since a high-grade metal
   // construct plausibly carries one. Representative: only metal gear.

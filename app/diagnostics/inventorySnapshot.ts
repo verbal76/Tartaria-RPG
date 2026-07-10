@@ -17,6 +17,7 @@
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
 import { categorizeItem, CATEGORY_ORDER, CATEGORY_LABEL, type InventoryCategory } from '../components/InventoryCategorize';
 import { consumeVerb } from '../engine/consumeVerb';
+import { isFusionReservable } from '../engine/itemFusion';
 import { getGameTitle } from '../engine/contentPack';
 import {
   findWeaponByName,
@@ -69,7 +70,10 @@ function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, stri
   }
   // SAVE FOR FUSION — only inferred items, only when not already
   // reserved. Mirrors the OTA-194 heart-tap gate.
-  if (isInferredInventoryItem(item) && !item.reservedForFusion) acts.push('save-for-fusion');
+  // OTA-1043 — forge-reservable now = shared predicate (2a excludes weapon/armor,
+  // 1a includes no-recipe material reagents). release-from-fusion still shows on ANY
+  // reserved item so a stranded reserve can be freed.
+  if (isFusionReservable(item) && !item.reservedForFusion) acts.push('save-for-fusion');
   if (item.reservedForFusion) acts.push('release-from-fusion');
   // DROP — always available unless equipped.
   if (equippedInSlots.length === 0) acts.push('drop');
@@ -85,7 +89,7 @@ function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>
   const parts: string[] = [];
   // OTA-204 — inferred-item ◆ marker matches the OTA-199 row diamond,
   // so the snapshot makes catalog-vs-engine-named obvious at a paste.
-  if (isInferredInventoryItem(item)) parts.push('◆');
+  if (isFusionReservable(item)) parts.push('◆');
   // OTA-707 — show the coating in the name (the in-game row does; the snapshot didn't,
   // so a coated weapon read as plain and looked like the coating never took).
   parts.push(item.coating?.label ? `${item.coating.label} ${item.name}` : item.name);

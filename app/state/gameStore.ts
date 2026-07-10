@@ -21657,7 +21657,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // output into a unique faction item (see findFactionCatalyst /
     // applyFusion). They still don't count toward the 3-scrap gate.
     const isFactionCatalyst = (item.tags ?? []).includes('faction_gear');
-    if (!(require('../engine/itemFusion') as typeof import('../engine/itemFusion')).isFusionReservable(item) && !isFactionCatalyst) return;
+    // OTA-1043 — a weapon/armor can no longer be freshly reserved (2a); an already-
+    // reserved item can always be toggled OFF regardless, so a piece stranded by the
+    // rule change can still be freed.
+    const { isFusionReservable } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    if (!isFusionReservable(item) && !isFactionCatalyst && !item.reservedForFusion) return;
     const reserving = !item.reservedForFusion;
     const qty = item.quantity ?? 1;
     // arb107 — a SINGLE-unit stack just flips the flag in place.

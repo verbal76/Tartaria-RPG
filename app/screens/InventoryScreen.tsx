@@ -863,7 +863,11 @@ export function InventoryScreen() {
     // CATALYST: reserving one themes the next Crucible output into a
     // unique faction item (it doesn't count toward the 3-scrap gate).
     const isFactionCatalyst = (pending.item.tags ?? []).includes('faction_gear');
-    if (isInferredInventoryItem(pending.item) || isFactionCatalyst) {
+    // OTA-1043 — show the reserve toggle when the item is forge-reservable (2a: no
+    // weapons/armor; 1a: no-recipe material reagents included) OR it's already reserved
+    // (so a piece stranded by the new rule can still be released) OR it's a catalyst.
+    const alreadyReserved = pending.item.reservedForFusion === true;
+    if (isFusionReservable(pending.item) || alreadyReserved || isFactionCatalyst) {
       const reserved = pending.item.reservedForFusion === true;
       const label = isFactionCatalyst
         ? (reserved ? '♥ Reserved as faction catalyst' : '♡ Save as faction catalyst')
@@ -906,7 +910,7 @@ export function InventoryScreen() {
     : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
       ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
       : undefined;
-  const fusionHint = pending && (isInferredInventoryItem(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
+  const fusionHint = pending && (isFusionReservable(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
     ? (() => {
         if ((pending.item.tags ?? []).includes('faction_gear')) {
           return 'Fusion: a faction catalyst — themes the Crucible\'s output (a separate slot; doesn\'t count toward the 3–5 materials).';
@@ -1575,7 +1579,7 @@ function ItemRow({
               NOT "inferred", so they never showed the ◆ — now they carry their own mark. */}
           {isFusedInventoryItem(item) ? (
             <Text style={[styles.rowFusedMark, { color: rarityHexColor(item.rarity) }]}>❖ </Text>
-          ) : isInferredInventoryItem(item) ? (
+          ) : isFusionReservable(item) ? (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           ) : null}
           <Text style={[styles.rowName, useContentPackStore.getState().devMode && isBuiltInDefaultItem(item.name) && { color: TEMPLATE_FLAG_COLOR }]} numberOfLines={1}>

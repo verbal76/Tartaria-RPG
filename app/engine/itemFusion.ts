@@ -117,7 +117,22 @@ const FUSION_EDIBLE_TAG = /food|drink|healing|potion|weapon_coating|edible|ratio
  *  material-kind / misc item that carries a fusion material tag also qualifies, so
  *  cataloged scrap (metal / bone / stone / cloth / aether / …) can be reserved too.
  *  Faction catalysts are handled separately by the reserve UI. */
-export function isFusionReservable(item: { name: string; kind?: string; tags?: readonly string[] }): boolean {
+export function isFusionReservable(
+  item: { name: string; kind?: string; tags?: readonly string[]; uniqueStats?: unknown },
+): boolean {
+  // OTA-1043 (2a) — shared guards so what the ♥ advertises and what the Crucible
+  // accepts can never drift apart:
+  //   - a fused one-of-a-kind (uniqueStats) is never re-fusible;
+  //   - equip kinds — weapon / armor / accessory / amulet / ring — are OUT, so
+  //     reserving a weapon no longer shows a ♥ the bench then silently ignores;
+  //   - edible items are OUT.
+  // NOTE: engine_Dev keeps its WIDENED reservable rule below (any material-tagged
+  // material/misc reagent counts, recipe-critical INCLUDED) — a lore-agnostic reskin
+  // catalogs most of its loot, so protecting recipe mats here would re-starve fusion.
+  // That's the deliberate divergence from the Tartaria line's "no-recipe-use" gate.
+  if (item.uniqueStats) return false;
+  if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
+  if ((item.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
   if (isInferredItem(item.name)) return true;
   const k = item.kind ?? '';
   if (k === 'material' || k === 'misc') {
