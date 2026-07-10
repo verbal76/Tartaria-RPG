@@ -1484,23 +1484,6 @@
           "quantity": 1
         }
       ]
-    },
-    {
-      "result": "Shaped Aetheric Shard",
-      "ingredients": [
-        {
-          "name": "Aether Crystal",
-          "quantity": 1
-        },
-        {
-          "name": "Aetheric Shard",
-          "quantity": 1
-        },
-        {
-          "name": "Aether Dust",
-          "quantity": 1
-        }
-      ]
     }
   ]
 }
