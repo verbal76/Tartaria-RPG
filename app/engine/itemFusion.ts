@@ -508,10 +508,13 @@ export async function synthesizeFusionViaQwen(
  *  re-name already-forged items that carry one from before this guard existed. */
 export function isLowQualityForgeName(name: string): boolean {
   if (!name) return true;
+  const n = name.toLowerCase();
   return /^(a|an|the)\b/i.test(name)
     || /\b(common|uncommon|rare|legendary)\b/i.test(name)
+    || /^(common|uncommon|rare|legendary)/.test(n)   // "RareArmor" — no space between the words
     || /[()\d]/.test(name)
-    || /\b(armou?r|weapon)\b/i.test(name);
+    || /\b(armou?r|weapon)\b/i.test(name)
+    || /(armou?r|weapon)$/.test(n);                  // "RareArmor" / "…Armor" ending in a kind word
 }
 
 export async function synthesizeFusionNameViaQwen(

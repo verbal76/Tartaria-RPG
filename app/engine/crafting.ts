@@ -433,6 +433,10 @@ function isSubstitutable(item: InventoryItem): boolean {
   if (item.kind !== 'misc') return false;
   if (item.stolen) return false;
   if (item.reservedForFusion) return false;
+  // OTA-1050 — never auto-consume a Rare/Legendary material as a cheap-slot substitute.
+  // The exact-named material still crafts; this only stops a valuable mat vanishing into
+  // a low-tier recipe via the tag drain. Common/Uncommon (the junk-fills-junk pool) flow.
+  if (item.rarity === 'Rare' || item.rarity === 'Legendary') return false;
   // OTA-424 — [audit fix #6] BOUGHT weapons/armor are stored kind:'misc' (so they
   // stack), but they are NOT raw material. If the item's name resolves to a real
   // weapon/armor catalog entry — or it carries a coating (a real weapon) — never
