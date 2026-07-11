@@ -38,7 +38,7 @@ export function FusionPickerModal() {
 
   const [picked, setPicked] = useState<string[]>([]);
   const [catalystId, setCatalystId] = useState<string | null>(null);
-  const [kind, setKind] = useState<'weapon' | 'armor'>('weapon');
+  const [kind, setKind] = useState<'weapon' | 'armor' | 'dog_armor'>('weapon');
 
   if (!visible) return null;
 
@@ -133,6 +133,11 @@ export function FusionPickerModal() {
                 </Pressable>
                 <Pressable onPress={() => setKind('armor')} style={[styles.kindBtn, kind === 'armor' && styles.kindOn]}>
                   <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
+                </Pressable>
+                {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. The synth
+                    already supports dog_armor; the picker just never offered it. */}
+                <Pressable onPress={() => setKind('dog_armor')} style={[styles.kindBtn, kind === 'dog_armor' && styles.kindOn]}>
+                  <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
                 </Pressable>
               </View>
 

@@ -2730,9 +2730,9 @@ interface GameStore {
   /** OTA — fusion picker: choose 3–5 of your reserved (♥) pieces + weapon/armor,
    *  instead of the Crucible consuming your WHOLE reserved pool on one item. */
   fusionPickerOpen: boolean;
-  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor'; catalystId?: string } | null;
+  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
   closeFusionPicker: () => void;
-  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor', catalystId?: string) => void;
+  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor' | 'dog_armor', catalystId?: string) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -21442,7 +21442,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon",
       // so a forged piece of armor was announced as a weapon).
-      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
+      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : sel.kind === 'dog_armor' ? 'piece of dog armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
