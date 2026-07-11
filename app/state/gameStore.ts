@@ -26265,7 +26265,14 @@ function narrateCasualLook(
     parts.push(`(Type 'leave outpost' to head into the wilds.)`);
   } else {
     const exitLine: string[] = [];
-    if (ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
+    // OTA-748 — the Micro-Micro "Room exits" are INDOOR navigation phrases ("forward
+    // into the Grand Hall", "through the side passage"). They only make sense when the
+    // player is genuinely INSIDE a structure. On the open overworld — where cardinal
+    // travel IS the navigation — they contradict "you're outside traveling" (playtest:
+    // "I'm not in a structure, I can't be headed toward a hall"). Show them only inside
+    // an entered building; on a travel tile the look reads as the overworld it is. The
+    // sibling-room navigation still works if the player types an exit phrase.
+    if (inBuilding && ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
       exitLine.push(`Room exits: ${ladder.microMicro.exits.join(' · ')}.`);
     }
     exitLine.push(`Cardinal travel: north, east, south, west.`);
