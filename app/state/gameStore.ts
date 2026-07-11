@@ -3850,6 +3850,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
           void get().persist();
         });
       }
+      // OTA-766 — one-time refund for the dev character "Verbal": two Corruption Tonics
+      // were wasted dosing corruption on the pre-OTA-764 dead drink route (the coating-
+      // drink counter didn't fire, so they vanished for nothing). Now that drinking a
+      // corruption coating cleanses corruption, repay the pair. Distinct slot key so it
+      // fires exactly once and never restacks; no effect for any other name.
+      if (player.name.trim().toLowerCase() === 'verbal') {
+        void grantTestSupplyGiftOnce(`${slotId}:verbal-corruption-refund-765`).then((res) => {
+          if (!res.granted) return;
+          set((s) => {
+            if (!s.player) return s;
+            const look = lookupCraftedItem('Corruption Tonic');
+            const inv = grantItem(s.player.inventory, {
+              id: `verbalrefund_${Date.now()}_corruptiontonic`,
+              name: 'Corruption Tonic',
+              kind: look.kind,
+              rarity: look.rarity,
+              quantity: 2,
+              tags: [...look.tags],
+            }).inventory;
+            return { player: { ...s.player, inventory: inv } };
+          });
+          get().appendLog(
+            'reward',
+            `✦ Two Corruption Tonics are refunded to ${player.name}'s pack — repayment for the pair spent before drinking a coating actually did anything.`,
+          );
+          void get().persist();
+        });
+      }
       // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
       // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
       // repayment for the pre-OTA-336 fusion-gate bug; the devs have theirs
