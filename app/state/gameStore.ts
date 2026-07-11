@@ -207,6 +207,7 @@ import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
+import { coatingDrinkRemedy } from '../engine/coatingRemedy';
 import {
   canScrap,
   scrapOutputFor,
@@ -10060,6 +10061,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // fired. Cheap deliverable until the buff system
                 // lands.
               }
+              if (fx.coating) {
+                // OTA-1051 — DRINK a weapon coating as a field remedy (see coatingRemedy).
+                const remedy = coatingDrinkRemedy(p, fx.coating.kind, used.rarity);
+                p = remedy.player;
+                messages.push(...remedy.messages);
+                if (remedy.corruptionAfter < remedy.corruptionBefore) {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+                  const crossLine = tierCrossLine(corruptionTierOf(remedy.corruptionBefore), corruptionTierOf(remedy.corruptionAfter));
+                  if (crossLine) void Promise.resolve().then(() => get().appendLog('reward', crossLine));
+                }
+              }
               const newInventory = leaveEmptyWaterBottle(
                 p.inventory
                   .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
@@ -10166,6 +10179,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
           const fxRaw = resolveItemEffect(consumable.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+          // OTA-1051 — a weapon coating drunk/eaten routes to its counter-medicine (see
+          // coatingRemedy) instead of the generic food branch, which would swallow it.
+          if (fxRaw && fxRaw.kind === 'consumable' && fxRaw.coating) {
+            const remedy = coatingDrinkRemedy(player, fxRaw.coating.kind, consumable.rarity);
+            const inv2 = leaveEmptyWaterBottle(
+              remedy.player.inventory
+                .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
+                .filter((i) => i.quantity > 0),
+              consumable.name,
+            );
+            set({ player: advanceTime({ ...remedy.player, inventory: inv2 }, 0.5) });
+            if (remedy.corruptionAfter < remedy.corruptionBefore) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+              const crossLine = tierCrossLine(corruptionTierOf(remedy.corruptionBefore), corruptionTierOf(remedy.corruptionAfter));
+              if (crossLine) void Promise.resolve().then(() => get().appendLog('reward', crossLine));
+            }
+            const tail = remedy.messages.length > 0 ? `${remedy.messages.join(', ')}.` : 'nothing to counter — it steadies you all the same.';
+            get().appendLog('world', `You ${consumeVerb(consumable)} the ${consumable.name}. ${tail}`);
+            void get().persist();
+            break;
+          }
           const fx = fxRaw && fxRaw.kind === 'consumable'
             ? fxRaw as {
                 kind: 'consumable';
