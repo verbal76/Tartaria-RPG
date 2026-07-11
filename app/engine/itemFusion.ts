@@ -573,7 +573,7 @@ function buildNamePrompt(
 export function synthesizeFusionDeterministic(
   inputs: readonly InventoryItem[],
   tagProfile: string[],
-  forcedKind?: 'weapon' | 'armor',
+  forcedKind?: 'weapon' | 'armor' | 'dog_armor',
   // OTA-739 — armor slots forged most recently (newest first); the slot picker
   // steps past these so the Crucible rotates slots instead of repeating one.
   recentSlots?: readonly string[],

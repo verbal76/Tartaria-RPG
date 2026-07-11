@@ -2703,9 +2703,9 @@ interface GameStore {
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
   fusionPickerOpen: boolean;
-  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor'; catalystId?: string } | null;
+  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
   closeFusionPicker: () => void;
-  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor', catalystId?: string) => void;
+  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor' | 'dog_armor', catalystId?: string) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -21446,7 +21446,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'reward',
       // OTA-688 — name the ACTUAL kind the player chose (was hard-coded "weapon").
-      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
+      `✦ The Crucible forges a ${fused.rarity ?? 'Rare'} ${sel.kind === 'armor' ? 'piece of armor' : sel.kind === 'dog_armor' ? 'piece of dog armor' : 'weapon'} from your reserved pieces — and it's in your pack, still cooling.`,
     );
     get().appendLog(
       'world',
