@@ -583,21 +583,45 @@ export function synthesizeFusionDeterministic(
   recentSlots?: readonly string[],
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
-  // Dominant material — first match wins. Drives kind + theme.
-  const dominantTag =
-    tagSet.has('aether') ? 'aether'
-    : tagSet.has('crystal') ? 'aether'
-    : tagSet.has('blade') ? 'metal'
-    : tagSet.has('metal') ? 'metal'
-    : tagSet.has('iron') ? 'metal'
-    : tagSet.has('plate') ? 'metal'
-    : tagSet.has('cloth') ? 'cloth'
-    : tagSet.has('fiber') ? 'cloth'
-    : tagSet.has('organic') ? 'organic'
-    : tagSet.has('bone') ? 'organic'
-    : tagSet.has('wood') ? 'wood'
-    : tagSet.has('stone') ? 'stone'
-    : 'improvised';
+  // OTA-759 — dominant material by COUNT across the actual inputs, NOT the old
+  // fixed aether-first priority. That priority tested `aether`/`crystal` FIRST, so
+  // a single aether-tagged input — and Tartaria fusion loot is aether-heavy — made
+  // EVERY fusion aether-dominant → always 'aetheric' resist + aether theme/damage
+  // ("all my fused dog vests are aetheric resist"). Now we tally how many of your
+  // reserved pieces carry each canonical material and take the most common; ties
+  // break on the input hash so different sets diverge (an organic/fur-heavy pool
+  // forges poison-resist, a metal-heavy one degradation, an aether one aetheric).
+  const CANON_MAT: Record<string, string> = {
+    aether: 'aether', crystal: 'aether',
+    blade: 'metal', metal: 'metal', iron: 'metal', plate: 'metal',
+    cloth: 'cloth', fiber: 'cloth',
+    organic: 'organic', bone: 'organic',
+    wood: 'wood', stone: 'stone', mudstone: 'stone',
+  };
+  const MAT_ORDER = ['aether', 'metal', 'cloth', 'organic', 'wood', 'stone'] as const;
+  const matCounts = new Map<string, number>();
+  for (const it of inputs) {
+    // fusionMaterialTags dedupes per item, so each piece adds at most 1 to a bucket
+    // → the count is "how many of your pieces are metal / organic / aether / …".
+    for (const t of fusionMaterialTags(it)) {
+      const c = CANON_MAT[t];
+      if (c) matCounts.set(c, (matCounts.get(c) ?? 0) + 1);
+    }
+  }
+  const domSeed = parseInt(fusionInputHash(inputs).substring(0, 8), 16) || 0;
+  const dominantTag = (() => {
+    // Rotate the tiebreak order by the input hash so equal-count materials don't
+    // always resolve to the same bucket across different reserved sets.
+    const rot = domSeed % MAT_ORDER.length;
+    const order = [...MAT_ORDER.slice(rot), ...MAT_ORDER.slice(0, rot)];
+    let best: string | null = null;
+    let bestN = 0;
+    for (const c of order) {
+      const n = matCounts.get(c) ?? 0;
+      if (n > bestN) { bestN = n; best = c; }
+    }
+    return best ?? 'improvised';
+  })();
   // Kind from the dominant tag — OVERRIDDEN by the player's explicit weapon/armor
   // choice from the fusion picker when provided (the material still drives theme +
   // stats, but the SHAPE is the player's call).
