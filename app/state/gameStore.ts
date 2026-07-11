@@ -2124,7 +2124,13 @@ function debugLoadout(player: PlayerCharacter): string {
 // match the zone's danger tier?). Routed to `[debug]` (log/bug-report only).
 function debugEnemy(e: Record<string, unknown>): string {
   const g = (k: string) => (e[k] ?? '?');
-  return `enemy: ${g('name')} hp=${g('hp')} ac=${g('ac')} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} danger=${g('danger')}${e['boss'] ? ' BOSS' : ''}`;
+  // OTA-1045 — AC and 'danger' are NOT stored on enemy records: AC is derived from
+  // `abilityPoint` at combat time (5 + AP, clamped) and 'danger' was never a field,
+  // so both printed as a placeholder '?'. Compute the real AC the attack paths use
+  // and surface the parsed ability-point (`ap`) as the actual threat number.
+  const ap = parseEnemyAP(e as { abilityPoint?: string });
+  const ac = Math.max(5, Math.min(18, 5 + ap)) + (e['boss'] ? 6 : 0);
+  return `enemy: ${g('name')} hp=${g('hp')} ac=${ac} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} ap=${ap}${e['boss'] ? ' BOSS' : ''}`;
 }
 
 // 2026-05-24 — effective stamina max accounting for hunger penalty.
