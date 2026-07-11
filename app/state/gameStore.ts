@@ -13086,12 +13086,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const opened = [...(room.containersOpened ?? []), key];
+        // OTA-741 — opening a container RESOLVES that object: also record the noun as
+        // a searched ambient noun so the salvage sweep (and take / investigate) skip
+        // it. Without this the same object paid out TWICE — once via 'open' (its
+        // contents) and again when a later SALVAGE ALL swept it up ("you work the
+        // lockbox over"). One object, one take.
+        const searchedAfterOpen = Array.from(new Set([...(room.searchedAmbientNouns ?? []), key]));
         set((s) => ({
           worldMemory: {
             ...s.worldMemory,
             visitedRooms: {
               ...(s.worldMemory.visitedRooms ?? {}),
-              [dropKey]: { ...room, containersOpened: opened },
+              [dropKey]: { ...room, containersOpened: opened, searchedAmbientNouns: searchedAfterOpen },
             },
           },
         }));
