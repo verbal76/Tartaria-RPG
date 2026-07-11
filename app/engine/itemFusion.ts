@@ -598,21 +598,40 @@ export function synthesizeFusionDeterministic(
   recentSlots?: readonly string[],
 ): { name: string; description: string; stats: UniqueItemStats } {
   const tagSet = new Set(tagProfile);
-  // Dominant material — first match wins. Drives kind + theme.
-  const dominantTag =
-    tagSet.has('aether') ? 'aether'
-    : tagSet.has('crystal') ? 'aether'
-    : tagSet.has('blade') ? 'metal'
-    : tagSet.has('metal') ? 'metal'
-    : tagSet.has('iron') ? 'metal'
-    : tagSet.has('plate') ? 'metal'
-    : tagSet.has('cloth') ? 'cloth'
-    : tagSet.has('fiber') ? 'cloth'
-    : tagSet.has('organic') ? 'organic'
-    : tagSet.has('bone') ? 'organic'
-    : tagSet.has('wood') ? 'wood'
-    : tagSet.has('stone') ? 'stone'
-    : 'improvised';
+  // OTA-1046 — dominant material by COUNT across the actual inputs, NOT a fixed
+  // aether-first priority. The old priority tested `aether`/`crystal` FIRST, so a
+  // single aether-tagged input made EVERY fusion aether-dominant → always the same
+  // resist + theme. Now we tally how many reserved pieces carry each canonical
+  // material and take the most common; ties break on the input hash so different
+  // sets diverge. Fully content-agnostic — reads whatever material tags the pack
+  // put on the loot.
+  const CANON_MAT: Record<string, string> = {
+    aether: 'aether', crystal: 'aether',
+    blade: 'metal', metal: 'metal', iron: 'metal', plate: 'metal',
+    cloth: 'cloth', fiber: 'cloth',
+    organic: 'organic', bone: 'organic',
+    wood: 'wood', stone: 'stone', mudstone: 'stone',
+  };
+  const MAT_ORDER = ['aether', 'metal', 'cloth', 'organic', 'wood', 'stone'] as const;
+  const matCounts = new Map<string, number>();
+  for (const it of inputs) {
+    for (const t of fusionMaterialTags(it)) {
+      const c = CANON_MAT[t];
+      if (c) matCounts.set(c, (matCounts.get(c) ?? 0) + 1);
+    }
+  }
+  const domSeed = parseInt(fusionInputHash(inputs).substring(0, 8), 16) || 0;
+  const dominantTag = (() => {
+    const rot = domSeed % MAT_ORDER.length;
+    const order = [...MAT_ORDER.slice(rot), ...MAT_ORDER.slice(0, rot)];
+    let best: string | null = null;
+    let bestN = 0;
+    for (const c of order) {
+      const n = matCounts.get(c) ?? 0;
+      if (n > bestN) { bestN = n; best = c; }
+    }
+    return best ?? 'improvised';
+  })();
   // Kind: the player's explicit choice wins; otherwise infer from the dominant tag.
   const kind: 'weapon' | 'armor' | 'dog_armor' =
     preferKind === 'weapon' ? 'weapon'

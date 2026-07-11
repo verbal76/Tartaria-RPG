@@ -5,7 +5,7 @@
 //        premium), never the common bulk. Which concrete mats those roles map to is the
 //        content pack's call — this test reads the loaded scrap role config.
 
-import { isFusionReservable } from '../app/engine/itemFusion';
+import { isFusionReservable, synthesizeFusionDeterministic } from '../app/engine/itemFusion';
 import { scrapOutputFor } from '../app/engine/scrapEngine';
 import scrapData from '../app/data/scrap/scrap.json';
 import type { InventoryItem, UniqueItemStats } from '../app/engine/types';
@@ -50,5 +50,32 @@ describe('OTA-1043 (3) — fused weapon/armor scraps to premium role mats only',
     const out = scrapOutputFor(fusedArmor);
     for (const g of out.grants) expect(commonRoles.has(g.name)).toBe(false);
     expect(out.grants.map((g) => g.name)).toContain(roles.essencePrimary);
+  });
+});
+
+describe('OTA-1046 — fused resistance follows the DOMINANT material by count', () => {
+  const mkI = (name: string, tags: string[]): InventoryItem =>
+    ({ id: name, name, kind: 'misc', rarity: 'Common', quantity: 1, tags } as InventoryItem);
+
+  it('an organic-majority reserved set forges poison resist (not always aetheric)', () => {
+    const inputs = [
+      mkI('Alpha Fur', ['organic']),
+      mkI('Hound Fur', ['organic']),
+      mkI('Crab Meat', ['organic']),
+      mkI('Fragmented Aether', ['aether', 'improvised']),
+    ];
+    const r = synthesizeFusionDeterministic(inputs, ['organic', 'aether', 'improvised'], 'dog_armor');
+    expect(r.stats.resistance).toBe('poison');
+  });
+
+  it('an aether-majority reserved set still forges aetheric resist', () => {
+    const inputs = [
+      mkI('Aetheric Blood', ['aether']),
+      mkI('Fragmented Aether', ['aether', 'improvised']),
+      mkI('Aetheric Residue', ['aether']),
+      mkI('Alpha Fur', ['organic']),
+    ];
+    const r = synthesizeFusionDeterministic(inputs, ['aether', 'organic', 'improvised'], 'dog_armor');
+    expect(r.stats.resistance).toBe('aetheric');
   });
 });
