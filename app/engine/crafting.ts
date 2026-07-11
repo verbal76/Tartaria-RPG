@@ -848,12 +848,25 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
   return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
+// OTA-762 — spread the WEAKNESSES so no single damage type is the near-universal
+// answer. Pre-OTA, bludgeoning was the weakness for Aetheric Mutation + Aetheric
+// Creature + Automation — the three most common types in the aetheric wasteland
+// (56 of 109 enemies) — so every fight rewarded the same blunt weapon. And four
+// bestiary types (Human, Mechanism, Etheric Undead, Mech-Construct) had NO row, so
+// they showed no weakness at all. Now each type leans a distinct way (bludgeoning
+// stays the CONSTRUCT/heavy-mutation answer, aether-forms take a slashing edge,
+// machines short-circuit to electrical, mud/undead burn, beasts/humans pierce) and
+// every type in the JSON is covered. Resists are largely unchanged.
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
   Animal: { resist: [], weak: ['piercing'] },
+  Human: { resist: [], weak: ['piercing', 'slashing'] },
   'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
   'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning'] },
-  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['bludgeoning'] },
-  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical', 'bludgeoning'] },
+  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['slashing'] },
+  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical'] },
+  Mechanism: { resist: ['poison', 'aetheric'], weak: ['electrical'] },
+  'Mech-Construct': { resist: ['slashing', 'piercing'], weak: ['electrical', 'bludgeoning'] },
+  'Etheric Undead': { resist: ['poison', 'aetheric'], weak: ['burn', 'radiation'] },
   Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical'] },
 };
 
