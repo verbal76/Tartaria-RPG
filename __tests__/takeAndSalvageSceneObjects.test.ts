@@ -181,3 +181,43 @@ describe('OTA-1000 — salvage falls back to the context-resolved noun', () => {
     expect(hoursAfter - hoursBefore).toBeGreaterThanOrEqual(0.2);
   });
 });
+
+describe('OTA-1047 — an OPENED container is not also salvageable (no double-dip)', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  it('opening a lockbox marks it searched, so a later SALVAGE ALL skips it', async () => {
+    const store = await bootstrap('BoxCracker');
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene,
+        enemies: [],
+        hooks: [],
+        investigateAmbushUsed: true,
+        ambientNouns: ['lockbox', 'rubble'],
+        displayedAmbientNouns: ['lockbox', 'rubble'],
+      },
+    });
+
+    store.getState().submitPlayerAction('open lockbox');
+
+    const rooms = store.getState().worldMemory.visitedRooms ?? {};
+    const searchedSomewhere = Object.values(rooms).some(
+      (r) => (r.searchedAmbientNouns ?? []).includes('lockbox'),
+    );
+    const openedSomewhere = Object.values(rooms).some(
+      (r) => (r.containersOpened ?? []).includes('lockbox'),
+    );
+    expect(openedSomewhere).toBe(true);
+    expect(searchedSomewhere).toBe(true);
+
+    const hoursBefore = store.getState().player!.hoursElapsed ?? 0;
+    store.getState().salvageAllAmbient(['lockbox']);
+    const hoursAfter = store.getState().player!.hoursElapsed ?? 0;
+    expect(hoursAfter - hoursBefore).toBe(0);
+  });
+});
