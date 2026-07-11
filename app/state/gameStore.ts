@@ -200,7 +200,7 @@ import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
-import { coatingDrinkRemedy } from '../engine/coatingRemedy';
+import { coatingDrinkRemedy, isCoatingDrinkable } from '../engine/coatingRemedy';
 import {
   canScrap,
   scrapOutputFor,
@@ -9742,6 +9742,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // lands.
               }
               if (fx.coating) {
+                // OTA-746 — drinkable only if its element has a player-side counter.
+                // Acid is coat-only: refuse without spending it.
+                if (!isCoatingDrinkable(fx.coating.kind)) {
+                  get().appendLog('arbiter', `The ${used.name} is a coating, not a draught — nothing in you for its ${fx.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
+                  break;
+                }
                 // OTA-745 — DRINK a weapon coating as a field remedy (see coatingRemedy).
                 const remedy = coatingDrinkRemedy(p, fx.coating.kind, used.rarity);
                 p = remedy.player;
@@ -9862,6 +9868,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // OTA-745 — a weapon coating drunk/eaten routes to its counter-medicine (see
           // coatingRemedy) instead of the generic food branch, which would swallow it.
           if (fxRaw && fxRaw.kind === 'consumable' && fxRaw.coating) {
+            // OTA-746 — coat-only coatings (acid) refuse the drink instead of being spent.
+            if (!isCoatingDrinkable(fxRaw.coating.kind)) {
+              get().appendLog('arbiter', `The ${consumable.name} is a coating, not a draught — nothing in you for its ${fxRaw.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
+              break;
+            }
             const remedy = coatingDrinkRemedy(player, fxRaw.coating.kind, consumable.rarity);
             const inv2 = leaveEmptyWaterBottle(
               remedy.player.inventory
