@@ -17215,4 +17215,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // regardless of AC, so no stack makes the player unhittable. No hardcoded content — the dev panel now
 // documents the field: TABLE_OPTION_NOTES gains an ACCESSORY_NOTE for the amulets + rings tables, and the
 // template ships a defensive (+AC) sample ring + amulet. Item preview shows the AC line. +2 tests.
-export const OTA_BUILD_ID = '2026-07-11-1048-fused-name-quality';
+export const OTA_BUILD_ID = '2026-07-11-1049-enemy-weakness-variety';

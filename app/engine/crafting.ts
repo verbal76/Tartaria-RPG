@@ -909,12 +909,18 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
   return rArmor().find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
+// OTA-1049 — spread the WEAKNESSES in the DEFAULT map so no single damage type is
+// the near-universal answer: pre-OTA, Aetheric Mutation + Aetheric Creature +
+// Automation all shared 'bludgeoning', so one blunt weapon solved most fights. Now
+// aether-forms take a slashing edge and machines short-circuit to electrical.
+// (This is the built-in DEFAULT only; a content pack still overrides the whole map
+// via resolveTypeResistances(), and pack-specific enemy types live there, not here.)
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
   Animal: { resist: [], weak: ['piercing'] },
   'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
   'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning'] },
-  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['bludgeoning'] },
-  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical', 'bludgeoning'] },
+  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['slashing'] },
+  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical'] },
   Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical'] },
 };
 
