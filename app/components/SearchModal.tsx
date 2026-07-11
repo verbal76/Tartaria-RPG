@@ -86,16 +86,16 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
     Keyboard.dismiss();
     onSubmit(target);
   };
-  // OTA — completed (consumed) chips now LEAVE the list instead of lingering
-  // greyed with a ✓. (Reverses the [POLISH-3]/OTA-257 "keep a visible record"
-  // behavior per player request — a finished item just disappears.) Two things
-  // stay: the pinned surface chip ('the ground'/'floor'/'mud') is a permanent
-  // per-room affordance (alwaysShow), so it remains after a dig; and LOCKED chips
-  // (unmetRequirement, not yet consumed) remain so the player still sees what
-  // needs a scanner / climb-down. Any alwaysShow chip that IS consumed sorts to
-  // the bottom so the actionable rows read first.
+  // OTA-747 — a CONSUMED chip always leaves the list, INCLUDING the pinned surface
+  // chip ('the ground' / 'floor' / 'mud'). Player ask: every other investigated noun
+  // vanishes, so the surface shouldn't linger as a disabled greyed ✓ either (a consumed
+  // chip is `disabled`, so keeping it was a dead, space-taking row). It still stays
+  // PINNED while it's actionable — alwaysShow keeps it in the pool until investigating
+  // it marks it consumed, and only THEN does it disappear, exactly like a one-shot prop.
+  // LOCKED chips (unmetRequirement, not yet consumed) still remain so the player sees
+  // what needs a scanner / climb-down.
   const visibleChips = (chips ?? [])
-    .filter((c) => c.alwaysShow || !c.consumed)
+    .filter((c) => !c.consumed)
     .sort((a, b) => (a.consumed ? 1 : 0) - (b.consumed ? 1 : 0));
   // 2026-05-25 — Common-hints section removed. Per playtester:
   // the canned chips ("the wall" / "the rubble" / "the silt" /
