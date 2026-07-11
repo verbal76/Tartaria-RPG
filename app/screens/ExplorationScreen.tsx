@@ -89,6 +89,9 @@ export function ExplorationScreen() {
   // OTA-508 — the Hidden Market offers the Fuse Cauldron at every stall.
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
+  // OTA-758 — the Crucible chip also lights at a roadside/wild vendor (portable
+  // forge, 25 TC); suppressed during the tutorial demo vendor.
+  const tutorialDemoVendor = useGameStore((s) => s.tutorialDemoVendor);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
@@ -729,7 +732,23 @@ export function ExplorationScreen() {
           spawn macro-location). A wild fusion_bench permit (fusionPending)
           still shows it anywhere. This also keeps it off-screen for the whole
           tutorial, which runs before you've ever left. */}
-      {!crucibleDismissed && (player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1) || activeBuildingId === 'market') && (() => {
+      {(() => {
+        if (crucibleDismissed || !player) return null;
+        // A location that carries its OWN (free) Crucible: an outpost you've left
+        // and returned to, an active fusion permit, or a market building.
+        const atLocationCrucible = !!(player.fusionPending
+          || (player.hubRoomId && (player.macroVisitSeq ?? 0) >= 1)
+          || activeBuildingId === 'market');
+        // OTA-758 (option A) — otherwise a roadside/wild VENDOR fires a PORTABLE
+        // Crucible for 25 TC. Only when the location has no free Crucible (so the
+        // two never both show), you've left the spawn once, and it isn't the
+        // tutorial demo — mirrors the vendor-screen button's own gate + the
+        // useVendorCrucible guard, so what the chip promises is what fires.
+        const atVendorCrucible = !atLocationCrucible
+          && !!currentScene?.vendor
+          && !tutorialDemoVendor
+          && (player.macroVisitSeq ?? 0) >= 1;
+        if (!atLocationCrucible && !atVendorCrucible) return null;
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -741,20 +760,29 @@ export function ExplorationScreen() {
         );
         const bannerCatalyst = findFactionCatalyst(player.inventory ?? [], bannerEquippedIds);
         const gate = gateFusion(player.inventory ?? [], bannerCatalyst);
+        // A vendor forge charges 25 TC and goes through useVendorCrucible (which
+        // re-checks the gate + charges); a location forge is free via 'fuse'.
+        const fireCrucible = atVendorCrucible
+          ? () => useGameStore.getState().useVendorCrucible()
+          : () => useGameStore.getState().submitPlayerAction('fuse');
+        const readyName = atVendorCrucible ? '★★ Fusing Crucible · 25 TC' : '★★ Fusing Crucible ready';
+        const readyHint = atVendorCrucible
+          ? 'tap to fire the vendor’s portable Crucible (25 TC)'
+          : 'tap to fuse · spends your ♥ reserved items';
         return (
         <TouchableOpacity
           style={styles.fusionBanner}
-          onPress={() => useGameStore.getState().submitPlayerAction('fuse')}
+          onPress={fireCrucible}
           activeOpacity={0.7}
         >
           <View style={styles.fusionBannerStripe} />
           <View style={styles.vendorBannerBody}>
             <Text style={styles.fusionBannerName}>
-              {gate.ok ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}
+              {gate.ok ? readyName : '★★ Fusing Crucible · needs prep'}
             </Text>
             <Text style={styles.vendorBannerHint}>
               {gate.ok
-                ? 'tap to fuse · spends your ♥ reserved items'
+                ? readyHint
                 : (gate.reason ?? 'tap for details')}
             </Text>
           </View>
