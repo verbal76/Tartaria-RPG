@@ -22,6 +22,7 @@ import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { fusionMaterialTags, isFusionReservable } from '../engine/itemFusion';
+import { coatingItemDrinkable } from '../engine/coatingRemedy';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -629,7 +630,9 @@ export function InventoryScreen() {
     // an off-hand-eligible item that takes a use-style off-hand
     // equip. Pure-armor / pure-weapon (no effect, equippable) gets
     // the dedicated Equip button only.
-    const useIsRealAction = isConsumable || hasEffect || (offEligible && isThrowableItem);
+    // OTA-1052 — a coat-only coating (acid: no player ailment to counter) shows no
+    // Use/Drink button; the "Coat a weapon" / "Coat armor" buttons below still appear.
+    const useIsRealAction = (isConsumable || hasEffect || (offEligible && isThrowableItem)) && coatingItemDrinkable(pending.item);
     const perItemHP = isConsumable ? (() => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { resolveItemEffect } = require('../engine/itemEffect');
