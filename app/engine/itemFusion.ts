@@ -592,7 +592,7 @@ export function synthesizeFusionDeterministic(
   // FORCES the output kind; the theme/stats still flow from the dominant tag, so
   // an armor-tagged input set forced to 'weapon' still reads on-theme. Omitted =
   // legacy behavior (kind inferred from the dominant material tag).
-  preferKind?: 'weapon' | 'armor',
+  preferKind?: 'weapon' | 'armor' | 'dog_armor',
   // OTA-739 — armor slots forged most recently (newest first); the slot picker
   // steps past these so the Crucible rotates slots instead of repeating one.
   recentSlots?: readonly string[],
@@ -617,6 +617,7 @@ export function synthesizeFusionDeterministic(
   const kind: 'weapon' | 'armor' | 'dog_armor' =
     preferKind === 'weapon' ? 'weapon'
     : preferKind === 'armor' ? 'armor'
+    : preferKind === 'dog_armor' ? 'dog_armor'
     : dominantTag === 'metal' || dominantTag === 'wood' || dominantTag === 'stone'
       ? 'weapon'
       : dominantTag === 'cloth'

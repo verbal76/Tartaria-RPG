@@ -3092,11 +3092,11 @@ interface GameStore {
    *  ≥3 distinct material tags). Calls Qwen for a balanced unique
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
-  fuseAtCrucible: (preferKind?: 'weapon' | 'armor') => Promise<void>;
+  fuseAtCrucible: (preferKind?: 'weapon' | 'armor' | 'dog_armor') => Promise<void>;
   fusionPickerOpen: boolean;
-  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor'; catalystId?: string } | null;
+  pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
   closeFusionPicker: () => void;
-  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor', catalystId?: string) => void;
+  confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor' | 'dog_armor', catalystId?: string) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -21925,7 +21925,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The ${getCrucibleName()} cools. "${selGate.reason ?? 'Pick 3 to 5 reserved pieces spanning different materials.'}"`);
       return;
     }
-    const effKind: 'weapon' | 'armor' = sel.kind;
+    const effKind: 'weapon' | 'armor' | 'dog_armor' = sel.kind;
     // Gate 3 — Qwen readiness. The static-inference path can't design
     // OTA-195 → OTA-221 — Qwen path PREFERRED but no longer required.
     // Playtest log: player tapped fuse 20+ times after meeting every
