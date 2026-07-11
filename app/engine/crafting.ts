@@ -355,6 +355,14 @@ const MATERIAL_SUBSTITUTE_TAGS: Record<string, string[]> = {
   'small rock': ['stone', 'mudstone', 'improvised'],
   'aetheric shard': ['aether', 'crystal'],
   'bone shard': ['organic', 'bone'],
+  // OTA-744 — mud recipes (the Common Mud Scanner, the starter Mud Golem, …) now
+  // accept any cheap mud-tagged material the player actually forages, so a pack full
+  // of Mud Essence / Aetheric Sludge / Aether Mud satisfies an "Aether Mud" or
+  // "Mud Fragment" slot instead of demanding those exact names. The rarity guard in
+  // isSubstitutable keeps Rare mud (Mudstone / Mud Gem / Hardened Mudstone) OUT of
+  // these low-tier slots, so a valuable stone is never spent on a Common scanner.
+  'aether mud': ['mud'],
+  'mud fragment': ['mud'],
 };
 
 /** Is this inventory item eligible to be auto-consumed as a substitute
@@ -369,6 +377,12 @@ function isSubstitutable(item: InventoryItem): boolean {
   if (item.kind !== 'misc') return false;
   if (item.stolen) return false;
   if (item.reservedForFusion) return false;
+  // OTA-744 — never auto-consume a Rare/Legendary material as a cheap-slot substitute
+  // (a Rare Mudstone standing in for a Common Mud Fragment, an Aetheric Cloth for
+  // Patched Cloth, a Golem Core for an Aetheric Shard). The exact-named material still
+  // crafts; this only stops a valuable mat vanishing into a low-tier recipe via the
+  // tag drain. Common/Uncommon materials (the intended junk-fills-junk pool) still flow.
+  if (item.rarity === 'Rare' || item.rarity === 'Legendary') return false;
   // OTA-424 — [audit fix #6] BOUGHT weapons/armor are stored kind:'misc' (so they
   // stack), but they are NOT raw material. If the item's name resolves to a real
   // weapon/armor catalog entry — or it carries a coating (a real weapon) — never

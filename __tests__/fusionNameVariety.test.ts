@@ -76,6 +76,13 @@ describe('OTA-742 — migrateFusedName re-mints an existing low-quality name on 
     expect(isLowQualityForgeName(out.name)).toBe(false);
   });
 
+  it('renames "RareArmor" (concatenated rarity+kind, no spaces) too', () => {
+    expect(isLowQualityForgeName('RareArmor')).toBe(true);
+    const out = migrateFusedName(fused('RareArmor'));
+    expect(out.name).not.toBe('RareArmor');
+    expect(isLowQualityForgeName(out.name)).toBe(false);
+  });
+
   it('leaves a clean name alone (idempotent)', () => {
     expect(migrateFusedName(fused('Marrow Wrap')).name).toBe('Marrow Wrap');
   });
