@@ -18,6 +18,7 @@ import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { fusionMaterialTags, isForgeReservableItem } from '../engine/itemFusion';
+import { coatingItemDrinkable } from '../engine/coatingRemedy';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -598,7 +599,9 @@ export function InventoryScreen() {
     // an off-hand-eligible item that takes a use-style off-hand
     // equip. Pure-armor / pure-weapon (no effect, equippable) gets
     // the dedicated Equip button only.
-    const useIsRealAction = isConsumable || hasEffect || (offEligible && isThrowableItem);
+    // OTA-765 — a coat-only coating (acid: no player ailment to counter) shows no
+    // Use/Drink button; the "Coat a weapon" / "Coat armor" buttons below still appear.
+    const useIsRealAction = (isConsumable || hasEffect || (offEligible && isThrowableItem)) && coatingItemDrinkable(pending.item);
     if (useIsRealAction) {
       // arb106 — show YOUR current HP on the eat/drink button so you can see at a
       // glance whether you actually need it (player ask).

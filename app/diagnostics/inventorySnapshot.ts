@@ -18,6 +18,7 @@ import type { InventoryItem, PlayerCharacter } from '../engine/types';
 import { categorizeItem, CATEGORY_ORDER, CATEGORY_LABEL, type InventoryCategory } from '../components/InventoryCategorize';
 import { consumeVerb } from '../engine/consumeVerb';
 import { isForgeReservableItem } from '../engine/itemFusion';
+import { coatingItemDrinkable } from '../engine/coatingRemedy';
 import {
   findWeaponByName,
   isInferredItem,
@@ -52,7 +53,9 @@ function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, stri
   const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
   const offEligible = slots.includes('off') && !equippedInSlots.includes('off');
   const anySlotFree = slots.some((s) => !equippedInSlots.includes(s));
-  if (isConsumable || fx !== null || (anySlotFree && (offEligible || slots.length > 0))) {
+  // OTA-765 — a coat-only coating (acid: no player ailment to counter) offers no
+  // drink/use action; it can still be worked into a weapon or armor.
+  if ((isConsumable || fx !== null || (anySlotFree && (offEligible || slots.length > 0))) && coatingItemDrinkable(item)) {
     acts.push(isConsumable ? `use(${consumeVerb(item)})` : offEligible ? 'use(off)' : 'use');
   }
   // OTA-208 — throwable items are now weapons (equip:main / equip:off

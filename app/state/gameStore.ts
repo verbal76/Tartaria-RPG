@@ -200,7 +200,7 @@ import { isBandolierEligible } from '../engine/bandolierEligibility';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { leaveEmptyWaterBottle } from '../engine/waterBottle';
 import { consumeVerb } from '../engine/consumeVerb';
-import { coatingDrinkRemedy } from '../engine/coatingRemedy';
+import { coatingDrinkRemedy, isCoatingDrinkable } from '../engine/coatingRemedy';
 import {
   canScrap,
   scrapOutputFor,
@@ -9703,6 +9703,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 // lands.
               }
               if (fx.coating) {
+                // OTA-765 — a coating is drinkable only if its element has a player-side
+                // counter. Acid (no player 'acid' ailment) is coat-only: refuse without
+                // spending it, and point the player at the weapon/armor coat action.
+                if (!isCoatingDrinkable(fx.coating.kind)) {
+                  get().appendLog('arbiter', `The ${used.name} is a coating, not a draught — nothing in you for its ${fx.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
+                  break;
+                }
                 const remedy = coatingDrinkRemedy(p, fx.coating.kind, used.rarity);
                 p = remedy.player;
                 messages.push(...remedy.messages);
@@ -9823,6 +9830,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // applyCoatingDrink) instead of the generic food branch below, which — since
           // coatings carry no healHP/cure — would swallow it for a blank no-op.
           if (fxRaw && fxRaw.kind === 'consumable' && fxRaw.coating) {
+            // OTA-765 — coat-only coatings (acid: no player ailment to counter) refuse
+            // the drink instead of being spent for nothing.
+            if (!isCoatingDrinkable(fxRaw.coating.kind)) {
+              get().appendLog('arbiter', `The ${consumable.name} is a coating, not a draught — nothing in you for its ${fxRaw.coating.kind} to counter. Work it into a weapon or a piece of armor instead.`);
+              break;
+            }
             const remedy = coatingDrinkRemedy(player, fxRaw.coating.kind, consumable.rarity);
             const inv2 = leaveEmptyWaterBottle(
               remedy.player.inventory
