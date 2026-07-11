@@ -477,6 +477,21 @@ export async function synthesizeFusionViaQwen(
   }
 }
 
+/** OTA-761 — a forged name is "low quality" when it reads like a prompt echo or a
+ *  stat dump instead of an evocative 2-4 word name. The small on-device model
+ *  sometimes parrots the naming PROMPT back ("A Rare Dog Armor (+3 AC)") or emits a
+ *  bare "<theme> Armor". A good name has NO leading article, NO rarity word, NO
+ *  generic kind word, and NO digits/parens (a stat echo like "(+3 AC)" or "2d8").
+ *  Used to (a) reject such a Qwen name so the deterministic name stands, AND (b)
+ *  re-name already-forged items that carry one from before this guard existed. */
+export function isLowQualityForgeName(name: string): boolean {
+  if (!name) return true;
+  return /^(a|an|the)\b/i.test(name)
+    || /\b(common|uncommon|rare|legendary)\b/i.test(name)
+    || /[()\d]/.test(name)
+    || /\b(armou?r|weapon)\b/i.test(name);
+}
+
 /** OTA-631 — name + description ONLY for an already-stat-balanced fused item.
  *  The deterministic synth has already decided the kind / rarity / stats; this
  *  asks Qwen for JUST the flavor (a 2-4 word name + one-line description), which
@@ -520,7 +535,10 @@ export async function synthesizeFusionNameViaQwen(
     const collidesCrossKind = stats.kind === 'weapon'
       ? !!findArmorByName(name)
       : !!findWeaponByName(name); // armor/dog_armor forge must not be named like a catalog weapon
-    if (endsWithKindWord || collidesCrossKind) return null;
+    // OTA-761 — also reject an ECHOED / low-quality name (see isLowQualityForgeName)
+    // so the evocative deterministic name (theme + kind suffix, e.g. "Humming Vest")
+    // stands instead.
+    if (endsWithKindWord || collidesCrossKind || isLowQualityForgeName(name)) return null;
     return { name, description };
   } catch {
     return null;
@@ -843,7 +861,15 @@ export function deterministicFusedName(item: NamedFusedRef): string {
 /** OTA-706 — one-time load migration: rename a fused item whose stored name
  *  cross-kind-collides with the catalog. Idempotent (a clean name is returned as-is). */
 export function migrateFusedName(item: InventoryItem): InventoryItem {
-  return fusedNameCollidesCrossKind(item) ? { ...item, name: deterministicFusedName(item) } : item;
+  // OTA-761 — re-mint the name when it cross-kind-collides with a catalog row OR is
+  // low-quality (a prompt echo like "A Rare Dog Armor (+3 AC)" or a bare "<theme>
+  // Armor" that predates the namer guard). Guarded to fused items via uniqueStats so
+  // deterministicFusedName (which reads uniqueStats) always has real data. Idempotent:
+  // a clean name is left alone next load.
+  if (!item.uniqueStats) return item;
+  return (fusedNameCollidesCrossKind(item) || isLowQualityForgeName(item.name))
+    ? { ...item, name: deterministicFusedName(item) }
+    : item;
 }
 
 export function applyFusion(
