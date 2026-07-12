@@ -5576,11 +5576,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb36 — announce a discovered structure so the new ENTER affordance
     // isn't unexplained. Skipped on the opening scene (you start on the
     // anchor, so sceneBuilding is null there anyway).
-    if (scene.sceneBuilding === 'market' && scene.location.id === 'hidden_market' && !opts?.isOpening && !get().activeBuildingId) {
+    if (scene.sceneBuilding === 'market' && scene.location.id === 'hidden_market' && !get().activeBuildingId) {
       // OTA-508 — the Hidden Market IS the market: auto-enter it on arrival so the
       // four stall buttons (weapons / armor / food / materials) + EXIT replace the
       // cardinals immediately, instead of requiring a separate "enter" step. Deferred
       // so it runs AFTER beginScene's own set() lands (no re-entrancy).
+      // OTA-777 — this now also fires on LOAD (isOpening). Building state
+      // (activeBuildingId) isn't persisted, so a save made INSIDE the market
+      // reloaded half-out — at the hidden_market tile with a stale stall vendor
+      // in the scene but no activeBuildingId — which made the top vendor +
+      // Crucible banners reappear. Re-entering on load restores the in-stall
+      // view (OTA-775 suppresses those top banners while activeBuildingId is set).
+      // The location.id === 'hidden_market' gate keeps this off every other
+      // scene, incl. a brand-new game (which opens at a spawn outpost).
       void Promise.resolve().then(() => {
         if (get().currentScene?.location.id === 'hidden_market' && !get().activeBuildingId) {
           get().enterBuilding('market');
