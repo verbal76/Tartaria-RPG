@@ -221,3 +221,40 @@ describe('OTA-1047 — an OPENED container is not also salvageable (no double-di
     expect(hoursAfter - hoursBefore).toBe(0);
   });
 });
+
+describe('OTA-1056 — attack wording + rousing an animate scene noun', () => {
+  beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
+
+  const setScene = (store: ReturnType<typeof bootstrap> extends Promise<infer S> ? S : never, nouns: string[]) => {
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene, enemies: [], enemyHps: [], hooks: [], investigateAmbushUsed: true,
+        ambientNouns: nouns, displayedAmbientNouns: nouns,
+      },
+    });
+  };
+
+  it('attacking a non-animate scene noun harvests it but no longer narrates "sift"', async () => {
+    const store = await bootstrap('Smasher');
+    setScene(store, ['debris', 'rubble']);
+    store.getState().submitPlayerAction('attack the debris');
+    expect(tailLog(10)).not.toMatch(/\bsift\b/i);
+  });
+
+  it('attacking an animate scene noun (knight) rouses it into combat', async () => {
+    const store = await bootstrap('KnightWaker');
+    setScene(store, ['knight', 'debris']);
+    expect(store.getState().currentScene!.enemies.length).toBe(0);
+    store.getState().submitPlayerAction('attack the knight');
+    expect(store.getState().currentScene!.enemies.length).toBe(1);
+    expect(tailLog(10)).toMatch(/surges upright|comes for you/i);
+  });
+
+  it('"wake the knight" also rouses it (wake routes to attack)', async () => {
+    const store = await bootstrap('Rouser');
+    setScene(store, ['knight', 'debris']);
+    store.getState().submitPlayerAction('wake the knight');
+    expect(store.getState().currentScene!.enemies.length).toBe(1);
+  });
+});
