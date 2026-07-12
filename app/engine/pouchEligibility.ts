@@ -38,6 +38,19 @@
 
 import type { InventoryItem } from './types';
 import type { PlayerCharacter } from './types';
+import { findExplorationItemByName } from './crafting';
+
+// OTA-778 — the pouch is the SCANNER POUCH now. Pouched items apply their
+// effect AT ALL TIMES (a scanner in a slot is always running, which is why a
+// search surfaces its hidden loot). That "always-on" contract only makes sense
+// for scanners — the Aetheric Torch is a deliberate button-use item (it would
+// read as "always running" in a slot, which it isn't), and a pry bar / rope
+// works straight from the pack. So the pouch holds ONLY scanners now: Pulse,
+// Aetheric, Mud (effect.kind === 'scanner'), across three slots.
+export function itemIsScanner(item: InventoryItem): boolean {
+  const exp = findExplorationItemByName(item.name);
+  return exp?.effect?.kind === 'scanner';
+}
 
 const TOOL_KINDS = ['exploration', 'relic'] as const;
 const TOOL_TAGS = [
@@ -89,10 +102,10 @@ export function isPouchEligible(
 
   // Already in the pouch — no-op.
   if ((eq.toolPouchIds ?? []).includes(item.id)) {
-    return { eligible: false, reason: "already on your belt" };
+    return { eligible: false, reason: "already in your scanner pouch" };
   }
-  // Currently held in the off-hand. The pouch is an alternative to
-  // the off-hand slot for tools; can't be in both at once.
+  // Currently held in the off-hand. The pouch is an alternative to the off-hand
+  // slot for a scanner; can't be in both at once.
   if (eq.off?.toLowerCase() === item.name.toLowerCase()) {
     return {
       eligible: false,
@@ -100,44 +113,15 @@ export function isPouchEligible(
     };
   }
 
-  // Wrong-kind refusals — clearer wording per category.
-  const kind = (item.kind ?? '').toLowerCase();
-  if (kind === 'consumable') {
-    return { eligible: false, reason: "that's lunch, not a tool" };
-  }
-  if (kind === 'weapon') {
-    return { eligible: false, reason: "a weapon — wield it, don't pouch it" };
-  }
-  if (kind === 'armor') {
-    return { eligible: false, reason: "armor — wear it" };
-  }
-  if (kind === 'accessory' || kind === 'amulet' || kind === 'ring') {
-    return { eligible: false, reason: "that's jewelry — equip it on a ring or amulet slot" };
-  }
-
-  // arb101 — wardrobe pieces are worn, not pouched (nicer message than the
-  // generic fall-through below).
-  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
-  if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) {
-    return { eligible: false, reason: "you wear that — it's not a tool" };
-  }
-  // OTA-491 — a thrown one-shot weapon (kind 'misc' + 'throwable', e.g. the
-  // Shaped Aetheric Shard) is a weapon, not a tool. Refuse with weapon wording.
-  if (tags.some((t) => (WEAPON_TAGS as readonly string[]).includes(t))) {
-    return { eligible: false, reason: "a throwing weapon — hurl it, don't pouch it" };
-  }
-  // OTA-385 — rope is carried gear, not a pouch tool. A rope grants its climb
-  // capability (the `climb_steep` gate) just by sitting in your pack — the gate
-  // checks the inventory, not the pouch — so a rope in a tool slot is wasted.
-  // (Scanners differ: they only fire when equipped / pouched, so THEY belong
-  // there.) Reclaimer's Rope / Climbing Rope are kind:relic + tagged `tool`, so
-  // itemIsTool would otherwise wave them in; gate them out here explicitly.
-  if (tags.includes('rope')) {
-    return { eligible: false, reason: "that's just rope — it works from your pack, no tool slot needed" };
-  }
-  // Single source of truth (shared with the inventory TOOLS category).
-  if (itemIsTool(item)) {
+  // OTA-778 — SCANNER-ONLY. The pouch keeps its stowed items ALWAYS RUNNING, so
+  // only always-on scanners belong here. Everything else (the Aetheric Torch —
+  // a button-use item; pry bars, ropes, lenses — pack gear) is refused with a
+  // clear pointer to how it's actually used.
+  if (itemIsScanner(item)) {
     return { eligible: true };
   }
-  return { eligible: false, reason: "that's not a tool" };
+  if (/torch|lantern|lamp/i.test(item.name)) {
+    return { eligible: false, reason: "the torch isn't always-on — use it from the 🔦 button, not the scanner pouch" };
+  }
+  return { eligible: false, reason: "the scanner pouch only holds scanners — Pulse, Aetheric, or Mud" };
 }
