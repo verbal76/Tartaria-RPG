@@ -461,28 +461,66 @@ export function maybePremiumOffer(existing: VendorOffer[]): VendorOffer | null {
 
 /** Existing lore-named vendors reused to staff the four stalls (they also
  *  appear at their home hubs). Neutral-ish traders for a neutral bazaar. */
-const STALL_IDENTITY: Record<StallCategory, { id: string; name: string; title: string; faction: string | null; description: string }> = {
-  weapons: {
-    id: 'hidden_market_weapons',
-    name: 'Zorin Nightblade', title: 'Exotic Weapons Dealer', faction: 'unknowing_masses',
-    description: 'Zorin Nightblade works the weapons stall — a fence of exotic arms who asks no questions about where you are headed.',
-  },
-  armor: {
-    id: 'hidden_market_armor',
-    name: 'Vela Ironheart', title: 'Melee Armorer', faction: 'true_tartarians',
-    description: 'Vela Ironheart keeps the armor stall, sizing you up by the dents in what you already wear.',
-  },
-  food: {
-    id: 'hidden_market_food',
-    name: 'Halem the Trader', title: 'General Goods', faction: null,
-    description: 'Halem the Trader minds the provisions stall — rations, medkits, and whatever keeps a body moving through a hard fight.',
-  },
-  materials: {
-    id: 'hidden_market_materials',
-    name: 'Tellin Mak', title: 'Scrap Broker', faction: 'reclaimers_guild',
-    description: 'Tellin Mak runs the materials stall, bins sorted for anyone stocking up before a hard road.',
-  },
+// OTA-784 — the market's faction reps ROTATE daily in REAL time. Each stall
+// draws from a roster of lore vendors (different factions), re-picked at local
+// midnight — the device here runs on America/New_York, so that's ET midnight.
+// The stall id stays stable (hidden_market_<category>) so broker contracts +
+// sigil turn-in keep working; only the name/title/faction rotate.
+interface StallRep { name: string; title: string; faction: string | null }
+const STALL_ROSTER: Record<StallCategory, StallRep[]> = {
+  weapons: [
+    { name: 'Zorin Nightblade', title: 'Exotic Weapons Dealer', faction: 'unknowing_masses' },
+    { name: 'Drakos the Mercenary', title: 'Two-Handed Weapons Dealer', faction: 'true_tartarians' },
+    { name: 'Cassia Nightwind', title: 'Ranged Weapons Specialist', faction: 'aetherborn' },
+    { name: 'Korr Stonefoot', title: 'Heavy Weapons Dealer', faction: 'mud_golems' },
+    { name: 'Odar Flameforge', title: 'Fire-Weaponsmith', faction: 'architectural_sentinels' },
+    { name: 'Nalren Frostgrip', title: 'Frost-Gear Specialist', faction: 'reclaimers_guild' },
+  ],
+  armor: [
+    { name: 'Vela Ironheart', title: 'Melee Armorer', faction: 'true_tartarians' },
+    { name: 'Irma Ironhand', title: 'Heavy Armorer', faction: 'true_tartarians' },
+    { name: 'Korash of the Deep', title: 'True Tartarian Quartermaster', faction: 'true_tartarians' },
+    { name: 'Mara Stoneskin', title: 'Earth-Gear Vendor', faction: 'mud_golems' },
+  ],
+  food: [
+    { name: 'Halem the Trader', title: 'General Goods', faction: null },
+    { name: 'Naha', title: 'Wandering Drifter', faction: null },
+    { name: 'Thalan the Wanderer', title: 'Provisioner', faction: null },
+    { name: 'Bran the Beastmaster', title: 'Wilderness Outfitter', faction: 'reclaimers_guild' },
+    { name: 'Sister Yune Ashfall', title: 'Revival Quartermaster', faction: 'tartarian_revivalists' },
+    { name: 'Vael of the Listening Stone', title: 'Devout Quartermaster', faction: 'servants_of_giants' },
+  ],
+  materials: [
+    { name: 'Tellin Mak', title: 'Scrap Broker', faction: 'reclaimers_guild' },
+    { name: 'Tarek the Tinkerer', title: 'Mechanical Outfitter', faction: 'reclaimers_guild' },
+    { name: 'Silvan the Quiet', title: 'Relic Dealer', faction: 'aetherborn' },
+    { name: 'Foreman Drest Holloway', title: 'Master Mason', faction: 'stone_builders' },
+    { name: 'Magister Caul Veyre', title: 'Dynastic Factor', faction: 'eternal_dynasty' },
+    { name: 'The Cartographer', title: 'Keeper of Quiet Plans', faction: 'conspiracy_architects' },
+  ],
 };
+// A per-category prime so the four stalls don't rotate in lockstep.
+const STALL_ROTATION_OFFSET: Record<StallCategory, number> = { weapons: 0, armor: 3, food: 7, materials: 11 };
+
+/** Real-world local calendar day (YYYYMMDD) — the rotation seed. Rolls over at
+ *  local midnight; the target device runs on America/New_York, i.e. ET. */
+function marketRotationDay(now: Date = new Date()): number {
+  return now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+}
+
+/** Today's rep for a stall — stable within a real day, rotates at local midnight. */
+function resolveStallIdentity(category: StallCategory): { id: string; name: string; title: string; faction: string | null; description: string } {
+  const roster = STALL_ROSTER[category];
+  const idx = ((marketRotationDay() + STALL_ROTATION_OFFSET[category]) % roster.length + roster.length) % roster.length;
+  const rep = roster[idx]!;
+  return {
+    id: `hidden_market_${category}`,
+    name: rep.name,
+    title: rep.title,
+    faction: rep.faction,
+    description: `Today ${rep.name} works the ${category} stall of the Hidden Market — a neutral-ground broker. The faces here change with the day; the truce does not.`,
+  };
+}
 
 // Rarity-tiered stock depth. Stackable stalls (materials, food/consumables) are
 // bulk-buyable at the low end (grab 10 eggs / 10 commons); rare/legendary wares
@@ -604,7 +642,7 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
     const stallPremium = maybePremiumOffer(offers);
     if (stallPremium) offers.push(stallPremium);
   }
-  const who = STALL_IDENTITY[category];
+  const who = resolveStallIdentity(category);
   return {
     id: who.id,
     name: who.name,
