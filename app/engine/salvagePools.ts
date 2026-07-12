@@ -80,7 +80,10 @@ const POOLS: SalvagePool[] = [
       { name: 'Scrap Metal', rarity: 'Common', weight: 25, min: 1, max: 3 },
       { name: 'Climbing Rope', rarity: 'Common', weight: 20, min: 1, max: 1 },
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 20, min: 3, max: 8 },
-      { name: 'Aetheric Torch', rarity: 'Common', weight: 10, min: 1, max: 1 },
+      // OTA-772 — the Aetheric Torch is a managed resource now (its use is a
+      // scarce Rare/Legendary gamble); it no longer falls out of generic
+      // rubble. It stays craftable + purchasable, plus a low-rate thematic
+      // find in the 'light' salvage pool below.
     ],
   },
   {
@@ -135,7 +138,9 @@ const POOLS: SalvagePool[] = [
       { name: 'Aether Dust', rarity: 'Common', weight: 40, min: 1, max: 3 },
       { name: 'Aether Crystal', rarity: 'Common', weight: 25, min: 1, max: 1 },
       { name: 'Scrap Metal', rarity: 'Common', weight: 20, min: 1, max: 2 },
-      { name: 'Aetheric Torch', rarity: 'Common', weight: 15, min: 1, max: 1 },
+      // OTA-772 — trimmed 15 → 4: torches are a managed resource; a broken
+      // lantern only occasionally yields a still-working one.
+      { name: 'Aetheric Torch', rarity: 'Common', weight: 4, min: 1, max: 1 },
     ],
   },
   {

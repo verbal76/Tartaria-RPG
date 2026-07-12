@@ -9713,6 +9713,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fx?.kind === 'consumable') {
               const messages: string[] = [];
               let p = { ...player };
+              // OTA-772 — Resonance-lantern gamble. The Aetheric Torch is now a
+              // SCARCE resource: used on a room that still holds an unresolved
+              // hook, it spends one charge and rolls a low, WIS-scaled chance at
+              // a single Rare/Legendary material / weapon / armor drop. A miss is
+              // a dead miss (charge gone, hook stays for a future pull). An EMPTY
+              // room falls through to the plain revealScene refund below, so a
+              // torch is never wasted on nothing. We deliberately do NOT resolve
+              // the hook — that would clobber authored story/quest threads; torch
+              // scarcity is the throttle.
+              {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                const { rollTorchProbe, isResonanceLantern } = require('../engine/resonanceLantern');
+                const unresolvedHooks = (currentScene.hooks ?? []).filter((h) => !h.resolved);
+                if (isResonanceLantern(used) && unresolvedHooks.length > 0) {
+                  const wis = effectiveStats(p).wisdom;
+                  const probe = rollTorchProbe(wis);
+                  const hookNoun = unresolvedHooks[Math.floor(Math.random() * unresolvedHooks.length)]!.nouns[0] ?? 'the buried dark';
+                  if (probe.hit && probe.reward) {
+                    const look = lookupCraftedItem(probe.reward.name);
+                    const granted = grantItem(p.inventory, {
+                      id: `torch_${Date.now()}`,
+                      name: probe.reward.name,
+                      kind: look.kind,
+                      rarity: look.rarity,
+                      quantity: 1,
+                      tags: [...look.tags, 'loot'],
+                      ...(look.baseDurability ? { durability: { current: look.baseDurability, max: look.baseDurability } } : {}),
+                    });
+                    const afterSpend = granted.inventory
+                      .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
+                      .filter((i) => i.quantity > 0);
+                    p = { ...p, inventory: afterSpend };
+                    set({ player: advanceTime(p, 0.25) });
+                    get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The flame catches something the room had swallowed — the air rings like struck crystal, and it answers.`);
+                    get().appendLog('reward', `✦ The resonance yields ${probe.reward.name} (${probe.reward.rarity})!`);
+                  } else {
+                    const afterSpend = p.inventory
+                      .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
+                      .filter((i) => i.quantity > 0);
+                    p = { ...p, inventory: afterSpend };
+                    set({ player: advanceTime(p, 0.25) });
+                    get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The resonance rises — a hum, a promise — then thins to nothing. The charge is spent.`);
+                  }
+                  void get().persist();
+                  break;
+                }
+              }
               if (fx.healHP) {
                 const room = Math.max(0, p.hpMax - p.hp);
                 const amt = Math.min(room, fx.healHP);
