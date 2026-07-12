@@ -6,6 +6,7 @@ import ringsData from '../data/items/rings.json';
 import materialsData from '../data/items/materials.json';
 import gearData from '../data/items/gear.json';
 import dogGearData from '../data/items/dogGear.json';
+import recipesData from '../data/items/recipes.json';
 import { pickWeighted } from './rng';
 import type { Enemy } from './types';
 import type { StallCategory } from './buildings';
@@ -312,23 +313,138 @@ export function maybePremiumOffer(existing: VendorOffer[]): VendorOffer | null {
   return { itemName: pick.name, price: pick.price, quantity: 1 };
 }
 
+// ── OTA-774 — The Hidden Market as a Jita-style fight-restock hub ─────────
+// The 4-stall market now exists ONLY at the hidden_market location (the random
+// wild-tile spawn was removed in buildings.ts). buildStallVendor therefore
+// builds the Hidden Market's stalls, and is tuned to be a RELIABLE pre-mission
+// restock: bulk-buyable low-tier consumables/materials, a scarce premium gear
+// piece to fill a weak slot, and — guaranteed every visit — the healing wares
+// and the crafting materials that feed healing + coating recipes.
+
+/** Existing lore-named vendors reused to staff the four stalls (they also
+ *  appear at their home hubs). Neutral-ish traders for a neutral bazaar. */
+const STALL_IDENTITY: Record<StallCategory, { id: string; name: string; title: string; faction: string | null; description: string }> = {
+  weapons: {
+    id: 'hidden_market_weapons',
+    name: 'Zorin Nightblade', title: 'Exotic Weapons Dealer', faction: 'unknowing_masses',
+    description: 'Zorin Nightblade works the weapons stall — a fence of exotic arms who asks no questions about where you are headed.',
+  },
+  armor: {
+    id: 'hidden_market_armor',
+    name: 'Vela Ironheart', title: 'Melee Armorer', faction: 'true_tartarians',
+    description: 'Vela Ironheart keeps the armor stall, sizing you up by the dents in what you already wear.',
+  },
+  food: {
+    id: 'hidden_market_food',
+    name: 'Halem the Trader', title: 'General Goods', faction: null,
+    description: 'Halem the Trader minds the provisions stall — rations, medkits, and whatever keeps a body moving through a hard fight.',
+  },
+  materials: {
+    id: 'hidden_market_materials',
+    name: 'Tellin Mak', title: 'Scrap Broker', faction: 'reclaimers_guild',
+    description: 'Tellin Mak runs the materials stall, bins sorted for anyone stocking up before a hard road.',
+  },
+};
+
+// Rarity-tiered stock depth. Stackable stalls (materials, food/consumables) are
+// bulk-buyable at the low end (grab 10 eggs / 10 commons); rare/legendary wares
+// stay scarce. Instance stalls (weapons, armor) are always 1 per line.
+function stallStockQuantity(rarity: string | undefined, category: StallCategory): number {
+  // Weapons/armor are per-instance gear — never bulk-stack a shelf line.
+  const stackable = category === 'materials' || category === 'food';
+  if (!stackable) return 1;
+  const r = (rarity ?? 'Common').toLowerCase();
+  if (r === 'legendary') return 1;
+  if (r === 'rare') return 1 + Math.floor(Math.random() * 2);   // 1-2
+  if (r === 'uncommon') return 3 + Math.floor(Math.random() * 4); // 3-6
+  return 6 + Math.floor(Math.random() * 7);                      // 6-12
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ALL_GEAR = (((gearData as any).gear ?? []) as any[]);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ALL_MATERIAL_NAMES = new Set((((materialsData as any).materials ?? []) as any[]).map((m) => String(m.name).toLowerCase()));
+
+const isHealingItem = (g: { effect?: { healHP?: number; cureBleed?: boolean; curePoison?: boolean; reduceCorruption?: number } }): boolean => {
+  const fx = g.effect;
+  return !!fx && ((fx.healHP ?? 0) >= 1 || !!fx.cureBleed || !!fx.curePoison || (fx.reduceCorruption ?? 0) >= 1);
+};
+const isCoatingItem = (g: { effect?: { coating?: unknown; kind?: string } }): boolean =>
+  !!g.effect && (!!g.effect.coating || g.effect.kind === 'coating');
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ALL_RECIPES = (Array.isArray(recipesData) ? recipesData : (recipesData as any).recipes ?? []) as any[];
+const RECIPE_RESULTS = new Set(ALL_RECIPES.map((r) => String(r.result ?? '').toLowerCase()));
+
+// Every healing consumable (for deriving recipe-ingredient staples) …
+const HEALING_CONSUMABLES: string[] = ALL_GEAR.filter(isHealingItem).map((g) => String(g.name));
+// … but the provisions stall only GUARANTEES the CRAFTED medical items — the
+// kits, tonics, stews you deliberately restock (First Aid Kit, Trauma Kit,
+// Antivenom, …). Raw foraged foods still flow through the random draw in bulk.
+const HEALING_STAPLES: string[] = HEALING_CONSUMABLES.filter((n) => RECIPE_RESULTS.has(n.toLowerCase()));
+// Coating products (Static Paste, Incendiary Paste, …) — guaranteed at the
+// provisions stall too, so you can buy the counter-element outright.
+const COATING_PRODUCTS: string[] = ALL_GEAR.filter(isCoatingItem).map((g) => String(g.name));
+
+// Materials that feed healing OR coating recipes — the materials stall
+// guarantees these in bulk. Data-driven from recipes so it stays correct as
+// recipes change (no hardcoded material list).
+const FIGHT_STAPLE_MATERIALS: string[] = (() => {
+  const products = new Set([...HEALING_CONSUMABLES, ...COATING_PRODUCTS].map((n) => n.toLowerCase()));
+  const mats = new Set<string>();
+  for (const rec of ALL_RECIPES) {
+    if (!products.has(String(rec.result ?? '').toLowerCase())) continue;
+    for (const ing of (rec.ingredients ?? [])) {
+      if (ALL_MATERIAL_NAMES.has(String(ing.name).toLowerCase())) mats.add(String(ing.name));
+    }
+  }
+  return [...mats];
+})();
+
+/** Price an item name by looking it up in its catalog (tc/tcBuy first, else a
+ *  rarity/value estimate) and applying the stall haggle spread. */
+function stallPriceFor(name: string, category: StallCategory): { price: number; rarity?: string } {
+  const lc = name.toLowerCase();
+  const pools: { list: StallCatalogItem[]; cat: StallCategory }[] = [
+    { list: stallCatalog('materials'), cat: 'materials' },
+    { list: stallCatalog('food'), cat: 'food' },
+    { list: (((gearData as unknown) as { gear: StallCatalogItem[] }).gear ?? []), cat: 'food' },
+  ];
+  for (const { list, cat } of pools) {
+    const it = list.find((x) => x.name.toLowerCase() === lc);
+    if (it) {
+      const base = it.tc || it.tcBuy || estimatedStallValue(it, cat);
+      return { price: Math.max(2, Math.round(base * (0.8 + Math.random() * 0.45))), rarity: it.rarity };
+    }
+  }
+  const base = estimatedStallValue({ name } as StallCatalogItem, category);
+  return { price: Math.max(2, Math.round(base * (0.8 + Math.random() * 0.45))) };
+}
+
 export function buildStallVendor(category: StallCategory, stallName: string): VendorInstance {
   const items = stallCatalog(category);
-  const n = Math.min(items.length, 3 + Math.floor(Math.random() * 4)); // 3-6
+  // Deeper shelf (6-10 random wares) on top of the guaranteed staples below.
+  const n = Math.min(items.length, 6 + Math.floor(Math.random() * 5));
   const shuffled = [...items].sort(() => Math.random() - 0.5).slice(0, n);
   const offers: VendorOffer[] = shuffled.map((it) => {
-    // arb119 — `||` not `??`: an authored `tc:0` means "not for open sale",
-    // not "free". `0 ?? x` keeps the 0 and the price floors at 2 TC; `0 || x`
-    // falls through to the value estimate so nothing prices at the 2-TC floor.
+    // arb119 — `||` not `??`: an authored `tc:0` means "not for open sale".
     const base = it.tc || it.tcBuy || estimatedStallValue(it, category);
-    // Wider per-offer haggling spread (±~22%) on top of the value-based base so
-    // even two of the same item vary a little visit to visit.
     const price = Math.max(2, Math.round(base * (0.8 + Math.random() * 0.45)));
-    return { itemName: it.name, price, quantity: rollOfferQuantity(it.name) };
+    return { itemName: it.name, price, quantity: stallStockQuantity(it.rarity, category) };
   });
-  // OTA-603 — armor stalls sometimes carry a dog vest (rarity-weighted, so a
-  // Burlap Vest is common and an Aetheric Padded Vest is rare). Priced off its
-  // AC + durability like any armor piece. One per stall, no dupes.
+  const addStaple = (name: string) => {
+    if (offers.some((o) => o.itemName.toLowerCase() === name.toLowerCase())) return;
+    const { price, rarity } = stallPriceFor(name, category);
+    offers.push({ itemName: name, price, quantity: stallStockQuantity(rarity, category) });
+  };
+  // GUARANTEED fight-restock staples — the whole point of a Jita-style hub.
+  if (category === 'materials') {
+    for (const m of FIGHT_STAPLE_MATERIALS) addStaple(m);
+  } else if (category === 'food') {
+    for (const h of HEALING_STAPLES) addStaple(h);
+    for (const c of COATING_PRODUCTS) addStaple(c);
+  }
+  // OTA-603 — armor stalls also carry a rarity-weighted dog vest.
   if (category === 'armor' && BUYABLE_DOG_VESTS.length > 0 && Math.random() < 0.5) {
     const vest = pickWeighted(BUYABLE_DOG_VESTS, (v) => dogVestRarityWeight(v.rarity));
     if (!offers.some((o) => o.itemName === vest.name)) {
@@ -337,18 +453,61 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
       offers.push({ itemName: vest.name, price: vprice, quantity: 1 });
     }
   }
-  // OTA-729 — sometimes a genuinely worth-saving-for ware among the shelf.
-  const stallPremium = maybePremiumOffer(offers);
-  if (stallPremium) offers.push(stallPremium);
+  // Gear stalls: a hub should reliably let you fill a weak slot. Always offer a
+  // premium (Uncommon/Rare) piece; ~25% of the time a scarce Legendary too.
+  if (category === 'weapons' || category === 'armor') {
+    const p1 = maybePremiumOfferForced(offers);
+    if (p1) offers.push(p1);
+    if (Math.random() < 0.25) {
+      const leg = pickLegendaryGear(category, offers);
+      if (leg) offers.push(leg);
+    }
+  } else {
+    const stallPremium = maybePremiumOffer(offers);
+    if (stallPremium) offers.push(stallPremium);
+  }
+  const who = STALL_IDENTITY[category];
   return {
-    id: `stall_${category}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-    name: `${stallName} Trader`,
-    title: `${category} stall`,
-    faction: null,
-    description: `A trader minding the ${stallName.toLowerCase()} stall, wares laid out for haggling.`,
+    id: who.id,
+    name: who.name,
+    title: who.title,
+    faction: who.faction,
+    description: who.description,
     offers,
     demeanor: 'honest',
   };
+}
+
+/** Like maybePremiumOffer but ALWAYS returns a premium ware (no 45% gate) so a
+ *  gear stall reliably has one worth-saving-for piece. */
+function maybePremiumOfferForced(existing: VendorOffer[]): VendorOffer | null {
+  if (PREMIUM_POOL.length === 0) return null;
+  for (let tries = 0; tries < 4; tries++) {
+    const pick = pickWeighted(PREMIUM_POOL, (p) => p.weight);
+    if (!existing.some((o) => o.itemName.toLowerCase() === pick.name.toLowerCase())) {
+      return { itemName: pick.name, price: pick.price, quantity: 1 };
+    }
+  }
+  return null;
+}
+
+/** A single Legendary weapon/armor piece for the hub's "fill your weak slot"
+ *  fantasy. Excludes construct/faction rows; priced at full value (a real sink). */
+function pickLegendaryGear(category: 'weapons' | 'armor', existing: VendorOffer[]): VendorOffer | null {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const src = (category === 'weapons' ? (weaponsData as any).weapons : (armorData as any).armor) ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const legs = (src as any[]).filter((it) => {
+    const tags = (it.tags ?? []) as string[];
+    return String(it.rarity).toLowerCase() === 'legendary'
+      && !tags.includes('golem_weapon') && !tags.includes('faction_gear')
+      && (category !== 'weapons' || tags.includes('weapon')); // real weapons only
+  });
+  if (legs.length === 0) return null;
+  const pick = legs[Math.floor(Math.random() * legs.length)];
+  if (existing.some((o) => o.itemName.toLowerCase() === String(pick.name).toLowerCase())) return null;
+  const base = pick.tc || pick.tcBuy || estimatedStallValue(pick as StallCatalogItem, category);
+  return { itemName: String(pick.name), price: Math.max(20, Math.round(base * (0.9 + Math.random() * 0.35))), quantity: 1 };
 }
 
 // OTA 030 — turn a vendor into an Enemy when a steal attempt is

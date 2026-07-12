@@ -1,13 +1,12 @@
-// OTA-772 — integration smoke test for the Aetheric Torch resonance gamble.
+// OTA-773 — integration smoke test for the Aetheric Torch resonance gamble.
 //
 // The odds engine is unit-tested in resonanceLantern.test.ts. This pins the
 // STORE WIRING, deterministically (independent of the hit/miss RNG):
-//   1. Using a torch in a room that HAS an unresolved hook spends one charge
-//      (hit or miss both consume — it's a gamble) and advances the clock.
-//   2. Using a torch in a room with NO unresolved hook refunds it (charge
-//      unchanged) — a torch is never wasted on nothing.
-//   3. The unresolved hook is NOT consumed by the probe (story/quest threads
-//      must survive), so scarcity is the only throttle.
+//   1. Using a torch in a room with an UNDISCOVERED lead (stage-0 hook) spends
+//      one charge (hit or miss both consume — it's a gamble), marks that lead
+//      torch-probed, but does NOT resolve it (a normal INVESTIGATE still works).
+//   2. One-use, NON-REFUNDABLE: using a torch in a room with no undiscovered
+//      lead ALSO spends the charge (the risk is the player's to judge).
 
 jest.setTimeout(20000);
 
@@ -81,12 +80,13 @@ function tailLog(n = 8): string {
   return useGameStore.getState().gameLog.slice(-n).map((e) => e.text).join('\n');
 }
 
-const HOOK = { id: 'h_test', kind: 'lore', nouns: ['statue'], resolved: false };
+// An UNDISCOVERED lead: stage 0, unresolved, not yet torch-probed.
+const HOOK = { id: 'h_test', kind: 'lore', nouns: ['statue'], stage: 0, resolved: false };
 
-describe('OTA-772 — torch resonance gamble wiring', () => {
+describe('OTA-773 — torch resonance gamble wiring', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-  it('a room WITH an unresolved hook spends one torch (hit or miss) and keeps the hook', async () => {
+  it('a room WITH an undiscovered lead spends one torch and marks the lead probed (not resolved)', async () => {
     const store = await bootstrap('TorchGambler');
     // Player starts with one torch. Guarantee at least one for the assertion.
     expect(torchQty()).toBeGreaterThanOrEqual(1);
@@ -103,14 +103,16 @@ describe('OTA-772 — torch resonance gamble wiring', () => {
 
     // Charge spent regardless of the RNG outcome.
     expect(torchQty()).toBe(before - 1);
-    // The hook survives the probe — no authored thread was consumed.
+    // The lead is now torch-probed but NOT resolved — a normal INVESTIGATE
+    // still works, and it can't be re-torched.
     const hooksAfter = store.getState().currentScene!.hooks ?? [];
-    expect(hooksAfter.some((h) => h.id === 'h_test' && !h.resolved)).toBe(true);
-    // It routed through the gamble, not the plain "unspent" refund.
-    expect(tailLog()).not.toMatch(/unspent/i);
+    const probed = hooksAfter.find((h) => h.id === 'h_test');
+    expect(probed).toBeTruthy();
+    expect(probed!.torchProbed).toBe(true);
+    expect(probed!.resolved).toBe(false);
   });
 
-  it('a room with NO unresolved hook refunds the torch (never wasted on nothing)', async () => {
+  it('one-use & non-refundable: a room with NO undiscovered lead still spends the charge', async () => {
     const store = await bootstrap('TorchSaver');
     const before = torchQty();
     const scene = store.getState().currentScene!;
@@ -120,8 +122,27 @@ describe('OTA-772 — torch resonance gamble wiring', () => {
 
     store.getState().submitPlayerAction(`use ${torchName()}`);
 
-    // No hook to resonate with → charge preserved.
-    expect(torchQty()).toBe(before);
-    expect(tailLog()).toMatch(/unspent|nothing here/i);
+    // Non-refundable — the charge is spent even with nothing to find.
+    expect(torchQty()).toBe(before - 1);
+    expect(tailLog()).toMatch(/nothing here is still hidden|gutters out/i);
+  });
+
+  it('a torch cannot re-probe a lead it already probed (charge still spent, no double-dip)', async () => {
+    const store = await bootstrap('TorchRepeater');
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene, enemies: [], enemyHps: [],
+        hooks: [{ ...HOOK, torchProbed: true }], // already probed
+      },
+    });
+    const before = torchQty();
+    if (before < 1) return; // no torch to test with (defensive)
+
+    store.getState().submitPlayerAction(`use ${torchName()}`);
+
+    // Already-probed lead is not undiscovered → no-effect branch, still spent.
+    expect(torchQty()).toBe(before - 1);
+    expect(tailLog()).toMatch(/nothing here is still hidden|gutters out/i);
   });
 });
