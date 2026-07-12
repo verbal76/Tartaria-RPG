@@ -1,12 +1,13 @@
-// OTA-773 — integration smoke test for the Aetheric Torch resonance gamble.
+// OTA-776 — integration test for the AIMED Aetheric Torch.
 //
-// The odds engine is unit-tested in resonanceLantern.test.ts. This pins the
-// STORE WIRING, deterministically (independent of the hit/miss RNG):
-//   1. Using a torch in a room with an UNDISCOVERED lead (stage-0 hook) spends
-//      one charge (hit or miss both consume — it's a gamble), marks that lead
-//      torch-probed, but does NOT resolve it (a normal INVESTIGATE still works).
-//   2. One-use, NON-REFUNDABLE: using a torch in a room with no undiscovered
-//      lead ALSO spends the charge (the risk is the player's to judge).
+// The reward roll is unit-tested in resonanceLantern.test.ts. This pins the
+// STORE WIRING (deterministic):
+//   1. applyTorchToHook charges a chosen open lead: spends one torch, sets
+//      torchCharged, does NOT resolve the lead.
+//   2. Typed `use torch` routes: exactly one open lead → charges it; no open
+//      lead → keeps the charge (no waste); several leads → keeps the charge and
+//      tells the player to choose.
+//   3. Working a charged lead to completion pays out the upgraded drop.
 
 jest.setTimeout(20000);
 
@@ -80,69 +81,112 @@ function tailLog(n = 8): string {
   return useGameStore.getState().gameLog.slice(-n).map((e) => e.text).join('\n');
 }
 
-// An UNDISCOVERED lead: stage 0, unresolved, not yet torch-probed.
+// An open, un-charged lead: stage 0, unresolved.
 const HOOK = { id: 'h_test', kind: 'lore', nouns: ['statue'], stage: 0, resolved: false };
 
-describe('OTA-773 — torch resonance gamble wiring', () => {
+describe('OTA-776 — aiming the torch charges a chosen lead', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-  it('a room WITH an undiscovered lead spends one torch and marks the lead probed (not resolved)', async () => {
-    const store = await bootstrap('TorchGambler');
-    // Player starts with one torch. Guarantee at least one for the assertion.
+  it('applyTorchToHook charges the lead: spends one torch, sets torchCharged, does NOT resolve', async () => {
+    const store = await bootstrap('TorchAimer');
     expect(torchQty()).toBeGreaterThanOrEqual(1);
     const before = torchQty();
     const scene = store.getState().currentScene!;
+    store.setState({ currentScene: { ...scene, enemies: [], enemyHps: [], hooks: [{ ...HOOK }] } });
+
+    store.getState().applyTorchToHook('h_test');
+
+    expect(torchQty()).toBe(before - 1);
+    const hook = store.getState().currentScene!.hooks!.find((h) => h.id === 'h_test');
+    expect(hook!.torchCharged).toBe(true);
+    expect(hook!.resolved).toBe(false);
+  });
+
+  it('applyTorchToHook on a non-existent / invalid lead spends nothing', async () => {
+    const store = await bootstrap('TorchMisfire');
+    const before = torchQty();
+    const scene = store.getState().currentScene!;
+    store.setState({ currentScene: { ...scene, enemies: [], enemyHps: [], hooks: [{ ...HOOK }] } });
+
+    store.getState().applyTorchToHook('does_not_exist');
+
+    expect(torchQty()).toBe(before); // no charge burned on a bad target
+  });
+});
+
+describe('OTA-776 — typed `use torch` routing', () => {
+  beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
+
+  it('exactly ONE open lead → charges it', async () => {
+    const store = await bootstrap('TorchOne');
+    const before = torchQty();
+    const scene = store.getState().currentScene!;
+    store.setState({ currentScene: { ...scene, enemies: [], enemyHps: [], hooks: [{ ...HOOK }] } });
+
+    store.getState().submitPlayerAction(`use ${torchName()}`);
+
+    expect(torchQty()).toBe(before - 1);
+    expect(store.getState().currentScene!.hooks!.find((h) => h.id === 'h_test')!.torchCharged).toBe(true);
+  });
+
+  it('NO open lead → keeps the charge (a purposeful tool is not wasted on nothing)', async () => {
+    const store = await bootstrap('TorchNone');
+    const before = torchQty();
+    const scene = store.getState().currentScene!;
+    store.setState({ currentScene: { ...scene, enemies: [], enemyHps: [], hooks: [] } });
+
+    store.getState().submitPlayerAction(`use ${torchName()}`);
+
+    expect(torchQty()).toBe(before);
+    expect(tailLog()).toMatch(/no open lead/i);
+  });
+
+  it('SEVERAL open leads with no target → keeps the charge and asks you to choose', async () => {
+    const store = await bootstrap('TorchMany');
+    const before = torchQty();
+    const scene = store.getState().currentScene!;
     store.setState({
       currentScene: {
         ...scene, enemies: [], enemyHps: [],
-        hooks: [{ ...HOOK }],
+        hooks: [
+          { id: 'h_a', kind: 'lore', nouns: ['statue'], stage: 0, resolved: false },
+          { id: 'h_b', kind: 'lore', nouns: ['obelisk'], stage: 0, resolved: false },
+        ],
       },
     });
 
     store.getState().submitPlayerAction(`use ${torchName()}`);
 
-    // Charge spent regardless of the RNG outcome.
-    expect(torchQty()).toBe(before - 1);
-    // The lead is now torch-probed but NOT resolved — a normal INVESTIGATE
-    // still works, and it can't be re-torched.
-    const hooksAfter = store.getState().currentScene!.hooks ?? [];
-    const probed = hooksAfter.find((h) => h.id === 'h_test');
-    expect(probed).toBeTruthy();
-    expect(probed!.torchProbed).toBe(true);
-    expect(probed!.resolved).toBe(false);
+    expect(torchQty()).toBe(before);
+    expect(tailLog()).toMatch(/several leads/i);
   });
+});
 
-  it('one-use & non-refundable: a room with NO undiscovered lead still spends the charge', async () => {
-    const store = await bootstrap('TorchSaver');
-    const before = torchQty();
+describe('OTA-776 — a charged lead pays out the upgraded drop when worked', () => {
+  beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
+
+  it('charge a glint lead, work it to completion → the torch mark pays out', async () => {
+    const store = await bootstrap('TorchPayout');
     const scene = store.getState().currentScene!;
-    store.setState({
-      currentScene: { ...scene, enemies: [], enemyHps: [], hooks: [] },
-    });
-
-    store.getState().submitPlayerAction(`use ${torchName()}`);
-
-    // Non-refundable — the charge is spent even with nothing to find.
-    expect(torchQty()).toBe(before - 1);
-    expect(tailLog()).toMatch(/nothing here is still hidden|gutters out/i);
-  });
-
-  it('a torch cannot re-probe a lead it already probed (charge still spent, no double-dip)', async () => {
-    const store = await bootstrap('TorchRepeater');
-    const scene = store.getState().currentScene!;
+    // 'glint' is a real 2-step loot chain (stage 1 is `done`). Silence the
+    // one-per-visit investigate ambush so both investigates reach the hook.
     store.setState({
       currentScene: {
-        ...scene, enemies: [], enemyHps: [],
-        hooks: [{ ...HOOK, torchProbed: true }], // already probed
+        ...scene, enemies: [], enemyHps: [], hooks: [
+          { id: 'h_glint', kind: 'glint', nouns: ['glint'], stage: 0, resolved: false },
+        ],
+        investigateAmbushUsed: true,
       },
     });
-    const before = torchQty();
-    if (before < 1) return; // no torch to test with (defensive)
 
-    store.getState().submitPlayerAction(`use ${torchName()}`);
+    store.getState().applyTorchToHook('h_glint');
+    expect(store.getState().currentScene!.hooks!.find((h) => h.id === 'h_glint')!.torchCharged).toBe(true);
 
-    // Already-probed lead is not undiscovered → no-effect branch, still spent.
-    expect(torchQty()).toBe(before - 1);
-    expect(tailLog()).toMatch(/nothing here is still hidden|gutters out/i);
+    // Work the lead to its terminal step.
+    store.getState().submitPlayerAction('investigate glint');
+    store.getState().submitPlayerAction('investigate glint');
+
+    // The upgraded drop lands where the player worked the lead.
+    expect(tailLog(24)).toMatch(/torch'?s mark pays out/i);
   });
 });
