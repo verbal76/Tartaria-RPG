@@ -21558,9 +21558,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const tile = startingLocationForFaction(fac.id);
-    if (player.currentLocationId !== tile) {
+    // OTA-783 — the Hidden Market is a neutral broker: turn in ANY faction's
+    // sigil here, not only at that faction's home stake. Keeps the market the
+    // one-stop hub so a carried sigil is never stranded.
+    const atMarket = player.currentLocationId === 'hidden_market';
+    if (player.currentLocationId !== tile && !atMarket) {
       const dest = getLocationById(tile)?.name ?? tile;
-      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "Not here. Carry the ${item.name} to ${dest} and lay it down among their own."`);
+      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "Not here. Carry the ${item.name} to ${dest} and lay it down among their own — or take it to the Hidden Market; they broker such debts."`);
       return;
     }
     const repResult = applyRepChange(player.factionStanding, fac.id, 1);
@@ -21575,7 +21579,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           },
         }
       : s));
-    get().appendLog('world', `You lay the ${item.name} down among ${fac.name}'s own. They mark the debt paid — one of their dead comes home.`);
+    get().appendLog('world', atMarket
+      ? `The Hidden Market broker takes the ${item.name} and sends it on to ${fac.name}'s own. The debt is marked paid — one of their dead comes home. (+1 ${fac.name} standing)`
+      : `You lay the ${item.name} down among ${fac.name}'s own. They mark the debt paid — one of their dead comes home.`);
     logRepChanges(get, repResult.changed);
     void get().persist();
   },
