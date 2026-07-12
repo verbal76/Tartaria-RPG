@@ -18,6 +18,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'shatter', 'break', 'destroy', 'crush', 'bash',
     // From the overwhelm action card — semantically a flavour of attack.
     'overwhelm', 'press the attack',
+    // OTA-750 — rousing a dormant guardian ("wake the knight") IS a hostile act:
+    // route it to attack so an animate scene noun stands up and fights.
+    'wake', 'rouse', 'awaken', 'stir', 'provoke', 'disturb',
   ],
   diplomacy: [
     'convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk',
