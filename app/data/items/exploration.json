@@ -1,6 +1,6 @@
 [
   {
-    "name": "Advanced Aetheric Torch",
+    "name": "Aetheric Field Kit",
     "abilityReq": "Dexterity Level 5",
     "kind": "exploration",
     "rarity": "Uncommon",
@@ -11,14 +11,15 @@
       "gear",
       "uncommon"
     ],
-    "description": "Lasts 36 hours and resists storms.",
+    "description": "Field medic bundle of salve and charge cells. Restores health and stamina in the field.",
     "effect": {
       "kind": "consumable",
-      "extendLight": 36
+      "healHP": 6,
+      "restoreStamina": 6
     }
   },
   {
-    "name": "Endless Aether Torch",
+    "name": "Aetheric Sentinel Lantern",
     "abilityReq": "Wisdom Level 9",
     "kind": "exploration",
     "rarity": "Rare",
@@ -26,13 +27,14 @@
     "tcBuy": 60,
     "tags": [
       "exploration",
-      "gear",
+      "relic",
       "rare"
     ],
-    "description": "Emits aura and repels wildlife.",
+    "description": "A warding lantern that steadies the mind and sharpens the senses while carried.",
     "effect": {
-      "kind": "gate",
-      "unlocks": "nightvision"
+      "kind": "passive",
+      "stat": "wisdom",
+      "bonus": 2
     }
   },
   {
