@@ -407,15 +407,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   onPress={() => goBuildingRoom(r.id)}
                 />
               ))}
-              {/* OTA-780 — market stall actions live here beside the room tabs,
-                  not as floating chips over the feed: TRADE opens this stall's
-                  vendor, FUSE fires the free Crucible. */}
-              {activeBuildingId === 'market' && onOpenVendor && (
-                <TravelBtn label="TRADE" onPress={onOpenVendor} />
-              )}
-              {activeBuildingId === 'market' && onFuse && (
-                <TravelBtn label="FUSE" onPress={onFuse} />
-              )}
+              {/* OTA-781 — the nav row stays CLEAN like a building's rooms:
+                  just the stall tabs + EXIT. Tapping a stall swaps to it; EXIT
+                  leaves the whole market. TRADE / FUSE live in the quick-action
+                  row below (not here, not as floating chips). */}
               <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
             </>
           ) : travelTargetName ? (
@@ -613,6 +608,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn label="all missions" tone="amber" onPress={onOpenMissions} blocked={tutLock} />
             {hasTorch && (
               <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
+            )}
+            {/* OTA-781 — market stall actions, kept OFF the (clean) stall-nav
+                travel row: browse this stall's wares + fire the free Crucible. */}
+            {activeBuildingId === 'market' && onOpenVendor && (
+              <QuickBtn label="trade" onPress={onOpenVendor} tone="ready" blocked={tutLock} />
+            )}
+            {activeBuildingId === 'market' && onFuse && (
+              <QuickBtn label="fuse" onPress={onFuse} blocked={tutLock} />
             )}
           </>
         )}
