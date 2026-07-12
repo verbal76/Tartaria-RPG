@@ -81,6 +81,11 @@ interface Props {
    *  so the button reads "use hand torch" — blatantly the item, not a mystery
    *  flashlight icon. */
   torchLabel?: string;
+  /** OTA-780 — inside the Hidden Market, the stall's actions live in the bottom
+   *  travel row beside the room tabs (no floating chips): TRADE opens the
+   *  current stall's vendor, FUSE fires the free Crucible. */
+  onOpenVendor?: () => void;
+  onFuse?: () => void;
   onClimbUp: () => void;
   onClimbDown: () => void;
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
@@ -159,7 +164,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onOpenVendor, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
@@ -402,6 +407,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   onPress={() => goBuildingRoom(r.id)}
                 />
               ))}
+              {/* OTA-780 — market stall actions live here beside the room tabs,
+                  not as floating chips over the feed: TRADE opens this stall's
+                  vendor, FUSE fires the free Crucible. */}
+              {activeBuildingId === 'market' && onOpenVendor && (
+                <TravelBtn label="TRADE" onPress={onOpenVendor} />
+              )}
+              {activeBuildingId === 'market' && onFuse && (
+                <TravelBtn label="FUSE" onPress={onFuse} />
+              )}
               <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
             </>
           ) : travelTargetName ? (

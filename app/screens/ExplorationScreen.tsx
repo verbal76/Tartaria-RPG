@@ -765,57 +765,10 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
-      {/* OTA-775 — in-stall actions. Inside a building with a stall vendor, the
-          room presents its OWN actions: browse the vendor's wares, and (at the
-          Hidden Market) fire the free Crucible right here. This replaces both
-          top banners so the market reads as "you're standing in this stall". */}
-      {activeBuildingId && currentScene?.vendor && !inCombat && player && (() => {
-        const v = currentScene.vendor;
-        const isMarket = activeBuildingId === 'market';
-        let crucibleOk = false;
-        let crucibleHint = '';
-        if (isMarket) {
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
-          const eqF = player.equipped ?? {};
-          const equippedIds = new Set(
-            [eqF.mainId, eqF.offId, eqF.headId, eqF.chestId, eqF.handsId, eqF.legsId, eqF.feetId, eqF.cloakId, eqF.amuletId, eqF.ringId, eqF.ring2Id, eqF.ring3Id].filter(Boolean) as string[],
-          );
-          const catalyst = findFactionCatalyst(player.inventory ?? [], equippedIds);
-          const gate = gateFusion(player.inventory ?? [], catalyst);
-          crucibleOk = gate.ok;
-          crucibleHint = gate.ok ? 'tap to fuse · spends your ♥ reserved items' : (gate.reason ?? 'tap for details');
-        }
-        return (
-          <>
-            <TouchableOpacity
-              style={styles.vendorBanner}
-              onPress={() => setScreen('vendor')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.vendorBannerStripe} />
-              <View style={styles.vendorBannerBody}>
-                <Text style={styles.vendorBannerName}>🛒 {v.name}</Text>
-                <Text style={styles.vendorBannerHint}>{v.title ? `${v.title} · ` : ''}browse wares · {v.offers.length} in stock</Text>
-              </View>
-              <Text style={styles.vendorBannerArrow}>›</Text>
-            </TouchableOpacity>
-            {isMarket && (
-              <TouchableOpacity
-                style={styles.fusionBanner}
-                onPress={() => useGameStore.getState().submitPlayerAction('fuse')}
-                activeOpacity={0.7}
-              >
-                <View style={styles.fusionBannerStripe} />
-                <View style={styles.vendorBannerBody}>
-                  <Text style={styles.fusionBannerName}>{crucibleOk ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}</Text>
-                  <Text style={styles.vendorBannerHint}>{crucibleHint}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          </>
-        );
-      })()}
+      {/* OTA-780 — no floating stall chips. Inside the market the room tabs ARE
+          the stalls (bottom travel row) and the stall's actions — TRADE and
+          FUSE — live down there beside them + EXIT (see InputBox). Nothing
+          layers over the feed. */}
 
       {/* OTA-451 — Mission Board chip. Stands in the vendor-free central square
           of every faction Outpost; tapping reads the board's open postings into
@@ -1013,6 +966,8 @@ export function ExplorationScreen() {
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
             onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
+            onOpenVendor={currentScene?.vendor ? () => setScreen('vendor') : undefined}
+            onFuse={activeBuildingId === 'market' ? () => useGameStore.getState().submitPlayerAction('fuse') : undefined}
             hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)}
             torchLabel={(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)?.name?.toLowerCase()}
             torchReady={(currentScene?.hooks ?? []).some((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged)}
