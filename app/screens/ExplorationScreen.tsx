@@ -680,7 +680,14 @@ export function ExplorationScreen() {
           banner returns once the enemies are down), but while a hostile is
           present the banner is hidden so the player can't step into the stall
           during combat ("I just entered a vendors stall during combat"). */}
-      {currentScene?.vendor && !inCombat && (
+      {/* OTA-775 — the top "approach vendor" banner is for OUTDOOR vendors
+          (roadside fences, hub square traders). Inside a building the stalls
+          ARE the rooms — the bottom room tabs navigate them and EXIT leaves —
+          so advertising the current stall as a separate "approach" banner on
+          top is redundant and breaks the walked-into-a-building feel. Suppress
+          it while inside a building; the stall's own Trade + Crucible actions
+          render inside the room instead (block just below). */}
+      {currentScene?.vendor && !inCombat && !activeBuildingId && (
         <TouchableOpacity
           style={styles.vendorBanner}
           onPress={() => setScreen('vendor')}
@@ -694,6 +701,58 @@ export function ExplorationScreen() {
           <Text style={styles.vendorBannerArrow}>›</Text>
         </TouchableOpacity>
       )}
+
+      {/* OTA-775 — in-stall actions. Inside a building with a stall vendor, the
+          room presents its OWN actions: browse the vendor's wares, and (at the
+          Hidden Market) fire the free Crucible right here. This replaces both
+          top banners so the market reads as "you're standing in this stall". */}
+      {activeBuildingId && currentScene?.vendor && !inCombat && player && (() => {
+        const v = currentScene.vendor;
+        const isMarket = activeBuildingId === 'market';
+        let crucibleOk = false;
+        let crucibleHint = '';
+        if (isMarket) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+          const eqF = player.equipped ?? {};
+          const equippedIds = new Set(
+            [eqF.mainId, eqF.offId, eqF.headId, eqF.chestId, eqF.handsId, eqF.legsId, eqF.feetId, eqF.cloakId, eqF.amuletId, eqF.ringId, eqF.ring2Id, eqF.ring3Id].filter(Boolean) as string[],
+          );
+          const catalyst = findFactionCatalyst(player.inventory ?? [], equippedIds);
+          const gate = gateFusion(player.inventory ?? [], catalyst);
+          crucibleOk = gate.ok;
+          crucibleHint = gate.ok ? 'tap to fuse · spends your ♥ reserved items' : (gate.reason ?? 'tap for details');
+        }
+        return (
+          <>
+            <TouchableOpacity
+              style={styles.vendorBanner}
+              onPress={() => setScreen('vendor')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.vendorBannerStripe} />
+              <View style={styles.vendorBannerBody}>
+                <Text style={styles.vendorBannerName}>🛒 {v.name}</Text>
+                <Text style={styles.vendorBannerHint}>{v.title ? `${v.title} · ` : ''}browse wares · {v.offers.length} in stock</Text>
+              </View>
+              <Text style={styles.vendorBannerArrow}>›</Text>
+            </TouchableOpacity>
+            {isMarket && (
+              <TouchableOpacity
+                style={styles.fusionBanner}
+                onPress={() => useGameStore.getState().submitPlayerAction('fuse')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.fusionBannerStripe} />
+                <View style={styles.vendorBannerBody}>
+                  <Text style={styles.fusionBannerName}>{crucibleOk ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}</Text>
+                  <Text style={styles.vendorBannerHint}>{crucibleHint}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          </>
+        );
+      })()}
 
       {/* OTA-451 — Mission Board chip. Stands in the vendor-free central square
           of every faction Outpost; tapping reads the board's open postings into
@@ -734,6 +793,11 @@ export function ExplorationScreen() {
           tutorial, which runs before you've ever left. */}
       {(() => {
         if (crucibleDismissed || !player) return null;
+        // OTA-775 — inside a building the Crucible is offered from within the
+        // stall (the in-stall actions block above), so the redundant top banner
+        // is suppressed here. Outpost/hub and wild-permit Crucibles (not inside
+        // a building) still show their top banner as before.
+        if (activeBuildingId) return null;
         // A location that carries its OWN (free) Crucible: an outpost you've left
         // and returned to, an active fusion permit, or a market building.
         const atLocationCrucible = !!(player.fusionPending
