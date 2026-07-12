@@ -2626,6 +2626,12 @@ interface GameStore {
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
   dismissVendor: () => void;
+  /** OTA-776 — aim the Aetheric Torch at a chosen open lead and CHARGE it.
+   *  Consumes one torch, reveals + marks the lead (torchCharged), and the lead
+   *  pays out an upgraded WIS-scaled Rare/Legendary drop when the player later
+   *  works it (injected at hook resolution). No-op (no charge spent) if there's
+   *  no torch or the lead isn't an open, un-charged, stage-0 hook. */
+  applyTorchToHook: (hookId: string) => void;
   /** arb103 — every vendor will fire up a portable Fusing Crucible for a
    *  flat 25 TC. Pre-checks the reserve gate (no charge if you're not ready),
    *  then charges + fuses. */
@@ -9723,71 +9729,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fx?.kind === 'consumable') {
               const messages: string[] = [];
               let p = { ...player };
-              // OTA-773 — Resonance-lantern gamble (room-button item). The
-              // Aetheric Torch is a SCARCE, ONE-USE resource. Using it picks a
-              // single UNDISCOVERED lead in the room (a hook at stage 0, not yet
-              // investigated and not already torch-probed) and rolls a low,
-              // WIS-scaled chance at THAT lead's Rare/Legendary material / weapon
-              // / armor drop — only that one lead, never the others. It marks the
-              // lead torch-probed (so it can't be re-milled) but does NOT resolve
-              // it, so a normal INVESTIGATE still works. NON-REFUNDABLE: the
-              // charge is always spent — on a hit, on a dead miss, and even when
-              // there is no undiscovered lead here to answer.
+              // OTA-776 — the Aetheric Torch is an AIMED tool, not a random
+              // gamble. Using it REVEALS + takes over ONE chosen open lead and
+              // CHARGES it: the lead pays out an upgraded, WIS-scaled Rare/
+              // Legendary drop when the player works it (injected at hook
+              // resolution). The charge is spent only when it actually lands on
+              // a lead. From the 🔦 room button a multi-lead room opens a chooser
+              // first; the typed `use torch [on <lead>]` path is handled here:
+              //   • an explicit target that matches an open lead → charge it
+              //   • exactly one open lead → charge it
+              //   • several open leads, no target → don't spend; say to choose
+              //   • no open lead → don't spend; say there's nothing to aim at
               {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const { rollTorchProbe, isResonanceLantern } = require('../engine/resonanceLantern');
+                const { isResonanceLantern } = require('../engine/resonanceLantern');
                 if (isResonanceLantern(used)) {
-                  const undiscovered = (currentScene.hooks ?? []).filter(
-                    (h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchProbed,
+                  const chargeable = (currentScene.hooks ?? []).filter(
+                    (h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged,
                   );
-                  const spendTorch = (inv: typeof p.inventory) =>
-                    inv
-                      .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
-                      .filter((i) => i.quantity > 0);
-                  if (undiscovered.length > 0) {
-                    const target = undiscovered[Math.floor(Math.random() * undiscovered.length)]!;
-                    const hookNoun = target.nouns[0] ?? 'the buried dark';
-                    const wis = effectiveStats(p).wisdom;
-                    const probe = rollTorchProbe(wis);
-                    let inv = p.inventory;
-                    if (probe.hit && probe.reward) {
-                      const look = lookupCraftedItem(probe.reward.name);
-                      inv = grantItem(inv, {
-                        id: `torch_${Date.now()}`,
-                        name: probe.reward.name,
-                        kind: look.kind,
-                        rarity: look.rarity,
-                        quantity: 1,
-                        tags: [...look.tags, 'loot'],
-                        ...(look.baseDurability ? { durability: { current: look.baseDurability, max: look.baseDurability } } : {}),
-                      }).inventory;
-                    }
-                    p = { ...p, inventory: spendTorch(inv) };
-                    // Mark ONLY the probed lead so it can't be re-torched; leave
-                    // resolved/stage untouched so INVESTIGATE still opens it.
-                    set((s) => (s.currentScene ? {
-                      player: advanceTime(p, 0.25),
-                      currentScene: {
-                        ...s.currentScene,
-                        hooks: s.currentScene.hooks.map((h) =>
-                          h.id === target.id ? { ...h, torchProbed: true } : h,
-                        ),
-                      },
-                    } : { player: advanceTime(p, 0.25) }));
-                    if (probe.hit && probe.reward) {
-                      get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The flame catches something the room had swallowed — the air rings like struck crystal, and it answers.`);
-                      get().appendLog('reward', `✦ The resonance yields ${probe.reward.name} (${probe.reward.rarity})!`);
-                    } else {
-                      get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The resonance rises — a hum, a promise — then thins to nothing. The charge is spent.`);
-                    }
+                  const tgt = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase().trim();
+                  let target = tgt
+                    ? chargeable.find((h) => h.nouns.some((n) => {
+                        const ln = n.toLowerCase();
+                        return ln === tgt || tgt.includes(ln) || ln.includes(tgt);
+                      }))
+                    : undefined;
+                  if (!target && chargeable.length === 1) target = chargeable[0];
+                  if (target) {
+                    get().applyTorchToHook(target.id);
+                  } else if (chargeable.length === 0) {
+                    get().appendLog('arbiter', `There's no open lead here to aim the ${used.name} at. You keep the charge for a room that holds one.`);
                   } else {
-                    // No undiscovered lead here — the charge is still spent (one-use,
-                    // non-refundable). Clear feedback so it never reads as a bug.
-                    p = { ...p, inventory: spendTorch(p.inventory) };
-                    set({ player: advanceTime(p, 0.25) });
-                    get().appendLog('world', `You raise the ${used.name}, but nothing here is still hidden — every lead is already known or spent. The flame gutters out, the charge with it.`);
+                    const list = chargeable.map((h) => h.nouns[0] ?? h.kind).slice(0, 6).join(', ');
+                    get().appendLog('arbiter', `Several leads here — the ${used.name} takes only one. Tap the 🔦 button to choose, or say "use torch on <lead>". Open leads: ${list}.`);
                   }
-                  void get().persist();
                   break;
                 }
               }
@@ -16711,6 +16686,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  applyTorchToHook(hookId: string) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player || !scene) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isResonanceLantern } = require('../engine/resonanceLantern') as typeof import('../engine/resonanceLantern');
+    const torch = player.inventory.find(
+      (i) => isResonanceLantern(i) && (i.tags ?? []).includes('light') && i.quantity > 0,
+    );
+    if (!torch) {
+      get().appendLog('arbiter', 'You have no torch to aim.');
+      return;
+    }
+    const hook = (scene.hooks ?? []).find(
+      (h) => h.id === hookId && !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged,
+    );
+    if (!hook) {
+      get().appendLog('arbiter', 'That lead is already known, spent, or claimed — nothing for the torch to take over.');
+      return;
+    }
+    const noun = hook.nouns[0] ?? 'the lead';
+    set((s) => {
+      if (!s.currentScene || !s.player) return {};
+      const inv = s.player.inventory
+        .map((i) => (i.id === torch.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      return {
+        player: advanceTime({ ...s.player, inventory: inv }, 0.25),
+        currentScene: {
+          ...s.currentScene,
+          hooks: s.currentScene.hooks.map((h) => (h.id === hookId ? { ...h, torchCharged: true } : h)),
+        },
+      };
+    });
+    get().appendLog('world', `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work it, and it will give up something rare.`);
+    void get().persist();
+  },
+
   useVendorCrucible() {
     const state = get();
     const scene = state.currentScene;
@@ -23023,6 +23037,36 @@ function resolveHookOneStep(
   // occasionally yields a GOOD material on top of the thread's own payout —
   // a sprinkle for the player who followed the lore instead of walking past.
   if (outcome.done) {
+    // OTA-776 — a torch-CHARGED lead pays out an UPGRADED, WIS-scaled Rare/
+    // Legendary drop on top of its normal reward. The player aimed the torch at
+    // this lead earlier (applyTorchToHook set torchCharged); this is that altered
+    // loot landing where they worked it — the whole point of the aimed tool.
+    if (hook.torchCharged) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { rollTorchReward } = require('../engine/resonanceLantern') as typeof import('../engine/resonanceLantern');
+      const pl = get().player;
+      if (pl) {
+        const reward = rollTorchReward(effectiveStats(pl).wisdom);
+        if (reward) {
+          const look = lookupCraftedItem(reward.name);
+          set((s) => (s.player ? {
+            player: {
+              ...s.player,
+              inventory: mergeOrPushItem(s.player.inventory, {
+                id: `torchclaim_${Date.now()}`,
+                name: reward.name,
+                kind: look.kind,
+                rarity: look.rarity,
+                quantity: 1,
+                tags: [...look.tags, 'loot'],
+                ...(look.baseDurability ? { durability: { current: look.baseDurability, max: look.baseDurability } } : {}),
+              }),
+            },
+          } : s));
+          get().appendLog('reward', `✦ The torch's mark pays out — ${reward.name} (${reward.rarity})!`);
+        }
+      }
+    }
     const hookBonus = maybeLoreHookBonus();
     if (hookBonus) {
       const look = lookupCraftedItem(hookBonus.name);

@@ -93,13 +93,9 @@ function pick(pool: readonly string[], rng: () => number): string | null {
   return pool[Math.floor(rng() * pool.length)] ?? pool[0]!;
 }
 
-/** Roll a single torch probe. `wisdom` is the player's EFFECTIVE wisdom
- *  (base + gear + food). Returns { hit: false } for a dead miss. */
-export function rollTorchProbe(
-  wisdom: number,
-  rng: () => number = Math.random,
-): TorchProbeResult {
-  if (rng() >= probeHitChance(wisdom)) return { hit: false, reward: null };
+/** Pick the reward for a hit: a WISDOM-scaled Rare/Legendary material, weapon,
+ *  or armor. Shared by the (gated) probe roll and the (guaranteed) reward roll. */
+function pickReward(wisdom: number, rng: () => number): TorchReward | null {
   const rarity: ProbeRarity = rng() < probeLegendaryChance(wisdom) ? 'Legendary' : 'Rare';
   const t = rng();
   let category: ProbeCategory =
@@ -111,8 +107,30 @@ export function rollTorchProbe(
     category = 'material';
     name = pick(POOLS.material[rarity], rng) ?? pick(POOLS.material.Rare, rng);
   }
-  if (!name) return { hit: false, reward: null };
-  return { hit: true, reward: { name, category, rarity } };
+  if (!name) return null;
+  return { name, category, rarity };
+}
+
+/** Roll a single torch probe. `wisdom` is the player's EFFECTIVE wisdom
+ *  (base + gear + food). Returns { hit: false } for a dead miss.
+ *  (Legacy random-gamble path; the OTA-776 aimed torch uses rollTorchReward.) */
+export function rollTorchProbe(
+  wisdom: number,
+  rng: () => number = Math.random,
+): TorchProbeResult {
+  if (rng() >= probeHitChance(wisdom)) return { hit: false, reward: null };
+  const reward = pickReward(wisdom, rng);
+  return reward ? { hit: true, reward } : { hit: false, reward: null };
+}
+
+/** OTA-776 — a GUARANTEED reward (no hit gate). The torch is an aimed tool now:
+ *  the player charges a chosen lead, and when they work it the lead pays out
+ *  this upgraded, WISDOM-scaled Rare/Legendary drop. */
+export function rollTorchReward(
+  wisdom: number,
+  rng: () => number = Math.random,
+): TorchReward | null {
+  return pickReward(wisdom, rng);
 }
 
 /** Is this item a resonance lantern (the Aetheric Torch or a future lantern

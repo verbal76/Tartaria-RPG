@@ -9,6 +9,7 @@
 
 import {
   rollTorchProbe,
+  rollTorchReward,
   probeHitChance,
   probeLegendaryChance,
   isResonanceLantern,
@@ -95,6 +96,29 @@ describe('rollTorchProbe outcomes', () => {
       expect(hasRare(list)).toBe(true);
       expect(hasLeg(list)).toBe(true);
     }
+  });
+});
+
+describe('rollTorchReward — the OTA-776 GUARANTEED aimed-tool payout', () => {
+  it('always returns a real catalog reward (no hit gate)', () => {
+    // Even a "would-miss" first rng value yields a reward — the tool is aimed,
+    // not a gamble. Sweep several seeds; every one must produce a real item.
+    for (const seed of [0.0, 0.3, 0.5, 0.7, 0.99]) {
+      const r = rollTorchReward(14, seq([seed, seed, seed, seed]));
+      expect(r).not.toBeNull();
+      const look = lookupCraftedItem(r!.name);
+      expect(['Rare', 'Legendary']).toContain(look.rarity);
+      expect(r!.rarity).toBe(look.rarity);
+    }
+  });
+
+  it('WISDOM still scales the Rare-vs-Legendary tier', () => {
+    // tier roll = 0.0 is below the legendary chance at any WIS → Legendary.
+    const leg = rollTorchReward(20, seq([0.0, 0.0, 0.0]));
+    expect(leg!.rarity).toBe('Legendary');
+    // tier roll = 0.99 is above the legendary chance → Rare.
+    const rare = rollTorchReward(10, seq([0.99, 0.0, 0.0]));
+    expect(rare!.rarity).toBe('Rare');
   });
 });
 
