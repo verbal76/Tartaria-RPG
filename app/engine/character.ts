@@ -132,7 +132,7 @@ function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem
 // flavor array — keep the tags to keep the behavior. Built-in SETTING-NEUTRAL kit is the
 // default when no override is uploaded (so it never seeds another setting's proper nouns).
 const DEFAULT_STARTER_ITEMS: InventoryItem[] = [
-  { id: 'aetheric_torch', name: 'Hand Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held torch. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+  { id: 'aetheric_torch', name: 'Hand Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held torch that resonates with the buried. USE it in a room that still holds an unexplored lead for a chance to shake loose a rare or legendary find (higher Wisdom, better odds). A miss burns the charge. Scarce — spend it where a lead remains.' },
   { id: 'rations', name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
   // OTA-375 — every character starts with a Water Bottle (the cheap,
   // refillable stamina recovery item) so exhaustion in an early fight
