@@ -1254,7 +1254,10 @@ export function ContractsScreen() {
                 and lay it down among their own — they honor the dead you bring home.
               </Text>
               {carriedSigils(player.inventory).map((sg) => {
-                const here = player.currentLocationId === sg.tileId;
+                // OTA-783 — the Hidden Market brokers any faction's sigil, so the
+                // RETURN button lights up there too, not only at the home stake.
+                const atMarket = player.currentLocationId === 'hidden_market';
+                const here = player.currentLocationId === sg.tileId || atMarket;
                 const qty = sg.item.quantity > 1 ? ` ×${sg.item.quantity}` : '';
                 return (
                   <View key={`sigil_${sg.item.id}`} style={styles.card}>
@@ -1264,9 +1267,11 @@ export function ContractsScreen() {
                     </View>
                     <Text style={styles.cardFaction}>{sg.factionName} · honor their dead</Text>
                     <Text style={styles.cardStageBody}>
-                      {here
-                        ? `You're at ${safeLocName(sg.tileId)}. Lay the sigil down among their own.`
-                        : `○ Return it at ${safeLocName(sg.tileId)} for +1 ${sg.factionName} standing.`}
+                      {atMarket
+                        ? `The Hidden Market brokers it — turn it in here for +1 ${sg.factionName} standing.`
+                        : here
+                          ? `You're at ${safeLocName(sg.tileId)}. Lay the sigil down among their own.`
+                          : `○ Return it at ${safeLocName(sg.tileId)} — or the Hidden Market — for +1 ${sg.factionName} standing.`}
                     </Text>
                     {here ? (
                       <Pressable
