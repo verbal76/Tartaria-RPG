@@ -30,6 +30,7 @@ import { SalvageModal, isSalvageable as isSalvageableForModal } from '../compone
 import { BrandedModal } from '../components/BrandedModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
+import { TorchProbeModal } from '../components/TorchProbeModal';
 import { HookContinueModal } from '../components/HookContinueModal';
 import { WhisperCompleteModal } from '../components/WhisperCompleteModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
@@ -211,6 +212,9 @@ export function ExplorationScreen() {
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
   const [climbOpen, setClimbOpen] = useState(false);
+  // OTA-776 — the "aim the torch" lead chooser (opens when a room holds more
+  // than one open lead so the player picks which one to reveal + take over).
+  const [torchChooserOpen, setTorchChooserOpen] = useState(false);
   // Tell the floating KeyboardInputBar to stand down whenever a popup
   // that owns its own (keyboard-avoided) text field is open, so the bar
   // can't mount behind the modal and steal focus from the visible field.
@@ -924,13 +928,12 @@ export function ExplorationScreen() {
         );
       })()}
 
-      {/* OTA-773 — Aetheric Torch room chip. Shown whenever a torch is in the
-          pack (peaceful scenes only — probing a hidden lead isn't a combat
-          action). Tapping submits a torch USE: it picks one UNDISCOVERED lead
-          in the room and gambles a single charge on that lead's Rare/Legendary
-          drop. One use, non-refundable. The hint deliberately does NOT reveal
-          whether a lead is present — that read (and the risk of wasting a
-          charge) is the player's to make. */}
+      {/* OTA-776 — Aetheric Torch room chip (aimed tool). Shown whenever a torch
+          is in the pack, peaceful scenes only. Tapping AIMS the torch at an open
+          lead: several leads → a chooser opens; one lead → it charges that one;
+          none → it says there's nothing to aim at (and keeps the charge).
+          Charging a lead reveals + takes it over, and working that lead then
+          pays an upgraded Rare/Legendary drop. */}
       {(() => {
         if (!player) return null;
         if ((currentScene?.enemies?.length ?? 0) > 0) return null;
@@ -938,19 +941,25 @@ export function ExplorationScreen() {
           (i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0,
         );
         if (!torch) return null;
+        const chargeable = (currentScene?.hooks ?? []).filter(
+          (h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged,
+        );
         return (
           <TouchableOpacity
             style={styles.fusionBanner}
-            onPress={() => useGameStore.getState().submitPlayerAction(`use ${torch.name}`)}
+            onPress={() => {
+              if (chargeable.length > 1) setTorchChooserOpen(true);
+              else useGameStore.getState().submitPlayerAction(`use ${torch.name}`);
+            }}
             activeOpacity={0.7}
           >
             <View style={styles.fusionBannerStripe} />
             <View style={styles.vendorBannerBody}>
               <Text style={styles.fusionBannerName}>
-                🔦 {torch.name}{torch.quantity > 1 ? ` ×${torch.quantity}` : ''} · probe a hidden lead
+                🔦 {torch.name}{torch.quantity > 1 ? ` ×${torch.quantity}` : ''} · aim at a lead
               </Text>
               <Text style={styles.vendorBannerHint}>
-                tap to gamble one charge on a Rare/Legendary find · one use, non-refundable
+                reveal &amp; take over one open lead — it pays a Rare/Legendary drop when you work it
               </Text>
             </View>
           </TouchableOpacity>
@@ -1692,6 +1701,21 @@ export function ExplorationScreen() {
           />
         );
       })()}
+
+      {/* OTA-776 — "aim the torch" lead chooser. Lists the room's open leads;
+          picking one charges it with the torch (reveal + take over), and that
+          lead pays an upgraded Rare/Legendary drop when the player works it. */}
+      <TorchProbeModal
+        visible={torchChooserOpen}
+        leads={(currentScene?.hooks ?? [])
+          .filter((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged)
+          .map((h) => ({ id: h.id, noun: h.nouns[0] ?? h.kind }))}
+        onSubmit={(hookId) => {
+          setTorchChooserOpen(false);
+          useGameStore.getState().applyTorchToHook(hookId);
+        }}
+        onCancel={() => setTorchChooserOpen(false)}
+      />
 
       {/* 2026-05-25 — branded vendor-leave prompt. Replaces the
           native Alert.alert that broke the dark+amber palette. */}
