@@ -10623,7 +10623,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (wantsDown && !currentScene.microMicroId) {
           const macroId = LOCATION_TO_MACRO[currentScene.location.id];
           if (macroId) {
-            const target = pickRandomMicroMicroIn(macroId);
+            // OTA-769 — descending REACHES the indoor / buried micro-areas (which the
+            // surface random-assignment now skips), so 'go down' opens the mausoleum /
+            // catacombs the outdoor tile no longer stamps on you.
+            const target = pickRandomMicroMicroIn(macroId, undefined, { includeIndoor: true });
             if (target) {
               set({ player: advanceTime(spendTravelStamina(player), 1) });
               get().appendLog(
