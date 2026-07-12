@@ -9713,48 +9713,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (fx?.kind === 'consumable') {
               const messages: string[] = [];
               let p = { ...player };
-              // OTA-772 — Resonance-lantern gamble. The Aetheric Torch is now a
-              // SCARCE resource: used on a room that still holds an unresolved
-              // hook, it spends one charge and rolls a low, WIS-scaled chance at
-              // a single Rare/Legendary material / weapon / armor drop. A miss is
-              // a dead miss (charge gone, hook stays for a future pull). An EMPTY
-              // room falls through to the plain revealScene refund below, so a
-              // torch is never wasted on nothing. We deliberately do NOT resolve
-              // the hook — that would clobber authored story/quest threads; torch
-              // scarcity is the throttle.
+              // OTA-773 — Resonance-lantern gamble (room-button item). The
+              // Aetheric Torch is a SCARCE, ONE-USE resource. Using it picks a
+              // single UNDISCOVERED lead in the room (a hook at stage 0, not yet
+              // investigated and not already torch-probed) and rolls a low,
+              // WIS-scaled chance at THAT lead's Rare/Legendary material / weapon
+              // / armor drop — only that one lead, never the others. It marks the
+              // lead torch-probed (so it can't be re-milled) but does NOT resolve
+              // it, so a normal INVESTIGATE still works. NON-REFUNDABLE: the
+              // charge is always spent — on a hit, on a dead miss, and even when
+              // there is no undiscovered lead here to answer.
               {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
                 const { rollTorchProbe, isResonanceLantern } = require('../engine/resonanceLantern');
-                const unresolvedHooks = (currentScene.hooks ?? []).filter((h) => !h.resolved);
-                if (isResonanceLantern(used) && unresolvedHooks.length > 0) {
-                  const wis = effectiveStats(p).wisdom;
-                  const probe = rollTorchProbe(wis);
-                  const hookNoun = unresolvedHooks[Math.floor(Math.random() * unresolvedHooks.length)]!.nouns[0] ?? 'the buried dark';
-                  if (probe.hit && probe.reward) {
-                    const look = lookupCraftedItem(probe.reward.name);
-                    const granted = grantItem(p.inventory, {
-                      id: `torch_${Date.now()}`,
-                      name: probe.reward.name,
-                      kind: look.kind,
-                      rarity: look.rarity,
-                      quantity: 1,
-                      tags: [...look.tags, 'loot'],
-                      ...(look.baseDurability ? { durability: { current: look.baseDurability, max: look.baseDurability } } : {}),
-                    });
-                    const afterSpend = granted.inventory
+                if (isResonanceLantern(used)) {
+                  const undiscovered = (currentScene.hooks ?? []).filter(
+                    (h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchProbed,
+                  );
+                  const spendTorch = (inv: typeof p.inventory) =>
+                    inv
                       .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
                       .filter((i) => i.quantity > 0);
-                    p = { ...p, inventory: afterSpend };
-                    set({ player: advanceTime(p, 0.25) });
-                    get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The flame catches something the room had swallowed — the air rings like struck crystal, and it answers.`);
-                    get().appendLog('reward', `✦ The resonance yields ${probe.reward.name} (${probe.reward.rarity})!`);
+                  if (undiscovered.length > 0) {
+                    const target = undiscovered[Math.floor(Math.random() * undiscovered.length)]!;
+                    const hookNoun = target.nouns[0] ?? 'the buried dark';
+                    const wis = effectiveStats(p).wisdom;
+                    const probe = rollTorchProbe(wis);
+                    let inv = p.inventory;
+                    if (probe.hit && probe.reward) {
+                      const look = lookupCraftedItem(probe.reward.name);
+                      inv = grantItem(inv, {
+                        id: `torch_${Date.now()}`,
+                        name: probe.reward.name,
+                        kind: look.kind,
+                        rarity: look.rarity,
+                        quantity: 1,
+                        tags: [...look.tags, 'loot'],
+                        ...(look.baseDurability ? { durability: { current: look.baseDurability, max: look.baseDurability } } : {}),
+                      }).inventory;
+                    }
+                    p = { ...p, inventory: spendTorch(inv) };
+                    // Mark ONLY the probed lead so it can't be re-torched; leave
+                    // resolved/stage untouched so INVESTIGATE still opens it.
+                    set((s) => (s.currentScene ? {
+                      player: advanceTime(p, 0.25),
+                      currentScene: {
+                        ...s.currentScene,
+                        hooks: s.currentScene.hooks.map((h) =>
+                          h.id === target.id ? { ...h, torchProbed: true } : h,
+                        ),
+                      },
+                    } : { player: advanceTime(p, 0.25) }));
+                    if (probe.hit && probe.reward) {
+                      get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The flame catches something the room had swallowed — the air rings like struck crystal, and it answers.`);
+                      get().appendLog('reward', `✦ The resonance yields ${probe.reward.name} (${probe.reward.rarity})!`);
+                    } else {
+                      get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The resonance rises — a hum, a promise — then thins to nothing. The charge is spent.`);
+                    }
                   } else {
-                    const afterSpend = p.inventory
-                      .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
-                      .filter((i) => i.quantity > 0);
-                    p = { ...p, inventory: afterSpend };
+                    // No undiscovered lead here — the charge is still spent (one-use,
+                    // non-refundable). Clear feedback so it never reads as a bug.
+                    p = { ...p, inventory: spendTorch(p.inventory) };
                     set({ player: advanceTime(p, 0.25) });
-                    get().appendLog('world', `You raise the ${used.name} to the ${hookNoun}. The resonance rises — a hum, a promise — then thins to nothing. The charge is spent.`);
+                    get().appendLog('world', `You raise the ${used.name}, but nothing here is still hidden — every lead is already known or spent. The flame gutters out, the charge with it.`);
                   }
                   void get().persist();
                   break;

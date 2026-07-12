@@ -295,7 +295,12 @@ export function buildingForTile(
   }
   h = (h ^ (h >>> 16)) >>> 0;
   if (h % 100 >= BUILDING_TILE_CHANCE) return null;
-  const ids = Object.keys(BUILDINGS);
+  // OTA-774 — the 'market' template is the Hidden Market's own 4-stall bazaar;
+  // it is force-attached ONLY at the hidden_market location (see beginScene).
+  // It must never spawn on a random wild tile, or the player finds the same
+  // market — off its (47,15) grid home — at ~1-in-5 of every building tile in
+  // every location. Exclude it from the generic pick pool.
+  const ids = Object.keys(BUILDINGS).filter((id) => id !== 'market');
   // A second, decorrelated draw picks WHICH structure, so the presence
   // roll and the type roll don't move together.
   const pick = Math.imul(h ^ 0x9e3779b9, 2654435761) >>> 0;
