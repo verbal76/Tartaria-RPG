@@ -77,6 +77,10 @@ interface Props {
   onOpenTorch: () => void;
   hasTorch?: boolean;
   torchReady?: boolean;
+  /** OTA-778 — the torch's actual item name ("Aetheric Torch" / "Hand Torch"),
+   *  so the button reads "use hand torch" — blatantly the item, not a mystery
+   *  flashlight icon. */
+  torchLabel?: string;
   onClimbUp: () => void;
   onClimbDown: () => void;
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
@@ -155,7 +159,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
@@ -594,7 +598,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
             <QuickBtn label="all missions" tone="amber" onPress={onOpenMissions} blocked={tutLock} />
             {hasTorch && (
-              <QuickBtn label="🔦 torch" onPress={onOpenTorch} tone={torchReady ? 'ready' : undefined} blocked={tutLock} />
+              <QuickBtn label={`🔦 use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={torchReady ? 'ready' : undefined} blocked={tutLock} />
             )}
           </>
         )}

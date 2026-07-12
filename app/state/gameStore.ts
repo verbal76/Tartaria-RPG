@@ -21390,15 +21390,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-239 — Tool Pouch. OTA-270 — capacity raised 3 → 4 so a player
-  // with all three scanner families (Pulse / Aetheric / Mud) can pouch
-  // every one AND still keep a fourth general tool on the belt. Pouched
-  // items remain in inventory; pouchIds is the index. Players stow
-  // Aetheric Torches, Vision Lenses, scanners, etc. so `use <item>`
-  // resolves faster and the InventoryScreen surfaces them in a
-  // dedicated section.
+  // OTA-239 — Tool Pouch → OTA-778 SCANNER POUCH. Three slots, one per scanner
+  // family (Pulse / Aetheric / Mud). Pouched scanners are ALWAYS RUNNING, which
+  // is why a search surfaces their hidden loot — an "always-on" contract that
+  // only makes sense for scanners. Non-scanners (the button-use torch,
+  // pack-gear ropes/pry bars) are refused by isPouchEligible. Pouched items
+  // remain in inventory; toolPouchIds is the index.
   stowInPouch(itemName, itemId) {
-    const POUCH_MAX = 4;
+    const POUCH_MAX = 3;
     const state = get();
     const player = state.player;
     if (!player) return;
@@ -21430,7 +21429,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (current.length >= POUCH_MAX) {
       get().appendLog(
         'arbiter',
-        `The ${getNarratorName()} looks at the pouch. "Four is the limit. Take one out before another goes in."`,
+        `The ${getNarratorName()} looks at the pouch. "Three is the limit — one slot per scanner. Take one out before another goes in."`,
       );
       return;
     }
@@ -21445,7 +21444,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           },
         }
       : s);
-    get().appendLog('world', `You stow ${item.name} on your tool belt. Ready to use.`);
+    get().appendLog('world', `You clip ${item.name} into your scanner pouch. It runs whenever you search.`);
     void get().persist();
   },
 

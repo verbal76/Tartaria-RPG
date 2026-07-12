@@ -405,7 +405,7 @@ export function InventoryScreen() {
     const worn = (eq as Record<string, unknown>)[slot];
     return typeof worn === 'string' && worn.length > 0;
   };
-  const POUCH_MAX = 4; // mirrors stowInPouch in gameStore
+  const POUCH_MAX = 3; // mirrors stowInPouch in gameStore
   const itemSlotTaken = (item: InventoryItem): boolean => {
     if (equippedItemIds.has(item.id)) return false;
     const slots = validSlotsForItem(item);
@@ -1280,7 +1280,7 @@ function ToolPouchBanner({
   pouchFilterActive: boolean;
   onTapEmptySlot: () => void;
 }) {
-  const POUCH_MAX = 4;
+  const POUCH_MAX = 3;
   const pouchIds = player.equipped?.toolPouchIds ?? [];
   const unpouchItem = useGameStore((s) => s.unpouchItem);
   const slots: Array<{ name: string | null; id: string | null }> = [];
@@ -1291,8 +1291,8 @@ function ToolPouchBanner({
   }
   return (
     <View style={pouchStyles.banner}>
-      <Text style={pouchStyles.title}>TOOL POUCH</Text>
-      <Text style={pouchStyles.hint}>Ready-to-use tools (4 slots). Tap an empty slot to stow from your pack.</Text>
+      <Text style={pouchStyles.title}>SCANNER POUCH</Text>
+      <Text style={pouchStyles.hint}>Scanners run whenever you search (3 slots). Tap an empty slot to stow one from your pack.</Text>
       <View style={pouchStyles.row}>
         {slots.map((slot, idx) => (
           <View key={idx} style={pouchStyles.slot}>
@@ -1604,7 +1604,7 @@ function ItemRow({
           {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
           {/* arb58 — mark items currently stowed in the tool pouch so the
               player can see at a glance which pack items are pouched. */}
-          {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[tool pouch]</Text>}
+          {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[scanner pouch]</Text>}
           {isBandoliered && <Text style={[styles.rowMeta, styles.rowBandolier]}>[bandolier]</Text>}
           {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
           {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}

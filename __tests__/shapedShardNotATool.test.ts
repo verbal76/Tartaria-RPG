@@ -26,21 +26,22 @@ describe('OTA-491 — Shaped Aetheric Shard is a weapon, not a tool', () => {
     expect(itemIsTool(shard())).toBe(false);
   });
 
-  it('is NOT pouch-eligible, with weapon wording', () => {
+  it('is NOT pouch-eligible (OTA-778 — pouch is scanner-only anyway)', () => {
     const r = isPouchEligible(shard(), player);
     expect(r.eligible).toBe(false);
-    expect(r.reason).toMatch(/throw|weapon|hurl/i);
   });
 
   it('categorizes under Weapons, not Tools', () => {
     expect(categorizeItem(shard())).toBe('weapon');
   });
 
-  it("still doesn't mis-flag a genuine aetheric tool as a weapon", () => {
+  it("a genuine aetheric tool still reads as a TOOL (inventory category), though the scanner pouch no longer takes it", () => {
     const lens = { id: 'l', name: 'Aetheric Vision Lens', kind: 'exploration', quantity: 1,
       tags: ['tool', 'detection', 'aetheric', 'lens'] } as unknown as InventoryItem;
+    // Still a tool for the inventory TOOLS section…
     expect(itemIsTool(lens)).toBe(true);
-    expect(isPouchEligible(lens, player).eligible).toBe(true);
     expect(categorizeItem(lens)).toBe('tool');
+    // …but OTA-778 made the pouch scanner-only, so a lens no longer fits there.
+    expect(isPouchEligible(lens, player).eligible).toBe(false);
   });
 });
