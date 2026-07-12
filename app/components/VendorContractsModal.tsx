@@ -13,8 +13,16 @@ import { availableFactionQuests } from '../engine/factionQuests';
 import { availableHunts } from '../engine/hunts';
 import { availableMysteries } from '../engine/mysteries';
 import { availableStorylines } from '../engine/factionStorylines';
-import { getStanding } from '../engine/factions';
+import { getStanding, FACTIONS } from '../engine/factions';
 import type { VendorInstance } from '../engine/vendors';
+
+/** OTA-782 — the Hidden Market is the contract HUB. Its stall vendors are
+ *  neutral-ground brokers: instead of only their own faction's work, they post
+ *  every open contract across all factions (still rep-gated per faction), so
+ *  there's always a board to pick from no matter who you've been running with. */
+function isBrokerVendor(vendor: VendorInstance): boolean {
+  return typeof vendor.id === 'string' && vendor.id.startsWith('hidden_market_');
+}
 
 interface Props {
   visible: boolean;
@@ -57,15 +65,37 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
   const acceptStoryline = useGameStore((s) => s.acceptStoryline);
 
   const sections = useMemo(() => {
-    const rep = vendor.faction ? getStanding(factionStanding ?? [], vendor.faction) : 0;
-    const quests = vendor.faction
-      ? availableFactionQuests(vendor.faction, rep, activeFactionQuestIds ?? [], completedFactionQuestIds ?? [])
-      : [];
-    const hunts = availableHunts(vendor.faction, rep, (activeHunts ?? []).map((h) => h.id), completedHuntIds ?? []);
-    const mysteries = availableMysteries(vendor.faction, rep, (activeMysteries ?? []).map((m) => m.id), completedMysteryIds ?? []);
-    const stories = vendor.faction
-      ? availableStorylines(vendor.faction, rep, (activeStorylines ?? []).map((s) => s.id), completedStorylineIds ?? [])
-      : [];
+    // A market broker posts EVERY faction's board (+ faction-agnostic work);
+    // any other vendor posts only its own. Each faction is scored at the
+    // player's OWN standing with it, so rep gates still apply.
+    const factionIds: (string | null)[] = isBrokerVendor(vendor)
+      ? [null, ...FACTIONS.map((f) => f.id)]
+      : [vendor.faction ?? null];
+    const activeHuntIds = (activeHunts ?? []).map((h) => h.id);
+    const activeMysteryIds = (activeMysteries ?? []).map((m) => m.id);
+    const activeStorylineIds = (activeStorylines ?? []).map((s) => s.id);
+    const quests: ReturnType<typeof availableFactionQuests> = [];
+    const hunts: ReturnType<typeof availableHunts> = [];
+    const mysteries: ReturnType<typeof availableMysteries> = [];
+    const stories: ReturnType<typeof availableStorylines> = [];
+    const seen = new Set<string>();
+    for (const fid of factionIds) {
+      const rep = fid ? getStanding(factionStanding ?? [], fid) : 0;
+      if (fid) {
+        for (const q of availableFactionQuests(fid, rep, activeFactionQuestIds ?? [], completedFactionQuestIds ?? [])) {
+          if (!seen.has(`q:${q.id}`)) { seen.add(`q:${q.id}`); quests.push(q); }
+        }
+        for (const s of availableStorylines(fid, rep, activeStorylineIds, completedStorylineIds ?? [])) {
+          if (!seen.has(`s:${s.id}`)) { seen.add(`s:${s.id}`); stories.push(s); }
+        }
+      }
+      for (const h of availableHunts(fid, rep, activeHuntIds, completedHuntIds ?? [])) {
+        if (!seen.has(`h:${h.id}`)) { seen.add(`h:${h.id}`); hunts.push(h); }
+      }
+      for (const m of availableMysteries(fid, rep, activeMysteryIds, completedMysteryIds ?? [])) {
+        if (!seen.has(`m:${m.id}`)) { seen.add(`m:${m.id}`); mysteries.push(m); }
+      }
+    }
 
     const out: { label: string; postings: Posting[] }[] = [];
     if (quests.length > 0) {
@@ -106,7 +136,7 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
     }
     return out;
   }, [
-    vendor.faction, factionStanding, activeFactionQuestIds, completedFactionQuestIds,
+    vendor.id, vendor.faction, factionStanding, activeFactionQuestIds, completedFactionQuestIds,
     activeHunts, completedHuntIds, activeMysteries, completedMysteryIds,
     activeStorylines, completedStorylineIds,
     acceptFactionQuest, acceptHunt, acceptMystery, acceptStoryline,
