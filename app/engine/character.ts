@@ -112,7 +112,7 @@ function starterId(prefix: string): string {
 
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   const items: InventoryItem[] = [
-    { id: starterId('starter_torch'), name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light. Flick it on to reveal hidden hooks in the current room. Burns one charge per use; carry several.' },
+    { id: starterId('starter_torch'), name: 'Aetheric Torch', kind: 'relic', rarity: 'Common', quantity: 1, tags: ['light'], description: 'A hand-held aether-light that resonates with the buried. USE it in a room that still holds an unexplored lead for a chance to shake loose a rare or legendary find (higher Wisdom, better odds). A miss burns the charge. Scarce — spend it where a lead remains.' },
     { id: starterId('starter_rations'), name: 'Trail Rations', kind: 'consumable', quantity: 3, tags: ['food'], description: 'Enough to keep you walking another day.' },
     // OTA-375 — every character starts with a Water Bottle (the cheap,
     // refillable stamina recovery item) so exhaustion in an early fight
