@@ -36,6 +36,10 @@ export interface MicroLocation {
   id: string;
   name: string;
   description: string;
+  /** OTA-1055 — an ENCLOSED interior / buried-underworld micro-area whose rooms read
+   *  as indoors. Must NOT be handed to an OUTDOOR surface tile. Surface assignment
+   *  skips them; the DESCEND path still reaches them. Content packs set it per micro. */
+  indoor?: boolean;
   microMicroLocations: MicroMicroLocation[];
 }
 
@@ -182,11 +186,15 @@ export function findMicroMicroAnywhere(microMicroId: string): LadderTriple | nul
 export function pickRandomMicroMicroIn(
   macroId: string,
   rng: () => number = Math.random,
+  opts?: { includeIndoor?: boolean },
 ): LadderTriple | null {
   const macro = findMacro(macroId);
   if (!macro) return null;
   const candidates: LadderTriple[] = [];
   for (const micro of macro.microLocations) {
+    // OTA-1055 — a SURFACE tile never adopts an indoor micro-area; only DESCEND
+    // (includeIndoor) reaches those. An all-indoor macro yields no surface micro-area.
+    if (micro.indoor && !opts?.includeIndoor) continue;
     for (const microMicro of micro.microMicroLocations) {
       candidates.push({ macro, micro, microMicro });
     }

@@ -11031,7 +11031,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (wantsDown && !currentScene.microMicroId) {
           const macroId = LOCATION_TO_MACRO[currentScene.location.id];
           if (macroId) {
-            const target = pickRandomMicroMicroIn(macroId);
+            // OTA-1055 — descending REACHES the indoor / buried micro-areas the surface
+            // random-assignment now skips.
+            const target = pickRandomMicroMicroIn(macroId, undefined, { includeIndoor: true });
             if (target) {
               set({ player: advanceTime(spendTravelStamina(player), 1) });
               get().appendLog(
