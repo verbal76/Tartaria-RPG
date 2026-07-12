@@ -7750,6 +7750,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // for scene-side intent, fall back to resolvedNoun only if
           // target is empty.
           const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+          // OTA-770 — an ANIMATE scene noun (a knight / sentinel / statue-guardian)
+          // ROUSES into a fight when attacked or woken, instead of being harvested like
+          // scenery ("wake the knight" now routes here). Prefer a catalog enemy by that
+          // name; otherwise a generic roused guardian scaled to the tile stands up. Gated
+          // on a real ambient-noun match, so "attack the knight" fights while "attack the
+          // wall" still harvests. Marks the noun worked-over so a re-kill can't re-spawn it.
+          const ANIMATE_ATTACK_NOUN = /\b(knight|sentinel|guardian|warden|warrior|soldier|statue|effigy|colossus|golem|automaton|construct|wraith|revenant|sleeper|watcher|husk|skeleton)\b/i;
+          const animateHit = rawTarget ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []) : null;
+          if (rawTarget && animateHit && ANIMATE_ATTACK_NOUN.test(animateHit)) {
+            const nounTitle = animateHit.replace(/^the\s+/i, '').split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            const danger = (currentScene.location as { danger?: number })?.danger ?? 2;
+            let foe = findEnemyByName(animateHit) ?? findEnemyByName(nounTitle);
+            if (!foe) {
+              const ap = 3 + Math.min(6, danger);
+              foe = {
+                name: `Roused ${nounTitle}`,
+                type: 'Construct',
+                abilityPoint: `Strength ${ap}`,
+                attack: 'Slam',
+                damage: danger >= 4 ? '2D8' : '2D6',
+                hp: 24 + danger * 6,
+                rarity: danger >= 4 ? 'Rare' : 'Uncommon',
+                traits: ['armored'],
+                loot: [],
+              } as unknown as Enemy;
+            }
+            const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
+            const rouseRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+            const rouseLower = animateHit.toLowerCase();
+            set((s) => {
+              if (!s.currentScene) return s;
+              const scene = s.currentScene;
+              const room = s.worldMemory.visitedRooms?.[rouseRoomKey] ?? { firstVisitAt: Date.now(), lastVisitAt: Date.now(), visitCount: 1 };
+              return {
+                currentScene: {
+                  ...scene,
+                  enemies: [...scene.enemies, spawn],
+                  enemyHps: [...scene.enemyHps, spawn.hp],
+                  activeEnemyIdx: scene.enemies.length,
+                  range: 'close',
+                  enemyAmbushUsed: [...(scene.enemyAmbushUsed ?? []), false],
+                },
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [rouseRoomKey]: { ...room, searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), rouseLower] },
+                  },
+                },
+                stepsSinceCombat: 0,
+              };
+            });
+            get().appendLog('world', `The ${nounTitle} was never dead — only waiting. It surges upright and comes for you.`);
+            get().appendLog('combat', `${spawn.name} closes — ${spawn.attack} ready, ${spawn.damage} damage on a hit. (range: close)`);
+            void get().persist();
+            break;
+          }
           if (rawTarget && isGroundSearch(rawTarget)) {
             get().digHere();
             break;
@@ -8016,7 +8073,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (outcome.kind === 'hook') {
               get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
             } else {
-              get().appendLog('world', outcome.line);
+              // OTA-770 — this is the ATTACK fallback, so narrate a STRIKE, not the
+              // shared 'sift/search' template (playtest: "attack the silhouette" printed
+              // "You sift the silhouette and pull out a piece worth keeping").
+              const strikeWord = isBodyVerb ? (BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`) : 'struck';
+              get().appendLog('world', outcome.kind === 'material'
+                ? `You ${strikeWord} the ${targetForNarration} — a piece breaks loose.`
+                : `You ${strikeWord} the ${targetForNarration}. Nothing comes free.`);
             }
             // Dispatch outcome first, then dedupe based on whether
             // anything actually produced — mirrors the harvest-verb
