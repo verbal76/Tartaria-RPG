@@ -73,6 +73,13 @@ export interface Hook {
    *  so the player can come back to a half-solved tumbler and pick
    *  up where they left off. Undefined on hooks without a puzzle. */
   puzzleProgress?: import('./hookPuzzles').PuzzleProgress;
+  /** OTA-773 — the Aetheric Torch resonance gamble has probed this hook.
+   *  A torch can only target an UNDISCOVERED lead (stage 0, unresolved,
+   *  not already probed); using it sets this so the same lead can't be
+   *  re-torched. Separate from `resolved` so a normal INVESTIGATE of the
+   *  hook still works — the torch reads its loot, it doesn't close the
+   *  thread. */
+  torchProbed?: boolean;
 }
 
 // Plant lines, paired with the nouns that should resolve to that hook kind.

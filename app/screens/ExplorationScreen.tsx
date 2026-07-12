@@ -865,6 +865,39 @@ export function ExplorationScreen() {
         );
       })()}
 
+      {/* OTA-773 — Aetheric Torch room chip. Shown whenever a torch is in the
+          pack (peaceful scenes only — probing a hidden lead isn't a combat
+          action). Tapping submits a torch USE: it picks one UNDISCOVERED lead
+          in the room and gambles a single charge on that lead's Rare/Legendary
+          drop. One use, non-refundable. The hint deliberately does NOT reveal
+          whether a lead is present — that read (and the risk of wasting a
+          charge) is the player's to make. */}
+      {(() => {
+        if (!player) return null;
+        if ((currentScene?.enemies?.length ?? 0) > 0) return null;
+        const torch = (player.inventory ?? []).find(
+          (i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0,
+        );
+        if (!torch) return null;
+        return (
+          <TouchableOpacity
+            style={styles.fusionBanner}
+            onPress={() => useGameStore.getState().submitPlayerAction(`use ${torch.name}`)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.fusionBannerStripe} />
+            <View style={styles.vendorBannerBody}>
+              <Text style={styles.fusionBannerName}>
+                🔦 {torch.name}{torch.quantity > 1 ? ` ×${torch.quantity}` : ''} · probe a hidden lead
+              </Text>
+              <Text style={styles.vendorBannerHint}>
+                tap to gamble one charge on a Rare/Legendary find · one use, non-refundable
+              </Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })()}
+
       {/* engine_Dev — during the combat arena, the tall char|enemy topRow takes the world-window,
           so the feed hides; otherwise the normal scrolling feed shows. Keyed on a live threat
           (arenaActive), so once the last foe is down the feed returns even if a KO'd body lingers. */}
