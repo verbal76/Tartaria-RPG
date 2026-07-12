@@ -882,43 +882,8 @@ export function ExplorationScreen() {
         );
       })()}
 
-      {/* OTA-776 — Aetheric Torch room chip (aimed tool). Shown whenever a torch
-          is in the pack, peaceful scenes only. Tapping AIMS the torch at an open
-          lead: several leads → a chooser opens; one lead → it charges that one;
-          none → it says there's nothing to aim at (and keeps the charge).
-          Charging a lead reveals + takes it over, and working that lead then
-          pays an upgraded Rare/Legendary drop. */}
-      {(() => {
-        if (!player) return null;
-        if ((currentScene?.enemies?.length ?? 0) > 0) return null;
-        const torch = (player.inventory ?? []).find(
-          (i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0,
-        );
-        if (!torch) return null;
-        const chargeable = (currentScene?.hooks ?? []).filter(
-          (h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged,
-        );
-        return (
-          <TouchableOpacity
-            style={styles.fusionBanner}
-            onPress={() => {
-              if (chargeable.length > 1) setTorchChooserOpen(true);
-              else useGameStore.getState().submitPlayerAction(`use ${torch.name}`);
-            }}
-            activeOpacity={0.7}
-          >
-            <View style={styles.fusionBannerStripe} />
-            <View style={styles.vendorBannerBody}>
-              <Text style={styles.fusionBannerName}>
-                🔦 {torch.name}{torch.quantity > 1 ? ` ×${torch.quantity}` : ''} · aim at a lead
-              </Text>
-              <Text style={styles.vendorBannerHint}>
-                reveal &amp; take over one open lead — it pays a Rare/Legendary drop when you work it
-              </Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })()}
+      {/* OTA-777 — the torch is a small quick-use button in the bottom action
+          row (see InputBox `torch` QuickBtn), NOT a top banner. */}
 
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
@@ -988,6 +953,15 @@ export function ExplorationScreen() {
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
             onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
+            hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)}
+            torchReady={(currentScene?.hooks ?? []).some((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged)}
+            onOpenTorch={() => {
+              const torch = (player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0);
+              if (!torch) return;
+              const chargeable = (currentScene?.hooks ?? []).filter((h) => !h.resolved && (h.stage ?? 0) === 0 && !h.torchCharged);
+              if (chargeable.length > 1) setTorchChooserOpen(true);
+              else useGameStore.getState().submitPlayerAction(`use ${torch.name}`);
+            }}
             onClimbUp={() => {
               // OTA 033 — tolerate the old OTA 031 string schema for
               // saves that haven't been re-saved on the new shape.
