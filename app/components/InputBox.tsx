@@ -574,7 +574,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
             <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
             {hasTorch && (
-              <QuickBtn label={`🔦 use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={torchReady ? 'ready' : undefined} blocked={tutLock} />
+              <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
             )}
           </>
         )}
