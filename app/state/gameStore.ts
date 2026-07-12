@@ -1623,6 +1623,18 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
         const cell = canonicalCellOf(p.currentLocationId);
         gx = cell.x; gy = cell.y;
       }
+      // OTA-784 — one-time FRESH-MARKET repair. A save left INSIDE / AT the
+      // Hidden Market is dropped 5 tiles EAST of it, and the market auto-enter is
+      // suppressed once (see beginScene), so it loads OUTSIDE — the market tile
+      // with ENTER + cardinals — and walks/taps into a clean, renewed market
+      // instead of snapping back into stale in-market state. Flag-guarded: fires
+      // exactly once, only for a save actually parked at the market.
+      if (!p._freshMarketEntry784 && p.currentLocationId === 'hidden_market') {
+        const mk = canonicalCellOf('hidden_market');
+        gx = mk.x + 5; gy = mk.y;
+        const vis = gridToVisual(gx, gy, p.currentLocationId);
+        return { gridX: gx, gridY: gy, mapX: vis.mapX, mapY: vis.mapY, _freshMarketEntry784: true, _skipMarketAutoEnterOnce: true };
+      }
       // OTA-510 — one-shot: drop the player ONE tile west of the Hidden Market so
       // the next auto-route to it reads exactly 1 pace. Flag-guarded so it fires
       // once and never re-yanks the player back on subsequent loads. Computed from
@@ -5200,11 +5212,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // view (OTA-775 suppresses those top banners while activeBuildingId is set).
       // The location.id === 'hidden_market' gate keeps this off every other
       // scene, incl. a brand-new game (which opens at a spawn outpost).
-      void Promise.resolve().then(() => {
-        if (get().currentScene?.location.id === 'hidden_market' && !get().activeBuildingId) {
-          get().enterBuilding('market');
-        }
-      });
+      // OTA-784 — the fresh-market repair asks to skip the auto-enter ONCE so the
+      // player lands OUTSIDE and walks/taps in. Consume the flag and don't enter.
+      if (get().player?._skipMarketAutoEnterOnce) {
+        set((s) => (s.player ? { player: { ...s.player, _skipMarketAutoEnterOnce: false } } : s));
+        void get().persist();
+      } else {
+        void Promise.resolve().then(() => {
+          if (get().currentScene?.location.id === 'hidden_market' && !get().activeBuildingId) {
+            get().enterBuilding('market');
+          }
+        });
+      }
     } else if (scene.sceneBuilding && !opts?.isOpening) {
       const onRoute = !!get().player?.travelTarget || !!get().player?.whisperCourse;
       get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute));
