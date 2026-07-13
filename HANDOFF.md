@@ -251,6 +251,30 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **engine_Dev Tartaria-leakage audit (2026-07-13) — findings reported, fixes
+  pending user approval.** Rule (§2): engine_Dev's hardcoded prefills must be
+  lore-neutral. Architecture verified sound: content resolves author pack →
+  boot-installed generic pack ("the Reaches", `genericGame.ts`, installed by
+  `App.tsx` → `installGenericDefaults`) → built-in Tartaria JSON, so the generic
+  layer masks the vast majority of ~130 `tartar` hits in engine code at runtime.
+  The REACHABLE leaks for a custom-pack (Philadelphia Experiment) player, in
+  priority order: (1) `engine/investigationTable.ts:171,218` — hardcoded yield
+  item **"Worn Tartarian Coin"** on INVESTIGATE shelf/altar; no resolver/reskin
+  gate, and the lowercased feed line defeats the case-sensitive scrub — top fix.
+  (2) Codex **Timeline tab** (`components/LoreCodexBody.tsx:29,37-41`) imports
+  Tartaria `data/events/timeline.json` directly; hidden only when the author
+  uploads factions/locations tables. (3) `engine/contentPack.ts`
+  `dressBuiltInLeaks` (L373-425) is a no-op unless a first-class override
+  (worldName/energy/corruption) is set, and its swaps are case-sensitive with
+  proper-noun gaps (lowercase `tartarian`/`aether`, `Aetherstone`, `Mud
+  Monarch`, `Reclaimer` pass through). (4) `engine/hunts.ts:131` biome labels
+  ("the Tartarian Outskirts", "the Mud Seas") — player-facing, not gated.
+  (5) Robustness, not text: hardcoded `tartarian_outskirts` fallback location id
+  (`contractMarkers.ts:38`, `character.ts:491`, `gameStore.ts`) breaks contract
+  pinning/spawn routing in a custom catalog lacking that id. Benign (leave):
+  storage keys (`tartaria.*`), MiniLM embedding anchors
+  (`CognitiveOrchestrator.ts` — internal, never shown), pronunciation lexicon,
+  parser noun dictionary. Full report in the 2026-07-13 session log.
 - **Arbiter TTS tail clip — FIXED in 790/770/1076; retest on device.** The last
   fraction of every spoken line was clipped (report 2026-07-13, Pixel 10 Pro XL,
   bundled Kokoro): `trimSilenceLeadTrail` shaved the trailing decay to within
