@@ -81,10 +81,8 @@ interface Props {
    *  so the button reads "use hand torch" — blatantly the item, not a mystery
    *  flashlight icon. */
   torchLabel?: string;
-  /** OTA-780 — inside the Hidden Market, the stall's actions live in the bottom
-   *  travel row beside the room tabs (no floating chips): TRADE opens the
-   *  current stall's vendor, FUSE fires the free Crucible. */
-  onOpenVendor?: () => void;
+  /** OTA-788 — inside the Hidden Market, FUSE fires the free Crucible. (Trading
+   *  is handled by stepping into a stall, which auto-opens its wares.) */
   onFuse?: () => void;
   onClimbUp: () => void;
   onClimbDown: () => void;
@@ -164,7 +162,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onOpenVendor, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
@@ -612,11 +610,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {hasTorch && (
               <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
             )}
-            {/* OTA-781 — market stall actions, kept OFF the (clean) stall-nav
-                travel row: browse this stall's wares + fire the free Crucible. */}
-            {activeBuildingId === 'market' && onOpenVendor && (
-              <QuickBtn label="trade" onPress={onOpenVendor} tone="ready" blocked={tutLock} />
-            )}
+            {/* OTA-788 — no TRADE button: stepping into a stall opens its wares
+                (and tapping the stall tab you're in re-opens them). FUSE stays —
+                the free Crucible has no other in-market affordance. */}
             {activeBuildingId === 'market' && onFuse && (
               <QuickBtn label="fuse" onPress={onFuse} blocked={tutLock} />
             )}

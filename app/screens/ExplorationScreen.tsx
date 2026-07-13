@@ -966,7 +966,6 @@ export function ExplorationScreen() {
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
             onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
-            onOpenVendor={currentScene?.vendor ? () => setScreen('vendor') : undefined}
             onFuse={activeBuildingId === 'market' ? () => useGameStore.getState().submitPlayerAction('fuse') : undefined}
             hasTorch={!!(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)}
             torchLabel={(player?.inventory ?? []).find((i) => /torch|lantern|lamp/i.test(i.name) && (i.tags ?? []).includes('light') && i.quantity > 0)?.name?.toLowerCase()}
