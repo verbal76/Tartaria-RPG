@@ -15916,4 +15916,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shows. Now setScreen('vendor') refuses while enemies are live (refusal logged to the feed the
 // player IS looking at, enemy card stays in view), and VendorScreen ejects to exploration if a
 // fight starts mid-trade (hook spawn, caught stealing). +2 tests (vendorCombatGuard).
-export const OTA_BUILD_ID = '2026-07-13-791-combat-blocks-trade-screen';
+// OTA-792 — companions follow the dice + wild-water balance (playtest log 2026-07-13).
+// (1) Companion rolls honor the natural-1/natural-20 rule like every other d20 in the game:
+// the golem's attack (the log showed a nat-20 dealing 13 while an ordinary 12 dealt 36 — no
+// crit path existed) and the enemy's retaliation vs the golem now fumble on nat-1 and crit
+// on nat-20 (double base swing / second damage roll — mirrors the dog-bite and enemy-vs-dog
+// treatment; the dog already followed the rule). (2) Wild water reined in: a bare-handed
+// drink from a scene water source is ONE per location visit, adds +1 corruption (untreated
+// water carries what the ground put in it), and the Arbiter warns after the sip. Filling a
+// water bottle (also one refill per visit) runs it through the bottle's built-in filter, so
+// bottled water stays clean and unlimited. Rationale: rest recovers 1 stamina/hour while the
+// old cup-hands loop gave +3 per 5 min forever — 36:1 over sleeping, and the log showed the
+// loop in live use. golemCompanion tests pin the dice (nat rules made guaranteed-hit setups
+// flaky).
+export const OTA_BUILD_ID = '2026-07-13-792-companion-dice-wild-water';
