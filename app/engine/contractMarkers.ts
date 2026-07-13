@@ -23,19 +23,31 @@ import { findHuntById } from './hunts';
 import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
 import { findFactionQuestById } from './factionQuests';
-import { startingLocationForFaction } from './character';
+import { startingLocationForFaction, defaultLocationId } from './character';
+import { resolveTable } from './contentPack';
+import locationsData from '../data/locations/locations.json';
 
-/** hunt biomeTag → a representative, install-fixed location to anchor the pin on.
- *  (hunts.json only carries a biome + decorated prose location text, never an id.) */
+/** hunt biomeTag → a representative location to anchor the pin on, for the
+ *  BUILT-IN hunt set (hunts.json only carries a biome + decorated prose location
+ *  text, never an id). Only honored when the id exists in the LIVE locations
+ *  catalog — an uploaded world without these ids falls through to the faction /
+ *  neutral anchor instead of pinning to a phantom tile. */
 const BIOME_ANCHOR: Record<string, string> = {
   buried_capital: 'asgardar',
   mud_seas: 'mud_seas',
   outskirts: 'tartarian_outskirts',
   sentinel_ward: 'obsidian_pillars',
 };
+function anchorForBiome(biomeTag: string): string | undefined {
+  const id = BIOME_ANCHOR[biomeTag];
+  if (!id) return undefined;
+  const locs = resolveTable<{ id?: string }>('locations', locationsData as { id?: string }[]);
+  return locs.some((l) => l.id === id) ? id : undefined;
+}
 /** Fallback anchor when a contract has neither a location, a known biome, nor a
- *  faction to pin to (e.g. a null-faction mystery). The starter region. */
-const NEUTRAL_ANCHOR = 'tartarian_outskirts';
+ *  faction to pin to (e.g. a null-faction mystery). engine_Dev — resolves to the
+ *  live catalog's first row (defaultLocationId), never a hardcoded setting id. */
+const NEUTRAL_ANCHOR = (): string => defaultLocationId();
 
 export type ContractFamily = 'hunt' | 'mystery' | 'storyline' | 'faction' | 'lead';
 
@@ -55,11 +67,11 @@ export interface ContractMarker {
 }
 
 function anchorForFaction(factionId: string | null | undefined): string {
-  if (!factionId) return NEUTRAL_ANCHOR;
+  if (!factionId) return NEUTRAL_ANCHOR();
   try {
-    return startingLocationForFaction(factionId) || NEUTRAL_ANCHOR;
+    return startingLocationForFaction(factionId) || NEUTRAL_ANCHOR();
   } catch {
-    return NEUTRAL_ANCHOR;
+    return NEUTRAL_ANCHOR();
   }
 }
 
@@ -79,7 +91,7 @@ export function openContractMarkers(player: PlayerCharacter | null | undefined):
   for (const h of player.activeHunts ?? []) {
     const def = findHuntById(h.id);
     if (!def) continue;
-    const anchor = BIOME_ANCHOR[def.biomeTag] ?? anchorForFaction(def.factionId);
+    const anchor = anchorForBiome(def.biomeTag) ?? anchorForFaction(def.factionId);
     add('hunt', h.id, def.title, anchor);
   }
   for (const m of player.activeMysteries ?? []) {

@@ -46,7 +46,7 @@ describe('mergeOrPushItem — consumable / misc / runecaster (always stack)', ()
 
   it('does not merge items with different names', () => {
     const inv = [makeItem({ name: 'Bioluminescent Fungus', kind: 'misc' })];
-    const out = mergeOrPushItem(inv, makeItem({ name: 'Worn Tartarian Coin', kind: 'misc' }));
+    const out = mergeOrPushItem(inv, makeItem({ name: 'Worn Temporal Credits', kind: 'misc' }));
     expect(out).toHaveLength(2);
   });
 
@@ -109,9 +109,9 @@ describe('mergeOrPushItem — durability-tracked (only merge when both pristine)
 
 describe('mergeOrPushItem — edge cases', () => {
   it('pushes onto an empty inventory cleanly', () => {
-    const out = mergeOrPushItem([], makeItem({ name: 'Worn Tartarian Coin', kind: 'misc' }));
+    const out = mergeOrPushItem([], makeItem({ name: 'Worn Temporal Credits', kind: 'misc' }));
     expect(out).toHaveLength(1);
-    expect(out[0]!.name).toBe('Worn Tartarian Coin');
+    expect(out[0]!.name).toBe('Worn Temporal Credits');
   });
 
   it('returns a fresh array — does not mutate the input', () => {

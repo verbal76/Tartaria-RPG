@@ -4,9 +4,10 @@
 // pay out big once turned in.
 
 import huntsData from '../data/quests/hunts.json';
-import type { PlayerCharacter, Enemy } from './types';
+import type { PlayerCharacter, Enemy, Location } from './types';
 import enemiesData from '../data/enemies/enemies.json';
-import { resolveMissions } from './contentPack';
+import locationsData from '../data/locations/locations.json';
+import { resolveMissions, resolveTable } from './contentPack';
 
 export type HuntCheckKind =
   | null
@@ -122,18 +123,23 @@ export function checkKindLabel(kind: HuntCheckKind): string | null {
 }
 
 /** 2026-05-26 OTA-053 — friendly label for a biomeTag when a hunt
- *  doesn't carry an explicit targetLocationName. Falls back to the
- *  tag itself title-cased if no mapping exists. */
-const BIOME_LABELS: Record<string, string> = {
-  mud_seas: 'the Mud Seas',
-  buried_capital: 'a buried capital',
-  sentinel_ward: 'a Sentinel Ward',
-  outskirts: 'the Tartarian Outskirts',
-  ruin: 'the buried ruins',
-};
+ *  doesn't carry an explicit targetLocationName.
+ *
+ *  engine_Dev — resolved from JSON, never from a hardcoded label map (the old
+ *  BIOME_LABELS table carried setting-specific names). The tag is matched
+ *  against the LIVE locations table (author pack → generic pack → built-in
+ *  data/locations/locations.json): a location whose `id` equals the tag, or
+ *  whose optional `biomeTags` array contains it, lends its authored name. An
+ *  unmatched tag title-cases neutrally ("mud_seas" → "Mud Seas"). Authors who
+ *  want a richer label than any location name should set the hunt row's
+ *  `targetLocationName` — it wins before this function is consulted. */
 export function biomeLabel(biomeTag: string): string {
-  const mapped = BIOME_LABELS[biomeTag];
-  if (mapped) return mapped;
+  type LocRow = Location & { biomeTags?: readonly string[] };
+  const locs = resolveTable('locations', locationsData as unknown as readonly LocRow[]);
+  const match = locs.find(
+    (l) => l.id === biomeTag || (Array.isArray(l.biomeTags) && l.biomeTags.includes(biomeTag)),
+  );
+  if (match?.name) return match.name;
   return biomeTag
     .split(/[_\s]+/)
     .map((w) => (w ? w[0]!.toUpperCase() + w.slice(1) : ''))

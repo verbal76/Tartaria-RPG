@@ -338,8 +338,11 @@ export function hasEnergyOverride(): boolean {
 export function getEnergy(): EnergyConfig {
   const w = loreOverrides.world as { energy?: Partial<EnergyConfig> } | undefined;
   const e = w?.energy;
-  // Re-skinned game with no energy named → neutral words, not the built-in "Aether".
-  const base = isReskinActive() ? NEUTRAL_ENERGY : DEFAULT_ENERGY;
+  // Any game with no energy named → neutral words, not the built-in "Aether".
+  // The generic pack counts: once it's installed (every real boot), the built-in
+  // Aether family only ever surfaces if an author explicitly asks for it. Pure
+  // built-in mode (tests, clearGenericDefaults) still resolves to Aether.
+  const base = (isReskinActive() || hasGenericDefaults()) ? NEUTRAL_ENERGY : DEFAULT_ENERGY;
   if ((!e || typeof e !== 'object') && energyNameOverride == null) return base;
   const ee = (e && typeof e === 'object' ? e : {}) as Partial<EnergyConfig>;
   const str = (v: unknown, d: string): string => (typeof v === 'string' && v.trim() ? v.trim() : d);
@@ -368,48 +371,73 @@ export function energyTermForFaction(factionId?: string | null): string {
 /** engine_Dev — scrub built-in Tartaria leaks from a feed line. Runs in appendLog
  *  (every line passes through it) so the dozens of hard-coded template strings that
  *  name "Tartaria" or the role-words "the Arbiter" / "the Narrator" are rewritten
- *  to the author's world name and narrator name. Both halves are gated on an
- *  override being set, so the built-in Tartaria game is untouched. */
+ *  to the RESOLVED world/narrator/energy/affliction names (author override →
+ *  generic-pack identity → built-in default).
+ *
+ *  NO LONGER gated on an author override being set: the old gates meant a pack
+ *  that leaned on the generic identity got ZERO scrubbing, so residual literals
+ *  slipped through. Each family instead no-ops when its resolved name IS the
+ *  built-in word — which is what happens in pure built-in (test) mode, where
+ *  neither the generic pack nor an author pack is installed.
+ *
+ *  All patterns are CASE-AGNOSTIC with case-preserving replacements — lowercased
+ *  feed lines (investigation results run through .toLowerCase()) used to slip
+ *  past the old capitalized-only patterns. */
 export function dressBuiltInLeaks(text: string): string {
   if (!text) return text;
   let out = text;
-  // Role-word narrator → the chosen name. Built-in combat/ambient templates print
-  // "The Narrator" / "the Arbiter" literally instead of the configured name.
-  if (hasNarratorNameOverride()) {
-    const name = getNarratorName();
-    if (name && !/^the\s/i.test(name)) {
-      out = out.replace(/\b[Tt]he (?:Arbiter|Narrator)\b/g, name);
+  // Case-preserving swap: a match whose first letter is lowercase gets the
+  // lowercase replacement; anything else (Capitalized, ALL-CAPS) the given form.
+  const swap = (s: string, pattern: RegExp, repl: string): string =>
+    s.replace(pattern, (m) => (m[0] === m[0]!.toLowerCase() ? repl.toLowerCase() : repl));
+  // Role-word narrator → the resolved name. The Tartaria role word "Arbiter" is
+  // always rewritten; the neutral role word "Narrator" only when the author chose
+  // their own narrator name. Article-preserving ("the Arbiter" → "the Narrator");
+  // a resolved name that itself starts with "the" is reduced to its bare form and
+  // the doubled-article collapse below tidies the rest.
+  {
+    const bare = getNarratorName().replace(/^the\s+/i, '').trim();
+    if (bare && bare.toLowerCase() !== 'arbiter') {
+      out = swap(out, /\barbiter\b/gi, bare);
+      if (hasNarratorNameOverride() && bare.toLowerCase() !== 'narrator') {
+        out = swap(out, /\bnarrator\b/gi, bare);
+      }
     }
   }
-  // World noun → the chosen world name. Covers the whole word family — the proper
-  // noun "Tartaria" AND the adjective "Tartarian"/"Tartarians" (the OTA-705 version
-  // missed the adjective). The adjective maps to "<world> " so "Tartarian stone" →
-  // "the Void stone"; tidy enough, and the term map below can refine it.
-  if (hasWorldNameOverride()) {
+  // World noun → the resolved world name. Covers the whole word family — the
+  // proper noun "Tartaria", the adjective "Tartarian"/"Tartarians" (the OTA-705
+  // version missed the adjective), and the archaic "Tartary". The adjective maps
+  // to "<world> " so "Tartarian stone" → "the Reaches stone"; tidy enough, and
+  // the term map below can refine it.
+  {
     const w = getWorldName();
-    out = out.replace(/\bTartarians\b/g, w).replace(/\bTartarian\b/g, w).replace(/\bTartaria\b/g, w);
+    if (w && !/tartaria/i.test(w)) {
+      out = swap(out, /\btartarians?\b/gi, w);
+      out = swap(out, /\btartaria\b/gi, w);
+      out = swap(out, /\btartary\b/gi, w);
+    }
   }
   // engine_Dev — the ENERGY / "magic" concept. Built-in narration names it "Aether"
-  // (the energy), "Aetheric" (adjective) and "Aetherstone" (its material). A re-skin
-  // sets world.energy and the whole family is rewritten — so "the magic" reads as
-  // The Fold / Vril / the Static / broken physics instead of fantasy Aether. Gated
-  // on an override so the built-in game is unchanged; a re-skin that uploads its own
-  // materials won't have "Aetherstone <X>" items to desync against.
-  if (hasEnergyOverride()) {
+  // (the energy), "Aetheric" (adjective) and "Aetherstone" (its material). The
+  // resolved family (author's world.energy → neutral generic words → built-in
+  // Aether) is swapped in — so "the magic" reads as The Fold / Vril / the Static /
+  // plain "energy" instead of fantasy Aether.
+  {
     const e = getEnergy();
-    // Case-preserving (like the corruption swap below) so the family is caught in
-    // BOTH proper-noun text AND lowercase mechanical lines — e.g. a weapon's
-    // "aetheric damage" reads as your energy adjective, not a leaked "aetheric".
-    out = out.replace(/\bAetherstone\b/g, e.material).replace(/\baetherstone\b/g, e.material.toLowerCase())
-      .replace(/\bAetheric\b/g, e.adjective).replace(/\baetheric\b/g, e.adjective.toLowerCase())
-      .replace(/\bAether\b/g, e.name).replace(/\baether\b/g, e.name.toLowerCase());
+    if (!/^aether$/i.test(e.name)) {
+      out = swap(out, /\baetherstone\b/gi, e.material);
+      out = swap(out, /\baetheric\b/gi, e.adjective);
+      out = swap(out, /\baether\b/gi, e.name);
+    }
   }
-  // engine_Dev — the affliction noun. "corruption" / "Corruption" → the re-skin's
-  // name for its plague (Phase-Sickness, Chronal Decay, …). Case-preserving so a
-  // sentence-start "Corruption" stays capitalized.
-  if (hasCorruptionNameOverride()) {
-    const c = getCorruptionName();
-    out = out.replace(/\bCorruption\b/g, c).replace(/\bcorruption\b/g, c.toLowerCase());
+  // engine_Dev — the affliction noun. "corruption" → the resolved name for the
+  // game's plague (the Blight, Phase-Sickness, Chronal Decay, …), bare form so
+  // mid-sentence mechanical lines ("+1 blight") read cleanly.
+  {
+    const c = getCorruptionName().replace(/^the\s+/i, '').trim();
+    if (c && c.toLowerCase() !== 'corruption') {
+      out = swap(out, /\bcorruption\b/gi, c);
+    }
   }
   // engine_Dev — the CATCHALL term map. The author supplies world.termMap in the
   // World-lore block: { "Reclaimers": "operatives", "Aetherstone": "the Anomaly", … }.

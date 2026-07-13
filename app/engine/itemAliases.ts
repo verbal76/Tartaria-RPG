@@ -78,9 +78,9 @@ const ALIAS_MAP: Record<string, string> = {
   'ancient mask': 'Aetheric Locket',
 
   // Coin / currency
-  'coin pouch': 'Worn Tartarian Coin',
-  'hidden pouch': 'Worn Tartarian Coin',
-  'ancient coin cache': 'Worn Tartarian Coin',
+  'coin pouch': 'Worn Temporal Credits',
+  'hidden pouch': 'Worn Temporal Credits',
+  'ancient coin cache': 'Worn Temporal Credits',
 
   // Crystals + shards
   'aether crystal': 'Aether Crystal',

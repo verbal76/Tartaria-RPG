@@ -96,12 +96,12 @@ describe('OTA-1001 — item-use nudge requires a whole-word overlap', () => {
     expect(sugg).not.toMatch(/use flame of aether/);
   });
 
-  it('a real word overlap still suggests the item ("the coin" → use worn tartarian coin)', () => {
-    const parsed = parseInput('the coin', {
-      inventory: [{ id: 'c1', name: 'Worn Tartarian Coin', kind: 'misc', quantity: 1, tags: [] }] as any,
+  it('a real word overlap still suggests the item ("the credits" → use worn temporal credits)', () => {
+    const parsed = parseInput('the credits', {
+      inventory: [{ id: 'c1', name: 'Worn Temporal Credits', kind: 'misc', quantity: 1, tags: [] }] as any,
     });
     const sugg = (parsed.suggestions ?? []).join(' | ').toLowerCase();
-    expect(sugg).toMatch(/use worn tartarian coin/);
+    expect(sugg).toMatch(/use worn temporal credits/);
   });
 });
 

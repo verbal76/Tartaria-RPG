@@ -34,7 +34,7 @@
                 "Black Cloak Agent"
               ],
               "lootTable": [
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Ancient Fragment",
                 "Tarnished Ether Necklace",
                 "Etheric Flashlight",
@@ -100,7 +100,7 @@
               ],
               "lootTable": [
                 "Bioluminescent Fungus",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Scrap Metal",
                 "Etheric Rope",
                 "Dust Compass"
@@ -169,7 +169,7 @@
                 "Bog Hound"
               ],
               "lootTable": [
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Leatherbound Tome",
                 "Bioluminescent Fungus",
                 "Glowstone Pendant",
@@ -361,7 +361,7 @@
               "lootTable": [
                 "Tartarian Pottery Shard",
                 "Tartarian Writing Tablet",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Ancient Fragment",
                 "Forgotten Scroll",
                 "Tartarian Crown Fragment"
@@ -409,7 +409,7 @@
                 "Black Cloak Agent"
               ],
               "lootTable": [
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Dust Compass",
                 "Etheric Rope",
                 "Bioluminescent Fungus",
@@ -461,7 +461,7 @@
               "possibleEncounters": [],
               "lootTable": [
                 "Tartarian Map Fragment",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Forgotten Scroll",
                 "Tartarian Navigator's Map",
                 "Dust Compass"
@@ -531,7 +531,7 @@
                 "Mud Monarch Seal",
                 "Etheric Insignia",
                 "Ancient Tools",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Etheric Battery"
               ],
               "interactables": [
@@ -803,7 +803,7 @@
               ],
               "lootTable": [
                 "Forgotten Scroll",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Ancient Fragment",
                 "Tarnished Ether Necklace",
                 "Glowstone Pendant",
@@ -902,7 +902,7 @@
                 "Tartarian Blood Dagger",
                 "Obsidian Knife",
                 "Mud Warden Amulet",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Etheric Talisman",
                 "Forgotten Scroll"
               ],
@@ -965,7 +965,7 @@
               ],
               "lootTable": [
                 "Bioluminescent Fungus",
-                "Worn Tartarian Coin",
+                "Worn Temporal Credits",
                 "Old Relic Key",
                 "Etheric Potion Vial",
                 "Ether Lamp"

@@ -319,7 +319,7 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
               { itemName: 'Aetheric Torch', price: 35 },
               { itemName: 'Aether Dust', price: 10 },
               { itemName: 'Bone Sliver', price: 6 },
-              { itemName: 'Worn Tartarian Coin', price: 4 },
+              { itemName: 'Worn Temporal Credits', price: 4 },
             ],
           },
         },

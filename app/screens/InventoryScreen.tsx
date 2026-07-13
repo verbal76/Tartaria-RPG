@@ -152,7 +152,7 @@ export function InventoryScreen() {
   // item-tap.
   const [scrapResult, setScrapResult] = useState<InventoryDelta[] | null>(null);
   // OTA-286 — quantity selector for batch scrap. Player log showed
-  // 5 Aetheric Locket + 5 Worn Tartarian Coin scrapped in rapid
+  // 5 Aetheric Locket + 5 Worn Temporal Credits scrapped in rapid
   // succession one tap at a time. Stepper lets them pick the count
   // up front; doScrap loops scrapInventoryItem that many times.
   // Reset to 1 whenever the pending item changes (different items

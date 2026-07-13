@@ -25,20 +25,19 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'rea
 import { BrandedModal } from './BrandedModal';
 import locationsData from '../data/locations/locations.json';
 import { getRaces, getFactions } from '../engine/character';
-import { resolveTable, hasTableOverride, getNarratorName } from '../engine/contentPack';
-import timelineData from '../data/events/timeline.json';
-import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
+import { resolveTable, getNarratorName } from '../engine/contentPack';
+import type { Faction, Race, Location } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
 
-type Section = 'races' | 'factions' | 'places' | 'timeline';
+type Section = 'races' | 'factions' | 'places';
 
 export function LoreCodexBody() {
-  // engine_Dev — drop the built-in-only Timeline tab once a custom game is loaded.
-  const customGame = hasTableOverride('locations') || hasTableOverride('factions');
-  const SECTIONS: Section[] = customGame
-    ? ['races', 'factions', 'places']
-    : ['races', 'factions', 'places', 'timeline'];
+  // engine_Dev — the Timeline tab is REMOVED. It was the one Codex section with
+  // no upload path: it imported the built-in timeline JSON directly, so any game
+  // that didn't override BOTH locations and factions still showed the built-in
+  // events. Races/factions/places all resolve through the content pack.
+  const SECTIONS: Section[] = ['races', 'factions', 'places'];
   const [section, setSection] = useState<Section>('races');
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
@@ -79,10 +78,6 @@ export function LoreCodexBody() {
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.tabs}>
-        {/* engine_Dev — the Timeline is the one section with no upload path yet, so
-            it still holds built-in (Tartaria) events. Hide it once a custom game is
-            loaded (locations/factions overridden) so a re-skin never shows the
-            built-in timeline. Races/factions/places are all data-driven. */}
         {SECTIONS.map((s) => (
           <TouchableOpacity
             key={s}
@@ -156,13 +151,6 @@ export function LoreCodexBody() {
             </TouchableOpacity>
           );
         })}
-        {section === 'timeline' && (timelineData as TimelineEvent[]).map((e) => (
-          <View key={`${e.year}_${e.name}`} style={styles.entry}>
-            <Text style={styles.name}>{e.year} — {e.name}</Text>
-            <Text style={styles.subtitle}>{e.location} • {e.outcome}</Text>
-            <Text style={styles.desc}>{e.summary}</Text>
-          </View>
-        ))}
       </ScrollView>
 
       <Modal
@@ -175,8 +163,8 @@ export function LoreCodexBody() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>PLAN A ROUTE</Text>
             <Text style={styles.modalBody}>
-              Set course for {pendingRoute?.name}? The Arbiter will start
-              the walk and the travel row will replace your cardinal
+              Set course for {pendingRoute?.name}? The {getNarratorName()} will
+              start the walk and the travel row will replace your cardinal
               controls until you arrive or STOP.
             </Text>
             <View style={styles.modalRow}>

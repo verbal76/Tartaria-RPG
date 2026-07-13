@@ -17230,4 +17230,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shows. Now setScreen('vendor') refuses while enemies are live (refusal logged to the feed the
 // player IS looking at, enemy card stays in view), and VendorScreen ejects to exploration if a
 // fight starts mid-trade (hook spawn, caught stealing). +2 tests (vendorCombatGuard).
-export const OTA_BUILD_ID = '2026-07-13-1077-combat-blocks-trade-screen';
+// OTA-1078 — sidekick dice + wild-water balance + lore-leak hardening (audit items 1-5).
+// SHARED (ported from Tartaria 792 / golem 772, code-specific): (1) sidekick attack + enemy
+// retaliation rolls honor the natural-1/natural-20 rule (fumble / crit with doubled base
+// swing or second damage roll — mirrors the dog-bite treatment; golemCompanion tests pin the
+// dice since guaranteed-hit setups went flaky). (2) Wild water reined in: ONE bare-handed
+// drink per location visit, +1 to the affliction meter (noun resolves through the content
+// pack), narrator warns after the sip; ONE bottle refill per visit and the bottle's built-in
+// filter cleanses it, so bottled water stays clean and unlimited.
+// ENGINE-ONLY (2026-07-13 Tartaria-leakage audit, all five items): (a) "Worn Tartarian Coin"
+// → "Worn Temporal Credits" everywhere (the investigation shelf/altar yields were REACHABLE
+// in custom-pack games; description de-loreified; tests updated). (b) Codex Timeline tab
+// REMOVED — the one Codex section with no upload path, importing built-in timeline events
+// directly (also: the route-confirm modal's hardcoded "The Arbiter" → getNarratorName()).
+// (c) dressBuiltInLeaks un-gated + case-agnostic: swaps now run on the RESOLVED names
+// (author → generic pack → built-in default, no-op in pure built-in test mode) and catch
+// lowercased feed lines that slipped the old capitalized-only patterns; the energy family
+// (Aether/Aetheric/Aetherstone) also resolves to neutral words on any generic-pack boot
+// instead of only under an explicit reskin. (d) Hunt biome labels resolve from the live
+// locations JSON (row id or biomeTags match lends the authored name; unmatched tags
+// title-case neutrally) — the hardcoded BIOME_LABELS map with Tartaria names is gone.
+// (e) The hardcoded 'tartarian_outskirts' fallback location id is replaced by
+// defaultLocationId() — the FIRST ROW of the live locations table (a structural point in
+// whatever JSON the game runs on, never flavor); contract-marker biome anchors are now
+// validated against the live catalog before use.
+export const OTA_BUILD_ID = '2026-07-13-1078-companion-dice-water-lore-leaks';

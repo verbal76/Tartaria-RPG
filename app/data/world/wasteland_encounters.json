@@ -18,7 +18,7 @@
       { "name": "Trail Rations", "weight": 40, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
       { "name": "Scrap Metal", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
       { "name": "Patched Cloth", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["cloth"] },
-      { "name": "Worn Tartarian Coin", "weight": 10, "min": 1, "max": 3, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 10, "min": 1, "max": 3, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Smoke-Cured Jerky Strip", "weight": 12, "min": 1, "max": 2, "kind": "consumable", "tags": ["food","treat","dog_treat"] }
     ],
     "lore_note": "A note tucked under the bench reads: 'East three days, the Pillars. We didn't make it.'"
@@ -30,7 +30,7 @@
     "matchers": ["mud", "outskirts", "ruin", "buried", "etheric_anomaly"],
     "narration": "A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.",
     "loot": [
-      { "name": "Worn Tartarian Coin", "weight": 25, "min": 2, "max": 5, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 25, "min": 2, "max": 5, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Spider Silk", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["fiber"] },
       { "name": "Aether Dust", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] },
@@ -106,7 +106,7 @@
     "loot": [
       { "name": "Trail Rations", "weight": 30, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
       { "name": "Scrap Metal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
-      { "name": "Worn Tartarian Coin", "weight": 25, "min": 3, "max": 8, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 25, "min": 3, "max": 8, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Honey-Glazed Knuckle", "weight": 6, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat","baker"] }
     ],
@@ -147,7 +147,7 @@
     "narration": "A church steeple breaks the mud at a sideways angle — the rest of the building swallowed whole. The steeple's broken door yawns open and lets you down into what used to be the choir balcony. Inside the air is dry, dimmer than outside, and the pews below the mudline are still arranged for a service that never ended. A pre-flood reliquary lies overturned on the altar. You pick through what the flood spared.",
     "loot": [
       { "name": "Aetheric Locket", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
-      { "name": "Worn Tartarian Coin", "weight": 35, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 35, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "First Aid Kit", "weight": 20, "min": 1, "max": 1, "kind": "consumable", "tags": ["medical"] },
       { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] }
     ],
@@ -161,7 +161,7 @@
     "narration": "A natural cave mouth, low, half-curtained by a tarp pulled aside. Inside: a cold cookfire, three bedrolls, a strongbox kicked open in haste. Someone left in a hurry — but someone else is on their way back, and you can hear footsteps in the throat of the cave behind you.",
     "loot": [
       { "name": "Throwing Knife", "weight": 30, "min": 2, "max": 4, "kind": "misc", "tags": ["weapon","throwable"] },
-      { "name": "Worn Tartarian Coin", "weight": 30, "min": 6, "max": 14, "kind": "misc", "tags": ["currency"] },
+      { "name": "Worn Temporal Credits", "weight": 30, "min": 6, "max": 14, "kind": "misc", "tags": ["currency"] },
       { "name": "Rusted Blade", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["weapon","melee"] },
       { "name": "Trail Rations", "weight": 15, "min": 1, "max": 3, "kind": "consumable", "tags": ["food"] }
     ],
@@ -191,7 +191,7 @@
     "matchers": ["mud", "outskirts", "ruin", "borderlands"],
     "narration": "A grey stone, no carving, no name. You almost walk past it. The mud at its base has been disturbed recently in a pattern too regular for weather. Underneath: a flat tin box. Inside the box: a coded note, a small purse, an obsidian token cut to the shape of an open eye. You have just walked into one end of a Mud Monarch dead-drop.",
     "loot": [
-      { "name": "Worn Tartarian Coin", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency"] },
+      { "name": "Worn Temporal Credits", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency"] },
       { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] },
       { "name": "Obsidian Eye Token", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["faction","mud_monarchs","token"] }
@@ -207,7 +207,7 @@
     "narration": "A reading room — small, panelled in waterlogged wood, the shelves bowing under the weight of books the mud forgot to destroy. A single oil lantern, dry, still has fuel. You touch a book on the nearest shelf and the binding holds. The titles are in old Tartarian; the most recent stamp on every cover is older than every kingdom on every honest map.",
     "loot": [
       { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
-      { "name": "Worn Tartarian Coin", "weight": 25, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 25, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aetheric Locket", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
       { "name": "Aetheric Compass", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
       { "name": "Aether Dust", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] }
@@ -223,7 +223,7 @@
     "narration": "A line of three wagons, their axles buried, their canvas tops cracked open by the mud. The horses are gone — pulled free in a panic or eaten in one. The wagons themselves are intact. Whoever drove them packed for a long trip and made it nowhere.",
     "loot": [
       { "name": "Trail Rations", "weight": 30, "min": 2, "max": 5, "kind": "consumable", "tags": ["food"] },
-      { "name": "Worn Tartarian Coin", "weight": 25, "min": 5, "max": 12, "kind": "misc", "tags": ["currency"] },
+      { "name": "Worn Temporal Credits", "weight": 25, "min": 5, "max": 12, "kind": "misc", "tags": ["currency"] },
       { "name": "Climbing Rope", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
       { "name": "Aetheric Torch", "weight": 4, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
       { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] }
@@ -320,7 +320,7 @@
     "matchers": ["mud", "open", "buried"],
     "narration": "The plain in front of you folds, very slightly, the way fabric folds when something is laid on it from the other side. For a long blink the city of Asgardar stands in front of you — the capital at its height, lanterns burning at every level of every tower, traffic in the streets, breath in the air. You step forward; the fold lets go. The city is not there. What it left at your feet is real.",
     "loot": [
-      { "name": "Worn Tartarian Coin", "weight": 35, "min": 8, "max": 15, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 35, "min": 8, "max": 15, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
       { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Aetheric Shard", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] }
@@ -367,7 +367,7 @@
       { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Obsidian Shard", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["obsidian","crystal"] },
       { "name": "Automaton Circuit", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["automaton","circuit","tech"] },
-      { "name": "Worn Tartarian Coin", "weight": 10, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] }
+      { "name": "Worn Temporal Credits", "weight": 10, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] }
     ],
     "bandit_pool": ["Scrap Drone"],
     "lore_note": "A logbook on the central desk records, in careful hand: 'Day 1,847 since the surface stopped answering. The sky charts still match. We have stopped checking.'",
@@ -396,7 +396,7 @@
     "matchers": ["mud", "buried", "ruin"],
     "narration": "A spur of one of Zharak's Teeth bends low enough to enter at the waterline. Inside: a grotto carved by mud and patience. A True Tartarian shrine occupies the back wall — three standing stones, an iron bowl, an offering of coins that no living hand has touched in centuries. Silt Serpents nest in the warm hollows under the shrine. They do not share.",
     "loot": [
-      { "name": "Worn Tartarian Coin", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
       { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Mud Fragment", "weight": 20, "min": 2, "max": 4, "kind": "misc", "tags": ["mud","glass"] }
@@ -430,7 +430,7 @@
       { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Void Ether Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard","void"] },
       { "name": "Aetheric Compass", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
-      { "name": "Worn Tartarian Coin", "weight": 20, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 20, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aether Dust", "weight": 10, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] }
     ],
     "bandit_pool": ["Aetheric Slug"],
@@ -463,7 +463,7 @@
     "matchers": ["buried", "ruin", "etheric_anomaly"],
     "narration": "The seal over Drakova thins here. You walk into a Lost Capital plaza the mud has not been allowed to enter. The crowd that was crossing it the day the flood came is still crossing — gestures held mid-stride, a cart in the act of turning, a child paused on the lip of a fountain. They are not aware of you. The air around them does not move.",
     "loot": [
-      { "name": "Worn Tartarian Coin", "weight": 30, "min": 12, "max": 22, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 30, "min": 12, "max": 22, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
       { "name": "Aether Crystal", "weight": 20, "min": 2, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Aetheric Compass", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
@@ -483,7 +483,7 @@
       { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Aetheric Shard", "weight": 25, "min": 2, "max": 3, "kind": "misc", "tags": ["aether","shard"] },
       { "name": "Automaton Circuit", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["automaton","circuit","tech"] },
-      { "name": "Worn Tartarian Coin", "weight": 15, "min": 10, "max": 18, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 15, "min": 10, "max": 18, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Architect's Key Fragment", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["key","architect","fragment","rare"] }
     ],
     "bandit_pool": ["Scrap Drone"],
@@ -530,7 +530,7 @@
     "narration": "Below the Nimari cathedral steeple, the crypt level still holds. You drop through a broken floor pane and land on a stone walkway that the mud has not yet reached. Sarcophagi line both walls. One at the far end is open, the lid leaned against the wall as if whoever was inside walked out. The air smells of old incense and warm copper.",
     "loot": [
       { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
-      { "name": "Worn Tartarian Coin", "weight": 30, "min": 8, "max": 16, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 30, "min": 8, "max": 16, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Phoenix Feather Quill", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","quill","rare"] },
       { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "First Aid Kit", "weight": 10, "min": 1, "max": 1, "kind": "consumable", "tags": ["medical"] }
@@ -545,7 +545,7 @@
     "matchers": ["outskirts", "open", "ruin"],
     "narration": "A pre-flood postal way-station, the kind the Empire put at every crossroads to receive letters and rotate couriers. The hitching posts are still here. So are the letters — five canvas sacks of undelivered mail, sealed and stacked behind the counter the day the flood came. The seals are still intact. The names on the envelopes are still legible.",
     "loot": [
-      { "name": "Worn Tartarian Coin", "weight": 35, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 35, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Trail Rations", "weight": 20, "min": 1, "max": 3, "kind": "consumable", "tags": ["food"] },
       { "name": "Tartarian Map Fragment", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["ancient","map","fragment"] },
       { "name": "Aether Dust", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] },
@@ -591,7 +591,7 @@
     "narration": "A noble's mausoleum, sealed before the flood and intact under the silt. The seal yields to a careful hand. Inside: a single sarcophagus, draped, the cloth still bright. Offerings around the base — a cup, a folded letter, a child's wooden horse. Whoever was loved in here was loved by people who had time to plan the leaving.",
     "loot": [
       { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["amulet","relic"] },
-      { "name": "Worn Tartarian Coin", "weight": 30, "min": 12, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Worn Temporal Credits", "weight": 30, "min": 12, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
       { "name": "Phoenix Feather Quill", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","quill","rare"] },
       { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
       { "name": "Noble's Signet Ring", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["ring","relic","tartarian"] }

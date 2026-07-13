@@ -174,7 +174,7 @@ describe('OTA-048 — engagement engines smoke test', () => {
       // actual OTA-043 trinket emits, not collisions on item name.
       const trinketFired = log.some((e) =>
         e.channel === 'reward'
-        && /^✦ (Worn Tartarian Coin|Aether Dust|Bent Nail|Cloth Scrap|Aether Residue)(?: x\d+)? \(Common\)\.$/.test(e.text),
+        && /^✦ (Worn Temporal Credits|Aether Dust|Bent Nail|Cloth Scrap|Aether Residue)(?: x\d+)? \(Common\)\.$/.test(e.text),
       );
       // The order of operations in stepDirection: encounter rolls
       // FIRST, then the trinket gate. Trinket should always skip when

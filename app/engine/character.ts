@@ -471,6 +471,16 @@ export const FACTION_STARTING_LOCATION: Record<string, string> = {
   tartarian_revivalists: 'revivalist_field_camp',
 };
 
+/** engine_Dev — the engine's structural fallback location: the FIRST row of the
+ *  live locations table (author pack → generic pack → built-in JSON). Use this
+ *  wherever code needs "some valid location" and nothing better is known —
+ *  never a hardcoded setting id. Pulls a fixed POINT in whatever locations
+ *  JSON the game runs on, not flavor. */
+export function defaultLocationId(): string {
+  const locs = resolveTable<{ id?: string }>('locations', locationsData as { id?: string }[]);
+  return locs.find((l) => !!l.id)?.id ?? 'origin';
+}
+
 export function startingLocationForFaction(factionId: string): string {
   // engine_Dev — resolve to a REAL location in the live (possibly uploaded) world.
   const locs = resolveTable<{ id?: string }>('locations', locationsData as { id?: string }[]);
@@ -488,7 +498,7 @@ export function startingLocationForFaction(factionId: string): string {
   //    declared a base still spawns at a REAL place in ITS world instead of the
   //    missing Tartaria fallback (which silently bounced to locations[0] and left
   //    currentLocationId pointing at a non-existent tile).
-  return locs[0]?.id ?? 'tartarian_outskirts';
+  return locs[0]?.id ?? defaultLocationId();
 }
 
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {

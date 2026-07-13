@@ -134,7 +134,7 @@
         "demeanor": "honest",
         "offers": [
           {
-            "itemName": "Worn Tartarian Coin",
+            "itemName": "Worn Temporal Credits",
             "priceMin": 1,
             "priceMax": 2
           },
@@ -267,7 +267,7 @@
             "priceMax": 38
           },
           {
-            "itemName": "Worn Tartarian Coin",
+            "itemName": "Worn Temporal Credits",
             "priceMin": 1,
             "priceMax": 2
           },

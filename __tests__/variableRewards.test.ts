@@ -51,7 +51,7 @@ jest.mock('expo-updates', () => ({}));
 import { useGameStore } from '../app/state/gameStore';
 
 const TRINKET_NAMES = new Set([
-  'Worn Tartarian Coin',
+  'Worn Temporal Credits',
   'Aether Dust',
   'Bent Nail',
   'Cloth Scrap',

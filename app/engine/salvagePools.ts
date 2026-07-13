@@ -19,7 +19,7 @@ import { resolveTable, hasTableOverride, getWastelandOverride, getCustomBosses, 
 // historically mixed in gear (Aetheric Locket/Torch, Throwing Knife, Rusted
 // Blade, Climbing Rope), food (Trail Rations), and clues (Map Fragment, Sealed
 // Letter). We now filter every pool roll down to names that are TRUE materials
-// (present in materials.json — which includes Worn Tartarian Coin, a fine
+// (present in materials.json — which includes Worn Temporal Credits, a fine
 // salvage byproduct). Weight redistributes naturally among the survivors; if a
 // pool has no material entries we fall back to the all-material JUNK_POOL.
 // engine_Dev — built-in default materials, normalized to a name array. The

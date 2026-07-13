@@ -168,7 +168,7 @@ const TEMPLATES: Record<NounCategory, Template> = {
   shelf: {
     category: 'shelf',
     fallbackLore: 'Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.',
-    yield: { itemName: 'Worn Tartarian Coin', qty: 1, chance: 0.25 },
+    yield: { itemName: 'Worn Temporal Credits', qty: 1, chance: 0.25 },
     hookKind: null,
   },
   machinery: {
@@ -215,7 +215,7 @@ const TEMPLATES: Record<NounCategory, Template> = {
   altar: {
     category: 'altar',
     fallbackLore: 'A residue of old offerings still rings the surface — wax, ash, a single bent coin no one came back for.',
-    yield: { itemName: 'Worn Tartarian Coin', qty: 1, chance: 0.18 },
+    yield: { itemName: 'Worn Temporal Credits', qty: 1, chance: 0.18 },
     hookKind: null,
   },
   vegetation: {

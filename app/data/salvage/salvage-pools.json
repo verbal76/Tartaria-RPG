@@ -95,7 +95,7 @@
           "max": 1
         },
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 20,
           "min": 3,
@@ -277,7 +277,7 @@
           "max": 2
         },
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 20,
           "min": 5,
@@ -349,7 +349,7 @@
       ],
       "items": [
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 35,
           "min": 3,
@@ -396,7 +396,7 @@
       ],
       "items": [
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 30,
           "min": 2,
@@ -463,7 +463,7 @@
           "max": 1
         },
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 15,
           "min": 2,
@@ -503,7 +503,7 @@
       ],
       "items": [
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 30,
           "min": 2,
@@ -568,7 +568,7 @@
       ],
       "items": [
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 30,
           "min": 3,
@@ -637,7 +637,7 @@
           "max": 1
         },
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 15,
           "min": 1,
@@ -693,7 +693,7 @@
           "max": 2
         },
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 15,
           "min": 1,
@@ -802,7 +802,7 @@
           "max": 2
         },
         {
-          "name": "Worn Tartarian Coin",
+          "name": "Worn Temporal Credits",
           "rarity": "Common",
           "weight": 10,
           "min": 1,

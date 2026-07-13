@@ -73,7 +73,7 @@ import {
 import { trimSaveStateToFit, saveSizeBreakdown, pruneRegenerableRoomTables, SAFE_BLOB_CHARS } from '../engine/saveTrim';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { sanitizePlayerName } from '../engine/playerName';
-import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName, getNarratorPersona, getWorldTone, getWorldSetting } from '../engine/contentPack';
+import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, getCorruptionName, dressNarratorArticles, dressBuiltInLeaks, fillContentPlaceholders, getCrucibleName, isCrucibleEnabled, isWeatherEnabled, isVendorsEnabled, resolveTable, resolveFlavor, isReskinActive, getWorldName, getEnergyMaterial, getEnergyName, getNarratorPersona, getWorldTone, getWorldSetting } from '../engine/contentPack';
 import { sentenceNamesOffCanonEntity, buildEntityAllowList } from '../engine/entityGuard';
 import { loadLoreConceptBank } from '../engine/loreConceptBank';
 import { useContentPackStore } from './contentPackStore';
@@ -81,7 +81,7 @@ import { stripForeignWords } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
-import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
+import { createCharacter, getRaces, getFactions, defaultLocationId, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
@@ -647,6 +647,15 @@ interface CurrentScene {
    *  player can't sit on a tile spamming `investigate` to mint free trivial
    *  enemies for stat-training + loot. Resets with the scene (leave + return). */
   investigateAmbushUsed?: boolean;
+  /** Set once the player has cupped a bare-handed drink from a scene water
+   *  source this visit. One wild drink per location visit — the playtest-log
+   *  floodwater loop (+3 stamina per 5 min, forever) out-recovered sleeping
+   *  36:1. Resets with the scene (leave + return). */
+  barehandDrinkUsed?: boolean;
+  /** Set once the player has refilled a water bottle from this location's
+   *  water source this visit. One refill per visit, same rationale as
+   *  barehandDrinkUsed. Resets with the scene (leave + return). */
+  bottleRefillUsed?: boolean;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -1873,8 +1882,8 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // canonical start so a corrupted save still loads to a sensible
   // tile.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { startingLocationForFaction: stf, rollRaceStealth: rrs } = require('../engine/character');
-  const safeLocationId = p.currentLocationId || stf(p.factionId) || 'tartarian_outskirts';
+  const { startingLocationForFaction: stf, rollRaceStealth: rrs, defaultLocationId: dli } = require('../engine/character');
+  const safeLocationId = p.currentLocationId || stf(p.factionId) || dli();
   // OTA-348 — legacy saves predate the Stealth attribute. Backfill it once with
   // a race-proportional roll (Giants 0, constructs low, Mud Dwellers/Reclaimers
   // high) so existing characters get a sensible Stealth instead of undefined.
@@ -12025,6 +12034,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
+        // One refill per location visit — same anti-loop bound as the
+        // bare-handed drink. Resets when the scene does (leave + return).
+        if (currentScene.bottleRefillUsed) {
+          get().appendLog(
+            'arbiter',
+            `The ${getNarratorName()} nods at the ${sourceNoun}. "You've already topped up here. The filter needs time between draws — fill again at the next stop."`,
+          );
+          break;
+        }
         // Swap empty → full.
         set((s) => {
           if (!s.player) return s;
@@ -12049,7 +12067,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           return { player: { ...s.player, inventory: newInventory } };
         });
-        get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. (✦ Water Bottle, ✗ Empty Water Bottle)`);
+        set((s) => s.currentScene
+          ? { currentScene: { ...s.currentScene, bottleRefillUsed: true } }
+          : s);
+        get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. The filter seam in its neck pulls the murk out — bottled water drinks clean. (✦ Water Bottle, ✗ Empty Water Bottle)`);
         break;
       }
       case 'drink': {
@@ -12091,9 +12112,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ?? (sceneNouns.find((sn) => sn.includes('water')));
         const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
         if (drinkSource && wantsWater) {
+          // One cupped-hands drink per location visit. Wild water used to be an
+          // infinite free stamina tap (+3 per 5 min vs sleep's +1/hour — a
+          // playtest log showed the loop in action). Bottled water (below, via
+          // the consumable path) stays unlimited because filling the bottle
+          // filters it.
+          if (currentScene.barehandDrinkUsed) {
+            get().appendLog(
+              'arbiter',
+              `The ${getNarratorName()} shakes their head. "You've drunk your fill from the ${drinkSource}. Bottle some if you want more for the road."`,
+            );
+            break;
+          }
           const effMax = effectiveStaminaMax(player);
           const stamGained = Math.min(3, effMax - player.stamina);
-          set({ player: advanceTime(restoreStamina(player, 3), 0.083) }); // 5 min
+          // Untreated wild water carries a trace of what's settled in it:
+          // +1 to the affliction meter per drink (noun resolves through the
+          // content pack — never a hardcoded lore term). Filling a bottle
+          // first cleanses it (the bottle's built-in filter), so bottled
+          // water stays clean.
+          const afflictionNoun = getCorruptionName().replace(/^the\s+/i, '').toLowerCase();
+          const prevCorr = player.corruption;
+          const newCorr = Math.min(100, prevCorr + 1);
+          set({
+            player: {
+              ...advanceTime(restoreStamina(player, 3), 0.083), // 5 min
+              corruption: newCorr,
+            },
+          });
+          set((s) => s.currentScene
+            ? { currentScene: { ...s.currentScene, barehandDrinkUsed: true } }
+            : s);
           // A 0-gain drink has two very different causes: you're genuinely full, OR
           // hunger has capped your effective max below your real max (water can't lift
           // that — only food does). Spell out the hunger case so it never reads as broken.
@@ -12101,11 +12150,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog(
             'world',
             stamGained > 0
-              ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
+              ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, +1 ${afflictionNoun}, 5 min)`
               : hungerCapped
-                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (5 min)`
-                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
+                ? `You cup the ${drinkSource} in your hands and drink, but hunger has capped your wind — water won't lift it. Eat a ration to recover the rest. (+1 ${afflictionNoun}, 5 min)`
+                : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (+1 ${afflictionNoun}, 5 min)`,
           );
+          // The warning lands AFTER the drink (player ruling) — the first sip
+          // teaches the rule, the bottle is the clean alternative.
+          get().appendLog(
+            'arbiter',
+            `The ${getNarratorName()} watches you wipe your mouth. "Raw ${drinkSource} carries what the ground put in it. Fill a bottle next time — the filter takes the taint out."`,
+          );
+          {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+            const crossLine = tierCrossLine(corruptionTierOf(prevCorr), corruptionTierOf(newCorr));
+            if (crossLine) get().appendLog('reward', crossLine);
+          }
           // OTA-619 — a combat sip is a FAST action now (player ruling): drinking
           // from a water source mid-fight no longer draws a free enemy swing,
           // matching the consumable-heal change above.
@@ -20750,7 +20811,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const floorPool = [
         // engine_Dev — neutral coin name for non-Tartaria packs ('Worn Tartarian
         // Coin' leaked into any pack's hub-floor dig).
-        { name: isReskinActive() ? 'Old Coin' : 'Worn Tartarian Coin', kind: 'misc' as const, qty: 1 },
+        { name: isReskinActive() ? 'Old Coin' : 'Worn Temporal Credits', kind: 'misc' as const, qty: 1 },
         { name: 'Cloth Scrap',          kind: 'misc' as const, qty: 1 },
         { name: 'Bent Nail',            kind: 'misc' as const, qty: 1 },
         { name: 'Small Rock',           kind: 'misc' as const, qty: 1 },
@@ -23624,7 +23685,7 @@ function applyHookEffect(
       const candidates = (enemiesData as Enemy[]).filter((e) => e.type === tag);
       const spawn = candidates.length > 0
         ? candidates[Math.floor(Math.random() * candidates.length)]!
-        : pickEnemyForLocation(get().currentScene?.location ?? getLocationById('tartarian_outskirts'));
+        : pickEnemyForLocation(get().currentScene?.location ?? getLocationById(defaultLocationId()));
       if (!spawn) return { inlineSummary: null, fatal: false };
       set((s) =>
         s.currentScene
@@ -26701,7 +26762,7 @@ function pickFragmentSalvageLine(noun: string): string {
 // Weighted toward coins + dust + Aetheric trace; no tier rolls. Bare
 // catalog names match the materials catalog already used elsewhere.
 const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common' | 'Uncommon'; qtyMin: number; qtyMax: number; line: string }> = [
-  { name: 'Worn Tartarian Coin', rarity: 'Common', qtyMin: 1, qtyMax: 3, line: `A coin tumbles loose from the {noun}, mud-stuck and warm. You pocket it.` },
+  { name: 'Worn Temporal Credits', rarity: 'Common', qtyMin: 1, qtyMax: 3, line: `A coin tumbles loose from the {noun}, mud-stuck and warm. You pocket it.` },
   { name: 'Aether Dust',         rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `Fine grey-blue dust sifts off the {noun} when you handle it. You catch what you can.` },
   { name: 'Bent Nail',           rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A bent nail works free of the {noun}. Salvageable, barely.` },
   { name: 'Cloth Scrap',         rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A scrap of cloth, wedged into the {noun} long ago. You free it.` },
@@ -28088,10 +28149,15 @@ function handleSidekickCommand(
   const atkRoll = rollDie(20);
   const golemAtkBonus = golem.hitBonus + golemPower;
   const atkTotal = atkRoll + golemAtkBonus;
-  const hit = atkTotal >= enemyAc;
+  // Natural 1 / natural 20 rule — sidekicks follow the same dice as the
+  // player and the dog's bite: a nat-1 always misses regardless of bonuses,
+  // a nat-20 always hits and doubles the damage below.
+  const golemNat20 = atkRoll === 20;
+  const golemNat1 = atkRoll === 1;
+  const hit = golemNat20 || (!golemNat1 && atkTotal >= enemyAc);
   get().appendLog(
     'combat',
-    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golemAtkBonus ? ` + ${golemAtkBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golemAtkBonus ? ` + ${golemAtkBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? (golemNat20 ? '✓ NAT 20' : '✓ HIT') : '✗ MISS'}`,
   );
 
   if (hit) {
@@ -28115,6 +28181,9 @@ function handleSidekickCommand(
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
     dmg += golem.attackMod + Math.floor(golemPower / 2);
+    // Nat-20 doubles the base swing (dice + mods) before type modifiers —
+    // same treatment as the dog's bite.
+    if (golemNat20) dmg *= 2;
     // Combat-Parity (companion) — honor the enemy's resist/weakness + creature-trait
     // multipliers for the golem's INNATE damage type. Restored from golem-line: the
     // engine_Dev refactor dropped it, so the base swing punched FLAT damage that
@@ -28227,7 +28296,12 @@ function handleSidekickCommand(
   const enemyAtkRoll = rollDie(20);
   const enemyAtkBonus = parseEnemyAP(target);
   const golemAc = 11; // simple flat AC for golems
-  const enemyHit = (enemyAtkRoll + enemyAtkBonus) >= golemAc;
+  // Natural 1 / natural 20 rule — same floor/ceiling as every other roll:
+  // enemy nat-1 fumbles past the sidekick, nat-20 always connects and rolls
+  // damage twice (mirrors the enemy-vs-dog crit treatment).
+  const enemyNat20 = enemyAtkRoll === 20;
+  const enemyNat1 = enemyAtkRoll === 1;
+  const enemyHit = enemyNat1 ? false : enemyNat20 || (enemyAtkRoll + enemyAtkBonus) >= golemAc;
   if (enemyHit) {
     // OTA-433 — roll the enemy's REAL damage notation against the golem, the
     // same `enemy.damage` the player takes (gameStore ~21327), instead of a flat
@@ -28239,12 +28313,13 @@ function handleSidekickCommand(
     // arb170 — % damage resistance (innate by kind + trained resilience), capped,
     // applied to the enemy's REAL damage roll. Min 1 always lands (never immune).
     const resist: number = sidekickDamageResist(workingGolem);
-    const rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
+    let rawDmg = rollFromNotation(String(target.damage)) || (rollDie(6) + 1);
+    if (enemyNat20) rawDmg += rollFromNotation(String(target.damage)) || rollDie(6);
     const enemyDmg = Math.max(1, Math.round(rawDmg * (1 - resist)));
     const newGolemHp = Math.max(0, workingGolem.hp - enemyDmg);
     get().appendLog(
       'combat',
-      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}${resist > 0 ? ` (${Math.round(resist * 100)}% resisted)` : ''}. (${newGolemHp}/${golem.hpMax})`,
+      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus}${enemyNat20 ? ' (NAT 20)' : ''} hits ${golem.name} for ${enemyDmg}${resist > 0 ? ` (${Math.round(resist * 100)}% resisted)` : ''}. (${newGolemHp}/${golem.hpMax})`,
     );
     if (newGolemHp <= 0) {
       get().appendLog(
@@ -29122,7 +29197,7 @@ function normalizeDogLeadingVerb(input: string): string {
 // crate / strongbox / …) use their own richer pools via classifyContainer.
 const GENERIC_PRY_POOL: ContainerLootEntry[] = [
   { name: 'Scrap Metal', weight: 5, min: 1, max: 2, tags: ['scrap', 'metal'], kind: 'misc' },
-  { name: 'Worn Tartarian Coin', weight: 3, min: 1, max: 3, tags: ['currency'], kind: 'misc' },
+  { name: 'Worn Temporal Credits', weight: 3, min: 1, max: 3, tags: ['currency'], kind: 'misc' },
   // arb94 — was 'Tartarian Pottery Shard' (not in materials.json → fell to
   // inferGear with a generic description). 'Aether Residue' is a real
   // materials.json row, so it resolves cleanly with its authored stats.
