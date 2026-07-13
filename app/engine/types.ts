@@ -816,7 +816,11 @@ export type StatusEffectKind =
   // OTA-120 — dog distract success applies this to one enemy for
   // the player's NEXT action. The next attack hit roll, dodge
   // parry, or flee from THAT enemy gets +2. Consumed when applied.
-  | 'distracted';
+  | 'distracted'
+  // OTA-795 — successful dodge payoff: the player's NEXT attack deals double
+  // damage dice (buildCombatSteps peeks it; rollMods consumes it on the swing,
+  // hit or miss — the window closes either way).
+  | 'perfect_opening';
 
 export interface StatusEffect {
   kind: StatusEffectKind;

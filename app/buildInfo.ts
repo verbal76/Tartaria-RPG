@@ -15664,4 +15664,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Hidden Market now loads exactly where it saved; the market auto-enter is unconditional
 // again; the _freshMarketEntry784 / _skipMarketAutoEnterOnce player flags are gone (old
 // saves may still carry the keys — ignored).
-export const OTA_BUILD_ID = '2026-07-13-774-remove-fresh-market-repair';
+// OTA-775 — DODGE reworked into an AC-bypass gamble; dog DISTRACT gets a scaled DC and a
+// failure cost (user design call, replaces the landed-hit-only parry + instant riposte).
+// DODGE: while the stance is up, the enemy's swing resolves as an OPPOSED CONTEST (d20+DEX
+// vs its attack total) instead of vs your AC. Win → take nothing + PERFECT OPENING: your
+// next attack rolls double damage dice (consumed by that swing, hit or miss — crit stacks
+// to 4× dice); lose → you dodged INTO it: the blow lands regardless of AC for 2× damage.
+// Enemy fumble = free opening; nat-20/nat-1 auto-win/lose the contest; DEX (+stealth-gear
+// stealth) training kept; the boxing exception + 2-durability stance cost retired. This
+// finally makes dodge live at high AC — an untouchable tank now gambles that immunity for
+// a 2× window. DISTRACT: DC is 8 + the target's ability points (was flat 12 — a trained
+// dog auto-passed); a FAILED feint redirects that enemy's counter onto the DOG instead of
+// the player. Action-reference help text updated. (defensiveTurnAdvances' 3 failures are
+// the long-standing pre-existing wording drift, verified identical before this change.)
+export const OTA_BUILD_ID = '2026-07-13-775-dodge-gamble-distract-teeth';

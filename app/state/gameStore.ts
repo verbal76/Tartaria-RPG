@@ -10987,7 +10987,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // through this single dodge intent now.
         const alreadyDodging = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
         if (alreadyDodging) {
-          get().appendLog('world', `You're already poised to parry — no need to spend another beat on it.`);
+          get().appendLog('world', `You're already committed to the dodge — no need to spend another beat on it.`);
           break;
         }
         const dodging: StatusEffect = {
@@ -11008,11 +11008,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             : s,
         );
+        // OTA-795 — the stance line spells out the new stakes: dodge is an
+        // AC-bypass gamble (win → next strike ×2 dice; lose → the blow lands
+        // regardless of armor for 2× damage).
         get().appendLog(
           'world',
           currentScene.enemies.length > 0
-            ? `You set your stance. The next ${activeEnemy(currentScene)?.name ?? 'attacker'} swing — you intend to turn into your own.`
-            : `You shift into a parry-ready stance. Nothing tests it.`,
+            ? `You commit to the dodge. Slip ${activeEnemy(currentScene)?.name ?? 'the attacker'}'s swing and your next strike lands double — read it wrong and the blow finds you past any armor, twice as hard.`
+            : `You shift into a dodge-ready stance. Nothing tests it.`,
         );
         if (currentScene.enemies.length > 0) {
           runEnemyGroupCounters(get, set, get().player ?? player);
@@ -24991,6 +24994,9 @@ export function runEnemyGroupCounters(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   fallbackPlayer: PlayerCharacter,
+  // OTA-795 — a failed dog distract redirects THAT enemy's counter onto the
+  // dog (it rounds on the feint) instead of rolling the usual soak chance.
+  opts?: { forceDogEnemyIdx?: number },
 ): void {
   const scene = get().currentScene;
   if (!scene || scene.enemies.length === 0) return;
@@ -25023,7 +25029,10 @@ export function runEnemyGroupCounters(
     // soaks. Fires on every volley regardless of the player's action, so it
     // can't be gamed by commanding the dog (the arb169 exploit stays closed).
     const dogNow = livePlayer.dog;
-    if (dogNow && dogNow.status === 'with_player' && dogNow.hp > 0 && Math.random() < DOG_TARGET_CHANCE) {
+    const dogUp = !!dogNow && dogNow.status === 'with_player' && dogNow.hp > 0;
+    // OTA-795 — failed-distract redirect wins over the random soak roll.
+    const forcedOnDog = dogUp && opts?.forceDogEnemyIdx === liveIdx;
+    if (dogUp && (forcedOnDog || Math.random() < DOG_TARGET_CHANCE)) {
       applyEnemyCounterToDog(enemy, get, set);
       continue;
     }
@@ -25246,12 +25255,54 @@ function applyEnemyCounter(
   // forces a hit AND doubles the damage roll below.
   const enemyCrit = atkRoll === 20;
   const enemyFumble = atkRoll === 1;
-  const hit = enemyFumble ? false : enemyCrit ? true : atkTotal >= effectiveAc;
-  const outcomeTag = enemyCrit
-    ? '✓ CRITICAL HIT'
-    : enemyFumble
-      ? '✗ FUMBLE'
-      : hit ? '✓ HIT' : '✗ MISS';
+  // OTA-795 — DODGE is an AC-BYPASS GAMBLE (player design call; replaces the
+  // old landed-hit-only parry + instant no-roll riposte, incl. the OTA-260
+  // boxing exception and the 2-durability stance cost). While the stance is
+  // up, this swing resolves as an OPPOSED CONTEST — d20 + DEX vs the enemy's
+  // attack total — instead of vs your AC:
+  //   • WIN  → you take nothing (even a swing that beats your AC) and gain a
+  //     PERFECT OPENING: your next attack deals double damage dice; the
+  //     window is consumed by that swing, hit or miss (see combatRules).
+  //   • LOSE → you dodged INTO it: the blow lands regardless of AC and deals
+  //     2× rolled damage (out of position).
+  // The stance is spent either way. An enemy FUMBLE is a free win (it
+  // overcommits past you); nat-20 auto-wins / nat-1 auto-loses the contest.
+  const dodgingActive = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
+  let dodgeWin: boolean | null = null;
+  let dodgeLine: string | null = null;
+  if (dodgingActive) {
+    const dexStats = effectiveStats(player);
+    if (enemyFumble) {
+      dodgeWin = true;
+      dodgeLine = `Dodge — ${enemy.name} overcommits past you. ✓ Free opening (next strike ×2 dice).`;
+    } else {
+      const dRoll = rollDie(20);
+      const dTotal = dRoll + dexStats.dexterity;
+      dodgeWin = dRoll === 20 ? true : dRoll === 1 ? false : dTotal >= atkTotal;
+      dodgeLine = dodgeWin
+        ? `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).`
+        : `Dodge — d20 → ${dRoll} + DEX ${dexStats.dexterity} = ${dTotal} vs ATK ${atkTotal}. ✗ Read it wrong — you dodge INTO the blow (2× damage; armor can't save you).`;
+    }
+    // The stance is spent by this swing, win or lose.
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'dodging'),
+      },
+    } : s));
+  }
+  const hit = dodgeWin != null
+    ? !dodgeWin
+    : enemyFumble ? false : enemyCrit ? true : atkTotal >= effectiveAc;
+  const outcomeTag = dodgeWin === true
+    ? '✗ EVADED'
+    : dodgeWin === false
+      ? (enemyCrit ? '✓ CRITICAL HIT (out of position)' : '✓ HIT (out of position)')
+      : enemyCrit
+        ? '✓ CRITICAL HIT'
+        : enemyFumble
+          ? '✗ FUMBLE'
+          : hit ? '✓ HIT' : '✗ MISS';
 
   // OTA 221 — tag enemy whiffs so AdventureFeed can color the
   // outcome marker (MISS / FUMBLE) green at the end of the line.
@@ -25262,6 +25313,42 @@ function applyEnemyCounter(
     `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${outcomeTag}`,
     hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
+  if (dodgeLine) {
+    get().appendLog('combat', dodgeLine, dodgeWin ? { combatOutcome: 'enemy_miss' } : undefined);
+  }
+  if (dodgeWin === true) {
+    // The read paid off — train DEX (and STEALTH when stealth gear is worn;
+    // both carried over from the old parry's training rules).
+    const liveParrier = get().player;
+    if (liveParrier) {
+      const tr = trainStat(liveParrier, 'dexterity', true);
+      set((s) => (s.player ? { player: tr.player } : s));
+      if (tr.leveled) {
+        get().appendLog('reward', `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`);
+      }
+    }
+    const liveSte = get().player;
+    if (liveSte && (aggregateEquippedStatBonuses(liveSte).stealth ?? 0) > 0) {
+      const trS = trainStat(liveSte, 'stealth', true);
+      set((s) => (s.player ? { player: trS.player } : s));
+      if (trS.leveled) {
+        get().appendLog('reward', `✦ The shadows move with you. +1 STE (now ${trS.leveled.to}).`);
+      }
+    }
+    // Grant the opening. remainingRounds 2 so the round tick at the end of
+    // THIS action can't expire it before the player's next swing; the swing
+    // itself consumes it (rollMods), so 2 is a ceiling, not a duration.
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        statusEffects: applyEffect(s.player.statusEffects ?? [], {
+          kind: 'perfect_opening' as const,
+          remainingRounds: 2,
+          label: 'perfect opening',
+        }),
+      },
+    } : s));
+  }
 
   if (hit) {
     let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
@@ -25354,122 +25441,13 @@ function applyEnemyCounter(
       }
     }
 
-    // ACTIVE PARRY — the player committed a dodge before this swing
-    // landed. Opposed roll: d20 + DEX vs the enemy's attack total.
-    //   - Success → damage NEGATED + free counter-strike at 2× the
-    //     equipped weapon's damage dice (no roll-to-hit on the
-    //     counter; it just lands).
-    //   - Failure → damage stays as already rolled.
-    // Either way: status consumed, equipped weapon takes 2 durability
-    // (1.5× normal hit-wear, rounded up). Bare-handed dodging still
-    // rolls — you just can't deal counter damage without a weapon.
-    //
-    // Folded the old 'block' verb into this 2026-05-21. The
-    // half-damage / 25%-1d4-riposte block was diluted vs an
-    // all-or-nothing parry, and players were getting confused about
-    // which defensive option to pick. Now there's one defensive
-    // commit and one clear payoff.
-    const dodgingActive = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
-    let parryNarration: string | null = null;
-    let riposteDamage = 0;
-    if (dodgingActive) {
-      const stats = effectiveStats(player);
-      const parryRoll = rollDie(20);
-      const parryTotal = parryRoll + stats.dexterity;
-      const success = parryRoll === 20 ? true : parryRoll === 1 ? false : parryTotal >= atkTotal;
-      const mainName = player.equipped?.main ?? player.equipped?.weaponName ?? null;
-      const equipped = mainName ? findWeaponByName(mainName) : null;
-      if (success) {
-        // OTA 058 — successful parry trains DEX.
-        {
-          const liveParrier = get().player;
-          if (liveParrier) {
-            const tr = trainStat(liveParrier, 'dexterity', true);
-            set((s) => (s.player ? { player: tr.player } : s));
-            if (tr.leveled) {
-              get().appendLog(
-                'reward',
-                `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`,
-              );
-            }
-          }
-          // OTA-350 — using stealth gear in combat trains STEALTH. A clean
-          // parry/dodge while wearing stealth gear (cloak, footwraps, a quiet
-          // blade) is the gear earning its keep — moving unseen under fire.
-          // Gated on equipped stealth > 0 so it only fires when gear is worn.
-          const liveSte = get().player;
-          if (liveSte && (aggregateEquippedStatBonuses(liveSte).stealth ?? 0) > 0) {
-            const trS = trainStat(liveSte, 'stealth', true);
-            set((s) => (s.player ? { player: trS.player } : s));
-            if (trS.leveled) {
-              get().appendLog(
-                'reward',
-                `✦ The shadows move with you. +1 STE (now ${trS.leveled.to}).`,
-              );
-            }
-          }
-        }
-        const before = dmg;
-        // OTA-260 — boxing/karate exception. Weapon strikes can be
-        // parried clean — steel has a definite arc and a definite
-        // edge, you knock the line aside and you take nothing. A
-        // PUNCH or KICK is different: it's a body part with momentum
-        // behind it, the swing arc is wide, and "dodge" against a
-        // boxer means absorbing the glancing edge of a hook even when
-        // your read was right. Player call: "punch and kick should
-        // still land damage on Dodge — think boxing and karate."
-        // Detect unarmed strike via keywords in the enemy.damage
-        // string; on a successful parry of an unarmed strike, the
-        // counter still fires at 2× weapon dice (you opened a window),
-        // but the player eats 50% of the rolled damage (floor 1) for
-        // getting clipped on the way through.
-        const isUnarmedIncoming = isUnarmedStrike(String(enemy.damage));
-        if (isUnarmedIncoming) {
-          dmg = Math.max(1, Math.floor(before * 0.5));
-        } else {
-          dmg = 0;
-        }
-        if (equipped) {
-          // Counter-strike at 2× the weapon's damage notation.
-          const parsed = parseDamageDice(equipped.damageDice);
-          let counterDmg = 0;
-          for (let i = 0; i < parsed.count * 2; i++) counterDmg += rollDie(parsed.sides);
-          // Per-weapon-effect bonus damage if the active weapon's
-          // effect line matches this enemy (e.g. +1d4 vs constructs).
-          const fx = parseWeaponEffect(equipped.effect);
-          if (fx) counterDmg += rollEffectBonusDamage(fx, enemy);
-          riposteDamage = Math.max(1, counterDmg);
-          parryNarration = isUnarmedIncoming
-            ? `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Read the strike, but you can't parry a fist clean — ${dmg} grazes you. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`
-            : `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Caught the blade. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`;
-        } else {
-          // Bare-handed parry. Same OTA-260 boxing exception applies:
-          // a punch / kick still grazes even when you read the swing.
-          // No counter possible without a weapon, so the only outcome
-          // mod is the partial-damage on unarmed incoming.
-          parryNarration = isUnarmedIncoming
-            ? `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Read it, but you can't parry a fist clean barehanded — ${dmg} grazes you.`
-            : `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Slipped clean (no weapon to counter).`;
-        }
-        void before;
-      } else {
-        parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✗ Read through.`;
-      }
-      // 1.5× normal hit-wear, rounded up = 2 durability per parry,
-      // regardless of outcome. The cost of committing the stance.
-      if (mainName) {
-        for (let i = 0; i < 2; i++) {
-          set((s) => (s.player ? { player: wearEquippedItem(s.player, mainName, get) } : s));
-        }
-      }
-      // Consume the dodging status — single-shot reaction, gone
-      // whether it landed or not.
-      set((s) => (s.player ? {
-        player: {
-          ...s.player,
-          statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'dodging'),
-        },
-      } : s));
+    // OTA-795 — failed dodge: out of position. The swing already landed via
+    // the opposed contest above (AC bypassed); after every resistance has had
+    // its say, it lands twice as hard. (The old ACTIVE PARRY that lived here —
+    // negate + instant 2×-dice riposte, boxing exception, 2-durability cost —
+    // is retired; the dodge gamble replaces it.)
+    if (dodgeWin === false) {
+      dmg *= 2;
     }
 
     // Roll for a status effect to apply based on the damage type.
@@ -25527,10 +25505,6 @@ function applyEnemyCounter(
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
-    if (parryNarration) {
-      void Promise.resolve().then(() => get().appendLog('combat', parryNarration!));
-    }
-
     if (newEffect) {
       const verb = newEffect.isNew ? 'inflicts' : 'refreshes';
       void Promise.resolve().then(() =>
@@ -25542,43 +25516,6 @@ function applyEnemyCounter(
       void Promise.resolve().then(() =>
         get().appendLog('combat', `${enemy.name}'s strike leaves you ${traitHit.label}.`),
       );
-    }
-
-    // RIPOSTE — successful block landed a counter-strike. Find the live
-    // enemy index and apply the damage to enemyHps. Death from riposte
-    // resolves normally on the next attack cycle.
-    if (riposteDamage > 0) {
-      const live = get().currentScene;
-      if (live) {
-        const idx = live.enemies.findIndex((e) => e === enemy);
-        if (idx >= 0) {
-          const hpNow = live.enemyHps[idx] ?? enemy.hp;
-          const hpAfter = Math.max(0, hpNow - riposteDamage);
-          set((s) => {
-            if (!s.currentScene) return {};
-            const hps = [...s.currentScene.enemyHps];
-            hps[idx] = hpAfter;
-            return { currentScene: { ...s.currentScene, enemyHps: hps } };
-          });
-          void Promise.resolve().then(() =>
-            get().appendLog('combat', `Counter-strike! Your parry opens a gap — ${enemy.name} takes ${riposteDamage} damage.`, { combatOutcome: 'player_dmg' }),
-          );
-          // If the riposte killed the enemy, resolve their defeat now so
-          // the rest of the group counter-volley doesn't skip them.
-          if (hpAfter <= 0) {
-            void Promise.resolve().then(() => {
-              const scene = get().currentScene;
-              if (!scene) return;
-              const i = scene.enemies.findIndex((e) => e === enemy);
-              if (i < 0) return;
-              // Re-point the active idx to the riposted enemy so
-              // resolveEnemyDefeat splices the right one.
-              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: i } } : s));
-              get().resolveEnemyDefeat();
-            });
-          }
-        }
-      }
     }
 
     if (killed) {
@@ -25613,25 +25550,6 @@ function applyEnemyCounter(
 
 // arb119 — damage-type parsing/inference moved to engine/damageTypes.ts
 // (parseDamageTypeKeyword + enemyDamageType), shared with the EnemyPanel.
-
-// OTA-260 — boxing/karate-style body strikes that should still graze
-// the player on a successful dodge/parry. Keyed on humanoid-fighter
-// verbs (the user's framing was explicit: "think boxing and karate").
-// Natural weapons (bite / claw / talon / horn / sting) are NOT in
-// this list — those are real edged weapons mounted on a creature,
-// and the dodge handles them clean like a sword. The current incoming
-// attack is classified by string-match against enemy.damage, which
-// is where authored monster damage notation lives ("punch 1d6+1",
-// "claw 1d4", "1d8 sword", etc).
-const UNARMED_STRIKE_KEYWORDS = [
-  'punch', 'kick', 'fist', 'knuckle', 'headbutt', 'head-butt',
-  'elbow', 'knee', 'stomp', 'slam', 'shove', 'tackle', 'jab',
-  'hook', 'uppercut', 'cross',
-];
-function isUnarmedStrike(damageString: string): boolean {
-  const lower = damageString.toLowerCase();
-  return UNARMED_STRIKE_KEYWORDS.some((k) => lower.includes(k));
-}
 
 // Death is no longer permanent erasure. The character is marked dead and
 // remains on the title slot list (with a DEAD badge) so the player can
@@ -27682,6 +27600,9 @@ function handleDogCombat(
   kind: 'dog_bite' | 'dog_distract',
   targetText: string | undefined,
 ): void {
+  // OTA-795 — set when a distract FAILS; redirects that enemy's counter in
+  // this action's volley onto the dog (see runEnemyGroupCounters).
+  let failedDistractIdx: number | null = null;
   const player = get().player;
   const scene = get().currentScene;
   if (!player || !scene) return;
@@ -27838,10 +27759,14 @@ function handleDogCombat(
     const statVal = dog.stats[statKey];
     const roll = rollDie(20);
     const total = roll + statVal;
-    const success = total >= 12;
+    // OTA-795 — the DC scales with the target (8 + its ability points): a Mud
+    // Boar is easy to bait, a Core Guardian isn't. Was a flat DC 12, which a
+    // trained dog out-grew into auto-success.
+    const distractDc = 8 + parseEnemyAP(target);
+    const success = total >= distractDc;
     get().appendLog(
       'combat',
-      `${dog.name} dances at ${target.name}'s heels — d20 ${roll} + ${statKey.slice(0, 3).toUpperCase()} ${statVal} = ${total} vs DC 12 — ${success ? '✓ DISTRACTED' : '✗ NO EFFECT'}`,
+      `${dog.name} dances at ${target.name}'s heels — d20 ${roll} + ${statKey.slice(0, 3).toUpperCase()} ${statVal} = ${total} vs DC ${distractDc} — ${success ? '✓ DISTRACTED' : '✗ NOT FOOLED'}`,
     );
     if (success) {
       const trained = trainDogStat(dog, statKey, true);
@@ -27883,6 +27808,15 @@ function handleDogCombat(
           `✦ ${dog.name}'s ${statKey.slice(0, 3).toUpperCase()} rises to ${trained.leveled.to}.`,
         );
       }
+    } else {
+      // OTA-795 — a failed feint has teeth: the enemy isn't fooled and rounds
+      // on the DOG. Its counter in the volley below is redirected onto the dog
+      // instead of the player (dog AC / vest / resists apply as usual).
+      failedDistractIdx = targetIdx;
+      get().appendLog(
+        'world',
+        `${target.name} isn't fooled — it rounds on ${dog.name}.`,
+      );
     }
   }
   // arb169 — companion commands now provoke the FULL enemy volley, same as a
@@ -27896,7 +27830,7 @@ function handleDogCombat(
   if (!liveScene || liveScene.enemies.length === 0) return;
   const livePlayer = get().player;
   if (!livePlayer) return;
-  runEnemyGroupCounters(get, set, livePlayer);
+  runEnemyGroupCounters(get, set, livePlayer, failedDistractIdx != null ? { forceDogEnemyIdx: failedDistractIdx } : undefined);
 }
 
 // ----- OTA-120 Phase 3 / 4 helpers -------------------------------------
