@@ -1537,6 +1537,10 @@ export interface PendingRollState {
   // who back out of a flee / cast / stealth / etc. modal shouldn't
   // lose 15 minutes and stamina for nothing.
   refundOnCancel?: { hoursElapsed: number; stamina: number };
+  /** OTA-1082 — one-shot statuses to strip when the ATTACK step actually resolves.
+   *  Was stripped at prompt-BUILD time, so CANCEL on the dice modal destroyed
+   *  earned buffs — and let a player shed 'surprised' via cancel + re-attack. */
+  consumeOnResolve?: string[];
 }
 
 /**

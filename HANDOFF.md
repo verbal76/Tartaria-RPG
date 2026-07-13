@@ -251,6 +251,44 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **Exploit-sweep backlog (2026-07-13) — 12 fixed in 796/776/1082, these REMAIN.**
+  A multi-agent audit surfaced ~33 findings; the confirmed criticals/highs with
+  contained fixes shipped this OTA. Still open, grouped by why they were deferred:
+  - **Economy re-tiering (needs a design call on numbers):** (a) self-crafted
+    rarity items sell far above ingredient value — Mudstone/Corruption Tonic from
+    free forage sell 36 TC (`sellPrice.ts`, `scrapEngine.ts` fused-scrap bypass of
+    the `selfCrafted` trim); (b) fused-item SCRAP re-mints Golem Cores + sellable
+    aether stock from free junk (`scrapEngine.ts:104`); (c) Common armor sell
+    floor 11 TC > authored stall price 8 TC → cross-stall arbitrage
+    (`sellPrice.ts:37`); (d) `giftToVendor` trains CHA + gives +5 rep per junk
+    item, no value floor/cooldown (`gameStore` ~16528). Fix direction: ground
+    self-crafted sale price on ingredient value; value-gate gifts.
+  - **Contract location-gating (needs stage-def schema add):** hunt/mystery/
+    storyline stages advance on ANY matching skill-check/kill/travel anywhere, and
+    the Contracts-UI COMPLETE pays 100% from any tile (only faction_quest has the
+    remote-pay cut). Whole storylines farmable from a safe hub. Also: broker stalls
+    accept every faction's contracts but refuse to take them back (one-way). Fix:
+    add optional `locationId`/`biomeTag`/`enemyName` to stage defs + mirror the
+    faction_quest remote-pay cut to the other three kinds.
+  - **Item-dupe via name-keyed merges (medium, needs careful stacking audit):**
+    dropped-item pickup merges by name (durability laundering + coating dupe,
+    `gameStore` ~13301); `applyCoating` stamps a whole qty-N stack for one vial;
+    throwable consumption resolves by name not equipped id (infinite coated throw
+    + bandolier double-spend). Fix: route through `grantItem`/id-resolution.
+  - **Water bounce residual (medium):** the one-per-visit water flags still live on
+    `currentScene`, so bouncing two adjacent OUTDOOR water tiles resets them (the
+    substring fix already killed the free-hub version). Fix: persist in
+    `worldMemory.visitedRooms` with a game-hours re-arm.
+  - **Small bugs:** enemy DOTs only tick on the player's `attack` action (frozen
+    during dodge/move/companion turns, `gameStore` ~7560 — hoist out of `case
+    'attack'`); no hard stat cap anywhere in the training stack (`statTraining.ts`
+    +dog/golem twins — add a design ceiling); `jump at <any text>` trains DEX on
+    unresolved targets; `defeatedEnemies` array grows unbounded → eventual
+    save-loss (`worldMemory.ts` — collapse to a count map or trim). Full
+    per-finding detail (file:line, repro, proposed fix) in the 2026-07-13 session
+    log / scratchpad `sweep-findings.txt`.
+
+
 - **engine_Dev Tartaria-leakage audit (2026-07-13) — all five items FIXED in
   engine OTA-1078.** Rule (§2): engine_Dev's hardcoded prefills must be
   lore-neutral. Architecture verified sound: content resolves author pack →
@@ -343,12 +381,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-795`**,
-**golem-line `…-775`**, **engine_Dev `…-1081`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-796`**,
+**golem-line `…-776`**, **engine_Dev `…-1082`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 796 | 776 | 1082 | Exploit-sweep batch (12 shared fixes): dodge costs a turn + 3-train cap; failed-dodge no longer 4× under crit; distract DC floor 12 + nat rules; shared ranged-enemy classifier (kite fix); boss regen once/round; buffs consume on attack-resolve not prompt-build; scrap ghost-slot fix (hands/cloak/ring2/3); 2H-displace hpMax loop closed; whole-word water match; fill costs time; hunt boss must be killed; investigate self-dispatch loop killed |
 | 795 | 775 | 1081 | Dodge = AC-bypass gamble (win: next strike ×2 dice; lose: hit lands past armor for 2×); dog distract DC scales with target + failed feint redirects the counter onto the dog |
 | 794 | 774 | 1080 | OTA-784's one-time fresh-market save repair removed (served its failed-OTA reset; save repaired) — market saves load in place, auto-enter unconditional again |
 | 793 | 773 | 1079 | Ambient narration drops second-person "You…" sentences (off-scene Qwen musings read as world text) |
