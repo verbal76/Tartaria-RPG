@@ -1,6 +1,6 @@
 # Tartaria Realms — Session Handoff
 
-**This checkout:** branch `HaL2001` — **LIVE Tartaria line** (real testers). Channel `hal2001`+`preview`+`ios-preview`. This is the primary line.
+**This checkout:** branch `HaL2001` — **LIVE Tartaria line / PRODUCTION** — in the wild with internal testers. Channel `hal2001`+`preview`+`ios-preview`. Vetted changes only; a push OTAs their devices.
 
 > **This doc was rewritten & de-bloated on 2026-07-02.** The previous 5,400-line
 > HANDOFF (with the full open/closed issue tracker and the entire OTA changelog)
@@ -27,10 +27,11 @@ git worktree add /tmp/hal-eng7 engine_Dev
   directs work to the three named line branches above. Pushing to them requires
   the user's authorization, granted per-session (§2) — once granted, push each
   OTA as it lands.
-- **Changes apply to ALL relevant lines in ONE pass.** Despite §2's "trial on
-  golem then promote" wording, standing practice is: implement in all three
-  worktrees together, per-line OTA bumps, one commit + push per line.
-  golem-as-trial is reserved for changes the user explicitly wants staged.
+- **Changes apply to ALL relevant lines in ONE pass.** Standing practice: minor
+  changes/upgrades land on HaL2001 AND golem-line together — plus engine_Dev when
+  (and only when) the change is engine-level, not Tartaria content/flavor —
+  per-line OTA bumps, one commit + push per line. golem-as-trial is reserved for
+  changes the user explicitly wants staged (see the clarified roles in §2).
 - **Working style:** the user playtests on-device (Android, OTA-delivered) and
   pastes in-game logs. For a bug report, DIAGNOSE first — root cause + proposed
   fix, briefly — and implement only after approval (unless the message says
@@ -73,8 +74,8 @@ one line is applied **per-line, code-specifically** (see §4).
 | Line (branch) | app name | package / bundle id | OTA channel | Role |
 |---|---|---|---|---|
 | **HaL2001** | Tartaria Realms HAL | `…tartarprim.hal2001` | `hal2001` + `preview` + `ios-preview` | **LIVE Tartaria game** — the build at real testers (production) |
-| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | **HAL's testing branch** — trial HAL improvements here, then promote to HaL2001 (installs side-by-side) |
-| **engine_Dev** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | **Separate project** — lore-agnostic engine (upload-driven content), NOT the Tartaria game |
+| **golem-line** | Tartaria Realms Golem | `…tartarprim.golem` | `golem-line` | **HAL's warm standby** — kept current with HAL; the fork point for future engine-breaking work (installs side-by-side) |
+| **engine_Dev** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | **Separate project** — lore-agnostic interaction engine (JSON/pack-driven content, lore-neutral prefills), NOT the Tartaria game |
 | **steam_Dev** | Tartaria Realms PC (Steam Dev) | `…tartarprim.steamdev` | `steam-dev` | Windows/Electron; updates via Steam depot, not OTA |
 | **mac_dev** | Tartaria Realms (Mac Dev) | `…tartarprim.macdev` | `mac-dev` | macOS `.dmg` (Electron) |
 | **linux_dev** | Tartaria Realms (Linux Dev) | `…tartarprim.linuxdev` | `linux-dev` | Linux/Steam Deck AppImage (Electron) |
@@ -83,12 +84,28 @@ one line is applied **per-line, code-specifically** (see §4).
 | **Dev_engine_PC** | RPG Engine (dev) | `…tartarprim.engine` | `engine_Dev` | engine_Dev's Windows `.exe` standing branch |
 | **arbiters-line** | Tartaria Realms ARB | `…tartarprim.arbiters` | `arbiters-line` (dead channel) | Isolated APK scratch line — publishes nothing |
 
-**The three MAIN lines are `HaL2001`, `golem-line`, and `engine_Dev`.** HAL and
-golem are the SAME game — golem is HAL's testing branch, so a HAL improvement is
-built/tested on golem and then promoted to HaL2001 when the user approves.
-`engine_Dev` is a DIFFERENT product that only shares engine code. Everything else
-in the table is downstream packaging of these three. (On `main`, the handoff is a
-short router that names these three and asks which to work on.)
+**The three MAIN lines are `HaL2001`, `golem-line`, and `engine_Dev`** — roles
+as clarified by the user on 2026-07-13:
+
+- **`HaL2001` is PRODUCTION.** The Tartaria build in the wild with internal
+  testers. Vetted changes only; a push OTAs their devices.
+- **`golem-line` is HAL's warm standby — it must STAY CURRENT with HAL.** Not a
+  scratch pad. Its purpose: when a major, potentially engine-breaking change
+  begins, development forks onto golem so production Tartaria is never at risk
+  while the new thing is built. Until then, minor changes/upgrades land on BOTH
+  lines in the same pass so the parity gap never widens into a migration problem.
+- **`engine_Dev` is a SEPARATE, PARALLEL product** — the game stripped of ALL
+  lore: a bare interaction engine. Content is entirely JSON/content-pack driven
+  (the current build in it is "The Philadelphia Experiment" — every interaction
+  and all of its info live in the pack JSON; alter the JSON and it becomes any
+  game you want). The only hardcoded engine-side pieces are the interaction
+  engine itself and generic PREFILLS that cover any JSON section a content
+  author forgets to supply — and those prefills must be lore-NEUTRAL: never
+  Tartaria-flavored, never containing Tartaria terms. Tartaria content/data
+  edits do NOT belong in engine_Dev's base; only engine-level fixes port there.
+
+Everything else in the table is downstream packaging of these three. (On `main`,
+the handoff is a short router that names these three and asks which to work on.)
 
 Utility / parked branches: **`main`** (base + start-here router; the standing dev→prod PR target),
 **`iOS-initial`** / **`release/**`** / **`revert`** / **`submit-workflow-to-main`**
