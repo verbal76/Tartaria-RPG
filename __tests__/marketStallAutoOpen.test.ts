@@ -78,6 +78,12 @@ describe('OTA-786 — market stalls auto-open their wares', () => {
       // tabs + EXIT stay available to swap stalls or leave.
       store.getState().setScreen('exploration');
       expect(store.getState().currentScene!.vendor).toBeTruthy();
+
+      // OTA-788 — tapping the stall tab you're already in re-opens its wares
+      // (the TRADE button is gone).
+      store.getState().goBuildingRoom(room);
+      expect(store.getState().currentScreen).toBe('vendor');
+      store.getState().setScreen('exploration');
     }
   });
 

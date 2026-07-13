@@ -3563,7 +3563,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!id) return;
     const room = getBuildingRoom(id, roomId);
     if (!room) return;
-    if (roomId === get().activeBuildingRoomId) return;
+    if (roomId === get().activeBuildingRoomId) {
+      // OTA-788 — tapping the stall you're already in re-opens its wares. With
+      // the TRADE button gone, the active stall tab IS the way back into a shop
+      // you closed with ← BACK.
+      if (id === 'market' && get().currentScene?.vendor) get().setScreen('vendor');
+      return;
+    }
     // Hidden rooms can't be walked into until revealed.
     if (room.secret && !get().buildingRevealed.includes(roomId)) return;
     const p = get().player;
