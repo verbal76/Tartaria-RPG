@@ -15624,4 +15624,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // are Rare MATERIALS used as ingredients in dozens of recipes — hiding them soft-blocked the crafting tree
 // (the Hardened Mudstone upgrade stopped showing). isDiscoverableRecipe now excludes any material result
 // (findMaterialByName); Rare/Legendary weapons/armor/relics/consumables stay found-only. Tests reworked. +1 test.
-export const OTA_BUILD_ID = '2026-07-12-767-market-square-entry';
+export const OTA_BUILD_ID = '2026-07-12-768-remove-trade-button';
