@@ -932,7 +932,11 @@ export type StatusEffectKind =
   // engine_Dev — a generic damage-type DOT applied TO THE PLAYER when an enemy hits
   // with a custom damage type configured as 'dot' (symmetry with the enemy-side
   // dt_dot). Ticks perRoundDamage each round; label carries the type name.
-  | 'dt_dot';
+  | 'dt_dot'
+  // OTA-1081 — successful dodge payoff: the player's NEXT attack deals double
+  // damage dice (buildCombatSteps peeks it; rollMods consumes it on the swing,
+  // hit or miss — the window closes either way).
+  | 'perfect_opening';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
