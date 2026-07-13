@@ -2059,6 +2059,16 @@ function grantTutorialItem(
 // operate on the room), the scene-bar label shows "Building · Room", and any
 // wilderness vendor / hooks are cleared (you're indoors). Combat fields are
 // left untouched — buildings are entered from peaceful scenes.
+// OTA-789 — a Hidden Market stall is a neutral-ground BROKER: its Contracts
+// board posts EVERY faction's open work (see VendorContractsModal), not just its
+// own rostered faction. So a contract accepted there usually belongs to a
+// DIFFERENT faction than the vendor. The accept handlers use this to search
+// every faction's pool for a broker vendor (a normal vendor / mission board
+// searches only its single faction).
+function isBrokerVendorId(id: string | null | undefined): boolean {
+  return typeof id === 'string' && id.startsWith('hidden_market_');
+}
+
 function patchSceneForBuildingRoom(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -16946,17 +16956,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    // Direct id match first, then fuzzy title within this faction's pool.
+    // Direct id match first, then fuzzy title within the faction pool. A broker
+    // (Hidden Market stall) searches EVERY faction's pool, since its board posts
+    // all factions' work — the contract's faction may not be the vendor's own.
     const direct = findFactionQuestById(titleOrId);
-    const pool = availableFactionQuests(
-      acceptFaction,
-      getStanding(player.factionStanding, acceptFaction),
-      player.activeFactionQuestIds ?? [],
-      player.completedFactionQuestIds ?? [],
-    );
-    const quest = direct && pool.includes(direct) ? direct : fuzzyFindFactionQuest(titleOrId, pool);
-    if (!quest) {
-      const titles = pool.map((q) => `"${q.title}"`).join(', ');
+    const searchFactions = isBrokerVendorId(scene?.vendor?.id)
+      ? FACTIONS.map((f) => f.id)
+      : [acceptFaction];
+    let matchedQuest: typeof direct | null = null;
+    let factionId: string = acceptFaction;
+    const offered: string[] = [];
+    for (const fid of searchFactions) {
+      const pool = availableFactionQuests(
+        fid,
+        getStanding(player.factionStanding, fid),
+        player.activeFactionQuestIds ?? [],
+        player.completedFactionQuestIds ?? [],
+      );
+      for (const q of pool) offered.push(`"${q.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindFactionQuest(titleOrId, pool);
+      if (found) { matchedQuest = found; factionId = fid; break; }
+    }
+    if (!matchedQuest) {
+      const titles = offered.join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -16965,7 +16987,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const factionId = acceptFaction;
+    const quest = matchedQuest;
     const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
       && (player.completedFactionQuestIds?.length ?? 0) === 0;
     // SINGLE-ACTIVE — a new contract joins ACTIVE only if you aren't already
@@ -17445,18 +17467,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    const factionId = scene.vendor.faction;
-    const playerRep = factionId ? getStanding(player.factionStanding, factionId) : 0;
+    // A broker (Hidden Market stall) searches EVERY faction's pool; a normal
+    // vendor searches only its own. availableHunts folds in faction-neutral
+    // bounties for each searched faction.
+    const searchFactions: (string | null)[] = isBrokerVendorId(scene.vendor.id)
+      ? FACTIONS.map((f) => f.id)
+      : [scene.vendor.faction];
     const direct = findHuntById(titleOrId);
-    const pool = availableHunts(
-      factionId,
-      playerRep,
-      (player.activeHunts ?? []).map((h) => h.id),
-      player.completedHuntIds ?? [],
-    );
-    const hunt = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);
-    if (!hunt) {
-      const titles = pool.map((h) => `"${h.title}"`).join(', ');
+    let matchedHunt: typeof direct | null = null;
+    let factionId: string | null = scene.vendor.faction;
+    const offered = new Set<string>();
+    for (const fid of searchFactions) {
+      const playerRep = fid ? getStanding(player.factionStanding, fid) : 0;
+      const pool = availableHunts(
+        fid,
+        playerRep,
+        (player.activeHunts ?? []).map((h) => h.id),
+        player.completedHuntIds ?? [],
+      );
+      for (const h of pool) offered.add(`"${h.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);
+      if (found) { matchedHunt = found; factionId = fid; break; }
+    }
+    if (!matchedHunt) {
+      const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -17465,6 +17499,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const hunt = matchedHunt;
     set((s) =>
       s.player
         ? {
@@ -17769,18 +17804,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    const factionId = scene.vendor.faction;
-    const playerRep = factionId ? getStanding(player.factionStanding, factionId) : 0;
+    // A broker (Hidden Market stall) searches EVERY faction's pool; a normal
+    // vendor searches only its own. availableMysteries folds in faction-neutral
+    // work for each searched faction.
+    const searchFactions: (string | null)[] = isBrokerVendorId(scene.vendor.id)
+      ? FACTIONS.map((f) => f.id)
+      : [scene.vendor.faction];
     const direct = findMysteryById(titleOrId);
-    const pool = availableMysteries(
-      factionId,
-      playerRep,
-      (player.activeMysteries ?? []).map((m) => m.id),
-      player.completedMysteryIds ?? [],
-    );
-    const m = direct && pool.includes(direct) ? direct : fuzzyFindMystery(titleOrId, pool);
-    if (!m) {
-      const titles = pool.map((m2) => `"${m2.title}"`).join(', ');
+    let matchedMystery: typeof direct | null = null;
+    let factionId: string | null = scene.vendor.faction;
+    const offered = new Set<string>();
+    for (const fid of searchFactions) {
+      const playerRep = fid ? getStanding(player.factionStanding, fid) : 0;
+      const pool = availableMysteries(
+        fid,
+        playerRep,
+        (player.activeMysteries ?? []).map((m2) => m2.id),
+        player.completedMysteryIds ?? [],
+      );
+      for (const m2 of pool) offered.add(`"${m2.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindMystery(titleOrId, pool);
+      if (found) { matchedMystery = found; factionId = fid; break; }
+    }
+    if (!matchedMystery) {
+      const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -17789,6 +17836,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const m = matchedMystery;
     set((s) =>
       s.player
         ? {
@@ -17983,7 +18031,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
       return;
     }
-    if (!scene?.vendor?.faction) {
+    // A broker (Hidden Market stall) proceeds even if its own rostered faction
+    // has no storylines — it posts every faction's board. A normal vendor still
+    // needs a faction of its own.
+    if (!scene?.vendor || (!scene.vendor.faction && !isBrokerVendorId(scene.vendor.id))) {
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
@@ -17996,18 +18047,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return;
     }
-    const factionId = scene.vendor.faction;
-    const playerRep = getStanding(player.factionStanding, factionId);
+    // A broker searches EVERY faction's storyline pool; a normal vendor only its
+    // own.
+    const searchFactions: string[] = isBrokerVendorId(scene.vendor.id)
+      ? FACTIONS.map((f) => f.id)
+      : (scene.vendor.faction ? [scene.vendor.faction] : []);
     const direct = findStorylineById(titleOrId);
-    const pool = availableStorylines(
-      factionId,
-      playerRep,
-      (player.activeStorylines ?? []).map((s) => s.id),
-      player.completedStorylineIds ?? [],
-    );
-    const s = direct && pool.includes(direct) ? direct : fuzzyFindStoryline(titleOrId, pool);
-    if (!s) {
-      const titles = pool.map((s2) => `"${s2.title}"`).join(', ');
+    let matchedStoryline: typeof direct | null = null;
+    let factionId: string | null = scene.vendor.faction;
+    const offered = new Set<string>();
+    for (const fid of searchFactions) {
+      const playerRep = getStanding(player.factionStanding, fid);
+      const pool = availableStorylines(
+        fid,
+        playerRep,
+        (player.activeStorylines ?? []).map((s2) => s2.id),
+        player.completedStorylineIds ?? [],
+      );
+      for (const s2 of pool) offered.add(`"${s2.title}"`);
+      const found = direct && pool.includes(direct) ? direct : fuzzyFindStoryline(titleOrId, pool);
+      if (found) { matchedStoryline = found; factionId = fid; break; }
+    }
+    if (!matchedStoryline) {
+      const titles = [...offered].join(', ');
       get().appendLog(
         'arbiter',
         titles
@@ -18016,6 +18078,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const s = matchedStoryline;
     set((st) =>
       st.player
         ? {
