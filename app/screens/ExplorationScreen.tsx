@@ -691,7 +691,7 @@ export function ExplorationScreen() {
           top is redundant and breaks the walked-into-a-building feel. Suppress
           it while inside a building; the stall's own Trade + Crucible actions
           render inside the room instead (block just below). */}
-      {currentScene?.vendor && !inCombat && !activeBuildingId && (
+      {currentScene?.vendor && !inCombat && !activeBuildingId && currentScene?.location?.id !== 'hidden_market' && (
         <TouchableOpacity
           style={styles.vendorBanner}
           onPress={() => setScreen('vendor')}
@@ -754,7 +754,7 @@ export function ExplorationScreen() {
         // stall (the in-stall actions block above), so the redundant top banner
         // is suppressed here. Outpost/hub and wild-permit Crucibles (not inside
         // a building) still show their top banner as before.
-        if (activeBuildingId) return null;
+        if (activeBuildingId || currentScene?.location?.id === 'hidden_market') return null;
         // A location that carries its OWN (free) Crucible: an outpost you've left
         // and returned to, an active fusion permit, or a market building.
         const atLocationCrucible = !!(player.fusionPending
