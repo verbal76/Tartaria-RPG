@@ -276,12 +276,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-790`**,
-**golem-line `…-770`**, **engine_Dev `…-1076`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-791`**,
+**golem-line `…-771`**, **engine_Dev `…-1077`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 791 | 771 | 1077 | Combat blocks the trade screen visibly — vendor entry refused mid-fight, VendorScreen ejects if a fight starts mid-trade |
 | 790 | 770 | 1076 | Arbiter TTS tail-clip fix — deferred expo-av release (300 ms), 200 ms tail pad, 40 ms trailing trim guard |
 | 789 | 769 | 1075 | Broker stalls accept ANY faction's contracts — accept handlers search every faction pool for `hidden_market_*` vendors |
 | 788 | 768 | 1074 | TRADE button removed (stall tab IS the shop); tapping the active stall tab re-opens its wares |
