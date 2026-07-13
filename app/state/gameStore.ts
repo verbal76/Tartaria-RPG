@@ -485,6 +485,10 @@ interface CurrentScene {
    *  water source this visit. One refill per visit, same rationale as
    *  barehandDrinkUsed. Resets with the scene (leave + return). */
   bottleRefillUsed?: boolean;
+  /** OTA-796 — dodge-training bound. Successful dodges train DEX/STE only for
+   *  the first 3 contest wins per scene visit, so a pet weak enemy can't be
+   *  dodge-farmed for unbounded stats. Resets with the scene. */
+  dodgeTrainsUsed?: number;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -7765,23 +7769,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // OTA-362 — acid-coating armor shred on the active enemy.
             acReduction: currentScene.enemyArmorShred?.[currentScene.activeEnemyIdx] ?? 0,
           });
-          // Drop one-shot status effects consumed by this roll (aiming
-          // burns on use).
-          if (statusMods.consume.length > 0) {
-            set((s) =>
-              s.player
-                ? {
-                    player: {
-                      ...s.player,
-                      statusEffects: (s.player.statusEffects ?? []).filter(
-                        (e) => !statusMods.consume.includes(e.kind),
-                      ),
-                    },
-                  }
-                : s,
-            );
-          }
-          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+          // OTA-796 — one-shot statuses consumed by this roll (aiming burns on
+          // use) are now stripped when the ATTACK STEP RESOLVES, not at prompt
+          // build. Stripping at build time meant CANCEL on the dice modal
+          // destroyed earned buffs (perfect_opening, stealthed +5, ready,
+          // distract +4) — and doubled as an exploit: cancel + re-attack shed
+          // the 'surprised' penalty without ever rolling a die.
+          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, consumeOnResolve: statusMods.consume.length > 0 ? statusMods.consume : undefined } });
           // arb138 — the opener's weapon noun comes from parsed.resolvedNoun, but the
           // resolver sometimes binds a weapon phrase ("Tartarian Hand Axe (Throw)") to a
           // SCENE object ("shattered tartarian relay"), so the narration named the wrong
@@ -9678,7 +9672,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // above threshold (0.85), re-run the action with the inferred
         // target. Otherwise re-prompt politely.
         if (rawTarget) {
-          if (cognitive.isReady()) {
+          // OTA-796 — the semantic fallback is a ONE-SHOT: a re-dispatched
+          // action (skipPreChecks) must never re-enter it. The old code could
+          // self-dispatch forever: location.name sat in the candidate pool but
+          // NO earlier handler hard-matches it (collectSceneNouns excludes it),
+          // so 'search the <location name>' matched itself at sim ~1.0 and
+          // re-submitted the identical command in an unbounded promise loop —
+          // ticking DOTs, spamming the feed, and burning CPU until force-kill.
+          if (!_opts?.skipPreChecks && cognitive.isReady()) {
             const candidates = [
               ...(currentScene.ambientNouns ?? []),
               ...(currentScene.hooks ?? []).filter((h) => !h.resolved).flatMap((h) => h.nouns),
@@ -9689,7 +9690,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // can still resolve it (at the new 0.85 floor, only a
               // genuinely-confident match will land).
               ...(currentScene.vendor?.name ? [currentScene.vendor.name] : []),
-              currentScene.location.name,
+              // (location.name removed — no downstream hard-match handler
+              // exists for it, so matching it can only loop.)
               ...(currentScene.hazard ? [currentScene.hazard.name] : []),
             ];
             void cognitive.inferTarget(rawTarget, candidates).then((match) => {
@@ -9698,7 +9700,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   'cognitive',
                   `Resolved "${rawTarget}" → "${match.target}" (sim ${match.score.toFixed(2)}).`,
                 );
-                get().submitPlayerAction(`search the ${match.target}`);
+                get().submitPlayerAction(`search the ${match.target}`, { skipPreChecks: true });
               } else {
                 repromptUnknownTarget(get, currentScene, rawTarget);
               }
@@ -10991,14 +10993,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           remainingRounds: 1,
           label: 'dodging (parry)',
         };
+        // OTA-796 — the stance costs the turn like its OTA-611 siblings
+        // (disengage / ready / take_cover / aim): 1 stamina + 6 min. The
+        // exploit sweep's top CONFIRMED finding was dodge-as-free-action:
+        // zero cost + DEX/STE training on every contest win = unbounded,
+        // risk-free stat farming against a pet weak enemy in zero game time.
         set((s) =>
           s.player
-            ? {
-                player: {
-                  ...s.player,
-                  statusEffects: applyEffect(s.player.statusEffects ?? [], dodging),
-                },
-              }
+            ? { player: advanceTime(spendStamina({ ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], dodging) }, 1), 0.1) }
             : s,
         );
         // OTA-795 — the stance line spells out the new stakes: dodge is an
@@ -11582,8 +11584,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'canal', 'aqueduct', 'reservoir',
         ];
         const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
-        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)))
-          ?? (sceneNouns.find((sn) => sn.includes('water')));
+        // OTA-796 — match WHOLE WORDS, not substrings: 'spool'.includes('pool')
+        // and 'stairwell'.includes('well') used to make dry rooms (the Workshop's
+        // wire spool, the Culvert's stairwell) read as open water. Tokenize and
+        // require an exact token hit (plus a 'water*' token).
+        const sourceTokens = sceneNouns.flatMap((sn) => sn.split(/[^a-z]+/i)).filter(Boolean);
+        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sourceTokens.includes(w))
+          ?? (sourceTokens.some((t) => t === 'water' || t.startsWith('water')) ? 'water' : undefined);
         if (!sourceNoun) {
           get().appendLog(
             'arbiter',
@@ -11634,6 +11641,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           return { player: { ...s.player, inventory: newInventory } };
         });
+        // OTA-796 — filling costs 5 min like the cupped drink; it used to be a
+        // zero-time action, which is part of what made the water loops free.
+        set((s) => (s.player ? { player: advanceTime(s.player, 0.083) } : s));
         set((s) => s.currentScene
           ? { currentScene: { ...s.currentScene, bottleRefillUsed: true } }
           : s);
@@ -11675,8 +11685,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'canal', 'aqueduct', 'reservoir',
         ];
         const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
-        const drinkSource = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)))
-          ?? (sceneNouns.find((sn) => sn.includes('water')));
+        // OTA-796 — whole-word match (see the fill handler); substrings turned
+        // 'spool'/'stairwell' into drinkable water.
+        const drinkTokens = sceneNouns.flatMap((sn) => sn.split(/[^a-z]+/i)).filter(Boolean);
+        const drinkSource = WATER_SOURCE_NOUNS.find((w) => drinkTokens.includes(w))
+          ?? (drinkTokens.some((t) => t === 'water' || t.startsWith('water')) ? 'water' : undefined);
         const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
         if (drinkSource && wantsWater) {
           // One cupped-hands drink per location visit. Wild water used to be an
@@ -13952,6 +13965,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const filled: RollStep = { ...step, values, total, success, ...(critical ? { critical } : {}) };
     const updatedSteps = state.steps.map((s, i) => (i === idx ? filled : s));
+    // OTA-796 — the swing is now committed: strip the one-shot statuses this
+    // roll consumes (see consumeOnResolve). Runs once, on the attack step.
+    if (step.id === 'attack' && state.consumeOnResolve?.length) {
+      const toConsume = state.consumeOnResolve;
+      set((s) =>
+        s.player
+          ? {
+              player: {
+                ...s.player,
+                statusEffects: (s.player.statusEffects ?? []).filter(
+                  (e) => !toConsume.includes(e.kind),
+                ),
+              },
+            }
+          : s,
+      );
+    }
 
     // Skip damage roll if attack missed. Double damage dice on crit
     // so the follow-up roll naturally produces the bigger number.
@@ -15591,7 +15621,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         for (let i = 0; i < def.stages.length; i++) {
           if (def.stages[i]?.checkKind === 'boss') lastBoss = i;
         }
-        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage > lastBoss;
+        // OTA-796 — >= not >: the final boss stage now FREEZES at lastBoss
+        // (advanceHunt no longer increments past it), so the kill AT lastBoss
+        // is what completes the hunt. Mid-hunt boss stages already advanced
+        // past their index, so this still won't fire early for them.
+        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage >= lastBoss;
       });
     if (matchingHunt && matchingHunt.def) {
       set((s) =>
@@ -17653,8 +17687,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    // Boss stage spawns the scaled enemy and freezes the hunt at this stage
-    // until the boss dies; otherwise advance the stage counter.
+    // Boss stage spawns the scaled enemy. OTA-796 — the FINAL boss stage FREEZES
+    // the hunt here (no stage increment): the boss must actually be KILLED to
+    // complete it (resolveEnemyDefeat does the final advance). Previously every
+    // boss stage — including the last — incremented on SPAWN, so the moment the
+    // apex enemy appeared the stage hit stages.length and the turn-in gate
+    // (`stage < stages.length`) passed; the player could flee/despawn the boss
+    // and collect the full bounty without the fight (exploit sweep). Mid-hunt
+    // boss stages (there are hunts with a boss beat before the apex) still
+    // increment on spawn.
+    let lastBossIndex = -1;
+    for (let i = 0; i < hunt.stages.length; i++) {
+      if (hunt.stages[i]?.checkKind === 'boss') lastBossIndex = i;
+    }
+    const freezeForKill = stageDef.checkKind === 'boss' && record.stage === lastBossIndex;
     if (stageDef.checkKind === 'boss') {
       const boss = scaleHuntBoss(player, hunt);
       if (boss) {
@@ -17674,18 +17720,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('combat', `${boss.name} closes the distance. The hunt comes to its end.`);
       }
     }
-    set((s) =>
-      s.player
-        ? {
-            player: {
-              ...s.player,
-              activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                h.id === huntId ? { ...h, stage: h.stage + 1 } : h,
-              ),
-            },
-          }
-        : s,
-    );
+    if (!freezeForKill) {
+      set((s) =>
+        s.player
+          ? {
+              player: {
+                ...s.player,
+                activeHunts: (s.player.activeHunts ?? []).map((h) =>
+                  h.id === huntId ? { ...h, stage: h.stage + 1 } : h,
+                ),
+              },
+            }
+          : s,
+      );
+    }
     void get().persist();
   },
 
@@ -20814,9 +20862,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Track displacements so a single combined "you set X aside" line
     // fires before the equip narration.
     const displaced: string[] = [];
+    // OTA-796 — a displaced weapon must give back the max-HP bonus it baked in
+    // (mirror of unequipSlot). Without this, alternating a +HP shield with a
+    // +HP two-hander re-baked the bonus on every re-equip while the displace
+    // never stripped it — an unbounded hpMax + full-heal loop (exploit sweep).
+    const stripDisplacedHp = (name: string | undefined) => {
+      const d = -gearHpBonus(name);
+      if (d === 0) return;
+      set((s) => {
+        if (!s.player) return s;
+        const newMax = Math.max(1, (s.player.hpMax ?? 1) + d);
+        return { player: { ...s.player, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + d, newMax)) } };
+      });
+    };
     if (slot === 'off' && mainCat?.style === 'two_handed') {
       // Equipping anything to off-hand while 2H in main → drop the 2H.
       displaced.push(mainName!);
+      stripDisplacedHp(mainName);
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -20827,6 +20889,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (slot === 'main' && incomingCat?.style === 'two_handed' && offName) {
       // Equipping a 2H to main while off-hand has something → drop off-hand.
       displaced.push(offName);
+      stripDisplacedHp(offName);
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -20841,6 +20904,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // here. Drops anything in either hand.
       if (mainName) {
         displaced.push(mainName);
+        stripDisplacedHp(mainName);
         set((s) => (s.player ? {
           player: {
             ...s.player,
@@ -20850,6 +20914,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (offName) {
         displaced.push(offName);
+        stripDisplacedHp(offName);
         set((s) => (s.player ? {
           player: {
             ...s.player,
@@ -22178,13 +22243,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the slot when the SPECIFIC equipped instance is being broken
     // down. Same name + different id leaves the slot alone.
     const eq = player.equipped ?? {};
-    const equippedSlots = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'] as const;
+    // OTA-796 — the scan was missing 'hands' and 'cloak' (both real equip
+    // slots) and never checked ring2/ring3, so scrapping the equipped instance
+    // in one of those slots destroyed the inventory row but left the equipped
+    // pointer live — the destroyed gear kept granting AC / resists / stats /
+    // regen forever (name-based aggregation with catalog fallback). Now every
+    // SLOT_ID_KEY slot is covered.
+    const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring'] as const;
     const occupiedSlots = equippedSlots.filter((s) => {
       const idKey = SLOT_ID_KEY[s];
       return eq[idKey] === item.id;
     });
     if (occupiedSlots.length > 0) {
       for (const slot of occupiedSlots) get().unequipSlot(slot);
+    }
+    // ring2 / ring3 have no EquipSlot entry, so unequipSlot can't address them —
+    // clear the pointer inline and strip the ring's HP bonus (mirror of
+    // unequipSlot's bake-out) when the scrapped instance sits there.
+    for (const [nameKey, idKey] of [['ring2', 'ring2Id'], ['ring3', 'ring3Id']] as const) {
+      if (eq[idKey] === item.id) {
+        const ringName = eq[nameKey];
+        const hpDelta = -gearHpBonus(ringName);
+        set((s) => {
+          if (!s.player) return s;
+          const newEq = { ...(s.player.equipped ?? {}), [nameKey]: undefined, [idKey]: undefined };
+          const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
+          return { player: { ...s.player, equipped: newEq, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) } };
+        });
+      }
     }
     // OTA 23-014 — salvage now rolls for success. Base 70% + INT/DEX
     // modifiers. The item is CONSUMED on failure either way; the
@@ -23526,6 +23612,17 @@ function runMoveCombatRange(
   }
 }
 
+// OTA-796 — ONE ranged-enemy classifier, shared by the reach gate and the
+// full-cover auto-miss. The two sites used to carry DIFFERENT regexes: the
+// reach gate only knew bow-words, so 14 bestiary entries with Laser / Breath /
+// Venom / Burst attacks (Bog Dragon, Architectural Sentinel, Aetheric
+// Cyclops, …) were classified melee and could NEVER counter at far range —
+// the exploit sweep's "kite the hardest non-boss monsters risk-free" finding.
+function isRangedEnemy(enemy: Enemy): boolean {
+  const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
+  return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart|laser|beam|breath|burst|venom|bolt|blast|aetheric|pulse|spit|spine|quill)/.test(sig);
+}
+
 // Whether an enemy can still strike the player at the given range.
 // Lore: melee = arm's reach, ranged = close + far, runecasters mostly close
 // + arm. We use a conservative default — most generic enemies threaten arm
@@ -23534,9 +23631,8 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
   // OTA-550 — at close/mid a generic (melee-capable) enemy threatens the
   // player; at far/distant only a ranged enemy can still strike.
   if (range === 'close' || range === 'mid') return true;
-  // 'far' / 'distant' — only ranged enemies (loose hint via attack/damage str).
-  const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
-  return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart)/.test(sig);
+  // 'far' / 'distant' — only ranged enemies can still strike.
+  return isRangedEnemy(enemy);
 }
 
 // Which range bands the player's current weapon can reach. Bare hands and
@@ -25078,7 +25174,7 @@ export function runEnemyGroupCounters(
         && sceneAfter.enemies[liveIdx] === enemy;
       if (enemyStillAlive) {
         get().appendLog('combat', `${enemy.name} presses the second strike — bosses do not yield the tempo.`);
-        applyEnemyCounter(enemy, liveAfter, get, set, liveIdx);
+        applyEnemyCounter(enemy, liveAfter, get, set, liveIdx, true);
       }
     }
   }
@@ -25119,10 +25215,14 @@ function applyEnemyCounter(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   enemyIdx?: number,
+  // OTA-796 — set on a boss's SECOND swing of the volley so the end-of-round
+  // regen doesn't fire twice per round (fast_regen is tuned to 2 HP/round but
+  // bosses got 4/round, out-healing coating DOTs — exploit-sweep balance bug).
+  secondSwing?: boolean,
 ) {
-  // Full cover vs ranged enemies auto-misses. Detect ranged from the
-  // enemy's damage notation (Aetheric / ranged tag in the name).
-  const enemyIsRanged = /aetheric|burst|laser|breath|venom|crossbow|bolt/i.test(enemy.attack + ' ' + enemy.damage);
+  // Full cover vs ranged enemies auto-misses. OTA-796 — uses the shared
+  // isRangedEnemy classifier (was a second, different regex).
+  const enemyIsRanged = isRangedEnemy(enemy);
   if (hasFullCover(player.statusEffects) && enemyIsRanged) {
     get().appendLog(
       'combat',
@@ -25345,8 +25445,14 @@ function applyEnemyCounter(
   }
   if (dodgeWin === true) {
     // The read paid off — train DEX (and STEALTH when stealth gear is worn;
-    // both carried over from the old parry's training rules).
-    const liveParrier = get().player;
+    // both carried over from the old parry's training rules). OTA-796 — capped
+    // at 3 trains per scene visit (exploit sweep: unbounded dodge-farming).
+    const dodgeTrains = get().currentScene?.dodgeTrainsUsed ?? 0;
+    const mayTrain = dodgeTrains < 3;
+    if (mayTrain) {
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, dodgeTrainsUsed: dodgeTrains + 1 } } : s));
+    }
+    const liveParrier = mayTrain ? get().player : null;
     if (liveParrier) {
       const tr = trainStat(liveParrier, 'dexterity', true);
       set((s) => (s.player ? { player: tr.player } : s));
@@ -25354,7 +25460,7 @@ function applyEnemyCounter(
         get().appendLog('reward', `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`);
       }
     }
-    const liveSte = get().player;
+    const liveSte = mayTrain ? get().player : null;
     if (liveSte && (aggregateEquippedStatBonuses(liveSte).stealth ?? 0) > 0) {
       const trS = trainStat(liveSte, 'stealth', true);
       set((s) => (s.player ? { player: trS.player } : s));
@@ -25380,8 +25486,11 @@ function applyEnemyCounter(
   if (hit) {
     let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
     // Critical: roll damage twice and sum, mirroring the player's
-    // double-dice crit treatment so the bite hurts.
-    if (enemyCrit) {
+    // double-dice crit treatment so the bite hurts. OTA-796 — skipped when a
+    // dodge contest resolved this swing: the contest replaced the to-hit roll,
+    // and stacking the crit reroll under the failed-dodge ×2 made dodging vs a
+    // nat-20 FOUR times as deadly as standing still (exploit-sweep finding).
+    if (enemyCrit && dodgeWin == null) {
       rawDmg += rollFromNotation(String(enemy.damage)) || rollDie(6);
     }
     // Boss-tier bonus damage — +1d6 on every connecting swing on top
@@ -25550,8 +25659,9 @@ function applyEnemyCounter(
     }
   }
   // End-of-round regen for the attacking enemy. Caps at its starting HP
-  // so a player can't out-wait a regenerator past its base.
-  const regen = traitRegen(enemy.traits);
+  // so a player can't out-wait a regenerator past its base. OTA-796 — skip on a
+  // boss's second swing so it regens once per round, not per swing.
+  const regen = secondSwing ? 0 : traitRegen(enemy.traits);
   if (regen > 0) {
     const live = get().currentScene;
     if (live) {
@@ -27784,9 +27894,12 @@ function handleDogCombat(
     const total = roll + statVal;
     // OTA-795 — the DC scales with the target (8 + its ability points): a Mud
     // Boar is easy to bait, a Core Guardian isn't. Was a flat DC 12, which a
-    // trained dog out-grew into auto-success.
-    const distractDc = 8 + parseEnemyAP(target);
-    const success = total >= distractDc;
+    // trained dog out-grew into auto-success. OTA-796 — floored at 12 (the
+    // scaling formula made LOW-tier targets easier than the old flat DC) and
+    // nat-1 always fails / nat-20 always succeeds, mirroring dog_bite — so the
+    // failure cost keeps ≥5% teeth no matter how trained the dog gets.
+    const distractDc = Math.max(12, 8 + parseEnemyAP(target));
+    const success = roll === 1 ? false : roll === 20 ? true : total >= distractDc;
     get().appendLog(
       'combat',
       `${dog.name} dances at ${target.name}'s heels — d20 ${roll} + ${statKey.slice(0, 3).toUpperCase()} ${statVal} = ${total} vs DC ${distractDc} — ${success ? '✓ DISTRACTED' : '✗ NOT FOOLED'}`,
