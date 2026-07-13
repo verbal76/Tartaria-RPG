@@ -15901,4 +15901,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aether Dust). isDiscoverableRecipe now excludes any result that IS a material (findMaterialByName) — the
 // refine chain is always craftable again; Rare/Legendary weapons/armor/relics/consumables stay found-only.
 // Recipe-discovery + craftableTabCounts tests reworked off the Mudstone example onto a non-material Rare.
-export const OTA_BUILD_ID = '2026-07-12-789-broker-contract-accept';
+// OTA-790 — Arbiter TTS tail clip: the last fraction of EVERY spoken line was cut off
+// (player report, Pixel 10 Pro XL, bundled Kokoro). Three stacked causes in
+// PiperTTSManager.playPcm: trimSilenceLeadTrail shaved the trailing decay to within 8ms of the
+// last loud sample; only a 70ms silent tail pad followed it; and didJustFinish → immediate
+// unloadAsync released the player while Android's hardware AudioTrack still held ~100-250ms of
+// "finished" audio. Fix: defer the release 300ms (queue pacing unchanged — the promise still
+// resolves on didJustFinish), raise the tail pad 70 → 200ms, and widen the trailing trim guard
+// 8 → 40ms so a soft natural decay survives the trim.
+export const OTA_BUILD_ID = '2026-07-13-790-tts-tail-clip-fix';

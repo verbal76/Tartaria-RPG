@@ -10,6 +10,38 @@
 
 ---
 
+## 0. Cold start — read this FIRST in a fresh container
+
+A fresh remote session has ONE checkout (usually `/home/user/Tartaria-RPG`, on a
+harness-made `claude/*` branch). The working setup is THREE worktrees:
+
+```bash
+cd /home/user/Tartaria-RPG
+git fetch origin HaL2001 golem-line engine_Dev
+git worktree add /tmp/hal-main-fix HaL2001
+git worktree add /tmp/hal-golem golem-line
+git worktree add /tmp/hal-eng7 engine_Dev
+```
+
+- **The harness-designated `claude/*` branch is NOT where work ships.** The user
+  directs work to the three named line branches above. Pushing to them requires
+  the user's authorization, granted per-session (§2) — once granted, push each
+  OTA as it lands.
+- **Changes apply to ALL relevant lines in ONE pass.** Despite §2's "trial on
+  golem then promote" wording, standing practice is: implement in all three
+  worktrees together, per-line OTA bumps, one commit + push per line.
+  golem-as-trial is reserved for changes the user explicitly wants staged.
+- **Working style:** the user playtests on-device (Android, OTA-delivered) and
+  pastes in-game logs. For a bug report, DIAGNOSE first — root cause + proposed
+  fix, briefly — and implement only after approval (unless the message says
+  "fix it"). Use AskUserQuestion for genuine UX forks with 2-4 options.
+- **Judging "clean":** filter typecheck output to `app/**`, and additionally
+  ignore the pre-existing `expo-document-picker` errors in engine_Dev app
+  source (3 of them) plus the long-standing test-file type errors on all lines
+  (§3). engine_Dev diverges in places (content-pack layer, e.g. import lists,
+  `getNarratorName` in the voice warmup) — port fixes code-specifically, never
+  assume byte-identical files.
+
 ## 1. What this is
 
 **Tartaria Realms** — an Android-first, on-device (Hermes/Expo/React Native)
@@ -202,18 +234,16 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
-- **Arbiter TTS tail clip (OPEN — diagnosed, fix NOT yet approved)** — the last
-  fraction of every spoken Arbiter line is cut off (player report 2026-07-13,
-  Pixel 10 Pro XL, bundled Kokoro engine). Diagnosis: in
-  `app/voice/PiperTTSManager.ts` `playPcm`, `trimSilenceLeadTrail` shaves the
-  natural trailing decay to within an 8 ms guard of the last sample above 0.01
-  amplitude, then only a **70 ms** silent tail pad (`padSilence(buf, sr, 90, 70)`)
-  stands between the final phoneme and the `didJustFinish` → `unloadAsync`
-  release — and Android's expo-av can discard up to ~100–250 ms still queued in
-  the hardware AudioTrack when the sound is released. Candidate fix (awaiting
-  user approval): resolve the queue promise on `didJustFinish` but DEFER the
-  actual `unloadAsync` ~300 ms, and/or raise the tail pad to ~200 ms and the
-  trailing trim guard to ~40 ms. Do not ship until approved.
+- **Arbiter TTS tail clip — FIXED in 790/770/1076; retest on device.** The last
+  fraction of every spoken line was clipped (report 2026-07-13, Pixel 10 Pro XL,
+  bundled Kokoro): `trimSilenceLeadTrail` shaved the trailing decay to within
+  8 ms, only a 70 ms tail pad followed, and the `didJustFinish` → immediate
+  `unloadAsync` release discarded the ~100–250 ms Android still holds in the
+  hardware AudioTrack. Fix in `PiperTTSManager.playPcm`: release deferred 300 ms
+  (`UNLOAD_DRAIN_MS` — queue pacing unchanged, the promise still resolves on
+  `didJustFinish`), tail pad 70 → 200 ms, trailing trim guard 8 → 40 ms. If a
+  tail still clips after this, suspect the buffer arriving truncated from
+  synthesis (the arb68 "upstream of playback" case).
 - **Android recents/square-button SIGSEGV** — hardened across all lines (native ML
   frees + Qwen `generate()` ctx-capture now serialized through the lock; OTA
   658/643/951). Native crashes carry no JS stack, so this closes the known race
@@ -246,12 +276,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-12-789`**,
-**golem-line `…-769`**, **engine_Dev `…-1075`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-790`**,
+**golem-line `…-770`**, **engine_Dev `…-1076`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 790 | 770 | 1076 | Arbiter TTS tail-clip fix — deferred expo-av release (300 ms), 200 ms tail pad, 40 ms trailing trim guard |
 | 789 | 769 | 1075 | Broker stalls accept ANY faction's contracts — accept handlers search every faction pool for `hidden_market_*` vendors |
 | 788 | 768 | 1074 | TRADE button removed (stall tab IS the shop); tapping the active stall tab re-opens its wares |
 | 787 | 767 | 1073 | ENTER lands in a market square (navHidden concourse room); pick a stall to enter, EXIT returns outside |
