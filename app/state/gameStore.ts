@@ -3552,6 +3552,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
     get().appendLog('world', entry.description);
     patchSceneForBuildingRoom(get, set, buildingId, entry.id);
+    // OTA-786 — market stalls are shops: stepping into one opens its wares
+    // immediately. Back (← BACK) returns to the stall, where the stall tabs +
+    // EXIT live. Only market stalls carry a vendor, so this never fires for
+    // ordinary building rooms.
+    if (buildingId === 'market' && get().currentScene?.vendor) get().setScreen('vendor');
   },
   goBuildingRoom(roomId) {
     const id = get().activeBuildingId;
@@ -3567,6 +3572,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', `You step into ${room.name.toLowerCase()}.`);
     get().appendLog('world', room.description);
     patchSceneForBuildingRoom(get, set, id, roomId);
+    // OTA-786 — swapping to another market stall opens its wares immediately,
+    // same as first entry (see enterBuilding).
+    if (id === 'market' && get().currentScene?.vendor) get().setScreen('vendor');
   },
   exitBuilding() {
     const id = get().activeBuildingId;
