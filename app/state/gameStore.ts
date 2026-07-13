@@ -4029,6 +4029,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // here is the interrupted-death state.)
       const wasInterruptedDeath = (saved.player.hp ?? 0) <= 0;
       if (wasInterruptedDeath) restoredScene = null;
+      // OTA-784 — the fresh-market repair (backfillPlayer) repositioned the player
+      // 5 tiles east of the Hidden Market and flagged a skip-auto-enter. The SAVED
+      // scene is the stale IN-market one (stall vendor + market chrome), which
+      // would otherwise be restored verbatim — chips and all. Drop it so beginScene
+      // rebuilds a clean scene at the new position and the skip-auto-enter fires.
+      if (player._skipMarketAutoEnterOnce) restoredScene = null;
       // Refresh ambientNouns from the canonical source. Prefer the
       // authored location.interactables list when present; fall back
       // to extractAmbientNouns(description) otherwise. Older saves
