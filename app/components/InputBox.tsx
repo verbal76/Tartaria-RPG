@@ -196,7 +196,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const exitBuilding = useGameStore((s) => s.exitBuilding);
   const buildingRooms = useMemo(
     () => (activeBuildingId
-      ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed))
+      // OTA-787 — navHidden rooms (the market square you land in) aren't tabs;
+      // the row is the four stall tabs + EXIT whether you're in the square or a
+      // stall.
+      ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed)).filter((r) => !r.navHidden)
       : []),
     [activeBuildingId, buildingRevealed],
   );
