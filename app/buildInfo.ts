@@ -17215,4 +17215,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // regardless of AC, so no stack makes the player unhittable. No hardcoded content — the dev panel now
 // documents the field: TABLE_OPTION_NOTES gains an ACCESSORY_NOTE for the amulets + rings tables, and the
 // template ships a defensive (+AC) sample ring + amulet. Item preview shows the AC line. +2 tests.
-export const OTA_BUILD_ID = '2026-07-12-1075-broker-contract-accept';
+// OTA-1076 — Arbiter TTS tail clip: the last fraction of EVERY spoken line was cut off
+// (player report, Pixel 10 Pro XL, bundled Kokoro). Three stacked causes in
+// PiperTTSManager.playPcm: trimSilenceLeadTrail shaved the trailing decay to within 8ms of the
+// last loud sample; only a 70ms silent tail pad followed it; and didJustFinish → immediate
+// unloadAsync released the player while Android's hardware AudioTrack still held ~100-250ms of
+// "finished" audio. Fix: defer the release 300ms (queue pacing unchanged — the promise still
+// resolves on didJustFinish), raise the tail pad 70 → 200ms, and widen the trailing trim guard
+// 8 → 40ms so a soft natural decay survives the trim.
+export const OTA_BUILD_ID = '2026-07-13-1076-tts-tail-clip-fix';

@@ -71,6 +71,12 @@ const CROSSFADE_MS = 12;
 // out of that silence so the join stays click-free.
 const SENTENCE_PAUSE_MS = 160;
 const EDGE_FADE_MS = 6;
+// OTA-790 — how long to keep a finished expo-av Sound alive before releasing it.
+// didJustFinish fires when the decoder finishes FEEDING the audio sink, not when
+// the speaker finishes playing; releasing immediately discards whatever the
+// hardware AudioTrack still holds (~100-250ms on Pixel-class devices), which
+// clipped the tail of every spoken line.
+const UNLOAD_DRAIN_MS = 300;
 
 interface QueuedUtterance {
   id: number;
@@ -868,7 +874,11 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // earlier 1300ms "first-utterance" lead was removed: the title-line clip is
   // upstream of playback — the buffer itself arrives truncated — so padding the
   // playback buffer never addressed it. Fixed at the source instead.)
-  try { buf = padSilence(buf, sampleRate, 90, 70); } catch { /* play unpadded */ }
+  // OTA-790 — tail raised 70 → 200ms: a player heard the end of EVERY Arbiter
+  // line clipped. The release is now also deferred (UNLOAD_DRAIN_MS below), but
+  // the tail must still outlast the deepest hardware buffer a device may hold
+  // when didJustFinish fires, so the shave only ever eats silence.
+  try { buf = padSilence(buf, sampleRate, 90, 200); } catch { /* play unpadded */ }
   const wavBase64 = encodeWav(buf, sampleRate);
   // progressUpdateIntervalMillis defaults to 500ms in expo-av, which
   // means didJustFinish fires up to half a second AFTER the audio
@@ -889,8 +899,17 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
     sound.setOnPlaybackStatusUpdate((status) => {
       if (!status.isLoaded) return;
       if (status.didJustFinish) {
-        try { void sound.unloadAsync(); } catch { /* ignore */ }
-        if (currentSound === sound) currentSound = null;
+        // OTA-790 — DEFER the release. didJustFinish means the decoder finished
+        // feeding the sink, not that the speaker finished playing: Android can
+        // still hold ~100-250ms in the hardware AudioTrack, and an immediate
+        // unloadAsync() discarded it — clipping the tail of every line. Resolve
+        // now (queue pacing unchanged) and release after the sink has drained.
+        // stopAndClear() may unload this sound first; the timer's second unload
+        // rejects harmlessly into its catch.
+        setTimeout(() => {
+          try { void sound.unloadAsync().catch(() => { /* already unloaded */ }); } catch { /* ignore */ }
+          if (currentSound === sound) currentSound = null;
+        }, UNLOAD_DRAIN_MS);
         resolve();
       }
     });
@@ -926,16 +945,21 @@ function asFloat32(x: unknown): Float32Array {
 function trimSilenceLeadTrail(samples: Float32Array, sampleRate: number): Float32Array {
   const n = samples.length;
   if (n === 0) return samples;
-  const THRESHOLD = 0.01;                       // |amp| counted as "sound"
-  const guard = Math.floor(sampleRate * 0.008); // keep ~8ms padding each end
+  const THRESHOLD = 0.01;                            // |amp| counted as "sound"
+  const guardLead = Math.floor(sampleRate * 0.008);   // keep ~8ms padding at the head
+  // OTA-790 — tail guard widened 8 → 40ms: a soft trailing decay (a fading
+  // fricative sits well under the 0.01 threshold) was trimmed to within 8ms of
+  // the last loud sample, running speech right up to the buffer edge and making
+  // the unload shave audible. 40ms keeps the natural decay.
+  const guardTail = Math.floor(sampleRate * 0.04);
   const maxTrim = Math.floor(sampleRate * 0.2); // never cut > 200ms per end
   let first = 0;
   while (first < n && Math.abs(samples[first]!) < THRESHOLD) first++;
   let last = n - 1;
   while (last > first && Math.abs(samples[last]!) < THRESHOLD) last--;
   if (first >= last) return samples;            // all-silence / lone spike
-  const start = Math.min(Math.max(0, first - guard), maxTrim);
-  const end = Math.max(Math.min(n - 1, last + guard), n - 1 - maxTrim);
+  const start = Math.min(Math.max(0, first - guardLead), maxTrim);
+  const end = Math.max(Math.min(n - 1, last + guardTail), n - 1 - maxTrim);
   if (start <= 0 && end >= n - 1) return samples;
   return samples.subarray(start, end + 1);
 }
