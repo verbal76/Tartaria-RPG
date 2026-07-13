@@ -15677,4 +15677,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog auto-passed); a FAILED feint redirects that enemy's counter onto the DOG instead of
 // the player. Action-reference help text updated. (defensiveTurnAdvances' 3 failures are
 // the long-standing pre-existing wording drift, verified identical before this change.)
-export const OTA_BUILD_ID = '2026-07-13-775-dodge-gamble-distract-teeth';
+// OTA-776 — exploit-sweep fixes (multi-agent audit; shared across all three lines).
+// COMBAT: (1) dodge now costs 1 stamina + 6 min like its OTA-611 siblings and
+// trains DEX/STE for only the first 3 wins per scene visit — closes the
+// zero-cost unbounded dodge-farm. (2) A failed dodge no longer stacks the
+// enemy's nat-20 crit reroll under its ×2, so dodging vs a crit is no longer 4×
+// deadly. (3) Dog distract DC floored at 12 with nat-1/nat-20 rules, so a
+// trained dog can't auto-succeed with no failure risk. (4) ONE shared
+// isRangedEnemy() classifier for the reach gate AND full-cover — 14 Laser/
+// Breath/Venom bestiary entries could never counter at 'far' and were kited
+// risk-free. (5) Boss regenerators heal once per round, not per swing. (6)
+// One-shot combat buffs (perfect_opening/stealthed/ready/distract/aiming) are
+// consumed when the ATTACK RESOLVES, not at prompt build — CANCEL no longer
+// eats your buff, and cancel+re-attack no longer sheds the 'surprised' penalty.
+// ECONOMY/ITEMS: (7) scrapping an equipped hands/cloak/ring2/ring3 item no
+// longer leaves a ghost granting AC/stats forever. (8) Two-handed auto-displace
+// strips the displaced weapon's HP bonus — closes an unbounded hpMax/heal loop.
+// SURVIVAL: (9) water sources match whole words, not substrings ('spool'/
+// 'stairwell' are no longer drinkable); (10) filling a bottle costs 5 min.
+// QUESTS: (11) a hunt's final boss must be KILLED to complete — spawning it no
+// longer marks it turn-inable. LOOP: (12) the MiniLM investigate fallback can't
+// self-dispatch 'search the <location name>' forever (unbounded CPU/feed/DOT).
+export const OTA_BUILD_ID = '2026-07-13-776-exploit-sweep-batch';

@@ -1361,6 +1361,13 @@ export interface PendingRollState {
   // who back out of a flee / cast / stealth / etc. modal shouldn't
   // lose 15 minutes and stamina for nothing.
   refundOnCancel?: { hoursElapsed: number; stamina: number };
+  /** OTA-796 — one-shot statuses to strip when the ATTACK step actually
+   *  resolves (perfect_opening / stealthed / ready / distracted / aiming /
+   *  quick_fire / surprised / power_attack_pending). They used to be stripped
+   *  at prompt-BUILD time, so tapping CANCEL on the dice modal silently
+   *  destroyed earned buffs — and let a player shed the 'surprised' penalty
+   *  by cancel + re-attack without ever rolling. */
+  consumeOnResolve?: string[];
 }
 
 /**
