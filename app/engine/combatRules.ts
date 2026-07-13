@@ -145,6 +145,15 @@ export function rollMods(
           consume.push('distracted');
         }
         break;
+      // OTA-795 — perfect opening (successful dodge): no to-hit change; the
+      // window is CONSUMED by this swing whether it lands or not. The damage
+      // doubling itself rides on buildCombatSteps' peek of the same status.
+      case 'perfect_opening':
+        if (action === 'attack_ranged' || action === 'attack_melee') {
+          sources.push('perfect opening (2× dice)');
+          consume.push('perfect_opening');
+        }
+        break;
       case 'dodging':
         if (action === 'defense') {
           bonus += 4;
@@ -478,6 +487,11 @@ export function buildCombatSteps(
   // both bonuses on the SAME swing — the player's first attack after the
   // dog distracts gets initiative +1 AND attack +4.
   const distractBonus = (player.statusEffects ?? []).some((e) => e.kind === 'distracted') ? 1 : 0;
+  // OTA-795 — perfect opening (successful dodge). Peek only; rollMods consumes
+  // the status on the attack step, so the window is spent by this swing whether
+  // it lands or not. Doubles the damage DICE — the same treatment as a crit,
+  // and they stack (a crit through a perfect opening is 4× dice).
+  const perfectOpening = (player.statusEffects ?? []).some((e) => e.kind === 'perfect_opening');
   // OTA-403 — manual weapon-coating damage roll. If the swinging weapon
   // instance carries a coating, append a 4th 'coating' step so the player
   // ROLLS the coating's bonus damage themselves (it was auto-rolled inside
@@ -559,13 +573,13 @@ export function buildCombatSteps(
       id: 'damage',
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
-      count: dmg.count,
+      count: perfectOpening ? dmg.count * 2 : dmg.count,
       bonus: damageBonus + aetherSurge,
       bonusLabel: [
         damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
         aetherSurge > 0 ? `+${aetherSurge} (Aetheric surge 1d6)` : '',
       ].filter(Boolean).join(' '),
-      context: `damage dealt to ${enemy.name}${damageTypeNote}`,
+      context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : ''}`,
       // no target — always applies if the attack hit
     },
   ];

@@ -283,18 +283,16 @@ Key invariants worth knowing:
   on old saves ignored).
   (c) Enemy ATK variance — **explained, deterministic, not dodge.** Silt Thief
   = base 5 (`Dexterity 5`) + 1 (`quick` trait) + one-shot +2 (`ambush_strike`,
-  first counter in scene only) → 8 first swing, 6 after. **DODGE wiring
-  (documented for a pending design call — owner's intent differs):** wired =
-  dodge sets a 1-round `dodging` status, provokes the volley, no AC/enemy-ATK
-  effect; if the enemy HIT lands, an opposed parry roll (d20+DEX vs the enemy's
-  attack total, nat-20/nat-1 honored) on SUCCESS negates the damage AND fires an
-  immediate free riposte at 2× weapon dice (no to-hit; bare-handed = negate
-  only; vs unarmed attacker = still eat 50%); on FAILURE takes normal damage,
-  deals nothing ("✗ Read through"), no out-of-position penalty. 2 weapon
-  durability either way (gameStore ~25406-25522). Owner's stated intent:
-  success → 2× on your NEXT hit; failure → you deal normal damage AND take
-  DOUBLE. Neither the double-damage penalty nor the carry-to-next-hit reward is
-  wired. Awaiting the user's call before changing.
+  first counter in scene only) → 8 first swing, 6 after. **DODGE + DISTRACT
+  reworked per the user's design call in 795/775/1081:** dodge is now an
+  AC-BYPASS GAMBLE — the enemy's swing resolves as an opposed contest (d20+DEX
+  vs its attack total; nat rules honored; enemy fumble = free win). Win → take
+  nothing + `perfect_opening` status: next attack rolls DOUBLE damage dice
+  (consumed by that swing hit or miss; stacks with crit to 4× dice). Lose → the
+  blow lands REGARDLESS of AC for 2× damage. Old landed-hit parry + instant
+  riposte + boxing exception + 2-durability cost retired; DEX/stealth training
+  kept. Dog distract: DC now 8 + target ability points (was flat 12); a failed
+  feint redirects that enemy's counter onto the DOG. Retest both on-device.
   (d) MiniLM `[cognitive]` labels — **cosmetic.** The intent half (SWIM /
   RETREAT · DISENGAGE) is consumed by nothing but the debug log line; the
   emotion half only biases which canned Arbiter flavor line prints (plus a tiny
@@ -345,12 +343,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-794`**,
-**golem-line `…-774`**, **engine_Dev `…-1080`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-795`**,
+**golem-line `…-775`**, **engine_Dev `…-1081`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 795 | 775 | 1081 | Dodge = AC-bypass gamble (win: next strike ×2 dice; lose: hit lands past armor for 2×); dog distract DC scales with target + failed feint redirects the counter onto the dog |
 | 794 | 774 | 1080 | OTA-784's one-time fresh-market save repair removed (served its failed-OTA reset; save repaired) — market saves load in place, auto-enter unconditional again |
 | 793 | 773 | 1079 | Ambient narration drops second-person "You…" sentences (off-scene Qwen musings read as world text) |
 | 792 | 772 | 1078 | Companions follow nat-1/nat-20; wild water: one cupped drink (+1 corruption) + one bottle refill per location visit, the bottle's filter cleanses. Engine also ships all five lore-leak audit fixes (Temporal Credits, Timeline removed, un-gated case-agnostic scrub, JSON biome labels, defaultLocationId) |
