@@ -251,30 +251,39 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
-- **engine_Dev Tartaria-leakage audit (2026-07-13) — findings reported, fixes
-  pending user approval.** Rule (§2): engine_Dev's hardcoded prefills must be
+- **engine_Dev Tartaria-leakage audit (2026-07-13) — all five items FIXED in
+  engine OTA-1078.** Rule (§2): engine_Dev's hardcoded prefills must be
   lore-neutral. Architecture verified sound: content resolves author pack →
   boot-installed generic pack ("the Reaches", `genericGame.ts`, installed by
   `App.tsx` → `installGenericDefaults`) → built-in Tartaria JSON, so the generic
   layer masks the vast majority of ~130 `tartar` hits in engine code at runtime.
-  The REACHABLE leaks for a custom-pack (Philadelphia Experiment) player, in
-  priority order: (1) `engine/investigationTable.ts:171,218` — hardcoded yield
-  item **"Worn Tartarian Coin"** on INVESTIGATE shelf/altar; no resolver/reskin
-  gate, and the lowercased feed line defeats the case-sensitive scrub — top fix.
-  (2) Codex **Timeline tab** (`components/LoreCodexBody.tsx:29,37-41`) imports
-  Tartaria `data/events/timeline.json` directly; hidden only when the author
-  uploads factions/locations tables. (3) `engine/contentPack.ts`
-  `dressBuiltInLeaks` (L373-425) is a no-op unless a first-class override
-  (worldName/energy/corruption) is set, and its swaps are case-sensitive with
-  proper-noun gaps (lowercase `tartarian`/`aether`, `Aetherstone`, `Mud
-  Monarch`, `Reclaimer` pass through). (4) `engine/hunts.ts:131` biome labels
-  ("the Tartarian Outskirts", "the Mud Seas") — player-facing, not gated.
-  (5) Robustness, not text: hardcoded `tartarian_outskirts` fallback location id
-  (`contractMarkers.ts:38`, `character.ts:491`, `gameStore.ts`) breaks contract
-  pinning/spawn routing in a custom catalog lacking that id. Benign (leave):
-  storage keys (`tartaria.*`), MiniLM embedding anchors
-  (`CognitiveOrchestrator.ts` — internal, never shown), pronunciation lexicon,
-  parser noun dictionary. Full report in the 2026-07-13 session log.
+  Shipped fixes for the five reachable leaks: (1) "Worn Tartarian Coin" → **"Worn
+  Temporal Credits"** everywhere (the INVESTIGATE shelf/altar yields were live in
+  custom games). (2) Codex **Timeline tab removed** (only section importing
+  built-in events directly, no upload path). (3) `dressBuiltInLeaks` **un-gated +
+  case-agnostic** — swaps run on the RESOLVED names (author → generic → built-in;
+  no-op in pure built-in test mode), and the energy family resolves neutrally on
+  any generic boot. (4) Hunt **biome labels resolve from the live locations
+  JSON** (hardcoded Tartaria label map deleted). (5) Hardcoded
+  `tartarian_outskirts` fallback → `defaultLocationId()` (first row of the live
+  locations table); contract biome anchors validated against the live catalog.
+  Deliberately left (benign, internal-only): storage keys (`tartaria.*`), MiniLM
+  embedding anchors (`CognitiveOrchestrator.ts` — never shown; a future
+  quality pass could genericize them for classifier neutrality), pronunciation
+  lexicon, parser noun dictionary.
+- **2026-07-13 playtest-log observations (all lines) — not yet addressed.**
+  (a) Ambient Qwen line can be off-scene and second-person ("cobweb-infested
+  alleyways" while in a flooded-house kitchen; "You step back, surveying…" in
+  the arbiter channel) — the ambient filters drop "the player"/"They…" but pass
+  second-person wrong-scene prose; candidate: filter ambient lines opening with
+  "You". (b) Position desync: entering the Hidden Market via a roadside hook
+  leaves `gridX/gridY` on the road cell, so compass lines and travel estimates
+  from "inside" the market are computed from the road (log: "The Hidden Market
+  lies 4 stretches further west" one step after leaving it). Watch travel
+  estimates on resume. (c) Enemy ATK bonus varied round-to-round in the log
+  (Silt Thief +8 → +6 after a dodge; +5 vs the golem) — unverified whether
+  intentional. (d) MiniLM `[cognitive]` labels are noisy (attack → RETREAT ·
+  DISENGAGE, drink water → SWIM) — cosmetic if telemetry-only.
 - **Arbiter TTS tail clip — FIXED in 790/770/1076; retest on device.** The last
   fraction of every spoken line was clipped (report 2026-07-13, Pixel 10 Pro XL,
   bundled Kokoro): `trimSilenceLeadTrail` shaved the trailing decay to within
@@ -317,12 +326,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-791`**,
-**golem-line `…-771`**, **engine_Dev `…-1077`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-792`**,
+**golem-line `…-772`**, **engine_Dev `…-1078`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 792 | 772 | 1078 | Companions follow nat-1/nat-20; wild water: one cupped drink (+1 corruption) + one bottle refill per location visit, the bottle's filter cleanses. Engine also ships all five lore-leak audit fixes (Temporal Credits, Timeline removed, un-gated case-agnostic scrub, JSON biome labels, defaultLocationId) |
 | 791 | 771 | 1077 | Combat blocks the trade screen visibly — vendor entry refused mid-fight, VendorScreen ejects if a fight starts mid-trade |
 | 790 | 770 | 1076 | Arbiter TTS tail-clip fix — deferred expo-av release (300 ms), 200 ms tail pad, 40 ms trailing trim guard |
 | 789 | 769 | 1075 | Broker stalls accept ANY faction's contracts — accept handlers search every faction pool for `hidden_market_*` vendors |

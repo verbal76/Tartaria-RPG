@@ -234,7 +234,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
       });
 
       const golemHpBefore = store.getState().player!.golem!.hp;
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState().player!.golem!;
       // 10d10 is at least 10 — comfortably above the old flat cap of 7.
@@ -270,7 +274,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         },
       });
 
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState();
       // Enemy resolved out + combat ended.
@@ -432,7 +440,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         },
       });
 
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState().player!.golem!;
       // Strike landed → power progress; the dummy hit back (atk vs AC 11) often
@@ -479,7 +491,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
       });
       // 3 strikes: weapon (durability 3) wears to 0 and shatters → golem.weapon cleared.
+      // Pin the dice (d20 = 11): a nat-1 fumble would skip a wear tick and
+      // leave the weapon unshattered after 3 swings.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       for (let i = 0; i < 3; i++) await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
       const g = store.getState().player!.golem!;
       expect(g.weapon ?? null).toBeNull();
       const log = store.getState().gameLog.map((l) => l.text).join('\n');
@@ -507,7 +523,11 @@ describe('MECHANIC-1b — golem sidekick', () => {
         currentScene: { ...scene, enemies: [{ name: 'Dummy', damage: '1d4', abilityPoint: 'Strength 0', hp: 100000, type: 'construct', loot: [], rarity: 'Common', traits: [] } as never], enemyHps: [100000], activeEnemyIdx: 0, range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]] },
       });
 
+      // Companion rolls honor nat-1/nat-20 now — pin the dice to a mid roll
+      // (d20 = 11) so the guaranteed-hit setup stays deterministic.
+      const rnd = jest.spyOn(Math, 'random').mockReturnValue(0.5);
       await store.getState().submitPlayerAction('golem attack');
+      rnd.mockRestore();
 
       const after = store.getState().currentScene!;
       // Acid shred accumulated on the enemy, and a DOT status seeded.
