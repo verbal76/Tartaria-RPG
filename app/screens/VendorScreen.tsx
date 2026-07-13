@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
@@ -42,6 +42,7 @@ export function VendorScreen() {
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const scene = useGameStore((s) => s.currentScene);
   const setScreen = useGameStore((s) => s.setScreen);
+  const appendLog = useGameStore((s) => s.appendLog);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
   const equipItem = useGameStore((s) => s.equipItem);
   const sellToVendor = useGameStore((s) => s.sellToVendor);
@@ -79,6 +80,18 @@ export function VendorScreen() {
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
 
   const vendor = scene?.vendor ?? null;
+
+  // OTA-791 — a fight can start while the trade screen is open (hook-spawned
+  // combat, caught stealing). The player kept trading blind: every sell bounced
+  // off the arb166 combat guard, whose messages land in a log this screen never
+  // shows. Eject to exploration the moment enemies appear so the enemy card is
+  // the first thing they see; setScreen's door guard covers re-entry.
+  const combatLive = (scene?.enemies?.length ?? 0) > 0;
+  useEffect(() => {
+    if (!combatLive) return;
+    appendLog('system', 'The trade breaks off — something hostile demands your attention.');
+    setScreen('exploration');
+  }, [combatLive, appendLog, setScreen]);
 
   if (!player || !vendor) {
     return (

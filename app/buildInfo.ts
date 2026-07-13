@@ -17223,4 +17223,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "finished" audio. Fix: defer the release 300ms (queue pacing unchanged — the promise still
 // resolves on didJustFinish), raise the tail pad 70 → 200ms, and widen the trailing trim guard
 // 8 → 40ms so a soft natural decay survives the trim.
-export const OTA_BUILD_ID = '2026-07-13-1076-tts-tail-clip-fix';
+// OTA-1077 — combat blocks the trade screen (visibly). A resonance story hook spawned combat
+// while the market vendor was still attached to the scene; the player opened TRADE unaware the
+// fight had started ("I never knew I was in combat"), every sell bounced off the arb166 guard,
+// and the guard's "Not while you're in a fight" lines went to a log the vendor screen never
+// shows. Now setScreen('vendor') refuses while enemies are live (refusal logged to the feed the
+// player IS looking at, enemy card stays in view), and VendorScreen ejects to exploration if a
+// fight starts mid-trade (hook spawn, caught stealing). +2 tests (vendorCombatGuard).
+export const OTA_BUILD_ID = '2026-07-13-1077-combat-blocks-trade-screen';

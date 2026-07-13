@@ -4455,6 +4455,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   setScreen(screen) {
+    // OTA-791 — the trade screen is unreachable mid-fight. A resonance-hook
+    // combat began while the market vendor was still attached to the scene;
+    // the player tapped into TRADE unaware, every sell bounced off the arb166
+    // guard, and the guard's "Not while you're in a fight" lines landed in a
+    // log the vendor screen never shows ("I never knew I was in combat").
+    // Refusing the switch keeps the enemy card in view, and the refusal lands
+    // in the feed the player is actually looking at.
+    if (screen === 'vendor' && (get().currentScene?.enemies.length ?? 0) > 0) {
+      get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
+      return;
+    }
     set({ currentScreen: screen });
     void get().persist();
   },
