@@ -17261,4 +17261,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ambient sentence filter now also removes sentences opening with "You"; if nothing
 // survives, ambient stays silent (it has no template fallback). Reactive narration is
 // untouched — second person is legitimate there.
-export const OTA_BUILD_ID = '2026-07-13-1079-ambient-second-person-filter';
+// OTA-1080 — the OTA-784 one-time fresh-market repair is removed (user call: it existed to
+// reset saves after a failed OTA, and the affected save has been repaired). A save at the
+// Hidden Market now loads exactly where it saved; the market auto-enter is unconditional
+// again; the _freshMarketEntry784 / _skipMarketAutoEnterOnce player flags are gone (old
+// saves may still carry the keys — ignored).
+export const OTA_BUILD_ID = '2026-07-13-1080-remove-fresh-market-repair';

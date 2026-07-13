@@ -1285,14 +1285,9 @@ export interface PlayerCharacter {
    *  auto-route to it reads exactly 1) and sets this true so it fires only once
    *  and never yanks the player back on later loads. */
   _placedWestOfHiddenMarket510?: boolean;
-  /** OTA-784 — one-time fresh-market repair: a save left AT the Hidden Market is
-   *  dropped 5 tiles east of it and the auto-enter is suppressed once, so it
-   *  loads OUTSIDE and walks/taps into a clean, renewed market. Fires once. */
-  _freshMarketEntry784?: boolean;
-  /** OTA-784 — transient: when set, the very next hidden_market beginScene
-   *  skips its auto-enter (so the fresh-market repair lands the player outside),
-   *  then clears itself. */
-  _skipMarketAutoEnterOnce?: boolean;
+  /** OTA-784's `_freshMarketEntry784` / `_skipMarketAutoEnterOnce` repair flags
+   *  were removed in OTA-1080 (the failed-OTA save reset they served is done);
+   *  old saves may still carry the keys — they're ignored. */
   /** Last cardinal direction the player traveled. Lets "continue" /
    *  "keep going" / "onward" repeat the previous step without forcing the
    *  player to retype the direction. Cleared on travelTo() to a named
