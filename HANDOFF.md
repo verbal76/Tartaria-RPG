@@ -274,13 +274,13 @@ Key invariants worth knowing:
 - **2026-07-13 playtest-log observations — resolved statuses.**
   (a) Ambient second-person/off-scene Qwen lines — **FIXED in 793/773/1079**
   (ambient sentence filter drops "You…" openers; reactive narration untouched).
-  (b) Hidden Market "position desync" — **NOT A BUG.** The log showed the
-  deliberate one-time OTA-784 fresh-market repair (a save parked at the market
-  is dropped 5 tiles east, flag `_freshMarketEntry784`). The compass line ("4
-  stretches further west" after one step) and the 29-day Asgardar estimate were
-  both verified exactly correct for that position. No hook path teleports into
-  the market (the green-lantern chain is narrative-only). Only residual nit:
-  the repair fires silently, so the resume feed doesn't explain the reposition.
+  (b) Hidden Market "position desync" — **NOT A BUG** (it was the deliberate
+  one-time OTA-784 fresh-market repair; compass + 29-day estimate verified
+  exact). Per the user, the repair existed only to reset saves after a failed
+  OTA and the save is repaired — so the whole mechanism was **REMOVED in
+  794/774/1080** (market saves load in place; auto-enter unconditional; the
+  `_freshMarketEntry784`/`_skipMarketAutoEnterOnce` flags dropped, stale keys
+  on old saves ignored).
   (c) Enemy ATK variance — **explained, deterministic, not dodge.** Silt Thief
   = base 5 (`Dexterity 5`) + 1 (`quick` trait) + one-shot +2 (`ambush_strike`,
   first counter in scene only) → 8 first swing, 6 after. **DODGE wiring
@@ -345,12 +345,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-793`**,
-**golem-line `…-773`**, **engine_Dev `…-1079`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-794`**,
+**golem-line `…-774`**, **engine_Dev `…-1080`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 794 | 774 | 1080 | OTA-784's one-time fresh-market save repair removed (served its failed-OTA reset; save repaired) — market saves load in place, auto-enter unconditional again |
 | 793 | 773 | 1079 | Ambient narration drops second-person "You…" sentences (off-scene Qwen musings read as world text) |
 | 792 | 772 | 1078 | Companions follow nat-1/nat-20; wild water: one cupped drink (+1 corruption) + one bottle refill per location visit, the bottle's filter cleanses. Engine also ships all five lore-leak audit fixes (Temporal Credits, Timeline removed, un-gated case-agnostic scrub, JSON biome labels, defaultLocationId) |
 | 791 | 771 | 1077 | Combat blocks the trade screen visibly — vendor entry refused mid-fight, VendorScreen ejects if a fight starts mid-trade |
