@@ -118,8 +118,8 @@ edits won't touch it. If a tool stages it: `git checkout HEAD -- app.json`.
 5. Update this `HANDOFF.md` (open-issues / recent-OTAs) in the same commit when
    the change is notable.
 6. Commit with the trailers in §6, then push that line's branch (`git push -u
-   origin <branch>`; for the detached HaL2001 worktree, `git push -u origin
-   HEAD:HaL2001`). Retry network failures with exponential backoff.
+   origin <branch>`). All three worktrees are now checked out ON their branches
+   (no detached HEAD). Retry network failures with exponential backoff.
 7. After pushing, ensure an **open draft PR** exists for the branch (create one if
    not). PRs already exist for the standing lines (#2 HaL2001, #7 golem-line,
    #13 engine_Dev, etc.).
@@ -142,8 +142,8 @@ a push to one reaches the others. Watch for per-line divergence:
   `metro.config.js` on the `web` target.
 Typecheck + run the relevant suite in **each** worktree before pushing it.
 
-Worktrees used this session: `/tmp/hal-main-fix` (HaL2001, detached — push
-`HEAD:HaL2001`), `/tmp/hal-golem` (golem-line), `/tmp/hal-eng7` (engine_Dev).
+Worktrees used this session: `/tmp/hal-main-fix` (HaL2001), `/tmp/hal-golem`
+(golem-line), `/tmp/hal-eng7` (engine_Dev) — each checked out on its branch.
 
 ## 5. Native / artifact builds (rare — confirm first)
 
@@ -202,6 +202,18 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **Arbiter TTS tail clip (OPEN — diagnosed, fix NOT yet approved)** — the last
+  fraction of every spoken Arbiter line is cut off (player report 2026-07-13,
+  Pixel 10 Pro XL, bundled Kokoro engine). Diagnosis: in
+  `app/voice/PiperTTSManager.ts` `playPcm`, `trimSilenceLeadTrail` shaves the
+  natural trailing decay to within an 8 ms guard of the last sample above 0.01
+  amplitude, then only a **70 ms** silent tail pad (`padSilence(buf, sr, 90, 70)`)
+  stands between the final phoneme and the `didJustFinish` → `unloadAsync`
+  release — and Android's expo-av can discard up to ~100–250 ms still queued in
+  the hardware AudioTrack when the sound is released. Candidate fix (awaiting
+  user approval): resolve the queue promise on `didJustFinish` but DEFER the
+  actual `unloadAsync` ~300 ms, and/or raise the tail pad to ~200 ms and the
+  trailing trim guard to ~40 ms. Do not ship until approved.
 - **Android recents/square-button SIGSEGV** — hardened across all lines (native ML
   frees + Qwen `generate()` ctx-capture now serialized through the lock; OTA
   658/643/951). Native crashes carry no JS stack, so this closes the known race
@@ -219,8 +231,8 @@ Key invariants worth knowing:
 - **Spin-off sync status** — steam_Dev / mac_dev / linux_dev / html_dev / apple_ios
   were merged up to the current Tartaria game code (`git merge -X theirs HaL2001`,
   identity + platform shims preserved) at the **OTA-660 baseline**; they're now
-  a couple OTAs behind again (661 aethercraft, 662 investigate) — re-run the same
-  merge to top them up. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
+  **~130 OTAs behind** (HaL2001 is at 789) — re-run the same merge to top them
+  up when the user asks. `Dev_engine_PC` tracks `engine_Dev` (not Tartaria) and was
   left alone; `arbiters-line` is retired. Native/desktop/web builds were NOT
   compiled in the SDK container — verify via each line's build workflow.
 - **golem CI hygiene (done)** — the dead inherited `eas-update.yml` (HAL's
@@ -231,25 +243,33 @@ Key invariants worth knowing:
   (defensiveTurnAdvances / fleeFailCounter wording drift, armorMultiStat data
   drift, directionalFind flake, movementStress) are stale/flaky, not live bugs.
 
-## 9. Recent OTA highlights (this session)
+## 9. Recent OTA highlights (latest sessions)
 
-Full changelog is in `HANDOFF-ARCHIVE.md`. Latest per line: **HaL2001
-`…-663`**, **golem-line `…-648`**, **engine_Dev `…-955`**.
+Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-12-789`**,
+**golem-line `…-769`**, **engine_Dev `…-1075`**. Current parity offsets:
+golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
-| 663 | 648 | 955 | Completed INVESTIGATE chips leave the picker (was greyed + ✓); pinned/locked chips stay |
-| 662 | 647 | 954 | INVESTIGATE chip count honors the elevation gate (no phantom-active hang) |
-| 661 | 646 | — | Aethercraft shape/mend open confirm popups (no clipboard copy-paste) |
-| 660 | 645 | 953 | Travel badge grid-exact from course-set (vendor-departure fix) |
-| 659 | 644 | 952 | Travel counter keeps progress across a mid-journey reload |
-| 658 | 643 | 951 | Native-ML teardown hardening (recents/background SIGSEGV) |
-| 657 | 642 | 950 | Dedicated collapsible "Dog Armor" inventory section |
-| 656 | 641 | 949 | Craft: fold hyphens in recipe match (infinite-loop/death fix) |
-| 655 | 640 | 948 | Fusion picker drops same-material duplicates once picked |
-| 654 | 639 | — | Default-collapsed categories + Rare/Legendary recipes |
-| 653 | 638 | 946 | Armor-recipe balance + collapsible crafting categories |
-| 652 | 637 | 945 | Drink-water clarity + fusion material info block |
+| 789 | 769 | 1075 | Broker stalls accept ANY faction's contracts — accept handlers search every faction pool for `hidden_market_*` vendors |
+| 788 | 768 | 1074 | TRADE button removed (stall tab IS the shop); tapping the active stall tab re-opens its wares |
+| 787 | 767 | 1073 | ENTER lands in a market square (navHidden concourse room); pick a stall to enter, EXIT returns outside |
+| 786 | 766 | 1072 | Stepping into a market stall auto-opens its vendor (wares) screen |
+| 785 | 765 | 1071 | Stale in-market scene dropped on save load (`_skipMarketAutoEnterOnce` — market-chip fix) |
+| 784 | 764 | 1070 | Fresh-market save repair + real-time daily vendor rotation |
+| 783 | 763 | 1069 | Faction sigils turn in at the Hidden Market (one-stop broker) |
+| 782 | 762 | 1068 | Hidden Market stalls broker EVERY faction's contracts (VendorContractsModal aggregation) |
+| 781 | 761 | 1067 | Clean Hidden Market nav row (stall tabs + EXIT, like building rooms) |
+| 780 | 760 | 1066 | Floating stall chips killed; TRADE/FUSE moved to the quick row |
+| 779 | 759 | 1065 | Torch button: icon dropped, green only with torch + valid lead |
+| 775–778 | 755–758 | 1061–1064 | Aetheric Torch as an aimed tool; Scanner Pouch; Hidden Market rendered as a building; market reload-inside fix |
+
+Older arcs since the 663 snapshot (see git log): combat-HUD/reading-mode layout
+(748–752), forge/fusion junk-loot + rarity-follows-material (753–759), enemy
+weakness spread + forged-name quality (760–761), coatings drinkable as
+counter-medicine (764–765), investigate-chip + indoor/outdoor scene fixes
+(766–770), torch rework (771–779), Hidden Market arc (780–789).
 
 ## 10. Reference (quick) — full detail in `HANDOFF-ARCHIVE.md`
 
