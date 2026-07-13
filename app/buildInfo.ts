@@ -17254,4 +17254,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // defaultLocationId() — the FIRST ROW of the live locations table (a structural point in
 // whatever JSON the game runs on, never flavor); contract-marker biome anchors are now
 // validated against the live catalog before use.
-export const OTA_BUILD_ID = '2026-07-13-1078-companion-dice-water-lore-leaks';
+// OTA-1079 — ambient narration drops second-person openers. The ambient Qwen musing is the
+// narrator's OWN idle observation, but the model sometimes writes it as world narration
+// ("You step back, surveying the cobweb-infested alleyways...") — and in the observed case
+// the scene it described wasn't the player's scene at all (a flooded-house kitchen). The
+// ambient sentence filter now also removes sentences opening with "You"; if nothing
+// survives, ambient stays silent (it has no template fallback). Reactive narration is
+// untouched — second person is legitimate there.
+export const OTA_BUILD_ID = '2026-07-13-1079-ambient-second-person-filter';
