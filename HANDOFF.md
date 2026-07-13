@@ -271,19 +271,38 @@ Key invariants worth knowing:
   embedding anchors (`CognitiveOrchestrator.ts` — never shown; a future
   quality pass could genericize them for classifier neutrality), pronunciation
   lexicon, parser noun dictionary.
-- **2026-07-13 playtest-log observations (all lines) — not yet addressed.**
-  (a) Ambient Qwen line can be off-scene and second-person ("cobweb-infested
-  alleyways" while in a flooded-house kitchen; "You step back, surveying…" in
-  the arbiter channel) — the ambient filters drop "the player"/"They…" but pass
-  second-person wrong-scene prose; candidate: filter ambient lines opening with
-  "You". (b) Position desync: entering the Hidden Market via a roadside hook
-  leaves `gridX/gridY` on the road cell, so compass lines and travel estimates
-  from "inside" the market are computed from the road (log: "The Hidden Market
-  lies 4 stretches further west" one step after leaving it). Watch travel
-  estimates on resume. (c) Enemy ATK bonus varied round-to-round in the log
-  (Silt Thief +8 → +6 after a dodge; +5 vs the golem) — unverified whether
-  intentional. (d) MiniLM `[cognitive]` labels are noisy (attack → RETREAT ·
-  DISENGAGE, drink water → SWIM) — cosmetic if telemetry-only.
+- **2026-07-13 playtest-log observations — resolved statuses.**
+  (a) Ambient second-person/off-scene Qwen lines — **FIXED in 793/773/1079**
+  (ambient sentence filter drops "You…" openers; reactive narration untouched).
+  (b) Hidden Market "position desync" — **NOT A BUG.** The log showed the
+  deliberate one-time OTA-784 fresh-market repair (a save parked at the market
+  is dropped 5 tiles east, flag `_freshMarketEntry784`). The compass line ("4
+  stretches further west" after one step) and the 29-day Asgardar estimate were
+  both verified exactly correct for that position. No hook path teleports into
+  the market (the green-lantern chain is narrative-only). Only residual nit:
+  the repair fires silently, so the resume feed doesn't explain the reposition.
+  (c) Enemy ATK variance — **explained, deterministic, not dodge.** Silt Thief
+  = base 5 (`Dexterity 5`) + 1 (`quick` trait) + one-shot +2 (`ambush_strike`,
+  first counter in scene only) → 8 first swing, 6 after. **DODGE wiring
+  (documented for a pending design call — owner's intent differs):** wired =
+  dodge sets a 1-round `dodging` status, provokes the volley, no AC/enemy-ATK
+  effect; if the enemy HIT lands, an opposed parry roll (d20+DEX vs the enemy's
+  attack total, nat-20/nat-1 honored) on SUCCESS negates the damage AND fires an
+  immediate free riposte at 2× weapon dice (no to-hit; bare-handed = negate
+  only; vs unarmed attacker = still eat 50%); on FAILURE takes normal damage,
+  deals nothing ("✗ Read through"), no out-of-position penalty. 2 weapon
+  durability either way (gameStore ~25406-25522). Owner's stated intent:
+  success → 2× on your NEXT hit; failure → you deal normal damage AND take
+  DOUBLE. Neither the double-damage penalty nor the carry-to-next-hit reward is
+  wired. Awaiting the user's call before changing.
+  (d) MiniLM `[cognitive]` labels — **cosmetic.** The intent half (SWIM /
+  RETREAT · DISENGAGE) is consumed by nothing but the debug log line; the
+  emotion half only biases which canned Arbiter flavor line prints (plus a tiny
+  speak-probability nudge), is one action stale, and never touches mechanics or
+  the Qwen prompt. Improving it = rewording `EMOTION_ANCHORS` only; no
+  gameplay effect.
+  (e) The install's 2 voice crashes — ignore per user (known Pixel 10 Pro XL
+  device issue).
 - **Arbiter TTS tail clip — FIXED in 790/770/1076; retest on device.** The last
   fraction of every spoken line was clipped (report 2026-07-13, Pixel 10 Pro XL,
   bundled Kokoro): `trimSilenceLeadTrail` shaved the trailing decay to within
@@ -326,12 +345,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-792`**,
-**golem-line `…-772`**, **engine_Dev `…-1078`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-793`**,
+**golem-line `…-773`**, **engine_Dev `…-1079`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 793 | 773 | 1079 | Ambient narration drops second-person "You…" sentences (off-scene Qwen musings read as world text) |
 | 792 | 772 | 1078 | Companions follow nat-1/nat-20; wild water: one cupped drink (+1 corruption) + one bottle refill per location visit, the bottle's filter cleanses. Engine also ships all five lore-leak audit fixes (Temporal Credits, Timeline removed, un-gated case-agnostic scrub, JSON biome labels, defaultLocationId) |
 | 791 | 771 | 1077 | Combat blocks the trade screen visibly — vendor entry refused mid-fight, VendorScreen ejects if a fight starts mid-trade |
 | 790 | 770 | 1076 | Arbiter TTS tail-clip fix — deferred expo-av release (300 ms), 200 ms tail pad, 40 ms trailing trim guard |

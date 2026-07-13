@@ -29395,6 +29395,13 @@ async function maybeGenerateAmbientArbiter(
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
+      // Ambient is the narrator's own idle musing, not world narration — a
+      // second-person opener ("You step back, surveying...") reads as scene
+      // text in the arbiter channel and in practice is an off-scene
+      // hallucination (log 2026-07-13: alleyways + stone pillars narrated
+      // inside a flooded-house kitchen). Drop those sentences; an empty
+      // result just stays silent (ambient has no template fallback).
+      .filter((s) => !/^\s*you\b/i.test(s))
       .filter((s) => !sentenceNamesOffCanonEntity(s, ambientAllow))
       .join(' ')
       .trim();

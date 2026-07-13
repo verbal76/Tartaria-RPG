@@ -15929,4 +15929,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // old cup-hands loop gave +3 per 5 min forever — 36:1 over sleeping, and the log showed the
 // loop in live use. golemCompanion tests pin the dice (nat rules made guaranteed-hit setups
 // flaky).
-export const OTA_BUILD_ID = '2026-07-13-792-companion-dice-wild-water';
+// OTA-793 — ambient narration drops second-person openers. The ambient Qwen musing is the
+// narrator's OWN idle observation, but the model sometimes writes it as world narration
+// ("You step back, surveying the cobweb-infested alleyways...") — and in the observed case
+// the scene it described wasn't the player's scene at all (a flooded-house kitchen). The
+// ambient sentence filter now also removes sentences opening with "You"; if nothing
+// survives, ambient stays silent (it has no template fallback). Reactive narration is
+// untouched — second person is legitimate there.
+export const OTA_BUILD_ID = '2026-07-13-793-ambient-second-person-filter';
