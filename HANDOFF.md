@@ -12,27 +12,35 @@ and its own full `HANDOFF.md` (read that branch's handoff once you're on it).
 
 ## The three main branches
 
-1. **`HaL2001` — the LIVE game (at testers).**
+1. **`HaL2001` — PRODUCTION (the live game, in the wild with internal testers).**
    The distributed Tartaria Realms build real testers are playing. A code push
    here publishes an OTA to their devices (channels `hal2001` + `preview` +
    `ios-preview`). Treat it as production: only ship vetted changes, and only when
    the user says to.
 
-2. **`golem-line` — the TESTING branch for HAL.**
-   Where improvements to the HAL game are trialed first (on the test phone) before
-   they're promoted to `HaL2001`. Same game as HAL, but a separate app id/channel
-   (`golem-line`) so it installs side-by-side. This is usually where HAL work
-   starts.
+2. **`golem-line` — HAL's warm standby (kept CURRENT with HAL).**
+   Same game as HAL, separate app id/channel (`golem-line`) so it installs
+   side-by-side. Its purpose: when a major, potentially engine-breaking change
+   begins, development forks onto golem so production Tartaria is never at risk.
+   Until then it must not fall behind — minor changes/upgrades ship to BOTH
+   HaL2001 and golem-line in the same pass.
 
-3. **`engine_Dev` — a SEPARATE project.**
-   The lore-agnostic RPG **Engine** (content is upload/pack-driven) — *not* the
-   Tartaria game. It shares a lot of engine code with HAL/golem but is its own
-   product with its own app id/channel (`engine_Dev`). Don't conflate it with the
-   Tartaria game; a "HAL improvement" does not automatically belong here.
+3. **`engine_Dev` — a SEPARATE, PARALLEL project.**
+   The Tartaria game stripped of ALL lore: a bare **interaction engine** whose
+   content is entirely JSON/content-pack driven (alter the JSON and it becomes
+   any game — the current build in it is "The Philadelphia Experiment"). It is
+   *not* the Tartaria game. Only the interaction engine plus generic prefills
+   (fallbacks for JSON sections a content author forgets) are hardcoded, and
+   those prefills must be lore-NEUTRAL — never Tartaria-flavored, never
+   containing Tartaria terms. Own app id/channel (`engine_Dev`). A "HAL
+   improvement" does not automatically belong here — only engine-level fixes
+   port over; Tartaria content edits never do.
 
-> Typical flow for a Tartaria-game change: build & test it on **golem-line**, then
-> promote the same change to **HaL2001** when the user approves. An engine change
-> belongs on **engine_Dev** and stands alone.
+> Typical flow for a Tartaria-game change: minor changes/upgrades ship to
+> **HaL2001 AND golem-line in one pass** (golem-as-trial is reserved for work the
+> user explicitly wants staged, and golem is the fork point for major
+> engine-breaking development). An engine change belongs on **engine_Dev** and
+> stands alone.
 
 ## Every line is isolated — no cross-pollination
 
