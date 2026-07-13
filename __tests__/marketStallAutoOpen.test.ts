@@ -54,32 +54,38 @@ async function freshGame() {
 describe('OTA-786 — market stalls auto-open their wares', () => {
   beforeAll(() => { console.log = () => {}; console.warn = () => {}; console.error = () => {}; });
 
-  it('sets a stall vendor with offers AND auto-opens the vendor screen on entry and each stall swap', async () => {
+  it('lands in the square (no shop) then auto-opens each stall you step into', async () => {
     const store = await freshGame();
 
-    // Step into the market: lands in the weapons stall and the shop opens.
+    // OTA-787 — ENTER drops you in the market SQUARE: flavor + a choice of
+    // stalls, NO vendor and NO auto-open. You pick a stall to shop.
     store.getState().enterBuilding('market');
     let scene = store.getState().currentScene!;
     expect(store.getState().activeBuildingId).toBe('market');
-    expect(scene.microMicroId).toBe('building:market:weapons_stall');
-    expect(scene.vendor).toBeTruthy();
-    expect(scene.vendor!.offers.length).toBeGreaterThan(0);
-    expect(store.getState().currentScreen).toBe('vendor');
+    expect(scene.microMicroId).toBe('building:market:market_square');
+    expect(scene.vendor).toBeFalsy();
+    expect(store.getState().currentScreen).not.toBe('vendor');
 
-    // "← BACK" returns to the stall exploration view WITHOUT clearing the
-    // vendor, so the stall tabs + EXIT are available to swap or leave.
-    store.getState().setScreen('exploration');
-    expect(store.getState().currentScene!.vendor).toBeTruthy();
-
-    for (const room of ['armor_stall', 'food_stall', 'materials_stall']) {
+    // Stepping into any stall mints its vendor with offers AND opens the shop.
+    for (const room of ['weapons_stall', 'armor_stall', 'food_stall', 'materials_stall']) {
       store.getState().goBuildingRoom(room);
       scene = store.getState().currentScene!;
       expect(scene.microMicroId).toBe(`building:market:${room}`);
       expect(scene.vendor).toBeTruthy();
       expect(scene.vendor!.offers.length).toBeGreaterThan(0);
       expect(store.getState().currentScreen).toBe('vendor');
+      // "← BACK" returns to the stall WITHOUT clearing the vendor, so the stall
+      // tabs + EXIT stay available to swap stalls or leave.
       store.getState().setScreen('exploration');
+      expect(store.getState().currentScene!.vendor).toBeTruthy();
     }
+  });
+
+  it('keeps the navHidden square OFF the stall tab list (four stalls only)', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { visibleBuildingRooms } = require('../app/engine/buildings') as typeof import('../app/engine/buildings');
+    const tabs = visibleBuildingRooms('market', new Set<string>()).filter((r) => !r.navHidden);
+    expect(tabs.map((r) => r.id)).toEqual(['weapons_stall', 'armor_stall', 'food_stall', 'materials_stall']);
   });
 
   it('does NOT auto-open a vendor for ordinary (non-market) building rooms', async () => {

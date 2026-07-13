@@ -42,6 +42,10 @@ export interface BuildingRoom {
   stallCategory?: StallCategory;
   /** Hidden from the room list until revealed. */
   secret?: boolean;
+  /** Hidden from the nav-row tab list, but still enterable as the entry room.
+   *  The market square uses this: you LAND here on entry (flavor + a choice of
+   *  stalls) but it isn't itself a tab — the tabs are the four stalls + EXIT. */
+  navHidden?: boolean;
   /** The interactable noun whose INVESTIGATE reveals this (secret) room.
    *  Lives as an interactable on another room in the same building. */
   revealOnInvestigate?: string;
@@ -212,8 +216,21 @@ export const BUILDINGS: Record<string, BuildingTemplate> = {
     id: 'market',
     name: 'Market',
     hookLabel: 'a roadside market',
-    entryRoomId: 'weapons_stall',
+    // OTA-787 — you land in the SQUARE first (flavor + a choice of stalls), not
+    // straight into a shop. The square isn't a tab (navHidden); its "exits" are
+    // the four stall tabs + EXIT.
+    entryRoomId: 'market_square',
     rooms: [
+      {
+        id: 'market_square',
+        name: 'The Market Square',
+        shortName: 'Square',
+        description:
+          'You push past the outer carts into the market proper — a press of canvas awnings, lantern smoke, and haggling voices. Stalls ring the square on every side: weapons, armor, food, and materials. Step up to whichever you like, or slip back out the way you came.',
+        interactables: ['crowd', 'lanterns'],
+        navHidden: true,
+        anchorNpc: null,
+      },
       {
         id: 'weapons_stall',
         name: 'The Weapons Stall',
