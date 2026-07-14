@@ -279,21 +279,26 @@ Key invariants worth knowing:
   11. Fusion material-type UX (surface item material buckets; kill refusal spam).
   12. MiniLM cognitive-label noise (8-label dumps, wrong classifications).
 
-- **REMAINING WORK LIST (2026-07-14) — the 9 open punch-list items, reorganized.**
-  The user's three front-loaded picks (#5 Qwen, #7 Guardians, #9 rope) are done;
-  what's left, grouped by kind of work. Old punch-list numbers kept in [brackets]
-  for traceability.
-  - **A. Correctness / bugs (do first — cheapest, clearest):**
-    - A1 [#4] Outdoor water-bounce flag persistence + misc small bugs: enemy DOTs
-      only tick on `attack` (hoist out of `case 'attack'`, ~gameStore 7560); no
-      hard stat cap (`statTraining.ts` + dog/golem twins); `jump at <any text>`
-      trains DEX on unresolved targets; `defeatedEnemies` grows unbounded → save
-      bloat (`worldMemory.ts` — collapse to a count map).
-    - A2 [#3] Name-keyed item dupes: drop/pickup merge by name (durability
-      laundering + coating dupe, ~gameStore 13301); `applyCoating` stamps a whole
-      qty-N stack for one vial; throwable consumption resolves by name not
-      equipped id. Fix: route through `grantItem`/id-resolution.
-  - **B. Economy / balance (needs a design/number call from the user):**
+- **REMAINING WORK LIST (2026-07-14) — reorganized; A1+A2 now DONE (800/780/1085).**
+  The user's three front-loaded picks (#5 Qwen, #7 Guardians, #9 rope) plus the
+  A-group correctness/dupe closes are done; what's left is the B (economy/balance,
+  needs your number calls) and C (UX/polish) groups. Old punch-list numbers in
+  [brackets].
+  - **A. Correctness / bugs — ~~DONE 800/780/1085~~.**
+    - ~~A1 [#4] Outdoor water-bounce + misc small bugs.~~ **FIXED:** DOT tick
+      hoisted into runEnemyGroupCounters (ticks every combat round, not just
+      attack); hard stat ceiling MAX_TRAINED_STAT=30 (player + dog + golem;
+      engine has no golem); `jump at` needs a resolved scene noun; defeatedEnemies
+      de-duplicated distinct-name set (self-heals legacy saves); wild-water re-arm
+      moved to worldMemory.waterUsedAt, keyed per source on game-hours
+      (WATER_REARM_HOURS=6).
+    - ~~A2 [#3] Name-keyed item dupes.~~ **FIXED:** dropped-item pickup routes
+      through grantItem + decrements the exact instance by id (no worn/coated/
+      rolled laundering); applyCoating (+armor) peels one unit off a stack instead
+      of coating all N for one vial; equipped throwable consumed by the equipped
+      instance id (mainId/offId), closing infinite coated-throw + bandolier
+      double-spend.
+  - **B. Economy / balance (needs a design/number call from the user) — NEXT:**
     - B1 [#1] Economy re-tiering: self-crafted sale price grounded on ingredients;
       fused-scrap Golem-Core/aether mint; Common-armor sell arbitrage; gift
       value-gate. *Needs number sign-off.*
@@ -441,14 +446,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-799`**,
-**golem-line `…-779`**, **engine_Dev `…-1084`**. Current parity offsets: golem =
-HAL − 20 (stable); engine_Dev = HAL + 285 (was +286 — the Guardian OTA 798/778 was
-HAL+golem-only, so engine is one behind on count; the rope fix 799/779/1084 shipped
-to all three and preserves that −20 / +285 spread).
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-800`**,
+**golem-line `…-780`**, **engine_Dev `…-1085`**. Current parity offsets: golem =
+HAL − 20 (stable); engine_Dev = HAL + 285 (the Guardian OTA 798/778 was
+HAL+golem-only, so engine is one behind on count; the A1+A2 batch 800/780/1085
+shipped to all three and preserves the −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 800 | 780 | 1085 | Small-bug + item-dupe closes (punch-list A1+A2). A1: (1) enemy DOTs tick EVERY combat round, not just `attack` (hoisted into runEnemyGroupCounters; attack path passes skipDotTick) — a poisoned enemy kept eating poison while the player dodged/moved/commanded a companion; (2) hard training ceiling MAX_TRAINED_STAT=30 (player + dog + golem; engine has no golem) — stats trained forever at 0.1/use; (3) `jump at <bogus text>` needs a RESOLVED scene noun to train DEX; (4) defeatedEnemies de-duplicated distinct-name set (self-heals legacy dup-farmed saves) → no unbounded save bloat; (5) wild-water re-arm moved to worldMemory.waterUsedAt, keyed per SOURCE on game-hours (WATER_REARM_HOURS=6) — off the per-scene flags that bounced between adjacent outdoor tiles. A2 dupes: (6) dropped-item PICKUP routes through grantItem + decrements the exact instance by id (no worn/coated/rolled laundering); (7) applyCoating (+armor) on a STACK peels ONE unit instead of coating all N for one vial; (8) equipped throwable consumed by the equipped INSTANCE id (mainId/offId) — closes infinite coated-throw + bandolier double-spend. Engine water lines use getNarratorName() |
 | 799 | 779 | 1084 | Climbing rope usable to its LAST point: only a spent rope (≤ 0) refuses/gives out; the last pull breaks GRACEFULLY at the top (no fall — "the last of the line coils dead at your feet"); a fraying warning fires while the rope is low. Old guard snapped/refused at ≤ ROPE_WEAR_PER_TIER (15), stranding a whole climb + dropping the player with no warning. climbReadiness (CLIMB button colour/haptic) mirrors the new ≤ 0 rule. Engine's lines use getNarratorName() (lore-neutral) |
 | 798 | 778 | — | Core Guardians carry authored thematic vulnerable/resist traits — weakness/resistance now shows in combat + the EnemyPanel (was always 'normal': their type isn't in the type-map and their traits weren't resist:/vulnerable:). HAL+golem only; engine_Dev has no Guardians |
 | 797 | 777 | 1083 | Qwen dormancy watchdog revives from a FAILED reinit (not just the narrow dormant case) — fixes whole-session qwen-not-ready when one revival attempt failed and stranded status='failed'; retries every 60s + unwedges a hung reload |
