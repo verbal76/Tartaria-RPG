@@ -15815,4 +15815,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // costs −6 standing. New engine/parley.ts + engine/menace.ts; Enemy.temperament +
 // Wanderer.temperament/faction + PlayerCharacter.menace; ParleyModal; parser parley
 // verbs. OTA-806/807 single-roll flows superseded (pure helpers retained).
-export const OTA_BUILD_ID = '2026-07-14-788-parley-and-menace';
+// OTA-809 — PARLEY Phase 2 (procedural payloads + dialogue beats + real rewards).
+// Wanderers carry a SEEDED payload (goods + a location lead). Intimidate grants their
+// actual CARRIED GOODS (coins + salvage) into the pack; persuade plants a real
+// pendingLead that PAYS OUT (the cache) the next time you reach fresh peaceful ground.
+// New "cagey" beat: opening a person-parley they name their price before you choose.
+// New wanderers helpers (makeWandererGoods/makeWandererLead/wandererCagey);
+// Wanderer.goods+lead; PlayerCharacter.pendingLead; miscLootItem grant helper;
+// beginScene lead payout. Lore-neutral. Closes the social rework.
+export const OTA_BUILD_ID = '2026-07-14-789-parley-rewards';

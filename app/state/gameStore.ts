@@ -196,7 +196,7 @@ import {
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
 import { isTalkDownBlocked } from '../engine/talkDown';
-import { makeWanderer, rollWandererReward, type Wanderer } from '../engine/wanderers';
+import { makeWanderer, wandererCagey, type Wanderer } from '../engine/wanderers';
 import {
   type ParleyChoice, type ParleyKind, type Temperament,
   isRightKey, revealsTemperament, parleyDC, deriveAnimalTemperament,
@@ -5432,6 +5432,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (scene.wanderer && !opts?.isOpening) {
       get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
     }
+    // OTA-809 — pay out a pending LEAD (talked out of a wanderer via PERSUADE) once
+    // the player reaches fresh, peaceful ground: they followed the lead and found the
+    // cache. Grants the reward + clears the lead. Gated to peaceful non-hub arrivals
+    // so it reads as "you traveled and dug it up."
+    {
+      const leadPlayer = get().player;
+      const lead = leadPlayer?.pendingLead ?? null;
+      if (lead && !opts?.isOpening && !hasEnemies && !hubRoom && !isNeutralMarket) {
+        const gainItem = lead.rewardItem ? miscLootItem(lead.rewardItem, 1) : null;
+        set((s) => {
+          if (!s.player) return s;
+          let p = { ...s.player, tc: s.player.tc + lead.rewardTc, pendingLead: null };
+          if (gainItem) {
+            const res = grantItem(p.inventory, gainItem);
+            p = { ...p, inventory: res.inventory };
+          }
+          return { player: p };
+        });
+        get().appendLog(
+          'reward',
+          `Following the lead — ${lead.hint} — you turn up the cache: ${lead.rewardTc} TC${gainItem ? ` + ${gainItem.name}` : ''}.`,
+        );
+      }
+    }
     // arb120 — occasional Arbiter nudge inviting a deeper question (replaces the
     // dropped "ask arbiter" button with an organic prompt). Peaceful outdoor
     // scenes only, rare, and never piled on a vendor / board / building moment.
@@ -7125,13 +7149,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const temperament = w.temperament;
       const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
       const ctx = { kind: 'person' as ParleyKind, temperament, targetName: w.name, wisRevealed };
+      // OTA-809 — the "cagey" beat: they name their price before you choose how to
+      // play it, so the exchange reads as a conversation, not a bare die roll.
+      get().appendLog('world', wandererCagey(w));
       get().appendLog('world', wisRevealed ? temperamentReadout(temperament) : temperamentTell(temperament));
       const explicit = detectParleyChoice(trimmed, 'person');
       set(() => ({ pendingParley: ctx }));
       if (explicit) {
         get().resolveParley(explicit);
       } else {
-        get().appendLog('world', `${w.name} waits, weighing you. Persuade them, or intimidate them?`);
+        get().appendLog('world', `Persuade ${w.name} for what they know, or intimidate them for what they carry?`);
         void get().persist();
       }
       return;
@@ -28798,6 +28825,18 @@ export type CallDogOption = 'scratch' | 'treat' | 'speak';
 // crack a vault. Half bleeds to their allies via applyRepChange, same as any rep hit.
 const PARLEY_EXTORT_REP = 6;
 
+/** OTA-809 — build a plain misc loot item (extorted goods / lead cache reward). No
+ *  catalog row required; grantItem gives it a default stack cap. */
+function miscLootItem(name: string, quantity: number): InventoryItem {
+  return {
+    id: `loot_${name.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}_${Math.floor(Math.random() * 1e6)}`,
+    name,
+    kind: 'misc',
+    quantity: Math.max(1, quantity),
+    tags: [],
+  };
+}
+
 /** OTA-808 — a botched shakedown turns the person hostile: build a lightweight Human
  *  enemy from them so the fight can start. factionNeutralFight so a fight they STARTED
  *  (by refusing your threat) doesn't also cascade faction hostility on their death —
@@ -28882,38 +28921,44 @@ function runParleyOutcome(
       );
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));
     } else if (choice === 'persuade') {
-      // Secrets: a lead. Phase-1 stand-in = the wanderer's tip + a small reward roll;
-      // Phase 2 upgrades this to a real traceable location lead.
+      // OTA-809 — SECRETS: talk a real LOCATION LEAD out of them. It plants as
+      // player.pendingLead and pays out (the cache) when you next reach fresh ground.
       const w = scene.wanderer;
-      const reward = w ? rollWandererReward(w, Math.random(), Math.random()) : null;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let repChanged: any[] = [];
+      const lead = w?.lead ?? null;
       set((s) => {
         if (!s.player || !s.currentScene) return s;
-        let p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
-        if (reward?.kind === 'tc') p = { ...p, tc: p.tc + reward.amount };
-        if (reward?.kind === 'standing' && p.factionId) {
-          const rr = applyRepChange(p.factionStanding, p.factionId, reward.amount);
-          p = { ...p, factionStanding: rr.standing };
-          repChanged = rr.changed;
-        }
-        return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
+        const p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
+        return {
+          player: lead ? { ...p, pendingLead: lead } : p,
+          currentScene: { ...s.currentScene, wanderer: null },
+        };
       });
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));
-      get().appendLog('reward', reward ? reward.line : `${targetName} tells you what they know.`);
-      if (repChanged.length) logRepChanges(get, repChanged);
+      if (lead) {
+        get().appendLog('reward', `${targetName} lowers their voice: "${lead.hint}." (a lead — you'll turn it up when you next cross fresh ground)`);
+      } else {
+        get().appendLog('reward', `${targetName} tells you what they know.`);
+      }
     } else {
-      // Intimidate a person → extort GOODS (Phase-1 stand-in = TC) + STANDING COST if
-      // they're faction-affiliated. Phase 2 grants their actual carried kit.
+      // OTA-809 — Intimidate a person → extort their actual CARRIED GOODS (coins +
+      // items) + STANDING COST if they're faction-affiliated.
       const w = scene.wanderer;
-      const loot = 8 + rollDie(12); // 9..20 TC shaken loose
+      const goods = w?.goods ?? { tc: 8 + rollDie(12), items: [] as { name: string; quantity: number }[] };
       const faction = w?.faction ?? null;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let repChanged: any[] = [];
+      const grantedNames: string[] = [];
       set((s) => {
         if (!s.player || !s.currentScene) return s;
         let p = withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25));
-        p = { ...p, tc: p.tc + loot };
+        p = { ...p, tc: p.tc + goods.tc };
+        let inv = p.inventory;
+        for (const it of goods.items) {
+          const res = grantItem(inv, miscLootItem(it.name, it.quantity));
+          inv = res.inventory;
+          if (res.accepted > 0) grantedNames.push(`${it.name}${it.quantity > 1 ? ` ×${it.quantity}` : ''}`);
+        }
+        p = { ...p, inventory: inv };
         if (faction) {
           const rr = applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP);
           p = { ...p, factionStanding: rr.standing };
@@ -28922,7 +28967,8 @@ function runParleyOutcome(
         return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
       });
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));
-      get().appendLog('reward', `You shake ${loot} TC loose from ${targetName}.`);
+      const lootDesc = [`${goods.tc} TC`, ...grantedNames].join(', ');
+      get().appendLog('reward', `You shake it loose from ${targetName}: ${lootDesc}.`);
       if (faction) {
         get().appendLog('system', `Word spreads that you strong-armed one of theirs. (−${PARLEY_EXTORT_REP} standing with the ${factionLabel(faction)})`);
       }
