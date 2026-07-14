@@ -15749,4 +15749,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // all N for one vial. (8) The equipped throwable consumed on a thrown attack
 // resolves by the equipped INSTANCE id, closing infinite coated-throw + bandolier
 // double-spend.
-export const OTA_BUILD_ID = '2026-07-14-780-small-bugs-and-item-dupe-closes';
+// OTA-781 — punch-list group C (polish; warm standby, lockstep with HAL 801). C1
+// FUSION UX: firing the Crucible with reserved-but-insufficient pieces opens the
+// PICKER (which surfaces each piece's material bucket + a live diversity readout)
+// instead of dead-ending on a repeated refusal. C2 FUSED-WEAPON NAMING: a forged
+// WEAPON with a soft / non-weapon Qwen name ("Aetheric Thread") is rejected so the
+// deterministic weapon pool names it; old saves heal on load. C3 POST-BOSS GRACE:
+// a boss kill stamps a game-hours grace window (POST_BOSS_GRACE_HOURS=3) that
+// suppresses arrival encounters, so stepping out of a just-cleared outpost doesn't
+// drop a fresh ambush mid-loot. C4 MiniLM ANCHORS: the 6 EMOTION_ANCHORS reworded
+// to short, distinct, lore-neutral sentences so cosine similarity discriminates.
+export const OTA_BUILD_ID = '2026-07-14-781-group-c-polish';

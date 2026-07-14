@@ -902,6 +902,12 @@ export interface PlayerCharacter {
    *  player on back-to-back steps (it reads as periodic pressure, not an
    *  un-escapable per-step drip). Absent for legacy saves → treated as 0. */
   weatherTickCooldown?: number;
+  /** OTA-801 — game-hours mark until which arrival encounters are suppressed after
+   *  a boss kill (post-boss grace window). Set to hoursElapsed + POST_BOSS_GRACE_HOURS
+   *  when a boss falls; beginScene suppresses the arrival roll while it exceeds the
+   *  current clock, so stepping out of a just-cleared outpost doesn't drop a fresh
+   *  ambush mid-loot. Absent for legacy saves → treated as 0 (no grace). */
+  bossDefeatGraceUntilHours?: number;
   ac: number;
   tc: number;
   corruption: number;
