@@ -17351,4 +17351,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // MiniLM ANCHORS: the 6 EMOTION_ANCHORS reworded to short, distinct, LORE-NEUTRAL
 // sentences so cosine similarity discriminates — and the neutral wording made the
 // anchors identical to HAL/golem (closes the leakage-audit note about them).
-export const OTA_BUILD_ID = '2026-07-14-1086-group-c-polish';
+// OTA-1087 — punch-list B1 (economy re-tiering). (a) self-crafted items never sell
+// above their recipe ingredient value (Legendary +25%); (b) fused items stay
+// scrappable but the fuel mats they yield (Golem Core, Aetheric Shard/Dust, Aether
+// Crystal, Aetheric Cloth, Mudstone) price near-worthless at vendors (flat 3 TC) —
+// crafting-only value, no fuse→scrap→sell pump; (c) nothing sells above the
+// cheapest realistic buy for its rarity (RARITY_BUY_FLOOR), closing cross-stall
+// arbitrage; (d) gifting a near-worthless item is declined (no rep/CHA, not
+// consumed) and rep scales with the gift's worth instead of a flat +5. All
+// lore-neutral (the gift decline names the vendor, not the Arbiter).
+export const OTA_BUILD_ID = '2026-07-14-1087-economy-re-tiering-b1';
