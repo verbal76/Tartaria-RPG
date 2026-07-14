@@ -730,6 +730,25 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
+      {/* OTA-807 — Wandering NPC chip. A person (not a vendor) resting on a peaceful
+          outdoor tile. Tapping submits "talk to <name>" so it routes through the
+          engine's wanderer talk-check (a d20 + CHA read for a tip / coins / a rare
+          standing nudge). Hidden in combat. */}
+      {currentScene?.wanderer && !inCombat && (
+        <TouchableOpacity
+          style={styles.wandererBanner}
+          onPress={() => submit(`talk to ${currentScene.wanderer!.name}`)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.wandererStripe} />
+          <View style={styles.vendorBannerBody}>
+            <Text style={styles.wandererName}>☺ {currentScene.wanderer.name}</Text>
+            <Text style={styles.vendorBannerHint}>{currentScene.wanderer.role} · tap to speak</Text>
+          </View>
+          <Text style={styles.wandererArrow}>›</Text>
+        </TouchableOpacity>
+      )}
+
       {/* OTA-217 / OTA-220 — visible permit indicator for the OTA-195
           Fusing Crucible. Playtest log: after OTA-217's banner shipped,
           player tapped 'fuse' 5 times in a row not realizing they
@@ -1948,6 +1967,21 @@ const styles = StyleSheet.create({
   missionBoardStripe: { width: 4, backgroundColor: '#8b7355', alignSelf: 'stretch' },
   missionBoardName: { color: '#b89a6a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   missionBoardArrow: { color: '#8b7355', fontSize: 22, paddingHorizontal: 12 },
+  // OTA-807 — Wandering NPC banner. Soft green stripe (a friendly, social beat) to
+  // set it apart from the vendor gold and mission-board brown.
+  wandererBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#12140f',
+    borderColor: '#6e8f4e',
+    borderWidth: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
+    minHeight: 44,
+  },
+  wandererStripe: { width: 4, backgroundColor: '#6e8f4e', alignSelf: 'stretch' },
+  wandererName: { color: '#9ec96a', fontSize: 13, fontWeight: '700', letterSpacing: 0.5 },
+  wandererArrow: { color: '#6e8f4e', fontSize: 22, paddingHorizontal: 12 },
   // OTA-217 — Crucible permit banner. Purple stripe to differentiate
   // from the vendor banner's amber, matching the OTA-199 Rare rarity
   // color so the visual signal reads "rare event, act now."

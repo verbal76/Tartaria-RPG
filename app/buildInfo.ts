@@ -16112,4 +16112,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // people back off); intercept in submitPlayerAction ahead of the shared diplomacy
 // switch arm. Also refreshed SKILL_ACTIVITIES.charisma (dropped the removed "Gifting
 // to a vendor"; added the talk-down + diplomacy-check surfaces).
-export const OTA_BUILD_ID = '2026-07-14-806-talk-down-a-fight';
+// OTA-807 — WANDERING NPCs. The other half of "where does Charisma matter?": the
+// open road now occasionally puts a PERSON in front of you — a traveler, refugee,
+// tinker, scout, pilgrim — someone you can actually talk to (not a vendor stall, not
+// an animal). Greeting / persuading them ("talk to <name>") is a d20 + CHA (+ Broker)
+// check vs a friendly DC 12 for a small payoff: a word of the road (tip), a few coins
+// (6–15 TC), or — rarely — a +1 standing nudge with your own faction as your people
+// hear you dealt fair. ONE read per wanderer (win or whiff, they move on), so CHA
+// decides whether the meeting pays. FARM-PROOF: each peaceful OUTDOOR tile gets
+// exactly ONE spawn roll ever (banked in worldMemory.wandererRolledTiles, a bounded
+// window), so you can't leave/return-roll a person off one square — you cross new
+// ground to meet new people (~12% of eligible fresh tiles). New engine module
+// wanderers.ts (makeWanderer / rollWandererReward / WANDERER_TALK_DC + lore-neutral
+// archetypes & flavor); CurrentScene.wanderer field; beginScene spawn (suppressed on
+// hubs/markets/capitals/combat/when a vendor rolled); talk intercept in
+// submitPlayerAction; a green "☺ <name>" banner in ExplorationScreen taps to speak.
+export const OTA_BUILD_ID = '2026-07-14-807-wandering-npcs';
