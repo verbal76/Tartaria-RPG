@@ -306,6 +306,10 @@ function dogProgressAwardFor(currentStat: number): number {
 }
 
 const DOG_LEVEL_UP_THRESHOLD = 100;
+// OTA-800 — hard training ceiling, mirroring the player's MAX_TRAINED_STAT
+// (statTraining.ts). Without it a dog stat trained forever (0.1/use at 22+), so
+// a companion could be ground past the player and past sane damage/AC scaling.
+const DOG_MAX_TRAINED_STAT = 30;
 
 export interface DogTrainResult {
   dog: DogCompanion;
@@ -321,18 +325,21 @@ export function trainDogStat(
 ): DogTrainResult {
   if (!success) return { dog, leveled: null };
   const baseStat = dog.stats[stat];
+  // OTA-800 — ceiling reached: stop training (see DOG_MAX_TRAINED_STAT).
+  if (baseStat >= DOG_MAX_TRAINED_STAT) return { dog, leveled: null };
   const award = dogProgressAwardFor(baseStat);
   if (award <= 0) return { dog, leveled: null };
   const prev = dog.statProgress[stat];
   let progress = prev + award;
   let next = baseStat;
   let leveled: DogTrainResult['leveled'] = null;
-  while (progress >= DOG_LEVEL_UP_THRESHOLD) {
+  while (progress >= DOG_LEVEL_UP_THRESHOLD && next < DOG_MAX_TRAINED_STAT) {
     progress -= DOG_LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next };
   }
+  if (next >= DOG_MAX_TRAINED_STAT) progress = 0;
   return {
     dog: {
       ...dog,

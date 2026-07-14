@@ -16010,4 +16010,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (≤ one climb of durability left) so it's never a surprise. climbReadiness (the
 // CLIMB button colour/haptic) mirrors the new ≤ 0 rule so button and engine agree.
 // Shared engine code — ships to all three lines.
-export const OTA_BUILD_ID = '2026-07-14-799-rope-usable-to-last-point';
+// OTA-800 — punch-list A1+A2: small-bug closes + item-dupe closes (exploit sweep).
+// A1 SMALL BUGS: (1) enemy DOT statuses (poison/acid/corruption/burn/electrical/
+// infection/typed) now tick once per COMBAT ROUND, not only on `attack` — a
+// poisoned enemy kept eating poison while the player dodged/moved/commanded a
+// companion (hoisted the tick into runEnemyGroupCounters; the attack path still
+// ticks pre-swing and passes skipDotTick so it can't double). (2) Hard training
+// ceiling MAX_TRAINED_STAT=30 on the player + dog + golem twins — stats trained
+// forever at 0.1/use, so a patient grind broke damage/AC/DC scaling (and the
+// golem's uncapped power/HP). (3) `jump at <bogus text>` no longer trains DEX —
+// it now needs a RESOLVED scene noun (ambient/hook/enemy/vendor), closing the
+// stamina→DEX grind the OTA-611 bare-jump guard missed. (4) defeatedEnemies is
+// now a de-duplicated distinct-name set (self-heals legacy dup-farmed saves) so
+// it can't grow unbounded → save bloat. (5) Wild-water re-arm moved off the
+// per-scene one-shot flags (which reset on leave+return, so two adjacent outdoor
+// water tiles could be bounced for infinite drinks/refills) onto worldMemory,
+// keyed per SOURCE on game-hours (WATER_REARM_HOURS=6). A2 ITEM DUPES: (6) dropped-
+// item PICKUP now routes through grantItem — the old name-keyed merge laundered a
+// worn/coated/rolled instance into a full same-name stack (free repair / coating
+// dupe); and it decrements the exact dropped instance by id. (7) applyCoating (and
+// armor) on a STACK peels ONE unit off to coat, instead of coating all N for a
+// single vial. (8) The equipped throwable consumed on a thrown attack resolves by
+// the equipped INSTANCE id (mainId/offId), not first-by-name — closing infinite
+// coated-throw + bandolier double-spend. Shared engine code — all three lines;
+// engine_Dev's water refusal lines use getNarratorName() (lore-neutral).
+export const OTA_BUILD_ID = '2026-07-14-800-small-bugs-and-item-dupe-closes';
