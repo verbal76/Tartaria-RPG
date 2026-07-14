@@ -196,6 +196,7 @@ import {
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
 import { isTalkDownBlocked, talkDownDC, isIntimidationVerb, talkDownSuccessLine, talkDownFailLine } from '../engine/talkDown';
+import { makeWanderer, WANDERER_TALK_DC, rollWandererReward, wandererFailLine, type Wanderer } from '../engine/wanderers';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -460,6 +461,12 @@ interface CurrentScene {
    *  renders a tappable "Mission Board" chip and acceptFactionQuest /
    *  turnInFactionQuest treat it as a quest source (no vendor required). */
   missionBoard?: { faction: string } | null;
+  /** OTA-807 — a wandering NPC (a PERSON, not a vendor) resting on this peaceful
+   *  outdoor tile. You can talk / greet / persuade them for a small payoff (a tip,
+   *  a few coins, or a rare standing nudge). Spawned in beginScene only on NOVEL
+   *  ground so it can't be leave/return-farmed; cleared once you've spoken to them.
+   *  Null on hubs, markets, combat tiles, and most tiles. */
+  wanderer?: import('../engine/wanderers').Wanderer | null;
   /** arb36 — id of an enterable structure standing on the player's current
    *  WILD tile (deterministic via buildingForTile), or null. Surfaces the
    *  ENTER affordance + narration so buildings are discovered organically
@@ -5203,10 +5210,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hubRoom?.id === 'outpost_central' && player?.factionId
         ? { faction: player.factionId }
         : null;
+    // OTA-807 — wandering NPC spawn. A person (not a vendor) on a peaceful OUTDOOR
+    // tile you can actually talk to. Suppressed on hubs, markets, capitals, combat
+    // tiles, when a vendor already rolled, and during the opening. Farm-proof: each
+    // tile gets exactly ONE spawn roll ever (banked in worldMemory.wandererRolled
+    // Tiles), so leaving and returning can't re-roll a person off one square — you
+    // have to cross new ground to meet new people. ~12% of eligible fresh tiles.
+    const wanderer: Wanderer | null = (() => {
+      if (opts?.isOpening || hasEnemies || hubRoom || atCoreCapital || vendor || isNeutralMarket) return null;
+      if (!player?.currentLocationId) return null;
+      const wTileKey = `${player.currentLocationId}:${player.mapX}:${player.mapY}`;
+      const rolled = get().worldMemory.wandererRolledTiles ?? [];
+      if (rolled.includes(wTileKey)) return null;
+      // Bank the roll for this tile up front (window-bounded) so it's one-and-done
+      // regardless of the outcome below.
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          wandererRolledTiles: [...(s.worldMemory.wandererRolledTiles ?? []), wTileKey].slice(-120),
+        },
+      }));
+      if (Math.random() >= 0.12) return null;
+      // Seed from a stable hash of the tile so the same visit reads the same person.
+      let seed = 0;
+      for (let i = 0; i < wTileKey.length; i++) seed = (seed * 31 + wTileKey.charCodeAt(i)) | 0;
+      return makeWanderer(seed);
+    })();
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
       missionBoard,
+      wanderer,
       sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
       // OTA-361 — knockout flags, one per enemy, all false at scene start.
@@ -5333,12 +5367,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const onRoute = !!get().player?.travelTarget || !!get().player?.whisperCourse;
       get().appendLog('world', buildingApproachLine(scene.sceneBuilding, onRoute));
     }
+    // OTA-807 — announce a wandering NPC on arrival so the TALK affordance isn't
+    // unexplained. Names the person after the archetype's greeting.
+    if (scene.wanderer && !opts?.isOpening) {
+      get().appendLog('world', `${scene.wanderer.greeting} This is ${scene.wanderer.name}, ${scene.wanderer.role}. (Try "talk to ${scene.wanderer.name}" — a fair word carries.)`);
+    }
     // arb120 — occasional Arbiter nudge inviting a deeper question (replaces the
     // dropped "ask arbiter" button with an organic prompt). Peaceful outdoor
     // scenes only, rare, and never piled on a vendor / board / building moment.
     if (!opts?.isOpening
         && (!scene.enemies || scene.enemies.length === 0)
-        && !scene.vendor && !scene.missionBoard && !scene.sceneBuilding
+        && !scene.vendor && !scene.missionBoard && !scene.sceneBuilding && !scene.wanderer
         && !get().player?.hubRoomId
         && Math.random() < 0.04) {
       const prompt = ARBITER_QUESTION_PROMPTS[Math.floor(Math.random() * ARBITER_QUESTION_PROMPTS.length)];
@@ -7050,6 +7089,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if ((get().currentScene?.enemies.length ?? 0) > 0) {
         runEnemyGroupCounters(get, set, get().player ?? player);
       }
+      void get().persist();
+      return;
+    }
+    // OTA-807 — Talk to a wandering NPC. When a person is resting on this peaceful
+    // tile, greeting / persuading them is a d20 + CHA check for a small payoff (a
+    // word of the road, a few coins, or a rare standing nudge as your people hear
+    // you dealt fair). ONE read per wanderer — win or whiff, they move on — so
+    // Charisma decides whether the meeting pays.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer) {
+      const w = currentScene.wanderer;
+      const cha = effectiveStats(player).charisma;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const tPerksW = require('../engine/titles').titlePerkModifiers(player);
+      const bonusW = tPerksW.diplomacyBonus ?? 0;
+      const rollW = rollDie(20);
+      const totalW = rollW + cha + bonusW;
+      const okW = totalW >= WANDERER_TALK_DC;
+      get().appendLog(
+        'world',
+        `You — speak with ${w.name} → d20 ${rollW} + CHA ${cha}${bonusW ? ` + ${bonusW} (Broker)` : ''} = ${totalW} vs DC ${WANDERER_TALK_DC} — ${okW ? '✓' : '✗'}`,
+      );
+      if (okW) {
+        const reward = rollWandererReward(w, Math.random(), Math.random());
+        // A standing reward needs a faction to credit; a factionless player just
+        // gets the word of the road instead.
+        const standingUnavailable = reward.kind === 'standing' && !player.factionId;
+        const trained = trainStat(player, 'charisma', true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let repChanged: any[] = [];
+        set((s) => {
+          if (!s.player || !s.currentScene) return s;
+          let p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
+          if (reward.kind === 'tc') p = { ...p, tc: p.tc + reward.amount };
+          if (reward.kind === 'standing' && p.factionId) {
+            const rr = applyRepChange(p.factionStanding, p.factionId, reward.amount);
+            p = { ...p, factionStanding: rr.standing };
+            repChanged = rr.changed;
+          }
+          return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
+        });
+        get().appendLog('reward', standingUnavailable ? w.tip : reward.line);
+        if (repChanged.length > 0) logRepChanges(get, repChanged);
+        if (trained.leveled) {
+          get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to}.`);
+        }
+        void get().persist();
+        return;
+      }
+      set((s) =>
+        s.player && s.currentScene
+          ? {
+              player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25),
+              currentScene: { ...s.currentScene, wanderer: null },
+            }
+          : s,
+      );
+      get().appendLog('world', wandererFailLine(w));
       void get().persist();
       return;
     }

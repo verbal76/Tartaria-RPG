@@ -1508,6 +1508,13 @@ export interface WorldMemory {
    *  bounced A→B→A to reset the old per-scene one-shot flags. Pruned to only
    *  still-cooling sources on write, so it stays tiny. */
   waterUsedAt?: Record<string, { drink?: number; fill?: number }>;
+  /** OTA-807 — outdoor tiles that have already ROLLED for a wandering NPC (see
+   *  gameStore beginScene). Each peaceful outdoor tile gets exactly ONE spawn roll
+   *  ever; the tile key is banked here so leaving and returning can't re-roll it
+   *  (no farming a person off one square). Bounded to a sliding window so it never
+   *  bloats the save — a tile older than the window can roll again, which requires
+   *  crossing that many fresh tiles first, so it's still not a practical farm. */
+  wandererRolledTiles?: string[];
   /** HANDOFF #15b — hub rooms the player has visited at least once.
    *  Used by hub fast-travel to gate "jump to the workshop" against
    *  rooms the player actually knows. Stored separately from

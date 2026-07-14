@@ -15793,4 +15793,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // counter. DC scales with foe count + toughest tier; bosses/Guardians refuse. New
 // engine/talkDown.ts; intercept in submitPlayerAction. SKILL_ACTIVITIES.charisma
 // refreshed (dropped removed gifting; added talk-down + diplomacy-check surfaces).
-export const OTA_BUILD_ID = '2026-07-14-786-talk-down-a-fight';
+// OTA-807 — WANDERING NPCs. The open road now occasionally puts a PERSON in front of
+// you (traveler / refugee / tinker / scout / pilgrim) you can talk to. "talk to
+// <name>" is a d20 + CHA (+ Broker) check vs DC 12 for a small payoff: a tip, a few
+// coins (6–15 TC), or a rare +1 standing with your own faction. ONE read per wanderer.
+// FARM-PROOF: each peaceful outdoor tile gets exactly ONE spawn roll ever
+// (worldMemory.wandererRolledTiles, bounded window) — no leave/return farming; ~12%
+// of eligible fresh tiles. New engine/wanderers.ts; CurrentScene.wanderer; beginScene
+// spawn; talk intercept in submitPlayerAction; green wanderer banner in
+// ExplorationScreen.
+export const OTA_BUILD_ID = '2026-07-14-787-wandering-npcs';
