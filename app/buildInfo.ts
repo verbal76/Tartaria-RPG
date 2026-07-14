@@ -16050,4 +16050,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // LORE-NEUTRAL sentences (no shared "ruins/Aetheric" boilerplate) so cosine
 // similarity discriminates instead of smearing across labels — and the neutral
 // wording keeps the engine_Dev copy identical. Shared engine code — all three lines.
-export const OTA_BUILD_ID = '2026-07-14-801-group-c-polish';
+// OTA-802 — punch-list B1 (economy re-tiering; per the user's design calls). (a)
+// SELF-CRAFTED SELL CAP: a self-crafted item never sells above the summed raw-sell
+// value of its recipe ingredients (crafting-to-sell is break-even, not a profit
+// loop) — a Legendary result gets a slight ×1.25 bump. (b) BOTTLENECK MATS: fused
+// items stay scrappable (the intended crafting-materials market), but the fuel
+// mats they yield — Golem Core, Aetheric Shard/Dust, Aether Crystal, Aetheric
+// Cloth, Mudstone — now price as near-worthless AT VENDORS (flat 3 TC) so they're
+// valuable to CRAFT/summon with, not as a fuse→scrap→sell money pump. (c) SELL ≤
+// BUY: nothing sells back above the cheapest realistic buy for its rarity
+// (RARITY_BUY_FLOOR: Common 5 / Uncommon 14 / Rare 40 / Legendary 112), closing
+// cross-stall arbitrage (the reported Common-armor sell-11 vs buy-8). (d) GIFT
+// VALUE-GATE: gifting a near-worthless item is politely declined (no rep, no CHA,
+// not consumed); rep now scales with the gift's worth (~30 TC ≈ the old +5, up to
+// +8) instead of a flat +5 per junk item. Shared engine code — all three lines.
+export const OTA_BUILD_ID = '2026-07-14-802-economy-re-tiering-b1';

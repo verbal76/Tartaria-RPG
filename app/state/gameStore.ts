@@ -16613,6 +16613,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // OTA-802 (B1d) — value-gate + scale. Pre-fix, gifting ANY item gave a flat
+    // +5 rep AND a guaranteed CHA train with no value floor or cooldown, so
+    // dumping worthless forage (rocks, sticks) farmed unbounded reputation and
+    // charisma. Now the gift's WORTH drives the reward: a near-worthless item is
+    // politely declined (no rep, no CHA, not consumed — nothing to farm), and rep
+    // scales with value (a typical ~30 TC gift ≈ the old +5; a fine gift up to
+    // +8). CHA only trains on a gift that actually lands.
+    const GIFT_VALUE_FLOOR = 5; // TC — below this a gift is just junk to the vendor
+    const giftValue = sellPriceFor(item, scene.vendor);
+    if (giftValue < GIFT_VALUE_FLOOR) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} turns the ${item.name.toLowerCase()} over once and hands it back. "Kind of you — but that's worth nothing to me. Bring me something I can use."`,
+      );
+      return;
+    }
+    const giftRep = Math.max(1, Math.min(8, Math.round(giftValue / 6)));
+
     // Decrement quantity (remove row at 0).
     const newInventory = player.inventory
       .map((it, i) =>
@@ -16622,7 +16640,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const vendorFaction = scene.vendor.faction;
     const repResult = vendorFaction
-      ? applyRepChange(player.factionStanding, vendorFaction, 5)
+      ? applyRepChange(player.factionStanding, vendorFaction, giftRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
 
     set((s) =>
