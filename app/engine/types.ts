@@ -367,6 +367,12 @@ export interface Enemy {
    *  along the grip so only a trained Order hand can take one up without
    *  flaying their own palm. Never enters the loot grant. */
   signatureWeapon?: { name: string; reason: string };
+  /** OTA-1093 — parley temperament (the "lock" the player reads). Animals are
+   *  'skittish' (yield to CALM) or 'aggressive' (yield to INTIMIDATE); a HUMANOID
+   *  ('Human') enemy is 'reasonable' (PERSUADE) or 'greedy' (INTIMIDATE). When
+   *  absent, engine/parley.deriveAnimalTemperament() infers it from the name/traits
+   *  so every foe has a stable read. Bosses are unparley-able regardless. */
+  temperament?: import('./parley').Temperament;
 }
 
 export interface WeatherEntry {
@@ -1042,6 +1048,14 @@ export interface PlayerCharacter {
    *  and grants +1 standing per BUY_REP_TC_PER_STANDING TC, remainder carried.
    *  Absent for legacy saves → treated as 0. */
   buyRepProgress?: number;
+  /** OTA-1093 — MENACE: a reputation for ruling by fear, built by intimidation. Rises
+   *  on every intimidate attempt (people more than animals); raises your own
+   *  intimidate DC (self-blunting), draws readier encounters, and decays slowly over
+   *  game-time. Shown on the character portrait. Absent for legacy saves → 0. */
+  menace?: number;
+  /** OTA-1093 — the game-hour at which `menace` was last raised, so decay can be
+   *  applied lazily (menace bleeds off MENACE_DECAY_PER_HOUR per hour since). */
+  menaceUpdatedHour?: number;
   ac: number;
   tc: number;
   corruption: number;

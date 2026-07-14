@@ -80,48 +80,6 @@ describe('OTA-1091 — talk-down helpers', () => {
   });
 });
 
-async function boot() {
-  const store = useGameStore;
-  await store.getState().hydrate();
-  await store.getState().startNewGame({ name: 'Talker', raceId: 'unknowing_mass', factionId: 'reclaimers_guild' });
-  store.getState().skipTutorial?.();
-  return store;
-}
-function armFight(store: ReturnType<typeof useGameStore>, enemies: Enemy[], cha: number) {
-  store.setState((s) => ({
-    currentScene: {
-      ...s.currentScene!,
-      enemies,
-      enemyHps: enemies.map((e) => e.hp),
-      enemyKnockedOut: enemies.map(() => false),
-      enemyAmbushUsed: enemies.map(() => false),
-      activeEnemyIdx: 0,
-      range: 'close',
-      vendor: null,
-    } as any,
-    player: {
-      ...s.player!,
-      corruption: 0,
-      stamina: 20,
-      stats: { ...s.player!.stats, charisma: cha },
-    },
-  }));
-}
-
-describe('OTA-1091 — talk-down ends a fight (store)', () => {
-  it('a strong talker clears a lone weak beast; the tile is kept', async () => {
-    const store = await boot();
-    armFight(store, [beast()], 30); // CHA 30 vs DC 10 — always clears
-    store.getState().submitPlayerAction('persuade the wolf to back off');
-    expect(store.getState().currentScene!.enemies.length).toBe(0);
-    // Kept the tile: still in a scene (not booted to a new location), no vendor.
-    expect(store.getState().currentScene).toBeTruthy();
-  });
-
-  it('a boss refuses — the fight stays on', async () => {
-    const store = await boot();
-    armFight(store, [beast({ name: 'The Hollow Titan', boss: true, hp: 200, rarity: 'Legendary' })], 30);
-    store.getState().submitPlayerAction('persuade the titan');
-    expect(store.getState().currentScene!.enemies.length).toBe(1);
-  });
-});
+// NOTE — the in-combat talk-down STORE flow was reshaped into the two-button PARLEY
+// in OTA-1093; that behavior is covered by __tests__/ota808Parley.test.ts. The pure
+// helpers above remain in use (isTalkDownBlocked still gates bosses out of a parley).

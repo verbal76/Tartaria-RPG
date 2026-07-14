@@ -77,38 +77,5 @@ describe('OTA-1092 — wanderer helpers', () => {
   });
 });
 
-async function boot() {
-  const store = useGameStore;
-  await store.getState().hydrate();
-  await store.getState().startNewGame({ name: 'Speaker', raceId: 'unknowing_mass', factionId: 'reclaimers_guild' });
-  store.getState().skipTutorial?.();
-  return store;
-}
-
-describe('OTA-1092 — talking to a wanderer (store)', () => {
-  it('a strong talker gets a payoff and the wanderer is consumed (one-shot)', async () => {
-    const store = await boot();
-    const w = makeWanderer(777);
-    store.setState((s) => ({
-      currentScene: { ...s.currentScene!, enemies: [], vendor: null, wanderer: w } as any,
-      player: { ...s.player!, stamina: 20, stats: { ...s.player!.stats, charisma: 30 } },
-    }));
-    store.getState().submitPlayerAction(`talk to ${w.name}`);
-    // One-shot: whatever the reward, the wanderer is gone after the exchange.
-    expect(store.getState().currentScene!.wanderer ?? null).toBeNull();
-  });
-
-  it('talking again does nothing once the wanderer has moved on', async () => {
-    const store = await boot();
-    const w = makeWanderer(778);
-    store.setState((s) => ({
-      currentScene: { ...s.currentScene!, enemies: [], vendor: null, wanderer: w } as any,
-      player: { ...s.player!, stamina: 20, stats: { ...s.player!.stats, charisma: 30 } },
-    }));
-    store.getState().submitPlayerAction(`talk to ${w.name}`);
-    const tcAfterFirst = store.getState().player!.tc;
-    store.getState().submitPlayerAction(`talk to ${w.name}`);
-    // No wanderer left → no second payoff.
-    expect(store.getState().player!.tc).toBe(tcAfterFirst);
-  });
-});
+// NOTE — the wanderer TALK store flow was reshaped into the two-button PARLEY in
+// OTA-1093; covered by __tests__/ota808Parley.test.ts. The pure helpers above remain.

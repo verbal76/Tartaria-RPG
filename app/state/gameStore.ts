@@ -202,8 +202,17 @@ import {
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
-import { isTalkDownBlocked, talkDownDC, isIntimidationVerb, talkDownSuccessLine, talkDownFailLine } from '../engine/talkDown';
-import { makeWanderer, WANDERER_TALK_DC, rollWandererReward, wandererFailLine, type Wanderer } from '../engine/wanderers';
+import { isTalkDownBlocked } from '../engine/talkDown';
+import { makeWanderer, rollWandererReward, type Wanderer } from '../engine/wanderers';
+import {
+  type ParleyChoice, type ParleyKind, type Temperament,
+  isRightKey, revealsTemperament, parleyDC, deriveAnimalTemperament,
+  temperamentTell, temperamentReadout, detectParleyChoice,
+  parleySuccessLine, parleyWrongKeyLine, parleyRolledFailLine,
+} from '../engine/parley';
+import {
+  raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
+} from '../engine/menace';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, bonusStaminaMaxFor, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -3330,6 +3339,21 @@ interface GameStore {
    *  ignored for 'scratch' / 'speak'. */
   selectCallDogOption: (option: 'scratch' | 'treat' | 'speak', treatItemName?: string) => void;
 
+  /** OTA-1093 — PARLEY. A pending two-button social choice against a wild NPC or the
+   *  animal you're fighting. Set when opened with a GENERIC opener (so ParleyModal
+   *  renders the two buttons); null otherwise. A SPECIFIC verb skips the modal. */
+  pendingParley:
+    | {
+        kind: ParleyKind;
+        temperament: Temperament;
+        targetName: string;
+        wisRevealed: boolean;
+        enemyIdx?: number;
+      }
+    | null;
+  closeParley: () => void;
+  resolveParley: (choice: ParleyChoice) => void;
+
   /** Write the active slot. Resolves `true` when the atomic save landed and
    *  verified, `false` when it was skipped (no slot / no player) or the write
    *  failed (truncated / storage full). Most callers fire-and-forget; the
@@ -3529,6 +3553,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectCallDogOption: (option, treatItemName) => {
     handleCallDogOption(get, set, option, treatItemName);
     set({ callDogModalOpen: false });
+    void get().persist();
+  },
+
+  // OTA-1093 — PARLEY. See engine/parley.ts.
+  pendingParley: null,
+  closeParley: () => {
+    const p = get().pendingParley;
+    if (p) get().appendLog('world', `You let the moment pass without pushing it.`);
+    set({ pendingParley: null });
+  },
+  resolveParley: (choice) => {
+    runParleyOutcome(get, set, choice);
+    set({ pendingParley: null });
     void get().persist();
   },
 
@@ -4572,6 +4609,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // arb119 — a fresh game must not inherit a stale open call-dog modal
       // (a transient UI flag that otherwise survives from a prior session).
       callDogModalOpen: false,
+      pendingParley: null, // OTA-1093 — clear any stale parley on a fresh game
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -5054,14 +5092,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // step (reach / return_to / hand_in / claim). Runs before the boss-injection
     // below so a satisfied step advances first (and a claim fires the win).
     checkCustomQuestLocation(get, set);
+    // OTA-1093 — Menace pressure: a player who rules by fear draws readier, meaner
+    // encounters. The decayed menace lifts the curated-encounter chance and can add
+    // one more foe. Legible payback for leaning on intimidation.
+    const sceneMenace = decayedMenace(player?.menace ?? 0, player?.menaceUpdatedHour ?? 0, hoursElapsed);
+    const menaceBonus = menaceEncounterBonus(sceneMenace);
     let encounter: Enemy[] = [];
     if (!suppressEncounter) {
-      if (ladderTriple && chance(40 + location.danger * 8)) {
+      if (ladderTriple && chance(40 + location.danger * 8 + Math.round(menaceBonus * 100))) {
         const curated = pickEncounterFromLadder(ladderTriple);
         if (curated) encounter = [curated];
       }
       if (encounter.length === 0) {
         encounter = rollEncounter(location);
+      }
+      if (encounter.length > 0 && ladderTriple && menaceBonus > 0 && Math.random() < menaceBonus) {
+        const extra = pickEncounterFromLadder(ladderTriple);
+        if (extra) encounter = [...encounter, extra];
       }
     }
     // engine_Dev — DATA-DRIVEN MAIN QUEST: when the active "kill" step targets a
@@ -5605,7 +5652,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (Math.random() >= 0.12) return null;
       let seed = 0;
       for (let i = 0; i < wTileKey.length; i++) seed = (seed * 31 + wTileKey.charCodeAt(i)) | 0;
-      return makeWanderer(seed);
+      // OTA-1093 — draw a faction (or none) so an affiliated wanderer's standing can
+      // be dinged if you extort them.
+      return makeWanderer(seed, FACTIONS.map((f) => f.id));
     })();
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
@@ -7439,13 +7488,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
-    // OTA-1091 — Talk down a fight. IN COMBAT, a diplomacy verb (persuade /
-    // intimidate / convince) is a real d20 + CHA contest that can END the encounter
-    // without a kill. Distinct from fleeing: success = the foe stands down and you
-    // KEEP the tile (no kill loot / XP, small CHA train); failure costs the turn and
-    // draws the enemy counter, same as any missed action. Intercepted here, before
-    // the shared stealth/diplomacy switch arm treats an in-combat "persuade" as a
-    // quest-stage check or a no-op. Bosses / story-class threats refuse outright.
+    // OTA-1093 — PARLEY. Speaking to a foe you're fighting (an animal) or a wild NPC
+    // (a person) opens a two-button social choice — Calm/Intimidate for animals,
+    // Persuade/Intimidate for people. A GENERIC opener ("talk to / greet / speak")
+    // surfaces the ParleyModal; a SPECIFIC verb commits straight through. Hard
+    // lock-and-key: the wrong approach auto-fails; a high-WIS read is told the
+    // temperament, everyone else gets the narrated tell. See parley.ts.
+    // --- Combat parley (animals; bosses / story-class threats refuse) ---
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length > 0) {
       const foes = currentScene.enemies;
       if (isTalkDownBlocked(foes)) {
@@ -7456,108 +7505,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
         void get().persist();
         return;
       }
-      const intimidation = isIntimidationVerb(trimmed);
-      const dc = talkDownDC(foes);
-      const cha = effectiveStats(player).charisma;
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const tPerksTalk = require('../engine/titles').titlePerkModifiers(player);
-      const bonus = tPerksTalk.diplomacyBonus ?? 0;
-      const roll = rollDie(20);
-      const total = roll + cha + bonus;
-      const success = total >= dc;
-      get().appendLog(
-        'combat',
-        `You — ${intimidation ? 'intimidate' : 'persuade'} → d20 ${roll} + CHA ${cha}${bonus ? ` + ${bonus} (Broker)` : ''} = ${total} vs DC ${dc} — ${success ? '✓ STANDS DOWN' : '✗ NO SALE'}`,
-      );
-      if (success) {
-        const trained = trainStat(player, 'charisma', true);
-        set((s) =>
-          s.player && s.currentScene
-            ? {
-                player: advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25),
-                currentScene: {
-                  ...s.currentScene,
-                  enemies: [],
-                  enemyHps: [],
-                  enemyKnockedOut: [],
-                  enemyAmbushUsed: [],
-                  activeEnemyIdx: 0,
-                  range: null,
-                },
-              }
-            : s,
-        );
-        get().appendLog('world', talkDownSuccessLine(foes, intimidation));
-        if (trained.leveled) {
-          get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to} — a talker's edge.`);
-        }
+      const idx = currentScene.activeEnemyIdx ?? 0;
+      const foe = currentScene.enemies[idx] ?? currentScene.enemies[0]!;
+      const temperament: Temperament = foe.temperament ?? deriveAnimalTemperament(foe.name, foe.traits ?? []);
+      const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
+      const ctx = { kind: 'animal' as ParleyKind, temperament, targetName: foe.name, wisRevealed, enemyIdx: idx };
+      get().appendLog('world', wisRevealed ? temperamentReadout(temperament) : temperamentTell(temperament));
+      const explicit = detectParleyChoice(trimmed, 'animal');
+      set(() => ({ pendingParley: ctx }));
+      if (explicit) {
+        get().resolveParley(explicit);
+      } else {
+        get().appendLog('world', `${foe.name} squares off. How do you play it — calm it, or intimidate it?`);
         void get().persist();
-        return;
       }
-      // Miss: spend the turn like any skill check, then the group counters.
-      set((s) =>
-        s.player ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25) } : s,
-      );
-      get().appendLog('world', talkDownFailLine(foes, intimidation));
-      if ((get().currentScene?.enemies.length ?? 0) > 0) {
-        runEnemyGroupCounters(get, set, get().player ?? player);
-      }
-      void get().persist();
       return;
     }
-    // OTA-1092 — Talk to a wandering NPC. When a person is resting on this peaceful
-    // tile, greeting / persuading them is a d20 + CHA check for a small payoff (a
-    // word of the road, a few coins, or a rare standing nudge as your people hear
-    // you dealt fair). ONE read per wanderer — win or whiff, they move on — so
-    // Charisma decides whether the meeting pays.
+    // --- Peaceful parley (a wild NPC / person) ---
     if (parsed.intent === 'diplomacy' && currentScene.enemies.length === 0 && currentScene.wanderer) {
       const w = currentScene.wanderer;
-      const cha = effectiveStats(player).charisma;
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const tPerksW = require('../engine/titles').titlePerkModifiers(player);
-      const bonusW = tPerksW.diplomacyBonus ?? 0;
-      const rollW = rollDie(20);
-      const totalW = rollW + cha + bonusW;
-      const okW = totalW >= WANDERER_TALK_DC;
-      get().appendLog(
-        'world',
-        `You — speak with ${w.name} → d20 ${rollW} + CHA ${cha}${bonusW ? ` + ${bonusW} (Broker)` : ''} = ${totalW} vs DC ${WANDERER_TALK_DC} — ${okW ? '✓' : '✗'}`,
-      );
-      if (okW) {
-        const reward = rollWandererReward(w, Math.random(), Math.random());
-        const standingUnavailable = reward.kind === 'standing' && !player.factionId;
-        const trained = trainStat(player, 'charisma', true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let repChanged: any[] = [];
-        set((s) => {
-          if (!s.player || !s.currentScene) return s;
-          let p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
-          if (reward.kind === 'tc') p = { ...p, tc: p.tc + reward.amount };
-          if (reward.kind === 'standing' && p.factionId) {
-            const rr = applyRepChange(p.factionStanding, p.factionId, reward.amount);
-            p = { ...p, factionStanding: rr.standing };
-            repChanged = rr.changed;
-          }
-          return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
-        });
-        get().appendLog('reward', standingUnavailable ? w.tip : reward.line);
-        if (repChanged.length > 0) logRepChanges(get, repChanged);
-        if (trained.leveled) {
-          get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to}.`);
-        }
+      const temperament = w.temperament;
+      const wisRevealed = revealsTemperament(effectiveStats(player).wisdom);
+      const ctx = { kind: 'person' as ParleyKind, temperament, targetName: w.name, wisRevealed };
+      get().appendLog('world', wisRevealed ? temperamentReadout(temperament) : temperamentTell(temperament));
+      const explicit = detectParleyChoice(trimmed, 'person');
+      set(() => ({ pendingParley: ctx }));
+      if (explicit) {
+        get().resolveParley(explicit);
+      } else {
+        get().appendLog('world', `${w.name} waits, weighing you. Persuade them, or intimidate them?`);
         void get().persist();
-        return;
       }
-      set((s) =>
-        s.player && s.currentScene
-          ? {
-              player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25),
-              currentScene: { ...s.currentScene, wanderer: null },
-            }
-          : s,
-      );
-      get().appendLog('world', wandererFailLine(w));
-      void get().persist();
       return;
     }
     // OTA-120 Phase 4 — `feed dog <item>` / `heal dog <item>` /
@@ -29663,6 +29641,187 @@ export type CallDogOption = 'scratch' | 'treat' | 'speak';
  *  loyalty bumps; Treat takes an itemName and routes through
  *  applyItemToDog so the +20/+40 loyalty math runs through one
  *  place. Idempotent on dead / abandoned. */
+// OTA-1093 — standing lost when you successfully extort a faction-affiliated person.
+const PARLEY_EXTORT_REP = 6;
+
+/** OTA-1093 — a botched shakedown turns the person hostile: build a lightweight Human
+ *  enemy from them. factionNeutralFight so a fight they STARTED doesn't cascade
+ *  faction hostility on death — the standing cost only lands on a SUCCESSFUL extort. */
+function wandererToEnemy(name: string, temperament: Temperament): Enemy {
+  return {
+    name,
+    type: 'Human',
+    abilityPoint: '',
+    attack: 'lashes out',
+    damage: '1d6',
+    hp: 14,
+    rarity: 'Common',
+    loot: [],
+    temperament,
+    factionNeutralFight: true,
+  };
+}
+
+/** OTA-1093 — resolve a committed parley choice. Reads the pending context, runs the
+ *  hard lock-and-key (wrong key auto-fails), the CHA roll on a right key, the
+ *  asymmetric outcomes, the Menace raise, and the extortion standing cost. */
+function runParleyOutcome(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  choice: ParleyChoice,
+): void {
+  const ctx = get().pendingParley;
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!ctx || !player || !scene) return;
+  const { kind, temperament, targetName } = ctx;
+
+  const stats = effectiveStats(player);
+  const cha = stats.charisma;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tPerks = require('../engine/titles').titlePerkModifiers(player);
+  const brokerBonus = tPerks.diplomacyBonus ?? 0;
+
+  const nowHours = player.hoursElapsed ?? 0;
+  const curMenace = decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, nowHours);
+  const isIntimidate = choice === 'intimidate';
+
+  const rightKey = isRightKey(choice, temperament);
+  const dcBonus = isIntimidate ? menaceIntimidateDcBonus(curMenace) : 0;
+  const dc = parleyDC(choice, dcBonus);
+  const roll = rightKey ? rollDie(20) : 0;
+  const total = roll + cha + brokerBonus;
+  const success = rightKey && total >= dc;
+
+  const menaceAfter = isIntimidate
+    ? raiseMenace(curMenace, kind === 'animal' ? 'animal' : 'person')
+    : curMenace;
+  const withMenace = (p: PlayerCharacter): PlayerCharacter =>
+    isIntimidate ? { ...p, menace: menaceAfter, menaceUpdatedHour: nowHours } : p;
+
+  if (rightKey) {
+    get().appendLog(
+      'combat',
+      `You — ${choice} ${targetName} → d20 ${roll} + CHA ${cha}${brokerBonus ? ` + ${brokerBonus} (Broker)` : ''} = ${total} vs DC ${dc} — ${success ? '✓' : '✗'}`,
+    );
+  } else {
+    get().appendLog('combat', `You — ${choice} ${targetName} → wrong read; it doesn't land.`);
+  }
+
+  const factionLabel = (id: string): string => (FACTIONS.find((f) => f.id === id)?.name ?? id.replace(/_/g, ' '));
+
+  if (success) {
+    const trained = trainStat(player, 'charisma', true);
+    if (kind === 'animal') {
+      set((s) =>
+        s.player && s.currentScene
+          ? {
+              player: withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25)),
+              currentScene: { ...s.currentScene, enemies: [], enemyHps: [], enemyKnockedOut: [], enemyAmbushUsed: [], activeEnemyIdx: 0, range: null },
+            }
+          : s,
+      );
+      get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+    } else if (choice === 'persuade') {
+      const w = scene.wanderer;
+      const reward = w ? rollWandererReward(w, Math.random(), Math.random()) : null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let repChanged: any[] = [];
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        let p = advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25);
+        if (reward?.kind === 'tc') p = { ...p, tc: p.tc + reward.amount };
+        if (reward?.kind === 'standing' && p.factionId) {
+          const rr = applyRepChange(p.factionStanding, p.factionId, reward.amount);
+          p = { ...p, factionStanding: rr.standing };
+          repChanged = rr.changed;
+        }
+        return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
+      });
+      get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+      get().appendLog('reward', reward ? reward.line : `${targetName} tells you what they know.`);
+      if (repChanged.length) logRepChanges(get, repChanged);
+    } else {
+      const w = scene.wanderer;
+      const loot = 8 + rollDie(12);
+      const faction = w?.faction ?? null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let repChanged: any[] = [];
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        let p = withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25));
+        p = { ...p, tc: p.tc + loot };
+        if (faction) {
+          const rr = applyRepChange(p.factionStanding, faction, -PARLEY_EXTORT_REP);
+          p = { ...p, factionStanding: rr.standing };
+          repChanged = rr.changed;
+        }
+        return { player: p, currentScene: { ...s.currentScene, wanderer: null } };
+      });
+      get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+      get().appendLog('reward', `You shake ${loot} TC loose from ${targetName}.`);
+      if (faction) {
+        get().appendLog('system', `Word spreads that you strong-armed one of theirs. (−${PARLEY_EXTORT_REP} standing with the ${factionLabel(faction)})`);
+      }
+      if (repChanged.length) logRepChanges(get, repChanged);
+    }
+    if (trained.leveled) get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to}.`);
+    return;
+  }
+
+  const failLine = rightKey
+    ? parleyRolledFailLine(choice, kind, targetName)
+    : parleyWrongKeyLine(choice, kind, targetName);
+
+  if (isIntimidate) {
+    if (kind === 'animal') {
+      const hit = 3 + rollDie(6);
+      set((s) =>
+        s.player
+          ? { player: withMenace(advanceTime(spendStamina({ ...s.player, hp: Math.max(0, s.player.hp - hit) }, STAMINA_COSTS.skillCheck), 0.25)) }
+          : s,
+      );
+      get().appendLog('world', failLine);
+      get().appendLog('combat', `${targetName} rakes you for ${hit} damage.`);
+      if ((get().currentScene?.enemies.length ?? 0) > 0) runEnemyGroupCounters(get, set, get().player ?? player);
+    } else {
+      const foe = wandererToEnemy(targetName, temperament);
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        return {
+          player: withMenace(advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25)),
+          currentScene: {
+            ...s.currentScene,
+            wanderer: null,
+            enemies: [...s.currentScene.enemies, foe],
+            enemyHps: [...s.currentScene.enemyHps, foe.hp],
+            enemyKnockedOut: [...(s.currentScene.enemyKnockedOut ?? []), false],
+            enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+            activeEnemyIdx: s.currentScene.enemies.length,
+            range: 'close',
+          },
+          stepsSinceCombat: 0,
+        };
+      });
+      get().appendLog('world', failLine);
+      get().appendLog('combat', `${targetName} won't be pushed — ${foe.attack}, ${foe.damage} on a hit. (range: close)`);
+    }
+  } else {
+    if (kind === 'animal') {
+      set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25) } : s));
+      get().appendLog('world', failLine);
+      if ((get().currentScene?.enemies.length ?? 0) > 0) runEnemyGroupCounters(get, set, get().player ?? player);
+    } else {
+      set((s) =>
+        s.player && s.currentScene
+          ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25), currentScene: { ...s.currentScene, wanderer: null } }
+          : s,
+      );
+      get().appendLog('world', failLine);
+    }
+  }
+}
+
 function handleCallDogOption(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

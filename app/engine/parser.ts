@@ -36,6 +36,14 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // collides with the 'call dog' parser intercept.
     // Social + performance card verbs.
     'intimidate', 'perform', 'sing', 'play',
+    // OTA-1093 — parley verbs. Threat + gentle approaches route through diplomacy so
+    // the two-button parley opens (soothe an animal / persuade a person, or
+    // intimidate either). 'calm'/'settle' are deliberately NOT here — they collide
+    // with the self-directed "calm down" / "settle down" (which are ready/rest); the
+    // unambiguous gentle verbs below cover the animal read, and the two-button modal
+    // (opened by a generic "talk to / approach") always offers "Calm it" by tap.
+    'threaten', 'menace', 'coerce', 'coax',
+    'soothe', 'pacify', 'tame',
   ],
   escape: [
     'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',

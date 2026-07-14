@@ -16,6 +16,7 @@ import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
+import { decayedMenace, menaceTier } from '../engine/menace';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -184,6 +185,25 @@ export function CharacterScreen() {
             </Text>
           </View>
           <Text style={styles.kvSub}>↳ {tierDescription(tier)}</Text>
+          {/* OTA-1093 — MENACE: your reputation for ruling by fear. Shown once you've
+              built any (intimidation raises it). Higher menace stiffens your own
+              intimidate checks and draws readier encounters; it fades if you stop. */}
+          {(() => {
+            const m = decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0);
+            if (m < 1) return null;
+            const mt = menaceTier(m);
+            return (
+              <>
+                <View style={styles.kvRow}>
+                  <Text style={styles.kvKey}>Menace</Text>
+                  <Text style={[styles.kvValue, mt === 'Dreaded' && styles.danger, mt === 'Feared' && styles.warning]}>
+                    {Math.round(m)} · {mt}
+                  </Text>
+                </View>
+                <Text style={styles.kvSub}>↳ The waste has heard of you. Fear opens doors — and stiffens every spine you'd threaten next.</Text>
+              </>
+            );
+          })()}
         </View>
         )}
 

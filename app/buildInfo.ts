@@ -17404,4 +17404,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // wanderers.ts (lore-neutral archetypes & flavor); CurrentScene.wanderer; beginScene
 // spawn; talk intercept in submitPlayerAction; green wanderer banner in
 // ExplorationScreen.
-export const OTA_BUILD_ID = '2026-07-14-1092-wandering-npcs';
+// OTA-1093 — PARLEY + MENACE (Phase 1 of the social rework). The flat wanderer/talk-
+// down rolls become a two-button CHOICE with real asymmetric stakes. People: PERSUADE
+// vs INTIMIDATE. Animals: CALM vs INTIMIDATE. A GENERIC opener surfaces the
+// ParleyModal; a SPECIFIC verb commits straight through. HARD LOCK-AND-KEY: every
+// target has a temperament and the WRONG key AUTO-FAILS regardless of Charisma (high
+// WIS is told it, others read the tell). Safe read fail = the hook is SPENT (no harm);
+// INTIMIDATE fail = harm (vicious hit / turns hostile) + hook spent. Rewards: persuade
+// → lead, intimidate → goods (Phase-1 stand-in = TC). Full MENACE loop: intimidation
+// raises player.menace → self-blunts intimidate DC, draws readier encounters, decays
+// 0.4/hr, shown on the portrait; extorting a faction person costs −6 standing. New
+// engine/parley.ts + engine/menace.ts (both lore-neutral); Enemy.temperament +
+// Wanderer.temperament/faction + PlayerCharacter.menace; ParleyModal; parser parley
+// verbs. OTA-1091/1092 single-roll flows superseded (pure helpers retained).
+export const OTA_BUILD_ID = '2026-07-14-1093-parley-and-menace';
