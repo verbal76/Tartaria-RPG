@@ -41,7 +41,6 @@ describe('QWEN_ALLOWED_INTENTS', () => {
     'cast',
     'equip',
     'craft',
-    'gift',
     'steal',
     'join',
     'repair',

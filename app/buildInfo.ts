@@ -16064,4 +16064,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // VALUE-GATE: gifting a near-worthless item is politely declined (no rep, no CHA,
 // not consumed); rep now scales with the gift's worth (~30 TC ≈ the old +5, up to
 // +8) instead of a flat +5 per junk item. Shared engine code — all three lines.
-export const OTA_BUILD_ID = '2026-07-14-802-economy-re-tiering-b1';
+// OTA-803 — GIFTING REMOVED (per the user). Faction standing is earned through
+// mission completions + sigil/pendant turn-ins; gifting vendors loot for rep
+// (added +5, then value-scaled in 802's B1d) was a side door that undercut that
+// design and was undiscoverable (no button, typed-only). The whole mechanic is
+// gone: the `gift` Intent, the parser verb table entry + verb-frame, the
+// giftToVendor store action + its `case 'gift'` handler, the LLM-parser intent
+// row, and the stray 'gift' mentions in help/hint text + the inventory modal.
+// (The buy-from-vendor +1 rep side door is left as-is unless the user asks.)
+// Shared engine code — all three lines.
+export const OTA_BUILD_ID = '2026-07-14-803-remove-gifting';
