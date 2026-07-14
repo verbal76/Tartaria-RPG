@@ -338,20 +338,27 @@ Key invariants worth knowing:
       are un-typeable vendors and animal enemies").** Real gap: diplomacy only fired
       inside scripted quest social stages (hunt toll-givers, faction-storyline
       social gates, main-quest "address the keepers"), so CHA felt invisible in
-      everyday play. User picked TWO fixes to make it live:
-      - **Talk down wild enemies — SHIPPED 806/786/1091.** In combat a diplomacy verb
-        is a d20+CHA contest that ENDS the fight without a kill (foe stands down, you
-        KEEP the tile — distinct from fleeing); no loot/XP on success, turn-cost +
-        counter on fail, bosses refuse. See §9. Module talkDown.ts; intercept in
-        submitPlayerAction.
-      - **Wandering NPCs — SHIPPED 807/787/1092.** Occasional lore-neutral travelers
-        (traveler / refugee / tinker / scout / pilgrim) on peaceful outdoor tiles;
-        `talk to <name>` is a d20+CHA(+Broker) check vs DC 12 for a tip / a few coins
-        (6–15 TC) / a rare +1 own-faction standing. ONE read per wanderer. Farm-proof:
-        each tile gets exactly ONE spawn roll ever (worldMemory.wandererRolledTiles,
-        120-window), ~12% of eligible fresh tiles. See §9. Module wanderers.ts;
-        CurrentScene.wanderer; beginScene spawn; talk intercept; green banner in
-        ExplorationScreen.
+      everyday play. Built out as a SOCIAL REWORK (talk-down + wanderers were the
+      first pass; the parley below supersedes their flat rolls):
+      - **Talk down wild enemies — SHIPPED 806/786/1091, then RESHAPED by 808.**
+        Original single-roll in-combat disengage. Now the animal side of the parley.
+      - **Wandering NPCs — SHIPPED 807/787/1092, then RESHAPED by 808.** Original
+        single-roll wanderer talk. Now the person side of the parley. (Spawn +
+        farm-proof window + banner are unchanged; only the talk RESOLUTION changed.)
+      - **Parley + Menace (social rework) — Phase 1 SHIPPED 808/788/1093.** Two-button
+        choice (Calm/Persuade vs Intimidate) with hard lock-and-key (wrong key
+        auto-fails; WIS reveals the temperament), asymmetric downsides (safe fail =
+        forfeit the hook; intimidate fail = harm + forfeit), reward split (persuade →
+        lead, intimidate → goods), and the full Menace loop (visible on the portrait,
+        self-blunting DC, encounter scaling, decay, −6 extortion standing cost). See
+        §9. Modules parley.ts + menace.ts; ParleyModal; store pendingParley/
+        resolveParley + runParleyOutcome.
+        - **Phase 2 — NEXT (807.5-style content pass, next OTA 809/789/1094).**
+          Larger PROCEDURAL NPC generator (randomized temperament + payload on the
+          archetypes); hint → follow-up → cagey DIALOGUE BEATS; persuade-leads wired
+          into the real WHISPER/hook system (traceable locations, replacing the
+          Phase-1 tip stand-in); intimidate-goods wired into the CARRIED-kit grant
+          (replacing the Phase-1 flat TC). Engine copy stays lore-neutral.
     - **B2 [#2] Contract location-gating + remote-pay cut** — NEXT. Needs a call
       on how strict the stage gating should be. hunt/mystery/storyline stages
       advance on ANY matching check/kill/travel anywhere + pay 100% from any tile
@@ -517,14 +524,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-807`**,
-**golem-line `…-787`**, **engine_Dev `…-1092`**. Current parity offsets: golem =
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-808`**,
+**golem-line `…-788`**, **engine_Dev `…-1093`**. Current parity offsets: golem =
 HAL − 20 (stable); engine_Dev = HAL + 285 (the Guardian OTA 798/778 was
-HAL+golem-only, so engine is one behind on count; the wandering-NPC batch 807/787/1092
+HAL+golem-only, so engine is one behind on count; the parley batch 808/788/1093
 shipped to all three and preserves the −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 808 | 788 | 1093 | PARLEY + MENACE — Phase 1 of the SOCIAL REWORK (user-designed; supersedes the flat 806/807 talk-down + wanderer rolls). Speaking to a foe you're fighting (an animal) or a wild NPC (a person) opens a TWO-BUTTON choice with real asymmetric stakes: animals Calm/Intimidate, people Persuade/Intimidate. A GENERIC opener ("talk to / approach / greet") surfaces the ParleyModal so stakes are explicit; a SPECIFIC verb (intimidate/soothe/persuade/threaten/…) commits straight through. HARD LOCK-AND-KEY: every target has a temperament (skittish→calm, aggressive→intimidate, reasonable→persuade, greedy→intimidate; animals derive one from name/traits when unauthored) and the WRONG key AUTO-FAILS regardless of Charisma — a high-WIS character (≥12) is TOLD the temperament (temperamentReadout), everyone else reads the narrated tell (temperamentTell) or gambles. STAKES set by the BUTTON: the safe read (calm/persuade) fail = the hook is SPENT — no new harm but the lead/clean-exit is gone; INTIMIDATE fail = ACTIVE HARM (animal lands a vicious hit 3+1d6 & the fight goes on / person turns hostile → spawns as a Human enemy) AND the hook is spent. REWARD split ("talk for secrets, threaten for stuff"): persuade → a lead (Phase-1 stand-in = the wanderer reward roll; Phase 2 wires real traceable leads), intimidate → their goods (Phase-1 stand-in = 9–20 TC; Phase 2 grants carried kit). Full MENACE loop: intimidation ATTEMPTS raise player.menace (people +8 / animals +4), which SELF-BLUNTS your own intimidate DC (+1/20 menace), lifts encounter chance + can add a foe (beginScene), decays 0.4/game-hour, and shows on the character portrait (decayed value + tier Unremarkable/Noticed/Feared/Dreaded). Successful EXTORTION of a faction-affiliated person costs −6 standing (half to allies). New engine modules parley.ts + menace.ts (lore-neutral); Enemy.temperament + Wanderer.temperament/faction + PlayerCharacter.menace/menaceUpdatedHour; new ParleyModal (self-mounts off pendingParley); store pendingParley + closeParley + resolveParley + module runParleyOutcome; parser gains parley verbs (soothe/pacify/tame/threaten/menace/coerce/coax — 'calm'/'settle' deliberately excluded, they collide with self-directed "calm/settle down"). Knobs: WIS_REVEAL_THRESHOLD(12), BASE_PARLEY_DC(11), MENACE_PER_INTIMIDATE_PERSON/ANIMAL(8/4), MENACE_DECAY_PER_HOUR(0.4), PARLEY_EXTORT_REP(6). All three lines. Phase 2 (procedural NPC pool + hint→follow-up dialogue + real leads/goods) is next |
 | 807 | 787 | 1092 | WANDERING NPCs — the second half of the "where does Charisma matter?" answer (talk-down was the first). The open road now occasionally puts a PERSON in front of you — a traveler / refugee / tinker / scout / pilgrim — someone you can actually TALK to (not a vendor stall, not an animal). `talk to <name>` is a d20 + CHA (+ Broker) check vs a friendly DC 12 (WANDERER_TALK_DC) for a small payoff: a word of the road (tip flavor), a few coins (6–15 TC), or — rarely — a +1 standing nudge with the player's OWN faction ("your people hear you dealt fair"). ONE read per wanderer (win or whiff, they move on), so CHA decides whether the meeting pays. FARM-PROOF via a self-contained window: each peaceful OUTDOOR tile gets exactly ONE spawn roll EVER, banked in worldMemory.wandererRolledTiles (bounded to the last 120 tiles), so leaving-and-returning can't re-roll a person off one square — you cross new ground to meet new people (~12% of eligible fresh tiles). Suppressed on hubs / markets / capitals / combat tiles / when a vendor already rolled / the opening. New engine module wanderers.ts (makeWanderer deterministic from a tile-hash seed / rollWandererReward tiers / wandererFailLine + 5 lore-neutral archetypes); CurrentScene.wanderer field; beginScene spawn + arrival narration ("This is <name>, <role>… try 'talk to <name>'"); talk intercept in submitPlayerAction right after the talk-down intercept (mutually exclusive — talk-down needs enemies>0, wanderer needs enemies===0); a green "☺ <name>" banner in ExplorationScreen taps to submit the talk. Standing reward routes through applyRepChange + logRepChanges; a factionless player gets the tip instead. All three lines (engine flavor already lore-neutral) |
 | 806 | 786 | 1091 | TALK DOWN A FIGHT (answers the user's "where can I actually USE persuade? all I meet are un-typeable vendors and animal enemies"). IN COMBAT, a diplomacy verb (persuade / intimidate / convince / negotiate) is now a real d20 + CHA (+ Broker) contest that ENDS the encounter without a kill — DISTINCT from fleeing: the foe stands down and you KEEP the tile (fleeing is you running and leaving it). Success clears the enemies with NO loot / XP (you avoided the fight, didn't win it) + a small CHA train; failure costs the turn AND draws the enemy counter (runEnemyGroupCounters), so spamming a tough group is actively dangerous — no risk-free grind. DC scales with foe count + toughest rarity (talkDownDC: 10 for a lone Common, +2/tier, +2/extra foe); bosses / story-class threats (the `boss` flag — Guardians included) refuse outright. New engine module talkDown.ts (talkDownDC / isTalkDownBlocked / isIntimidationVerb / isBeastPack + success/fail flavor — beasts flee, people back off, intimidation vs. reasoned persuasion read from the verb); intercept in submitPlayerAction right after the dog-combat dispatch, ahead of the shared stealth/diplomacy/escape switch arm (so an in-combat "persuade" is a talk-down, not the old "words hang unanswered" no-op). Also refreshed SKILL_ACTIVITIES.charisma — dropped the stale "Gifting to a vendor" (gifting removed 803/783/1088) and added the talk-down + diplomacy-check surfaces. engine talkDown flavor is lore-neutral. All three lines |
 | 805 | 785 | 1090 | CHA-SCALED VENDOR DISCOUNTS, gated per faction by a rapport quest (grew out of the B1/gifting talk — "does Charisma even affect pricing?" It didn't). Charisma now drives pricing: chaPriceDiscount = 2%/pt above 10, capped 20%, applied to BOTH buys (cheaper) and sell-backs (richer, on top of the B1 caps as an earned merchant perk — SELL_FRACTION 0.4 keeps buy-then-sell a loss, no arbitrage). GATED behind a per-faction RAPPORT quest `fq_<faction>_rapport` (vendorPriceMod returns 0 until completedFactionQuestIds holds it); until earned, pricing is unchanged. New module app/engine/factionRapport.ts (chaPriceDiscount / hasFactionRapport / vendorPriceMod / rapportQuestId); sellPriceFor takes a rapportBonus applied AFTER the caps; buyFromVendor + sellToVendor + VendorScreen honor the mod (trusted-partner banner shows the live %); turnInFactionQuest flourish announces the unlock. HAL/golem author 9 rapport fetch quests in faction-quests.json (fetch a Golem Core — 7/9 lore relics are broker-only, content follow-up to place them); engine ships the MECHANIC only (no Tartaria quest data — it keys off completedFactionQuestIds so it lights up wherever a rapport quest exists). Diplomacy was already wired (INTENT_TO_STAT.diplomacy='charisma'; "convince"/"persuade" in the CHA word list). Knobs: CHA_PRICE_DISCOUNT_PER_POINT (0.02), CHA_PRICE_DISCOUNT_CAP (0.20). All three lines |
