@@ -1056,6 +1056,10 @@ export interface PlayerCharacter {
   /** OTA-1093 — the game-hour at which `menace` was last raised, so decay can be
    *  applied lazily (menace bleeds off MENACE_DECAY_PER_HOUR per hour since). */
   menaceUpdatedHour?: number;
+  /** OTA-1094 — a LOCATION LEAD talked out of a wandering NPC (persuade reward). Paid
+   *  out the next time the player reaches fresh ground (beginScene on a novel tile).
+   *  Cleared on payout. One at a time — a fresh lead overwrites an unclaimed one. */
+  pendingLead?: { hint: string; rewardTc: number; rewardItem?: string } | null;
   ac: number;
   tc: number;
   corruption: number;
