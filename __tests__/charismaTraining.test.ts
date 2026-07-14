@@ -112,23 +112,8 @@ describe('OTA 059 — CHA training on tap-driven social paths', () => {
     expect(after).toBeGreaterThan(before);
   });
 
-  it('successful GIFT trains CHA', async () => {
-    const store = await setupVendor();
-    const p = store.getState().player!;
-    store.setState({
-      player: {
-        ...p,
-        inventory: [
-          ...p.inventory,
-          { id: 'xtal_gift', name: 'Aether Crystal', kind: 'misc', quantity: 1, tags: ['aether', 'crystal'] },
-        ],
-      },
-    });
-    const before = store.getState().player!.statProgress?.charisma ?? 0;
-    store.getState().giftToVendor('Aether Crystal');
-    const after = store.getState().player!.statProgress?.charisma ?? 0;
-    expect(after).toBeGreaterThan(before);
-  });
+  // OTA-1088 — gifting was removed (faction standing is earned via missions +
+  // sigil turn-ins, not by handing vendors loot), so there's no gift CHA path.
 
   it('accumulated social actions push toward a level-up', async () => {
     // Player at CHA 10 with progress 96 — one more successful BUY

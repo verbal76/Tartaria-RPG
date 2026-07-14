@@ -17360,4 +17360,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // arbitrage; (d) gifting a near-worthless item is declined (no rep/CHA, not
 // consumed) and rep scales with the gift's worth instead of a flat +5. All
 // lore-neutral (the gift decline names the vendor, not the Arbiter).
-export const OTA_BUILD_ID = '2026-07-14-1087-economy-re-tiering-b1';
+// OTA-1088 — GIFTING REMOVED. Faction standing is earned through mission
+// completions + sigil/pendant turn-ins; gifting vendors loot for rep undercut that
+// design and was undiscoverable, so the whole mechanic is gone (the `gift` Intent,
+// parser verb + frame, giftToVendor action + case handler, LLM-parser row, and the
+// stray gift mentions in help/hint/modal text). 1087's B1d gift value-gate is
+// superseded. The buy-for-rep +1 side door is left as-is.
+export const OTA_BUILD_ID = '2026-07-14-1088-remove-gifting';

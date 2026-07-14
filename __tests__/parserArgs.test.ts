@@ -68,17 +68,9 @@ describe('OTA 204 — argument extraction (J&M §12.3.5 frames)', () => {
     expect(instr?.resolvedItemId).toBe('bc1');
   });
 
-  it('gift with PPto recipient: args has direct + recipient', () => {
-    const p = parseInput('give the locket to Yulka', {
-      inventory: [LOCKET],
-      recentNouns: ['Yulka'],
-    });
-    expect(p.intent).toBe('gift');
-    const direct = p.args?.find((a) => a.role === 'direct');
-    const recip  = p.args?.find((a) => a.role === 'recipient');
-    expect(direct?.resolvedItemId).toBe('lck1');
-    expect(recip?.text.toLowerCase()).toContain('yulka');
-  });
+  // OTA-1088 — the `gift` intent was removed (gifting deleted). "give the locket
+  // to Yulka" no longer parses to a gift; the prepositional-arg extraction is
+  // still covered by the throw/other PP-recipient cases above.
 
   it('search with adverb: args has direct + manner', () => {
     const p = parseInput('search the trap carefully', {

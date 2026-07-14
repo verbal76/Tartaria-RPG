@@ -1488,7 +1488,7 @@ const DIRECTION_KEYWORDS = /\b(direction|way|paths?|exits?|route|where to go|whi
 // action where the player has already declared their intent.
 const ARBITER_ENGAGED_INTENTS: ReadonlySet<string> = new Set([
   'attack', 'investigate', 'open', 'pickup', 'use_relic', 'cast',
-  'steal', 'gift', 'craft', 'equip', 'throw', 'dig', 'repair',
+  'steal', 'craft', 'equip', 'throw', 'dig', 'repair',
   'accept', 'turn_in', 'sell', 'buy',
   'climb', 'search', 'drop', 'scrap', 'talk', 'advance', 'retreat',
   'unequip',
@@ -2966,7 +2966,6 @@ interface GameStore {
    *  only on the first unit and false for the rest — otherwise dumping a big stack
    *  farmed Charisma one level at a time. */
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean }) => void;
-  giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
@@ -7709,7 +7708,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'advance',
       'ask',
       'diplomacy',
-      'gift',
       'steal',
       // OTA-129 — hook-puzzle verbs route through hookEligible too
       // so the puzzle resolver runs against active hooks. The
@@ -9919,7 +9917,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (isNpcMatch) {
             get().appendLog(
               'world',
-              `You turn your attention to ${currentScene.vendor.name}. They glance up — focused on their own work, not yours. (Use 'gift', 'sell', 'accept', or 'recruit' if you mean to engage.)`,
+              `You turn your attention to ${currentScene.vendor.name}. They glance up — focused on their own work, not yours. (Use 'sell', 'accept', or 'recruit' if you mean to engage.)`,
             );
             break;
           }
@@ -13996,37 +13994,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         break;
       }
-      case 'gift': {
-        if (!currentScene.vendor) {
-          get().appendLog('arbiter', `The ${getNarratorName()} glances at the empty road. "No one here to gift to."`);
-          break;
-        }
-        // OTA 205 Phase 2 — if the player named a recipient
-        // explicitly ("give X to Yulka"), validate it matches the
-        // active vendor. Catches "give X to Bob" when Yulka is the
-        // one actually present. Falls through if no recipient was
-        // named (parser only attaches it when "to <name>" appears).
-        const recipArg = parsed.args?.find((a) => a.role === 'recipient');
-        if (recipArg?.text) {
-          const recipText = recipArg.text.toLowerCase().trim();
-          const vendorName = currentScene.vendor.name.toLowerCase();
-          const match = vendorName.includes(recipText) || recipText.includes(vendorName);
-          if (!match) {
-            get().appendLog(
-              'arbiter',
-              `The ${getNarratorName()} glances around. "${currentScene.vendor.name} is here, not ${recipArg.text}. Drop the 'to ${recipArg.text}' if you mean them."`,
-            );
-            break;
-          }
-        }
-        const target = parsed.resolvedNoun ?? parsed.target ?? '';
-        if (!target.trim()) {
-          get().appendLog('arbiter', `The ${getNarratorName()} tilts their head. "Gift what? Name a thing from your pack."`);
-          break;
-        }
-        get().giftToVendor(target);
-        break;
-      }
+      // OTA-1088 — the `gift` intent + giftToVendor were removed. Faction standing
+      // is earned through mission completions + sigil/pendant turn-ins; gifting
+      // vendors loot for rep undercut that design, so the mechanic is gone.
       case 'steal': {
         const stealTarget = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
         // Vendor present → real theft attempt against their inventory.
@@ -16916,93 +16886,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
 
-  giftToVendor(itemName) {
-    const state = get();
-    const scene = state.currentScene;
-    const player = state.player;
-    if (!scene?.vendor || !player) return;
-
-    const itemIdx = player.inventory.findIndex(
-      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
-    );
-    if (itemIdx < 0) {
-      get().appendLog('arbiter', `The ${getNarratorName()} shakes their head. "You do not carry any ${itemName}."`);
-      return;
-    }
-    const item = player.inventory[itemIdx]!;
-
-    // OTA 461 — quest-tag refusal. The drop, sell, and scrap paths
-    // already block quest-tagged items (Cores, etc.); gift was the
-    // remaining leak. Without this, a player could gift a Tartarian
-    // Core to a vendor and lose it permanently, soft-locking the
-    // main quest.
-    if ((item.tags ?? []).includes('quest')) {
-      get().appendLog(
-        'arbiter',
-        `The ${getNarratorName()} puts a hand on your wrist. "Not the ${item.name}. The main quest hangs on that piece — it stays with you."`,
-      );
-      return;
-    }
-
-    // OTA-1087 (B1d) — value-gate + scale. Pre-fix, gifting ANY item gave a flat
-    // +5 rep AND a guaranteed CHA train with no value floor or cooldown, so
-    // dumping worthless forage (rocks, sticks) farmed unbounded reputation and
-    // charisma. Now the gift's WORTH drives the reward: a near-worthless item is
-    // politely declined (no rep, no CHA, not consumed — nothing to farm), and rep
-    // scales with value (a typical ~30 TC gift ≈ the old +5; a fine gift up to
-    // +8). CHA only trains on a gift that actually lands.
-    const GIFT_VALUE_FLOOR = 5; // TC — below this a gift is just junk to the vendor
-    const giftValue = sellPriceFor(item, scene.vendor);
-    if (giftValue < GIFT_VALUE_FLOOR) {
-      get().appendLog(
-        'arbiter',
-        `${scene.vendor.name} turns the ${item.name.toLowerCase()} over once and hands it back. "Kind of you — but that's worth nothing to me. Bring me something I can use."`,
-      );
-      return;
-    }
-    const giftRep = Math.max(1, Math.min(8, Math.round(giftValue / 6)));
-
-    // Decrement quantity (remove row at 0).
-    const newInventory = player.inventory
-      .map((it, i) =>
-        i === itemIdx ? { ...it, quantity: it.quantity - 1 } : it,
-      )
-      .filter((it) => it.quantity > 0);
-
-    const vendorFaction = scene.vendor.faction;
-    const repResult = vendorFaction
-      ? applyRepChange(player.factionStanding, vendorFaction, giftRep)
-      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-
-    set((s) =>
-      s.player
-        ? {
-            player: { ...s.player, inventory: newInventory, factionStanding: repResult.standing },
-          }
-        : s,
-    );
-    get().appendLog(
-      'reward',
-      `You gift ${item.name} to ${scene.vendor.name}. They acknowledge it with a slow nod.`,
-    );
-    logRepChanges(get, repResult.changed);
-    // OTA 059 — gifting is pure social work; trains CHA reliably.
-    {
-      const liveGifter = get().player;
-      if (liveGifter) {
-        const tr = trainStat(liveGifter, 'charisma', true);
-        set((s) => (s.player ? { player: tr.player } : s));
-        if (tr.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ Generosity carries weight. +1 CHA (now ${tr.leveled.to}).`,
-          );
-        }
-      }
-      // OTA-057 — gifting is an active CHA push; no WIS train here.
-    }
-    void get().persist();
-  },
 
   stealFromVendor(itemName) {
     const state = get();

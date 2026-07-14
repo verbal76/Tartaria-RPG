@@ -175,7 +175,7 @@ function voiceRules(): string {
     'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
     'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
     'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
-    '(relic / item / torch), dig, craft, steal, gift, ask, rest. ';
+    '(relic / item / torch), dig, craft, steal, ask, rest. ';
   const vocab = getWorldVocabulary();
   const vocabLine = vocab ? `Favor this world's vocabulary in narration: ${vocab}. ` : '';
   return base + vocabLine + 'End on a complete sentence.';

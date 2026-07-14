@@ -87,27 +87,9 @@ describe('OTA 205 — Layer 4 selectional restrictions (Sleator §7.3)', () => {
     expect(p.args?.find((a) => a.role === 'instrument')?.resolvedItemId).toBe('b1');
   });
 
-  it('rejects "give the locket to the wall" (recipient is ambient, not NPC)', () => {
-    const LOCKET = { id: 'l1', name: 'Aetheric Locket', kind: 'misc' as const, quantity: 1, tags: [] };
-    const p = parseInput('give the locket to the wall', {
-      inventory: [LOCKET],
-      ambientNouns: ['wall', 'lever', 'pillar'],
-      vendorName: 'Yulka',
-    });
-    expect(p.intent).toBe('unknown');
-    expect(p.validationIssues).toContain('recipient_not_an_npc');
-  });
-
-  it('allows "give the locket to Yulka" (recipient matches vendor)', () => {
-    const LOCKET = { id: 'l1', name: 'Aetheric Locket', kind: 'misc' as const, quantity: 1, tags: [] };
-    const p = parseInput('give the locket to Yulka', {
-      inventory: [LOCKET],
-      ambientNouns: ['wall', 'lever'],
-      vendorName: 'Yulka',
-    });
-    expect(p.intent).toBe('gift');
-    expect(p.validationIssues).toBeUndefined();
-  });
+  // OTA-1088 — the `gift` intent + its recipient validation were removed (gifting
+  // deleted). "give the locket to the wall" / "…to Yulka" no longer route to a
+  // gift; "give" falls through to unknown with no gift-specific validation.
 
   it('validator pure-function: clean parse with ctx returns no issues', () => {
     const p = parseInput('attack the drone with the rusted blade', {

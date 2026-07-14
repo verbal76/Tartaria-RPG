@@ -909,9 +909,9 @@ export function InventoryScreen() {
     catch { modalPreview = null; }
   }
   const modalBody = pending && isQuestLockedItem(pending.item)
-    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, gifted, or fused.'
+    ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, or fused.'
     : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
-      ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
+      ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
       : undefined;
   const fusionHint = pending && (isFusionReservable(pending.item) || (pending.item.tags ?? []).includes('faction_gear'))
     ? (() => {
