@@ -306,14 +306,29 @@ Key invariants worth knowing:
       storylines (stage-def schema add; broker stalls should accept turn-ins).
     - B3 [#6] Dodge strictly dominant at high DEX. RETEST on 796+ first (the new
       dodge stamina cost may already brake it) before any tuning.
-  - **C. UX / polish (lowest urgency):**
-    - C1 [#11] Fusion material-type UX — surface item material buckets; kill the
-      repeat-refusal spam.
-    - C2 [#8] Rework the fused-weapon naming pool ("Aetheric Thread" is a bad
-      weapon name).
-    - C3 [#10] Post-boss ambush grace window on outpost exit.
-    - C4 [#12] MiniLM cognitive-label noise (8-label dumps, wrong classifications)
-      — cosmetic per the log analysis; reword `EMOTION_ANCHORS` only.
+  - **C. UX / polish — ~~DONE 801/781/1086~~.**
+    - ~~C1 [#11] Fusion material-type UX.~~ **FIXED:** firing the Crucible with
+      reserved-but-insufficient pieces opens the PICKER (which already surfaces
+      each piece's material bucket + a live diversity readout, OTA-679) instead of
+      dead-ending on a repeated refusal. (Identical-repeat refusals were already
+      deduped on the arbiter channel.)
+    - ~~C2 [#8] Fused-weapon naming pool.~~ **FIXED:** a forged WEAPON with a soft
+      / non-weapon Qwen name ("Aetheric Thread", "Resonant Veil") is rejected so
+      the deterministic weapon pool (Cleaver / Edge / Reaver / …) names it;
+      migrateFusedName heals such names on load. Armor keeps soft names.
+    - ~~C3 [#10] Post-boss ambush grace window.~~ **FIXED:** a boss kill stamps
+      player.bossDefeatGraceUntilHours = now + POST_BOSS_GRACE_HOURS (3);
+      beginScene suppresses arrival encounters while it holds, so stepping out of a
+      just-cleared outpost doesn't drop a fresh ambush mid-loot.
+    - ~~C4 [#12] MiniLM cognitive-label noise.~~ **FIXED:** reworded the 6
+      EMOTION_ANCHORS to short, distinct, LORE-NEUTRAL sentences (no shared
+      "ruins/Aetheric" boilerplate) so cosine similarity discriminates instead of
+      smearing across labels; the neutral wording made the anchors identical on
+      engine_Dev too. INTENT_ANCHORS left as-is (scope was EMOTION_ANCHORS only).
+
+- **PUNCH LIST STATUS — only the B group (economy/balance) remains, and each B
+  item needs a design/number call from the user before it can be worked.** A (bugs
+  + dupes) and C (polish) are shipped; #5/#7/#9 shipped earlier.
 
 
 - **Exploit-sweep backlog (2026-07-13) — 12 fixed in 796/776/1082, these REMAIN.**
@@ -446,14 +461,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-800`**,
-**golem-line `…-780`**, **engine_Dev `…-1085`**. Current parity offsets: golem =
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-801`**,
+**golem-line `…-781`**, **engine_Dev `…-1086`**. Current parity offsets: golem =
 HAL − 20 (stable); engine_Dev = HAL + 285 (the Guardian OTA 798/778 was
-HAL+golem-only, so engine is one behind on count; the A1+A2 batch 800/780/1085
+HAL+golem-only, so engine is one behind on count; the group-C batch 801/781/1086
 shipped to all three and preserves the −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 801 | 781 | 1086 | Group-C polish (punch-list C1–C4). C1 fusion UX: firing the Crucible with reserved-but-insufficient pieces opens the PICKER (which surfaces each piece's material bucket + a live "N materials → need 3+ DIFFERENT" readout, already OTA-679) instead of dead-ending on a repeated arbiter refusal. C2 fused-weapon naming: a forged WEAPON with a soft / non-weapon Qwen name ("Aetheric Thread", "Resonant Veil") is rejected so the deterministic weapon pool (Cleaver / Edge / Reaver / …) names it; migrateFusedName heals old saves (armor keeps soft names). C3 post-boss grace: a boss kill stamps player.bossDefeatGraceUntilHours = now + POST_BOSS_GRACE_HOURS (3); beginScene suppresses arrival encounters while it holds, so stepping out of a just-cleared outpost doesn't drop a fresh ambush mid-loot. C4 MiniLM anchors: the 6 EMOTION_ANCHORS reworded to short, distinct, LORE-NEUTRAL sentences (no shared "ruins/Aetheric" boilerplate) so cosine similarity discriminates — neutral wording makes the engine_Dev copy identical. All three lines |
 | 800 | 780 | 1085 | Small-bug + item-dupe closes (punch-list A1+A2). A1: (1) enemy DOTs tick EVERY combat round, not just `attack` (hoisted into runEnemyGroupCounters; attack path passes skipDotTick) — a poisoned enemy kept eating poison while the player dodged/moved/commanded a companion; (2) hard training ceiling MAX_TRAINED_STAT=30 (player + dog + golem; engine has no golem) — stats trained forever at 0.1/use; (3) `jump at <bogus text>` needs a RESOLVED scene noun to train DEX; (4) defeatedEnemies de-duplicated distinct-name set (self-heals legacy dup-farmed saves) → no unbounded save bloat; (5) wild-water re-arm moved to worldMemory.waterUsedAt, keyed per SOURCE on game-hours (WATER_REARM_HOURS=6) — off the per-scene flags that bounced between adjacent outdoor tiles. A2 dupes: (6) dropped-item PICKUP routes through grantItem + decrements the exact instance by id (no worn/coated/rolled laundering); (7) applyCoating (+armor) on a STACK peels ONE unit instead of coating all N for one vial; (8) equipped throwable consumed by the equipped INSTANCE id (mainId/offId) — closes infinite coated-throw + bandolier double-spend. Engine water lines use getNarratorName() |
 | 799 | 779 | 1084 | Climbing rope usable to its LAST point: only a spent rope (≤ 0) refuses/gives out; the last pull breaks GRACEFULLY at the top (no fall — "the last of the line coils dead at your feet"); a fraying warning fires while the rope is low. Old guard snapped/refused at ≤ ROPE_WEAR_PER_TIER (15), stranding a whole climb + dropping the player with no warning. climbReadiness (CLIMB button colour/haptic) mirrors the new ≤ 0 rule. Engine's lines use getNarratorName() (lore-neutral) |
 | 798 | 778 | — | Core Guardians carry authored thematic vulnerable/resist traits — weakness/resistance now shows in combat + the EnemyPanel (was always 'normal': their type isn't in the type-map and their traits weren't resist:/vulnerable:). HAL+golem only; engine_Dev has no Guardians |
