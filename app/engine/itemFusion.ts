@@ -490,6 +490,30 @@ export async function synthesizeFusionViaQwen(
   }
 }
 
+/** OTA-1086 — soft / non-weapon head-nouns that read as textile, ethereal, or
+ *  botanical rather than something you'd swing or fire. A forged WEAPON named
+ *  "Aetheric Thread" / "Resonant Veil" / "Humming Wisp" passed every other gate
+ *  (no article, no rarity word, no digits, no "weapon" kind-word, no catalog
+ *  collision) yet reads as anything but a weapon — the player report behind this
+ *  fix. When the Qwen namer lands one of these as the LAST word of a weapon name,
+ *  we reject it so the deterministic weapon pool (Cleaver / Edge / Reaver / …)
+ *  supplies a name that actually reads as a weapon. */
+const WEAPON_SOFT_TAIL_NOUNS = new Set([
+  'thread', 'threads', 'veil', 'wisp', 'silk', 'gauze', 'ribbon', 'lace',
+  'gossamer', 'filament', 'strand', 'fluff', 'down', 'mist', 'whisper', 'sigh',
+  'petal', 'bloom', 'feather', 'cloth', 'cloak', 'scarf', 'shawl', 'quilt',
+  'shroud', 'drape', 'weave', 'fringe', 'tassel',
+]);
+
+/** True when a forged WEAPON name ends in a soft / non-weapon noun (see the set
+ *  above) — used to reject a Qwen weapon name that doesn't read as a weapon so the
+ *  deterministic weapon-suffix pool stands instead. Only meaningful for weapons;
+ *  armor/dog_armor pass through (a "Veil" or "Shroud" is a fine armor name). */
+export function fusedWeaponNameReadsSoft(name: string): boolean {
+  const last = name.trim().toLowerCase().split(/\s+/).pop() ?? '';
+  return WEAPON_SOFT_TAIL_NOUNS.has(last);
+}
+
 /** OTA-631 — name + description ONLY for an already-stat-balanced fused item.
  *  The deterministic synth has already decided the kind / rarity / stats; this
  *  asks Qwen for JUST the flavor (a 2-4 word name + one-line description), which
@@ -553,7 +577,10 @@ export async function synthesizeFusionNameViaQwen(
       : !!findWeaponByName(name); // armor/dog_armor forge must not be named like a catalog weapon
     // OTA-1048 — also reject an ECHOED / low-quality name (see isLowQualityForgeName)
     // so the evocative deterministic name (theme + kind suffix) stands instead.
-    if (endsWithKindWord || collidesCrossKind || isLowQualityForgeName(name)) return null;
+    // OTA-1086 — and reject a WEAPON name that ends in a soft / non-weapon noun
+    // ("Aetheric Thread", "Resonant Veil") so the deterministic weapon pool names it.
+    const weaponReadsSoft = stats.kind === 'weapon' && fusedWeaponNameReadsSoft(name);
+    if (endsWithKindWord || collidesCrossKind || isLowQualityForgeName(name) || weaponReadsSoft) return null;
     return { name, description };
   } catch {
     return null;
@@ -878,7 +905,10 @@ export function migrateFusedName(item: InventoryItem): InventoryItem {
   // Armor" that predates the namer guard). Guarded to fused items via uniqueStats so
   // deterministicFusedName always has real data. Idempotent: a clean name is left alone.
   if (!item.uniqueStats) return item;
-  return (fusedNameCollidesCrossKind(item) || isLowQualityForgeName(item.name))
+  // OTA-1086 — also re-mint a WEAPON whose stored name ends in a soft / non-weapon
+  // noun ("Aetheric Thread") so old saves heal to a proper weapon name.
+  const weaponReadsSoft = item.uniqueStats.kind === 'weapon' && fusedWeaponNameReadsSoft(item.name);
+  return (fusedNameCollidesCrossKind(item) || isLowQualityForgeName(item.name) || weaponReadsSoft)
     ? { ...item, name: deterministicFusedName(item) }
     : item;
 }

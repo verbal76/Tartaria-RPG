@@ -3360,6 +3360,14 @@ interface GameStore {
 // on-disk log key (readFullLog), not this in-memory buffer.
 const MAX_LOG_IN_MEMORY = 500;
 
+// OTA-1086 — post-boss grace window (game-hours). A boss fight is a major beat —
+// often the whole reason you came to an outpost — and being ambushed the instant
+// you step out, still battered and mid-loot, read as punishing rather than tense.
+// Defeating a boss stamps player.bossDefeatGraceUntilHours = now + this, and
+// beginScene suppresses arrival encounters until it lapses: enough game-time to
+// loot, breathe, and walk out, then the wasteland resumes. Tunable design knob.
+const POST_BOSS_GRACE_HOURS = 3;
+
 // OTA-631 — the Crucible no longer BLOCKS on Qwen at all: stats are forged
 // deterministically and the item is minted instantly, then a BACKGROUND Qwen call
 // names it ("the Aether settling its name") and a reveal pops when it forms. This
@@ -5021,8 +5029,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // trade hubs with the 'market' tag (the built-in hidden_market keeps its id).
     const isNeutralMarket = location.id === 'hidden_market'
       || (location.tags ?? []).some((t) => String(t).toLowerCase() === 'market');
+    // OTA-1086 — post-boss grace window. A boss kill stamps player.
+    // bossDefeatGraceUntilHours (resolveEnemyDefeat); while it holds, arrival
+    // encounters are suppressed so stepping out of the outpost you just cleared
+    // doesn't drop a fresh ambush on you mid-loot. Lapses on game-time.
+    const inBossGrace = (player?.bossDefeatGraceUntilHours ?? 0) > hoursElapsed;
     const suppressEncounter =
-      enforcePeace || recentlyCleared || !!hubRoom || !!opts?.isOpening || inTutorial || atStarterComplex || isNeutralMarket;
+      enforcePeace || recentlyCleared || !!hubRoom || !!opts?.isOpening || inTutorial || atStarterComplex || isNeutralMarket || inBossGrace;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -16431,6 +16444,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // would flood the stash and drain death of stakes (the same concern that
     // raised the pity interval 50→100). On a repeat boss the guarantee lapses
     // and the kill falls back to the rare organic roll like any other.
+    // OTA-1086 — a felled boss opens a short grace window: arrival encounters are
+    // suppressed (in beginScene) until it lapses, so stepping out of the outpost
+    // you just cleared doesn't drop a fresh ambush on you mid-loot. Every boss
+    // kill (including a re-fight) re-arms it.
+    if (enemy.boss) {
+      const nowH = get().player?.hoursElapsed ?? 0;
+      set((s) => (s.player
+        ? { player: { ...s.player, bossDefeatGraceUntilHours: nowH + POST_BOSS_GRACE_HOURS } }
+        : s));
+    }
     const bossGemKey = enemy.boss ? (enemy.name ?? 'boss') : null;
     const bossAlreadyPaid = bossGemKey != null
       && (get().worldMemory.gemBossDefeatedKeys ?? []).includes(bossGemKey);
@@ -22365,6 +22388,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ fusionCatalystPrompt: { itemName: equippedReservedFaction.name, slot, slotLabel: SLOT_LABEL[slot] ?? slot, cost: 0 } });
           return;
         }
+      }
+      // OTA-1086 — fusion UX: if the player has reserved ANY eligible pieces (just
+      // not a passing set — too few, or too alike), OPEN THE PICKER instead of
+      // dead-ending on a refusal line. The picker surfaces each piece's material
+      // bucket + a live "N materials → need 3+ DIFFERENT" readout, so the player
+      // SEES what they have and what's missing and can fix it — rather than tapping
+      // FUSE again and again into the same arbiter refusal (the repeat-refusal
+      // spam). Only when NOTHING eligible is reserved do we fall back to the
+      // arbiter refusal (there's nothing to show).
+      const anyReserved = fusion.eligibleInputs(player.inventory).length > 0
+        || fusion.findFactionCatalyst(player.inventory, equippedIdSet);
+      if (anyReserved) {
+        set({ fusionPickerOpen: true });
+        return;
       }
       get().appendLog(
         'arbiter',
