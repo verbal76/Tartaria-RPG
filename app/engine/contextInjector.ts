@@ -165,7 +165,7 @@ const VOICE_RULES =
   'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
   'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
   'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
-  '(relic / item / torch / locket), dig, craft, steal, gift, ask, rest. ' +
+  '(relic / item / torch / locket), dig, craft, steal, ask, rest. ' +
   'Aetheric verbs: cast, channel, weave, incant. Use these vocabulary ' +
   'choices in narration so the player learns the system. ' +
   'End on a complete sentence.';

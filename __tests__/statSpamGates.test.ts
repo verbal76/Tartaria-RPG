@@ -205,31 +205,7 @@ describe('OTA-057 — stat spam gates', () => {
     expect(wisAfter).toBe(wisBefore);
   });
 
-  it('gifting to a vendor trains CHA only, not WIS', async () => {
-    const store = await bootstrap();
-    const p = store.getState().player!;
-    store.setState({
-      currentScene: {
-        ...store.getState().currentScene!,
-        vendor: {
-          id: 'spam_gift_vendor',
-          name: 'Test Merchant',
-          faction: 'reclaimers_guild',
-          offers: [{ itemName: 'Rusted Blade', price: 8 }],
-          greeting: '"Wares."',
-        } as any,
-      },
-      player: {
-        ...p,
-        inventory: [{ id: 'xtal_gift', name: 'Aether Crystal', kind: 'misc', quantity: 1, tags: ['aether', 'crystal'] } as any],
-      },
-    });
-    const chaBefore = store.getState().player!.statProgress?.charisma ?? 0;
-    const wisBefore = store.getState().player!.statProgress?.wisdom ?? 0;
-    store.getState().giftToVendor('Aether Crystal');
-    const chaAfter = store.getState().player!.statProgress?.charisma ?? 0;
-    const wisAfter = store.getState().player!.statProgress?.wisdom ?? 0;
-    expect(chaAfter).toBeGreaterThan(chaBefore);
-    expect(wisAfter).toBe(wisBefore);
-  });
+  // OTA-803 — gifting was removed (faction standing is earned via missions +
+  // sigil turn-ins, not by handing vendors loot). The CHA-not-WIS split for the
+  // remaining social verbs (buy / sell / accept) is still covered above.
 });

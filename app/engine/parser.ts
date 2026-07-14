@@ -134,7 +134,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // pouch; `unpouch <item>` / `unstow <item>` takes it out.
   stow_pouch: ['stow', 'pouch', 'belt'],
   unpouch: ['unpouch', 'unstow', 'unbelt'],
-  gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
+  // OTA-803 — the `gift` intent was removed (gifting deleted). Faction standing is
+  // earned through mission completions + sigil/pendant turn-ins, not by handing
+  // vendors loot; the gift-for-rep side door undercut that, so the whole verb +
+  // action is gone. Its verbs (give/offer/hand/…) now fall through to unknown.
   // 'pocket' removed — clashes with the noun "pockets" / "in his pocket"
   // and the inventory channel. 'grab' kept (genuine steal verb).
   steal: ['steal', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
