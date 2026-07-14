@@ -35,6 +35,7 @@ import { findGearByName, findMaterialByName, findExplorationItemByName } from '.
 import { ApproachModal } from '../components/ApproachModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
+import { ParleyModal } from '../components/ParleyModal';
 import { availableFactionQuests } from '../engine/factionQuests';
 import { getStanding } from '../engine/factions';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -1504,6 +1505,9 @@ export function ExplorationScreen() {
       />
 
       <FusionPickerModal />
+
+      {/* OTA-808 — the two-button parley chooser (self-mounts off pendingParley). */}
+      <ParleyModal />
 
       {/* OTA-180 — FeedbackModal render removed alongside the 📝
           button. Component file kept for any future re-add. */}

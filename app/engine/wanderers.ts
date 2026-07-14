@@ -27,6 +27,9 @@ export interface WandererArchetype {
   greeting: string;
   /** The "word of the road" tip line — pure flavor, the cheapest success payoff. */
   tip: string;
+  /** OTA-808 — the parley temperament this archetype naturally reads as. 'reasonable'
+   *  folk yield to PERSUADE; 'greedy' ones only fold to INTIMIDATE. */
+  temperament: import('./parley').Temperament;
 }
 
 const ARCHETYPES: WandererArchetype[] = [
@@ -35,30 +38,49 @@ const ARCHETYPES: WandererArchetype[] = [
     role: 'a road-worn traveler',
     greeting: 'Someone is resting on a stone up ahead — a traveler, pack down, watching the horizon. They lift a hand as you approach.',
     tip: '"Keep to the high ground after dark," they say. "The low places fill with things that hunt by sound."',
+    temperament: 'reasonable',
   },
   {
     id: 'refugee',
     role: 'a wary refugee',
     greeting: 'A figure with everything they own on their back stands off the path, ready to bolt. They relax a fraction when they see you\'re alone.',
     tip: '"There\'s clean water two days back the way I came," they murmur. "And nothing left worth the walk further on. Take that as you will."',
+    temperament: 'reasonable',
   },
   {
     id: 'tinker',
     role: 'a wandering tinker',
     greeting: 'A tinker sits amid a clatter of half-mended gear, squinting at a broken mechanism. They wave you over without looking up.',
     tip: '"Salvage the joints, not the plate," the tinker says, tapping a ruined frame. "Plate\'s everywhere. Good joints keep you alive."',
+    temperament: 'greedy',
   },
   {
     id: 'scout',
     role: 'a lone scout',
     greeting: 'A scout crouches at the treeline, reading the ground. They rise slow and easy, hands where you can see them.',
     tip: '"Tracks thin out to the east," the scout says. "Whatever\'s denning around here, it hunts west. Go against the grain if you want quiet."',
+    temperament: 'reasonable',
   },
   {
     id: 'pilgrim',
     role: 'a footsore pilgrim',
     greeting: 'A pilgrim walks the road at a measured pace, staff in hand, in no apparent hurry. They slow to match you.',
     tip: '"The old markers still stand, if you know to look," the pilgrim says. "They point somewhere. I\'ve stopped asking where."',
+    temperament: 'reasonable',
+  },
+  {
+    id: 'drifter',
+    role: 'a hard-eyed drifter',
+    greeting: 'A drifter leans in a doorway of rusted sheet-metal, thumbs in their belt, watching you come with a trader\'s arithmetic. They don\'t move to make room.',
+    tip: '"Word for word, friend — there\'s a stash north of here nobody\'s cracked. That\'s all you get for free."',
+    temperament: 'greedy',
+  },
+  {
+    id: 'scavenger',
+    role: 'a twitchy scavenger',
+    greeting: 'A scavenger crouches over a picked-clean carcass of machinery, stuffing bolts into a sack. They half-rise, eyeing your hands and your pack in equal measure.',
+    tip: '"Finders keepers out here," they mutter, not quite meeting your eye. "You didn\'t see nothing."',
+    temperament: 'greedy',
   },
 ];
 
@@ -69,13 +91,25 @@ export interface Wanderer {
   role: string;
   greeting: string;
   tip: string;
+  /** OTA-808 — the parley temperament (the "lock" the player reads). */
+  temperament: import('./parley').Temperament;
+  /** OTA-808 — the faction this person answers to, or null for an unaffiliated
+   *  drifter. Extorting an affiliated wanderer dings your standing with them. */
+  faction: string | null;
 }
 
 /** Build a wanderer from a seed index (caller passes a scene-stable number so the
- *  same tile visit reads the same person). Deterministic given the seed. */
-export function makeWanderer(seed: number): Wanderer {
+ *  same tile visit reads the same person). Deterministic given the seed. `factions`
+ *  is the live faction-id pool; a wanderer draws one (or, ~1 in 4, none). */
+export function makeWanderer(seed: number, factions: string[] = []): Wanderer {
   const arch = ARCHETYPES[Math.abs(seed) % ARCHETYPES.length]!;
   const name = FIRST_NAMES[Math.abs(Math.floor(seed / ARCHETYPES.length)) % FIRST_NAMES.length]!;
+  // Faction draw: deterministic in the seed; a 0 slot means unaffiliated.
+  let faction: string | null = null;
+  if (factions.length > 0) {
+    const slot = Math.abs(Math.floor(seed / (ARCHETYPES.length * FIRST_NAMES.length))) % (factions.length + 1);
+    faction = slot === 0 ? null : factions[slot - 1] ?? null;
+  }
   return {
     id: `wanderer_${arch.id}_${Math.abs(seed)}`,
     name,
@@ -83,6 +117,8 @@ export function makeWanderer(seed: number): Wanderer {
     role: arch.role,
     greeting: arch.greeting,
     tip: arch.tip,
+    temperament: arch.temperament,
+    faction,
   };
 }
 

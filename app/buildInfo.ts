@@ -16127,4 +16127,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // archetypes & flavor); CurrentScene.wanderer field; beginScene spawn (suppressed on
 // hubs/markets/capitals/combat/when a vendor rolled); talk intercept in
 // submitPlayerAction; a green "☺ <name>" banner in ExplorationScreen taps to speak.
-export const OTA_BUILD_ID = '2026-07-14-807-wandering-npcs';
+// OTA-808 — PARLEY + MENACE (Phase 1 of the social rework). The flat wanderer/talk-
+// down rolls become a two-button CHOICE with real asymmetric stakes. People: PERSUADE
+// vs INTIMIDATE. Animals (in combat): CALM vs INTIMIDATE. A GENERIC opener ("talk to
+// / approach") surfaces the ParleyModal so the stakes are explicit; a SPECIFIC verb
+// (intimidate / soothe / persuade …) commits straight through. HARD LOCK-AND-KEY:
+// every target has a temperament (skittish→calm, aggressive→intimidate, reasonable→
+// persuade, greedy→intimidate) and the WRONG key AUTO-FAILS regardless of Charisma —
+// a high-WIS character is TOLD the temperament, everyone else reads the narrated tell
+// or gambles. STAKES set by the button: the safe read (calm/persuade) fail = the hook
+// is SPENT (no harm, but the lead/exit is gone); INTIMIDATE fail = active harm (the
+// animal lands a vicious hit / the person turns hostile and it's a fight) AND the hook
+// is spent. REWARD split: persuade → a lead (Phase-2 wires real traceable leads),
+// intimidate → their goods (Phase-1 stand-in = TC). Full MENACE loop: intimidation
+// raises player.menace (people 8 / animals 4), which SELF-BLUNTS your own intimidate
+// DC (+1/20), draws readier encounters (beginScene), decays 0.4/game-hour, and shows
+// on the character portrait (decayed value + tier). Successful EXTORTION of a
+// faction-affiliated person costs −6 standing (half to allies). New engine modules
+// parley.ts + menace.ts; Enemy.temperament + Wanderer.temperament/faction +
+// PlayerCharacter.menace/menaceUpdatedHour; new ParleyModal; parser gains the parley
+// verbs (soothe/pacify/tame/threaten/menace/coerce/coax). The OTA-806/807 single-roll
+// store flows are SUPERSEDED by this (their pure helpers remain).
+export const OTA_BUILD_ID = '2026-07-14-808-parley-and-menace';
