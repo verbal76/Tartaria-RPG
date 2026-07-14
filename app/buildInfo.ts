@@ -17300,4 +17300,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // QUESTS: (11) a hunt's final boss must be KILLED to complete — spawning it no
 // longer marks it turn-inable. LOOP: (12) the MiniLM investigate fallback can't
 // self-dispatch 'search the <location name>' forever (unbounded CPU/feed/DOT).
-export const OTA_BUILD_ID = '2026-07-13-1082-exploit-sweep-batch';
+// OTA-1083 — Qwen dormancy watchdog now revives from a FAILED reinit, not just the
+// narrow dormant case. Root cause (2026-07-13 device log: one "detected dormant"
+// line at 18:23, then ~4.5h of every Arbiter line reason=qwen-not-ready): the
+// watchdog only re-kicked when isDormant() was true (status==='ready' but the
+// native runtime OOM-died). forceReinitialize() resets status idle→loading→
+// then 'ready' (ok) or 'failed' (reload throws under memory pressure). One failed
+// revival left status='failed', where isDormant() is FALSE, so the watchdog's
+// `if (!isDormant()) return` short-circuited forever and never retried. Now it
+// revives from ANY not-ready/not-progressing state (idle/failed/dormant), retries
+// every 60s (a transient memory failure no longer strands Qwen for the session),
+// unwedges a reinit hung in loading past 150s, and mirrors the revived status onto
+// the store so About/debug don't stay stuck on 'failed'. +1 regression test.
+export const OTA_BUILD_ID = '2026-07-14-1083-qwen-watchdog-revives-from-failed';

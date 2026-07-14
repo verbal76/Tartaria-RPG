@@ -251,6 +251,30 @@ Key invariants worth knowing:
 
 ## 8. Open issues / watch list (current)
 
+- **PUNCH LIST (2026-07-14) — 12 items, worked in order, nothing else until it's
+  clear.** From the multi-agent exploit sweep + the 2026-07-13 device-log
+  analysis. Status: **#5 DONE (797/777/1083).**
+  1. Economy re-tiering (self-crafted sale price grounded on ingredients;
+     fused-scrap Golem-Core/aether mint; Common-armor sell arbitrage; gift
+     value-gate). *Needs number sign-off.*
+  2. Contract location-gating + remote-pay cut for hunts/mysteries/storylines
+     (stage-def schema add; broker stalls should also accept turn-ins).
+  3. Name-keyed item dupes (drop/pickup merge, coating a stack, throwable-by-name).
+  4. Outdoor water-bounce flag persistence + misc small bugs (enemy DOT ticks
+     only on `attack`; no hard stat cap; `jump at <any text>` trains DEX;
+     `defeatedEnemies` array grows unbounded → save bloat).
+  5. ~~Qwen dormancy watchdog only revived the narrow dormant case; one failed
+     reinit stranded status='failed' for the whole session.~~ **FIXED 797/777/1083.**
+  6. Dodge strictly dominant at high DEX (100% win in the log). RETEST on 796+
+     (the dodge stamina cost may already brake it) before tuning.
+  7. Core Guardians show no weakness/resistance in combat (player asked twice).
+  8. Rework the fused-weapon naming pool ("Aetheric Thread" is a bad weapon name).
+  9. Climbing rope: warn at durability 4, fail only at 0 (stop stranding 15 pts).
+  10. Post-boss ambush grace window on outpost exit.
+  11. Fusion material-type UX (surface item material buckets; kill refusal spam).
+  12. MiniLM cognitive-label noise (8-label dumps, wrong classifications).
+
+
 - **Exploit-sweep backlog (2026-07-13) — 12 fixed in 796/776/1082, these REMAIN.**
   A multi-agent audit surfaced ~33 findings; the confirmed criticals/highs with
   contained fixes shipped this OTA. Still open, grouped by why they were deferred:
@@ -381,12 +405,13 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-13-796`**,
-**golem-line `…-776`**, **engine_Dev `…-1082`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-797`**,
+**golem-line `…-777`**, **engine_Dev `…-1083`**. Current parity offsets:
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 797 | 777 | 1083 | Qwen dormancy watchdog revives from a FAILED reinit (not just the narrow dormant case) — fixes whole-session qwen-not-ready when one revival attempt failed and stranded status='failed'; retries every 60s + unwedges a hung reload |
 | 796 | 776 | 1082 | Exploit-sweep batch (12 shared fixes): dodge costs a turn + 3-train cap; failed-dodge no longer 4× under crit; distract DC floor 12 + nat rules; shared ranged-enemy classifier (kite fix); boss regen once/round; buffs consume on attack-resolve not prompt-build; scrap ghost-slot fix (hands/cloak/ring2/3); 2H-displace hpMax loop closed; whole-word water match; fill costs time; hunt boss must be killed; investigate self-dispatch loop killed |
 | 795 | 775 | 1081 | Dodge = AC-bypass gamble (win: next strike ×2 dice; lose: hit lands past armor for 2×); dog distract DC scales with target + failed feint redirects the counter onto the dog |
 | 794 | 774 | 1080 | OTA-784's one-time fresh-market save repair removed (served its failed-OTA reset; save repaired) — market saves load in place, auto-enter unconditional again |
