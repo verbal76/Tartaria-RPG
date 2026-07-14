@@ -98,6 +98,27 @@ describe('Core Guardians', () => {
       expect(g!.boss).toBe(true);
       expect(g!.traits).toContain(CORE_GUARDIAN_TRAIT);
     });
+    // OTA-778 — every Guardian must carry an authored weakness + resistance so
+    // the "Weakness exposed" combat lines and the EnemyPanel actually engage
+    // (players asked why Guardians showed no weakness/strength). Guardian types
+    // (aether_construct / mud_revenant) aren't in the type-resistance map, so the
+    // trait is the ONLY thing that makes the damage system read non-'normal'.
+    it('every Guardian carries a vulnerable: and resist: trait the damage system reads', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { traitDamageMultiplier, traitDefenses } = require('../app/engine/enemyTraits');
+      for (const capitalId of Object.keys(GUARDIANS_BY_CAPITAL)) {
+        const g = spawnGuardianForCapital(makePlayer(), capitalId)!;
+        const def = traitDefenses(g.traits);
+        expect(def.weaknesses.length).toBeGreaterThan(0);
+        expect(def.resists.length).toBeGreaterThan(0);
+        // The authored weakness actually multiplies damage (×1.5, 'vulnerable').
+        const weakType = def.weaknesses[0];
+        expect(traitDamageMultiplier(g.traits, weakType).match).toBe('vulnerable');
+        // The authored resistance actually halves it (×0.5, 'resist').
+        const resistType = def.resists[0];
+        expect(traitDamageMultiplier(g.traits, resistType).match).toBe('resist');
+      }
+    });
     it('tier 1 spawn matches kill count of 0', () => {
       const p = makePlayer({ mainQuest: { phase: 'revelation', coresRecovered: [] } });
       const g = spawnGuardianForCapital(p, 'asgardar');
