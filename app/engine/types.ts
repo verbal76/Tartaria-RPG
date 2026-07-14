@@ -1491,6 +1491,13 @@ export interface WorldMemory {
    *  re-entry doesn't re-roll a fresh scene. Optional + defaulted so
    *  legacy saves load cleanly. */
   visitedRooms?: Record<string, VisitedRoom>;
+  /** OTA-800 — per-water-source use timestamps (game-hours, i.e. player.
+   *  hoursElapsed) so a wild drink / bottle refill re-arms on GAME TIME, not on
+   *  scene reset. Keyed by the composite room key (makeRoomKey — includes the
+   *  outdoor mapX/mapY), so two adjacent outdoor water tiles can no longer be
+   *  bounced A→B→A to reset the old per-scene one-shot flags. Pruned to only
+   *  still-cooling sources on write, so it stays tiny. */
+  waterUsedAt?: Record<string, { drink?: number; fill?: number }>;
   /** HANDOFF #15b — hub rooms the player has visited at least once.
    *  Used by hub fast-travel to gate "jump to the workshop" against
    *  rooms the player actually knows. Stored separately from

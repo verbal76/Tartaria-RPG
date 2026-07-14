@@ -31,6 +31,17 @@ import type { PlayerCharacter, Stats } from './types';
  *  the per-use AMOUNT that varies. */
 export const LEVEL_UP_THRESHOLD = 100;
 
+// OTA-800 — hard training ceiling. Before this, a stat trained forever (the
+// 23+ tier still awards 0.1/use), so a patient grind against a pet weak enemy
+// could push a stat into the hundreds and trivialize the game (damage/AC/skill
+// DCs all key off the raw stat). 30 is the design's own stated peak — the curve
+// comment above calls "30 STR ... still grindable in a long enough session" the
+// late-game target, and the 23+ tier costs ~1000 uses per point, so reaching 30
+// is already an extreme commitment; nobody hits it in normal play, but it bounds
+// the exploit. Tunable design knob — mirrored on the dog (dogCompanion.ts) and
+// golem (golems.ts) training twins so no companion out-scales it either.
+export const MAX_TRAINED_STAT = 30;
+
 export type StatKey = keyof Stats;
 
 /** How much progress one successful use awards, given the current
@@ -68,18 +79,24 @@ export function trainStat(
 ): TrainResult {
   if (!success) return { player, leveled: null };
   const baseStat = player.stats[stat];
+  // OTA-800 — at the ceiling the stat can't climb; stop training it (and don't
+  // bank progress that could never cash out).
+  if (baseStat >= MAX_TRAINED_STAT) return { player, leveled: null };
   const amount = progressAwardFor(baseStat);
   if (amount <= 0) return { player, leveled: null };
   const prevProgress = player.statProgress?.[stat] ?? 0;
   let progress = prevProgress + amount;
   let next = baseStat;
   let leveled: TrainResult['leveled'] = null;
-  while (progress >= LEVEL_UP_THRESHOLD) {
+  while (progress >= LEVEL_UP_THRESHOLD && next < MAX_TRAINED_STAT) {
     progress -= LEVEL_UP_THRESHOLD;
     const before = next;
     next = before + 1;
     if (!leveled) leveled = { stat, from: before, to: next };
   }
+  // Just hit the ceiling — flush leftover progress so the bar reads full-and-done
+  // instead of stranding a partial that can never level.
+  if (next >= MAX_TRAINED_STAT) progress = 0;
   return {
     player: {
       ...player,

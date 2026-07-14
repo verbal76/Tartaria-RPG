@@ -15733,4 +15733,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (≤ one climb of durability left) so it's never a surprise. climbReadiness (the
 // CLIMB button colour/haptic) mirrors the new ≤ 0 rule so button and engine agree.
 // Shared engine code — ships to all three lines.
-export const OTA_BUILD_ID = '2026-07-14-779-rope-usable-to-last-point';
+// OTA-780 — punch-list A1+A2: small-bug closes + item-dupe closes (warm standby,
+// lockstep with HAL 800). A1 SMALL BUGS: (1) enemy DOT statuses tick once per
+// COMBAT ROUND, not only on `attack` (frozen while dodging/moving/commanding a
+// companion). (2) Hard training ceiling MAX_TRAINED_STAT=30 on player + dog +
+// golem — stats trained forever at 0.1/use, breaking damage/AC/DC scaling. (3)
+// `jump at <bogus text>` needs a RESOLVED scene noun to train DEX. (4)
+// defeatedEnemies is a de-duplicated distinct-name set (self-heals legacy saves)
+// so it can't grow unbounded → save bloat. (5) Wild-water re-arm moved off the
+// per-scene one-shot flags (bounceable between adjacent outdoor tiles) onto
+// worldMemory, keyed per source on game-hours (WATER_REARM_HOURS=6). A2 ITEM
+// DUPES: (6) dropped-item PICKUP routes through grantItem (no laundering a worn/
+// coated/rolled instance into a full same-name stack) + decrements the exact
+// instance by id. (7) applyCoating on a STACK peels ONE unit instead of coating
+// all N for one vial. (8) The equipped throwable consumed on a thrown attack
+// resolves by the equipped INSTANCE id, closing infinite coated-throw + bandolier
+// double-spend.
+export const OTA_BUILD_ID = '2026-07-14-780-small-bugs-and-item-dupe-closes';
