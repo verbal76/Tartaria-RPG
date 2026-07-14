@@ -15759,4 +15759,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // suppresses arrival encounters, so stepping out of a just-cleared outpost doesn't
 // drop a fresh ambush mid-loot. C4 MiniLM ANCHORS: the 6 EMOTION_ANCHORS reworded
 // to short, distinct, lore-neutral sentences so cosine similarity discriminates.
-export const OTA_BUILD_ID = '2026-07-14-781-group-c-polish';
+// OTA-782 — punch-list B1 (economy re-tiering; warm standby, lockstep with HAL
+// 802). (a) self-crafted items never sell above their recipe ingredient value
+// (Legendary +25%); (b) fused items stay scrappable but the fuel mats they yield
+// (Golem Core, Aetheric Shard/Dust, Aether Crystal, Aetheric Cloth, Mudstone)
+// price near-worthless at vendors (flat 3 TC) — crafting-only value, no
+// fuse→scrap→sell pump; (c) nothing sells above the cheapest realistic buy for its
+// rarity (RARITY_BUY_FLOOR), closing cross-stall arbitrage; (d) gifting a
+// near-worthless item is declined (no rep/CHA, not consumed) and rep scales with
+// the gift's worth instead of a flat +5.
+export const OTA_BUILD_ID = '2026-07-14-782-economy-re-tiering-b1';
