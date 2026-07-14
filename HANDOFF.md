@@ -1,6 +1,6 @@
 # Tartaria Realms — Session Handoff
 
-**This checkout:** branch `engine_Dev` — **Separate, parallel project** — the game stripped of ALL lore: a bare interaction engine whose content is entirely JSON/content-pack driven (current build: "The Philadelphia Experiment"), NOT the Tartaria game. Hardcoded prefills must stay lore-NEUTRAL (no Tartaria terms, ever). Channel `engine_Dev`.
+**This checkout:** branch `HaL2001` — **LIVE Tartaria line / PRODUCTION** — in the wild with internal testers. Channel `hal2001`+`preview`+`ios-preview`. Vetted changes only; a push OTAs their devices.
 
 > **This doc was rewritten & de-bloated on 2026-07-02.** The previous 5,400-line
 > HANDOFF (with the full open/closed issue tracker and the entire OTA changelog)
@@ -253,7 +253,9 @@ Key invariants worth knowing:
 
 - **PUNCH LIST (2026-07-14) — 12 items, worked in order, nothing else until it's
   clear.** From the multi-agent exploit sweep + the 2026-07-13 device-log
-  analysis. Status: **#5 DONE (797/777/1083).**
+  analysis. Status: **#5 DONE (797/777/1083), #7 DONE (798/778), #9 DONE
+  (799/779/1084).** The three the user pulled to the front are shipped. Remaining
+  9 reorganized into a new working list below (grouped, no longer strict-order).
   1. Economy re-tiering (self-crafted sale price grounded on ingredients;
      fused-scrap Golem-Core/aether mint; Common-armor sell arbitrage; gift
      value-gate). *Needs number sign-off.*
@@ -270,10 +272,43 @@ Key invariants worth knowing:
   7. ~~Core Guardians show no weakness/resistance in combat (player asked
      twice).~~ **FIXED 798/778 (HAL+golem only — no Guardians on engine_Dev).**
   8. Rework the fused-weapon naming pool ("Aetheric Thread" is a bad weapon name).
-  9. Climbing rope: warn at durability 4, fail only at 0 (stop stranding 15 pts).
+  9. ~~Climbing rope: warn at durability 4, fail only at 0 (stop stranding 15
+     pts).~~ **FIXED 799/779/1084** (usable to last point; graceful break at 0,
+     no fall; fraying warning while low; climbReadiness button mirrors ≤ 0).
   10. Post-boss ambush grace window on outpost exit.
   11. Fusion material-type UX (surface item material buckets; kill refusal spam).
   12. MiniLM cognitive-label noise (8-label dumps, wrong classifications).
+
+- **REMAINING WORK LIST (2026-07-14) — the 9 open punch-list items, reorganized.**
+  The user's three front-loaded picks (#5 Qwen, #7 Guardians, #9 rope) are done;
+  what's left, grouped by kind of work. Old punch-list numbers kept in [brackets]
+  for traceability.
+  - **A. Correctness / bugs (do first — cheapest, clearest):**
+    - A1 [#4] Outdoor water-bounce flag persistence + misc small bugs: enemy DOTs
+      only tick on `attack` (hoist out of `case 'attack'`, ~gameStore 7560); no
+      hard stat cap (`statTraining.ts` + dog/golem twins); `jump at <any text>`
+      trains DEX on unresolved targets; `defeatedEnemies` grows unbounded → save
+      bloat (`worldMemory.ts` — collapse to a count map).
+    - A2 [#3] Name-keyed item dupes: drop/pickup merge by name (durability
+      laundering + coating dupe, ~gameStore 13301); `applyCoating` stamps a whole
+      qty-N stack for one vial; throwable consumption resolves by name not
+      equipped id. Fix: route through `grantItem`/id-resolution.
+  - **B. Economy / balance (needs a design/number call from the user):**
+    - B1 [#1] Economy re-tiering: self-crafted sale price grounded on ingredients;
+      fused-scrap Golem-Core/aether mint; Common-armor sell arbitrage; gift
+      value-gate. *Needs number sign-off.*
+    - B2 [#2] Contract location-gating + remote-pay cut for hunts/mysteries/
+      storylines (stage-def schema add; broker stalls should accept turn-ins).
+    - B3 [#6] Dodge strictly dominant at high DEX. RETEST on 796+ first (the new
+      dodge stamina cost may already brake it) before any tuning.
+  - **C. UX / polish (lowest urgency):**
+    - C1 [#11] Fusion material-type UX — surface item material buckets; kill the
+      repeat-refusal spam.
+    - C2 [#8] Rework the fused-weapon naming pool ("Aetheric Thread" is a bad
+      weapon name).
+    - C3 [#10] Post-boss ambush grace window on outpost exit.
+    - C4 [#12] MiniLM cognitive-label noise (8-label dumps, wrong classifications)
+      — cosmetic per the log analysis; reword `EMOTION_ANCHORS` only.
 
 
 - **Exploit-sweep backlog (2026-07-13) — 12 fixed in 796/776/1082, these REMAIN.**
@@ -406,15 +441,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-798`**,
-**golem-line `…-778`**, **engine_Dev `…-1083`** (engine skipped 798/778 — no
-Guardians there). Current parity offsets: golem = HAL − 20 (stable); engine_Dev =
-HAL + 285 now (was +286 — the Guardian OTA was HAL+golem-only, so engine fell one
-further behind).
-golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-799`**,
+**golem-line `…-779`**, **engine_Dev `…-1084`**. Current parity offsets: golem =
+HAL − 20 (stable); engine_Dev = HAL + 285 (was +286 — the Guardian OTA 798/778 was
+HAL+golem-only, so engine is one behind on count; the rope fix 799/779/1084 shipped
+to all three and preserves that −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 799 | 779 | 1084 | Climbing rope usable to its LAST point: only a spent rope (≤ 0) refuses/gives out; the last pull breaks GRACEFULLY at the top (no fall — "the last of the line coils dead at your feet"); a fraying warning fires while the rope is low. Old guard snapped/refused at ≤ ROPE_WEAR_PER_TIER (15), stranding a whole climb + dropping the player with no warning. climbReadiness (CLIMB button colour/haptic) mirrors the new ≤ 0 rule. Engine's lines use getNarratorName() (lore-neutral) |
 | 798 | 778 | — | Core Guardians carry authored thematic vulnerable/resist traits — weakness/resistance now shows in combat + the EnemyPanel (was always 'normal': their type isn't in the type-map and their traits weren't resist:/vulnerable:). HAL+golem only; engine_Dev has no Guardians |
 | 797 | 777 | 1083 | Qwen dormancy watchdog revives from a FAILED reinit (not just the narrow dormant case) — fixes whole-session qwen-not-ready when one revival attempt failed and stranded status='failed'; retries every 60s + unwedges a hung reload |
 | 796 | 776 | 1082 | Exploit-sweep batch (12 shared fixes): dodge costs a turn + 3-train cap; failed-dodge no longer 4× under crit; distract DC floor 12 + nat rules; shared ranged-enemy classifier (kite fix); boss regen once/round; buffs consume on attack-resolve not prompt-build; scrap ghost-slot fix (hands/cloak/ring2/3); 2H-displace hpMax loop closed; whole-word water match; fill costs time; hunt boss must be killed; investigate self-dispatch loop killed |

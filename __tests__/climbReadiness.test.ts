@@ -39,15 +39,20 @@ describe('OTA-628 — climbBlockReason', () => {
     expect(climbBlockReason({ ...base, wearsClimbStrap: true, stamina: 0 })).toBeNull();
   });
 
-  it('rope worn to ≤ wear-per-tier → frayed_rope (when stamina is fine)', () => {
-    expect(climbBlockReason({ ...base, activeRopeDurability: ROPE_WEAR_PER_TIER })).toBe('frayed_rope');
-    expect(climbBlockReason({ ...base, activeRopeDurability: ROPE_WEAR_PER_TIER - 1 })).toBe('frayed_rope');
+  // OTA-1084 — a rope is usable down to its LAST point. Only a SPENT rope
+  // (durability ≤ 0) blocks; a low-but-usable rope is green (it climbs and
+  // breaks gracefully at 0, with a fraying warning first). Was ≤ wear-per-tier
+  // (15), which stranded a whole climb and read red while the rope could pull.
+  it('rope SPENT (≤ 0) → frayed_rope; any positive durability → green', () => {
+    expect(climbBlockReason({ ...base, activeRopeDurability: 0 })).toBe('frayed_rope');
+    expect(climbBlockReason({ ...base, activeRopeDurability: 1 })).toBeNull();
+    expect(climbBlockReason({ ...base, activeRopeDurability: ROPE_WEAR_PER_TIER })).toBeNull();
     expect(climbBlockReason({ ...base, activeRopeDurability: ROPE_WEAR_PER_TIER + 1 })).toBeNull();
   });
 
-  it('stamina is checked BEFORE the frayed rope — empty tank + frayed rope reads as no_stamina', () => {
+  it('stamina is checked BEFORE the frayed rope — empty tank + spent rope reads as no_stamina', () => {
     expect(
-      climbBlockReason({ ...base, stamina: 0, activeRopeDurability: 5 }),
+      climbBlockReason({ ...base, stamina: 0, activeRopeDurability: 0 }),
     ).toBe('no_stamina');
   });
 

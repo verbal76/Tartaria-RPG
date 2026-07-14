@@ -17312,4 +17312,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // every 60s (a transient memory failure no longer strands Qwen for the session),
 // unwedges a reinit hung in loading past 150s, and mirrors the revived status onto
 // the store so About/debug don't stay stuck on 'failed'. +1 regression test.
-export const OTA_BUILD_ID = '2026-07-14-1083-qwen-watchdog-revives-from-failed';
+// OTA-1084 — Climbing rope is now usable down to its LAST point + warns before it
+// gives out. Player report (2026-07-13 log): "rope should fray… fire a warning to
+// you and not fail till it actually hits zero. what's the point of having 15 points
+// left if you die anyway?" The old guard refused/snapped at durability ≤
+// ROPE_WEAR_PER_TIER (15) — stranding a whole climb's worth of rope AND dropping
+// the player for fall damage with no warning. Now: (1) only a TRULY SPENT rope
+// (≤ 0) refuses/gives out; a low-but-usable rope climbs. (2) when the last pull
+// wears it to 0 it breaks GRACEFULLY at the top — no fall, "the last of the line
+// coils dead at your feet." (3) a fraying warning fires while the rope is low
+// (≤ one climb of durability left) so it's never a surprise. climbReadiness (the
+// CLIMB button colour/haptic) mirrors the new ≤ 0 rule so button and engine agree.
+// Shared engine code — the refusal/warning lines use getNarratorName() (lore-
+// neutral), never "The Arbiter".
+export const OTA_BUILD_ID = '2026-07-14-1084-rope-usable-to-last-point';
