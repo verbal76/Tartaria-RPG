@@ -194,6 +194,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -16297,7 +16298,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { corruptionTierOf, corruptionPriceMultiplier } = require('../engine/corruption');
     const tier = corruptionTierOf(player.corruption ?? 0);
     const mult = corruptionPriceMultiplier(tier);
-    const effectivePrice = Math.ceil(offer.price * mult);
+    // OTA-805 — Charisma-scaled faction DISCOUNT, gated by rapport. Once you've done
+    // this faction's rapport quest, its vendors knock up to 20% off (2%/CHA above
+    // 10). Multiplies in beside the corruption markup, same as any per-context price
+    // modifier. 0 for a neutral vendor or a faction you haven't earned.
+    const buyDiscount = vendorPriceMod(
+      effectiveStats(player).charisma,
+      player.completedFactionQuestIds,
+      scene.vendor.faction,
+    );
+    const effectivePrice = Math.max(1, Math.ceil(offer.price * mult * (1 - buyDiscount)));
     if (player.tc < effectivePrice) {
       get().appendLog(
         'system',
@@ -16508,7 +16518,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const basePrice = sellPriceFor(item, scene.vendor);
+    // OTA-805 — CHA-scaled rapport BONUS on the sell-back, once you've earned
+    // dealing with this faction (mirror of the buy discount).
+    const sellRapportBonus = vendorPriceMod(
+      effectiveStats(player).charisma,
+      player.completedFactionQuestIds,
+      scene.vendor.faction,
+    );
+    const basePrice = sellPriceFor(item, scene.vendor, sellRapportBonus);
     // arb45 — Relic Trader perk: sharper coin when bartering relics.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksSell = require('../engine/titles').titlePerkModifiers(player);
@@ -17424,6 +17441,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? `✦ Sent word — ${candidate.title} closed by courier for HALF (travel to claim full). +${payTc} TC, +${payRep} rep with ${fLabel}.`
         : `✦ Faction contract complete — ${candidate.title}. +${payTc} TC, +${payRep} rep with ${fLabel}.`,
     );
+    // OTA-805 — RAPPORT unlocked. Turning in a faction's rapport quest opens
+    // Charisma-scaled dealing with its vendors (the discount is derived from this
+    // completion — see factionRapport.hasFactionRapport). Announce it, and show the
+    // rate the player's current CHA earns so the payoff is concrete.
+    if (candidate.id === rapportQuestId(candidate.factionId)) {
+      const pct = Math.round(chaPriceDiscount(effectiveStats(get().player ?? player).charisma) * 100);
+      get().appendLog(
+        'reward',
+        `✦ You've earned dealing with the ${fLabel}. From now their vendors cut you the partner's rate — currently ${pct}% off buys and +${pct}% on sell-backs (it grows with your Charisma).`,
+      );
+    }
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-706
     logRepChanges(get, repResult.changed);
     plantNextContractHint(get, candidate.factionId, 'faction_quest');

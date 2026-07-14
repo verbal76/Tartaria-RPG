@@ -667,6 +667,168 @@
           "advanceOn": "kill"
         }
       ]
+    },
+    {
+      "id": "fq_reclaimers_guild_rapport",
+      "factionId": "reclaimers_guild",
+      "title": "Earning the Guild's Rate",
+      "description": "Anyone can sell the Guild scrap. A real partner brings something that matters. Lay a Golem Core on the bench and the quartermaster will cut you the members' rate — proper prices, coming and going.",
+      "objective": "Obtain a Golem Core, then hand it to a the Reclaimers Guild agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_forgotten_order_rapport",
+      "factionId": "forgotten_order",
+      "title": "The Order's Confidence",
+      "description": "The Order deals openly only with those who prove their worth. Bring them a Golem Core — a working relic of the old machine-craft — and they'll open their real ledger to you.",
+      "objective": "Obtain a Golem Core, then hand it to a the Forgotten Order agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_mud_monarchs_rapport",
+      "factionId": "mud_monarchs",
+      "title": "A Seat at the Table",
+      "description": "The Monarchs haggle hard with strangers. Hand their steward a Golem Core as tribute and you stop being a stranger — their stalls will deal you fair terms from then on.",
+      "objective": "Obtain a Golem Core, then hand it to a the Mud Monarchs agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_true_tartarians_rapport",
+      "factionId": "true_tartarians",
+      "title": "Proven Worthy",
+      "description": "The True Tartarians trust few. Recover a Golem Core and lay it before them as proof you can be relied on — and their traders will price you as one of their own.",
+      "objective": "Obtain a Golem Core, then hand it to a the True Tartarians agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_servants_of_giants_rapport",
+      "factionId": "servants_of_giants",
+      "title": "The Vigil's Favor",
+      "description": "The Servants keep their best goods for the devoted. Offer a Golem Core to the vigil and they'll count you a friend — friends pay less, and are paid more.",
+      "objective": "Obtain a Golem Core, then hand it to a the Servants of the Giants agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_eternal_dynasty_rapport",
+      "factionId": "eternal_dynasty",
+      "title": "The Magister's Regard",
+      "description": "The Dynasty's magisters do not bargain with just anyone. Present a Golem Core and Caul Veyre will extend you the court's rate — a courtesy, for a courtesy.",
+      "objective": "Obtain a Golem Core, then hand it to a the Eternal Dynasty agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_conspiracy_architects_rapport",
+      "factionId": "conspiracy_architects",
+      "title": "Into the Circle",
+      "description": "The Architects deal in secrets and rarely in favors. Bring the Cartographer a Golem Core and you buy your way into the inner circle — where the prices are the real ones.",
+      "objective": "Obtain a Golem Core, then hand it to a the Conspiracy Architects agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_stone_builders_rapport",
+      "factionId": "stone_builders",
+      "title": "Raised in Their Esteem",
+      "description": "The Builders respect what powers their works. Deliver a Golem Core to the foreman and they'll raise you in their books — better stock, better coin, both directions.",
+      "objective": "Obtain a Golem Core, then hand it to a the Stone Builders agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
+    },
+    {
+      "id": "fq_tartarian_revivalists_rapport",
+      "factionId": "tartarian_revivalists",
+      "title": "A Believer's Terms",
+      "description": "The Revivalists reserve their kindness for the faithful. Carry them a Golem Core, a spark of the old world reborn, and Sister Ashfall will see you dealt with generously.",
+      "objective": "Obtain a Golem Core, then hand it to a the Tartarian Revivalists agent in person to earn their dealing rate (Charisma-scaled discounts).",
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
+      "fetch": {
+        "itemName": "Golem Core",
+        "quantity": 1
+      }
     }
   ]
 }

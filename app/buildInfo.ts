@@ -15780,4 +15780,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (+1 per 500 TC spent, remainder carried in player.buyRepProgress). Cheap-junk
 // spam can't grind it; mission completions + sigil turn-ins stay dominant. Left in
 // as a minor contributor per the user.
-export const OTA_BUILD_ID = '2026-07-14-784-buy-rep-slow-grind';
+// OTA-785 — CHARISMA EARNS VENDOR DISCOUNTS, gated per faction by a rapport quest
+// (warm standby, lockstep with HAL 805). Once you've done a faction's rapport quest,
+// its vendors cut you a CHA-scaled break — 2%/point above 10, capped 20%, on buys
+// and sell-backs. New factionRapport.ts; wired into buy/sell + VendorScreen; nine
+// fq_<faction>_rapport quests (fetch a Golem Core) added to faction-quests.json.
+// Unlock derived from completedFactionQuestIds.
+export const OTA_BUILD_ID = '2026-07-14-785-charisma-vendor-discounts';

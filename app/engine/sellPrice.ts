@@ -102,10 +102,23 @@ function selfCraftedSellCap(item: InventoryItem): number | null {
   return Math.max(1, Math.round(ingredientValue * bump));
 }
 
-export function sellPriceFor(item: InventoryItem, vendor: VendorInstance | null | undefined): number {
+export function sellPriceFor(
+  item: InventoryItem,
+  vendor: VendorInstance | null | undefined,
+  // OTA-805 — Charisma-scaled faction rapport BONUS (0..0.20). Applied to the FINAL
+  // sell price (after the B1 caps) so an earned, high-CHA merchant genuinely sells
+  // higher at a faction they've built rapport with. It's an earned exception to the
+  // generic RARITY_BUY_FLOOR cap; the SELL_FRACTION (0.4) gap keeps buy-then-sell a
+  // loss so it's a merchant perk, not arbitrage. Bottleneck crafting mats are
+  // exempt (they stay crafting-only). Callers pass vendorPriceMod(...); default 0.
+  rapportBonus = 0,
+): number {
+  const withRapport = (price: number) =>
+    rapportBonus > 0 ? Math.max(1, Math.round(price * (1 + rapportBonus))) : price;
   // OTA-802 (B1b) — bottleneck crafting materials price as near-worthless AT
   // VENDORS (crafting-only value), checked BEFORE the vendor-offer match so a
   // materials stall that lists them can't reopen the fuse→scrap→sell money pump.
+  // No rapport bonus — they're deliberately not a cash commodity.
   if (BOTTLENECK_CRAFTING_MATS.has(item.name.toLowerCase())) {
     return BOTTLENECK_CRAFTING_SELL;
   }
@@ -117,14 +130,14 @@ export function sellPriceFor(item: InventoryItem, vendor: VendorInstance | null 
     if (offer) {
       const dur = durabilityFraction(item);
       raw = Math.max(1, Math.round(offer.price * SELL_FRACTION * dur));
-      return applySellCaps(item, raw);
+      return withRapport(applySellCaps(item, raw));
     }
   }
   if (!item.rarity) {
     // Untiered raw stuff still has a small base value via kind.
-    if (item.kind === 'consumable') return 3;
-    if (item.kind === 'misc') return 2;
-    return 1;
+    if (item.kind === 'consumable') return withRapport(3);
+    if (item.kind === 'misc') return withRapport(2);
+    return withRapport(1);
   }
   // arb149 — equippable gear uses the higher gear base; everything else (relics,
   // materials, consumables-with-a-tier) keeps the generic base.
@@ -132,7 +145,7 @@ export function sellPriceFor(item: InventoryItem, vendor: VendorInstance | null 
   const base = baseTable[item.rarity] ?? 5;
   const dur = durabilityFraction(item);
   raw = Math.max(1, Math.round(base * SELL_FRACTION * dur));
-  return applySellCaps(item, raw);
+  return withRapport(applySellCaps(item, raw));
 }
 
 /** OTA-802 — apply the B1 sell caps to a computed base sell price:
