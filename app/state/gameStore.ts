@@ -16367,12 +16367,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tags,
     });
 
-    // Small reputation boost with the vendor's faction for honest custom.
-    const vendorFaction = scene.vendor.faction;
-    const repResult = vendorFaction
-      ? applyRepChange(player.factionStanding, vendorFaction, 1)
-      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-
     // Check cap BEFORE charging TC. If the player can't carry it, refuse
     // the sale instead of taking their coin for nothing.
     const dryRun = grantItem(player.inventory, newItem);
@@ -16390,6 +16384,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const boughtCount = Math.max(1, dryRun.accepted);
     const totalCost = effectivePrice * boughtCount;
     const remainingStock = available - boughtCount;
+
+    // OTA-804 — buying builds faction standing, but only as a SLOW GRIND / after-
+    // thought (per the user). Was a flat +1 per purchase — so buying anything, even
+    // a 2 TC junk item, farmed standing and let you shop your way to a faction.
+    // Now standing accrues by TC of HONEST CUSTOM: a hidden pool banks the coin you
+    // spend and grants +1 standing per BUY_REP_TC_PER_STANDING TC, carrying the
+    // remainder across purchases (buyRepProgress, persisted). Real business slowly
+    // earns a little regard; cheap-junk spam can't grind it (a 2 TC buy adds 2 to
+    // the pool). The intended paths — mission completions + sigil turn-ins — still
+    // dwarf it (joining needs 20 standing ≈ 10,000 TC spent this way). The pool is
+    // faction-agnostic; it banks into whoever you're buying from when it crosses,
+    // a benign cross-faction bleed for an afterthought lever.
+    const BUY_REP_TC_PER_STANDING = 500;
+    const vendorFaction = scene.vendor.faction;
+    const buyRepPool = (player.buyRepProgress ?? 0) + totalCost;
+    const buyRepGranted = Math.floor(buyRepPool / BUY_REP_TC_PER_STANDING);
+    const nextBuyRepProgress = buyRepPool - buyRepGranted * BUY_REP_TC_PER_STANDING;
+    const repResult = (vendorFaction && buyRepGranted > 0)
+      ? applyRepChange(player.factionStanding, vendorFaction, buyRepGranted)
+      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       // OTA 036 — filter by (itemName, price) instead of reference
@@ -16410,6 +16424,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           tc: s.player.tc - totalCost,
           inventory: dryRun.inventory,
           factionStanding: repResult.standing,
+          buyRepProgress: nextBuyRepProgress,
         },
         currentScene: {
           ...s.currentScene,

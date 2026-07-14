@@ -16073,4 +16073,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // row, and the stray 'gift' mentions in help/hint text + the inventory modal.
 // (The buy-from-vendor +1 rep side door is left as-is unless the user asks.)
 // Shared engine code — all three lines.
-export const OTA_BUILD_ID = '2026-07-14-803-remove-gifting';
+// OTA-804 — BUY-FOR-REP greatly reduced to a slow afterthought (per the user:
+// "buying should be a slow grind … contributes but almost as an afterthought").
+// Was a flat +1 standing per purchase (so a 2 TC junk buy farmed rep). Now
+// standing accrues by TC of HONEST CUSTOM: spent coin banks in player.buyRepProgress
+// and grants +1 standing per BUY_REP_TC_PER_STANDING (500) TC, remainder carried.
+// Cheap-junk spam can't grind it; joining a faction this way alone needs ~10,000 TC
+// spent, so mission completions + sigil turn-ins still dominate. Left IN as a minor
+// contributor per the user; the pool is faction-agnostic (banks into whoever you're
+// buying from when it crosses). Shared engine code — all three lines.
+export const OTA_BUILD_ID = '2026-07-14-804-buy-rep-slow-grind';
