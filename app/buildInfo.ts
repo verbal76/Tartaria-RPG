@@ -17392,4 +17392,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // isIntimidationVerb / isBeastPack + flavor — beasts flee, people back off); intercept
 // in submitPlayerAction ahead of the shared diplomacy switch arm. SKILL_ACTIVITIES.
 // charisma refreshed (dropped removed gifting; added talk-down + diplomacy surfaces).
-export const OTA_BUILD_ID = '2026-07-14-1091-talk-down-a-fight';
+// OTA-1092 — WANDERING NPCs. The other half of "where does Charisma matter?": the
+// open road now occasionally puts a PERSON in front of you (traveler / refugee /
+// tinker / scout / pilgrim) you can actually talk to — not a vendor stall, not an
+// animal. "talk to <name>" is a d20 + CHA (+ Broker) check vs a friendly DC 12 for a
+// small payoff: a word of the road (tip), a few coins (6–15 TC), or — rarely — a +1
+// standing nudge with your own faction as your people hear you dealt fair. ONE read
+// per wanderer (win or whiff, they move on). FARM-PROOF: each peaceful OUTDOOR tile
+// gets exactly ONE spawn roll ever (worldMemory.wandererRolledTiles, bounded window)
+// — no leave/return farming; ~12% of eligible fresh tiles. New engine module
+// wanderers.ts (lore-neutral archetypes & flavor); CurrentScene.wanderer; beginScene
+// spawn; talk intercept in submitPlayerAction; green wanderer banner in
+// ExplorationScreen.
+export const OTA_BUILD_ID = '2026-07-14-1092-wandering-npcs';
