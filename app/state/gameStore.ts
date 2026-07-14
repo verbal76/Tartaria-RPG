@@ -1020,34 +1020,82 @@ function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, s
   getStore().appendLog('world', missionLine);
 }
 
-// OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen
-// reports isDormant() (the OOM-killed state where status==='ready'
-// but the native runtime is gone), kicks forceReinitialize() in the
-// background. Player never has to wait for the deterministic fallback
-// or notice anything — Qwen stays warm.
+// OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen isn't
+// healthy, kicks forceReinitialize() in the background so it warms back up
+// before the next narration/fusion — the player never waits on it.
+//
+// OTA-797 — the watchdog used to only recover the NARROW dormant case
+// (isDormant(): status==='ready' but the native runtime OOM-died). But
+// forceReinitialize() resets status to idle→loading→ then EITHER 'ready'
+// (success) or 'failed' (if the reload throws under memory pressure). A
+// SINGLE failed revival left status='failed', where isDormant() is FALSE —
+// so the old `if (!isDormant()) return` short-circuited forever and Qwen
+// stayed not-ready for the rest of the session (whole-session qwen-not-ready,
+// 2026-07-13 device log: one "detected dormant" line, then hours of template
+// fallback). Now the watchdog revives from ANY unhealthy-and-not-progressing
+// state (idle / failed / dormant), keeps retrying every tick, and unwedges a
+// reinit that hangs in loading/downloading past a generous window.
 //
 // Held at module scope so startQwenWatchdog() can replace it on
 // re-entry without leaking handles.
 let qwenWatchdogTimer: ReturnType<typeof setInterval> | null = null;
 const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
-function startQwenWatchdog(get: () => GameStore): void {
+// How long a re-init may sit in 'loading'/'downloading' before the watchdog
+// treats it as wedged and re-kicks. Generous: once dormancy is even possible
+// the GGUF is already cached, so a warm reload is ~5-30s; a legit in-flight
+// load is never interrupted.
+const QWEN_REINIT_HANG_MS = 150_000;
+let qwenReinitInFlightSince = 0;
+let qwenReinitAttempts = 0;
+function startQwenWatchdog(
+  get: () => GameStore,
+  set: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): void {
   if (qwenWatchdogTimer !== null) {
     clearInterval(qwenWatchdogTimer);
     qwenWatchdogTimer = null;
   }
+  qwenReinitInFlightSince = 0;
+  qwenReinitAttempts = 0;
   qwenWatchdogTimer = setInterval(() => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const q = qwen as any;
-      if (typeof q.isDormant !== 'function' || typeof q.forceReinitialize !== 'function') return;
-      if (!q.isDormant()) return;
+      const q = qwen;
+      if (typeof q.forceReinitialize !== 'function' || typeof q.getStatus !== 'function') return;
+      // Healthy — nothing to do; clear any in-flight tracking.
+      if (q.isReady()) {
+        if (qwenReinitAttempts > 0) {
+          get().appendLog('debug', `qwen-watchdog: Qwen ready again (recovered after ${qwenReinitAttempts} attempt${qwenReinitAttempts === 1 ? '' : 's'}).`);
+          // Mirror the revived engine status onto the store so About/debug
+          // surfaces don't stay stuck on 'failed' (narration itself already
+          // recovers — narrateViaArbiter reads qwen.isReady() directly).
+          set((s) => (s.qwenStatus === 'ready' ? {} : { qwenStatus: 'ready', qwenError: null }));
+        }
+        qwenReinitInFlightSince = 0;
+        qwenReinitAttempts = 0;
+        return;
+      }
+      const st = q.getStatus();
+      // A (re)init is genuinely in progress — let it finish, unless it has
+      // been wedged past the hang window (then fall through to re-kick).
+      if (st === 'downloading' || st === 'loading') {
+        if (qwenReinitInFlightSince === 0 || Date.now() - qwenReinitInFlightSince < QWEN_REINIT_HANG_MS) return;
+        get().appendLog('debug', `qwen-watchdog: reinit wedged in '${st}' for >${Math.round(QWEN_REINIT_HANG_MS / 1000)}s — re-kicking.`);
+      }
+      // Not ready and not making progress (idle / failed / dormant ready-but-
+      // dead / wedged): kick a fresh reinit. Keeps retrying every 60s so a
+      // transient memory-pressure failure doesn't strand Qwen for the session.
+      qwenReinitAttempts += 1;
+      qwenReinitInFlightSince = Date.now();
       get().appendLog(
         'debug',
-        `qwen-watchdog: detected dormant runtime — kicking forceReinitialize() in background.`,
+        `qwen-watchdog: Qwen not ready (status='${st}') — forceReinitialize() attempt #${qwenReinitAttempts}.`,
       );
-      void q.forceReinitialize().catch((err: unknown) => {
-        get().appendLog('debug', `qwen-watchdog: reinit threw: ${String(err)}`);
-      });
+      void q.forceReinitialize()
+        .then(() => { qwenReinitInFlightSince = 0; })
+        .catch((err: unknown) => {
+          qwenReinitInFlightSince = 0;
+          get().appendLog('debug', `qwen-watchdog: reinit attempt #${qwenReinitAttempts} threw: ${String(err)}`);
+        });
     } catch { /* watchdog should never crash the host */ }
   }, QWEN_WATCHDOG_INTERVAL_MS);
 }
@@ -22772,7 +22820,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // forceReinitialize() in the background so Qwen is warm by the
     // next time the player triggers narration or fusion. Idempotent —
     // starting twice replaces the timer cleanly.
-    startQwenWatchdog(get);
+    startQwenWatchdog(get, set);
   },
 
   async shutdownQwen() {
