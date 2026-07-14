@@ -32,7 +32,7 @@ import {
   trainDogStat,
   type RescueScenarioId,
 } from '../engine/dogCompanion';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
@@ -647,14 +647,14 @@ interface CurrentScene {
    *  player can't sit on a tile spamming `investigate` to mint free trivial
    *  enemies for stat-training + loot. Resets with the scene (leave + return). */
   investigateAmbushUsed?: boolean;
-  /** Set once the player has cupped a bare-handed drink from a scene water
-   *  source this visit. One wild drink per location visit — the playtest-log
-   *  floodwater loop (+3 stamina per 5 min, forever) out-recovered sleeping
-   *  36:1. Resets with the scene (leave + return). */
+  /** RETIRED OTA-1085 — the wild-drink bound moved off this per-scene flag (which
+   *  reset on leave+return, so adjacent outdoor water tiles could be bounced for
+   *  infinite drinks) to worldMemory.waterUsedAt, keyed per source on game-hours.
+   *  Kept as an optional field so legacy saves that still carry it load cleanly;
+   *  no longer read or written. */
   barehandDrinkUsed?: boolean;
-  /** Set once the player has refilled a water bottle from this location's
-   *  water source this visit. One refill per visit, same rationale as
-   *  barehandDrinkUsed. Resets with the scene (leave + return). */
+  /** RETIRED OTA-1085 — see barehandDrinkUsed; the refill bound also moved to
+   *  worldMemory.waterUsedAt. Kept optional for legacy-save compatibility. */
   bottleRefillUsed?: boolean;
   /** OTA-1082 — dodge-training bound: successful dodges train DEX/STE only for the
    *  first 3 contest wins per scene visit (anti dodge-farm). Resets with scene. */
@@ -7861,105 +7861,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     switch (parsed.intent) {
       case 'attack': {
-        // OTA-210 — tick enemy statuses at the START of each combat
-        // round. Disease Sample infection deals 1 HP/turn to its
-        // host for 10 turns; without this tick the status would
-        // never resolve. Decrements turnsRemaining + clears empty
-        // entries. Kills via DoT do NOT trigger resolveEnemyDefeat
-        // here (that fires through the natural damage path later
-        // when the player's attack also lands); a DoT-killed enemy
-        // is left at 0 HP and the next attack handler skips them.
-        {
-          const sceneNow = get().currentScene;
-          if (sceneNow && sceneNow.enemyStatuses) {
-            const newHps = [...sceneNow.enemyHps];
-            const newStatuses = sceneNow.enemyStatuses.map((arr) => [...arr]);
-            for (let i = 0; i < sceneNow.enemies.length; i++) {
-              const hp = newHps[i];
-              if (hp === undefined || hp <= 0) continue;
-              const list = newStatuses[i] ?? [];
-              const remaining: typeof list = [];
-              for (const st of list) {
-                // OTA-362 — coating DOTs (poison/acid/corruption) tick the
-                // same way as the OTA-210 infection: dmgPerTurn off the HP,
-                // decrement turns, expire with a kind-flavored line.
-                const isDot = st.kind === 'infected'
-                  || st.kind === 'poison_coat'
-                  || st.kind === 'acid_coat'
-                  || st.kind === 'corruption_coat'
-                  || st.kind === 'electrical_coat'
-                  || st.kind === 'burn_coat'
-                  || st.kind === 'dt_dot';
-                if (isDot && st.turnsRemaining > 0) {
-                  const dmg = st.dmgPerTurn;
-                  const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
-                  newHps[i] = updatedHp;
-                  const enemyName = sceneNow.enemies[i]!.name;
-                  const tickLine = st.kind === 'poison_coat'
-                    ? `${enemyName} shudders — poison eats ${dmg}.`
-                    : st.kind === 'acid_coat'
-                      ? `${enemyName} smokes — acid eats ${dmg}.`
-                      : st.kind === 'corruption_coat'
-                        ? `${enemyName} blackens — corruption eats ${dmg}.`
-                        : st.kind === 'electrical_coat'
-                          ? `${enemyName} convulses — arcing current bites ${dmg}.`
-                          : st.kind === 'burn_coat'
-                            ? `${enemyName} blisters — clinging fire sears ${dmg}.`
-                            : st.kind === 'dt_dot'
-                              ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
-                              : `${enemyName} convulses — infection bleeds ${dmg}.`;
-                  get().appendLog(
-                    'combat',
-                    `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
-                  );
-                  if (st.turnsRemaining - 1 > 0) {
-                    remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
-                  } else {
-                    get().appendLog(
-                      'combat',
-                      `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
-                    );
-                  }
-                } else if (st.kind === 'exposed' && st.turnsRemaining > 0) {
-                  // engine_Dev — timed AC debuff: no damage, just tick down and expire.
-                  if (st.turnsRemaining - 1 > 0) {
-                    remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
-                  } else {
-                    get().appendLog('combat', `${sceneNow.enemies[i]!.name} recovers its footing — no longer exposed.`);
-                  }
-                } else {
-                  remaining.push(st);
-                }
-              }
-              newStatuses[i] = remaining;
-            }
-            set((s) => s.currentScene
-              ? { currentScene: { ...s.currentScene, enemyHps: newHps, enemyStatuses: newStatuses } }
-              : s);
-          }
-        }
-        // OTA-429 — a DOT tick that drops the LAST living enemy must still end
-        // the fight. Pre-OTA, DOT kills were left at 0 HP for "the next attack
-        // to clean up" — but if the DOT kills the final enemy the player has
-        // nothing left to swing at, so the fight hung (range stayed set, no
-        // loot, no victory line). When EVERY enemy is now dead from the tick,
-        // sweep them all through resolveEnemyDefeat (loot + kill bookkeeping +
-        // combat-end, which persists) and bail out of the attack — there is no
-        // valid target. Mixed fights (at least one enemy still alive) keep the
-        // old behavior so mid-fight targeting isn't perturbed.
-        {
-          const swept = get().currentScene;
-          if (swept && swept.enemies.length > 0 && swept.enemyHps.every((h) => (h ?? 0) <= 0)) {
-            set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: 0 } } : s));
-            let guard = 0;
-            while (++guard <= 16) {
-              const sc = get().currentScene;
-              if (!sc || sc.enemies.length === 0) break;
-              get().resolveEnemyDefeat();
-            }
-            return;
-          }
-        }
+        // OTA-210/362/429 — tick enemy DOT statuses at the START of the attack
+        // round, BEFORE the player's swing (a swing that would kill still gets
+        // the loot before the DOT races it), then bail if the tick ended the
+        // fight. OTA-1085 hoisted the tick into tickEnemyDotsAndMaybeEndFight so
+        // every OTHER combat round (dodge / move / flee / companion / throw) ticks
+        // it too via runEnemyGroupCounters; the attack path passes skipDotTick to
+        // its counter calls below so DOTs don't double-tick.
+        if (tickEnemyDotsAndMaybeEndFight(get, set)) return;
         const targetEnemy = activeEnemy(currentScene);
         if (targetEnemy) {
           // OTA 205 — Phase 2 args migration. If the player named an
@@ -12061,14 +11970,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        // One refill per location visit — same anti-loop bound as the
-        // bare-handed drink. Resets when the scene does (leave + return).
-        if (currentScene.bottleRefillUsed) {
-          get().appendLog(
-            'arbiter',
-            `The ${getNarratorName()} nods at the ${sourceNoun}. "You've already topped up here. The filter needs time between draws — fill again at the next stop."`,
-          );
-          break;
+        // OTA-1085 — one refill per water SOURCE per re-arm window, persisted in
+        // worldMemory by the composite room key (mapX/mapY included) and keyed on
+        // GAME-HOURS. Was a per-scene flag that reset on leave+return, so bouncing
+        // two adjacent outdoor water tiles farmed unlimited refills.
+        {
+          const waterRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+          if (!waterSourceReady(get().worldMemory ?? emptyMemory(), waterRoomKey, 'fill', player.hoursElapsed ?? 0)) {
+            get().appendLog(
+              'arbiter',
+              `The ${getNarratorName()} nods at the ${sourceNoun}. "You've already topped up here. The filter needs time between draws — fill again at the next stop, or give this one time to settle."`,
+            );
+            break;
+          }
         }
         // Swap empty → full.
         set((s) => {
@@ -12096,9 +12010,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
         // OTA-1082 — filling costs 5 min like the cupped drink (was zero-time).
         set((s) => (s.player ? { player: advanceTime(s.player, 0.083) } : s));
-        set((s) => s.currentScene
-          ? { currentScene: { ...s.currentScene, bottleRefillUsed: true } }
-          : s);
+        // OTA-1085 — record the refill against the water source (game-hours) so it
+        // re-arms on time, not on scene reset. Uses the post-advanceTime clock.
+        {
+          const waterRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+          const nowHours = get().player?.hoursElapsed ?? player.hoursElapsed ?? 0;
+          set((s) => ({ worldMemory: recordWaterUse(s.worldMemory ?? emptyMemory(), waterRoomKey, 'fill', nowHours) }));
+        }
         get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. The filter seam in its neck pulls the murk out — bottled water drinks clean. (✦ Water Bottle, ✗ Empty Water Bottle)`);
         break;
       }
@@ -12143,15 +12061,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ?? (drinkTokens.some((t) => t === 'water' || t.startsWith('water')) ? 'water' : undefined);
         const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
         if (drinkSource && wantsWater) {
-          // One cupped-hands drink per location visit. Wild water used to be an
-          // infinite free stamina tap (+3 per 5 min vs sleep's +1/hour — a
-          // playtest log showed the loop in action). Bottled water (below, via
-          // the consumable path) stays unlimited because filling the bottle
-          // filters it.
-          if (currentScene.barehandDrinkUsed) {
+          // OTA-1085 — one cupped-hands drink per water SOURCE per re-arm window.
+          // Wild water used to be an infinite free stamina tap (+3 per 5 min vs
+          // sleep's +1/hour). The bound was a per-scene flag that reset on
+          // leave+return, so two adjacent outdoor water tiles could be bounced for
+          // unlimited drinks; now it's persisted per source on GAME-HOURS
+          // (WATER_REARM_HOURS). Bottled water (below, via the consumable path)
+          // stays unlimited because filling the bottle filters it.
+          const drinkRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+          if (!waterSourceReady(get().worldMemory ?? emptyMemory(), drinkRoomKey, 'drink', player.hoursElapsed ?? 0)) {
             get().appendLog(
               'arbiter',
-              `The ${getNarratorName()} shakes their head. "You've drunk your fill from the ${drinkSource}. Bottle some if you want more for the road."`,
+              `The ${getNarratorName()} shakes their head. "You've drunk your fill from the ${drinkSource}. Give it time to settle, or bottle some if you want more for the road."`,
             );
             break;
           }
@@ -12171,9 +12092,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               corruption: newCorr,
             },
           });
-          set((s) => s.currentScene
-            ? { currentScene: { ...s.currentScene, barehandDrinkUsed: true } }
-            : s);
+          // OTA-1085 — record the drink against the water source (game-hours) so
+          // it re-arms on time, not on scene reset. Uses the post-advanceTime clock.
+          {
+            const nowHours = get().player?.hoursElapsed ?? player.hoursElapsed ?? 0;
+            set((s) => ({ worldMemory: recordWaterUse(s.worldMemory ?? emptyMemory(), drinkRoomKey, 'drink', nowHours) }));
+          }
           // A 0-gain drink has two very different causes: you're genuinely full, OR
           // hunger has capped your effective max below your real max (water can't lift
           // that — only food does). Spell out the hunger case so it never reads as broken.
@@ -13099,18 +13023,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'jump': {
         set({ player: advanceTime(spendStamina(player, 1), 0.1) });
         const tgt = parsed.target ?? '';
+        // OTA-1085 — resolve the jump target against REAL scene nouns (ambient /
+        // hook / enemy / vendor), the same way the advance case does. Pre-fix,
+        // ANY text after "jump at" (parsed.target) counted as a target and
+        // trained DEX — so "jump at xyzzy" on a safe tile was a free stamina→DEX
+        // grind, exactly the spam the OTA-611 bare-"jump" guard was meant to
+        // close, slipped through via an unresolved target. Now unresolved text
+        // reads as a bare leap and does NOT train.
+        const tl = tgt.toLowerCase();
+        const resolvedJumpNoun = tgt
+          ? (matchAmbientNoun(tgt, currentScene.ambientNouns ?? [])
+              ?? matchHookNoun(tgt, currentScene.hooks ?? [])?.nouns[0]
+              ?? currentScene.enemies.find((e) =>
+                    e.name.toLowerCase().includes(tl)
+                    || (e.aliases ?? []).some((a) => a.toLowerCase().includes(tl)))?.name
+              ?? (currentScene.vendor
+                    && tl.includes((currentScene.vendor.name.toLowerCase().split(/\s+/)[0] ?? ''))
+                    ? currentScene.vendor.name
+                    : null))
+          : null;
         get().appendLog(
           'world',
-          tgt
-            ? `You launch yourself toward ${tgt}. Standing long jump — 3 squares without a STR check, more with one.`
+          resolvedJumpNoun
+            ? `You launch yourself toward ${resolvedJumpNoun}. Standing long jump — 3 squares without a STR check, more with one.`
             : `You leap. Standing long jump — 3 squares clean. With a STR check, you could push it further.`,
         );
-        // OTA-112 — DEX bottleneck fix per stat-growth audit. Jump
-        // is a textbook DEX action and was missing from the training
-        // map. OTA-611 — only trains when you jump AT something (a real
-        // target/obstacle); a bare "jump" into empty air no longer trains, so
-        // it can't be spammed as a pure stamina→DEX grind on a safe tile.
-        if (tgt) {
+        // OTA-112 — Jump is a textbook DEX action. OTA-611 gated it on jumping
+        // AT something; OTA-1085 tightens that to a RESOLVED scene noun so a bare
+        // or bogus target can't farm it.
+        if (resolvedJumpNoun) {
           const liveJumper = get().player;
           if (liveJumper) {
             const tr = trainStat(liveJumper, 'dexterity', true);
@@ -13812,18 +13753,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The ${getNarratorName()} scans the ground. "I see ${names} here. Name one."`);
           break;
         }
+        // OTA-1085 — remove the EXACT dropped instance by id (not every same-name
+        // entry) so picking up one worn sword doesn't also decrement a pristine
+        // one lying beside it.
         const remaining = dropped
-          .map((d) => (d.name === pickItem.name ? { ...d, quantity: d.quantity - 1 } : d))
+          .map((d) => (d.id === pickItem.id ? { ...d, quantity: d.quantity - 1 } : d))
           .filter((d) => d.quantity > 0);
+        let pickupAccepted = true;
         set((s) => {
           if (!s.player || !s.worldMemory.visitedRooms?.[dropKey]) return s;
-          // Merge into player inventory.
-          const inv = [...s.player.inventory];
-          const existing = inv.findIndex((i) => i.name === pickItem.name);
-          if (existing >= 0) inv[existing] = { ...inv[existing]!, quantity: inv[existing]!.quantity + 1 };
-          else inv.push({ ...pickItem, quantity: 1 });
+          // OTA-1085 — route the pickup through grantItem so the same per-instance
+          // guards that protect every other grant apply here too. The old
+          // hand-rolled merge stacked by NAME, so dropping a worn / coated /
+          // rolled instance and picking it back up laundered it into a full
+          // same-name row (its low durability, coating, or instanceStats silently
+          // vanished into a +1 quantity — a free repair / coating dupe). grantItem
+          // keeps the picked instance's own id + durability + coating + stats and
+          // merges ONLY when it's genuinely fungible with an existing row.
+          const grantResult = grantItem(s.player.inventory, { ...pickItem, quantity: 1 });
+          if (grantResult.accepted <= 0) {
+            // Pack is at the per-name cap — leave the item on the ground.
+            pickupAccepted = false;
+            return s;
+          }
           return {
-            player: { ...s.player, inventory: inv },
+            player: { ...s.player, inventory: grantResult.inventory },
             worldMemory: {
               ...s.worldMemory,
               visitedRooms: {
@@ -13833,7 +13787,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             },
           };
         });
-        get().appendLog('world', `You pick up the ${pickItem.name}.`);
+        if (pickupAccepted) {
+          get().appendLog('world', `You pick up the ${pickItem.name}.`);
+        } else {
+          get().appendLog('world', `You reach for the ${pickItem.name}, but your pack is already full of them.`);
+        }
         void get().persist();
         break;
       }
@@ -15581,9 +15539,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // in combatRules.getEquippedWeapon (with damageDice='2d20'
           // for Aetheric Shards) handles the damage roll; this block
           // handles the spent-it-now bookkeeping.
-          const equippedItem = player.inventory.find(
-            (i) => i.name.toLowerCase() === weaponInUse.toLowerCase(),
-          );
+          // OTA-1085 — resolve the equipped throwable by its equipped INSTANCE ID
+          // (mainId/offId), not by name. The old first-by-name find returned
+          // whichever same-named row sat first in the pack, so with two stacks of
+          // the same name — e.g. a COATED dart equipped alongside a plain stack —
+          // the throw consumed the WRONG instance: the coated one you're wielding
+          // never depleted (infinite coated throw), and a bandolier-racked copy
+          // could be double-spent. Fall back to name only for legacy equips with
+          // no tracked id.
+          const equippedId = usedOffHand ? player.equipped?.offId : player.equipped?.mainId;
+          const equippedItem = (equippedId
+            ? player.inventory.find((i) => i.id === equippedId)
+            : undefined)
+            ?? player.inventory.find((i) => i.name.toLowerCase() === weaponInUse.toLowerCase());
           const isThrowable = (equippedItem?.tags ?? []).some((t) => /throwable/i.test(t));
           if (isThrowable && equippedItem) {
             // engine_Dev — a durable thrown weapon buries in the enemy it just
@@ -15814,11 +15782,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
-        runEnemyGroupCounters(get, set, player);
+        // skipDotTick — the attack path already ticked DOTs at case-top.
+        runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      runEnemyGroupCounters(get, set, player);
+      runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
 
     if (shouldArbiterSpeak()) {
@@ -22216,17 +22185,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hadCoating = weapon.coating;
     set((s) => {
       if (!s.player) return s;
-      const inv = s.player.inventory
-        // Stamp the coating on the target weapon instance.
-        .map((i) =>
-          i.id === weaponId
-            ? { ...i, coating: { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) } }
-            : i,
-        )
-        // Consume one coating unit (drop the stack when it hits 0).
-        .map((i) =>
-          i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i,
-        )
+      const target = s.player.inventory.find((i) => i.id === weaponId);
+      if (!target) return s;
+      const coatingSpec = { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) };
+      let inv: InventoryItem[];
+      if (target.quantity > 1) {
+        // OTA-1085 — the target is a STACK (e.g. a bundle of throwing darts).
+        // Stamping the coating on the row would coat ALL N copies for a single
+        // vial — a coating dupe (throw/split them and every unit carries it).
+        // Peel ONE unit off into its own instance, coat only that, and leave the
+        // rest of the stack bare. (A coated instance never re-stacks — grantItem's
+        // OTA-363 guard keeps it separate.)
+        inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, quantity: i.quantity - 1 } : i));
+        inv.push({ ...target, id: freshInstanceId('coat'), quantity: 1, coating: coatingSpec });
+      } else {
+        // Single instance — stamp in place so the equipped weapon's id/equip
+        // state is preserved.
+        inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, coating: coatingSpec } : i));
+      }
+      // Consume one coating unit (drop the stack when it hits 0).
+      inv = inv
+        .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
       return { player: { ...s.player, inventory: inv } };
     });
@@ -22308,8 +22287,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     set((s) => {
       if (!s.player) return s;
-      const inv = s.player.inventory
-        .map((i) => (i.id === armorId ? { ...i, addedResists: [...(i.addedResists ?? []), type] } : i))
+      const target = s.player.inventory.find((i) => i.id === armorId);
+      if (!target) return s;
+      let inv: InventoryItem[];
+      if (target.quantity > 1) {
+        // OTA-1085 — same anti-dupe as applyCoating: peel one piece off the stack
+        // so a single vial can't work its resist into all N copies at once.
+        inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, quantity: i.quantity - 1 } : i));
+        inv.push({ ...target, id: freshInstanceId('coat'), quantity: 1, addedResists: [...(target.addedResists ?? []), type] });
+      } else {
+        inv = s.player.inventory.map((i) => (i.id === armorId ? { ...i, addedResists: [...(i.addedResists ?? []), type] } : i));
+      }
+      inv = inv
         .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
       return { player: { ...s.player, inventory: inv } };
@@ -25844,16 +25833,125 @@ export function applyEnemyCounterToDog(
   }
 }
 
+// OTA-1085 — enemy DOT statuses must tick once per COMBAT ROUND, not only on the
+// player's `attack`. Pre-fix the tick lived inline at the top of case 'attack',
+// so a round spent on dodge / advance / retreat / flee-fail / companion / throw
+// froze every DOT. Extracted here and driven from runEnemyGroupCounters (the one
+// call every combat round routes through), so every round ticks exactly once. The
+// attack path still ticks at its own top — BEFORE the player's swing, so a swing
+// that would kill still gets the loot before the DOT races it — and passes
+// skipDotTick so the counter phase doesn't double-tick. Returns true if the tick
+// ended the fight (all enemies dead → swept through resolveEnemyDefeat).
+function tickEnemyDotsAndMaybeEndFight(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  {
+    const sceneNow = get().currentScene;
+    if (sceneNow && sceneNow.enemyStatuses) {
+      const newHps = [...sceneNow.enemyHps];
+      const newStatuses = sceneNow.enemyStatuses.map((arr) => [...arr]);
+      for (let i = 0; i < sceneNow.enemies.length; i++) {
+        const hp = newHps[i];
+        if (hp === undefined || hp <= 0) continue;
+        const list = newStatuses[i] ?? [];
+        const remaining: typeof list = [];
+        for (const st of list) {
+          // OTA-362 — coating DOTs (poison/acid/corruption) tick the
+          // same way as the OTA-210 infection: dmgPerTurn off the HP,
+          // decrement turns, expire with a kind-flavored line.
+          const isDot = st.kind === 'infected'
+            || st.kind === 'poison_coat'
+            || st.kind === 'acid_coat'
+            || st.kind === 'corruption_coat'
+            || st.kind === 'electrical_coat'
+            || st.kind === 'burn_coat'
+            || st.kind === 'dt_dot';
+          if (isDot && st.turnsRemaining > 0) {
+            const dmg = st.dmgPerTurn;
+            const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
+            newHps[i] = updatedHp;
+            const enemyName = sceneNow.enemies[i]!.name;
+            const tickLine = st.kind === 'poison_coat'
+              ? `${enemyName} shudders — poison eats ${dmg}.`
+              : st.kind === 'acid_coat'
+                ? `${enemyName} smokes — acid eats ${dmg}.`
+                : st.kind === 'corruption_coat'
+                  ? `${enemyName} blackens — corruption eats ${dmg}.`
+                  : st.kind === 'electrical_coat'
+                    ? `${enemyName} convulses — arcing current bites ${dmg}.`
+                    : st.kind === 'burn_coat'
+                      ? `${enemyName} blisters — clinging fire sears ${dmg}.`
+                      : st.kind === 'dt_dot'
+                        ? `${enemyName} suffers — ${st.sourceName} eats ${dmg}.`
+                        : `${enemyName} convulses — infection bleeds ${dmg}.`;
+            get().appendLog(
+              'combat',
+              `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
+            );
+            if (st.turnsRemaining - 1 > 0) {
+              remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
+            } else {
+              get().appendLog(
+                'combat',
+                `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
+              );
+            }
+          } else if (st.kind === 'exposed' && st.turnsRemaining > 0) {
+            // engine_Dev — timed AC debuff: no damage, just tick down and expire.
+            if (st.turnsRemaining - 1 > 0) {
+              remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
+            } else {
+              get().appendLog('combat', `${sceneNow.enemies[i]!.name} recovers its footing — no longer exposed.`);
+            }
+          } else {
+            remaining.push(st);
+          }
+        }
+        newStatuses[i] = remaining;
+      }
+      set((s) => s.currentScene
+        ? { currentScene: { ...s.currentScene, enemyHps: newHps, enemyStatuses: newStatuses } }
+        : s);
+    }
+  }
+  // OTA-429 — a DOT tick that drops the LAST living enemy must still end the
+  // fight (loot + kill bookkeeping + combat-end). Mixed fights keep the old
+  // behavior so mid-fight targeting isn't perturbed.
+  {
+    const swept = get().currentScene;
+    if (swept && swept.enemies.length > 0 && swept.enemyHps.every((h) => (h ?? 0) <= 0)) {
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: 0 } } : s));
+      let guard = 0;
+      while (++guard <= 16) {
+        const sc = get().currentScene;
+        if (!sc || sc.enemies.length === 0) break;
+        get().resolveEnemyDefeat();
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 export function runEnemyGroupCounters(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   fallbackPlayer: PlayerCharacter,
   // OTA-1081 — a failed dog distract redirects THAT enemy's counter onto the
   // dog (it rounds on the feint) instead of rolling the usual soak chance.
-  opts?: { forceDogEnemyIdx?: number },
+  // OTA-1085 — skipDotTick is set by the attack path, which already ticked its
+  // DOTs at the top of case 'attack'; every other combat round leaves it unset so
+  // DOTs tick here, once, as the enemy group acts.
+  opts?: { forceDogEnemyIdx?: number; skipDotTick?: boolean },
 ): void {
   const scene = get().currentScene;
   if (!scene || scene.enemies.length === 0) return;
+  // Tick enemy DOTs as the enemy group takes its turn (unless the attack path
+  // already ticked). If the tick ends the fight, there's no group left to counter.
+  if (!opts?.skipDotTick && tickEnemyDotsAndMaybeEndFight(get, set)) return;
+  const scenePostDot = get().currentScene;
+  if (!scenePostDot || scenePostDot.enemies.length === 0) return;
   // Snapshot the enemies up-front so a death mid-volley (player killing
   // one by reaction, etc) doesn't reshape the iteration.
   const attackers = [...scene.enemies];

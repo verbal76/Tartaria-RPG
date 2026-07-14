@@ -81,7 +81,74 @@ export function discoverLocation(memory: WorldMemory, locationId: string): World
 }
 
 export function recordEnemyDefeat(memory: WorldMemory, enemyName: string): WorldMemory {
-  return { ...memory, defeatedEnemies: [...memory.defeatedEnemies, enemyName] };
+  // OTA-1085 — defeatedEnemies is a DISTINCT-name set of first kills, not a
+  // running kill tally (the lifetime total lives in player.milestones.
+  // enemiesDefeated). Every consumer already reads it as a set — Set(), the
+  // "N unique" Contracts label, includes()/Set.size for the milestone gate,
+  // defeated[0] for the "first thing you put down" Arbiter line. Appending on
+  // every kill let it grow unbounded (re-killable enemies farmed hundreds of
+  // duplicate strings → save bloat, eventual save-loss). Collapse through a Set
+  // so growth is bounded to the finite enemy catalog; this also SELF-HEALS old
+  // saves that already carry duplicates (they dedup on the next kill) and keeps
+  // insertion order so defeated[0] stays the true first kill.
+  const deduped = [...new Set(memory.defeatedEnemies)]; // Set keeps insertion order
+  if (deduped.includes(enemyName)) {
+    // No new name. Only touch state if we actually collapsed legacy duplicates,
+    // so a clean save stays referentially stable.
+    return deduped.length === memory.defeatedEnemies.length
+      ? memory
+      : { ...memory, defeatedEnemies: deduped };
+  }
+  return { ...memory, defeatedEnemies: [...deduped, enemyName] };
+}
+
+// OTA-1085 — wild-water re-arm. A cupped drink / bottle refill from a wild water
+// source used to be bounded by a per-SCENE one-shot flag (currentScene.
+// barehandDrinkUsed / bottleRefillUsed), which reset every time the scene did —
+// so leaving and returning, or bouncing between two adjacent OUTDOOR water tiles,
+// handed the player an infinite +3-stamina tap (the playtest floodwater loop
+// out-recovered sleeping 36:1). These persist the last-use game-hours per water
+// SOURCE (keyed by the composite room key) so the same source re-arms only after
+// WATER_REARM_HOURS of in-game time — bouncing tiles no longer resets it.
+//
+// Tunable design knob. 6 game-hours ≈ a quarter-day of downtime between draws
+// from the same spring, so wild water is a real resource with a cadence near
+// sleep's rather than a free spam.
+export const WATER_REARM_HOURS = 6;
+export type WaterUseKind = 'drink' | 'fill';
+
+/** True if this water source may be used for `kind` again — never used, or the
+ *  re-arm window has elapsed in game-hours since the last use. */
+export function waterSourceReady(
+  memory: WorldMemory,
+  roomKey: string,
+  kind: WaterUseKind,
+  nowHours: number,
+): boolean {
+  const last = memory.waterUsedAt?.[roomKey]?.[kind];
+  if (last == null) return true;
+  return nowHours - last >= WATER_REARM_HOURS;
+}
+
+/** Record a use of this water source at the current game-hours, and prune any
+ *  source whose every timestamp has already re-armed (keeps the map tiny — it
+ *  only ever holds sources currently on cooldown). */
+export function recordWaterUse(
+  memory: WorldMemory,
+  roomKey: string,
+  kind: WaterUseKind,
+  nowHours: number,
+): WorldMemory {
+  const prev = memory.waterUsedAt ?? {};
+  const rec = { ...(prev[roomKey] ?? {}), [kind]: nowHours };
+  const nextMap: Record<string, { drink?: number; fill?: number }> = { ...prev, [roomKey]: rec };
+  for (const [key, entry] of Object.entries(nextMap)) {
+    const stillCooling =
+      (entry.drink != null && nowHours - entry.drink < WATER_REARM_HOURS)
+      || (entry.fill != null && nowHours - entry.fill < WATER_REARM_HOURS);
+    if (!stillCooling) delete nextMap[key];
+  }
+  return { ...memory, waterUsedAt: nextMap };
 }
 
 export function completeQuest(memory: WorldMemory, questId: string): WorldMemory {
