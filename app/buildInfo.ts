@@ -16148,4 +16148,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // PlayerCharacter.menace/menaceUpdatedHour; new ParleyModal; parser gains the parley
 // verbs (soothe/pacify/tame/threaten/menace/coerce/coax). The OTA-806/807 single-roll
 // store flows are SUPERSEDED by this (their pure helpers remain).
-export const OTA_BUILD_ID = '2026-07-14-808-parley-and-menace';
+// OTA-809 — PARLEY Phase 2 (procedural payloads + dialogue beats + real rewards).
+// Wanderers now carry a SEEDED payload: GOODS (coins + salvage items, greedy sorts
+// carry more) and a LOCATION LEAD. Intimidate success now grants the actual CARRIED
+// GOODS into the pack (was a flat TC stand-in); persuade success plants a real
+// pendingLead on the player that PAYS OUT — the cache — the next time you reach fresh
+// peaceful ground (beginScene), so "talk for secrets" is a genuine go-find-it, not
+// instant loot. New "cagey" dialogue beat: on opening a person-parley they name their
+// price ("what's it worth to you?") before you choose, so it reads as a conversation.
+// Two new greedy archetypes (drifter, scavenger) already added in 808 round out the
+// pool. New wanderers helpers (makeWandererGoods / makeWandererLead / wandererCagey);
+// Wanderer.goods + Wanderer.lead; PlayerCharacter.pendingLead; miscLootItem grant
+// helper; beginScene lead payout. All lore-neutral. Closes the social rework.
+export const OTA_BUILD_ID = '2026-07-14-809-parley-rewards';

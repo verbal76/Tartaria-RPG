@@ -14,6 +14,8 @@
 // Lore-neutral: names and lines are generic road-flavor so this same module reads
 // straight on the lore-agnostic engine_Dev line.
 
+import type { Temperament } from './parley';
+
 const FIRST_NAMES = [
   'Corin', 'Mave', 'Tolen', 'Sera', 'Bram', 'Ysolde', 'Garrin', 'Nix', 'Odell',
   'Perra', 'Hale', 'Vesna', 'Dorn', 'Ketch', 'Lorne', 'Ammi',
@@ -96,6 +98,11 @@ export interface Wanderer {
   /** OTA-808 — the faction this person answers to, or null for an unaffiliated
    *  drifter. Extorting an affiliated wanderer dings your standing with them. */
   faction: string | null;
+  /** OTA-809 — concrete goods on them (shaken loose by a successful INTIMIDATE). */
+  goods: WandererGoods;
+  /** OTA-809 — a location lead they'll give up to a successful PERSUADE (paid out
+   *  when the player next reaches fresh ground). */
+  lead: WandererLead;
 }
 
 /** Build a wanderer from a seed index (caller passes a scene-stable number so the
@@ -119,6 +126,8 @@ export function makeWanderer(seed: number, factions: string[] = []): Wanderer {
     tip: arch.tip,
     temperament: arch.temperament,
     faction,
+    goods: makeWandererGoods(seed, arch.temperament),
+    lead: makeWandererLead(seed),
   };
 }
 
@@ -164,4 +173,76 @@ export function rollWandererReward(w: Wanderer, rand: number, coinRand: number):
 /** The line for a FAILED talk — no reward, they close up. */
 export function wandererFailLine(w: Wanderer): string {
   return `${w.name} hears you out, but something doesn\'t land. They give a noncommittal nod and turn back to the road. Whatever they knew, they keep.`;
+}
+
+// ── OTA-809 (Phase 2) — PROCEDURAL PAYLOAD + DIALOGUE BEATS ─────────────────────
+// Each wanderer now carries a concrete, seeded payload: GOODS you can shake loose by
+// intimidating them, and a LEAD (location intel) you can talk out of them. Plus a
+// "cagey" beat — the pause before the parley where they name their price — so the
+// exchange reads as a conversation, not a die roll.
+
+/** Lore-neutral goods a wanderer might be carrying (misc salvage + road supplies).
+ *  Grantable as plain misc items even without a catalog row. */
+const GOODS_POOL = [
+  'Scrap Metal', 'Dried Rations', 'Bundle of Cloth', 'Copper Wire',
+  'Salvaged Parts', 'Waterskin', 'Coil of Wire', 'Tin of Grease',
+];
+/** What a lead points you toward (the flavor of the cache at the end of it). */
+const CACHE_POOL = [
+  'a stash tucked under a collapsed overpass', 'a sealed lockbox in a dead relay tower',
+  'a cache behind a false wall in a burned-out station', 'a dropbox left in a hollow marker-stone',
+  'a buried footlocker at the old crossroads',
+];
+const DIRECTIONS = ['north', 'east', 'south', 'west', 'northeast', 'northwest', 'southeast', 'southwest'];
+
+export interface WandererGoods {
+  tc: number;
+  items: { name: string; quantity: number }[];
+}
+export interface WandererLead {
+  /** The intel line the wanderer gives up (what + roughly where). */
+  hint: string;
+  /** Paid out when the player next reaches fresh ground (they go find it). */
+  rewardTc: number;
+  rewardItem?: string;
+}
+
+function seededPick<T>(pool: T[], seed: number, salt: number): T {
+  return pool[Math.abs(seed * 2654435761 + salt) % pool.length]!;
+}
+
+/** Deterministic goods carried by this wanderer (seeded so a given person always
+ *  has the same pockets). Greedy sorts carry a little more; that's why they're worth
+ *  leaning on. */
+export function makeWandererGoods(seed: number, temperament: Temperament): WandererGoods {
+  const rich = temperament === 'greedy';
+  const tc = (rich ? 12 : 7) + (Math.abs(seed) % (rich ? 16 : 9)); // greedy 12..27, else 7..15
+  const item = seededPick(GOODS_POOL, seed, 11);
+  const qty = 1 + (Math.abs(seed) % (rich ? 3 : 2));
+  return { tc, items: [{ name: item, quantity: qty }] };
+}
+
+/** Deterministic LEAD this wanderer can give up — a cache somewhere out there, paid
+ *  out when the player next crosses fresh ground (so it's a real "go find it", not
+ *  instant loot). */
+export function makeWandererLead(seed: number): WandererLead {
+  const cache = seededPick(CACHE_POOL, seed, 23);
+  const dir = seededPick(DIRECTIONS, seed, 37);
+  const rewardTc = 14 + (Math.abs(seed) % 22); // 14..35
+  const rewardItem = seededPick(GOODS_POOL, seed, 53);
+  return {
+    hint: `${cache}, off to the ${dir}`,
+    rewardTc,
+    rewardItem,
+  };
+}
+
+/** The "cagey" beat — what they say when you open the parley, before you choose how
+ *  to play it. Keyed to temperament so a greedy sort haggles and a reasonable one
+ *  sizes you up. */
+export function wandererCagey(w: Wanderer): string {
+  if (w.temperament === 'greedy') {
+    return `${w.name} smiles without warmth. "Everyone wants something. Question is what it's worth to you — and whether I like how you ask."`;
+  }
+  return `${w.name} studies you a moment. "I might know a thing or two. Depends who's asking, and how."`;
 }
