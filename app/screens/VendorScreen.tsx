@@ -4,10 +4,11 @@ import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
-import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } from '../engine/equipment';
 import { getCrucibleName, isCrucibleEnabled } from '../engine/contentPack';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { vendorPriceMod } from '../engine/factionRapport';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem } from '../engine/crafting';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
@@ -251,6 +252,15 @@ export function VendorScreen() {
   const corruptionTier = corruptionTierOf(player.corruption ?? 0);
   const corruptionMult = corruptionPriceMultiplier(corruptionTier);
   const corruptionMarkupPct = Math.round((corruptionMult - 1) * 100);
+  // OTA-1090 — CHA-scaled faction rapport price break (0..0.20), once you've earned
+  // dealing with this vendor's faction. Cheaper buys, better sell-backs. Mirrors the
+  // gameStore buy/sell math so the displayed prices match what actually transacts.
+  const rapportMod = vendorPriceMod(
+    effectiveStats(player).charisma,
+    player.completedFactionQuestIds,
+    vendor?.faction,
+  );
+  const rapportPct = Math.round(rapportMod * 100);
   // Inventory items the player can sell — exclude the EXACT equipped instances +
   // unsellable. OTA-687 — exclude by INSTANCE ID (equippedInstanceIds), not name,
   // so a spare copy of an equipped item's name is a different instance and stays
@@ -269,7 +279,7 @@ export function VendorScreen() {
   const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
   const sellable = player.inventory
     .filter((i) => i.quantity > 0 && !equippedItemIds.has(i.id) && !isUnsellable(i))
-    .map((i) => ({ item: i, price: sellPriceFor(i, vendor) }))
+    .map((i) => ({ item: i, price: sellPriceFor(i, vendor, rapportMod) }))
     .filter((x) => x.price > 0)
     .sort((a, b) => {
       if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
@@ -327,6 +337,13 @@ export function VendorScreen() {
         <Text style={styles.vendorName}>{vendor.name}</Text>
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
+        {/* OTA-1090 — rapport price break. Shown once the player has earned dealing
+            with this faction (done its rapport quest); the % scales with Charisma. */}
+        {rapportMod > 0 && (
+          <Text style={styles.rapportBanner}>
+            ✦ Trusted partner — {rapportPct}% off buys, +{rapportPct}% on sell-backs (Charisma)
+          </Text>
+        )}
         {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC.
             arb153 — …EXCEPT where the LOCATION already has its own Crucible chip
             (outpost / Hidden Market / a live fusion permit): the exploration
@@ -414,7 +431,9 @@ export function VendorScreen() {
               // OTA 039 — corruption-tier markup. Show the marked-up
               // price; canAfford / buyFromVendor both compute on the
               // same value so the player never sees a mismatch.
-              const effPrice = Math.ceil(o.price * corruptionMult);
+              // OTA-1090 — CHA rapport discount folds in the same way (mirrors
+              // buyFromVendor's effectivePrice).
+              const effPrice = Math.max(1, Math.ceil(o.price * corruptionMult * (1 - rapportMod)));
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
               const owned = player.inventory
@@ -781,6 +800,7 @@ const styles = StyleSheet.create({
   vendorName: { color: '#6ab0c9', fontSize: 15, fontWeight: '700', letterSpacing: 1 },
   vendorTitle: { color: '#6c8088', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   vendorDesc: { color: '#bcd2db', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
+  rapportBanner: { color: '#9ec96a', fontSize: 12, marginTop: 6, fontWeight: '700' },
   // arb103 — vendor Fusing Crucible offer.
   crucibleBtn: {
     marginTop: 10,

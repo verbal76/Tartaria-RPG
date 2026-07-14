@@ -17371,4 +17371,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // remainder carried in player.buyRepProgress). Cheap-junk spam can't grind it;
 // mission completions + sigil turn-ins stay dominant. Left in as a minor
 // contributor per the user.
-export const OTA_BUILD_ID = '2026-07-14-1089-buy-rep-slow-grind';
+// OTA-1090 — CHARISMA-SCALED VENDOR DISCOUNTS, gated per faction. Charisma finally
+// affects pricing: 2% per point above 10, capped at 20%, applied to BOTH buys
+// (cheaper) and sell-backs (richer, on top of the B1 caps as an earned merchant
+// perk). Fully gated behind a per-faction RAPPORT quest — a vendor fetch contract
+// (fq_<faction>_rapport) that, once completed, unlocks the partner's rate with that
+// faction's vendors. Until then pricing is unchanged. New factionRapport.ts helper
+// (chaPriceDiscount / hasFactionRapport / vendorPriceMod); buyFromVendor +
+// sellToVendor + VendorScreen honor the mod; a turn-in flourish announces the
+// unlock. Lore-neutral (no faction-quest DATA ships to engine — the discount keys
+// off completedFactionQuestIds, so it lights up wherever a rapport quest exists).
+export const OTA_BUILD_ID = '2026-07-14-1090-charisma-vendor-discounts';
