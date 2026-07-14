@@ -267,7 +267,8 @@ Key invariants worth knowing:
      reinit stranded status='failed' for the whole session.~~ **FIXED 797/777/1083.**
   6. Dodge strictly dominant at high DEX (100% win in the log). RETEST on 796+
      (the dodge stamina cost may already brake it) before tuning.
-  7. Core Guardians show no weakness/resistance in combat (player asked twice).
+  7. ~~Core Guardians show no weakness/resistance in combat (player asked
+     twice).~~ **FIXED 798/778 (HAL+golem only — no Guardians on engine_Dev).**
   8. Rework the fused-weapon naming pool ("Aetheric Thread" is a bad weapon name).
   9. Climbing rope: warn at durability 4, fail only at 0 (stop stranding 15 pts).
   10. Post-boss ambush grace window on outpost exit.
@@ -405,12 +406,16 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-797`**,
-**golem-line `…-777`**, **engine_Dev `…-1083`**. Current parity offsets:
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-798`**,
+**golem-line `…-778`**, **engine_Dev `…-1083`** (engine skipped 798/778 — no
+Guardians there). Current parity offsets: golem = HAL − 20 (stable); engine_Dev =
+HAL + 285 now (was +286 — the Guardian OTA was HAL+golem-only, so engine fell one
+further behind).
 golem = HAL − 20, engine_Dev = HAL + 286 (stable since at least the 750s).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 798 | 778 | — | Core Guardians carry authored thematic vulnerable/resist traits — weakness/resistance now shows in combat + the EnemyPanel (was always 'normal': their type isn't in the type-map and their traits weren't resist:/vulnerable:). HAL+golem only; engine_Dev has no Guardians |
 | 797 | 777 | 1083 | Qwen dormancy watchdog revives from a FAILED reinit (not just the narrow dormant case) — fixes whole-session qwen-not-ready when one revival attempt failed and stranded status='failed'; retries every 60s + unwedges a hung reload |
 | 796 | 776 | 1082 | Exploit-sweep batch (12 shared fixes): dodge costs a turn + 3-train cap; failed-dodge no longer 4× under crit; distract DC floor 12 + nat rules; shared ranged-enemy classifier (kite fix); boss regen once/round; buffs consume on attack-resolve not prompt-build; scrap ghost-slot fix (hands/cloak/ring2/3); 2H-displace hpMax loop closed; whole-word water match; fill costs time; hunt boss must be killed; investigate self-dispatch loop killed |
 | 795 | 775 | 1081 | Dodge = AC-bypass gamble (win: next strike ×2 dice; lose: hit lands past armor for 2×); dog distract DC scales with target + failed feint redirects the counter onto the dog |

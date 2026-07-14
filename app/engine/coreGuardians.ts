@@ -188,6 +188,16 @@ export function dropsForCapital(capitalId: string): GuardianDrop | null {
 }
 
 // ----- Guardian definitions ----------------------------------------------
+//
+// OTA-798 — every Guardian carries an authored `vulnerable:<type>` +
+// `resist:<type>` trait so the weakness/resistance system engages in combat AND
+// the EnemyPanel surfaces their defenses. Previously the Guardians' snake_case
+// `type` (aether_construct / mud_revenant) wasn't in crafting.ts TYPE_RESISTANCE_MAP
+// and their signature traits weren't resist:/vulnerable: tags, so every hit read
+// as 'normal' — no "Weakness exposed" line ever fired (players asked why). Each
+// weakness is thematic (crack the plate → bludgeoning, dry the silt → burn, water
+// conducts → electrical, cut the seal → slashing, …); the aether-born broadly
+// resist aetheric. Traits flow through spawnGuardianForCapital's trait merge.
 
 /** Asgardar — Sentinel-Priest Vaelka, the sky-priest of the
  *  Asgardar spire. Living plate, silver-veined; first Guardian
@@ -205,7 +215,7 @@ const VAELKA: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['vaelka', 'sentinel', 'priest', 'guardian', 'sentinel-priest'],
-    traits: ['aether_pulse'],
+    traits: ['aether_pulse', 'vulnerable:bludgeoning', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -232,7 +242,7 @@ const ATALAN: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['atalan', 'heir', 'drowned', 'guardian', 'atalan-drowned'],
-    traits: ['silt_grip'],
+    traits: ['silt_grip', 'vulnerable:burn', 'resist:piercing'],
     boss: true,
   },
   approachLine:
@@ -258,7 +268,7 @@ const KONRAD: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['konrad', 'brother', 'litany', 'guardian', 'brother-konrad'],
-    traits: ['litany_chant'],
+    traits: ['litany_chant', 'vulnerable:electrical', 'resist:slashing'],
     boss: true,
   },
   approachLine:
@@ -284,7 +294,7 @@ const DRAKOVNA: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['drakovna', 'mother', 'matriarch', 'guardian'],
-    traits: ['rosary_curse'],
+    traits: ['rosary_curse', 'vulnerable:radiation', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -310,7 +320,7 @@ const CANTOR: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['cantor', 'high cantor', 'voronov cantor', 'guardian', 'voronov-beneath'],
-    traits: ['chord_break'],
+    traits: ['chord_break', 'vulnerable:cold', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -337,7 +347,7 @@ const TOBIEL: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['tobiel', 'sealwarden', 'warden', 'guardian'],
-    traits: ['sealcraft'],
+    traits: ['sealcraft', 'vulnerable:slashing', 'resist:aetheric'],
     boss: true,
   },
   approachLine:
@@ -364,7 +374,7 @@ const MARA_HIEROPHANT: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['mara', 'hierophant', 'yuldra', 'guardian', 'mara-of-yuldra'],
-    traits: ['giant_vigil'],
+    traits: ['giant_vigil', 'vulnerable:burn', 'resist:cold'],
     boss: true,
   },
   approachLine:
@@ -391,7 +401,7 @@ const OSTROS: CoreGuardianDef = {
     rarity: 'Legendary',
     loot: [],
     aliases: ['ostros', 'riverbinder', 'binder', 'guardian'],
-    traits: ['river_bind'],
+    traits: ['river_bind', 'vulnerable:electrical', 'resist:slashing'],
     boss: true,
   },
   approachLine:
@@ -419,7 +429,7 @@ const INARRA: CoreGuardianDef = {
     hp: 46,
     loot: [],
     aliases: ['inarra', 'veilkeeper', 'keeper', 'guardian'],
-    traits: ['veil_step'],
+    traits: ['veil_step', 'vulnerable:radiation', 'resist:piercing'],
     boss: true,
   },
   approachLine:

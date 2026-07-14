@@ -15987,4 +15987,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // every 60s (a transient memory failure no longer strands Qwen for the session),
 // unwedges a reinit hung in loading past 150s, and mirrors the revived status onto
 // the store so About/debug don't stay stuck on 'failed'. +1 regression test.
-export const OTA_BUILD_ID = '2026-07-14-797-qwen-watchdog-revives-from-failed';
+// OTA-798 — Core Guardians now show weakness/resistance in combat + the EnemyPanel.
+// Player asked twice (2026-07-13 log) why the Core Guardian showed no weakness or
+// strength — only flat damage. Cause: the 9 Guardians' snake_case type
+// (aether_construct / mud_revenant) isn't in crafting.ts TYPE_RESISTANCE_MAP, and
+// their signature traits weren't resist:/vulnerable: tags — so every hit resolved
+// as 'normal' and no "Weakness exposed" line ever fired. Each Guardian now carries
+// an authored, thematic vulnerable:<type> + resist:<type> trait (crack the plate →
+// bludgeoning, dry the silt → burn, water conducts → electrical, cut the seal →
+// slashing, thaw the vigil → burn, …; the aether-born broadly resist aetheric),
+// which drives both the in-combat multiplier lines and traitDefenses in the panel.
+// HAL + golem only — engine_Dev has no Guardians (Tartaria main-quest content).
+export const OTA_BUILD_ID = '2026-07-14-798-core-guardian-weaknesses';
