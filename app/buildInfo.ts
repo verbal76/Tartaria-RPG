@@ -16034,4 +16034,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the equipped INSTANCE id (mainId/offId), not first-by-name — closing infinite
 // coated-throw + bandolier double-spend. Shared engine code — all three lines;
 // engine_Dev's water refusal lines use getNarratorName() (lore-neutral).
-export const OTA_BUILD_ID = '2026-07-14-800-small-bugs-and-item-dupe-closes';
+// OTA-801 — punch-list group C (polish). C1 FUSION UX: firing the Crucible with
+// reserved-but-insufficient pieces (too few, or too alike) now OPENS THE PICKER —
+// which surfaces each piece's material bucket + a live "N materials → need 3+
+// DIFFERENT" readout — instead of dead-ending on a repeated arbiter refusal
+// (material buckets in the picker itself were already OTA-679; repeat-identical
+// refusals were already deduped on the arbiter channel). C2 FUSED-WEAPON NAMING:
+// a forged WEAPON whose Qwen name ends in a soft / non-weapon noun ("Aetheric
+// Thread", "Resonant Veil") is now rejected so the deterministic weapon pool
+// (Cleaver / Edge / Reaver / …) names it; migrateFusedName heals such names on
+// load. C3 POST-BOSS GRACE: a boss kill stamps a game-hours grace window
+// (POST_BOSS_GRACE_HOURS=3); beginScene suppresses arrival encounters while it
+// holds, so stepping out of a just-cleared outpost doesn't drop a fresh ambush
+// mid-loot. C4 MiniLM ANCHORS: reworded the 6 EMOTION_ANCHORS to short, distinct,
+// LORE-NEUTRAL sentences (no shared "ruins/Aetheric" boilerplate) so cosine
+// similarity discriminates instead of smearing across labels — and the neutral
+// wording keeps the engine_Dev copy identical. Shared engine code — all three lines.
+export const OTA_BUILD_ID = '2026-07-14-801-group-c-polish';

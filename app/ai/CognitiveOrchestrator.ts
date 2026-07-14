@@ -9,13 +9,25 @@ const ORT_RUNTIME_VERSION = '1.24.3';
 
 // Natural sentences — MiniLM is a sentence embedder, not a bag-of-words model.
 // Cosine similarity is much stronger against full phrases than keyword soup.
+//
+// OTA-801 — reworded for cleaner separation. The old anchors were long and shared
+// a heavy setting vocabulary ("buried ruins", "Aetheric", "sentinels") across every
+// label, so cosine similarity between a short player action and these bloated
+// sentences was dominated by that common boilerplate — the classifier smeared
+// across labels and mislabelled ("8-label dumps, wrong classifications"). Each
+// anchor is now a short, plain sentence built around its OWN distinctive emotional
+// vocabulary (afraid/flee · curious/examine · angry/attack · wary/careful ·
+// determined/press-on · hopeless/drained) with no shared scenery, so the vectors
+// spread apart and discriminate. Deliberately LORE-NEUTRAL (no Tartaria terms) — the
+// anchors are internal-only (never shown to the player) and this keeps the engine_Dev
+// copy identical, closing the leakage-audit note about genericizing them.
 const EMOTION_ANCHORS = {
-  FEAR: 'I am terrified and want to flee from this Aetheric hazard before the buried ruins collapse and kill me',
-  CURIOSITY: 'I want to investigate the strange resonance from the buried Aetherstone and understand what these forgotten Tartarian ruins are hiding',
-  AGGRESSION: 'I will attack and destroy this Sentinel with my weapon, channeling my runecaster to smash the construct apart in violence',
-  CAUTIOUSNESS: 'I move slowly and quietly through the collapsed ruins so the dormant sentinels and Aetheric hazards do not notice me passing',
-  RESOLVE: 'I will push deeper into the buried Tartarian ruins no matter the cost, determined to recover the lost relic and survive',
-  DESPAIR: 'I am exhausted and hopeless, drained by the Aetheric storms and the endless ruins, and I cannot keep going any longer',
+  FEAR: 'I am afraid. My heart is pounding and I want to run away and escape before something here hurts or kills me.',
+  CURIOSITY: 'I am curious and intrigued. I want to look closer, examine this strange thing, and understand the mystery of what it is.',
+  AGGRESSION: 'I am angry and aggressive. I want to attack, fight, strike, and destroy the enemy in front of me right now.',
+  CAUTIOUSNESS: 'I am wary and careful. I move slowly and quietly, staying alert and avoiding notice, taking no reckless risks.',
+  RESOLVE: 'I am determined and resolved. Whatever it costs, I will press on, push forward, and see this through to the end.',
+  DESPAIR: 'I am exhausted and hopeless. I feel drained and defeated, and I do not think I can keep going any longer.',
 } as const;
 
 const INTENT_ANCHORS = {
