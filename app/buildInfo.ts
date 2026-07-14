@@ -15786,4 +15786,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and sell-backs. New factionRapport.ts; wired into buy/sell + VendorScreen; nine
 // fq_<faction>_rapport quests (fetch a Golem Core) added to faction-quests.json.
 // Unlock derived from completedFactionQuestIds.
-export const OTA_BUILD_ID = '2026-07-14-785-charisma-vendor-discounts';
+// OTA-806 — TALK DOWN A FIGHT. In combat, a diplomacy verb (persuade / intimidate /
+// convince) is a real d20 + CHA (+ Broker) contest that ENDS the encounter without a
+// kill — distinct from fleeing (foe stands down, you KEEP the tile). Success clears
+// enemies with NO loot/XP + small CHA train; failure costs the turn and draws the
+// counter. DC scales with foe count + toughest tier; bosses/Guardians refuse. New
+// engine/talkDown.ts; intercept in submitPlayerAction. SKILL_ACTIVITIES.charisma
+// refreshed (dropped removed gifting; added talk-down + diplomacy-check surfaces).
+export const OTA_BUILD_ID = '2026-07-14-786-talk-down-a-fight';
