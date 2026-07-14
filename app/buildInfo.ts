@@ -15775,4 +15775,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // case handler, LLM-parser row, and the stray gift mentions in help/hint/modal
 // text). 802's B1d gift value-gate is superseded. The buy-for-rep +1 side door is
 // left as-is.
-export const OTA_BUILD_ID = '2026-07-14-783-remove-gifting';
+// OTA-784 — BUY-FOR-REP reduced to a slow afterthought (lockstep with HAL 804).
+// Was a flat +1 standing per purchase; now standing accrues by TC of honest custom
+// (+1 per 500 TC spent, remainder carried in player.buyRepProgress). Cheap-junk
+// spam can't grind it; mission completions + sigil turn-ins stay dominant. Left in
+// as a minor contributor per the user.
+export const OTA_BUILD_ID = '2026-07-14-784-buy-rep-slow-grind';
