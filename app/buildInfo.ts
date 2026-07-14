@@ -16099,4 +16099,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cap (SELL_FRACTION 0.4 keeps buy-then-sell a loss, so it's a merchant perk not
 // arbitrage). Also confirmed: DIPLOMACY is already wired (resolves social-gated
 // hunt/mystery/storyline stages + trains CHA); "convince" already routes to it.
-export const OTA_BUILD_ID = '2026-07-14-805-charisma-vendor-discounts';
+// OTA-806 — TALK DOWN A FIGHT. Answering "where does persuade actually matter?":
+// IN COMBAT, a diplomacy verb (persuade / intimidate / convince / negotiate) is now
+// a real d20 + CHA (+ Broker) contest that can END the encounter without a kill —
+// distinct from fleeing (the foe stands down and you KEEP the tile; fleeing is you
+// running and leaving it). Success clears the enemies with NO loot / XP (you avoided
+// the fight, didn't win it) + a small CHA train; failure costs the turn and draws the
+// enemy counter, so spamming a tough group is dangerous, not free. DC scales with foe
+// count + toughest tier (10 for a lone Common, +2/tier, +2/extra foe). Bosses /
+// Guardians refuse outright. New engine module talkDown.ts (talkDownDC /
+// isTalkDownBlocked / isIntimidationVerb / isBeastPack + flavor lines — beasts flee,
+// people back off); intercept in submitPlayerAction ahead of the shared diplomacy
+// switch arm. Also refreshed SKILL_ACTIVITIES.charisma (dropped the removed "Gifting
+// to a vendor"; added the talk-down + diplomacy-check surfaces).
+export const OTA_BUILD_ID = '2026-07-14-806-talk-down-a-fight';
