@@ -15998,4 +15998,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // slashing, thaw the vigil → burn, …; the aether-born broadly resist aetheric),
 // which drives both the in-combat multiplier lines and traitDefenses in the panel.
 // HAL + golem only — engine_Dev has no Guardians (Tartaria main-quest content).
-export const OTA_BUILD_ID = '2026-07-14-798-core-guardian-weaknesses';
+// OTA-799 — Climbing rope is now usable down to its LAST point + warns before it
+// gives out. Player report (2026-07-13 log): "rope should fray… fire a warning to
+// you and not fail till it actually hits zero. what's the point of having 15 points
+// left if you die anyway?" The old guard refused/snapped at durability ≤
+// ROPE_WEAR_PER_TIER (15) — stranding a whole climb's worth of rope AND dropping
+// the player for fall damage with no warning. Now: (1) only a TRULY SPENT rope
+// (≤ 0) refuses/gives out; a low-but-usable rope climbs. (2) when the last pull
+// wears it to 0 it breaks GRACEFULLY at the top — no fall, "the last of the line
+// coils dead at your feet." (3) a fraying warning fires while the rope is low
+// (≤ one climb of durability left) so it's never a surprise. climbReadiness (the
+// CLIMB button colour/haptic) mirrors the new ≤ 0 rule so button and engine agree.
+// Shared engine code — ships to all three lines.
+export const OTA_BUILD_ID = '2026-07-14-799-rope-usable-to-last-point';

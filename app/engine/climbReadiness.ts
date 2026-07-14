@@ -5,14 +5,21 @@
 // Refusal order MUST match the engine (on the ground / not elevated):
 //   1. no climb-gate item at all          → 'no_rope'    (red, no buzz)
 //   2. stamina < per-tier climb cost       → 'no_stamina' (red, BUZZ)
-//   3. active rope worn to ≤ wear-per-tier  → 'frayed_rope' (red, no buzz)
+//   3. active rope SPENT (durability ≤ 0)   → 'frayed_rope' (red, no buzz)
 //   else                                    → null (ready / green)
 //
-// The engine checks stamina BEFORE the rope-snap, so a frayed rope + empty tank
+// The engine checks stamina BEFORE the rope-snap, so a spent rope + empty tank
 // reads as 'no_stamina' (rest first) — same as the engine's "rest first" refusal.
+//
+// OTA-799 — the rope is usable down to its LAST point: the button stays GREEN
+// while the rope has any durability (a low rope climbs and breaks gracefully at
+// 0, with a fraying warning first). Only a spent rope (≤ 0) blocks. Was ≤ 15
+// (one climb's wear), which stranded a whole climb and read the button red while
+// the rope could still take a pull.
 
 /** Wear consumed per climbed tier. Kept in sync with ROPE_WEAR_PER_TIER in the
- *  gameStore climb handler — a rope at/below this can't survive the next tier. */
+ *  gameStore climb handler — also the fraying-warning threshold (a rope at/below
+ *  this has roughly one climb left before it breaks). */
 export const ROPE_WEAR_PER_TIER = 15;
 
 export type ClimbBlockReason = 'no_rope' | 'no_stamina' | 'frayed_rope' | null;
@@ -51,8 +58,8 @@ export function climbBlockReason(inp: ClimbReadinessInputs): ClimbBlockReason {
   if (!inp.hasGate) return 'no_rope';        // engine: "Not without rope"
   const cost = climbStaminaCost(inp.hasReclaimersRope, inp.wearsClimbStrap);
   if (inp.stamina < cost) return 'no_stamina'; // engine: "rest first" (checked first)
-  if (inp.activeRopeDurability != null && inp.activeRopeDurability <= ROPE_WEAR_PER_TIER) {
-    return 'frayed_rope';                    // engine OTA-625: "too frayed"
+  if (inp.activeRopeDurability != null && inp.activeRopeDurability <= 0) {
+    return 'frayed_rope';                    // OTA-799: only a SPENT rope blocks
   }
   return null;                               // ready
 }
