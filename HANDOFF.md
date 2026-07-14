@@ -308,10 +308,14 @@ Key invariants worth knowing:
       BOTTLENECK_CRAFTING_MATS) — crafting-only value, no fuse→scrap→sell pump;
       (c) nothing sells above the cheapest realistic buy for its rarity
       (RARITY_BUY_FLOOR: 5/14/40/112), closing cross-stall arbitrage;
-      (d) giftToVendor is value-gated (sell value < 5 TC → declined, no rep/CHA,
-      not consumed) and rep scales with worth (~30 TC ≈ old +5, cap +8). Tunable
-      knobs: RARITY_BUY_FLOOR, BOTTLENECK_CRAFTING_SELL, GIFT_VALUE_FLOOR, the
-      Legendary craft bump.
+      (d) ~~giftToVendor value-gated~~ **— SUPERSEDED: GIFTING REMOVED ENTIRELY
+      in 803/783/1088** (user call). Faction standing is earned through mission
+      completions + sigil/pendant turn-ins; gifting-for-rep undercut that + was
+      undiscoverable, so the whole mechanic (intent, verb, action, handler) is
+      gone. Tunable knobs still live for (a)–(c): RARITY_BUY_FLOOR,
+      BOTTLENECK_CRAFTING_SELL, the Legendary craft bump. **The buy-from-vendor +1
+      rep side door is still OPEN** — same "shop your way to standing" concern;
+      close it if the user asks.
     - **B2 [#2] Contract location-gating + remote-pay cut** — NEXT. Needs a call
       on how strict the stage gating should be. hunt/mystery/storyline stages
       advance on ANY matching check/kill/travel anywhere + pay 100% from any tile
@@ -474,14 +478,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-802`**,
-**golem-line `…-782`**, **engine_Dev `…-1087`**. Current parity offsets: golem =
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-803`**,
+**golem-line `…-783`**, **engine_Dev `…-1088`**. Current parity offsets: golem =
 HAL − 20 (stable); engine_Dev = HAL + 285 (the Guardian OTA 798/778 was
-HAL+golem-only, so engine is one behind on count; the B1 batch 802/782/1087
-shipped to all three and preserves the −20 / +285 spread).
+HAL+golem-only, so engine is one behind on count; the gift-removal batch 803/783/
+1088 shipped to all three and preserves the −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 803 | 783 | 1088 | GIFTING REMOVED (user call). Faction standing is EARNED — mission completions (rewardRep) + sigil/pendant turn-ins (+1); gifting vendors loot for rep was a side door that undercut that design and was undiscoverable (no button, typed-only). Removed the `gift` Intent (types.ts), the parser verb-table entry + verb-frame (parser.ts / verbFrames.ts), the LLM-parser intent row (llmParser.ts), the giftToVendor store action + its `case 'gift'` handler (gameStore.ts), and 'gift' from ARBITER_ENGAGED_INTENTS + the hook-eligible set + the vendor "how to engage" hint + the LLM verb hint + the inventory item-modal body text. Test cleanup across parser/charisma/statspam/year-sim; deleted the 802 gift value-gate suite. 802/782/1087's B1d gift value-gate is SUPERSEDED. The buy-from-vendor +1 rep side door is LEFT as-is (flag for the user if it should go too). All three lines |
 | 802 | 782 | 1087 | Economy re-tiering B1 (per the user's calls). (a) Self-crafted items never sell above their recipe INGREDIENT value — crafting-to-sell is break-even, Legendary +25% bump (sellPrice.selfCraftedSellCap). (b) Fused items stay SCRAPPABLE (the intended crafting-materials market), but the fuel mats they yield — Golem Core, Aetheric Shard/Dust, Aether Crystal, Aetheric Cloth, Mudstone — price near-worthless AT VENDORS (flat 3 TC, BOTTLENECK_CRAFTING_MATS): crafting-only value, no fuse→scrap→sell pump. (c) Nothing sells above the cheapest realistic buy for its rarity (RARITY_BUY_FLOOR 5/14/40/112), closing cross-stall arbitrage (Common-armor sell-11 vs buy-8). (d) giftToVendor value-gated: a near-worthless item (< 5 TC) is declined (no rep/CHA, not consumed), and rep scales with worth (~30 TC ≈ old +5, cap +8) instead of flat +5/junk. Tunable knobs noted in §8. All three lines |
 | 801 | 781 | 1086 | Group-C polish (punch-list C1–C4). C1 fusion UX: firing the Crucible with reserved-but-insufficient pieces opens the PICKER (which surfaces each piece's material bucket + a live "N materials → need 3+ DIFFERENT" readout, already OTA-679) instead of dead-ending on a repeated arbiter refusal. C2 fused-weapon naming: a forged WEAPON with a soft / non-weapon Qwen name ("Aetheric Thread", "Resonant Veil") is rejected so the deterministic weapon pool (Cleaver / Edge / Reaver / …) names it; migrateFusedName heals old saves (armor keeps soft names). C3 post-boss grace: a boss kill stamps player.bossDefeatGraceUntilHours = now + POST_BOSS_GRACE_HOURS (3); beginScene suppresses arrival encounters while it holds, so stepping out of a just-cleared outpost doesn't drop a fresh ambush mid-loot. C4 MiniLM anchors: the 6 EMOTION_ANCHORS reworded to short, distinct, LORE-NEUTRAL sentences (no shared "ruins/Aetheric" boilerplate) so cosine similarity discriminates — neutral wording makes the engine_Dev copy identical. All three lines |
 | 800 | 780 | 1085 | Small-bug + item-dupe closes (punch-list A1+A2). A1: (1) enemy DOTs tick EVERY combat round, not just `attack` (hoisted into runEnemyGroupCounters; attack path passes skipDotTick) — a poisoned enemy kept eating poison while the player dodged/moved/commanded a companion; (2) hard training ceiling MAX_TRAINED_STAT=30 (player + dog + golem; engine has no golem) — stats trained forever at 0.1/use; (3) `jump at <bogus text>` needs a RESOLVED scene noun to train DEX; (4) defeatedEnemies de-duplicated distinct-name set (self-heals legacy dup-farmed saves) → no unbounded save bloat; (5) wild-water re-arm moved to worldMemory.waterUsedAt, keyed per SOURCE on game-hours (WATER_REARM_HOURS=6) — off the per-scene flags that bounced between adjacent outdoor tiles. A2 dupes: (6) dropped-item PICKUP routes through grantItem + decrements the exact instance by id (no worn/coated/rolled laundering); (7) applyCoating (+armor) on a STACK peels ONE unit instead of coating all N for one vial; (8) equipped throwable consumed by the equipped INSTANCE id (mainId/offId) — closes infinite coated-throw + bandolier double-spend. Engine water lines use getNarratorName() |
