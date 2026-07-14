@@ -1037,6 +1037,11 @@ export interface PlayerCharacter {
    *  current clock, so stepping out of a just-cleared outpost doesn't drop a fresh
    *  ambush mid-loot. Absent for legacy saves → treated as 0 (no grace). */
   bossDefeatGraceUntilHours?: number;
+  /** OTA-1089 — unbanked "honest custom" credit toward faction standing from
+   *  BUYING. Buying accrues standing as a slow afterthought: TC spent banks here
+   *  and grants +1 standing per BUY_REP_TC_PER_STANDING TC, remainder carried.
+   *  Absent for legacy saves → treated as 0. */
+  buyRepProgress?: number;
   ac: number;
   tc: number;
   corruption: number;
