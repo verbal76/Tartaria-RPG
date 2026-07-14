@@ -313,9 +313,10 @@ Key invariants worth knowing:
       completions + sigil/pendant turn-ins; gifting-for-rep undercut that + was
       undiscoverable, so the whole mechanic (intent, verb, action, handler) is
       gone. Tunable knobs still live for (a)–(c): RARITY_BUY_FLOOR,
-      BOTTLENECK_CRAFTING_SELL, the Legendary craft bump. **The buy-from-vendor +1
-      rep side door is still OPEN** — same "shop your way to standing" concern;
-      close it if the user asks.
+      BOTTLENECK_CRAFTING_SELL, the Legendary craft bump. The buy-from-vendor rep
+      side door was **greatly reduced (not removed) in 804/784/1089** per the user:
+      standing now accrues by TC spent (+1 per 500 TC, banked in buyRepProgress) as
+      an afterthought contributor. Knob: BUY_REP_TC_PER_STANDING.
     - **B2 [#2] Contract location-gating + remote-pay cut** — NEXT. Needs a call
       on how strict the stage gating should be. hunt/mystery/storyline stages
       advance on ANY matching check/kill/travel anywhere + pay 100% from any tile
@@ -478,14 +479,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-803`**,
-**golem-line `…-783`**, **engine_Dev `…-1088`**. Current parity offsets: golem =
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-804`**,
+**golem-line `…-784`**, **engine_Dev `…-1089`**. Current parity offsets: golem =
 HAL − 20 (stable); engine_Dev = HAL + 285 (the Guardian OTA 798/778 was
-HAL+golem-only, so engine is one behind on count; the gift-removal batch 803/783/
-1088 shipped to all three and preserves the −20 / +285 spread).
+HAL+golem-only, so engine is one behind on count; the buy-rep batch 804/784/1089
+shipped to all three and preserves the −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 804 | 784 | 1089 | BUY-FOR-REP reduced to a slow afterthought (user call — "buying should be a slow grind … contributes but almost as an afterthought"). Was a flat +1 standing per purchase (a 2 TC junk buy farmed rep). Now standing accrues by TC of HONEST CUSTOM: spent coin banks in player.buyRepProgress and grants +1 standing per BUY_REP_TC_PER_STANDING (500) TC, remainder carried across purchases. Cheap-junk spam can't grind it; joining a faction by buying alone needs ~10,000 TC spent, so mission completions + sigil turn-ins dominate. Pool is faction-agnostic (banks into whoever you're buying from when it crosses — benign cross-faction bleed for an afterthought lever). NOTE: Charisma is the DIPLOMACY skill-check stat (INTENT_TO_STAT) but does NOT affect vendor pricing/haggling — a possible future design hook if the user wants CHA to earn discounts. All three lines |
 | 803 | 783 | 1088 | GIFTING REMOVED (user call). Faction standing is EARNED — mission completions (rewardRep) + sigil/pendant turn-ins (+1); gifting vendors loot for rep was a side door that undercut that design and was undiscoverable (no button, typed-only). Removed the `gift` Intent (types.ts), the parser verb-table entry + verb-frame (parser.ts / verbFrames.ts), the LLM-parser intent row (llmParser.ts), the giftToVendor store action + its `case 'gift'` handler (gameStore.ts), and 'gift' from ARBITER_ENGAGED_INTENTS + the hook-eligible set + the vendor "how to engage" hint + the LLM verb hint + the inventory item-modal body text. Test cleanup across parser/charisma/statspam/year-sim; deleted the 802 gift value-gate suite. 802/782/1087's B1d gift value-gate is SUPERSEDED. The buy-from-vendor +1 rep side door is LEFT as-is (flag for the user if it should go too). All three lines |
 | 802 | 782 | 1087 | Economy re-tiering B1 (per the user's calls). (a) Self-crafted items never sell above their recipe INGREDIENT value — crafting-to-sell is break-even, Legendary +25% bump (sellPrice.selfCraftedSellCap). (b) Fused items stay SCRAPPABLE (the intended crafting-materials market), but the fuel mats they yield — Golem Core, Aetheric Shard/Dust, Aether Crystal, Aetheric Cloth, Mudstone — price near-worthless AT VENDORS (flat 3 TC, BOTTLENECK_CRAFTING_MATS): crafting-only value, no fuse→scrap→sell pump. (c) Nothing sells above the cheapest realistic buy for its rarity (RARITY_BUY_FLOOR 5/14/40/112), closing cross-stall arbitrage (Common-armor sell-11 vs buy-8). (d) giftToVendor value-gated: a near-worthless item (< 5 TC) is declined (no rep/CHA, not consumed), and rep scales with worth (~30 TC ≈ old +5, cap +8) instead of flat +5/junk. Tunable knobs noted in §8. All three lines |
 | 801 | 781 | 1086 | Group-C polish (punch-list C1–C4). C1 fusion UX: firing the Crucible with reserved-but-insufficient pieces opens the PICKER (which surfaces each piece's material bucket + a live "N materials → need 3+ DIFFERENT" readout, already OTA-679) instead of dead-ending on a repeated arbiter refusal. C2 fused-weapon naming: a forged WEAPON with a soft / non-weapon Qwen name ("Aetheric Thread", "Resonant Veil") is rejected so the deterministic weapon pool (Cleaver / Edge / Reaver / …) names it; migrateFusedName heals old saves (armor keeps soft names). C3 post-boss grace: a boss kill stamps player.bossDefeatGraceUntilHours = now + POST_BOSS_GRACE_HOURS (3); beginScene suppresses arrival encounters while it holds, so stepping out of a just-cleared outpost doesn't drop a fresh ambush mid-loot. C4 MiniLM anchors: the 6 EMOTION_ANCHORS reworded to short, distinct, LORE-NEUTRAL sentences (no shared "ruins/Aetheric" boilerplate) so cosine similarity discriminates — neutral wording makes the engine_Dev copy identical. All three lines |
