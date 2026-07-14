@@ -12248,32 +12248,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the snap path catches the equal case and converts in place
         // before wear is applied.
         const activeRope = pickActiveRope();
-        if (activeRope && activeRope.current <= ROPE_WEAR_PER_TIER) {
-          // OTA-625 — frayed-rope fall LOOP. A rope at/below the wear-per-tier
-          // threshold is a guaranteed snap, but the same ground-rule as the
-          // empty-stamina case above applies: if you're still ON THE GROUND
-          // (not yet elevated), you can't fall off a thing you haven't left.
-          // Pre-fix, CLIMB stayed available and every tap dropped the player for
-          // ~7 (playtest: fell tier-2 back-to-back, 23→16→9, with a rope that
-          // could never make it). Refuse + warn on the ground (no fall, no
-          // damage, rope left intact to mend/replace) so the player isn't farmed
-          // for fall damage. Only a snap while ALREADY UP (committed mid-climb)
-          // actually drops them.
+        // OTA-779 — the rope is usable down to its LAST point. The old guard
+        // snapped/refused at current ≤ ROPE_WEAR_PER_TIER (15), which stranded a
+        // whole climb's worth of durability AND dropped the player with no
+        // warning ("durability 15 ≤ 15 — YOU FALL", player report: "what's the
+        // point of 15 points if you die anyway?"). Now only a TRULY SPENT rope
+        // (≤ 0 — which normally can't happen, since wearItemById removes it the
+        // moment it hits 0) fails here; a low-but-usable rope climbs, breaks
+        // gracefully at 0 below (it coils dead at your feet — no fall), and fires
+        // a fraying warning first (below) so it's never a surprise.
+        if (activeRope && activeRope.current <= 0) {
           const alreadyUpRope = !!get().currentScene?.elevatedOn;
           if (!alreadyUpRope) {
             get().appendLog(
               'arbiter',
-              `The Arbiter stops your hand. "That ${activeRope.name.toLowerCase()} is frayed through — it won't take your weight up the ${tgt}. Mend it or find another before you trust it."`,
+              `The Arbiter stops your hand. "That ${activeRope.name.toLowerCase()} is spent — worn through to nothing. Splice or replace it before you trust it to your weight."`,
             );
             get().appendLog(
               'combat',
-              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} too frayed (durability ${activeRope.current} ≤ ${ROPE_WEAR_PER_TIER}). (refused — it would snap; repair or replace first)`,
+              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} spent (durability 0). (refused — mend or replace first)`,
             );
             break;
           }
-          // Convert the rope instance to a Broken Rope artifact. Keep the
-          // same id so any saved equipment refs survive; strip durability
-          // since the broken artifact is misc and inert.
+          // Already committed mid-climb on a spent rope → it lets go.
           set((s) =>
             s.player
               ? {
@@ -12289,8 +12286,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s,
           );
           climbFall(
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} frayed through (durability ${activeRope.current} ≤ ${ROPE_WEAR_PER_TIER}). ✗ YOU FALL.`,
-            `Your ${activeRope.name.toLowerCase()} snaps under load on the ${tgt}.`,
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} spent (durability 0). ✗ YOU FALL.`,
+            `Your ${activeRope.name.toLowerCase()} gives out under load on the ${tgt}.`,
           );
           break;
         }
@@ -12322,12 +12319,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           set((s) => (s.player ? { player: { ...s.player, inventory: postWearInv } } : s));
           if (wearResult.broken && wearResult.brokenName) {
+            // OTA-779 — the rope gave its last climb, then let go at the top
+            // (durability 0). You completed THIS tier; there's just no rope for
+            // the next one. Graceful end-of-life, not a fall.
             get().appendLog(
               'combat',
-              `Your ${wearResult.brokenName} snaps under the strain. The line coils dead at your feet.`,
+              `Your ${wearResult.brokenName} gives out as you top the pull — the last of the line coils dead at your feet. Splice two to make a fresh one.`,
             );
             if (wearResult.salvageDrop) {
               get().appendLog('reward', `✦ ${wearResult.salvageDrop.name} (Common).`);
+            }
+          } else if (activeRope) {
+            // OTA-779 — fraying warning: the rope survived this climb but is
+            // low (≤ one more climb of durability). Heads-up to mend it before
+            // it's gone — it breaks gracefully above, but the player should
+            // never be surprised by it running out.
+            const worn = postWearInv.find((i) => i.id === activeRope.id);
+            const left = worn?.durability?.current ?? 0;
+            if (left > 0 && left <= ROPE_WEAR_PER_TIER) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter eyes your ${activeRope.name.toLowerCase()}. "That line's fraying — about one good pull left in it. Mend it before it gives out on you."`,
+              );
             }
           }
         }
