@@ -256,9 +256,10 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Surviving wasteland encounters',
   ],
   charisma: [
+    'Talking a foe down in combat (persuade / intimidate)',
+    'Passing a diplomacy check in a hunt / mystery / storyline stage',
     'Buying from a vendor',
     'Selling to a vendor',
-    'Gifting to a vendor',
     'Accepting a hunt / mystery / storyline / faction contract',
     'Wearing named armor / wielding named weapon (passive, on new ground)',
     'Completing a storyline chapter',

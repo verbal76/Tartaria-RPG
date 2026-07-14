@@ -202,6 +202,7 @@ import {
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { vendorPriceMod, rapportQuestId, chaPriceDiscount } from '../engine/factionRapport';
+import { isTalkDownBlocked, talkDownDC, isIntimidationVerb, talkDownSuccessLine, talkDownFailLine } from '../engine/talkDown';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, bonusStaminaMaxFor, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible } from '../engine/bandolierEligibility';
@@ -7399,6 +7400,72 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-120 — Dog Companion combat dispatch.
     if (parsed.intent === 'dog_bite' || parsed.intent === 'dog_distract') {
       handleDogCombat(get, set, parsed.intent, parsed.target);
+      void get().persist();
+      return;
+    }
+    // OTA-1091 — Talk down a fight. IN COMBAT, a diplomacy verb (persuade /
+    // intimidate / convince) is a real d20 + CHA contest that can END the encounter
+    // without a kill. Distinct from fleeing: success = the foe stands down and you
+    // KEEP the tile (no kill loot / XP, small CHA train); failure costs the turn and
+    // draws the enemy counter, same as any missed action. Intercepted here, before
+    // the shared stealth/diplomacy switch arm treats an in-combat "persuade" as a
+    // quest-stage check or a no-op. Bosses / story-class threats refuse outright.
+    if (parsed.intent === 'diplomacy' && currentScene.enemies.length > 0) {
+      const foes = currentScene.enemies;
+      if (isTalkDownBlocked(foes)) {
+        get().appendLog(
+          'combat',
+          `This isn't something you can talk your way out of — ${activeEnemy(currentScene)?.name ?? 'it'} is past reason. Steel, or run.`,
+        );
+        void get().persist();
+        return;
+      }
+      const intimidation = isIntimidationVerb(trimmed);
+      const dc = talkDownDC(foes);
+      const cha = effectiveStats(player).charisma;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const tPerksTalk = require('../engine/titles').titlePerkModifiers(player);
+      const bonus = tPerksTalk.diplomacyBonus ?? 0;
+      const roll = rollDie(20);
+      const total = roll + cha + bonus;
+      const success = total >= dc;
+      get().appendLog(
+        'combat',
+        `You — ${intimidation ? 'intimidate' : 'persuade'} → d20 ${roll} + CHA ${cha}${bonus ? ` + ${bonus} (Broker)` : ''} = ${total} vs DC ${dc} — ${success ? '✓ STANDS DOWN' : '✗ NO SALE'}`,
+      );
+      if (success) {
+        const trained = trainStat(player, 'charisma', true);
+        set((s) =>
+          s.player && s.currentScene
+            ? {
+                player: advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25),
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: [],
+                  enemyHps: [],
+                  enemyKnockedOut: [],
+                  enemyAmbushUsed: [],
+                  activeEnemyIdx: 0,
+                  range: null,
+                },
+              }
+            : s,
+        );
+        get().appendLog('world', talkDownSuccessLine(foes, intimidation));
+        if (trained.leveled) {
+          get().appendLog('reward', `Charisma ${trained.leveled.from} → ${trained.leveled.to} — a talker's edge.`);
+        }
+        void get().persist();
+        return;
+      }
+      // Miss: spend the turn like any skill check, then the group counters.
+      set((s) =>
+        s.player ? { player: advanceTime(spendStamina(s.player, STAMINA_COSTS.skillCheck), 0.25) } : s,
+      );
+      get().appendLog('world', talkDownFailLine(foes, intimidation));
+      if ((get().currentScene?.enemies.length ?? 0) > 0) {
+        runEnemyGroupCounters(get, set, get().player ?? player);
+      }
       void get().persist();
       return;
     }

@@ -17381,4 +17381,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sellToVendor + VendorScreen honor the mod; a turn-in flourish announces the
 // unlock. Lore-neutral (no faction-quest DATA ships to engine — the discount keys
 // off completedFactionQuestIds, so it lights up wherever a rapport quest exists).
-export const OTA_BUILD_ID = '2026-07-14-1090-charisma-vendor-discounts';
+// OTA-1091 — TALK DOWN A FIGHT. In combat, a diplomacy verb (persuade / intimidate /
+// convince / negotiate) is a real d20 + CHA (+ Broker) contest that ENDS the
+// encounter without a kill — distinct from fleeing (the foe stands down and you KEEP
+// the tile; fleeing is you running and leaving it). Success clears the enemies with
+// NO loot / XP + a small CHA train; failure costs the turn and draws the enemy
+// counter, so spamming a tough group is dangerous, not free. DC scales with foe count
+// + toughest tier (10 for a lone Common, +2/tier, +2/extra foe); bosses / story-class
+// threats refuse. New engine module talkDown.ts (talkDownDC / isTalkDownBlocked /
+// isIntimidationVerb / isBeastPack + flavor — beasts flee, people back off); intercept
+// in submitPlayerAction ahead of the shared diplomacy switch arm. SKILL_ACTIVITIES.
+// charisma refreshed (dropped removed gifting; added talk-down + diplomacy surfaces).
+export const OTA_BUILD_ID = '2026-07-14-1091-talk-down-a-fight';
