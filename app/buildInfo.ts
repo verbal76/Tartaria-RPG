@@ -16082,4 +16082,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spent, so mission completions + sigil turn-ins still dominate. Left IN as a minor
 // contributor per the user; the pool is faction-agnostic (banks into whoever you're
 // buying from when it crosses). Shared engine code — all three lines.
-export const OTA_BUILD_ID = '2026-07-14-804-buy-rep-slow-grind';
+// OTA-805 — CHARISMA EARNS VENDOR DISCOUNTS, gated per faction by a "rapport"
+// fetch quest (user-designed). Charisma finally touches pricing: once you've done a
+// faction's rapport quest ("bring me a high-end object … now we can deal"), that
+// faction's vendors cut you a CHA-scaled break — 2%/point of CHA above 10, capped
+// at 20%, applied to BOTH buys (× (1−mod)) and sell-backs (× (1+mod)). Ungated CHA
+// does nothing to price; the quest is the "in," Charisma is the magnitude. New
+// engine module factionRapport.ts (rapportQuestId/hasFactionRapport/chaPriceDiscount/
+// vendorPriceMod); wired into buyFromVendor.effectivePrice + sellToVendor +
+// sellPriceFor (new optional rapportBonus) + VendorScreen (discounted prices + a
+// "Trusted partner" banner). Nine rapport quests (fq_<faction>_rapport) added to
+// faction-quests.json — each fetches a Golem Core (an obtainable high-end object;
+// the lore coveted-relics aren't reliably placed in the world yet, a content
+// follow-up) and, on turn-in, logs "you've earned dealing with the <faction>". The
+// rapport SELL bonus is a deliberate earned exception to the B1 RARITY_BUY_FLOOR
+// cap (SELL_FRACTION 0.4 keeps buy-then-sell a loss, so it's a merchant perk not
+// arbitrage). Also confirmed: DIPLOMACY is already wired (resolves social-gated
+// hunt/mystery/storyline stages + trains CHA); "convince" already routes to it.
+export const OTA_BUILD_ID = '2026-07-14-805-charisma-vendor-discounts';
