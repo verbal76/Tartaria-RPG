@@ -1,5 +1,6 @@
 import type { Enemy, WeatherEntry, Hazard, Location, WorldMemory, Rarity } from './types';
 import { pick, pickWeighted, chance } from './rng';
+import { enemyTypeDefenses } from './crafting';
 import enemiesData from '../data/enemies/enemies.json';
 import weatherData from '../data/weather/weather.json';
 import hazardsData from '../data/hazards/hazards.json';
@@ -77,6 +78,41 @@ function overLevelT(power: number): number {
   return Math.max(0, Math.min(1, (power - 14) / 18));
 }
 
+// OTA-798 — PER-SPAWN RANDOMIZED WEAKNESS. Weaknesses were deterministic by enemy TYPE
+// (every "Aetheric Creature" is always weak to slashing), so one loadout genuinely fit
+// all — learn ten type-rows and autopilot forever (player: "random weaknesses so you
+// can't have a 1-kit-fits-all build"). Each non-boss spawn now gets a RANDOM primary
+// weakness + a random resistance, stamped as `vulnerable:`/`resist:` TRAITS. This rides
+// the existing combat resolver for free: combineDamageTypeMatch already lets a per-enemy
+// trait WIN over the type-map on a discord, so a `resist:<type-default-weak>` trait
+// cancels the old weakness and a `vulnerable:<rolled>` trait installs the new one — no
+// change to the ~10 damage call sites. Applied at every scaled spawn (so it varies even
+// on a frontier tile — engagement at all levels). Bosses/Guardians keep their authored,
+// thematic defenses. The EnemyPanel reconciles + WIS-gates the reveal.
+const WEAKNESS_POOL = ['piercing', 'slashing', 'bludgeoning', 'burn', 'electrical', 'cold', 'poison', 'radiation', 'aetheric'];
+
+/** Stamp a random weakness + resistance onto a NON-boss enemy (idempotent via the
+ *  `profiled` marker). Pure; `rng` injectable for tests. */
+export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.random): Enemy {
+  if (enemy.boss) return enemy;
+  const traits = [...(enemy.traits ?? [])];
+  if (traits.includes('profiled')) return enemy;                 // already rolled — don't re-roll
+  const pickType = () => WEAKNESS_POOL[Math.floor(rng() * WEAKNESS_POOL.length)]!;
+  const newWeak = pickType();
+  let newResist = pickType();
+  if (newResist === newWeak) newResist = WEAKNESS_POOL[(WEAKNESS_POOL.indexOf(newWeak) + 1) % WEAKNESS_POOL.length]!;
+  // Neutralize the type-map's DEFAULT weaknesses (bar the new one) so the old kit
+  // doesn't still work — a resist trait wins the discord vs a type weak.
+  const defaults = enemyTypeDefenses(enemy.type);
+  for (const w of defaults.weak) {
+    if (w !== newWeak && !traits.includes(`resist:${w}`)) traits.push(`resist:${w}`);
+  }
+  if (!traits.includes(`vulnerable:${newWeak}`)) traits.push(`vulnerable:${newWeak}`);
+  if (newResist !== newWeak && !traits.includes(`resist:${newResist}`)) traits.push(`resist:${newResist}`);
+  traits.push('profiled');
+  return { ...enemy, traits };
+}
+
 /** The HP a SINGLE enemy of `baseHp` scales to on this tile — floor (anti-farm) +
  *  a flat-capped multiplier (so a big Legendary is nudged, not exploded). */
 function soloScaledHp(baseHp: number, d: number, t: number): number {
@@ -90,16 +126,17 @@ function soloScaledHp(baseHp: number, d: number, t: number): number {
 /** Scale one rolled enemy to the player's power and the tile's danger. Pure; returns
  *  a fresh object (never mutates). Bosses pass through untouched. Use for SOLO spawns
  *  (rest-ambush, hook spawns); packs go through scaleEncounterForContext. */
-export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number): Enemy {
+export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number, rng: () => number = Math.random): Enemy {
   if (enemy.boss) return enemy;                                  // Guardians / story bosses tuned elsewhere
   const d = Math.max(0, danger);
   const t = overLevelT(power);
-  if (t <= 0 && d <= 0) return enemy;                            // fresh player on the frontier → as authored
-  const hp = soloScaledHp(enemy.hp, d, t);
+  // HP/attack scale with power+danger (a no-op for a fresh player on a frontier tile),
+  // but the WEAKNESS is randomized either way — engagement at every level.
+  const hp = (t <= 0 && d <= 0) ? enemy.hp : soloScaledHp(enemy.hp, d, t);
   // Attack/AC: a small bump (abilityPoint drives both, per combatRules) so a scaled
   // enemy can still land on a geared player — modest, +1 (d0) .. +4 (d5) at max power.
   const bonus = Math.round(t * (1 + d * 0.5));
-  return { ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) };
+  return randomizeEnemyDefense({ ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) }, rng);
 }
 
 // OTA-797 — PACK-AWARE scaling. A pack must be scaled as a PACKAGE, not per-body: if
@@ -127,7 +164,8 @@ export function scaleEncounterForContext(enemies: readonly Enemy[], danger: numb
   const nonBossIdx = enemies.map((e, i) => (e.boss ? -1 : i)).filter((i) => i >= 0);
   // Solo (0/1 non-boss foe) → per-enemy scaling, unchanged.
   if (nonBossIdx.length <= 1) return enemies.map((e) => scaledEnemyForContext(e, d, power));
-  if (t <= 0 && d <= 0) return enemies.map((e) => ({ ...e }));   // fresh + frontier → authored
+  // Fresh player on a frontier tile → HP as authored, but still randomize weakness.
+  if (t <= 0 && d <= 0) return enemies.map((e) => (e.boss ? { ...e } : randomizeEnemyDefense({ ...e })));
 
   const pack = nonBossIdx.map((i) => enemies[i]!);
   const totalBase = pack.reduce((s, e) => s + Math.max(1, e.hp), 0);
@@ -142,7 +180,9 @@ export function scaleEncounterForContext(enemies: readonly Enemy[], danger: numb
   for (const i of nonBossIdx) {
     const e = enemies[i]!;
     const share = Math.max(6, Math.round((packTotal * Math.max(1, e.hp)) / totalBase));
-    out[i] = { ...e, hp: share, abilityPoint: bumpAbilityPointNumber(e.abilityPoint, bonus) };
+    // Each pack member ALSO gets an independent randomized weakness (a pack of a
+    // drone/bandit/rat then carries three different answers in one fight).
+    out[i] = randomizeEnemyDefense({ ...e, hp: share, abilityPoint: bumpAbilityPointNumber(e.abilityPoint, bonus) });
   }
   return out;
 }
