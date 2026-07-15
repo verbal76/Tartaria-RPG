@@ -16288,4 +16288,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // current view-key, so the dismiss persists across the unmount but still auto-re-shows
 // when you actually move to a different location (key mismatch). Removed the now-moot
 // local reset effect.
-export const OTA_BUILD_ID = '2026-07-15-820-crucible-dismiss-persists';
+//
+// OTA-821 — NO DUPLICATE CRUCIBLE CHIP ON A VENDOR TILE (player: "we don't need a
+// separate fuse chip on a tile with a vendor if the vendor has a crucible too — the road
+// hawker has a built-in fuse chip"). OTA-758 lit the exploration Crucible chip in a
+// VENDOR mode (25 TC) on roadside-vendor tiles — but the vendor screen ALSO offers that
+// same portable Crucible (arb103), so the tile showed the chip AND the vendor its own
+// fuse button: two entry points for one Crucible. The exploration chip now shows ONLY
+// for a LOCATION's own Crucible (outpost/hub/market/fusion-permit); a vendor-carried
+// Crucible lives solely in the vendor screen (which already suppresses ITS offer at
+// location-crucible tiles — arb153 — so the two partition cleanly, never both). Nothing
+// stranded: the vendor screen still fires useVendorCrucible for 25 TC. Removed the
+// atVendorCrucible branch + the now-unused tutorialDemoVendor read.
+export const OTA_BUILD_ID = '2026-07-15-821-no-dup-vendor-crucible-chip';

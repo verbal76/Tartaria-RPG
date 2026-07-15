@@ -91,9 +91,6 @@ export function ExplorationScreen() {
   // OTA-508 — the Hidden Market offers the Fuse Cauldron at every stall.
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
-  // OTA-758 — the Crucible chip also lights at a roadside/wild vendor (portable
-  // forge, 25 TC); suppressed during the tutorial demo vendor.
-  const tutorialDemoVendor = useGameStore((s) => s.tutorialDemoVendor);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
   const craftSubstitutionPrompt = useGameStore((s) => s.craftSubstitutionPrompt);
@@ -787,16 +784,13 @@ export function ExplorationScreen() {
         const atLocationCrucible = !!(player.fusionPending
           || (player.hubRoomId && (player.macroVisitSeq ?? 0) >= 1)
           || activeBuildingId === 'market');
-        // OTA-758 (option A) — otherwise a roadside/wild VENDOR fires a PORTABLE
-        // Crucible for 25 TC. Only when the location has no free Crucible (so the
-        // two never both show), you've left the spawn once, and it isn't the
-        // tutorial demo — mirrors the vendor-screen button's own gate + the
-        // useVendorCrucible guard, so what the chip promises is what fires.
-        const atVendorCrucible = !atLocationCrucible
-          && !!currentScene?.vendor
-          && !tutorialDemoVendor
-          && (player.macroVisitSeq ?? 0) >= 1;
-        if (!atLocationCrucible && !atVendorCrucible) return null;
+        // arb-fix (player) — a VENDOR's portable Crucible is offered from INSIDE the
+        // vendor screen (its own fuse chip). On a roadside-vendor tile the old OTA-758
+        // exploration chip DUPLICATED that offer (chip on the tile + fuse chip in the
+        // vendor). So the tile chip now shows ONLY for a location's OWN Crucible; a
+        // vendor-carried Crucible lives solely in the vendor screen. No Crucible is
+        // stranded — the vendor screen still fires useVendorCrucible for 25 TC.
+        if (!atLocationCrucible) return null;
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
@@ -808,15 +802,11 @@ export function ExplorationScreen() {
         );
         const bannerCatalyst = findFactionCatalyst(player.inventory ?? [], bannerEquippedIds);
         const gate = gateFusion(player.inventory ?? [], bannerCatalyst);
-        // A vendor forge charges 25 TC and goes through useVendorCrucible (which
-        // re-checks the gate + charges); a location forge is free via 'fuse'.
-        const fireCrucible = atVendorCrucible
-          ? () => useGameStore.getState().useVendorCrucible()
-          : () => useGameStore.getState().submitPlayerAction('fuse');
-        const readyName = atVendorCrucible ? '★★ Fusing Crucible · 25 TC' : '★★ Fusing Crucible ready';
-        const readyHint = atVendorCrucible
-          ? 'tap to fire the vendor’s portable Crucible (25 TC)'
-          : 'tap to fuse · spends your ♥ reserved items';
+        // A location forge is free via 'fuse' (a vendor's paid Crucible lives in the
+        // vendor screen now).
+        const fireCrucible = () => useGameStore.getState().submitPlayerAction('fuse');
+        const readyName = '★★ Fusing Crucible ready';
+        const readyHint = 'tap to fuse · spends your ♥ reserved items';
         return (
         <TouchableOpacity
           style={styles.fusionBanner}
