@@ -40,11 +40,16 @@ it('OTA-825 — throwing at a surviving enemy draws an enemy counter (no free ra
 
   const p0 = useGameStore.getState().player!;
   // A guaranteed-hit, hard-hitting close-range enemy with plenty of HP so a bare
-  // stone (1 dmg) can't kill it — the group MUST survive to counter.
+  // stone (1 dmg) can't kill it — the group MUST survive to counter. abilityPoint
+  // 'Strength 40' makes BOTH the enemy's counter (d20 + ~40 vs armor-AC) land AND
+  // the improvised-throw AC clamp to 18 — so we boost the player's DEX to 25 to
+  // guarantee the throw itself lands (d20 + 25 − 2 ≥ 18 on any roll), keeping the
+  // test deterministic. DEX doesn't reduce the incoming counter (AC is armor-based,
+  // and dodge is an active declared action, not a passive DEX parry).
   const enemy = { name: 'Hammer', damage: '6d6', abilityPoint: 'Strength 40', hp: 300, type: 'brute', loot: [], rarity: 'Common', traits: [] };
   const scene = useGameStore.getState().currentScene!;
   useGameStore.setState({
-    player: { ...p0, hp: 120, hpMax: 120 },
+    player: { ...p0, hp: 120, hpMax: 120, stats: { ...p0.stats, dexterity: 25 } },
     currentScene: {
       ...scene, enemies: [enemy as never], enemyHps: [300], activeEnemyIdx: 0,
       range: 'close', enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
