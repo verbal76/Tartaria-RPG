@@ -3252,6 +3252,14 @@ interface GameStore {
   chooseFusionKind: (kind: 'weapon' | 'armor') => void;
   /** Dismiss the weapon/armor choice without forging (inputs stay reserved). */
   cancelFusionKindPrompt: () => void;
+  /** arb-fix — the view-key (location|building|room|hubRoom) at which the player
+   *  X-dismissed the Fusing Crucible chip. Held in the STORE, not ExplorationScreen
+   *  local state, so a dismiss survives entering a vendor (which UNMOUNTS the
+   *  exploration screen and would otherwise lose a useState flag → the chip popped
+   *  back on return). The chip is hidden while this equals the current view-key;
+   *  moving to a different location changes the key and re-shows it. */
+  crucibleChipDismissedKey: string | null;
+  setCrucibleChipDismissedKey: (key: string | null) => void;
   /** OTA-439 — [audit #23] when a craft would CONSUME material substitutes
    *  (a misc/inferred item standing in for a named ingredient via its tags),
    *  ask before stripping them instead of silently eating them. `subsList` is
@@ -3473,6 +3481,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingWhisperComplete: null,
   fusionCatalystPrompt: null,
   fusionKindPrompt: false,
+  crucibleChipDismissedKey: null,
+  setCrucibleChipDismissedKey(key) {
+    set({ crucibleChipDismissedKey: key });
+  },
   craftSubstitutionPrompt: null,
   craftSubConfirmedFor: null,
   discoveryReveal: null,

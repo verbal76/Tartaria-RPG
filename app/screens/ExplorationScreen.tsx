@@ -202,12 +202,18 @@ export function ExplorationScreen() {
   }, [currentScene?.missionBoard, player]);
   // arb152 — a per-location dismiss for the Fusing Crucible chip (X on the chip).
   // Reset whenever the location or building changes (re-entering re-shows it).
-  const [crucibleDismissed, setCrucibleDismissed] = useState(false);
+  // arb-fix — the dismiss lives in the STORE (crucibleChipDismissedKey), NOT local
+  // useState: entering a vendor UNMOUNTS this screen (App.tsx renders exploration vs
+  // vendor by a flag), so a local flag was lost on the round-trip and the chip popped
+  // back on return. Keying the stored dismiss to the view-key still auto-re-shows the
+  // chip when you actually move to a different location (key mismatch).
   // arb154 — include activeBuildingRoomId: moving between ROOMS of a building
   // (market stalls etc.) changes only this, not activeBuildingId — so without it
   // a dismiss in one room stuck for the whole building ("disabled in all rooms").
   const crucibleViewKey = `${currentScene?.location.id ?? ''}|${activeBuildingId ?? ''}|${activeBuildingRoomId ?? ''}|${player?.hubRoomId ?? ''}`;
-  useEffect(() => { setCrucibleDismissed(false); }, [crucibleViewKey]);
+  const crucibleDismissedKey = useGameStore((s) => s.crucibleChipDismissedKey);
+  const setCrucibleChipDismissedKey = useGameStore((s) => s.setCrucibleChipDismissedKey);
+  const crucibleDismissed = !!crucibleDismissedKey && crucibleDismissedKey === crucibleViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
@@ -892,7 +898,7 @@ export function ExplorationScreen() {
               'fuse' can still be typed, and re-entering re-shows the chip. */}
           <TouchableOpacity
             style={styles.crucibleDismiss}
-            onPress={() => setCrucibleDismissed(true)}
+            onPress={() => setCrucibleChipDismissedKey(crucibleViewKey)}
             hitSlop={10}
             activeOpacity={0.7}
           >

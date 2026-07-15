@@ -17501,4 +17501,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ×0.5 resist per spawn, and ~35% get a real ×0.25 wall (a trait resist STACKED onto a
 // type-map resist). Read is diegetic: the WIS-gated detail popup narrates what you
 // notice, not a bare label. Supersedes 1103's flat WEAKNESS_POOL.
-export const OTA_BUILD_ID = '2026-07-15-1104-thematic-weakness';
+// OTA-1105 — FUSE-CHIP DISMISS SURVIVES A VENDOR ROUND-TRIP. Entering the vendor
+// UNMOUNTS ExplorationScreen (App.tsx renders exploration vs vendor by a flag), so the
+// Crucible chip's LOCAL useState dismiss was lost and the chip re-showed on return.
+// Moved the dismiss into the store (crucibleChipDismissedKey + setter), keyed to the
+// view-key: hidden while the stored key equals the current view-key, so it survives the
+// unmount but still re-shows on a real location change. Removed the moot reset effect.
+export const OTA_BUILD_ID = '2026-07-15-1105-crucible-dismiss-persists';
