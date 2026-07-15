@@ -18339,10 +18339,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    // OTA-456 — a HUNT is a deed (the trophy is the proof), so it can be sent
-    // word remotely for a 15% TC cut; in person pays in full.
-    if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The ${getNarratorName()} folds their arms. "Need someone to pay you. Find a vendor — or 'send word <name>' to courier the trophy in for a smaller cut."`);
+    // OTA-1095 — a HUNT is a FACE-TO-FACE turn-in (user's call). The trophy is the
+    // proof, and proof has to be shown in person to a paying agent — the OTA-456
+    // remote "send word" courier option is removed for hunts. (Mysteries / storylines
+    // / faction deeds keep their remote cut.) This also closes the B2 exploit of
+    // closing hunts 100% from a safe hub.
+    if (remote) {
+      get().appendLog(
+        'arbiter',
+        `The ${getNarratorName()} shakes their head. "A trophy's no good sent by runner — a bounty is paid face to face. Carry it to an agent and put it on the table yourself."`,
+      );
+      return;
+    }
+    if (!scene?.vendor) {
+      get().appendLog(
+        'arbiter',
+        `The ${getNarratorName()} folds their arms. "A bounty's settled in person — find a vendor or faction agent and show them the trophy."`,
+      );
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -18414,7 +18427,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
-    const payTc = remote ? Math.max(1, Math.round(candidate.rewardTc * 0.85)) : candidate.rewardTc;
+    // OTA-1095 — face-to-face only now, so always full pay (no courier's cut).
+    const payTc = candidate.rewardTc;
     set((s) =>
       s.player
         ? {
@@ -18431,9 +18445,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     get().appendLog(
       'reward',
-      remote
-        ? `✦ Sent word — Hunt closed by courier: ${candidate.title}. +${payTc} TC (runner's cut taken)${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy carried back.`
-        : `✦ Hunt complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
+      `✦ Hunt complete — ${candidate.title}. +${payTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
     maybeTeachRecipeReward(get, set, 'MISSION_RECIPE_CHANCE', 'Recipe among the spoils'); // OTA-1013
     applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
@@ -18958,6 +18970,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       if (rec.stage < def.stages.length) {
         get().appendLog('arbiter', `The ${getNarratorName()} eyes the contract. "Not done. The trophy is the proof — you don't have it yet."`);
+        return;
+      }
+      // OTA-1095 — a HUNT is a FACE-TO-FACE turn-in (user's call). The Contracts-UI
+      // COMPLETE used to pay FULL from any tile — the B2 exploit (whole bounties
+      // closed from a safe hub). Now it requires a paying agent present, and the
+      // RIGHT faction's agent, exactly like the typed turn-in.
+      const scene = get().currentScene;
+      if (!scene?.vendor) {
+        get().appendLog('arbiter', `The ${getNarratorName()} folds their arms. "A bounty's settled in person — stand in front of a vendor or faction agent and show them the trophy."`);
+        return;
+      }
+      if (def.factionId && def.factionId !== scene.vendor.faction) {
+        get().appendLog('arbiter', `${scene.vendor.name} waves you off. "Wrong agent. ${def.factionId.replace(/_/g, ' ')} posted that bounty — take it to their people."`);
         return;
       }
       const trophy: InventoryItem = stampDurability({

@@ -17425,4 +17425,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // New wanderers helpers (makeWandererGoods/makeWandererLead/wandererCagey);
 // Wanderer.goods+lead; PlayerCharacter.pendingLead; miscLootItem grant helper;
 // beginScene lead payout. Lore-neutral. Closes the social rework.
-export const OTA_BUILD_ID = '2026-07-14-1094-parley-rewards';
+// OTA-1095 — HUNTS ARE A FACE-TO-FACE TURN-IN (user's call; closes the B2 exploit).
+// turnInHunt no longer accepts the remote "send word" courier close; the Contracts-UI
+// COMPLETE (completeContractFromUI 'hunt'), which used to pay FULL from ANY tile,
+// now requires a paying agent in scene AND the right posting faction's agent (neutral
+// hunts take any vendor). Always full pay (no courier's cut). Mysteries / storylines /
+// faction deeds untouched. ContractsScreen hunt copy updated. Refusal lines use
+// getNarratorName() (lore-neutral).
+export const OTA_BUILD_ID = '2026-07-14-1095-hunts-face-to-face';
