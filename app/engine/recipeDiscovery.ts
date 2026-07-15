@@ -155,23 +155,36 @@ export function recipeVendorPrice(result: string): number {
   }
 }
 
-/** A stable per-vendor slice of the recipes this vendor will teach for TC —
- *  drawn from the player's UNKNOWN discoverable recipes so nothing on offer is
- *  already owned. Deterministic in `seed` (hash of the vendor name) so the same
- *  trader shows the same stock all session. Empty once everything's learned. */
+/** Every discoverable recipe RESULT, sorted — the FULL, stable pool (independent of
+ *  what the player knows). This is the anchor for a vendor's fixed menu. */
+export function allDiscoverableRecipes(allRecipes: readonly RecipeLike[]): string[] {
+  const out = new Set<string>();
+  for (const r of allRecipes) if (isDiscoverableRecipe(r)) out.add(r.result);
+  return Array.from(out).sort();
+}
+
+/** A stable per-vendor slice of the recipes this vendor will teach for TC.
+ *  The MENU (which `count` recipes this trader carries) is fixed by `seed` over the
+ *  FULL discoverable pool, so it does NOT change as you learn things — otherwise every
+ *  purchase shrank the "unknown" pool and rerolled the window, restocking endlessly
+ *  (player could buy recipes until broke). Already-learned recipes in the fixed menu
+ *  simply drop out of the buyable list (their menu slot doesn't slide), so once you've
+ *  bought this trader's whole menu there's nothing left — no reroll, bounded supply. */
 export function vendorRecipeOffers(
   allRecipes: readonly RecipeLike[],
   knownRecipes: readonly string[] | undefined,
   seed: number,
   count = 3,
 ): { result: string; price: number }[] {
-  const pool = unknownDiscoverableRecipes(allRecipes, knownRecipes).slice().sort();
-  if (pool.length === 0) return [];
-  const start = ((seed % pool.length) + pool.length) % pool.length;
-  const n = Math.min(count, pool.length);
+  const full = allDiscoverableRecipes(allRecipes);          // STABLE — not filtered by known
+  if (full.length === 0) return [];
+  const start = ((seed % full.length) + full.length) % full.length;
+  const n = Math.min(count, full.length);
+  const known = new Set(knownRecipes ?? []);
   const out: { result: string; price: number }[] = [];
   for (let i = 0; i < n; i++) {
-    const result = pool[(start + i) % pool.length]!;
+    const result = full[(start + i) % full.length]!;
+    if (known.has(result)) continue;                         // learned → not buyable, but the menu slice stays fixed
     out.push({ result, price: recipeVendorPrice(result) });
   }
   return out;

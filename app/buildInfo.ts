@@ -16300,4 +16300,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // location-crucible tiles — arb153 — so the two partition cleanly, never both). Nothing
 // stranded: the vendor screen still fires useVendorCrucible for 25 TC. Removed the
 // atVendorCrucible branch + the now-unused tutorialDemoVendor read.
-export const OTA_BUILD_ID = '2026-07-15-821-no-dup-vendor-crucible-chip';
+//
+// OTA-822 — VENDOR RECIPE MENU: NO REROLL, NO "BUY & EQUIP" (device log: Road Hawker —
+// buying a recipe rerolled/restocked the recipe list so the player bought recipes until
+// broke; and recipes offered a nonsensical "Buy & Equip"). (1) REROLL: vendorRecipeOffers
+// drew its `count` window from the player's UNKNOWN pool, so learning one shrank the pool,
+// shifted `start = seed % pool.length`, and slid a NEW recipe into view — an endless
+// restock. The menu is now a FIXED seeded slice of the FULL discoverable pool (new
+// allDiscoverableRecipes), independent of what's known; a learned recipe just drops from
+// the buyable list (its slot doesn't slide), and once the whole menu is learned the
+// section is empty. (2) BUY & EQUIP / ×N: recipe rows reused the item-buy flow, so the
+// confirm offered "Buy & Equip" (tried to equip an item you don't own — "I don't see an
+// Aetheric Vest on you") and quantity. Recipe rows now open a LEARN pending (isRecipe):
+// no equip slots, no stack, the confirm button reads "Learn" and the title "Learn the X
+// working". buyFromVendor's recipe-learn branch still charges TC + teaches it.
+export const OTA_BUILD_ID = '2026-07-15-822-vendor-recipe-no-reroll';
