@@ -17529,4 +17529,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (2) The Aetheric Torch reveal said "Work it", so the player typed the flavor word
 // ("the resonance") and got refused; it now names the hook's noun ("Work the crystal —
 // investigate it and it will give up something rare").
-export const OTA_BUILD_ID = '2026-07-15-1110-throw-counter-and-fused-scrap-faucet';
+export const OTA_BUILD_ID = '2026-07-15-1111-groupk-combat-weakness-wiring';
