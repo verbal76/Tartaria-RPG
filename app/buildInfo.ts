@@ -17493,4 +17493,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (WEAKNESS_READ_WIS=12): EnemyPanel takes playerWisdom; Wisdom 12+ reads RESIST/WEAK
 // (engine keeps both lists with "—"), else "? strike to learn" + discover via the log.
 // defensesFor reconciles type-map vs traits so it never shows a flipped weakness.
-export const OTA_BUILD_ID = '2026-07-15-1103-random-weakness-wis-read';
+// OTA-1104 — THEMATIC ("Pokémon-route") weakness + medium hardness + diegetic read.
+// 1103's flat-random weakness read as nonsense (mud weak to cold). Now each creature
+// TYPE has a small pool of plausible weaknesses (THEMATIC_DEFENSE_POOLS) and a spawn
+// rolls ONE — believable every time, varied fight to fight. MEDIUM hardness: weakness is
+// a ×1.5 bonus, everything else stays normal & still works (never hard-locked); one soft
+// ×0.5 resist per spawn, and ~35% get a real ×0.25 wall (a trait resist STACKED onto a
+// type-map resist). Read is diegetic: the WIS-gated detail popup narrates what you
+// notice, not a bare label. Supersedes 1103's flat WEAKNESS_POOL.
+export const OTA_BUILD_ID = '2026-07-15-1104-thematic-weakness';
