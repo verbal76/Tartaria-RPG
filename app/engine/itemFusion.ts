@@ -159,6 +159,15 @@ export function isForgeReservableItem(
   if (item.uniqueStats) return false;
   if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
   if ((item.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
+  // OTA-829 — block protected kinds (quest / relic / sigil / currency / keepsake /
+  // throwable) BEFORE the inferred-item shortcut. Pre-fix a catalog-absent quest
+  // item — e.g. the Legendary Capital "Cores" (tags: quest, aetheric_core,
+  // main_quest) — fell through to `isInferredItem` and read as reservable junk, so
+  // the FUSABLE filter listed the player's un-fusible main-quest Cores. The same
+  // block already guarded the 'loot' reagent path (isForgeableLootReagent); it must
+  // guard the inferred path too. (relic KIND is also out — a relic is never fodder.)
+  if (item.kind === 'relic') return false;
+  if ((item.tags ?? []).some((t) => FORGE_LOOT_BLOCK_TAGS.test(t))) return false;
   if (isInferredItem(item.name)) return true;
   return isForgeableLootReagent(item);
 }
