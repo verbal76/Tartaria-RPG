@@ -16191,4 +16191,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // buyFromVendor's recipe-learn branch) — so learning a recipe no longer requires
 // knowing the typed "buy <name>" command from the arrival prose. Filtered to
 // not-yet-known recipes; open by default.
-export const OTA_BUILD_ID = '2026-07-14-812-readable-feed-recipe-buttons';
+// OTA-813 — BOSS NAME CASING. Playtest (Heir Atalan-Drowned, a Core Guardian): the
+// Arbiter's combat templates lowercased the enemy name — fine for a generic creature
+// ("the mud boar") but wrong for a NAMED boss ("the heir atalan-drowned is patient").
+// New combatEnemyLabel(enemy) keeps proper case when enemy.boss (Guardians + boss-gate
+// spawns all carry the flag) and still lowercases generics; applied to the three
+// combat-arbiter template sites in narrativeGenerator (combatRemark, the call-to-
+// action pick, ARBITER_COMBAT_INTROS).
+export const OTA_BUILD_ID = '2026-07-14-813-boss-name-casing';
