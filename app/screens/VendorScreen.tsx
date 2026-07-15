@@ -32,7 +32,7 @@ function rarityColor(rarity: string | null | undefined): string {
 
 type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
-  | { mode: 'buy'; itemName: string; price: number }
+  | { mode: 'buy'; itemName: string; price: number; isRecipe?: boolean }
   | { mode: 'sell'; itemName: string; price: number; itemId?: string }
   | { mode: 'steal'; itemName: string; dc: number }
   | { mode: 'dismiss' }
@@ -111,6 +111,10 @@ export function VendorScreen() {
   }
 
   const openBuy = (itemName: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName, price }); };
+  // A recipe is LEARNED, not equipped or stacked — flag it so the confirm shows a
+  // single "Learn" and never the item-only "Buy & Equip" / "Buy All" affordances
+  // (buying the Aetheric Vest working doesn't put a vest on you).
+  const openLearnRecipe = (result: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName: result, price, isRecipe: true }); };
   const openSell = (itemName: string, price: number, itemId?: string) => { setSellQty(1); setPending({ mode: 'sell', itemName, price, itemId }); };
 
   // OTA-178 — gate-loss warning helper. Returns the GateKind label
@@ -179,7 +183,8 @@ export function VendorScreen() {
   // the trader's stock).
   const buyStockFor = (name: string) =>
     vendor.offers.find((o) => o.itemName.toLowerCase() === name.toLowerCase())?.quantity ?? 1;
-  const pendingBuyStock = pending?.mode === 'buy' ? buyStockFor(pending.itemName) : 1;
+  // A recipe is a one-time learn — never a stack, so no ×N / Buy All.
+  const pendingBuyStock = pending?.mode === 'buy' && !pending.isRecipe ? buyStockFor(pending.itemName) : 1;
   const pendingBuyAfford = pending?.mode === 'buy' && pending.price > 0
     ? Math.floor(player.tc / pending.price)
     : 0;
@@ -190,7 +195,9 @@ export function VendorScreen() {
   // resolves weapons/armor/accessories by catalog name + name-regex fallback.
   const equipSlotsForName = (itemName: string): EquipSlot[] =>
     validSlotsForItem({ id: '', name: itemName, kind: 'misc', quantity: 1, tags: [] } as InventoryItem);
-  const pendingBuyEquipSlots: EquipSlot[] = pending?.mode === 'buy' ? equipSlotsForName(pending.itemName) : [];
+  // A recipe can't be equipped — never offer "Buy & Equip" for one (buying the working
+  // learns the recipe; it doesn't hand you the item to wear).
+  const pendingBuyEquipSlots: EquipSlot[] = pending?.mode === 'buy' && !pending.isRecipe ? equipSlotsForName(pending.itemName) : [];
 
   // Buy one and equip it immediately. A single valid slot (armor / accessory)
   // equips straight away; a weapon (main OR off hand) opens the hand-choice
@@ -545,7 +552,7 @@ export function VendorScreen() {
                       <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
                       <TouchableOpacity
                         style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
-                        onPress={() => openBuy(o.result, o.price)}
+                        onPress={() => openLearnRecipe(o.result, o.price)}
                         activeOpacity={0.7}
                       >
                         <View style={styles.offerHead}>
@@ -668,7 +675,7 @@ export function VendorScreen() {
                 : pending?.mode === 'accept'
                   ? `Accept "${pending.title}"`
                   : canAffordPending
-                    ? `Buy from ${vendor.name}`
+                    ? (pending?.mode === 'buy' && pending.isRecipe ? `Learn the ${pending.itemName} working` : `Buy from ${vendor.name}`)
                     : 'Not enough TC'
         }
         itemPreview={pending?.mode === 'accept' ? null : preview}
@@ -743,7 +750,7 @@ export function VendorScreen() {
                   : pending?.mode === 'buy' && canAffordPending
                     ? [
                         { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
-                        { label: buyMax > 1 ? `Buy ×${buyRepsClamped}` : 'Buy', onPress: () => doBuy(), tone: 'primary' as const },
+                        { label: pending.isRecipe ? 'Learn' : (buyMax > 1 ? `Buy ×${buyRepsClamped}` : 'Buy'), onPress: () => doBuy(), tone: 'primary' as const },
                         ...(buyMax > 1
                           ? [{ label: `Buy All (${buyMax})`, onPress: () => doBuy(buyMax), tone: 'primary' as const }]
                           : []),
