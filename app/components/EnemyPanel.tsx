@@ -70,6 +70,8 @@ interface Props {
   /** engine_Dev — combat arena: fill the (tall) column instead of capping at maxHeight, so the
    *  enemy box runs long like the character box. */
   fill?: boolean;
+  /** OTA-1103 — player Wisdom, gates reading a (non-boss) enemy's weaknesses. */
+  playerWisdom?: number;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -88,18 +90,37 @@ const CARD_CHROME = 18;
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Combine the macro type-resistance map with the enemy's per-instance
- *  resist:/vulnerable: traits into the damage types it resists / is weak to. */
+ *  resist:/vulnerable: traits into the damage types it resists / is weak to.
+ *  OTA-1103 — RECONCILE per type the same way combat does (combineDamageTypeMatch):
+ *  a trait that DISAGREES with the type-map wins, so a `resist:X` trait cancels a
+ *  type-map weakness (and a `vulnerable:X` overrides a type resist). Without this the
+ *  panel would still list an enemy's ORIGINAL type weakness even after per-spawn
+ *  randomization flipped it — showing a weakness that's actually now a resistance. */
 function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } {
   const type = enemyTypeDefenses(enemy.type);
   const trait = traitDefenses(enemy.traits);
-  const uniq = (a: string[]) => Array.from(new Set(a));
-  return {
-    resists: uniq([...type.resist, ...trait.resists]),
-    weaknesses: uniq([...type.weak, ...trait.weaknesses]),
-  };
+  const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
+  const resists: string[] = [];
+  const weaknesses: string[] = [];
+  for (const dt of all) {
+    const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
+    const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
+    // Discord → the per-enemy trait wins (matches combineDamageTypeMatch); else sum.
+    const dir = typeDir !== 0 && traitDir !== 0 && typeDir !== traitDir ? traitDir : typeDir + traitDir;
+    if (dir > 0) weaknesses.push(dt);
+    else if (dir < 0) resists.push(dt);
+  }
+  return { resists, weaknesses };
 }
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fill }: Props) {
+// OTA-1103 — a WISDOM ≥ this reads an enemy's (randomized) weaknesses off the portrait
+// up front; below it you must discover them by landing hits (the combat log's
+// "Weakness exposed" line is the feedback). Matches the parley WIS_REVEAL_THRESHOLD, so
+// Wisdom is the consistent "scout the enemy" stat. Bosses always show.
+const WEAKNESS_READ_WIS = 12;
+
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fill, playerWisdom }: Props) {
+  const canReadDefenses = (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
   // Measure the column we actually live in so cards fit the top-right corner
   // (portrait), instead of being sized to the full screen width and spilling
   // out into a left/right-scrolling "landscape" strip.
@@ -156,7 +177,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
     <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
-      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} />)}
+      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} />)}
     </TouchableOpacity>
   );
 
@@ -173,7 +194,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
         <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
-          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} />)}
+          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} />)}
         </TouchableOpacity>
       ) : (
         <FlatList
@@ -204,7 +225,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
     <BrandedModal
       visible={!!detailView}
       title={detailView?.enemy.name ?? ''}
-      body={detailView ? enemyDetailBody(detailView) : undefined}
+      body={detailView ? enemyDetailBody(detailView, canReadDefenses) : undefined}
       buttons={[{ label: 'Close', tone: 'primary', onPress: () => setDetailView(null) }]}
       onRequestClose={() => setDetailView(null)}
     />
@@ -215,7 +236,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
 // arb146 — format an enemy into the full-detail popup body. Mirrors EnemyCard's
 // AC/attack math so the popup agrees with the portrait, and adds everything the
 // cramped corner can't fit: full trait descriptions + all active effects.
-function enemyDetailBody(view: EnemyView): string {
+function enemyDetailBody(view: EnemyView, canRead: boolean): string {
   const e = view.enemy;
   const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
   const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
@@ -233,8 +254,14 @@ function enemyDetailBody(view: EnemyView): string {
   lines.push('');
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   lines.push(`Attack ${atkLabel}     Damage ${e.damage}${dealsType ? ` (${cap(dealsType)})` : ''}`);
-  if (defenses.resists.length) lines.push(`Resists: ${defenses.resists.map(cap).join(', ')}`);
-  if (defenses.weaknesses.length) lines.push(`Weak to: ${defenses.weaknesses.map(cap).join(', ')}`);
+  // OTA-1103 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
+  // front only with enough Wisdom, else discover by hitting.
+  if (e.boss || canRead) {
+    if (defenses.resists.length) lines.push(`Resists: ${defenses.resists.map(cap).join(', ')}`);
+    if (defenses.weaknesses.length) lines.push(`Weak to: ${defenses.weaknesses.map(cap).join(', ')}`);
+  } else if (defenses.resists.length || defenses.weaknesses.length) {
+    lines.push('Defenses: unknown — strike to learn (Wisdom 12 reads them on sight)');
+  }
   const traits = e.traits ?? [];
   if (traits.length) {
     lines.push('');
@@ -253,7 +280,7 @@ function enemyDetailBody(view: EnemyView): string {
   return lines.join('\n');
 }
 
-function EnemyCard({ view, cardWidth, hpBarWidth, fill }: { view: EnemyView; cardWidth: number; hpBarWidth: number; fill?: boolean }) {
+function EnemyCard({ view, cardWidth, hpBarWidth, fill, canRead }: { view: EnemyView; cardWidth: number; hpBarWidth: number; fill?: boolean; canRead: boolean }) {
   // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
@@ -317,16 +344,26 @@ function EnemyCard({ view, cardWidth, hpBarWidth, fill }: { view: EnemyView; car
         <Stat label="DMG" value={String(view.enemy.damage)} />
       </View>
       <View style={styles.defs}>
-        {/* engine_Dev — always show RESIST and WEAK (with a "—" when the type has none) so the
-            player always has both lists, not just DEALS. */}
-        <Text style={styles.defLine} numberOfLines={2}>
-          <Text style={styles.defResist}>RESIST </Text>
-          <Text style={styles.defVal}>{defenses.resists.length ? defenses.resists.map(cap).join(', ') : '—'}</Text>
-        </Text>
-        <Text style={styles.defLine} numberOfLines={2}>
-          <Text style={styles.defWeak}>WEAK </Text>
-          <Text style={styles.defVal}>{defenses.weaknesses.length ? defenses.weaknesses.map(cap).join(', ') : '—'}</Text>
-        </Text>
+        {/* OTA-1103 — a non-boss enemy's randomized RESIST/WEAK are WIS-gated (read
+            required); a boss always shows. Below the threshold you learn by hitting.
+            engine_Dev keeps both lists visible (with a "—" when empty) once readable. */}
+        {(view.enemy.boss || canRead) ? (
+          <>
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defResist}>RESIST </Text>
+              <Text style={styles.defVal}>{defenses.resists.length ? defenses.resists.map(cap).join(', ') : '—'}</Text>
+            </Text>
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defWeak}>WEAK </Text>
+              <Text style={styles.defVal}>{defenses.weaknesses.length ? defenses.weaknesses.map(cap).join(', ') : '—'}</Text>
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.defLine} numberOfLines={2}>
+            <Text style={styles.defResist}>DEF </Text>
+            <Text style={styles.defVal}>? — strike to learn</Text>
+          </Text>
+        )}
         {/* arb119 — what the enemy DEALS, so armor choices have a target. */}
         <Text style={styles.defLine} numberOfLines={1}>
           <Text style={styles.defDeals}>DEALS </Text>

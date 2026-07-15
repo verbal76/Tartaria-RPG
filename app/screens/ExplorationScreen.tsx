@@ -612,6 +612,7 @@ export function ExplorationScreen() {
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
               fill={arenaActive}
+              playerWisdom={player?.stats?.wisdom}
             />
           ) : (
             // Once the fight is over (last foe dead or knocked out) the top-right

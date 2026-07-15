@@ -17483,4 +17483,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // foes together beat a boss): a pack shares one budget, anchored on a solo-scaled mean
 // body + a small per-body premium, HARD-CAPPED under a boss (70+danger·10), distributed
 // by base-HP weight. Solo spawns still scale per-enemy. Next: randomized weakness + WIS read.
-export const OTA_BUILD_ID = '2026-07-15-1102-mixed-packs-pack-scaling';
+// OTA-1103 — PER-SPAWN RANDOMIZED WEAKNESS + WIS-GATED READ. Weaknesses were
+// deterministic by enemy TYPE, so one loadout fit all. randomizeEnemyDefense
+// (encounter.ts) rolls a random primary weakness + resistance for each NON-boss spawn
+// as vulnerable:/resist: traits, riding the existing resolver (a per-enemy trait wins a
+// discord → the type-default weakness is cancelled, the rolled one installed; no change
+// to the ~10 damage call sites). Folded into both scalers; applies at every spawn incl.
+// a fresh frontier tile. Bosses keep authored defenses. Reveal WIS-gated
+// (WEAKNESS_READ_WIS=12): EnemyPanel takes playerWisdom; Wisdom 12+ reads RESIST/WEAK
+// (engine keeps both lists with "—"), else "? strike to learn" + discover via the log.
+// defensesFor reconciles type-map vs traits so it never shows a flipped weakness.
+export const OTA_BUILD_ID = '2026-07-15-1103-random-weakness-wis-read';
