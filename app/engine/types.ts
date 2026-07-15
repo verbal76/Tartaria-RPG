@@ -869,6 +869,7 @@ export type DamageType =
   | 'degradation'
   | 'bludgeoning'
   | 'burn'
+  | 'cold'
   | 'aetheric'
   | 'electrical'
   | 'piercing'
@@ -876,6 +877,8 @@ export type DamageType =
   | 'radiation'
   | 'slashing'
   | 'stun'
+  // OTA-1112 [Group-K] — `cold` (above) is now explicit; `force` flows through the
+  // open escape hatch below (aliased to aetheric via canonicalDamageType).
   | (string & {});
 
 export type StatusEffectKind =

@@ -18,6 +18,10 @@ export const DAMAGE_TYPE_KEYWORDS = [
   'degradation',
   'bludgeoning',
   'burn',
+  // OTA-827 [Group-K] — `cold` is now a first-class damage type (frost weapons +
+  // the two Core Guardians' authored cold weakness/resist). Deep chill seizes
+  // machinery and slows the living.
+  'cold',
   'aetheric',
   'electrical',
   'piercing',
@@ -27,6 +31,27 @@ export const DAMAGE_TYPE_KEYWORDS = [
   'stun',
   'psychic',
 ] as const;
+
+// OTA-827 [Group-K] — canonical damage-type aliases, shared by EVERY consumer of
+// the weakness math (applyDamageTypeModifier, traitDamageMultiplier, the combat
+// flare procs). Pre-fix only gameStore's proc layer aliased these, so `force`
+// weapons (aetheric-flavored runecasters) and `frost` weapons stayed type-neutral
+// in the actual DAMAGE reconcile even though the proc layer already treated them
+// as aetheric/cold. Making the alias authoritative closes that gap in one place.
+export const DAMAGE_TYPE_ALIASES: Record<string, string> = {
+  force: 'aetheric',
+  psychic: 'aetheric',
+  frost: 'cold',
+  ice: 'cold',
+  shock: 'electrical',
+};
+
+/** Canonicalize a damage-type word through the shared alias table (identity for
+ *  a non-aliased type). Always lower-cases. */
+export function canonicalDamageType(t: string | null | undefined): string {
+  const lc = (t ?? '').toLowerCase();
+  return DAMAGE_TYPE_ALIASES[lc] ?? lc;
+}
 
 /** Scan a string for an explicit damage-type word. Returns the canonical type
  *  (psychic normalized to aetheric) or null when none is present. Mirrors the
@@ -50,6 +75,11 @@ export function parseDamageTypeKeyword(s: string | null | undefined): string | n
   for (const t of DAMAGE_TYPE_KEYWORDS) {
     if (lower.includes(t)) return t === 'psychic' ? 'aetheric' : t;
   }
+  // OTA-827 — fall back to the alias words (frost/ice/force/shock) so a string
+  // that names only a synonym still resolves to its canonical type.
+  for (const alias of Object.keys(DAMAGE_TYPE_ALIASES)) {
+    if (lower.includes(alias)) return DAMAGE_TYPE_ALIASES[alias]!;
+  }
   return null;
 }
 
@@ -62,6 +92,9 @@ export function parseDamageTypeKeyword(s: string | null | undefined): string | n
 const ATTACK_VERB_TYPE: ReadonlyArray<readonly [RegExp, string]> = [
   [/aether|psychic|void|mind|spectral|phantom|wail|scream|gaze|hex|curse|drain|wither/i, 'aetheric'],
   [/burn|flame|\bfire\b|scorch|ember|ignite|cinder|searing|molten|magma/i, 'burn'],
+  // OTA-827 [Group-K] — cold/frost attacks (before the physical buckets so a
+  // "Frost Maul" reads as cold, not bludgeoning).
+  [/frost|\bice\b|\bicy\b|freez|glaci|rime|chill|frigid|hoar|winter|permafrost/i, 'cold'],
   [/shock|spark|lightning|jolt|\bvolt|static|thunder|arc\b|electr/i, 'electrical'],
   [/poison|venom|toxic|spore|acid|corros|blight|rot\b|plague|sick/i, 'poison'],
   [/radiat|irradiat|fallout|decay\b/i, 'radiation'],
