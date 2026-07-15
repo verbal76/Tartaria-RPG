@@ -16314,4 +16314,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aetheric Vest on you") and quantity. Recipe rows now open a LEARN pending (isRecipe):
 // no equip slots, no stack, the confirm button reads "Learn" and the title "Learn the X
 // working". buyFromVendor's recipe-learn branch still charges TC + teaches it.
-export const OTA_BUILD_ID = '2026-07-15-822-vendor-recipe-no-reroll';
+//
+// OTA-823 — NARRATOR "theYou" GLUE + TORCH LEAD CLARITY (device log). (1) Qwen 0.5B
+// occasionally emits a token boundary with no space, gluing words at a lowercase→
+// Uppercase seam — the log caught the Arbiter narrating "theYou stood in the shadowy
+// chamber…". New repairGluedNarration (foreignText.ts) un-glues any [a-z][A-Z] seam
+// (English narration prose never has intra-word camelCase) and drops an article
+// stranded before a subject pronoun ("the You" → "You"); wired alongside
+// stripForeignWords at every narration site (main + ambient arbiter, generate wrapper,
+// ask-arbiter). (2) The Aetheric Torch charged a lead but the reveal said "Work it",
+// so the player typed the flavor word ("the resonance") and got refused; it now names
+// the hook's actual noun — "Work the crystal — investigate it and it will give up
+// something rare" — pointing the player at the interactable that claims the reward.
+export const OTA_BUILD_ID = '2026-07-15-823-narrator-glue-torch-lead';
