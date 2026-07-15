@@ -10,7 +10,8 @@ import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { vendorPriceMod } from '../engine/factionRapport';
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
-import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem } from '../engine/crafting';
+import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
+import { vendorRecipeOffers, vendorSeed } from '../engine/recipeDiscovery';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
 import {
   CATEGORY_ORDER,
@@ -261,6 +262,14 @@ export function VendorScreen() {
     vendor?.faction,
   );
   const rapportPct = Math.round(rapportMod * 100);
+  // OTA-812 — recipes this vendor will TEACH for TC, surfaced as buttons so the
+  // player doesn't have to know the typed "buy <name>" command. Same source the
+  // store's buy path checks; tapping LEARN calls buyFromVendor(result) which routes
+  // through the recipe-learn branch. Filtered to the ones not yet known.
+  const recipeOffers = vendor
+    ? vendorRecipeOffers(RECIPES, player.knownRecipes, vendorSeed(vendor.name))
+        .filter((o) => !(player.knownRecipes ?? []).includes(o.result))
+    : [];
   // Inventory items the player can sell — exclude the EXACT equipped instances +
   // unsellable. OTA-687 — exclude by INSTANCE ID (equippedInstanceIds), not name,
   // so a spare copy of an equipped item's name is a different instance and stays
@@ -413,7 +422,8 @@ export function VendorScreen() {
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {mode === 'buy' ? (
-          vendor.offers.length === 0 ? (
+          <>
+          {vendor.offers.length === 0 && recipeOffers.length === 0 ? (
             <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
           ) : (
             CATEGORY_ORDER.map((cat) => {
@@ -505,7 +515,56 @@ export function VendorScreen() {
                 </View>
               );
             })
-          )
+          )}
+          {/* OTA-812 — WORKINGS TO LEARN. Recipes the vendor teaches for TC, now
+              tappable buttons instead of a typed "buy <name>" the player had to guess
+              from the arrival prose. Tapping opens the same buy-confirm; confirming
+              routes through buyFromVendor's recipe-learn branch. */}
+          {recipeOffers.length > 0 && (() => {
+            const secKey = 'buy_recipes';
+            const collapsed = collapsedSections[secKey] ?? false; // open by default — this is the discoverable bit
+            const RECIPE_ACCENT = '#c9a86a';
+            return (
+              <View style={styles.section}>
+                <TouchableOpacity
+                  style={[styles.sectionHeader, { borderLeftColor: RECIPE_ACCENT }]}
+                  activeOpacity={0.7}
+                  onPress={() => setCollapsedSections((s) => ({ ...s, [secKey]: !(s[secKey] ?? false) }))}
+                >
+                  <View style={styles.sectionHeaderLeft}>
+                    <Text style={[styles.sectionChevron, { color: RECIPE_ACCENT }]}>{collapsed ? '▾' : '▴'}</Text>
+                    <Text style={[styles.sectionLabel, { color: RECIPE_ACCENT }]}>WORKINGS TO LEARN</Text>
+                  </View>
+                  <Text style={styles.sectionCount}>{recipeOffers.length}</Text>
+                </TouchableOpacity>
+                {!collapsed && recipeOffers.map((o) => {
+                  const preview = getItemPreview(o.result);
+                  const canAfford = player.tc >= o.price;
+                  return (
+                    <View key={`recipe_${o.result}`} style={styles.offerRow}>
+                      <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
+                      <TouchableOpacity
+                        style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
+                        onPress={() => openBuy(o.result, o.price)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.offerHead}>
+                          <Text style={styles.offerName} numberOfLines={1}>{o.result}</Text>
+                          <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>{o.price} TC</Text>
+                        </View>
+                        <View style={styles.offerSubHead}>
+                          <Text style={styles.offerKind} numberOfLines={1}>
+                            recipe{preview.rarity ? ` · ${preview.rarity}` : ''} · learn to craft
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
+          </>
         ) : (
           // SELL mode — inventory list with sell prices.
           <>
