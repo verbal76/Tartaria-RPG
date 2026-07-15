@@ -762,13 +762,17 @@ export type DamageType =
   | 'degradation'
   | 'bludgeoning'
   | 'burn'
+  | 'cold'
   | 'aetheric'
   | 'electrical'
   | 'piercing'
   | 'poison'
   | 'radiation'
   | 'slashing'
-  | 'stun';
+  | 'stun'
+  // OTA-827 [Group-K] — `force` is a first-class alias of aetheric (see
+  // canonicalDamageType); the 2 runecaster force weapons are aetheric-flavored.
+  | 'force';
 
 export type StatusEffectKind =
   | 'bleed'

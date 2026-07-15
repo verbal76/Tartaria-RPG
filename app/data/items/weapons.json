@@ -5483,6 +5483,51 @@
       "description": "Force Wave. A palm-shaped runecaster. Hits without contact and shoves with the strike."
     },
     {
+      "name": "Frostbind",
+      "weaponKind": "runecaster",
+      "damageType": "cold",
+      "damageDice": "1d6",
+      "stat": "intelligence",
+      "statRequirement": 2,
+      "rarity": "Uncommon",
+      "style": "runecaster",
+      "tc": 50,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "cold",
+        "frost",
+        "crafted"
+      ],
+      "effect": "1d6 cold; deep chill seizes machines — bites hard into Constructs, Automations, and the frost-vulnerable.",
+      "description": "Frostbind. A blue-white runecaster rimed with permanent frost — each pulse breathes a knife of cold that locks joints and cracks plate."
+    },
+    {
+      "name": "Frost Maul",
+      "weaponKind": "melee",
+      "damageType": "cold",
+      "damageDice": "1d8",
+      "stat": "strength",
+      "statRequirement": 3,
+      "rarity": "Rare",
+      "style": "heavy",
+      "tc": 90,
+      "defense": 0,
+      "tags": [
+        "weapon",
+        "melee",
+        "blunt",
+        "cold",
+        "frost",
+        "crafted"
+      ],
+      "effect": "1d8 cold; a two-handed rime-forged maul — seizes machinery and staggers the living.",
+      "description": "Frost Maul. A heavy warhammer forged from rime-iron, its head sheathed in never-melting frost. Every swing lands a shock of cold."
+    },
+    {
       "name": "Dark Blight",
       "weaponKind": "runecaster",
       "damageType": "poison",

@@ -7,6 +7,8 @@
 // a colon — "resist:slashing", "vulnerable:burn". Unknown ids are ignored,
 // so the catalog can drift ahead of code without breaking saves.
 
+import { canonicalDamageType } from './damageTypes';
+
 // arb-fix — flying / hovering enemies the dog can't reach (it can't jump
 // that high), and that ranged "+Nd6 against airborne enemies" weapons get a
 // bonus against. Primary signal is the explicit `aerial` trait; a name/type
@@ -70,12 +72,16 @@ export function traitDamageMultiplier(
   weaponDamageType: string | null | undefined,
 ): { multiplier: number; match: 'resist' | 'vulnerable' | 'normal' } {
   if (!traits || !weaponDamageType) return { multiplier: 1, match: 'normal' };
-  const wt = weaponDamageType.toLowerCase();
+  // OTA-827 [Group-K] — canonicalize both sides through the shared alias table so
+  // a `force` weapon matches a `resist:aetheric` trait and a `frost` weapon matches
+  // a `vulnerable:cold` trait (the two Core Guardians' authored cold traits now fire
+  // against the new frost weapons). Identity for a non-aliased type.
+  const wt = canonicalDamageType(weaponDamageType);
   for (const t of traits) {
     const [key, arg] = t.split(':');
     if (!arg) continue;
-    if (key === 'resist' && arg.toLowerCase() === wt) return { multiplier: 0.5, match: 'resist' };
-    if (key === 'vulnerable' && arg.toLowerCase() === wt) return { multiplier: 1.5, match: 'vulnerable' };
+    if (key === 'resist' && canonicalDamageType(arg) === wt) return { multiplier: 0.5, match: 'resist' };
+    if (key === 'vulnerable' && canonicalDamageType(arg) === wt) return { multiplier: 1.5, match: 'vulnerable' };
   }
   return { multiplier: 1, match: 'normal' };
 }
