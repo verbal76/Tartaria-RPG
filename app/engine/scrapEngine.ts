@@ -113,6 +113,35 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
         ? { name: 'Aetheric Cloth', quantity: 1 }   // Rare fiber
         : { name: 'Golem Core', quantity: 1 });     // Rare (Iron-Golem bottleneck)
     }
+    // OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). This
+    // OTA-756 fused branch RETURNED before the OTA-611 selfCrafted strip/halve
+    // guard below, so a fused piece — ALWAYS selfCrafted (applyFusion stamps it)
+    // — scrapped for its FULL premium yield, incl. a free Golem Core (the
+    // Iron-Golem bottleneck). Fusion is FREE at an outpost/market Crucible, so
+    // fuse→scrap was a renewable mint of the scarce Core + Aetheric stock from
+    // cheap inferred inputs — reopening the EXACT hole OTA-611's guard closed
+    // (see applyFusion's selfCrafted comment). A fused item is player-made, so it
+    // obeys the same rule as any self-craft: recycling never out-earns the
+    // inputs. Strip the premium (high-sell / bottleneck) mats and halve the rest.
+    // A genuinely-earned fusion you break still yields token mats, never the
+    // scarce Core/Cloth/Shard for free. LEGACY fused items (forged pre-OTA-611,
+    // no selfCrafted flag) are a FINITE, non-renewable set — you can't mint new
+    // ones — so they keep the old full yield.
+    if (item.selfCrafted) {
+      const FUSED_PREMIUM = new Set([
+        'Golem Core', 'Aetheric Shard', 'Aetheric Dust', 'Aetheric Cloth',
+        'Aether Crystal', 'Aether Dust', 'Mudstone',
+      ]);
+      const stripped = fusedGrants
+        .filter((g) => !FUSED_PREMIUM.has(g.name))
+        .map((g) => ({ name: g.name, quantity: Math.floor(g.quantity / 2) }))
+        .filter((g) => g.quantity > 0);
+      const finalFused = stripped.length > 0 ? stripped : [{ name: 'Small Rock', quantity: 1 }];
+      const strippedSummary = finalFused
+        .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
+        .join(', ');
+      return { grants: finalFused, summary: strippedSummary };
+    }
     const fusedSummary = fusedGrants
       .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
       .join(', ');

@@ -12087,6 +12087,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
+          // OTA-825 — exploit close (reverify workflow, CONFIRMED high-severity). A
+          // thrown attack is a PLAYER TURN, but this path never let the enemy group
+          // act, so throwing was a COUNTER-FREE ranged attack that ALSO skipped enemy
+          // regen (regen only ticks inside applyEnemyCounter). Even a bare "throw
+          // stone" chipped 1 dmg/turn with zero retaliation — a safe, if slow, kill of
+          // any enemy incl. bosses. Mirror the melee/golem-command paths: after the
+          // throw (hit OR miss), the surviving enemy group swings back + regen/DOTs
+          // tick via runEnemyGroupCounters. Guard on survivors: a throw that KILLED
+          // the last enemy (resolveEnemyDefeat cleared the scene) has none left to act.
+          {
+            const sceneAfterThrow = get().currentScene;
+            if (sceneAfterThrow && sceneAfterThrow.enemies.length > 0) {
+              runEnemyGroupCounters(get, set, get().player ?? player);
+            }
+          }
           break;
         }
         if (hookMatch && !hookMatch.resolved) {
