@@ -133,6 +133,13 @@ export function isFusionReservable(
   if (item.uniqueStats) return false;
   if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
   if ((item.tags ?? []).some((t) => FUSION_EDIBLE_TAG.test(t))) return false;
+  // OTA-1114 — protected kinds/tags (quest / relic / sigil / currency / keepsake /
+  // throwable) are NEVER fusion fodder — reject BEFORE the inferred/material
+  // shortcuts so a catalog-absent quest or relic item isn't listed as reservable in
+  // the FUSABLE filter (player report on the Tartaria line: the main-quest "Cores"
+  // showed up in sort-by-fusible).
+  if (item.kind === 'relic') return false;
+  if ((item.tags ?? []).some((t) => /throwable|keepsake|quest|sigil|currency|relic/i.test(t))) return false;
   if (isInferredItem(item.name)) return true;
   const k = item.kind ?? '';
   if (k === 'material' || k === 'misc') {
