@@ -12082,6 +12082,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
             get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}${coatBonus > 0 ? ` (+${coatBonus} ${throwCoat!.kind} coating)` : ''}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
+            // OTA-826 [Group-K audit] — coating PARITY on the typed-throw path. Pre-fix
+            // this path folded in the coating's on-hit bonus but DROPPED the lingering
+            // DOT (and acid armor-shred / corruption stacks), so a Poisoned/Acid/Corrupted
+            // knife thrown by name ("throw knife at X") did ~one 1d4 tick and nothing more,
+            // while the SAME knife racked in the bandolier landed a full 3-turn DOT. For
+            // poison/acid/corruption the DOT *is* the payload — dropping it made typed-throw
+            // coatings near-inert. Seed the same proc the equipped/bandolier paths use
+            // (shared applyWeaponCoatingProc) when the enemy survives the throw.
+            if ((hps[idx] ?? 0) > 0 && throwCoat && coatBonus > 0) {
+              applyWeaponCoatingProc(set, idx, { kind: throwCoat.kind, rolled: coatBonus, source: itemUsed?.name });
+              get().appendLog('combat', `The ${throwCoat.kind} coating clings to ${enemyHit.name}.`);
+            }
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
@@ -13241,9 +13253,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `Shot ${i + 1}/${burstCount} — d20 ${roll} + ${statLabel} ${statVal}${penalty ? ` − ${penalty} (burst)` : ''} = ${total} vs AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
           );
           if (hit) {
-            const dmg = Math.max(1, rollDie(equipped.damageDice.includes('d10') ? 10 : 6));
+            // OTA-826 [Group-K audit] — burst-fire was bypassing the weakness
+            // system: a bare rollDie ignored the weapon's damageType, so an
+            // electrical bolt-caster did nothing extra to an electrical-weak
+            // Automation and a piercing burst wasn't resisted by a pierce-resist
+            // foe. Route each shot through the same type-map + trait reconcile the
+            // primary attack uses.
+            const rawShot = Math.max(1, rollDie(equipped.damageDice.includes('d10') ? 10 : 6));
+            const shotType = equipped.damageType ?? null;
+            const shotMod = combineDamageTypeMatch(
+              applyDamageTypeModifier(rawShot, shotType, targetEnemy.type).match,
+              traitDamageMultiplier(targetEnemy.traits, shotType).match,
+            );
+            const dmg = Math.max(1, Math.round(rawShot * shotMod.multiplier));
+            const shotTag = shotMod.match === 'weak' ? ' (weak — bites deep!)' : shotMod.match === 'resist' ? ' (resisted)' : '';
             livingHp = Math.max(0, livingHp - dmg);
-            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
+            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}${shotTag}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
             if (livingHp <= 0) {
               killed = true;
               break;
@@ -22286,11 +22311,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
         const idx = Math.max(0, Math.min(liveScene.activeEnemyIdx ?? 0, liveScene.enemies.length - 1));
         const target = liveScene.enemies[idx]!;
-        const dmg = rollDie(6);
+        // OTA-826 [Group-K audit] — this proc's log says "aetheric" but the damage
+        // was typeless: full damage against the many aetheric-RESISTANT foes
+        // (Aetheric Mutation/Creature, Automation, Mechanism, Etheric Undead) and
+        // no bonus vs a vulnerable:aetheric enemy. Apply the aetheric type modifier
+        // so the named element actually interacts with the weakness system.
+        const rawEle = rollDie(6);
+        const eleMod = combineDamageTypeMatch(
+          applyDamageTypeModifier(rawEle, 'aetheric', target.type).match,
+          traitDamageMultiplier(target.traits, 'aetheric').match,
+        );
+        const dmg = Math.max(1, Math.round(rawEle * eleMod.multiplier));
+        const eleTag = eleMod.match === 'weak' ? ' (weak — bites deep!)' : eleMod.match === 'resist' ? ' (resisted)' : '';
         const prevHp = liveScene.enemyHps[idx] ?? target.hp;
         const newHp = Math.max(0, prevHp - dmg);
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => i === idx ? newHp : h) } } : s);
-        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric. (${newHp} HP left)`);
+        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric${eleTag}. (${newHp} HP left)`);
         // OTA-625 — run the defeat resolver when this proc is the killing blow.
         // idx is the active enemy, so resolveEnemyDefeat() targets the right one
         // (same guard pattern the normal attack paths use). Pre-fix the enemy sat
@@ -25584,7 +25620,17 @@ function applyEnemyCounter(
       }
       // Player lands a hit on enemy as part of trading.
       const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
-      const dmg = equipped ? rollDie(6) + 1 : rollDie(4);
+      // OTA-826 [Group-K audit] — the fight-back trade dealt untyped damage,
+      // bypassing the weakness system on this counter path. Apply the equipped
+      // weapon's type (bare-hand = bludgeoning, matching the primary attack) so a
+      // trade against a weak/resistant foe scales like a normal swing.
+      const rawFb = equipped ? rollDie(6) + 1 : rollDie(4);
+      const fbType = equipped ? (equipped.damageType ?? null) : 'bludgeoning';
+      const fbMod = combineDamageTypeMatch(
+        applyDamageTypeModifier(rawFb, fbType, enemy.type).match,
+        traitDamageMultiplier(enemy.traits, fbType).match,
+      );
+      const dmg = Math.max(1, Math.round(rawFb * fbMod.multiplier));
       const live = get().currentScene;
       if (live) {
         const idx = live.enemies.findIndex((e) => e === enemy);

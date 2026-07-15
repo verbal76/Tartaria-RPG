@@ -16342,4 +16342,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "follow the resonance": the torch-charged hook is stamped with sound-synonyms
 // (resonance/sound/ringing/hum/note) so investigate/examine/work/FOLLOW the resonance
 // all resolve to it; a "follow"-verb travel onto a torch-charged hook advances it.
-export const OTA_BUILD_ID = '2026-07-15-825-throw-counter-and-fused-scrap-faucet';
+export const OTA_BUILD_ID = '2026-07-15-826-groupk-combat-weakness-wiring';
