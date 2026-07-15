@@ -1,4 +1,4 @@
-// OTA-1095 — a HUNT is a FACE-TO-FACE turn-in. The trophy must be shown in person to
+// OTA-810 — a HUNT is a FACE-TO-FACE turn-in. The trophy must be shown in person to
 // a paying agent (the posting faction's, or any vendor for a neutral hunt); there is
 // no remote/courier close, and the Contracts-UI COMPLETE no longer pays from any tile
 // (that was the B2 exploit). Mysteries/storylines/faction deeds are untouched.
@@ -69,7 +69,7 @@ function armReadyHunt(store: ReturnType<typeof useGameStore>, vendor: { name: st
   return def;
 }
 
-describe('OTA-1095 — hunts are a face-to-face turn-in', () => {
+describe('OTA-810 — hunts are a face-to-face turn-in', () => {
   it('the Contracts-UI COMPLETE is refused with NO agent present (closes the B2 remote-close)', async () => {
     const store = await boot();
     const def = armReadyHunt(store, null); // no vendor in scene
@@ -93,7 +93,9 @@ describe('OTA-1095 — hunts are a face-to-face turn-in', () => {
     const tcBefore = store.getState().player!.tc;
     store.getState().completeContractFromUI('hunt', def.id);
     expect((store.getState().player!.activeHunts ?? []).some((h) => h.id === def.id)).toBe(false); // closed
-    expect(store.getState().player!.tc).toBe(tcBefore + def.rewardTc);                              // full pay
+    // B2/OTA-824 — full pay OR MORE (the face-to-face turn-in now adds a long-haul bonus
+    // scaled to how far the hand-in tile is from the starter hub).
+    expect(store.getState().player!.tc).toBeGreaterThanOrEqual(tcBefore + def.rewardTc);
   });
 });
 
