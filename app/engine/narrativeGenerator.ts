@@ -707,8 +707,15 @@ const COMBAT_REMARKS = [
   `"One of you ends this exchange standing," the ${getNarratorName()} says, eyes on the {enemy}. "Cast the vote."`,
 ];
 
+// OTA-1098 — a boss / named threat is a PROPER NOUN; lowercasing it reads wrong
+// ("the heir atalan-drowned is patient"). Generic creatures still lowercase cleanly
+// ("the mud boar"). Keyed off the `boss` flag.
+export function combatEnemyLabel(enemy: Pick<Enemy, 'name' | 'boss'>): string {
+  return enemy.boss ? enemy.name : enemy.name.toLowerCase();
+}
+
 function combatRemark(enemy: Enemy): string {
-  return rotatingPick(resolveFlavor('combatRemarks', COMBAT_REMARKS), 'arbiter.combat.remark').replace('{enemy}', enemy.name.toLowerCase());
+  return rotatingPick(resolveFlavor('combatRemarks', COMBAT_REMARKS), 'arbiter.combat.remark').replace('{enemy}', combatEnemyLabel(enemy));
 }
 
 // arb136 — cooldown counter for the unresolved-hook "nag" callback. Without it the
@@ -1129,7 +1136,7 @@ export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
 
   if (enemy) {
     return pick([
-      `The ${getNarratorName()} does not look away from the ${enemy.name.toLowerCase()}. "Decide quickly. It will not wait."`,
+      `The ${getNarratorName()} does not look away from the ${combatEnemyLabel(enemy)}. "Decide quickly. It will not wait."`,
       `"You can fight, hide, or speak," the ${getNarratorName()} says low. "${enemy.name} is already deciding for itself."`,
     ]);
   }
@@ -1193,7 +1200,7 @@ export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
   // Combat scenes stay tight on the threat — no identity / timeline drift
   // while a hostile is staged.
   if (enemy) {
-    return pick(resolveFlavor('combatIntros', ARBITER_COMBAT_INTROS)).replace('{enemyName}', enemy.name.toLowerCase());
+    return pick(resolveFlavor('combatIntros', ARBITER_COMBAT_INTROS)).replace('{enemyName}', combatEnemyLabel(enemy));
   }
 
   // ~12% — timeline callback. Builds dynamically from milestones and the

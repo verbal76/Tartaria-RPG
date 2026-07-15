@@ -17443,4 +17443,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // run-on wall). (2) The vendor buy screen surfaces a "WORKINGS TO LEARN" section —
 // recipes the trader teaches, each a tappable row (buy-confirm → buyFromVendor
 // recipe-learn branch) — so learning no longer needs the typed "buy <name>" command.
-export const OTA_BUILD_ID = '2026-07-14-1097-readable-feed-recipe-buttons';
+// OTA-1098 — BOSS NAME CASING. The narrator's combat templates lowercased the enemy
+// name — fine for a generic ("the mud boar") but wrong for a NAMED boss/threat ("the
+// heir atalan-drowned is patient"). New combatEnemyLabel(enemy) keeps proper case
+// when enemy.boss and lowercases generics; applied to the three combat-narrator
+// template sites in narrativeGenerator.
+export const OTA_BUILD_ID = '2026-07-14-1098-boss-name-casing';
