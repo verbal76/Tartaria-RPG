@@ -15874,4 +15874,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // at danger 0 to ~64 at danger 5) plus a flat-capped multiplier (a big Legendary is
 // nudged, not exploded → gentler than a Guardian). A fresh arrival on a danger-0 tile
 // is untouched. Applied at scene arrival + groups, rest-ambush, and hook spawn.
-export const OTA_BUILD_ID = '2026-07-15-796-regular-enemy-scaling';
+// OTA-797 — MIXED-ROLE PACKS + PACK-AWARE SCALING. (1) The curated single-enemy path
+// pre-empted the group roll, so laddered areas hadn't spawned more than one foe in
+// weeks. rollExtraPackMembers adds role-DIVERSE foes (different types → mixed
+// weaknesses in one fight), frequency scaling with danger, never onto a boss, capped
+// at 3. Revives the target-swipe UI + companions. (2) scaleEncounterForContext is now
+// PACK-AWARE (player: scale multiples as a package, not individually — 3 solo-scaled
+// foes together beat a boss): a pack shares one budget, anchored on a solo-scaled mean
+// body + a small per-body premium, HARD-CAPPED under a boss (70+danger·10), distributed
+// by base-HP weight. Solo spawns still scale per-enemy. Next: randomized weakness + WIS read.
+export const OTA_BUILD_ID = '2026-07-15-797-mixed-packs-pack-scaling';
