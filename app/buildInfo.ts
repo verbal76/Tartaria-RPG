@@ -16208,4 +16208,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   2. WEAPON_SOFT_TAIL_NOUNS gained item/material end-nouns (core, orb, heart,
 //      crystal, essence, stone, rune, sigil, …) so a forged WEAPON can't keep a
 //      soft Qwen name like "Aether Core"; the deterministic weapon pool renames it.
-export const OTA_BUILD_ID = '2026-07-14-814-coating-equip-repoint-and-fused-names';
+//
+// OTA-815 — three tuning calls from the playtest conversation:
+//   A. GUARDIAN POWER SCALING — Core Guardians scaled by kill-count only, so an
+//      over-leveled side-quester mashed the early Guardians. spawnGuardianForCapital
+//      now layers a player-power factor (guardianOverLevel) on top of the tier
+//      profile: 1.0 at/under the tier's expected power (authored fight stands for a
+//      fresh arrival), climbing to 1.9× for an over-leveled player — lifting HP, AC,
+//      and attack together. HAL/golem only (engine has no Guardians).
+//   B. DODGE FLOOR — a dodging high-DEX player could win the opposed contest even
+//      vs an enemy nat-20 and become literally untouchable. A NATURAL 20 now lands
+//      through a dodge (2× out-of-position, crit-doubling still suppressed per
+//      OTA-796), the same 5% floor the AC path honors. Never invulnerable; a high
+//      miss rate is fine.
+//   C. SIGIL → RAPPORT — returning a faction sigil now establishes that faction's
+//      CHA vendor discount (marks its rapport quest id complete), replacing the
+//      bespoke fetch-a-relic gate. Reuses the existing sigil economy; no new items.
+export const OTA_BUILD_ID = '2026-07-15-815-guardian-scale-dodge-floor-sigil-rapport';
