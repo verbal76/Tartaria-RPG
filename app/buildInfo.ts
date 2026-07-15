@@ -17457,4 +17457,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   2. WEAPON_SOFT_TAIL_NOUNS gained item/material end-nouns (core, orb, heart,
 //      crystal, essence, …) so a forged WEAPON can't keep a soft name like
 //      "Aether Core"; the deterministic weapon pool renames it.
-export const OTA_BUILD_ID = '2026-07-14-1099-coating-equip-repoint-and-fused-names';
+//
+// OTA-1100 — two tuning calls (playtest conversation; parts B+C of the sibling
+// batch — the Guardian-scaling part A is HAL/golem-only, no Guardians here):
+//   B. DODGE FLOOR — a natural 20 now lands through a dodge (2× out-of-position,
+//      crit-doubling suppressed per OTA-1082), the same 5% floor the AC path
+//      honors. Never invulnerable; a high miss rate is fine.
+//   C. SIGIL → RAPPORT — returning a faction sigil establishes that faction's CHA
+//      vendor discount (marks its rapport quest id complete), replacing the bespoke
+//      fetch-a-relic gate. No new items.
+export const OTA_BUILD_ID = '2026-07-15-1100-dodge-floor-sigil-rapport';
