@@ -16170,4 +16170,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // faction deeds keep their remote cut untouched. ContractsScreen hunt "how to finish"
 // updated to say hand in face to face. Dodge-at-high-DEX (the other open B item) is
 // parked pending a live retest.
-export const OTA_BUILD_ID = '2026-07-14-810-hunts-face-to-face';
+// OTA-811 — PROSE POLISH: kill the command-syntax placeholders leaking into
+// narration (playtest: "a big block of text with placeholder nouns in it"). The
+// vendor-arrival wares blurb welded typed-command syntax into the story — 'buy
+// <name>', 'repair <item>', 'train <stat>' — so the angle-bracket tokens read as
+// unfilled template placeholders in the middle of prose. Rewritten in plain language
+// (buy a recipe by name, "mends worn gear, trains a stat for coin, patches up a hurt
+// dog or golem — just ask") that still tells the player what to type. Same fix on the
+// three arbiter "send word <name>" contract-courier lines → "send word by name". The
+// remaining <...> tokens in the codebase are all in CODE COMMENTS, not player-facing.
+export const OTA_BUILD_ID = '2026-07-14-811-narration-placeholder-cleanup';
