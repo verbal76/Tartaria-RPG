@@ -50,6 +50,14 @@ const TYPE_TO_EFFECT: Record<string, EffectRule> = {
     duration: () => rollDie(6),
     label: 'poisoned',
   },
+  // OTA-831 — a cold hit can leave you `chilled`: a timed −DEX slow (applied in
+  // effectiveStats). The warming counter is drinking a cold coating.
+  cold: {
+    kind: 'chilled',
+    procChance: 0.3,
+    duration: () => rollDie(4),
+    label: 'chilled',
+  },
 };
 
 export interface AppliedEffect {

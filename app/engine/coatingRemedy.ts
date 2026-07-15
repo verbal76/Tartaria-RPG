@@ -8,16 +8,17 @@
 
 import type { PlayerCharacter, InventoryItem } from './types';
 
-export type CoatingKind = 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
+export type CoatingKind = 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold';
 
 /** Every damage element a coating can carry (drinkable or not). Used to read a
  *  coating's element off an inventory item's tags. */
-export const COATING_ELEMENTS: readonly CoatingKind[] = ['poison', 'acid', 'corruption', 'electrical', 'burn'];
+export const COATING_ELEMENTS: readonly CoatingKind[] = ['poison', 'acid', 'corruption', 'electrical', 'burn', 'cold'];
 
 /** Which coating elements have a player-side counter you can DRINK for. acid has none
- *  (no player 'acid' ailment) — it is coat-only. */
+ *  (no player 'acid' ailment) — it is coat-only. OTA-831 — cold IS drinkable: a warming
+ *  draught heals you and shakes off a `chilled` slow. */
 export function isCoatingDrinkable(kind: string | null | undefined): boolean {
-  return kind === 'corruption' || kind === 'poison' || kind === 'burn' || kind === 'electrical';
+  return kind === 'corruption' || kind === 'poison' || kind === 'burn' || kind === 'electrical' || kind === 'cold';
 }
 
 /** Pull a coating's element from an item's tags (Poison Vial → 'poison', Acid Flask →
@@ -81,6 +82,8 @@ export function coatingDrinkRemedy(
     case 'poison': dropStatus(['poisoned'], 'poison purged', 'no poison in you'); break;
     case 'burn': dropStatus(['burn_scar'], 'burns soothed', 'no burns to soothe'); break;
     case 'electrical': dropStatus(['stun', 'paralyzed'], 'nerves steadied', 'nerves steady'); break;
+    // OTA-831 — a warming draught shakes off the chill (a −DEX slow).
+    case 'cold': dropStatus(['chilled'], 'the chill lifts', 'no chill to shake'); break;
     default: break; // unreachable: acid is gated out by isCoatingDrinkable above
   }
   return { player: p, messages, corruptionBefore, corruptionAfter: p.corruption };

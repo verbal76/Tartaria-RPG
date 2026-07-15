@@ -23,7 +23,7 @@ import { BrandedModal } from './BrandedModal';
  *  panel so the player can see what's ticking and how many combat turns
  *  it has left. */
 export interface EnemyStatusView {
-  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'typed_dot';
+  kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat' | 'typed_dot';
   turnsRemaining: number;
   dmgPerTurn: number;
   sourceName: string;
@@ -49,6 +49,7 @@ const STATUS_META: Record<EnemyStatusView['kind'], { label: string; color: strin
   corruption_coat: { label: 'CORRUPTION', color: '#b88ce0' },
   electrical_coat: { label: 'SHOCK', color: '#6ac9e0' },
   burn_coat: { label: 'BURN', color: '#e0915f' },
+  cold_coat: { label: 'FROST', color: '#8fd4e8' },
   infected: { label: 'INFECTED', color: '#c97a5f' },
   // Combat-Parity II — built-in damage-type DOT (burn/poison/radiation procs). Distinct accent
   // from the coating families so a typed-DOT stack reads clearly on the enemy panel.

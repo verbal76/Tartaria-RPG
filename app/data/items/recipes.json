@@ -237,6 +237,40 @@
       ]
     },
     {
+      "result": "Frost Paste",
+      "ingredients": [
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rime Draught",
+      "ingredients": [
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

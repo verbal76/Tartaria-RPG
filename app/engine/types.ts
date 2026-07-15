@@ -493,8 +493,10 @@ export interface InventoryItem {
 
 /** OTA-360 — a weapon coating stamped on a single weapon instance. */
 export interface WeaponCoating {
-  /** Coating family — drives the on-hit enemy status that lands. */
-  kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn';
+  /** Coating family — drives the on-hit enemy status that lands. OTA-831 adds
+   *  `cold` (the anti-machine element from OTA-827): frost coatings deal a cold
+   *  DOT that earns a Construct/Automation's cold weakness. */
+  kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold';
   /** Damage dice rolled on a landing hit ("1d4"). */
   dice: string;
   /** Display adjective used by coatedDisplayName ("Corrupted"). */
@@ -781,6 +783,10 @@ export type StatusEffectKind =
   | 'armor_severed'
   | 'paralyzed'
   | 'poisoned'
+  // OTA-831 — a cold hit can leave you `chilled`: a timed −DEX slow (a shiver in the
+  // hands). Cleared by drinking a cold coating (the warming counter) or by waiting it
+  // out. Gives the new cold coating a real player-side ailment so it's drinkable.
+  | 'chilled'
   | 'dodging'
   // OTA-365 — 'blocking' removed (retired: no engine path ever applied
   // it; the dodge rework folded block into dodge).
