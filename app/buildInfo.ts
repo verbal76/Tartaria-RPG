@@ -16198,4 +16198,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spawns all carry the flag) and still lowercases generics; applied to the three
 // combat-arbiter template sites in narrativeGenerator (combatRemark, the call-to-
 // action pick, ARBITER_COMBAT_INTROS).
-export const OTA_BUILD_ID = '2026-07-14-813-boss-name-casing';
+//
+// OTA-814 — two playtest bugs from a device log re-read:
+//   1. applyCoating on a STACKED, equipped weapon peeled the coating onto a fresh
+//      instance but left equipped.mainId/offId on the uncoated stack remainder, so
+//      the on-hit resolver (keyed off the equip slot) never fired — the weapon read
+//      "Now wielding the Burning …" yet landed zero burn. Fix re-points the equip
+//      slot to the coated instance.
+//   2. WEAPON_SOFT_TAIL_NOUNS gained item/material end-nouns (core, orb, heart,
+//      crystal, essence, stone, rune, sigil, …) so a forged WEAPON can't keep a
+//      soft Qwen name like "Aether Core"; the deterministic weapon pool renames it.
+export const OTA_BUILD_ID = '2026-07-14-814-coating-equip-repoint-and-fused-names';
