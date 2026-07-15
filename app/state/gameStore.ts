@@ -22343,6 +22343,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!target) return s;
       const coatingSpec = { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) };
       let inv: InventoryItem[];
+      let equipped = s.player.equipped;
       if (target.quantity > 1) {
         // OTA-1085 — the target is a STACK (e.g. a bundle of throwing darts).
         // Stamping the coating on the row would coat ALL N copies for a single
@@ -22350,8 +22351,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Peel ONE unit off into its own instance, coat only that, and leave the
         // rest of the stack bare. (A coated instance never re-stacks — grantItem's
         // OTA-363 guard keeps it separate.)
+        const coatedId = freshInstanceId('coat');
         inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, quantity: i.quantity - 1 } : i));
-        inv.push({ ...target, id: freshInstanceId('coat'), quantity: 1, coating: coatingSpec });
+        inv.push({ ...target, id: coatedId, quantity: 1, coating: coatingSpec });
+        // OTA-814 — if the coated weapon was the EQUIPPED one, the peel just left the
+        // equipped slot pointing at the uncoated stack remainder — so the on-hit
+        // coating resolver (which looks up by equipped.mainId/offId) never fired and
+        // the "Now wielding the Burning …" line lied. Re-point the equipped slot(s)
+        // to the freshly-coated instance so the weapon you swing actually carries it.
+        if (equipped?.mainId === weaponId || equipped?.offId === weaponId) {
+          equipped = {
+            ...equipped,
+            ...(equipped.mainId === weaponId ? { mainId: coatedId } : {}),
+            ...(equipped.offId === weaponId ? { offId: coatedId } : {}),
+          };
+        }
       } else {
         // Single instance — stamp in place so the equipped weapon's id/equip
         // state is preserved.
@@ -22361,7 +22375,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inv = inv
         .map((i) => (i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
-      return { player: { ...s.player, inventory: inv } };
+      return { player: { ...s.player, inventory: inv, equipped } };
     });
     const display = coatedDisplayName({ name: weapon.name, coating: { ...spec } });
     get().appendLog(

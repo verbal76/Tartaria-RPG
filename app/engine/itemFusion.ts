@@ -503,6 +503,12 @@ const WEAPON_SOFT_TAIL_NOUNS = new Set([
   'gossamer', 'filament', 'strand', 'fluff', 'down', 'mist', 'whisper', 'sigh',
   'petal', 'bloom', 'feather', 'cloth', 'cloak', 'scarf', 'shawl', 'quilt',
   'shroud', 'drape', 'weave', 'fringe', 'tassel',
+  // OTA-814 — item/material/abstract nouns that read as a THING, not a weapon.
+  // Playtest: a forged weapon got named "Aether Core" (a core isn't a weapon), which
+  // the player had to re-roll by hand. These end-nouns now push a weapon back to the
+  // deterministic suffix pool (Cleaver / Edge / Reaver / …). Armor keeps them.
+  'core', 'orb', 'eye', 'heart', 'crystal', 'essence', 'stone', 'rune', 'sigil',
+  'dust', 'seed', 'husk', 'shell', 'node', 'glow', 'echo', 'hum',
 ]);
 
 /** True when a forged WEAPON name ends in a soft / non-weapon noun (see the set
