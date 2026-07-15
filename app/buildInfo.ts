@@ -15855,4 +15855,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   2. WEAPON_SOFT_TAIL_NOUNS gained item/material end-nouns (core, orb, heart,
 //      crystal, essence, …) so a forged WEAPON can't keep a soft name like
 //      "Aether Core"; the deterministic weapon pool renames it.
-export const OTA_BUILD_ID = '2026-07-14-794-coating-equip-repoint-and-fused-names';
+//
+// OTA-795 — three tuning calls (playtest conversation):
+//   A. GUARDIAN POWER SCALING — Core Guardians scaled by kill-count only, so an
+//      over-leveled side-quester mashed early Guardians. guardianOverLevel layers a
+//      player-power factor (1.0 at/under the tier curve → 1.9× over-leveled) onto
+//      HP, AC, and attack. The authored Tier-1 still stands for a fresh arrival.
+//   B. DODGE FLOOR — a natural 20 now lands through a dodge (2× out-of-position,
+//      crit-doubling suppressed per OTA-776), the same 5% floor the AC path honors.
+//      Never invulnerable; a high miss rate is fine.
+//   C. SIGIL → RAPPORT — returning a faction sigil establishes that faction's CHA
+//      vendor discount (marks its rapport quest id complete), replacing the bespoke
+//      fetch-a-relic gate. No new items.
+export const OTA_BUILD_ID = '2026-07-15-795-guardian-scale-dodge-floor-sigil-rapport';

@@ -21449,12 +21449,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter shakes their head. "Not here. Carry the ${item.name} to ${dest} and lay it down among their own — or take it to the Hidden Market; they broker such debts."`);
       return;
     }
+    // Honor the dead: +1 standing, spend the sigil.
+    // OTA-815 — returning a faction's sigil ALSO establishes TRADE RAPPORT with that
+    // faction: it turns on the CHA-scaled vendor discount (buys cheaper / sell-backs
+    // richer) that used to sit behind a bespoke "fetch a relic" faction quest. The
+    // player asked to reuse the existing sigil economy instead of authoring nine new
+    // relics — a returned sigil is the earned gesture that opens their better prices.
+    // Mechanically we mark the faction's rapport quest id complete (the same key
+    // hasFactionRapport / vendorPriceMod already read), so no new plumbing. The
+    // authored fetch quests, where they exist, still work as an alternate path.
+    const rapportId = rapportQuestId(fac.id);
+    const hadRapport = (player.completedFactionQuestIds ?? []).includes(rapportId);
     const repResult = applyRepChange(player.factionStanding, fac.id, 1);
     set((s) => (s.player
       ? {
           player: {
             ...s.player,
             factionStanding: repResult.standing,
+            completedFactionQuestIds: hadRapport
+              ? s.player.completedFactionQuestIds
+              : [...(s.player.completedFactionQuestIds ?? []), rapportId],
             inventory: s.player.inventory
               .map((i) => (i.id === itemId ? { ...i, quantity: i.quantity - 1 } : i))
               .filter((i) => i.quantity > 0),
@@ -21464,6 +21478,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('world', atMarket
       ? `The Hidden Market broker takes the ${item.name} and sends it on to ${fac.name}'s own. The debt is marked paid — one of their dead comes home. (+1 ${fac.name} standing)`
       : `You lay the ${item.name} down among ${fac.name}'s own. They mark the debt paid — one of their dead comes home.`);
+    if (!hadRapport) {
+      const chaNow = effectiveStats(player).charisma;
+      const discPct = Math.round(chaPriceDiscount(chaNow) * 100);
+      get().appendLog('world', discPct > 0
+        ? `${fac.name} count you a friend of the house now — their traders open their better prices to you. (Charisma trade discount with them: ${discPct}%.)`
+        : `${fac.name} count you a friend of the house now — their traders will open their better prices once your Charisma gives you the tongue for it.`);
+    }
     logRepChanges(get, repResult.changed);
     void get().persist();
   },
@@ -25752,7 +25773,19 @@ function applyEnemyCounter(
   let dodgeLine: string | null = null;
   if (dodgingActive) {
     const dexStats = effectiveStats(player);
-    if (enemyFumble) {
+    if (enemyCrit) {
+      // OTA-815 — a NATURAL 20 is a perfect strike: it lands through a dodge, the
+      // same 5% floor the AC path already honors (a nat-20 is always an auto-hit
+      // there). Without this a high-DEX dodger wins the opposed contest even vs a
+      // 20 and becomes literally untouchable — the invulnerability the design
+      // forbids ("never invulnerable, a high miss rate is fine"). It resolves as a
+      // dodge LOSS: 2× out-of-position damage, with the crit dice-doubling still
+      // suppressed (dodgeWin != null below) so a pierced dodge is 2×, not 4×
+      // (preserves the OTA-796 balance). So no matter how much DEX/AC you stack,
+      // an enemy still lands ~1 swing in 20.
+      dodgeWin = false;
+      dodgeLine = `Dodge — ${enemy.name} rolls a NAT 20. No read beats a perfect strike; it lands through your dodge (2× damage).`;
+    } else if (enemyFumble) {
       dodgeWin = true;
       dodgeLine = `Dodge — ${enemy.name} overcommits past you. ✓ Free opening (next strike ×2 dice).`;
     } else {

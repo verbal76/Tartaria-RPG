@@ -94,8 +94,42 @@ const TIER_PROFILES: Record<GuardianTier, TierProfile> = {
   9: { hpMult: 3.1, acBonus: 5,  damage: '2d6+5',  counters: 2, extraTraits: ['armored', 'quick', 'regenerate', 'bleeder', 'ambush_strike'] },
 };
 
+// OTA-815 — PLAYER-POWER SCALING. The kill-count tier sets the AUTHORED floor for
+// each Guardian, but difficulty was keyed to that alone: a player who over-levels on
+// side content (deep stats + a big HP pool) walked through the early Guardians
+// because the fight was tuned for a fresh arrival no matter how strong they actually
+// were (player: "I mashed out 2 Guardians and I'm at end-game level, all I did were
+// side quests"). We layer an over-level factor ON TOP of the tier profile that only
+// ADDS difficulty above the tier's expected power — never below, so a kitted fresh
+// arrival still meets the authored Tier 1 (the OTA-448 promise holds). It lifts HP
+// (the Guardian doesn't melt), AC and attack (an over-geared player neither
+// auto-hits nor is untouchable — the same "the enemy's hit chance tracks the player
+// and never floors at zero" the OTA-815 dodge fix enforces on the defensive side).
+//
+// Power proxy is deliberately BASE stats + HP pool (no gear) — an over-leveled
+// character reads high on both; a fresh arrival reads low even in good gear. (A gear
+// term could sharpen it later; base is dependency-light and deterministic for tests.)
+
+/** A single "how strong is this character" score: best offensive stat + a slice of
+ *  the HP pool (leveling and CON both read as power). Fresh arrival ≈ 11-14,
+ *  fully-built end-game ≈ 33-37. */
+export function guardianPlayerPower(player: PlayerCharacter): number {
+  const s = player.stats;
+  const bestCombat = Math.max(s.strength, s.dexterity, s.intelligence);
+  return bestCombat + player.hpMax / 10;
+}
+
+/** Over-level multiplier for a Guardian at `tier`. 1.0 when the player is at/under
+ *  the tier's expected power (authored fight stands); climbs above 1 for an
+ *  over-leveled player, capped at 1.9 so it never becomes a "ridiculously hard"
+ *  wall. Expected power runs ~17 at T1 to ~41 at T9. */
+export function guardianOverLevel(player: PlayerCharacter, tier: GuardianTier): number {
+  const expected = 14 + tier * 3;
+  return Math.min(1.9, Math.max(1, guardianPlayerPower(player) / expected));
+}
+
 /** Returns the live-fight Enemy for the Guardian at this Capital,
- *  scaled to the player's current kill count and HP pool. Returns
+ *  scaled to the player's current kill count AND actual power. Returns
  *  null when the locationId is not a Lost Capital. */
 export function spawnGuardianForCapital(
   player: PlayerCharacter,
@@ -107,19 +141,22 @@ export function spawnGuardianForCapital(
   const coresCount = player.mainQuest?.coresRecovered.length ?? 0;
   const tier = tierForKills(coresCount);
   const profile = TIER_PROFILES[tier];
-  // HP scales with the tier profile AND the player's HP pool, so
-  // a level-20 player isn't trivialising a Tier 1 Guardian.
-  const playerHpFactor = Math.min(1.6, Math.max(1.0, player.hpMax / 30));
-  const hp = Math.round(def.base.hp * profile.hpMult * playerHpFactor);
+  // HP scales with the tier profile AND the player's real power, so an over-leveled
+  // player can't two-round an early Guardian.
+  const over = guardianOverLevel(player, tier);
+  const hp = Math.round(def.base.hp * profile.hpMult * over);
   // Bump the abilityPoint number — engine's enemyAC() derives base
   // AC from `5 + apNum`, so increasing the AP by the tier's
-  // acBonus pipes the scaling through the standard combatRules
-  // formula. Format stays the canonical "Stat N" string.
+  // acBonus (+ the player-power bonus) pipes the scaling through the
+  // standard combatRules formula for BOTH the Guardian's AC and its
+  // attack bonus. Format stays the canonical "Stat N" string.
   const apStr = String(def.base.abilityPoint);
   const apMatch = apStr.match(/^(\w+)\s+(\d+)/);
   const statName = apMatch ? apMatch[1] : 'Strength';
   const apNum = apMatch ? parseInt(apMatch[2]!, 10) : 6;
-  const scaledAp = `${statName} ${apNum + profile.acBonus}`;
+  // +0 at/under the tier curve, up to +7 for a heavily over-leveled player.
+  const powerBonus = Math.round((over - 1) * 8);
+  const scaledAp = `${statName} ${apNum + profile.acBonus + powerBonus}`;
   // Merge traits: signature + tier extras. Deduped.
   const traits = Array.from(new Set([
     CORE_GUARDIAN_TRAIT,
