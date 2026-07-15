@@ -759,9 +759,43 @@ export function synthesizeFusionDeterministic(
       'Saddle', 'Collar', 'Vest', 'Cover',
     ],
   };
+  // OTA-832 — slot-appropriate armor nouns. A fused armor piece used to pull its
+  // NOUN from a flat pool (Girdle/Harness/Plating/…) while its SLOT was chosen
+  // separately, so a "Girdle" (a waist word) or a "Harness" (a torso word) would
+  // land on the FEET slot (player report). Pick the slot FIRST, then a noun that
+  // fits it — feet get Boots/Sabatons, legs get Girdle/Greaves, chest gets
+  // Plate/Cuirass, head gets Helm/Crown.
+  const ARMOR_SLOT_NOUNS: Record<string, string[]> = {
+    head: ['Helm', 'Crown', 'Hood', 'Visor', 'Coif', 'Cowl', 'Casque', 'Circlet'],
+    chest: ['Plate', 'Cuirass', 'Mantle', 'Carapace', 'Bastion', 'Aegis', 'Harness', 'Bulwark'],
+    legs: ['Girdle', 'Greaves', 'Faulds', 'Kilt', 'Legguards', 'Tassets', 'Brace'],
+    feet: ['Boots', 'Sabatons', 'Treads', 'Stompers', 'Warboots', 'Footguards', 'Striders'],
+  };
   const hash = parseInt(fusionInputHash(inputs).substring(0, 8), 16);
   const theme = themePool[dominantTag] ?? themePool.improvised!;
-  const suffix = suffixPool[kind] ?? suffixPool.weapon!;
+  // Compute the forged armor slot up front (kind === 'armor'), so the noun can
+  // match it. Same rotation logic as before: hash-seeded start (cloth leans chest),
+  // then step past any slot forged in the last couple of fusions so the Crucible
+  // never returns the same slot back-to-back.
+  let armorSlot: (typeof VALID_ARMOR_SLOTS)[number] | undefined;
+  if (kind === 'armor') {
+    const startIdx = dominantTag === 'cloth'
+      ? VALID_ARMOR_SLOTS.indexOf('chest')
+      : Math.abs(hash) % VALID_ARMOR_SLOTS.length;
+    const avoid = new Set((recentSlots ?? []).map((s) => s.toLowerCase()));
+    let slotIdx = startIdx < 0 ? 0 : startIdx;
+    for (
+      let step = 0;
+      step < VALID_ARMOR_SLOTS.length && avoid.has(VALID_ARMOR_SLOTS[slotIdx]!);
+      step++
+    ) {
+      slotIdx = (slotIdx + 1) % VALID_ARMOR_SLOTS.length;
+    }
+    armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
+  }
+  const suffix = kind === 'armor' && armorSlot
+    ? (ARMOR_SLOT_NOUNS[armorSlot] ?? suffixPool.armor!)
+    : (suffixPool[kind] ?? suffixPool.weapon!);
   // OTA-224 — playtest fix: a previous synth named the result
   // "Resonant undefined" because `hash >> 4` is a SIGNED 32-bit
   // right shift in JavaScript. For hashes ≥ 2^31, the shift returns
@@ -798,25 +832,9 @@ export function synthesizeFusionDeterministic(
     // OTA-445 — Legendary AC +5 / Rare AC +3 (was 4 / 2).
     baseStats.acBonus = rarity === 'Legendary' ? 5 : 3;
     if (kind === 'armor') {
-      // OTA-739 — rotate the forged slot across all four positions instead of the
-      // old fixed cloth?chest:head (which sent every non-cloth fusion to head).
-      // Start from the input hash (so different reserved sets favor different
-      // slots), then step past any slot forged in the last couple of fusions so
-      // the Crucible never returns the same slot back-to-back. A soft material
-      // lean is kept: cloth/fiber sets bias toward chest as the starting point.
-      const startIdx = dominantTag === 'cloth'
-        ? VALID_ARMOR_SLOTS.indexOf('chest')
-        : Math.abs(hash) % VALID_ARMOR_SLOTS.length;
-      const avoid = new Set((recentSlots ?? []).map((s) => s.toLowerCase()));
-      let slotIdx = startIdx < 0 ? 0 : startIdx;
-      for (
-        let step = 0;
-        step < VALID_ARMOR_SLOTS.length && avoid.has(VALID_ARMOR_SLOTS[slotIdx]!);
-        step++
-      ) {
-        slotIdx = (slotIdx + 1) % VALID_ARMOR_SLOTS.length;
-      }
-      baseStats.armorSlot = VALID_ARMOR_SLOTS[slotIdx]!;
+      // OTA-739/OTA-832 — the forged slot is now computed up front (see above) so
+      // the item's NOUN can be chosen to match it; just apply it here.
+      baseStats.armorSlot = armorSlot;
     }
   }
   // OTA-445 — a fused piece always carries a real perk: +2 (Legendary) / +1
