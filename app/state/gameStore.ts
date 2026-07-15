@@ -1478,9 +1478,15 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     item = resealUtilityDurability(item);
     // OTA-688 — mark older Crucible forges. applyFusion now stamps uniqueStats AND
     // a 'fused' tag, but pieces forged before the tag existed carry uniqueStats
-    // without it. Backfill the tag on load so every crucible item is marked. uniqueStats
-    // is set ONLY by fusion, so this can't mislabel authored or looted gear.
-    if (item.uniqueStats && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
+    // without it. Backfill the tag on load so every crucible item is marked (the
+    // inventory ✶ badge + any fused-aware logic keys off it).
+    // OTA-808 — Core Guardian reward gear now ALSO carries uniqueStats (so it's a
+    // usable weapon/armor — see coreGuardians.ts), which breaks OTA-688's old
+    // "uniqueStats ⇒ fused" assumption. A Guardian drop is NOT a forge: skip the
+    // fused-tag backfill AND the fused-name migration below for the tagged set, so
+    // "Atalan's Trident" keeps its name and doesn't read as a Crucible fusion.
+    const isGuardianReward = (item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set');
+    if (item.uniqueStats && !isGuardianReward && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
       item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
     }
     // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
@@ -1512,7 +1518,7 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // section) before OTA-704/705 sealed the resolution. Those fixes made the collision
     // harmless, but the ugly/duplicate name persisted — re-mint a distinct, non-
     // colliding deterministic name. Idempotent: a clean name is left alone next load.
-    if (item.uniqueStats) {
+    if (item.uniqueStats && !isGuardianReward) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { migrateFusedName } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
       item = migrateFusedName(item);
@@ -12298,7 +12304,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the OTA 037 marker-length guard; both preserved in the
         // helper.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier } = require('../engine/climbHeight');
+        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier, sameClimbNoun } = require('../engine/climbHeight');
         const totalTiers: number = climbHeightFor(tgt);
         const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
         const climbMarks = climbRoom?.searchedAmbientNouns ?? [];
@@ -12419,16 +12425,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'world',
             `${worldReason} You drop hard, taking ${fallDamage} damage${fallShaveTag} (${newHp}/${player.hpMax} HP).`,
           );
-          set((s) =>
-            s.player
+          // OTA-828 — a FALL wipes this climb's cleared-tier progress (player ruling:
+          // "you shouldn't resume at the level you fell from — start all the way
+          // over"). Strip the climbed:<noun>:tN markers for THIS climb (fuzzy-matched
+          // via sameClimbNoun) from the room memory, so the next attempt begins at
+          // tier 1 from the ground instead of resuming at the tier you fell off.
+          if (newHp > 0) {
+            get().appendLog(
+              'world',
+              `The line whips free and your holds are gone — the ${tgt} will have to be climbed again from the base.`,
+            );
+          }
+          set((s) => {
+            if (!s.player) return s;
+            const rooms = s.worldMemory.visitedRooms ?? {};
+            const fallRoom = rooms[climbRoomKey];
+            const prunedWorldMemory = fallRoom
               ? {
-                  player: { ...s.player, hp: newHp },
-                  currentScene: s.currentScene
-                    ? { ...s.currentScene, elevatedOn: null }
-                    : s.currentScene,
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...rooms,
+                    [climbRoomKey]: {
+                      ...fallRoom,
+                      searchedAmbientNouns: (fallRoom.searchedAmbientNouns ?? []).filter((m) => {
+                        if (!m.startsWith('climbed:')) return true; // keep non-climb markers
+                        const parts = m.split(':');
+                        if (parts.length < 3) return true;
+                        const markerNoun = parts.slice(1, parts.length - 1).join(':');
+                        return !sameClimbNoun(markerNoun, tgt); // drop only THIS climb's tier marks
+                      }),
+                    },
+                  },
                 }
-              : s,
-          );
+              : s.worldMemory;
+            return {
+              player: { ...s.player, hp: newHp },
+              currentScene: s.currentScene
+                ? { ...s.currentScene, elevatedOn: null }
+                : s.currentScene,
+              worldMemory: prunedWorldMemory,
+            };
+          });
           void get().persist();
           if (newHp <= 0) {
             handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);

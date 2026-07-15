@@ -498,6 +498,45 @@ export const GUARDIANS_BY_CAPITAL: Record<string, CoreGuardianDef> = {
 // the player's expected level for each tier — better than a
 // Legendary roll but not so good that the player skips other gear.
 
+// OTA-828 — derive a Guardian weapon's damage TYPE + scaling stat from its flavor
+// tags. Pre-fix the weapon() helper stored NONE of this (the `damage` param was
+// dropped on the floor), and Guardian gear carries no catalog row + no uniqueStats,
+// so getEquippedWeapon/aggregateArmor couldn't resolve it — every Core Guardian
+// reward (9 weapons + 9 armor) was cosmetic-only and "couldn't be used as a weapon".
+const GUARDIAN_WEAPON_TYPE_TAGS: ReadonlyArray<readonly [string, string]> = [
+  ['cold_damage', 'cold'], ['corruption_damage', 'aetheric'], ['sonic', 'aetheric'],
+  ['slashing', 'slashing'], ['piercing', 'piercing'], ['blunt', 'bludgeoning'],
+  ['burn', 'burn'], ['electrical', 'electrical'], ['poison', 'poison'],
+  ['radiation', 'radiation'], ['aetheric', 'aetheric'],
+];
+function guardianWeaponDamageType(tags: string[]): string {
+  const lower = tags.map((t) => t.toLowerCase());
+  for (const [tag, dt] of GUARDIAN_WEAPON_TYPE_TAGS) if (lower.includes(tag)) return dt;
+  return 'bludgeoning';
+}
+function guardianWeaponStat(tags: string[]): 'strength' | 'dexterity' | 'intelligence' {
+  const lower = tags.map((t) => t.toLowerCase());
+  if (lower.includes('finesse')) return 'dexterity';
+  // The exotic/caster Guardian arms (Cold-Iron Rosary, Tuning Fork) channel rather
+  // than swing — they scale INT.
+  if (lower.includes('corruption_damage') || lower.includes('sonic')) return 'intelligence';
+  return 'strength';
+}
+function guardianArmorSlot(tags: string[]): 'head' | 'chest' | 'legs' | 'feet' {
+  const lower = tags.map((t) => t.toLowerCase());
+  for (const s of ['head', 'chest', 'legs', 'feet'] as const) if (lower.includes(s)) return s;
+  return 'chest';
+}
+function guardianArmorResist(tags: string[]): string | undefined {
+  const lower = tags.map((t) => t.toLowerCase());
+  if (lower.includes('cold_resist')) return 'cold';
+  if (lower.includes('aether_resist')) return 'aetheric';
+  if (lower.includes('corruption_resist')) return 'aetheric';
+  if (lower.includes('burn_resist')) return 'burn';
+  if (lower.includes('poison_resist')) return 'poison';
+  return undefined;
+}
+
 function weapon(
   id: string,
   name: string,
@@ -506,6 +545,9 @@ function weapon(
   durabilityMax: number,
   tags: string[],
 ): InventoryItem {
+  // OTA-828 — attach uniqueStats so getEquippedWeapon (combatRules) resolves this
+  // non-catalog Legendary as a real weapon: the `damage` dice + a tag-derived type
+  // and scaling stat now actually reach combat.
   return {
     id,
     name,
@@ -515,6 +557,14 @@ function weapon(
     quantity: 1,
     tags: ['core_guardian_set', 'aether_born', ...tags],
     durability: { current: durabilityMax, max: durabilityMax },
+    uniqueStats: {
+      kind: 'weapon',
+      rarity: 'Legendary',
+      durability: { current: durabilityMax, max: durabilityMax },
+      damageDice: damage,
+      damageType: guardianWeaponDamageType(tags),
+      scalesWith: guardianWeaponStat(tags),
+    },
   };
 }
 
@@ -526,6 +576,9 @@ function armor(
   durabilityMax: number,
   tags: string[],
 ): InventoryItem {
+  // OTA-828 — attach uniqueStats so aggregateArmor credits this non-catalog
+  // Legendary its AC + resistance (pre-fix it gave 0 AC — the `ac:N` tag was never
+  // read by the armor aggregator).
   return {
     id,
     name,
@@ -535,6 +588,14 @@ function armor(
     quantity: 1,
     tags: ['core_guardian_set', 'aether_born', `ac:${ac}`, ...tags],
     durability: { current: durabilityMax, max: durabilityMax },
+    uniqueStats: {
+      kind: 'armor',
+      rarity: 'Legendary',
+      durability: { current: durabilityMax, max: durabilityMax },
+      acBonus: ac,
+      armorSlot: guardianArmorSlot(tags),
+      resistance: guardianArmorResist(tags),
+    },
   };
 }
 
