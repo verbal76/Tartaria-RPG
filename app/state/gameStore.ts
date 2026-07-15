@@ -17502,7 +17502,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : `a vendor from one of: ${lines.join('; ')}`;
         get().appendLog(
           'arbiter',
-          `The Arbiter waves. "Find ${list} to turn that contract in for full pay — or 'send word <name>' to courier it now for a smaller cut."`,
+          `The Arbiter waves. "Find ${list} to turn that contract in for full pay — or send word by name to courier it now for a smaller cut."`,
         );
       } else {
         get().appendLog(
@@ -18213,7 +18213,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — a mystery is a deed (the artifact is the proof), so it can be
     // sent word remotely for a 15% TC cut; in person pays in full.
     if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor — or 'send word <name>' to courier it in for a smaller cut."`);
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor — or send word by name to courier it in for a smaller cut."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -18453,7 +18453,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-456 — a storyline is a deed arc, so it can be sent word remotely for a
     // 15% TC cut; in person pays in full.
     if (!remote && !scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent — or 'send word <name>' to courier it in for a smaller cut."`);
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent — or send word by name to courier it in for a smaller cut."`);
       return;
     }
     const sourceLabel = scene?.vendor?.name ?? 'A runner';
@@ -24080,13 +24080,18 @@ function vendorWaresBlurb(get: () => GameStore, vendorName: string): string | nu
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { RECIPES } = require('../engine/crafting') as typeof import('../engine/crafting');
   const offers = rd.vendorRecipeOffers(RECIPES, player.knownRecipes, rd.vendorSeed(vendorName));
+  // OTA-811 — prose, not a command reference. The old blurb welded typed-command
+  // syntax ("buy <name>", "repair <item>", "train <stat>") into the story, so the
+  // angle-bracket tokens read as unfilled placeholders. Say what the trader offers in
+  // plain language; the natural phrasing still tells the player what to type (buy a
+  // recipe by name, ask to repair/train/heal).
   const parts: string[] = [];
   if (offers.length > 0) {
     parts.push(
-      `Workings for sale: ${offers.map((o) => `${o.result} (${o.price} TC)`).join(', ')} — "buy <name>" to learn one.`,
+      `Rare workings for sale: ${offers.map((o) => `${o.result} (${o.price} TC)`).join(', ')} — buy one by name to learn it.`,
     );
   }
-  parts.push('They can also mend gear ("repair <item>"), train a stat ("train <stat>"), and tend your dog or golem ("heal dog" / "revive dog").');
+  parts.push('This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.');
   return parts.join(' ');
 }
 
