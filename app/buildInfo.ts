@@ -15841,4 +15841,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // LEARN" section — recipes the trader teaches, each a tappable row (buy-confirm →
 // buyFromVendor recipe-learn branch) — so learning no longer needs the typed
 // "buy <name>" command.
-export const OTA_BUILD_ID = '2026-07-14-792-readable-feed-recipe-buttons';
+// OTA-813 — BOSS NAME CASING. The Arbiter's combat templates lowercased the enemy
+// name — fine for a generic ("the mud boar") but wrong for a NAMED boss ("the heir
+// atalan-drowned is patient"). New combatEnemyLabel(enemy) keeps proper case when
+// enemy.boss and lowercases generics; applied to the three combat-arbiter template
+// sites in narrativeGenerator.
+export const OTA_BUILD_ID = '2026-07-14-793-boss-name-casing';
