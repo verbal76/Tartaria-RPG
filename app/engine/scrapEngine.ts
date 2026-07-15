@@ -212,6 +212,31 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
     ];
     // A Rare+ forge (every real fusion is Rare/Legendary) also yields the premium role.
     if (rb >= 2) fusedGrants.push({ name: role.metalPremium, quantity: 1 });
+    // OTA-1110 — exploit close (reverify workflow, CONFIRMED high-severity). This
+    // fused branch RETURNED before the selfCrafted strip/halve guard below, so a
+    // fused piece — ALWAYS selfCrafted (applyFusion stamps it) — scrapped for its
+    // FULL premium yield, incl. the scarce premium-role mat (the bottleneck). Fusion
+    // is FREE at a Crucible, so fuse→scrap was a renewable mint of the premium roles
+    // from cheap inferred inputs — reopening the exact self-craft hole the guard
+    // closes. A fused item is player-made, so it obeys the same rule as any
+    // self-craft: recycling never out-earns the inputs. Strip the premium mats (the
+    // role mats this branch mints + the pack's configured premium set) and halve the
+    // rest; floor to the stone role so the click isn't wasted. LEGACY fused items
+    // (no selfCrafted flag) are a FINITE, non-renewable set → old full yield.
+    if (item.selfCrafted) {
+      const FUSED_PREMIUM = new Set([
+        role.essencePrimary, role.essenceBonus, role.metalPremium, ...scfg().premiumMats,
+      ]);
+      const stripped = fusedGrants
+        .filter((g) => !FUSED_PREMIUM.has(g.name))
+        .map((g) => ({ name: g.name, quantity: Math.floor(g.quantity / 2) }))
+        .filter((g) => g.quantity > 0);
+      const finalFused = stripped.length > 0 ? stripped : [{ name: role.stone, quantity: 1 }];
+      const strippedSummary = finalFused
+        .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
+        .join(', ');
+      return { grants: finalFused, summary: strippedSummary };
+    }
     const fusedSummary = fusedGrants
       .map((g) => g.quantity > 1 ? `${g.name} x${g.quantity}` : g.name)
       .join(', ');
