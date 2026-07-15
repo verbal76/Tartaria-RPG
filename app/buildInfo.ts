@@ -17432,4 +17432,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hunts take any vendor). Always full pay (no courier's cut). Mysteries / storylines /
 // faction deeds untouched. ContractsScreen hunt copy updated. Refusal lines use
 // getNarratorName() (lore-neutral).
-export const OTA_BUILD_ID = '2026-07-14-1095-hunts-face-to-face';
+// OTA-1096 — PROSE POLISH: remove command-syntax placeholders from narration
+// (playtest: "a big block of text with placeholder nouns"). The vendor wares blurb's
+// 'buy <name>' / 'repair <item>' / 'train <stat>' angle-bracket tokens read as
+// unfilled templates in the prose; rewritten in plain language (keeps "sidekick" for
+// lore-neutrality). Same fix on the three narrator "send word <name>" courier lines →
+// "send word by name".
+export const OTA_BUILD_ID = '2026-07-14-1096-narration-placeholder-cleanup';
