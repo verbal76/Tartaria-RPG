@@ -94,6 +94,7 @@ import {
   enemyScalePower,
   scaleEncounterForContext,
   scaledEnemyForContext,
+  rollExtraPackMembers,
 } from '../engine/encounter';
 import {
   buildOpening,
@@ -5118,6 +5119,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (encounter.length > 0 && ladderTriple && menaceBonus > 0 && Math.random() < menaceBonus) {
         const extra = pickEncounterFromLadder(ladderTriple);
         if (extra) encounter = [...encounter, extra];
+      }
+      // OTA-1102 — MIXED-ROLE PACKS. The curated single-enemy path pre-empted the group
+      // roll, so laddered areas hadn't spawned more than one foe in weeks (and the
+      // target-swipe UI + companions went unused). Add role-diverse pack members
+      // (drone + bandit + rat), frequency scaling with danger — a frontier tile stays
+      // mostly single, a deep tile brings packs. Scaling below treats the pack as one
+      // shared, boss-capped budget so a trio never out-guns a Guardian.
+      if (encounter.length > 0) {
+        const packAdds = rollExtraPackMembers(location, encounter);
+        if (packAdds.length) encounter = [...encounter, ...packAdds];
       }
     }
     // engine_Dev — DATA-DRIVEN MAIN QUEST: when the active "kill" step targets a

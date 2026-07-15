@@ -79,31 +79,79 @@ function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number):
   return `${m[1]} ${parseInt(m[2]!, 10) + bonus}`;
 }
 
+/** Over-level term: 0 at a fresh arrival → 1 at end-game. Shared by solo + pack. */
+function overLevelT(power: number): number {
+  return Math.max(0, Math.min(1, (power - 14) / 18));
+}
+
+/** The HP a SINGLE enemy of `baseHp` scales to on this tile — floor (anti-farm) +
+ *  a flat-capped multiplier (so a big Legendary is nudged, not exploded). */
+function soloScaledHp(baseHp: number, d: number, t: number): number {
+  const areaFactor = 1 + d * 0.12;                               // 1.0 (frontier) .. 1.6 (deep)
+  const floor = Math.round((34 + d * 6) * t);                    // maxed: ~34 (d0) .. ~64 (d5)
+  const addCap = 22 + d * 8;
+  const added = Math.min(baseHp * 0.5 * t * areaFactor, addCap);
+  return Math.round(Math.max(baseHp + added, floor));
+}
+
 /** Scale one rolled enemy to the player's power and the tile's danger. Pure; returns
- *  a fresh object (never mutates). Bosses pass through untouched. */
+ *  a fresh object (never mutates). Bosses pass through untouched. Use for SOLO spawns
+ *  (rest-ambush, hook spawns); packs go through scaleEncounterForContext. */
 export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number): Enemy {
   if (enemy.boss) return enemy;                                  // Guardians / story bosses tuned elsewhere
   const d = Math.max(0, danger);
-  const t = Math.max(0, Math.min(1, (power - 14) / 18));         // 0 at a fresh arrival → 1 at end-game
+  const t = overLevelT(power);
   if (t <= 0 && d <= 0) return enemy;                            // fresh player on the frontier → as authored
-  const areaFactor = 1 + d * 0.12;                              // 1.0 (frontier) .. 1.6 (deep)
-  // Floor: the main lever for trash — a per-power/per-danger MINIMUM so a strong
-  // player can't one-shot-farm the weakest mob. Maxed player: ~34 (d0) .. ~64 (d5).
-  const floor = Math.round((34 + d * 6) * t);
-  // Multiplier: a gentle, FLAT-CAPPED bump so already-meaty enemies stay proportionate
-  // and never rival a Guardian (a 360-HP Legendary gains only ~addCap, not ×1.7).
-  const addCap = 22 + d * 8;
-  const added = Math.min(enemy.hp * 0.5 * t * areaFactor, addCap);
-  const hp = Math.round(Math.max(enemy.hp + added, floor));
+  const hp = soloScaledHp(enemy.hp, d, t);
   // Attack/AC: a small bump (abilityPoint drives both, per combatRules) so a scaled
   // enemy can still land on a geared player — modest, +1 (d0) .. +4 (d5) at max power.
   const bonus = Math.round(t * (1 + d * 0.5));
   return { ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) };
 }
 
-/** Batch form — scales each enemy in a rolled encounter. */
+// OTA-1102 — PACK-AWARE scaling. A pack must be scaled as a PACKAGE, not per-body: if
+// you floored each of 3 foes to a solo target (3 × ~34-64) and stood them together,
+// the trio would out-HP a boss — and with 3 attacks/round it would be brutal (player's
+// call: "scale multiples as a package not individually"). So a multi-enemy encounter
+// SHARES one budget: it anchors on what a SINGLE enemy (of the pack's mean base HP)
+// would scale to, adds a SMALL premium per extra body (action economy already makes N
+// foes harder per-HP, so the HP premium stays modest), hard-caps the pack total UNDER
+// a boss's HP, then distributes that total across the members by base-HP weight (so a
+// brute in the pack still out-bulks a rat). Attack/AC bumps are also softened for pack
+// members (they're many). Bosses in the mix pass through untouched and don't share the
+// pack budget.
+
+/** Pack-total HP ceiling — a pack never out-HPs a boss for the same player/tile. */
+function packHpCeiling(d: number): number {
+  return 70 + d * 10;                                            // d0 70 .. d5 120 (bosses run higher)
+}
+
+/** Scale a rolled encounter to player power + tile danger. A single non-boss enemy
+ *  scales solo; a multi-foe pack is scaled as one shared, boss-capped budget. */
 export function scaleEncounterForContext(enemies: readonly Enemy[], danger: number, power: number): Enemy[] {
-  return enemies.map((e) => scaledEnemyForContext(e, danger, power));
+  const d = Math.max(0, danger);
+  const t = overLevelT(power);
+  const nonBossIdx = enemies.map((e, i) => (e.boss ? -1 : i)).filter((i) => i >= 0);
+  // Solo (0/1 non-boss foe) → per-enemy scaling, unchanged.
+  if (nonBossIdx.length <= 1) return enemies.map((e) => scaledEnemyForContext(e, d, power));
+  if (t <= 0 && d <= 0) return enemies.map((e) => ({ ...e }));   // fresh + frontier → authored
+
+  const pack = nonBossIdx.map((i) => enemies[i]!);
+  const totalBase = pack.reduce((s, e) => s + Math.max(1, e.hp), 0);
+  const meanBase = totalBase / pack.length;
+  // Anchor on one solo-equivalent (of the mean body) + a small premium per extra body.
+  const soloAnchor = soloScaledHp(meanBase, d, t);
+  const premium = 1 + 0.22 * (pack.length - 1);                  // 2→1.22, 3→1.44
+  const packTotal = Math.min(Math.round(soloAnchor * premium), packHpCeiling(d));
+  // Softer attack/AC bump than a solo foe (there are several of them).
+  const bonus = Math.round(t * (1 + d * 0.5) * 0.6);
+  const out = enemies.map((e) => ({ ...e }));
+  for (const i of nonBossIdx) {
+    const e = enemies[i]!;
+    const share = Math.max(6, Math.round((packTotal * Math.max(1, e.hp)) / totalBase));
+    out[i] = { ...e, hp: share, abilityPoint: bumpAbilityPointNumber(e.abilityPoint, bonus) };
+  }
+  return out;
 }
 
 export function pickEnemyForLocation(location: Location): Enemy | null {
@@ -170,6 +218,61 @@ const GROUP_TEMPLATES: GroupTemplate[] = [
   { enemyName: 'Aetheric Ooze', count: 3, minDanger: 2, weight: 3 },
   { enemyName: 'Black Cloak Agent', count: 2, minDanger: 3, weight: 2 },
 ];
+
+/** The rarity ceiling a tile's danger allows (shared by the pickers). */
+function rarityCapForDanger(danger: number): Rarity {
+  return danger >= 4 ? 'Legendary' : danger >= 3 ? 'Rare' : danger >= 2 ? 'Uncommon' : 'Common';
+}
+
+// OTA-1102 — MIXED-ROLE PACKS. The scene-arrival path lets a single "curated" ladder
+// enemy pre-empt the group roll, so in any explored (laddered) area you almost never
+// faced more than one foe — the multi-enemy target-swipe UI and the companions it
+// demands hadn't been seen in weeks. This ADDS role-diverse pack members to a rolled
+// single enemy (a drone + a bandit + a rat), so you can't be in-range of everything at
+// once and actually need the dog to pin the rusher / the golem to soak the shooter.
+// Frequency scales with danger — a frontier tile still skews single ("low level is
+// still low level"), a deep tile brings packs. Never packs onto a boss/Guardian.
+// Diversity is by enemy TYPE, which also means MIXED WEAKNESSES in one fight (a pack
+// of three types can't be answered by one coating) — the first half of the
+// "no 1-kit-fits-all" ask, before per-instance weakness randomization lands.
+
+/** Roll 0-2 additional, role-diverse foes to append to an existing single/small
+ *  encounter. Pure; `rng` injectable for tests. */
+export function rollExtraPackMembers(
+  location: Location,
+  existing: readonly Enemy[],
+  opts?: { rng?: () => number },
+): Enemy[] {
+  const rng = opts?.rng ?? Math.random;
+  const danger = Math.max(0, location.danger);
+  if (existing.length === 0 || existing.length >= 3) return [];
+  if (existing.some((e) => e.boss)) return [];            // never gang up onto a boss/Guardian
+  // Pack chance climbs with danger: frontier ~10%, deep zone ~75%.
+  const packChance = 0.10 + danger * 0.13;
+  if (rng() >= packChance) return [];
+  const cap = rarityCapForDanger(danger);
+  const pool = enemies.filter((e) => !e.boss && rarityRank(e.rarity) <= rarityRank(cap));
+  if (pool.length === 0) return [];
+  const usedTypes = new Set(existing.map((e) => (e.type ?? '').toLowerCase()));
+  const usedNames = new Set(existing.map((e) => e.name.toLowerCase()));
+  const maxExtra = Math.min(3 - existing.length, danger >= 3 ? 2 : 1);
+  const out: Enemy[] = [];
+  for (let n = 0; n < maxExtra; n++) {
+    // Prefer a DIFFERENT type than anything already in the pack (role/weakness
+    // diversity); fall back to any not-yet-present name if the pool is thin.
+    const diverse = pool.filter((e) => !usedTypes.has((e.type ?? '').toLowerCase()) && !usedNames.has(e.name.toLowerCase()));
+    const choose = diverse.length ? diverse : pool.filter((e) => !usedNames.has(e.name.toLowerCase()));
+    if (choose.length === 0) break;
+    const picked = pickWeighted(choose, (e) => rarityWeights[e.rarity]);
+    const inst = JSON.parse(JSON.stringify(picked)) as Enemy;
+    usedTypes.add((inst.type ?? '').toLowerCase());
+    usedNames.add(inst.name.toLowerCase());
+    out.push(inst);
+    // Taper: a second extra foe only ~45% of the time even when danger allows it.
+    if (rng() > 0.45) break;
+  }
+  return out;
+}
 
 // Roll a group encounter for this location. ~22% chance overall, gated by
 // the location's danger. Returns null when no group spawns — the caller
