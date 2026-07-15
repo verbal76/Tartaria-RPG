@@ -91,6 +91,9 @@ import {
   getLocationById,
   pickEncounterFromLadder,
   findEnemyByName,
+  enemyScalePower,
+  scaleEncounterForContext,
+  scaledEnemyForContext,
 } from '../engine/encounter';
 import {
   buildOpening,
@@ -5132,7 +5135,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const boss = questBoss ?? fixedBoss ?? randomBoss;
       if (boss) encounter = [boss as unknown as Enemy];
     }
-    const enemies: Enemy[] = encounter;
+    // OTA-1101 — scale rolled (non-boss) enemies to the player's power AND the tile's
+    // danger, so a strong character isn't farming trivial trash and a deep zone bites
+    // harder than the frontier. Bosses (incl. the data-driven quest boss injected just
+    // above) are skipped inside the scaler — they carry their own curve. A fresh
+    // arrival on a danger-0 tile is untouched.
+    const scalePower = player
+      ? enemyScalePower(Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence), player.hpMax)
+      : 0;
+    const enemies: Enemy[] = scaleEncounterForContext(encounter, location.danger, scalePower);
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
     const hasEnemies = enemies.length > 0;
@@ -10964,7 +10975,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // warning (OTA-244) gives the heads-up; if the player
             // rests anyway, RNG runs free. Stays a design dial we
             // can re-enable later if playtest insists.
-            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            const rawRestEnemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            // OTA-1101 — scale the rest-ambusher the same way scene-arrival foes scale.
+            const restPlayer = get().player;
+            const enemy = rawRestEnemy && restPlayer
+              ? scaledEnemyForContext(
+                  rawRestEnemy,
+                  restScene.location.danger,
+                  enemyScalePower(Math.max(restPlayer.stats.strength, restPlayer.stats.dexterity, restPlayer.stats.intelligence), restPlayer.hpMax),
+                )
+              : rawRestEnemy;
             if (enemy) {
               set((s) => s.currentScene
                 ? {
@@ -23973,10 +23993,20 @@ function applyHookEffect(
     case 'spawn_enemy_tag': {
       const tag = effect.tag;
       const candidates = (enemiesData as Enemy[]).filter((e) => e.type === tag);
-      const spawn = candidates.length > 0
+      const rawSpawn = candidates.length > 0
         ? candidates[Math.floor(Math.random() * candidates.length)]!
         : pickEnemyForLocation(get().currentScene?.location ?? getLocationById(defaultLocationId()));
-      if (!spawn) return { inlineSummary: null, fatal: false };
+      if (!rawSpawn) return { inlineSummary: null, fatal: false };
+      // OTA-1101 — scale the hook-spawned foe to player power + tile danger too.
+      const spawnLoc = get().currentScene?.location ?? getLocationById(defaultLocationId());
+      const spawnPlayer = get().player;
+      const spawn = spawnPlayer
+        ? scaledEnemyForContext(
+            rawSpawn,
+            spawnLoc.danger,
+            enemyScalePower(Math.max(spawnPlayer.stats.strength, spawnPlayer.stats.dexterity, spawnPlayer.stats.intelligence), spawnPlayer.hpMax),
+          )
+        : rawSpawn;
       set((s) =>
         s.currentScene
           ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'mid' } }
