@@ -15846,4 +15846,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // atalan-drowned is patient"). New combatEnemyLabel(enemy) keeps proper case when
 // enemy.boss and lowercases generics; applied to the three combat-arbiter template
 // sites in narrativeGenerator.
-export const OTA_BUILD_ID = '2026-07-14-793-boss-name-casing';
+//
+// OTA-794 — two playtest bugs (device-log re-read):
+//   1. applyCoating on a STACKED, equipped weapon peeled the coating onto a fresh
+//      instance but left equipped.mainId/offId on the uncoated stack remainder, so
+//      the on-hit resolver (keyed off the equip slot) never fired. Fix re-points the
+//      equip slot to the coated instance.
+//   2. WEAPON_SOFT_TAIL_NOUNS gained item/material end-nouns (core, orb, heart,
+//      crystal, essence, …) so a forged WEAPON can't keep a soft name like
+//      "Aether Core"; the deterministic weapon pool renames it.
+export const OTA_BUILD_ID = '2026-07-14-794-coating-equip-repoint-and-fused-names';

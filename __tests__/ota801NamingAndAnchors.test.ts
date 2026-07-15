@@ -20,11 +20,16 @@ describe('OTA-801 C2 — fusedWeaponNameReadsSoft', () => {
     expect(fusedWeaponNameReadsSoft('Resonant Veil')).toBe(true);
     expect(fusedWeaponNameReadsSoft('Humming Wisp')).toBe(true);
     expect(fusedWeaponNameReadsSoft('Shroud')).toBe(true);
+    // OTA-814 — item/material end-nouns (playtest: a weapon named "Aether Core").
+    expect(fusedWeaponNameReadsSoft('Aether Core')).toBe(true);
+    expect(fusedWeaponNameReadsSoft('Sunken Heart')).toBe(true);
+    expect(fusedWeaponNameReadsSoft('Mud Crystal')).toBe(true);
   });
   it('passes real weapon names', () => {
     expect(fusedWeaponNameReadsSoft('Resonant Cleaver')).toBe(false);
     expect(fusedWeaponNameReadsSoft('Iron-Bound Reaver')).toBe(false);
     expect(fusedWeaponNameReadsSoft('Marrow Spike')).toBe(false);
+    expect(fusedWeaponNameReadsSoft('Aether-Shard Spear')).toBe(false); // the re-roll — tail is Spear
   });
 });
 
