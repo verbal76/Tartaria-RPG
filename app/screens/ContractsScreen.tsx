@@ -732,7 +732,7 @@ export function ContractsScreen() {
                         <Text style={styles.expandedLabel}>How to finish</Text>
                         <Text style={styles.expandedBody}>
                           {ready
-                            ? 'Boss slain. Tap COMPLETE to claim the bounty.'
+                            ? 'Boss slain. A bounty is paid FACE TO FACE — stand in front of a vendor or the posting faction\'s agent, then tap COMPLETE to hand over the trophy and claim it. No courier.'
                             : `Travel to ${def.targetLocationName ?? biomeLabel(def.biomeTag)} and defeat the ${def.targetEnemyName}. Each stage above auto-advances when you perform the matching action there.`}
                         </Text>
                       </View>

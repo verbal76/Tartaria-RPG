@@ -16160,4 +16160,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pool. New wanderers helpers (makeWandererGoods / makeWandererLead / wandererCagey);
 // Wanderer.goods + Wanderer.lead; PlayerCharacter.pendingLead; miscLootItem grant
 // helper; beginScene lead payout. All lore-neutral. Closes the social rework.
-export const OTA_BUILD_ID = '2026-07-14-809-parley-rewards';
+// OTA-810 — HUNTS ARE A FACE-TO-FACE TURN-IN (user's call; closes the B2 exploit).
+// A bounty's proof is the trophy, and proof is shown in person: turnInHunt no longer
+// accepts the OTA-456 remote "send word" courier close, and the Contracts-UI COMPLETE
+// (completeContractFromUI 'hunt') — which used to pay FULL from ANY tile, the actual
+// B2 hole — now requires a paying agent in scene AND the RIGHT posting faction's agent
+// (neutral hunts take any vendor). Always full pay now (no courier's cut). The kill
+// handler already directs "return to a posting agent". Mysteries / storylines /
+// faction deeds keep their remote cut untouched. ContractsScreen hunt "how to finish"
+// updated to say hand in face to face. Dodge-at-high-DEX (the other open B item) is
+// parked pending a live retest.
+export const OTA_BUILD_ID = '2026-07-14-810-hunts-face-to-face';
