@@ -46,6 +46,59 @@ export function pickHazardForLocation(location: Location, dangerBoost = 0): Haza
   return pick(hazards);
 }
 
+// OTA-816 — REGULAR-ENEMY SCALING. Base enemy stats come straight from
+// enemies.json, so an over-leveled character farmed low-HP trash (a 15-HP Aetherbat
+// stayed 15 HP forever — free XP/loot) while the danger tiers only ever changed WHICH
+// rarity could spawn, never the numbers. This lifts a NON-BOSS enemy's HP (and lightly
+// its attack/AC) by two axes:
+//   • player power  — a strong character stops farming trivial mobs
+//   • area danger    — a deep zone bites harder than the frontier
+// It is deliberately GENTLER than the Guardian curve: bosses/Guardians are SKIPPED
+// (they carry their own scaling), the HP the multiplier can ADD is capped flat so a
+// big Legendary doesn't explode, and a fresh arrival in a danger-0 zone is left
+// EXACTLY as authored — "low level is still low level". Knobs are all here.
+
+/** How strong is this character. Best offensive stat + a slice of the HP pool — the
+ *  same proxy the Guardian scaler uses, kept in sync deliberately. */
+export function enemyScalePower(bestCombatStat: number, hpMax: number): number {
+  return bestCombatStat + hpMax / 10;
+}
+
+function bumpAbilityPointNumber(ap: string | number | undefined, bonus: number): string {
+  const s = String(ap ?? 'Strength 3');
+  if (bonus <= 0) return s;
+  const m = s.match(/^(\w+)\s+(\d+)/);
+  if (!m) return s;
+  return `${m[1]} ${parseInt(m[2]!, 10) + bonus}`;
+}
+
+/** Scale one rolled enemy to the player's power and the tile's danger. Pure; returns
+ *  a fresh object (never mutates). Bosses pass through untouched. */
+export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number): Enemy {
+  if (enemy.boss) return enemy;                                  // Guardians / story bosses tuned elsewhere
+  const d = Math.max(0, danger);
+  const t = Math.max(0, Math.min(1, (power - 14) / 18));         // 0 at a fresh arrival → 1 at end-game
+  if (t <= 0 && d <= 0) return enemy;                            // fresh player on the frontier → as authored
+  const areaFactor = 1 + d * 0.12;                              // 1.0 (frontier) .. 1.6 (deep)
+  // Floor: the main lever for trash — a per-power/per-danger MINIMUM so a strong
+  // player can't one-shot-farm the weakest mob. Maxed player: ~34 (d0) .. ~64 (d5).
+  const floor = Math.round((34 + d * 6) * t);
+  // Multiplier: a gentle, FLAT-CAPPED bump so already-meaty enemies stay proportionate
+  // and never rival a Guardian (a 360-HP Legendary gains only ~addCap, not ×1.7).
+  const addCap = 22 + d * 8;
+  const added = Math.min(enemy.hp * 0.5 * t * areaFactor, addCap);
+  const hp = Math.round(Math.max(enemy.hp + added, floor));
+  // Attack/AC: a small bump (abilityPoint drives both, per combatRules) so a scaled
+  // enemy can still land on a geared player — modest, +1 (d0) .. +4 (d5) at max power.
+  const bonus = Math.round(t * (1 + d * 0.5));
+  return { ...enemy, hp, abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, bonus) };
+}
+
+/** Batch form — scales each enemy in a rolled encounter. */
+export function scaleEncounterForContext(enemies: readonly Enemy[], danger: number, power: number): Enemy[] {
+  return enemies.map((e) => scaledEnemyForContext(e, danger, power));
+}
+
 export function pickEnemyForLocation(location: Location): Enemy | null {
   // OTA-187 — base scene-arrival enemy chance bumped from 40 to 50
   // (10pp) per playtester: "the game is a little shy on combat."

@@ -16224,4 +16224,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   C. SIGIL → RAPPORT — returning a faction sigil now establishes that faction's
 //      CHA vendor discount (marks its rapport quest id complete), replacing the
 //      bespoke fetch-a-relic gate. Reuses the existing sigil economy; no new items.
-export const OTA_BUILD_ID = '2026-07-15-815-guardian-scale-dodge-floor-sigil-rapport';
+//
+// OTA-816 — REGULAR-ENEMY SCALING (the companion to 815's Guardian scaling). Base
+// enemy stats came straight from enemies.json, so an over-leveled character farmed
+// trivial trash (a 15-HP Aetherbat stayed 15 HP forever) — danger tiers only changed
+// WHICH rarity spawned, never the numbers. scaledEnemyForContext now lifts a NON-BOSS
+// enemy's HP (and lightly its attack/AC) by player power AND tile danger: a rising
+// per-power/per-danger HP floor (kills one-shot farming; maxed player ~34 at danger 0
+// to ~64 at danger 5) plus a flat-CAPPED multiplier (so a big Legendary is nudged,
+// not exploded — stays gentler than a Guardian). A fresh arrival on a danger-0 tile
+// is left exactly as authored — "low level is still low level". Applied at the three
+// spawn boundaries (scene arrival + groups, rest-ambush, hook spawn_enemy_tag). All
+// knobs in encounter.ts.
+export const OTA_BUILD_ID = '2026-07-15-816-regular-enemy-scaling';
