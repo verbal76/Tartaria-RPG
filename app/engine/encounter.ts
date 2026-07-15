@@ -78,37 +78,75 @@ function overLevelT(power: number): number {
   return Math.max(0, Math.min(1, (power - 14) / 18));
 }
 
-// OTA-798 — PER-SPAWN RANDOMIZED WEAKNESS. Weaknesses were deterministic by enemy TYPE
-// (every "Aetheric Creature" is always weak to slashing), so one loadout genuinely fit
-// all — learn ten type-rows and autopilot forever (player: "random weaknesses so you
-// can't have a 1-kit-fits-all build"). Each non-boss spawn now gets a RANDOM primary
-// weakness + a random resistance, stamped as `vulnerable:`/`resist:` TRAITS. This rides
-// the existing combat resolver for free: combineDamageTypeMatch already lets a per-enemy
-// trait WIN over the type-map on a discord, so a `resist:<type-default-weak>` trait
-// cancels the old weakness and a `vulnerable:<rolled>` trait installs the new one — no
-// change to the ~10 damage call sites. Applied at every scaled spawn (so it varies even
-// on a frontier tile — engagement at all levels). Bosses/Guardians keep their authored,
-// thematic defenses. The EnemyPanel reconciles + WIS-gates the reveal.
-const WEAKNESS_POOL = ['piercing', 'slashing', 'bludgeoning', 'burn', 'electrical', 'cold', 'poison', 'radiation', 'aetheric'];
+// OTA-799 — THEMATIC (Pokémon-route) weakness. OTA-818 rolled a fully RANDOM weakness,
+// which killed the "1-kit-fits-all" staleness but read as nonsense (a mud creature weak
+// to cold) and broke immersion. This keeps the VARIETY but makes it BELIEVABLE: each
+// creature TYPE has a small pool of thematically-plausible weaknesses, and a spawn rolls
+// ONE from it — so a mud thing is always weak to something mud-appropriate (dries in
+// fire / conducts a shock / rots in radiation), but WHICH varies fight to fight. You
+// bring a small toolkit and read the enemy, never memorize one answer.
+//
+// Hardness = MEDIUM (player's call): the rolled weakness is super-effective (×1.5) and
+// everything else stays NORMAL and still works — you're never hard-locked. Each spawn
+// also takes ONE soft resist (×0.5) from its type's resist pool, and ~35% of spawns get
+// a REAL WALL (×0.25) on a type its kind is already armored against — achieved for free
+// by STACKING a `resist:` trait onto a type the TYPE-MAP already resists (combine
+// multiplies 0.5×0.5). Weakness/soft-resist ride the trait resolver exactly like 818.
+// Bosses/Guardians keep their authored thematic defenses.
+interface DefensePool { weak: string[]; resist: string[] }
+const THEMATIC_DEFENSE_POOLS: Record<string, DefensePool> = {
+  // waterlogged earth — fire dries it, shock conducts, radiation rots; shrugs blades/cold.
+  'mud creature':      { weak: ['burn', 'radiation', 'electrical'], resist: ['cold', 'bludgeoning'] },
+  // unstable energy-flesh — radiation destabilizes it, fire, blunt trauma disrupts.
+  'aetheric mutation': { weak: ['radiation', 'burn', 'bludgeoning'], resist: ['poison', 'cold'] },
+  // a being of pure aether — break the FORM: blunt, cold-dampen, or cut it.
+  'aetheric creature': { weak: ['bludgeoning', 'cold', 'slashing'], resist: ['poison', 'radiation'] },
+  // machines — fry the circuits, dent the casing, or disrupt with aether.
+  'automation':        { weak: ['electrical', 'bludgeoning', 'aetheric'], resist: ['poison', 'cold'] },
+  'mechanism':         { weak: ['electrical', 'bludgeoning', 'aetheric'], resist: ['poison', 'cold'] },
+  'mech-construct':    { weak: ['electrical', 'bludgeoning', 'aetheric'], resist: ['poison', 'cold'] },
+  // flesh — pierce it, poison it, cut it, burn it; unmoved by aether tricks.
+  'animal':            { weak: ['piercing', 'poison', 'cold', 'slashing'], resist: ['aetheric'] },
+  'human':             { weak: ['piercing', 'poison', 'burn', 'slashing'], resist: ['aetheric'] },
+  // an unbound husk — burn it, irradiate it, or unmake it with aether; poison/cold do little.
+  'etheric undead':    { weak: ['burn', 'radiation', 'aetheric'], resist: ['poison', 'cold'] },
+};
+const FALLBACK_DEFENSE_POOL: DefensePool = { weak: ['slashing', 'piercing', 'burn', 'bludgeoning'], resist: ['aetheric'] };
 
-/** Stamp a random weakness + resistance onto a NON-boss enemy (idempotent via the
- *  `profiled` marker). Pure; `rng` injectable for tests. */
+function thematicPoolFor(enemyType: string | null | undefined): DefensePool {
+  return THEMATIC_DEFENSE_POOLS[(enemyType ?? '').toLowerCase()] ?? FALLBACK_DEFENSE_POOL;
+}
+
+/** Read a type's THEMATIC weakness pool (for tooling/tests). */
+export function thematicWeaknessPool(enemyType: string | null | undefined): string[] {
+  return thematicPoolFor(enemyType).weak;
+}
+
+/** Stamp a thematically-plausible, per-spawn weakness (+ a soft resist, and ~35% a
+ *  hard wall) onto a NON-boss enemy. Idempotent via `profiled`. Pure; `rng` injectable. */
 export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.random): Enemy {
   if (enemy.boss) return enemy;
   const traits = [...(enemy.traits ?? [])];
   if (traits.includes('profiled')) return enemy;                 // already rolled — don't re-roll
-  const pickType = () => WEAKNESS_POOL[Math.floor(rng() * WEAKNESS_POOL.length)]!;
-  const newWeak = pickType();
-  let newResist = pickType();
-  if (newResist === newWeak) newResist = WEAKNESS_POOL[(WEAKNESS_POOL.indexOf(newWeak) + 1) % WEAKNESS_POOL.length]!;
-  // Neutralize the type-map's DEFAULT weaknesses (bar the new one) so the old kit
-  // doesn't still work — a resist trait wins the discord vs a type weak.
-  const defaults = enemyTypeDefenses(enemy.type);
-  for (const w of defaults.weak) {
+  const pool = thematicPoolFor(enemy.type);
+  const pick = (arr: readonly string[]) => arr[Math.floor(rng() * arr.length)];
+  const newWeak = pick(pool.weak) ?? 'slashing';
+  const softResist = pool.resist.length ? pick(pool.resist.filter((r) => r !== newWeak)) : undefined;
+  // Neutralize the type-map's DEFAULT weaknesses (bar the rolled one) so the old fixed
+  // answer doesn't still work — a resist trait wins the discord vs a type weak.
+  const map = enemyTypeDefenses(enemy.type);
+  for (const w of map.weak) {
     if (w !== newWeak && !traits.includes(`resist:${w}`)) traits.push(`resist:${w}`);
   }
   if (!traits.includes(`vulnerable:${newWeak}`)) traits.push(`vulnerable:${newWeak}`);
-  if (newResist !== newWeak && !traits.includes(`resist:${newResist}`)) traits.push(`resist:${newResist}`);
+  if (softResist && softResist !== newWeak && !traits.includes(`resist:${softResist}`)) traits.push(`resist:${softResist}`);
+  // MEDIUM hardness — ~35% of spawns get a real ×0.25 WALL on a type their kind is
+  // already armored against (stacking a trait resist onto a type-map resist). Believable
+  // (extra-plated construct, silt-caked mud) and occasional, not every fight.
+  if (rng() < 0.35 && map.resist.length) {
+    const wall = pick(map.resist.filter((r) => r !== newWeak));
+    if (wall && !traits.includes(`resist:${wall}`)) traits.push(`resist:${wall}`);
+  }
   traits.push('profiled');
   return { ...enemy, traits };
 }
