@@ -16249,4 +16249,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // HP, +a small premium per extra body, HARD-CAPPED under a boss's HP (70+danger·10),
 // then distributed across members by base-HP weight (a brute out-bulks a rat). Solo
 // spawns still scale per-enemy. Weakness reveal chosen WIS-gated (lands next in 818).
-export const OTA_BUILD_ID = '2026-07-15-817-mixed-packs-pack-scaling';
+//
+// OTA-818 — PER-SPAWN RANDOMIZED WEAKNESS + WIS-GATED READ (the second half of "random
+// weaknesses so you can't have a 1-kit-fits-all build"). Weaknesses were deterministic
+// by enemy TYPE, so one loadout fit all forever. Each NON-boss spawn now rolls a random
+// primary weakness + a resistance, stamped as vulnerable:/resist: TRAITS — which ride
+// the existing resolver free: combineDamageTypeMatch already lets a per-enemy trait WIN
+// on a discord, so a resist:<type-default-weak> trait cancels the old weakness and a
+// vulnerable:<rolled> installs the new one (no change to the ~10 damage call sites).
+// Folded into the scalers so it applies at every spawn (varies even on a frontier tile
+// — engagement at all levels); bosses/Guardians keep authored defenses. REVEAL is
+// WIS-gated (WEAKNESS_READ_WIS=12, matching the parley threshold): high-Wisdom reads a
+// non-boss enemy's RESIST/WEAK off the portrait, everyone else sees "? — strike to
+// learn" and discovers via the combat log's "Weakness exposed" line. EnemyPanel's
+// defensesFor now RECONCILES type-map vs traits (discord → trait wins) so it never
+// shows a flipped-away weakness. Knobs (WEAKNESS_POOL) in encounter.ts.
+export const OTA_BUILD_ID = '2026-07-15-818-random-weakness-wis-read';
