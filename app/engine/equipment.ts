@@ -490,6 +490,12 @@ export function effectiveStats(
     if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
     food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
   }
+  // OTA-831 — a `chilled` status (from a cold-typed hit) slows the hands: −2 DEX while
+  // it lasts. Folds into the food-buff bucket so it flows through the ≥1 floor below.
+  // Cleared by a warming coating drink (coatingDrinkRemedy) or by expiry.
+  if ((player.statusEffects ?? []).some((e) => e.kind === 'chilled')) {
+    food.dexterity = (food.dexterity ?? 0) - 2;
+  }
   // OTA-211 — Aether Dust food additive grants +3 to a player-chosen
   // stat for 5 real-world minutes. Stored on player.aetherBuff with a
   // wall-clock expiresAtMs; we apply IF still active. Stacks on top

@@ -91,6 +91,8 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
       return 'arcs electrical damage into the target (counts as electrical — extra-effective vs constructs/automatons)';
     case 'burn':
       return 'sears burn damage into the target (counts as burn — extra-effective vs mud creatures and other burn-weak foes)';
+    case 'cold':
+      return 'sinks a biting frost into the target (counts as cold — extra-effective vs constructs/automatons and other cold-weak foes)';
   }
 }
 
@@ -149,8 +151,8 @@ export function corruptionStackCap(enemy: { boss?: boolean } | null | undefined)
 /** The enemyStatuses `kind` string a coating lands as a DOT. */
 export function coatingStatusKind(
   kind: WeaponCoating['kind'],
-): 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' {
-  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat';
+): 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat' {
+  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat';
 }
 
 // ─── OTA-363 — occasional coated-weapon loot ───────────────────────
@@ -168,10 +170,11 @@ const LOOT_COATING_LABELS: Record<WeaponCoating['kind'], string> = {
   poison: 'Poisoned',
   acid: 'Acid-Etched',
   corruption: 'Corrupted',
-  // Electrical/etheric + burn coatings are craft-only (not in the loot `kinds`
-  // roll below), but the label map stays exhaustive over the union.
+  // Electrical/etheric + burn + cold coatings are craft-only (not in the loot
+  // `kinds` roll below), but the label map stays exhaustive over the union.
   electrical: 'Charged',
   burn: 'Burning',
+  cold: 'Frost-Rimed',
 };
 
 /** Roll whether a looted weapon arrives pre-coated. Returns the coating

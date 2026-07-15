@@ -571,7 +571,7 @@ interface CurrentScene {
   enemyStatuses?: Array<Array<{
     // engine_Dev (Combat-Parity II) — 'typed_dot' is a generic built-in-damage-type DOT (burn/poison/
     // radiation weapon procs), ticking like the coating DOTs.
-    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'typed_dot';
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat' | 'electrical_coat' | 'burn_coat' | 'cold_coat' | 'typed_dot';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
@@ -12113,7 +12113,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             let coatBonus = 0;
             if (throwCoat) {
               const raw = Math.max(1, rollFromNotation(throwCoat.dice));
-              coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn')
+              coatBonus = (throwCoat.kind === 'electrical' || throwCoat.kind === 'burn' || throwCoat.kind === 'cold')
                 ? Math.max(1, Math.round(raw * combineDamageTypeMatch(applyDamageTypeModifier(raw, throwCoat.kind, enemyHit.type).match, traitDamageMultiplier(enemyHit.traits, throwCoat.kind).match).multiplier))
                 : raw;
               dmg += coatBonus;
@@ -15268,7 +15268,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // also seeds an ongoing DOT (applied below, only if the enemy
       // survives the blow). The instance is resolved off the equipped
       // slot id for the hand that swung.
-      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; label: string; source: string } | null = null;
+      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; label: string; source: string } | null = null;
       if (!barehand) {
         const coatSlotId = usedOffHandForDmg
           ? (player.equipped?.offId ?? null)
@@ -15299,7 +15299,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // type — both the macro type map AND the enemy's own resist:/vulnerable:
           // traits — even when the base weapon isn't that type. Poison/acid/
           // corruption deal flat typeless bonus damage (their bite is the DOT).
-          const isElemental = coating.kind === 'electrical' || coating.kind === 'burn';
+          const isElemental = coating.kind === 'electrical' || coating.kind === 'burn' || coating.kind === 'cold';
           const rolled = isElemental
             ? Math.max(
                 1,
@@ -27565,7 +27565,7 @@ function runAethercraft(
 function applyWeaponCoatingProc(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   activeIdx: number,
-  proc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string },
+  proc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; source?: string },
 ): void {
   set((s) => {
     if (!s.currentScene) return s;
@@ -27718,10 +27718,10 @@ function handleGolemCommand(
     // coating's shred/stack/DOT on the enemy (the armor-breaker payoff). Mirrors
     // the player's coated-strike math.
     const golemCoating = workingGolem.weapon?.coating;
-    let golemCoatProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn'; rolled: number; source?: string } | null = null;
+    let golemCoatProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; source?: string } | null = null;
     if (golemCoating) {
       const rawRolled = Math.max(1, rollFromNotation(golemCoating.dice));
-      const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn';
+      const isElemental = golemCoating.kind === 'electrical' || golemCoating.kind === 'burn' || golemCoating.kind === 'cold';
       const rolled = isElemental
         ? Math.max(1, Math.round(
             rawRolled * combineDamageTypeMatch(
