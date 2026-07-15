@@ -112,6 +112,32 @@ function defensesFor(enemy: Enemy): { resists: string[]; weaknesses: string[] } 
 // Wisdom is the consistent "scout the enemy" stat. Bosses always show (OTA-798).
 const WEAKNESS_READ_WIS = 12;
 
+// OTA-819 — the WIS read is DIEGETIC: instead of a bare "WEAK: burn" label, the detail
+// popup narrates what you notice about the creature that gives the weakness/resistance
+// away. Keeps the concrete damage type in parentheses so it's still actionable.
+const WEAK_FLAVOR: Record<string, string> = {
+  burn: 'its hide is dry and cracked — fire would take fast',
+  electrical: "it's waterlogged and conductive — a shock would run right through it",
+  radiation: 'its flesh is unstable — radiation would rot it fast',
+  bludgeoning: 'its form is brittle — a heavy blow would shatter it',
+  cold: 'it runs hot and quick — cold would seize it up',
+  slashing: 'its skin is thin — a keen edge would open it',
+  piercing: 'it wears no plate — a point would sink deep',
+  poison: 'it still draws breath — venom would take hold',
+  aetheric: 'its binding is loose — aether would unmake it',
+};
+const RESIST_FLAVOR: Record<string, string> = {
+  slashing: 'blades skate off it',
+  piercing: 'points fail to find anything vital',
+  bludgeoning: 'blunt blows deform it and it just resets',
+  burn: 'flame barely marks it',
+  electrical: 'current earths away harmlessly',
+  cold: 'the chill does not touch it',
+  poison: 'it has no biology for venom to work on',
+  radiation: 'radiation washes over it',
+  aetheric: 'aether slides off it unheeded',
+};
+
 export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, playerWisdom }: Props) {
   const canReadDefenses = (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
   // Measure the column we actually live in so cards fit the top-right corner
@@ -235,13 +261,14 @@ function enemyDetailBody(view: EnemyView, canRead: boolean): string {
   lines.push('');
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   lines.push(`Attack ${atkLabel}     Damage ${e.damage}${dealsType ? ` (${cap(dealsType)})` : ''}`);
-  // OTA-818 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
-  // front only with enough Wisdom, else discover by hitting.
+  // OTA-818/819 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
+  // front only with enough Wisdom, else discover by hitting. OTA-819 — the read is
+  // DIEGETIC: narrate what you notice, with the damage type in parens.
   if (e.boss || canRead) {
-    if (defenses.resists.length) lines.push(`Resists: ${defenses.resists.map(cap).join(', ')}`);
-    if (defenses.weaknesses.length) lines.push(`Weak to: ${defenses.weaknesses.map(cap).join(', ')}`);
+    for (const w of defenses.weaknesses) lines.push(`You size it up — ${WEAK_FLAVOR[w] ?? `it looks vulnerable to ${w}`}. (Weak: ${cap(w)})`);
+    for (const r of defenses.resists) lines.push(`— ${RESIST_FLAVOR[r] ?? `it shrugs off ${r}`}. (Resists: ${cap(r)})`);
   } else if (defenses.resists.length || defenses.weaknesses.length) {
-    lines.push('Defenses: unknown — strike to learn (Wisdom 12 reads them on sight)');
+    lines.push("You can't read its weaknesses at a glance — strike it and watch what bites (Wisdom 12 reads them on sight).");
   }
   const traits = e.traits ?? [];
   if (traits.length) {

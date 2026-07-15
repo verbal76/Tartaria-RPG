@@ -16264,4 +16264,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // learn" and discovers via the combat log's "Weakness exposed" line. EnemyPanel's
 // defensesFor now RECONCILES type-map vs traits (discord → trait wins) so it never
 // shows a flipped-away weakness. Knobs (WEAKNESS_POOL) in encounter.ts.
-export const OTA_BUILD_ID = '2026-07-15-818-random-weakness-wis-read';
+//
+// OTA-819 — THEMATIC ("Pokémon-route") weakness + medium hardness + diegetic read
+// (player: "believable but not stale — not 'only weak to this', don't break immersion").
+// 818's flat-random weakness read as nonsense (mud weak to cold). Now each creature TYPE
+// has a small pool of PLAUSIBLE weaknesses (mud → burn/radiation/electrical; aetheric
+// being → bludgeoning/cold/slashing; machine → electrical/bludgeoning/aetheric; flesh →
+// pierce/poison/cut/burn) and a spawn rolls ONE — believable every time, varied fight to
+// fight. HARDNESS = MEDIUM: the weakness is a ×1.5 BONUS, everything else stays normal
+// and still works (never hard-locked); each spawn takes one soft ×0.5 resist, and ~35%
+// get a real ×0.25 WALL on a type their kind is already armored against (a trait resist
+// STACKED onto a type-map resist — no new plumbing). READ is diegetic: the WIS-gated
+// detail popup narrates what you notice ("its hide is dry and cracked — fire would take
+// fast (Weak: Burn)") instead of a bare label. THEMATIC_DEFENSE_POOLS + flavor maps are
+// the knobs. Supersedes 818's flat WEAKNESS_POOL.
+export const OTA_BUILD_ID = '2026-07-15-819-thematic-weakness';
