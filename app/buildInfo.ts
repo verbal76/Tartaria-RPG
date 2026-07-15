@@ -16236,4 +16236,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is left exactly as authored — "low level is still low level". Applied at the three
 // spawn boundaries (scene arrival + groups, rest-ambush, hook spawn_enemy_tag). All
 // knobs in encounter.ts.
-export const OTA_BUILD_ID = '2026-07-15-816-regular-enemy-scaling';
+//
+// OTA-817 — MIXED-ROLE PACKS + PACK-AWARE SCALING (player: bring back multi-enemy
+// fights; "scale multiples as a package not individually — 3 scaled enemies together
+// would be harder than a boss"). (1) The curated single-enemy path pre-empted the
+// group roll, so laddered areas hadn't spawned more than one foe in weeks (the
+// target-swipe UI + companions went unused). rollExtraPackMembers now adds role-DIVERSE
+// foes (a drone + a bandit + a rat — different types → different weaknesses in one
+// fight), frequency scaling with danger (frontier ~10% → deep ~75%), never onto a
+// boss, capped at 3 total. (2) scaleEncounterForContext is now PACK-AWARE: a multi-foe
+// pack shares ONE budget — anchored on a single solo-scaled body of the pack's mean
+// HP, +a small premium per extra body, HARD-CAPPED under a boss's HP (70+danger·10),
+// then distributed across members by base-HP weight (a brute out-bulks a rat). Solo
+// spawns still scale per-enemy. Weakness reveal chosen WIS-gated (lands next in 818).
+export const OTA_BUILD_ID = '2026-07-15-817-mixed-packs-pack-scaling';
