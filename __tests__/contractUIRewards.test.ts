@@ -67,13 +67,16 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
     await store.getState().startNewGame({ name: 'Sleuth', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
 
-    // Inject a fully-progressed mystery on the player's slate.
+    // Inject a fully-progressed mystery on the player's slate + a matching-faction
+    // vendor in scene (B2 — the UI complete is a FACE-TO-FACE hand-in now).
     const p0 = store.getState().player!;
+    const sc0 = store.getState().currentScene!;
     store.setState({
       player: {
         ...p0,
         activeMysteries: [{ id: mystery.id, stage: mystery.stages.length, postedByFaction: mystery.factionId ?? null, acceptedAt: Date.now() }],
       },
+      currentScene: { ...sc0, vendor: { id: 'test_agent', name: 'Test Agent', faction: mystery.factionId ?? null } as never },
     });
 
     const inventoryNamesBefore = store.getState().player!.inventory.map((i) => i.name);
@@ -100,11 +103,13 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
     store.getState().skipTutorial?.();
 
     const p0 = store.getState().player!;
+    const sc0 = store.getState().currentScene!;
     store.setState({
       player: {
         ...p0,
         activeStorylines: [{ id: story.id, stage: story.stages.length, postedByFaction: story.factionId ?? null, acceptedAt: Date.now() }],
       },
+      currentScene: { ...sc0, vendor: { id: 'test_agent', name: 'Test Agent', faction: story.factionId ?? null } as never },
     });
 
     const beforeCount = store.getState().player!.inventory.filter((i) => i.name === story.rewardItem).length;
@@ -150,8 +155,10 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
     expect((after.activeFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(true);
     expect((after.completedFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(false);
 
-    // Now hold exactly the required items.
+    // Now hold exactly the required items + a same-faction agent in scene (B2 — the
+    // UI complete is a FACE-TO-FACE hand-in now; no agent → refused, not half-pay).
     const p1 = store.getState().player!;
+    const sc1 = store.getState().currentScene!;
     store.setState({
       player: {
         ...p1,
@@ -160,6 +167,7 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
           { id: 'fetch_stack', name: itemName, kind: 'material', rarity: 'Common', quantity, tags: [] } as never,
         ],
       },
+      currentScene: { ...sc1, vendor: { id: 'test_agent', name: 'Test Agent', faction: fetchQuest.factionId } as never },
     });
     const tcBefore = store.getState().player!.tc;
 
@@ -169,10 +177,8 @@ describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
     // Completed, reward paid, and the fetch items consumed.
     expect((after.completedFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(true);
     expect((after.activeFactionQuestIds ?? []).includes(fetchQuest.id)).toBe(false);
-    // arb171 — the COMPLETE button is the COURIER path: with no same-faction agent
-    // in the scene it pays HALF (closes the "100% from anywhere" exploit). Arriving
-    // at the turn-in spot auto-submits at full (autoSubmitReadyFactionQuests).
-    expect(after.tc).toBe(tcBefore + Math.max(1, Math.round(fetchQuest.reward.tc * 0.5)));
+    // B2/OTA-824 — face-to-face → FULL pay + a long-haul bonus (>= full, never half).
+    expect(after.tc).toBeGreaterThanOrEqual(tcBefore + fetchQuest.reward.tc);
     const held = after.inventory
       .filter((i) => i.name.toLowerCase() === itemName.toLowerCase())
       .reduce((n, i) => n + (i.quantity ?? 1), 0);

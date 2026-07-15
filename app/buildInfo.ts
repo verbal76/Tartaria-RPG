@@ -16326,4 +16326,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so the player typed the flavor word ("the resonance") and got refused; it now names
 // the hook's actual noun — "Work the crystal — investigate it and it will give up
 // something rare" — pointing the player at the interactable that claims the reward.
-export const OTA_BUILD_ID = '2026-07-15-823-narrator-glue-torch-lead';
+//
+// OTA-824 — B2: FACE-TO-FACE CONTRACT HAND-INS + LONG-HAUL BONUS, and "follow the
+// resonance" (player: "kill all remote hand ins, make all routable, but make sure the
+// journey is worth the loot — I don't want a 32-time trip worth 20 TC"). (1) KILLED all
+// remote "send word / courier" turn-ins for EVERY contract type (faction/mystery/
+// storyline; hunts were already OTA-810). The typed handlers require in person; the
+// Contracts-UI COMPLETE now DELEGATES to those handlers (closing the "pay 100% / half
+// from any tile" hole — the OTA-617 half-pay-from-afar path is gone too). A typed "send
+// word …" is refused with a route-to-the-pin steer. (2) LONG-HAUL BONUS: new
+// contractJourneyBonusTc (contractMarkers.ts) adds TC scaled to the turn-in tile's
+// grid-cell remoteness from the starter hub (0 next door, capped at 1.5× base), applied
+// at every turn-in — so a far hand-in is never trivially paid. (3) ROUTABLE: every open
+// contract already carries an atlas ◆ pin + SET COURSE anchor (contractMarkers). (4)
+// "follow the resonance": the torch-charged hook is stamped with sound-synonyms
+// (resonance/sound/ringing/hum/note) so investigate/examine/work/FOLLOW the resonance
+// all resolve to it; a "follow"-verb travel onto a torch-charged hook advances it.
+export const OTA_BUILD_ID = '2026-07-15-824-contract-face-to-face-and-resonance';
