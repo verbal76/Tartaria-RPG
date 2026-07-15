@@ -15867,4 +15867,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   C. SIGIL → RAPPORT — returning a faction sigil establishes that faction's CHA
 //      vendor discount (marks its rapport quest id complete), replacing the bespoke
 //      fetch-a-relic gate. No new items.
-export const OTA_BUILD_ID = '2026-07-15-795-guardian-scale-dodge-floor-sigil-rapport';
+// OTA-796 — REGULAR-ENEMY SCALING (companion to 795's Guardian scaling). Base enemy
+// stats came straight from enemies.json, so an over-leveled character farmed trivial
+// trash. scaledEnemyForContext (encounter.ts) lifts a NON-BOSS enemy's HP (and lightly
+// its attack/AC) by player power AND tile danger: a rising HP floor (maxed player ~34
+// at danger 0 to ~64 at danger 5) plus a flat-capped multiplier (a big Legendary is
+// nudged, not exploded → gentler than a Guardian). A fresh arrival on a danger-0 tile
+// is untouched. Applied at scene arrival + groups, rest-ambush, and hook spawn.
+export const OTA_BUILD_ID = '2026-07-15-796-regular-enemy-scaling';
