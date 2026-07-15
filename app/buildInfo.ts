@@ -15921,4 +15921,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // learned → empty. And recipe rows no longer reuse the item-buy flow: they open a LEARN
 // pending (isRecipe) — no Buy & Equip, no ×N; button reads "Learn". buyFromVendor's
 // recipe-learn branch still charges TC + teaches it.
-export const OTA_BUILD_ID = '2026-07-15-802-vendor-recipe-no-reroll';
+// OTA-803 — NARRATOR "theYou" GLUE + TORCH-LEAD CLARITY. (1) Qwen 0.5B sometimes emits
+// a token boundary with no space, gluing words at a lowercase->Uppercase seam (log:
+// "theYou stood in the shadowy chamber"). New repairGluedNarration (foreignText.ts)
+// un-glues any [a-z][A-Z] seam and drops an article stranded before a subject pronoun
+// ("the You" -> "You"; "aStone" -> "a Stone" kept); wired at all four narration sites.
+// (2) The Aetheric Torch reveal said "Work it", so the player typed the flavor word
+// ("the resonance") and got refused; it now names the hook's noun ("Work the crystal —
+// investigate it and it will give up something rare").
+export const OTA_BUILD_ID = '2026-07-15-803-narrator-glue-torch-lead';
