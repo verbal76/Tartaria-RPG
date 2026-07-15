@@ -8012,17 +8012,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const danger = (currentScene.location as { danger?: number })?.danger ?? 2;
             let foe = findEnemyByName(animateHit) ?? findEnemyByName(nounTitle);
             if (!foe) {
-              const ap = 3 + Math.min(6, danger);
+              // OTA-827 [Group-K] — Constructs are a real, PROVOKABLE mid-tier BOSS: a
+              // war-automaton (big autumn-iron robot) roused by striking a statue /
+              // colossus / sentinel / automaton on a tile. It scales with BOTH the tile
+              // danger AND the player's power (guardianPlayerPower = bestCombat +
+              // hpMax/10) so it stays a threat at endgame instead of being farmed, but
+              // is CAPPED below Core-Guardian tier ("almost up to a Guardian, not quite").
+              // type 'Construct' → resists slashing/piercing, weak to bludgeoning /
+              // electrical / COLD (see TYPE_RESISTANCE_MAP): a big machine seizes to a
+              // maul, a jolt, or a deep chill. Drops real salvage (incl. the scarce
+              // Golem Core on a heavy one) so provoking it is worth the risk.
+              // Player power = best combat stat + hpMax/10 (same measure the Guardian
+              // scaler uses), computed inline so this stays lore/line-neutral.
+              const cgEff = effectiveStats(player);
+              const cgPow = Math.max(cgEff.strength, cgEff.dexterity, cgEff.intelligence) + player.hpMax / 10;
+              const over = Math.min(1.8, Math.max(1, cgPow / 15)); // 1.0 (early) .. 1.8 (endgame)
+              const hp = Math.min(90, Math.round((26 + danger * 7) * over)); // capped under Guardian HP
+              const ap = Math.min(11, Math.round(4 + danger + 3 * (over - 1)));
+              const heavy = danger >= 4 || over >= 1.4;
               foe = {
                 name: `Roused ${nounTitle}`,
                 type: 'Construct',
                 abilityPoint: `Strength ${ap}`,
-                attack: 'Slam',
-                damage: danger >= 4 ? '2D8' : '2D6',
-                hp: 24 + danger * 6,
-                rarity: danger >= 4 ? 'Rare' : 'Uncommon',
-                traits: ['armored'],
-                loot: [],
+                attack: 'Piston Slam',
+                damage: heavy ? '2D8' : '2D6',
+                hp,
+                rarity: 'Rare',
+                traits: ['armored', 'ambush_strike'],
+                loot: heavy ? ['Scrap Metal', 'Golem Core', 'Aether Crystal'] : ['Scrap Metal', 'Aether Crystal'],
               } as unknown as Enemy;
             }
             const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
@@ -8051,8 +8068,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 stepsSinceCombat: 0,
               };
             });
-            get().appendLog('world', `The ${nounTitle} was never dead — only waiting. It surges upright and comes for you.`);
-            get().appendLog('combat', `${spawn.name} closes — ${spawn.attack} ready, ${spawn.damage} damage on a hit. (range: close)`);
+            get().appendLog('world', `The ${nounTitle} was never dead — only waiting. Iron the size of a cart grinds and unfolds; a war-automaton older than the outpost surges upright and comes for you.`);
+            get().appendLog('combat', `${spawn.name} closes — a ${spawn.rarity} Construct. ${spawn.attack} ready, ${spawn.damage} on a hit. Plate turns blades; it seizes to a maul, a jolt, or a deep chill. (range: close)`);
             void get().persist();
             break;
           }

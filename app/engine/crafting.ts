@@ -1,6 +1,7 @@
 import type { InventoryItem, Rarity, DamageType } from './types';
 import type { ItemEffect } from './itemEffect';
 import { levenshtein } from './editDistance';
+import { canonicalDamageType } from './damageTypes';
 import { resolveItemAlias } from './itemAliases';
 import materialsData from '../data/items/materials.json';
 import weaponsData from '../data/items/weapons.json';
@@ -872,16 +873,24 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
 // machines short-circuit to electrical, mud/undead burn, beasts/humans pierce) and
 // every type in the JSON is covered. Resists are largely unchanged.
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
-  Animal: { resist: [], weak: ['piercing'] },
-  Human: { resist: [], weak: ['piercing', 'slashing'] },
+  // OTA-827 [Group-K] — `poison` is now anti-ORGANIC: venom/toxin bites living
+  // flesh (Animal, Human, the fleshy Aetheric Mutation) but is still RESISTED by
+  // machines and the undead below (Automation/Mechanism/Etheric Undead) — nothing
+  // to poison. Pre-fix no enemy was ever vulnerable:poison, so poison weapons/
+  // coatings could only ever land neutral or halved.
+  Animal: { resist: [], weak: ['piercing', 'poison'] },
+  Human: { resist: [], weak: ['piercing', 'slashing', 'poison'] },
   'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
-  'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning'] },
+  'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning', 'poison'] },
   'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['slashing'] },
-  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical'] },
-  Mechanism: { resist: ['poison', 'aetheric'], weak: ['electrical'] },
-  'Mech-Construct': { resist: ['slashing', 'piercing'], weak: ['electrical', 'bludgeoning'] },
+  // OTA-827 [Group-K] — `cold` seizes machinery: the metal contracts, joints
+  // lock, coolant freezes. It's the anti-machine element (alongside electrical),
+  // and the marquee use is the provokable Roused Construct boss.
+  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical', 'cold'] },
+  Mechanism: { resist: ['poison', 'aetheric'], weak: ['electrical', 'cold'] },
+  'Mech-Construct': { resist: ['slashing', 'piercing'], weak: ['electrical', 'bludgeoning', 'cold'] },
   'Etheric Undead': { resist: ['poison', 'aetheric'], weak: ['burn', 'radiation'] },
-  Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical'] },
+  Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical', 'cold'] },
 };
 
 export type DamageMatch = 'normal' | 'weak' | 'resist';
@@ -905,7 +914,11 @@ export function applyDamageTypeModifier(
   if (!weaponDamageType || !enemyType) return { damage: rawDamage, match: 'normal' };
   const map = TYPE_RESISTANCE_MAP[enemyType];
   if (!map) return { damage: rawDamage, match: 'normal' };
-  const wt = weaponDamageType.toLowerCase();
+  // OTA-827 [Group-K] — canonicalize through the shared alias table so a `force`
+  // weapon reconciles as aetheric and a `frost` weapon as cold (pre-fix this used
+  // a bare lower-case, so aliased types stayed permanently type-neutral here even
+  // though the proc layer already aliased them).
+  const wt = canonicalDamageType(weaponDamageType);
   if (map.weak.includes(wt)) return { damage: Math.ceil(rawDamage * 1.5), match: 'weak' };
   if (map.resist.includes(wt)) return { damage: Math.max(1, Math.floor(rawDamage / 2)), match: 'resist' };
   return { damage: rawDamage, match: 'normal' };
