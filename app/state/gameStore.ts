@@ -1486,6 +1486,18 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // fused-tag backfill AND the fused-name migration below for the tagged set, so
     // "Atalan's Trident" keeps its name and doesn't read as a Crucible fusion.
     const isGuardianReward = (item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set');
+    // OTA-830 — make a Core Guardian drop granted BEFORE OTA-828 usable. Those saves
+    // stored the weapon/armor with NO uniqueStats (the builder didn't stamp it yet),
+    // so getEquippedWeapon resolved them barehanded and aggregateArmor gave 0 AC —
+    // "Atalan's Trident can't be used." (A name that happens to contain a catalog word
+    // like "Halberd" worked by accident via findWeaponByName's fuzzy match; a
+    // "Trident" / "Rosary" / "Tuning Fork" did not.) Backfill uniqueStats from the
+    // canonical set entry, matched by name, BEFORE the fused-tag backfill below (which
+    // still skips Guardian gear via !isGuardianReward).
+    if (isGuardianReward && !item.uniqueStats) {
+      const gStats = (require('../engine/coreGuardians') as typeof import('../engine/coreGuardians')).guardianGearUniqueStats(item);
+      if (gStats) item = { ...item, uniqueStats: gStats };
+    }
     if (item.uniqueStats && !isGuardianReward && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
       item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
     }

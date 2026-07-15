@@ -224,6 +224,35 @@ export function dropsForCapital(capitalId: string): GuardianDrop | null {
   return { weapon: freshDrop(set.weapon), armor: freshDrop(set.armor) };
 }
 
+// OTA-830 — index every canonical Guardian weapon+armor by NAME (a freshDrop only
+// suffixes the id, never the name), so a save-load migration can re-derive stats for
+// a drop granted BEFORE OTA-828 (when weapon()/armor() didn't stamp uniqueStats).
+let _guardianGearByName: Map<string, InventoryItem> | null = null;
+function guardianGearByName(): Map<string, InventoryItem> {
+  if (_guardianGearByName) return _guardianGearByName;
+  const m = new Map<string, InventoryItem>();
+  for (const set of Object.values(GUARDIAN_GEAR_BY_CAPITAL)) {
+    m.set(set.weapon.name.toLowerCase(), set.weapon);
+    m.set(set.armor.name.toLowerCase(), set.armor);
+  }
+  _guardianGearByName = m;
+  return m;
+}
+
+/** OTA-830 — the uniqueStats a Core Guardian drop SHOULD carry, matched by name.
+ *  Returns null for a non-Guardian item or one that already has uniqueStats. Used by
+ *  the save-load migration to make pre-OTA-828 drops (e.g. "Atalan's Trident") usable
+ *  without re-granting them: the canonical set entries now carry uniqueStats (OTA-828),
+ *  so we just graft the matching one onto the stored instance. */
+export function guardianGearUniqueStats(
+  item: { name: string; tags?: readonly string[]; uniqueStats?: unknown },
+): NonNullable<InventoryItem['uniqueStats']> | null {
+  if (item.uniqueStats) return null;
+  if (!(item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set')) return null;
+  const canon = guardianGearByName().get(item.name.toLowerCase());
+  return canon?.uniqueStats ?? null;
+}
+
 // ----- Guardian definitions ----------------------------------------------
 //
 // OTA-778 — every Guardian carries an authored `vulnerable:<type>` +
