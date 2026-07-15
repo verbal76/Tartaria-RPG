@@ -77,7 +77,7 @@ import { DEV_ACCESS_NAME, isDevAccessName, getNarratorName, getCorruptionName, d
 import { sentenceNamesOffCanonEntity, buildEntityAllowList } from '../engine/entityGuard';
 import { loadLoreConceptBank } from '../engine/loreConceptBank';
 import { useContentPackStore } from './contentPackStore';
-import { stripForeignWords } from '../engine/foreignText';
+import { stripForeignWords, repairGluedNarration } from '../engine/foreignText';
 import { isQuestLockedItem } from '../engine/questItems';
 import { revealedLocationName } from '../engine/hiddenLocations';
 import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
@@ -932,7 +932,7 @@ async function arbiterPersonaAnswer(question: string): Promise<string | null> {
     );
     // OTA-494 — sieve foreign words from the Ask-the-Arbiter answer too (same
     // model code-switch risk as the narration feed).
-    const line = stripForeignWords((out ?? '').trim());
+    const line = repairGluedNarration(stripForeignWords((out ?? '').trim()));
     return line.length > 0 ? line : null;
   } catch {
     return null;
@@ -9312,7 +9312,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // model code-switch ("huà") can't leak into investigate one-liners
               // or the patched entry.result.line either.
               const qwenGenerator: LoreGenerator | null = qwen.isReady()
-                ? async (messages, opts) => stripForeignWords(await qwen.generate(messages, opts))
+                ? async (messages, opts) => repairGluedNarration(stripForeignWords(await qwen.generate(messages, opts)))
                 : null;
               const locationName =
                 currentScene.location.name ?? 'this place';
@@ -17407,7 +17407,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    get().appendLog('world', `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work it, and it will give up something rare.`);
+    get().appendLog('world', `You fix the ${torch.name}'s aetheric light on the ${noun}. It answers with a deep, wrong-sounding resonance — there is more here than there should be. Work the ${noun} — investigate it and it will give up something rare.`);
     void get().persist();
   },
 
@@ -30753,7 +30753,7 @@ async function narrateViaArbiter(
     // the feed). Done FIRST so sentence-capping / trimming operate on the cleaned
     // English; if it empties the line, the `|| trimmed` fallback below restores
     // the template.
-    const deforeigned = stripForeignWords(text);
+    const deforeigned = repairGluedNarration(stripForeignWords(text));
     // Cap sentences before trimming so we never emit the 4-sentence
     // hallucination paragraphs the playtest log caught.
     const capped = clampSentences(deforeigned, ctx.in_combat ? 1 : 2);
@@ -30934,7 +30934,7 @@ async function maybeGenerateAmbientArbiter(
     // OTA-970 — off-canon entity guard (ambient path). A dropped line just stays
     // silent (ambient has no template fallback), the safe outcome.
     const ambientAllow = narrationEntityAllow(get);
-    const survivors = clampSentences(stripForeignWords(text), 1)
+    const survivors = clampSentences(repairGluedNarration(stripForeignWords(text)), 1)
       .split(/(?<=[.!?])\s+/)
       .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
       .filter((s) => !/^\s*they\s/i.test(s))
