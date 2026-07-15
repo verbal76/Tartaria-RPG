@@ -15834,4 +15834,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 'buy <name>' / 'repair <item>' / 'train <stat>' angle-bracket tokens read as
 // unfilled templates in the prose; rewritten in plain language. Same fix on the three
 // arbiter "send word <name>" courier lines → "send word by name".
-export const OTA_BUILD_ID = '2026-07-14-791-narration-placeholder-cleanup';
+// OTA-812 — READABILITY: (1) the same-channel feed debounce now joins grouped
+// world/system beats with a PARAGRAPH BREAK ("\n\n") instead of two spaces, so a
+// travel step's stall line + wares blurb + walk + encounter read as distinct
+// paragraphs, not a run-on wall. (2) The vendor buy screen surfaces a "WORKINGS TO
+// LEARN" section — recipes the trader teaches, each a tappable row (buy-confirm →
+// buyFromVendor recipe-learn branch) — so learning no longer needs the typed
+// "buy <name>" command.
+export const OTA_BUILD_ID = '2026-07-14-792-readable-feed-recipe-buttons';

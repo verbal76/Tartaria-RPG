@@ -4460,10 +4460,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
       // HANDOFF #4 — same-channel debounce. When two `world` entries land
       // within 500ms (typical: dig outcome + hook callback firing in the
-      // same handler), merge the second into the first so the feed reads
-      // as one continuous beat instead of a stutter. Only world+system,
+      // same handler), group the second into the first so the feed reads
+      // as one card instead of a stutter of separate stamps. Only world+system,
       // never arbiter (has dedup) or combat (one beat per d20) or reward
       // (player-positive notifications stay distinct).
+      // OTA-812 — grouped beats join with a PARAGRAPH BREAK, not two spaces.
+      // Playtest ("a big block of text"): a travel step fires the stall line, the
+      // wares blurb, the walk narration, and the arrival encounter all inside the
+      // 500ms window, and the old two-space joiner welded them into one run-on wall.
+      // A blank line between them keeps the single-card grouping (no stutter) while
+      // reading as distinct beats. RN <Text> renders "\n\n" as a paragraph gap.
       const lastEntry = state.gameLog[state.gameLog.length - 1];
       const canMerge =
         lastEntry &&
@@ -4474,7 +4480,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         !text.startsWith('⏳') &&
         !lastEntry.text.startsWith('⏳');
       if (canMerge) {
-        const merged = { ...lastEntry, text: `${lastEntry.text}  ${text}`, ts: entry.ts };
+        const merged = { ...lastEntry, text: `${lastEntry.text}\n\n${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);
         // NOTE: previously this branch extracted ambient nouns from
         // the merged text and pushed them into scene.ambientNouns.
