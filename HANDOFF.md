@@ -374,10 +374,22 @@ Key invariants worth knowing:
       check/kill/travel anywhere — if the user wants those tightened too, add optional
       locationId/biomeTag/enemyName to stage defs + extend the face-to-face turn-in to
       those kinds. Only hunts were called out this pass.
-    - **B3 [#6] Dodge strictly dominant at high DEX** — PARKED pending the user's
-      live retest on a current build (they said "I'll test and we can revisit"). The
-      796 dodge changes (turn cost + 3-win train cap) may already brake it; don't tune
-      until the retest confirms it's still an issue.
+    - **B3 [#6] Dodge strictly dominant at high DEX** — RETEST DATA IN (2026-07-15
+      device log, Heir Atalan-Drowned Core Guardian fight): it's really an AC/defense
+      dominance more than a dodge-loop exploit now. The player at **AC 31, DEX 20** made
+      the boss (d20+5 to hit) need a **26+ — i.e. only a natural 20** lands, so across
+      the whole fight the boss connected exactly ONCE (a crit for 14); every other swing
+      of its two-per-round missed. Dodge on top gives a free "PERFECT OPENING (next
+      strike ×2 dice)" every time. BUT the fight was NOT trivial: the Guardian RESISTS
+      piercing (the player's Giant Bone Longbow + Phoenix Rebirth both piercing → ×0.5,
+      3–6 dmg/hit), so offense was slow and the golem (Fat Ass) actually landed the
+      kill — the OTA-798 weakness/resist system + the Arbiter's "try burn" hint were
+      doing their job. So the open question for the USER's design call is narrower than
+      "dodge is broken": **high AC makes late-game characters near-unhittable except on
+      crits.** Options if they want to tune — (a) let bosses' bonus scale so they hit a
+      31-AC target more than 5%; (b) cap/curve AC contribution; (c) leave it (defense IS
+      the reward for stacking AC, and offense is already gated by resistances). Do NOT
+      change anything until the user picks a direction — this is a balance/feel call.
   - **C. UX / polish — ~~DONE 801/781/1086~~.**
     - ~~C1 [#11] Fusion material-type UX.~~ **FIXED:** firing the Crucible with
       reserved-but-insufficient pieces opens the PICKER (which already surfaces
@@ -536,14 +548,15 @@ Key invariants worth knowing:
 ## 9. Recent OTA highlights (latest sessions)
 
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-812`**,
-**golem-line `…-792`**, **engine_Dev `…-1097`**. Current parity offsets: golem =
+history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-07-14-813`**,
+**golem-line `…-793`**, **engine_Dev `…-1098`**. Current parity offsets: golem =
 HAL − 20 (stable); engine_Dev = HAL + 285 (the Guardian OTA 798/778 was
-HAL+golem-only, so engine is one behind on count; the readability batch 812/792/1097
+HAL+golem-only, so engine is one behind on count; the boss-name-casing batch 813/793/1098
 shipped to all three and preserves the −20 / +285 spread).
 
 | HaL2001 | golem | engine_Dev | Change |
 |---|---|---|---|
+| 813 | 793 | 1098 | BOSS NAME CASING — playtest (Heir Atalan-Drowned, a Core Guardian): the combat-arbiter templates injected the enemy name via `enemy.name.toLowerCase()`, which reads fine for a generic creature ("the mud boar is patient") but mangles a NAMED boss ("the heir atalan-drowned is patient. Be patienter."). New `combatEnemyLabel(enemy)` (narrativeGenerator, exported) returns the name AS-IS when `enemy.boss` (Core Guardians + boss-gate spawns all carry the flag) and lowercased otherwise; applied to the three combat-arbiter template sites (combatRemark's COMBAT_REMARKS `{enemy}`, the call-to-action "does not look away from the …" pick, and ARBITER_COMBAT_INTROS's `{enemyName}`). Generic mobs still read naturally. All three lines (engine copy uses getNarratorName; the casing helper is lore-neutral). |
 | 812 | 792 | 1097 | READABILITY — the two follow-ups to 811's placeholder cleanup (user: "run both fixes"). (1) FEED WALL-OF-TEXT: the same-channel debounce (appendLog, ~line 4448) GROUPS rapid world/system entries into one card so the feed doesn't stutter separate stamps — but it welded them together with a TWO-SPACE joiner, so a single travel step (stall arrival line + wares blurb + "You walk east…/compass" + the arrival encounter, all inside the 500ms window) rendered as one run-on block (the screenshot). Changed the merge joiner to a PARAGRAPH BREAK (`\n\n`), so grouped beats read as distinct paragraphs while still living in one card (no stutter). RN `<Text>` renders `\n\n` as a blank line — no AdventureFeed change needed. (2) RECIPE BUY BUTTONS: recipe-learning was typed-only ("buy <name>", the thing 811 had to teach in prose). The vendor BUY screen now renders a "WORKINGS TO LEARN" section (VendorScreen) listing `vendorRecipeOffers(RECIPES, knownRecipes, vendorSeed(vendor.name))` filtered to not-yet-known, each a tappable row that opens the standard buy-confirm → confirm calls buyFromVendor(result) → the existing recipe-learn branch (gameStore ~16461). Open by default (it's the discoverable bit). This is the "surface it as UI so the prose can drop the syntax" follow-up noted in 811. All three lines. NOTE: the underlying travel-narration is still MULTIPLE appendLog beats merged — the paragraph-break makes that read well; if you'd rather each beat be its OWN feed card (harder visual separation), that's a bigger AdventureFeed change, not done here. |
 | 811 | 791 | 1096 | PROSE POLISH — command-syntax placeholders removed from player-facing narration (playtest screenshot: "a big block of text with placeholder nouns in it"). The vendor-arrival wares blurb (vendorWaresBlurb) welded TYPED-COMMAND syntax into the story prose — `"buy <name>"`, `"repair <item>"`, `"train <stat>"`, `"heal dog"/"revive dog"` — so the angle-bracket tokens read as unfilled template variables mid-paragraph (and stacked onto the travel line + the encounter beat into one wall). Rewritten in plain language that still teaches the verb without the syntax: "Rare workings for sale: … — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask." (engine keeps "sidekick" for lore-neutrality). Same fix on the three narrator "send word `<name>`" contract-courier refusal lines → "send word by name". Swept the rest: every other `<...>` token in the codebase is in a CODE COMMENT, not player-facing (the mission-board "Type ACCEPT `<name>`" line was left — it's explicit instruction with a filled example right after). NOTE for future: the underlying "wall of text" is structural — vendor blurb + intra-scene travel narration + the arrival encounter concatenate into one paragraph; a real fix would break those into separate feed beats (not done this pass). Recipe-buying is still typed-only (no VendorScreen button) — surfacing it as UI would let the prose drop the buy hint entirely. All three lines |
 | 810 | 790 | 1095 | HUNTS ARE A FACE-TO-FACE TURN-IN (user's B2 call — "hunts are a face to face turn in"). A bounty's proof is the trophy, and proof is shown IN PERSON to a paying agent. (1) turnInHunt no longer accepts the OTA-456 remote "send word" courier close for hunts — a typed "send word <hunt>" is refused. (2) The REAL B2 hole: the Contracts-UI COMPLETE (completeContractFromUI 'hunt') paid FULL reward from ANY tile with no vendor/agent check — a whole bounty closable from a safe hub. It now requires a paying vendor IN SCENE and the RIGHT posting faction's agent (a neutral hunt takes any vendor), exactly like the typed turn-in. (3) Always full pay now (the courier's 15% cut is gone with the remote path). The kill handler already stamped ready + directed "return to a posting agent", so the loop reads coherently. Mysteries / storylines / faction deeds KEEP their remote cut untouched (only hunts were called out). ContractsScreen hunt "how to finish" copy updated to say hand in face to face, no courier. Engine refusal lines use getNarratorName() (lore-neutral). All three lines. (The other open B item — dodge-dominant-at-high-DEX — is PARKED pending the user's live retest on a current build.) |
