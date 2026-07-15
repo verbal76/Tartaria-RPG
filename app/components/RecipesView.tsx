@@ -61,6 +61,11 @@ export interface RecipesViewProps {
    *  on every craft. Player feedback: "the crafting menu shouldn't
    *  close it should stay open for me to craft something else." */
   onAfterCraft?: (delta: InventoryDelta[]) => void;
+  /** OTA-833 — a craft that did NOTHING (gated on Cores, missing ingredients, pack
+   *  full, …) used to leave the screen silent — the player couldn't tell their tap
+   *  registered. Surface the engine's refusal narration so the screen can pop a
+   *  "not yet" modal. Not called for the substitution-confirm case (its own modal). */
+  onCraftRefused?: (message: string) => void;
   /** OTA-059 — kind filter. CRAFT tab passes 'non-consumable' to
    *  show weapons/armor/relics/gear; RECIPES tab passes 'consumable'
    *  to show stews / tinctures / draughts. Omitting the prop shows
@@ -91,6 +96,7 @@ export interface RecipesViewProps {
 // the missing-piece list for everything else so the goal is legible.
 export function RecipesView({
   onAfterCraft,
+  onCraftRefused,
   kindFilter,
   query,
   sortKey = 'ready',
@@ -160,10 +166,28 @@ export function RecipesView({
   // the failure narration.
   const handleCraft = (recipe: Recipe) => {
     const preInv = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
+    const preLogLen = useGameStore.getState().gameLog.length;
     craftRecipe(recipe.result);
-    const postInv = useGameStore.getState().player?.inventory ?? [];
+    const state = useGameStore.getState();
+    const postInv = state.player?.inventory ?? [];
     const delta = computeInventoryDelta(preInv, postInv);
-    onAfterCraft?.(delta);
+    if (delta.length > 0) {
+      onAfterCraft?.(delta);
+      return;
+    }
+    // OTA-833 — the craft produced nothing. If it raised the substitution-confirm
+    // prompt, that has its own modal — don't double up. Otherwise it was REFUSED
+    // (gated on Cores, missing ingredients, pack full, …); surface the newest
+    // refusal narration the engine logged so the screen pops a "not yet" modal
+    // instead of sitting there silently (device report: a gated craft looked like a
+    // dead tap — the player only found out by leaving the menu).
+    if (state.craftSubstitutionPrompt) return;
+    const reason = state.gameLog
+      .slice(preLogLen)
+      .filter((e) => e.channel === 'arbiter' || e.channel === 'world')
+      .map((e) => e.text)
+      .pop() ?? 'That didn’t take — check what the recipe needs and try again.';
+    onCraftRefused?.(reason);
   };
 
   const [collapsed, setCollapsed] = React.useState<Record<string, boolean>>({});

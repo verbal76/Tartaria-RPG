@@ -5,6 +5,7 @@ import { repairCostMaterials } from '../engine/scrapEngine';
 import { missingIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftResultModal } from '../components/CraftResultModal';
+import { CraftRefusalModal } from '../components/CraftRefusalModal';
 import { BrandedModal } from '../components/BrandedModal';
 import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
@@ -222,6 +223,10 @@ export function CraftingScreen() {
   // Empty / null delta = craft failed or no-op'd — the world feed
   // narrates the failure; no popup, screen stays on tab.
   const [craftResult, setCraftResult] = useState<InventoryDelta[] | null>(null);
+  // OTA-833 — refusal popup message. Set when a craft did nothing and wasn't a
+  // substitution-confirm (gated on Cores / missing ingredients / pack full). Renders
+  // the CraftRefusalModal so a gated tap isn't a silent no-op.
+  const [craftRefusal, setCraftRefusal] = useState<string | null>(null);
   // arb147 — golem summon confirm. Tapping a golem variant used to only copy
   // "summon X golem" to the clipboard and make the player paste it back in
   // exploration. Now it opens a confirm → on Summon it dispatches the action and
@@ -405,6 +410,7 @@ export function CraftingScreen() {
               // Empty delta = craft failed; world feed shows the
               // error and the screen stays on the active tab.
             }}
+              onCraftRefused={setCraftRefusal}
             query={craftQuery}
             sortKey={craftSortKey}
             sortDirection={craftSortDir}
@@ -428,6 +434,7 @@ export function CraftingScreen() {
               // Empty delta = craft failed; world feed shows the
               // error and the screen stays on the active tab.
             }}
+              onCraftRefused={setCraftRefusal}
             query={recipesQuery}
             sortKey={recipesSortKey}
             sortDirection={recipesSortDir}
@@ -633,6 +640,19 @@ export function CraftingScreen() {
         onContinue={() => setCraftResult(null)}
         onClose={() => {
           setCraftResult(null);
+          setScreen('exploration');
+        }}
+      />
+
+      {/* OTA-833 — craft-REFUSAL popup. A gated / unaffordable craft used to do
+          nothing visible (silent fail); now the engine's refusal narration surfaces
+          here so the tap clearly registered. KEEP CRAFTING stays; CLOSE MENU exits. */}
+      <CraftRefusalModal
+        visible={craftRefusal !== null}
+        message={craftRefusal ?? ''}
+        onContinue={() => setCraftRefusal(null)}
+        onClose={() => {
+          setCraftRefusal(null);
           setScreen('exploration');
         }}
       />

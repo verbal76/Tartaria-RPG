@@ -1283,7 +1283,7 @@
     },
     {
       "result": "Golem Sledge",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1301,7 +1301,7 @@
     },
     {
       "result": "Crude Golem Sledge",
-      "coresRequired": 4,
+      "coresRequired": 1,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1337,7 +1337,7 @@
     },
     {
       "result": "Golem Greatsword",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1355,7 +1355,7 @@
     },
     {
       "result": "Crude Golem Greatsword",
-      "coresRequired": 4,
+      "coresRequired": 1,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1387,7 +1387,7 @@
     },
     {
       "result": "Golem Pike",
-      "coresRequired": 4,
+      "coresRequired": 2,
       "ingredients": [
         {
           "name": "Scrap Metal",
@@ -1405,7 +1405,7 @@
     },
     {
       "result": "Crude Golem Pike",
-      "coresRequired": 4,
+      "coresRequired": 1,
       "ingredients": [
         {
           "name": "Scrap Metal",
