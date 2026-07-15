@@ -15913,4 +15913,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Crucible. The exploration chip now shows ONLY for a LOCATION's own Crucible; a
 // vendor-carried Crucible lives solely in the vendor screen (which suppresses its offer
 // at location-crucible tiles via the same atLocationCrucible gate). Nothing stranded.
-export const OTA_BUILD_ID = '2026-07-15-801-no-dup-vendor-crucible-chip';
+// OTA-802 — VENDOR RECIPE MENU: NO REROLL + NO "BUY & EQUIP". Buying a recipe rerolled
+// the recipe list (vendorRecipeOffers drew its window from the UNKNOWN pool, so learning
+// one shrank the pool and slid a new recipe in — endless restock, buy till broke). The
+// menu is now a FIXED seeded slice of the FULL discoverable pool (allDiscoverableRecipes);
+// a learned recipe drops from the buyable return without sliding the rest; whole menu
+// learned → empty. And recipe rows no longer reuse the item-buy flow: they open a LEARN
+// pending (isRecipe) — no Buy & Equip, no ×N; button reads "Learn". buyFromVendor's
+// recipe-learn branch still charges TC + teaches it.
+export const OTA_BUILD_ID = '2026-07-15-802-vendor-recipe-no-reroll';
