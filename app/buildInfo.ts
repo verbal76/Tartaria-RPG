@@ -15907,4 +15907,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Moved the dismiss into the store (crucibleChipDismissedKey + setter), keyed to the
 // view-key: hidden while the stored key equals the current view-key, so it survives the
 // unmount but still re-shows on a real location change. Removed the moot reset effect.
-export const OTA_BUILD_ID = '2026-07-15-800-crucible-dismiss-persists';
+// OTA-801 — NO DUPLICATE CRUCIBLE CHIP ON A VENDOR TILE. OTA-739 lit the exploration
+// Crucible chip in a VENDOR mode (25 TC) on roadside-vendor tiles, but the vendor screen
+// itself already offers that portable Crucible (arb103) — two entry points for one
+// Crucible. The exploration chip now shows ONLY for a LOCATION's own Crucible; a
+// vendor-carried Crucible lives solely in the vendor screen (which suppresses its offer
+// at location-crucible tiles via the same atLocationCrucible gate). Nothing stranded.
+export const OTA_BUILD_ID = '2026-07-15-801-no-dup-vendor-crucible-chip';
