@@ -16179,4 +16179,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog or golem — just ask") that still tells the player what to type. Same fix on the
 // three arbiter "send word <name>" contract-courier lines → "send word by name". The
 // remaining <...> tokens in the codebase are all in CODE COMMENTS, not player-facing.
-export const OTA_BUILD_ID = '2026-07-14-811-narration-placeholder-cleanup';
+// OTA-812 — READABILITY: break the wall of text + surface recipe buys as buttons
+// (the two follow-ups to 811's placeholder cleanup). (1) FEED BEATS: the same-channel
+// debounce still GROUPS rapid world/system entries into one card (no stutter of
+// stamps), but now joins them with a PARAGRAPH BREAK ("\n\n") instead of two spaces —
+// so a travel step's stall line + wares blurb + walk narration + arrival encounter
+// read as distinct paragraphs, not one run-on block (the screenshot). RN <Text>
+// renders "\n\n" as a blank line; no feed-component change. (2) RECIPE BUTTONS: the
+// vendor buy screen now shows a "WORKINGS TO LEARN" section listing the recipes the
+// trader teaches for TC, each a tappable row (opens the standard buy-confirm →
+// buyFromVendor's recipe-learn branch) — so learning a recipe no longer requires
+// knowing the typed "buy <name>" command from the arrival prose. Filtered to
+// not-yet-known recipes; open by default.
+export const OTA_BUILD_ID = '2026-07-14-812-readable-feed-recipe-buttons';
