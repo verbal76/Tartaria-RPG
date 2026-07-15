@@ -16278,4 +16278,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // detail popup narrates what you notice ("its hide is dry and cracked — fire would take
 // fast (Weak: Burn)") instead of a bare label. THEMATIC_DEFENSE_POOLS + flavor maps are
 // the knobs. Supersedes 818's flat WEAKNESS_POOL.
-export const OTA_BUILD_ID = '2026-07-15-819-thematic-weakness';
+//
+// OTA-820 — FUSE-CHIP DISMISS SURVIVES A VENDOR ROUND-TRIP (player: dismiss the Crucible
+// chip with its X, enter the vendor, come back to exploration → the chip is there again).
+// App.tsx renders exploration vs vendor by a flag, so entering the vendor UNMOUNTS
+// ExplorationScreen — and the chip's dismiss was LOCAL useState, lost on the round-trip.
+// Moved the dismiss into the STORE (crucibleChipDismissedKey), keyed to the view-key
+// (location|building|room|hubRoom): the chip is hidden while the stored key equals the
+// current view-key, so the dismiss persists across the unmount but still auto-re-shows
+// when you actually move to a different location (key mismatch). Removed the now-moot
+// local reset effect.
+export const OTA_BUILD_ID = '2026-07-15-820-crucible-dismiss-persists';
