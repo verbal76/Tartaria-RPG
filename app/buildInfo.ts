@@ -16468,4 +16468,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // of the Character sheet. Also NEW: a WORSENING corruption-tier crossing now records a
 // `corruption_tier` memorable event (at the weather-accrual site), so the Aether's
 // arc on the soul shows in the timeline, not just the live number. Test: ota843Chronicle.
-export const OTA_BUILD_ID = '2026-07-16-843-character-chronicle';
+// ── OTA-844 (Tier-3 depth #2: the world that moves offscreen — WORLD PULSE) ────
+// Tartaria used to sit still between the player's actions — factions never gained or
+// lost ground on their own. This gives the world a slow heartbeat. New
+// engine/worldPulse.ts nextWorldTide() advances the balance of power one pulse: one
+// faction rises (pressing its rivals down, lifting its allies), DETERMINISTICALLY (the
+// tick index picks the mover — no RNG, so it's reproducible + testable). worldTideCheck
+// (gameStore, end-of-action, gated to ~one pulse per in-game DAY via WORLD_TICK_HOURS)
+// runs it, stores per-faction momentum in worldMemory.factionTides, keeps the last 12
+// worldRumors, and drops a "🗞 Word on the wind: the Mud Monarchs press their claim…"
+// line so the player SEES the world move. The faction-standings panel now tags each
+// faction rising ▲ / waning ▼ / ascendant / collapsing (tideLabel). First action on a
+// save just stamps the baseline (no turn-one rumour). Test: ota844WorldPulse.
+export const OTA_BUILD_ID = '2026-07-16-844-world-pulse';
