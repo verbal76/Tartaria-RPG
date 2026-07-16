@@ -17609,4 +17609,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // A worsening corruption-tier crossing records a corruption_tier memorable event so the
 // descent shows in the timeline. (Chronicle uses tierLabel, not engine's content-pack
 // getCorruptionName — a summary line, acceptable.) Test: ota843Chronicle.
-export const OTA_BUILD_ID = '2026-07-16-1124-character-chronicle';
+// ── OTA-1125 (Tier-3 depth #2: World Pulse — engine port of HAL-844) ───────────
+// New engine/worldPulse.ts nextWorldTide() advances the balance of power one pulse
+// (mover rises, rivals fall, allies rise; deterministic by tick index). worldTideCheck
+// (end-of-action, ~one pulse per in-game day) stores per-faction momentum in
+// worldMemory.factionTides + worldRumors and drops a "🗞 Word on the wind…" line; the
+// faction-standings panel tags each faction rising ▲ / waning ▼. engine_Dev
+// divergences: the tick sits alongside engine's campaign-timeout check, and the pulse
+// resolves factions via the content pack (getFactions) not the built-in JSON, so a
+// re-skin's own factions drive it. Test: ota844WorldPulse.
+export const OTA_BUILD_ID = '2026-07-16-1125-world-pulse';
