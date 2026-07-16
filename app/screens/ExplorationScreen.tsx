@@ -547,7 +547,19 @@ export function ExplorationScreen() {
               enemyIntel={worldMemory?.enemyIntel}
             />
           ) : (
-            <CrestPlaceholder />
+            // OTA-852 — the crest square is idle real estate when peaceful, so it
+            // becomes the codex hub: WORLD above, LORE below, bracketing the crest.
+            // Both vanish the instant an enemy is staged (the panel flips to
+            // EnemyPanel), so they never cost permanent space or clutter combat.
+            <>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')}>
+                <Text style={styles.crestNavText}>⚑ WORLD</Text>
+              </TouchableOpacity>
+              <CrestPlaceholder />
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')}>
+                <Text style={styles.crestNavText}>◈ LORE</Text>
+              </TouchableOpacity>
+            </>
           )}
           {/* OTA-748 — the settings gear moved OUT of the enemy card. Overlaid
               bottom-right, it sat on top of the enemy's trait tags ("Vuln Burn"
@@ -1857,6 +1869,9 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
+  // OTA-852 — WORLD / LORE nav buttons bracketing the peaceful crest.
+  crestNavBtn: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingVertical: 5, alignItems: 'center', marginVertical: 3 },
+  crestNavText: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
   // (EnemyPanel or CrestPlaceholder). 32×32 hit area, semi-
   // transparent backdrop so it stays legible on top of either

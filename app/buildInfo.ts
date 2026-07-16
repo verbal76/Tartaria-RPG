@@ -16607,4 +16607,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   • THE BOARD — WorldScreen now shows the world-event feed (glyph per kind) + a live
 //     "N patrols abroad" note, alongside the bounty board + balance of power.
 // Deterministic (seeded by tick index). Test: ota851WorldEvents pins the pure engine.
-export const OTA_BUILD_ID = '2026-07-16-851-world-events-patrols';
+// ── OTA-852 (surface WORLD + LORE on the crest; fix the crowded Lore tab row) ──
+// Discoverability. The World view and the Lore Codex were both buried — World behind
+// a link in the Character sheet's faction section, Lore three taps deep in Settings —
+// so nobody found them.
+//   • CREST HUB — the top-right square shows the Tartaria crest when peaceful and the
+//     enemy portrait in combat. That idle peaceful square now brackets the crest with
+//     two small nav buttons: ⚑ WORLD above, ◈ LORE below. Both vanish the instant an
+//     enemy is staged (the panel flips to EnemyPanel), so they cost no permanent real
+//     estate and never clutter a fight. The old buried paths stay as secondary routes.
+//   • LORE TAB ROW — the 7 codex tabs (races/factions/places/timeline/beasts/lore/
+//     fallen) were 7 equal flex cells crammed into the width, so every label word-
+//     wrapped. The row is now a horizontal scroll of content-sized, one-line tabs.
+// UI-only (no engine change); covered by the app-source typecheck.
+export const OTA_BUILD_ID = '2026-07-16-852-surface-world-lore';
