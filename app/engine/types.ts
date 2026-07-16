@@ -239,6 +239,11 @@ export interface Enemy {
    *  paths are skipped. See engine/dogCompanion.ts for the spawn
    *  site and the framework spec entry in HANDOFF.md §0.A. */
   factionNeutralFight?: boolean;
+  /** OTA-849 [living world] — the faction this enemy fights for, when it's a
+   *  faction combatant (a raid party member, a patrol). Killing it shifts the
+   *  player's standing with this faction (down) and its strongest rival (up). Unset
+   *  on wild beasts / automata / freelance foes, which carry no allegiance. */
+  factionId?: string;
   /** Synonyms the parser accepts for this enemy. "Architectural Sentinel"
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
@@ -1543,6 +1548,9 @@ export interface WorldMemory {
   lastWorldTickHour?: number;
   /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
   worldRumors?: { text: string; hour: number }[];
+  /** OTA-849 [tides get teeth] — in-game hour of the last faction raid (gates the
+   *  next one so raids stay periodic, not constant). */
+  lastRaidHour?: number;
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has
    *  fired. Prevents the Arbiter from repeating the "you're light
@@ -1803,6 +1811,7 @@ export type ScreenName =
   | 'vendor'
   | 'actions'
   | 'contracts'
+  | 'world'
   | 'ending';
 
 export interface SaveState {

@@ -31,6 +31,7 @@ import { CraftingScreen } from './app/screens/CraftingScreen';
 import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
+import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
@@ -787,6 +788,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'vendor' && <VendorScreen />}
           {screen === 'actions' && <ActionReferenceScreen />}
           {screen === 'contracts' && <ContractsScreen />}
+          {screen === 'world' && <WorldScreen />}
           {screen === 'ending' && <EndingScreen />}
         </View>
       </View>

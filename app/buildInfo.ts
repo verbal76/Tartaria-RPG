@@ -16549,4 +16549,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     tested describeTitleEarned helper. Titles earned before this shipped get an
 //     honest "before this was recorded" fallback — never a fabricated date.
 // Test: ota848TitleProvenance pins the date formatter + fallback.
-export const OTA_BUILD_ID = '2026-07-16-848-character-readability';
+// ── OTA-849 (LIVING WORLD — tides get teeth + World view + raids + kill-standing + offline) ─
+// OTA-844's World Pulse was cosmetic (a momentum number that narrated itself). This
+// gives it teeth and makes the background world genuinely live:
+//   • TIDE VISIBILITY — a new WORLD view (WorldScreen, reached from the Character
+//     sheet's faction section) shows EVERY faction's momentum meter (rising/waning),
+//     your standing with each, and the running rumour feed. The tides were near-
+//     invisible before (tideLabel is null at 0, and the sheet only tagged factions
+//     you already stood with) — now the whole board is on one screen.
+//   • TIDES GET TEETH — a vendor's faction tide moves its prices (tideVendorPriceMult:
+//     ascendant charges up to +20%, waning discounts to −20%), folded into buyFromVendor.
+//   • RIVAL RAIDS — take a side (positive standing) and that faction's rivals come for
+//     you: a war party of the most-ascendant eligible rival periodically drops into a
+//     peaceful outdoor scene (maybeSpawnRaid, cooldown-gated, avoidable, never when
+//     you're already bloodied). Party size ESCALATES with the raider's tide
+//     (raidPartySize) — raids grow with the game. The Arbiter gives a terse warning.
+//   • KILL → STANDING — defeating a faction combatant (Enemy.factionId) now lowers your
+//     standing with them and nudges you UP with their strongest rival (design pick:
+//     rivals, not allies).
+//   • OFFLINE — the world moves while you're away: on load, real time offline is
+//     converted into bounded world pulses (advancing tides + rumours), and the Arbiter
+//     recaps what shifted. Data hygiene: nextWorldTide now ignores the factions JSON's
+//     descriptive pseudo-ids (e.g. "anyone_paying") so the tide map only holds real
+//     factions. Test: ota849LivingWorld pins the pure helpers.
+export const OTA_BUILD_ID = '2026-07-16-849-living-world';
