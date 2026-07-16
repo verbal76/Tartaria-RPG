@@ -14,34 +14,33 @@ import {
 
 interface Props {
   visible: boolean;
-  /** Names of enemies currently in the scene — surfaced as red-tinted
-   *  chips at the top of the picker. Empty when the scene is peaceful. */
-  enemyHints?: string[];
-  /** Ambient nouns / hook nouns from the scene — neutral chips below
-   *  the enemy row. Optional. */
-  sceneHints?: string[];
-  /** Vendor name in the scene, if any. Lands as a green-tinted chip
-   *  alongside the scene hints so the player can hard-target NPCs
-   *  by tap. */
+  /** Vendor name in the scene, if any — the header names who you're lifting
+   *  from. */
   vendorName?: string;
-  /** The player taps a target → engine runs `approach <target>`
-   *  (positioning only). OTA-847 retired the USE STEALTH toggle; the
-   *  sneak-attack opener now lives on the in-combat STEALTH button. */
+  /** The vendor's offer item names, surfaced as green chips — tap one to
+   *  attempt to lift THAT item. */
+  vendorOffers?: string[];
+  /** Ambient / NPC nouns you can pickpocket when there's no vendor (opportunistic
+   *  sleight-of-hand grabs). */
+  npcHints?: string[];
+  /** The player picks a mark/item (or types one) and the engine runs the
+   *  Stealth check. Success → it's yours, quiet and clean. Failure → if your
+   *  Stealth is high you withdraw unseen; if it's low against a vendor, you're
+   *  caught and the fight is real. */
   onSubmit: (target: string) => void;
   onCancel: () => void;
 }
 
-// Approach modal. The player picks a target (or types one) and the
-// engine resolves "approach <target>" — in combat, it switches focus
-// to that enemy and closes the gap if reachable; out of combat, it
-// runs the intra-scene move-toward narration ("you move across the
-// ground to the X, close enough now to act on it"). Same UI shape
-// as SearchModal so it feels consistent.
-export function ApproachModal({
+// OTA-847 (STEALTH SYSTEM) — PICKPOCKET modal. Replaces the old out-of-combat
+// APPROACH picker (whose walk-up-to-a-noun job is retired). Same UI shape as
+// ApproachModal so it feels consistent, minus the stealth toggle — pickpocket
+// IS the stealth action, so there's nothing to toggle. Rolls Stealth vs the
+// mark's awareness.
+export function PickpocketModal({
   visible,
-  enemyHints,
-  sceneHints,
   vendorName,
+  vendorOffers,
+  npcHints,
   onSubmit,
   onCancel,
 }: Props) {
@@ -49,15 +48,9 @@ export function ApproachModal({
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    if (visible) {
-      setText('');
-    }
+    if (visible) setText('');
     return undefined;
   }, [visible]);
-  // No auto-focus on the TextInput — the keyboard popping up reflows
-  // the modal layout and the first tap on a chip lands where the chip
-  // used to be (forcing a second tap to actually fire). Player can
-  // tap the input field if they want to type.
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -66,24 +59,13 @@ export function ApproachModal({
     onSubmit(trimmed);
   };
 
-  const tapToApproach = (target: string) => {
+  const tapTarget = (target: string) => {
     Keyboard.dismiss();
     onSubmit(target);
   };
 
-  // Common things players approach when no scene-specific target
-  // jumps out. Mix of combat-y and exploration-y so the button works
-  // in both peace and combat modes.
-  const commonHints = [
-    'the guard',
-    'the door',
-    'the entrance',
-    'the wall',
-    'the figure',
-  ];
-
-  const enemies = enemyHints ?? [];
-  const scene = sceneHints ?? [];
+  const offers = vendorOffers ?? [];
+  const npcs = npcHints ?? [];
 
   return (
     <Modal
@@ -97,12 +79,12 @@ export function ApproachModal({
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>APPROACH</Text>
+              <Text style={styles.title}>PICKPOCKET</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
-                Name a person, enemy, door, or feature to close on. In combat
-                this switches focus and moves you in; outside combat it walks
-                you up to the thing without burning a full travel turn.
+                {vendorName
+                  ? `Lift something off ${vendorName} without them noticing. Rolls STEALTH — a clean hand takes it quiet; a clumsy one gets caught, and the steel comes out.`
+                  : 'Palm something off a mark or out of the open without being seen. Rolls STEALTH.'}
               </Text>
 
               <TextInput
@@ -110,7 +92,7 @@ export function ApproachModal({
                 style={styles.input}
                 value={text}
                 onChangeText={setText}
-                placeholder='e.g. "the guard", "the dragon", "the door"'
+                placeholder='e.g. "the coin pouch", "the amulet"'
                 placeholderTextColor="#6ab0c9"
                 onSubmitEditing={handleSubmit}
                 returnKeyType="go"
@@ -118,69 +100,47 @@ export function ApproachModal({
                 autoCapitalize="none"
               />
 
-              {enemies.length > 0 && (
+              {offers.length > 0 && (
                 <>
-                  <Text style={styles.chipLabel}>Enemies present</Text>
+                  <Text style={styles.chipLabel}>{vendorName ? `${vendorName}'s goods` : 'On offer'}</Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.chipScrollRow}
                   >
-                    {enemies.map((e) => (
+                    {offers.map((o) => (
                       <Pressable
-                        key={`enemy-${e}`}
-                        style={({ pressed }) => [styles.chip, styles.chipEnemy, pressed && styles.btnPressed]}
-                        onPress={() => tapToApproach(e)}
+                        key={`offer-${o}`}
+                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                        onPress={() => tapTarget(o)}
                       >
-                        <Text style={styles.chipTextEnemy} numberOfLines={1}>{e}</Text>
+                        <Text style={styles.chipTextScene} numberOfLines={1}>{o}</Text>
                       </Pressable>
                     ))}
                   </ScrollView>
                 </>
               )}
 
-              {(scene.length > 0 || vendorName) && (
+              {npcs.length > 0 && (
                 <>
-                  <Text style={styles.chipLabel}>In this scene</Text>
+                  <Text style={styles.chipLabel}>Within reach</Text>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.chipScrollRow}
                   >
-                    {vendorName && (
+                    {npcs.map((h) => (
                       <Pressable
-                        key={`vendor-${vendorName}`}
-                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
-                        onPress={() => tapToApproach(vendorName)}
+                        key={`npc-${h}`}
+                        style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
+                        onPress={() => tapTarget(h)}
                       >
-                        <Text style={styles.chipTextScene} numberOfLines={1}>{vendorName}</Text>
-                      </Pressable>
-                    )}
-                    {scene.map((h) => (
-                      <Pressable
-                        key={`scene-${h}`}
-                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
-                        onPress={() => tapToApproach(h)}
-                      >
-                        <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
+                        <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
                       </Pressable>
                     ))}
                   </ScrollView>
                 </>
               )}
-
-              <Text style={styles.chipLabel}>Common</Text>
-              <View style={styles.chipRow}>
-                {commonHints.map((h) => (
-                  <Pressable
-                    key={`common-${h}`}
-                    style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
-                    onPress={() => tapToApproach(h)}
-                  >
-                    <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
-                  </Pressable>
-                ))}
-              </View>
 
               <View style={styles.btnRow}>
                 <Pressable
@@ -199,7 +159,7 @@ export function ApproachModal({
                   onPress={handleSubmit}
                   disabled={!text.trim()}
                 >
-                  <Text style={styles.btnTextPrimary}>APPROACH</Text>
+                  <Text style={styles.btnTextPrimary}>LIFT</Text>
                 </Pressable>
               </View>
             </View>
@@ -218,14 +178,11 @@ const styles = StyleSheet.create({
   body: { color: '#d6e4e8', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   input: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, color: '#d6e4e8', paddingHorizontal: 10, paddingVertical: 9, borderRadius: 3, fontSize: 14 },
   chipLabel: { color: '#6c8088', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
   chip: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 3, paddingHorizontal: 10, paddingVertical: 6 },
   chipScene: { borderColor: '#9ec96a' },
-  chipEnemy: { borderColor: '#e07a5f' },
   chipText: { color: '#bcd2db', fontSize: 12 },
   chipTextScene: { color: '#9ec96a', fontSize: 12 },
-  chipTextEnemy: { color: '#e07a5f', fontSize: 12 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },

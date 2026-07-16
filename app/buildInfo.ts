@@ -17638,4 +17638,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   • STE surfaced the stealth-gear passive and the STEALTH skill-check path.
 // INT / WIS / CHA verified accurate, unchanged. Pure display-copy fix — no
 // mechanics change. Test: ota846SkillActivities.
-export const OTA_BUILD_ID = '2026-07-16-1127-grows-from-audit';
+// ── OTA-1128 (STEALTH SYSTEM — pickpocket + in-combat sneak attack / backstab) ─
+// Stealth becomes a real playstyle. The peaceful APPROACH button becomes
+// PICKPOCKET (new PickpocketModal, teal palette): Stealth roll vs the mark's
+// awareness; a failed lift by a practiced thief (Stealth ≥
+// STEALTH_QUIET_FAIL_STE=14) fails QUIETLY (no item, no fight), a clumsy one is
+// caught and the vendor flips hostile. APPROACH's walk-up job and the USE
+// STEALTH toggle are retired. A new in-combat STEALTH button (beside dodge/flee)
+// drives the stealth intent: first action = SNEAK ATTACK opener, mid-combat =
+// BACKSTAB attempt (turn-costing STE race). BACKSTAB: striking from `stealthed`
+// with a FINESSE/thrown weapon (stat 'dexterity') doubles the damage dice; a
+// HEAVY weapon keeps the +5 to-hit but no doubling. STE 'Grows from:' copy names
+// the new buttons. Test: ota847Stealth.
+export const OTA_BUILD_ID = '2026-07-16-1128-stealth-system';
