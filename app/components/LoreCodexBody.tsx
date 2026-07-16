@@ -119,19 +119,26 @@ export function LoreCodexBody() {
 
   return (
     <View style={styles.bodyWrap}>
-      <View style={styles.tabs}>
+      {/* OTA-852 — the codex tabs no longer cram into the width and word-wrap;
+          the row scrolls horizontally and each tab sizes to its (one-line) label. */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabsScroll}
+        contentContainerStyle={styles.tabs}
+      >
         {SECTIONS.map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
             style={[styles.tab, section === s && styles.tabActive]}
           >
-            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>
+            <Text style={[styles.tabText, section === s && styles.tabTextActive]} numberOfLines={1}>
               {s === 'bestiary' ? 'beasts' : s}
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 24 }}>
         {section === 'races' && (getRaces() as Race[]).map((r) => {
@@ -323,10 +330,11 @@ export function LoreCodexBody() {
 
 const styles = StyleSheet.create({
   bodyWrap: { flex: 1 },
-  tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
-  tab: { flex: 1, paddingVertical: 6, borderWidth: 1, borderColor: '#2b3a3e', borderRadius: 4, alignItems: 'center' },
+  tabsScroll: { flexGrow: 0, marginBottom: 8 },
+  tabs: { flexDirection: 'row', gap: 6, paddingRight: 8 },
+  tab: { paddingVertical: 6, paddingHorizontal: 14, borderWidth: 1, borderColor: '#2b3a3e', borderRadius: 4, alignItems: 'center' },
   tabActive: { borderColor: '#6ab0c9' },
-  tabText: { color: '#6c8088', fontSize: 11, letterSpacing: 2 },
+  tabText: { color: '#6c8088', fontSize: 11, letterSpacing: 1 },
   tabTextActive: { color: '#d6e4e8' },
   scroll: { flex: 1 },
   entry: { backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },

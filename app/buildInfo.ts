@@ -17691,4 +17691,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and fight off-screen (simulatePatrols: rival clashes, outpost assaults, beast
 // maulings). The WORLD board shows the event feed + patrol count. Deterministic (seeded
 // by tick index). Test: ota851WorldEvents.
-export const OTA_BUILD_ID = '2026-07-16-1132-world-events-patrols';
+// ── OTA-1133 (surface WORLD + LORE on the crest; fix the crowded Lore tab row) ──
+// Port of HAL OTA-852 (engine teal crest buttons). The idle peaceful crest square
+// brackets the crest with ⚑ WORLD above / ◈ LORE below — hidden when an enemy is
+// staged — surfacing two buried screens. The Lore codex tabs no longer word-wrap:
+// the row is a horizontal scroll of content-sized one-line tabs. UI-only.
+export const OTA_BUILD_ID = '2026-07-16-1133-surface-world-lore';

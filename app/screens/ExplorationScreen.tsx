@@ -625,10 +625,19 @@ export function ExplorationScreen() {
               enemyIntel={worldMemory?.enemyIntel}
             />
           ) : (
-            // Once the fight is over (last foe dead or knocked out) the top-right
-            // reverts to the crest, exactly as it was before combat — the KO'd body
-            // is still lootable via the "loot" button in the input row.
-            <CrestPlaceholder />
+            // OTA-852 — the idle peaceful crest square becomes the codex hub: WORLD
+            // above, LORE below, bracketing the crest. Both vanish the instant an enemy
+            // is staged (panel flips to EnemyPanel). After a fight the top-right reverts
+            // to the crest; the KO'd body is still lootable via the input row.
+            <>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')}>
+                <Text style={styles.crestNavText}>⚑ WORLD</Text>
+              </TouchableOpacity>
+              <CrestPlaceholder />
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')}>
+                <Text style={styles.crestNavText}>◈ LORE</Text>
+              </TouchableOpacity>
+            </>
           )}
           {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
               Replaces the bottom-row gear, which was the only thing
@@ -1974,6 +1983,9 @@ const styles = StyleSheet.create({
   combatColEqual: { flex: 1 }, // equal halves during combat (override statsCol's 1.2)
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
+  // OTA-852 — WORLD / LORE nav buttons bracketing the peaceful crest.
+  crestNavBtn: { backgroundColor: '#131c1f', borderColor: '#6ab0c9', borderWidth: 1, borderRadius: 4, paddingVertical: 5, alignItems: 'center', marginVertical: 3 },
+  crestNavText: { color: '#6ab0c9', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
   // (EnemyPanel or CrestPlaceholder). 32×32 hit area, semi-
   // transparent backdrop so it stays legible on top of either
