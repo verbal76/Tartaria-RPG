@@ -17570,4 +17570,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the Wisdom read-threshold (merged with engine's `fill` prop), and the bestiary
 // shows "WEAK TO / RESISTS" per fought enemy. Test: ota838EnemyIntel. Completes the
 // three Tier-1 "make the depth visible" OTAs (1117/1118/1119).
-export const OTA_BUILD_ID = '2026-07-16-1119-observed-weakness-tags';
+// ── OTA-1120 (lore-accuracy pass — engine port of HAL-839's data fixes) ────────
+// Reconciled built-in lore against the code. races.json applied cleanly (Sentinel
+// "Immunity to Time" drops the removed hunger/forage promise; Mud Golem states its
+// aetheric vulnerability; "Elemental Control" = strike + ward; Mud Dweller drops the
+// non-existent "Mud-power" type). concepts.json: the 5 combat/stat fixes (dodge = the
+// AC-bypass gamble; stealth actions use STEALTH; stealing DC vendor-set/escalating)
+// were applied by targeted replacement — engine's concepts.json diverges in order and
+// carries NO built-in damage-type entries (those are content-pack-driven here), so the
+// HAL `cold` concept was intentionally NOT added. HAL-839's HAL-only intel backfill is
+// not on this line either. Test: ota839LoreAccuracy (cold assertion made conditional).
+export const OTA_BUILD_ID = '2026-07-16-1120-lore-accuracy';

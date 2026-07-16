@@ -56,7 +56,7 @@
       "Tunnel Sense: At home in the dark. Indoors or underground you turn up loot more often and pull more story hooks when you investigate.",
       "Aethercraft Mastery: +2 Intelligence when using Aethercraft (shaping Aetherstone, tools, weapons, golems, earth).",
       "Relic Savvy: +2 Dexterity when investigating Aetherstone or Tartarian tech.",
-      "Aetherstone Resilience: Half damage from Aetheric or Mud-power attacks."
+      "Aetherstone Resilience: Half damage from Aetheric attacks."
     ],
     "description": "True Tartarians who survived underground in subterranean enclaves. Nimble but lacking brute force; rely on Aethercraft.",
     "flavor": "The dark was your cradle. You hear stone the way the surface hears wind, and Aetherstone shapes under your fingers like wet clay. Above you are the cities that should have been yours.",
@@ -120,7 +120,7 @@
     "traits": [
       "Aetheric Constitution: Half damage from energy-based attacks.",
       "Indomitable Strength: +2 Strength, +1 Intelligence.",
-      "Immunity to Time: You are an ageless construct — you neither age, hunger, nor tire. Where the living must stop to forage, drink, and sleep off exhaustion, you simply keep going: a week-long vigil in a dead city, a march across a famine-struck waste, a night with no shelter — none of it wears on you the way it would on flesh. The one thing in Tartaria that survives death answers to that kindred patience: your kills are markedly more likely to yield a Resurrection Gem.",
+      "Immunity to Time: You are an ageless construct. Every exertion costs you only half the stamina flesh would spend — a week-long vigil in a dead city, a long march, a night with no shelter wears on you at half the rate it would on the living. The corrupting Aether the weather grinds into flesh simply cannot decay you. And the one thing in Tartaria that survives death answers to that kindred patience: your kills are markedly more likely to yield a Resurrection Gem.",
       "Defensive Protocols: Once per day, activate a shield reducing incoming damage by half for 3 rounds."
     ],
     "description": "Aetherstone-powered constructs left over from Tartaria's golden age. Tireless, durable, programmed with ancient duties.",
@@ -150,8 +150,8 @@
       "regenerative"
     ],
     "traits": [
-      "Aetherstone Resilience: +2 Strength; half damage from non-Aetheric attacks.",
-      "Elemental Control: Manipulate Aetherstone within arm's reach/close range. 1d6 block / 1d6 attack, one of each per encounter.",
+      "Aetherstone Resilience: +2 Strength. Your stony hide shrugs off a quarter of all non-Aetheric damage — but raw Aether is your undoing: Aetheric attacks tear into you for half again as much.",
+      "Elemental Control: Shape the Aetherstone around you into a weapon or a shield. Once per day each: hurl it for 1d6 Aetheric damage, or harden it into a ward that soaks the next 1d6 of incoming damage.",
       "Regenerative Core: Near Aetherstone, roll 1d10 daily for free HP recharge up to max."
     ],
     "description": "Etheric constructs born of the mud that consumed Tartaria. Unpredictable. Some serve their makers, others turn on them.",

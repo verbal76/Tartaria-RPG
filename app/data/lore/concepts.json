@@ -62,7 +62,7 @@
         "roll"
       ],
       "title": "Skill checks",
-      "answer": "d20 + the relevant stat, against a DC. Stealth uses DEX. Diplomacy uses CHA. Investigate uses INT. Cast uses INT. Use Relic uses WIS. Escape uses DEX."
+      "answer": "d20 + the relevant stat, against a DC. Stealth uses STEALTH. Diplomacy uses CHA. Investigate uses INT. Cast uses INT. Use Relic uses WIS. Escape uses DEX."
     },
     {
       "id": "crafting",
@@ -98,7 +98,7 @@
         "pocket"
       ],
       "title": "Stealing",
-      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + DEX vs DC 12 stealth check resolves immediately. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
+      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + STEALTH check resolves immediately, against a DC the vendor's wariness sets — and it climbs every time you try, so serial pilfering gets steeply harder. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
     },
     {
       "id": "factions_join",
@@ -265,7 +265,7 @@
         "dodging"
       ],
       "title": "Dodge",
-      "answer": "You have Advantage on DEX saving throws, and any attack roll made against you has Disadvantage — if you can see the attacker. Defensive action of choice when you cannot kill or escape this turn."
+      "answer": "A gamble, not a hunker. Commit to a dodge and the next blow is contested: d20 + DEX against the attacker's swing. Slip it and your counter lands double; misjudge it and the blow finds you past any armor, twice as hard. Costs a little stamina and weapon wear — the defensive play of choice when you cannot kill or escape this turn."
     },
     {
       "id": "help_action",
@@ -295,7 +295,7 @@
         "stealth roll"
       ],
       "title": "Hide",
-      "answer": "Attempt to hide from an enemy. Roll DEX (Stealth) to see if you succeed. Failed Hide attempts leave you visible AND committed — the enemy knows you tried."
+      "answer": "Attempt to hide from an enemy. Roll STEALTH to see if you succeed. Failed Hide attempts leave you visible AND committed — the enemy knows you tried."
     },
     {
       "id": "ready_action",
@@ -649,7 +649,7 @@
         "side-step blade"
       ],
       "title": "Dodge Melee — Skill: Dodge",
-      "answer": "MELEE ATTACKS ONLY. Dodge an attacker's melee attack or combat maneuver using an opposed dodge skill check. A defender's dodge check is an opposed skill roll to the attacker's fighting skill check, so it may still be possible to fail a successful dodge if the attacker rolls a higher success. In the case of a skill check draw, the success goes to the defender. If both fail their skill checks, no damage is inflicted. Cost: 1 Evasive Action."
+      "answer": "MELEE ATTACKS ONLY. Commit to a dodge and the next incoming strike is contested by d20 + DEX against the attacker's swing total. Beat it and you slip clear and riposte at double weapon dice; fall short and you dodge into the blow for double damage, armor be damned. Costs the beat either way."
     },
     {
       "id": "fight_back",
