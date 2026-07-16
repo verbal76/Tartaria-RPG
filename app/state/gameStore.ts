@@ -762,7 +762,18 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   const { newlyEarnedTitles, TITLE_PASSIVE_PERK } = require('../engine/titles');
   const fresh: string[] = newlyEarnedTitles(player);
   if (fresh.length === 0) return;
-  setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh] } } : s));
+  // OTA-848 — stamp each freshly-earned title with WHEN it landed (in-game hour
+  // + real time) so the Character screen can show its earn-date on tap.
+  const atHours = player.hoursElapsed ?? 0;
+  const atMs = Date.now();
+  const freshLog = fresh.map((id) => ({ id, atHours, atMs }));
+  setStore((s) => (s.player
+    ? { player: {
+        ...s.player,
+        earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh],
+        titleLog: [...(s.player.titleLog ?? []), ...freshLog],
+      } }
+    : s));
   for (const id of fresh) {
     const meta = ARBITER_TITLE_META[id];
     if (!meta) continue;

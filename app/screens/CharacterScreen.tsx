@@ -19,7 +19,7 @@ import { buildChronicle } from '../engine/chronicle';
 import { tideLabel } from '../engine/worldPulse';
 import { decayedMenace, menaceTier } from '../engine/menace';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-import { TITLE_PASSIVE_PERK } from '../engine/titles';
+import { TITLE_PASSIVE_PERK, describeTitleEarned } from '../engine/titles';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -55,6 +55,9 @@ export function CharacterScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   // arb119 — per-section collapse (hook must precede the early return below).
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
+  const [acOpen, setAcOpen] = useState(false);
+  const [openTitle, setOpenTitle] = useState<string | null>(null);
 
   if (!player) {
     return (
@@ -195,25 +198,45 @@ export function CharacterScreen() {
         {sectionHeader('defense', 'DEFENSE')}
         {!collapsed.defense && (
         <View style={styles.card}>
-          <View style={styles.kvRow}>
-            <Text style={styles.kvKey}>Armor Class</Text>
+          {/* OTA-848 — the whole AC row is tappable: it expands a readable,
+              line-per-source breakdown of exactly what builds the number (base +
+              each armor piece / stance / title / racial). OTA-836 first surfaced
+              these as chips; the tap keeps the card clean by default and lets the
+              player audit any surprising AC on demand. */}
+          <TouchableOpacity
+            style={styles.kvRow}
+            activeOpacity={acBd.sources.length > 0 ? 0.7 : 1}
+            onPress={() => acBd.sources.length > 0 && setAcOpen((v) => !v)}
+          >
+            <Text style={styles.kvKey}>
+              Armor Class{acBd.sources.length > 0 && <Text style={styles.tapHint}>  {acOpen ? '▾' : '▸'}</Text>}
+            </Text>
             <Text style={styles.kvValue}>
               {acBd.total}
               {acBd.sources.length > 0 && <Text style={styles.statBase}>  (base {acBd.base})</Text>}
             </Text>
-          </View>
-          {/* OTA-836 — AC source chips (armor / stance / title / race context), so a
-              plate-armored player can SEE where their number comes from. Mirrors the
-              core-stat chips; matches the AC the combat resolver actually uses. */}
-          {acBd.sources.length > 0 && (
-            <View style={styles.chipRow}>
+          </TouchableOpacity>
+          {acBd.sources.length > 0 && !acOpen && (
+            <Text style={styles.tapHintLine}>tap to see what makes up your AC ›</Text>
+          )}
+          {acBd.sources.length > 0 && acOpen && (
+            <View style={styles.breakdownList}>
+              <View style={styles.breakdownRow}>
+                <Text style={styles.breakdownDelta}>{acBd.base}</Text>
+                <Text style={styles.breakdownLabel}>base (10 + racial floor)</Text>
+              </View>
               {acBd.sources.map((s, i) => (
-                <View key={i} style={[styles.chip, s.delta < 0 && styles.chipNeg]}>
-                  <Text style={[styles.chipText, s.delta < 0 && styles.chipTextNeg]}>
-                    {s.delta > 0 ? '+' : ''}{s.delta} {s.label}
+                <View key={i} style={styles.breakdownRow}>
+                  <Text style={[styles.breakdownDelta, s.delta < 0 && styles.breakdownDeltaNeg]}>
+                    {s.delta > 0 ? '+' : ''}{s.delta}
                   </Text>
+                  <Text style={styles.breakdownLabel}>{s.label}</Text>
                 </View>
               ))}
+              <View style={[styles.breakdownRow, styles.breakdownTotalRow]}>
+                <Text style={styles.breakdownTotalDelta}>{acBd.total}</Text>
+                <Text style={styles.breakdownTotalLabel}>total Armor Class</Text>
+              </View>
             </View>
           )}
           {race?.racialACBonus && race.racialACBonus !== 'No inherent AC bonus' && (
@@ -647,6 +670,8 @@ export function CharacterScreen() {
           {(() => {
             const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
             const earned = new Set(player.earnedTitles ?? []);
+            // OTA-848 — provenance lookup: id → when it was earned.
+            const logMap = new Map((player.titleLog ?? []).map((e) => [e.id, e]));
             const sorted = [...allTitles].sort((a, b) => {
               const ea = earned.has(a.id) ? 0 : 1;
               const eb = earned.has(b.id) ? 0 : 1;
@@ -659,19 +684,48 @@ export function CharacterScreen() {
                 <Text style={styles.titlesSummary}>
                   {earnedCount === 0
                     ? 'No titles earned yet. The Arbiter watches your deeds.'
-                    : `${earnedCount} of ${allTitles.length} titles earned.`}
+                    : `${earnedCount} of ${allTitles.length} titles earned. Tap a title for details.`}
                 </Text>
                 {sorted.map((t) => {
                   const isEarned = earned.has(t.id);
+                  const isOpen = openTitle === t.id;
+                  // OTA-848 — each title is singly tappable: expands to show HOW it
+                  // was earned (the requirement / deed) and, for earned titles, WHEN
+                  // (its earn-date from titleLog, or an honest fallback for titles
+                  // earned before provenance was recorded).
                   return (
-                    <View key={t.id} style={styles.titleRow}>
+                    <TouchableOpacity
+                      key={t.id}
+                      style={styles.titleRow}
+                      activeOpacity={0.7}
+                      onPress={() => setOpenTitle((cur) => (cur === t.id ? null : t.id))}
+                    >
                       <Text style={[styles.titleName, isEarned ? styles.titleNameEarned : styles.titleNameLocked]}>
                         {isEarned ? '◆ ' : '◇ '}{t.title}
+                        <Text style={styles.tapHint}>  {isOpen ? '▾' : '▸'}</Text>
                       </Text>
                       <Text style={isEarned ? styles.titlePerk : styles.titleRequirement}>
                         {isEarned ? (TITLE_PASSIVE_PERK[t.id] ?? t.perk) : t.requirement}
                       </Text>
-                    </View>
+                      {isOpen && (
+                        <View style={styles.titleDetail}>
+                          <Text style={styles.titleDetailLine}>
+                            <Text style={styles.titleDetailKey}>How: </Text>{t.requirement}
+                          </Text>
+                          {isEarned ? (
+                            <Text style={styles.titleDetailLine}>
+                              <Text style={styles.titleDetailKey}>When: </Text>
+                              {describeTitleEarned(logMap.get(t.id)).replace(/^Earned(: )?/, '')}
+                            </Text>
+                          ) : (
+                            <Text style={styles.titleDetailLine}>
+                              <Text style={styles.titleDetailKey}>Perk once earned: </Text>
+                              {TITLE_PASSIVE_PERK[t.id] ?? t.perk}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </TouchableOpacity>
                   );
                 })}
               </>
@@ -686,6 +740,11 @@ export function CharacterScreen() {
   );
 }
 
+// OTA-848 — each core-stat row is now tap-to-expand. Collapsed, it's a clean
+// number + progress bar (readable at a glance); expanded, it opens the full
+// source breakdown AND the "Grows from" activities as a bulleted list, one per
+// line, so the cramped ellipsized run-on that used to squeeze six trainers into
+// three clipped lines is gone.
 function StatRow({
   label,
   b,
@@ -699,14 +758,21 @@ function StatRow({
   progressPct: number;
   activities: string[];
 }) {
+  const [expanded, setExpanded] = useState(false);
   const hasSources = b.sources.length > 0;
+  const hasDetail = hasSources || activities.length > 0;
   return (
-    <View style={styles.statRow}>
+    <TouchableOpacity
+      style={styles.statRow}
+      activeOpacity={hasDetail ? 0.7 : 1}
+      onPress={() => hasDetail && setExpanded((v) => !v)}
+    >
       <Text style={styles.statKey}>{label}</Text>
       <View style={styles.statBody}>
         <Text style={styles.statTotal}>
           {b.total}
           {hasSources && <Text style={styles.statBase}>  (base {b.base})</Text>}
+          {hasDetail && <Text style={styles.tapHint}>  {expanded ? '▾' : '▸'}</Text>}
         </Text>
         {/* 2026-05-25 [VIZ-1] — 20-segment fine bar (5% per rune)
             replaces the legacy 4-segment quartile. Player sees
@@ -714,15 +780,10 @@ function StatRow({
         <Text style={styles.progressBar}>
           {progressBar}  <Text style={styles.progressPct}>{progressPct}%</Text>
         </Text>
-        {/* 2026-05-25 [VIZ-1] — activity list per skill. Shows the
-            player which game actions train this stat so they don't
-            have to guess. */}
-        {activities.length > 0 && (
-          <Text style={styles.activityList} numberOfLines={3} ellipsizeMode="tail">
-            Grows from: {activities.join(' · ')}
-          </Text>
+        {!expanded && hasDetail && (
+          <Text style={styles.tapHintLine}>tap to see sources & how it grows ›</Text>
         )}
-        {hasSources && (
+        {expanded && hasSources && (
           <View style={styles.chipRow}>
             {b.sources.map((s, i) => (
               <View key={i} style={[styles.chip, s.delta < 0 && styles.chipNeg]}>
@@ -733,8 +794,16 @@ function StatRow({
             ))}
           </View>
         )}
+        {expanded && activities.length > 0 && (
+          <View style={styles.growsFrom}>
+            <Text style={styles.growsFromHead}>Grows from:</Text>
+            {activities.map((a, i) => (
+              <Text key={i} style={styles.growsFromItem}>•  {a}</Text>
+            ))}
+          </View>
+        )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -815,6 +884,23 @@ const styles = StyleSheet.create({
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
   progressPct: { color: '#c9a86a', fontSize: 9, letterSpacing: 0.5 },
   activityList: { color: '#c9a86a', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
+  // OTA-848 — tap-to-expand affordances + readable breakdown lists.
+  tapHint: { color: '#7a705c', fontSize: 11, fontWeight: '400' },
+  tapHintLine: { color: '#7a705c', fontSize: 9, fontStyle: 'italic', marginTop: 3, letterSpacing: 0.3 },
+  breakdownList: { marginTop: 6, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 6 },
+  breakdownRow: { flexDirection: 'row', alignItems: 'baseline', paddingVertical: 2 },
+  breakdownDelta: { color: '#9ec96a', fontSize: 12, fontWeight: '700', width: 40 },
+  breakdownDeltaNeg: { color: '#e07a5f' },
+  breakdownLabel: { color: '#cdbf99', fontSize: 12, flex: 1 },
+  breakdownTotalRow: { marginTop: 3, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 5 },
+  breakdownTotalDelta: { color: '#e6d8b3', fontSize: 13, fontWeight: '800', width: 40 },
+  breakdownTotalLabel: { color: '#e6d8b3', fontSize: 12, fontWeight: '700', flex: 1 },
+  growsFrom: { marginTop: 6 },
+  growsFromHead: { color: '#c9a86a', fontSize: 10, letterSpacing: 0.5, marginBottom: 3, fontWeight: '700' },
+  growsFromItem: { color: '#bcae88', fontSize: 11, lineHeight: 16, marginLeft: 2 },
+  titleDetail: { marginTop: 6, marginLeft: 14, borderLeftColor: '#3a342c', borderLeftWidth: 2, paddingLeft: 8 },
+  titleDetailLine: { color: '#bcae88', fontSize: 11, lineHeight: 16, marginBottom: 2 },
+  titleDetailKey: { color: '#c9a86a', fontWeight: '700' },
   // OTA-843 — Chronicle section.
   chronicleTitle: { color: '#e6d8b3', fontSize: 15, fontWeight: '700', letterSpacing: 0.5 },
   chronicleHeadline: { color: '#c9a86a', fontSize: 12, marginTop: 2, marginBottom: 8, letterSpacing: 0.5 },
