@@ -21,8 +21,17 @@ export function WorldScreen() {
 
   const factions = getFactions();
   const tides = worldMemory?.factionTides ?? {};
-  const rumors = [...(worldMemory?.worldRumors ?? [])].reverse(); // newest first
+  // OTA-851 — the board: the world-event feed (newest first), richer than the raw rumours.
+  const events = [...(worldMemory?.worldEvents ?? [])].reverse();
+  const rumors = [...(worldMemory?.worldRumors ?? [])].reverse(); // fallback if no events yet
+  const patrolCount = (worldMemory?.patrols ?? []).length;
   const standingOf = (id: string) => player?.factionStanding.find((r) => r.factionId === id)?.standing ?? 0;
+  // A small glyph per event kind so the board reads at a glance.
+  const glyphFor = (kind: string): string => (
+    { surge: '▲', setback: '▼', skirmish: '⚔', muster: '⚑', warband: '⚔', bounty: '◆',
+      schism: '✂', truce: '☮', defector: '↩', pilgrimage: '⛨', caravan: '⛟', relic: '✦',
+      market: '⚖', omen: '☄', purge: '✖', windfall: '✧', patrol_clash: '⚔', outpost_assault: '⌂', patrol_mauled: '☠' }[kind] ?? '🗞'
+  );
 
   // OTA-850 — active bounty, or an offer to accept (routes the player to the quarry's outpost).
   const activeBounty = player?.activeBounty;
@@ -142,18 +151,28 @@ export function WorldScreen() {
           </Text>
         </View>
 
-        {/* ── WORD ON THE WIND ──────────────────────────────────── */}
-        <Text style={styles.sectionLabel}>WORD ON THE WIND</Text>
+        {/* ── THE BOARD (world events) ──────────────────────────── */}
+        <Text style={styles.sectionLabel}>THE BOARD — WORD ON THE WIND</Text>
+        {patrolCount > 0 && (
+          <Text style={styles.patrolNote}>⚑ {patrolCount} faction patrol{patrolCount === 1 ? '' : 's'} abroad in the waste.</Text>
+        )}
         <View style={styles.card}>
-          {rumors.length === 0 ? (
-            <Text style={styles.empty}>No rumours yet. Give the world time — it will move.</Text>
-          ) : (
+          {events.length > 0 ? (
+            events.map((e, i) => (
+              <View key={i} style={styles.rumorRow}>
+                <Text style={styles.rumorGlyph}>{glyphFor(e.kind)}</Text>
+                <Text style={styles.rumorText}>{e.text}</Text>
+              </View>
+            ))
+          ) : rumors.length > 0 ? (
             rumors.map((r, i) => (
               <View key={i} style={styles.rumorRow}>
                 <Text style={styles.rumorGlyph}>🗞</Text>
                 <Text style={styles.rumorText}>{r.text}</Text>
               </View>
             ))
+          ) : (
+            <Text style={styles.empty}>The waste is quiet — for now. Give it time; the factions never rest long.</Text>
           )}
         </View>
       </ScrollView>
@@ -183,6 +202,7 @@ const styles = StyleSheet.create({
   meterOnNeg: { color: '#c98a6a' },
   facStanding: { fontSize: 10, marginLeft: 8, letterSpacing: 0.3 },
   footNote: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginTop: 8, lineHeight: 14 },
+  patrolNote: { color: '#c98a6a', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 4 },
   rumorRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
   rumorGlyph: { fontSize: 12, width: 18, textAlign: 'center' },
   rumorText: { color: '#bcd2db', fontSize: 12, lineHeight: 17, flex: 1 },

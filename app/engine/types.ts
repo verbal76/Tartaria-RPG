@@ -1720,6 +1720,14 @@ export interface WorldMemory {
   /** OTA-849 [tides get teeth] — in-game hour of the last faction raid (gates the
    *  next one so raids stay periodic, not constant). */
   lastRaidHour?: number;
+  /** OTA-851 [variety] — recent world events for the WORLD board's event feed
+   *  (newest last, capped). Distinct from worldRumors (the rumour line) by kind. */
+  worldEvents?: { text: string; hour: number; kind: string }[];
+  /** OTA-851 — roaming faction patrols on the world grid: war-parties that wander
+   *  loops near their outposts and intercept the player on proximity, anywhere. */
+  patrols?: import('./worldEvents').Patrol[];
+  /** In-game hour the patrols last advanced (throttles their movement). */
+  lastPatrolTickHour?: number;
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has
    *  fired. Prevents the Arbiter from repeating the "you're light

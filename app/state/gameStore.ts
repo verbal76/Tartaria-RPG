@@ -2186,11 +2186,14 @@ function recordMemorableEvent(
 // rumours never spam.
 const WORLD_TICK_HOURS = 24;
 
-// OTA-844 — the world's slow heartbeat. Called at the end of every action; when a full
-// pulse of in-game time has accrued, one faction's fortunes rise (pressing rivals,
-// lifting allies) and a rumour of it reaches the player. Deterministic (the tick index
-// selects the mover), so it's reproducible and testable. First call on a save just
-// stamps the baseline so a brand-new character doesn't hear a rumour on turn one.
+// OTA-844/849/851 — the world's heartbeat. Called at the end of every action; when a
+// full pulse of in-game time has accrued, one WORLD EVENT fires from a broad, weighted
+// catalogue (OTA-851: surges, skirmishes, musters, warbands, schisms, caravans, omens,
+// bounties posted, …) so the world never reads the same twice. The event's data-only
+// effect is applied here (tide shifts, patrol musters, rep nudges, bounty offers), then
+// the roaming patrols advance and fight OFF-SCREEN (rival patrols clash, patrols assault
+// enemy outposts, beasts maul them) — each skirmish another line on the board. All
+// deterministic (seeded by the tick index). First call just stamps the baseline.
 function worldTideCheck(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -2210,21 +2213,174 @@ function worldTideCheck(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const factions = (require('../engine/character') as typeof import('../engine/character')).getFactions() as unknown as import('../engine/worldPulse').FactionMeta[];
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { nextWorldTide } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
-  const result = nextWorldTide(factions, s.worldMemory.factionTides ?? {}, tickIndex);
-  if (!result.moverId) {
-    set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
-    return;
+  const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+  const ctx = { factions, tides: s.worldMemory.factionTides ?? {}, standings: player.factionStanding };
+  const ev = WE.pickWorldEvent(ctx, tickIndex);
+  if (ev) {
+    // Apply the event's data-only effect.
+    let tides = WE.applyTideDelta(s.worldMemory.factionTides ?? {}, ev.effect.tideDelta);
+    if (ev.effect.repDelta) {
+      const rep = applyRepChange(player.factionStanding, ev.effect.repDelta.factionId, ev.effect.repDelta.delta);
+      set((st) => (st.player ? { player: { ...st.player, factionStanding: rep.standing } } : st));
+      logRepChanges(get, rep.changed);
+    }
+    set((st) => ({
+      worldMemory: {
+        ...st.worldMemory,
+        factionTides: tides,
+        worldRumors: [...(st.worldMemory.worldRumors ?? []), { text: ev.rumor, hour }].slice(-12),
+        worldEvents: [...(st.worldMemory.worldEvents ?? []), { text: ev.rumor, hour, kind: ev.kind }].slice(-16),
+      },
+    }));
+    get().appendLog('world', `🗞 ${ev.rumor}`);
+    if (ev.arbiter) get().appendLog('arbiter', ev.arbiter);
+    if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
+    if (ev.effect.offerBounty) {
+      get().appendLog('arbiter', `"There's coin on the board for a willing blade," the Arbiter says. "Read the World."`);
+    }
   }
-  set((st) => ({
-    worldMemory: {
+  // Roaming patrols: keep the fielded count in line with each faction's tide, then let
+  // them wander + fight off-screen for this tick.
+  maintainPatrols(get, set, factions, tickIndex);
+  simulatePatrols(get, set, factions, hour, tickIndex);
+  set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
+}
+
+// OTA-851 — bring a faction's roaming-patrol count in line with its ascendancy (a
+// faction on the rise fields more), homed at its outpost cell. Muster events bump it.
+function targetPatrolCount(tide: number): number { return Math.max(0, Math.min(3, Math.floor(Math.max(0, tide)))); }
+function maintainPatrols(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  factions: import('../engine/worldPulse').FactionMeta[],
+  tickIndex: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const tides = get().worldMemory.factionTides ?? {};
+  const cur = get().worldMemory.patrols ?? [];
+  const byFaction = new Map<string, number>();
+  for (const p of cur) byFaction.set(p.factionId, (byFaction.get(p.factionId) ?? 0) + 1);
+  const next = [...cur];
+  for (const f of factions) {
+    const outpost = FACTION_STARTING_LOCATION[f.id];
+    if (!outpost) continue;
+    const want = targetPatrolCount(tides[f.id] ?? 0);
+    const have = byFaction.get(f.id) ?? 0;
+    if (have < want) {
+      const cell = canonicalCellOf(outpost);
+      for (let i = have; i < want; i++) {
+        next.push({ factionId: f.id, gx: cell.x, gy: cell.y, homeX: cell.x, homeY: cell.y, phase: (tickIndex + i * 7) % 97 });
+      }
+    }
+  }
+  if (next.length !== cur.length) set((st) => ({ worldMemory: { ...st.worldMemory, patrols: next } }));
+}
+
+// OTA-851 — advance patrols one wandering step and resolve OFF-SCREEN combat: rival
+// patrols within 2 tiles clash (the weaker faction's patrol is lost, tides shift), a
+// patrol within 2 tiles of a RIVAL outpost assaults it (that faction loses ground), and
+// a deterministic slice get mauled by wasteland beasts. Every clash is another line on
+// the board — the world fighting its own wars while you fight yours.
+function simulatePatrols(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  factions: import('../engine/worldPulse').FactionMeta[],
+  hour: number,
+  tickIndex: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const nameOf = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
+  const realIds = new Set(factions.map((f) => f.id));
+  const rivalsOf = (id: string) => (factions.find((f) => f.id === id)?.rivals ?? []).filter((r) => realIds.has(r));
+  let patrols = (get().worldMemory.patrols ?? []).map((p) => WE.stepPatrol(p, tickIndex));
+  let tides = { ...(get().worldMemory.factionTides ?? {}) };
+  const events: { text: string; kind: string }[] = [];
+  const lost = new Set<number>();
+
+  // Rival patrol clashes (each unordered pair once).
+  for (let i = 0; i < patrols.length; i++) {
+    if (lost.has(i)) continue;
+    for (let j = i + 1; j < patrols.length; j++) {
+      if (lost.has(j)) continue;
+      const a = patrols[i]!, b = patrols[j]!;
+      if (a.factionId === b.factionId) continue;
+      if (!rivalsOf(a.factionId).includes(b.factionId)) continue;
+      if (Math.abs(a.gx - b.gx) + Math.abs(a.gy - b.gy) > 2) continue;
+      // The more ascendant faction's patrol wins.
+      const aWin = (tides[a.factionId] ?? 0) >= (tides[b.factionId] ?? 0);
+      const loser = aWin ? j : i, winnerFac = aWin ? a.factionId : b.factionId, loserFac = aWin ? b.factionId : a.factionId;
+      lost.add(loser);
+      tides[winnerFac] = Math.max(-5, Math.min(5, (tides[winnerFac] ?? 0) + 1));
+      tides[loserFac] = Math.max(-5, Math.min(5, (tides[loserFac] ?? 0) - 1));
+      events.push({ text: `A ${nameOf(winnerFac)} patrol broke a ${nameOf(loserFac)} one in the open waste.`, kind: 'patrol_clash' });
+      break;
+    }
+  }
+  // Outpost assaults + beast maulings.
+  for (let i = 0; i < patrols.length; i++) {
+    if (lost.has(i)) continue;
+    const p = patrols[i]!;
+    // Assault a rival outpost if adjacent to one.
+    let assaulted = false;
+    for (const rid of rivalsOf(p.factionId)) {
+      const loc = FACTION_STARTING_LOCATION[rid];
+      if (!loc) continue;
+      const cell = canonicalCellOf(loc);
+      if (Math.abs(p.gx - cell.x) + Math.abs(p.gy - cell.y) <= 2) {
+        tides[rid] = Math.max(-5, Math.min(5, (tides[rid] ?? 0) - 1));
+        events.push({ text: `A ${nameOf(p.factionId)} patrol struck at the ${nameOf(rid)} outpost.`, kind: 'outpost_assault' });
+        assaulted = true;
+        break;
+      }
+    }
+    if (assaulted) continue;
+    // Beasts maul a deterministic slice of patrols in open country.
+    if (((p.phase + tickIndex) % 11) === 0) {
+      lost.add(i);
+      tides[p.factionId] = Math.max(-5, Math.min(5, (tides[p.factionId] ?? 0) - 1));
+      events.push({ text: `Wasteland beasts fell on a ${nameOf(p.factionId)} patrol — none rode home.`, kind: 'patrol_mauled' });
+    }
+  }
+
+  patrols = patrols.filter((_, i) => !lost.has(i));
+  if (events.length > 0 || lost.size > 0) {
+    set((st) => ({ worldMemory: {
       ...st.worldMemory,
-      factionTides: result.tides,
-      lastWorldTickHour: hour,
-      worldRumors: [...(st.worldMemory.worldRumors ?? []), { text: result.rumor, hour }].slice(-12),
-    },
+      patrols,
+      factionTides: tides,
+      worldEvents: [...(st.worldMemory.worldEvents ?? []), ...events.map((e) => ({ ...e, hour }))].slice(-16),
+      worldRumors: [...(st.worldMemory.worldRumors ?? []), ...events.map((e) => ({ text: e.text, hour }))].slice(-12),
+    } }));
+    // Surface at most one to the live feed so a tick doesn't spam the log.
+    const head = events[0];
+    if (head) get().appendLog('world', `🗞 ${head.text}`);
+  } else {
+    set((st) => ({ worldMemory: { ...st.worldMemory, patrols } }));
+  }
+}
+
+// OTA-851 — muster: add N roaming patrols for a faction at its outpost right now.
+function musterPatrols(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  factions: import('../engine/worldPulse').FactionMeta[],
+  factionId: string,
+  count: number,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const outpost = FACTION_STARTING_LOCATION[factionId];
+  if (!outpost) return;
+  const cell = canonicalCellOf(outpost);
+  const cur = get().worldMemory.patrols ?? [];
+  const add = Array.from({ length: Math.max(1, count) }, (_, i) => ({
+    factionId, gx: cell.x, gy: cell.y, homeX: cell.x, homeY: cell.y, phase: (cur.length + i * 13 + 5) % 97,
   }));
-  get().appendLog('world', `🗞 ${result.rumor}`);
+  set((st) => ({ worldMemory: { ...st.worldMemory, patrols: [...(st.worldMemory.patrols ?? []), ...add] } }));
 }
 
 // OTA-849 [living world] — RIVAL RAIDS. When the player has taken a side (positive
@@ -2371,6 +2527,52 @@ function maybeInterceptPatrol(
     'arbiter',
     `"You're on ${holderName} ground now," the Arbiter says low. "Their patrols don't ask why you came."`,
   );
+}
+
+// OTA-851 — ROAMING-PATROL AMBUSH. A patrol wandering the open grid can be blundered
+// into ANYWHERE, not just near its outpost (that's maybeInterceptPatrol). Checked at
+// the end of every action: if a hostile / bounty-target faction's patrol is within 2
+// tiles of the player, it engages. The patrol that engages is consumed into the fight.
+function maybePatrolAmbush(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return;
+  if ((scene.enemies?.length ?? 0) > 0) return;
+  if (player.hubRoomId) return;
+  if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
+  const patrols = s.worldMemory.patrols ?? [];
+  if (patrols.length === 0) return;
+  const hour = player.hoursElapsed ?? 0;
+  const last = s.worldMemory.lastRaidHour;
+  if (last !== undefined && hour - last < PATROL_MIN_HOURS) return;
+  const cell = playerGridCell(player);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { patrolsNear } = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+  const near = patrolsNear(patrols, cell.x, cell.y, 2);
+  if (near.length === 0) return;
+  const hostile = near.find((p) => {
+    const standing = player.factionStanding.find((r) => r.factionId === p.factionId)?.standing ?? 0;
+    return player.activeBounty?.targetFactionId === p.factionId || standing < 0;
+  });
+  if (!hostile) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  const name = factions.find((f) => f.id === hostile.factionId)?.name ?? hostile.factionId;
+  const tide = Math.max(0, s.worldMemory.factionTides?.[hostile.factionId] ?? 0);
+  const partySize = Math.max(2, Math.min(4, 2 + Math.floor(tide / 2)));
+  const landed = injectFactionParty(get, set, { factionId: hostile.factionId, factionName: name, partySize, noun: 'Patrol' });
+  if (!landed) return;
+  set((st) => ({ worldMemory: {
+    ...st.worldMemory,
+    patrols: (st.worldMemory.patrols ?? []).filter((p) => p !== hostile),
+    lastRaidHour: hour,
+  } }));
+  get().appendLog('world', `A ${name} patrol crosses your path in the open — and turns toward you.`);
+  get().appendLog('arbiter', `"${name} riders," the Arbiter says. "They've marked you. No outrunning this one."`);
 }
 
 // Milestone thresholds. Hit one of these counters and the character gets a
@@ -4660,28 +4862,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (pulses >= 1) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+            // OTA-851 — offline advance runs the same VARIED event engine, so a return
+            // after days away reads a mix of skirmishes / musters / caravans, not a row
+            // of identical surges.
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const { nextWorldTide } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+            const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
             let tides = { ...(get().worldMemory.factionTides ?? {}) };
             const rumors: { text: string; hour: number }[] = [];
+            const eventRows: { text: string; hour: number; kind: string }[] = [];
             const seed = Math.floor((get().worldMemory.lastWorldTickHour ?? 0) / 24);
-            let lastMoverName = '';
+            const nowH = livePlayer.hoursElapsed ?? 0;
             for (let i = 0; i < pulses; i++) {
-              const r = nextWorldTide(factions, tides, seed + i + 1);
-              if (!r.moverId) continue;
-              tides = r.tides;
-              rumors.push({ text: r.rumor, hour: livePlayer.hoursElapsed ?? 0 });
-              lastMoverName = factions.find((f) => f.id === r.moverId)?.name ?? lastMoverName;
+              const ev = WE.pickWorldEvent({ factions, tides, standings: livePlayer.factionStanding }, seed + i + 1);
+              if (!ev) continue;
+              tides = WE.applyTideDelta(tides, ev.effect.tideDelta);
+              rumors.push({ text: ev.rumor, hour: nowH });
+              eventRows.push({ text: ev.rumor, hour: nowH, kind: ev.kind });
             }
             if (rumors.length > 0) {
               set((st) => ({ worldMemory: {
                 ...st.worldMemory,
                 factionTides: tides,
                 worldRumors: [...(st.worldMemory.worldRumors ?? []), ...rumors].slice(-12),
+                worldEvents: [...(st.worldMemory.worldEvents ?? []), ...eventRows].slice(-16),
               } }));
               get().appendLog(
                 'arbiter',
-                `"While you were gone, the waste did not sleep," the Arbiter says. "${rumors.length} shift${rumors.length === 1 ? '' : 's'} in the balance of power — the ${lastMoverName} the latest to move. Read the World for the full account."`,
+                `"While you were gone, the waste did not sleep," the Arbiter says. "${rumors.length} thing${rumors.length === 1 ? '' : 's'} moved in the balance of power. Read the World for the full account."`,
                 { skipDedup: true },
               );
             }
@@ -15055,6 +15262,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
     // outdoor moment.
     maybeSpawnRaid(get, set);
+    // OTA-851 — a roaming faction patrol can cross your path in the open, anywhere.
+    if ((get().currentScene?.enemies?.length ?? 0) === 0) maybePatrolAmbush(get, set);
     void get().persist();
   },
 
