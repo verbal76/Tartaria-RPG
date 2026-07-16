@@ -16416,4 +16416,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // returning character's OTA-838 enemyIntel from the foes they've ALREADY defeated, so
 // the new bestiary/panel weaknesses aren't blank on a veteran save. Runs once (only
 // when the save has no enemyIntel yet). Tests: ota839LoreAccuracy, ota839IntelBackfill.
-export const OTA_BUILD_ID = '2026-07-16-839-lore-accuracy-and-intel-backfill';
+// ── OTA-840 (Tier-2 QoL #1: never-fail-silently sweep) ────────────────────────
+// An audit of the whole action pipeline (submitPlayerAction + every intent handler)
+// confirmed the codebase is already unusually well-instrumented — most guards already
+// speak. The genuine residual silent no-ops (an action that ends with no log / no
+// modal) were a short list; all fixed here:
+//   • UNEQUIP an empty slot — `remove helmet` / `take off ring` with nothing there
+//     used to do nothing at all (unequipSlot narrates nothing). Now checks the slot
+//     first and says "nothing in that slot to take off" (and "nothing to put away"
+//     for an empty-handed weapon strip).
+//   • TYPED EQUIP — `equip iron sword` printed nothing (equipItem stays silent for
+//     UI taps). Now a typed equip confirms with a slot-aware verb ("You ready/don …").
+//   • BUY with an item the vendor doesn't stock — the one silent exit in buyFromVendor
+//     ("…doesn't carry any X").
+//   • BUY / SELL with NO VENDOR present (queued/stale action) — now "There's no one
+//     here to trade with."
+//   • SUMMON CORE GUARDIAN — the no_guardian_def / no_scene reasons had no line; a
+//     failed main-quest summon could no-op silently. Now always answers.
+//   • SALVAGE ALL on a MIXED batch — unmatched nouns left only a debug breadcrumb
+//     while the successful loot showed; now they surface too.
+// Test: ota840NeverFailSilently.
+export const OTA_BUILD_ID = '2026-07-16-840-never-fail-silently';
