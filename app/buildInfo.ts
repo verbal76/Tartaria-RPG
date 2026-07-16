@@ -16480,4 +16480,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // line so the player SEES the world move. The faction-standings panel now tags each
 // faction rising ▲ / waning ▼ / ascendant / collapsing (tideLabel). First action on a
 // save just stamps the baseline (no turn-one rumour). Test: ota844WorldPulse.
-export const OTA_BUILD_ID = '2026-07-16-844-world-pulse';
+// ── OTA-845 (Tier-3 depth #3: "losing is fun" — THE FALLEN) ───────────────────
+// Death used to be a clean wipe — a character fell, and unless you spent a Resurrection
+// Gem, they were simply gone. This makes the run's END part of the world. Every
+// character who dies is now appended to an install-wide, cross-character roll of THE
+// FALLEN (saveSystem GlobalStash `fallen` + recordFallen/loadFallen, capped 25): their
+// name, race, epitaph, where they fell, foes bested, hours survived, and the corruption
+// that took them. handlePlayerDeath records it and adds a beat — "You join the Fallen of
+// Tartaria — N names the buried world keeps now." A new FALLEN tab in the Lore Codex
+// renders the memorial (newest first), readable BETWEEN runs from the title screen too,
+// so a long-dead predecessor is never forgotten. Losing is fun: the run ends, the legend
+// persists. (Recommended core of the Tier-3 death batch; the dead-PC-as-enemy and
+// permanent-corruption-scar variants are noted as follow-ups.) Test: ota845TheFallen.
+// Completes the Tier-3 emergent-depth batch (843/844/845).
+export const OTA_BUILD_ID = '2026-07-16-845-the-fallen';

@@ -61,6 +61,7 @@ import {
   getActiveSlotId,
   loadGlobalStash,
   addResurrectionGems,
+  recordFallen,
   ensureFirstInstallSeed,
   grantDevGemOnce,
   grantTestSupplyGiftOnce,
@@ -26537,6 +26538,32 @@ function handlePlayerDeath(
     'system',
     `${player.name} has fallen. A Resurrection Gem from the title screen can bring them back.`,
   );
+
+  // OTA-845 [The Fallen] — a death is never wiped clean. Append this character to the
+  // install-wide roll of the Fallen so later characters inherit a graveyard of
+  // predecessors (readable in the Lore Codex, cross-character). Losing is fun: the run
+  // ends, the legend persists. Fire-and-forget; when it lands, name the beat.
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const races = require('../data/races/races.json') as Array<{ id: string; name: string }>;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { corruptionTierOf, tierLabel } = require('../engine/corruption');
+    const hero = {
+      name: player.name,
+      raceName: races.find((r) => r.id === player.raceId)?.name ?? player.raceId ?? 'wanderer',
+      epitaph,
+      locationName: locName,
+      kills: player.milestones?.enemiesDefeated ?? 0,
+      corruption: tierLabel(corruptionTierOf(player.corruption ?? 0)),
+      hours: Math.floor(player.hoursElapsed ?? 0),
+      ts: Date.now(),
+    };
+    void recordFallen(hero).then((total) => {
+      if (total > 1) {
+        get().appendLog('system', `You join the Fallen of Tartaria — ${total} names the buried world keeps now. Read the roll from the Lore Codex.`);
+      }
+    }).catch(() => { /* the graveyard is a keepsake, never block death on it */ });
+  }
 
   // OTA-067 — dev cheat for the project owner. If the fallen
   // character is named one of the dev names (case-insensitive,
