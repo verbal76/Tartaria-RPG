@@ -16446,4 +16446,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // above the input — one tap re-submits that command. Turns the NL cliff into a
 // one-tap recovery. Test: ota841DidYouMean (populate on unresolved parse; clear on
 // next action).
-export const OTA_BUILD_ID = '2026-07-16-841-did-you-mean-chips';
+// ── OTA-842 (Tier-2 QoL #3: combat-log restructure — damage-modifier breakdown) ─
+// The incoming-hit line appended each mitigation as its OWN parenthetical, so a hit
+// that armor + a title + a race resist/vuln + a shield + a ward all touched read as a
+// wall: "…damage (armor turns 40% of the cold)(your title turns aside half the cold)
+// (Aetherstone Vulnerability — +50% dmg)(Defensive Protocols shield)(stone ward soaks
+// 3)." New `damageModClause()` collects them into ONE terse comma-separated bracket in
+// apply-order: "…damage [armor −40%, title ½, +50% dmg, shield ½, ward soaks 3]." A
+// race VULNERABILITY lists as "+N%" (the bracket shows every modifier, not only
+// reductions); no modifiers → no bracket. Completes the Tier-2 QoL batch (840/841/842).
+// Test: ota842CombatLogMods.
+export const OTA_BUILD_ID = '2026-07-16-842-combat-log-breakdown';
