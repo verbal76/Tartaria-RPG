@@ -17545,4 +17545,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   (4) BEGINNER'S LUCK — real one-shot reroll token (luckyRerollReady).
 //   (5) LEGACY OF POWER — three channels (repair/power-up/surge).
 // Plus Sentinel tireless+ageless and Stormcaller also-halves-electrical.
-export const OTA_BUILD_ID = '2026-07-16-1116-race-flavor-wiring';
+// ── OTA-1117 (Tier-1 QoL #1: tap-to-explain numbers — engine port of HAL-836) ──
+// "Armor Class" on the Character sheet rendered only effectiveAC() (race base +
+// scene context), dropping equipped-armor/accessory AC + ruins title + stance —
+// a plate-armored player read the same AC as a naked one. New
+// effectiveACBreakdown() returns the same total the combat resolver uses,
+// decomposed into labelled sources; the DEFENSE card shows total + "(base N)" +
+// chips. Import merge kept engine's getRaces/getFactions content-pack path.
+// Test: ota836ACBreakdown.
+export const OTA_BUILD_ID = '2026-07-16-1117-tap-to-explain-ac';
