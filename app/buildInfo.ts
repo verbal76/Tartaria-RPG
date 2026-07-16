@@ -16077,4 +16077,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // staged. Surfaces two screens that were buried (World behind a Character-sheet link,
 // Lore three taps deep in Settings). The 7 Lore codex tabs no longer word-wrap: the
 // row is a horizontal scroll of content-sized one-line tabs. UI-only.
-export const OTA_BUILD_ID = '2026-07-16-832-surface-world-lore';
+// ── OTA-833 (EMERGENT GRUDGES — factions wage their own wars across the whole map) ─
+// Port of HAL OTA-853. Factions get standing with each other (factionRelations); grudges
+// are earned from patrol clashes and can spark from ZERO between neutrals (meetOutcome).
+// Patrols roam the whole map (leash removed) toward hostile outposts. factionTides is now
+// earned war POWER (drives patrol count / prices / raids). New GRUDGES export const OTA_BUILD_ID = '2026-07-16-832-surface-world-lore'; ALLIANCES board
+// section; world drama routes only to the WORLD board, never the play feed. Offline load
+// simulates the gap. Test: ota853FactionRelations.
+export const OTA_BUILD_ID = '2026-07-16-833-emergent-grudges';

@@ -1862,12 +1862,12 @@ function worldTideCheck(
       worldMemory: {
         ...st.worldMemory,
         factionTides: tides,
-        worldRumors: [...(st.worldMemory.worldRumors ?? []), { text: ev.rumor, hour }].slice(-12),
-        worldEvents: [...(st.worldMemory.worldEvents ?? []), { text: ev.rumor, hour, kind: ev.kind }].slice(-16),
+        // OTA-853 — world drama lands on the WORLD board (capped 50), NOT the play feed.
+        worldEvents: [...(st.worldMemory.worldEvents ?? []), { text: ev.rumor, hour, kind: ev.kind }].slice(-50),
       },
     }));
-    get().appendLog('world', `🗞 ${ev.rumor}`);
-    if (ev.arbiter) get().appendLog('arbiter', ev.arbiter);
+    // Only PLAYER-directed nudges reach the exploration feed (a posted bounty). The
+    // ambient world churn stays on the board so it never clutters play.
     if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
     if (ev.effect.offerBounty) {
       get().appendLog('arbiter', `"There's coin on the board for a willing blade," the Arbiter says. "Read the World."`);
@@ -1880,9 +1880,12 @@ function worldTideCheck(
   set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
 }
 
-// OTA-851 — bring a faction's roaming-patrol count in line with its ascendancy (a
-// faction on the rise fields more), homed at its outpost cell. Muster events bump it.
-function targetPatrolCount(tide: number): number { return Math.max(0, Math.min(3, Math.floor(Math.max(0, tide)))); }
+// OTA-853 — a faction fields more patrols the more POWER it holds (the war scoreboard,
+// factionTides). Every faction keeps a standing force (min 2) so the wars never stall,
+// scaling up to 10 for a dominant one. ~5 average × 9 factions ≈ 45 patrols roaming —
+// lively but far below any performance concern.
+const PATROL_SOFT_CAP = 100; // total patrols across the world; well under the O(N²) worry
+function targetPatrolCount(power: number): number { return Math.max(2, Math.min(10, 5 + Math.round(power))); }
 function maintainPatrols(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -1893,29 +1896,36 @@ function maintainPatrols(
   const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
   const tides = get().worldMemory.factionTides ?? {};
   const cur = get().worldMemory.patrols ?? [];
-  const byFaction = new Map<string, number>();
-  for (const p of cur) byFaction.set(p.factionId, (byFaction.get(p.factionId) ?? 0) + 1);
-  const next = [...cur];
+  const idxByFaction = new Map<string, number[]>();
+  cur.forEach((p, i) => { const a = idxByFaction.get(p.factionId) ?? []; a.push(i); idxByFaction.set(p.factionId, a); });
+  let next = [...cur];
+  const dropIdx = new Set<number>();
   for (const f of factions) {
     const outpost = FACTION_STARTING_LOCATION[f.id];
     if (!outpost) continue;
     const want = targetPatrolCount(tides[f.id] ?? 0);
-    const have = byFaction.get(f.id) ?? 0;
-    if (have < want) {
+    const idxs = idxByFaction.get(f.id) ?? [];
+    if (idxs.length < want && next.length < PATROL_SOFT_CAP) {
       const cell = canonicalCellOf(outpost);
-      for (let i = have; i < want; i++) {
+      for (let i = idxs.length; i < want && next.length < PATROL_SOFT_CAP; i++) {
         next.push({ factionId: f.id, gx: cell.x, gy: cell.y, homeX: cell.x, homeY: cell.y, phase: (tickIndex + i * 7) % 97 });
       }
+    } else if (idxs.length > want) {
+      // OTA-853 — a fading faction's war-parties thin out instead of lingering forever.
+      for (let k = want; k < idxs.length; k++) dropIdx.add(idxs[k]!);
     }
   }
+  if (dropIdx.size > 0) next = next.filter((_, i) => !dropIdx.has(i));
   if (next.length !== cur.length) set((st) => ({ worldMemory: { ...st.worldMemory, patrols: next } }));
 }
 
-// OTA-851 — advance patrols one wandering step and resolve OFF-SCREEN combat: rival
-// patrols within 2 tiles clash (the weaker faction's patrol is lost, tides shift), a
-// patrol within 2 tiles of a RIVAL outpost assaults it (that faction loses ground), and
-// a deterministic slice get mauled by wasteland beasts. Every clash is another line on
-// the board — the world fighting its own wars while you fight yours.
+// OTA-853 — the world fights its OWN wars. Patrols roam the whole map, seeking rival
+// ground; who fights whom is decided by live faction-vs-faction STANDING, not a static
+// rival list. When patrols meet: sworn enemies clash on sight, and even two neutrals can
+// come to blows through friction — which SEEDS a brand-new grudge from zero. Every clash
+// deepens the standing (the feud grows) and moves the war scoreboard (winner gains power,
+// loser bleeds it). Patrols also sack rival outposts and get mauled by beasts. All of it
+// streams to the World board.
 function simulatePatrols(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -1926,75 +1936,100 @@ function simulatePatrols(
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const FR = require('../engine/factionRelations') as typeof import('../engine/factionRelations');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
   const nameOf = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
-  const realIds = new Set(factions.map((f) => f.id));
-  const rivalsOf = (id: string) => (factions.find((f) => f.id === id)?.rivals ?? []).filter((r) => realIds.has(r));
-  let patrols = (get().worldMemory.patrols ?? []).map((p) => WE.stepPatrol(p, tickIndex));
+  // Seed the grudge matrix from lore the first time.
+  let relations = get().worldMemory.factionRelations ?? {};
+  if (Object.keys(relations).length === 0) relations = FR.seedRelations(factions);
+  // Outpost cells (once).
+  const outpostCell: Record<string, { x: number; y: number }> = {};
+  for (const f of factions) { const loc = FACTION_STARTING_LOCATION[f.id]; if (loc) outpostCell[f.id] = canonicalCellOf(loc); }
   let tides = { ...(get().worldMemory.factionTides ?? {}) };
+  const bumpPower = (id: string, d: number) => { tides[id] = Math.max(-5, Math.min(5, (tides[id] ?? 0) + d)); };
+  // Advance each patrol, drifting toward its NEAREST hostile faction's outpost so they go
+  // looking for a fight instead of milling about.
+  let patrols = (get().worldMemory.patrols ?? []).map((p) => {
+    let target: { x: number; y: number } | undefined;
+    let best = Infinity;
+    for (const f of factions) {
+      if (f.id === p.factionId) continue;
+      if (FR.getRelation(relations, p.factionId, f.id) > FR.HOSTILE_AT) continue;
+      const c = outpostCell[f.id]; if (!c) continue;
+      const d = Math.abs(p.gx - c.x) + Math.abs(p.gy - c.y);
+      if (d < best) { best = d; target = c; }
+    }
+    return WE.stepPatrol(p, tickIndex, target);
+  });
   const events: { text: string; kind: string }[] = [];
   const lost = new Set<number>();
 
-  // Rival patrol clashes (each unordered pair once).
+  // Patrol meetings (each unordered pair once).
   for (let i = 0; i < patrols.length; i++) {
     if (lost.has(i)) continue;
     for (let j = i + 1; j < patrols.length; j++) {
       if (lost.has(j)) continue;
       const a = patrols[i]!, b = patrols[j]!;
       if (a.factionId === b.factionId) continue;
-      if (!rivalsOf(a.factionId).includes(b.factionId)) continue;
       if (Math.abs(a.gx - b.gx) + Math.abs(a.gy - b.gy) > 2) continue;
-      // The more ascendant faction's patrol wins.
-      const aWin = (tides[a.factionId] ?? 0) >= (tides[b.factionId] ?? 0);
+      const rel = FR.getRelation(relations, a.factionId, b.factionId);
+      const outcome = FR.meetOutcome(rel, tickIndex * 131 + i * 17 + j);
+      if (!outcome.fight) continue;
+      // Winner: whoever holds more power (tie-break deterministically by id).
+      const aWin = (tides[a.factionId] ?? 0) !== (tides[b.factionId] ?? 0)
+        ? (tides[a.factionId] ?? 0) > (tides[b.factionId] ?? 0)
+        : a.factionId < b.factionId;
       const loser = aWin ? j : i, winnerFac = aWin ? a.factionId : b.factionId, loserFac = aWin ? b.factionId : a.factionId;
       lost.add(loser);
-      tides[winnerFac] = Math.max(-5, Math.min(5, (tides[winnerFac] ?? 0) + 1));
-      tides[loserFac] = Math.max(-5, Math.min(5, (tides[loserFac] ?? 0) - 1));
-      events.push({ text: `A ${nameOf(winnerFac)} patrol broke a ${nameOf(loserFac)} one in the open waste.`, kind: 'patrol_clash' });
+      bumpPower(winnerFac, 1); bumpPower(loserFac, -1);
+      relations = FR.adjustRelation(relations, a.factionId, b.factionId, FR.grudgeDelta(outcome.friction));
+      events.push({
+        text: outcome.friction
+          ? `A chance skirmish flared between ${nameOf(winnerFac)} and ${nameOf(loserFac)} patrols — the ${nameOf(winnerFac)} left none standing. A grudge is born.`
+          : `A ${nameOf(winnerFac)} patrol broke a ${nameOf(loserFac)} one in the open waste.`,
+        kind: 'patrol_clash',
+      });
       break;
     }
   }
-  // Outpost assaults + beast maulings.
+  // Outpost assaults (only against a faction you're hostile with) + beast maulings.
   for (let i = 0; i < patrols.length; i++) {
     if (lost.has(i)) continue;
     const p = patrols[i]!;
-    // Assault a rival outpost if adjacent to one.
     let assaulted = false;
-    for (const rid of rivalsOf(p.factionId)) {
-      const loc = FACTION_STARTING_LOCATION[rid];
-      if (!loc) continue;
-      const cell = canonicalCellOf(loc);
+    for (const f of factions) {
+      if (f.id === p.factionId) continue;
+      if (FR.getRelation(relations, p.factionId, f.id) > FR.HOSTILE_AT) continue;
+      const cell = outpostCell[f.id]; if (!cell) continue;
       if (Math.abs(p.gx - cell.x) + Math.abs(p.gy - cell.y) <= 2) {
-        tides[rid] = Math.max(-5, Math.min(5, (tides[rid] ?? 0) - 1));
-        events.push({ text: `A ${nameOf(p.factionId)} patrol struck at the ${nameOf(rid)} outpost.`, kind: 'outpost_assault' });
+        bumpPower(f.id, -1); bumpPower(p.factionId, 1);
+        relations = FR.adjustRelation(relations, p.factionId, f.id, -4);
+        events.push({ text: `A ${nameOf(p.factionId)} war-party struck the ${nameOf(f.id)} outpost and burned what they could.`, kind: 'outpost_assault' });
         assaulted = true;
         break;
       }
     }
     if (assaulted) continue;
-    // Beasts maul a deterministic slice of patrols in open country.
     if (((p.phase + tickIndex) % 11) === 0) {
       lost.add(i);
-      tides[p.factionId] = Math.max(-5, Math.min(5, (tides[p.factionId] ?? 0) - 1));
+      bumpPower(p.factionId, -1);
       events.push({ text: `Wasteland beasts fell on a ${nameOf(p.factionId)} patrol — none rode home.`, kind: 'patrol_mauled' });
     }
   }
 
   patrols = patrols.filter((_, i) => !lost.has(i));
-  if (events.length > 0 || lost.size > 0) {
-    set((st) => ({ worldMemory: {
-      ...st.worldMemory,
-      patrols,
-      factionTides: tides,
-      worldEvents: [...(st.worldMemory.worldEvents ?? []), ...events.map((e) => ({ ...e, hour }))].slice(-16),
-      worldRumors: [...(st.worldMemory.worldRumors ?? []), ...events.map((e) => ({ text: e.text, hour }))].slice(-12),
-    } }));
-    // Surface at most one to the live feed so a tick doesn't spam the log.
-    const head = events[0];
-    if (head) get().appendLog('world', `🗞 ${head.text}`);
-  } else {
-    set((st) => ({ worldMemory: { ...st.worldMemory, patrols } }));
-  }
+  set((st) => ({ worldMemory: {
+    ...st.worldMemory,
+    patrols,
+    factionTides: tides,
+    factionRelations: relations,
+    ...(events.length > 0 ? {
+      // OTA-853 — world drama routes ONLY to the World board's own log (capped 50), never
+      // the exploration feed. You see it when you tap WORLD, not mid-play.
+      worldEvents: [...(st.worldMemory.worldEvents ?? []), ...events.map((e) => ({ ...e, hour }))].slice(-50),
+    } : {}),
+  } }));
 }
 
 // OTA-851 — muster: add N roaming patrols for a faction at its outpost right now.
@@ -4529,12 +4564,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set((st) => ({ worldMemory: {
                 ...st.worldMemory,
                 factionTides: tides,
-                worldRumors: [...(st.worldMemory.worldRumors ?? []), ...rumors].slice(-12),
-                worldEvents: [...(st.worldMemory.worldEvents ?? []), ...eventRows].slice(-16),
+                worldEvents: [...(st.worldMemory.worldEvents ?? []), ...eventRows].slice(-50),
               } }));
+            }
+            // OTA-853 — the wars ran too. Advance the roaming-patrol sim for the gap so
+            // the World board fills with the clashes / outpost sackings you "missed."
+            for (let i = 0; i < pulses; i++) {
+              maintainPatrols(get, set, factions, seed + i + 1);
+              simulatePatrols(get, set, factions, nowH, seed + i + 1);
+            }
+            if (rumors.length > 0 || (get().worldMemory.patrols ?? []).length > 0) {
               get().appendLog(
                 'arbiter',
-                `"While you were gone, the waste did not sleep," the Arbiter says. "${rumors.length} thing${rumors.length === 1 ? '' : 's'} moved in the balance of power. Read the World for the full account."`,
+                `"While you were gone, the waste did not sleep," the Arbiter says. "Blood was spilled and ground changed hands. Read the World for the account."`,
                 { skipDedup: true },
               );
             }

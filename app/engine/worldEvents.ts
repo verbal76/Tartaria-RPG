@@ -295,22 +295,22 @@ export interface Patrol {
   phase: number;
 }
 
-const PATROL_RADIUS = 3; // how far a patrol strays from its outpost
-
-/** Advance a patrol one wandering step. Deterministic from (phase, tickIndex).
- *  Stays within PATROL_RADIUS of home — beyond it, the step is pulled back toward
- *  home, so the path loops the outpost without ever repeating exactly. Pure. */
-export function stepPatrol(p: Patrol, tickIndex: number): Patrol {
-  const distX = p.gx - p.homeX, distY = p.gy - p.homeY;
-  const manhattan = Math.abs(distX) + Math.abs(distY);
+/** OTA-853 — patrols ROAM THE WHOLE MAP now (no home leash). A deterministic wander:
+ *  each step picks a cardinal direction from the hash, with a light drift toward a
+ *  target when one is set (the store points them at a rival outpost so they go LOOKING
+ *  for someone's ground to take, instead of circling their own). Pure. */
+export function stepPatrol(p: Patrol, tickIndex: number, target?: { x: number; y: number }): Patrol {
+  const h = hash(p.phase * 31 + tickIndex);
   let dx = 0, dy = 0;
-  if (manhattan >= PATROL_RADIUS) {
-    // Too far — head back toward home (favor the larger axis).
-    if (Math.abs(distX) >= Math.abs(distY)) dx = distX > 0 ? -1 : 1;
-    else dy = distY > 0 ? -1 : 1;
-  } else {
-    // Wander: pick an axis + direction from the hash.
-    const h = hash(p.phase * 31 + tickIndex);
+  // 55% of steps drift toward the target (if any); the rest wander freely, so a patrol
+  // heads roughly for a fight but never on rails.
+  if (target && h < 0.55) {
+    const distX = target.x - p.gx, distY = target.y - p.gy;
+    if (distX === 0 && distY === 0) { /* arrived — wander below */ }
+    else if (Math.abs(distX) >= Math.abs(distY)) dx = distX > 0 ? 1 : -1;
+    else dy = distY > 0 ? 1 : -1;
+  }
+  if (dx === 0 && dy === 0) {
     if (h < 0.25) dx = 1; else if (h < 0.5) dx = -1; else if (h < 0.75) dy = 1; else dy = -1;
   }
   return { ...p, gx: p.gx + dx, gy: p.gy + dy };

@@ -87,12 +87,12 @@ describe('OTA-844 (3) — the pulse fires after a day of in-game time', () => {
       player: { ...p, hoursElapsed: 200 },
       worldMemory: { ...useGameStore.getState().worldMemory, lastWorldTickHour: 100 },
     });
-    const before = useGameStore.getState().gameLog.length;
+    const eventsBefore = (useGameStore.getState().worldMemory.worldEvents ?? []).length;
     await useGameStore.getState().submitPlayerAction('look around');
     const st = useGameStore.getState();
-    // A rumour should have reached the player, and tides recorded.
-    const log = st.gameLog.slice(before).map((e) => e.text).join('\n');
-    expect(log).toMatch(/Word on the wind|🗞/);
+    // OTA-853 — world drama lands on the WORLD board (worldEvents), NOT the play feed.
+    // A pulse should have added at least one board entry, and moved the war scoreboard.
+    expect((st.worldMemory.worldEvents ?? []).length).toBeGreaterThan(eventsBefore);
     expect(Object.keys(st.worldMemory.factionTides ?? {}).length).toBeGreaterThan(0);
     expect(st.worldMemory.lastWorldTickHour).toBe(200);
   });
