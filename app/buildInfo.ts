@@ -16572,4 +16572,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     recaps what shifted. Data hygiene: nextWorldTide now ignores the factions JSON's
 //     descriptive pseudo-ids (e.g. "anyone_paying") so the tide map only holds real
 //     factions. Test: ota849LivingWorld pins the pure helpers.
-export const OTA_BUILD_ID = '2026-07-16-849-living-world';
+// ── OTA-850 (FACTION PATROLS & BOUNTIES — bounties that route you into harm's way) ─
+// The spatial half of the living world. A faction you FAVOR (standing +10) will pay
+// you to thin its rivals — and the contract names WHERE: the rival's own outpost.
+//   • BOUNTY OFFER — surfaced in the WORLD view (pickBounty): the favored faction's
+//     most-ascendant rival is the quarry; bounty size + pay ESCALATE with the quarry's
+//     tide (bountyTerms). ACCEPT sets your course straight to the quarry's outpost.
+//   • ROUTE INTO HARM'S WAY — acceptBounty stores player.activeBounty and calls
+//     setTravelCourse(targetLocationId), so the reward sits inside patrolled ground.
+//   • PATROL INTERCEPTION — within 2 tiles of a hostile / bounty-target outpost while
+//     travelling toward it, that faction's patrol intercepts (maybeInterceptPatrol,
+//     hooked into continueTravel's per-step distance; peaceful-moment + cooldown gated).
+//     Reuses the OTA-849 faction-party builder (now shared as injectFactionParty).
+//   • PROGRESS + TURN-IN — each kill of a targetFactionId combatant ticks the bounty;
+//     the last one pays TC + giver standing and clears it (in the kill handler).
+// Enemies carry factionId (OTA-849), so patrol/raid kills also move standing. Test:
+// ota850FactionBounty pins the pure offer/terms/kill-counts helpers.
+export const OTA_BUILD_ID = '2026-07-16-850-faction-bounties';

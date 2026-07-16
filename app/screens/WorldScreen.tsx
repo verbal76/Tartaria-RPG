@@ -11,6 +11,9 @@ import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
 import type { Faction } from '../engine/types';
 import { tideLabel } from '../engine/worldPulse';
+import { pickBounty } from '../engine/factionBounty';
+import { FACTION_STARTING_LOCATION } from '../engine/character';
+import { getLocationById } from '../engine/encounter';
 
 export function WorldScreen() {
   const player = useGameStore((s) => s.player);
@@ -21,6 +24,18 @@ export function WorldScreen() {
   const tides = worldMemory?.factionTides ?? {};
   const rumors = [...(worldMemory?.worldRumors ?? [])].reverse(); // newest first
   const standingOf = (id: string) => player?.factionStanding.find((r) => r.factionId === id)?.standing ?? 0;
+
+  // OTA-850 — active bounty, or an offer to accept (routes the player to the quarry's outpost).
+  const activeBounty = player?.activeBounty;
+  const offer = !activeBounty && player
+    ? pickBounty(
+        factions,
+        player.factionStanding,
+        (fid) => FACTION_STARTING_LOCATION[fid],
+        (loc) => getLocationById(loc).name ?? loc,
+        tides,
+      )
+    : null;
 
   // Sort factions by momentum (most ascendant first), then name.
   const rows = [...factions].sort((a, b) => {
@@ -43,6 +58,41 @@ export function WorldScreen() {
           The waste does not wait for you. Factions gain and lose ground on their own — while you
           play and while you are away. Here is where the power stands.
         </Text>
+
+        {/* ── FACTION BOUNTY ────────────────────────────────────── */}
+        <Text style={styles.sectionLabel}>FACTION BOUNTY</Text>
+        <View style={styles.card}>
+          {activeBounty ? (
+            <>
+              <Text style={styles.bountyHead}>{activeBounty.giverName} — contract in progress</Text>
+              <Text style={styles.bountyBody}>
+                Hunt {activeBounty.targetName} near {activeBounty.targetLocationName}.
+              </Text>
+              <Text style={styles.bountyProgress}>
+                {activeBounty.progress}/{activeBounty.count} put down · reward {activeBounty.rewardTc} TC
+              </Text>
+              <Text style={styles.bountyFoot}>↳ Their patrols work the ground near the outpost. Watch the road in.</Text>
+            </>
+          ) : offer ? (
+            <>
+              <Text style={styles.bountyHead}>{offer.giverName} have work for you</Text>
+              <Text style={styles.bountyBody}>
+                Put down {offer.count} of the {offer.targetName} at {offer.targetLocationName}. Pays {offer.rewardTc} TC
+                and {offer.giverName} standing.
+              </Text>
+              <Text style={styles.bountyFoot}>↳ Accepting sets your course to {offer.targetLocationName} — patrolled ground.</Text>
+              <TouchableOpacity
+                style={styles.bountyBtn}
+                activeOpacity={0.8}
+                onPress={() => { useGameStore.getState().acceptBounty(offer); setScreen('exploration'); }}
+              >
+                <Text style={styles.bountyBtnText}>ACCEPT & SET COURSE ›</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <Text style={styles.empty}>No bounties on offer. Earn a faction's favor (standing +10) and its enemies become your work.</Text>
+          )}
+        </View>
 
         {/* ── BALANCE OF POWER ──────────────────────────────────── */}
         <Text style={styles.sectionLabel}>BALANCE OF POWER</Text>
@@ -138,4 +188,11 @@ const styles = StyleSheet.create({
   rumorGlyph: { fontSize: 12, width: 18, textAlign: 'center' },
   rumorText: { color: '#cdbf99', fontSize: 12, lineHeight: 17, flex: 1 },
   empty: { color: '#7a705c', fontSize: 12, fontStyle: 'italic' },
+  // OTA-850 — bounty card.
+  bountyHead: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', letterSpacing: 0.3, marginBottom: 3 },
+  bountyBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
+  bountyProgress: { color: '#9ec96a', fontSize: 12, fontWeight: '700', marginTop: 4 },
+  bountyFoot: { color: '#c98a6a', fontSize: 10, fontStyle: 'italic', marginTop: 6, lineHeight: 14 },
+  bountyBtn: { marginTop: 10, backgroundColor: '#c9a86a', borderRadius: 3, paddingVertical: 9, alignItems: 'center' },
+  bountyBtnText: { color: '#13110f', fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
 });
