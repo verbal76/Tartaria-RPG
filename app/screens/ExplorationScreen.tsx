@@ -143,6 +143,9 @@ export function ExplorationScreen() {
     && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
+  // OTA-841 [did-you-mean] — runnable command suggestions from the last low-confidence
+  // parse, rendered as a tappable chip row above the input.
+  const parseSuggestions = useGameStore((s) => s.parseSuggestions);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const pendingWhisperComplete = useGameStore((s) => s.pendingWhisperComplete);
   const dismissWhisperComplete = useGameStore((s) => s.dismissWhisperComplete);
@@ -937,6 +940,25 @@ export function ExplorationScreen() {
             onCancel={cancelPendingRolls}
           />
         ) : (
+          <>
+          {/* OTA-841 [did-you-mean] — after a low-confidence / unresolved parse, the
+              engine stashes the runnable command suggestions; show them as a tappable
+              chip row so the player can pick one with a tap instead of retyping. */}
+          {parseSuggestions.length > 0 && !inCombat && (
+            <View style={styles.didYouMeanRow}>
+              <Text style={styles.didYouMeanLabel}>Did you mean…</Text>
+              {parseSuggestions.map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={styles.didYouMeanChip}
+                  activeOpacity={0.7}
+                  onPress={() => submit(s)}
+                >
+                  <Text style={styles.didYouMeanChipText}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
           <InputBox
             onSubmit={(text) => {
               // 2026-05-25 [POLISH-4] — warn before leaving a vendor.
@@ -1312,6 +1334,7 @@ export function ExplorationScreen() {
               else st.stopTravel();
             }}
           />
+          </>
         )}
         {/* v2.4.1 (OTA 048) — bottom menu row removed. Gear icon
             moved to the top-right corner of the right column
@@ -1913,6 +1936,11 @@ export function ExplorationScreen() {
 }
 
 const styles = StyleSheet.create({
+  // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.
+  didYouMeanRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingBottom: 4 },
+  didYouMeanLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
+  didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
+  didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
   container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
   // minHeight (not fixed height) — characters with multiple active

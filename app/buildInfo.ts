@@ -17587,4 +17587,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // unmapped reasons) does NOT apply here — this engine has no core-guardian / core-gate
 // block at all (no coreGuardians), so that hunk was dropped on merge. Test:
 // ota840NeverFailSilently.
-export const OTA_BUILD_ID = '2026-07-16-1121-never-fail-silently';
+// ── OTA-1122 (Tier-2 QoL #2: "did you mean…" chip row — engine port of HAL-841) ─
+// A low-confidence / unresolved parse already logged a "Try: …" text hint; now the
+// same runnable commands are stashed on the store (parseSuggestions, set on both
+// soft-refusal paths, cleared at the start of the next action) and ExplorationScreen
+// renders them as a TAPPABLE "Did you mean…" chip row above the input — one tap
+// re-submits. Applied cleanly (the parse/soft-refusal plumbing is shared engine).
+// Test: ota841DidYouMean.
+export const OTA_BUILD_ID = '2026-07-16-1122-did-you-mean-chips';
