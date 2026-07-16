@@ -17703,4 +17703,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outposts. factionTides is now earned war POWER. New GRUDGES export const OTA_BUILD_ID = '2026-07-16-1133-surface-world-lore'; ALLIANCES board section;
 // world drama routes only to the WORLD board, never the play feed. Offline load simulates
 // the gap. Test: ota853FactionRelations.
-export const OTA_BUILD_ID = '2026-07-16-1134-emergent-grudges';
+// ── OTA-1135 (TALK A PATROL DOWN — persuade / intimidate a rival faction's patrol) ─
+// Port of HAL OTA-854. A hostile faction patrol can be ended with words: PERSUADE ->
+// they break off, no ill will, +1 standing with their faction (PARLEY_CALM_REP);
+// INTIMIDATE -> they break and RUN, dropping their loot + a little TC. Wired into the
+// combat parley (runParleyOutcome) for foes carrying a factionId. Big vocabulary
+// expansion (detectParleyChoice + parser diplomacy verbs): 'shout at them to go away',
+// 'scare them off', 'or else' -> intimidate; 'reason with them', 'talk them down' ->
+// persuade. Test: ota854TalkDownVocab.
+export const OTA_BUILD_ID = '2026-07-16-1135-talk-down-patrols';
