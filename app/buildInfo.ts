@@ -16092,4 +16092,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // expansion (detectParleyChoice + parser diplomacy verbs): 'shout at them to go away',
 // 'scare them off', 'or else' -> intimidate; 'reason with them', 'talk them down' ->
 // persuade. Test: ota854TalkDownVocab.
-export const OTA_BUILD_ID = '2026-07-16-834-talk-down-patrols';
+// ── OTA-835 (LIVING WORLD fixes — the board actually fills; collapsible standings) ──
+// Port of HAL OTA-855. Fixes a near-empty World board: the sim ticked once per 24 IN-GAME
+// hours (never accrues in a real sitting). WORLD_TICK_HOURS 24->2 + sim sub-steps + a
+// first-tick warm-up burst; patrols SCATTER on spawn (were stacked, never met). Beast
+// maulings stay COMMON (~11%, real herd-thinning pressure) but the feed shows only a
+// bounded, drama-first SAMPLE. Repopulation is PACED (a trickle per cycle) so losses
+// persist. World board standings (power, grudges) are now collapsible, start collapsed,
+// so the war feed gets room. Test: ota844WorldPulse strengthened.
+export const OTA_BUILD_ID = '2026-07-16-835-living-world-fills';
