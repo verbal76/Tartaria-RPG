@@ -24,9 +24,12 @@ describe('race conditional skill bonuses — relic investigate', () => {
     expect(investigateBonus('mud_dweller', false).bonus).toBe(0); // no relic → no bonus
   });
 
-  it("Unknowing Masses Curious Mind gives +2 ONLY on a relic/secret target", () => {
-    expect(investigateBonus('unknowing_mass', true).bonus).toBe(2);
-    expect(investigateBonus('unknowing_mass', true).label).toContain('Curious Mind');
+  it("Unknowing Masses Curious Mind no longer fires as a per-roll investigate bonus (OTA-835)", () => {
+    // OTA-835 — Curious Mind was re-implemented as a persistent +2 INT/+2 WIS that
+    // AWAKENS on first exposure (curiousMindAwakened → effectiveStats), so it no
+    // longer adds a special-case investigate delta here (keeping both would double-
+    // count). The investigate roll now shows only the flat WIS base.
+    expect(investigateBonus('unknowing_mass', true).bonus).toBe(0);
     expect(investigateBonus('unknowing_mass', false).bonus).toBe(0);
   });
 

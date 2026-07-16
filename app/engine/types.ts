@@ -818,6 +818,11 @@ export type StatusEffectKind =
   // player.golem + handleGolemCommand. Removed from the union now
   // that the unreachable handler block was deleted.
   | 'shaped_stone_ward'
+  // OTA-835 — Mud Golem "Elemental Control" DEFENSIVE half: shaped Aetherstone
+  // held as a ward that ABSORBS a fixed pool of incoming damage (the rolled 1d6)
+  // before it reaches HP, then falls away. Distinct from shaped_stone_ward (a
+  // one-round +4 AC to-be-hit bonus); this soaks damage on a hit that lands.
+  | 'stone_ward'
   // 2026-05-24 — stamina-driven combat statuses. tired and exhausted
   // are auto-applied/cleared by tickPlayerStaminaStatuses based on
   // current stamina (no persistence drift). power_attack_pending and
@@ -848,6 +853,9 @@ export interface StatusEffect {
    *  how much. effectiveStats reads these when summing buffs. */
   buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
   buffBonus?: number;
+  /** OTA-835 — remaining damage this ward can still soak (stone_ward). Each hit
+   *  subtracts from it; the ward is dropped when it reaches 0. */
+  absorb?: number;
 }
 
 // v2.4.1 (OTA 033) — Mud Flood Nexus main quest arc.
@@ -1065,6 +1073,16 @@ export interface PlayerCharacter {
    *  last used. A daily ability is ready again when that day < the current
    *  day (Math.floor(hoursElapsed/24)+1). */
   abilityCooldowns?: Record<string, number>;
+  /** OTA-835 — Unknowing Masses "Beginner's Luck": a one-shot reroll token set
+   *  by the daily race ability and burned the next time a difficulty roll FAILS
+   *  (resolveRollStep). A plain flag (not a status) so it survives scene changes
+   *  and never ticks down — the daily cooldown is what gates re-arming it. */
+  luckyRerollReady?: boolean;
+  /** OTA-835 — Unknowing Masses "Curious Mind": flips true the first time the
+   *  character is exposed to Tartaria's secrets (a relic/ancient target or a
+   *  ruin). Once awakened it grants a persistent +2 INT / +2 WIS via
+   *  effectiveStats — the flavor's "after first exposure" stat awakening. */
+  curiousMindAwakened?: boolean;
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
   /** OTA-612 — persistent vendor-theft "heat". Each steal attempt (success or

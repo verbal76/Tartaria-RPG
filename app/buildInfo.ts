@@ -15929,4 +15929,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (2) The Aetheric Torch reveal said "Work it", so the player typed the flavor word
 // ("the resonance") and got refused; it now names the hook's noun ("Work the crystal —
 // investigate it and it will give up something rare").
-export const OTA_BUILD_ID = '2026-07-15-814-race-starter-and-stall-faction-wiring';
+// ── OTA-815 (race trait/ability "make the flavor true" batch — golem port of
+//    HAL-835) ────────────────────────────────────────────────────────────────
+// Five trait re-implementations + the first real race VULNERABILITY:
+//   (1) raceDamageMultiplier may now exceed 1 — the Mud Golem's aetheric weakness
+//       bites (+50% aetheric, ×0.75 else); raceResistLabel reads both directions.
+//   (2) Curious Mind (Unknowing Masses) — persistent +2 INT/+2 WIS that AWAKENS on
+//       first relic/ruin exposure (curiousMindAwakened → effectiveStats); the old
+//       per-roll investigate special-case removed (no double-count).
+//   (3) Elemental Control (Mud Golem) gained its 1d6 defensive ward (elemental_ward
+//       → stone_ward soak, per-encounter, consumed at the damage site).
+//   (4) Beginner's Luck (Unknowing Masses) — real one-shot reroll token
+//       (luckyRerollReady) spent on the next FAILED difficulty roll.
+//   (5) Legacy of Power (Tartarian Giant) — three channels (repair/power-up/surge).
+// Plus Sentinel tireless+ageless and Stormcaller also-halves-electrical.
+export const OTA_BUILD_ID = '2026-07-16-815-race-flavor-wiring';
