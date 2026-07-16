@@ -16008,4 +16008,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 25). handlePlayerDeath records the fallen + adds a beat; a new FALLEN tab in the Lore
 // Codex renders the memorial (newest first), readable between runs from the title screen.
 // Completes the Tier-3 batch (823/824/825). Test: ota845TheFallen.
-export const OTA_BUILD_ID = '2026-07-16-825-the-fallen';
+// ── OTA-826 (audit fix: "Grows from:" stat-training copy accuracy) ────────────
+// The Character sheet prints SKILL_ACTIVITIES[stat] under each core stat as "how
+// it is earned." A line-by-line audit against the live trainStat() call sites
+// found two blocks had drifted from the engine:
+//   • DEX still advertised "Parry / dodge" — parry was RETIRED (dodge gamble
+//     replaced it) — and omitted the trainers the code actually rewards: landing
+//     finesse/ranged hits, dodging, jumping to a resolved target, disengaging
+//     under pressure, and escape skill-checks. Rewritten to match.
+//   • STR advertised "Heavy salvage / breaking", but salvage trains INT, not STR;
+//     dropped it and added the real "Winning a Fight-Back struggle" trainer.
+//   • STE surfaced the stealth-gear passive and the STEALTH skill-check path.
+// INT / WIS / CHA verified accurate, unchanged. Pure display-copy fix — no
+// mechanics change. Test: ota846SkillActivities.
+export const OTA_BUILD_ID = '2026-07-16-826-grows-from-audit';

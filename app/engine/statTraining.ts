@@ -193,13 +193,17 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Punch / kick attacks',
     'Landing melee attacks in combat',
     'Two-handed weapon swings',
+    'Winning a Fight-Back struggle',
     'Climbing (per tier)',
-    'Heavy salvage / breaking',
     'Carrying 20+ items in your pouch (passive, on new ground)',
   ],
   dexterity: [
+    'Landing hits with a finesse / ranged weapon',
+    'Dodging an attack in combat',
     'Climbing (per tier)',
-    'Parry / dodge in combat',
+    'Jumping to reach a resolved target',
+    'Disengaging under pressure',
+    'Escaping a trap / grapple (skill check)',
   ],
   intelligence: [
     'Scrapping items in your pack',
@@ -229,7 +233,9 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
   // race-proportional roll; these grow it from there.
   stealth: [
     'A successful STEALTH approach (the APPROACH "use stealth" toggle)',
+    'A passed STEALTH skill check (hunt / mystery / storyline stage)',
     'Stealing from vendors',
     'Sleight-of-hand / pickpocket takes',
+    'Weathering a hit while cloaked in stealth gear (passive)',
   ],
 };
