@@ -27,11 +27,29 @@ import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import timelineData from '../data/events/timeline.json';
+import enemiesData from '../data/enemies/enemies.json';
+import conceptsData from '../data/lore/concepts.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
 
-type Section = 'races' | 'factions' | 'places' | 'timeline';
+// OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
+// in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
+// concepts bank (the "massive lore document" that lived in the files but was never
+// shown to the player — only fed to the Arbiter's context). Both extend the existing
+// races/factions/places/timeline codex rather than a new screen.
+type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore';
+
+interface CodexEnemy {
+  name: string;
+  type?: string;
+  hp?: number;
+  damage?: string;
+  rarity?: string;
+  traits?: string[];
+  loot?: string[];
+}
+interface LoreConcept { id: string; title: string; answer: string }
 
 export function LoreCodexBody() {
   const [section, setSection] = useState<Section>('races');
@@ -46,6 +64,16 @@ export function LoreCodexBody() {
   const appendLog = useGameStore((s) => s.appendLog);
   // OTA-498 — hidden locations (the Hidden Market) read as "?" here too until visited.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  // OTA-837 — the bestiary reveals an enemy once you've DEFEATED its type (its name is
+  // recorded in worldMemory.defeatedEnemies). Undiscovered foes read as "??? — undiscovered".
+  const defeatedEnemies = useGameStore((s) => s.worldMemory?.defeatedEnemies);
+  const defeatedSet = React.useMemo(
+    () => new Set((defeatedEnemies ?? []).map((n) => n.toLowerCase())),
+    [defeatedEnemies],
+  );
+  const enemyCatalog = enemiesData as CodexEnemy[];
+  const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
+  const concepts = (conceptsData as { concepts: LoreConcept[] }).concepts;
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -74,13 +102,15 @@ export function LoreCodexBody() {
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.tabs}>
-        {(['races', 'factions', 'places', 'timeline'] as Section[]).map((s) => (
+        {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore'] as Section[]).map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
             style={[styles.tab, section === s && styles.tabActive]}
           >
-            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>{s}</Text>
+            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>
+              {s === 'bestiary' ? 'beasts' : s}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -154,6 +184,52 @@ export function LoreCodexBody() {
             <Text style={styles.desc}>{e.summary}</Text>
           </View>
         ))}
+        {/* OTA-837 — BESTIARY. Fills in as you defeat enemy types; an unbeaten foe
+            reads as an "??? — undiscovered" silhouette so the tab shows the shape of
+            what's left to meet, not a spoiler dump. */}
+        {section === 'bestiary' && (
+          <>
+            <Text style={styles.counter}>{beatenCount} of {enemyCatalog.length} catalogued</Text>
+            {enemyCatalog.map((e, idx) => {
+              const known = defeatedSet.has(e.name.toLowerCase());
+              if (!known) {
+                return (
+                  <View key={`${e.name}_${idx}`} style={[styles.entry, styles.entryLocked]}>
+                    <Text style={styles.lockedName}>??? — undiscovered</Text>
+                    <Text style={styles.lockedSub}>Defeat one to record it here.</Text>
+                  </View>
+                );
+              }
+              return (
+                <View key={`${e.name}_${idx}`} style={styles.entry}>
+                  <Text style={styles.name}>{e.name}</Text>
+                  <Text style={styles.subtitle}>{e.type ?? 'Unknown'} • {e.rarity ?? 'Common'}</Text>
+                  <Text style={styles.meta}>COMBAT • HP {e.hp ?? '?'} • Dmg {e.damage ?? '?'}</Text>
+                  {(e.traits ?? []).length > 0 && (
+                    <Text style={styles.meta}>TRAITS • {(e.traits ?? []).join(', ')}</Text>
+                  )}
+                  {(e.loot ?? []).length > 0 && (
+                    <Text style={styles.meta}>DROPS • {(e.loot ?? []).join(', ')}</Text>
+                  )}
+                </View>
+              );
+            })}
+          </>
+        )}
+        {/* OTA-837 — LORE. Surfaces the concepts bank (172 entries) that was already
+            in the files feeding the Arbiter's context but never shown to the player.
+            Reference material — always readable, not discovery-gated. */}
+        {section === 'lore' && (
+          <>
+            <Text style={styles.counter}>{concepts.length} entries</Text>
+            {concepts.map((c) => (
+              <View key={c.id} style={styles.entry}>
+                <Text style={styles.name}>{c.title}</Text>
+                <Text style={styles.desc}>{c.answer}</Text>
+              </View>
+            ))}
+          </>
+        )}
       </ScrollView>
 
       <Modal
@@ -226,6 +302,11 @@ const styles = StyleSheet.create({
   tabTextActive: { color: '#e6d8b3' },
   scroll: { flex: 1 },
   entry: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
+  // OTA-837 — bestiary/lore chrome.
+  counter: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
+  entryLocked: { opacity: 0.5, borderStyle: 'dashed' },
+  lockedName: { color: '#7a705c', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  lockedSub: { color: '#5a5245', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   subtitle: { color: '#c9a86a', fontSize: 11, marginBottom: 4 },
   desc: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginTop: 2 },

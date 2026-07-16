@@ -15950,4 +15950,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // effectiveACBreakdown() returns the same total the combat resolver uses,
 // decomposed into labelled sources; the DEFENSE card shows total + "(base N)" +
 // source chips. Test: ota836ACBreakdown.
-export const OTA_BUILD_ID = '2026-07-16-816-tap-to-explain-ac';
+// ── OTA-817 (Tier-1 QoL #2: discovery codex / bestiary — golem port of HAL-837) ─
+// LoreCodexBody gained a BESTIARY tab (fills in as you defeat enemy types, keyed off
+// worldMemory.defeatedEnemies; "??? — undiscovered" until beaten, then type/HP/dmg/
+// traits/drops + an "X of N catalogued" counter) and a LORE tab surfacing the 172-
+// entry concepts bank (was in the files feeding the Arbiter, never shown). Test:
+// ota837CodexData.
+export const OTA_BUILD_ID = '2026-07-16-817-discovery-codex';
