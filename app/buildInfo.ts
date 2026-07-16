@@ -15964,4 +15964,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // threshold (its "strike to learn" promise, made real), and the bestiary shows
 // "WEAK TO / RESISTS" per fought enemy. Test: ota838EnemyIntel. Completes the three
 // Tier-1 "make the depth visible" OTAs (816/817/818).
-export const OTA_BUILD_ID = '2026-07-16-818-observed-weakness-tags';
+// ── OTA-819 (lore-accuracy pass — golem port of HAL-839's data fixes) ──────────
+// Reconciled the player-facing codex against the code (game wins on a conflict):
+// races.json — Sentinel "Immunity to Time" drops the removed hunger/forage promise
+// (real: half stamina + weather-corruption immunity + gem luck); Mud Golem states its
+// aetheric vulnerability (+50%) + x0.75 non-aetheric; "Elemental Control" = strike +
+// 1d6 ward; Mud Dweller drops the non-existent "Mud-power" type. concepts.json —
+// dodge entries describe the AC-bypass gamble; stealth actions use STEALTH not DEX;
+// stealing DC is vendor-set/escalating; added the missing `cold` entry. NOTE: HAL-839's
+// HAL-ONLY enemy-intel backfill was intentionally NOT ported here. Test: ota839LoreAccuracy.
+export const OTA_BUILD_ID = '2026-07-16-819-lore-accuracy';
