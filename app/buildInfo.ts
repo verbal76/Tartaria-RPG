@@ -15973,4 +15973,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dodge entries describe the AC-bypass gamble; stealth actions use STEALTH not DEX;
 // stealing DC is vendor-set/escalating; added the missing `cold` entry. NOTE: HAL-839's
 // HAL-ONLY enemy-intel backfill was intentionally NOT ported here. Test: ota839LoreAccuracy.
-export const OTA_BUILD_ID = '2026-07-16-819-lore-accuracy';
+// ── OTA-820 (Tier-2 QoL #1: never-fail-silently sweep — golem port of HAL-840) ──
+// Fixed the short list of genuine silent no-ops: unequip an empty slot; typed equip
+// (confirms now); buy an unstocked item; buy/sell with no vendor; summon Core Guardian
+// unmapped reasons; SALVAGE ALL mixed-batch unmatched nouns. Ships to all three lines.
+// Test: ota840NeverFailSilently.
+export const OTA_BUILD_ID = '2026-07-16-820-never-fail-silently';
