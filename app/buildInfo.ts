@@ -17625,4 +17625,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Codex renders the memorial (added to engine's SECTIONS; the HAL LORE/concepts tab
 // stays omitted here, and the memorial styles use engine's teal palette). Completes the
 // Tier-3 batch (1124/1125/1126). Test: ota845TheFallen.
-export const OTA_BUILD_ID = '2026-07-16-1126-the-fallen';
+// ── OTA-1127 (audit fix: "Grows from:" stat-training copy accuracy) ───────────
+// The Character sheet prints SKILL_ACTIVITIES[stat] under each core stat as "how
+// it is earned." A line-by-line audit against the live trainStat() call sites
+// found two blocks had drifted from the engine:
+//   • DEX still advertised "Parry / dodge" — parry was RETIRED (dodge gamble
+//     replaced it) — and omitted the trainers the code actually rewards: landing
+//     finesse/ranged hits, dodging, jumping to a resolved target, disengaging
+//     under pressure, and escape skill-checks. Rewritten to match.
+//   • STR advertised "Heavy salvage / breaking", but salvage trains INT, not STR;
+//     dropped it and added the real "Winning a Fight-Back struggle" trainer.
+//   • STE surfaced the stealth-gear passive and the STEALTH skill-check path.
+// INT / WIS / CHA verified accurate, unchanged. Pure display-copy fix — no
+// mechanics change. Test: ota846SkillActivities.
+export const OTA_BUILD_ID = '2026-07-16-1127-grows-from-audit';
