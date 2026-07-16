@@ -17650,4 +17650,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // with a FINESSE/thrown weapon (stat 'dexterity') doubles the damage dice; a
 // HEAVY weapon keeps the +5 to-hit but no doubling. STE 'Grows from:' copy names
 // the new buttons. Test: ota847Stealth.
-export const OTA_BUILD_ID = '2026-07-16-1128-stealth-system';
+// ── OTA-1129 (Character screen — readability: expandable stats, AC breakdown, title provenance) ─
+// Three tap-to-expand upgrades to the Character sheet (engine teal palette on the
+// new rows; custom/importable titles also get provenance):
+//   • CORE STATS — each stat row is tap-to-expand; collapsed = number + progress
+//     bar, expanded = source breakdown + the "Grows from" trainers as a one-per-
+//     line bulleted list (retires the cramped ellipsized run-on).
+//   • ARMOR CLASS — the AC row is tappable, expanding a readable line-per-source
+//     breakdown (base + each armor piece / stance / title / racial → total).
+//   • TITLES — each title is singly tappable: shows HOW it was earned (the
+//     requirement) and, for earned titles, WHEN — a new player.titleLog captures
+//     the in-game hour + real timestamp at award (awardNewTitles, built-in AND
+//     custom titles), rendered "Day N (period) · YYYY-MM-DD" by the tested
+//     describeTitleEarned helper; pre-tracking titles get an honest fallback.
+// Test: ota848TitleProvenance.
+export const OTA_BUILD_ID = '2026-07-16-1129-character-readability';

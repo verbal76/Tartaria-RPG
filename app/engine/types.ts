@@ -1092,6 +1092,13 @@ export interface PlayerCharacter {
    *  the titles' requirement strings (e.g. "Discover three Tartarian
    *  relics") to runtime trackers. arb45 wires the Tier-A/B titles. */
   earnedTitles?: string[];
+  /** OTA-848 — provenance for earned titles: WHEN each was awarded, so the
+   *  Character screen can show "Earned: Day N" on tap. `atHours` is in-game
+   *  time (hoursElapsed at award); `atMs` is the real wall-clock stamp. Titles
+   *  earned before this shipped have no entry — the UI shows an honest "before
+   *  this was recorded" fallback rather than a fake date. Parallel to
+   *  earnedTitles (which stays the source of truth for WHICH are earned). */
+  titleLog?: Array<{ id: string; atHours: number; atMs: number }>;
   /** arb45 — running counters the title-earning engine reads to award
    *  Arbiter titles (relics found, sentinels defeated, storms survived,
    *  etc.). See engine/titles.ts. Absent on legacy saves → treated as all

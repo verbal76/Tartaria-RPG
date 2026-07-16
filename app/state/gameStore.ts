@@ -960,7 +960,19 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   const freshCustom = newlyEarnedCustomTitles(player);
   if (fresh.length === 0 && freshCustom.length === 0) return;
   const freshCustomIds = freshCustom.map((t) => t.id);
-  setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh, ...freshCustomIds] } } : s));
+  // OTA-848 — stamp each freshly-earned title (built-in AND custom) with WHEN it
+  // landed (in-game hour + real time) so the Character screen can show its
+  // earn-date on tap.
+  const atHours = player.hoursElapsed ?? 0;
+  const atMs = Date.now();
+  const freshLog = [...fresh, ...freshCustomIds].map((id) => ({ id, atHours, atMs }));
+  setStore((s) => (s.player
+    ? { player: {
+        ...s.player,
+        earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh, ...freshCustomIds],
+        titleLog: [...(s.player.titleLog ?? []), ...freshLog],
+      } }
+    : s));
   for (const t of freshCustom) {
     const tail = t.description && t.description.trim() ? ` ${t.description.trim()}` : '';
     getStore().appendLog(
