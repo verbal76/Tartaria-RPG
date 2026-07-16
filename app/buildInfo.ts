@@ -15984,4 +15984,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // soft-refusal paths, cleared at the start of the next action) and ExplorationScreen
 // renders them as a TAPPABLE "Did you mean…" chip row above the input — one tap
 // re-submits. Test: ota841DidYouMean.
-export const OTA_BUILD_ID = '2026-07-16-821-did-you-mean-chips';
+// ── OTA-822 (Tier-2 QoL #3: combat-log breakdown — golem port of HAL-842) ──────
+// The incoming-hit line appended each mitigation as its own parenthetical (a wall of
+// "(…)(…)(…)"). New damageModClause() collects them into one terse comma-separated
+// bracket in apply-order: "…damage [armor −40%, title ½, shield ½, ward soaks 3]." A
+// race vulnerability lists as "+N%". Pure log-format change. Completes the Tier-2 QoL
+// batch (820/821/822). Test: ota842CombatLogMods.
+export const OTA_BUILD_ID = '2026-07-16-822-combat-log-breakdown';

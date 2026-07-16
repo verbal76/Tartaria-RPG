@@ -26228,15 +26228,25 @@ function applyEnemyCounter(
       }
       const newHp = Math.max(0, nextPlayer.hp - dmg);
       killed = newHp <= 0;
-      const titleTag = titleAethericHalved
-        ? ` (your title turns aside half the ${enemyDamageType})`
-        : titleHazardShaved > 0
-          ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
-          : '';
-      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag + wardTag;
+      // OTA-842 [combat-log restructure] — the incoming hit's modifiers used to be
+      // appended as run-on parentheticals ("…damage (armor turns 40% of the cold)(your
+      // title turns aside half the cold)(Aetherstone Vulnerability — +50% dmg)(stone
+      // ward soaks 3)"). When two or more fired it read as a wall of parens. Collect
+      // them into ONE terse, comma-separated clause instead: "…damage [armor −40%,
+      // title ½, ward soaks 3]." Order = armor → title → race → shield → ward, the
+      // order they applied. (A race VULNERABILITY reads "+N%" here — the bracket lists
+      // every modifier, not only reductions.)
+      const modClause = damageModClause({
+        armorFraction: resisted.blocked ? resisted.fraction : 0,
+        titleHalved: titleAethericHalved,
+        titleShaved: titleHazardShaved,
+        raceTag: raceResistTag,
+        shield: !!shieldTag,
+        wardTag,
+      });
       const msg = killed
-        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
-        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You fall.`
+        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}. You have ${newHp} HP remaining.`;
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {
@@ -26321,6 +26331,32 @@ function applyEnemyCounter(
 // bestiary can reveal what you've learned by fighting (the panel's "strike to learn"
 // promise, made real + persistent). Deduped per lowercased enemy name; a type lives
 // in weak OR resist, and a fresh contradicting observation MOVES it (per-spawn
+// OTA-842 [combat-log restructure] — build the incoming-hit modifier clause. The old
+// line appended each mitigation as its own parenthetical, so a hit that armor + title +
+// race + ward all touched read as a wall of "(…)(…)(…)(…)". This collects them into one
+// terse comma-separated bracket: " [armor −40%, title ½, ward soaks 3]". Order mirrors
+// the order they applied. Race VULNERABILITY appears as "+N%" — the bracket lists every
+// modifier, not only reductions. Empty modifiers → empty clause (no bracket). Exported
+// for the OTA-842 format test.
+export function damageModClause(opts: {
+  armorFraction?: number; // >0 when armor turned part of the hit
+  titleHalved?: boolean;  // a title halved this type
+  titleShaved?: number;   // Etherbound Survivor flat shave
+  raceTag?: string;       // raceResistLabel output — raw " (…)" or ''
+  shield?: boolean;       // Defensive Protocols shield active
+  wardTag?: string;       // stone-ward soak — raw " (…)" or ''
+}): string {
+  const strip = (t: string) => t.replace(/^\s*\(/, '').replace(/\)\s*$/, '').trim();
+  const mods: string[] = [];
+  if (opts.armorFraction && opts.armorFraction > 0) mods.push(`armor −${Math.round(opts.armorFraction * 100)}%`);
+  if (opts.titleHalved) mods.push('title ½');
+  else if (opts.titleShaved && opts.titleShaved > 0) mods.push(`Etherbound −${opts.titleShaved}`);
+  if (opts.raceTag) mods.push(strip(opts.raceTag));
+  if (opts.shield) mods.push('shield ½');
+  if (opts.wardTag) mods.push(strip(opts.wardTag));
+  return mods.length ? ` [${mods.join(', ')}]` : '';
+}
+
 // randomization can flip a type, so the latest hit is the truth). No-op for 'normal'.
 // Exported for unit testing the dedup/move logic (OTA-838).
 export function recordEnemyIntel(
