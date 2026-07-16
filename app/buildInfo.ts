@@ -17580,4 +17580,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries NO built-in damage-type entries (those are content-pack-driven here), so the
 // HAL `cold` concept was intentionally NOT added. HAL-839's HAL-only intel backfill is
 // not on this line either. Test: ota839LoreAccuracy (cold assertion made conditional).
-export const OTA_BUILD_ID = '2026-07-16-1120-lore-accuracy';
+// ── OTA-1121 (Tier-2 QoL #1: never-fail-silently sweep — engine port of HAL-840) ─
+// Fixed the residual silent no-ops: unequip an empty slot; typed equip (confirms
+// now); buy an unstocked item; buy/sell with no vendor; SALVAGE ALL mixed-batch
+// unmatched nouns. engine_Dev divergence: HAL's 6th fix (summon Core Guardian's
+// unmapped reasons) does NOT apply here — this engine has no core-guardian / core-gate
+// block at all (no coreGuardians), so that hunk was dropped on merge. Test:
+// ota840NeverFailSilently.
+export const OTA_BUILD_ID = '2026-07-16-1121-never-fail-silently';

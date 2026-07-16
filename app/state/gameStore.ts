@@ -12130,16 +12130,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const onlyFeet = /boot|shoe|sandal|sabaton/.test(target);
           const onlyAmulet = /amulet|locket|necklace|diadem|charm/.test(target);
           const onlyRing = /ring|band|seal/.test(target);
-          if (onlyHead) get().unequipSlot('head');
-          else if (onlyChest) get().unequipSlot('chest');
-          else if (onlyLegs) get().unequipSlot('legs');
-          else if (onlyFeet) get().unequipSlot('feet');
-          else if (onlyAmulet) get().unequipSlot('amulet');
-          else if (onlyRing) get().unequipSlot('ring');
-          else {
-            // No specific target — clear hands.
-            get().unequipSlot('main');
-            get().unequipSlot('off');
+          // OTA-840 [never-fail-silently] — unequip used to no-op in SILENCE when the
+          // targeted slot was already empty (unequipSlot narrates nothing). Check the
+          // slot first: strip it if occupied, else tell the player there's nothing there.
+          const eqNow = get().player?.equipped ?? {};
+          const targetSlot: keyof PlayerEquipped | null =
+            onlyHead ? 'head' : onlyChest ? 'chest' : onlyLegs ? 'legs'
+            : onlyFeet ? 'feet' : onlyAmulet ? 'amulet' : onlyRing ? 'ring' : null;
+          if (targetSlot) {
+            if (eqNow[targetSlot]) get().unequipSlot(targetSlot);
+            else get().appendLog('arbiter', `The Arbiter glances at you. "Nothing in that slot to take off."`);
+          } else {
+            // No specific target — clear hands (both, if held).
+            const hadMain = !!eqNow.main;
+            const hadOff = !!eqNow.off;
+            if (hadMain) get().unequipSlot('main');
+            if (hadOff) get().unequipSlot('off');
+            if (!hadMain && !hadOff) {
+              get().appendLog('arbiter', `The Arbiter looks at your empty hands. "Nothing to put away."`);
+            }
           }
           break;
         }
@@ -12169,6 +12178,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? 'off'
           : validSlots[0]!;
         get().equipItem(inInventory.name, slot);
+        // OTA-840 [never-fail-silently] — a TYPED equip printed nothing to the feed
+        // (equipItem stays silent so UI taps don't bury the scene). A typed command
+        // deserves acknowledgement, so confirm it here with a slot-aware verb.
+        get().appendLog('world', `You ${slot === 'main' || slot === 'off' ? 'ready' : 'don'} the ${inInventory.name}.`);
         break;
       }
       case 'repair': {
@@ -16950,7 +16963,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
-    if (!scene?.vendor || !player) return;
+    if (!player) return;
+    // OTA-840 [never-fail-silently] — a buy fired with no vendor present (queued action,
+    // stale/dismissed vendor screen) used to no-op in silence. Say so.
+    if (!scene?.vendor) { get().appendLog('system', "There's no one here to trade with."); return; }
     // arb166 — no trading mid-fight (defense-in-depth behind the hidden vendor
     // banner: the 'buy from X' text command still parses during combat).
     if (scene.enemies.length > 0) {
@@ -16994,7 +17010,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const offer = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === itemName.toLowerCase());
-    if (!offer) return;
+    // OTA-840 [never-fail-silently] — asking for an item the vendor doesn't stock
+    // (stale row, sold-out, an LLM-rephrased buy) was the one silent exit here.
+    if (!offer) { get().appendLog('system', `${scene.vendor.name} doesn't carry any ${itemName}.`); return; }
     // OTA 039 — corruption-tier price markup. Corrupted players pay
     // +15%, Hollowed +30%; vendors notice the aether on you.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -17175,7 +17193,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
-    if (!scene?.vendor || !player) return;
+    if (!player) return;
+    // OTA-840 [never-fail-silently] — a sell with no vendor present used to no-op silently.
+    if (!scene?.vendor) { get().appendLog('system', "There's no one here to trade with."); return; }
     // arb166 — no trading mid-fight (see buyFromVendor).
     if (scene.enemies.length > 0) {
       get().appendLog('system', "Not while you're in a fight — deal with the threat first.");
@@ -21530,6 +21550,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // tell the player. If everything was unmatched, surface that
     // explicitly + persist a breadcrumb naming the nouns so we can
     // add the missing pools without a repro.
+    // OTA-840 [never-fail-silently] — on a MIXED batch (some nouns broke down, some
+    // matched no pool) the unmatched ones used to leave only a 'debug' breadcrumb —
+    // the player saw the successful loot but never learned the rest yielded nothing.
+    // Surface them whenever there WAS other output; the all-empty case below still
+    // owns the nothing-at-all batch.
+    const hadOtherOutput =
+      narrationLines.length > 0 || skippedAlready.length > 0 || itemTotals.size > 0 || tcGained > 0;
+    if (unmatchedNouns.length > 0 && hadOtherOutput) {
+      get().appendLog(
+        'world',
+        `You look the ${unmatchedNouns.slice(0, 3).join(', ')} over and find nothing your tools can break down here.`,
+      );
+    }
     if (
       narrationLines.length === 0
       && skippedAlready.length === 0
