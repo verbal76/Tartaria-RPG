@@ -40,6 +40,7 @@ import { CraftingScreen } from './app/screens/CraftingScreen';
 import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
+import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
 import { DiscoveryRevealModal } from './app/components/DiscoveryRevealModal';
@@ -821,6 +822,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'actions' && <ActionReferenceScreen />}
           {screen === 'contracts' && <ContractsScreen />}
           {screen === 'developer' && <DeveloperSettingsScreen />}
+          {screen === 'world' && <WorldScreen />}
         </View>
       </View>
       {/* OTA-471 — opening splash overlay at the ROOT (outside the safe-area

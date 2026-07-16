@@ -346,6 +346,10 @@ export function CharacterScreen() {
             with a faction surfaces more of their contracts (hunts, mysteries, storylines) when
             you meet their vendors.
           </Text>
+          {/* OTA-849 — jump to the WORLD view: the full balance of power + rumours. */}
+          <TouchableOpacity style={styles.worldLink} activeOpacity={0.7} onPress={() => setScreen('world')}>
+            <Text style={styles.worldLinkText}>◆ THE WORLD — balance of power & rumours ›</Text>
+          </TouchableOpacity>
         </View>
         )}
 
@@ -920,6 +924,9 @@ const styles = StyleSheet.create({
   titleDetail: { marginTop: 6, marginLeft: 14, borderLeftColor: '#2b3a3e', borderLeftWidth: 2, paddingLeft: 8 },
   titleDetailLine: { color: '#a8bcc2', fontSize: 11, lineHeight: 16, marginBottom: 2 },
   titleDetailKey: { color: '#6ab0c9', fontWeight: '700' },
+  // OTA-849 — WORLD view link on the faction section (engine teal).
+  worldLink: { marginTop: 8, borderTopColor: '#2b3a3e', borderTopWidth: 1, paddingTop: 8, alignItems: 'center' },
+  worldLinkText: { color: '#6ab0c9', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   // OTA-843 — Chronicle section (engine teal palette).
   chronicleTitle: { color: '#d6e4e8', fontSize: 15, fontWeight: '700', letterSpacing: 0.5 },
   chronicleHeadline: { color: '#6ab0c9', fontSize: 12, marginTop: 2, marginBottom: 8, letterSpacing: 0.5 },

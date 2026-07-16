@@ -17664,4 +17664,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     custom titles), rendered "Day N (period) · YYYY-MM-DD" by the tested
 //     describeTitleEarned helper; pre-tracking titles get an honest fallback.
 // Test: ota848TitleProvenance.
-export const OTA_BUILD_ID = '2026-07-16-1129-character-readability';
+// ── OTA-1130 (LIVING WORLD — tides get teeth + World view + raids + kill-standing + offline) ─
+// Makes OTA-844's World Pulse live instead of cosmetic (engine line: WorldScreen uses
+// getFactions() + teal palette). New WORLD view (from the Character sheet's faction
+// section) shows every faction's momentum meter + your standing + the rumour feed
+// (fixes tide invisibility). Vendor prices move with the vendor's faction tide
+// (tideVendorPriceMult, ±20%). Rival factions RAID a player who's taken a side — the
+// most-ascendant eligible rival drops a war party into a peaceful outdoor scene
+// (maybeSpawnRaid; cooldown-gated, avoidable, party size ESCALATES with tide). Killing
+// a faction combatant (Enemy.factionId) lowers standing with them, raises it with their
+// strongest rival. On load, real time offline advances bounded world pulses + Arbiter
+// recap. nextWorldTide ignores descriptive pseudo-ids. Test: ota849LivingWorld.
+export const OTA_BUILD_ID = '2026-07-16-1130-living-world';

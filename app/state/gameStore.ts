@@ -2227,6 +2227,81 @@ function worldTideCheck(
   get().appendLog('world', `🗞 ${result.rumor}`);
 }
 
+// OTA-849 [living world] — RIVAL RAIDS. When the player has taken a side (positive
+// standing with a faction), that faction's rivals come for them. Periodically — and
+// only in a peaceful outdoor moment, never mid-fight or when the player is already
+// hurt — a war party of the most ASCENDANT eligible rival drops in. The party
+// ESCALATES with the raider's World-Pulse tide (raidPartySize), so a faction on the
+// rise fields a bigger, deadlier group: the raids grow with the game. The Arbiter
+// gives a terse warning as they arrive. Killing raiders shifts standing (see the
+// kill-handler). Deliberately avoidable: the player can still flee.
+const RAID_MIN_HOURS = 20;      // min in-game hours between raids
+const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
+function maybeSpawnRaid(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return;
+  // Peaceful outdoor moment only: no active fight, no vendor, not inside a hub
+  // building, and not while the player is already bloodied (no kicking them down).
+  if ((scene.enemies?.length ?? 0) > 0) return;
+  if (scene.vendor) return;
+  if (player.hubRoomId) return;
+  if (player.hpMax > 0 && player.hp / player.hpMax < 0.5) return;
+  const hour = player.hoursElapsed ?? 0;
+  const last = s.worldMemory.lastRaidHour;
+  if (last !== undefined && hour - last < RAID_MIN_HOURS) return;
+  if (Math.random() > RAID_TRIGGER_CHANCE) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { pickRaid } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+  const plan = pickRaid(factions, player.factionStanding, s.worldMemory.factionTides ?? {});
+  if (!plan) return;
+  const base = rollEncounter(scene.location).filter((e) => !e.boss);
+  if (base.length === 0) return;
+  const party: Enemy[] = [];
+  for (let i = 0; i < plan.partySize; i++) {
+    const tmpl = base[i % base.length]!;
+    party.push({
+      ...tmpl,
+      name: plan.partySize > 1 ? `${plan.raiderName} Raider ${i + 1}` : `${plan.raiderName} Raider`,
+      factionId: plan.raiderId,
+      aliases: ['raider', 'soldier', 'raiders', plan.raiderName.toLowerCase()],
+    });
+  }
+  const tide = Math.max(0, s.worldMemory.factionTides?.[plan.raiderId] ?? 0);
+  const power = enemyScalePower(
+    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
+    player.hpMax,
+  ) + tide; // escalation: an ascendant raider hits harder
+  const scaled = scaleEncounterForContext(party, scene.location.danger + Math.floor(tide / 2), power);
+  const enemyHps = scaled.map((e) => e.hp);
+  set((st) => (st.currentScene ? {
+    currentScene: {
+      ...st.currentScene,
+      enemies: scaled,
+      enemyHps,
+      activeEnemyIdx: 0,
+      range: 'mid',
+      enemyAmbushUsed: scaled.map(() => false),
+      stealthOpenerUsed: false,
+    },
+    worldMemory: { ...st.worldMemory, lastRaidHour: hour },
+  } : st));
+  get().appendLog(
+    'world',
+    `A ${plan.raiderName} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `"The ${plan.raiderName} do not forgive a friend of the ${plan.provokedAllyName}," the Arbiter murmurs. "Stand, or run — but decide now."`,
+  );
+}
+
 // Milestone thresholds. Hit one of these counters and the character gets a
 // permanent stat bump. Numbers are intentionally generous so growth feels
 // earned, not handed out.
@@ -4494,6 +4569,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (lastEnd && Date.now() - lastEnd >= SIX_HOURS_MS) {
           const beat = WHILE_AWAY_LINES[Math.floor(Math.random() * WHILE_AWAY_LINES.length)]!;
           get().appendLog(beat.channel, beat.line, { skipDedup: true });
+        }
+      }
+      // OTA-849 [living world] — the world actually MOVED while you were away. Real
+      // time offline is converted into world pulses (bounded, so a month gone isn't
+      // chaos); the faction tides + rumours advance for that gap and the Arbiter
+      // recaps what shifted. This is what makes "offline" real: come back after a few
+      // days and the balance of power has changed without you lifting a finger.
+      {
+        const livePlayer = get().player;
+        const lastEnd = livePlayer?.lastSessionEndedAt;
+        const OFFLINE_MS_PER_PULSE = 4 * 60 * 60 * 1000; // one pulse per 4 real hours away
+        const OFFLINE_PULSE_CAP = 6;                     // bounded drift
+        if (lastEnd && livePlayer) {
+          const pulses = Math.min(OFFLINE_PULSE_CAP, Math.floor((Date.now() - lastEnd) / OFFLINE_MS_PER_PULSE));
+          if (pulses >= 1) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { nextWorldTide } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+            let tides = { ...(get().worldMemory.factionTides ?? {}) };
+            const rumors: { text: string; hour: number }[] = [];
+            const seed = Math.floor((get().worldMemory.lastWorldTickHour ?? 0) / 24);
+            let lastMoverName = '';
+            for (let i = 0; i < pulses; i++) {
+              const r = nextWorldTide(factions, tides, seed + i + 1);
+              if (!r.moverId) continue;
+              tides = r.tides;
+              rumors.push({ text: r.rumor, hour: livePlayer.hoursElapsed ?? 0 });
+              lastMoverName = factions.find((f) => f.id === r.moverId)?.name ?? lastMoverName;
+            }
+            if (rumors.length > 0) {
+              set((st) => ({ worldMemory: {
+                ...st.worldMemory,
+                factionTides: tides,
+                worldRumors: [...(st.worldMemory.worldRumors ?? []), ...rumors].slice(-12),
+              } }));
+              get().appendLog(
+                'arbiter',
+                `"While you were gone, the waste did not sleep," the Arbiter says. "${rumors.length} shift${rumors.length === 1 ? '' : 's'} in the balance of power — the ${lastMoverName} the latest to move. Read the World for the full account."`,
+                { skipDedup: true },
+              );
+            }
+          }
         }
       }
       // OTA 007 — Welcome-back from the Arbiter on every save load.
@@ -14859,6 +14977,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-844 [world pulse] — advance the world's slow heartbeat. No-op unless a full
     // pulse of in-game time has accrued since the last one.
     worldTideCheck(get, set);
+    // OTA-849 [living world] — the world reaches back: rival factions raid a player
+    // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
+    // outdoor moment.
+    maybeSpawnRaid(get, set);
     void get().persist();
   },
 
@@ -16820,6 +16942,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
       completeRescueScenario(get, set);
     }
 
+    // OTA-849 [living world] — killing a FACTION combatant (a raider, a patrol)
+    // has two-way consequences: their people mark you (−3 standing with that
+    // faction), and their strongest rival takes note in your favor (+1). Choosing
+    // a side is a real allegiance, not a free-for-all. Gated on a real factionId
+    // and NOT a neutral/rescue fight.
+    if (enemy.factionId && !enemy.factionNeutralFight) {
+      const killer = get().player;
+      if (killer) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const facData = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { strongestRivalOf } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+        const rivalId = strongestRivalOf(facData, enemy.factionId, killer.factionStanding);
+        // Honor the design pick "down with them, up with rivals" — NOT the ally
+        // cascade applyRepChange() bakes in — with a local clamped update to just
+        // the two rows. Only touch/report factions the player already tracks.
+        const KILL_REP = -3, RIVAL_REP = 1;
+        const changed: { factionId: string; delta: number; newStanding: number }[] = [];
+        const nextStanding = killer.factionStanding.map((row) => {
+          const raw = row.factionId === enemy.factionId ? KILL_REP
+            : (rivalId && row.factionId === rivalId) ? RIVAL_REP : 0;
+          if (raw === 0) return row;
+          const ns = Math.max(-100, Math.min(100, row.standing + raw));
+          const realDelta = ns - row.standing;
+          if (realDelta !== 0) changed.push({ factionId: row.factionId, delta: realDelta, newStanding: ns });
+          return { ...row, standing: ns };
+        });
+        if (changed.length > 0) {
+          set((s) => (s.player ? { player: { ...s.player, factionStanding: nextStanding } } : s));
+          logRepChanges(get, changed);
+        }
+      }
+    }
+
     // First-kill and rare-kill milestones are noted in the memorable-event
     // log so the Arbiter can reference them later.
     if (newKills === 1) {
@@ -17125,7 +17281,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       player.completedFactionQuestIds,
       scene.vendor.faction,
     );
-    const effectivePrice = Math.max(1, Math.ceil(offer.price * mult * (1 - buyDiscount)));
+    // OTA-849 [tides get teeth] — the vendor's faction fortunes move prices. An
+    // ascendant faction's traders charge a confidence premium; a waning faction's
+    // discount to move goods before they lose the ground to hold them. ±20% at the
+    // tide extremes, multiplied in beside the corruption markup + CHA discount.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { tideVendorPriceMult } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+    const vendorTideMult = scene.vendor.faction
+      ? tideVendorPriceMult(get().worldMemory.factionTides?.[scene.vendor.faction])
+      : 1;
+    const effectivePrice = Math.max(1, Math.ceil(offer.price * mult * (1 - buyDiscount) * vendorTideMult));
     if (player.tc < effectivePrice) {
       get().appendLog(
         'system',
