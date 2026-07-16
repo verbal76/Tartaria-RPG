@@ -16652,4 +16652,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     commands like "back off" stay out of the parser to avoid colliding with retreat;
 //     they resolve once a parley is open.)
 // Test: ota854TalkDownVocab pins the widened reads.
-export const OTA_BUILD_ID = '2026-07-16-854-talk-down-patrols';
+// ── OTA-855 (LIVING WORLD fixes — the board actually fills; collapsible standings) ──
+// A device log showed the World board near-empty (events=4) even at Day 99. The bug: the
+// sim ticked once per 24 IN-GAME hours, which almost never accrues in a real sitting.
+//   • CADENCE — WORLD_TICK_HOURS 24 → 2, plus PATROL_SUBSTEPS_PER_TICK sub-steps so
+//     patrols cover ground and meet. A first-ever tick runs a warm-up burst so a fresh
+//     player opening the board already sees the war underway.
+//   • PATROLS SCATTER ON SPAWN (deterministic spread around the outpost) instead of
+//     stacking on one cell — stacked patrols never cross an enemy, so nothing happened.
+//   • BEAST MAULINGS stay COMMON (~11%) — real ecological pressure that thins every
+//     faction's herd and can hand a rival the upper hand — but the FEED only shows a
+//     bounded, drama-first SAMPLE per sub-step (clashes/assaults lead, a taste of maulings
+//     trails), so the board reads as a story, not a wall of identical beast lines. Varied
+//     maul flavor too. The mechanical cull always applies regardless of what's shown.
+//   • REPOPULATION IS PACED — a faction musters only a trickle of fresh patrols per cycle
+//     (not an instant refill), so losses PERSIST and a faction on a bad run stays thinned.
+//     Cold start still deploys a full force; the target scales with war power.
+//   • WORLD BOARD — the standings sections (balance of power, grudges) are now COLLAPSIBLE
+//     like the inventory, and start collapsed, so the war FEED gets the room.
+export const OTA_BUILD_ID = '2026-07-16-855-living-world-fills';

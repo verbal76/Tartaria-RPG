@@ -1881,7 +1881,14 @@ function recordMemorableEvent(
 // OTA-844 [world pulse] — how much in-game time between world heartbeats. ~one pulse
 // per in-game day: often enough that a long game visibly shifts, rare enough that the
 // rumours never spam.
-const WORLD_TICK_HOURS = 24;
+// OTA-855 — the world ticks every couple of in-game hours, not once a day. At 24h the
+// sim effectively never ran in a normal session (a 15-min sitting is only a few in-game
+// hours), so the board stayed empty. 2h means patrols move + fight throughout play.
+const WORLD_TICK_HOURS = 2;
+// OTA-855 — patrols only clash when they actually cross paths, which takes several steps
+// of roaming. Run this many sim sub-steps per tick so they cover ground and the board
+// fills at a satisfying pace instead of one line every real hour.
+const PATROL_SUBSTEPS_PER_TICK = 4;
 
 // OTA-844/849/851 — the world's heartbeat. Called at the end of every action; when a
 // full pulse of in-game time has accrued, one WORLD EVENT fires from a broad, weighted
@@ -1934,10 +1941,14 @@ function worldTideCheck(
       get().appendLog('arbiter', `"There's coin on the board for a willing blade," the Arbiter says. "Read the World."`);
     }
   }
-  // Roaming patrols: keep the fielded count in line with each faction's tide, then let
-  // them wander + fight off-screen for this tick.
+  // Roaming patrols: keep the fielded count in line with each faction's power, then let
+  // them roam + fight off-screen. Several sub-steps per tick so they actually meet.
   maintainPatrols(get, set, factions, tickIndex);
-  simulatePatrols(get, set, factions, hour, tickIndex);
+  // OTA-855 — a WARM-UP burst the very first time patrols exist, so a player who opens
+  // the World board early already sees the war underway instead of a blank feed.
+  const firstEver = (get().worldMemory.worldEvents ?? []).length === 0;
+  const steps = firstEver ? PATROL_SUBSTEPS_PER_TICK * 4 : PATROL_SUBSTEPS_PER_TICK;
+  for (let i = 0; i < steps; i++) simulatePatrols(get, set, factions, hour, tickIndex * 16 + i);
   set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
 }
 
@@ -1968,8 +1979,21 @@ function maintainPatrols(
     const idxs = idxByFaction.get(f.id) ?? [];
     if (idxs.length < want && next.length < PATROL_SOFT_CAP) {
       const cell = canonicalCellOf(outpost);
-      for (let i = idxs.length; i < want && next.length < PATROL_SOFT_CAP; i++) {
-        next.push({ factionId: f.id, gx: cell.x, gy: cell.y, homeX: cell.x, homeY: cell.y, phase: (tickIndex + i * 7) % 97 });
+      // OTA-855 — REPOPULATION is PACED, not instant. A faction musters fresh patrols
+      // from its outpost, but only a trickle per cycle (REINFORCE_PER_TICK) — so losses
+      // to beasts and rivals actually PERSIST, and a faction on a bad run stays thinned
+      // while others gain the upper hand. Exception: a cold start (0 patrols) deploys the
+      // full force at once, so a fresh world isn't empty. And the target itself scales
+      // with the faction's war power, so a losing faction rebuilds toward a smaller army.
+      const REINFORCE_PER_TICK = 1;
+      const fillTo = idxs.length === 0 ? want : Math.min(want, idxs.length + REINFORCE_PER_TICK);
+      for (let i = idxs.length; i < fillTo && next.length < PATROL_SOFT_CAP; i++) {
+        // SCATTER on spawn so patrols don't all stack on one cell (stacked patrols never
+        // cross an enemy). Deterministic spread of a few tiles around the outpost.
+        const ph = (tickIndex + i * 7) % 97;
+        const ox = ((ph % 7) - 3);
+        const oy = ((Math.floor(ph / 7) % 7) - 3);
+        next.push({ factionId: f.id, gx: cell.x + ox, gy: cell.y + oy, homeX: cell.x, homeY: cell.y, phase: ph });
       }
     } else if (idxs.length > want) {
       // OTA-853 — a fading faction's war-parties thin out instead of lingering forever.
@@ -2072,23 +2096,41 @@ function simulatePatrols(
       }
     }
     if (assaulted) continue;
-    if (((p.phase + tickIndex) % 11) === 0) {
+    // OTA-855 — beast maulings stay COMMON (~11%): the waste is a real predator that
+    // thins every faction's herd and can hand a rival the upper hand when the dice go
+    // cold. The MECHANICAL cull always applies; the feed only SAMPLES it (below) so the
+    // board isn't a wall of identical beast lines. Varied flavor keeps repeats readable.
+    if (((p.phase * 7 + tickIndex) % 9) === 0) {
       lost.add(i);
       bumpPower(p.factionId, -1);
-      events.push({ text: `Wasteland beasts fell on a ${nameOf(p.factionId)} patrol — none rode home.`, kind: 'patrol_mauled' });
+      const beastLine = [
+        `Wasteland beasts fell on a ${nameOf(p.factionId)} patrol — none rode home.`,
+        `A ${nameOf(p.factionId)} patrol wandered into a nest of drones and was torn apart.`,
+        `Something in the silt took a ${nameOf(p.factionId)} patrol whole. Only tracks remained.`,
+        `A ${nameOf(p.factionId)} column was run down by wasteland predators.`,
+      ][(p.phase + tickIndex) % 4]!;
+      events.push({ text: beastLine, kind: 'patrol_mauled' });
     }
   }
 
   patrols = patrols.filter((_, i) => !lost.has(i));
+  // OTA-855 — the MECHANICS above (power shifts, grudges, culled patrols) all already
+  // applied. The FEED, though, only shows a bounded, drama-first SAMPLE per sub-step:
+  // clashes and outpost assaults lead, a taste of the beast maulings trails. So the war
+  // is fully simulated (the herd really is thinned) but the board reads as a story, not
+  // a wall of identical lines.
+  const FEED_PER_STEP = 3;
+  const prio: Record<string, number> = { patrol_clash: 0, outpost_assault: 1, patrol_mauled: 2 };
+  const sample = [...events].sort((a, b) => (prio[a.kind] ?? 9) - (prio[b.kind] ?? 9)).slice(0, FEED_PER_STEP);
   set((st) => ({ worldMemory: {
     ...st.worldMemory,
     patrols,
     factionTides: tides,
     factionRelations: relations,
-    ...(events.length > 0 ? {
+    ...(sample.length > 0 ? {
       // OTA-853 — world drama routes ONLY to the World board's own log (capped 50), never
       // the exploration feed. You see it when you tap WORLD, not mid-play.
-      worldEvents: [...(st.worldMemory.worldEvents ?? []), ...events.map((e) => ({ ...e, hour }))].slice(-50),
+      worldEvents: [...(st.worldMemory.worldEvents ?? []), ...sample.map((e) => ({ ...e, hour }))].slice(-50),
     } : {}),
   } }));
 }
