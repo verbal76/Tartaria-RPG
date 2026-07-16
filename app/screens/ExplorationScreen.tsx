@@ -538,6 +538,7 @@ export function ExplorationScreen() {
               onSelectActive={setActiveEnemyIdx}
               maxHeight={statsColH}
               playerWisdom={player?.stats?.wisdom}
+              enemyIntel={worldMemory?.enemyIntel}
             />
           ) : (
             <CrestPlaceholder />

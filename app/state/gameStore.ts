@@ -13360,6 +13360,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const dmg = Math.max(1, Math.round(rawShot * shotMod.multiplier));
             const shotTag = shotMod.match === 'weak' ? ' (weak — bites deep!)' : shotMod.match === 'resist' ? ' (resisted)' : '';
+            // OTA-838 — record the observed match from ranged fire too.
+            recordEnemyIntel(get, set, targetEnemy.name, shotType, shotMod.match);
             livingHp = Math.max(0, livingHp - dmg);
             get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}${shotTag}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
             if (livingHp <= 0) {
@@ -15397,6 +15399,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else if (combinedMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×${combinedMod.multiplier} for ${dmg})`);
       }
+      // OTA-838 — bank what that swing taught you: the panel/bestiary now reveal this
+      // enemy's observed weak/resist types (even below the Wisdom read-threshold).
+      recordEnemyIntel(get, set, enemy.name, weaponType, combinedMod.match);
       // OTA-197 — consecutive-resist nudge. Playtester swung a piercing
       // bolt-caster at a piercing-resistant Silt Serpent + Mud Lurker
       // back-to-back and lost the fight largely because they didn't
@@ -21641,7 +21646,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const rawBurst = perTurn * COATING_DOT_TURNS;
       const mod = applyDamageTypeModifier(rawBurst, dtype, target.type);
       const traitMod = traitDamageMultiplier(target.traits, dtype);
-      const burst = Math.max(1, Math.round(rawBurst * combineDamageTypeMatch(mod.match, traitMod.match).multiplier));
+      // OTA-715 — reconcile type+trait (trait wins on a discord).
+      const burstCombined = combineDamageTypeMatch(mod.match, traitMod.match);
+      const burst = Math.max(1, Math.round(rawBurst * burstCombined.multiplier));
+      // OTA-838 — a thrown coating teaches you the target's reaction to that type too.
+      recordEnemyIntel(get, set, target.name, dtype, burstCombined.match);
       const newHp = Math.max(0, targetHp - burst);
       // Consume one vial + write the enemy's reduced HP + point the active index at
       // the target so resolveEnemyDefeat resolves THIS enemy on a kill.
@@ -26257,6 +26266,39 @@ function applyEnemyCounter(
 // Death is no longer permanent erasure. The character is marked dead and
 // remains on the title slot list (with a DEAD badge) so the player can
 // resurrect them with a Resurrection Gem.
+// OTA-838 — record an OBSERVED damage-type match against an enemy so the panel and
+// bestiary can reveal what you've learned by fighting (the panel's "strike to learn"
+// promise, made real + persistent). Deduped per lowercased enemy name; a type lives
+// in weak OR resist, and a fresh contradicting observation MOVES it (per-spawn
+// randomization can flip a type, so the latest hit is the truth). No-op for 'normal'.
+// Exported for unit testing the dedup/move logic (OTA-838).
+export function recordEnemyIntel(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  enemyName: string,
+  damageType: string | null | undefined,
+  match: 'weak' | 'resist' | 'normal',
+): void {
+  if (match === 'normal') return;
+  const dt = (damageType ?? '').toLowerCase();
+  if (!dt || !enemyName) return;
+  const key = enemyName.toLowerCase();
+  set((s) => {
+    const wm = s.worldMemory;
+    if (!wm) return {};
+    const cur = wm.enemyIntel?.[key] ?? { weak: [], resist: [] };
+    const weak = cur.weak.filter((t) => t !== dt);
+    const resist = cur.resist.filter((t) => t !== dt);
+    if (match === 'weak') weak.push(dt); else resist.push(dt);
+    // Nothing changed → skip the write (avoids a needless re-render/persist).
+    if (weak.length === cur.weak.length && resist.length === cur.resist.length
+        && weak.every((t, i) => t === cur.weak[i]) && resist.every((t, i) => t === cur.resist[i])) {
+      return {};
+    }
+    return { worldMemory: { ...wm, enemyIntel: { ...(wm.enemyIntel ?? {}), [key]: { weak, resist } } } };
+  });
+}
+
 function handlePlayerDeath(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

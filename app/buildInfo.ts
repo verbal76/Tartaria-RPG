@@ -15956,4 +15956,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // traits/drops + an "X of N catalogued" counter) and a LORE tab surfacing the 172-
 // entry concepts bank (was in the files feeding the Arbiter, never shown). Test:
 // ota837CodexData.
-export const OTA_BUILD_ID = '2026-07-16-817-discovery-codex';
+// ── OTA-818 (Tier-1 QoL #3: observed enemy weakness tags — golem port of HAL-838) ─
+// Landing a weak/resist hit now records the observed damage type in new
+// worldMemory.enemyIntel (name-keyed; recordEnemyIntel dedupes, a contradicting hit
+// MOVES the type). Wired at the melee, ranged-bolt, and thrown-coating paths. The
+// EnemyPanel portrait/detail reveal what you've LEARNED even below the Wisdom read-
+// threshold (its "strike to learn" promise, made real), and the bestiary shows
+// "WEAK TO / RESISTS" per fought enemy. Test: ota838EnemyIntel. Completes the three
+// Tier-1 "make the depth visible" OTAs (816/817/818).
+export const OTA_BUILD_ID = '2026-07-16-818-observed-weakness-tags';
