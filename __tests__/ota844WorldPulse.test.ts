@@ -90,9 +90,11 @@ describe('OTA-844 (3) — the pulse fires after a day of in-game time', () => {
     const eventsBefore = (useGameStore.getState().worldMemory.worldEvents ?? []).length;
     await useGameStore.getState().submitPlayerAction('look around');
     const st = useGameStore.getState();
-    // OTA-853 — world drama lands on the WORLD board (worldEvents), NOT the play feed.
-    // A pulse should have added at least one board entry, and moved the war scoreboard.
-    expect((st.worldMemory.worldEvents ?? []).length).toBeGreaterThan(eventsBefore);
+    // OTA-853/855 — world drama lands on the WORLD board (worldEvents), NOT the play feed.
+    // OTA-855: the first tick warms up (patrols spawn scattered + several sim sub-steps),
+    // so the board should FILL — several entries, not a lone line — and patrols exist.
+    expect((st.worldMemory.worldEvents ?? []).length).toBeGreaterThan(eventsBefore + 2);
+    expect((st.worldMemory.patrols ?? []).length).toBeGreaterThan(0);
     expect(Object.keys(st.worldMemory.factionTides ?? {}).length).toBeGreaterThan(0);
     expect(st.worldMemory.lastWorldTickHour).toBe(200);
   });

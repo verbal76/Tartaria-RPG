@@ -5,7 +5,7 @@
 // where the previously-invisible tides finally surface — the Character sheet only
 // tagged factions you already stood with; here you see the whole board.
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getFactions } from '../engine/character';
@@ -19,6 +19,15 @@ export function WorldScreen() {
   const player = useGameStore((s) => s.player);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-855 — collapsible standings so the WAR FEED gets the room. Power + grudges start
+  // collapsed (the feed is the point); tap a header to fold/unfold, like the inventory.
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({ power: true, grudges: true });
+  const sectionHeader = (key: string, label: string) => (
+    <TouchableOpacity style={styles.secHeader} activeOpacity={0.7} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}>
+      <Text style={styles.secChevron}>{collapsed[key] ? '▸' : '▾'}</Text>
+      <Text style={styles.sectionLabel}>{label}</Text>
+    </TouchableOpacity>
+  );
 
   const factions = getFactions();
   const tides = worldMemory?.factionTides ?? {};
@@ -107,7 +116,8 @@ export function WorldScreen() {
         </View>
 
         {/* ── BALANCE OF POWER ──────────────────────────────────── */}
-        <Text style={styles.sectionLabel}>BALANCE OF POWER</Text>
+        {sectionHeader('power', 'BALANCE OF POWER')}
+        {!collapsed.power && (
         <View style={styles.card}>
           {rows.map((f) => {
             const m = tides[f.id] ?? 0;
@@ -154,11 +164,13 @@ export function WorldScreen() {
             the rise fields bigger raiding parties against those who side with its rivals.
           </Text>
         </View>
+        )}
 
         {/* ── GRUDGES & ALLIANCES ───────────────────────────────── */}
         {grudges.length > 0 && (
           <>
-            <Text style={styles.sectionLabel}>GRUDGES & ALLIANCES</Text>
+            {sectionHeader('grudges', 'GRUDGES & ALLIANCES')}
+            {!collapsed.grudges && (
             <View style={styles.card}>
               {grudges.map((g, i) => {
                 const lab = relationLabel(g.relation);
@@ -172,6 +184,7 @@ export function WorldScreen() {
               <Text style={styles.footNote}>↳ Grudges are earned: every patrol that guts another deepens the feud, and two
                 neutrals can come to blows from nothing but a bad crossing. Rivalries build themselves.</Text>
             </View>
+            )}
           </>
         )}
 
@@ -227,6 +240,8 @@ const styles = StyleSheet.create({
   facStanding: { fontSize: 10, marginLeft: 8, letterSpacing: 0.3 },
   footNote: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginTop: 8, lineHeight: 14 },
   patrolNote: { color: '#c98a6a', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 4 },
+  secHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 0 },
+  secChevron: { color: '#6ab0c9', fontSize: 11, fontWeight: '900', width: 14, textAlign: 'center', marginTop: 12, marginBottom: 6 },
   grudgeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4, borderBottomColor: '#1a2427', borderBottomWidth: 1 },
   grudgeText: { color: '#bcd2db', fontSize: 12 },
   grudgeTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
