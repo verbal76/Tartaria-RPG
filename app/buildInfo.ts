@@ -17618,4 +17618,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // divergences: the tick sits alongside engine's campaign-timeout check, and the pulse
 // resolves factions via the content pack (getFactions) not the built-in JSON, so a
 // re-skin's own factions drive it. Test: ota844WorldPulse.
-export const OTA_BUILD_ID = '2026-07-16-1125-world-pulse';
+// ── OTA-1126 (Tier-3 depth #3: The Fallen — engine port of HAL-845) ────────────
+// Death is no longer a clean wipe: every fallen character is appended to an install-wide
+// roll of THE FALLEN (saveSystem GlobalStash `fallen` + recordFallen/loadFallen, capped
+// 25). handlePlayerDeath records the fallen + adds a beat; a new FALLEN tab in the Lore
+// Codex renders the memorial (added to engine's SECTIONS; the HAL LORE/concepts tab
+// stays omitted here, and the memorial styles use engine's teal palette). Completes the
+// Tier-3 batch (1124/1125/1126). Test: ota845TheFallen.
+export const OTA_BUILD_ID = '2026-07-16-1126-the-fallen';

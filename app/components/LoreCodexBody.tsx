@@ -20,7 +20,7 @@
 // only activates when there's an active player (so the title-screen
 // host still renders the entries as info-only).
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { BrandedModal } from './BrandedModal';
 import locationsData from '../data/locations/locations.json';
@@ -30,6 +30,7 @@ import enemiesData from '../data/enemies/enemies.json';
 import type { Faction, Race, Location } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
+import { loadFallen, type FallenHero } from '../engine/saveSystem';
 
 // OTA-837 — Tier-1 QoL #2: the codex gains a discovery-gated BESTIARY (fills in as
 // you defeat enemy types). engine_Dev DIVERGENCE from HAL: the bestiary reads
@@ -38,7 +39,10 @@ import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../e
 // is INTENTIONALLY omitted here — this engine's lore is the content-pack `lore`
 // table, not that Tartaria-specific narration bank, so injecting it would leak
 // built-in Tartaria lore into a re-skin.
-type Section = 'races' | 'factions' | 'places' | 'bestiary';
+// OTA-845 — the FALLEN tab: an install-wide, cross-character memorial. Every character
+// who dies is remembered here (saveSystem.loadFallen), so a run ending is never a clean
+// wipe — later characters (and the title screen, between runs) can read who came before.
+type Section = 'races' | 'factions' | 'places' | 'bestiary' | 'fallen';
 
 interface CodexEnemy {
   name: string;
@@ -55,7 +59,7 @@ export function LoreCodexBody() {
   // no upload path: it imported the built-in timeline JSON directly, so any game
   // that didn't override BOTH locations and factions still showed the built-in
   // events. Races/factions/places all resolve through the content pack.
-  const SECTIONS: Section[] = ['races', 'factions', 'places', 'bestiary'];
+  const SECTIONS: Section[] = ['races', 'factions', 'places', 'bestiary', 'fallen'];
   const [section, setSection] = useState<Section>('races');
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
@@ -80,6 +84,14 @@ export function LoreCodexBody() {
   // engine_Dev — resolve through the content pack so a re-skin's enemy roster shows.
   const enemyCatalog = resolveTable('enemies', enemiesData as CodexEnemy[]) as CodexEnemy[];
   const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
+  // OTA-845 [The Fallen] — install-wide roll of the dead, loaded async from the global
+  // stash. Newest first (most recent death at the top of the memorial).
+  const [fallen, setFallen] = useState<FallenHero[]>([]);
+  useEffect(() => {
+    let live = true;
+    void loadFallen().then((f) => { if (live) setFallen([...f].reverse()); });
+    return () => { live = false; };
+  }, []);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -225,6 +237,27 @@ export function LoreCodexBody() {
             })}
           </>
         )}
+        {/* OTA-845 — THE FALLEN. The install-wide memorial of dead characters. A run
+            ending is never a clean wipe: every fallen predecessor is remembered here,
+            readable between runs from the title screen too. (engine_Dev: no LORE tab
+            here — engine's concepts are content-pack-driven, see the 837 note.) */}
+        {section === 'fallen' && (
+          fallen.length === 0 ? (
+            <Text style={styles.fallenEmpty}>No one has fallen yet. Tartaria is patient.</Text>
+          ) : (
+            <>
+              <Text style={styles.counter}>{fallen.length} remembered</Text>
+              {fallen.map((h, i) => (
+                <View key={`${h.name}_${h.ts}_${i}`} style={[styles.entry, styles.fallenEntry]}>
+                  <Text style={styles.name}>† {h.name}</Text>
+                  <Text style={styles.subtitle}>{h.raceName} • fell at {h.locationName}</Text>
+                  <Text style={styles.desc}>{h.epitaph}</Text>
+                  <Text style={styles.meta}>{h.kills} foes bested • {h.hours}h in Tartaria • {h.corruption}</Text>
+                </View>
+              ))}
+            </>
+          )
+        )}
       </ScrollView>
 
       <Modal
@@ -300,6 +333,9 @@ const styles = StyleSheet.create({
   // OTA-837 — bestiary chrome (engine teal palette).
   counter: { color: '#6c8088', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
   entryLocked: { opacity: 0.5, borderStyle: 'dashed' },
+  // OTA-845 — The Fallen memorial.
+  fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#3a5560' },
+  fallenEmpty: { color: '#6c8088', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   lockedName: { color: '#6c8088', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   lockedSub: { color: '#4a5a60', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
