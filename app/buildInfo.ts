@@ -16493,4 +16493,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // persists. (Recommended core of the Tier-3 death batch; the dead-PC-as-enemy and
 // permanent-corruption-scar variants are noted as follow-ups.) Test: ota845TheFallen.
 // Completes the Tier-3 emergent-depth batch (843/844/845).
-export const OTA_BUILD_ID = '2026-07-16-845-the-fallen';
+// ── OTA-846 (audit fix: "Grows from:" stat-training copy accuracy) ────────────
+// The Character sheet prints SKILL_ACTIVITIES[stat] under each core stat as "how
+// it is earned." A line-by-line audit against the live trainStat() call sites in
+// gameStore found two blocks had drifted from the engine:
+//   • DEX still advertised "Parry / dodge" — parry was RETIRED in OTA-795 (dodge
+//     gamble replaced it) — and omitted the trainers the code actually rewards:
+//     landing finesse/ranged hits, dodging, jumping to a resolved target,
+//     disengaging under pressure, and escape skill-checks. Rewritten to match.
+//   • STR advertised "Heavy salvage / breaking", but salvage trains INT, not STR;
+//     dropped that line and added the real "Winning a Fight-Back struggle" trainer.
+//   • STE was accurate but under-sold — surfaced the stealth-gear passive (train
+//     on a hit taken while wearing stealth gear) and the STEALTH skill-check path.
+// INT / WIS / CHA verified accurate, unchanged. Pure display-copy fix — no
+// mechanics change. Test: ota846SkillActivities pins the corrected copy so it
+// can't silently drift back to describing mechanics the engine no longer has.
+export const OTA_BUILD_ID = '2026-07-16-846-grows-from-audit';
