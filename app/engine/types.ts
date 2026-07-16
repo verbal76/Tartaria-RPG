@@ -1682,6 +1682,12 @@ export interface WorldMemory {
   /** OTA-500 — install-canon locations registered from dynamic mentions. */
   canonLocations?: CanonLocation[];
   defeatedEnemies: string[];
+  /** OTA-838 — enemy INTEL learned by fighting. Keyed by lowercased enemy name →
+   *  the damage types you've SEEN bite deep (weak) or wash off (resist) against it.
+   *  Landing a weak/resist hit records it here; the EnemyPanel then reveals those
+   *  specific types even below the Wisdom read-threshold ("strike to learn" made
+   *  real + persistent), and the bestiary shows them on that enemy's entry. */
+  enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has
    *  fired. Prevents the Arbiter from repeating the "you're light

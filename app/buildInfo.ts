@@ -17562,4 +17562,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is intentionally OMITTED — this engine's lore is the content-pack `lore` table, so
 // injecting the built-in bank would leak Tartaria lore into a re-skin. Timeline tab
 // stays removed (engine has no override path for it). Test: ota837CodexData.
-export const OTA_BUILD_ID = '2026-07-16-1118-discovery-codex';
+// ── OTA-1119 (Tier-1 QoL #3: observed enemy weakness tags — engine port of HAL-838) ─
+// Landing a weak/resist hit records the observed damage type in new
+// worldMemory.enemyIntel (name-keyed; recordEnemyIntel dedupes, a contradicting hit
+// MOVES the type). Wired at engine's melee, ranged-bolt, and (restructured) thrown-
+// coating paths. The EnemyPanel portrait/detail reveal what you've LEARNED even below
+// the Wisdom read-threshold (merged with engine's `fill` prop), and the bestiary
+// shows "WEAK TO / RESISTS" per fought enemy. Test: ota838EnemyIntel. Completes the
+// three Tier-1 "make the depth visible" OTAs (1117/1118/1119).
+export const OTA_BUILD_ID = '2026-07-16-1119-observed-weakness-tags';

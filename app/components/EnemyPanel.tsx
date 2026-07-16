@@ -72,6 +72,10 @@ interface Props {
   fill?: boolean;
   /** OTA-1103 — player Wisdom, gates reading a (non-boss) enemy's weaknesses. */
   playerWisdom?: number;
+  /** OTA-838 — enemy intel learned by fighting (worldMemory.enemyIntel), keyed by
+   *  lowercased enemy name. Even below the Wisdom read-threshold, a type you've SEEN
+   *  bite (weak) or wash off (resist) is revealed on the portrait. */
+  enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
 }
 
 // OTA-382 — fallback width only. The panel lives in the top-right column
@@ -145,8 +149,14 @@ const RESIST_FLAVOR: Record<string, string> = {
   aetheric: 'aether slides off it unheeded',
 };
 
-export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fill, playerWisdom }: Props) {
+export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fill, playerWisdom, enemyIntel }: Props) {
   const canReadDefenses = (playerWisdom ?? 0) >= WEAKNESS_READ_WIS;
+  // OTA-838 — per-enemy observed intel lookup (lowercased name). Passed to each card
+  // so an already-learned weakness shows even for a low-Wisdom character.
+  const intelFor = useCallback(
+    (name: string) => enemyIntel?.[name.toLowerCase()],
+    [enemyIntel],
+  );
   // Measure the column we actually live in so cards fit the top-right corner
   // (portrait), instead of being sized to the full screen width and spilling
   // out into a left/right-scrolling "landscape" strip.
@@ -203,7 +213,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
 
   const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
     <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(item)} style={fill ? styles.fillTouch : undefined}>
-      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} />)}
+      {scrollWrap(<EnemyCard view={item} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} observed={intelFor(item.enemy.name)} />)}
     </TouchableOpacity>
   );
 
@@ -220,7 +230,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
         // capped to the corner height and vertically scrollable when it's tall.
         // arb146 — tappable to open the full-detail popup.
         <TouchableOpacity activeOpacity={0.7} onPress={() => setDetailView(enemies[0]!)} style={fill ? styles.fillTouch : undefined}>
-          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} />)}
+          {scrollWrap(<EnemyCard view={enemies[0]!} cardWidth={cardWidth} hpBarWidth={hpBarWidth} fill={fill} canRead={canReadDefenses} observed={intelFor(enemies[0]!.enemy.name)} />)}
         </TouchableOpacity>
       ) : (
         <FlatList
@@ -251,7 +261,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
     <BrandedModal
       visible={!!detailView}
       title={detailView?.enemy.name ?? ''}
-      body={detailView ? enemyDetailBody(detailView, canReadDefenses) : undefined}
+      body={detailView ? enemyDetailBody(detailView, canReadDefenses, intelFor(detailView.enemy.name)) : undefined}
       buttons={[{ label: 'Close', tone: 'primary', onPress: () => setDetailView(null) }]}
       onRequestClose={() => setDetailView(null)}
     />
@@ -262,7 +272,7 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, fi
 // arb146 — format an enemy into the full-detail popup body. Mirrors EnemyCard's
 // AC/attack math so the popup agrees with the portrait, and adds everything the
 // cramped corner can't fit: full trait descriptions + all active effects.
-function enemyDetailBody(view: EnemyView, canRead: boolean): string {
+function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: string[]; resist: string[] }): string {
   const e = view.enemy;
   const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
   const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
@@ -287,7 +297,17 @@ function enemyDetailBody(view: EnemyView, canRead: boolean): string {
     for (const w of defenses.weaknesses) lines.push(`You size it up — ${WEAK_FLAVOR[w] ?? `it looks vulnerable to ${w}`}. (Weak: ${cap(w)})`);
     for (const r of defenses.resists) lines.push(`— ${RESIST_FLAVOR[r] ?? `it shrugs off ${r}`}. (Resists: ${cap(r)})`);
   } else if (defenses.resists.length || defenses.weaknesses.length) {
-    lines.push("You can't read its weaknesses at a glance — strike it and watch what bites (Wisdom 12 reads them on sight).");
+    // OTA-838 — you can't read it on sight, but anything you've already SEEN in combat
+    // (recorded in worldMemory.enemyIntel) is revealed here — "strike to learn" made real.
+    const ow = observed?.weak ?? [];
+    const orr = observed?.resist ?? [];
+    if (ow.length || orr.length) {
+      for (const w of ow) lines.push(`You've seen it flinch from ${WEAK_FLAVOR[w] ?? w}. (Weak: ${cap(w)})`);
+      for (const r of orr) lines.push(`You've seen it shrug off ${r} — ${RESIST_FLAVOR[r] ?? 'it barely marks'}. (Resists: ${cap(r)})`);
+      lines.push('Keep striking with new types to learn the rest (Wisdom 12 reads them on sight).');
+    } else {
+      lines.push("You can't read its weaknesses at a glance — strike it and watch what bites (Wisdom 12 reads them on sight).");
+    }
   }
   const traits = e.traits ?? [];
   if (traits.length) {
@@ -307,7 +327,7 @@ function enemyDetailBody(view: EnemyView, canRead: boolean): string {
   return lines.join('\n');
 }
 
-function EnemyCard({ view, cardWidth, hpBarWidth, fill, canRead }: { view: EnemyView; cardWidth: number; hpBarWidth: number; fill?: boolean; canRead: boolean }) {
+function EnemyCard({ view, cardWidth, hpBarWidth, fill, canRead, observed }: { view: EnemyView; cardWidth: number; hpBarWidth: number; fill?: boolean; canRead: boolean; observed?: { weak: string[]; resist: string[] } }) {
   // OTA-419 — mirror combatRules.enemyAC EXACTLY so the panel's AC matches what
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
@@ -385,11 +405,30 @@ function EnemyCard({ view, cardWidth, hpBarWidth, fill, canRead }: { view: Enemy
               <Text style={styles.defVal}>{defenses.weaknesses.length ? defenses.weaknesses.map(cap).join(', ') : '—'}</Text>
             </Text>
           </>
-        ) : (
-          <Text style={styles.defLine} numberOfLines={2}>
-            <Text style={styles.defResist}>DEF </Text>
-            <Text style={styles.defVal}>? — strike to learn</Text>
-          </Text>
+        ) : (defenses.resists.length > 0 || defenses.weaknesses.length > 0) && (
+          // OTA-838 — below the Wisdom read-threshold, reveal only what you've LEARNED
+          // by hitting it (worldMemory.enemyIntel). Nothing learned yet → the prompt.
+          (observed && (observed.weak.length > 0 || observed.resist.length > 0)) ? (
+            <>
+              {observed.resist.length > 0 && (
+                <Text style={styles.defLine} numberOfLines={2}>
+                  <Text style={styles.defResist}>RESIST </Text>
+                  <Text style={styles.defVal}>{observed.resist.map(cap).join(', ')}</Text>
+                </Text>
+              )}
+              {observed.weak.length > 0 && (
+                <Text style={styles.defLine} numberOfLines={2}>
+                  <Text style={styles.defWeak}>WEAK </Text>
+                  <Text style={styles.defVal}>{observed.weak.map(cap).join(', ')}</Text>
+                </Text>
+              )}
+            </>
+          ) : (
+            <Text style={styles.defLine} numberOfLines={2}>
+              <Text style={styles.defResist}>DEF </Text>
+              <Text style={styles.defVal}>? — strike to learn</Text>
+            </Text>
+          )
         )}
         {/* arb119 — what the enemy DEALS, so armor choices have a target. */}
         <Text style={styles.defLine} numberOfLines={1}>
