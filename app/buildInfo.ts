@@ -16376,4 +16376,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // decomposed into labelled sources. The DEFENSE card now shows acBd.total with
 // "(base N)" + source chips, matching the core-stat treatment. Fixes both the
 // legibility gap AND the display-accuracy bug. Test: ota836ACBreakdown.
-export const OTA_BUILD_ID = '2026-07-16-836-tap-to-explain-ac';
+// ── OTA-837 (Tier-1 QoL #2: discovery codex / bestiary) ───────────────────────
+// The Lore codex (LoreCodexBody — reachable from the gear icon + title screen) had
+// races/factions/places/timeline tabs. Two more, per the "make the depth visible"
+// push: (1) a BESTIARY that FILLS IN AS YOU PLAY — each enemy is a "??? —
+// undiscovered" silhouette until you defeat its type (keyed off
+// worldMemory.defeatedEnemies, case-insensitive), then reveals type/HP/damage/
+// traits/drops, with an "X of N catalogued" counter; (2) a LORE tab that finally
+// surfaces the 172-entry concepts bank (app/data/lore/concepts.json) — the "massive
+// lore document" that was in the files feeding the Arbiter's narration context but
+// NEVER shown to the player. Test: ota837CodexData (data contracts + the discovery
+// gate). Next: OTA-838 adds observed damage-type weaknesses to each bestiary entry.
+export const OTA_BUILD_ID = '2026-07-16-837-discovery-codex';
