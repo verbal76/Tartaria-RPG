@@ -79,6 +79,46 @@ export interface GlobalStash {
   // rations / dog jerky / fungus / water). Idempotent per slot so a
   // resume never restacks it.
   testGiftGrantedSlots?: string[];
+  // OTA-845 [The Fallen] — install-wide roll of dead characters. Every character
+  // who falls is appended here (capped, newest last), so a death is never wiped
+  // clean: later characters inherit a graveyard of predecessors to remember (and,
+  // in future, to encounter in the world). "Losing is fun" — the run ends, the
+  // legend persists.
+  fallen?: FallenHero[];
+}
+
+/** OTA-845 — a character who died. Persisted install-wide in the GlobalStash. */
+export interface FallenHero {
+  name: string;
+  raceName: string;
+  /** The death-screen epitaph line. */
+  epitaph: string;
+  /** Where they fell (location name). */
+  locationName: string;
+  /** Lifetime foes bested. */
+  kills: number;
+  /** Corruption tier at death (label). */
+  corruption: string;
+  /** In-game hours survived. */
+  hours: number;
+  /** Wall-clock death time (for ordering / recency). */
+  ts: number;
+}
+
+const FALLEN_CAP = 25;
+
+/** OTA-845 — append a fallen character to the install-wide roll (capped). Returns the
+ *  new total number of fallen ever recorded within the cap window. */
+export async function recordFallen(hero: FallenHero): Promise<number> {
+  const stash = await loadGlobalStash();
+  const next = [...(stash.fallen ?? []), hero].slice(-FALLEN_CAP);
+  await saveGlobalStash({ ...stash, fallen: next });
+  return next.length;
+}
+
+/** OTA-845 — read the roll of the Fallen (newest last). */
+export async function loadFallen(): Promise<FallenHero[]> {
+  return (await loadGlobalStash()).fallen ?? [];
 }
 
 export async function loadGlobalStash(): Promise<GlobalStash> {
@@ -92,6 +132,7 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       installSeeded: parsed.installSeeded ?? false,
       devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
       testGiftGrantedSlots: parsed.testGiftGrantedSlots ?? [],
+      fallen: parsed.fallen ?? [],
     };
   } catch {
     return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [], testGiftGrantedSlots: [] };

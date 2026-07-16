@@ -20,7 +20,7 @@
 // only activates when there's an active player (so the title-screen
 // host still renders the entries as info-only).
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { BrandedModal } from './BrandedModal';
 import factionsData from '../data/factions/factions.json';
@@ -32,13 +32,17 @@ import conceptsData from '../data/lore/concepts.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
+import { loadFallen, type FallenHero } from '../engine/saveSystem';
 
 // OTA-837 — Tier-1 QoL #2: the codex now includes a discovery-gated BESTIARY (fills
 // in as you defeat enemy types) and a LORE tab that finally surfaces the 172-entry
 // concepts bank (the "massive lore document" that lived in the files but was never
 // shown to the player — only fed to the Arbiter's context). Both extend the existing
 // races/factions/places/timeline codex rather than a new screen.
-type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore';
+// OTA-845 — the FALLEN tab: an install-wide, cross-character memorial. Every character
+// who dies is remembered here (saveSystem.loadFallen), so a run ending is never a clean
+// wipe — later characters (and the title screen, between runs) can read who came before.
+type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen';
 
 interface CodexEnemy {
   name: string;
@@ -76,6 +80,14 @@ export function LoreCodexBody() {
   const enemyCatalog = enemiesData as CodexEnemy[];
   const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
   const concepts = (conceptsData as { concepts: LoreConcept[] }).concepts;
+  // OTA-845 [The Fallen] — install-wide roll of the dead, loaded async from the global
+  // stash. Newest first (most recent death at the top of the memorial).
+  const [fallen, setFallen] = useState<FallenHero[]>([]);
+  useEffect(() => {
+    let live = true;
+    void loadFallen().then((f) => { if (live) setFallen([...f].reverse()); });
+    return () => { live = false; };
+  }, []);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -104,7 +116,7 @@ export function LoreCodexBody() {
   return (
     <View style={styles.bodyWrap}>
       <View style={styles.tabs}>
-        {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore'] as Section[]).map((s) => (
+        {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen'] as Section[]).map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
@@ -240,6 +252,26 @@ export function LoreCodexBody() {
             ))}
           </>
         )}
+        {/* OTA-845 — THE FALLEN. The install-wide memorial of dead characters. A run
+            ending is never a clean wipe: every fallen predecessor is remembered here,
+            readable between runs from the title screen too. */}
+        {section === 'fallen' && (
+          fallen.length === 0 ? (
+            <Text style={styles.fallenEmpty}>No one has fallen yet. Tartaria is patient.</Text>
+          ) : (
+            <>
+              <Text style={styles.counter}>{fallen.length} remembered</Text>
+              {fallen.map((h, i) => (
+                <View key={`${h.name}_${h.ts}_${i}`} style={[styles.entry, styles.fallenEntry]}>
+                  <Text style={styles.name}>† {h.name}</Text>
+                  <Text style={styles.subtitle}>{h.raceName} • fell at {h.locationName}</Text>
+                  <Text style={styles.desc}>{h.epitaph}</Text>
+                  <Text style={styles.meta}>{h.kills} foes bested • {h.hours}h in Tartaria • {h.corruption}</Text>
+                </View>
+              ))}
+            </>
+          )
+        )}
       </ScrollView>
 
       <Modal
@@ -315,6 +347,9 @@ const styles = StyleSheet.create({
   // OTA-837 — bestiary/lore chrome.
   counter: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
   entryLocked: { opacity: 0.5, borderStyle: 'dashed' },
+  // OTA-845 — The Fallen memorial.
+  fallenEntry: { borderLeftWidth: 3, borderLeftColor: '#6a5a4a' },
+  fallenEmpty: { color: '#7a705c', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   lockedName: { color: '#7a705c', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   lockedSub: { color: '#5a5245', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },

@@ -16002,4 +16002,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (end-of-action, ~one pulse per in-game day) stores per-faction momentum in
 // worldMemory.factionTides + worldRumors and drops a "🗞 Word on the wind…" line; the
 // faction-standings panel tags each faction rising ▲ / waning ▼. Test: ota844WorldPulse.
-export const OTA_BUILD_ID = '2026-07-16-824-world-pulse';
+// ── OTA-825 (Tier-3 depth #3: The Fallen — golem port of HAL-845) ──────────────
+// Death is no longer a clean wipe: every fallen character is appended to an install-wide
+// roll of THE FALLEN (saveSystem GlobalStash `fallen` + recordFallen/loadFallen, capped
+// 25). handlePlayerDeath records the fallen + adds a beat; a new FALLEN tab in the Lore
+// Codex renders the memorial (newest first), readable between runs from the title screen.
+// Completes the Tier-3 batch (823/824/825). Test: ota845TheFallen.
+export const OTA_BUILD_ID = '2026-07-16-825-the-fallen';
