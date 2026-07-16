@@ -33,6 +33,7 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
+import { PickpocketModal } from '../components/PickpocketModal';
 import { MissionBoardModal } from '../components/MissionBoardModal';
 import { FusionPickerModal } from '../components/FusionPickerModal';
 import { ParleyModal } from '../components/ParleyModal';
@@ -139,6 +140,8 @@ export function ExplorationScreen() {
   const [statsColH, setStatsColH] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
+  // OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (replaces the peaceful APPROACH).
+  const [pickpocketOpen, setPickpocketOpen] = useState(false);
   // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
   // quick-row button; submits `ask the arbiter about <input>` so
   // OTA-233's parser fallback fires the MiniLM lore lookup.
@@ -928,6 +931,10 @@ export function ExplorationScreen() {
               }
               setApproachOpen(true);
             }}
+            // OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET. Greyed when there's
+            // no vendor and nothing liftable in the scene.
+            onOpenPickpocket={() => { Keyboard.dismiss(); setPickpocketOpen(true); }}
+            pickpocketBlocked={!currentScene?.vendor && (currentScene?.ambientNouns ?? []).length === 0}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenMissions={() => { useGameStore.getState().maybeAdvanceTutorial('main_quest'); setScreen('contracts'); }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
@@ -1538,20 +1545,31 @@ export function ExplorationScreen() {
         enemyHints={currentScene?.enemies.map((e) => e.name) ?? []}
         sceneHints={buildChipPool(currentScene)}
         vendorName={currentScene?.vendor?.name}
-        onSubmit={(target, useStealth) => {
+        onSubmit={(target) => {
           setApproachOpen(false);
-          // Stealth-on routes through the stealth intent (sneak verb
-          // → DEX skill check). Stealth-off routes through the
-          // approach/advance verb chain — in combat that closes the
-          // gap and switches focus to the named enemy; out of combat
-          // it runs the intra-scene move-toward narration.
-          if (useStealth) {
-            submit(`sneak up on ${target}`);
-          } else {
-            submit(`approach ${target}`);
-          }
+          // OTA-847 (STEALTH SYSTEM) — APPROACH is now positioning only. The old
+          // USE STEALTH toggle (sneak-up opener) is retired; the pre-fight sneak
+          // attack migrated to the in-combat STEALTH button's first action. In
+          // combat this closes the gap and switches focus to the named enemy.
+          submit(`approach ${target}`);
         }}
         onCancel={() => setApproachOpen(false)}
+      />
+
+      {/* OTA-847 (STEALTH SYSTEM) — PICKPOCKET picker (peaceful). Vendor offers
+          become lift targets; ambient nouns become opportunistic grabs. Routes
+          to stealthTakeAmbientNoun, which dispatches vendor theft (Stealth vs
+          the vendor's DC, high-STE quiet-fail) or a sleight-of-hand grab. */}
+      <PickpocketModal
+        visible={pickpocketOpen}
+        vendorName={currentScene?.vendor?.name}
+        vendorOffers={(currentScene?.vendor?.offers ?? []).map((o) => o.itemName)}
+        npcHints={currentScene?.vendor ? [] : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])}
+        onSubmit={(target) => {
+          setPickpocketOpen(false);
+          useGameStore.getState().stealthTakeAmbientNoun(target);
+        }}
+        onCancel={() => setPickpocketOpen(false)}
       />
 
       {/* OTA 046 — CLIMB picker. Pull climbables from the same scene

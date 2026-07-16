@@ -16508,4 +16508,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // INT / WIS / CHA verified accurate, unchanged. Pure display-copy fix — no
 // mechanics change. Test: ota846SkillActivities pins the corrected copy so it
 // can't silently drift back to describing mechanics the engine no longer has.
-export const OTA_BUILD_ID = '2026-07-16-846-grows-from-audit';
+// ── OTA-847 (STEALTH SYSTEM — pickpocket + in-combat sneak attack / backstab) ──
+// Stealth becomes a real playstyle instead of a thin 6th stat. One STE stat now
+// governs the whole loop: pickpocket → the sneak-attack opener → the mid-combat
+// backstab → the finesse-weapon payoff.
+//   OUT OF COMBAT — the peaceful APPROACH button becomes PICKPOCKET (new
+//     PickpocketModal). Tap a vendor's goods or an in-reach mark → Stealth roll
+//     vs their awareness. Win → it's yours, quiet. Fail → STE-GATED: a practiced
+//     thief (Stealth ≥ STEALTH_QUIET_FAIL_STE=14) feels the attention turn and
+//     withdraws clean (no item, no fight); a clumsy one is caught and the vendor
+//     flips hostile (the existing rep hit stands). APPROACH's old walk-up-to-a-
+//     noun job is retired; the USE STEALTH toggle on the approach picker is gone.
+//   IN COMBAT — a new STEALTH button (beside dodge/flee) drives the existing
+//     stealth intent: FIRST action of the fight = SNEAK ATTACK (free STE check
+//     for the drop, the `stealthed` +5 opener); mid-combat = BACKSTAB attempt
+//     (costs your turn, STE-tilted initiative race, capped one free opener).
+//   BACKSTAB payoff (combatRules.buildCombatSteps) — striking from `stealthed`
+//     with a FINESSE / thrown weapon (stat 'dexterity') DOUBLES the damage dice
+//     (reusing the perfect_opening treatment); a HEAVY weapon still gets the +5
+//     to-hit but no doubling — a plain sneak strike, so heavy builds can use the
+//     button too, they just don't get the rogue multiplier. The throwing-knife
+//     perk falls out for free: a finesse throwable hurled from stealth backstabs.
+// SKILL_ACTIVITIES STE copy updated to name the new STEALTH / PICKPOCKET buttons
+// (the retired approach toggle line is gone). Test: ota847Stealth pins the
+// finesse-only dice-doubling gate.
+export const OTA_BUILD_ID = '2026-07-16-847-stealth-system';

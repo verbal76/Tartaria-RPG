@@ -1186,6 +1186,12 @@ const STAMINA_COSTS = {
   skillCheck: 1,
 } as const;
 
+// OTA-847 (STEALTH SYSTEM) — Stealth at or above this value makes a FAILED
+// pickpocket against a vendor fail QUIETLY (you feel the mark's attention turn
+// and withdraw clean) instead of getting caught into a fight. A practiced thief
+// doesn't get grabbed red-handed; a clumsy one does. Tunable design knob.
+const STEALTH_QUIET_FAIL_STE = 14;
+
 // OTA 008 — Arbiter welcome-back debounce. Skip the line when the
 // player navigates away + back faster than this; first cold-load
 // per session always fires (lastWelcomeBackAt is null at boot).
@@ -17270,6 +17276,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+    } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
+      // OTA-847 (STEALTH SYSTEM) — STE-gated QUIET FAIL. A practiced thief
+      // (Stealth ≥ STEALTH_QUIET_FAIL_STE) who blows the roll doesn't get
+      // caught red-handed — they feel the mark's attention turn and withdraw a
+      // beat before it lands on them. No item, no fight, no rep loss. The
+      // steal-heat bump above still applies, so serial fumbling still climbs the
+      // DC — it's not risk-free, just not fatal. Below the threshold, the CAUGHT
+      // path below fires: the vendor flips hostile and the fight is real.
+      get().appendLog(
+        'world',
+        `Your fingers hover at the ${offer.itemName} — then you feel ${scene.vendor.name}'s attention start to swing your way. You let it go and step back, easy and clean. Nothing taken, nothing seen.`,
+      );
+      void get().persist();
+      return;
     } else {
       // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
       // Spin up an Enemy scaled to the vendor's tier and clear the

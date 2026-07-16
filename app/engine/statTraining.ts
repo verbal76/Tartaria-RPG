@@ -232,10 +232,10 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
   // OTA-348 — Stealth's own activities (moved off DEX). Starting value is a
   // race-proportional roll; these grow it from there.
   stealth: [
-    'A successful STEALTH approach (the APPROACH "use stealth" toggle)',
+    'A successful in-combat STEALTH — sneak attack or backstab (the STEALTH button)',
     'A passed STEALTH skill check (hunt / mystery / storyline stage)',
-    'Stealing from vendors',
-    'Sleight-of-hand / pickpocket takes',
+    'Pickpocketing a mark or vendor (the PICKPOCKET button)',
+    'Sleight-of-hand / opportunistic takes',
     'Weathering a hit while cloaked in stealth gear (passive)',
   ],
 };
