@@ -1475,7 +1475,11 @@ export interface MemorableEvent {
     | 'mq_core_recovered'
     | 'mq_descent_unlocked'
     | 'mq_nexus_reached'
-    | 'mq_ending_chosen';
+    | 'mq_ending_chosen'
+    // OTA-843 [Chronicle] — the character first crossed INTO a worse corruption tier
+    // (Tainted / Corrupted / Hollowed). Records the aether's arc on the soul so the
+    // Chronicle can show how far they've fallen, not just the current number.
+    | 'corruption_tier';
   text: string;
   timestamp: number;
   factionId?: string;

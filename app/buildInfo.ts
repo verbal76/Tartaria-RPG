@@ -16456,4 +16456,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // race VULNERABILITY lists as "+N%" (the bracket shows every modifier, not only
 // reductions); no modifiers → no bracket. Completes the Tier-2 QoL batch (840/841/842).
 // Test: ota842CombatLogMods.
-export const OTA_BUILD_ID = '2026-07-16-842-combat-log-breakdown';
+// ── OTA-843 (Tier-3 depth #1: Character Chronicle / legends log) ──────────────
+// A long-lived character ACCRETED a story — worldMemory.memorableEvents logs the
+// dramatic beats (first kill, faction oath, Guardians felled, the Choice), milestones
+// count the lifetime deeds, corruption marks the descent — but nothing pulled it into
+// one readable place, so a veteran read as a pile of numbers, not a legend. New
+// engine/chronicle.ts `buildChronicle()` assembles it: a headline ("<race> · <faction>
+// · Nd Mh in Tartaria"), a deed-list (foes bested, kinds catalogued, titles earned,
+// Cores recovered, corruption tier), and the memorable beats as a glyph-marked
+// timeline (oldest → newest). Surfaced as a collapsible CHRONICLE section at the top
+// of the Character sheet. Also NEW: a WORSENING corruption-tier crossing now records a
+// `corruption_tier` memorable event (at the weather-accrual site), so the Aether's
+// arc on the soul shows in the timeline, not just the live number. Test: ota843Chronicle.
+export const OTA_BUILD_ID = '2026-07-16-843-character-chronicle';
