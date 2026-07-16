@@ -17594,4 +17594,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // renders them as a TAPPABLE "Did you mean…" chip row above the input — one tap
 // re-submits. Applied cleanly (the parse/soft-refusal plumbing is shared engine).
 // Test: ota841DidYouMean.
-export const OTA_BUILD_ID = '2026-07-16-1122-did-you-mean-chips';
+// ── OTA-1123 (Tier-2 QoL #3: combat-log breakdown — engine port of HAL-842) ────
+// The incoming-hit line appended each mitigation as its own parenthetical (a wall of
+// "(…)(…)(…)"). New damageModClause() collects them into one terse comma-separated
+// bracket. engine_Dev divergence: engine's damage line carries two EXTRA tags the HAL
+// helper lacked — rfResistTag (race/faction content-pack resist) and drinkResistTag
+// (drunk-coating resist) — so engine's damageModClause takes rfTag/drinkTag params and
+// slots them in apply-order (armor → title → race → rf → shield → drink → ward).
+// Completes the Tier-2 QoL batch (1121/1122/1123). Test: ota842CombatLogMods.
+export const OTA_BUILD_ID = '2026-07-16-1123-combat-log-breakdown';
