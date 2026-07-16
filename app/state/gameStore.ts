@@ -1376,6 +1376,46 @@ function acceptKeyword(title: string): string {
 // to the raw saved player (which still loads — and the persist integrity
 // guard then refuses to write it back if it's missing core identity)
 // instead of failing the load to .bak / a slot-load error.
+// OTA-839 (HAL only) — one-time INTEL BACKFILL for a returning character. The
+// observed-weakness system (OTA-838) only starts recording the day you install it,
+// so a long-time character would open the new bestiary/panel to blank weaknesses on
+// foes they've beaten dozens of times. A player who DEFEATED an enemy did learn its
+// reactions in that fight, so we seed each already-defeated enemy's canonical
+// (type + base-trait) weak/resist set — the SAME reconcile the EnemyPanel's
+// defensesFor uses (trait wins on a discord). Runs once: only when the save carries
+// no enemyIntel yet (post-838 saves keep their real observations untouched).
+export function backfillEnemyIntelFromDefeats(
+  defeatedNames: readonly string[] | undefined,
+): Record<string, { weak: string[]; resist: string[] }> {
+  const out: Record<string, { weak: string[]; resist: string[] }> = {};
+  if (!defeatedNames || defeatedNames.length === 0) return out;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const enemies = require('../data/enemies/enemies.json') as Array<{ name: string; type?: string; traits?: string[] }>;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { enemyTypeDefenses } = require('../engine/crafting') as typeof import('../engine/crafting');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { traitDefenses } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
+  const byName = new Map(enemies.map((e) => [e.name.toLowerCase(), e]));
+  for (const rawName of new Set(defeatedNames.map((n) => n.toLowerCase()))) {
+    const e = byName.get(rawName);
+    if (!e) continue;
+    const type = enemyTypeDefenses(e.type);
+    const trait = traitDefenses(e.traits);
+    const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
+    const weak: string[] = [];
+    const resist: string[] = [];
+    for (const dt of all) {
+      const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
+      const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
+      const dir = traitDir !== 0 ? traitDir : typeDir; // trait wins on a discord (mirrors defensesFor)
+      if (dir > 0) weak.push(dt);
+      else if (dir < 0) resist.push(dt);
+    }
+    if (weak.length || resist.length) out[rawName] = { weak, resist };
+  }
+  return out;
+}
+
 // Exported for the OTA-486 regression test (equipped hands/cloak must survive a
 // load). The save/load round-trip funnels every load through this migration.
 export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
@@ -3925,6 +3965,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
         fusionCompensationGranted: saved.worldMemory.fusionCompensationGranted ?? false,
         pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
+        // OTA-839 (HAL only) — one-time intel backfill: a returning character whose
+        // save predates OTA-838 (no enemyIntel yet) gets the weak/resist they'd have
+        // learned by beating each foe, seeded from the enemies they've already
+        // defeated. Post-838 saves keep their real recorded observations.
+        enemyIntel: saved.worldMemory.enemyIntel
+          ?? backfillEnemyIntelFromDefeats(saved.worldMemory.defeatedEnemies),
       };
       set({
         player: { ...player, hasSeenIntro: true },

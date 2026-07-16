@@ -16399,4 +16399,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // you've LEARNED even below the Wisdom threshold, and the OTA-837 bestiary shows
 // "WEAK TO / RESISTS" on each fought enemy. Test: ota838EnemyIntel (dedup/move).
 // This completes the three Tier-1 "make the depth visible" OTAs (836/837/838).
-export const OTA_BUILD_ID = '2026-07-16-838-observed-weakness-tags';
+// ── OTA-839 (lore-accuracy pass + HAL-only intel backfill) ────────────────────
+// (1) LORE ACCURACY — the game drifted from its lore docs; two parallel audits
+// (races/factions + concepts/glossary) reconciled the player-facing codex against
+// the CODE (game wins on a conflict). races.json: Sentinel "Immunity to Time" no
+// longer promises immunity to the REMOVED hunger/forage system (now: half stamina
+// cost + weather-corruption immunity + gem luck); Mud Golem "Aetherstone Resilience"
+// now states its aetheric VULNERABILITY (+50%) and the ×0.75 non-aetheric cut (was
+// "half from non-Aetheric"); "Elemental Control" reads as the two once/day abilities
+// (strike + ward); Mud Dweller drops the non-existent "Mud-power" type. concepts.json:
+// dodge_action + dodge_melee describe the AC-bypass GAMBLE (not the retired
+// advantage/opposed-check model); skill_check/hide_action/stealing use STEALTH (not
+// DEX) and stealing's DC is vendor-set + escalating (not a fixed 12); added the
+// missing `cold` damage-type entry (cold is live). factions/glossary were clean.
+// (2) INTEL BACKFILL (HAL ONLY, per owner) — backfillEnemyIntelFromDefeats seeds a
+// returning character's OTA-838 enemyIntel from the foes they've ALREADY defeated, so
+// the new bestiary/panel weaknesses aren't blank on a veteran save. Runs once (only
+// when the save has no enemyIntel yet). Tests: ota839LoreAccuracy, ota839IntelBackfill.
+export const OTA_BUILD_ID = '2026-07-16-839-lore-accuracy-and-intel-backfill';
