@@ -17602,4 +17602,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (drunk-coating resist) — so engine's damageModClause takes rfTag/drinkTag params and
 // slots them in apply-order (armor → title → race → rf → shield → drink → ward).
 // Completes the Tier-2 QoL batch (1121/1122/1123). Test: ota842CombatLogMods.
-export const OTA_BUILD_ID = '2026-07-16-1123-combat-log-breakdown';
+// ── OTA-1124 (Tier-3 depth #1: Character Chronicle — engine port of HAL-843) ───
+// New engine/chronicle.ts buildChronicle() assembles the character's legend (headline
+// + deed-list + glyph-marked memorable-beat timeline), surfaced as a collapsible
+// CHRONICLE section atop the Character sheet (styles adapted to engine's teal palette).
+// A worsening corruption-tier crossing records a corruption_tier memorable event so the
+// descent shows in the timeline. (Chronicle uses tierLabel, not engine's content-pack
+// getCorruptionName — a summary line, acceptable.) Test: ota843Chronicle.
+export const OTA_BUILD_ID = '2026-07-16-1124-character-chronicle';

@@ -16,6 +16,7 @@ import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
+import { buildChronicle } from '../engine/chronicle';
 import { decayedMenace, menaceTier } from '../engine/menace';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
@@ -81,6 +82,16 @@ export function CharacterScreen() {
     : `${barehand.count}d${barehand.sides}${barehand.bonus > 0 ? '+' : ''}${barehand.bonus}`;
   const tier = corruptionTierOf(player.corruption ?? 0);
 
+  // OTA-843 [Chronicle] — assemble the character's legend from accreted state
+  // (memorable beats + milestones + titles + corruption + main-quest progress).
+  const chronicle = buildChronicle(player, worldMemory?.memorableEvents, {
+    raceName: race?.name,
+    factionName: faction?.name,
+    distinctFoes: new Set(worldMemory?.defeatedEnemies ?? []).size,
+    coresRecovered: player.mainQuest?.coresRecovered?.length ?? 0,
+    coresTotal: player.mainQuest ? 9 : 0,
+  });
+
   // arb119 — section header helper, mirroring the inventory headers: each section
   // title is a tappable plate (semi-transparent backing so the gold label reads
   // over any background) with a ▾/▴ chevron that folds the section away.
@@ -134,6 +145,33 @@ export function CharacterScreen() {
             <Text style={styles.barValue}>{player.stamina}/{stamMaxShown}</Text>
           </View>
         </View>
+
+        {/* ── CHRONICLE ─────────────────────────────────────────── */}
+        {/* OTA-843 — the character's legend: a headline, a short deed-list, and the
+            memorable beats as a timeline. Collapsed by default so it doesn't push the
+            stats down; tap to unfurl the story. */}
+        {sectionHeader('chronicle', 'CHRONICLE')}
+        {!collapsed.chronicle && (
+        <View style={styles.card}>
+          <Text style={styles.chronicleTitle}>{chronicle.title}</Text>
+          <Text style={styles.chronicleHeadline}>{chronicle.headline}</Text>
+          {chronicle.deeds.map((d, i) => (
+            <Text key={i} style={styles.chronicleDeed}>· {d}</Text>
+          ))}
+          {chronicle.entries.length > 0 ? (
+            <View style={styles.chronicleTimeline}>
+              {chronicle.entries.map((e, i) => (
+                <View key={i} style={styles.chronicleRow}>
+                  <Text style={styles.chronicleGlyph}>{e.glyph}</Text>
+                  <Text style={styles.chronicleEntryText}>{e.text}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.chronicleEmpty}>Your legend is unwritten. Go and make it.</Text>
+          )}
+        </View>
+        )}
 
         {/* ── CORE STATS ────────────────────────────────────────── */}
         {sectionHeader('core', 'CORE STATS')}
@@ -789,6 +827,15 @@ const styles = StyleSheet.create({
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
   progressPct: { color: '#6ab0c9', fontSize: 9, letterSpacing: 0.5 },
   activityList: { color: '#6ab0c9', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
+  // OTA-843 — Chronicle section (engine teal palette).
+  chronicleTitle: { color: '#d6e4e8', fontSize: 15, fontWeight: '700', letterSpacing: 0.5 },
+  chronicleHeadline: { color: '#6ab0c9', fontSize: 12, marginTop: 2, marginBottom: 8, letterSpacing: 0.5 },
+  chronicleDeed: { color: '#bcd2db', fontSize: 12, lineHeight: 18 },
+  chronicleTimeline: { marginTop: 10, borderTopColor: '#2b3a3e', borderTopWidth: 1, paddingTop: 8, gap: 6 },
+  chronicleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  chronicleGlyph: { color: '#6ab0c9', fontSize: 13, width: 16, textAlign: 'center' },
+  chronicleEntryText: { color: '#a8bcc2', fontSize: 12, lineHeight: 18, flex: 1 },
+  chronicleEmpty: { color: '#6c8088', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   chip: { backgroundColor: '#131c1f', borderColor: '#2b3a3e', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
   chipNeg: { borderColor: '#7a4040', backgroundColor: '#221512' },
