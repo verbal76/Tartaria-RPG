@@ -16588,4 +16588,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     the last one pays TC + giver standing and clears it (in the kill handler).
 // Enemies carry factionId (OTA-849), so patrol/raid kills also move standing. Test:
 // ota850FactionBounty pins the pure offer/terms/kill-counts helpers.
-export const OTA_BUILD_ID = '2026-07-16-850-faction-bounties';
+// ── OTA-851 (LIVING WORLD — event variety + roaming patrols that fight their own wars) ─
+// Two things keep the world from getting old: VARIETY and AUTONOMY.
+//   • WORLD-EVENT ENGINE (worldEvents.ts) — the single OTA-844 pulse becomes a broad,
+//     weighted catalogue (surge, setback, skirmish, muster, warband, bounty-posted,
+//     schism, truce, defector, pilgrimage, caravan, relic, market, omen, purge,
+//     windfall). Each carries a data-only effect the store applies (tide shifts, patrol
+//     musters, rep nudges, bounty offers) + a rumour and a terse Arbiter line. Drives
+//     the live tick AND the offline catch-up, so no two stretches read the same.
+//   • ROAMING PATROLS — faction war-parties (worldMemory.patrols) wander loops near
+//     their outposts on the world grid (stepPatrol). They can be blundered into ANYWHERE
+//     (maybePatrolAmbush, per-action proximity) — on top of OTA-850's outpost-approach
+//     interception. Count scales with the faction's tide; musters/warbands add more.
+//   • OFF-SCREEN WARS (simulatePatrols) — each tick, patrols fight without you: rival
+//     patrols within 2 tiles CLASH (weaker faction's is lost, tides shift), a patrol
+//     next to a RIVAL outpost ASSAULTS it, and beasts MAUL a deterministic slice — every
+//     skirmish another line on the board.
+//   • THE BOARD — WorldScreen now shows the world-event feed (glyph per kind) + a live
+//     "N patrols abroad" note, alongside the bounty board + balance of power.
+// Deterministic (seeded by tick index). Test: ota851WorldEvents pins the pure engine.
+export const OTA_BUILD_ID = '2026-07-16-851-world-events-patrols';
