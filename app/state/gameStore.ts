@@ -1799,6 +1799,50 @@ function recordMemorableEvent(
   }));
 }
 
+// OTA-844 [world pulse] — how much in-game time between world heartbeats. ~one pulse
+// per in-game day: often enough that a long game visibly shifts, rare enough that the
+// rumours never spam.
+const WORLD_TICK_HOURS = 24;
+
+// OTA-844 — the world's slow heartbeat. Called at the end of every action; when a full
+// pulse of in-game time has accrued, one faction's fortunes rise (pressing rivals,
+// lifting allies) and a rumour of it reaches the player. Deterministic (the tick index
+// selects the mover), so it's reproducible and testable. First call on a save just
+// stamps the baseline so a brand-new character doesn't hear a rumour on turn one.
+function worldTideCheck(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const s = get();
+  const player = s.player;
+  if (!player) return;
+  const hour = player.hoursElapsed ?? 0;
+  if (s.worldMemory.lastWorldTickHour === undefined) {
+    set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
+    return;
+  }
+  if (hour - s.worldMemory.lastWorldTickHour < WORLD_TICK_HOURS) return;
+  const tickIndex = Math.floor(hour / WORLD_TICK_HOURS);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { nextWorldTide } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
+  const result = nextWorldTide(factions, s.worldMemory.factionTides ?? {}, tickIndex);
+  if (!result.moverId) {
+    set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
+    return;
+  }
+  set((st) => ({
+    worldMemory: {
+      ...st.worldMemory,
+      factionTides: result.tides,
+      lastWorldTickHour: hour,
+      worldRumors: [...(st.worldMemory.worldRumors ?? []), { text: result.rumor, hour }].slice(-12),
+    },
+  }));
+  get().appendLog('world', `🗞 ${result.rumor}`);
+}
+
 // Milestone thresholds. Hit one of these counters and the character gets a
 // permanent stat bump. Numbers are intentionally generous so growth feels
 // earned, not handed out.
@@ -14372,6 +14416,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // while at 32 loyalty drops to 30 and emits the 30-beat) fires
     // exactly once.
     dogThresholdCheck(get, set, dogLoyaltyBefore);
+    // OTA-844 [world pulse] — advance the world's slow heartbeat. No-op unless a full
+    // pulse of in-game time has accrued since the last one.
+    worldTideCheck(get, set);
     void get().persist();
   },
 

@@ -16,6 +16,7 @@ import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine
 import { barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
 import { buildChronicle } from '../engine/chronicle';
+import { tideLabel } from '../engine/worldPulse';
 import { decayedMenace, menaceTier } from '../engine/menace';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
 import { TITLE_PASSIVE_PERK } from '../engine/titles';
@@ -299,10 +300,14 @@ export function CharacterScreen() {
                 : standing >= 0 ? '#cdbf99'
                 : standing >= -10 ? '#c9a86a'
                 : '#e07a5f';
+              // OTA-844 [world pulse] — the world moves on its own; show whether this
+              // faction is rising or waning in the balance of power right now.
+              const tide = tideLabel(worldMemory?.factionTides?.[row.factionId]);
               return (
                 <View key={row.factionId} style={styles.kvRow}>
                   <Text style={[styles.kvKey, isOwn && styles.factionOwn]}>
                     {meta!.name}{isOwn ? ' (sworn)' : ''}
+                    {tide ? <Text style={tide.word === 'rising' || tide.word === 'ascendant' ? styles.tideRising : styles.tideWaning}>{`  ${tide.glyph} ${tide.word}`}</Text> : null}
                   </Text>
                   <Text style={[styles.kvValue, { color }]}>
                     {standing >= 0 ? '+' : ''}{standing}{qualifies && !isOwn ? ' ✓' : ''}
@@ -828,6 +833,9 @@ const styles = StyleSheet.create({
   kvRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4 },
   kvKey: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
   factionOwn: { color: '#cdbf99', fontWeight: '700' },
+  // OTA-844 — world-pulse tide tags on the faction standings.
+  tideRising: { color: '#9ec96a', fontSize: 10, fontWeight: '400' },
+  tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
   warning: { color: '#c9a86a' },

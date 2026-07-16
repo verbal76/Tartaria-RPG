@@ -1527,6 +1527,14 @@ export interface WorldMemory {
    *  specific types even below the Wisdom read-threshold ("strike to learn" made
    *  real + persistent), and the bestiary shows them on that enemy's entry. */
   enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
+  /** OTA-844 [world pulse] — per-faction momentum (−5..+5). Drifts on its own over
+   *  in-game time (nextWorldTide) so the balance of power shifts without the player.
+   *  Surfaced as a rising/waning tag on the faction-standings panel. */
+  factionTides?: Record<string, number>;
+  /** In-game hour of the last world pulse (gates the next one). */
+  lastWorldTickHour?: number;
+  /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
+  worldRumors?: { text: string; hour: number }[];
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has
    *  fired. Prevents the Arbiter from repeating the "you're light

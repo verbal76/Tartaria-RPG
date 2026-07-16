@@ -15996,4 +15996,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // CHRONICLE section atop the Character sheet. A worsening corruption-tier crossing now
 // records a corruption_tier memorable event so the descent shows in the timeline.
 // Test: ota843Chronicle.
-export const OTA_BUILD_ID = '2026-07-16-823-character-chronicle';
+// ── OTA-824 (Tier-3 depth #2: World Pulse — golem port of HAL-844) ─────────────
+// New engine/worldPulse.ts nextWorldTide() advances the balance of power one pulse
+// (mover rises, rivals fall, allies rise; deterministic by tick index). worldTideCheck
+// (end-of-action, ~one pulse per in-game day) stores per-faction momentum in
+// worldMemory.factionTides + worldRumors and drops a "🗞 Word on the wind…" line; the
+// faction-standings panel tags each faction rising ▲ / waning ▼. Test: ota844WorldPulse.
+export const OTA_BUILD_ID = '2026-07-16-824-world-pulse';
