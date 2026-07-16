@@ -17553,4 +17553,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // decomposed into labelled sources; the DEFENSE card shows total + "(base N)" +
 // chips. Import merge kept engine's getRaces/getFactions content-pack path.
 // Test: ota836ACBreakdown.
-export const OTA_BUILD_ID = '2026-07-16-1117-tap-to-explain-ac';
+// ── OTA-1118 (Tier-1 QoL #2: discovery bestiary — engine port of HAL-837) ──────
+// LoreCodexBody gained a BESTIARY tab (fills in as you defeat enemy types, keyed off
+// worldMemory.defeatedEnemies; "??? — undiscovered" until beaten, then type/HP/dmg/
+// traits/drops + an "X of N catalogued" counter). engine_Dev DIVERGENCE: the roster
+// resolves through resolveTable('enemies', …) so a content pack's own enemies show,
+// and the HAL "lore" tab (which surfaces Tartaria's built-in concepts.json Q&A bank)
+// is intentionally OMITTED — this engine's lore is the content-pack `lore` table, so
+// injecting the built-in bank would leak Tartaria lore into a re-skin. Timeline tab
+// stays removed (engine has no override path for it). Test: ota837CodexData.
+export const OTA_BUILD_ID = '2026-07-16-1118-discovery-codex';

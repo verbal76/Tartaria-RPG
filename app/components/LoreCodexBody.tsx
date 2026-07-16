@@ -26,18 +26,36 @@ import { BrandedModal } from './BrandedModal';
 import locationsData from '../data/locations/locations.json';
 import { getRaces, getFactions } from '../engine/character';
 import { resolveTable, getNarratorName } from '../engine/contentPack';
+import enemiesData from '../data/enemies/enemies.json';
 import type { Faction, Race, Location } from '../engine/types';
 import { useGameStore } from '../state/gameStore';
 import { revealedLocationName, isLocationRevealed, isHiddenLocation } from '../engine/hiddenLocations';
 
-type Section = 'races' | 'factions' | 'places';
+// OTA-837 — Tier-1 QoL #2: the codex gains a discovery-gated BESTIARY (fills in as
+// you defeat enemy types). engine_Dev DIVERGENCE from HAL: the bestiary reads
+// enemies through resolveTable('enemies', …) so a content pack's own roster shows,
+// and the HAL "lore" tab (which surfaces Tartaria's built-in concepts.json Q&A bank)
+// is INTENTIONALLY omitted here — this engine's lore is the content-pack `lore`
+// table, not that Tartaria-specific narration bank, so injecting it would leak
+// built-in Tartaria lore into a re-skin.
+type Section = 'races' | 'factions' | 'places' | 'bestiary';
+
+interface CodexEnemy {
+  name: string;
+  type?: string;
+  hp?: number;
+  damage?: string;
+  rarity?: string;
+  traits?: string[];
+  loot?: string[];
+}
 
 export function LoreCodexBody() {
   // engine_Dev — the Timeline tab is REMOVED. It was the one Codex section with
   // no upload path: it imported the built-in timeline JSON directly, so any game
   // that didn't override BOTH locations and factions still showed the built-in
   // events. Races/factions/places all resolve through the content pack.
-  const SECTIONS: Section[] = ['races', 'factions', 'places'];
+  const SECTIONS: Section[] = ['races', 'factions', 'places', 'bestiary'];
   const [section, setSection] = useState<Section>('races');
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
@@ -50,6 +68,16 @@ export function LoreCodexBody() {
   const appendLog = useGameStore((s) => s.appendLog);
   // OTA-498 — hidden locations (the Hidden Market) read as "?" here too until visited.
   const discoveredIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  // OTA-837 — the bestiary reveals an enemy once you've DEFEATED its type (its name is
+  // recorded in worldMemory.defeatedEnemies). Undiscovered foes read as "??? — undiscovered".
+  const defeatedEnemies = useGameStore((s) => s.worldMemory?.defeatedEnemies);
+  const defeatedSet = React.useMemo(
+    () => new Set((defeatedEnemies ?? []).map((n) => n.toLowerCase())),
+    [defeatedEnemies],
+  );
+  // engine_Dev — resolve through the content pack so a re-skin's enemy roster shows.
+  const enemyCatalog = resolveTable('enemies', enemiesData as CodexEnemy[]) as CodexEnemy[];
+  const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
@@ -84,7 +112,9 @@ export function LoreCodexBody() {
             onPress={() => setSection(s)}
             style={[styles.tab, section === s && styles.tabActive]}
           >
-            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>{s}</Text>
+            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>
+              {s === 'bestiary' ? 'beasts' : s}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -151,6 +181,40 @@ export function LoreCodexBody() {
             </TouchableOpacity>
           );
         })}
+        {/* OTA-837 — BESTIARY. Fills in as you defeat enemy types; an unbeaten foe
+            reads as an "??? — undiscovered" silhouette so the tab shows the shape of
+            what's left to meet, not a spoiler dump. engine_Dev: catalog resolves
+            through the content pack (see enemyCatalog above). The HAL "lore" concepts
+            tab is intentionally omitted — engine lore is content-pack-driven. */}
+        {section === 'bestiary' && (
+          <>
+            <Text style={styles.counter}>{beatenCount} of {enemyCatalog.length} catalogued</Text>
+            {enemyCatalog.map((e, idx) => {
+              const known = defeatedSet.has(e.name.toLowerCase());
+              if (!known) {
+                return (
+                  <View key={`${e.name}_${idx}`} style={[styles.entry, styles.entryLocked]}>
+                    <Text style={styles.lockedName}>??? — undiscovered</Text>
+                    <Text style={styles.lockedSub}>Defeat one to record it here.</Text>
+                  </View>
+                );
+              }
+              return (
+                <View key={`${e.name}_${idx}`} style={styles.entry}>
+                  <Text style={styles.name}>{e.name}</Text>
+                  <Text style={styles.subtitle}>{e.type ?? 'Unknown'} • {e.rarity ?? 'Common'}</Text>
+                  <Text style={styles.meta}>COMBAT • HP {e.hp ?? '?'} • Dmg {e.damage ?? '?'}</Text>
+                  {(e.traits ?? []).length > 0 && (
+                    <Text style={styles.meta}>TRAITS • {(e.traits ?? []).join(', ')}</Text>
+                  )}
+                  {(e.loot ?? []).length > 0 && (
+                    <Text style={styles.meta}>DROPS • {(e.loot ?? []).join(', ')}</Text>
+                  )}
+                </View>
+              );
+            })}
+          </>
+        )}
       </ScrollView>
 
       <Modal
@@ -223,6 +287,11 @@ const styles = StyleSheet.create({
   tabTextActive: { color: '#d6e4e8' },
   scroll: { flex: 1 },
   entry: { backgroundColor: '#0e1618', borderColor: '#2b3a3e', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
+  // OTA-837 — bestiary chrome (engine teal palette).
+  counter: { color: '#6c8088', fontSize: 10, letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' },
+  entryLocked: { opacity: 0.5, borderStyle: 'dashed' },
+  lockedName: { color: '#6c8088', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  lockedSub: { color: '#4a5a60', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   name: { color: '#d6e4e8', fontSize: 14, fontWeight: '700' },
   subtitle: { color: '#6ab0c9', fontSize: 11, marginBottom: 4 },
   desc: { color: '#bcd2db', fontSize: 12, lineHeight: 18, marginTop: 2 },
