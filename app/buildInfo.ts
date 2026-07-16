@@ -16436,4 +16436,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   • SALVAGE ALL on a MIXED batch — unmatched nouns left only a debug breadcrumb
 //     while the successful loot showed; now they surface too.
 // Test: ota840NeverFailSilently.
-export const OTA_BUILD_ID = '2026-07-16-840-never-fail-silently';
+// ── OTA-841 (Tier-2 QoL #2: intent-parse "did you mean…" chip row) ────────────
+// The natural-language parser already degraded gracefully — a low-confidence /
+// unresolved input tries the Qwen fallback, then a soft Arbiter refusal + a "Try:
+// look around · search · rest" TEXT hint. But that hint was dead text the player had
+// to RETYPE. Now the same runnable command list is stashed on the store
+// (parseSuggestions, set on both soft-refusal paths, cleared at the start of the next
+// action), and ExplorationScreen renders it as a TAPPABLE "Did you mean…" chip row
+// above the input — one tap re-submits that command. Turns the NL cliff into a
+// one-tap recovery. Test: ota841DidYouMean (populate on unresolved parse; clear on
+// next action).
+export const OTA_BUILD_ID = '2026-07-16-841-did-you-mean-chips';
