@@ -7767,7 +7767,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (explicit) {
         get().resolveParley(explicit);
       } else {
-        get().appendLog('world', `${foe.name} squares off. How do you play it — calm it, or intimidate it?`);
+        // OTA-854 — faction patrols read as people, not beasts: persuade / intimidate.
+        get().appendLog('world', foe.factionId
+          ? `${foe.name} squares off. How do you play it — persuade them to stand down, or intimidate them into leaving?`
+          : `${foe.name} squares off. How do you play it — calm it, or intimidate it?`);
         void get().persist();
       }
       return;
@@ -29938,6 +29941,9 @@ export type CallDogOption = 'scratch' | 'treat' | 'speak';
 // A hair under the −10 for stealing a protected item: you shook them down, you didn't
 // crack a vault. Half bleeds to their allies via applyRepChange, same as any rep hit.
 const PARLEY_EXTORT_REP = 6;
+// OTA-854 — persuading a rival FACTION patrol to break off cleanly earns you a point
+// of goodwill with their faction (you spared their people; word gets around).
+const PARLEY_CALM_REP = 1;
 
 /** OTA-809 — build a plain misc loot item (extorted goods / lead cache reward). No
  *  catalog row required; grantItem gives it a default stack cap. */
@@ -30024,16 +30030,52 @@ function runParleyOutcome(
   if (success) {
     const trained = trainStat(player, 'charisma', true);
     if (kind === 'animal') {
-      // Calm or intimidate — the creature disengages; you keep the tile.
-      set((s) =>
-        s.player && s.currentScene
-          ? {
-              player: withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25)),
-              currentScene: { ...s.currentScene, enemies: [], enemyHps: [], enemyKnockedOut: [], enemyAmbushUsed: [], activeEnemyIdx: 0, range: null },
-            }
-          : s,
-      );
+      // Calm or intimidate — the foe disengages; you keep the tile.
+      // OTA-854 — a FACTION patrol (enemies carrying a factionId) has faction
+      // consequences the way a wild beast doesn't:
+      //   • INTIMIDATE → they break and run, dropping what they carried (their loot + TC).
+      //   • PERSUADE (calm) → clean break, no ill will, +1 standing with their faction —
+      //     you spared their people and word gets around.
+      const facId = scene.enemies.map((e) => e.factionId).find(Boolean) ?? null;
+      const facLoot = (facId && isIntimidate)
+        ? scene.enemies.flatMap((e) => (e.factionId ? (e.loot ?? []) : []))
+        : [];
+      const dropTc = (facId && isIntimidate) ? (5 + rollDie(10)) : 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let repChangedFac: any[] = [];
+      const grantedFacNames: string[] = [];
+      set((s) => {
+        if (!s.player || !s.currentScene) return s;
+        let p = withMenace(advanceTime(spendStamina(trained.player, STAMINA_COSTS.skillCheck), 0.25));
+        if (facId && isIntimidate) {
+          p = { ...p, tc: p.tc + dropTc };
+          let inv = p.inventory;
+          for (const name of facLoot) {
+            const res = grantItem(inv, miscLootItem(name, 1));
+            inv = res.inventory;
+            if (res.accepted > 0) grantedFacNames.push(name);
+          }
+          p = { ...p, inventory: inv };
+        } else if (facId && !isIntimidate) {
+          const rr = applyRepChange(p.factionStanding, facId, PARLEY_CALM_REP);
+          p = { ...p, factionStanding: rr.standing };
+          repChangedFac = rr.changed;
+        }
+        return {
+          player: p,
+          currentScene: { ...s.currentScene, enemies: [], enemyHps: [], enemyKnockedOut: [], enemyAmbushUsed: [], activeEnemyIdx: 0, range: null },
+        };
+      });
       get().appendLog('world', parleySuccessLine(choice, kind, targetName));
+      if (facId && isIntimidate) {
+        const lootDesc = [dropTc > 0 ? `${dropTc} TC` : null, ...grantedFacNames].filter(Boolean).join(', ');
+        get().appendLog('reward', lootDesc
+          ? `The ${factionLabel(facId)} break and run, dropping ${lootDesc} in their haste.`
+          : `The ${factionLabel(facId)} break and run.`);
+      } else if (facId && !isIntimidate) {
+        get().appendLog('reward', `The ${factionLabel(facId)} lower their weapons and pull back — no blood spilled. (+${PARLEY_CALM_REP} standing with the ${factionLabel(facId)})`);
+        if (repChangedFac.length) logRepChanges(get, repChangedFac);
+      }
     } else if (choice === 'persuade') {
       // OTA-809 — SECRETS: talk a real LOCATION LEAD out of them. It plants as
       // player.pendingLead and pays out (the cache) when you next reach fresh ground.

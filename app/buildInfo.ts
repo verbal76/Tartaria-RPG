@@ -16636,4 +16636,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     relationLabel); the event feed (capped 50) is THE WAR AS IT HAPPENS. World drama now
 //     routes ONLY to the board, never the exploration feed. Offline load simulates the gap.
 // Test: ota853FactionRelations. (854 next: talk a rival patrol down — persuade/intimidate.)
-export const OTA_BUILD_ID = '2026-07-16-853-emergent-grudges';
+// ── OTA-854 (TALK A PATROL DOWN — persuade / intimidate a rival faction's patrol) ─
+// The player-facing counterpart to the roaming patrols (OTA-853). When a faction
+// patrol is hostile to you over standing, you can end it with words:
+//   • PERSUADE → they break off, no ill will — everyone walks — and you GAIN +1 standing
+//     with their faction (PARLEY_CALM_REP; you spared their people, word gets around).
+//   • INTIMIDATE → they break and RUN, dropping what they carried (their loot + a little TC).
+// Wired into the existing combat parley (runParleyOutcome): a foe carrying a factionId
+// now routes faction consequences a wild beast never did, and the opener prompt reads
+// "persuade them to stand down, or intimidate them into leaving" for a patrol.
+//   • BIG VOCABULARY EXPANSION — detectParleyChoice + the parser's diplomacy verbs now
+//     read natural aggression: "shout at them to go away", "yell to back off", "get out
+//     of here", "scare them off", "browbeat them", "or else" → INTIMIDATE; "reason with
+//     them", "talk them down", "defuse it", "make peace" → PERSUADE. (Bare phrasal
+//     commands like "back off" stay out of the parser to avoid colliding with retreat;
+//     they resolve once a parley is open.)
+// Test: ota854TalkDownVocab pins the widened reads.
+export const OTA_BUILD_ID = '2026-07-16-854-talk-down-patrols';
