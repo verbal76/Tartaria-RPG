@@ -6,14 +6,14 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, effectiveACBreakdown } from '../state/gameStore';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
-import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
+import { barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
 import { decayedMenace, menaceTier } from '../engine/menace';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
@@ -71,7 +71,10 @@ export function CharacterScreen() {
   const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
 
   const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null));
-  const acValue = effectiveAC(player, scene ?? null);
+  // OTA-836 — full AC breakdown (base + armor + title + stance), matching what
+  // the combat resolver actually stands on (the old sheet showed only race base +
+  // context, dropping equipped armor). The DEFENSE card renders acBd.total + chips.
+  const acBd = effectiveACBreakdown(player, scene ?? null);
   const barehand = barehandDamageFor(player.raceId);
   const barehandStr = barehand.bonus === 0
     ? `${barehand.count}d${barehand.sides}`
@@ -155,8 +158,25 @@ export function CharacterScreen() {
         <View style={styles.card}>
           <View style={styles.kvRow}>
             <Text style={styles.kvKey}>Armor Class</Text>
-            <Text style={styles.kvValue}>{acValue}</Text>
+            <Text style={styles.kvValue}>
+              {acBd.total}
+              {acBd.sources.length > 0 && <Text style={styles.statBase}>  (base {acBd.base})</Text>}
+            </Text>
           </View>
+          {/* OTA-836 — AC source chips (armor / stance / title / race context), so a
+              plate-armored player can SEE where their number comes from. Mirrors the
+              core-stat chips; matches the AC the combat resolver actually uses. */}
+          {acBd.sources.length > 0 && (
+            <View style={styles.chipRow}>
+              {acBd.sources.map((s, i) => (
+                <View key={i} style={[styles.chip, s.delta < 0 && styles.chipNeg]}>
+                  <Text style={[styles.chipText, s.delta < 0 && styles.chipTextNeg]}>
+                    {s.delta > 0 ? '+' : ''}{s.delta} {s.label}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
           {race?.racialACBonus && race.racialACBonus !== 'No inherent AC bonus' && (
             <Text style={styles.kvSub}>↳ {race.racialACBonus}</Text>
           )}

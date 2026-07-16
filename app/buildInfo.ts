@@ -16364,4 +16364,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       three channels (repair / power-up / unexpected surge).
 // Sentinel (tireless + ageless), Stormcaller (also halves electrical) landed in
 // the same batch.
-export const OTA_BUILD_ID = '2026-07-16-835-race-flavor-wiring';
+// ── OTA-836 (Tier-1 QoL #1: tap-to-explain numbers) ───────────────────────────
+// The Character sheet's core STATS already showed per-source chips (base + race +
+// equipped + food + weather + corruption …), but the derived DEFENSE number did
+// NOT — and worse, "Armor Class" rendered only effectiveAC() (race base + scene
+// context), silently DROPPING the equipped armor / accessory AC, the ruins-defense
+// title bonus, and any active stance/cover. A plate-armored player read the SAME
+// AC as a naked one. New effectiveACBreakdown() (gameStore) returns the SAME total
+// the enemy-attack resolver stands on — racialAC + armor + title + status (the
+// dodge gamble is a per-swing AC bypass, not standing AC, so it's excluded) —
+// decomposed into labelled sources. The DEFENSE card now shows acBd.total with
+// "(base N)" + source chips, matching the core-stat treatment. Fixes both the
+// legibility gap AND the display-accuracy bug. Test: ota836ACBreakdown.
+export const OTA_BUILD_ID = '2026-07-16-836-tap-to-explain-ac';

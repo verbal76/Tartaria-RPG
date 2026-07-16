@@ -25407,6 +25407,44 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
   return { acBonus, resistances, resistSlots };
 }
 
+// OTA-836 — TAP-TO-EXPLAIN AC. The Character sheet used to show only
+// effectiveAC() (race base + scene context), silently DROPPING the equipped
+// armor / accessory AC, the ruins-defense title bonus, and any active
+// stance/cover status — so a plate-armored player read the SAME "Armor Class"
+// as a naked one. This returns the same total the enemy-attack resolver stands
+// on (racialAC + armor + title + status; the dodge gamble is a per-swing AC
+// BYPASS, not standing AC, so it's excluded), decomposed into labelled sources
+// so the sheet can show WHY the number is what it is — matching the core-stat
+// chips. Lives here (not equipment.ts) because aggregateArmor — with its fused /
+// per-instance / accessory handling — is module-private, and keeping the display
+// on the same helper the combat math uses stops the two from drifting.
+export function effectiveACBreakdown(
+  player: PlayerCharacter,
+  scene: Parameters<typeof effectiveAC>[1],
+): { total: number; base: number; sources: Array<{ label: string; delta: number }> } {
+  const base = player.ac ?? 10;
+  const racialAC = effectiveAC(player, scene); // base + race-conditional context delta
+  const raceCtxDelta = racialAC - base;
+  const armor = aggregateArmor(player).acBonus;
+  // ruins-defense title (Protector / Warden): +AC inside a constructed environment.
+  let titleRuinsAc = 0;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tPerks = require('../engine/titles').titlePerkModifiers(player);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { detectACContexts } = require('../engine/raceMechanics');
+  if (tPerks.ruinsDefenseBonus > 0 && detectACContexts(player, scene).has('constructed_environment')) {
+    titleRuinsAc = tPerks.ruinsDefenseBonus;
+  }
+  const statusAdj = statusAcAdjustment(player.statusEffects);
+  const sources: Array<{ label: string; delta: number }> = [];
+  if (raceCtxDelta !== 0) sources.push({ label: 'race context', delta: raceCtxDelta });
+  if (armor !== 0) sources.push({ label: 'armor', delta: armor });
+  if (titleRuinsAc !== 0) sources.push({ label: 'title (ruins)', delta: titleRuinsAc });
+  if (statusAdj !== 0) sources.push({ label: 'stance/cover', delta: statusAdj });
+  const total = Math.max(1, base + raceCtxDelta + armor + titleRuinsAc + statusAdj);
+  return { total, base, sources };
+}
+
 // OTA-685 — per-enemy chance to swing at the DOG instead of the commander on a
 // group volley. arb169 had (correctly) closed the "command the dog to dodge the
 // group's retaliation" exploit by routing the WHOLE volley to the player — but it
