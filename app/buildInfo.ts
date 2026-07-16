@@ -16620,4 +16620,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     fallen) were 7 equal flex cells crammed into the width, so every label word-
 //     wrapped. The row is now a horizontal scroll of content-sized, one-line tabs.
 // UI-only (no engine change); covered by the app-source typecheck.
-export const OTA_BUILD_ID = '2026-07-16-852-surface-world-lore';
+// ── OTA-853 (EMERGENT GRUDGES — factions wage their own wars across the whole map) ─
+// Kills the abstract "tide" model. Factions now have STANDING WITH EACH OTHER
+// (factionRelations, −100..+100) — the same concept the player has with factions:
+//   • EARNED GRUDGES — seeded from lore, then live: every patrol clash deepens the two
+//     factions' standing, and two NEUTRALS can come to blows through friction, seeding a
+//     brand-new grudge FROM ZERO (meetOutcome). Rivalries build themselves out of RNG.
+//   • PATROLS ROAM THE WHOLE MAP — the radius-3 home leash is gone (stepPatrol). Patrols
+//     drift toward their nearest hostile faction's outpost, so they go LOOKING for a fight.
+//   • WAR SCOREBOARD — factionTides is now earned POWER: win clashes / sack outposts →
+//     power up, get crushed → down. It still drives patrol count, vendor prices, raids.
+//   • FIELDED FORCE scaled up (targetPatrolCount 2..10 by power; ~45 out typically, soft-
+//     capped 100 — trivially cheap), and a fading faction's patrols now thin out.
+//   • WORLD BOARD — new GRUDGES & ALLIANCES section (who's at whose throat, via topGrudges/
+//     relationLabel); the event feed (capped 50) is THE WAR AS IT HAPPENS. World drama now
+//     routes ONLY to the board, never the exploration feed. Offline load simulates the gap.
+// Test: ota853FactionRelations. (854 next: talk a rival patrol down — persuade/intimidate.)
+export const OTA_BUILD_ID = '2026-07-16-853-emergent-grudges';
