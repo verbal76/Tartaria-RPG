@@ -16387,4 +16387,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lore document" that was in the files feeding the Arbiter's narration context but
 // NEVER shown to the player. Test: ota837CodexData (data contracts + the discovery
 // gate). Next: OTA-838 adds observed damage-type weaknesses to each bestiary entry.
-export const OTA_BUILD_ID = '2026-07-16-837-discovery-codex';
+// ── OTA-838 (Tier-1 QoL #3: enemy weakness tags "once discovered") ────────────
+// The EnemyPanel already WIS-gated an enemy's weak/resist reveal (Wisdom ≥ 12 reads
+// them on sight; below that its own copy said "strike to learn") — but that "learn
+// by hitting" was a transient combat-log line, never persisted or shown on the
+// portrait. This makes it real: landing a weak/resist hit now records the observed
+// damage type in worldMemory.enemyIntel (name-keyed; recordEnemyIntel dedupes and a
+// contradicting later hit MOVES the type — per-spawn randomization can flip it, so
+// the freshest observation wins). Wired at the primary melee, ranged-bolt, and
+// thrown-coating attack paths. The portrait + detail popup now reveal the types
+// you've LEARNED even below the Wisdom threshold, and the OTA-837 bestiary shows
+// "WEAK TO / RESISTS" on each fought enemy. Test: ota838EnemyIntel (dedup/move).
+// This completes the three Tier-1 "make the depth visible" OTAs (836/837/838).
+export const OTA_BUILD_ID = '2026-07-16-838-observed-weakness-tags';

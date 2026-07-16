@@ -71,6 +71,8 @@ export function LoreCodexBody() {
     () => new Set((defeatedEnemies ?? []).map((n) => n.toLowerCase())),
     [defeatedEnemies],
   );
+  // OTA-838 — damage-type intel you've LEARNED by fighting each enemy (name-keyed).
+  const enemyIntel = useGameStore((s) => s.worldMemory?.enemyIntel);
   const enemyCatalog = enemiesData as CodexEnemy[];
   const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
   const concepts = (conceptsData as { concepts: LoreConcept[] }).concepts;
@@ -200,6 +202,7 @@ export function LoreCodexBody() {
                   </View>
                 );
               }
+              const intel = enemyIntel?.[e.name.toLowerCase()];
               return (
                 <View key={`${e.name}_${idx}`} style={styles.entry}>
                   <Text style={styles.name}>{e.name}</Text>
@@ -207,6 +210,13 @@ export function LoreCodexBody() {
                   <Text style={styles.meta}>COMBAT • HP {e.hp ?? '?'} • Dmg {e.damage ?? '?'}</Text>
                   {(e.traits ?? []).length > 0 && (
                     <Text style={styles.meta}>TRAITS • {(e.traits ?? []).join(', ')}</Text>
+                  )}
+                  {/* OTA-838 — damage-type intel you've learned by fighting it. */}
+                  {(intel?.weak.length ?? 0) > 0 && (
+                    <Text style={styles.meta}>WEAK TO • {intel!.weak.join(', ')}</Text>
+                  )}
+                  {(intel?.resist.length ?? 0) > 0 && (
+                    <Text style={styles.meta}>RESISTS • {intel!.resist.join(', ')}</Text>
                   )}
                   {(e.loot ?? []).length > 0 && (
                     <Text style={styles.meta}>DROPS • {(e.loot ?? []).join(', ')}</Text>
