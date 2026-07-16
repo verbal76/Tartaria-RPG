@@ -115,19 +115,26 @@ export function LoreCodexBody() {
 
   return (
     <View style={styles.bodyWrap}>
-      <View style={styles.tabs}>
+      {/* OTA-852 — the 7 codex tabs no longer cram into the width and word-wrap;
+          the row scrolls horizontally and each tab sizes to its (one-line) label. */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabsScroll}
+        contentContainerStyle={styles.tabs}
+      >
         {(['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen'] as Section[]).map((s) => (
           <TouchableOpacity
             key={s}
             onPress={() => setSection(s)}
             style={[styles.tab, section === s && styles.tabActive]}
           >
-            <Text style={[styles.tabText, section === s && styles.tabTextActive]}>
+            <Text style={[styles.tabText, section === s && styles.tabTextActive]} numberOfLines={1}>
               {s === 'bestiary' ? 'beasts' : s}
             </Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
 
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 24 }}>
         {section === 'races' && (racesData as Race[]).map((r) => {
@@ -337,10 +344,11 @@ export function LoreCodexBody() {
 
 const styles = StyleSheet.create({
   bodyWrap: { flex: 1 },
-  tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
-  tab: { flex: 1, paddingVertical: 6, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
+  tabsScroll: { flexGrow: 0, marginBottom: 8 },
+  tabs: { flexDirection: 'row', gap: 6, paddingRight: 8 },
+  tab: { paddingVertical: 6, paddingHorizontal: 14, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },
   tabActive: { borderColor: '#c9a86a' },
-  tabText: { color: '#7a705c', fontSize: 11, letterSpacing: 2 },
+  tabText: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
   tabTextActive: { color: '#e6d8b3' },
   scroll: { flex: 1 },
   entry: { backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, padding: 10, borderRadius: 4, marginBottom: 8 },
