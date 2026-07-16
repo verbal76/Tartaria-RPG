@@ -17,6 +17,22 @@
 // needed; "once per day" lore perks become balanced passives.
 
 import type { PlayerCharacter } from './types';
+import { getDayPeriod } from './timeOfDay';
+
+/** OTA-848 — human-readable earn-date for a title, from its titleLog entry.
+ *  In-game "Day N (period)" is the primary, immersive date; the real wall-clock
+ *  date is appended as the literal answer. Titles earned before provenance was
+ *  recorded (no entry) get an honest fallback, never a fabricated date.
+ *  Exported + pure so it's unit-testable and reused by the Character screen. */
+export function describeTitleEarned(entry?: { atHours: number; atMs: number }): string {
+  if (!entry) return 'Earned earlier in your journey (before this was recorded).';
+  const day = Math.floor((entry.atHours ?? 0) / 24) + 1;
+  const period = getDayPeriod(entry.atHours);
+  const d = new Date(entry.atMs);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const real = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `Earned: Day ${day} (${period}) · ${real}`;
+}
 
 /** Running counters that title predicates read. Lives on the player as
  *  `player.titleProgress`; absent fields default to 0 via EMPTY. */

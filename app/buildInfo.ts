@@ -16532,4 +16532,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SKILL_ACTIVITIES STE copy updated to name the new STEALTH / PICKPOCKET buttons
 // (the retired approach toggle line is gone). Test: ota847Stealth pins the
 // finesse-only dice-doubling gate.
-export const OTA_BUILD_ID = '2026-07-16-847-stealth-system';
+// ── OTA-848 (Character screen — readability: expandable stats, AC breakdown, title provenance) ─
+// Three tap-to-expand upgrades to the Character sheet:
+//   • CORE STATS — each stat row is tap-to-expand. Collapsed it's a clean number
+//     + progress bar; expanded it opens the source breakdown AND the "Grows
+//     from" trainers as a one-per-line bulleted list (the old cramped, ellipsized
+//     3-line run-on is gone). Readability, per playtester ask.
+//   • ARMOR CLASS — the AC row is tappable, expanding a readable line-per-source
+//     breakdown (base + each armor piece / stance / title / racial → total) so a
+//     player can audit exactly what builds their number. (OTA-836 first surfaced
+//     these as chips; now they're clean rows behind a tap.)
+//   • ARBITER TITLES — each title is singly tappable: expands to show HOW it was
+//     earned (the requirement / deed) and, for earned titles, WHEN — a new
+//     player.titleLog captures the in-game hour + real timestamp at award time
+//     (awardNewTitles), rendered as "Day N (period) · YYYY-MM-DD" by the pure,
+//     tested describeTitleEarned helper. Titles earned before this shipped get an
+//     honest "before this was recorded" fallback — never a fabricated date.
+// Test: ota848TitleProvenance pins the date formatter + fallback.
+export const OTA_BUILD_ID = '2026-07-16-848-character-readability';
