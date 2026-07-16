@@ -56,20 +56,30 @@ describe('OTA-851 — applyTideDelta clamps to [-5,5]', () => {
   });
 });
 
-describe('OTA-851 — stepPatrol stays near home', () => {
-  it('never strays past the patrol radius over a long walk', () => {
+describe('OTA-853 — stepPatrol roams free and seeks a target', () => {
+  it('roams the map (no home leash) — it actually moves and ranges out', () => {
     let p: Patrol = { factionId: 'monarchs', gx: 10, gy: 10, homeX: 10, homeY: 10, phase: 3 };
     let maxDist = 0;
     for (let t = 0; t < 200; t++) {
-      p = stepPatrol(p, t);
+      p = stepPatrol(p, t); // no target → free wander
       maxDist = Math.max(maxDist, Math.abs(p.gx - p.homeX) + Math.abs(p.gy - p.homeY));
     }
-    expect(maxDist).toBeLessThanOrEqual(4); // radius 3 + one step of overshoot before pull-back
+    expect(maxDist).toBeGreaterThan(4); // it is NOT leashed near home anymore
+  });
+
+  it('drifts toward a target (goes looking for a fight)', () => {
+    let p: Patrol = { factionId: 'monarchs', gx: 0, gy: 0, homeX: 0, homeY: 0, phase: 3 };
+    const target = { x: 40, y: 40 };
+    const start = Math.abs(target.x - p.gx) + Math.abs(target.y - p.gy);
+    for (let t = 0; t < 60; t++) p = stepPatrol(p, t, target);
+    const end = Math.abs(target.x - p.gx) + Math.abs(target.y - p.gy);
+    expect(end).toBeLessThan(start); // net closes on the target
   });
 
   it('is deterministic', () => {
     const base: Patrol = { factionId: 'x', gx: 5, gy: 5, homeX: 5, homeY: 5, phase: 1 };
     expect(stepPatrol(base, 7)).toEqual(stepPatrol(base, 7));
+    expect(stepPatrol(base, 7, { x: 9, y: 9 })).toEqual(stepPatrol(base, 7, { x: 9, y: 9 }));
   });
 });
 

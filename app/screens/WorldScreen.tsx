@@ -13,6 +13,7 @@ import { tideLabel } from '../engine/worldPulse';
 import { pickBounty } from '../engine/factionBounty';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
+import { topGrudges, relationLabel } from '../engine/factionRelations';
 
 export function WorldScreen() {
   const player = useGameStore((s) => s.player);
@@ -26,6 +27,9 @@ export function WorldScreen() {
   const rumors = [...(worldMemory?.worldRumors ?? [])].reverse(); // fallback if no events yet
   const patrolCount = (worldMemory?.patrols ?? []).length;
   const standingOf = (id: string) => player?.factionStanding.find((r) => r.factionId === id)?.standing ?? 0;
+  // OTA-853 — the live grudge board: who's at whose throat right now.
+  const grudges = topGrudges(worldMemory?.factionRelations, factions, 6);
+  const nameOfFac = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
   // A small glyph per event kind so the board reads at a glance.
   const glyphFor = (kind: string): string => (
     { surge: '▲', setback: '▼', skirmish: '⚔', muster: '⚑', warband: '⚔', bounty: '◆',
@@ -151,8 +155,28 @@ export function WorldScreen() {
           </Text>
         </View>
 
+        {/* ── GRUDGES & ALLIANCES ───────────────────────────────── */}
+        {grudges.length > 0 && (
+          <>
+            <Text style={styles.sectionLabel}>GRUDGES & ALLIANCES</Text>
+            <View style={styles.card}>
+              {grudges.map((g, i) => {
+                const lab = relationLabel(g.relation);
+                return (
+                  <View key={i} style={styles.grudgeRow}>
+                    <Text style={styles.grudgeText}>{nameOfFac(g.a)}  vs  {nameOfFac(g.b)}</Text>
+                    <Text style={[styles.grudgeTag, { color: lab.hostile ? '#e07a5f' : '#9ec96a' }]}>{lab.word}</Text>
+                  </View>
+                );
+              })}
+              <Text style={styles.footNote}>↳ Grudges are earned: every patrol that guts another deepens the feud, and two
+                neutrals can come to blows from nothing but a bad crossing. Rivalries build themselves.</Text>
+            </View>
+          </>
+        )}
+
         {/* ── THE BOARD (world events) ──────────────────────────── */}
-        <Text style={styles.sectionLabel}>THE BOARD — WORD ON THE WIND</Text>
+        <Text style={styles.sectionLabel}>THE BOARD — THE WAR, AS IT HAPPENS</Text>
         {patrolCount > 0 && (
           <Text style={styles.patrolNote}>⚑ {patrolCount} faction patrol{patrolCount === 1 ? '' : 's'} abroad in the waste.</Text>
         )}
@@ -203,6 +227,9 @@ const styles = StyleSheet.create({
   facStanding: { fontSize: 10, marginLeft: 8, letterSpacing: 0.3 },
   footNote: { color: '#6c8088', fontSize: 10, fontStyle: 'italic', marginTop: 8, lineHeight: 14 },
   patrolNote: { color: '#c98a6a', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 4 },
+  grudgeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4, borderBottomColor: '#1a2427', borderBottomWidth: 1 },
+  grudgeText: { color: '#bcd2db', fontSize: 12 },
+  grudgeTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
   rumorRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
   rumorGlyph: { fontSize: 12, width: 18, textAlign: 'center' },
   rumorText: { color: '#bcd2db', fontSize: 12, lineHeight: 17, flex: 1 },

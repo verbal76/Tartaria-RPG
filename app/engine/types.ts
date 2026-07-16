@@ -1709,10 +1709,15 @@ export interface WorldMemory {
    *  specific types even below the Wisdom read-threshold ("strike to learn" made
    *  real + persistent), and the bestiary shows them on that enemy's entry. */
   enemyIntel?: Record<string, { weak: string[]; resist: string[] }>;
-  /** OTA-844 [world pulse] — per-faction momentum (−5..+5). Drifts on its own over
-   *  in-game time (nextWorldTide) so the balance of power shifts without the player.
-   *  Surfaced as a rising/waning tag on the faction-standings panel. */
+  /** OTA-844 [world pulse] / OTA-853 [war scoreboard] — per-faction POWER (−5..+5):
+   *  who's winning the world's wars. OTA-853 made this EARNED — it rises when a
+   *  faction's patrols win clashes and sack outposts, falls when they're crushed
+   *  (was an abstract pulse). Drives patrol count, vendor prices, and raid strength. */
   factionTides?: Record<string, number>;
+  /** OTA-853 [emergent grudges] — faction-vs-faction STANDING (−100..+100), the same
+   *  concept the player has with factions. Seeded from lore, then earned through actual
+   *  patrol clashes; decides who fights whom. Two neutrals can grudge into war from zero. */
+  factionRelations?: import('./factionRelations').RelationsMatrix;
   /** In-game hour of the last world pulse (gates the next one). */
   lastWorldTickHour?: number;
   /** Recent world rumours (newest last), capped. The world moving, in the player's ear. */
