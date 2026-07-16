@@ -15990,4 +15990,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bracket in apply-order: "…damage [armor −40%, title ½, shield ½, ward soaks 3]." A
 // race vulnerability lists as "+N%". Pure log-format change. Completes the Tier-2 QoL
 // batch (820/821/822). Test: ota842CombatLogMods.
-export const OTA_BUILD_ID = '2026-07-16-822-combat-log-breakdown';
+// ── OTA-823 (Tier-3 depth #1: Character Chronicle — golem port of HAL-843) ─────
+// New engine/chronicle.ts buildChronicle() assembles the character's legend (headline
+// + deed-list + glyph-marked memorable-beat timeline), surfaced as a collapsible
+// CHRONICLE section atop the Character sheet. A worsening corruption-tier crossing now
+// records a corruption_tier memorable event so the descent shows in the timeline.
+// Test: ota843Chronicle.
+export const OTA_BUILD_ID = '2026-07-16-823-character-chronicle';

@@ -6986,10 +6986,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the player across a corruption threshold.
       {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+        const { corruptionTierOf, tierCrossLine, tierLabel } = require('../engine/corruption');
         const nowCorr = get().player?.corruption ?? 0;
-        const crossLine = tierCrossLine(corruptionTierOf(prevCorrWeather), corruptionTierOf(nowCorr));
+        const fromTier = corruptionTierOf(prevCorrWeather);
+        const toTier = corruptionTierOf(nowCorr);
+        const crossLine = tierCrossLine(fromTier, toTier);
         if (crossLine) get().appendLog('reward', crossLine);
+        // OTA-843 [Chronicle] — a WORSENING tier crossing is a beat in the character's
+        // arc; log it so the corruption descent shows in the Chronicle, not just the
+        // live number. Guard on the tier-order index so a recovery doesn't record.
+        const CORR_ORDER = ['clean', 'tainted', 'corrupted', 'hollowed'];
+        if (crossLine && CORR_ORDER.indexOf(toTier) > CORR_ORDER.indexOf(fromTier)) {
+          recordMemorableEvent(get, set, {
+            kind: 'corruption_tier',
+            text: `The Aether takes deeper root — you cross into ${tierLabel(toTier)}.`,
+            hoursElapsed: get().player?.hoursElapsed ?? 0,
+          });
+        }
       }
       if (!recentlyShown) {
         // OTA-355 — surface the actual HP bite. Lines like "a silent bolt
