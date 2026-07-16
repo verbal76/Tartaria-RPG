@@ -15943,4 +15943,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       (luckyRerollReady) spent on the next FAILED difficulty roll.
 //   (5) Legacy of Power (Tartarian Giant) — three channels (repair/power-up/surge).
 // Plus Sentinel tireless+ageless and Stormcaller also-halves-electrical.
-export const OTA_BUILD_ID = '2026-07-16-815-race-flavor-wiring';
+// ── OTA-816 (Tier-1 QoL #1: tap-to-explain numbers — golem port of HAL-836) ────
+// "Armor Class" on the Character sheet rendered only effectiveAC() (race base +
+// scene context), dropping equipped-armor/accessory AC + ruins title + stance —
+// a plate-armored player read the same AC as a naked one. New
+// effectiveACBreakdown() returns the same total the combat resolver uses,
+// decomposed into labelled sources; the DEFENSE card shows total + "(base N)" +
+// source chips. Test: ota836ACBreakdown.
+export const OTA_BUILD_ID = '2026-07-16-816-tap-to-explain-ac';
