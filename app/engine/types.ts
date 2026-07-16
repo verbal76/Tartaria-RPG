@@ -1293,6 +1293,11 @@ export interface PlayerCharacter {
   activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
+  /** OTA-850 [faction bounty] — the one active kill-bounty a favored faction has
+   *  paid the player for: hunt N of a rival's members at the rival's outpost.
+   *  Accepting routes the player to targetLocationId; progress ticks on each kill
+   *  of a targetFactionId combatant; turn-in pays out and clears it. */
+  activeBounty?: import('./factionBounty').FactionBounty;
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
   activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */
