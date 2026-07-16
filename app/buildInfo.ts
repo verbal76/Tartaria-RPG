@@ -17529,4 +17529,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (2) The Aetheric Torch reveal said "Work it", so the player typed the flavor word
 // ("the resonance") and got refused; it now names the hook's noun ("Work the crystal —
 // investigate it and it will give up something rare").
-export const OTA_BUILD_ID = '2026-07-15-1115-fused-armor-slot-noun';
+// ── OTA-1116 (race trait "make the flavor true" batch — engine port of HAL-835) ─
+// The engine SHARES the built-in race abilities/mechanics with HAL (same race ids
+// and RACE_ABILITIES), so this batch DOES apply here (unlike 834's RACE_PRIMARY /
+// stall-faction fixes, which are HAL+golem-only content). Ported:
+//   (1) RACE VULNERABILITY — raceDamageMultiplier may exceed 1 (was ≤1); the Mud
+//       Golem's aetheric weakness bites (+50%). raceResistLabel reads both
+//       directions; the incoming-damage site applies mult !== 1 (kept alongside
+//       engine's playerRaceFactionResists content-pack resist path).
+//   (2) CURIOUS MIND — persistent +2 INT/+2 WIS awakened on first relic/ruin
+//       exposure (curiousMindAwakened → effectiveStats, folded in beside engine's
+//       faction + title stat terms).
+//   (3) ELEMENTAL CONTROL ward — new elemental_ward → stone_ward soak, consumed at
+//       the damage site after every engine resist/proc.
+//   (4) BEGINNER'S LUCK — real one-shot reroll token (luckyRerollReady).
+//   (5) LEGACY OF POWER — three channels (repair/power-up/surge).
+// Plus Sentinel tireless+ageless and Stormcaller also-halves-electrical.
+export const OTA_BUILD_ID = '2026-07-16-1116-race-flavor-wiring';

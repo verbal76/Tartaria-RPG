@@ -545,6 +545,13 @@ export function effectiveStats(
   const racial = racialStatBonusesFor(player.raceId);
   // engine_Dev — faction-derived always-on stat bonuses (factionStatBonuses).
   const fac = factionStatBonusesFor(player.factionId);
+  // OTA-835 — Unknowing Masses "Curious Mind": a persistent +2 INT / +2 WIS that
+  // AWAKENS the first time the character is exposed to Tartaria's secrets (a relic
+  // or a ruin sets player.curiousMindAwakened). Flat-static racialStatBonusesFor
+  // can't express a flag-gated bonus, so it folds in here.
+  const curious = player.raceId === 'unknowing_mass' && player.curiousMindAwakened
+    ? { intelligence: 2, wisdom: 2 }
+    : {};
   // OTA 039 — corruption tier penalty. Tainted=-1 CHA, Corrupted=-1
   // all, Hollowed=-2 all. Subtracts at every skill-check site so the
   // aether under your skin actually costs you something.
@@ -558,8 +565,8 @@ export function effectiveStats(
   return {
     strength: Math.max(1, player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (fac.strength ?? 0) + (corrPen.strength ?? 0) + (ttl.strength ?? 0)),
     dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (fac.dexterity ?? 0) + (corrPen.dexterity ?? 0) + (ttl.dexterity ?? 0)),
-    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (fac.intelligence ?? 0) + (corrPen.intelligence ?? 0) + (ttl.intelligence ?? 0)),
-    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (fac.wisdom ?? 0) + (corrPen.wisdom ?? 0) + (ttl.wisdom ?? 0)),
+    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (fac.intelligence ?? 0) + (curious.intelligence ?? 0) + (corrPen.intelligence ?? 0) + (ttl.intelligence ?? 0)),
+    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (fac.wisdom ?? 0) + (curious.wisdom ?? 0) + (corrPen.wisdom ?? 0) + (ttl.wisdom ?? 0)),
     charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (fac.charisma ?? 0) + (corrPen.charisma ?? 0) + (ttl.charisma ?? 0)),
     // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player.
     stealth: Math.max(1, (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (fac.stealth ?? 0) + (corrPen.stealth ?? 0) + (ttl.stealth ?? 0)),
@@ -598,6 +605,10 @@ export function effectiveStatsBreakdown(
   }
   const racial = racialStatBonusesFor(player.raceId);
   const fac = factionStatBonusesFor(player.factionId);
+  // OTA-835 — Curious Mind persistent +2 INT/+2 WIS (see effectiveStats).
+  const curious: Partial<Stats> = player.raceId === 'unknowing_mass' && player.curiousMindAwakened
+    ? { intelligence: 2, wisdom: 2 }
+    : {};
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
   const w = weatherMod ?? {};
@@ -607,6 +618,7 @@ export function effectiveStatsBreakdown(
     const sources: StatSource[] = [];
     if ((racial[stat] ?? 0) !== 0) sources.push({ label: 'race', delta: racial[stat]! });
     if ((fac[stat] ?? 0) !== 0) sources.push({ label: 'faction', delta: fac[stat]! });
+    if ((curious[stat] ?? 0) !== 0) sources.push({ label: 'Curious Mind', delta: curious[stat]! });
     if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
     if ((inv[stat] ?? 0) !== 0) sources.push({ label: 'pack passive', delta: inv[stat]! });
     for (const fb of foodBuffs) {

@@ -47,14 +47,17 @@ function raceSkillBonus(
   const parts: string[] = [];
   const add = (v: number, name: string) => { bonus += v; parts.push(name); };
   // Ancient/relic INVESTIGATE — Giants, Aetherborn, Reclaimers each read the
-  // old world better; Mud Dwellers handle the tech (Relic Savvy, DEX); Unknowing
-  // Masses' Curious Mind sharpens on Tartaria's secrets once they've seen them.
+  // old world better; Mud Dwellers handle the tech (Relic Savvy, DEX).
+  // OTA-835 — the Unknowing Masses' "Curious Mind" line was removed here: it no
+  // longer fires as a per-roll investigate bonus. It now AWAKENS a persistent
+  // +2 INT / +2 WIS the first time they touch a relic/ruin (curiousMindAwakened,
+  // applied in effectiveStats), which already lifts these rolls — keeping the
+  // line too would double-count.
   if (intent === 'investigate' && ctx?.relicTarget) {
     if (r === 'tartarian_giant') add(1, 'Ancient Insight');
     else if (r === 'aetherborn') add(2, 'Aetheric Awakening');
     else if (r === 'reclaimer') add(1, 'Ruins Specialist');
     else if (r === 'mud_dweller') add(2, 'Relic Savvy');
-    else if (r === 'unknowing_mass') add(2, 'Curious Mind');
   }
   // Aethercraft = the CAST discipline. Mud Dwellers (True Tartarians) trained it.
   if (intent === 'cast' && r === 'mud_dweller') add(2, 'Aethercraft Mastery');

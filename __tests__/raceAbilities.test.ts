@@ -19,10 +19,15 @@ describe('race abilities — registry + cooldown logic', () => {
     }
   });
 
-  it('ownedRaceAbilities returns only the player race', () => {
+  it('ownedRaceAbilities returns the player race abilities', () => {
     const owned = ownedRaceAbilities(player({ raceId: 'mud_golem' }));
-    expect(owned.length).toBe(2); // Regenerative Core + Elemental Control
-    expect(owned.every((a) => a.raceId === 'mud_golem')).toBe(true);
+    const ids = owned.map((a) => a.id);
+    // engine_Dev — OwnedAbility is the merged (race + faction + built-in) shape and
+    // carries no `raceId` field (a re-skin's data-driven abilities own that), so we
+    // assert on the built-in Mud-Golem ability ids instead of a raceId equality.
+    // OTA-835 — Elemental Control gained its defensive half (elemental_ward): the
+    // Mud Golem now owns Regenerative Core + Elemental Control (Strike) + (Ward).
+    expect(ids).toEqual(expect.arrayContaining(['regenerative_core', 'elemental_control', 'elemental_ward']));
   });
 
   it('day rolls over at 24 in-game hours', () => {

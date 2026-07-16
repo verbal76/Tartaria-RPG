@@ -2258,9 +2258,15 @@ function tickPlayerStaminaStatuses(player: PlayerCharacter): PlayerCharacter {
 }
 
 function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
+  // OTA-835 — Architectural Sentinels are TIRELESS constructs ("Immunity to Time"):
+  // every stamina-costing action costs HALF. Together with their ambient-corruption
+  // immunity below, this is the mechanical weight behind "a week-long vigil, a march
+  // across a famine-struck waste — none of it wears on you." (Previously the trait
+  // did nothing — the hunger/fatigue drains it described were removed/never existed.)
+  const eff = player.raceId === 'architectural_sentinel' ? amount * 0.5 : amount;
   return tickPlayerStaminaStatuses({
     ...player,
-    stamina: Math.max(0, player.stamina - amount),
+    stamina: Math.max(0, player.stamina - eff),
   });
 }
 
@@ -7327,6 +7333,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let effHpDelta = wtick.hpDelta;
       let effCorrDelta = wtick.corruptionDelta;
       if (tPerks.corruptionResist && effCorrDelta > 0) effCorrDelta = Math.ceil(effCorrDelta / 2);
+      // OTA-835 — Architectural Sentinels (ageless construct body) don't absorb the
+      // ambient aetheric corruption the weather notches into flesh — the environment
+      // can't decay them. The other half of their "Immunity to Time" trait.
+      if (player.raceId === 'architectural_sentinel' && effCorrDelta > 0) effCorrDelta = 0;
       if ((tPerks.ethericDamageResist || tPerks.ethericShield) && isEthericWeather && effHpDelta < 0) {
         effHpDelta = Math.ceil(effHpDelta / 2);
       }
@@ -10503,6 +10513,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const ctxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
         const relicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(ctxNoun);
         const inRuins = (currentScene?.location?.tags ?? []).some((t) => /ruin|buried|capital|cathedral|tomb|vault|dig|labyrinth/.test(String(t).toLowerCase()));
+        // OTA-835 — Unknowing Masses "Curious Mind" AWAKENS on first exposure to
+        // Tartaria's secrets. This skill-check path is the exposure chokepoint:
+        // investigating/handling a relic or acting inside a ruin flips the flag
+        // once, granting the persistent +2 INT / +2 WIS (see effectiveStats).
+        if (player.raceId === 'unknowing_mass' && !player.curiousMindAwakened && (relicTarget || inRuins)) {
+          set((s) => s.player ? { player: { ...s.player, curiousMindAwakened: true } } : s);
+          void Promise.resolve().then(() =>
+            get().appendLog('reward', `✦ Curious Mind — Tartaria's secrets crack open before you, and something in your head clicks awake. (+2 INT and +2 WIS, from here on.)`),
+          );
+        }
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
           companionAssist: !!player.companion,
@@ -14738,8 +14758,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const step = state.steps[idx];
     if (!step) return;
 
-    const total = values.reduce((a, b) => a + b, 0) + step.bonus;
+    let total = values.reduce((a, b) => a + b, 0) + step.bonus;
     let success = step.target !== undefined ? total >= step.target : undefined;
+    // OTA-835 — Unknowing Masses "Beginner's Luck": if this difficulty roll FAILED
+    // and the player has banked a reroll (set by the daily race ability), roll the
+    // same dice again and keep the better total. One shot — the token is burned
+    // whether or not the second throw lands. Applies to any targeted roll (skill,
+    // combat attack, relic check) — the trait's "survival, combat, or relic" scope.
+    if (success === false && step.target !== undefined) {
+      const pl = get().player;
+      if (pl?.raceId === 'unknowing_mass' && pl.luckyRerollReady) {
+        const reValues = values.map(() => rollDie(step.sides));
+        const reTotal = reValues.reduce((a, b) => a + b, 0) + step.bonus;
+        if (reTotal > total) { values = reValues; total = reTotal; }
+        success = total >= step.target;
+        set((s) => s.player ? { player: { ...s.player, luckyRerollReady: false } } : s);
+        const landed = success;
+        void Promise.resolve().then(() =>
+          get().appendLog('reward', `✦ Beginner's Luck — you throw again and ${landed ? 'pull it off' : 'still come up short'} (${total} vs DC ${step.target}).`),
+        );
+      }
+    }
     let critical: boolean | undefined;
     // Natural 1 / natural 20 rule on d20 attack rolls. Forces the
     // floor (5% always-miss) and ceiling (5% always-hit + crit damage)
@@ -22886,29 +22925,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     switch (id) {
       case 'legacy_of_power': {
-        let worstIdx = -1; let worstFrac = 1;
-        player.inventory.forEach((it, i) => {
-          const d = it.durability;
-          // arb141 — climbing ropes ('rope'-tagged) are a CONSUMABLE climbing
-          // resource that must wear out and be re-spliced/re-bought. A rope takes
-          // the most beating of anything in the pack (every climb tier), so it was
-          // ALWAYS the most-worn item — making this once-a-day mend an infinite-rope
-          // engine: free, eternal climbing with no stamina/durability cost (the
-          // player flagged the double-gain). Skip ropes so the mend lands on real
-          // gear and the rope stays a resource you actually spend.
-          if ((it.tags ?? []).includes('rope')) return;
-          if (d && d.max > 0 && d.current < d.max) {
-            const f = d.current / d.max;
-            if (f < worstFrac) { worstFrac = f; worstIdx = i; }
+        // OTA-835 — the trait promises "repair, power-up, unexpected effect"; it
+        // used to be repair-only. Roll the three channels of the Aether. The repair
+        // channel falls back to the power-up when there's nothing worn to mend, so
+        // the day's charge is never spent on a no-op.
+        const powerUp = () => {
+          set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'strength' as const, buffBonus: 2, label: 'Legacy of Power' }] } } : s);
+          get().appendLog('reward', `✦ ${def.name} — Aether floods your limbs. +2 STR for 3 rounds.`);
+        };
+        const channel = rollDie(3);
+        if (channel === 1) {
+          let worstIdx = -1; let worstFrac = 1;
+          player.inventory.forEach((it, i) => {
+            const d = it.durability;
+            // arb141 — climbing ropes ('rope'-tagged) are a CONSUMABLE climbing
+            // resource that must wear out and be re-spliced/re-bought. A rope takes
+            // the most beating of anything in the pack (every climb tier), so it was
+            // ALWAYS the most-worn item — making this mend an infinite-rope engine:
+            // free, eternal climbing. Skip ropes so the mend lands on real gear.
+            if ((it.tags ?? []).includes('rope')) return;
+            if (d && d.max > 0 && d.current < d.max) {
+              const f = d.current / d.max;
+              if (f < worstFrac) { worstFrac = f; worstIdx = i; }
+            }
+          });
+          if (worstIdx < 0) {
+            // Nothing to mend — the Aether powers you up instead (channel never wasted).
+            powerUp();
+          } else {
+            const item = player.inventory[worstIdx]!;
+            set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — you channel Aether into the ${item.name}. It mends to full.`);
           }
-        });
-        if (worstIdx < 0) {
-          get().appendLog('world', `${def.name}: nothing in your pack needs mending. The Aether has nowhere to go. (Climbing rope can't be channeled — splice or replace it instead.)`);
-          applied = false;
+        } else if (channel === 2) {
+          powerUp();
         } else {
-          const item = player.inventory[worstIdx]!;
-          set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
-          get().appendLog('reward', `✦ ${def.name} — you channel Aether into the ${item.name}. It mends to full.`);
+          // Unexpected surge — the Aether is capricious. A small table: mostly a
+          // boon (heal / double power-up / cleanse), but sometimes it bites back
+          // with a spike of corruption (the trait's "unexpected effect" downside).
+          const surge = rollDie(4);
+          if (surge === 1) {
+            const heal = rollDie(8) + 2;
+            set((s) => s.player ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + heal) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the surge knits your wounds. +${heal} HP.`);
+          } else if (surge === 2) {
+            set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'strength' as const, buffBonus: 2, label: 'Legacy of Power (surge)' }, { kind: 'food_buff' as const, remainingRounds: 3, buffStat: 'wisdom' as const, buffBonus: 2, label: 'Legacy of Power (surge)' }] } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the surge overflows: +2 STR and +2 WIS for 3 rounds.`);
+          } else if (surge === 3) {
+            const cleanse = rollDie(6);
+            set((s) => s.player ? { player: { ...s.player, corruption: Math.max(0, (s.player.corruption ?? 0) - cleanse) } } : s);
+            get().appendLog('reward', `✦ ${def.name} — the Aether runs clean and washes ${cleanse} corruption from your veins.`);
+          } else {
+            const backlash = rollDie(4);
+            set((s) => s.player ? { player: { ...s.player, corruption: Math.min(100, (s.player.corruption ?? 0) + backlash) } } : s);
+            get().appendLog('world', `✦ ${def.name} — the channel turns on you. The Aether spikes and leaves +${backlash} corruption behind.`);
+          }
         }
         break;
       }
@@ -22952,12 +23023,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (newHp <= 0) get().resolveEnemyDefeat();
         break;
       }
-      case 'latent_powers':
-      case 'noble_heritage':
+      case 'elemental_ward': {
+        // OTA-835 — Elemental Control DEFENSIVE half (the "1d6 block"). Raises a
+        // shaped-stone ward that soaks the next 1d6 incoming damage before HP
+        // (consumed at the damage site). Combat-gated like the strike half.
+        const liveScene = get().currentScene;
+        if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
+        const soak = rollDie(6);
+        set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []).filter((e) => e.kind !== 'stone_ward'), { kind: 'stone_ward' as const, remainingRounds: 10, absorb: soak, label: `Elemental Ward (soak ${soak})` }] } } : s);
+        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone hardens before you. It soaks the next ${soak} damage.`);
+        break;
+      }
       case 'beginners_luck': {
+        // OTA-835 — was a flat +3 WIS buff; now the trait's real promise: bank a
+        // one-shot reroll. resolveRollStep consumes luckyRerollReady the next time
+        // a difficulty roll FAILS, rerolling and keeping the better result.
+        set((s) => s.player ? { player: { ...s.player, luckyRerollReady: true } } : s);
+        get().appendLog('reward', `✦ ${def.name} — you feel the odds tilt your way. The next roll you fail today gets a second throw.`);
+        break;
+      }
+      case 'latent_powers':
+      case 'noble_heritage': {
         const buff = id === 'latent_powers' ? { stat: 'strength' as const, amt: 2, label: 'Latent Powers' }
-          : id === 'noble_heritage' ? { stat: 'charisma' as const, amt: 3, label: 'Noble Heritage' }
-          : { stat: 'wisdom' as const, amt: 3, label: "Beginner's Luck" };
+          : { stat: 'charisma' as const, amt: 3, label: 'Noble Heritage' };
         set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: buff.stat, buffBonus: buff.amt, label: buff.label }] } } : s);
         get().appendLog('reward', `✦ ${def.name} — +${buff.amt} ${buff.stat.slice(0, 3).toUpperCase()} for 3 rounds.`);
         break;
@@ -26564,6 +26652,13 @@ function applyEnemyCounter(
         dmg = Math.max(1, Math.ceil(dmg / 2));
         titleAethericHalved = true;
       }
+      // OTA-835 — Stormcaller (ethericShield) is now STORM-HARDENED: it also halves
+      // incoming ELECTRICAL, giving the title a defensive niche distinct from Aetheric
+      // Attuned (ethericDamageResist, aetheric-only). One storm-warded body, two lines.
+      if (enemyDamageType === 'electrical' && tPerksHit.ethericShield) {
+        dmg = Math.max(1, Math.ceil(dmg / 2));
+        titleAethericHalved = true;
+      }
       // Etherbound Survivor — environmental/elemental damage types (burn /
       // cold / electrical / poison / aetheric) get the save-bonus shaved off.
       if (tPerksHit.envHazardSaveBonus > 0
@@ -26580,10 +26675,12 @@ function applyEnemyCounter(
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { raceDamageMultiplier, raceResistLabel } = require('../engine/raceMechanics');
       const raceMult = raceDamageMultiplier(player.raceId, enemyDamageType);
-      if (raceMult < 1) {
+      // OTA-835 — apply BOTH directions (was `< 1` = resist-only). A race authored as
+      // VULNERABLE (mult > 1, e.g. Mud Golem vs aetheric) now takes extra damage.
+      if (raceMult !== 1) {
         const before = dmg;
         dmg = Math.max(1, Math.round(dmg * raceMult));
-        if (dmg < before) raceResistTag = raceResistLabel(player.raceId, raceMult);
+        if (dmg !== before) raceResistTag = raceResistLabel(player.raceId, raceMult);
       }
     }
     // engine_Dev — content-pack RACE/FACTION resist/weak now scale the actual HP damage you take,
@@ -26638,6 +26735,23 @@ function applyEnemyCounter(
       const weak = rf.weak.includes(t);
       incChanceMult = resists ? 0.35 : weak ? 1.6 : 1;
     }
+    // OTA-835 — Elemental Control WARD (Mud Golem defensive half): a shaped-stone
+    // ward soaks a flat pool of damage before it reaches HP. Runs LAST, on the
+    // final incoming number (after every resist/shield and the dodge double), so
+    // it soaks what you'd actually take. Records the remaining pool so the set()
+    // below can decrement the ward and drop it when spent.
+    let wardTag = '';
+    let wardRemain: number | null = null;
+    {
+      const wardFx = (player.statusEffects ?? []).find((e) => e.kind === 'stone_ward' && (e.absorb ?? 0) > 0);
+      if (wardFx && dmg > 0) {
+        const soak = Math.min(wardFx.absorb ?? 0, dmg);
+        dmg -= soak;
+        wardRemain = (wardFx.absorb ?? 0) - soak;
+        wardTag = ` (stone ward soaks ${soak})`;
+      }
+    }
+
     // Roll for a status effect to apply based on the damage type.
     const newEffect = rollIncomingStatusEffect(explicitDamageType, player.statusEffects ?? [], incChanceMult);
     // engine_Dev — SYMMETRY: if the enemy's damage type carries an author combat
@@ -26698,7 +26812,7 @@ function applyEnemyCounter(
         : titleHazardShaved > 0
           ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
           : '';
-      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + rfResistTag + shieldTag + drinkResistTag;
+      const resistTag = (resisted.blocked ? ` (armor turns ${Math.round(resisted.fraction * 100)}% of the ${enemyDamageType})` : '') + titleTag + raceResistTag + rfResistTag + shieldTag + drinkResistTag + wardTag;
       const msg = killed
         ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${resistTag}. You have ${newHp} HP remaining.`;
@@ -26744,6 +26858,13 @@ function applyEnemyCounter(
       }
       // engine_Dev — seed the symmetric damage-type DOT on the player if one procced.
       if (dtcDotEffect) effects = applyEffect(effects ?? [], dtcDotEffect);
+      // OTA-835 — decrement (or drop) the Elemental Control ward now that it has
+      // soaked its share of this hit.
+      if (wardRemain !== null) {
+        effects = (effects ?? [])
+          .map((e) => (e.kind === 'stone_ward' ? { ...e, absorb: wardRemain! } : e))
+          .filter((e) => e.kind !== 'stone_ward' || (e.absorb ?? 0) > 0);
+      }
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 

@@ -153,6 +153,9 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   'defensive_stance', 'distracted',
   // engine_Dev — a drunk coating's resist lasts "the rest of the fight".
   'resist_buff',
+  // OTA-835 — the Mud Golem's Elemental Control ward is a per-encounter block;
+  // clear any unspent soak when the fight ends so it never carries into the next.
+  'stone_ward',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 
