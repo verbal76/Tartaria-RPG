@@ -16342,4 +16342,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "follow the resonance": the torch-charged hook is stamped with sound-synonyms
 // (resonance/sound/ringing/hum/note) so investigate/examine/work/FOLLOW the resonance
 // all resolve to it; a "follow"-verb travel onto a torch-charged hook advances it.
-export const OTA_BUILD_ID = '2026-07-15-834-race-starter-and-stall-faction-wiring';
+// ── OTA-835 (race trait/ability "make the flavor true" batch) ─────────────────
+// The races/factions/titles audit flagged four traits whose text over-promised.
+// This ships the four re-implementations the owner signed off on, plus real race
+// VULNERABILITY:
+//   (1) RACE WEAKNESS is now possible — raceDamageMultiplier may exceed 1. The
+//       Mud Golem's authored aetheric weakness bites (+50% aetheric; ×0.75 to
+//       everything else). raceResistLabel reads both directions (weakness/absorb),
+//       and the incoming-damage site applies mult !== 1 (was resist-only <1).
+//   (2) CURIOUS MIND (Unknowing Masses) — was a per-roll +2 investigate; now a
+//       persistent +2 INT / +2 WIS that AWAKENS on first exposure to a relic/ruin
+//       (curiousMindAwakened → effectiveStats). The old investigate special-case
+//       was removed to avoid double-counting.
+//   (3) ELEMENTAL CONTROL (Mud Golem) gained its defensive half: a new
+//       'elemental_ward' ability raises a 1d6-soak stone_ward (per-encounter,
+//       consumed at the damage site before HP).
+//   (4) BEGINNER'S LUCK (Unknowing Masses) — was a flat +3 WIS buff; now banks a
+//       real one-shot reroll token (luckyRerollReady) that resolveRollStep spends
+//       on the next FAILED difficulty roll, keeping the better throw.
+//   (5) LEGACY OF POWER (Tartarian Giant) — was repair-only; now rolls the trait's
+//       three channels (repair / power-up / unexpected surge).
+// Sentinel (tireless + ageless), Stormcaller (also halves electrical) landed in
+// the same batch.
+export const OTA_BUILD_ID = '2026-07-16-835-race-flavor-wiring';
