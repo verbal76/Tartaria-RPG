@@ -1871,6 +1871,54 @@ function worldTideCheck(
 // kill-handler). Deliberately avoidable: the player can still flee.
 const RAID_MIN_HOURS = 20;      // min in-game hours between raids
 const RAID_TRIGGER_CHANCE = 0.3; // per eligible action, once past the cooldown
+
+// OTA-849/850 — build + inject a FACTION-tagged party into the current scene. Shared
+// by the aspatial rival RAID (OTA-849) and the outpost PATROL interception (OTA-850):
+// both field a group of that faction's soldiers, tagged with factionId (so kills shift
+// standing + tick a bounty) and scaled/escalated by the faction's World-Pulse tide.
+// Returns true if a party actually landed. Caller does the gating + the log lines.
+function injectFactionParty(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  opts: { factionId: string; factionName: string; partySize: number; noun: string },
+): boolean {
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return false;
+  const base = rollEncounter(scene.location).filter((e) => !e.boss);
+  if (base.length === 0) return false;
+  const party: Enemy[] = [];
+  for (let i = 0; i < opts.partySize; i++) {
+    const tmpl = base[i % base.length]!;
+    party.push({
+      ...tmpl,
+      name: opts.partySize > 1 ? `${opts.factionName} ${opts.noun} ${i + 1}` : `${opts.factionName} ${opts.noun}`,
+      factionId: opts.factionId,
+      aliases: [opts.noun.toLowerCase(), 'soldier', 'raider', opts.factionName.toLowerCase()],
+    });
+  }
+  const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
+  const power = enemyScalePower(
+    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
+    player.hpMax,
+  ) + tide; // escalation: an ascendant faction hits harder
+  const scaled = scaleEncounterForContext(party, scene.location.danger + Math.floor(tide / 2), power);
+  const enemyHps = scaled.map((e) => e.hp);
+  set((st) => (st.currentScene ? {
+    currentScene: {
+      ...st.currentScene,
+      enemies: scaled,
+      enemyHps,
+      activeEnemyIdx: 0,
+      range: 'mid',
+      enemyAmbushUsed: scaled.map(() => false),
+      stealthOpenerUsed: false,
+    },
+  } : st));
+  return true;
+}
+
 function maybeSpawnRaid(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -1895,37 +1943,11 @@ function maybeSpawnRaid(
   const { pickRaid } = require('../engine/worldPulse') as typeof import('../engine/worldPulse');
   const plan = pickRaid(factions, player.factionStanding, s.worldMemory.factionTides ?? {});
   if (!plan) return;
-  const base = rollEncounter(scene.location).filter((e) => !e.boss);
-  if (base.length === 0) return;
-  const party: Enemy[] = [];
-  for (let i = 0; i < plan.partySize; i++) {
-    const tmpl = base[i % base.length]!;
-    party.push({
-      ...tmpl,
-      name: plan.partySize > 1 ? `${plan.raiderName} Raider ${i + 1}` : `${plan.raiderName} Raider`,
-      factionId: plan.raiderId,
-      aliases: ['raider', 'soldier', 'raiders', plan.raiderName.toLowerCase()],
-    });
-  }
-  const tide = Math.max(0, s.worldMemory.factionTides?.[plan.raiderId] ?? 0);
-  const power = enemyScalePower(
-    Math.max(player.stats.strength, player.stats.dexterity, player.stats.intelligence),
-    player.hpMax,
-  ) + tide; // escalation: an ascendant raider hits harder
-  const scaled = scaleEncounterForContext(party, scene.location.danger + Math.floor(tide / 2), power);
-  const enemyHps = scaled.map((e) => e.hp);
-  set((st) => (st.currentScene ? {
-    currentScene: {
-      ...st.currentScene,
-      enemies: scaled,
-      enemyHps,
-      activeEnemyIdx: 0,
-      range: 'mid',
-      enemyAmbushUsed: scaled.map(() => false),
-      stealthOpenerUsed: false,
-    },
-    worldMemory: { ...st.worldMemory, lastRaidHour: hour },
-  } : st));
+  const landed = injectFactionParty(get, set, {
+    factionId: plan.raiderId, factionName: plan.raiderName, partySize: plan.partySize, noun: 'Raider',
+  });
+  if (!landed) return;
+  set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
   get().appendLog(
     'world',
     `A ${plan.raiderName} war party crests the rise — ${plan.partySize} of them, blades already out. They've marked you for standing with the ${plan.provokedAllyName}.`,
@@ -1933,6 +1955,55 @@ function maybeSpawnRaid(
   get().appendLog(
     'arbiter',
     `"The ${plan.raiderName} do not forgive a friend of the ${plan.provokedAllyName}," the Arbiter murmurs. "Stand, or run — but decide now."`,
+  );
+}
+
+// OTA-850 — PATROL INTERCEPTION. When the player is within 2 tiles of a faction's
+// outpost while routed toward it (a bounty destination, or any rival outpost), that
+// faction's patrol intercepts. This is what makes accepting a bounty "harm's way":
+// the reward sits inside patrolled ground. Gated on the same peaceful-moment rules as
+// a raid, plus a per-approach cooldown so one journey can't spawn a wall of patrols.
+const PATROL_MIN_HOURS = 6;
+function maybeInterceptPatrol(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  targetLocationId: string,
+  distanceRemaining: number,
+): void {
+  if (distanceRemaining > 2 || distanceRemaining < 0) return;
+  const s = get();
+  const player = s.player;
+  const scene = s.currentScene;
+  if (!player || !scene || !scene.location) return;
+  if ((scene.enemies?.length ?? 0) > 0) return;
+  if (player.hubRoomId) return;
+  if (player.hpMax > 0 && player.hp / player.hpMax < 0.4) return;
+  // Which faction holds this outpost? Only real, non-friendly factions patrol at you.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { FACTION_STARTING_LOCATION } = require('../engine/character') as typeof import('../engine/character');
+  const holderId = Object.keys(FACTION_STARTING_LOCATION).find((fid) => FACTION_STARTING_LOCATION[fid] === targetLocationId);
+  if (!holderId) return;
+  const standing = player.factionStanding.find((r) => r.factionId === holderId)?.standing ?? 0;
+  const isBountyTarget = player.activeBounty?.targetFactionId === holderId;
+  if (!isBountyTarget && standing >= 0) return; // friends' patrols wave you through
+  const hour = player.hoursElapsed ?? 0;
+  const last = s.worldMemory.lastRaidHour;
+  if (last !== undefined && hour - last < PATROL_MIN_HOURS) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+  const holderName = factions.find((f) => f.id === holderId)?.name ?? holderId;
+  const tide = Math.max(0, s.worldMemory.factionTides?.[holderId] ?? 0);
+  const partySize = Math.max(2, Math.min(4, 2 + Math.floor(tide / 2)));
+  const landed = injectFactionParty(get, set, { factionId: holderId, factionName: holderName, partySize, noun: 'Patrol' });
+  if (!landed) return;
+  set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
+  get().appendLog(
+    'world',
+    `A ${holderName} patrol works the ground near their outpost — ${partySize} of them — and spots you closing in. They move to cut you off.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `"You're on ${holderName} ground now," the Arbiter says low. "Their patrols don't ask why you came."`,
   );
 }
 
@@ -2772,6 +2843,9 @@ interface GameStore {
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
+  /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
+   *  outpost (routing the player into patrolled ground). */
+  acceptBounty: (bounty: import('../engine/factionBounty').FactionBounty) => void;
   /** Activate / deactivate an accepted faction contract. SINGLE-ACTIVE:
    *  activating one pauses every other; deactivate parks just this one (zero
    *  active = between missions). A paused contract stays on the slate and its
@@ -16578,6 +16652,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-850 [faction bounty] — a kill of the bounty's quarry ticks progress; the
+    // final one pays out (TC + standing with the giver) and clears the contract.
+    {
+      const b = get().player?.activeBounty;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { killCountsForBounty } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+      if (b && killCountsForBounty(b, enemy.factionId)) {
+        const progress = b.progress + 1;
+        if (progress < b.count) {
+          set((s) => (s.player?.activeBounty ? { player: { ...s.player, activeBounty: { ...s.player.activeBounty, progress } } } : s));
+          get().appendLog('world', `Bounty: ${progress}/${b.count} ${b.targetName} put down.`);
+        } else {
+          const payer = get().player;
+          if (payer) {
+            const rep = applyRepChange(payer.factionStanding, b.giverFactionId, b.rewardRep);
+            set((s) => (s.player ? { player: {
+              ...s.player,
+              tc: (s.player.tc ?? 0) + b.rewardTc,
+              factionStanding: rep.standing,
+              activeBounty: undefined,
+            } } : s));
+            logRepChanges(get, rep.changed);
+            get().appendLog('reward', `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
+            get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
+          }
+        }
+      }
+    }
+
     // First-kill and rare-kill milestones are noted in the memorable-event
     // log so the Arbiter can reference them later.
     if (newKills === 1) {
@@ -19292,6 +19395,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // setTravelCourse sets player.travelTarget and takes one step
   // toward the target's procedural position. continueTravel takes
   // additional steps. stopTravel clears the target.
+  acceptBounty(bounty) {
+    const player = get().player;
+    if (!player) return;
+    if (player.activeBounty) {
+      get().appendLog('system', 'You already carry a bounty. Finish or abandon it first.');
+      return;
+    }
+    set((s) => (s.player ? { player: { ...s.player, activeBounty: { ...bounty, progress: 0 } } } : s));
+    get().appendLog(
+      'arbiter',
+      `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
+    );
+    // Route the player to the quarry's outpost — straight into patrol country.
+    get().setTravelCourse(bounty.targetLocationId);
+  },
+
   setTravelCourse(locationId: string) {
     const player = get().player;
     const scene = get().currentScene;
@@ -19522,6 +19641,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player?.travelTarget ? {
         player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
       } : s));
+      // OTA-850 — within 2 tiles of a hostile / bounty-target outpost, its patrol
+      // intercepts. No-op unless the step didn't already start a fight.
+      if ((get().currentScene?.enemies?.length ?? 0) === 0) maybeInterceptPatrol(get, set, targetId, dist);
     }
   },
 

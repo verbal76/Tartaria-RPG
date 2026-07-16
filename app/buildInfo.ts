@@ -16055,4 +16055,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lowers standing with them, raises it with their strongest rival. On load, real time
 // offline advances bounded world pulses (tides + rumours) and the Arbiter recaps.
 // nextWorldTide now ignores the factions JSON's descriptive pseudo-ids. Test: ota849LivingWorld.
-export const OTA_BUILD_ID = '2026-07-16-829-living-world';
+// ── OTA-830 (FACTION PATROLS & BOUNTIES — bounties that route you into harm's way) ─
+// Port of HAL OTA-850. A faction you favor (standing +10) pays you to thin its
+// rivals; the bounty (surfaced in the WORLD view via pickBounty) names the rival's
+// OUTPOST and ACCEPT routes you there (acceptBounty -> setTravelCourse). Within 2
+// tiles of that outpost its patrol intercepts (maybeInterceptPatrol, hooked into
+// continueTravel; reuses the OTA-849 party builder as injectFactionParty). Kills of
+// the quarry tick the bounty; the last pays TC + giver standing. Test: ota850FactionBounty.
+export const OTA_BUILD_ID = '2026-07-16-830-faction-bounties';
