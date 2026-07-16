@@ -495,6 +495,16 @@ export function buildCombatSteps(
   // it lands or not. Doubles the damage DICE — the same treatment as a crit,
   // and they stack (a crit through a perfect opening is 4× dice).
   const perfectOpening = (player.statusEffects ?? []).some((e) => e.kind === 'perfect_opening');
+  // OTA-847 (STEALTH SYSTEM) — BACKSTAB. Striking from stealth (the `stealthed`
+  // buff, earned via the first-action SNEAK ATTACK opener or a mid-combat
+  // re-stealth) with a FINESSE / thrown weapon (stat 'dexterity') doubles the
+  // damage dice — the rogue payoff. A HEAVY weapon striking from stealth still
+  // gets the +5 to-hit from `stealthed` (rollMods), but no dice-doubling — a
+  // plain SNEAK STRIKE, so heavy builds can still use the button, they just
+  // don't get the multiplier. Peek only; the +5 consume happens in rollMods,
+  // the same peek/consume split perfect_opening uses, so one swing gets both.
+  const backstab = (player.statusEffects ?? []).some((e) => e.kind === 'stealthed')
+    && equipped?.stat === 'dexterity';
   // OTA-403 — manual weapon-coating damage roll. If the swinging weapon
   // instance carries a coating, append a 4th 'coating' step so the player
   // ROLLS the coating's bonus damage themselves (it was auto-rolled inside
@@ -576,13 +586,13 @@ export function buildCombatSteps(
       id: 'damage',
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
-      count: perfectOpening ? dmg.count * 2 : dmg.count,
+      count: (perfectOpening || backstab) ? dmg.count * 2 : dmg.count,
       bonus: damageBonus + aetherSurge,
       bonusLabel: [
         damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
         aetherSurge > 0 ? `+${aetherSurge} (Aetheric surge 1d6)` : '',
       ].filter(Boolean).join(' '),
-      context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : ''}`,
+      context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}`,
       // no target — always applies if the attack hit
     },
   ];

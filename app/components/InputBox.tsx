@@ -62,6 +62,13 @@ interface Props {
   onOpenSearch: () => void;
   onOpenCrafting: () => void;
   onOpenApproach: () => void;
+  /** OTA-847 (STEALTH SYSTEM) — peaceful PICKPOCKET button (replaces the old
+   *  out-of-combat APPROACH). Opens the mark/target picker; the walk-up-to-a-
+   *  noun job APPROACH used to do out of combat is retired. */
+  onOpenPickpocket: () => void;
+  /** True when there's nothing to lift here (no vendor, no liftable target) —
+   *  greys the PICKPOCKET button so it's never a dead tap. */
+  pickpocketBlocked?: boolean;
   onOpenAskArbiter: () => void;
   /** arb120 — quick-row MISSIONS button → Contracts screen. Lets the top
    *  main-quest chip slim to a single line for more exploration room. */
@@ -160,7 +167,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
@@ -520,6 +527,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
               ) : null}
               <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
+              {/* OTA-847 (STEALTH SYSTEM) — in-combat STEALTH. First action of the
+                  fight = SNEAK ATTACK (free STE check for the drop); mid-combat =
+                  BACKSTAB attempt (costs your turn, STE initiative race). The
+                  'sneak' verb routes to the stealth intent handler either way. */}
+              <QuickBtn label="stealth" defensive onPress={() => onSubmit('sneak')} />
               <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
               {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
                   kit (damaged) + drops + TC and clears them from the fight. */}
@@ -566,7 +578,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               tone={investigateTone}
               blocked={investigateBlocked}
             />
-            <QuickBtn label="approach" onPress={onOpenApproach} blocked={approachBlocked} />
+            <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} />
             <QuickBtn
               label="take"
               onPress={takeOverride ?? onOpenTake}
