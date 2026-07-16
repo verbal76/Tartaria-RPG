@@ -329,20 +329,30 @@ export function maybePremiumOffer(existing: VendorOffer[]): VendorOffer | null {
 // The stall id stays stable (hidden_market_<category>) so broker contracts +
 // sigil turn-in keep working; only the name/title/faction rotate.
 interface StallRep { name: string; title: string; faction: string | null }
+// OTA-834 — every stall `faction` must be a CANONICAL faction id from
+// factions.json, or its rapport/CHA-discount silently no-ops (vendorPriceMod +
+// applyRepChange only recognize real factions). Pre-fix four reps carried RACE ids
+// (unknowing_masses / aetherborn / mud_golems / architectural_sentinels), so on
+// those rotation days the stall could never earn rep or grant the discount. Remapped
+// each to the faction that actually owns that theme: unknowing_masses →
+// conspiracy_architects (they "keep the Unknowing Masses ignorant"), aetherborn →
+// eternal_dynasty (the "Aetherborn Cabal"), mud_golems → mud_monarchs (mud),
+// architectural_sentinels → stone_builders (Sacred Architecture). true_tartarians IS
+// canonical and was left as-is.
 const STALL_ROSTER: Record<StallCategory, StallRep[]> = {
   weapons: [
-    { name: 'Zorin Nightblade', title: 'Exotic Weapons Dealer', faction: 'unknowing_masses' },
+    { name: 'Zorin Nightblade', title: 'Exotic Weapons Dealer', faction: 'conspiracy_architects' },
     { name: 'Drakos the Mercenary', title: 'Two-Handed Weapons Dealer', faction: 'true_tartarians' },
-    { name: 'Cassia Nightwind', title: 'Ranged Weapons Specialist', faction: 'aetherborn' },
-    { name: 'Korr Stonefoot', title: 'Heavy Weapons Dealer', faction: 'mud_golems' },
-    { name: 'Odar Flameforge', title: 'Fire-Weaponsmith', faction: 'architectural_sentinels' },
+    { name: 'Cassia Nightwind', title: 'Ranged Weapons Specialist', faction: 'eternal_dynasty' },
+    { name: 'Korr Stonefoot', title: 'Heavy Weapons Dealer', faction: 'mud_monarchs' },
+    { name: 'Odar Flameforge', title: 'Fire-Weaponsmith', faction: 'stone_builders' },
     { name: 'Nalren Frostgrip', title: 'Frost-Gear Specialist', faction: 'reclaimers_guild' },
   ],
   armor: [
     { name: 'Vela Ironheart', title: 'Melee Armorer', faction: 'true_tartarians' },
     { name: 'Irma Ironhand', title: 'Heavy Armorer', faction: 'true_tartarians' },
     { name: 'Korash of the Deep', title: 'True Tartarian Quartermaster', faction: 'true_tartarians' },
-    { name: 'Mara Stoneskin', title: 'Earth-Gear Vendor', faction: 'mud_golems' },
+    { name: 'Mara Stoneskin', title: 'Earth-Gear Vendor', faction: 'mud_monarchs' },
   ],
   food: [
     { name: 'Halem the Trader', title: 'General Goods', faction: null },
@@ -355,7 +365,7 @@ const STALL_ROSTER: Record<StallCategory, StallRep[]> = {
   materials: [
     { name: 'Tellin Mak', title: 'Scrap Broker', faction: 'reclaimers_guild' },
     { name: 'Tarek the Tinkerer', title: 'Mechanical Outfitter', faction: 'reclaimers_guild' },
-    { name: 'Silvan the Quiet', title: 'Relic Dealer', faction: 'aetherborn' },
+    { name: 'Silvan the Quiet', title: 'Relic Dealer', faction: 'eternal_dynasty' },
     { name: 'Foreman Drest Holloway', title: 'Master Mason', faction: 'stone_builders' },
     { name: 'Magister Caul Veyre', title: 'Dynastic Factor', faction: 'eternal_dynasty' },
     { name: 'The Cartographer', title: 'Keeper of Quiet Plans', faction: 'conspiracy_architects' },
