@@ -16062,4 +16062,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tiles of that outpost its patrol intercepts (maybeInterceptPatrol, hooked into
 // continueTravel; reuses the OTA-849 party builder as injectFactionParty). Kills of
 // the quarry tick the bounty; the last pays TC + giver standing. Test: ota850FactionBounty.
-export const OTA_BUILD_ID = '2026-07-16-830-faction-bounties';
+// ── OTA-831 (LIVING WORLD — event variety + roaming patrols that fight their own wars) ─
+// Port of HAL OTA-851. The single OTA-844 pulse becomes a broad weighted world-event
+// catalogue (worldEvents.ts: surge/setback/skirmish/muster/warband/bounty/schism/truce/
+// caravan/relic/omen/…) driving both the live tick and offline catch-up. Roaming faction
+// patrols (worldMemory.patrols) wander loops near their outposts (stepPatrol) and can be
+// blundered into anywhere (maybePatrolAmbush) on top of the OTA-850 outpost interception;
+// off-screen they fight (simulatePatrols: rival patrols clash, assault rival outposts,
+// beasts maul them). The WORLD board shows the event feed + a live patrol count.
+// Deterministic (seeded by tick index). Test: ota851WorldEvents.
+export const OTA_BUILD_ID = '2026-07-16-831-world-events-patrols';
