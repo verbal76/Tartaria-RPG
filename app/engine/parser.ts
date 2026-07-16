@@ -44,6 +44,14 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // (opened by a generic "talk to / approach") always offers "Calm it" by tap.
     'threaten', 'menace', 'coerce', 'coax',
     'soothe', 'pacify', 'tame',
+    // OTA-854 — a wider net of LEADING verbs so natural talk-down phrasings route to
+    // diplomacy ("shout at them to go away", "browbeat the patrol"). The phrasal
+    // target-commands ("back off", "go away") are NOT here — they collide with retreat
+    // as bare input; detectParleyChoice reads them once a parley is underway.
+    'shout', 'yell', 'holler', 'bellow', 'roar', 'snarl', 'growl', 'scare', 'frighten',
+    'bully', 'terrify', 'browbeat', 'scowl', 'spook', 'daunt',
+    // PERSUASION reads (reason): defuse the standoff with words.
+    'reason', 'appeal', 'defuse', 'deescalate', 'de-escalate', 'reconcile', 'placate',
   ],
   escape: [
     'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',

@@ -55,13 +55,24 @@ export function choicesFor(kind: ParleyKind): [ParleyChoice, ParleyChoice] {
  *  specific approach commits: threat verbs → intimidate; gentle/reasoning verbs →
  *  the kind's safe button (calm for an animal, persuade for a person). */
 export function detectParleyChoice(input: string, kind: ParleyKind): ParleyChoice | null {
-  if (/\b(intimidate|threaten|scare|menace|frighten|cow|bully|coerce|extort|terrify)\b/i.test(input)) {
+  // OTA-854 — a wide INTIMIDATION vocabulary so natural aggression lands: threat verbs,
+  // a raised voice, and "go away" / "back off" commands all read as fear.
+  if (
+    /\b(intimidate|threaten|scare|menace|frighten|cow|bully|coerce|extort|terrify|browbeat|daunt|spook)\b/i.test(input)
+    || /\b(shout|yell|holler|bellow|roar|snarl|growl|bark|scowl|glare)\b/i.test(input)
+    || /\b(back\s*off|go\s*away|stand\s*down|get\s*(lost|out)|clear\s*off|buzz\s*off|shove\s*off|push\s*off|piss\s*off|scram|shoo)\b/i.test(input)
+    || /\b(scare|drive|warn|face|see)\s*(them|it|him|her|these|those)?\s*off\b/i.test(input)
+    || /\bor\s+else\b|\bleave\s+or\b/i.test(input)
+  ) {
     return 'intimidate';
   }
-  if (/\b(calm|soothe|pacify|settle|tame|gentle|ease|steady)\b/i.test(input)) {
+  if (/\b(calm|soothe|pacify|settle|tame|gentle|ease|steady|placate|reconcile)\b/i.test(input)) {
     return kind === 'animal' ? 'calm' : 'persuade';
   }
-  if (/\b(persuade|convince|reason|plead|bargain|negotiate|parley|appeal|coax|entreat)\b/i.test(input)) {
+  if (
+    /\b(persuade|convince|reason|plead|bargain|negotiate|parley|appeal|coax|entreat|defuse|de-?escalate|make\s*peace|placate|reconcile)\b/i.test(input)
+    || /\btalk\b[\w\s]{0,12}\bdown\b/i.test(input) // "talk down", "talk them down"
+  ) {
     return kind === 'animal' ? 'calm' : 'persuade';
   }
   return null; // generic opener → show the two buttons
