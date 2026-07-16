@@ -2235,6 +2235,12 @@ interface GameStore {
   currentScreen: ScreenName;
   currentScene: CurrentScene | null;
   pendingRolls: PendingRollState | null;
+  /** OTA-841 [did-you-mean] — runnable command suggestions surfaced after a
+   *  low-confidence / unresolved parse (the same list the "Try: …" log line
+   *  shows), so the UI can render a TAPPABLE chip row: one tap re-submits that
+   *  command instead of making the player retype it. Cleared at the start of the
+   *  next action so stale chips never linger. */
+  parseSuggestions: string[];
   /** OTA-259 — When a multi-stage investigation hook fires a non-
    *  terminal stage (outcome.done === false), this state captures
    *  enough info to surface a CONTINUE popup so the player can
@@ -3120,6 +3126,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScreen: 'title',
   currentScene: null,
   pendingRolls: null,
+  parseSuggestions: [],
   pendingHookContinue: null,
   pendingWhisperComplete: null,
   fusionCatalystPrompt: null,
@@ -6410,6 +6417,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
+    // OTA-841 [did-you-mean] — a new action clears any stale disambiguation chips
+    // from the previous low-confidence parse (tapping a chip routes here too, so the
+    // chip row vanishes the moment you pick one).
+    if (get().parseSuggestions.length) set({ parseSuggestions: [] });
+
     // Poplar Anvil — reconcile the dog's time-based fates (bleed-out /
     // abandonment) AFTER this action resolves. Scheduled as a microtask
     // so a rescue verb (feed / rest / heal) applies its HP / loyalty
@@ -7461,6 +7473,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             if (parsed.suggestions.length) {
               get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+              // OTA-841 — also surface the same commands as a TAPPABLE "did you mean" chip row.
+              set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
             }
             void get().persist();
             return;
@@ -7512,6 +7526,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (parsed.suggestions.length) {
         get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+        // OTA-841 — tappable "did you mean" chip row mirroring the Try: line.
+        set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
       }
       void get().persist();
       return;

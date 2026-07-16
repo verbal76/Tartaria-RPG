@@ -15978,4 +15978,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (confirms now); buy an unstocked item; buy/sell with no vendor; summon Core Guardian
 // unmapped reasons; SALVAGE ALL mixed-batch unmatched nouns. Ships to all three lines.
 // Test: ota840NeverFailSilently.
-export const OTA_BUILD_ID = '2026-07-16-820-never-fail-silently';
+// ── OTA-821 (Tier-2 QoL #2: "did you mean…" chip row — golem port of HAL-841) ───
+// A low-confidence / unresolved parse already logged a "Try: …" text hint; now the
+// same runnable commands are stashed on the store (parseSuggestions, set on both
+// soft-refusal paths, cleared at the start of the next action) and ExplorationScreen
+// renders them as a TAPPABLE "Did you mean…" chip row above the input — one tap
+// re-submits. Test: ota841DidYouMean.
+export const OTA_BUILD_ID = '2026-07-16-821-did-you-mean-chips';
