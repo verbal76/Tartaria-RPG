@@ -16190,4 +16190,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // +4 storylines (Reclaimers, Architects, 2nd Order, 2nd Dynasty — all 9 factions now have
 // one), +6 hunts (3 standard_7 + 3 bait_switch_5), +6 mysteries. Totals hunts 6→18,
 // mysteries 6→18, storylines 4→14. Data only (Tartaria lore; NOT engine).
-export const OTA_BUILD_ID = '2026-07-16-849-quest-content-batch2';
+//
+// 2026-07-17 OTA-850 — port of HAL OTA-871 (completability sweep). A 6-agent audit
+// drove every hunt/mystery/storyline/bounty/whisper/hook to completion plus a full
+// endgame run. Two real bugs fixed: (1) advanceMystery/advanceStoryline now auto-consume
+// a trailing pure-narration (checkKind: null) epilogue stage so 14 authored quests no
+// longer hang one stage short of turn-in; (2) hunt_salamander_voronov's invalid checkKind
+// 'investigation' → 'investigate'. EndingScreen recap now uses the LOST_CAPITAL_NAMES
+// export (all nine Capitals show real names). Adds ota871QuestEpilogue guard test.
+export const OTA_BUILD_ID = '2026-07-17-850-completability-sweep';

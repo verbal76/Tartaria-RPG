@@ -20,7 +20,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { endingLine, LOST_CAPITAL_LOCATIONS } from '../engine/mainQuest';
+import { endingLine, LOST_CAPITAL_LOCATIONS, LOST_CAPITAL_NAMES } from '../engine/mainQuest';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 
@@ -34,11 +34,10 @@ function factionName(id: string): string {
   return factions.find((f) => f.id === id)?.name ?? id;
 }
 function capitalLabel(id: string): string {
-  const map: Record<string, string> = {
-    asgardar: 'Asgardar', samarran: 'Samarran', nimari: 'Nimari',
-    drakova: 'Drakova', voronov: 'Voronov',
-  };
-  return map[id] ?? id;
+  // OTA-871 — use the canonical export from mainQuest so the ending recap
+  // shows real names for all nine Lost Capitals (the local map only listed
+  // the original five, so the four OTA-052 Capitals fell back to raw ids).
+  return LOST_CAPITAL_NAMES[id] ?? id;
 }
 
 // OTA-151 — homeward narrative. Faction-neutral wording so it lands
