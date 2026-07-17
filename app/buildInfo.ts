@@ -16702,4 +16702,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that road (each held bounty has its own "set course" button). player.activeBounty (single)
 // is migrated into player.activeBounties[] on read so old saves keep an in-progress contract.
 // New engine helpers listBounties + bountyKey. Test: ota859BountyBoard.
-export const OTA_BUILD_ID = '2026-07-16-859-bounty-board';
+// ── OTA-860 (First-time tips pass + a global off switch) ──
+// Only Inventory + Crafting had first-time hint popups; a lot of systems shipped with no
+// just-in-time intro. Added a ~25-word FirstTimeHint at the entry of Character sheet,
+// World board, Lore codex, Map, Vendor, the Missions/Contracts board, and the FIRST combat
+// (stealth / talk-down / parley live there and aren't in the tutorial). Added a GLOBAL
+// tips kill-switch: a "First-time tips" ON/OFF toggle + "SHOW ALL TIPS AGAIN" reset in
+// Settings → Display, and a "Turn off tips" link inside every popup — both write the same
+// per-install flag, live. useFirstTimeHint now respects it. Test: ota860Hints.
+// ── OTA-861 (Rope tutorial: type it, don't pre-fill) ──
+// The rope beat used to pre-fill the input with "take rope"; now the player TYPES it. The
+// draftText pre-fill is gone and the accept-regex broadened to take/grab/get/pick up/…rope
+// so a natural synonym still lands. If they mistype, the existing lockdown nudges them.
+export const OTA_BUILD_ID = '2026-07-16-860-tips-pass';

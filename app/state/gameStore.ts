@@ -7085,7 +7085,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
-      if (tStep?.id === 'rope' && /\btake\s+.*rope\b/i.test(trimmed)) {
+      // OTA-861 — the player now TYPES this themselves (no pre-fill), so accept the
+      // natural synonyms for picking it up, not just "take".
+      if (tStep?.id === 'rope' && /\b(take|grab|get|pick\s+up|pickup|collect|snag)\s+.*rope\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
         grantTutorialItem(get, set, 'rope');
         get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");

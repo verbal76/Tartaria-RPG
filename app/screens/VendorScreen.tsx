@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
@@ -339,6 +340,11 @@ export function VendorScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="vendor_first_open"
+        title="The trader"
+        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
