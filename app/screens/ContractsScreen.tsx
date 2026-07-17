@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -283,6 +284,11 @@ export function ContractsScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="contracts_first_open"
+        title="Your missions"
+        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

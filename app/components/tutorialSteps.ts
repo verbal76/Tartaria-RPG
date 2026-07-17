@@ -120,11 +120,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
-    draftText: 'take rope',
     title: 'Take the Rope',
-    body: 'Tartaria takes typed input too. The input below is pre-filled with "take rope". Tap Act to grab it.',
+    body: 'Tartaria takes typed input too. Type take rope into the input below yourself, then tap ACT.',
     arbiter:
-      '"Now the rope, on the shelf. This time, type it. I\'ve written the command. Tap ACT."',
+      '"Now the rope, on the shelf. This time, type it yourself — take rope — then tap ACT. Most of Tartaria answers to plain words like that."',
   },
   {
     id: 'scrap',

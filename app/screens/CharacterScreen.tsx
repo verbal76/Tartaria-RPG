@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, effectiveACBreakdown } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
@@ -112,6 +113,11 @@ export function CharacterScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="character_first_open"
+        title="Your character"
+        body="Tap any stat or number to see exactly what feeds it. Scroll down for your Chronicle — the legend of what you've done."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

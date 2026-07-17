@@ -16125,4 +16125,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pays out + drops off independently — several at once is a faster standing grind. Legacy
 // single activeBounty migrates into activeBounties[] on read. New helpers listBounties +
 // bountyKey. Test: ota859BountyBoard.
-export const OTA_BUILD_ID = '2026-07-16-839-bounty-board';
+//
+// 2026-07-16 OTA-840 — port of HAL OTA-860/861. First-time tips pass: added a ~25-word
+// FirstTimeHint at the entry of the Character sheet, World board, Lore codex, Map, Vendor,
+// the Missions board, and the first combat (stealth/talk-down/parley aren't in the
+// tutorial). Global tips kill-switch: a toggle + "show all again" reset in Settings ->
+// Display and a "Turn off tips" link in every popup, both writing one per-install flag.
+// Rope tutorial beat now TYPED (no pre-fill); accept-regex broadened. Test: ota860Hints.
+export const OTA_BUILD_ID = '2026-07-16-840-tips-pass';

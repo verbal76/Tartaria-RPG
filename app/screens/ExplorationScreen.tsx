@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
@@ -520,6 +521,16 @@ export function ExplorationScreen() {
       // text line we are typing into?"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {/* OTA-860 — combat is where most of the un-tutorialized systems live (stealth,
+          backstab, talking a foe down, parley). Fire this the first time a fight is
+          actually on-screen, not on first exploration. */}
+      {(currentScene?.enemies?.length ?? 0) > 0 && (
+        <FirstTimeHint
+          id="combat_first_fight"
+          title="In a fight"
+          body="Type what you do — strike, aim, or use a skill. You can also STEALTH for a sneak hit, or try to talk a foe down or scare them off."
+        />
+      )}
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
           {/* OTA 040 — tap the stats panel to open the full Player

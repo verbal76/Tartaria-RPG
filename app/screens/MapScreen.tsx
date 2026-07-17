@@ -38,6 +38,7 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
 // panel so a player can tap any known location and start travel
@@ -657,6 +658,11 @@ export function MapScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="map_first_open"
+        title="The map"
+        body="Tap a known place to set a course; travel burns stamina and time. Your dot shows where you stand."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
