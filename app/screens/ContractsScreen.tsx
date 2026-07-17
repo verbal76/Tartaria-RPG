@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal,
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, getHunts, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { FirstTimeHint } from '../components/FirstTimeHint';
-import { bountyKey, bountyHoursLeft } from '../engine/factionBounty';
+import { bountyKey, bountyHoursLeft, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, getMysteries } from '../engine/mysteries';
 import { findStorylineById, getStorylines } from '../engine/factionStorylines';
@@ -591,11 +591,24 @@ export function ContractsScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>BOUNTIES</Text>
               {activeBounties.map((b) => {
+                // OTA-866 — a prominent LIVE countdown on every accepted bounty. The window
+                // is in-game hours (only drains as you act), so it can't tick in real time —
+                // but the bar + colour make "how long have I got" unmistakable, and it
+                // updates the moment the clock moves.
                 const left = bountyHoursLeft(b, bountyNowHour);
-                const leftLabel = !Number.isFinite(left)
-                  ? 'no deadline'
-                  : left <= 0 ? 'LAPSED' : `${Math.ceil(left)}h left`;
-                const urgent = Number.isFinite(left) && left > 0 && left <= 6;
+                const deadline = b.deadlineHours ?? BOUNTY_DEADLINE_HOURS;
+                const hasClock = Number.isFinite(left);
+                const lapsed = hasClock && left <= 0;
+                const frac = hasClock ? Math.max(0, Math.min(1, left / deadline)) : 1;
+                // Green with lots of room → amber → red as it runs down.
+                const tier = !hasClock ? 'none' : lapsed ? 'lapsed' : left <= 6 ? 'crit' : left <= 12 ? 'warn' : 'ok';
+                const timerColor = tier === 'ok' ? '#9ec96a'
+                  : tier === 'warn' ? '#d9b45f'
+                  : tier === 'crit' || tier === 'lapsed' ? '#e07a5f'
+                  : '#7a705c';
+                const timerLabel = !hasClock ? 'no deadline'
+                  : lapsed ? '⏳ LAPSED'
+                  : `⏳ ${Math.ceil(left)}h left`;
                 return (
                   <Pressable
                     key={`b_${bountyKey(b)}`}
@@ -604,8 +617,14 @@ export function ContractsScreen() {
                   >
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{b.giverName} bounty</Text>
-                      <Text style={[styles.stagePill, urgent && { color: '#c98a6a' }]}>{leftLabel}</Text>
+                      <Text style={[styles.bountyTimerPill, { color: timerColor, borderColor: timerColor }]}>{timerLabel}</Text>
                     </View>
+                    {/* Draining time bar — the fraction of the window left. */}
+                    {hasClock && (
+                      <View style={styles.bountyTimerTrack}>
+                        <View style={[styles.bountyTimerFill, { width: `${Math.round(frac * 100)}%`, backgroundColor: timerColor }]} />
+                      </View>
+                    )}
                     <Text style={styles.cardFaction}>Hunt the {b.targetName}</Text>
                     <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
                     <Text style={styles.cardHint}>
@@ -1719,6 +1738,10 @@ const styles = StyleSheet.create({
   difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#bcd2db', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#6ab0c9', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
+  // OTA-866 — bounty countdown: a bordered time pill + a draining bar (colours are semantic).
+  bountyTimerPill: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, borderWidth: 1, borderRadius: 3, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' },
+  bountyTimerTrack: { height: 4, borderRadius: 2, backgroundColor: 'rgba(122,112,92,0.25)', marginTop: 6, marginBottom: 2, overflow: 'hidden' },
+  bountyTimerFill: { height: 4, borderRadius: 2 },
   cardStageLabel: { color: '#6ab0c9', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
   cardStageBody: { color: '#d6e4e8', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   whispersBlurb: { color: '#6c8088', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
