@@ -16733,4 +16733,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Near jobs still ~24-34h; the farthest (~31 tiles) get ~55h. The offer card shows the
 // estimated window before you accept; the held card + Missions board count it down.
 // Test: ota862BountyDeadline (OTA-863 cases).
-export const OTA_BUILD_ID = '2026-07-16-863-bounty-deadline-distance';
+// ── OTA-864 (War-feed flavour — deep, varied line pools) ──
+// The World board drew patrol clashes from 2 lines, outpost assaults from 1, and beast
+// maulings from 4, so it read the same on loop ("X smashed Y in the wild" over and over).
+// New seeded pools in worldEvents (patrolClashLine / outpostAssaultLine / patrolMaulLine):
+// 20 clash lines that vary the verb AND the scenario (ambushes, routes, night raids, box
+// canyons, pyrrhic wins), 14 assault lines, 16 maul lines (beasts, storms, sinkholes, bad
+// water). A friction clash appends one of 7 varied "a grudge is born" tails. All pure +
+// deterministic (same sim seed → same line), so the world stays reproducible + testable.
+// Test: ota864WarFlavor.
+export const OTA_BUILD_ID = '2026-07-16-864-war-feed-flavor';
