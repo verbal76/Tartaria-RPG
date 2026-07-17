@@ -1829,6 +1829,20 @@ const WORLD_TICK_HOURS = 2;
 // fills at a satisfying pace instead of one line every real hour.
 const PATROL_SUBSTEPS_PER_TICK = 4;
 
+// OTA-859 [bounty board] — how many kill-bounties the player may carry at once. Small
+// enough that the slate stays meaningful, big enough to stack a grind.
+const MAX_ACTIVE_BOUNTIES = 3;
+// Read the player's bounty slate, migrating a LEGACY single activeBounty into the array
+// so an old save mid-contract doesn't lose it.
+function activeBountiesOf(
+  player: { activeBounties?: import('../engine/factionBounty').FactionBounty[]; activeBounty?: import('../engine/factionBounty').FactionBounty } | null | undefined,
+): import('../engine/factionBounty').FactionBounty[] {
+  if (!player) return [];
+  if (player.activeBounties && player.activeBounties.length > 0) return player.activeBounties;
+  if (player.activeBounty) return [player.activeBounty];
+  return [];
+}
+
 // OTA-844/849/851 — the world's heartbeat. Called at the end of every action; when a
 // full pulse of in-game time has accrued, one WORLD EVENT fires from a broad, weighted
 // catalogue (OTA-851: surges, skirmishes, musters, warbands, schisms, caravans, omens,
@@ -2217,7 +2231,7 @@ function maybeInterceptPatrol(
   const holderId = Object.keys(FACTION_STARTING_LOCATION).find((fid) => FACTION_STARTING_LOCATION[fid] === targetLocationId);
   if (!holderId) return;
   const standing = player.factionStanding.find((r) => r.factionId === holderId)?.standing ?? 0;
-  const isBountyTarget = player.activeBounty?.targetFactionId === holderId;
+  const isBountyTarget = activeBountiesOf(player).some((b) => b.targetFactionId === holderId);
   if (!isBountyTarget && standing >= 0) return; // friends' patrols wave you through
   const hour = player.hoursElapsed ?? 0;
   const last = s.worldMemory.lastRaidHour;
@@ -2265,9 +2279,10 @@ function maybePatrolAmbush(
   const { patrolsNear } = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
   const near = patrolsNear(patrols, cell.x, cell.y, 2);
   if (near.length === 0) return;
+  const bountyTargets = new Set(activeBountiesOf(player).map((b) => b.targetFactionId));
   const hostile = near.find((p) => {
     const standing = player.factionStanding.find((r) => r.factionId === p.factionId)?.standing ?? 0;
-    return player.activeBounty?.targetFactionId === p.factionId || standing < 0;
+    return bountyTargets.has(p.factionId) || standing < 0;
   });
   if (!hostile) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -16952,31 +16967,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // OTA-850 [faction bounty] — a kill of the bounty's quarry ticks progress; the
-    // final one pays out (TC + standing with the giver) and clears the contract.
+    // OTA-850/859 [faction bounty] — a kill of a quarry ticks progress on EVERY active
+    // bounty whose target it matches (grind several at once). Each bounty that completes
+    // pays out (TC + standing with its giver) and drops off the slate; the rest carry on.
     {
-      const b = get().player?.activeBounty;
+      const slate = activeBountiesOf(get().player);
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { killCountsForBounty } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
-      if (b && killCountsForBounty(b, enemy.factionId)) {
-        const progress = b.progress + 1;
-        if (progress < b.count) {
-          set((s) => (s.player?.activeBounty ? { player: { ...s.player, activeBounty: { ...s.player.activeBounty, progress } } } : s));
-          get().appendLog('world', `Bounty: ${progress}/${b.count} ${b.targetName} put down.`);
-        } else {
-          const payer = get().player;
-          if (payer) {
-            const rep = applyRepChange(payer.factionStanding, b.giverFactionId, b.rewardRep);
-            set((s) => (s.player ? { player: {
-              ...s.player,
-              tc: (s.player.tc ?? 0) + b.rewardTc,
-              factionStanding: rep.standing,
-              activeBounty: undefined,
-            } } : s));
-            logRepChanges(get, rep.changed);
-            get().appendLog('reward', `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
-            get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
+      if (slate.some((b) => killCountsForBounty(b, enemy.factionId))) {
+        const remaining: import('../engine/factionBounty').FactionBounty[] = [];
+        const completed: import('../engine/factionBounty').FactionBounty[] = [];
+        for (const b of slate) {
+          if (!killCountsForBounty(b, enemy.factionId)) { remaining.push(b); continue; }
+          const progress = b.progress + 1;
+          if (progress < b.count) {
+            remaining.push({ ...b, progress });
+            get().appendLog('world', `Bounty: ${progress}/${b.count} ${b.targetName} put down for the ${b.giverName}.`);
+          } else {
+            completed.push({ ...b, progress });
           }
+        }
+        // Apply the surviving slate first (single kill only ever advances each bounty once).
+        set((s) => (s.player ? { player: { ...s.player, activeBounties: remaining, activeBounty: undefined } } : s));
+        // Then settle every completed contract's payout in turn.
+        for (const b of completed) {
+          const payer = get().player;
+          if (!payer) break;
+          const rep = applyRepChange(payer.factionStanding, b.giverFactionId, b.rewardRep);
+          set((s) => (s.player ? { player: {
+            ...s.player,
+            tc: (s.player.tc ?? 0) + b.rewardTc,
+            factionStanding: rep.standing,
+          } } : s));
+          logRepChanges(get, rep.changed);
+          get().appendLog('reward', `✦ Bounty complete — the ${b.giverName} pay out ${b.rewardTc} TC.`);
+          get().appendLog('arbiter', `"The ${b.giverName} will hear of this," the Arbiter says. "You've done what they could not."`);
         }
       }
     }
@@ -19698,17 +19723,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
   acceptBounty(bounty) {
     const player = get().player;
     if (!player) return;
-    if (player.activeBounty) {
-      get().appendLog('system', 'You already carry a bounty. Finish or abandon it first.');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { bountyKey } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+    const slate = activeBountiesOf(player);
+    // OTA-859 — don't stack the exact same contract twice.
+    if (slate.some((b) => bountyKey(b) === bountyKey(bounty))) {
+      get().appendLog('system', `You already carry the ${bounty.giverName} contract on the ${bounty.targetName}.`);
       return;
     }
-    set((s) => (s.player ? { player: { ...s.player, activeBounty: { ...bounty, progress: 0 } } } : s));
+    // OTA-859 — hold up to MAX_ACTIVE_BOUNTIES at once; beyond that the slate is full.
+    if (slate.length >= MAX_ACTIVE_BOUNTIES) {
+      get().appendLog('system', `Your bounty slate is full (${MAX_ACTIVE_BOUNTIES}). Finish or abandon one first.`);
+      return;
+    }
+    const hadCourse = slate.length > 0;
+    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0 }], activeBounty: undefined } } : s));
     get().appendLog(
       'arbiter',
-      `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
+      hadCourse
+        ? `"Another contract," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down around ${bounty.targetLocationName}. Added to your slate — your current course holds."`
+        : `"A contract, then," the Arbiter says. "The ${bounty.giverName} want ${bounty.count} of the ${bounty.targetName} put down — and they'll be thick around ${bounty.targetLocationName}. Setting your course there now."`,
     );
-    // Route the player to the quarry's outpost — straight into patrol country.
-    get().setTravelCourse(bounty.targetLocationId);
+    // Route the player to the quarry's outpost — but only if they weren't already on a
+    // bounty course. Stacking a second contract must not yank you off the first one's road.
+    if (!hadCourse) get().setTravelCourse(bounty.targetLocationId);
   },
 
   worldRealtimeTick() {

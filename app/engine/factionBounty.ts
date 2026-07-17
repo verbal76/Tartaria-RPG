@@ -48,12 +48,32 @@ export function pickBounty(
   tides: Record<string, number>,
   positiveThreshold = 10,
 ): FactionBounty | null {
+  return bountyCandidates(factions, standings, outpostOf, locationName, tides, positiveThreshold)[0] ?? null;
+}
+
+/** OTA-859 — a stable identity for a bounty (giver + quarry + place), so the store can
+ *  tell whether an offer is already on the player's slate and never stack a duplicate. */
+export function bountyKey(b: Pick<FactionBounty, 'giverFactionId' | 'targetFactionId' | 'targetLocationId'>): string {
+  return `${b.giverFactionId}>${b.targetFactionId}@${b.targetLocationId}`;
+}
+
+/** Collect every eligible bounty candidate (a favored faction's real, unfriendly rival
+ *  with a known outpost), most ASCENDANT first. Shared by pickBounty + listBounties. */
+function bountyCandidates(
+  factions: readonly FactionMeta[],
+  standings: ReadonlyArray<{ factionId: string; standing: number }>,
+  outpostOf: (factionId: string) => string | undefined,
+  locationName: (locationId: string) => string,
+  tides: Record<string, number>,
+  positiveThreshold: number,
+): FactionBounty[] {
   const realIds = new Set(factions.map((f) => f.id));
   const nameOf = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
   const standingOf = (id: string) => standings.find((s) => s.factionId === id)?.standing ?? 0;
   const allies = factions.filter((f) => standingOf(f.id) >= positiveThreshold);
   // Candidate quarries: real rivals of a favored faction that the player is NOT also
-  // friendly with AND that have a known outpost to route to.
+  // friendly with AND that have a known outpost to route to. Keyed by giver>target so
+  // two different allies who both hate the same rival each post their OWN contract.
   const candidates = new Map<string, { targetId: string; giverId: string; loc: string }>();
   for (const ally of allies) {
     for (const rivalId of ally.rivals ?? []) {
@@ -61,27 +81,46 @@ export function pickBounty(
       if (standingOf(rivalId) >= positiveThreshold) continue;
       const loc = outpostOf(rivalId);
       if (!loc) continue;
-      if (!candidates.has(rivalId)) candidates.set(rivalId, { targetId: rivalId, giverId: ally.id, loc });
+      const k = `${ally.id}>${rivalId}`;
+      if (!candidates.has(k)) candidates.set(k, { targetId: rivalId, giverId: ally.id, loc });
     }
   }
-  if (candidates.size === 0) return null;
-  const chosen = [...candidates.values()].sort((a, b) => {
+  const sorted = [...candidates.values()].sort((a, b) => {
     const d = (tides[b.targetId] ?? 0) - (tides[a.targetId] ?? 0);
-    return d !== 0 ? d : a.targetId.localeCompare(b.targetId);
-  })[0]!;
-  const terms = bountyTerms(tides[chosen.targetId] ?? 0);
-  return {
-    giverFactionId: chosen.giverId,
-    giverName: nameOf(chosen.giverId),
-    targetFactionId: chosen.targetId,
-    targetName: nameOf(chosen.targetId),
-    targetLocationId: chosen.loc,
-    targetLocationName: locationName(chosen.loc),
-    count: terms.count,
-    progress: 0,
-    rewardTc: terms.rewardTc,
-    rewardRep: terms.rewardRep,
-  };
+    return d !== 0 ? d : (a.giverId + a.targetId).localeCompare(b.giverId + b.targetId);
+  });
+  return sorted.map((c) => {
+    const terms = bountyTerms(tides[c.targetId] ?? 0);
+    return {
+      giverFactionId: c.giverId,
+      giverName: nameOf(c.giverId),
+      targetFactionId: c.targetId,
+      targetName: nameOf(c.targetId),
+      targetLocationId: c.loc,
+      targetLocationName: locationName(c.loc),
+      count: terms.count,
+      progress: 0,
+      rewardTc: terms.rewardTc,
+      rewardRep: terms.rewardRep,
+    };
+  });
+}
+
+/**
+ * OTA-859 — the whole bounty BOARD: every eligible contract at once (most ascendant
+ * first), so the player can stack several and grind faction standing instead of being
+ * handed a single job. `max` caps how many are surfaced. Pure + deterministic.
+ */
+export function listBounties(
+  factions: readonly FactionMeta[],
+  standings: ReadonlyArray<{ factionId: string; standing: number }>,
+  outpostOf: (factionId: string) => string | undefined,
+  locationName: (locationId: string) => string,
+  tides: Record<string, number>,
+  max = 4,
+  positiveThreshold = 10,
+): FactionBounty[] {
+  return bountyCandidates(factions, standings, outpostOf, locationName, tides, positiveThreshold).slice(0, Math.max(0, max));
 }
 
 /** Would this kill count toward the active bounty? (target-faction member, bounty
