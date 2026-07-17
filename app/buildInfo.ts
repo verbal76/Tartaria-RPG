@@ -17723,4 +17723,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // headers (Balance of Power, Grudges & Alliances) now READ as buttons: a bordered
 // plate with a left accent rule, an explicit label, and a "tap to show/hide" hint,
 // instead of a bare row that gave no signal it was tappable.
-export const OTA_BUILD_ID = '2026-07-16-1137-world-header-buttons';
+//
+// 2026-07-16 OTA-1138 — port of HAL OTA-857. The World board is now a LIVE SCROLL.
+// The war used to advance only on player actions that burned in-game hours, so a
+// player watching the board saw a frozen feed. A real-time timer in App.tsx fires
+// worldRealtimeTick() every 6s no matter what screen is open — patrols roam, clash,
+// sack outposts and get mauled continuously, with a broader world event folded in
+// every sixth tick. Wall-clock driven (worldRealtimeTicks), not in-game hours; self-
+// guards on no-player/title/creation/ending. Test: ota857WorldRealtime.
+export const OTA_BUILD_ID = '2026-07-16-1138-world-live-scroll';
