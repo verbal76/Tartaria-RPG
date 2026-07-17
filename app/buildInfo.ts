@@ -17792,4 +17792,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Dynasty). Enemy-of-my-enemy warming: factions that also hate a beaten party warm toward
 // the winner (Dynasty excluded → stays friendless). topAlliances + the World board renders
 // a GRUDGES list AND an ALLIANCES list. Test: ota853FactionRelations.
-export const OTA_BUILD_ID = '2026-07-16-1147-alliances';
+//
+// 2026-07-16 OTA-1148 — port of HAL OTA-868. Bloc battles: a clash can escalate when allied
+// war-parties (within 3 tiles, allied >= FRIENDLY_AT) pile in on their side; combined power
+// decides it, casualties scale but are conservatively capped (<=2 losing side, <=1 winning
+// side, <=3 total) and the paced muster refills. Only fires on genuine ally clusters, so
+// it's a rare set-piece. New blocBattleLine flavour pool + 🛡 glyph + top feed priority.
+// Test: ota868BlocBattle.
+export const OTA_BUILD_ID = '2026-07-16-1148-bloc-battles';

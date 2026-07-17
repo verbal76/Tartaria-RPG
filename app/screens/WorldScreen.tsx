@@ -48,7 +48,7 @@ export function WorldScreen() {
   const glyphFor = (kind: string): string => (
     { surge: '▲', setback: '▼', skirmish: '⚔', muster: '⚑', warband: '⚔', bounty: '◆',
       schism: '✂', truce: '☮', defector: '↩', pilgrimage: '⛨', caravan: '⛟', relic: '✦',
-      market: '⚖', omen: '☄', purge: '✖', windfall: '✧', patrol_clash: '⚔', outpost_assault: '⌂', patrol_mauled: '☠' }[kind] ?? '🗞'
+      market: '⚖', omen: '☄', purge: '✖', windfall: '✧', patrol_clash: '⚔', outpost_assault: '⌂', patrol_mauled: '☠', bloc_battle: '🛡' }[kind] ?? '🗞'
   );
 
   // OTA-850/859 — the bounty BOARD: every contract the player holds, plus a slate of
