@@ -16686,4 +16686,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in-game hours — the board is a genuine live scroll independent of what the player does.
 // worldRealtimeTick() self-guards (no player / title / creation / ending) and doesn't
 // persist (the 90s autosave + player actions flush worldMemory). Test: ota857WorldRealtime.
-export const OTA_BUILD_ID = '2026-07-16-857-world-live-scroll';
+// ── OTA-858 (Live-scroll balance — one sub-step per real-time tick) ──
+// OTA-857's real-time path ran 2 sim sub-steps every 6s. That mauls ~22% of the fielded
+// patrols per tick, which OUTRAN the +1/faction muster: the wars read as a meat-grinder
+// and faction power thrashed. Dropped to 1 sub-step (~11% attrition) so the muster keeps
+// pace — losses still land constantly but armies hold ground and the field stays near its
+// ~45 target. The warm-up burst and the in-game worldTideCheck path keep their 4 steps.
+export const OTA_BUILD_ID = '2026-07-16-858-live-scroll-balance';
