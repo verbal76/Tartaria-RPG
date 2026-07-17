@@ -17731,4 +17731,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sack outposts and get mauled continuously, with a broader world event folded in
 // every sixth tick. Wall-clock driven (worldRealtimeTicks), not in-game hours; self-
 // guards on no-player/title/creation/ending. Test: ota857WorldRealtime.
-export const OTA_BUILD_ID = '2026-07-16-1138-world-live-scroll';
+//
+// 2026-07-16 OTA-1139 — port of HAL OTA-858. The live-scroll path ran 2 sim sub-steps
+// every 6s, mauling ~22% of the field per tick — that outran the +1/faction muster and
+// the wars read as a meat-grinder. Dropped to 1 sub-step (~11% attrition) so the muster
+// keeps pace and armies hold ground near their ~45 target.
+export const OTA_BUILD_ID = '2026-07-16-1139-live-scroll-balance';
