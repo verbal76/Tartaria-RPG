@@ -322,6 +322,32 @@ export function patrolsNear(patrols: readonly Patrol[], gx: number, gy: number, 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// OTA-865 — LOCAL WAR HEAT. How contested the ground around a point is, 0..1, read
+// straight from how many war-parties are roaming nearby. Feeds the vendor micro-economy:
+// a hot area means soldiers are buying, so traders mark up (and pay more, since they can
+// resell). Needs a genuine CLUSTER — a lone wanderer reads as ~0 — so quiet ground stays
+// cheap and only real fighting moves prices.
+// ─────────────────────────────────────────────────────────────────────────────
+const HEAT_RADIUS = 5;      // Manhattan tiles counted as "around here"
+const HEAT_BASELINE = 1;    // one passing patrol is just traffic, not a war
+const HEAT_SPAN = 6;        // this many patrols above baseline = fully contested
+
+/** 0..1 contestedness of the ground around a cell, from nearby roaming patrols. */
+export function localWarHeat(patrols: readonly Patrol[], gx: number, gy: number): number {
+  const near = patrolsNear(patrols, gx, gy, HEAT_RADIUS).length;
+  return Math.max(0, Math.min(1, (near - HEAT_BASELINE) / HEAT_SPAN));
+}
+
+/** The two factions with the most war-parties near a cell — who's fighting over this
+ *  ground right now. Returns [] when nothing's near, one id when only one faction is. */
+export function contestedFactions(patrols: readonly Patrol[], gx: number, gy: number): string[] {
+  const near = patrolsNear(patrols, gx, gy, HEAT_RADIUS);
+  const count = new Map<string, number>();
+  for (const p of near) count.set(p.factionId, (count.get(p.factionId) ?? 0) + 1);
+  return [...count.entries()].sort((a, b) => (b[1] - a[1]) || a[0].localeCompare(b[0])).slice(0, 2).map((e) => e[0]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // OTA-864 — WAR-FEED FLAVOUR. The board used to draw clashes from 2 lines, outpost
 // assaults from 1, and beast maulings from 4, so it read the same on loop. These are
 // deep, deterministic pools (seeded by the sim index) that vary BOTH the verb and the

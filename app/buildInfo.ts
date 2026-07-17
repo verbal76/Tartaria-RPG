@@ -16742,4 +16742,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // water). A friction clash appends one of 7 varied "a grudge is born" tails. All pure +
 // deterministic (same sim seed → same line), so the world stays reproducible + testable.
 // Test: ota864WarFlavor.
-export const OTA_BUILD_ID = '2026-07-16-864-war-feed-flavor';
+// ── OTA-865 (War micro-economy — contested ground moves vendor prices) ──
+// The living world now touches your wallet. LOCAL WAR HEAT (0..1, from roaming-patrol
+// density near the vendor's cell) marks BUY prices up (soldiers are buying) and SELL prices
+// up a little (the trader resells to those soldiers). Bounded hard — +12% buy / +8% sell at
+// full heat, inside the CHA/tide swing — and the sell premium stays far under the buy/sell
+// spread, so there's no buy-here-sell-there arbitrage. New pure module vendorPricing
+// (warPriceFactor / finalBuyPrice / strangerBuyPrice / priceArrow) is now the SINGLE source
+// of the price math for BOTH the screen and buyFromVendor/sellToVendor — fixing an old drift
+// where the display dropped the tide modifier. UX: a war-market flavour line on entry
+// ("The fighting between the X and the Y is cleaning them out — prices run high"), a green▼/
+// red▲ ticker beside every price (colour = your benefit, so your discount beating the war
+// tax reads green), and a "friend's price" line after a buy showing what your standing/charm
+// shaved off vs a stranger. Test: ota865WarEconomy.
+export const OTA_BUILD_ID = '2026-07-16-865-war-micro-economy';
