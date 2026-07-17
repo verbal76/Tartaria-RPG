@@ -447,3 +447,27 @@ const MAUL_LINES: readonly string[] = [
 export function patrolMaulLine(faction: string, seed: number): string {
   return (seededPick(MAUL_LINES, seed) ?? MAUL_LINES[0]!).replace(/\{F\}/g, faction);
 }
+
+// OTA-868 — a PITCHED BLOC BATTLE: allied war-parties pile into a clash and it becomes a
+// coalition engagement. {W}=winning bloc's lead faction, {L}=losing bloc's lead, {N}=total
+// war-parties lost across both sides.
+const BLOC_LINES: readonly string[] = [
+  'A pitched battle erupted in the open waste — the {W} and their allies shattered the {L} coalition. {N} war-parties fell.',
+  'Banners of the {W} drew their allies in and rolled over the {L} host; {N} columns lay broken by dusk.',
+  'The {W} bloc met the {L} coalition in force at a dry crossroads — a true battle, and {N} patrols never rode home.',
+  'Allies of the {W} converged on a {L} war-party and turned a skirmish into a slaughter. {N} columns lost.',
+  'The {L} coalition made a stand; the {W} and their sworn broke it, at a cost of {N} war-parties all told.',
+  'Two blocs collided near the flats — the {W} and their allies held the field, the {L} left {N} columns in the dust.',
+  'A running bloc-battle raged for hours; the {W} coalition ground down the {L}, {N} patrols spent between them.',
+  'The {W} rallied their allies and enveloped the {L} host in the open — {N} war-parties broke.',
+  'What began as one clash pulled in whole alliances; the {W} bloc carried it, {N} columns fallen.',
+  'The {L} coalition was caught between the {W} and their allies and cut to pieces — {N} war-parties lost.',
+  'Sworn banners answered the call on both sides; the {W} out-bled the {L}, {N} columns gone to the sand.',
+  'A set-piece battle of blocs near the ruins — the {W} and allies stood; the {L} coalition shattered, {N} patrols lost.',
+];
+
+/** A world-board line for a pitched bloc battle. `casualties` fills {N}. */
+export function blocBattleLine(winnerLead: string, loserLead: string, casualties: number, seed: number): string {
+  return (seededPick(BLOC_LINES, seed) ?? BLOC_LINES[0]!)
+    .replace(/\{W\}/g, winnerLead).replace(/\{L\}/g, loserLead).replace(/\{N\}/g, String(Math.max(1, casualties)));
+}

@@ -16774,4 +16774,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // FORM from shared foes over time; the all-hating Dynasty is excluded so it stays friendless.
 // (3) topAlliances + the World board now renders a GRUDGES list AND an ALLIANCES list, so
 // the section finally earns its name. Test: ota853FactionRelations (seed/warming/alliances).
-export const OTA_BUILD_ID = '2026-07-16-867-alliances';
+// ── OTA-868 (Bloc battles — alliances fight together) ──
+// Now that alliances are real, a clash can escalate into a PITCHED BLOC BATTLE: allied
+// war-parties near the fight (within 3 tiles, allied ≥ FRIENDLY_AT) pile in on their side,
+// combined power decides it, and casualties scale. CONSERVATIVELY capped so the field can't
+// be wiped in one event — ≤2 lost on the losing side, ≤1 on the winning side (≤3 total) —
+// and the paced muster refills over time. Only fires when allies are genuinely clustered
+// (≥3 participants, a side of ≥2), so it stays a rare set-piece, not every clash. A new
+// 12-line seeded flavour pool (blocBattleLine) + a 🛡 board glyph + top feed priority.
+// Test: ota868BlocBattle.
+export const OTA_BUILD_ID = '2026-07-16-868-bloc-battles';

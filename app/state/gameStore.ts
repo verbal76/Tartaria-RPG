@@ -2096,9 +2096,50 @@ function simulatePatrols(
       if (a.factionId === b.factionId) continue;
       if (Math.abs(a.gx - b.gx) + Math.abs(a.gy - b.gy) > 2) continue;
       const rel = FR.getRelation(relations, a.factionId, b.factionId);
-      const outcome = FR.meetOutcome(rel, tickIndex * 131 + i * 17 + j);
+      const seed = tickIndex * 131 + i * 17 + j;
+      const outcome = FR.meetOutcome(rel, seed);
       if (!outcome.fight) continue;
-      // Winner: whoever holds more power (tie-break deterministically by id).
+      // OTA-868 — BLOC BATTLE. Allied war-parties near the clash pile in on their side, and a
+      // skirmish becomes a coalition engagement. Combined power decides it, casualties scale —
+      // but stay CONSERVATIVELY capped (≤2 losing side, ≤1 winning side, so ≤3 total) so the
+      // field can never be wiped in one event; the paced muster refills the losses over time.
+      const midX = Math.round((a.gx + b.gx) / 2), midY = Math.round((a.gy + b.gy) / 2);
+      const BLOC_RADIUS = 3;
+      const alliedTo = (patFac: string, sideFac: string) =>
+        patFac === sideFac || FR.getRelation(relations, patFac, sideFac) >= FR.FRIENDLY_AT;
+      const sideA: number[] = [i], sideB: number[] = [j];
+      for (let k = 0; k < patrols.length; k++) {
+        if (k === i || k === j || lost.has(k)) continue;
+        const p = patrols[k]!;
+        if (Math.abs(p.gx - midX) + Math.abs(p.gy - midY) > BLOC_RADIUS) continue;
+        const toA = alliedTo(p.factionId, a.factionId), toB = alliedTo(p.factionId, b.factionId);
+        if (toA && !toB) sideA.push(k);
+        else if (toB && !toA) sideB.push(k); // allied to both / neither → stays out
+      }
+      const isBloc = sideA.length + sideB.length >= 3 && (sideA.length >= 2 || sideB.length >= 2);
+      if (isBloc) {
+        const sidePower = (side: number[]) => side.reduce((s, k) => s + 2 + Math.max(0, tides[patrols[k]!.factionId] ?? 0), 0);
+        const pA = sidePower(sideA), pB = sidePower(sideB);
+        const aSideWins = pA !== pB ? pA > pB : a.factionId < b.factionId;
+        const winSide = aSideWins ? sideA : sideB, loseSide = aSideWins ? sideB : sideA;
+        const winLead = aSideWins ? a.factionId : b.factionId, loseLead = aSideWins ? b.factionId : a.factionId;
+        // Conservative casualties: cap at 2 on the losing side, 1 on the winning side.
+        const loserLosses = Math.min(2, loseSide.length);
+        const winnerLosses = (loseSide.length >= 2 && winSide.length >= 2) ? Math.min(1, winSide.length) : 0;
+        const casualties: number[] = [];
+        for (let n = 0; n < loserLosses; n++) casualties.push(loseSide[loseSide.length - 1 - n]!);
+        for (let n = 0; n < winnerLosses; n++) casualties.push(winSide[winSide.length - 1 - n]!);
+        casualties.forEach((k) => lost.add(k));
+        bumpPower(winLead, 1); bumpPower(loseLead, -1);
+        relations = FR.adjustRelation(relations, a.factionId, b.factionId, FR.grudgeDelta(outcome.friction));
+        relations = FR.warmSharedEnemy(relations, winLead, loseLead, factions);
+        events.push({
+          text: WE.blocBattleLine(nameOf(winLead), nameOf(loseLead), loserLosses + winnerLosses, seed),
+          kind: 'bloc_battle',
+        });
+        break;
+      }
+      // 1v1 fallback. Winner: whoever holds more power (tie-break deterministically by id).
       const aWin = (tides[a.factionId] ?? 0) !== (tides[b.factionId] ?? 0)
         ? (tides[a.factionId] ?? 0) > (tides[b.factionId] ?? 0)
         : a.factionId < b.factionId;
@@ -2112,7 +2153,7 @@ function simulatePatrols(
       relations = FR.warmSharedEnemy(relations, winnerFac, loserFac, factions);
       // OTA-864 — deep, seeded flavour pool (varies verb + scenario) so the war reads fresh.
       events.push({
-        text: WE.patrolClashLine(nameOf(winnerFac), nameOf(loserFac), outcome.friction, tickIndex * 131 + i * 17 + j),
+        text: WE.patrolClashLine(nameOf(winnerFac), nameOf(loserFac), outcome.friction, seed),
         kind: 'patrol_clash',
       });
       break;
@@ -2155,7 +2196,7 @@ function simulatePatrols(
   // is fully simulated (the herd really is thinned) but the board reads as a story, not
   // a wall of identical lines.
   const FEED_PER_STEP = 3;
-  const prio: Record<string, number> = { patrol_clash: 0, outpost_assault: 1, patrol_mauled: 2 };
+  const prio: Record<string, number> = { bloc_battle: 0, patrol_clash: 1, outpost_assault: 2, patrol_mauled: 3 };
   const sample = [...events].sort((a, b) => (prio[a.kind] ?? 9) - (prio[b.kind] ?? 9)).slice(0, FEED_PER_STEP);
   set((st) => ({ worldMemory: {
     ...st.worldMemory,
