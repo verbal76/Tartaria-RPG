@@ -464,6 +464,174 @@
           "arbiter": "\"You left a light on in a house that drowned a civilization,\" the Arbiter says. \"History will decide if that was hope or the first drop. So, eventually, will you.\""
         }
       ]
+    },
+    {
+      "id": "story_reclaimer_highest_bidder",
+      "title": "The Highest Bidder",
+      "posterText": "A Reclaimer broker at the Hidden Market needs a neutral blade to run a relic auction that three factions all mean to win by force. 1700 TC and standing.",
+      "factionId": "reclaimers_guild",
+      "minRep": 5,
+      "rewardTc": 1700,
+      "rewardItem": "Runic Mantle",
+      "rewardRep": 24,
+      "stages": [
+        {
+          "checkKind": null,
+          "narration": "The broker taps a strongbox. \"One relic. A Guardian control-key — points a dormant construct at whatever you like. The Order, the Dynasty, and the Monarchs all bid. I need someone who owes none of them to run the floor and keep me breathing when the loser draws steel.\"",
+          "arbiter": "\"You are not selling a relic,\" the Arbiter says. \"You are selling the right to aim a god. Whoever wins, someone dies later. Keep that in your ledger.\""
+        },
+        {
+          "checkKind": "investigate",
+          "narration": "You case the Market floor before the bell. All three bidders came heavy — Order sappers by the east stalls, a Dynasty duelist working the shadows, a Monarch factor with coin enough to buy the building. None of them plans to lose an auction.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "diplomacy",
+          "narration": "You open the floor and hold it with your voice alone, letting the bids climb while the room decides whether to be civilized. The Dynasty duelist tests you once, quietly. You cool it without a blade. The price triples.",
+          "arbiter": "\"You are conducting a room full of loaded guns,\" the Arbiter says. \"The music is the only thing keeping them holstered. Do not stop playing.\""
+        },
+        {
+          "checkKind": "stealth",
+          "narration": "The Monarch factor moves to end the auction his way — a signal to torch the strongbox rather than let a rival have the key. You slip the box out from under his fire and into the broker's hands before the flames find it.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "attack_provoke",
+          "narration": "With coin no longer able to settle it, the losers settle it the old way — the Order sappers and the Dynasty duelist turning on each other and on you across the burning floor. The broker cowers behind the box.",
+          "arbiter": "\"The auction is over,\" the Arbiter says. \"The war it started is not. Cut your way to the door.\""
+        },
+        {
+          "checkKind": "boss",
+          "narration": "You break clear with the broker and the box both intact. He pays you in the quiet after, hands shaking. \"The winner gets the key tomorrow,\" he says. \"You could take it tonight.\" The strongbox sits between you, and for one breath the aim of a Guardian is yours to set.",
+          "arbiter": "\"Every faction wanted this and you are the one holding it,\" the Arbiter says. \"That is not luck. That is a test. Answer it as yourself.\""
+        }
+      ]
+    },
+    {
+      "id": "story_architect_silence_protocol",
+      "title": "The Silence Protocol",
+      "posterText": "A Conspiracy Architect handler needs a leak at Voronov closed before the Unknowing Masses learn what sleeps under their city. Total discretion. 1600 TC and standing.",
+      "factionId": "conspiracy_architects",
+      "minRep": 5,
+      "rewardTc": 1600,
+      "rewardItem": "Runic Mantle",
+      "rewardRep": 24,
+      "stages": [
+        {
+          "checkKind": null,
+          "narration": "The handler speaks in the flat voice of someone who has done this before. \"A Voronov schoolmaster found a Tartarian relay under his town and started teaching from it. Children are drawing Aether-glyphs in their primers. The Protocol is simple: the lesson stops. How, we leave to you.\"",
+          "arbiter": "\"The lie is a kindness. The silence is a service,\" the Arbiter says. \"They will keep telling you that until you believe it. Notice the moment you do.\""
+        },
+        {
+          "checkKind": "investigate",
+          "narration": "In Voronov you find the relay exactly as reported — and the schoolmaster is no zealot, just a curious man who found a wonder and could not keep it to himself. The glyphs in the children's primers are, God help you, correct.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "diplomacy",
+          "narration": "You could burn the relay and the man with it — the Protocol's usual reading. Instead you sit with the schoolmaster and learn what he actually knows. Less than the handler fears. Enough to matter. He is not afraid of you. That is the hardest part.",
+          "arbiter": "\"He thinks you came to learn,\" the Arbiter says. \"You came to close a mouth. The distance between those is the whole of your character. Mind it.\""
+        },
+        {
+          "checkKind": "stealth",
+          "narration": "A Monarch cutter has also come for the leak — the Architects' patrons prefer their silences permanent. You reach the relay ahead of the knife and pull its core, leaving the schoolmaster a dead machine and a live pulse.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "boss",
+          "narration": "The pulled core does not want to die quiet — it discharges its stored century of Aether as a Shifting Shade in the empty schoolhouse, and the children are still filing out. You put yourself between them and it.",
+          "arbiter": "\"The relay would rather scream than be silenced too,\" the Arbiter says. \"So would the man. So, one day, might you. End this without ending them.\""
+        },
+        {
+          "checkKind": null,
+          "narration": "You bring the handler a dead relay and a report that reads \"contained.\" What you left in Voronov — a frightened schoolmaster, a town of children who saw a wonder and were told to forget it — is the part of the Protocol that has no line on the form. You wrote that line yourself.",
+          "arbiter": "\"You served the silence,\" the Arbiter says. \"Or you served the man. The Architects will only read one of those in your report. You will carry the other.\""
+        }
+      ]
+    },
+    {
+      "id": "story_order_drowned_library",
+      "title": "The Drowned Library",
+      "posterText": "Vesryn of the Forgotten Order seeks a scholar to recover the Aetheric treatises lost in the flooding of the Sunken Enclave — the Order's deepest archive. 1800 TC and standing.",
+      "factionId": "forgotten_order",
+      "minRep": 6,
+      "rewardTc": 1800,
+      "rewardItem": "Aetheric Cloth",
+      "rewardRep": 26,
+      "stages": [
+        {
+          "checkKind": null,
+          "narration": "Vesryn lays a hand on an empty shelf. \"The Sunken Enclave held every treatise we ever recovered. When it flooded we saved the readers, not the reading. Aether-proof cases keep the pages down there yet. Bring back what you can. Choose well — you cannot carry it all.\"",
+          "arbiter": "\"Knowledge that drowned once will drown you gladly,\" the Arbiter says. \"Take what you can bear, and forgive yourself the rest.\""
+        },
+        {
+          "checkKind": "investigate",
+          "narration": "You dive the Enclave and find the stacks by lamplight, cases glinting in the silt. The catalogue is intact — you can read what each case holds before you spend your air lifting it. Some are cures. Some are weapons. Some are only beautiful.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "cast",
+          "narration": "The deepest stack is warded — Tartarian ink that eats light and lungs both. You hold a working over your own breath and read past the ward to a case marked in the Enclave's founder's own hand: the treatise on the cores themselves.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "escape",
+          "narration": "Lifting the founder's case wakes the Enclave's failsafe — the flood meant to keep exactly this from leaving. The water rises to reclaim its library. You run the drowning stacks with your chosen cases, air and archive both running out.",
+          "arbiter": "\"The Order built a tomb to protect its own knowledge from itself,\" the Arbiter says. \"It is working. Get out before it works on you.\""
+        },
+        {
+          "checkKind": "boss",
+          "narration": "At the Enclave mouth an Aetheric Ooze — grown fat on a century of dissolved ink and lost thought — bars the only stair. It has read, in its way, everything that dissolved into it. You cut through the sum of the Order's losses to reach the light.",
+          "arbiter": "\"Everything the Order forgot ended up in that thing,\" the Arbiter says. \"It is very well read. Kill it anyway.\""
+        },
+        {
+          "checkKind": null,
+          "narration": "You lay your salvage on Vesryn's table — a handful of what once filled a hall. He reads the founder's treatise on the cores and goes very still. \"This changes what we thought we knew about the Flood,\" he says. \"You chose these pages. You should be here when we learn what they mean.\"",
+          "arbiter": null
+        }
+      ]
+    },
+    {
+      "id": "story_dynasty_purge_asgardar",
+      "title": "The Purge at Asgardar",
+      "posterText": "A Dynasty enforcer at Asgardar needs a discreet hand to help \"reconcile\" a bloodline that has grown impure — quietly, before the court notices. 1900 TC and standing.",
+      "factionId": "eternal_dynasty",
+      "minRep": 7,
+      "rewardTc": 1900,
+      "rewardItem": "Runic Mantle",
+      "rewardRep": 28,
+      "stages": [
+        {
+          "checkKind": null,
+          "narration": "The enforcer will not say the word \"kill.\" \"A cadet branch at Asgardar has thinned. Their blood no longer reads pure. The court would spend them in the machines. I would rather retire them quietly, with their dignity. Help me do the merciful thing.\" He believes it.",
+          "arbiter": "\"He calls a purge a mercy and means it,\" the Arbiter says. \"That is worse than a man who lies. Watch where his mercy runs out.\""
+        },
+        {
+          "checkKind": "investigate",
+          "narration": "At Asgardar you find the cadet branch — an old woman and her grandchildren, tending a border-shrine, harming no one. Their blood is \"impure\" by a fraction the machines would never notice. Someone at court wants their estate, and purity is the lever.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "diplomacy",
+          "narration": "The matriarch knows exactly why you have come. \"The Dynasty eats its own to prove it is still hungry,\" she says, unafraid. \"You could carry back that we are already dead. Or you could carry the truth, and be spent for it.\" She hands you the estate's true bloodline record.",
+          "arbiter": "\"She is asking you to risk the machines in her place,\" the Arbiter says. \"That is a great deal to ask a stranger. It is also fair. Decide which you weigh heavier.\""
+        },
+        {
+          "checkKind": "stealth",
+          "narration": "The court's real agent — the one who wants the estate — moves to make the purge permanent before you can report otherwise. You reach the shrine ahead of his blades and put the cadet family behind you.",
+          "arbiter": null
+        },
+        {
+          "checkKind": "boss",
+          "narration": "Cornered, the court's agent throws the shrine's own defense at you — a Vein-Reliquary Apparition roused to \"test\" the impure, aimed at the family it was built to protect. You stand between the Dynasty's cruelty and its excuse.",
+          "arbiter": "\"They built the relic to purge the impure,\" the Arbiter says. \"Now it cannot tell the family from the assassin. Neither, it seems, could the Dynasty. End it.\""
+        },
+        {
+          "checkKind": null,
+          "narration": "You bring the enforcer the estate's true record and the court agent's severed scheme. He reads it, and for the first time his certainty cracks. \"Retired quietly,\" he writes, and lets the cadet branch live. Whether you saved a family or just delayed a machine, you made the Dynasty blink. It is not nothing.",
+          "arbiter": "\"You did not fix the Dynasty,\" the Arbiter says. \"You made one of its knives hesitate. In an empire of the certain, a hesitation is a revolution. Small. Real.\""
+        }
+      ]
     }
   ]
 }

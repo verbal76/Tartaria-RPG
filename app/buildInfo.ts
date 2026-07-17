@@ -16799,4 +16799,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // factionIds resolve + have vendors, every hunt boss spawns, typecheck clean. (The pre-
 // existing questProgressionAudit boss-KILL step + starterFetchQuests were already red on the
 // clean tree — unrelated combat-harness issues, not this content.)
-export const OTA_BUILD_ID = '2026-07-16-869-quest-content-batch1';
+// ── OTA-870 (Content sprint batch 2 — completes the double) ──
+// The second half of the authored-questline sprint, finishing "twice what was recommended".
+//   +4 STORYLINES — Reclaimers "The Highest Bidder", Architects "The Silence Protocol", a
+//     2nd Order arc "The Drowned Library", a 2nd Dynasty arc "The Purge at Asgardar". Now
+//     ALL 9 factions have at least one storyline.
+//   +6 HUNTS (3 standard_7 + 3 bait_switch_5 for structural variety) — Harpy of the Cradle
+//     of Dusk, Fiend in the Tartary Dust, Warden of Thametan's Tower, Plague Moth of the
+//     Sunken Enclave, Alpha of Yuldra-Tul, Salamander Under Voronov.
+//   +6 MYSTERIES — Cartographer's Last Map, Giant's Tooth, Hollow Crown, Ashen Codex,
+//     Tuning Fork of Asgardar, The Pale Signal.
+// Totals: hunts 6→18, mysteries 6→18, storylines 4→14. Data only; HAL + golem (NOT engine).
+// Validated: all 18 hunt targets are real enemies, all factionIds resolve + have vendors,
+// typecheck clean, loaders green.
+export const OTA_BUILD_ID = '2026-07-16-870-quest-content-batch2';
