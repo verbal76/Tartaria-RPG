@@ -19736,7 +19736,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (cold-start fill above) and runs a WARM-UP burst, so a player who opens
     // World seconds after launch already sees the war underway, not a blank feed.
     const firstEver = (get().worldMemory.worldEvents ?? []).length === 0;
-    const steps = firstEver ? PATROL_SUBSTEPS_PER_TICK * 4 : 2;
+    // OTA-858 — ONE sub-step per real-time tick (was 2). This path fires every 6s, so 2
+    // sub-steps (~22% of the field mauled per tick) outran the +1/faction repop and the
+    // wars read as a meat-grinder with thrashing power. At 1 sub-step attrition is ~11%,
+    // which the muster comfortably keeps pace with — losses still land constantly, but
+    // armies hold ground and the field stays near its ~45 target. The warm-up burst (and
+    // the in-game worldTideCheck path) keep their heavier 4-step jumps.
+    const steps = firstEver ? PATROL_SUBSTEPS_PER_TICK * 4 : 1;
     for (let i = 0; i < steps; i++) simulatePatrols(get, set, factions, hour, rt * 32 + i);
     // Every so often, fold in a broader world EVENT (surge, muster, schism,
     // caravan, omen, posted bounty) so the scroll isn't only patrol skirmishes.
