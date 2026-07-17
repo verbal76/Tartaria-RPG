@@ -16670,4 +16670,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     Cold start still deploys a full force; the target scales with war power.
 //   • WORLD BOARD — the standings sections (balance of power, grudges) are now COLLAPSIBLE
 //     like the inventory, and start collapsed, so the war FEED gets the room.
-export const OTA_BUILD_ID = '2026-07-16-855-living-world-fills';
+// ── OTA-856 (World board — the collapsible section headers now READ as buttons) ──
+// The BALANCE OF POWER / GRUDGES headers were plain text + a chevron, so the tap target
+// wasn't obvious. They're now proper tappable plates (bordered card + gold left accent
+// bar + chevron + a "tap to show / tap to hide" hint), matching the inventory/character
+// collapsible headers. UI-only.
+export const OTA_BUILD_ID = '2026-07-16-856-world-header-buttons';
