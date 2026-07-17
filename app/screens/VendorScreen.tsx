@@ -14,6 +14,11 @@ import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
 import { vendorRecipeOffers, vendorSeed } from '../engine/recipeDiscovery';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
+import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
+import { localWarHeat, contestedFactions } from '../engine/worldEvents';
+import { tideVendorPriceMult } from '../engine/worldPulse';
+import { canonicalCellOf } from '../engine/worldMap';
+import factionsData from '../data/factions/factions.json';
 import {
   CATEGORY_ORDER,
   CATEGORY_LABEL,
@@ -44,6 +49,7 @@ export function VendorScreen() {
   const player = useGameStore((s) => s.player);
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const scene = useGameStore((s) => s.currentScene);
+  const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
   const appendLog = useGameStore((s) => s.appendLog);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
@@ -270,6 +276,19 @@ export function VendorScreen() {
     vendor?.faction,
   );
   const rapportPct = Math.round(rapportMod * 100);
+  // OTA-849/865 — the two modifiers that also move the REAL transaction price but the
+  // display used to omit: the vendor faction's fortunes (tide teeth) and LOCAL WAR HEAT.
+  // Computed here so the screen shows exactly what buyFromVendor / sellToVendor charge.
+  const vendorTideMult = vendor?.faction ? tideVendorPriceMult(worldMemory?.factionTides?.[vendor.faction]) : 1;
+  const warCell = player ? canonicalCellOf(player.currentLocationId) : { x: 0, y: 0 };
+  const warHeat = localWarHeat(worldMemory?.patrols ?? [], warCell.x, warCell.y);
+  const { buyMult: warBuyMult, sellMult: warSellMult } = warPriceFactor(warHeat);
+  // The two factions whose war-parties are thickest here — for the "prices are up" line.
+  const contestNames = contestedFactions(worldMemory?.patrols ?? [], warCell.x, warCell.y)
+    .map((id) => (factionsData as { id: string; name: string }[]).find((f) => f.id === id)?.name ?? null)
+    .filter((n): n is string => !!n);
+  // Show the war-market note once the ground is meaningfully contested (not on one patrol).
+  const warNote = warHeat >= 0.25;
   // OTA-812 — recipes this vendor will TEACH for TC, surfaced as buttons so the
   // player doesn't have to know the typed "buy <name>" command. Same source the
   // store's buy path checks; tapping LEARN calls buyFromVendor(result) which routes
@@ -296,7 +315,13 @@ export function VendorScreen() {
   const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
   const sellable = player.inventory
     .filter((i) => i.quantity > 0 && !equippedItemIds.has(i.id) && !isUnsellable(i))
-    .map((i) => ({ item: i, price: sellPriceFor(i, vendor, rapportMod) }))
+    // OTA-865 — display the war-premium sell price (matches sellToVendor); carry the plain
+    // catalogue value as `base` so the ▲/▼ ticker can show whether you're getting more.
+    .map((i) => ({
+      item: i,
+      price: Math.round(sellPriceFor(i, vendor, rapportMod) * warSellMult),
+      base: sellPriceFor(i, vendor, 0),
+    }))
     .filter((x) => x.price > 0)
     .sort((a, b) => {
       if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
@@ -403,6 +428,18 @@ export function VendorScreen() {
           ⚠ +{corruptionMarkupPct}% prices — your aether unsettles them. ({corruptionTier})
         </Text>
       )}
+      {/* OTA-865 — war-market flavour: contested ground means soldiers are buying, so the
+          trader marks up (and pays a touch more). The ▲/▼ next to each price shows the net. */}
+      {warNote && (
+        <Text style={styles.warMarket}>
+          ⚔ {contestNames.length >= 2
+            ? `The fighting between the ${contestNames[0]} and the ${contestNames[1]} is cleaning them out.`
+            : contestNames.length === 1
+              ? `${contestNames[0]} war-parties are all over this ground.`
+              : 'The fighting nearby has soldiers buying up supplies.'}{' '}
+          Prices run high — your standing and charm matter more here.
+        </Text>
+      )}
 
       <View style={styles.tabRow}>
         <TouchableOpacity
@@ -456,7 +493,11 @@ export function VendorScreen() {
               // same value so the player never sees a mismatch.
               // OTA-1090 — CHA rapport discount folds in the same way (mirrors
               // buyFromVendor's effectivePrice).
-              const effPrice = Math.max(1, Math.ceil(o.price * corruptionMult * (1 - rapportMod)));
+              // OTA-865 — the FULL buy price (now including faction-tide + war heat, which
+              // the display used to drop), from the same helper buyFromVendor uses so the
+              // shown price is exactly what transacts. The ▲/▼ ticker compares it to base.
+              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult });
+              const buyTick = priceArrow(effPrice, o.price, 'buy');
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
               const owned = player.inventory
@@ -485,7 +526,7 @@ export function VendorScreen() {
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
                       <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
-                        {effPrice} TC
+                        {effPrice} TC{buyTick ? <Text style={buyTick.good ? styles.tickGood : styles.tickBad}> {buyTick.glyph}</Text> : null}
                       </Text>
                     </View>
                     <View style={styles.offerSubHead}>
@@ -613,7 +654,7 @@ export function VendorScreen() {
                 return (
                   <View key={secKey} style={styles.section}>
                     {renderSectionHeader(secKey, cat, count, collapsed)}
-                    {!collapsed && catRows.map(({ item, price }) => {
+                    {!collapsed && catRows.map(({ item, price, base }) => {
               // arb150 — instance-aware preview so the row shows THIS copy's
               // rolled stats (AC / attribute perks / damage / resists), not the
               // generic catalog row. Two "Bone Shoes" with different rolls now
@@ -640,7 +681,7 @@ export function VendorScreen() {
                             ? <Text style={styles.loadoutTag}>  ⚑ in pouch</Text>
                             : null}
                       </Text>
-                      <Text style={styles.sellPrice}>+{price} TC</Text>
+                      <Text style={styles.sellPrice}>+{price} TC{(() => { const t = priceArrow(price, base, 'sell'); return t ? <Text style={t.good ? styles.tickGood : styles.tickBad}> {t.glyph}</Text> : null; })()}</Text>
                     </View>
                     <View style={styles.offerSubHead}>
                       <Text style={styles.offerKind} numberOfLines={1}>
@@ -901,6 +942,18 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   walletValue: { color: '#6ab0c9', fontSize: 13, fontWeight: '700' },
+  // OTA-865 — war-market note + the ▲/▼ price ticker.
+  warMarket: {
+    color: '#d98a5f',
+    fontSize: 11,
+    lineHeight: 15,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 6,
+  },
+  tickGood: { color: '#7fc96a', fontWeight: '900' },
+  tickBad: { color: '#e07a5f', fontWeight: '900' },
   tourBanner: {
     backgroundColor: '#16242a',
     borderColor: '#6ab0c9',
