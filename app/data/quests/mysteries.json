@@ -395,6 +395,204 @@
           "checkKind": null
         }
       ]
+    },
+    {
+      "id": "mystery_cartographers_last_map",
+      "title": "The Cartographer's Last Map",
+      "posterText": "A Reclaimer broker seeks the last map of a dead cartographer — said to chart a sealed Tartarian vault no one else has found. 550 TC.",
+      "trophyName": "Cartographer's Map",
+      "minRep": 0,
+      "factionId": "reclaimers_guild",
+      "rewardTc": 550,
+      "rewardItem": "Aetheric Shard",
+      "rewardRep": 9,
+      "stages": [
+        {
+          "narration": "The broker unrolls a blank scrap. \"Old Merik mapped every vault worth robbing, then found one he wouldn't sell the map to — sealed, Tartarian, unopened. He died with it on him. The map surfaced, then sank into the market. Find it before a rival does.\"",
+          "arbiter": "\"A map to a door no one has opened,\" the Arbiter says. \"Doors stay closed for reasons. Fetch the map. Think hard before you fetch the key.\"",
+          "checkKind": null
+        },
+        {
+          "narration": "You trace Merik's effects through three fences to a Reclaimer who bought the lot unread. Among the junk, the map — and Merik's last note in the margin: I DID NOT SEAL IT. IT SEALED ITSELF. WITH SOMETHING INSIDE.",
+          "arbiter": null,
+          "checkKind": "investigate"
+        },
+        {
+          "narration": "The fence will trade the map, but she's spooked — a Monarch buyer has been asking after it too, and asking is the Monarchs' polite step. You get the map clear of the stall before the impolite step arrives.",
+          "arbiter": null,
+          "checkKind": "stealth"
+        },
+        {
+          "narration": "You lay Merik's map on the broker's table. He traces the route to the sealed vault and grins — then reads the margin note and stops grinning. \"It sealed itself,\" he repeats. \"With something inside.\" He pays you and does not, you notice, ask you to open it.",
+          "arbiter": "\"You found the door,\" the Arbiter says. \"The market can argue over who dares knock. That is a different, more expensive kind of courage.\"",
+          "checkKind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "mystery_giants_tooth",
+      "title": "The Giant's Tooth",
+      "posterText": "The Servants of the Giants seek a relic tooth of a true Tartarian Giant, torn loose in the Flood and lost in the Mud Seas. A holy find. 500 TC.",
+      "trophyName": "Giant's Tooth",
+      "minRep": 0,
+      "factionId": "servants_of_giants",
+      "rewardTc": 500,
+      "rewardItem": "Aetheric Cloth",
+      "rewardRep": 8,
+      "stages": [
+        {
+          "narration": "The pilgrim-elder speaks of it like a saint's bone. \"When the Flood took the Giants, one lost a tooth — a relic the length of a man, humming with the old Aether still. It sank in the Mud Seas. To hold it is to touch the divine. Bring it to us.\"",
+          "arbiter": "\"A tooth the length of a man,\" the Arbiter says. \"Whatever the Giants were, they were not small. Mind what else in the Mud Seas might want a relic that hums.\"",
+          "checkKind": null
+        },
+        {
+          "narration": "You find the tooth by its hum — a low note rising through the silt where a shelf of Mud-Sea floor drops into black. It is snared in the ribs of a drowned barge, humming to itself in the dark, exactly as the elder said.",
+          "arbiter": null,
+          "checkKind": "investigate"
+        },
+        {
+          "narration": "Freeing the tooth disturbs its long guardian — a Mud Spirit coiled around the relic, grown strange on a century of its hum. You clear the Spirit and work the tooth loose from the drowned ribs.",
+          "arbiter": null,
+          "checkKind": "boss"
+        },
+        {
+          "narration": "You lay the Giant's Tooth before the pilgrim-elder and the whole camp kneels. She presses her brow to it and weeps at its hum. \"It still sings,\" she breathes. \"The Giant is dead a thousand years and its tooth still sings. They are not gone. They are only sleeping deeper than the Sea.\"",
+          "arbiter": "\"Whether it is a god's relic or a very large fossil that hums,\" the Arbiter says, \"their faith is real, and you put it in their hands. That is its own kind of true.\"",
+          "checkKind": null
+        }
+      ]
+    },
+    {
+      "id": "mystery_hollow_crown",
+      "title": "The Hollow Crown",
+      "posterText": "A Mud Monarch factor seeks the Hollow Crown — a relic of the old Tartarian rule the Monarchs claim as their own inheritance, lost in a rival's hoard. 650 TC.",
+      "trophyName": "Hollow Crown",
+      "minRep": 3,
+      "factionId": "mud_monarchs",
+      "rewardTc": 650,
+      "rewardItem": "Runic Mantle",
+      "rewardRep": 10,
+      "stages": [
+        {
+          "narration": "The factor keeps his voice even, but his hand tightens. \"The Hollow Crown is proof — the Monarchs descend from Tartaria's last true rulers. A Reclaimer hoard holds it, unknowing, filed as scrap. We want it back before someone learns to read it. Discreetly.\"",
+          "arbiter": "\"They want a crown to prove a right to rule,\" the Arbiter says. \"The crown is hollow. Notice that the poster is, too. Fetch it and keep your own counsel.\"",
+          "checkKind": null
+        },
+        {
+          "narration": "You find the hoard and the Crown in it, mislabeled among genuine scrap. It IS old — but the metal is common, the jewels glass. Whatever the Hollow Crown proves, it does not prove a bloodline. The Monarchs' inheritance is a prop. You wonder if they know.",
+          "arbiter": null,
+          "checkKind": "investigate"
+        },
+        {
+          "narration": "The hoard's Reclaimer keeper won't miss one filed scrap, but a Monarch cutter is also here to make the recovery \"clean\" of witnesses. You lift the Crown and clear the keeper out of the cutter's path both.",
+          "arbiter": null,
+          "checkKind": "stealth"
+        },
+        {
+          "narration": "You return the Hollow Crown to the factor. He handles it like a holy thing, this common circle of old tin. \"The proof of our line,\" he murmurs. You know what it is worth and he does not — or he does, and needs the others not to. Either way, the secret leaves with your silence.",
+          "arbiter": "\"An empire of shadows, ruling on a crown of glass,\" the Arbiter says. \"You could break their spell with one word. You could also start a war with it. Choose the word, or the silence, deliberately.\"",
+          "checkKind": "boss"
+        }
+      ]
+    },
+    {
+      "id": "mystery_ashen_codex",
+      "title": "The Ashen Codex",
+      "posterText": "The Forgotten Order seeks the Ashen Codex — a treatise burned in a Monarch purge, its words readable still in the char if handled with care. 600 TC.",
+      "trophyName": "Ashen Codex",
+      "minRep": 0,
+      "factionId": "forgotten_order",
+      "rewardTc": 600,
+      "rewardItem": "Aetheric Shard",
+      "rewardRep": 9,
+      "stages": [
+        {
+          "narration": "The archivist shows you a single charred page under glass. \"The Monarchs burned the Aphelion treatise a generation ago — but Tartarian ink does not truly burn, it only chars. The words are still in the ash if the Codex survived whole. It was last seen at the purge-site, Nimari.\"",
+          "arbiter": "\"They burned it and it refused to die,\" the Arbiter says. \"Knowledge is stubborn that way. Handle the ash gently — it is still a book.\"",
+          "checkKind": null
+        },
+        {
+          "narration": "At the Nimari purge-site you dig the old fire-pit and find the Codex where it fell, charred black but whole — the Monarchs' torch could not finish what the ink would not allow. The char holds its words like a shadow of the fire.",
+          "arbiter": null,
+          "checkKind": "investigate"
+        },
+        {
+          "narration": "Reading the Ashen Codex without crumbling it takes a careful working — you hold the char together with Aether while the shadow-words rise. A Rust Lurker, drawn to the disturbed site, tests you mid-reading. You end it and keep the pages whole.",
+          "arbiter": null,
+          "checkKind": "boss"
+        },
+        {
+          "narration": "You bring the Ashen Codex to the archivist, who receives it like a rescued prisoner. She reads the shadow-words the Monarchs died to erase and looks up, shaken. \"This is why they burned it,\" she says. \"Not what it teaches. What it proves about them. Some fires are confessions.\"",
+          "arbiter": "\"They told the world a lie by burning the truth,\" the Arbiter says. \"The ash kept the truth anyway. Ash usually does. You carried a confession home.\"",
+          "checkKind": null
+        }
+      ]
+    },
+    {
+      "id": "mystery_tuning_fork_asgardar",
+      "title": "The Tuning Fork of Asgardar",
+      "posterText": "The Stone Builders seek a Tartarian resonance-tool from Asgardar — a \"tuning fork\" that reads the true note of any stone, key to their whole craft. 550 TC.",
+      "trophyName": "Resonance Fork",
+      "minRep": 0,
+      "factionId": "stone_builders",
+      "rewardTc": 550,
+      "rewardItem": "Aetheric Shard",
+      "rewardRep": 9,
+      "stages": [
+        {
+          "narration": "The lodge-master rings a common fork and frowns. \"Ours are guesses. The Tartarians had a true one — strike it to a wall and it sings back the stone's real health, its real load. One lies in the Asgardar ruins. With it, we stop guessing. Without it, we keep burying apprentices.\"",
+          "arbiter": "\"A tool to hear whether a building is lying to you,\" the Arbiter says. \"Their whole craft turns on it. Fetch it carefully; it is more precious than any weapon.\"",
+          "checkKind": null
+        },
+        {
+          "narration": "In the Asgardar ruins you find the Resonance Fork in a collapsed workshop, and prove its worth at once — struck to the leaning wall beside you, it sings a cracked, dying note. You step back a breath before the wall answers the note by falling.",
+          "arbiter": null,
+          "checkKind": "investigate"
+        },
+        {
+          "narration": "The ruin does not want to give up its tool — the collapse the Fork warned of spreads, and an Aetheric Scarab swarm boils out of the opening stone. You clear them and take the Fork out ahead of the failing gallery.",
+          "arbiter": null,
+          "checkKind": "boss"
+        },
+        {
+          "narration": "You lay the Resonance Fork on the lodge bench and the lodge-master strikes it to the wall. It sings back true and clear, and every mason in the room leans in to hear a building tell the truth for the first time. \"We have been deaf,\" he says. \"You gave us ears. Nothing we raise now will be a guess.\"",
+          "arbiter": "\"A craft that could not hear its own work, handed a listening tool,\" the Arbiter says. \"Quietly, you may have saved every soul who lives under a Builder roof from here on. Quietly enormous.\"",
+          "checkKind": null
+        }
+      ]
+    },
+    {
+      "id": "mystery_pale_signal",
+      "title": "The Pale Signal",
+      "posterText": "An unaffiliated buyer will pay well for the source of the \"Pale Signal\" — a faint, repeating Aetheric pulse rising from the Mud Flood Nexus that no one can explain. 700 TC.",
+      "trophyName": "Signal-Core",
+      "minRep": 0,
+      "factionId": null,
+      "rewardTc": 700,
+      "rewardItem": "Aetheric Cloth",
+      "rewardRep": 10,
+      "stages": [
+        {
+          "narration": "The buyer keeps their hood up. \"Something at the Mud Flood Nexus is pulsing — faint, patient, on a beat. Not weather. Not a beast. A signal. It has repeated for months and no faction will admit to hearing it. Bring me its source. I only want to know what is calling, and to whom.\"",
+          "arbiter": "\"A patient, repeating pulse from the place the world drowned,\" the Arbiter says. \"Someone, or something, is still transmitting from the wound. Find the mouth. Do not answer it.\"",
+          "checkKind": null
+        },
+        {
+          "narration": "You track the Pale Signal into the Nexus' outer galleries. It strengthens as you descend, and resolves from noise into pattern — a sequence, deliberate, old. It is not decaying like a broken machine. It is being kept up. On purpose.",
+          "arbiter": null,
+          "checkKind": "investigate"
+        },
+        {
+          "narration": "The signal's source is warded behind a live Aether-field that reads intruders. You read the pulse's own rhythm and slip through on its beat — the ward keyed, you realize, to let the signal out but nothing in. Someone built this to be heard and never found.",
+          "arbiter": null,
+          "checkKind": "stealth"
+        },
+        {
+          "narration": "You reach the source: a single Tartarian core, alone in the dark, pulsing its patient sequence into a world that forgot how to listen. You lift the Signal-Core still transmitting. The buyer takes it, holds it to the light, and goes very quiet. \"It was still calling,\" they say. \"After everything. It never stopped calling home.\" They do not tell you whose home. You are not sure they know.",
+          "arbiter": "\"You found a voice that outlasted its civilization, still saying the same word into the dark,\" the Arbiter says. \"Some questions you carry home unanswered. This is one. Let it weigh what it weighs.\"",
+          "checkKind": "boss"
+        }
+      ]
     }
   ]
 }

@@ -16185,4 +16185,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // narrative pools from the Tartaria Prima lore. +6 storylines (one per thin faction), +6
 // hunts, +6 mysteries — hunts 6→12, mysteries 6→12, storylines 4→10 — each unique and
 // anchored to real named locations/enemies/factions. Data only (Tartaria lore; NOT engine).
-export const OTA_BUILD_ID = '2026-07-16-848-quest-content-batch1';
+//
+// 2026-07-16 OTA-849 — port of HAL OTA-870. Content sprint batch 2 completes the double:
+// +4 storylines (Reclaimers, Architects, 2nd Order, 2nd Dynasty — all 9 factions now have
+// one), +6 hunts (3 standard_7 + 3 bait_switch_5), +6 mysteries. Totals hunts 6→18,
+// mysteries 6→18, storylines 4→14. Data only (Tartaria lore; NOT engine).
+export const OTA_BUILD_ID = '2026-07-16-849-quest-content-batch2';
