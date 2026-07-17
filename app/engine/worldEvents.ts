@@ -320,3 +320,104 @@ export function stepPatrol(p: Patrol, tickIndex: number, target?: { x: number; y
 export function patrolsNear(patrols: readonly Patrol[], gx: number, gy: number, radius = 2): Patrol[] {
   return patrols.filter((p) => Math.abs(p.gx - gx) + Math.abs(p.gy - gy) <= radius);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OTA-864 — WAR-FEED FLAVOUR. The board used to draw clashes from 2 lines, outpost
+// assaults from 1, and beast maulings from 4, so it read the same on loop. These are
+// deep, deterministic pools (seeded by the sim index) that vary BOTH the verb and the
+// scenario — where the fight happened, how it turned, what it cost — so the war reads
+// like a war, not a stuck ticker. All pure: same seed → same line.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// A clash where W beat L in the open. {W} = winner name, {L} = loser name.
+const CLASH_LINES: readonly string[] = [
+  'A {W} patrol broke a {L} column in the open waste and left the sand red.',
+  'Two war-parties met at a dry wash — the {W} rode out; the {L} did not.',
+  'The {W} caught a {L} patrol watering their mounts and cut them down to the last.',
+  'A running fight along the ridge ended with the {W} standing over {L} dead.',
+  'The {W} sprang an ambush from the dunes; the {L} scattered and were hunted down.',
+  'A {L} scouting party walked into {W} guns at the crossroads and was gutted.',
+  'Blades out at dusk — the {W} shattered a {L} patrol and stripped the bodies.',
+  'The {W} ran a {L} column into a box canyon and finished them there.',
+  'A duel of outriders spilled into a rout; the {W} chased the {L} for miles.',
+  'The {W} held the high ground and broke wave after wave of {L} until none rose.',
+  'A night raid — the {W} slit the {L} pickets and took the camp before dawn.',
+  'The {W} traded volleys with a {L} patrol across a salt pan and won the field.',
+  'A {L} war-party pressed too far from its lines; the {W} encircled and destroyed it.',
+  'The {W} bled for it, but a {L} patrol was left broken in the flats.',
+  'Steel rang at the old road — the {W} carried the day over the {L}.',
+  'The {W} torched a {L} supply train and put its guards to the sword.',
+  'A skirmish over a ruined well turned into a slaughter; the {W} took the water.',
+  'The {W} feigned a retreat and turned on the pursuing {L}, wiping them out.',
+  'Outnumbered, the {W} still broke the {L} line and sent the rest running.',
+  'A {L} patrol was caught in the open by {W} riders and ridden down.',
+];
+
+// Tacked onto a clash that SEEDED a fresh grudge (neutrals coming to blows). Varied.
+const GRUDGE_TAILS: readonly string[] = [
+  'Bad blood runs between them now.',
+  'A grudge is born of it.',
+  "There'll be no forgetting this one.",
+  'What was indifference is now a feud.',
+  'The first cut of a new war.',
+  'Neither will let this pass.',
+  'A quarrel that was nothing is a hatred now.',
+];
+
+/** A world-board line for a patrol clash. `friction` = the fight seeded a new grudge. */
+export function patrolClashLine(winner: string, loser: string, friction: boolean, seed: number): string {
+  const base = (seededPick(CLASH_LINES, seed) ?? CLASH_LINES[0]!)
+    .replace(/\{W\}/g, winner).replace(/\{L\}/g, loser);
+  if (!friction) return base;
+  const tail = seededPick(GRUDGE_TAILS, seed * 7 + 3) ?? GRUDGE_TAILS[0]!;
+  return `${base} ${tail}`;
+}
+
+// An outpost assault: {A} attacker sacks {D} defender's outpost.
+const ASSAULT_LINES: readonly string[] = [
+  'A {A} war-party struck the {D} outpost and burned what they could carry off.',
+  'The {A} stormed the {D} outpost at first light and left it smoking.',
+  'Raiders of the {A} breached the {D} palisade and sacked the stores within.',
+  'The {A} put the {D} outpost to the torch and drove off its garrison.',
+  'A lightning raid — the {A} looted the {D} outpost and were gone by dark.',
+  'The {A} overran a {D} watchpost and carried its munitions home.',
+  'The {D} outpost held for an hour before the {A} broke the gate.',
+  'The {A} poisoned the {D} outpost well and razed the granary.',
+  'A {A} column battered the {D} outpost walls and stripped it bare.',
+  'The {A} caught the {D} garrison changing watch and took the outpost cheap.',
+  'The {A} left the {D} outpost a ruin and its banner in the dust.',
+  'Smoke over the flats — the {A} had been at the {D} outpost again.',
+  'The {A} sapped the {D} outpost gate and swarmed through the breach.',
+  'A {D} outpost fell in a night to a {A} raid nobody saw coming.',
+];
+
+/** A world-board line for an outpost assault. */
+export function outpostAssaultLine(attacker: string, defender: string, seed: number): string {
+  return (seededPick(ASSAULT_LINES, seed) ?? ASSAULT_LINES[0]!)
+    .replace(/\{A\}/g, attacker).replace(/\{D\}/g, defender);
+}
+
+// A beast/environment mauling of a patrol. {F} = the patrol's faction name.
+const MAUL_LINES: readonly string[] = [
+  'Wasteland beasts fell on a {F} patrol — none rode home.',
+  'A {F} patrol wandered into a nest of drones and was torn apart.',
+  'Something in the silt took a {F} patrol whole. Only tracks remained.',
+  'A {F} column was run down by wasteland predators.',
+  'The dunes swallowed a {F} patrol in a storm; the sand kept them.',
+  'A rust-ghoul pack ran a {F} patrol to ground and left nothing.',
+  'A {F} patrol drank from a bad spring and never woke.',
+  'Sinkholes took half a {F} column; the beasts took the rest.',
+  'A {F} patrol was caught in the open by a silt-wyrm and unmade.',
+  'Carrion-drones stripped a {F} patrol before the sun was high.',
+  'A {F} patrol chased shade into a predator warren and did not return.',
+  'The flats went quiet where a {F} patrol had been — only their gear was found.',
+  'A cave-in buried a {F} patrol scouting the old tunnels.',
+  'A {F} patrol froze in a night squall miles from any fire.',
+  'Something large crossed a {F} patrol in the dark. Come morning, nothing.',
+  'A {F} patrol was mobbed by burrow-things and dragged under.',
+];
+
+/** A world-board line for a beast/environment mauling. */
+export function patrolMaulLine(faction: string, seed: number): string {
+  return (seededPick(MAUL_LINES, seed) ?? MAUL_LINES[0]!).replace(/\{F\}/g, faction);
+}
