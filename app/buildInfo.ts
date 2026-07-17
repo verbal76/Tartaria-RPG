@@ -16783,4 +16783,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (≥3 participants, a side of ≥2), so it stays a rare set-piece, not every clash. A new
 // 12-line seeded flavour pool (blocBattleLine) + a 🛡 board glyph + top feed priority.
 // Test: ota868BlocBattle.
-export const OTA_BUILD_ID = '2026-07-16-868-bloc-battles';
+// ── OTA-869 (Content sprint — authored questlines from the Tartaria Prima lore) ──
+// The audit found the authored-narrative layer thin (6 hunts / 6 mysteries / 4 storylines).
+// This batch DOUBLES each, grounded in the Tartaria Hack ("Prima") material and anchored to
+// real named locations, enemies, and factions — every questline unique and specific:
+//   +6 STORYLINES, one per thin faction — Monarchs "Ledger of Silence", True Tartarians
+//     "Descent to Karok-Sa", Dynasty "Blood of the Aetherborn", Servants "Giant-Watch Vigil",
+//     Stone Builders "Scripture in Stone", Revivalists "Sasha's Gambit".
+//   +6 HUNTS — Steam Walker of Zharak's Teeth, Silt Serpent of the Sinking Cathedral, Shade
+//     of the Endless Stair, Siren of Drakova, Weaver of the Obsidian Pillars, Apparition in
+//     the Red Tower (standard_7, real enemy targets).
+//   +6 MYSTERIES — Weeping Core, Aetherborn Foundling, Drowned Bell of Samarran, Singing
+//     Stone of Ostragar, Monarch's Redaction, Second Flood Cipher.
+// Data only. HAL + golem lore lines (NOT engine — engine is lore-agnostic). Validated: all
+// factionIds resolve + have vendors, every hunt boss spawns, typecheck clean. (The pre-
+// existing questProgressionAudit boss-KILL step + starterFetchQuests were already red on the
+// clean tree — unrelated combat-harness issues, not this content.)
+export const OTA_BUILD_ID = '2026-07-16-869-quest-content-batch1';
