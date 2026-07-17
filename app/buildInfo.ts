@@ -17759,4 +17759,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deadline: acceptBounty stamps acceptedAtHour, expireBounties lapses overdue contracts on
 // the action path. Held bounties render on the Missions board under BOUNTIES with a live
 // countdown + tap-to-route. Test: ota862BountyDeadline.
-export const OTA_BUILD_ID = '2026-07-16-1142-bounty-board-v2';
+//
+// 2026-07-16 OTA-1143 — port of HAL OTA-863. Bounty deadline is now DISTANCE-AWARE: 24h
+// base + one hour per tile between the player and the quarry's outpost (bountyDeadlineFor),
+// stored per-bounty as deadlineHours on accept. A flat 24h was too tight for a far + hard
+// contract (patrol fights en route, up to 9 kills, ~8h per forced rest). Near jobs stay
+// ~24-34h; the farthest (~31 tiles) get ~55h. Offer card shows the estimate before accept.
+// Test: ota862BountyDeadline (OTA-863 cases).
+export const OTA_BUILD_ID = '2026-07-16-1143-bounty-deadline-distance';

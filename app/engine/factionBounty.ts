@@ -23,20 +23,31 @@ export interface FactionBounty {
   rewardTc: number;
   rewardRep: number;
   /** OTA-862 — in-game hour the contract was accepted. Set on accept; used to expire the
-   *  bounty after BOUNTY_DEADLINE_HOURS of in-game time. Optional so a legacy bounty
-   *  migrated from the old single-slot model (no stamp) simply never times out. */
+   *  bounty after its deadline of in-game time. Optional so a legacy bounty migrated from
+   *  the old single-slot model (no stamp) simply never times out. */
   acceptedAtHour?: number;
+  /** OTA-863 — this contract's own deadline in in-game hours. DISTANCE-AWARE: set on
+   *  accept to 24 + the tiles between the player and the quarry's outpost, so a far job
+   *  isn't impossible to reach in time. Falls back to the 24h base when absent. */
+  deadlineHours?: number;
 }
 
-/** OTA-862 — a bounty lapses this many IN-GAME hours after you accept it. In-game time
+/** OTA-862 — the BASE window a bounty gives you, before distance is added. In-game time
  *  only advances when you act, so this is a real "get moving" pressure, not a wall-clock
  *  countdown that drains while the app is closed. */
 export const BOUNTY_DEADLINE_HOURS = 24;
 
+/** OTA-863 — a bounty's full deadline: 24h base + one hour per tile you must cross to
+ *  reach the quarry's outpost (travel is ~0.25h/tile, but the buffer also covers the
+ *  fights the route runs you through, the kills at the far end, and the odd rest). */
+export function bountyDeadlineFor(distanceTiles: number): number {
+  return BOUNTY_DEADLINE_HOURS + Math.max(0, Math.round(distanceTiles));
+}
+
 /** Hours of in-game time left on a bounty (Infinity for a legacy one with no stamp). */
 export function bountyHoursLeft(bounty: FactionBounty, nowHour: number): number {
   if (bounty.acceptedAtHour === undefined) return Infinity;
-  return BOUNTY_DEADLINE_HOURS - (nowHour - bounty.acceptedAtHour);
+  return (bounty.deadlineHours ?? BOUNTY_DEADLINE_HOURS) - (nowHour - bounty.acceptedAtHour);
 }
 
 /** Has the contract's in-game deadline passed? */

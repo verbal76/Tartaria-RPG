@@ -20177,7 +20177,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hadCourse = slate.length > 0;
     // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
     const acceptedAtHour = player.hoursElapsed ?? 0;
-    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour }], activeBounty: undefined } } : s));
+    // OTA-863 — DISTANCE-AWARE deadline: 24h base + one hour per tile between the player
+    // and the quarry's outpost, so a far contract isn't unreachable in time. Measured from
+    // the player's absolute cell at accept.
+    const grid = playerGridCell(player);
+    const tiles = canonicalDistanceFromGrid(grid.x, grid.y, bounty.targetLocationId);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { bountyDeadlineFor } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+    const deadlineHours = bountyDeadlineFor(tiles);
+    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour, deadlineHours }], activeBounty: undefined } } : s));
     get().appendLog(
       'arbiter',
       hadCourse

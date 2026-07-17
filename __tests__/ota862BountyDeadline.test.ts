@@ -29,7 +29,7 @@ jest.mock('expo-av', () => ({
 
 import {
   bountyTerms, giverDifficulty, bountyHoursLeft, bountyExpired, listBounties,
-  BOUNTY_DEADLINE_HOURS, type FactionBounty,
+  bountyDeadlineFor, BOUNTY_DEADLINE_HOURS, type FactionBounty,
 } from '../app/engine/factionBounty';
 import type { FactionMeta } from '../app/engine/worldPulse';
 import { useGameStore } from '../app/state/gameStore';
@@ -73,6 +73,22 @@ describe('OTA-862 — the 24 in-game-hour deadline', () => {
     expect(bountyExpired({ ...b, acceptedAtHour: undefined }, 9999)).toBe(false);
   });
 
+  it('OTA-863 — the deadline is distance-aware: 24h base + one hour per tile', () => {
+    expect(bountyDeadlineFor(0)).toBe(BOUNTY_DEADLINE_HOURS);
+    expect(bountyDeadlineFor(10)).toBe(BOUNTY_DEADLINE_HOURS + 10);
+    expect(bountyDeadlineFor(31)).toBe(BOUNTY_DEADLINE_HOURS + 31);
+    expect(bountyDeadlineFor(-5)).toBe(BOUNTY_DEADLINE_HOURS); // never below base
+    // A bounty carrying its own longer deadline uses it, not the 24h base.
+    const far: FactionBounty = {
+      giverFactionId: 'g', giverName: 'G', targetFactionId: 't', targetName: 'T',
+      targetLocationId: 'x', targetLocationName: 'X', count: 3, progress: 0, rewardTc: 50, rewardRep: 8,
+      acceptedAtHour: 100, deadlineHours: 55,
+    };
+    expect(bountyHoursLeft(far, 100)).toBe(55);
+    expect(bountyExpired(far, 100 + 40)).toBe(false); // still 15h left — a flat-24 would've lapsed
+    expect(bountyExpired(far, 100 + 55)).toBe(true);
+  });
+
   it('a held bounty lapses off the slate once its window passes and an action ticks the clock', async () => {
     await useGameStore.getState().hydrate();
     await useGameStore.getState().startNewGame({ name: 'Clock', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
@@ -86,11 +102,14 @@ describe('OTA-862 — the 24 in-game-hour deadline', () => {
     useGameStore.getState().acceptBounty(bounty);
     const held = useGameStore.getState().player!.activeBounties ?? [];
     expect(held.length).toBe(1);
-    expect(held[0]!.acceptedAtHour).toBeDefined(); // stamped on accept
+    expect(held[0]!.acceptedAtHour).toBeDefined();       // stamped on accept
+    expect(held[0]!.deadlineHours).toBeGreaterThanOrEqual(BOUNTY_DEADLINE_HOURS); // OTA-863: 24 + tiles
 
-    // Jump the in-game clock well past the deadline, then take one action to trigger the sweep.
+    // Jump the in-game clock past THIS bounty's own (distance-aware) deadline, then take
+    // one action to trigger the sweep.
     const p = useGameStore.getState().player!;
-    useGameStore.setState({ player: { ...p, hoursElapsed: (held[0]!.acceptedAtHour ?? 0) + BOUNTY_DEADLINE_HOURS + 5 } });
+    const deadline = held[0]!.deadlineHours ?? BOUNTY_DEADLINE_HOURS;
+    useGameStore.setState({ player: { ...p, hoursElapsed: (held[0]!.acceptedAtHour ?? 0) + deadline + 5 } });
     await useGameStore.getState().submitPlayerAction('look around');
 
     expect((useGameStore.getState().player!.activeBounties ?? []).length).toBe(0); // lapsed

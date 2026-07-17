@@ -10,9 +10,8 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { getFactions } from '../engine/character';
 import { tideLabel } from '../engine/worldPulse';
-import { listBounties, bountyKey, bountyHoursLeft, giverDifficulty, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
-
-const BOUNTY_DEADLINE_LABEL = `Expires in ${BOUNTY_DEADLINE_HOURS} in-game hours`;
+import { listBounties, bountyKey, bountyHoursLeft, giverDifficulty, bountyDeadlineFor, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
+import { canonicalCellOf, canonicalDistanceFromGrid } from '../engine/worldMap';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { getLocationById } from '../engine/encounter';
@@ -67,6 +66,13 @@ export function WorldScreen() {
     const left = bountyHoursLeft(b, nowHour);
     if (!Number.isFinite(left)) return 'no deadline';
     return left <= 0 ? 'lapsed' : `${Math.ceil(left)}h left`;
+  };
+  // OTA-863 — the deadline is DISTANCE-AWARE. Estimate an offer's window from the player's
+  // current cell so the board can say how long you'll really have before you accept.
+  const estDeadline = (targetLocationId: string): number => {
+    if (!player) return BOUNTY_DEADLINE_HOURS;
+    const cell = canonicalCellOf(player.currentLocationId);
+    return bountyDeadlineFor(canonicalDistanceFromGrid(cell.x, cell.y, targetLocationId));
   };
   // OTA-862 — a faction that dislikes you still offers work, just a harder job. Frame it.
   const difficultyNote = (giverId: string): string | null => {
@@ -143,7 +149,7 @@ export function WorldScreen() {
               <Text style={styles.bountyHead}>{offer.giverName} have work for you</Text>
               <Text style={styles.bountyBody}>
                 Put down {offer.count} of the {offer.targetName} at {offer.targetLocationName}. Pays {offer.rewardTc} TC
-                and {offer.giverName} standing. {BOUNTY_DEADLINE_LABEL}.
+                and {offer.giverName} standing. Expires in {estDeadline(offer.targetLocationId)} in-game hours.
               </Text>
               {difficultyNote(offer.giverFactionId) ? (
                 <Text style={styles.bountyWarn}>⚠ {difficultyNote(offer.giverFactionId)}</Text>
