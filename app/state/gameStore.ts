@@ -1843,6 +1843,29 @@ function activeBountiesOf(
   return [];
 }
 
+// OTA-862 — drop any bounty whose in-game deadline has passed. Called wherever in-game
+// time has just advanced (the action-completion path). Announces each lapse so the player
+// knows a contract went cold; no standing penalty — just the lost payout.
+function expireBounties(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const slate = activeBountiesOf(player);
+  if (slate.length === 0) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { bountyExpired } = require('../engine/factionBounty') as typeof import('../engine/factionBounty');
+  const hour = player.hoursElapsed ?? 0;
+  const kept = slate.filter((b) => !bountyExpired(b, hour));
+  if (kept.length === slate.length) return; // nothing lapsed
+  const lapsed = slate.filter((b) => bountyExpired(b, hour));
+  set((s) => (s.player ? { player: { ...s.player, activeBounties: kept, activeBounty: undefined } } : s));
+  for (const b of lapsed) {
+    get().appendLog('arbiter', `"The ${b.giverName} contract on the ${b.targetName} has lapsed," the Arbiter says. "You were too slow. The offer's off the board."`);
+  }
+}
+
 // OTA-844/849/851 — the world's heartbeat. Called at the end of every action; when a
 // full pulse of in-game time has accrued, one WORLD EVENT fires from a broad, weighted
 // catalogue (OTA-851: surges, skirmishes, musters, warbands, schisms, caravans, omens,
@@ -14944,6 +14967,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-844 [world pulse] — advance the world's slow heartbeat. No-op unless a full
     // pulse of in-game time has accrued since the last one.
     worldTideCheck(get, set);
+    // OTA-862 [bounty deadline] — lapse any contract whose 24 in-game-hour window ran out.
+    expireBounties(get, set);
     // OTA-849 [living world] — the world reaches back: rival factions raid a player
     // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
     // outdoor moment.
@@ -19739,7 +19764,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const hadCourse = slate.length > 0;
-    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0 }], activeBounty: undefined } } : s));
+    // OTA-862 — stamp the accept hour so the contract can lapse after its in-game deadline.
+    const acceptedAtHour = player.hoursElapsed ?? 0;
+    set((s) => (s.player ? { player: { ...s.player, activeBounties: [...slate, { ...bounty, progress: 0, acceptedAtHour }], activeBounty: undefined } } : s));
     get().appendLog(
       'arbiter',
       hadCourse

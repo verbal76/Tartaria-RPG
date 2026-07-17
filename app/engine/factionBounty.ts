@@ -22,14 +22,53 @@ export interface FactionBounty {
   /** Payout on turn-in. */
   rewardTc: number;
   rewardRep: number;
+  /** OTA-862 — in-game hour the contract was accepted. Set on accept; used to expire the
+   *  bounty after BOUNTY_DEADLINE_HOURS of in-game time. Optional so a legacy bounty
+   *  migrated from the old single-slot model (no stamp) simply never times out. */
+  acceptedAtHour?: number;
 }
 
-/** Bounty size + pay scale with the target's ascendancy — a rising faction is a
- *  harder, better-paid job. Kept pure so the test can pin the curve. */
-export function bountyTerms(targetTide: number | undefined): { count: number; rewardTc: number; rewardRep: number } {
+/** OTA-862 — a bounty lapses this many IN-GAME hours after you accept it. In-game time
+ *  only advances when you act, so this is a real "get moving" pressure, not a wall-clock
+ *  countdown that drains while the app is closed. */
+export const BOUNTY_DEADLINE_HOURS = 24;
+
+/** Hours of in-game time left on a bounty (Infinity for a legacy one with no stamp). */
+export function bountyHoursLeft(bounty: FactionBounty, nowHour: number): number {
+  if (bounty.acceptedAtHour === undefined) return Infinity;
+  return BOUNTY_DEADLINE_HOURS - (nowHour - bounty.acceptedAtHour);
+}
+
+/** Has the contract's in-game deadline passed? */
+export function bountyExpired(bounty: FactionBounty, nowHour: number): boolean {
+  return bountyHoursLeft(bounty, nowHour) <= 0;
+}
+
+/** OTA-862 — how much HARDER a bounty gets from a faction that dislikes you. Every
+ *  faction offers work regardless of standing (no gate), but the less they trust you the
+ *  more they demand before they'll pay: a disliked faction makes you prove yourself. The
+ *  flip side — because it's a tougher job for a faction you're on the outs with, it pays
+ *  MORE standing, so bounties are the road back into any faction's good graces. */
+export function giverDifficulty(giverStanding: number | undefined): number {
+  const s = giverStanding ?? 0;
+  if (s >= 20) return 0;   // favored — the easy, trusting job
+  if (s >= 0) return 1;    // neutral/acquainted
+  if (s >= -20) return 2;  // disliked
+  return 3;                // hostile — prove yourself
+}
+
+/** Bounty size + pay scale with the target's ascendancy (a rising faction is a harder,
+ *  better-paid job) AND with the GIVER's opinion of you (a faction that dislikes you
+ *  demands more kills but pays more standing). Kept pure so the test can pin the curve.
+ *  giverStanding defaults to a favored value so the ascendancy-only curve is unchanged. */
+export function bountyTerms(
+  targetTide: number | undefined,
+  giverStanding = 100,
+): { count: number; rewardTc: number; rewardRep: number } {
   const t = Math.max(0, Math.min(5, targetTide ?? 0));
-  const count = 3 + Math.ceil(t / 2); // 3 at neutral → up to 6 for an ascendant target
-  return { count, rewardTc: 40 + count * 15, rewardRep: 8 + Math.floor(t / 2) };
+  const diff = giverDifficulty(giverStanding);
+  const count = 3 + Math.ceil(t / 2) + diff; // 3 at neutral/favored → +tide, +dislike
+  return { count, rewardTc: 40 + count * 15, rewardRep: 8 + Math.floor(t / 2) + diff };
 }
 
 /**
@@ -46,9 +85,8 @@ export function pickBounty(
   outpostOf: (factionId: string) => string | undefined,
   locationName: (locationId: string) => string,
   tides: Record<string, number>,
-  positiveThreshold = 10,
 ): FactionBounty | null {
-  return bountyCandidates(factions, standings, outpostOf, locationName, tides, positiveThreshold)[0] ?? null;
+  return bountyCandidates(factions, standings, outpostOf, locationName, tides)[0] ?? null;
 }
 
 /** OTA-859 — a stable identity for a bounty (giver + quarry + place), so the store can
@@ -59,38 +97,45 @@ export function bountyKey(b: Pick<FactionBounty, 'giverFactionId' | 'targetFacti
 
 /** Collect every eligible bounty candidate (a favored faction's real, unfriendly rival
  *  with a known outpost), most ASCENDANT first. Shared by pickBounty + listBounties. */
+// OTA-862 — a faction won't hire you to hunt someone you're genuinely allied with. At or
+// above this standing with the QUARRY, that contract is withheld (you'd never take it).
+const FRIENDLY_QUARRY = 20;
+
 function bountyCandidates(
   factions: readonly FactionMeta[],
   standings: ReadonlyArray<{ factionId: string; standing: number }>,
   outpostOf: (factionId: string) => string | undefined,
   locationName: (locationId: string) => string,
   tides: Record<string, number>,
-  positiveThreshold: number,
 ): FactionBounty[] {
   const realIds = new Set(factions.map((f) => f.id));
   const nameOf = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
   const standingOf = (id: string) => standings.find((s) => s.factionId === id)?.standing ?? 0;
-  const allies = factions.filter((f) => standingOf(f.id) >= positiveThreshold);
-  // Candidate quarries: real rivals of a favored faction that the player is NOT also
-  // friendly with AND that have a known outpost to route to. Keyed by giver>target so
-  // two different allies who both hate the same rival each post their OWN contract.
+  // OTA-862 — EVERY faction posts bounties on its real rivals; there is NO giver-standing
+  // gate. A faction that dislikes you still offers work — just a harder job (bountyTerms
+  // scales the count with how little they trust you). The only quarry we withhold is one
+  // the player is genuinely allied with (they'd never hunt a friend). Keyed by giver>target
+  // so two factions that both hate the same rival each post their OWN contract.
   const candidates = new Map<string, { targetId: string; giverId: string; loc: string }>();
-  for (const ally of allies) {
-    for (const rivalId of ally.rivals ?? []) {
+  for (const giver of factions) {
+    for (const rivalId of giver.rivals ?? []) {
       if (!realIds.has(rivalId)) continue;
-      if (standingOf(rivalId) >= positiveThreshold) continue;
+      if (standingOf(rivalId) >= FRIENDLY_QUARRY) continue; // don't hunt your allies
       const loc = outpostOf(rivalId);
       if (!loc) continue;
-      const k = `${ally.id}>${rivalId}`;
-      if (!candidates.has(k)) candidates.set(k, { targetId: rivalId, giverId: ally.id, loc });
+      const k = `${giver.id}>${rivalId}`;
+      if (!candidates.has(k)) candidates.set(k, { targetId: rivalId, giverId: giver.id, loc });
     }
   }
+  // Favored givers' jobs surface first (easier, better-liked), then by target ascendancy.
   const sorted = [...candidates.values()].sort((a, b) => {
+    const sg = standingOf(b.giverId) - standingOf(a.giverId);
+    if (sg !== 0) return sg;
     const d = (tides[b.targetId] ?? 0) - (tides[a.targetId] ?? 0);
     return d !== 0 ? d : (a.giverId + a.targetId).localeCompare(b.giverId + b.targetId);
   });
   return sorted.map((c) => {
-    const terms = bountyTerms(tides[c.targetId] ?? 0);
+    const terms = bountyTerms(tides[c.targetId] ?? 0, standingOf(c.giverId));
     return {
       giverFactionId: c.giverId,
       giverName: nameOf(c.giverId),
@@ -118,9 +163,8 @@ export function listBounties(
   locationName: (locationId: string) => string,
   tides: Record<string, number>,
   max = 4,
-  positiveThreshold = 10,
 ): FactionBounty[] {
-  return bountyCandidates(factions, standings, outpostOf, locationName, tides, positiveThreshold).slice(0, Math.max(0, max));
+  return bountyCandidates(factions, standings, outpostOf, locationName, tides).slice(0, Math.max(0, max));
 }
 
 /** Would this kill count toward the active bounty? (target-faction member, bounty
