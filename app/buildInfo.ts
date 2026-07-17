@@ -16725,4 +16725,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Arbiter line, no penalty. Held bounties now also render on the Missions/Contracts board
 // under BOUNTIES with a live countdown + tap-to-route. Tests: ota862BountyDeadline; ota850
 // updated for the no-gate model.
-export const OTA_BUILD_ID = '2026-07-16-862-bounty-board-v2';
+// ── OTA-863 (Bounty deadline is DISTANCE-AWARE) ──
+// A flat 24 in-game-hour window was too tight for a far + hard contract (a distant hostile-
+// faction bounty routes you through patrol fights, demands up to 9 kills, and one forced
+// rest alone is ~8h). The deadline is now 24h + one hour per TILE between the player and the
+// quarry's outpost (bountyDeadlineFor), measured at accept from the player's absolute cell.
+// Near jobs still ~24-34h; the farthest (~31 tiles) get ~55h. The offer card shows the
+// estimated window before you accept; the held card + Missions board count it down.
+// Test: ota862BountyDeadline (OTA-863 cases).
+export const OTA_BUILD_ID = '2026-07-16-863-bounty-deadline-distance';
