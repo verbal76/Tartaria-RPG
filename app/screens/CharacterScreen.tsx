@@ -10,6 +10,7 @@ import { resolveTitleRoster } from '../engine/customTitles';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, effectiveACBreakdown } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, displayStaminaMax, type StatBreakdown } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
@@ -114,6 +115,11 @@ export function CharacterScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="character_first_open"
+        title="Your character"
+        body="Tap any stat or number to see exactly what feeds it. Scroll down for your Chronicle — the legend of what you've done."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

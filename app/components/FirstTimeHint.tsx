@@ -19,7 +19,7 @@
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
-import { useFirstTimeHint } from './useFirstTimeHint';
+import { useFirstTimeHint, setHintsDisabled } from './useFirstTimeHint';
 
 interface Props {
   /** Stable id — never reuse across hints. AsyncStorage key uses it. */
@@ -46,9 +46,22 @@ export function FirstTimeHint({ id, title, body }: Props) {
       <View style={styles.card} onStartShouldSetResponder={() => true}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.body}>{body}</Text>
-        <TouchableOpacity onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
-          <Text style={styles.btnText}>Got it</Text>
-        </TouchableOpacity>
+        <View style={styles.footerRow}>
+          {/* OTA-860 — one-tap escape hatch: kill every future tip and close this one.
+              Mirrors the Settings toggle (both write the same global flag). */}
+          <TouchableOpacity
+            onPress={() => { void setHintsDisabled(true); dismiss(); }}
+            style={styles.linkBtn}
+            activeOpacity={0.6}
+            hitSlop={8}
+          >
+            <Text style={styles.linkText}>Turn off tips</Text>
+          </TouchableOpacity>
+          <View style={{ flex: 1 }} />
+          <TouchableOpacity onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
+            <Text style={styles.btnText}>Got it</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Pressable>
   );
@@ -86,8 +99,11 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 14,
   },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   btn: {
-    alignSelf: 'flex-end',
     paddingVertical: 8,
     paddingHorizontal: 18,
     borderColor: '#6ab0c9',
@@ -99,5 +115,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  // OTA-860 — quiet secondary link; reads as a toggle-off, not a primary action.
+  linkBtn: {
+    paddingVertical: 8,
+    paddingRight: 10,
+  },
+  linkText: {
+    color: '#8a7f6c',
+    fontSize: 11,
+    textDecorationLine: 'underline',
+    letterSpacing: 0.3,
   },
 });

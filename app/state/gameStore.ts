@@ -7430,7 +7430,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
-      if (tStep?.id === 'rope' && /\btake\b/i.test(trimmed)) {
+      // OTA-861 — the player now TYPES this themselves (no pre-fill), so accept the
+      // natural synonyms for picking it up, not just "take". Lore-agnostic: match the
+      // VERB only (the prop's name is content-pack-defined, not always "rope").
+      if (tStep?.id === 'rope' && /\b(take|grab|get|pick\s+up|pickup|collect|snag)\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { getTutorialProps: gtp } = require('../engine/tutorialProps') as typeof import('../engine/tutorialProps');

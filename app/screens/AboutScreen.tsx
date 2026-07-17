@@ -21,6 +21,7 @@ import {
   type DisplaySettings,
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
+import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
   flushLogWrites,
@@ -109,6 +110,9 @@ export function AboutScreen() {
   useEffect(() => {
     if (!devMode && tab === 'dev') setTab('session');
   }, [devMode, tab]);
+  // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
+  const hintsDisabled = useHintsDisabled();
+  const [tipsReset, setTipsReset] = useState(false);
   // arb78 — player-tunable background settings (live).
   const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
   useEffect(() => {
@@ -863,6 +867,48 @@ export function AboutScreen() {
             activeOpacity={0.7}
           >
             <Text style={styles.sessionBtnSecondaryText}>RESET TO DEFAULT</Text>
+          </TouchableOpacity>
+        </View>
+        )}
+
+        {/* OTA-860 — GUIDANCE: master switch for the first-time tips that pop up the
+            first time you open each system. Off hides them everywhere; the reset makes
+            them all show once more (e.g. after a big update). */}
+        {tab === 'display' && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle}>GUIDANCE</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Short tips pop up the first time you open a screen. Turn them off, or show them
+            all again after an update.
+          </Text>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>First-time tips</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => { void setHintsDisabled(!hintsDisabled); }}
+              style={[styles.musicToggle, !hintsDisabled && styles.musicToggleOn]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.musicToggleText, !hintsDisabled && styles.musicToggleTextOn]}>
+                {hintsDisabled ? 'OFF' : 'ON'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+            onPress={() => {
+              void resetAllFirstTimeHints();
+              void setHintsDisabled(false);
+              setTipsReset(true);
+              setTimeout(() => setTipsReset(false), 2000);
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>{tipsReset ? 'TIPS RESET ✓' : 'SHOW ALL TIPS AGAIN'}</Text>
           </TouchableOpacity>
         </View>
         )}

@@ -119,11 +119,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'exploration',
     area: 'input-row',
     inputPulse: true,
-    draftText: 'take {rope}',
     title: 'Take the Rope',
-    body: 'This game takes typed input too. The input below is pre-filled — tap Act to grab the {rope}.',
+    body: 'This game takes typed input too. Type take {rope} into the input below yourself, then tap ACT.',
     arbiter:
-      '"Now the {rope}. This time, type it. I\'ve written the command. Tap ACT."',
+      '"Now the {rope}. This time, type it yourself — take {rope} — then tap ACT. Most commands here answer to plain words like that."',
   },
   {
     id: 'scrap',

@@ -12,6 +12,7 @@ import { getFactions } from '../engine/character';
 import { tideLabel } from '../engine/worldPulse';
 import { listBounties, bountyKey } from '../engine/factionBounty';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import { getLocationById } from '../engine/encounter';
 import { topGrudges, relationLabel } from '../engine/factionRelations';
 
@@ -77,6 +78,11 @@ export function WorldScreen() {
 
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id="world_first_open"
+        title="The living world"
+        body="This board is alive — factions fight, gain, and lose ground on their own. Take bounties here; tap a header to unfold the standings."
+      />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setScreen('exploration')} style={styles.backBtn} hitSlop={8} activeOpacity={0.7}>
           <Text style={styles.backText}>← BACK</Text>
