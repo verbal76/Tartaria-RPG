@@ -17429,7 +17429,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const vendorTideMult = scene.vendor.faction
       ? tideVendorPriceMult(get().worldMemory.factionTides?.[scene.vendor.faction])
       : 1;
-    const effectivePrice = Math.max(1, Math.ceil(offer.price * mult * (1 - buyDiscount) * vendorTideMult));
+    // OTA-865 [war micro-economy] — contested ground marks prices up: soldiers are buying.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const WEbuy = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const VP = require('../engine/vendorPricing') as typeof import('../engine/vendorPricing');
+    const buyCell = canonicalCellOf(player.currentLocationId);
+    const buyHeat = WEbuy.localWarHeat(get().worldMemory.patrols ?? [], buyCell.x, buyCell.y);
+    const { buyMult: warBuyMult } = VP.warPriceFactor(buyHeat);
+    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult };
+    const effectivePrice = VP.finalBuyPrice(offer.price, priceParts);
     if (player.tc < effectivePrice) {
       get().appendLog(
         'system',
@@ -17566,6 +17575,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `Bought ${countNote}${offer.itemName} from ${scene.vendor.name} for ${totalCost} TC${markupNote}. (${player.tc - totalCost} TC left)`,
     );
+    // OTA-865 — the "friend's price" line: what your CHA/rapport shaved off vs. a stranger's
+    // price here (heat/tide/corruption are NOT counted — this is purely YOUR skill's doing,
+    // so it reads as a win even in a marked-up war market). Only shown when it saved coin.
+    {
+      const strangerUnit = VP.strangerBuyPrice(offer.price, priceParts);
+      const saved = (strangerUnit - effectivePrice) * boughtCount;
+      if (saved > 0) {
+        get().appendLog('reward', `They don't charge a friend full price — ${saved} TC stayed in your pouch.`);
+      }
+    }
     logRepChanges(get, repResult.changed);
     // OTA 059 — successful BUY trains CHA. You read the room well
     // enough to close the deal at the price they offered. The
@@ -17649,7 +17668,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       player.completedFactionQuestIds,
       scene.vendor.faction,
     );
-    const basePrice = sellPriceFor(item, scene.vendor, sellRapportBonus);
+    // OTA-865 [war micro-economy] — in a contested area the trader pays a little more:
+    // they can turn your goods over to soldiers who need them. Bounded (+8% at full heat),
+    // and well under the buy/sell spread so it never opens a buy-here-sell-there arbitrage.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const WEsell = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const VPsell = require('../engine/vendorPricing') as typeof import('../engine/vendorPricing');
+    const sellCell = canonicalCellOf(player.currentLocationId);
+    const sellHeat = WEsell.localWarHeat(get().worldMemory.patrols ?? [], sellCell.x, sellCell.y);
+    const { sellMult: warSellMult } = VPsell.warPriceFactor(sellHeat);
+    const basePrice = Math.round(sellPriceFor(item, scene.vendor, sellRapportBonus) * warSellMult);
     // arb45 — Relic Trader perk: sharper coin when bartering relics.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const tPerksSell = require('../engine/titles').titlePerkModifiers(player);

@@ -16153,4 +16153,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // seeded pools in worldEvents (patrolClashLine / outpostAssaultLine / patrolMaulLine): 20
 // clash lines varying verb + scenario, 14 assault, 16 maul; a friction clash appends one
 // of 7 grudge-born tails. Pure + deterministic. Test: ota864WarFlavor.
-export const OTA_BUILD_ID = '2026-07-16-843-war-feed-flavor';
+//
+// 2026-07-16 OTA-844 — port of HAL OTA-865. War micro-economy: local war heat (from
+// roaming-patrol density near the vendor) marks buy prices up (+12% at full heat) and sell
+// prices up a little (+8%), bounded and spread-safe (no arbitrage). New pure vendorPricing
+// module is the single price-math source for the screen AND buy/sell (fixes an old drift
+// dropping the tide modifier). UX: a war-market entry line naming the fighting factions, a
+// green▼/red▲ ticker beside every price (colour = your benefit), and a "friend's price"
+// line after a buy showing what your standing/charm saved vs a stranger. Test: ota865WarEconomy.
+export const OTA_BUILD_ID = '2026-07-16-844-war-micro-economy';
