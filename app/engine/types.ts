@@ -1293,11 +1293,16 @@ export interface PlayerCharacter {
   activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
-  /** OTA-850 [faction bounty] — the one active kill-bounty a favored faction has
-   *  paid the player for: hunt N of a rival's members at the rival's outpost.
-   *  Accepting routes the player to targetLocationId; progress ticks on each kill
-   *  of a targetFactionId combatant; turn-in pays out and clears it. */
+  /** OTA-850 [faction bounty] — LEGACY single active kill-bounty. Superseded by
+   *  activeBounties (OTA-859); still read on load and migrated into the array so old
+   *  saves don't lose an in-progress contract. New writes go to activeBounties. */
   activeBounty?: import('./factionBounty').FactionBounty;
+  /** OTA-859 [bounty board] — every kill-bounty the player currently carries (up to a
+   *  small cap). A favored faction pays to hunt N of a rival's members at the rival's
+   *  outpost. Accepting routes the player there; each kill of a targetFactionId
+   *  combatant ticks EVERY matching bounty's progress; a bounty that completes pays out
+   *  and drops off the slate. Holding several lets the player grind faction standing. */
+  activeBounties?: import('./factionBounty').FactionBounty[];
   /** Active mystery-object quests. `tracked === false` = paused (see activeHunts). */
   activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number; tracked?: boolean }[];
   /** IDs of mystery quests turned in. */

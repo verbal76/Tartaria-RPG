@@ -17736,4 +17736,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // every 6s, mauling ~22% of the field per tick — that outran the +1/faction muster and
 // the wars read as a meat-grinder. Dropped to 1 sub-step (~11% attrition) so the muster
 // keeps pace and armies hold ground near their ~45 target.
-export const OTA_BUILD_ID = '2026-07-16-1139-live-scroll-balance';
+//
+// 2026-07-16 OTA-1140 — port of HAL OTA-859. The World board is now a real BOUNTY BOARD:
+// every eligible contract shows at once and the player can STACK up to 3. A single kill
+// of a quarry advances every held bounty whose target it matches; each completed contract
+// pays out + drops off independently — several at once is a faster standing grind. Legacy
+// single activeBounty migrates into activeBounties[] on read. New helpers listBounties +
+// bountyKey. Test: ota859BountyBoard.
+export const OTA_BUILD_ID = '2026-07-16-1140-bounty-board';
