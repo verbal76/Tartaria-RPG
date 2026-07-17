@@ -47,11 +47,21 @@ describe('OTA-850 — pickBounty', () => {
     expect(b?.count).toBe(bountyTerms(5).count);
   });
 
-  it('returns null with no favored faction, or when the rival has no outpost', () => {
-    expect(pickBounty(FACTIONS, [], outpostOf, locName, {})).toBeNull();
-    // Favor order but strip the rival's outpost → nowhere to route → no bounty.
-    const noOutpost = (fid: string) => (fid === 'monarchs' ? undefined : OUTPOST[fid]);
+  it('OTA-862 — offers work even at NEUTRAL/negative standing (no gate), just harder', () => {
+    // Empty standings = everyone neutral. A faction still posts a bounty on its rival.
+    const b = pickBounty(FACTIONS, [], outpostOf, locName, {});
+    expect(b).not.toBeNull();
+    // At NEUTRAL (0) the giver difficulty is +1 → one more kill than a favored job.
+    expect(b!.count).toBe(bountyTerms(0, 0).count);
+    expect(bountyTerms(0, 0).count).toBe(4);        // 3 base + 1 dislike step
+    expect(bountyTerms(0, -30).count).toBe(6);       // hostile → +3
+    expect(bountyTerms(0, -30).rewardRep).toBeGreaterThan(bountyTerms(0, 100).rewardRep); // pays more standing
+  });
+
+  it('returns null only when NO faction has an outpost-holding rival', () => {
+    const noOutpost = () => undefined;
     expect(pickBounty(FACTIONS, [{ factionId: 'order', standing: 30 }], noOutpost, locName, {})).toBeNull();
+    expect(pickBounty([], [], outpostOf, locName, {})).toBeNull();
   });
 });
 

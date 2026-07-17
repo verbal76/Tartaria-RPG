@@ -11,7 +11,9 @@ import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
 import type { Faction } from '../engine/types';
 import { tideLabel } from '../engine/worldPulse';
-import { listBounties, bountyKey } from '../engine/factionBounty';
+import { listBounties, bountyKey, bountyHoursLeft, giverDifficulty, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
+
+const BOUNTY_DEADLINE_LABEL = `Expires in ${BOUNTY_DEADLINE_HOURS} in-game hours`;
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { getLocationById } from '../engine/encounter';
@@ -60,6 +62,22 @@ export function WorldScreen() {
   const heldKeys = new Set(activeBounties.map((b) => bountyKey(b)));
   const MAX_BOUNTIES = 3;
   const slateFull = activeBounties.length >= MAX_BOUNTIES;
+  const nowHour = player?.hoursElapsed ?? 0;
+  // OTA-862 — how urgent a held bounty's countdown reads.
+  const timeLabel = (b: (typeof activeBounties)[number]): string => {
+    const left = bountyHoursLeft(b, nowHour);
+    if (!Number.isFinite(left)) return 'no deadline';
+    return left <= 0 ? 'lapsed' : `${Math.ceil(left)}h left`;
+  };
+  // OTA-862 — a faction that dislikes you still offers work, just a harder job. Frame it.
+  const difficultyNote = (giverId: string): string | null => {
+    const s = player?.factionStanding.find((r) => r.factionId === giverId)?.standing ?? 0;
+    const d = giverDifficulty(s);
+    if (d === 0) return null; // favored — no note, it's the easy job
+    if (d === 1) return 'They barely know you — a fair test.';
+    if (d === 2) return "They don't trust you — a harder job to prove yourself.";
+    return 'They despise you — a punishing job, but it pays real standing.';
+  };
   const offers = player
     ? listBounties(
         factions,
@@ -107,7 +125,7 @@ export function WorldScreen() {
             <Text style={styles.bountyHead}>{b.giverName} — contract in progress</Text>
             <Text style={styles.bountyBody}>Hunt {b.targetName} near {b.targetLocationName}.</Text>
             <Text style={styles.bountyProgress}>
-              {b.progress}/{b.count} put down · reward {b.rewardTc} TC
+              {b.progress}/{b.count} put down · reward {b.rewardTc} TC · {timeLabel(b)}
             </Text>
             <TouchableOpacity
               style={styles.bountySecondaryBtn}
@@ -126,8 +144,11 @@ export function WorldScreen() {
               <Text style={styles.bountyHead}>{offer.giverName} have work for you</Text>
               <Text style={styles.bountyBody}>
                 Put down {offer.count} of the {offer.targetName} at {offer.targetLocationName}. Pays {offer.rewardTc} TC
-                and {offer.giverName} standing.
+                and {offer.giverName} standing. {BOUNTY_DEADLINE_LABEL}.
               </Text>
+              {difficultyNote(offer.giverFactionId) ? (
+                <Text style={styles.bountyWarn}>⚠ {difficultyNote(offer.giverFactionId)}</Text>
+              ) : null}
               <Text style={styles.bountyFoot}>
                 {activeBounties.length > 0
                   ? `↳ Adds to your slate — your current course holds.`
@@ -150,8 +171,8 @@ export function WorldScreen() {
               {slateFull
                 ? `Your slate is full (${MAX_BOUNTIES} contracts). Complete one and the board refreshes.`
                 : activeBounties.length > 0
-                  ? 'No further contracts on offer right now — favor more factions to open new work.'
-                  : "No bounties on offer. Earn a faction's favor (standing +10) and its enemies become your work."}
+                  ? 'No further contracts on offer right now — the war will throw up more soon.'
+                  : 'No bounties on offer right now. As factions clash, they post work against their rivals — check back.'}
             </Text>
           </View>
         )}
@@ -312,6 +333,8 @@ const styles = StyleSheet.create({
   bountyBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   bountyProgress: { color: '#9ec96a', fontSize: 12, fontWeight: '700', marginTop: 4 },
   bountyFoot: { color: '#c98a6a', fontSize: 10, fontStyle: 'italic', marginTop: 6, lineHeight: 14 },
+  // OTA-862 — "they don't like you, so it's a harder job" note on a low-standing offer.
+  bountyWarn: { color: '#c98a6a', fontSize: 11, fontWeight: '700', marginTop: 5 },
   bountyBtn: { marginTop: 10, backgroundColor: '#c9a86a', borderRadius: 3, paddingVertical: 9, alignItems: 'center' },
   bountyBtnText: { color: '#13110f', fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
   // OTA-859 — re-route to a held bounty (outline button, secondary to the gold ACCEPT).

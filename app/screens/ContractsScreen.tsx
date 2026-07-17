@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { bountyKey, bountyHoursLeft } from '../engine/factionBounty';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -202,6 +203,12 @@ export function ContractsScreen() {
     );
   }
 
+  // OTA-862 — bounties the player currently carries (migrating the legacy single slot).
+  const activeBounties = (player.activeBounties && player.activeBounties.length > 0)
+    ? player.activeBounties
+    : player.activeBounty ? [player.activeBounty] : [];
+  const bountyNowHour = player.hoursElapsed ?? 0;
+
   // Resolve every active contract via its catalog lookup so we always
   // have a current title + stage count even after lore edits.
   const hunts = (player.activeHunts ?? []).map((h) => ({
@@ -270,7 +277,7 @@ export function ContractsScreen() {
 
   const totalActive =
     hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length
-    + (brokerMission ? 1 : 0);
+    + (brokerMission ? 1 : 0) + activeBounties.length;
 
   // Lifetime milestone counters — surfaced here so players have a single
   // place to see progress toward stat bumps (every 10 checks succeeded
@@ -622,6 +629,38 @@ export function ContractsScreen() {
             </Text>
           </View>
         ) : null}
+
+        {/* OTA-862 — bounties are timed contracts, so they lead the board. Each shows
+            progress + how much in-game time is left, and re-routes on tap. */}
+        {activeBounties.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>BOUNTIES</Text>
+              {activeBounties.map((b) => {
+                const left = bountyHoursLeft(b, bountyNowHour);
+                const leftLabel = !Number.isFinite(left)
+                  ? 'no deadline'
+                  : left <= 0 ? 'LAPSED' : `${Math.ceil(left)}h left`;
+                const urgent = Number.isFinite(left) && left > 0 && left <= 6;
+                return (
+                  <Pressable
+                    key={`b_${bountyKey(b)}`}
+                    onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+                    style={styles.card}
+                  >
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{b.giverName} bounty</Text>
+                      <Text style={[styles.stagePill, urgent && { color: '#c98a6a' }]}>{leftLabel}</Text>
+                    </View>
+                    <Text style={styles.cardFaction}>Hunt the {b.targetName}</Text>
+                    <Text style={styles.cardLocation}>📍 {b.targetLocationName}</Text>
+                    <Text style={styles.cardHint}>
+                      {b.progress}/{b.count} put down · pays {b.rewardTc} TC + {b.giverName} standing · tap to set course
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+        )}
 
         {hunts.length > 0 && (
             <View style={styles.section}>

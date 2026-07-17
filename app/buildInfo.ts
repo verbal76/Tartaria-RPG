@@ -16714,4 +16714,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The rope beat used to pre-fill the input with "take rope"; now the player TYPES it. The
 // draftText pre-fill is gone and the accept-regex broadened to take/grab/get/pick up/…rope
 // so a natural synonym still lands. If they mistype, the existing lockdown nudges them.
-export const OTA_BUILD_ID = '2026-07-16-860-tips-pass';
+// ── OTA-862 (Bounty board v2 — all-faction offers + 24h deadline + missions tracking) ──
+// Two changes to the bounty board. (1) NO standing gate: EVERY faction posts bounties on
+// its rivals, not just favored ones. A faction that dislikes you still hires you — just a
+// harder job (more kills, scaled by giverDifficulty) that pays MORE standing, so bounties
+// are the road back into any faction's favor. The only quarry withheld is one you're
+// genuinely allied with. The World board frames the difficulty ("they don't trust you…").
+// (2) A 24 IN-GAME-hour DEADLINE: acceptBounty stamps acceptedAtHour; expireBounties (run
+// on the action path, where in-game time advances) lapses any overdue contract with an
+// Arbiter line, no penalty. Held bounties now also render on the Missions/Contracts board
+// under BOUNTIES with a live countdown + tap-to-route. Tests: ota862BountyDeadline; ota850
+// updated for the no-gate model.
+export const OTA_BUILD_ID = '2026-07-16-862-bounty-board-v2';
