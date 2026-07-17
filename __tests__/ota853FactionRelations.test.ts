@@ -4,7 +4,8 @@
 
 import {
   seedRelations, getRelation, adjustRelation, meetOutcome, grudgeDelta,
-  relationLabel, topGrudges, HOSTILE_AT, FRIENDLY_AT, REL_MIN, REL_MAX,
+  relationLabel, topGrudges, topAlliances, warmSharedEnemy,
+  HOSTILE_AT, FRIENDLY_AT, REL_MIN, REL_MAX,
 } from '../app/engine/factionRelations';
 import type { FactionMeta } from '../app/engine/worldPulse';
 
@@ -14,16 +15,64 @@ const FACTIONS: FactionMeta[] = [
   { id: 'tartarians', name: 'True Tartarians', rivals: [], allies: ['order'] },
 ];
 
-describe('OTA-853 — seedRelations from lore', () => {
-  const m = seedRelations(FACTIONS);
-  it('rivals start hostile, allies start friendly, pseudo-ids ignored', () => {
-    expect(getRelation(m, 'order', 'monarchs')).toBeLessThan(0);
-    expect(getRelation(m, 'order', 'tartarians')).toBeGreaterThan(0);
-    expect(getRelation(m, 'order', 'ghost')).toBe(0); // pseudo-id never seeded
-    expect(getRelation(m, 'monarchs', 'tartarians')).toBe(0); // no lore link
+// OTA-867 — real faction ids so the LORE_RELATIONS table applies.
+const REAL: FactionMeta[] = [
+  'mud_monarchs', 'conspiracy_architects', 'forgotten_order', 'stone_builders',
+  'eternal_dynasty', 'true_tartarians', 'servants_of_giants', 'tartarian_revivalists',
+  'reclaimers_guild',
+].map((id) => ({ id, name: id }));
+
+describe('OTA-853/867 — seedRelations from the lore table', () => {
+  const m = seedRelations(REAL);
+  it('seeds real alliances AND grudges (not just grudges)', () => {
+    expect(getRelation(m, 'mud_monarchs', 'conspiracy_architects')).toBeGreaterThanOrEqual(FRIENDLY_AT); // funded allies
+    expect(getRelation(m, 'forgotten_order', 'stone_builders')).toBeGreaterThanOrEqual(FRIENDLY_AT);     // scholars
+    expect(getRelation(m, 'mud_monarchs', 'forgotten_order')).toBeLessThanOrEqual(HOSTILE_AT);            // suppressor vs reclaimer
   });
-  it('is symmetric', () => {
-    expect(getRelation(m, 'order', 'monarchs')).toBe(getRelation(m, 'monarchs', 'order'));
+  it('the Eternal Dynasty is friendless — no positive relation with anyone', () => {
+    for (const f of REAL) {
+      if (f.id === 'eternal_dynasty') continue;
+      expect(getRelation(m, 'eternal_dynasty', f.id)).toBeLessThanOrEqual(0);
+    }
+  });
+  it('is symmetric, and a pair with no lore link is 0', () => {
+    expect(getRelation(m, 'mud_monarchs', 'forgotten_order')).toBe(getRelation(m, 'forgotten_order', 'mud_monarchs'));
+    expect(getRelation(m, 'servants_of_giants', 'reclaimers_guild')).toBe(0);
+  });
+});
+
+describe('OTA-867 — enemy of my enemy warms co-belligerents', () => {
+  it('a faction that also hates the loser warms toward the winner — but not one already at war', () => {
+    // A and B both hate C (at war). A and B start neutral with each other.
+    let m: Record<string, Record<string, number>> = {};
+    m = adjustRelation(m, 'a', 'c', -40); // A at war with C
+    m = adjustRelation(m, 'b', 'c', -40); // B at war with C
+    const facs: FactionMeta[] = [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }, { id: 'd', name: 'D' }];
+    const before = getRelation(m, 'a', 'b');
+    m = warmSharedEnemy(m, 'a', 'c', facs); // A beat C
+    expect(getRelation(m, 'a', 'b')).toBeGreaterThan(before); // B warmed to A (shared enemy C)
+    expect(getRelation(m, 'a', 'd')).toBe(0);                 // D doesn't hate C → no warming
+  });
+  it('a faction already at war with the winner does NOT back into friendship', () => {
+    let m: Record<string, Record<string, number>> = {};
+    m = adjustRelation(m, 'b', 'c', -40); // B hates C
+    m = adjustRelation(m, 'a', 'b', -40); // ...but A and B are already at war
+    const facs: FactionMeta[] = [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }];
+    m = warmSharedEnemy(m, 'a', 'c', facs);
+    expect(getRelation(m, 'a', 'b')).toBe(-40); // unchanged — enemies stay enemies
+  });
+});
+
+describe('OTA-867 — topAlliances', () => {
+  it('surfaces the most-friendly pairs (>= FRIENDLY_AT), most-allied first', () => {
+    const m = seedRelations(REAL);
+    const allies = topAlliances(m, REAL, 6);
+    expect(allies.length).toBeGreaterThan(0);
+    expect(allies.every((p) => p.relation >= FRIENDLY_AT)).toBe(true);
+    expect(allies[0]!.relation).toBeGreaterThanOrEqual(allies[allies.length - 1]!.relation);
+    // The strongest seeded bond leads.
+    const lead = allies[0]!;
+    expect([lead.a, lead.b].sort()).toEqual(['conspiracy_architects', 'mud_monarchs']);
   });
 });
 

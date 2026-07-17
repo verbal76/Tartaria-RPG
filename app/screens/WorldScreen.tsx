@@ -15,7 +15,7 @@ import { canonicalCellOf, canonicalDistanceFromGrid } from '../engine/worldMap';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { getLocationById } from '../engine/encounter';
-import { topGrudges, relationLabel } from '../engine/factionRelations';
+import { topGrudges, topAlliances, relationLabel } from '../engine/factionRelations';
 
 export function WorldScreen() {
   const player = useGameStore((s) => s.player);
@@ -41,6 +41,8 @@ export function WorldScreen() {
   const standingOf = (id: string) => player?.factionStanding.find((r) => r.factionId === id)?.standing ?? 0;
   // OTA-853 — the live grudge board: who's at whose throat right now.
   const grudges = topGrudges(worldMemory?.factionRelations, factions, 6);
+  // OTA-867 — the alliances board: lore-seeded + emergent (enemy-of-my-enemy) friendships.
+  const alliances = topAlliances(worldMemory?.factionRelations, factions, 6);
   const nameOfFac = (id: string) => factions.find((f) => f.id === id)?.name ?? id;
   // A small glyph per event kind so the board reads at a glance.
   const glyphFor = (kind: string): string => (
@@ -234,22 +236,33 @@ export function WorldScreen() {
         )}
 
         {/* ── GRUDGES & ALLIANCES ───────────────────────────────── */}
-        {grudges.length > 0 && (
+        {(grudges.length > 0 || alliances.length > 0) && (
           <>
             {sectionHeader('grudges', 'GRUDGES & ALLIANCES')}
             {!collapsed.grudges && (
             <View style={styles.card}>
+              {grudges.length > 0 && <Text style={styles.relHead}>⚔ GRUDGES</Text>}
               {grudges.map((g, i) => {
                 const lab = relationLabel(g.relation);
                 return (
-                  <View key={i} style={styles.grudgeRow}>
+                  <View key={`g${i}`} style={styles.grudgeRow}>
                     <Text style={styles.grudgeText}>{nameOfFac(g.a)}  vs  {nameOfFac(g.b)}</Text>
                     <Text style={[styles.grudgeTag, { color: lab.hostile ? '#e07a5f' : '#9ec96a' }]}>{lab.word}</Text>
                   </View>
                 );
               })}
-              <Text style={styles.footNote}>↳ Grudges are earned: every patrol that guts another deepens the feud, and two
-                neutrals can come to blows from nothing but a bad crossing. Rivalries build themselves.</Text>
+              {alliances.length > 0 && <Text style={[styles.relHead, { marginTop: grudges.length > 0 ? 10 : 0 }]}>🤝 ALLIANCES</Text>}
+              {alliances.map((g, i) => {
+                const lab = relationLabel(g.relation);
+                return (
+                  <View key={`a${i}`} style={styles.grudgeRow}>
+                    <Text style={styles.grudgeText}>{nameOfFac(g.a)}  &amp;  {nameOfFac(g.b)}</Text>
+                    <Text style={[styles.grudgeTag, { color: '#9ec96a' }]}>{lab.word}</Text>
+                  </View>
+                );
+              })}
+              <Text style={styles.footNote}>↳ Both are earned: patrols that gut each other deepen feuds, while factions that
+                bloody a common enemy warm toward each other — alliances of shared foes. The world takes its own sides.</Text>
             </View>
             )}
           </>
@@ -329,6 +342,8 @@ const styles = StyleSheet.create({
   grudgeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4, borderBottomColor: '#1a2427', borderBottomWidth: 1 },
   grudgeText: { color: '#bcd2db', fontSize: 12 },
   grudgeTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
+  // OTA-867 — sub-headers splitting the grudges list from the alliances list.
+  relHead: { color: '#7a705c', fontSize: 10, fontWeight: '800', letterSpacing: 2, marginBottom: 4 },
   rumorRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
   rumorGlyph: { fontSize: 12, width: 18, textAlign: 'center' },
   rumorText: { color: '#bcd2db', fontSize: 12, lineHeight: 17, flex: 1 },

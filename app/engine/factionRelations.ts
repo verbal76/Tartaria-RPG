@@ -47,11 +47,79 @@ export function adjustRelation(m: RelationsMatrix, a: string, b: string, delta: 
 export function seedRelations(factions: readonly FactionMeta[]): RelationsMatrix {
   const realIds = new Set(factions.map((f) => f.id));
   let m: RelationsMatrix = {};
-  for (const f of factions) {
-    for (const r of f.rivals ?? []) if (realIds.has(r)) m = adjustRelation(m, f.id, r, -30);
-    for (const a of f.allies ?? []) if (realIds.has(a)) m = adjustRelation(m, f.id, a, 30);
+  for (const [a, b, v] of LORE_RELATIONS) {
+    if (realIds.has(a) && realIds.has(b)) m = adjustRelation(m, a, b, v);
   }
   return m;
+}
+
+// OTA-867 — the LORE-AUTHORED seed. The JSON's rivals/allies arrays were sparse and full of
+// descriptive pseudo-ids ("anyone_paying", "mud_monarchs_when_unpaid") that the old seed
+// silently dropped — so most factions started with NO relationships and the board only ever
+// showed grudges. This table encodes the politics the faction descriptions actually spell
+// out, weighted by how the lore frames each bond, so all 9 have real grudges AND alliances.
+//   • Suppressors (bury Tartaria): Mud Monarchs + Conspiracy Architects — funded, aligned.
+//   • Religious Reclamation: True Tartarians + Servants of Giants + Tartarian Revivalists.
+//   • Scholars: Forgotten Order + Stone Builders ("cooperate on engineering").
+//   • Eternal Dynasty: supremacist, FRIENDLESS — against every other faction.
+//   • Reclaimers Guild: mercenary, near-neutral, only sour on the Suppressors.
+export const LORE_RELATIONS: ReadonlyArray<readonly [string, string, number]> = [
+  // ── Alliances ──
+  ['mud_monarchs', 'conspiracy_architects', 45],       // funded + aligned: the strongest bond
+  ['true_tartarians', 'servants_of_giants', 35],       // "loosely affiliated"
+  ['servants_of_giants', 'tartarian_revivalists', 30],
+  ['true_tartarians', 'tartarian_revivalists', 22],
+  ['forgotten_order', 'stone_builders', 30],           // "cooperate on engineering"
+  ['forgotten_order', 'true_tartarians', 15],          // "partial" ally
+  // ── Mud Monarchs vs the reclaimers (they want it all buried) ──
+  ['mud_monarchs', 'forgotten_order', -35],
+  ['mud_monarchs', 'true_tartarians', -30],
+  ['mud_monarchs', 'eternal_dynasty', -35],
+  ['mud_monarchs', 'servants_of_giants', -25],
+  ['mud_monarchs', 'stone_builders', -25],
+  ['mud_monarchs', 'tartarian_revivalists', -30],
+  ['mud_monarchs', 'reclaimers_guild', -15],
+  // ── Conspiracy Architects vs the revealers ──
+  ['conspiracy_architects', 'forgotten_order', -30],
+  ['conspiracy_architects', 'reclaimers_guild', -20],
+  ['conspiracy_architects', 'true_tartarians', -25],
+  ['conspiracy_architects', 'tartarian_revivalists', -30],
+  ['conspiracy_architects', 'servants_of_giants', -20],
+  ['conspiracy_architects', 'stone_builders', -20],
+  ['conspiracy_architects', 'eternal_dynasty', -15],
+  // ── Eternal Dynasty: "only the pure deserve to inherit" — friendless, against all ──
+  ['eternal_dynasty', 'forgotten_order', -30],
+  ['eternal_dynasty', 'true_tartarians', -30],
+  ['eternal_dynasty', 'servants_of_giants', -22],
+  ['eternal_dynasty', 'stone_builders', -20],
+  ['eternal_dynasty', 'tartarian_revivalists', -22],
+  ['eternal_dynasty', 'reclaimers_guild', -15],
+  // ── Intra-family cracks the lore names ──
+  ['tartarian_revivalists', 'forgotten_order', -25],   // extremists vs moderates
+  ['tartarian_revivalists', 'stone_builders', -12],    // "regarded as extremists by most"
+];
+
+/** OTA-867 — ENEMY OF MY ENEMY. When `winner` guts `loser`, every faction that ALSO holds
+ *  `loser` as an enemy — and isn't already at war with the winner — warms a little toward the
+ *  winner. Co-belligerents drift into alliance over time, so the board's alliances EVOLVE
+ *  rather than sit at their lore seed. The "not already at war with the winner" guard means a
+ *  faction hostile to everyone (the Dynasty) never backs into a friendship through a shared
+ *  foe, and seeded rivalries aren't thawed by convenience. Pure + deterministic. */
+export const SHARED_ENEMY_WARMTH = 3;
+export function warmSharedEnemy(
+  m: RelationsMatrix,
+  winner: string,
+  loser: string,
+  factions: readonly FactionMeta[],
+): RelationsMatrix {
+  let next = m;
+  for (const f of factions) {
+    if (f.id === winner || f.id === loser) continue;
+    if (getRelation(next, f.id, loser) > HOSTILE_AT) continue;   // f is not an enemy of the loser
+    if (getRelation(next, f.id, winner) <= HOSTILE_AT) continue; // f is already at war with the winner
+    next = adjustRelation(next, winner, f.id, SHARED_ENEMY_WARMTH);
+  }
+  return next;
 }
 
 export interface MeetOutcome {
@@ -92,14 +160,11 @@ export function relationLabel(relation: number): { word: string; hostile: boolea
   return { word: 'sworn', hostile: false };
 }
 
-/** The sharpest live grudges (most-hostile pairs first), for the relations board.
- *  Each unordered pair once. */
-export function topGrudges(
-  m: RelationsMatrix | undefined,
+// Every unordered faction pair with a non-zero relation, once.
+function relationPairs(
+  m: RelationsMatrix,
   factions: readonly FactionMeta[],
-  limit = 6,
 ): { a: string; b: string; relation: number }[] {
-  if (!m) return [];
   const seen = new Set<string>();
   const out: { a: string; b: string; relation: number }[] = [];
   for (const fa of factions) {
@@ -112,5 +177,33 @@ export function topGrudges(
       if (rel !== 0) out.push({ a: fa.id, b: fb.id, relation: rel });
     }
   }
-  return out.sort((x, y) => x.relation - y.relation).slice(0, limit);
+  return out;
+}
+
+/** The sharpest live grudges (most-hostile NEGATIVE pairs first), for the relations board. */
+export function topGrudges(
+  m: RelationsMatrix | undefined,
+  factions: readonly FactionMeta[],
+  limit = 6,
+): { a: string; b: string; relation: number }[] {
+  if (!m) return [];
+  return relationPairs(m, factions)
+    .filter((p) => p.relation < 0)
+    .sort((x, y) => x.relation - y.relation)
+    .slice(0, limit);
+}
+
+/** OTA-867 — the strongest live ALLIANCES (most-friendly POSITIVE pairs first), for the
+ *  relations board. Only genuine standing-together (≥ FRIENDLY_AT), so a mild +5 warming
+ *  isn't paraded as an alliance yet. */
+export function topAlliances(
+  m: RelationsMatrix | undefined,
+  factions: readonly FactionMeta[],
+  limit = 6,
+): { a: string; b: string; relation: number }[] {
+  if (!m) return [];
+  return relationPairs(m, factions)
+    .filter((p) => p.relation >= FRIENDLY_AT)
+    .sort((x, y) => y.relation - x.relation)
+    .slice(0, limit);
 }

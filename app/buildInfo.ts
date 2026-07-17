@@ -17785,4 +17785,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // shows a prominent live countdown: a bordered "⏳ Nh left" pill + a draining time bar,
 // colour-tiered green → amber → red (LAPSED past deadline). In-game hours (drains as you
 // act), updates the instant the clock moves. UI-only.
-export const OTA_BUILD_ID = '2026-07-16-1146-bounty-countdown';
+//
+// 2026-07-16 OTA-1147 — port of HAL OTA-867. Alliances, lore-seeded + emergent + shown. A
+// LORE_RELATIONS seed matrix gives all 9 factions real starting grudges AND alliances
+// (Suppressor axis, Reclamation bloc, Scholars, merc Reclaimers, friendless Eternal
+// Dynasty). Enemy-of-my-enemy warming: factions that also hate a beaten party warm toward
+// the winner (Dynasty excluded → stays friendless). topAlliances + the World board renders
+// a GRUDGES list AND an ALLIANCES list. Test: ota853FactionRelations.
+export const OTA_BUILD_ID = '2026-07-16-1147-alliances';
