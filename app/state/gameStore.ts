@@ -2106,6 +2106,10 @@ function simulatePatrols(
       lost.add(loser);
       bumpPower(winnerFac, 1); bumpPower(loserFac, -1);
       relations = FR.adjustRelation(relations, a.factionId, b.factionId, FR.grudgeDelta(outcome.friction));
+      // OTA-867 — enemy of my enemy: factions who also hate the loser warm toward the winner,
+      // so alliances EMERGE from shared foes (not just the lore seed). The Dynasty — hostile
+      // to all — is excluded by the helper, so it stays friendless.
+      relations = FR.warmSharedEnemy(relations, winnerFac, loserFac, factions);
       // OTA-864 — deep, seeded flavour pool (varies verb + scenario) so the war reads fresh.
       events.push({
         text: WE.patrolClashLine(nameOf(winnerFac), nameOf(loserFac), outcome.friction, tickIndex * 131 + i * 17 + j),

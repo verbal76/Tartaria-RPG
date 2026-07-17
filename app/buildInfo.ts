@@ -16762,4 +16762,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (drains only as you act, per OTA-862), so it can't tick in real time, but the bar makes
 // "how long have I got" unmistakable and it updates the instant the clock moves. UI-only;
 // the countdown math (bountyHoursLeft) is already covered by ota862/863.
-export const OTA_BUILD_ID = '2026-07-16-866-bounty-countdown';
+// ── OTA-867 (Alliances — lore-seeded + emergent, and shown) ──
+// The relations board only ever showed grudges because relations only ever moved DOWN and
+// the ally seeds were half-broken (the JSON's allies arrays were full of descriptive
+// pseudo-ids the seeder dropped). Three fixes: (1) a LORE-AUTHORED seed matrix — every one
+// of the 9 factions gets real starting grudges AND alliances read from the descriptions
+// (Suppressor axis Monarchs+Architects; the Religious Reclamation bloc; the Scholars; the
+// Reclaimers merc; and the Eternal Dynasty as the friendless supremacist, hated by all).
+// (2) EMERGENT warming — enemy-of-my-enemy: when a patrol guts another, factions that also
+// hate the loser (and aren't already at war with the winner) warm toward it, so alliances
+// FORM from shared foes over time; the all-hating Dynasty is excluded so it stays friendless.
+// (3) topAlliances + the World board now renders a GRUDGES list AND an ALLIANCES list, so
+// the section finally earns its name. Test: ota853FactionRelations (seed/warming/alliances).
+export const OTA_BUILD_ID = '2026-07-16-867-alliances';
