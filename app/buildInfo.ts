@@ -16161,4 +16161,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dropping the tide modifier). UX: a war-market entry line naming the fighting factions, a
 // green▼/red▲ ticker beside every price (colour = your benefit), and a "friend's price"
 // line after a buy showing what your standing/charm saved vs a stranger. Test: ota865WarEconomy.
-export const OTA_BUILD_ID = '2026-07-16-844-war-micro-economy';
+//
+// 2026-07-16 OTA-845 — port of HAL OTA-866. Every accepted bounty on the Missions board now
+// shows a prominent live countdown: a bordered "⏳ Nh left" pill + a draining time bar,
+// colour-tiered green → amber → red (LAPSED past deadline). In-game hours (drains as you
+// act), updates the instant the clock moves. UI-only.
+export const OTA_BUILD_ID = '2026-07-16-845-bounty-countdown';
