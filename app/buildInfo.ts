@@ -16692,4 +16692,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and faction power thrashed. Dropped to 1 sub-step (~11% attrition) so the muster keeps
 // pace — losses still land constantly but armies hold ground and the field stays near its
 // ~45 target. The warm-up burst and the in-game worldTideCheck path keep their 4 steps.
-export const OTA_BUILD_ID = '2026-07-16-858-live-scroll-balance';
+// ── OTA-859 (Bounty BOARD — hold several contracts and grind standing) ──
+// The World board handed out ONE bounty at a time (accept it, no others until you finished
+// or abandoned). Now it's a real board: every eligible contract shows at once (a favored
+// faction posts a job for each of its outpost-holding rivals), and the player can STACK up
+// to 3. A single kill of a quarry advances EVERY held bounty whose target it matches, and
+// each contract that completes pays out + drops off independently — so several at once is a
+// faster standing grind. Accepting the first sets course; stacking more doesn't yank you off
+// that road (each held bounty has its own "set course" button). player.activeBounty (single)
+// is migrated into player.activeBounties[] on read so old saves keep an in-progress contract.
+// New engine helpers listBounties + bountyKey. Test: ota859BountyBoard.
+export const OTA_BUILD_ID = '2026-07-16-859-bounty-board';

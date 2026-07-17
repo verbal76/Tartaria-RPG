@@ -11,7 +11,7 @@ import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
 import type { Faction } from '../engine/types';
 import { tideLabel } from '../engine/worldPulse';
-import { pickBounty } from '../engine/factionBounty';
+import { listBounties, bountyKey } from '../engine/factionBounty';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { getLocationById } from '../engine/encounter';
 import { topGrudges, relationLabel } from '../engine/factionRelations';
@@ -48,17 +48,27 @@ export function WorldScreen() {
       market: '⚖', omen: '☄', purge: '✖', windfall: '✧', patrol_clash: '⚔', outpost_assault: '⌂', patrol_mauled: '☠' }[kind] ?? '🗞'
   );
 
-  // OTA-850 — active bounty, or an offer to accept (routes the player to the quarry's outpost).
-  const activeBounty = player?.activeBounty;
-  const offer = !activeBounty && player
-    ? pickBounty(
+  // OTA-850/859 — the bounty BOARD: every contract the player holds, plus a slate of
+  // fresh offers to stack (routing them into patrol country). Kills grind EVERY held
+  // bounty whose quarry they match, so several at once = faster standing.
+  const activeBounties = player
+    ? (player.activeBounties && player.activeBounties.length > 0
+        ? player.activeBounties
+        : player.activeBounty ? [player.activeBounty] : [])
+    : [];
+  const heldKeys = new Set(activeBounties.map((b) => bountyKey(b)));
+  const MAX_BOUNTIES = 3;
+  const slateFull = activeBounties.length >= MAX_BOUNTIES;
+  const offers = player
+    ? listBounties(
         factions,
         player.factionStanding,
         (fid) => FACTION_STARTING_LOCATION[fid],
         (loc) => getLocationById(loc).name ?? loc,
         tides,
-      )
-    : null;
+        4,
+      ).filter((b) => !heldKeys.has(bountyKey(b)))
+    : [];
 
   // Sort factions by momentum (most ascendant first), then name.
   const rows = [...factions].sort((a, b) => {
@@ -82,40 +92,63 @@ export function WorldScreen() {
           play and while you are away. Here is where the power stands.
         </Text>
 
-        {/* ── FACTION BOUNTY ────────────────────────────────────── */}
-        <Text style={styles.sectionLabel}>FACTION BOUNTY</Text>
-        <View style={styles.card}>
-          {activeBounty ? (
-            <>
-              <Text style={styles.bountyHead}>{activeBounty.giverName} — contract in progress</Text>
-              <Text style={styles.bountyBody}>
-                Hunt {activeBounty.targetName} near {activeBounty.targetLocationName}.
-              </Text>
-              <Text style={styles.bountyProgress}>
-                {activeBounty.progress}/{activeBounty.count} put down · reward {activeBounty.rewardTc} TC
-              </Text>
-              <Text style={styles.bountyFoot}>↳ Their patrols work the ground near the outpost. Watch the road in.</Text>
-            </>
-          ) : offer ? (
-            <>
+        {/* ── FACTION BOUNTY BOARD ──────────────────────────────── */}
+        <Text style={styles.sectionLabel}>FACTION BOUNTY BOARD</Text>
+
+        {/* Contracts the player currently carries — kills grind ALL of these at once. */}
+        {activeBounties.map((b) => (
+          <View key={`held-${bountyKey(b)}`} style={styles.card}>
+            <Text style={styles.bountyHead}>{b.giverName} — contract in progress</Text>
+            <Text style={styles.bountyBody}>Hunt {b.targetName} near {b.targetLocationName}.</Text>
+            <Text style={styles.bountyProgress}>
+              {b.progress}/{b.count} put down · reward {b.rewardTc} TC
+            </Text>
+            <TouchableOpacity
+              style={styles.bountySecondaryBtn}
+              activeOpacity={0.8}
+              onPress={() => { useGameStore.getState().setTravelCourse(b.targetLocationId); setScreen('exploration'); }}
+            >
+              <Text style={styles.bountySecondaryText}>SET COURSE TO {b.targetLocationName.toUpperCase()} ›</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+
+        {/* Fresh offers to stack (up to the slate cap). */}
+        {offers.length > 0 && !slateFull ? (
+          offers.map((offer) => (
+            <View key={`offer-${bountyKey(offer)}`} style={styles.card}>
               <Text style={styles.bountyHead}>{offer.giverName} have work for you</Text>
               <Text style={styles.bountyBody}>
                 Put down {offer.count} of the {offer.targetName} at {offer.targetLocationName}. Pays {offer.rewardTc} TC
                 and {offer.giverName} standing.
               </Text>
-              <Text style={styles.bountyFoot}>↳ Accepting sets your course to {offer.targetLocationName} — patrolled ground.</Text>
+              <Text style={styles.bountyFoot}>
+                {activeBounties.length > 0
+                  ? `↳ Adds to your slate — your current course holds.`
+                  : `↳ Accepting sets your course to ${offer.targetLocationName} — patrolled ground.`}
+              </Text>
               <TouchableOpacity
                 style={styles.bountyBtn}
                 activeOpacity={0.8}
                 onPress={() => { useGameStore.getState().acceptBounty(offer); setScreen('exploration'); }}
               >
-                <Text style={styles.bountyBtnText}>ACCEPT & SET COURSE ›</Text>
+                <Text style={styles.bountyBtnText}>
+                  {activeBounties.length > 0 ? 'ACCEPT (STACK) ›' : 'ACCEPT & SET COURSE ›'}
+                </Text>
               </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={styles.empty}>No bounties on offer. Earn a faction's favor (standing +10) and its enemies become your work.</Text>
-          )}
-        </View>
+            </View>
+          ))
+        ) : (
+          <View style={styles.card}>
+            <Text style={styles.empty}>
+              {slateFull
+                ? `Your slate is full (${MAX_BOUNTIES} contracts). Complete one and the board refreshes.`
+                : activeBounties.length > 0
+                  ? 'No further contracts on offer right now — favor more factions to open new work.'
+                  : "No bounties on offer. Earn a faction's favor (standing +10) and its enemies become your work."}
+            </Text>
+          </View>
+        )}
 
         {/* ── BALANCE OF POWER ──────────────────────────────────── */}
         {sectionHeader('power', 'BALANCE OF POWER')}
@@ -275,4 +308,7 @@ const styles = StyleSheet.create({
   bountyFoot: { color: '#c98a6a', fontSize: 10, fontStyle: 'italic', marginTop: 6, lineHeight: 14 },
   bountyBtn: { marginTop: 10, backgroundColor: '#c9a86a', borderRadius: 3, paddingVertical: 9, alignItems: 'center' },
   bountyBtnText: { color: '#13110f', fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
+  // OTA-859 — re-route to a held bounty (outline button, secondary to the gold ACCEPT).
+  bountySecondaryBtn: { marginTop: 9, borderColor: '#c9a86a', borderWidth: 1, borderRadius: 3, paddingVertical: 8, alignItems: 'center' },
+  bountySecondaryText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
 });
