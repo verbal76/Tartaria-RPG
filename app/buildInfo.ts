@@ -17751,4 +17751,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Display and a "Turn off tips" link in every popup, both writing one per-install flag.
 // Rope tutorial beat now TYPED (no pre-fill); accept-regex broadened (verb-only, lore-
 // agnostic). Test: ota860Hints.
-export const OTA_BUILD_ID = '2026-07-16-1141-tips-pass';
+//
+// 2026-07-16 OTA-1142 — port of HAL OTA-862. Bounty board v2. (1) NO standing gate: every
+// faction posts bounties on its rivals; a faction that dislikes you gives a harder job
+// (more kills, scaled by giverDifficulty) that pays MORE standing — the road back into
+// favor. Only a faction you're allied with is spared as a quarry. (2) A 24 in-game-hour
+// deadline: acceptBounty stamps acceptedAtHour, expireBounties lapses overdue contracts on
+// the action path. Held bounties render on the Missions board under BOUNTIES with a live
+// countdown + tap-to-route. Test: ota862BountyDeadline.
+export const OTA_BUILD_ID = '2026-07-16-1142-bounty-board-v2';
