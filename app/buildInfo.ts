@@ -16675,4 +16675,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // wasn't obvious. They're now proper tappable plates (bordered card + gold left accent
 // bar + chevron + a "tap to show / tap to hide" hint), matching the inventory/character
 // collapsible headers. UI-only.
-export const OTA_BUILD_ID = '2026-07-16-856-world-header-buttons';
+// ── OTA-857 (The world is a LIVE SCROLL — wall-clock heartbeat) ──
+// The war only advanced when the player took actions that burned in-game hours, so a
+// player who opened the World board and just watched saw a frozen feed ("still nothing
+// populating"). Now a real-time timer in App.tsx fires worldRealtimeTick() every 6s no
+// matter what screen is open — patrols roam, clash, sack outposts, and get mauled
+// continuously, and every so often a broader world event (surge, muster, schism, caravan,
+// omen, bounty) folds in for variety. The first tick warms up a blank board so it's
+// populated seconds after launch. Tick is wall-clock (worldRealtimeTicks counter), NOT
+// in-game hours — the board is a genuine live scroll independent of what the player does.
+// worldRealtimeTick() self-guards (no player / title / creation / ending) and doesn't
+// persist (the 90s autosave + player actions flush worldMemory). Test: ota857WorldRealtime.
+export const OTA_BUILD_ID = '2026-07-16-857-world-live-scroll';

@@ -3186,6 +3186,10 @@ interface GameStore {
   /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
    *  outpost (routing the player into patrolled ground). */
   acceptBounty: (bounty: import('../engine/factionBounty').FactionBounty) => void;
+  /** OTA-857 — the world's REAL-TIME heartbeat. Driven by a wall-clock timer in
+   *  App.tsx (not in-game hours), so the war advances no matter what screen is
+   *  open or whether the player is acting — the World board is a live scroll. */
+  worldRealtimeTick: () => void;
   /** Activate / deactivate an accepted faction contract. SINGLE-ACTIVE:
    *  activating one pauses every other; deactivate parks just this one (zero
    *  active = between missions). A paused contract stays on the slate and its
@@ -19759,6 +19763,59 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     // Route the player to the quarry's outpost — straight into patrol country.
     get().setTravelCourse(bounty.targetLocationId);
+  },
+
+  worldRealtimeTick() {
+    // OTA-857 — the world moves on WALL-CLOCK time, always. The in-game
+    // worldTideCheck only advanced when the player took actions that burned
+    // in-game hours; a player who opened the World board and just watched saw a
+    // frozen feed. This runs off a real-time timer (App.tsx) regardless of the
+    // open screen, so patrols roam + clash + get mauled continuously and the
+    // board is a genuine live scroll — "no matter what window is open."
+    const s = get();
+    const player = s.player;
+    if (!player) return; // no game in progress yet — nothing to simulate
+    // Don't churn the world during a boss/ending cutscene or on the title flow.
+    if (s.currentScreen === 'title' || s.currentScreen === 'character_creation' || s.currentScreen === 'ending') return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
+    const hour = player.hoursElapsed ?? 0;
+    // A monotonic wall-clock tick index, persisted so the sequence survives a
+    // reload (patrol positions already persist, so the war simply continues).
+    const rt = (s.worldMemory.worldRealtimeTicks ?? 0) + 1;
+    set((st) => ({ worldMemory: { ...st.worldMemory, worldRealtimeTicks: rt } }));
+    // Keep the fielded force in line with each faction's power (paced repop).
+    maintainPatrols(get, set, factions, rt);
+    // The very first heartbeat with an empty board deploys the standing forces
+    // (cold-start fill above) and runs a WARM-UP burst, so a player who opens
+    // World seconds after launch already sees the war underway, not a blank feed.
+    const firstEver = (get().worldMemory.worldEvents ?? []).length === 0;
+    const steps = firstEver ? PATROL_SUBSTEPS_PER_TICK * 4 : 2;
+    for (let i = 0; i < steps; i++) simulatePatrols(get, set, factions, hour, rt * 32 + i);
+    // Every so often, fold in a broader world EVENT (surge, muster, schism,
+    // caravan, omen, posted bounty) so the scroll isn't only patrol skirmishes.
+    if (rt % 6 === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const WE = require('../engine/worldEvents') as typeof import('../engine/worldEvents');
+      const ctx = { factions, tides: get().worldMemory.factionTides ?? {}, standings: player.factionStanding };
+      const ev = WE.pickWorldEvent(ctx, rt);
+      if (ev) {
+        const tides = WE.applyTideDelta(get().worldMemory.factionTides ?? {}, ev.effect.tideDelta);
+        if (ev.effect.repDelta) {
+          const rep = applyRepChange(get().player!.factionStanding, ev.effect.repDelta.factionId, ev.effect.repDelta.delta);
+          set((st) => (st.player ? { player: { ...st.player, factionStanding: rep.standing } } : st));
+          logRepChanges(get, rep.changed);
+        }
+        set((st) => ({ worldMemory: {
+          ...st.worldMemory,
+          factionTides: tides,
+          worldEvents: [...(st.worldMemory.worldEvents ?? []), { text: ev.rumor, hour, kind: ev.kind }].slice(-50),
+        } }));
+        if (ev.effect.musterPatrols) musterPatrols(get, set, factions, ev.effect.musterPatrols.factionId, ev.effect.musterPatrols.count);
+      }
+    }
+    // No persist() here — the 90s autosave + every player action flush
+    // worldMemory. A disk write every few seconds would be needless churn.
   },
 
   setTravelCourse(locationId: string) {

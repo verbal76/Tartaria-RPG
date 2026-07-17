@@ -1569,6 +1569,10 @@ export interface WorldMemory {
   patrols?: import('./worldEvents').Patrol[];
   /** In-game hour the patrols last advanced (throttles their movement). */
   lastPatrolTickHour?: number;
+  /** OTA-857 — monotonic counter for the WALL-CLOCK world heartbeat (App.tsx
+   *  timer). Seeds the real-time patrol sim and survives reload so the war
+   *  continues from where it stood, independent of in-game hours. */
+  worldRealtimeTicks?: number;
   completedQuestIds: string[];
   /** OTA-244 — location ids for which the danger-vs-tier warning has
    *  fired. Prevents the Arbiter from repeating the "you're light
