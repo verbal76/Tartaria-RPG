@@ -16180,4 +16180,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // side, <=3 total) and the paced muster refills. Only fires on genuine ally clusters, so
 // it's a rare set-piece. New blocBattleLine flavour pool + 🛡 glyph + top feed priority.
 // Test: ota868BlocBattle.
-export const OTA_BUILD_ID = '2026-07-16-847-bloc-battles';
+//
+// 2026-07-16 OTA-848 — port of HAL OTA-869. Content sprint: doubled the thin authored-
+// narrative pools from the Tartaria Prima lore. +6 storylines (one per thin faction), +6
+// hunts, +6 mysteries — hunts 6→12, mysteries 6→12, storylines 4→10 — each unique and
+// anchored to real named locations/enemies/factions. Data only (Tartaria lore; NOT engine).
+export const OTA_BUILD_ID = '2026-07-16-848-quest-content-batch1';
