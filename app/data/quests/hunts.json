@@ -1059,7 +1059,7 @@
           "stageType": "investigation",
           "narration": "You trace it by the glowing conduit-scars to the main junction under Voronov's heart. Here it means to nest for good, wrapped around the quarter's primary Aether-line — the one that, if it bursts, takes the district with it.",
           "arbiter": null,
-          "checkKind": "investigation"
+          "checkKind": "investigate"
         },
         {
           "stageType": "gauntlet",

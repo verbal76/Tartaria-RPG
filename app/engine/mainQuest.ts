@@ -307,7 +307,7 @@ const CORE_RECOVERED_LINE = (factionId: string, capitalId: string, recoveredCoun
   return `${line} ${tail}`;
 };
 
-const LOST_CAPITAL_NAMES: Record<string, string> = {
+export const LOST_CAPITAL_NAMES: Record<string, string> = {
   asgardar: 'Asgardar',
   samarran: 'Samarran',
   nimari: 'Nimari',

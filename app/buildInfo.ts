@@ -16812,4 +16812,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Totals: hunts 6→18, mysteries 6→18, storylines 4→14. Data only; HAL + golem (NOT engine).
 // Validated: all 18 hunt targets are real enemies, all factionIds resolve + have vendors,
 // typecheck clean, loaders green.
-export const OTA_BUILD_ID = '2026-07-16-870-quest-content-batch2';
+//
+// OTA-871 (completability sweep) — a 6-agent audit drove every hunt / mystery /
+// storyline / bounty / whisper / hook to completion plus a full endgame run. Two
+// real bugs surfaced and are fixed here:
+//   (bug 1, MECHANIC — all 3 lines) mysteries/storylines authored with a trailing
+//     pure-narration (checkKind: null) EPILOGUE stage hung one stage short of turn-in,
+//     because the real-play advance path can't step past a null stage. advanceMystery/
+//     advanceStoryline now auto-consume trailing null stages (emit their narration +
+//     arbiter line, then advance) so turn-in unlocks. Affected 14 authored quests.
+//   (bug 2, CONTENT — HAL + golem) hunt_salamander_voronov had an invalid checkKind
+//     "investigation" (≠ "investigate"); the stage could never be satisfied. Fixed.
+//   (cosmetic, MECHANIC — all 3 lines) EndingScreen recap showed raw ids for the four
+//     OTA-052 Capitals; now reads the canonical LOST_CAPITAL_NAMES export from mainQuest.
+// New guard test __tests__/ota871QuestEpilogue.test.ts (data-integrity checkKind guard +
+// mystery/storyline epilogue advance-to-turn-in). Typecheck clean; 3/3 green.
+export const OTA_BUILD_ID = '2026-07-17-871-completability-sweep';
