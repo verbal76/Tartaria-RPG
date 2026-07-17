@@ -16755,4 +16755,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // red▲ ticker beside every price (colour = your benefit, so your discount beating the war
 // tax reads green), and a "friend's price" line after a buy showing what your standing/charm
 // shaved off vs a stranger. Test: ota865WarEconomy.
-export const OTA_BUILD_ID = '2026-07-16-865-war-micro-economy';
+// ── OTA-866 (Bounty countdown on the Missions board) ──
+// Every accepted bounty on the Missions board now carries a prominent LIVE countdown: a
+// bordered "⏳ Nh left" pill + a draining time bar, colour-tiered green → amber → red as the
+// window runs down (and "LAPSED" in red past the deadline). The window is in-game hours
+// (drains only as you act, per OTA-862), so it can't tick in real time, but the bar makes
+// "how long have I got" unmistakable and it updates the instant the clock moves. UI-only;
+// the countdown math (bountyHoursLeft) is already covered by ota862/863.
+export const OTA_BUILD_ID = '2026-07-16-866-bounty-countdown';
