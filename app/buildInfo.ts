@@ -17799,4 +17799,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // side, <=3 total) and the paced muster refills. Only fires on genuine ally clusters, so
 // it's a rare set-piece. New blocBattleLine flavour pool + 🛡 glyph + top feed priority.
 // Test: ota868BlocBattle.
-export const OTA_BUILD_ID = '2026-07-16-1148-bloc-battles';
+//
+// 2026-07-17 OTA-1149 — port of the MECHANIC half of HAL OTA-871 (completability sweep).
+// advanceMystery/advanceStoryline now auto-consume a trailing pure-narration
+// (checkKind: null) epilogue stage — emit its narration + arbiter line, then advance —
+// so a mystery/storyline authored with a denouement after its final action no longer
+// hangs one stage short of turn-in. Lore-agnostic store fix; the HAL/golem content pieces
+// (salamander hunt, LOST_CAPITAL_NAMES / EndingScreen recap) are HAL-specific and are NOT
+// ported here — engine carries its own quest content.
+export const OTA_BUILD_ID = '2026-07-17-1149-quest-epilogue-turnin';

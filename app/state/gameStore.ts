@@ -19621,7 +19621,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // Final stage is the "synthesis" — the player has the trophy in hand
     // (narratively); advance the stage past the end so turn-in unlocks.
-    const nextStage = record.stage + 1;
+    let nextStage = record.stage + 1;
+    // OTA-871 — auto-consume pure-narration (checkKind: null) stages. They have no player-
+    // action gate, so a trailing null epilogue (a denouement authored after the boss stage)
+    // would otherwise leave the quest one stage short of turn-in forever. Display each such
+    // stage's narration, then advance past it — so epilogues read AND the quest completes.
+    while (nextStage < mystery.stages.length && mystery.stages[nextStage]!.checkKind === null) {
+      const epi = mystery.stages[nextStage]!;
+      get().appendLog('world', epi.narration);
+      if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+      nextStage++;
+    }
     set((s) =>
       s.player
         ? {
@@ -19861,7 +19871,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!stageDef) return;
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    const nextStage = record.stage + 1;
+    let nextStage = record.stage + 1;
+    // OTA-871 — auto-consume trailing pure-narration (checkKind: null) epilogue stages so a
+    // storyline authored with a denouement after its final action doesn't hang one stage
+    // short of turn-in. Show each epilogue's narration, then advance past it.
+    while (nextStage < def.stages.length && def.stages[nextStage]!.checkKind === null) {
+      const epi = def.stages[nextStage]!;
+      get().appendLog('world', epi.narration);
+      if (epi.arbiter) get().appendLog('arbiter', epi.arbiter);
+      nextStage++;
+    }
     set((s) =>
       s.player
         ? {
