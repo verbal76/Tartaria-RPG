@@ -16100,4 +16100,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bounded, drama-first SAMPLE. Repopulation is PACED (a trickle per cycle) so losses
 // persist. World board standings (power, grudges) are now collapsible, start collapsed,
 // so the war feed gets room. Test: ota844WorldPulse strengthened.
-export const OTA_BUILD_ID = '2026-07-16-835-living-world-fills';
+//
+// 2026-07-16 OTA-836 — port of HAL OTA-856. The collapsible World board section
+// headers (Balance of Power, Grudges & Alliances) now READ as buttons: a bordered
+// plate with a left accent rule, an explicit label, and a "tap to show/hide" hint,
+// instead of a bare row that gave no signal it was tappable.
+export const OTA_BUILD_ID = '2026-07-16-836-world-header-buttons';

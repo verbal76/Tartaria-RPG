@@ -24,9 +24,10 @@ export function WorldScreen() {
   // collapsed (the feed is the point); tap a header to fold/unfold, like the inventory.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({ power: true, grudges: true });
   const sectionHeader = (key: string, label: string) => (
-    <TouchableOpacity style={styles.secHeader} activeOpacity={0.7} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}>
+    <TouchableOpacity style={styles.secHeader} activeOpacity={0.6} onPress={() => setCollapsed((s) => ({ ...s, [key]: !s[key] }))}>
       <Text style={styles.secChevron}>{collapsed[key] ? '▸' : '▾'}</Text>
-      <Text style={styles.sectionLabel}>{label}</Text>
+      <Text style={styles.secHeaderLabel}>{label}</Text>
+      <Text style={styles.secHeaderHint}>{collapsed[key] ? 'tap to show' : 'tap to hide'}</Text>
     </TouchableOpacity>
   );
 
@@ -241,8 +242,25 @@ const styles = StyleSheet.create({
   facStanding: { fontSize: 10, marginLeft: 8, letterSpacing: 0.3 },
   footNote: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, lineHeight: 14 },
   patrolNote: { color: '#c98a6a', fontSize: 11, fontStyle: 'italic', marginBottom: 4, paddingHorizontal: 4 },
-  secHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 0 },
-  secChevron: { color: '#c9a86a', fontSize: 11, fontWeight: '900', width: 14, textAlign: 'center', marginTop: 12, marginBottom: 6 },
+  // OTA-855b — make the collapsible headers read clearly as tappable controls: a plate
+  // with a border + gold left accent bar + a chevron and a "tap to show/hide" hint.
+  secHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(20,17,15,0.9)',
+    borderWidth: 1,
+    borderColor: '#c9a86a',
+    borderLeftWidth: 4,
+    borderRadius: 4,
+    paddingLeft: 8,
+    paddingRight: 10,
+    paddingVertical: 9,
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  secChevron: { color: '#c9a86a', fontSize: 12, fontWeight: '900', width: 16, textAlign: 'center', marginRight: 4 },
+  secHeaderLabel: { color: '#e6d8b3', fontSize: 11, letterSpacing: 3, fontWeight: '700', flex: 1 },
+  secHeaderHint: { color: '#7a705c', fontSize: 9, fontStyle: 'italic', letterSpacing: 0.5 },
   grudgeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
   grudgeText: { color: '#cdbf99', fontSize: 12 },
   grudgeTag: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
