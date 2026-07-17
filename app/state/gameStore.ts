@@ -2045,10 +2045,9 @@ function simulatePatrols(
       lost.add(loser);
       bumpPower(winnerFac, 1); bumpPower(loserFac, -1);
       relations = FR.adjustRelation(relations, a.factionId, b.factionId, FR.grudgeDelta(outcome.friction));
+      // OTA-864 — deep, seeded flavour pool (varies verb + scenario) so the war reads fresh.
       events.push({
-        text: outcome.friction
-          ? `A chance skirmish flared between ${nameOf(winnerFac)} and ${nameOf(loserFac)} patrols — the ${nameOf(winnerFac)} left none standing. A grudge is born.`
-          : `A ${nameOf(winnerFac)} patrol broke a ${nameOf(loserFac)} one in the open waste.`,
+        text: WE.patrolClashLine(nameOf(winnerFac), nameOf(loserFac), outcome.friction, tickIndex * 131 + i * 17 + j),
         kind: 'patrol_clash',
       });
       break;
@@ -2066,7 +2065,7 @@ function simulatePatrols(
       if (Math.abs(p.gx - cell.x) + Math.abs(p.gy - cell.y) <= 2) {
         bumpPower(f.id, -1); bumpPower(p.factionId, 1);
         relations = FR.adjustRelation(relations, p.factionId, f.id, -4);
-        events.push({ text: `A ${nameOf(p.factionId)} war-party struck the ${nameOf(f.id)} outpost and burned what they could.`, kind: 'outpost_assault' });
+        events.push({ text: WE.outpostAssaultLine(nameOf(p.factionId), nameOf(f.id), tickIndex * 53 + i * 11 + p.phase), kind: 'outpost_assault' });
         assaulted = true;
         break;
       }
@@ -2079,13 +2078,8 @@ function simulatePatrols(
     if (((p.phase * 7 + tickIndex) % 9) === 0) {
       lost.add(i);
       bumpPower(p.factionId, -1);
-      const beastLine = [
-        `Wasteland beasts fell on a ${nameOf(p.factionId)} patrol — none rode home.`,
-        `A ${nameOf(p.factionId)} patrol wandered into a nest of drones and was torn apart.`,
-        `Something in the silt took a ${nameOf(p.factionId)} patrol whole. Only tracks remained.`,
-        `A ${nameOf(p.factionId)} column was run down by wasteland predators.`,
-      ][(p.phase + tickIndex) % 4]!;
-      events.push({ text: beastLine, kind: 'patrol_mauled' });
+      // OTA-864 — 16-line seeded maul pool (beasts, storms, sinkholes, bad water …).
+      events.push({ text: WE.patrolMaulLine(nameOf(p.factionId), p.phase * 31 + tickIndex * 7 + i), kind: 'patrol_mauled' });
     }
   }
 

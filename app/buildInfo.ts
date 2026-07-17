@@ -16147,4 +16147,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // contract (patrol fights en route, up to 9 kills, ~8h per forced rest). Near jobs stay
 // ~24-34h; the farthest (~31 tiles) get ~55h. Offer card shows the estimate before accept.
 // Test: ota862BountyDeadline (OTA-863 cases).
-export const OTA_BUILD_ID = '2026-07-16-842-bounty-deadline-distance';
+//
+// 2026-07-16 OTA-843 — port of HAL OTA-864. War-feed flavour: the World board drew patrol
+// clashes from 2 lines, outpost assaults from 1, and maulings from 4, so it looped. New
+// seeded pools in worldEvents (patrolClashLine / outpostAssaultLine / patrolMaulLine): 20
+// clash lines varying verb + scenario, 14 assault, 16 maul; a friction clash appends one
+// of 7 grudge-born tails. Pure + deterministic. Test: ota864WarFlavor.
+export const OTA_BUILD_ID = '2026-07-16-843-war-feed-flavor';
