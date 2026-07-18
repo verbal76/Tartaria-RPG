@@ -17843,4 +17843,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // powers and immunities arrive in a follow-up update.)" — those all shipped, so it leaked a
 // dev/update reference and was factually wrong. Note-only (engine carries its own race
 // content, so HAL OTA-875's trait rewrites don't apply here).
-export const OTA_BUILD_ID = '2026-07-18-1152-race-creation-stale-note';
+// 2026-07-18 OTA-1153 — faction data hygiene (port of HAL OTA-876). The default faction data
+// carried three allies/rivals pseudo-ids that only the standing system resolved; cleaned them
+// to real faction ids so the relationships fire in the world-sim too. Data-only.
+export const OTA_BUILD_ID = '2026-07-18-1153-faction-relation-ids';
