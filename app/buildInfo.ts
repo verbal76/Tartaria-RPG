@@ -16866,7 +16866,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     branches weapon vs armor, refuses ineligible / already-upgraded / wrong count).
 //   · combatRules stages the 2nd coating step; equipment aggregates a 2nd coating's
 //     passive statBonus.
-// Tests: __tests__/ota873WeaponUpgradeDualCoat.test.ts (9/9) + ota873DualPoisonSum.test.ts
+// Tests: __tests__/ota873WeaponUpgradeDualCoat.test.ts + ota873DualPoisonSum.test.ts
 // (drives a real dual-poison hit: DOT ticks for exactly 2× a single-poison weapon, as one
 // merged status). Typecheck clean; fast coating/combat/armor suites green.
-export const OTA_BUILD_ID = '2026-07-18-873-crucible-upgrade-dualcoat-sum';
+//
+// OTA-873 hardening — a 5-agent pressure-test suite (real headless combat + exploit hunt)
+// verified dual-coating combat, same-element DOT summing (10-hit flat, no unbounded growth),
+// armor/dog double-resists (cap 3→4, real damage reduction), the picker eligibility logic,
+// and the engine custom-coating merge — all CLEAN. It also found TWO real exploits in
+// upgradeCoatingSlot, now fixed:
+//   (1) dup-id cost bypass — passing the same reserved id five times satisfied the count
+//       gate but the Set-based consumption spent only ONE unit (5-cost upgrade for 1 piece).
+//       Fixed by deduping itemIds (Array.from(new Set(...))) before the ===5 gate.
+//   (2) stack mass-upgrade — upgradeCoatingSlot stamped coatingSlots/resistCapBonus on a
+//       quantity>1 row, upgrading every copy for one cost. Fixed by refusing a stacked
+//       target (the picker already restricts to quantity===1). Two EXPLOIT-GUARD regression
+//       tests added; suite now 11/11.
+export const OTA_BUILD_ID = '2026-07-18-873-crucible-upgrade-exploit-fix';

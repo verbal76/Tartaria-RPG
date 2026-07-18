@@ -124,6 +124,29 @@ describe('OTA-873 — upgradeWeaponCoatingSlot + dual-slot applyCoating', () => 
     expect(useGameStore.getState().player!.inventory.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(5);
   });
 
+  it('EXPLOIT GUARD — passing the same reserved id 5× is refused (no 1-piece upgrade)', () => {
+    // Regression for the dup-id cost bypass: the same id repeated must NOT satisfy the
+    // 5-piece gate. Weapon stays single-slot and the one fragment is not spent.
+    useGameStore.getState().upgradeCoatingSlot('blade', ['rsv_1', 'rsv_1', 'rsv_1', 'rsv_1', 'rsv_1']);
+    const inv = useGameStore.getState().player!.inventory;
+    expect(coatingCapacity(inv.find((i) => i.id === 'blade')!)).toBe(1); // NOT upgraded
+    expect(inv.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(5); // nothing consumed
+  });
+
+  it('EXPLOIT GUARD — a quantity>1 weapon stack is refused (no mass-upgrade)', () => {
+    const p = useGameStore.getState().player!;
+    // Turn the blade into a stack of 3.
+    useGameStore.setState({
+      player: { ...p, inventory: p.inventory.map((i) => (i.id === 'blade' ? { ...i, quantity: 3 } : i)) },
+    });
+    useGameStore.getState().upgradeCoatingSlot('blade', ['rsv_1', 'rsv_2', 'rsv_3', 'rsv_4', 'rsv_5']);
+    const inv = useGameStore.getState().player!.inventory;
+    const blade = inv.find((i) => i.id === 'blade')!;
+    expect(blade.quantity).toBe(3);
+    expect(coatingCapacity(blade)).toBe(1); // stack NOT upgraded
+    expect(inv.filter((i) => i.name.startsWith('Odd Fragment'))).toHaveLength(5); // nothing consumed
+  });
+
   it('upgrades an ARMOR piece by raising its worked-in-resist capacity (+1)', () => {
     const p = useGameStore.getState().player!;
     const vest: InventoryItem = { id: 'vest', name: 'Padded Vest', kind: 'armor', quantity: 1, tags: [], addedResists: ['poison', 'acid', 'cold'] } as InventoryItem;
