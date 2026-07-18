@@ -16393,10 +16393,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // its DOT tick harder. (Immediate coating damage already landed
         // above, folded into `dmg`.)
         // OTA-873 — apply ONE coating proc's ongoing effects. Hoisted into a local so
-        // an upgraded weapon's TWO coatings each seed their DOT / shred / stack. Same-
-        // kind slots (poison + poison) refresh the single per-kind DOT rather than
-        // double-stacking it (the existing per-kind cap), but each still lands its
-        // immediate damage and its acid-shred / corruption-stack tick.
+        // an upgraded weapon's TWO coatings each seed their DOT / shred / stack. When
+        // BOTH slots are the same element (poison + poison), their DOTs SUM within this
+        // hit into one bigger per-kind tick; across hits the DOT still refreshes (is
+        // replaced, not accumulated), so it can't grow unboundedly. Each proc still
+        // lands its own immediate damage and its acid-shred / corruption-stack tick.
+        const dotKindsThisHit = new Set<string>();
         const applyCoatingProc = (proc: CoatingProc) => {
           set((s) => {
             if (!s.currentScene) return s;
@@ -16423,10 +16425,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const dotPerTurn = coatingDotPerTurn(proc.kind, proc.rolled, stacksAfter);
             const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
             while (statuses.length < n) statuses.push([]);
-            // Refresh: drop any prior coating-of-this-kind, push a fresh one.
-            const list = (statuses[activeIdx] ?? []).filter((st) => st.kind !== dotKind);
-            list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source ?? 'coating' });
-            statuses[activeIdx] = list;
+            const prior = statuses[activeIdx] ?? [];
+            const priorSame = prior.find((st) => st.kind === dotKind);
+            if (dotKindsThisHit.has(dotKind) && priorSame) {
+              // OTA-873 — a SECOND same-element slot on THIS hit sums into the DOT the
+              // first slot just seeded (a bigger tick), refreshing its duration.
+              statuses[activeIdx] = prior.map((st) =>
+                st.kind === dotKind
+                  ? { ...st, dmgPerTurn: st.dmgPerTurn + dotPerTurn, turnsRemaining: COATING_DOT_TURNS, sourceName: proc.source ?? st.sourceName }
+                  : st,
+              );
+            } else {
+              // Refresh across hits: drop any prior coating-of-this-kind, push a fresh one.
+              const list = prior.filter((st) => st.kind !== dotKind);
+              list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source ?? 'coating' });
+              statuses[activeIdx] = list;
+            }
+            dotKindsThisHit.add(dotKind);
             const next: typeof s.currentScene = { ...s.currentScene, enemyStatuses: statuses };
             if (corr) next.enemyCorruptionStacks = corr;
             if (shred) next.enemyArmorShred = shred;

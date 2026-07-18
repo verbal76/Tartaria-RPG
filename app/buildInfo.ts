@@ -16850,8 +16850,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   · WEAPON → a SECOND coating slot (coatingSlots → 2). A dual-coat weapon holds two
 //     coatings at once and BOTH fire on every landing hit: two on-hit roll steps
 //     ('coating' + 'coating2'), two DOTs / shred / corruption ticks. Any two elements,
-//     including the same twice (same-kind DOT refreshes per the existing per-kind cap;
-//     immediate damage still doubles).
+//     including the same twice — two same-element slots (poison + poison) SUM their DOT
+//     within the hit into one bigger per-kind tick (still refreshed, not accumulated,
+//     across hits, so it can't grow unboundedly); immediate damage doubles too.
 //   · ARMOR / DOG-VEST → +1 worked-in-resist capacity (resistCapBonus → 1), so the
 //     piece can hold one more damage-type resist than the stock cap of 3 (→ 4). The
 //     armor parallel to a weapon's 2nd coating slot.
@@ -16865,6 +16866,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     branches weapon vs armor, refuses ineligible / already-upgraded / wrong count).
 //   · combatRules stages the 2nd coating step; equipment aggregates a 2nd coating's
 //     passive statBonus.
-// New test __tests__/ota873WeaponUpgradeDualCoat.test.ts (9/9). Typecheck clean; the
-// fast coating/combat/armor suites are 72/72 green.
-export const OTA_BUILD_ID = '2026-07-18-873-crucible-upgrade-coating';
+// Tests: __tests__/ota873WeaponUpgradeDualCoat.test.ts (9/9) + ota873DualPoisonSum.test.ts
+// (drives a real dual-poison hit: DOT ticks for exactly 2× a single-poison weapon, as one
+// merged status). Typecheck clean; fast coating/combat/armor suites green.
+export const OTA_BUILD_ID = '2026-07-18-873-crucible-upgrade-dualcoat-sum';
