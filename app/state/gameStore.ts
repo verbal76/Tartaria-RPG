@@ -23839,6 +23839,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
     const piece = player.inventory.find((i) => i.id === itemId);
     if (!piece) return;
+    // OTA-873 fix — never upgrade a STACK. Stamping coatingSlots / resistCapBonus on a
+    // quantity>1 row would upgrade every copy for one 5-piece cost. The picker only
+    // offers quantity===1 pieces, so this is a belt-and-suspenders guard on the action.
+    if ((piece.quantity ?? 1) > 1) {
+      get().appendLog('world', `You can only upgrade a single piece at the Crucible — you're holding a stack of ${piece.quantity} ${piece.name}. Split one off first.`);
+      return;
+    }
     const isWeaponTarget = isCoatableItem(piece);
     const isArmorTarget = !isWeaponTarget && (
       piece.kind === 'armor' || piece.kind === 'dog_armor'
@@ -23860,7 +23867,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Gate 3 — EXACTLY 5 reserved, eligible inputs (a heavier cost than a normal fuse).
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fusion = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
-    const chosen = itemIds
+    // OTA-873 fix — require 5 DISTINCT reserved instances. Deduping itemIds closes a
+    // dupe where passing the same id five times satisfied the count gate (chosen.length
+    // === 5) while the Set-based consumption below spent only ONE unit — a 5-cost
+    // upgrade bought with a single reserved piece.
+    const chosen = Array.from(new Set(itemIds))
       .map((id) => player.inventory.find((i) => i.id === id && i.reservedForFusion && i.quantity > 0 && fusion.isFusionReservable(i)))
       .filter(Boolean) as InventoryItem[];
     if (chosen.length !== 5) {
