@@ -3423,6 +3423,13 @@ interface GameStore {
   pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
   closeFusionPicker: () => void;
   confirmFusionSelection: (itemIds: string[], kind: 'weapon' | 'armor' | 'dog_armor', catalystId?: string) => void;
+  /** OTA-873 — Crucible "Upgrade" mode. Spend exactly 5 reserved pieces to add a
+   *  coating channel to the chosen piece: a WEAPON gains a 2nd coating slot
+   *  (coatingSlots → 2, both coatings fire on hit); an ARMOR / DOG-VEST gains +1
+   *  worked-in-resist capacity (resistCapBonus → 1, holds one more resist type).
+   *  Adds a coating channel only — no AC / damage / durability change. Consumes the
+   *  5 items like a fusion; refuses an ineligible or already-upgraded piece. */
+  upgradeCoatingSlot: (itemId: string, itemIds: string[]) => void;
   /** OTA-631 — settle a materializing fused item with its final name +
    *  description (from the background Qwen namer, or the deterministic fallback)
    *  and raise the "your forging has formed" reveal. No-op if the item was
@@ -15100,7 +15107,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     while (
       nextIdx < updatedSteps.length
       && attackStep?.success === false
-      && (updatedSteps[nextIdx]?.id === 'damage' || updatedSteps[nextIdx]?.id === 'coating')
+      && (updatedSteps[nextIdx]?.id === 'damage' || updatedSteps[nextIdx]?.id === 'coating' || updatedSteps[nextIdx]?.id === 'coating2')
     ) {
       nextIdx++;
     }
@@ -16003,37 +16010,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // also seeds an ongoing DOT (applied below, only if the enemy
       // survives the blow). The instance is resolved off the equipped
       // slot id for the hand that swung.
-      let coatingProc: { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; label: string; source: string } | null = null;
+      type CoatingProc = { kind: 'poison' | 'acid' | 'corruption' | 'electrical' | 'burn' | 'cold'; rolled: number; label: string; source: string };
+      let coatingProc: CoatingProc | null = null;
+      // OTA-873 — a Crucible-upgraded weapon carries a SECOND coating; both slots
+      // roll and apply on this landing hit (two procs, two DOTs).
+      let coatingProc2: CoatingProc | null = null;
       if (!barehand) {
         const coatSlotId = usedOffHandForDmg
           ? (player.equipped?.offId ?? null)
           : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
         const coatInst = coatSlotId ? player.inventory.find((i) => i.id === coatSlotId) : null;
-        const coating = coatInst?.coating;
-        if (coating) {
+        // Resolve ONE coating slot into a proc (null if it fails to take against a
+        // resistant foe), reading the player's manual roll step when present. Shared
+        // by both coating slots so the two behave identically. OTA-873.
+        const resolveCoatingProc = (coating: InventoryItem['coating'], stepId: string): CoatingProc | null => {
+          if (!coating) return null;
           // engine_Dev (design call) — a coating ALWAYS takes UNLESS the enemy RESISTS
           // its damage type, in which case it gets only a small chance
           // (COATING_RESIST_LAND_CHANCE) to slip through. Weak AND neutral both always
           // land ("drop your hands and you get hit"). Keys off the resist RELATIONSHIP
           // (the same applyDamageTypeModifier + resist:/vulnerable: traits the damage
-          // math uses). Ported from engine_Dev; these lines had no coating gate before.
+          // math uses).
           const coatResists = applyDamageTypeModifier(1, coating.kind, enemy.type).match === 'resist'
             || traitDamageMultiplier(enemy.traits, coating.kind).match === 'resist';
           if (coatResists && Math.random() >= COATING_RESIST_LAND_CHANCE) {
             get().appendLog('combat', `The ${coating.label} coating fails to take on ${enemy.name}.`);
-          } else {
-          // OTA-403 — prefer the player's MANUAL coating roll (the new
-          // 'coating' RollStep) when present; fall back to an internal
-          // roll only for legacy paths that didn't stage the step.
-          const coatingStep = steps.find((s) => s.id === 'coating');
+            return null;
+          }
+          // OTA-403 — prefer the player's MANUAL coating roll (the staged RollStep)
+          // when present; fall back to an internal roll only for legacy paths.
+          const coatingStep = steps.find((s) => s.id === stepId);
           const rawRolled = coatingStep?.total != null
             ? Math.max(1, coatingStep.total)
             : Math.max(1, rollFromNotation(coating.dice));
-          // OTA-386/387 — ELEMENTAL coatings (electrical, burn) deliver their own
-          // damage-typed bonus, so the proc earns the enemy's weakness to that
-          // type — both the macro type map AND the enemy's own resist:/vulnerable:
-          // traits — even when the base weapon isn't that type. Poison/acid/
-          // corruption deal flat typeless bonus damage (their bite is the DOT).
+          // OTA-386/387 — ELEMENTAL coatings (electrical, burn, cold) deliver their own
+          // damage-typed bonus, so the proc earns the enemy's weakness to that type —
+          // both the macro type map AND the enemy's own resist:/vulnerable: traits —
+          // even when the base weapon isn't that type. Poison/acid/corruption deal flat
+          // typeless bonus damage (their bite is the DOT).
           const isElemental = coating.kind === 'electrical' || coating.kind === 'burn' || coating.kind === 'cold';
           const rolled = isElemental
             ? Math.max(
@@ -16046,10 +16060,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ),
               )
             : rawRolled;
-          coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
-          dmg += rolled;
-          }
-        }
+          return { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
+        };
+        coatingProc = resolveCoatingProc(coatInst?.coating, 'coating');
+        coatingProc2 = resolveCoatingProc(coatInst?.coating2, 'coating2');
+        if (coatingProc) dmg += coatingProc.rolled;
+        if (coatingProc2) dmg += coatingProc2.rolled;
       }
       if (surgeBonus > 0) {
         get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
@@ -16331,8 +16347,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // enemy's AC (capped), corruption also adds a stack that makes
         // its DOT tick harder. (Immediate coating damage already landed
         // above, folded into `dmg`.)
-        if (coatingProc) {
-          const proc = coatingProc;
+        // OTA-873 — apply ONE coating proc's ongoing effects. Hoisted into a local so
+        // an upgraded weapon's TWO coatings each seed their DOT / shred / stack. Same-
+        // kind slots (poison + poison) refresh the single per-kind DOT rather than
+        // double-stacking it (the existing per-kind cap), but each still lands its
+        // immediate damage and its acid-shred / corruption-stack tick.
+        const applyCoatingProc = (proc: CoatingProc) => {
           set((s) => {
             if (!s.currentScene) return s;
             const n = s.currentScene.enemies.length;
@@ -16377,7 +16397,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
             { combatOutcome: 'player_dmg' },
           );
-        }
+        };
+        // OTA-362 — the enemy survived the blow, so apply the coating's ONGOING
+        // effects. OTA-873 — both coating slots on an upgraded weapon apply.
+        if (coatingProc) applyCoatingProc(coatingProc);
+        if (coatingProc2) applyCoatingProc(coatingProc2);
         // engine_Dev (Combat-Parity II) — seed the typed DOT + "exposed" AC shred (reuses the acid
         // enemyArmorShred lever; capped). Only runs if the proc above staged one.
         if (typedDot || typedShred > 0) {
@@ -22937,19 +22961,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isCoatableItem, coatedDisplayName } = require('../engine/weaponCoating');
+    const { isCoatableItem, coatedDisplayName, nextCoatSlot } = require('../engine/weaponCoating');
     // OTA-453 — instance-aware: a FUSED weapon is catalog-absent (its stats live
     // on the instance), so the old name-only isCoatableWeapon always refused it.
     if (!isCoatableItem(weapon)) {
       get().appendLog('world', `You can't coat the ${weapon.name} — a coating needs an edge or a point to carry it. Try a blade, an arrow-arm, or a bolt-caster.`);
       return;
     }
-    const hadCoating = weapon.coating;
+    // OTA-873 — which slot this coat fills. 'coating' = fresh slot 1; 'coating2' =
+    // slot 1 full and this is a Crucible-upgraded dual-slot weapon with slot 2 open
+    // (adds a SECOND coating rather than replacing); 'replace' = both usable slots
+    // full, so it overwrites slot 1.
+    const coatSlot: 'coating' | 'coating2' | 'replace' = nextCoatSlot(weapon);
+    const replaced = coatSlot === 'replace' ? weapon.coating : null;
+    const addedSecond = coatSlot === 'coating2';
     set((s) => {
       if (!s.player) return s;
       const target = s.player.inventory.find((i) => i.id === weaponId);
       if (!target) return s;
       const coatingSpec = { kind: spec.kind, dice: spec.dice, label: spec.label, ...(spec.statBonus ? { statBonus: spec.statBonus } : {}) };
+      // The field to stamp: slot 2 only when nextCoatSlot chose it; 'replace' and a
+      // fresh coat both write slot 1 (`coating`).
+      const coatField: 'coating' | 'coating2' = coatSlot === 'coating2' ? 'coating2' : 'coating';
       let inv: InventoryItem[];
       let equipped = s.player.equipped;
       if (target.quantity > 1) {
@@ -22975,9 +23008,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           };
         }
       } else {
-        // Single instance — stamp in place so the equipped weapon's id/equip
-        // state is preserved.
-        inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, coating: coatingSpec } : i));
+        // Single instance — stamp in place (into slot 1 or slot 2 per coatField) so
+        // the equipped weapon's id/equip state is preserved.
+        inv = s.player.inventory.map((i) => (i.id === weaponId ? { ...i, [coatField]: coatingSpec } : i));
       }
       // Consume one coating unit (drop the stack when it hits 0).
       inv = inv
@@ -22985,12 +23018,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
       return { player: { ...s.player, inventory: inv, equipped } };
     });
-    const display = coatedDisplayName({ name: weapon.name, coating: { ...spec } });
+    // OTA-873 — show the weapon with BOTH coatings when a second was added / a slot
+    // was replaced, so the reward line names the real dual-coat weapon.
+    const resultCoatings = addedSecond
+      ? { coating: weapon.coating, coating2: { ...spec } }
+      : coatSlot === 'replace'
+        ? { coating: { ...spec }, coating2: weapon.coating2 }
+        : { coating: { ...spec }, coating2: weapon.coating2 };
+    const display = coatedDisplayName({ name: weapon.name, ...resultCoatings });
     get().appendLog(
       'reward',
-      hadCoating
-        ? `You scrape off the old ${hadCoating.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
-        : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
+      addedSecond
+        ? `You work the ${coatItem.name.toLowerCase()} into the weapon's second channel — it now carries TWO coatings. Now wielding the ${display}; both bite on every landing hit (${weapon.coating!.dice} ${weapon.coating!.kind} + ${spec.dice} ${spec.kind}).`
+        : replaced
+          ? `You scrape off the old ${replaced.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
+          : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
     );
     // OTA-707 — persist the freshly-painted coating; the action had no explicit save,
     // so a hard-quit before the next auto-persist lost the coating.
@@ -23023,10 +23065,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', `The ${armor.name} already turns aside ${type}. No need to waste another vial on it.`);
       return;
     }
-    // Cap worked-in resists so one piece can't become a god-vest.
+    // Cap worked-in resists so one piece can't become a god-vest. OTA-873 — the
+    // Crucible "Upgrade" mode raises THIS piece's cap by resistCapBonus (a second
+    // coating channel, the armor parallel to a weapon's 2nd coating slot).
     const ADDED_RESIST_CAP = 3;
-    if (already.length >= ADDED_RESIST_CAP) {
-      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down or use a different piece.`);
+    const effectiveCap = ADDED_RESIST_CAP + (armor.resistCapBonus ?? 0);
+    if (already.length >= effectiveCap) {
+      get().appendLog('world', `The ${armor.name} is already worked with ${already.length} resists (${(armor.addedResists ?? []).join(', ')}). It can't hold another — strip it down, upgrade it at a Crucible, or use a different piece.`);
       return;
     }
     set((s) => {
@@ -23259,6 +23304,82 @@ export const useGameStore = create<GameStore>((set, get) => ({
   confirmFusionSelection(itemIds, kind, catalystId) {
     set({ pendingFusionSelection: { itemIds, kind, catalystId }, fusionPickerOpen: false });
     void get().fuseAtCrucible();
+  },
+
+  upgradeCoatingSlot(itemId, itemIds) {
+    const player = get().player;
+    if (!player) return;
+    // Gate 1 — Crucible access. Same permit as fuseAtCrucible: a wild fusion bench
+    // (fusionPending) OR standing at an outpost / Hidden-Market Crucible.
+    const hasLeftOutpost = (player.macroVisitSeq ?? 0) >= 1;
+    const atOutpostCrucible = !!player.hubRoomId && hasLeftOutpost;
+    const atMarketCrucible = get().activeBuildingId === 'market';
+    if (!player.fusionPending && !atOutpostCrucible && !atMarketCrucible) {
+      get().appendLog('arbiter', `"There's no Crucible here," the Arbiter says. "Find one — an outpost or a ruin — then bring your reserved pieces and the piece to upgrade."`);
+      return;
+    }
+    // Gate 2 — the target must be an eligible, not-yet-upgraded piece: a coatable
+    // WEAPON (→ 2nd coating slot) or an ARMOR / DOG-VEST (→ +1 resist capacity).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isCoatableItem, coatingCapacity } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findArmorByName } = require('../engine/crafting') as typeof import('../engine/crafting');
+    const piece = player.inventory.find((i) => i.id === itemId);
+    if (!piece) return;
+    const isWeaponTarget = isCoatableItem(piece);
+    const isArmorTarget = !isWeaponTarget && (
+      piece.kind === 'armor' || piece.kind === 'dog_armor'
+      || piece.uniqueStats?.kind === 'armor' || piece.uniqueStats?.kind === 'dog_armor'
+      || !!findArmorByName(piece.name)
+    );
+    if (!isWeaponTarget && !isArmorTarget) {
+      get().appendLog('world', `The ${piece.name} can't take a coating channel — upgrade a coatable weapon (blade / arrow-arm / bolt-caster) or a piece of armor or a dog vest.`);
+      return;
+    }
+    if (isWeaponTarget && coatingCapacity(piece) >= 2) {
+      get().appendLog('world', `The ${piece.name} already has two coating channels.`);
+      return;
+    }
+    if (isArmorTarget && (piece.resistCapBonus ?? 0) >= 1) {
+      get().appendLog('world', `The ${piece.name} already carries an extra resist channel.`);
+      return;
+    }
+    // Gate 3 — EXACTLY 5 reserved, eligible inputs (a heavier cost than a normal fuse).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fusion = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    const chosen = itemIds
+      .map((id) => player.inventory.find((i) => i.id === id && i.reservedForFusion && i.quantity > 0 && fusion.isForgeReservableItem(i)))
+      .filter(Boolean) as InventoryItem[];
+    if (chosen.length !== 5) {
+      get().appendLog('arbiter', `The Crucible cools. "An upgrade takes five reserved pieces — you set ${chosen.length}."`);
+      return;
+    }
+    // Consume one unit of each chosen input and clear its reservation (mirrors
+    // applyFusion's drain), then stamp the upgrade on the chosen piece.
+    const chosenIds = new Set(chosen.map((i) => i.id));
+    set((s) => {
+      if (!s.player) return s;
+      const inv = s.player.inventory
+        .map((i) => {
+          if (i.id === itemId) {
+            return isWeaponTarget
+              ? { ...i, coatingSlots: 2 }
+              : { ...i, resistCapBonus: (i.resistCapBonus ?? 0) + 1 };
+          }
+          if (chosenIds.has(i.id)) return { ...i, quantity: Math.max(0, i.quantity - 1), reservedForFusion: false };
+          return i;
+        })
+        .filter((i) => i.quantity > 0);
+      return { player: { ...s.player, inventory: inv, fusionPending: false } };
+    });
+    recordTitleProgress(get, set, { fusionsCompleted: 1 });
+    get().appendLog(
+      'reward',
+      isWeaponTarget
+        ? `✦ The Crucible drinks the five pieces and works a second coating channel into the ${piece.name}. It can now hold TWO coatings at once — both bite on every landing hit. (Its damage and edge are unchanged.)`
+        : `✦ The Crucible drinks the five pieces and works an extra resist channel into the ${piece.name}. It can now hold one more worked-in resist. (Its armor rating is unchanged.)`,
+    );
+    void get().persist();
   },
 
   settleFusion(itemId, name, description) {

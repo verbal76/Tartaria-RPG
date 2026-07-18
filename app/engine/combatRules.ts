@@ -521,6 +521,9 @@ export function buildCombatSteps(
       : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
   const coatInst = coatSlotId ? (player.inventory ?? []).find((i) => i.id === coatSlotId) : null;
   const coating = coatInst?.coating ?? null;
+  // OTA-873 — a Crucible-upgraded weapon carries a SECOND coating that also rolls
+  // and applies on every landing hit (staged as its own 'coating2' roll step below).
+  const coating2 = coatInst?.coating2 ?? null;
 
   const steps: RollStep[] = [
     {
@@ -608,6 +611,20 @@ export function buildCombatSteps(
       bonusLabel: '',
       context: `${coating.label} coating — extra ${coating.kind} damage to ${enemy.name}`,
       // no target — bonus damage that applies whenever the strike landed
+    });
+  }
+  // OTA-873 — the second coating on an upgraded weapon rolls its own step, so the
+  // player sees (and rolls) BOTH coatings landing on the strike.
+  if (coating2) {
+    const cd2 = parseDamageDice(coating2.dice);
+    steps.push({
+      id: 'coating2',
+      label: `Roll for ${coating2.label.toUpperCase()} COATING`,
+      sides: cd2.sides,
+      count: cd2.count,
+      bonus: 0,
+      bonusLabel: '',
+      context: `${coating2.label} coating — extra ${coating2.kind} damage to ${enemy.name}`,
     });
   }
 

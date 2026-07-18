@@ -16206,4 +16206,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // quest" button (⚑) on ordinary food/materials/loot: moves the item into the Quest Items
 // section and hides it from the sell tab while leaving it usable/droppable; peels one unit
 // off a stack; mutually exclusive with the fusion reserve. Adds ota872SaveForQuest (7/7).
-export const OTA_BUILD_ID = '2026-07-18-851-save-for-quest';
+//
+// 2026-07-18 OTA-852 — port of HAL OTA-873 (Crucible "Upgrade" mode). A 4th Crucible mode
+// beside Weapon / Armor / Dog: pick exactly 5 reserved pieces, then choose a piece to work
+// an extra coating channel into it. WEAPON → a 2nd coating slot (coatingSlots→2; both
+// coatings fire on every landing hit — two roll steps, two DOTs). ARMOR / DOG-VEST → +1
+// worked-in-resist capacity (resistCapBonus→1; holds one more resist than the stock cap of
+// 3). Adds a coating channel only — no AC / damage change. New store action
+// upgradeCoatingSlot; coating2 + coatingSlots + resistCapBonus fields; dual-slot applyCoating;
+// combatRules 2nd coating step. Adds ota873WeaponUpgradeDualCoat (9/9).
+export const OTA_BUILD_ID = '2026-07-18-852-crucible-upgrade-coating';

@@ -70,11 +70,32 @@ export function isCoatableItem(item: Pick<InventoryItem, 'name' | 'kind' | 'uniq
 }
 
 /** The player-facing name for an item, prefixed with the coating
- *  adjective when one is applied ("Corrupted Battle Axe"). The
- *  underlying InventoryItem.name is never mutated. */
-export function coatedDisplayName(item: Pick<InventoryItem, 'name' | 'coating'>): string {
-  if (item.coating?.label) return `${item.coating.label} ${item.name}`;
+ *  adjective(s) when one is applied ("Corrupted Battle Axe"). OTA-873 — a
+ *  dual-coat weapon shows BOTH adjectives ("Corrupted Venomous Battle Axe").
+ *  The underlying InventoryItem.name is never mutated. */
+export function coatedDisplayName(item: Pick<InventoryItem, 'name' | 'coating' | 'coating2'>): string {
+  const parts = [item.coating?.label, item.coating2?.label].filter(Boolean);
+  if (parts.length) return `${parts.join(' ')} ${item.name}`;
   return item.name;
+}
+
+/** OTA-873 — coating capacity of THIS weapon instance: 2 if the Crucible upgrade
+ *  granted a second slot, else 1. */
+export function coatingCapacity(item: Pick<InventoryItem, 'coatingSlots'>): number {
+  return item.coatingSlots && item.coatingSlots >= 2 ? 2 : 1;
+}
+
+/** OTA-873 — which coating slot the next "coat a weapon" application should fill:
+ *   · 'coating'  — slot 1 is empty (or the weapon is single-slot: always slot 1)
+ *   · 'coating2' — slot 1 is full and this is a dual-slot weapon with slot 2 empty
+ *   · 'replace'  — both usable slots are full; a new coat replaces slot 1
+ *  Lets the apply flow and its UI copy agree on what a fresh coat will do. */
+export function nextCoatSlot(
+  item: Pick<InventoryItem, 'coating' | 'coating2' | 'coatingSlots'>,
+): 'coating' | 'coating2' | 'replace' {
+  if (!item.coating) return 'coating';
+  if (coatingCapacity(item) >= 2 && !item.coating2) return 'coating2';
+  return 'replace';
 }
 
 /** Short combat/log description of what a coating does, keyed by
