@@ -4490,6 +4490,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
         dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
         dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
+        factionRepIntroShown: saved.worldMemory.factionRepIntroShown ?? false,
         fusionCompensationGranted: saved.worldMemory.fusionCompensationGranted ?? false,
         pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
       };
@@ -31042,6 +31043,18 @@ function logRepChanges(
     const name = faction?.name ?? c.factionId;
     const sign = c.delta > 0 ? '+' : '';
     get().appendLog('system', `${name} standing ${sign}${c.delta} (now ${c.newStanding})`);
+  }
+  // OTA-877 — the FIRST time any standing moves, drop a one-time note explaining what
+  // faction standing is (playtest: the tutorial's first standing burst pops up with no
+  // context). Fires once per save via worldMemory.factionRepIntroShown. A single change
+  // to your OWN faction isn't confusing; but even that's a fine teaching moment, so any
+  // first change triggers it.
+  if (changes.length > 0 && !get().worldMemory?.factionRepIntroShown) {
+    get().appendLog(
+      'system',
+      'Faction standing is how a faction sees you: at −20 or below they turn hostile, at +20 or above they treat you as an ally, neutral in between. It shifts as you act — and as their own rivalries play out — and it shapes vendor prices, the work they will offer you, and who fights beside you when blades come out.',
+    );
+    useGameStore.setState((s) => ({ worldMemory: { ...s.worldMemory, factionRepIntroShown: true } }));
   }
 }
 

@@ -16244,4 +16244,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pseudo-ids to real faction ids so the relationships fire in the world-sim (not just the
 // standing system): forgotten_order→reclaimers_guild, true_tartarians→forgotten_order,
 // reclaimers_guild rival→mud_monarchs, and dropped the non-faction "anyone_paying" ally.
-export const OTA_BUILD_ID = '2026-07-18-855-faction-relation-ids';
+// 2026-07-18 OTA-856 — one-time faction-standing explainer (port of HAL OTA-877). The tutorial's
+// first standing burst pops up "<faction> standing +N" lines with no context; logRepChanges now
+// appends ONE brief note the first time any standing moves (thresholds: hostile ≤ −20, allied
+// ≥ +20, neutral between; driven by the player's actions and factions' own rivalries; shapes
+// vendor prices, offered work, and who fights beside you). Gated by new
+// worldMemory.factionRepIntroShown (hydration-defaulted), same pattern as dogClimbNoticeShown.
+export const OTA_BUILD_ID = '2026-07-18-856-faction-standing-intro';
