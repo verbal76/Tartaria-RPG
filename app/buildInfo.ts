@@ -16215,4 +16215,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 3). Adds a coating channel only — no AC / damage change. New store action
 // upgradeCoatingSlot; coating2 + coatingSlots + resistCapBonus fields; dual-slot applyCoating;
 // combatRules 2nd coating step. Adds ota873WeaponUpgradeDualCoat (9/9).
-export const OTA_BUILD_ID = '2026-07-18-852-crucible-upgrade-coating';
+// 2026-07-18 OTA-852b — follow-up: same-element dual coatings SUM their DOT within a hit
+// (poison + poison ticks for the sum, one merged status; still refreshes across hits, no
+// unbounded growth). Two different elements stay two independent DOTs. Adds ota873DualPoisonSum.
+export const OTA_BUILD_ID = '2026-07-18-852-crucible-upgrade-dualcoat-sum';
