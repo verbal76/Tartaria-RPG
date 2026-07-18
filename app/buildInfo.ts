@@ -16948,4 +16948,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // actions AND faction rivalries; affects vendor prices, offered work, and who fights beside
 // you). Fires once per save via new worldMemory.factionRepIntroShown (hydration-defaulted for
 // old saves), same one-time pattern as dogClimbNoticeShown.
-export const OTA_BUILD_ID = '2026-07-18-877-faction-standing-intro';
+//
+// OTA-878 (Hardened Climbing Strap → climbing gear, not armor; 1 stamina/climb) — the strap is
+// worn (cloak slot) but carries no AC: it opens the climb_steep gate like a rope. It was showing
+// under the inventory's ARMOR section (via its `wardrobe` tag), reading like a defensive piece.
+// It now categorizes as a TOOL, listing with the other climbing implements (ropes, treads,
+// grapplers, the "Climbing Gear" item). Its worn climb cost changed from 0 → 1 stamina/tier
+// (as cheap as a Reclaimer's Rope, and it still never wears out or snaps — just no longer a free
+// climb). Rest-at-altitude (dozing on a wall while the strap is worn) is unchanged.
+export const OTA_BUILD_ID = '2026-07-18-878-climbing-strap-gear';
