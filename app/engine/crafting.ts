@@ -878,19 +878,25 @@ const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> 
   // machines and the undead below (Automation/Mechanism/Etheric Undead) — nothing
   // to poison. Pre-fix no enemy was ever vulnerable:poison, so poison weapons/
   // coatings could only ever land neutral or halved.
-  Animal: { resist: [], weak: ['piercing', 'poison'] },
-  Human: { resist: [], weak: ['piercing', 'slashing', 'poison'] },
+  // OTA-874 — acid + corruption are now first-class types. Acid corrodes metal, so
+  // constructs/machines are WEAK to it; the aetheric oozes that spit it are made of it
+  // and RESIST it. Corruption rots the living, so flesh (Animal / Human / the fleshy
+  // Aetheric Mutation) is WEAK to it, while machines and the already-hollow undead RESIST
+  // it. (Enemy weakness/resist to these types also gates whether an acid/corruption COATING
+  // "takes" on that foe.)
+  Animal: { resist: [], weak: ['piercing', 'poison', 'corruption'] },
+  Human: { resist: [], weak: ['piercing', 'slashing', 'poison', 'corruption'] },
   'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
-  'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning', 'poison'] },
-  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['slashing'] },
+  'Aetheric Mutation': { resist: ['aetheric', 'radiation', 'acid'], weak: ['bludgeoning', 'poison', 'corruption'] },
+  'Aetheric Creature': { resist: ['aetheric', 'electrical', 'acid'], weak: ['slashing'] },
   // OTA-827 [Group-K] — `cold` seizes machinery: the metal contracts, joints
   // lock, coolant freezes. It's the anti-machine element (alongside electrical),
   // and the marquee use is the provokable Roused Construct boss.
-  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical', 'cold'] },
-  Mechanism: { resist: ['poison', 'aetheric'], weak: ['electrical', 'cold'] },
-  'Mech-Construct': { resist: ['slashing', 'piercing'], weak: ['electrical', 'bludgeoning', 'cold'] },
-  'Etheric Undead': { resist: ['poison', 'aetheric'], weak: ['burn', 'radiation'] },
-  Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical', 'cold'] },
+  Automation: { resist: ['poison', 'aetheric', 'corruption'], weak: ['electrical', 'cold', 'acid'] },
+  Mechanism: { resist: ['poison', 'aetheric', 'corruption'], weak: ['electrical', 'cold', 'acid'] },
+  'Mech-Construct': { resist: ['slashing', 'piercing', 'corruption'], weak: ['electrical', 'bludgeoning', 'cold', 'acid'] },
+  'Etheric Undead': { resist: ['poison', 'aetheric', 'corruption'], weak: ['burn', 'radiation'] },
+  Construct: { resist: ['slashing', 'piercing', 'corruption'], weak: ['bludgeoning', 'electrical', 'cold', 'acid'] },
 };
 
 export type DamageMatch = 'normal' | 'weak' | 'resist';

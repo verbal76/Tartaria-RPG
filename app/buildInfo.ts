@@ -16894,4 +16894,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // unaffected — a fully-upgraded piece (cap 4) can still hold all four. Data-driven, so if
 // acid/corruption ever become real incoming types the armor path auto-enables. New test
 // ota873ArmorCoatOffensive (acid/corruption refused + not consumed; poison still works).
-export const OTA_BUILD_ID = '2026-07-18-873-armor-coat-offensive-guard';
+//
+// OTA-874 (acid + corruption become first-class damage types) — HAL + golem.
+// Player insight: the damage inference already reads acidic/corrosive/rot attacks — it
+// just folded them ALL into `poison`, which is why an "acid resist" on armor was inert.
+// Rather than block those vials (OTA-873), this SPLITS acid + corruption out into their
+// own incoming types so a resist against them is real:
+//   · damageTypes.ts — `acid` + `corruption` added to DAMAGE_TYPE_KEYWORDS (+ corrosive/
+//     caustic/blight/hollowing aliases); two new ATTACK_VERB_TYPE rules placed before the
+//     physical buckets, so acidic attacks read `acid` and hollowing attacks read
+//     `corruption` (they were poison / slashing). Re-types the 3 Aetheric oozes (Acidic
+//     Dissolve / Acid Spit / Acid Trail → acid) and the Hollow King (Hollow Cleave →
+//     corruption), giving each type a real incoming source.
+//   · crafting.ts TYPE_RESISTANCE_MAP — metal/constructs WEAK to acid + RESIST corruption;
+//     living flesh WEAK to corruption; the acid oozes RESIST acid (made of it). This also
+//     gates whether an acid/corruption COATING "takes" on a resistant foe (thematic: acid
+//     can't corrode an acid ooze; corruption can't rot a machine or the undead).
+//   · Because isResistableIncomingType() is data-driven off DAMAGE_TYPE_KEYWORDS, the
+//     OTA-873 armor guard AUTO-LIFTS: Acid Flask / Corruption Tonic now grant a REAL resist
+//     worked into armor and the "Apply to armor" button reappears for them. (Engine keeps
+//     the guard — its lore-agnostic base defines no acid/corruption attackers.)
+// New test ota874AcidCorruptionTypes (replaces ota873ArmorCoatOffensive); typecheck clean;
+// construct/coating/weakness suites 55/55 green.
+export const OTA_BUILD_ID = '2026-07-18-874-acid-corruption-types';

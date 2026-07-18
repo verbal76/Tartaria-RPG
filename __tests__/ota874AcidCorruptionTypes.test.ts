@@ -1,8 +1,10 @@
-// OTA-873 — armor coating rejects OFFENSIVE-only families. acid/corruption are DOT
-// families the player's coated WEAPON applies; no enemy deals them as incoming damage,
-// so a worked-in armor resist against them is inert (matches nothing). The "apply to
-// armor" path must reject them so a vial isn't silently wasted, while still accepting
-// the four resistable incoming types (poison / electrical / burn / cold).
+// OTA-874 — acid + corruption are now first-class incoming damage types (were folded
+// into poison). This means:
+//  (1) the inference types acidic / hollowing enemy attacks distinctly (the Aetheric
+//      oozes now DEAL acid; the Hollow King DEALS corruption);
+//  (2) both are resistable, so a vial worked into armor grants a REAL resist that a
+//      matching incoming attack reduces (superseding OTA-873's block of those vials);
+//  (3) the resistance map earns the right weak/resist relationships.
 
 jest.setTimeout(20000);
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -19,22 +21,44 @@ jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn(), isSpeakingA
 jest.mock('expo-av', () => ({ Audio: { setAudioModeAsync: jest.fn(), Sound: class { static createAsync = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } })); } } }));
 
 import { useGameStore } from '../app/state/gameStore';
-import { isResistableIncomingType } from '../app/engine/damageTypes';
+import { isResistableIncomingType, enemyDamageType } from '../app/engine/damageTypes';
+import { applyDamageTypeModifier } from '../app/engine/crafting';
+import { findEnemyByName } from '../app/engine/encounter';
 import type { InventoryItem } from '../app/engine/types';
 
-describe('OTA-873 — isResistableIncomingType', () => {
-  it('accepts the four resistable coating types and rejects the offensive-only two', () => {
-    for (const t of ['poison', 'electrical', 'burn', 'cold']) {
-      expect(isResistableIncomingType(t)).toBe(true);
+describe('OTA-874 — acid + corruption are real, resistable incoming types', () => {
+  it('both are now resistable incoming types (were not before)', () => {
+    expect(isResistableIncomingType('acid')).toBe(true);
+    expect(isResistableIncomingType('corruption')).toBe(true);
+    // aliases resolve
+    expect(isResistableIncomingType('corrosive')).toBe(true); // → acid
+    expect(isResistableIncomingType('blight')).toBe(true);    // → corruption
+  });
+
+  it('the inference types acidic attacks as acid (were poison before)', () => {
+    for (const name of ['Aetheric Ooze', 'Aetheric Worm', 'Aetheric Slug']) {
+      const e = findEnemyByName(name);
+      expect(e).toBeTruthy();
+      expect(enemyDamageType(e!)).toBe('acid');
     }
-    expect(isResistableIncomingType('acid')).toBe(false);
-    expect(isResistableIncomingType('corruption')).toBe(false);
-    // aliases still resolve
-    expect(isResistableIncomingType('frost')).toBe(true); // → cold
+  });
+
+  it('the Hollow King now deals corruption (Hollow Cleave), giving corruption an incoming source', () => {
+    const e = findEnemyByName('Hollow King');
+    expect(e).toBeTruthy();
+    expect(enemyDamageType(e!)).toBe('corruption');
+  });
+
+  it('resistance map: metal is WEAK to acid + RESISTS corruption; flesh is WEAK to corruption', () => {
+    expect(applyDamageTypeModifier(1, 'acid', 'Automation').match).toBe('weak');
+    expect(applyDamageTypeModifier(1, 'corruption', 'Automation').match).toBe('resist');
+    expect(applyDamageTypeModifier(1, 'corruption', 'Animal').match).toBe('weak');
+    // the acid oozes are made of acid — they shrug it off
+    expect(applyDamageTypeModifier(1, 'acid', 'Aetheric Mutation').match).toBe('resist');
   });
 });
 
-describe('OTA-873 — applyCoatingToArmor rejects offensive coatings', () => {
+describe('OTA-874 — acid/corruption vials can now be worked into armor', () => {
   const armor: InventoryItem = { id: 'vest', name: 'Padded Vest', kind: 'armor', quantity: 1, tags: [] } as InventoryItem;
   const vial = (id: string, name: string, dmg: string): InventoryItem =>
     ({ id, name, kind: 'consumable', quantity: 1, tags: ['weapon_coating', dmg] }) as InventoryItem;
@@ -52,7 +76,6 @@ describe('OTA-873 — applyCoatingToArmor rejects offensive coatings', () => {
           { ...armor },
           vial('acid_v', 'Acid Flask', 'acid'),
           vial('corr_v', 'Corruption Tonic', 'corruption'),
-          vial('pois_v', 'Poison Vial', 'poison'),
         ],
       },
     });
@@ -61,21 +84,15 @@ describe('OTA-873 — applyCoatingToArmor rejects offensive coatings', () => {
   const armorNow = () => useGameStore.getState().player!.inventory.find((i) => i.id === 'vest')!;
   const has = (id: string) => useGameStore.getState().player!.inventory.some((i) => i.id === id);
 
-  it('an Acid Flask is refused — no resist added, vial NOT consumed', () => {
+  it('an Acid Flask now grants a real acid resist and is consumed', () => {
     useGameStore.getState().applyCoatingToArmor('acid_v', 'vest');
-    expect(armorNow().addedResists ?? []).toHaveLength(0);
-    expect(has('acid_v')).toBe(true); // vial kept
+    expect(armorNow().addedResists).toContain('acid');
+    expect(has('acid_v')).toBe(false);
   });
 
-  it('a Corruption Tonic is refused — no resist added, vial NOT consumed', () => {
+  it('a Corruption Tonic now grants a real corruption resist and is consumed', () => {
     useGameStore.getState().applyCoatingToArmor('corr_v', 'vest');
-    expect(armorNow().addedResists ?? []).toHaveLength(0);
-    expect(has('corr_v')).toBe(true);
-  });
-
-  it('a Poison Vial STILL works — resist added, vial consumed', () => {
-    useGameStore.getState().applyCoatingToArmor('pois_v', 'vest');
-    expect(armorNow().addedResists).toContain('poison');
-    expect(has('pois_v')).toBe(false); // consumed
+    expect(armorNow().addedResists).toContain('corruption');
+    expect(has('corr_v')).toBe(false);
   });
 });

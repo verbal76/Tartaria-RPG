@@ -26,6 +26,12 @@ export const DAMAGE_TYPE_KEYWORDS = [
   'electrical',
   'piercing',
   'poison',
+  // OTA-874 — `acid` and `corruption` are now first-class incoming damage types (they
+  // were previously folded into `poison`). Acid corrodes metal (constructs are weak);
+  // corruption rots the living. This makes an armor resist against them meaningful and
+  // lets the inference type acidic / hollowing enemy attacks distinctly.
+  'acid',
+  'corruption',
   'radiation',
   'slashing',
   'stun',
@@ -44,6 +50,11 @@ export const DAMAGE_TYPE_ALIASES: Record<string, string> = {
   frost: 'cold',
   ice: 'cold',
   shock: 'electrical',
+  // OTA-874 — acid / corruption synonyms.
+  corrosive: 'acid',
+  caustic: 'acid',
+  blight: 'corruption',
+  hollowing: 'corruption',
 };
 
 /** Canonicalize a damage-type word through the shared alias table (identity for
@@ -96,7 +107,12 @@ const ATTACK_VERB_TYPE: ReadonlyArray<readonly [RegExp, string]> = [
   // "Frost Maul" reads as cold, not bludgeoning).
   [/frost|\bice\b|\bicy\b|freez|glaci|rime|chill|frigid|hoar|winter|permafrost/i, 'cold'],
   [/shock|spark|lightning|jolt|\bvolt|static|thunder|arc\b|electr/i, 'electrical'],
-  [/poison|venom|toxic|spore|acid|corros|blight|rot\b|plague|sick/i, 'poison'],
+  // OTA-874 — acid + corruption split OUT of the poison bucket into their own types.
+  // Both sit BEFORE the physical buckets so a "Corrosive Bite" reads acid (not piercing)
+  // and a "Hollow Cleave" reads corruption (not slashing).
+  [/acid|corros|caustic|dissolv|etch\b|slag\b/i, 'acid'],
+  [/corrupt|blight|wither|defile|hollow|necrot|festering|\brot\b/i, 'corruption'],
+  [/poison|venom|toxic|spore|plague|sick/i, 'poison'],
   [/radiat|irradiat|fallout|decay\b/i, 'radiation'],
   [/bite|fang|maw|sting|spike|spear|stab|pierc|gore|horn|tusk|quill|barb|bolt|arrow|lance|pincer|beak|impale|skewer|needle|jab/i, 'piercing'],
   [/claw|talon|rake|slash|rend|blade|cleaver|sword|knife|dagger|scythe|razor|saber|sabre|\baxe|shred|slice|gash|hook\b|sickle/i, 'slashing'],
