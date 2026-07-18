@@ -16940,4 +16940,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // → forgotten_order; reclaimers_guild rival mud_monarchs_when_unpaid → mud_monarchs; and its
 // non-faction ally "anyone_paying" removed (the Guild keeps no fixed faction ally). Data-only;
 // all allies/rivals now resolve to real faction ids.
-export const OTA_BUILD_ID = '2026-07-18-876-faction-relation-ids';
+//
+// OTA-877 (first-time faction-standing explainer) — playtest: the tutorial's first standing
+// burst (e.g. picking up the Reclaimer's Rope / salvaging) pops up "X standing +N" lines with
+// zero context. logRepChanges now appends ONE brief note the first time any standing moves,
+// explaining what standing is (hostile ≤ −20, allied ≥ +20, neutral between; shaped by your
+// actions AND faction rivalries; affects vendor prices, offered work, and who fights beside
+// you). Fires once per save via new worldMemory.factionRepIntroShown (hydration-defaulted for
+// old saves), same one-time pattern as dogClimbNoticeShown.
+export const OTA_BUILD_ID = '2026-07-18-877-faction-standing-intro';
