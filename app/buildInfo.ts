@@ -17846,4 +17846,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-07-18 OTA-1153 — faction data hygiene (port of HAL OTA-876). The default faction data
 // carried three allies/rivals pseudo-ids that only the standing system resolved; cleaned them
 // to real faction ids so the relationships fire in the world-sim too. Data-only.
-export const OTA_BUILD_ID = '2026-07-18-1153-faction-relation-ids';
+// 2026-07-18 OTA-1154 — one-time faction-standing explainer (port of HAL OTA-877). The first
+// standing burst pops up "<faction> standing +N" lines with no context; logRepChanges now
+// appends ONE brief note the first time any standing moves (thresholds: hostile ≤ −20, allied
+// ≥ +20, neutral between; driven by the player's actions and factions' own rivalries; shapes
+// vendor prices, offered work, and who fights beside you). Gated by new
+// worldMemory.factionRepIntroShown (hydration-defaulted), same pattern as dogClimbNoticeShown.
+export const OTA_BUILD_ID = '2026-07-18-1154-faction-standing-intro';

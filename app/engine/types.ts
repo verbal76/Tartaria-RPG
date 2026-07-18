@@ -1864,6 +1864,10 @@ export interface WorldMemory {
    *  the player is elevated). Cleared when the dog rejoins on descent,
    *  so each climb gets the joke once; taps still buzz. */
   dogClimbNoticeShown?: boolean;
+  /** OTA-877 — one-time faction-standing explainer. Set true after the first time
+   *  any standing change is logged, so the brief "what is faction standing" note
+   *  (appended by logRepChanges) fires exactly once per save. */
+  factionRepIntroShown?: boolean;
   /** arb-fix — one-time make-good: a faction fused item the player should
    *  have received but didn't (the pre-fix faction catalyst never counted
    *  toward the gate). Granted once per save on load for dev names; this
