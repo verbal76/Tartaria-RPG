@@ -16198,4 +16198,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // longer hang one stage short of turn-in; (2) hunt_salamander_voronov's invalid checkKind
 // 'investigation' → 'investigate'. EndingScreen recap now uses the LOST_CAPITAL_NAMES
 // export (all nine Capitals show real names). Adds ota871QuestEpilogue guard test.
-export const OTA_BUILD_ID = '2026-07-17-850-completability-sweep';
+//
+// 2026-07-18 OTA-851 — port of HAL OTA-872 (inventory sell-tab protection + Save-for-quest).
+// Fusion-reserved items (reservedForFusion) no longer appear in the vendor SELL tab;
+// isUnsellable now routes through isQuestLockedItem so contract/broker/whisper objective
+// items are locked out of selling too. New soft earmark reservedForQuest + a "Save for
+// quest" button (⚑) on ordinary food/materials/loot: moves the item into the Quest Items
+// section and hides it from the sell tab while leaving it usable/droppable; peels one unit
+// off a stack; mutually exclusive with the fusion reserve. Adds ota872SaveForQuest (7/7).
+export const OTA_BUILD_ID = '2026-07-18-851-save-for-quest';

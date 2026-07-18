@@ -16,6 +16,7 @@
 import type { InventoryItem, Rarity } from './types';
 import type { VendorInstance } from './vendors';
 import { findRecipeByResult, findMaterialByName, findWeaponByName, findArmorByName, findGearByName } from './crafting';
+import { isQuestLockedItem } from './questItems';
 
 // Approximate "fair" base price per rarity tier, in TC. Matches the
 // upper bound of typical vendor catalog prices.
@@ -177,7 +178,18 @@ function durabilityFraction(item: InventoryItem): number {
  *  Equipped check is the caller's responsibility (we don't have player
  *  context here); this just covers the catalog-level cases. */
 export function isUnsellable(item: InventoryItem): boolean {
-  if (item.tags?.includes('quest')) return true;
+  // OTA-872 — a hand-authored objective item (quest / contract / broker / whisper
+  // tag) is fully locked. Route through the single isQuestLockedItem predicate so a
+  // contract/broker/whisper item that ISN'T also tagged 'quest' still can't be sold
+  // (the old `quest`-tag-only check missed those).
+  if (isQuestLockedItem(item)) return true;
+  // OTA-872 — items the player has EARMARKED never appear in the sell tab:
+  //  · reservedForFusion — saved for the Crucible (was a real leak: fusion-reserved
+  //    scrap still showed up as sellable, so it was easy to sell your fusion stock).
+  //  · reservedForQuest  — player tapped "Save for quest" on ordinary food/materials
+  //    they were told to bring, so they don't get sold before the turn-in.
+  if (item.reservedForFusion) return true;
+  if (item.reservedForQuest) return true;
   if (item.tags?.includes('unsellable')) return true;
   // arb107 — Crucible-fused items are UNSELLABLE. They're one-of-a-kind
   // gear minted to be wielded, not a commodity. Without this, a fused
