@@ -3756,6 +3756,14 @@ interface GameStore {
    *  OTA-193 auto-substitute drain so they survive for the fusion
    *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
   toggleReserveForFusion: (itemId: string) => void;
+  /** OTA-872 — "Save for quest" earmark toggle for an ordinary item (food,
+   *  materials, loot) the player was told to bring for a turn-in. Sets the soft
+   *  reservedForQuest flag: the item moves to the Quest Items section and drops out
+   *  of the vendor sell tab, but stays usable/droppable (unlike a hard tag-locked
+   *  quest item). Peels a single unit off a stack, like toggleReserveForFusion, so
+   *  the player can save two rations and still eat the rest. Mutually exclusive with
+   *  reservedForFusion. Looked up by InventoryItem.id to disambiguate stacks. */
+  toggleReserveForQuest: (itemId: string) => void;
   /** OTA-500 — register a dynamically-mentioned place (whisper/contract/mission/
    *  narration) as install-canon: it persists in worldMemory, gets a permanent
    *  grid cell, and becomes plotted + routable with exact grid-to-grid distance. */
@@ -23305,6 +23313,66 @@ export const useGameStore = create<GameStore>((set, get) => ({
           id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'rsv' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
           quantity: 1,
           reservedForFusion: reserving,
+        }];
+      }
+      return { player: { ...s.player, inventory: inv } };
+    });
+  },
+
+  toggleReserveForQuest(itemId) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    if (!item) return;
+    // A hand-authored objective item (quest / contract / broker / whisper tag) is
+    // already hard-locked and lives in the Quest Items section on its own — there's
+    // nothing to earmark, and its modal is view-only anyway.
+    if (isQuestLockedItem(item)) return;
+    // Mutually exclusive with the fusion reserve: an item can't be both fodder for
+    // the Crucible and saved for a turn-in. If it's reserved for fusion, that has to
+    // be released first (the UI hides this button in that case).
+    if (item.reservedForFusion && !item.reservedForQuest) return;
+    const reserving = !item.reservedForQuest;
+    const qty = item.quantity ?? 1;
+    // A single-unit stack just flips the flag in place.
+    if (qty <= 1) {
+      set((s) => s.player
+        ? {
+            player: {
+              ...s.player,
+              inventory: s.player.inventory.map((i) =>
+                i.id === itemId ? { ...i, reservedForQuest: reserving } : i,
+              ),
+            },
+          }
+        : s);
+      return;
+    }
+    // A multi-unit stack peels exactly ONE unit across the reserved/free boundary so
+    // the player can save one (or a few) and keep the rest free — save 2 rations for
+    // the quest, eat the other 3. Tapping again moves another unit; the opposite-
+    // state stack re-absorbs it on un-save. Mirrors toggleReserveForFusion's split.
+    const sameUnit = (a: InventoryItem, b: InventoryItem): boolean =>
+      a.name === b.name && a.kind === b.kind
+      && !a.coating && !b.coating
+      && !a.instanceStats && !b.instanceStats
+      && !a.uniqueStats && !b.uniqueStats;
+    set((s) => {
+      if (!s.player) return s;
+      let inv = s.player.inventory
+        .map((i) => (i.id === itemId ? { ...i, quantity: (i.quantity ?? 1) - 1 } : i))
+        .filter((i) => (i.quantity ?? 1) > 0);
+      const destIdx = inv.findIndex(
+        (i) => i.id !== itemId && sameUnit(i, item) && (i.reservedForQuest === true) === reserving,
+      );
+      if (destIdx >= 0) {
+        inv = inv.map((i, idx) => (idx === destIdx ? { ...i, quantity: (i.quantity ?? 1) + 1 } : i));
+      } else {
+        inv = [...inv, {
+          ...item,
+          id: `${item.name.replace(/\s+/g, '_')}_${reserving ? 'q' : 'free'}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          quantity: 1,
+          reservedForQuest: reserving,
         }];
       }
       return { player: { ...s.player, inventory: inv } };

@@ -551,6 +551,15 @@ export interface InventoryItem {
    *  flag; the inventory UI gates the heart-tap on that predicate.
    *  Reserved items are saved for the fusion bench. */
   reservedForFusion?: boolean;
+  /** OTA-872 — player-tapped "Save for quest" earmark on an ordinary
+   *  item (food, materials, loot) the player was told to bring for a
+   *  quest turn-in. Unlike a hand-authored quest-locked item (quest /
+   *  contract / broker / whisper tag, which is fully view-only), a
+   *  reservedForQuest item can still be used or dropped — the flag only
+   *  moves it into the Quest Items section and hides it from the vendor
+   *  sell tab so it isn't sold by accident. Mutually exclusive with
+   *  reservedForFusion. */
+  reservedForQuest?: boolean;
   /** OTA-195 — per-instance unique stats stamped on a fused item.
    *  When present, combat / preview / equip resolvers read these
    *  BEFORE falling back to catalog or inference. A fused item is

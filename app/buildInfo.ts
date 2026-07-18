@@ -17807,4 +17807,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hangs one stage short of turn-in. Lore-agnostic store fix; the HAL/golem content pieces
 // (salamander hunt, LOST_CAPITAL_NAMES / EndingScreen recap) are HAL-specific and are NOT
 // ported here — engine carries its own quest content.
-export const OTA_BUILD_ID = '2026-07-17-1149-quest-epilogue-turnin';
+//
+// 2026-07-18 OTA-1150 — port of HAL OTA-872 (inventory sell-tab protection + Save-for-quest).
+// Fusion-reserved items (reservedForFusion) no longer appear in the vendor SELL tab;
+// isUnsellable now routes through isQuestLockedItem so contract/broker/whisper objective
+// items are locked out of selling too. New soft earmark reservedForQuest + a "Save for
+// quest" button (⚑) on ordinary food/materials/loot: moves the item into the Quest Items
+// section and hides it from the sell tab while leaving it usable/droppable; peels one unit
+// off a stack; mutually exclusive with the fusion reserve. Fully lore-agnostic. Kept engine's
+// isFusionReservable divergence on the fusion-hint line. Adds ota872SaveForQuest (7/7).
+export const OTA_BUILD_ID = '2026-07-18-1150-save-for-quest';
