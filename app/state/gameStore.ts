@@ -13463,14 +13463,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const hasReclaimersRope = player.inventory.some(
           (i) => (i.name === "Reclaimer's Rope" || (i.tags ?? []).some((t) => /^climb_anchor$/i.test(t))) && i.quantity > 0,
         );
-        // arb102 — a climbing harness (worn in the cloak slot) takes the whole
-        // weight off your arms: climbing costs 0 stamina while it's worn. Detected
-        // by Tartaria name OR a 'climb_harness' tag.
+        // arb102 — a climbing harness (worn in the cloak slot) takes most of the
+        // weight off your arms: climbing costs 1 stamina while it's worn — as cheap
+        // as a Reclaimer's Rope, and the harness never wears out or snaps, but it's
+        // no longer a free climb. Detected by Tartaria name OR a 'climb_harness' tag.
         const cloakNameC = (player.equipped?.cloak ?? '').toLowerCase();
         const cloakItemC = player.inventory.find((i) => i.name.toLowerCase() === cloakNameC);
         const wearsClimbStrap = cloakNameC === 'hardened climbing strap'
           || (cloakItemC?.tags ?? []).some((t) => /^climb_harness$/i.test(t));
-        const climbStaminaCost = wearsClimbStrap ? 0 : (hasReclaimersRope ? 1 : 2);
+        const climbStaminaCost = wearsClimbStrap ? 1 : (hasReclaimersRope ? 1 : 2);
         // Active rope instance for wear/snap tracking. Reclaimer's takes
         // precedence; falls back to Climbing Rope. We pick the highest-
         // durability instance among matches so the freshest copy gets used

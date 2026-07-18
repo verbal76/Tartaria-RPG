@@ -64,6 +64,28 @@ describe('weapon coatings get their own Coatings section', () => {
   });
 });
 
+describe('the Hardened Climbing Strap is climbing gear (Tools), not Armor', () => {
+  // It's worn in the cloak slot (`wardrobe` tag) but carries no AC — it opens the
+  // climb_steep gate like a rope. It should list under Tools with the other
+  // climbing implements, NOT masquerade as defensive Armor.
+  it('the strap categorizes as tool, not armor', () => {
+    expect(categoriesForItem(mk('Hardened Climbing Strap', ['exploration', 'wardrobe'], 'exploration'))).toEqual(['tool']);
+  });
+
+  it('grouping buckets the strap under Tools with an empty Armor section', () => {
+    const groups = groupInventoryByCategory([
+      mk('Hardened Climbing Strap', ['exploration', 'wardrobe'], 'exploration', 1),
+    ]);
+    expect(groups.tool).toHaveLength(1);
+    expect(groups.tool[0]!.name).toBe('Hardened Climbing Strap');
+    expect(groups.armor).toHaveLength(0);
+  });
+
+  it('a hypothetical future wardrobe piece with no climb name still falls to Armor', () => {
+    expect(categoriesForItem(mk('Woven Aether Cloak', ['wardrobe'], 'armor'))).toEqual(['armor']);
+  });
+});
+
 describe('dog companion vests get their own Dog Armor section', () => {
   it('a kind:dog_armor vest categorizes as dog_armor (not player armor/loot)', () => {
     expect(categoriesForItem(mk('Burlap Vest', ['dog_armor', 'vest'], 'dog_armor'))).toEqual(['dog_armor']);

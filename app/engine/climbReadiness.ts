@@ -32,7 +32,8 @@ export interface ClimbReadinessInputs {
   hasGate: boolean;
   /** Does the pack hold a Reclaimer's Rope (halves the per-tier stamina cost)? */
   hasReclaimersRope: boolean;
-  /** Is a Hardened Climbing Strap worn (climbing costs 0 stamina)? */
+  /** Is a Hardened Climbing Strap worn (climbing costs 1 stamina — as cheap as a
+   *  Reclaimer's Rope, and it never wears out or snaps)? */
   wearsClimbStrap: boolean;
   /** Current stamina. */
   stamina: number;
@@ -42,9 +43,11 @@ export interface ClimbReadinessInputs {
   activeRopeDurability: number | null;
 }
 
-/** Per-tier stamina cost, mirroring gameStore: strap → 0, Reclaimer's → 1, else 2. */
+/** Per-tier stamina cost, mirroring gameStore: strap → 1, Reclaimer's → 1, else 2.
+ *  The worn strap is the cheapest climb at 1 stamina/tier (tied with the
+ *  Reclaimer's Rope) AND never wears out or snaps — but it's no longer free. */
 export function climbStaminaCost(hasReclaimersRope: boolean, wearsClimbStrap: boolean): number {
-  if (wearsClimbStrap) return 0;
+  if (wearsClimbStrap) return 1;
   return hasReclaimersRope ? 1 : 2;
 }
 

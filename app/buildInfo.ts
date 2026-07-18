@@ -17852,4 +17852,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ≥ +20, neutral between; driven by the player's actions and factions' own rivalries; shapes
 // vendor prices, offered work, and who fights beside you). Gated by new
 // worldMemory.factionRepIntroShown (hydration-defaulted), same pattern as dogClimbNoticeShown.
-export const OTA_BUILD_ID = '2026-07-18-1154-faction-standing-intro';
+// 2026-07-18 OTA-1155 — worn climbing harness → climbing gear, not armor; 1 stamina/climb (port
+// of HAL OTA-878). A harness worn in the cloak slot carries no AC — it opens the climb_steep gate
+// like a rope. It was listing under the inventory's ARMOR section (via its `wardrobe` tag); it now
+// categorizes as a TOOL with the other climbing implements. Detected content-agnostically by the
+// `climb_harness` tag (the same tag the climb handler already keys the harness tier off) OR a
+// climb-y name. Worn climb cost changed 0 → 1 stamina/tier (as cheap as an anchor rope, still
+// never wears out or snaps — just no longer free). Rest-at-altitude unchanged.
+export const OTA_BUILD_ID = '2026-07-18-1155-climbing-strap-gear';

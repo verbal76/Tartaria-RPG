@@ -35,8 +35,9 @@ describe('OTA-628 — climbBlockReason', () => {
     expect(climbBlockReason({ ...base, hasReclaimersRope: true, stamina: 0 })).toBe('no_stamina');
   });
 
-  it('Hardened Climbing Strap → cost 0, never blocked on stamina', () => {
-    expect(climbBlockReason({ ...base, wearsClimbStrap: true, stamina: 0 })).toBeNull();
+  it('Hardened Climbing Strap → cost 1 (as cheap as a Reclaimer\'s Rope) — stamina 1 is enough, 0 is not', () => {
+    expect(climbBlockReason({ ...base, wearsClimbStrap: true, stamina: 1 })).toBeNull();
+    expect(climbBlockReason({ ...base, wearsClimbStrap: true, stamina: 0 })).toBe('no_stamina');
   });
 
   // OTA-1084 — a rope is usable down to its LAST point. Only a SPENT rope
@@ -67,7 +68,7 @@ describe('OTA-628 — climbBlockReason', () => {
   it('climbStaminaCost matches the engine ladder', () => {
     expect(climbStaminaCost(false, false)).toBe(2);
     expect(climbStaminaCost(true, false)).toBe(1);
-    expect(climbStaminaCost(false, true)).toBe(0);
-    expect(climbStaminaCost(true, true)).toBe(0); // strap wins
+    expect(climbStaminaCost(false, true)).toBe(1); // worn strap: 1 stamina/tier, not free
+    expect(climbStaminaCost(true, true)).toBe(1); // strap + Reclaimer's both land at 1
   });
 });
