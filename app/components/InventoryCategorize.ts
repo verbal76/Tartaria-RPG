@@ -84,6 +84,13 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // Quest Items section, ahead of every other bucket, regardless of their other
   // tags/kind (a Core is kind 'misc'; a whisper token also carries 'aether').
   if (isQuestLockedItem(item)) return 'quest';
+  // OTA-872 — an ordinary item the player has tapped "Save for quest" on (food,
+  // materials, loot they were told to bring for a turn-in) moves into the Quest
+  // Items section too, so it sits with the objective items and out of the way of
+  // things they'd sell or craft with. The flag also hides it from the vendor sell
+  // tab (see sellPrice.isUnsellable). It stays usable/droppable — this is a soft
+  // earmark, not the hard lock a tag-based quest item carries.
+  if (item.reservedForQuest) return 'quest';
   // engine_Dev — weapon coatings (Poison Vial / Acid Flask / Corruption Tonic +
   // any author-defined coating) carry the `weapon_coating` tag. Pull them into their
   // own Coatings section ahead of the catalog/kind heuristics, which would otherwise

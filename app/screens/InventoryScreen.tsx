@@ -132,6 +132,7 @@ export function InventoryScreen() {
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
+  const toggleReserveForQuest = useGameStore((s) => s.toggleReserveForQuest);
   const applyCoating = useGameStore((s) => s.applyCoating);
   const applyCoatingToArmor = useGameStore((s) => s.applyCoatingToArmor);
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
@@ -851,6 +852,25 @@ export function InventoryScreen() {
         tone: 'neutral',
       });
     }
+    // OTA-872 — SAVE FOR QUEST. A soft earmark for an ordinary item (food,
+    // materials, loot) the player was told to bring for a turn-in. Sets
+    // reservedForQuest: the item moves to the Quest Items section and drops out of
+    // the vendor sell tab, but stays usable/droppable (unlike a hard tag-locked
+    // quest item, which returns a view-only modal above and never reaches here).
+    // Hidden while the item is reserved for fusion — the two earmarks are mutually
+    // exclusive (an item can't be both Crucible fodder and a quest hand-in). The
+    // player releases the fusion reserve first, then can save it for a quest.
+    if (!pending.item.reservedForFusion) {
+      const savedForQuest = pending.item.reservedForQuest === true;
+      buttons.push({
+        label: savedForQuest ? '⚑ Saved for quest' : '⚐ Save for quest',
+        onPress: () => {
+          toggleReserveForQuest(pending.item.id);
+          closeModal();
+        },
+        tone: 'neutral',
+      });
+    }
     // DROP — always available unless the item is currently equipped.
     // Drop handler in the engine also refuses equipped items, but
     // hiding the button cuts down on noise.
@@ -877,9 +897,13 @@ export function InventoryScreen() {
   }
   const modalBody = pending && isQuestLockedItem(pending.item)
     ? 'Reserved for your objective — this stays in your pack until you turn it in. It can\'t be dropped, scrapped, sold, or fused.'
-    : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
-      ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
-      : undefined;
+    // OTA-872 — a soft "Save for quest" earmark: explain that it's out of the sell
+    // tab and filed under Quest Items, but still yours to use or drop.
+    : pending && pending.item.reservedForQuest
+      ? 'Saved for a quest — filed under Quest Items and hidden from vendor sell lists so you don\'t sell it by accident. You can still use or drop it, or tap "Saved for quest" to release it.'
+      : pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
+        ? 'This item cannot be equipped, but you can still keep, sell, or use it.'
+        : undefined;
   // OTA — fusion info block: for a fusable/reservable item, name the material it
   // contributes and how diversity drives output rarity (a common playtest question:
   // "does what I put in change the quality?" — yes: DIFFERENT materials, not rarity).
@@ -1584,6 +1608,10 @@ function ItemRow({
               rarity / dog tags. No marker when un-reserved so the row
               isn't noisy for the catalog majority. */}
           {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
+          {/* OTA-872 — pennant marker on items the player has saved for a quest
+              turn-in (soft earmark; hidden from the sell tab). Gold to match the
+              Quest Items section colour. */}
+          {item.reservedForQuest && <Text style={[styles.rowMeta, styles.rowQuestSaved]}>⚑</Text>}
           {/* arb58 — mark items currently stowed in the tool pouch so the
               player can see at a glance which pack items are pouched. */}
           {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[scanner pouch]</Text>}
@@ -1776,6 +1804,7 @@ const styles = StyleSheet.create({
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
+  rowQuestSaved: { color: '#d9c34a', fontWeight: '700' }, // gold — matches Quest Items section
   // OTA-360 — weapon-coating chip. Sickly green-violet so it reads as
   // an applied toxin distinct from the green damage-dice chip.
   rowCoating: { color: '#b08fd4', fontWeight: '700' },

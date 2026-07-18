@@ -16827,4 +16827,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     OTA-052 Capitals; now reads the canonical LOST_CAPITAL_NAMES export from mainQuest.
 // New guard test __tests__/ota871QuestEpilogue.test.ts (data-integrity checkKind guard +
 // mystery/storyline epilogue advance-to-turn-in). Typecheck clean; 3/3 green.
-export const OTA_BUILD_ID = '2026-07-17-871-completability-sweep';
+//
+// OTA-872 (inventory sell-tab protection + "Save for quest") — MECHANIC, all 3 lines.
+//   · Items reserved for the fusion Crucible (reservedForFusion) no longer appear in the
+//     vendor SELL tab — closes a real leak where fusion stock was easy to sell off.
+//   · isUnsellable now routes through isQuestLockedItem, so a contract/broker/whisper
+//     objective item that isn't ALSO tagged 'quest' is still locked out of selling (the
+//     old check only matched the bare 'quest' tag). Named mandatory hand-in items stay
+//     fully view-only (no drop/scrap/sell/gift/fuse) as before.
+//   · NEW soft earmark reservedForQuest + toggleReserveForQuest: a "Save for quest" button
+//     (⚑) on ordinary food/materials/loot the player was told to bring. It moves the item
+//     into the Quest Items section and hides it from the sell tab, but leaves it usable and
+//     droppable (unlike a hard tag-locked item). Peels one unit off a stack like the fusion
+//     reserve (save 2 rations, eat the rest); mutually exclusive with the fusion reserve.
+// New test __tests__/ota872SaveForQuest.test.ts (7/7). Typecheck clean; related vendor/
+// fusion/sell suites 161/161 green.
+export const OTA_BUILD_ID = '2026-07-18-872-save-for-quest';
