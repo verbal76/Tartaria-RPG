@@ -23075,14 +23075,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
     const type = coatingDamageType(String(spec.kind));
-    // OTA-873 — reject an OFFENSIVE-only coating (acid / corruption). Those are DOT
-    // families the player's coated WEAPON applies; no enemy deals them as incoming
-    // damage, so a worked-in resist against them would match nothing and silently
-    // waste the vial. Steer the player to coat a weapon with it instead.
+    // OTA-873/874 — reject a coating whose damage type no enemy can ever DEAL (so a
+    // worked-in resist would match nothing and silently waste the vial). OTA-874 made
+    // acid + corruption first-class incoming types, so every current coating family
+    // (poison / acid / corruption / electrical / burn / cold) is resistable and passes;
+    // this now only guards a hypothetical future coating with no incoming counterpart.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { isResistableIncomingType } = require('../engine/damageTypes') as typeof import('../engine/damageTypes');
     if (!isResistableIncomingType(type)) {
-      get().appendLog('world', `A ${coatItem.name.toLowerCase()} is an offensive coating — ${type} eats the target, it isn't something armor turns aside. Work it into a WEAPON instead. (Armor takes poison, electrical, burn, or cold.)`);
+      get().appendLog('world', `A ${coatItem.name.toLowerCase()} is a pure offensive coating — nothing in the wasteland strikes with ${type}, so armor can't be hardened against it. Work it into a WEAPON instead.`);
       return;
     }
     const already = (armor.addedResists ?? []).map((r) => r.toLowerCase());

@@ -16228,4 +16228,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // damage). New isResistableIncomingType() gates applyCoatingToArmor (refuses them, steers to
 // a weapon) and hides the "Apply to armor" button for them; poison/electrical/burn/cold
 // unaffected. Adds ota873ArmorCoatOffensive.
-export const OTA_BUILD_ID = '2026-07-18-852-armor-coat-offensive-guard';
+// 2026-07-18 OTA-853 — acid + corruption become first-class damage types. The inference
+// already read acidic/corrosive/rot attacks but folded them into poison; this splits acid +
+// corruption into their own incoming types (new keywords + aliases + ATTACK_VERB_TYPE rules)
+// so a resist against them is real. Re-types the 3 Aetheric oozes → acid and the Hollow King
+// → corruption; TYPE_RESISTANCE_MAP earns metal-weak-to-acid / flesh-weak-to-corruption. The
+// data-driven armor guard auto-lifts, so Acid Flask / Corruption Tonic now grant a real armor
+// resist. Replaces ota873ArmorCoatOffensive with ota874AcidCorruptionTypes (6/6).
+export const OTA_BUILD_ID = '2026-07-18-853-acid-corruption-types';
