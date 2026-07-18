@@ -16218,4 +16218,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 2026-07-18 OTA-852b — follow-up: same-element dual coatings SUM their DOT within a hit
 // (poison + poison ticks for the sum, one merged status; still refreshes across hits, no
 // unbounded growth). Two different elements stay two independent DOTs. Adds ota873DualPoisonSum.
-export const OTA_BUILD_ID = '2026-07-18-852-crucible-upgrade-dualcoat-sum';
+// 2026-07-18 OTA-852c — hardening: a 5-agent pressure-test suite found two upgradeCoatingSlot
+// exploits, fixed here. (1) dup-id cost bypass — passing the same reserved id five times
+// satisfied the ===5 gate but consumed only one unit; fixed by deduping itemIds. (2) stack
+// mass-upgrade — a quantity>1 target upgraded every copy for one cost; fixed by refusing a
+// stacked target. Two EXPLOIT-GUARD regression tests; suite 11/11.
+export const OTA_BUILD_ID = '2026-07-18-852-crucible-upgrade-exploit-fix';
