@@ -16240,4 +16240,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reworded five misleading trait lines to match the real mechanics (investigate bonuses stated
 // as "+N to investigation on relics"; dropped a fictional Common-level magic cap on Unknowing
 // Masses and an unenforced "Near Aetherstone" gate on the Mud Golem). Text-only.
-export const OTA_BUILD_ID = '2026-07-18-854-race-text-audit';
+// 2026-07-18 OTA-855 — faction data hygiene (port of HAL OTA-876). Cleaned three allies/rivals
+// pseudo-ids to real faction ids so the relationships fire in the world-sim (not just the
+// standing system): forgotten_order→reclaimers_guild, true_tartarians→forgotten_order,
+// reclaimers_guild rival→mud_monarchs, and dropped the non-faction "anyone_paying" ally.
+export const OTA_BUILD_ID = '2026-07-18-855-faction-relation-ids';
