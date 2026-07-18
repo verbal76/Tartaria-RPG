@@ -16223,4 +16223,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // satisfied the ===5 gate but consumed only one unit; fixed by deduping itemIds. (2) stack
 // mass-upgrade — a quantity>1 target upgraded every copy for one cost; fixed by refusing a
 // stacked target. Two EXPLOIT-GUARD regression tests; suite 11/11.
-export const OTA_BUILD_ID = '2026-07-18-852-crucible-upgrade-exploit-fix';
+// 2026-07-18 OTA-852d — armor-coating hygiene: acid/corruption vials worked into ARMOR
+// granted an inert resist (offensive-only DOT families; no enemy deals them as incoming
+// damage). New isResistableIncomingType() gates applyCoatingToArmor (refuses them, steers to
+// a weapon) and hides the "Apply to armor" button for them; poison/electrical/burn/cold
+// unaffected. Adds ota873ArmorCoatOffensive.
+export const OTA_BUILD_ID = '2026-07-18-852-armor-coat-offensive-guard';

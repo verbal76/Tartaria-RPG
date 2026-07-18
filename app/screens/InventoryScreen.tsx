@@ -780,15 +780,30 @@ export function InventoryScreen() {
         } catch { /* fall through to tag */ }
         return (pending.item.tags ?? []).find((t) => ['poison', 'acid', 'corruption', 'electrical', 'burn'].includes(t));
       })();
-      buttons.push({
-        label: armorCoatType ? `Apply to armor (+${armorCoatType} resist)` : 'Apply to armor',
-        onPress: () => {
-          const coat = pending.item;
-          closeModal();
-          setArmorCoatTarget(coat);
-        },
-        tone: 'primary',
-      });
+      // OTA-873 — only offer "Apply to armor" when the coating's type is one armor can
+      // actually resist (an incoming damage type). acid / corruption are offensive-only
+      // DOT families — no enemy deals them, so a resist against them is inert; hide the
+      // button for those so a vial isn't wasted. Unknown types still show it (the store
+      // action guards them).
+      const canArmorCoat = (() => {
+        if (!armorCoatType) return true;
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { isResistableIncomingType } = require('../engine/damageTypes') as typeof import('../engine/damageTypes');
+          return isResistableIncomingType(armorCoatType);
+        } catch { return true; }
+      })();
+      if (canArmorCoat) {
+        buttons.push({
+          label: armorCoatType ? `Apply to armor (+${armorCoatType} resist)` : 'Apply to armor',
+          onPress: () => {
+            const coat = pending.item;
+            closeModal();
+            setArmorCoatTarget(coat);
+          },
+          tone: 'primary',
+        });
+      }
     }
     // SCRAP — only for built items with material content. Hidden for
     // raw stock (already material) and for items currently equipped
