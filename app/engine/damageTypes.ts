@@ -53,6 +53,18 @@ export function canonicalDamageType(t: string | null | undefined): string {
   return DAMAGE_TYPE_ALIASES[lc] ?? lc;
 }
 
+/** OTA-873 — true iff `type` is a damage type an enemy can actually DEAL, i.e. a
+ *  type that a worn armor resist can ever match. Keyed off DAMAGE_TYPE_KEYWORDS (via
+ *  the alias table). `acid` and `corruption` are OFFENSIVE-only coating families —
+ *  the player's coated WEAPON applies them as DOTs; no enemy emits them as incoming
+ *  damage — so a coating resist against them is inert. The "apply to armor" flow uses
+ *  this to reject those vials; if acid/corruption ever become real incoming types,
+ *  adding them to DAMAGE_TYPE_KEYWORDS auto-enables the armor path. */
+export function isResistableIncomingType(type: string | null | undefined): boolean {
+  const c = canonicalDamageType(type);
+  return (DAMAGE_TYPE_KEYWORDS as readonly string[]).includes(c);
+}
+
 /** Scan a string for an explicit damage-type word. Returns the canonical type
  *  (psychic normalized to aetheric) or null when none is present. Mirrors the
  *  long-standing parseIncomingDamageType so resistance behavior is unchanged

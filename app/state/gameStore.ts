@@ -23560,6 +23560,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { coatingDamageType } = require('../engine/weaponCoating') as typeof import('../engine/weaponCoating');
     const type = coatingDamageType(String(spec.kind));
+    // OTA-873 — reject an OFFENSIVE-only coating (acid / corruption). Those are DOT
+    // families the player's coated WEAPON applies; no enemy deals them as incoming
+    // damage, so a worked-in resist against them would match nothing and silently
+    // waste the vial. Steer the player to coat a weapon with it instead.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isResistableIncomingType } = require('../engine/damageTypes') as typeof import('../engine/damageTypes');
+    if (!isResistableIncomingType(type)) {
+      get().appendLog('world', `A ${coatItem.name.toLowerCase()} is an offensive coating — ${type} eats the target, it isn't something armor turns aside. Work it into a WEAPON instead. (Armor takes poison, electrical, burn, or cold.)`);
+      return;
+    }
     const already = (armor.addedResists ?? []).map((r) => r.toLowerCase());
     if (already.includes(type.toLowerCase())) {
       get().appendLog('world', `The ${armor.name} already turns aside ${type}. No need to waste another vial on it.`);
