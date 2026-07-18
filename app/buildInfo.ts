@@ -16235,4 +16235,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // → corruption; TYPE_RESISTANCE_MAP earns metal-weak-to-acid / flesh-weak-to-corruption. The
 // data-driven armor guard auto-lifts, so Acid Flask / Corruption Tonic now grant a real armor
 // resist. Replaces ota873ArmorCoatOffensive with ota874AcidCorruptionTypes (6/6).
-export const OTA_BUILD_ID = '2026-07-18-853-acid-corruption-types';
+// 2026-07-18 OTA-854 — Choose-Your-Race text audit (port of HAL OTA-875). Removed the stale
+// "(Per-day powers and immunities arrive in a follow-up update.)" note (those all shipped) and
+// reworded five misleading trait lines to match the real mechanics (investigate bonuses stated
+// as "+N to investigation on relics"; dropped a fictional Common-level magic cap on Unknowing
+// Masses and an unenforced "Near Aetherstone" gate on the Mud Golem). Text-only.
+export const OTA_BUILD_ID = '2026-07-18-854-race-text-audit';
