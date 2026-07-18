@@ -16916,4 +16916,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     the guard — its lore-agnostic base defines no acid/corruption attackers.)
 // New test ota874AcidCorruptionTypes (replaces ota873ArmorCoatOffensive); typecheck clean;
 // construct/coating/weakness suites 55/55 green.
-export const OTA_BUILD_ID = '2026-07-18-874-acid-corruption-types';
+//
+// OTA-875 (Choose-Your-Race text audit) — removed a STALE player-facing note and fixed
+// five misleading trait lines to match the shipped mechanics:
+//   · CharacterCreationScreen: deleted "(Per-day powers and immunities arrive in a
+//     follow-up update.)" — those all shipped (OTA-835 race abilities + Sentinel Immunity
+//     to Time), so the note both leaked a dev reference and was flat wrong. (All 3 lines.)
+//   · races.json (HAL + golem): the investigate-bonus traits were framed as STAT bonuses on
+//     the wrong stat / with unimplemented conditions. Reworded to the real effect (a flat
+//     "+N to investigation on relics"): Giant Ancient Insight, Mud Dweller Relic Savvy (also
+//     clarified the +2 DEX is always-on, shown separately), Reclaimer Ruins Specialist (drop
+//     the unimplemented "navigating dangerous areas"), Aetherborn Aetheric Awakening. Mud
+//     Golem Regenerative Core drops the unenforced "Near Aetherstone" gate. Unknowing Masses
+//     "Ignorant of Aetheric Power" drops a fictional Common-level magic-tier cap / 1d6 dice
+//     (no such mechanic exists) and now states the real effect (untrained → stiff Aethercraft
+//     DC penalty). No mechanic changes — text-only, matched to the engine.
+export const OTA_BUILD_ID = '2026-07-18-875-race-text-audit';
