@@ -136,9 +136,6 @@ export function CharacterCreationScreen() {
                   {r.traits.map((t, i) => (
                     <Text key={i} style={styles.optionTrait}>· {t}</Text>
                   ))}
-                  <Text style={styles.optionTraitNote}>
-                    (Per-day powers and immunities arrive in a follow-up update.)
-                  </Text>
                 </View>
               )}
               <Text style={styles.optionMeta}>
@@ -243,7 +240,6 @@ const styles = StyleSheet.create({
   optionMetaSub: { color: '#6ab0c9', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
   optionTraits: { marginTop: 8, paddingLeft: 6, borderLeftColor: '#2b3a3e', borderLeftWidth: 2 },
   optionTrait: { color: '#9ec96a', fontSize: 11, lineHeight: 16, marginBottom: 2 },
-  optionTraitNote: { color: '#6ab0c9', fontSize: 10, marginTop: 4, fontStyle: 'italic' },
   optionFlavor: {
     color: '#a89776',
     fontSize: 12,

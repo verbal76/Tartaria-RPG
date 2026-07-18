@@ -17839,4 +17839,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // damage). New isResistableIncomingType() gates applyCoatingToArmor (refuses them, steers to
 // a weapon) and hides the "Apply to armor" button for them; poison/electrical/burn/cold
 // unaffected. Kept engine's Drink-to-resist button + coatType var. Adds ota873ArmorCoatOffensive.
-export const OTA_BUILD_ID = '2026-07-18-1151-armor-coat-offensive-guard';
+// 2026-07-18 OTA-1152 — Choose-Your-Race: removed the stale player-facing note "(Per-day
+// powers and immunities arrive in a follow-up update.)" — those all shipped, so it leaked a
+// dev/update reference and was factually wrong. Note-only (engine carries its own race
+// content, so HAL OTA-875's trait rewrites don't apply here).
+export const OTA_BUILD_ID = '2026-07-18-1152-race-creation-stale-note';
