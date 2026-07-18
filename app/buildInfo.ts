@@ -16842,4 +16842,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     reserve (save 2 rations, eat the rest); mutually exclusive with the fusion reserve.
 // New test __tests__/ota872SaveForQuest.test.ts (7/7). Typecheck clean; related vendor/
 // fusion/sell suites 161/161 green.
-export const OTA_BUILD_ID = '2026-07-18-872-save-for-quest';
+//
+// OTA-873 (Crucible "Upgrade" mode — extra coating channels) — MECHANIC, all 3 lines.
+//   The Fusing Crucible gains a 4th mode next to Weapon / Armor / Dog: "⬆ Upgrade".
+//   Pick EXACTLY 5 reserved pieces, then choose a piece on a second screen — the
+//   Crucible works an extra coating channel into it. Two target kinds:
+//   · WEAPON → a SECOND coating slot (coatingSlots → 2). A dual-coat weapon holds two
+//     coatings at once and BOTH fire on every landing hit: two on-hit roll steps
+//     ('coating' + 'coating2'), two DOTs / shred / corruption ticks. Any two elements,
+//     including the same twice (same-kind DOT refreshes per the existing per-kind cap;
+//     immediate damage still doubles).
+//   · ARMOR / DOG-VEST → +1 worked-in-resist capacity (resistCapBonus → 1), so the
+//     piece can hold one more damage-type resist than the stock cap of 3 (→ 4). The
+//     armor parallel to a weapon's 2nd coating slot.
+//   Adds a coating channel ONLY — no AC / damage / durability change either way.
+//   · types: InventoryItem.coating2 + coatingSlots (weapon); resistCapBonus (armor).
+//   · weaponCoating: coatedDisplayName shows both adjectives; new coatingCapacity /
+//     nextCoatSlot helpers.
+//   · applyCoating is dual-slot aware (2nd coat fills the open slot, list labels it
+//     "adds 2nd coat"); applyCoatingToArmor honours the per-instance resist cap.
+//   · new store action upgradeCoatingSlot (permit-gated like fusion; consumes 5,
+//     branches weapon vs armor, refuses ineligible / already-upgraded / wrong count).
+//   · combatRules stages the 2nd coating step; equipment aggregates a 2nd coating's
+//     passive statBonus.
+// New test __tests__/ota873WeaponUpgradeDualCoat.test.ts (9/9). Typecheck clean; the
+// fast coating/combat/armor suites are 72/72 green.
+export const OTA_BUILD_ID = '2026-07-18-873-crucible-upgrade-coating';

@@ -360,6 +360,8 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     // bonus (+1 stealth / charisma / …) while it's wielded, on top of whatever
     // the weapon itself grants. Applies independent of the catalog/instance perks.
     if (inst?.coating?.statBonus) add(inst.coating.statBonus.stat, inst.coating.statBonus.amount);
+    // OTA-873 — a dual-coat weapon's SECOND coating grants its passive stat bonus too.
+    if (inst?.coating2?.statBonus) add(inst.coating2.statBonus.stat, inst.coating2.statBonus.amount);
     if (inst?.instanceStats?.statBonuses) {
       for (const b of inst.instanceStats.statBonuses) add(b.stat, b.amount);
       continue;

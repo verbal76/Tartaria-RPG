@@ -7,10 +7,13 @@ import React, { useMemo, useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Pressable, TouchableWithoutFeedback } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { eligibleInputs, fusionMaterialTags, visibleFusionInputs } from '../engine/itemFusion';
+import { isCoatableItem, coatingCapacity, coatedDisplayName } from '../engine/weaponCoating';
 import type { InventoryItem } from '../engine/types';
 
 const MIN_PICK = 3;
 const MAX_PICK = 5;
+// OTA-873 — the "Upgrade weapon" mode costs EXACTLY this many reserved pieces.
+const UPGRADE_PICK = 5;
 
 // OTA-679 — the item's material type(s) for the picker row (metal / aether / organic
 // / wood / stone / …), title-cased and joined. Mirrors the fusionMaterialTags the
@@ -21,11 +24,14 @@ function fusionTypeLabel(item: InventoryItem): string {
   return mats.map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(' · ');
 }
 
+type ForgeKind = 'weapon' | 'armor' | 'dog_armor' | 'upgrade';
+
 export function FusionPickerModal() {
   const visible = useGameStore((s) => s.fusionPickerOpen);
   const inventory = useGameStore((s) => s.player?.inventory);
   const close = useGameStore((s) => s.closeFusionPicker);
   const confirm = useGameStore((s) => s.confirmFusionSelection);
+  const upgradeCoating = useGameStore((s) => s.upgradeCoatingSlot);
 
   const scraps = useMemo<InventoryItem[]>(
     () => (inventory ? eligibleInputs(inventory) : []),
@@ -35,17 +41,37 @@ export function FusionPickerModal() {
     () => (inventory ?? []).filter((i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear')),
     [inventory],
   );
+  // OTA-873 — pieces eligible for a coating-channel upgrade. A single-instance
+  // WEAPON that's coatable and not already dual-slot gains a 2nd coating slot; a
+  // single-instance ARMOR / DOG-VEST not already upgraded gains +1 resist capacity.
+  const isArmorPiece = (i: InventoryItem) =>
+    i.kind === 'armor' || i.kind === 'dog_armor'
+    || i.uniqueStats?.kind === 'armor' || i.uniqueStats?.kind === 'dog_armor';
+  const upgradeable = useMemo<InventoryItem[]>(
+    () => (inventory ?? []).filter((i) =>
+      i.quantity === 1 && (
+        (isCoatableItem(i) && coatingCapacity(i) < 2)
+        || (isArmorPiece(i) && (i.resistCapBonus ?? 0) < 1)
+      ),
+    ),
+    [inventory],
+  );
 
   const [picked, setPicked] = useState<string[]>([]);
   const [catalystId, setCatalystId] = useState<string | null>(null);
-  const [kind, setKind] = useState<'weapon' | 'armor' | 'dog_armor'>('weapon');
+  const [kind, setKind] = useState<ForgeKind>('weapon');
+  // OTA-873 — two-stage flow for the upgrade: pick 5 materials, then pick the weapon.
+  const [stage, setStage] = useState<'pick' | 'weapon'>('pick');
 
   if (!visible) return null;
+
+  const isUpgrade = kind === 'upgrade';
+  const pickCap = isUpgrade ? UPGRADE_PICK : MAX_PICK;
 
   const toggle = (id: string) => {
     setPicked((cur) => {
       if (cur.includes(id)) return cur.filter((x) => x !== id);
-      if (cur.length >= MAX_PICK) return cur; // cap at 5
+      if (cur.length >= pickCap) return cur; // cap
       return [...cur, id];
     });
   };
@@ -63,16 +89,31 @@ export function FusionPickerModal() {
   // naive declutter then hid ALL remaining filler and the Fuse button could never light
   // (OTA-682 deadlock read as "I still can't fuse"). visibleFusionInputs reveals filler
   // when you're short of MIN_PICK with nothing left that adds a new material.
-  const visibleScraps = visibleFusionInputs(scraps, picked, MIN_PICK);
+  const visibleScraps = visibleFusionInputs(scraps, picked, isUpgrade ? UPGRADE_PICK : MIN_PICK);
   const predicted = nMats >= 4 ? 'Legendary' : nMats >= 3 ? 'Rare' : null;
-  const canFuse = picked.length >= MIN_PICK && picked.length <= MAX_PICK;
+  // OTA-873 — upgrade needs EXACTLY 5; a normal forge needs 3–5.
+  const canFuse = isUpgrade
+    ? picked.length === UPGRADE_PICK
+    : picked.length >= MIN_PICK && picked.length <= MAX_PICK;
+
+  const reset = () => { setPicked([]); setCatalystId(null); setKind('weapon'); setStage('pick'); };
 
   const onFuse = () => {
     if (!canFuse) return;
-    confirm(picked, kind, catalystId ?? undefined);
-    setPicked([]); setCatalystId(null); setKind('weapon');
+    if (isUpgrade) {
+      // Move to weapon selection instead of forging a new item.
+      setStage('weapon');
+      return;
+    }
+    confirm(picked, kind as 'weapon' | 'armor' | 'dog_armor', catalystId ?? undefined);
+    reset();
   };
-  const onClose = () => { setPicked([]); setCatalystId(null); setKind('weapon'); close(); };
+  const onPickPiece = (pieceId: string) => {
+    upgradeCoating(pieceId, picked);
+    reset();
+    close();
+  };
+  const onClose = () => { reset(); close(); };
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
@@ -81,74 +122,124 @@ export function FusionPickerModal() {
           <TouchableWithoutFeedback onPress={() => { /* swallow inner taps */ }}>
             <View style={styles.card}>
               <Text style={styles.title}>Fusing Crucible</Text>
-              <Text style={styles.sub}>
-                Pick {MIN_PICK}–{MAX_PICK} reserved pieces to spend ({picked.length} chosen), then forge.
-              </Text>
-              <Text style={styles.readout}>
-                {nMats} material{nMats === 1 ? '' : 's'}{distinctMats.length ? ` (${distinctMats.join(', ')})` : ''} → {predicted ? `${predicted} result` : 'need 3+ DIFFERENT materials'}
-              </Text>
 
-              {scraps.length === 0 ? (
-                <Text style={styles.empty}>No reserved (♥) materials. Heart items in your inventory first.</Text>
+              {stage === 'weapon' ? (
+                // OTA-873 — upgrade stage 2: choose which piece gains the coating channel.
+                // A weapon gains a 2nd coating slot; armor / a dog vest gains +1 resist slot.
+                <>
+                  <Text style={styles.sub}>
+                    Choose the piece to gain a coating channel — a weapon gets a SECOND coating slot; armor or a dog vest gets room for one more worked-in resist. This spends your {UPGRADE_PICK} reserved pieces; it doesn't change the piece's AC, damage, or edge.
+                  </Text>
+                  {upgradeable.length === 0 ? (
+                    <Text style={styles.empty}>No eligible piece. You need a single coatable weapon (blade / arrow-arm / bolt-caster) without two coating slots, or a piece of armor or a dog vest that hasn't been upgraded yet.</Text>
+                  ) : (
+                    <ScrollView style={styles.list} nestedScrollEnabled>
+                      {upgradeable.map((w) => {
+                        const armor = isArmorPiece(w);
+                        const detail = armor
+                          ? `${(w.addedResists ?? []).length} resist${(w.addedResists ?? []).length === 1 ? '' : 's'} → +1 slot`
+                          : w.coating ? `has ${w.coating.label.toLowerCase()} → +1 slot` : 'no coating yet → +1 slot';
+                        return (
+                          <Pressable key={w.id} onPress={() => onPickPiece(w.id)} style={[styles.row, styles.rowOn]}>
+                            <Text style={styles.rowName} numberOfLines={1}>{armor ? w.name : coatedDisplayName(w)}</Text>
+                            <Text style={styles.rowType} numberOfLines={1}>{detail}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </ScrollView>
+                  )}
+                  <View style={styles.actions}>
+                    <Pressable onPress={() => setStage('pick')} style={[styles.actBtn, styles.actNeutral]}>
+                      <Text style={styles.actNeutralTxt}>← Back</Text>
+                    </Pressable>
+                  </View>
+                </>
               ) : (
-                <ScrollView style={styles.list} nestedScrollEnabled>
-                  {visibleScraps.map((it) => {
-                    const on = picked.includes(it.id);
-                    const dim = !on && picked.length >= MAX_PICK;
-                    // OTA-679 — show the item's MATERIAL TYPE (metal / aether / organic /
-                    // wood / …) next to the name. Fusion needs DIFFERENT materials, so the
-                    // type is the info the player actually picks on; rarity is secondary.
-                    return (
-                      <Pressable key={it.id} onPress={() => toggle(it.id)} style={[styles.row, on && styles.rowOn, dim && styles.rowDim]}>
-                        <Text style={[styles.check, on && styles.checkOn]}>{on ? '☑' : '☐'}</Text>
-                        <Text style={styles.rowName} numberOfLines={1}>{it.name}</Text>
-                        <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(it)}</Text>
-                        <Text style={styles.rowMeta}>{it.rarity}</Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
+                <>
+                  <Text style={styles.sub}>
+                    {isUpgrade
+                      ? `Pick exactly ${UPGRADE_PICK} reserved pieces (${picked.length} chosen), then choose a weapon, armor piece, or dog vest to add a coating channel.`
+                      : `Pick ${MIN_PICK}–${MAX_PICK} reserved pieces to spend (${picked.length} chosen), then forge.`}
+                  </Text>
+                  {isUpgrade ? (
+                    <Text style={styles.readout}>
+                      Upgrade — adds a coating channel (no rarity / AC / damage change). A weapon then carries two coatings that both bite on every hit; armor / a vest holds one more worked-in resist.
+                    </Text>
+                  ) : (
+                    <Text style={styles.readout}>
+                      {nMats} material{nMats === 1 ? '' : 's'}{distinctMats.length ? ` (${distinctMats.join(', ')})` : ''} → {predicted ? `${predicted} result` : 'need 3+ DIFFERENT materials'}
+                    </Text>
+                  )}
+
+                  {scraps.length === 0 ? (
+                    <Text style={styles.empty}>No reserved (♥) materials. Heart items in your inventory first.</Text>
+                  ) : (
+                    <ScrollView style={styles.list} nestedScrollEnabled>
+                      {visibleScraps.map((it) => {
+                        const on = picked.includes(it.id);
+                        const dim = !on && picked.length >= pickCap;
+                        // OTA-679 — show the item's MATERIAL TYPE (metal / aether / organic /
+                        // wood / …) next to the name. Fusion needs DIFFERENT materials, so the
+                        // type is the info the player actually picks on; rarity is secondary.
+                        return (
+                          <Pressable key={it.id} onPress={() => toggle(it.id)} style={[styles.row, on && styles.rowOn, dim && styles.rowDim]}>
+                            <Text style={[styles.check, on && styles.checkOn]}>{on ? '☑' : '☐'}</Text>
+                            <Text style={styles.rowName} numberOfLines={1}>{it.name}</Text>
+                            <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(it)}</Text>
+                            <Text style={styles.rowMeta}>{it.rarity}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </ScrollView>
+                  )}
+
+                  {/* Faction catalyst themes a FORGED item — irrelevant to a coating-slot upgrade. */}
+                  {!isUpgrade && catalysts.length > 0 && (
+                    <View style={styles.catBlock}>
+                      <Text style={styles.catLabel}>Faction catalyst (optional — themes the result)</Text>
+                      {catalysts.map((c) => {
+                        const on = catalystId === c.id;
+                        return (
+                          <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[styles.row, on && styles.rowOn]}>
+                            <Text style={[styles.check, on && styles.checkOn]}>{on ? '◉' : '○'}</Text>
+                            <Text style={styles.rowName} numberOfLines={1}>{c.name}</Text>
+                            <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(c)}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  )}
+
+                  <Text style={styles.catLabel}>{isUpgrade ? 'Mode' : 'Forge as'}</Text>
+                  <View style={styles.kindRow}>
+                    <Pressable onPress={() => setKind('weapon')} style={[styles.kindBtn, kind === 'weapon' && styles.kindOn]}>
+                      <Text style={[styles.kindTxt, kind === 'weapon' && styles.kindTxtOn]}>⚔ Weapon</Text>
+                    </Pressable>
+                    <Pressable onPress={() => setKind('armor')} style={[styles.kindBtn, kind === 'armor' && styles.kindOn]}>
+                      <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
+                    </Pressable>
+                    {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. */}
+                    <Pressable onPress={() => setKind('dog_armor')} style={[styles.kindBtn, kind === 'dog_armor' && styles.kindOn]}>
+                      <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
+                    </Pressable>
+                    {/* OTA-873 — fourth mode: upgrade an existing weapon with a 2nd coating slot. */}
+                    <Pressable onPress={() => { setKind('upgrade'); setPicked((cur) => cur.slice(0, UPGRADE_PICK)); }} style={[styles.kindBtn, kind === 'upgrade' && styles.kindOn]}>
+                      <Text style={[styles.kindTxt, kind === 'upgrade' && styles.kindTxtOn]}>⬆ Upgrade</Text>
+                    </Pressable>
+                  </View>
+
+                  <View style={styles.actions}>
+                    <Pressable onPress={onClose} style={[styles.actBtn, styles.actNeutral]}>
+                      <Text style={styles.actNeutralTxt}>Cancel</Text>
+                    </Pressable>
+                    <Pressable onPress={onFuse} disabled={!canFuse} style={[styles.actBtn, styles.actPrimary, !canFuse && styles.actDisabled]}>
+                      <Text style={styles.actPrimaryTxt}>
+                        {isUpgrade ? `Choose piece → ${picked.length}/${UPGRADE_PICK}` : `Fuse ${picked.length > 0 ? `(${picked.length})` : ''}`}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </>
               )}
-
-              {catalysts.length > 0 && (
-                <View style={styles.catBlock}>
-                  <Text style={styles.catLabel}>Faction catalyst (optional — themes the result)</Text>
-                  {catalysts.map((c) => {
-                    const on = catalystId === c.id;
-                    return (
-                      <Pressable key={c.id} onPress={() => setCatalystId(on ? null : c.id)} style={[styles.row, on && styles.rowOn]}>
-                        <Text style={[styles.check, on && styles.checkOn]}>{on ? '◉' : '○'}</Text>
-                        <Text style={styles.rowName} numberOfLines={1}>{c.name}</Text>
-                        <Text style={styles.rowType} numberOfLines={1}>{fusionTypeLabel(c)}</Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              )}
-
-              <Text style={styles.catLabel}>Forge as</Text>
-              <View style={styles.kindRow}>
-                <Pressable onPress={() => setKind('weapon')} style={[styles.kindBtn, kind === 'weapon' && styles.kindOn]}>
-                  <Text style={[styles.kindTxt, kind === 'weapon' && styles.kindTxtOn]}>⚔ Weapon</Text>
-                </Pressable>
-                <Pressable onPress={() => setKind('armor')} style={[styles.kindBtn, kind === 'armor' && styles.kindOn]}>
-                  <Text style={[styles.kindTxt, kind === 'armor' && styles.kindTxtOn]}>🛡 Armor</Text>
-                </Pressable>
-                {/* OTA-757 — third forge shape: a one-of-a-kind DOG VEST. The synth
-                    already supports dog_armor; the picker just never offered it. */}
-                <Pressable onPress={() => setKind('dog_armor')} style={[styles.kindBtn, kind === 'dog_armor' && styles.kindOn]}>
-                  <Text style={[styles.kindTxt, kind === 'dog_armor' && styles.kindTxtOn]}>🐕 Dog</Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.actions}>
-                <Pressable onPress={onClose} style={[styles.actBtn, styles.actNeutral]}>
-                  <Text style={styles.actNeutralTxt}>Cancel</Text>
-                </Pressable>
-                <Pressable onPress={onFuse} disabled={!canFuse} style={[styles.actBtn, styles.actPrimary, !canFuse && styles.actDisabled]}>
-                  <Text style={styles.actPrimaryTxt}>Fuse {picked.length > 0 ? `(${picked.length})` : ''}</Text>
-                </Pressable>
-              </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
