@@ -16931,4 +16931,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     "Ignorant of Aetheric Power" drops a fictional Common-level magic-tier cap / 1d6 dice
 //     (no such mechanic exists) and now states the real effect (untrained → stiff Aethercraft
 //     DC penalty). No mechanic changes — text-only, matched to the engine.
-export const OTA_BUILD_ID = '2026-07-18-875-race-text-audit';
+//
+// OTA-876 (faction data hygiene) — three allies/rivals entries used pseudo-ids that only
+// the standing system's normalizeRef resolved, so the relationships fired for reputation
+// but were silently dropped by the world-sim (bounties / world-pulse / world-events filter
+// on exact ids). Cleaned to plain real ids so they fire everywhere: forgotten_order ally
+// reclaimers_guild_situational → reclaimers_guild; true_tartarians ally forgotten_order_partial
+// → forgotten_order; reclaimers_guild rival mud_monarchs_when_unpaid → mud_monarchs; and its
+// non-faction ally "anyone_paying" removed (the Guild keeps no fixed faction ally). Data-only;
+// all allies/rivals now resolve to real faction ids.
+export const OTA_BUILD_ID = '2026-07-18-876-faction-relation-ids';
