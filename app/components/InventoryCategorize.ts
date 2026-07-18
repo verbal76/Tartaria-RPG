@@ -152,12 +152,24 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // arb90 — tools before the generic gear/material buckets so utility
   // implements get their own section (and the pry bar lands there).
   if (isToolItem(item)) return 'tool';
-  // arb-fix — `wardrobe`-tagged worn apparel (the Hardened Climbing Strap)
-  // equips in the cloak slot, so it belongs under ARMOR, not the generic Loot
-  // bucket. It lives in exploration.json (kind:exploration) for its climb_steep
-  // gate, so it isn't in the ARMOR catalog above and was falling through to
-  // 'loot'. `wardrobe` is the canonical worn-not-tool tag (see pouchEligibility
-  // NON_TOOL_TAGS); the strap is currently its only holder.
+  // The Hardened Climbing Strap is worn (cloak slot, `wardrobe` tag) but it's
+  // CLIMBING GEAR, not defensive armor — it opens the climb_steep gate like a
+  // rope and carries no AC. File it under TOOLS with the other climbing
+  // implements (Climbing Rope, Reclaimer's Rope, treads, grapplers, the
+  // "Climbing Gear" item) instead of letting it masquerade as Armor. It stays
+  // worn-not-pouchable (pouchEligibility keeps `wardrobe` out of tool slots);
+  // this only changes which inventory SECTION it lists under. The name guard
+  // keeps any hypothetical future worn *armor* (wardrobe-tagged, no climb name)
+  // falling through to the armor rules below.
+  if (
+    item.tags.some((t) => t.toLowerCase() === 'wardrobe') &&
+    /climb|strap|harness/.test(nameLower)
+  ) {
+    return 'tool';
+  }
+  // arb-fix — any other `wardrobe`-tagged worn apparel equips in the cloak slot,
+  // so it belongs under ARMOR, not the generic Loot bucket. (None today; the
+  // strap above is the only wardrobe item, and it's climbing gear.)
   if (item.tags.some((t) => t.toLowerCase() === 'wardrobe')) return 'armor';
   if (GEAR.some((g) => g.name.toLowerCase() === nameLower)) {
     const gearKind = GEAR.find((g) => g.name.toLowerCase() === nameLower)?.kind;
