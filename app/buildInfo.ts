@@ -16882,4 +16882,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //       quantity>1 row, upgrading every copy for one cost. Fixed by refusing a stacked
 //       target (the picker already restricts to quantity===1). Two EXPLOIT-GUARD regression
 //       tests added; suite now 11/11.
-export const OTA_BUILD_ID = '2026-07-18-873-crucible-upgrade-exploit-fix';
+//
+// OTA-873 armor-coating hygiene — the pressure-test suite also flagged a pre-existing
+// gap: acid / corruption vials worked into ARMOR granted an inert resist, because acid /
+// corruption are OFFENSIVE-only DOT families (the coated WEAPON applies them) and no enemy
+// deals them as incoming damage — so the resist matched nothing and silently wasted the
+// vial. New isResistableIncomingType() (app/engine/damageTypes.ts, keyed off
+// DAMAGE_TYPE_KEYWORDS) now gates the armor path: applyCoatingToArmor refuses an offensive
+// coating with a message steering it to a weapon, and the "Apply to armor" button is hidden
+// for those vials. The four resistable types (poison / electrical / burn / cold) are
+// unaffected — a fully-upgraded piece (cap 4) can still hold all four. Data-driven, so if
+// acid/corruption ever become real incoming types the armor path auto-enables. New test
+// ota873ArmorCoatOffensive (acid/corruption refused + not consumed; poison still works).
+export const OTA_BUILD_ID = '2026-07-18-873-armor-coat-offensive-guard';
