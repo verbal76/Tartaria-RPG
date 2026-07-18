@@ -986,7 +986,7 @@ export function InventoryScreen() {
   if (coatTarget) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { isCoatableItem, coatedDisplayName } = require('../engine/weaponCoating');
+      const { isCoatableItem, coatedDisplayName, nextCoatSlot } = require('../engine/weaponCoating');
       const coatable = (player.inventory ?? []).filter(
         // OTA-453 — instance-aware so FUSED weapons (catalog-absent) are listed.
         (i: InventoryItem) => isCoatableItem(i),
@@ -995,16 +995,24 @@ export function InventoryScreen() {
         coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.';
       } else {
         coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`;
-        coatPickerButtons = coatable.map((w: InventoryItem) => ({
-          label: w.coating
-            ? `${coatedDisplayName(w)} — replaces ${w.coating.label.toLowerCase()}`
-            : w.name,
-          onPress: () => {
-            applyCoating(coatTarget.id, w.id);
-            setCoatTarget(null);
-          },
-          tone: 'primary' as const,
-        }));
+        coatPickerButtons = coatable.map((w: InventoryItem) => {
+          // OTA-873 — dual-slot aware label: an upgraded weapon with an open 2nd slot
+          // ADDS a coating; a full weapon REPLACES slot 1; a bare one just coats.
+          const slot: 'coating' | 'coating2' | 'replace' = nextCoatSlot(w);
+          const label = slot === 'coating2'
+            ? `${coatedDisplayName(w)} — adds 2nd coat`
+            : slot === 'replace'
+              ? `${coatedDisplayName(w)} — replaces ${w.coating!.label.toLowerCase()}`
+              : w.name;
+          return {
+            label,
+            onPress: () => {
+              applyCoating(coatTarget.id, w.id);
+              setCoatTarget(null);
+            },
+            tone: 'primary' as const,
+          };
+        });
       }
     } catch {
       coatPickerBody = 'Could not read your weapons just now.';
@@ -1615,10 +1623,13 @@ function ItemRow({
           <Text style={[styles.rowName, useContentPackStore.getState().devMode && isBuiltInDefaultItem(item.name) && { color: TEMPLATE_FLAG_COLOR }]} numberOfLines={1}>
             {/* OTA-360 — a coated weapon shows its coated name
                 ("Corrupted Battle Axe"); the underlying name is
-                unchanged for stat lookup. */}
+                unchanged for stat lookup. OTA-873 — a dual-coat weapon
+                shows both adjectives ("Corrupted Venomous Battle Axe"). */}
             {/* engine_Dev — a built-in DEFAULT item name renders PINK: it's un-authored
                 template material the author should replace with their own. */}
-            {item.coating ? `${item.coating.label} ${item.name}` : item.name}
+            {[item.coating?.label, item.coating2?.label].filter(Boolean).length
+              ? `${[item.coating?.label, item.coating2?.label].filter(Boolean).join(' ')} ${item.name}`
+              : item.name}
           </Text>
           <Text style={styles.rowQty}>×{item.quantity}</Text>
         </View>

@@ -595,10 +595,26 @@ export interface InventoryItem {
    *  status: poison = pure DOT, acid = DOT + armor shred (−AC),
    *  corruption = DOT + corruption stacks. */
   coating?: WeaponCoating;
+  /** OTA-873 — SECOND coating slot, unlocked by the Fusing Crucible's "Upgrade
+   *  weapon" mode (spend 5 reserved pieces + pick a weapon → coatingSlots = 2). A
+   *  dual-coat weapon carries two coatings at once and BOTH fire on every landing
+   *  hit — two on-hit rolls, two DOTs (poison + acid, or even poison + poison; the
+   *  design allows same-element). Only ever set when coatingSlots >= 2. The upgrade
+   *  adds a coating slot only — it does NOT change AC / damage / durability. */
+  coating2?: WeaponCoating;
+  /** OTA-873 — coating capacity for THIS weapon instance. Absent / 1 = the normal
+   *  single slot; 2 = upgraded (can hold `coating2`). Set by the Crucible upgrade. */
+  coatingSlots?: number;
   /** engine_Dev — damage-type resists APPLIED to this ARMOR instance from a coating
    *  vial (e.g. drinking-vial's "apply to armor" use). Permanent for the piece's
    *  life; aggregateArmor adds these to the slot's resistances while it's worn. */
   addedResists?: string[];
+  /** OTA-873 — extra resist-coating capacity granted by the Fusing Crucible's
+   *  "Upgrade" mode on an ARMOR / DOG-VEST instance (the armor parallel to a
+   *  weapon's second coating slot). The effective worked-in-resist cap is
+   *  ADDED_RESIST_CAP + resistCapBonus, so an upgraded piece can hold one more
+   *  resist type than a stock one. Adds a coating channel only — no AC change. */
+  resistCapBonus?: number;
 }
 
 /** The five built-in coating BEHAVIOR families. A custom (author-defined) coating
