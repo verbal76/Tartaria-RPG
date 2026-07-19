@@ -17038,4 +17038,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // at a different location, or any whisperCourse — as ON THE ROAD and never indoors, mirroring the
 // `onRoute` signal used elsewhere. Genuine hub-room / building interiors (no course underway) still
 // plant interior leads. JS-only; ships over-the-air. Covered by indoorHooksTravel.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-885-indoor-leads-on-road';
+//
+// OTA-886 (doubled hunt hint + "a Aetheric" article) — two copy fixes. (1) The auto-grant "Hunt
+// added to your slate" line appended "at <location>", but the hunt TITLE already names the place
+// ("The Sludge Behemoth at the Cradle of Dusk"), so the location read twice; it now names just the
+// target and leaves the full staged location to Contracts → Hunts. (2) A few player-facing lines
+// hardcoded the article "a" before a dynamic vowel-sound word — the recipe-unlock suggestion ("a
+// Aetheric Crystal Blade"), the Construct spawn line and the Crucible-forge line ("a Uncommon …").
+// They now use the shared grammar helper (withArticle / anOrA) so vowel-initial names and rarities
+// read "an". JS-only; ships over-the-air. Covered by grammar.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-886-hunt-hint-and-article';
