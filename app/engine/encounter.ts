@@ -168,11 +168,61 @@ function soloScaledHp(baseHp: number, d: number, t: number): number {
   return Math.round(Math.max(baseHp + added, floor));
 }
 
+// OTA-1171 (SA-4) — STATIC-BOSS POWER SCALING. The context scaler below skipped
+// boss-flagged enemies ("tuned elsewhere" — they never were): the 8 story bosses
+// in the catalog (458-700 HP) spawned at a FIXED HP regardless of the player. Player
+// damage is weapon-driven and stat-INDEPENDENT (combatRules gates the attack stat to
+// to-hit, never the damage roll), so a fixed 240-700 HP apex is a flat 30-55 round
+// slog for an under-damage arrival and a trivial chip for an over-geared one. This
+// re-centers the fight on the player's real power, reusing the shared power proxy
+// (enemyScalePower — best combat stat + hpMax/10).
+export const STATIC_SCALED_TRAIT = 'static_power_scaled';
+
+/** Expected player-power to face a static apex enemy fairly. Story bosses are
+ *  climactic set-pieces (expect a leveled character); Legendaries are mid/late
+ *  random-encounter fodder. */
+function staticExpectedPower(enemy: Enemy): number {
+  return enemy.boss ? 26 : 20;
+}
+
+/** Two-sided power scaler for the catalog's apex enemies (Legendary rarity OR
+ *  boss-flagged). HP scales BOTH ways — a weak arrival gets a shorter (not
+ *  deadlier) fight, an over-leveled one a longer fight — bounded so neither end
+ *  is a 3-round pushover nor a 60-round wall. THREAT (AC + attack-to-hit, both
+ *  derived from abilityPoint) scales UP ONLY: shrinking a sponge for a weak
+ *  player must never also make it hit harder — that would be a difficulty spike,
+ *  not the tedium fix intended. Raw damage dice untouched. No-op for non-apex
+ *  enemies, hunt targets (already scaled), and — via STATIC_SCALED_TRAIT — an
+ *  already-scaled enemy, so a second spawn path can't double-scale. Pure. */
+export function scaleStaticBoss(power: number, enemy: Enemy): Enemy {
+  if (!enemy) return enemy;
+  const isApex = enemy.boss === true || enemy.rarity === 'Legendary';
+  if (!isApex) return enemy;
+  const traits = enemy.traits ?? [];
+  if (traits.includes(STATIC_SCALED_TRAIT)) return enemy;    // idempotent
+  if ((enemy.name ?? '').includes('(hunted)')) return enemy; // hunt scaler already ran
+
+  const raw = power / staticExpectedPower(enemy);
+  const lo = enemy.boss ? 0.8 : 0.6;
+  const hi = enemy.boss ? 1.4 : 1.6;
+  const mult = Math.max(lo, Math.min(hi, raw));
+  const hp = Math.max(1, Math.round(enemy.hp * mult));
+  // Threat rises only above the curve (mult > 1). abilityPoint drives both the
+  // enemy's AC and its attack bonus, so bumping it pipes through combatRules.
+  const threatBonus = mult > 1 ? Math.round((mult - 1) * 6) : 0;
+  return {
+    ...enemy,
+    hp,
+    abilityPoint: bumpAbilityPointNumber(enemy.abilityPoint, threatBonus),
+    traits: [...traits, STATIC_SCALED_TRAIT],
+  };
+}
+
 /** Scale one rolled enemy to the player's power and the tile's danger. Pure; returns
- *  a fresh object (never mutates). Bosses pass through untouched. Use for SOLO spawns
- *  (rest-ambush, hook spawns); packs go through scaleEncounterForContext. */
+ *  a fresh object (never mutates). Bosses go through the static-boss scaler. Use for
+ *  SOLO spawns (rest-ambush, hook spawns); packs go through scaleEncounterForContext. */
 export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number, rng: () => number = Math.random): Enemy {
-  if (enemy.boss) return enemy;                                  // Guardians / story bosses tuned elsewhere
+  if (enemy.boss) return scaleStaticBoss(power, enemy);          // OTA-1171 (SA-4) — was a flat pass-through
   const d = Math.max(0, danger);
   const t = overLevelT(power);
   // HP/attack scale with power+danger (a no-op for a fresh player on a frontier tile),
@@ -210,7 +260,8 @@ export function scaleEncounterForContext(enemies: readonly Enemy[], danger: numb
   // Solo (0/1 non-boss foe) → per-enemy scaling, unchanged.
   if (nonBossIdx.length <= 1) return enemies.map((e) => scaledEnemyForContext(e, d, power));
   // Fresh player on a frontier tile → HP as authored, but still randomize weakness.
-  if (t <= 0 && d <= 0) return enemies.map((e) => (e.boss ? { ...e } : randomizeEnemyDefense({ ...e })));
+  // OTA-1171 (SA-4) — boss members now scale to the player instead of passing fixed.
+  if (t <= 0 && d <= 0) return enemies.map((e) => (e.boss ? scaleStaticBoss(power, e) : randomizeEnemyDefense({ ...e })));
 
   const pack = nonBossIdx.map((i) => enemies[i]!);
   const totalBase = pack.reduce((s, e) => s + Math.max(1, e.hp), 0);
@@ -221,7 +272,8 @@ export function scaleEncounterForContext(enemies: readonly Enemy[], danger: numb
   const packTotal = Math.min(Math.round(soloAnchor * premium), packHpCeiling(d));
   // Softer attack/AC bump than a solo foe (there are several of them).
   const bonus = Math.round(t * (1 + d * 0.5) * 0.6);
-  const out = enemies.map((e) => ({ ...e }));
+  // OTA-1171 (SA-4) — boss members in a mixed pack scale to the player too.
+  const out = enemies.map((e) => (e.boss ? scaleStaticBoss(power, e) : { ...e }));
   for (const i of nonBossIdx) {
     const e = enemies[i]!;
     const share = Math.max(6, Math.round((packTotal * Math.max(1, e.hp)) / totalBase));

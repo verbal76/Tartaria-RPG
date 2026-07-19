@@ -8415,7 +8415,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const nextCorr = Math.max(0, Math.min(CORRUPTION_MAX, (s.player.corruption ?? 0) + corrGain));
           let scene = s.currentScene;
           if (scene && foe) {
-            const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
+            // OTA-1171 (SA-4) — a provoked apex foe (Legendary/boss) scales to the
+            // player like a rolled encounter; this direct-provoke path bypasses
+            // scaleEncounterForContext, so scale it here.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const encScale = require('../engine/encounter') as typeof import('../engine/encounter');
+            const spawn = encScale.scaleStaticBoss(
+              encScale.enemyScalePower(Math.max(s.player.stats.strength, s.player.stats.dexterity, s.player.stats.intelligence), s.player.hpMax),
+              JSON.parse(JSON.stringify(foe)) as Enemy,
+            );
             scene = {
               ...scene,
               enemies: [...scene.enemies, spawn],
@@ -21798,7 +21806,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           if (spawned) {
-            const finalSpawn: Enemy = spawned;
+            // OTA-1171 (SA-4) — scale the apex spawn (the boss-swap boss, or a
+            // Legendary walk-in) to the player's power. This wasteland path
+            // bypasses scaleEncounterForContext, so without this a strong player
+            // walks into a fixed 580 HP apex no matter their build.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const encScale = require('../engine/encounter') as typeof import('../engine/encounter');
+            const wePlayer = get().player;
+            const finalSpawn: Enemy = wePlayer
+              ? encScale.scaleStaticBoss(
+                  encScale.enemyScalePower(Math.max(wePlayer.stats.strength, wePlayer.stats.dexterity, wePlayer.stats.intelligence), wePlayer.hpMax),
+                  spawned,
+                )
+              : spawned;
             set((s) => {
               if (!s.currentScene) return s;
               return {

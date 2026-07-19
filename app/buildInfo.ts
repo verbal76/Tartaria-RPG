@@ -17955,4 +17955,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // singular-branches ("1 turns"/"1 stacks"/boosts/exposed), and "+0 rep" suppression. Engine keeps its
 // getNarratorName() + contentPack damage-type path + lore-agnostic ambient lines. JS/data-only; ships
 // over-the-air. Covered by attackOpenerWeapon + grammar tests.
-export const OTA_BUILD_ID = '2026-07-19-1170-narration-audit-sweep';
+// 2026-07-19 OTA-1171 (SA-4) — static-boss power scaling (engine port of HAL OTA-896). The two context
+// scalers skipped boss-flagged enemies ("tuned elsewhere"), so the 8 story bosses (458-700 HP) and the
+// 28 Legendary catalog enemies (240-446 HP) spawned at a FIXED HP no matter the player. Player damage is
+// weapon-driven and stat-independent (combatRules gates the attack stat to to-hit, never the damage
+// roll), so a fixed apex was a 30-55 round slog for a weak player and a trivial chip for a strong one.
+// New scaleStaticBoss() (self-contained in encounter.ts, reusing enemyScalePower) re-centers the fight on
+// player power: HP scales BOTH ways (Legendary 0.6-1.6x, story boss 0.8-1.4x); THREAT (AC + attack-to-hit)
+// scales UP ONLY; raw damage untouched. Wired into both context scalers plus the wasteland boss-swap and
+// provoke spawn paths that bypass context scaling. Idempotent; no-op for hunt targets/non-apex. Engine
+// logic; ships over-the-air. Covered by ota1171StaticBossScaling + ota1101.
+export const OTA_BUILD_ID = '2026-07-19-1171-static-boss-scaling';
