@@ -16990,4 +16990,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // faction (player.factionId), so pricing, buy-rep, theft, and kill-standing attribute to the
 // faction whose outpost it actually is — not always the True Tartarians. Foreign capitals use a
 // separate vendor path, so only the player's own home-hub anchor is affected.
-export const OTA_BUILD_ID = '2026-07-19-880-anchor-vendor-host-faction';
+//
+// OTA-881 (peace-break penalty + victim's own faction) — refines OTA-880's framing. Killing or
+// robbing someone inside a faction's outpost is a PEACE violation owed to the HOST faction (you
+// broke their peace / abused their protection of a guest), independent of who the victim is; and
+// if the victim belongs to their OWN faction they are angered too (their member was harmed). The
+// anchor vendor now carries faction=HOST (prices, buy-rep, peace-break) AND nativeFaction=her real
+// identity (Enemy.nativeFactionId); kill→standing and caught-theft both apply to the host AND the
+// native faction when they differ. Runtime-verified: robbing hosted-Tartarian Irma at a Stone
+// Builders outpost drops Stone Builders (peace) AND True Tartarians (member) by 10 each.
+export const OTA_BUILD_ID = '2026-07-19-881-outpost-peace-penalty';

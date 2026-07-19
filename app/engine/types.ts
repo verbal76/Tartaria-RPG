@@ -244,6 +244,12 @@ export interface Enemy {
    *  player's standing with this faction (down) and its strongest rival (up). Unset
    *  on wild beasts / automata / freelance foes, which carry no allegiance. */
   factionId?: string;
+  /** arb-fix — the victim's OWN faction, when it differs from factionId. An outpost
+   *  anchor vendor's factionId is the HOST faction (whose peace you break by fighting
+   *  in their outpost); nativeFactionId is who the vendor actually IS (e.g. Irma is a
+   *  hosted True Tartarian). Killing them angers the host (peace) AND their own faction
+   *  (their member was harmed). Unset for enemies whose allegiance == their host. */
+  nativeFactionId?: string;
   /** Synonyms the parser accepts for this enemy. "Architectural Sentinel"
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
