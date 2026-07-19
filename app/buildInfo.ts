@@ -17144,4 +17144,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // elevated tier-4 reward still reflects the difficulty); the two faction-posted tier-4 hunts and the
 // faction mysteries keep their standing gate. Each posterText's inline "N TC" prose was kept in sync
 // with the new reward. Data-only (hunts.json + mysteries.json); ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-895-contract-retier';
+//
+// OTA-896 (SA-4 — static-boss power scaling) — the Guardian scaler solved over-leveling for the ONE
+// hand-authored boss line, but every OTHER apex fight spawned at a FIXED HP: the 28 Legendary catalog
+// enemies (240-446 HP) and — worse — the 8 story bosses (458-700 HP, boss-flagged), which BOTH context
+// scalers explicitly skipped ("tuned elsewhere" — they never were). Player damage is weapon-driven and
+// stat-INDEPENDENT (combatRules gates the attack stat to to-hit, never the damage roll), so a fixed
+// 240-700 HP apex was a flat 30-55 round slog for an under-damage arrival and a trivial chip for an
+// over-geared one. New scaleStaticBoss() (coreGuardians) re-centers the fight on the player's real power
+// (reusing the Guardian power proxy): HP scales BOTH ways — a weak player gets a SHORTER, not deadlier,
+// fight; an over-leveled one a longer fight — bounded (Legendary 0.6-1.6×, story boss 0.8-1.4× so a
+// climactic set-piece never deflates below 80%). THREAT (AC + attack-to-hit) scales UP ONLY: shrinking a
+// sponge must never also make it hit harder. Raw damage dice untouched. Wired into both context scalers
+// (bosses now route through it instead of passing through fixed) plus the wasteland boss-swap and direct-
+// provoke spawn paths that bypass context scaling. Idempotent + no-op for Guardians/hunt targets/non-apex
+// via a trait stamp. Engine logic; ships over-the-air. Covered by ota896StaticBossScaling + ota816.
+export const OTA_BUILD_ID = '2026-07-19-896-static-boss-scaling';

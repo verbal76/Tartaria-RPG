@@ -8107,7 +8107,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const nextCorr = Math.max(0, Math.min(CORRUPTION_MAX, (s.player.corruption ?? 0) + corrGain));
           let scene = s.currentScene;
           if (scene && foe) {
-            const spawn = JSON.parse(JSON.stringify(foe)) as Enemy;
+            // OTA-896 (SA-4) — a provoked apex foe (Legendary/boss) scales to the
+            // player like a rolled encounter; this direct-provoke path bypasses
+            // scaleEncounterForContext, so scale it here.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const cgScale = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+            const spawn = cgScale.scaleStaticBoss(
+              cgScale.guardianPlayerPower(s.player),
+              JSON.parse(JSON.stringify(foe)) as Enemy,
+            );
             scene = {
               ...scene,
               enemies: [...scene.enemies, spawn],
@@ -21449,7 +21457,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           if (spawned) {
-            const finalSpawn: Enemy = spawned;
+            // OTA-896 (SA-4) — scale the apex spawn (the boss-swap boss, or a
+            // Legendary walk-in) to the player's power. This wasteland path
+            // bypasses scaleEncounterForContext, so without this a Day-30 player
+            // walks into a fixed 580 HP Hollow King no matter their build.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const cgScale = require('../engine/coreGuardians') as typeof import('../engine/coreGuardians');
+            const wePlayer = get().player;
+            const finalSpawn: Enemy = wePlayer
+              ? cgScale.scaleStaticBoss(cgScale.guardianPlayerPower(wePlayer), spawned)
+              : spawned;
             set((s) => {
               if (!s.currentScene) return s;
               return {
