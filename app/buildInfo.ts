@@ -16303,4 +16303,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // readsIndoorsForHooks now treats an active travel course (travelTarget pointing elsewhere, or any
 // whisperCourse) as ON THE ROAD and never indoors. Genuine interiors still plant interior leads.
 // JS-only; ships over-the-air. Covered by indoorHooksTravel.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-864-indoor-leads-on-road';
+// 2026-07-19 OTA-865 — doubled hunt hint + 'a Aetheric' article (port of HAL OTA-886). The 'Hunt
+// added to your slate' line no longer restates the location the hunt TITLE already names, and the
+// recipe-unlock / Construct-spawn / Crucible-forge lines use the shared grammar helper (withArticle
+// / anOrA) so a vowel-sound name or rarity reads 'an' ('an Aetheric …', 'an Uncommon …'). JS-only;
+// ships over-the-air. Covered by grammar.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-865-hunt-hint-and-article';
