@@ -17070,4 +17070,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // line surfaces it ("Dusk is with you … stealth +1, night" / "The daylight leaves you little cover
 // … stealth −1, day") so the player can see the modifier move the roll. Mechanic-consistency; no
 // balance change to pickpocket. JS-only; ships over-the-air. Covered by stealthTimeOfDay.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-889-stealth-daynight';
+//
+// OTA-890 (attack opener named the wrong weapon) — playtest: a PUNCH and an off-hand swing both
+// narrated "You bring the aetheric bolt gun to bear" — the main weapon the striking hand isn't even
+// holding. The pre-swing opener's weapon noun fell back to equipped.main whenever the resolved noun
+// wasn't a carried weapon, ignoring that the swing was bare-handed or off-hand. Now it honours the
+// actual swing: a resolved carried weapon wins, then an off-hand swing names the off-hand slot, then
+// a genuine bare-hand strike drops the weapon noun for the fists flavor, otherwise the main weapon.
+// (Bare-reach weapons like the mud-fist wraps still keep their name — barehand sits below the weapon
+// / off-hand cases.) Narration-only; the resolved combat was already correct. JS-only; ships over-
+// the-air. Covered by attackOpenerWeapon.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-890-attack-opener-weapon';

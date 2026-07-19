@@ -8836,13 +8836,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // SCENE object ("shattered tartarian relay"), so the narration named the wrong
           // thing ("the shattered tartarian relay is already moving…"). Use resolvedNoun
           // only when it's actually a weapon the player carries; else fall back to the
-          // equipped main weapon (or bare-hands flavor).
+          // weapon the swing ACTUALLY uses.
+          // arb-fix (playtest) — a PUNCH and an OFF-HAND swing both fell back to
+          // equipped.main here, so "punch" and "attack with the off-hand mud-fist wraps"
+          // narrated "You bring the aetheric bolt gun to bear" — the main weapon the hand
+          // isn't even holding. Honour the resolved swing: bare-hand → no weapon noun (the
+          // fists flavor), off-hand swing → the off-hand slot, otherwise the main weapon.
           const openerP = get().player;
           const rNoun = parsed.resolvedNoun;
           const rNounIsWeapon = !!rNoun && (openerP?.inventory ?? []).some(
             (it) => it.kind === 'weapon' && it.name.toLowerCase() === rNoun.toLowerCase(),
           );
-          const openerWeapon = rNounIsWeapon ? rNoun : (openerP?.equipped?.main ?? null);
+          // Precedence: a resolved carried weapon wins (covers "attack with the
+          // off-hand mud-fist wraps" AND "attack with the aetheric bolt gun"); then an
+          // off-hand SWING names the off-hand slot even when its noun mis-resolved; then a
+          // genuine bare-hand strike (punch/kick) drops the weapon noun for the fists
+          // flavor instead of naming the main weapon; otherwise the main weapon. Note
+          // mud-fist wraps read bareHand=true, so barehand must sit BELOW the weapon /
+          // off-hand cases or the wraps would lose their name.
+          const openerWeapon =
+            rNounIsWeapon ? rNoun
+            : offHandSwing ? (openerP?.equipped?.off ?? null)
+            : barehand ? null
+            : (openerP?.equipped?.main ?? null);
           get().appendLog('world', attackOpener(targetEnemy.name, coatedWeaponNoun(openerP, openerWeapon)));
         } else {
           // No enemy — the player might have meant "kick the rubble"
