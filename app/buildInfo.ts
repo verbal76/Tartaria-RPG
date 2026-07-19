@@ -17062,4 +17062,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the last kit's surplus clamped at hpMax by useHealBatch. It shows only when it takes 2+ kits and
 // the pack holds enough; "Use Max (no waste)" stays as a de-emphasised secondary when it's a
 // smaller count. JS-only; ships over-the-air. Covered by healBatch.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-888-heal-to-full';
+//
+// OTA-889 (stealth day/night made consistent + visible) — playtest question: "does stealth scale up
+// at night, down in the day?" It did for the pickpocket / sleight-of-hand check (+1 night / −1 day)
+// but the IN-COMBAT stealth opener (and its reset initiative gamble) ignored the clock entirely.
+// Now the same stealthTimeBonus is folded into the combat opener + reset rolls, and a short world
+// line surfaces it ("Dusk is with you … stealth +1, night" / "The daylight leaves you little cover
+// … stealth −1, day") so the player can see the modifier move the roll. Mechanic-consistency; no
+// balance change to pickpocket. JS-only; ships over-the-air. Covered by stealthTimeOfDay.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-889-stealth-daynight';

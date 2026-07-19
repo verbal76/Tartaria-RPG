@@ -15562,6 +15562,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // surprised the player every time. Use the raw stat like the rest of
               // the engine so STEALTH actually helps.
               const steBonus = ste;
+              // #6 — day/night cover applies to EVERY stealth check, not just
+              // pickpocket (playtest: "does stealth scale up at night, down in the
+              // day?"). Fold the same +1-night / −1-day modifier the sleight-of-hand
+              // path uses into the combat opener + reset, and surface it so the
+              // player can see it move the roll.
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { stealthTimeBonus } = require('../engine/timeOfDay');
+              const timeBonus: number = stealthTimeBonus(livePlayer?.hoursElapsed);
+              if (timeBonus !== 0) {
+                get().appendLog('world', timeBonus > 0
+                  ? 'Dusk is with you — the silt eats sound after dark. (stealth +1, night)'
+                  : 'The daylight leaves you little cover. (stealth −1, day)');
+              }
               // Awareness scales with the area's danger rating (alert country =
               // harder to slip). Kept small so STE stays the deciding factor.
               const enemyAware = 2 + Math.floor((currentScene.location?.danger ?? 2) / 2);
@@ -15585,7 +15598,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               let stealthSucceeded = false;
               if (openerAvailable) {
                 const roll = rollDie(20);
-                const total = roll + steBonus + 3; // +3 for the drop (they're unaware)
+                const total = roll + steBonus + 3 + timeBonus; // +3 for the drop (they're unaware)
                 const dc = 10 + enemyAware;
                 if (total >= dc) {
                   set((s) => (s.player
@@ -15594,14 +15607,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('world', hasCover
                     ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
                     : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
-                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steBonus >= 0 ? '+' : ''}${steBonus}+3 = ${total} vs DC ${dc} — UNSEEN`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steBonus >= 0 ? '+' : ''}${steBonus}+3${timeBonus !== 0 ? `${timeBonus > 0 ? '+' : ''}${timeBonus}(${timeBonus > 0 ? 'night' : 'day'})` : ''} = ${total} vs DC ${dc} — UNSEEN`);
                   stealthSucceeded = true;
                 } else {
                   get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
-                  get().appendLog('debug', `stealth: opener d20=${roll} → ${total} vs DC ${dc} — SPOTTED`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}${timeBonus !== 0 ? `${timeBonus > 0 ? '+' : ''}${timeBonus}(${timeBonus > 0 ? 'night' : 'day'})` : ''} → ${total} vs DC ${dc} — SPOTTED`);
                 }
               } else {
-                const pInit = rollDie(20) + steBonus + 2; // you chose the moment
+                const pInit = rollDie(20) + steBonus + 2 + timeBonus; // you chose the moment
                 const eInit = rollDie(20) + enemyAware;
                 if (pInit >= eInit) {
                   const rounds = hasCover ? 2 : 1;
