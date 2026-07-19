@@ -16353,4 +16353,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 'Aetherbound Survivor' title). Field-aware: ids/keys/tags untouched (etheric_storm_burst,
 // etherbound_survivor), 'ethereal' untouched, catalog item names deliberately deferred to a
 // save-migration pass. Data/string-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-873-aether-prose-reconcile';
+// 2026-07-19 OTA-874 (SA-3) — re-tier contract rewards to a monotone formula (port of HAL OTA-895).
+// The board had reward/difficulty inversions (a tier-2 hunt out-paying a tier-3, a high-rep mystery
+// paying less than an open one). HUNTS now pay by difficultyTier in non-overlapping bands (tier2=400,
+// tier3=700-780, tier4=1000-1080; an id-hashed nudge keeps payouts distinct within a band). MYSTERIES
+// floored at 300 TC with a rep gate that rises with the reward. Only FACTION-POSTED contracts gate on
+// standing — acceptHunt/acceptMystery compute playerRep=0 for a null-faction ("open contract") vendor,
+// so a rep gate there was unreachable or bypassed; open contracts stay open. posterText "N TC" prose
+// kept in sync. Data-only (hunts.json + mysteries.json); ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-874-contract-retier';
