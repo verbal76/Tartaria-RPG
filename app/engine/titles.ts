@@ -283,7 +283,10 @@ export const TITLE_PASSIVE_PERK: Record<string, string> = {
   inner_awakening: 'Passive: once per fight, your first hit detonates an energy surge (+1d8 damage).',
   scholar_of_forgotten_lore: 'Passive: +2 to Investigate / lore checks.',
   arcane_attuned: 'Passive: halves incoming energy damage — in combat AND from charged weather.',
-  stormcaller: 'Passive: halves incoming energy damage — in combat AND from charged weather.',
+  // arb-fix — was a copy of arcane_attuned's line. Stormcaller's perk sets
+  // ethericShield, which ALSO halves electrical damage in combat (OTA-835) — so
+  // the description must state its distinct effect, not duplicate the other title.
+  stormcaller: 'Passive: halves incoming energy damage (in combat AND from charged weather) — and halves incoming electrical damage in combat.',
   // Tier-C (earnable once those challenges go live):
   guild_broker: 'Passive: +1 to social (diplomacy) checks.',
   shadow_diver: 'Passive: +1 to Stealth checks.',

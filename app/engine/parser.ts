@@ -1190,7 +1190,20 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const enemyNamesLower = (context.enemyNames ?? []).map((n) => n.toLowerCase());
   let enemyHit: string | undefined = undefined;
   if (enemyNamesLower.length > 0 && targetTokens.length > 0) {
+    // arb-fix — respect an explicit trailing ordinal ("raider 3") BEFORE the
+    // loose any-token match. Numbered enemies share every word except the
+    // number ("Conspiracy Architects Raider 2/3"), so the any-token loop below
+    // matched on "conspiracy" and returned the FIRST enemy regardless of the
+    // typed number (so "approach raider 3" resolved to raider 2 once 1 died).
+    const ordinalTok = targetTokens.find((t) => /^\d+$/.test(t));
+    if (ordinalTok) {
+      const numbered = (context.enemyNames ?? []).find((e) =>
+        new RegExp(`\\b${ordinalTok}\\b\\s*$`).test(e.toLowerCase().trim()),
+      );
+      if (numbered) enemyHit = numbered;
+    }
     // Exact substring first.
+    if (!enemyHit)
     for (const eRaw of context.enemyNames ?? []) {
       const e = eRaw.toLowerCase();
       if (targetTokens.some((t) => e.includes(t) || t.includes(e))) {

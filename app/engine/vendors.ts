@@ -698,6 +698,12 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
   const tier = vendor.demeanor ?? 'hub';
   const baseLoot = vendor.offers.slice(0, 2).map((o) => o.itemName);
   const loot = baseLoot.length > 0 ? baseLoot : ['Aether Residue'];
+  // arb-fix — carry the vendor's faction onto the enemy so KILLING a merchant
+  // actually shifts faction standing (the kill→standing path is gated on
+  // enemy.factionId, which trader enemies never set — so murdering a faction
+  // vendor was consequence-free). Roadside traders with no faction stay
+  // undefined → no standing change, same as before.
+  const factionId = vendor.faction ?? undefined;
   if (tier === 'sketchy') {
     return {
       name: vendor.name,
@@ -709,6 +715,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
       rarity: 'Uncommon',
       loot,
       traits: ['quick', 'ambush_strike'],
+      factionId,
     };
   }
   if (tier === 'honest') {
@@ -721,6 +728,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
       hp: 12,
       rarity: 'Common',
       loot,
+      factionId,
     };
   }
   // Hub vendor — established merchant with help nearby.
@@ -734,6 +742,7 @@ export function buildTraderEnemy(vendor: VendorInstance): Enemy {
     rarity: 'Uncommon',
     loot,
     traits: ['armored'],
+    factionId,
   };
 }
 

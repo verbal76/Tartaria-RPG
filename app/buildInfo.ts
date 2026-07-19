@@ -17859,4 +17859,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `climb_harness` tag (the same tag the climb handler already keys the harness tier off) OR a
 // climb-y name. Worn climb cost changed 0 → 1 stamina/tier (as cheap as an anchor rope, still
 // never wears out or snaps — just no longer free). Rest-at-altitude unchanged.
-export const OTA_BUILD_ID = '2026-07-18-1155-climbing-strap-gear';
+// 2026-07-19 OTA-1156 — playtest-log bugfix sweep (port of HAL OTA-879). Applied: (1) STEALTH
+// init contest used the D&D (ste-10)/2 modifier on a 0–10 stat scale, making STEALTH a penalty
+// — a passed sneak check still lost and surprised the player; now uses the raw stat. (2)
+// Stormcaller's passive description was a copy of arcane_attuned's; reworded (also halves
+// electrical in combat). (3) "✓ HIT" then dodge now resolves the dodge first → "✗ DODGED"
+// (melee + thrown). (4) Quest arrival/exploration stages no longer auto-advance mid-combat.
+// (5) Killing a faction vendor now shifts standing (buildTraderEnemy carries the faction).
+// (6) World-sim drift frozen during the tutorial. (7) Parser respects a typed enemy ordinal;
+// duplicate surge fade deduped; CAUGHT theft roll label fixed (Stealth, not DEX). NOT ported:
+// the title re-award-loop ledger — the engine already fixes that via recordTitleProgress
+// skipAward (storm award deferred to the pre-snapshot catch-all); and the off-hand dual-wield
+// display already had the engine's currentOff guard (kept, plus the id-based check).
+export const OTA_BUILD_ID = '2026-07-19-1156-playtest-bugfix-sweep';
