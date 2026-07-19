@@ -17029,4 +17029,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // MORE ▾ / less ▴ toggle. Nothing is removed — MORE is always present — so every action stays one
 // tap (or two) away and the layout no longer jumps as context changes. During the tutorial the tray
 // is force-open so each beat can still point at its control. UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-884-adaptive-quick-row';
+//
+// OTA-885 (indoor "room to room" leads leaking onto the open road) — playtest: the world feed
+// narrated interior finds ("You move from room to room…") while the player was traveling in the
+// open. Cause: mid-journey the departure scene (often a hub room) isn't rebuilt until arrival, so
+// player.hubRoomId / activeBuildingId linger, and indoorsForOutdoorHooks read those stale flags as
+// "indoors". Fix: readsIndoorsForHooks now treats an ACTIVE TRAVEL COURSE — a travelTarget pointing
+// at a different location, or any whisperCourse — as ON THE ROAD and never indoors, mirroring the
+// `onRoute` signal used elsewhere. Genuine hub-room / building interiors (no course underway) still
+// plant interior leads. JS-only; ships over-the-air. Covered by indoorHooksTravel.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-885-indoor-leads-on-road';
