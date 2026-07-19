@@ -47,9 +47,15 @@ describe('OTA-816 — regular-enemy scaling', () => {
     expect(scaled.hp).toBeLessThan(430);          // ...but by a flat-capped amount, not ×1.7
   });
 
-  it('never touches a boss / Guardian (they carry their own curve)', () => {
+  it('a story boss now scales via the static-boss scaler (OTA-896 — was a flat pass-through)', () => {
     const boss = { ...bat(), boss: true } as Enemy;
     const out = scaledEnemyForContext(boss, 5, ENDGAME);
+    expect(out.hp).toBeGreaterThan(15);           // over-leveled → grows (used to stay 15)
+  });
+
+  it('still never touches a Core Guardian (it owns its own curve)', () => {
+    const guardian = { ...bat(), boss: true, traits: ['core_guardian'] } as Enemy;
+    const out = scaledEnemyForContext(guardian, 5, ENDGAME);
     expect(out.hp).toBe(15);
     expect(out.abilityPoint).toBe('Dexterity 3');
   });

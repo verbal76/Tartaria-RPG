@@ -165,7 +165,15 @@ function soloScaledHp(baseHp: number, d: number, t: number): number {
  *  a fresh object (never mutates). Bosses pass through untouched. Use for SOLO spawns
  *  (rest-ambush, hook spawns); packs go through scaleEncounterForContext. */
 export function scaledEnemyForContext(enemy: Enemy, danger: number, power: number, rng: () => number = Math.random): Enemy {
-  if (enemy.boss) return enemy;                                  // Guardians / story bosses tuned elsewhere
+  if (enemy.boss) {
+    // OTA-896 (SA-4) — Core Guardians own their curve (spawnGuardianForCapital);
+    // every other boss-flagged story boss was left FIXED here ("tuned elsewhere"
+    // — it never was), a flat 458-700 HP slog. Route it through the two-sided
+    // static-boss scaler so it tracks the player like the Legendaries already do.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { scaleStaticBoss } = require('./coreGuardians') as typeof import('./coreGuardians');
+    return scaleStaticBoss(power, enemy);
+  }
   const d = Math.max(0, danger);
   const t = overLevelT(power);
   // HP/attack scale with power+danger (a no-op for a fresh player on a frontier tile),
@@ -200,10 +208,16 @@ export function scaleEncounterForContext(enemies: readonly Enemy[], danger: numb
   const d = Math.max(0, danger);
   const t = overLevelT(power);
   const nonBossIdx = enemies.map((e, i) => (e.boss ? -1 : i)).filter((i) => i >= 0);
+  // OTA-896 (SA-4) — boss members (story bosses) now scale to the player via the
+  // static-boss scaler instead of passing through fixed. scaledEnemyForContext
+  // already routes bosses through it, so the solo path is covered; the frontier
+  // and pack paths below scale their boss members explicitly.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { scaleStaticBoss } = require('./coreGuardians') as typeof import('./coreGuardians');
   // Solo (0/1 non-boss foe) → per-enemy scaling, unchanged.
   if (nonBossIdx.length <= 1) return enemies.map((e) => scaledEnemyForContext(e, d, power));
   // Fresh player on a frontier tile → HP as authored, but still randomize weakness.
-  if (t <= 0 && d <= 0) return enemies.map((e) => (e.boss ? { ...e } : randomizeEnemyDefense({ ...e })));
+  if (t <= 0 && d <= 0) return enemies.map((e) => (e.boss ? scaleStaticBoss(power, e) : randomizeEnemyDefense({ ...e })));
 
   const pack = nonBossIdx.map((i) => enemies[i]!);
   const totalBase = pack.reduce((s, e) => s + Math.max(1, e.hp), 0);
@@ -214,7 +228,7 @@ export function scaleEncounterForContext(enemies: readonly Enemy[], danger: numb
   const packTotal = Math.min(Math.round(soloAnchor * premium), packHpCeiling(d));
   // Softer attack/AC bump than a solo foe (there are several of them).
   const bonus = Math.round(t * (1 + d * 0.5) * 0.6);
-  const out = enemies.map((e) => ({ ...e }));
+  const out = enemies.map((e) => (e.boss ? scaleStaticBoss(power, e) : { ...e }));
   for (const i of nonBossIdx) {
     const e = enemies[i]!;
     const share = Math.max(6, Math.round((packTotal * Math.max(1, e.hp)) / totalBase));

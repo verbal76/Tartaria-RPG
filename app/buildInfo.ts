@@ -16361,4 +16361,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // standing — acceptHunt/acceptMystery compute playerRep=0 for a null-faction ("open contract") vendor,
 // so a rep gate there was unreachable or bypassed; open contracts stay open. posterText "N TC" prose
 // kept in sync. Data-only (hunts.json + mysteries.json); ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-874-contract-retier';
+// 2026-07-19 OTA-875 (SA-4) — static-boss power scaling (port of HAL OTA-896). The Guardian scaler
+// solved over-leveling for the one hand-authored boss line, but the 28 Legendary catalog enemies
+// (240-446 HP) and the 8 story bosses (458-700 HP) spawned at FIXED HP — both context scalers skipped
+// bosses ("tuned elsewhere"). Player damage is weapon-driven and stat-independent, so a fixed apex is
+// a 30-55 round slog for a weak player / trivial for a strong one. New scaleStaticBoss() re-centers the
+// fight on player power: HP scales BOTH ways (Legendary 0.6-1.6x, story boss 0.8-1.4x); THREAT (AC +
+// attack) scales UP ONLY; raw damage untouched. Wired into both context scalers plus the wasteland
+// boss-swap and provoke spawn paths. Idempotent; no-op for Guardians/hunt targets/non-apex. Engine
+// logic; ships over-the-air. Covered by ota896StaticBossScaling + ota816.
+export const OTA_BUILD_ID = '2026-07-19-875-static-boss-scaling';

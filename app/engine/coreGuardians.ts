@@ -178,6 +178,71 @@ export function spawnGuardianForCapital(
   };
 }
 
+// OTA-896 (SA-4) — STATIC-BOSS POWER SCALING. The Guardian scaler above solves
+// over-leveling for the ONE hand-authored boss line. Every OTHER apex fight — the
+// 28 Legendary-rarity catalog enemies (240-446 HP) and the 8 story bosses (458-700
+// HP, boss-flagged) — spawned at a FIXED HP no matter the player. Player damage is
+// weapon-driven and stat-INDEPENDENT (combatRules gates the attack stat to to-hit,
+// never to the damage roll), so a fixed 240-700 HP apex is a flat 30-55 round slog
+// for an under-damage arrival and a trivial chip for an over-geared one. This
+// re-centers the fight on the player's real power, reusing the Guardian power proxy.
+export const STATIC_SCALED_TRAIT = 'static_power_scaled';
+
+/** Expected player-power to face a static apex enemy fairly. Story bosses are
+ *  climactic set-pieces (expect a leveled character); Legendaries are mid/late
+ *  random-encounter fodder. */
+function staticExpectedPower(enemy: Enemy): number {
+  return enemy.boss ? 26 : 20;
+}
+
+/** Two-sided power scaler for the catalog's apex enemies (Legendary rarity OR
+ *  boss-flagged). `power` is the shared proxy (guardianPlayerPower /
+ *  enemyScalePower — best combat stat + hpMax/10). HP scales BOTH ways — a weak
+ *  arrival gets a shorter (not deadlier) fight, an over-leveled one a longer
+ *  fight — bounded so neither end is a 3-round pushover nor a 60-round wall.
+ *  THREAT (AC + attack-to-hit, both derived from abilityPoint) scales UP ONLY:
+ *  shrinking a sponge for a weak player must never also make it hit harder —
+ *  that would be a difficulty spike, not the tedium fix intended — while an
+ *  over-leveled player still faces a real fight, not a stationary HP bag. Raw
+ *  damage dice are untouched.
+ *
+ *  No-op for non-apex enemies, for Core Guardians (own scaler) and hunt targets
+ *  (scaleHuntBoss), and — via the STATIC_SCALED_TRAIT stamp — for an already-
+ *  scaled enemy, so re-entry or a second spawn path can't double-scale. Pure. */
+export function scaleStaticBoss(power: number, enemy: Enemy): Enemy {
+  if (!enemy) return enemy;
+  const isApex = enemy.boss === true || enemy.rarity === 'Legendary';
+  if (!isApex) return enemy;
+  const traits = enemy.traits ?? [];
+  if (traits.includes(STATIC_SCALED_TRAIT)) return enemy;   // idempotent
+  if (traits.includes(CORE_GUARDIAN_TRAIT)) return enemy;   // Guardian owns its curve
+  if ((enemy.name ?? '').includes('(hunted)')) return enemy; // scaleHuntBoss already ran
+
+  const raw = power / staticExpectedPower(enemy);
+  // Wider band for Legendaries (should track the player closely); tighter,
+  // higher-floored band for story bosses so a climactic fight never deflates
+  // below 80% of its authored weight.
+  const lo = enemy.boss ? 0.8 : 0.6;
+  const hi = enemy.boss ? 1.4 : 1.6;
+  const mult = Math.max(lo, Math.min(hi, raw));
+  const hp = Math.max(1, Math.round(enemy.hp * mult));
+  // Threat rises only above the curve (mult > 1). enemyAC() derives both the
+  // enemy's AC and its attack bonus from `5 + abilityPointNumber`, so bumping
+  // the AP number pipes the scaling through the standard combatRules formula.
+  const threatBonus = mult > 1 ? Math.round((mult - 1) * 6) : 0;
+  const apStr = String(enemy.abilityPoint ?? 'Strength 3');
+  const apMatch = apStr.match(/^(\w+)\s+(\d+)/);
+  const scaledAp = threatBonus > 0 && apMatch
+    ? `${apMatch[1]} ${parseInt(apMatch[2]!, 10) + threatBonus}`
+    : apStr;
+  return {
+    ...enemy,
+    hp,
+    abilityPoint: scaledAp,
+    traits: [...traits, STATIC_SCALED_TRAIT],
+  };
+}
+
 /** Detect whether an arbitrary enemy is a Core Guardian. */
 export function isCoreGuardian(enemy: Enemy | null | undefined): boolean {
   if (!enemy) return false;
