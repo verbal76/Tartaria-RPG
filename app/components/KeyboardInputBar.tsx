@@ -53,10 +53,23 @@ import {
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 
+// arb-fix — cache the last real keyboard height ACROSS mounts/opens. The New
+// Architecture (Fabric) on Android drops the keyboardDidShow height event ~half
+// the time, so a freshly-mounted bar may have no live height yet. We now mount on
+// a reliable focus signal (see below) rather than on the height event, and fall
+// back to this cached value (then a screen-fraction estimate) so the bar always
+// sits just above the keyboard even when the event never arrives.
+let lastKeyboardHeight = 0;
+
 export function KeyboardInputBar() {
   const screen = useGameStore((s) => s.currentScreen);
   const submit = useGameStore((s) => s.submitPlayerAction);
   const inputModalOpen = useGameStore((s) => s.inputModalOpen);
+  // arb-fix — the bar's presence is driven by THIS (set when the player taps the
+  // in-flow input), not by the flaky keyboard-height event. Height only positions
+  // it. That split is the fix for "the keyboard covers the box half the time".
+  const active = useGameStore((s) => s.explorationInputActive);
+  const setActive = useGameStore((s) => s.setExplorationInputActive);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -81,7 +94,7 @@ export function KeyboardInputBar() {
     let hideTimer: ReturnType<typeof setTimeout> | null = null;
     const applyHeight = (height: number) => {
       if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
-      if (height > 0) setKeyboardOffset(height);
+      if (height > 0) { lastKeyboardHeight = height; setKeyboardOffset(height); }
     };
     const onShow = (e: { endCoordinates: { height: number } }) => {
       applyHeight(e.endCoordinates?.height ?? 0);
@@ -112,6 +125,8 @@ export function KeyboardInputBar() {
       hideTimer = setTimeout(() => {
         setKeyboardOffset(0);
         setText('');
+        // Keyboard is really gone (not a quick refocus) → retract the bar.
+        useGameStore.getState().setExplorationInputActive(false);
       }, 200);
     };
     const showSub = Keyboard.addListener(
@@ -153,25 +168,44 @@ export function KeyboardInputBar() {
   // own input fields that aren't covered by the keyboard, so a
   // floating popup would just clutter them.
   if (screen !== 'exploration') return null;
-  if (keyboardOffset <= 0) return null;
+  // arb-fix — mount when the player has focused the in-flow input (a reliable
+  // React focus signal), NOT when a keyboard-height event arrived. On the New
+  // Architecture that event is dropped ~half the time, which used to leave this
+  // bar unmounted and the field covered. The autoFocus below keeps the keyboard
+  // the field already raised, so this can never pop the keyboard unbidden.
+  if (!active) return null;
   // A popup with its own text field is open (Ask the Arbiter, Search,
   // Salvage, Approach). That modal renders in its own window on top and
   // is keyboard-avoided; the floating bar would only mount behind it and
   // steal focus from the visible field. Stand down.
   if (inputModalOpen) return null;
 
+  // Position just above the keyboard. Prefer the live height; fall back to the
+  // last real height we ever saw (cached across opens), then a screen-fraction
+  // estimate for the very first open before any height event lands.
+  const bottom = keyboardOffset > 0
+    ? keyboardOffset
+    : lastKeyboardHeight > 0
+      ? lastKeyboardHeight
+      : Math.round(Dimensions.get('window').height * 0.36);
+
+  const retract = () => {
+    setText('');
+    useGameStore.getState().setExplorationInputActive(false);
+  };
+
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
     submit(trimmed);
-    setText('');
     inputRef.current?.clear();
+    retract();
     Keyboard.dismiss();
   };
 
   return (
     <View
-      style={[styles.bar, { bottom: keyboardOffset }]}
+      style={[styles.bar, { bottom }]}
       pointerEvents="box-none"
     >
       <View style={styles.row}>
@@ -183,6 +217,11 @@ export function KeyboardInputBar() {
           placeholder="What do you do?"
           placeholderTextColor="#c9a86a"
           onSubmitEditing={handleSubmit}
+          // arb-fix — when this field loses focus the typing session is over
+          // (keyboard dismissed, back button, focus moved away). Retract the bar
+          // so it can't linger on-screen after the keyboard closes. Deferred one
+          // tick so a same-frame refocus (Android focus-swap) doesn't flicker it.
+          onBlur={() => { setTimeout(() => { if (!Keyboard.isVisible?.()) retract(); }, 150); }}
           returnKeyType="send"
           autoFocus
           autoCorrect={false}
