@@ -136,10 +136,11 @@ describe('resist/weakness surfacing (EnemyPanel)', () => {
   });
 
   it('enemyTypeDefenses returns the macro type-resistance row', () => {
-    // Construct: resists slashing/piercing, weak to bludgeoning/electrical.
+    // Construct (metal-bodied): resists slashing/piercing + shrugs off corruption;
+    // weak to bludgeoning/electrical and — as a rigid, brittle frame — cold/acid.
     expect(enemyTypeDefenses('Construct')).toEqual({
-      resist: ['slashing', 'piercing'],
-      weak: ['bludgeoning', 'electrical'],
+      resist: ['slashing', 'piercing', 'corruption'],
+      weak: ['bludgeoning', 'electrical', 'cold', 'acid'],
     });
     // Unknown / missing type → empty (no crash).
     expect(enemyTypeDefenses('Nonexistent Type')).toEqual({ resist: [], weak: [] });

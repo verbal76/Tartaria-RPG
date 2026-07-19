@@ -17182,4 +17182,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Text SIZE is intentionally NOT a new in-app control: the app never disables allowFontScaling, so the OS
 // Dynamic-Type / font-size setting already scales every label; a second control would only drift from it.
 // UI + a tiny new prefs store; ships over-the-air. Covered by ota898Accessibility.
-export const OTA_BUILD_ID = '2026-07-19-898-accessibility-baseline';
+//
+// OTA-899 (test-suite triage, batch 1) — hardening + stale-test cleanup toward making the jest suite a
+// real (blocking) CI gate. Shipped-source change: accessibility.ts now LAZY-loads AsyncStorage inside its
+// read/write helpers instead of at module top, so importing the store never pulls the native module —
+// a component that transitively imports it (StatsPanel, InputBox) can be loaded in a bare JS/test env
+// without crashing (this was surfacing as a "PlatformLocalStorage undefined" load failure). On-device
+// behavior is unchanged. The rest of this batch is test-only: corrected stale expectations
+// (enemyTypeDefenses Construct row, roadside 3-7 offers), fixed the questProgressionAudit boss-kill probe
+// for OTA-796's frozen final-boss stage, updated dogGolem retaliation stats for OTA-685's DOG_TARGET_
+// CHANCE, and bounded two OOM-prone stress probes to their stable iteration range.
+export const OTA_BUILD_ID = '2026-07-19-899-accessibility-lazyload';
