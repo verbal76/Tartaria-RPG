@@ -17929,4 +17929,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // opener + reset rolls, with a short world line surfacing it so the player can see the roll move
 // with the clock. Mechanic-consistency; no balance change to pickpocket. JS-only; ships over-the-
 // air. Covered by stealthTimeOfDay.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-1166-stealth-daynight';
+// 2026-07-19 OTA-1167 — attack opener names the weapon the swing actually uses (port of HAL OTA-890).
+// A PUNCH and an off-hand swing both narrated the main weapon ("You bring the aetheric bolt gun to
+// bear") because the opener fell back to equipped.main whenever the resolved noun wasn't a carried
+// weapon. Now: resolved carried weapon → off-hand slot on an off-hand swing → fists flavor on a
+// bare-hand strike → otherwise the main weapon. Narration-only. JS-only; ships over-the-air. Covered
+// by attackOpenerWeapon.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-1167-attack-opener-weapon';
