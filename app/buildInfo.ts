@@ -16982,4 +16982,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //  9. Parser respects an explicit trailing ordinal ("raider 3" no longer resolves to raider 2);
 //     duplicate "Legacy of Power (surge) fades." line deduped; CAUGHT-theft roll label fixed
 //     (logged "+ DEX" but rolls Stealth).
-export const OTA_BUILD_ID = '2026-07-19-879-playtest-bugfix-sweep';
+//
+// OTA-880 (anchor-vendor faction follows the host outpost) — follow-up to OTA-879 #6. The
+// armory anchor "Irma Ironhand" is re-skinned into every faction's outpost (hub rooms are
+// re-skinned by player.factionId), but her vendor template hard-codes faction 'true_tartarians'.
+// When she spawns as the home-hub armory anchor the scene now re-points her faction to the HOST
+// faction (player.factionId), so pricing, buy-rep, theft, and kill-standing attribute to the
+// faction whose outpost it actually is — not always the True Tartarians. Foreign capitals use a
+// separate vendor path, so only the player's own home-hub anchor is affected.
+export const OTA_BUILD_ID = '2026-07-19-880-anchor-vendor-host-faction';
