@@ -18908,6 +18908,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
+    // OTA-456 — a FETCH quest is a PHYSICAL delivery: it can't be couriered
+    // remotely (you can't mail the goods). Refuse a remote turn-in for a fetch
+    // contract; it has to change hands in person. (Non-fetch contracts may still
+    // be couriered for a reduced cut — handled by their own turn-in paths.)
+    if (remote && candidate.fetch) {
+      const fLabel = candidate.factionId.replace(/_/g, ' ');
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "${candidate.title} is a delivery — the ${candidate.fetch.itemName} has to change hands in person. Carry it to ${fLabel} yourself."`,
+      );
+      return;
+    }
     // OTA-450 — fetch gate. The generic per-faction starter quests require the
     // player to actually HOLD the items; verify, then consume them on turn-in so
     // it's a real "gather N, bring them back" loop (not a free narrative close).

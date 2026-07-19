@@ -17192,4 +17192,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (enemyTypeDefenses Construct row, roadside 3-7 offers), fixed the questProgressionAudit boss-kill probe
 // for OTA-796's frozen final-boss stage, updated dogGolem retaliation stats for OTA-685's DOG_TARGET_
 // CHANCE, and bounded two OOM-prone stress probes to their stable iteration range.
-export const OTA_BUILD_ID = '2026-07-19-899-accessibility-lazyload';
+//
+// OTA-900 (test-suite triage, batch 3) — one real gameplay fix + stale-test cleanup toward the blocking
+// jest gate. SHIPPED FIX: turnInFactionQuest's `remote` parameter was declared but never used, so a
+// FETCH faction quest could be couriered remotely (completed without in-person delivery) — the OTA-456
+// promise ("you can't mail the goods") wasn't enforced. Now a remote turn-in of a fetch contract is
+// refused; carry it in person. Test-only in this batch: starterFetchQuests now computes the expected pay
+// via contractJourneyBonusTc (B2 long-haul bonus) instead of a flat 35; fungusFoodReveal points its
+// pure-detector case at a Basic Aether Detector (the Aetheric Torch became an AIMED tool, OTA-776);
+// chainedNarrative injects the face-to-face vendor completeContractFromUI requires (OTA-810); and two
+// heavy stress sims (thousandDayStressSim 180→90 days, combatStress 700→250 days) are bounded to their
+// stable range (the engine's world/persist layer grows super-linearly in the tail).
+export const OTA_BUILD_ID = '2026-07-19-900-fetch-courier-gate';

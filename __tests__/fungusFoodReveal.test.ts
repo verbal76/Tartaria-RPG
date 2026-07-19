@@ -58,21 +58,23 @@ it('OTA-620 — eating a Bioluminescent Fungus with no hooks heals +1 and is con
   expect(qtyOf('Bioluminescent Fungus')).toBe(1); // one was eaten
 });
 
-it('OTA-212 branch still holds — a pure Aetheric Torch with no hooks takes the no-reveal path', async () => {
+it('OTA-212 branch still holds — a pure revealScene detector with no hooks takes the no-reveal path', async () => {
   // Guards that the messages.length===0 split still routes a PURE detector
-  // (revealScene-only) to the "nothing to reveal / unspent" branch rather than
-  // the new food-that-glows branch. (The torch's separate decrement happens in
-  // an earlier relic handler — out of scope here; we assert the branch taken.)
+  // (revealScene-only consumable) to the "nothing to reveal / unspent" branch
+  // rather than the food-that-glows branch. Uses a Basic Aether Detector: the
+  // Aetheric Torch was reworked into an AIMED tool (applyTorchToHook, OTA-776)
+  // so 'use Aetheric Torch' no longer routes through the generic revealScene
+  // path — a Basic Aether Detector is the clean, still-generic pure detector.
   await boot();
   const p0 = useGameStore.getState().player!;
-  const torch: InventoryItem = { id: 'at_test', name: 'Aetheric Torch', kind: 'relic', quantity: 2, tags: ['light', 'relic'], rarity: 'Common', description: 'x' };
+  const detector: InventoryItem = { id: 'det_test', name: 'Basic Aether Detector', kind: 'exploration', quantity: 2, tags: ['detector'], rarity: 'Common', description: 'x' };
   const scene = useGameStore.getState().currentScene!;
   useGameStore.setState({
-    player: { ...p0, inventory: [...p0.inventory, torch] },
+    player: { ...p0, inventory: [...p0.inventory, detector] },
     currentScene: { ...scene, hooks: [] },
   });
 
-  await useGameStore.getState().submitPlayerAction('use Aetheric Torch');
+  await useGameStore.getState().submitPlayerAction('use Basic Aether Detector');
 
   const log = useGameStore.getState().gameLog.map((l) => l.text).join('\n');
   expect(log).toContain('The torch goes back in your pack, unspent');
