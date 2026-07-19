@@ -17047,4 +17047,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aetheric Crystal Blade"), the Construct spawn line and the Crucible-forge line ("a Uncommon …").
 // They now use the shared grammar helper (withArticle / anOrA) so vowel-initial names and rarities
 // read "an". JS-only; ships over-the-air. Covered by grammar.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-886-hunt-hint-and-article';
+//
+// OTA-887 (multi-enemy gesture hint too long / too small) — the swipe-to-target caption under the
+// enemy carousel dots (shown only with 2+ enemies) read "swipe to target · tap for details" at a
+// 9px, wide-tracked font — playtest: too long and too small to read mid-fight. Shortened to "swipe
+// to aim · tap for info" and bumped to a larger, tighter, slightly brighter font (fontSize 9 → 12,
+// letterSpacing 1 → 0.3). UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-887-enemy-hint-legible';
