@@ -350,6 +350,11 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed }: { view: E
             : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
         </Text>
       </View>
+      {/* OTA-897 (SA-5) — the bestiary voice line also greets you on the combat
+          card, so a foe reads as a described creature, not a bare stat block. */}
+      {!!view.enemy.flavor && (
+        <Text style={styles.flavorLine} numberOfLines={3}>{view.enemy.flavor}</Text>
+      )}
       <View style={[styles.hpBarBg, { width: hpBarWidth }]}>
         {/* OTA-081 — numeric pixel width (was percent string): RN sometimes
             skipped the layout pass when only the percent changed, leaving the
@@ -483,6 +488,9 @@ const styles = StyleSheet.create({
   rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
   rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
   subline: { color: '#7a705c', fontSize: 11, flexShrink: 1 },
+  // OTA-897 (SA-5) — the enemy card's voice line: readable italic prose, set
+  // above the stat grid.
+  flavorLine: { color: '#b8a982', fontSize: 11, lineHeight: 15, fontStyle: 'italic', marginBottom: 6 },
   hpBarBg: {
     height: 6,
     backgroundColor: '#1a1714',

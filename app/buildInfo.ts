@@ -16370,4 +16370,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // attack) scales UP ONLY; raw damage untouched. Wired into both context scalers plus the wasteland
 // boss-swap and provoke spawn paths. Idempotent; no-op for Guardians/hunt targets/non-apex. Engine
 // logic; ships over-the-air. Covered by ota896StaticBossScaling + ota816.
-export const OTA_BUILD_ID = '2026-07-19-875-static-boss-scaling';
+// 2026-07-19 OTA-876 (SA-5) — voice the bestiary (port of HAL OTA-897). All 109 catalog enemies shipped
+// with zero prose; the bestiary + combat enemy panel showed a bare stat block. Added a one-line "flavor"
+// field to every enemy in enemies.json (evocative field descriptions in the post-Mud-Flood Tartaria
+// voice, canonical "Aether" throughout), surfaced in the codex bestiary (once recorded) and briefly on
+// the in-combat EnemyPanel. Pure flavor — never read by combat logic. Data + two thin UI renders; ships
+// over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-876-voice-the-bestiary';
