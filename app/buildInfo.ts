@@ -17080,4 +17080,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (Bare-reach weapons like the mud-fist wraps still keep their name — barehand sits below the weapon
 // / off-hand cases.) Narration-only; the resolved combat was already correct. JS-only; ships over-
 // the-air. Covered by attackOpenerWeapon.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-890-attack-opener-weapon';
+//
+// OTA-891 (signature-weapon leave line deduped per scene) — an unlootable signature weapon (the
+// Order's Hollow Edge) prints a long "you can't take it" paragraph when left on a body. Clearing two
+// enforcers in one scene printed the whole paragraph twice back-to-back. Now the full reason shows
+// the FIRST time a given signature weapon is left in a scene; later leaves of the same weapon get a
+// one-line acknowledgement ("You leave the Hollow Edge where it fell — the same locked grip as
+// before…") so the player still knows it stays behind without re-reading the lore. Tracked per scene
+// (cleared on a fresh scene). JS-only; ships over-the-air. Covered by signatureWeaponDedup.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-891-signature-weapon-dedup';

@@ -578,6 +578,12 @@ interface CurrentScene {
    *  re-fires if the weather actually shifts. Cleared when a fresh combat
    *  begins (so each new fight gets one reminder). */
   weatherSwingAnnounced?: string | null;
+  /** arb-fix (playtest) — signature-weapon leave lines already explained THIS scene.
+   *  The Order's Hollow Edge carries a long "you can't take it" paragraph; clearing
+   *  two enforcers in one scene printed it twice back-to-back. The full reason shows
+   *  the first time a given signature weapon is left; later ones in the same scene get
+   *  a one-line acknowledgement instead. Keyed by weapon name. */
+  signatureWeaponsExplained?: string[];
   /** Slow-weather repositioning progress (Iron Fog etc.). Counts player
    *  advance/retreat actions toward the next range change. Reset to 0
    *  whenever range actually changes, the player switches direction, or
@@ -17092,9 +17098,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     })();
     get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
     // OTA-366 — a signature weapon (the Order's Hollow Edge) can't be taken,
-    // even off a corpse; surface why and leave it.
+    // even off a corpse; surface why and leave it. Deduped per scene (arb-fix).
     if (enemy.signatureWeapon) {
-      get().appendLog('world', enemy.signatureWeapon.reason);
+      leaveSignatureWeapon(get, set, enemy.signatureWeapon);
     }
 
     // Increment lifetime kill count and check for a milestone bump. arb119 — the
@@ -17665,9 +17671,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You strip the unconscious ${enemy.name} — ${summary || 'nothing of worth'}${tcGained > 0 ? `, +${tcGained} TC` : ''}. The gear's seen better days (worn from the fight).`,
     );
     // OTA-366 — a signature weapon (the Order's Hollow Edge) is never
-    // lootable; surface the reason and leave it on the body.
+    // lootable; surface the reason and leave it on the body. Deduped per scene (arb-fix).
     if (enemy.signatureWeapon) {
-      get().appendLog('world', enemy.signatureWeapon.reason);
+      leaveSignatureWeapon(get, set, enemy.signatureWeapon);
     }
     if (stillFighting) {
       const next = remainingEnemies[nextActiveIdx]!;
@@ -31254,6 +31260,28 @@ function coatedWeaponNoun(
 
 function weaponPhrase(weapon: string | null): string {
   return weapon ? ` with the ${weapon.toLowerCase()}` : '';
+}
+
+/** arb-fix (playtest) — a defeated/knocked-out enemy's UNLOOTABLE signature weapon
+ *  (the Order's Hollow Edge) prints a long "you can't take it" paragraph. Clearing two
+ *  enforcers in one scene fired it twice back-to-back. Emit the full `reason` the FIRST
+ *  time a given signature weapon is left this scene; on repeats, a one-line nod so the
+ *  player still knows it stays behind without re-reading the paragraph. Keyed by weapon
+ *  name on currentScene.signatureWeaponsExplained. */
+function leaveSignatureWeapon(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  sig: { name: string; reason: string },
+): void {
+  const already = get().currentScene?.signatureWeaponsExplained ?? [];
+  if (already.some((n) => n.toLowerCase() === sig.name.toLowerCase())) {
+    get().appendLog('world', `You leave the ${sig.name} where it fell — the same locked grip as before, not yours to take.`);
+    return;
+  }
+  get().appendLog('world', sig.reason);
+  set((s) => (s.currentScene
+    ? { currentScene: { ...s.currentScene, signatureWeaponsExplained: [...(s.currentScene.signatureWeaponsExplained ?? []), sig.name] } }
+    : {}));
 }
 
 function attackOpener(enemyName: string, weapon?: string | null): string {
