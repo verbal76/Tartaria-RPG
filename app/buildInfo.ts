@@ -16268,4 +16268,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries the faction). (7) World-sim drift frozen during the tutorial. (8) One off-hand weapon
 // no longer shows in both hand slots. (9) Parser respects a typed enemy ordinal; duplicate surge
 // fade deduped; CAUGHT theft roll label fixed (Stealth, not DEX).
-export const OTA_BUILD_ID = '2026-07-19-858-playtest-bugfix-sweep';
+// 2026-07-19 OTA-859 — anchor vendor faction follows the host outpost (port of HAL OTA-880,
+// follow-up to the sweep's vendor-kill fix). The armory anchor "Irma Ironhand" is re-skinned into
+// every faction's outpost but her template hard-codes faction 'true_tartarians'; when she spawns
+// as the home-hub anchor the scene now re-points her to the HOST faction (player.factionId), so
+// pricing, buy-rep, theft, and kill-standing attribute to the faction whose outpost it is.
+export const OTA_BUILD_ID = '2026-07-19-859-anchor-vendor-host-faction';

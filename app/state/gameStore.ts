@@ -5577,12 +5577,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       // arb104 — the outpost Armory stocks the player's OWN faction's named
       // armor + weapons (Irma carries faction-issue gear in your outpost).
+      // arb-fix — Irma is the shared armory ANCHOR, re-skinned into every
+      // faction's outpost (hub rooms are re-skinned by player.factionId via
+      // hubRoomFor), but her vendor template hard-codes faction 'true_tartarians'.
+      // Re-point it to the HOST faction — player.factionId, the owner of this hub
+      // — so pricing, buy-rep, theft, and kill-standing all attribute to the
+      // faction whose outpost this actually is, not always the True Tartarians.
+      // (Foreign capitals use the separate atCoreCapital vendor path above, so
+      // this only ever fires for the player's own home-hub armory anchor.)
       if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {
         const facOffers = factionGearOffers(player.factionId);
-        if (facOffers.length > 0) {
-          const have = new Set(base.offers.map((o) => o.itemName));
-          return { ...base, offers: [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))] };
-        }
+        const have = new Set(base.offers.map((o) => o.itemName));
+        const offers = facOffers.length > 0
+          ? [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))]
+          : base.offers;
+        return { ...base, faction: player.factionId, offers };
       }
       return base;
     })();
