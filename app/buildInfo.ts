@@ -17903,4 +17903,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the screen is no longer a wall of buttons. Nothing is removed; during the tutorial the tray is
 // force-open so each beat can still point at its control. Engine keeps its amber "all missions"
 // label inside the tray. UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-1161-adaptive-quick-row';
+// 2026-07-19 OTA-1162 — indoor 'room to room' leads on the open road (port of HAL OTA-885).
+// engine_Dev already guarded the overland-travelTarget leak; this port extends the guard to an
+// active whisperCourse, which is likewise a cross-country route — so wandering / look-around
+// narration reads as ON THE ROAD (never indoors) for both course types even when a stale hubRoomId
+// lingers from the departure hub. Genuine interiors still plant interior leads. Covered by the
+// existing indoorHooksTravel.test.ts (whisper-course case added). JS-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-1162-indoor-leads-on-road';

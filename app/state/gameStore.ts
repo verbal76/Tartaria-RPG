@@ -594,7 +594,10 @@ export function indoorsForOutdoorHooks(get: () => GameStore): boolean {
   // guard the wandering-journey narration leaked "you move from room to room" indoor
   // framing into open travel — playtester: "why am I seeing indoor prompts when I'm
   // traveling in the open?" A travelTarget to a DIFFERENT location = mid-transit.
+  // OTA-885 (port) — a whisperCourse is likewise an active cross-country route, so
+  // it also reads as on-the-road.
   if (p?.travelTarget && p.travelTarget.locationId !== p.currentLocationId) return false;
+  if (p?.whisperCourse) return false;
   return !!p?.hubRoomId || !!get().activeBuildingId;
 }
 

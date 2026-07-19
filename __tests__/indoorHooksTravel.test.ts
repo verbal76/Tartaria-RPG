@@ -52,6 +52,15 @@ describe('indoorsForOutdoorHooks — travel is outdoors', () => {
     expect(indoorsForOutdoorHooks(store)).toBe(false);
   });
 
+  it('is OUTDOORS on an active whisper course even with hubRoomId still set', () => {
+    const store = mk({
+      hubRoomId: 'operations',
+      currentLocationId: 'hq',
+      whisperCourse: { mapX: 3, mapY: 7, label: 'Yulka' },
+    });
+    expect(indoorsForOutdoorHooks(store)).toBe(false);
+  });
+
   it('is still indoors when the travelTarget is the CURRENT location (arrived / stale)', () => {
     const store = mk({
       hubRoomId: 'operations',
