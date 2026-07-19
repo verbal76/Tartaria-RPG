@@ -16312,4 +16312,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // target caption under the enemy carousel dots (2+ enemies) was shortened to 'swipe to aim · tap
 // for info' and bumped to a larger, tighter, slightly brighter font (fontSize 9 → 12, letterSpacing
 // 1 → 0.3). UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-866-enemy-hint-legible';
+// 2026-07-19 OTA-867 — First Aid Kit 'Heal to full' option (port of HAL OTA-888). The inventory
+// batch-heal only offered 'Use Max (no waste)' = floor(gap / perKit), which stops short of full when
+// the missing HP isn't a multiple of the per-kit heal (First Aid Kit = 25). Added a primary 'Heal to
+// full ×N → max/max' button using ceil(gap / perKit) kits (capped at the stack); 'Use Max (no waste)'
+// stays as a de-emphasised secondary. JS-only; ships over-the-air. Covered by healBatch.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-867-heal-to-full';
