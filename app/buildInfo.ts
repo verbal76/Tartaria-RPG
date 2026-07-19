@@ -16291,4 +16291,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in the expanded PRIMARY OBJECTIVE box does too. A SORT BY DISTANCE toggle (top of the missions
 // scroll + inside the Primary Objective box) reorders entries nearest-first while keeping them
 // GROUPED BY TYPE. Distance = canonicalDistanceFromGrid(gridX/gridY, targetLocationId). UI-only.
-export const OTA_BUILD_ID = '2026-07-19-862-mission-distance-sort';
+// 2026-07-19 OTA-863 — adaptive quick-action row / MORE ▾ tray (port of HAL OTA-884). The
+// out-of-combat quick row keeps the world-interaction verbs (look / rest / ✦ ability / investigate /
+// take / salvage / climb) always visible and tucks the menus + rarer actions (pickpocket / craft /
+// inventory / missions / torch / fuse) behind a single MORE ▾ / less ▴ toggle so the bottom of the
+// screen is no longer a wall of buttons. Nothing is removed; during the tutorial the tray is
+// force-open so each beat can still point at its control. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-863-adaptive-quick-row';
