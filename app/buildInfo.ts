@@ -16328,4 +16328,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // weapon. Now: resolved carried weapon → off-hand slot on an off-hand swing → fists flavor on a
 // bare-hand strike → otherwise the main weapon. Narration-only. JS-only; ships over-the-air. Covered
 // by attackOpenerWeapon.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-869-attack-opener-weapon';
+// 2026-07-19 OTA-870 — signature-weapon leave line deduped per scene (port of HAL OTA-891). An
+// unlootable signature weapon (the Order's Hollow Edge) printed its long "you can't take it"
+// paragraph on every enforcer left in a scene. Now the full reason shows the first time in a scene;
+// later leaves of the same weapon get a one-line acknowledgement. JS-only; ships over-the-air.
+// Covered by signatureWeaponDedup.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-870-signature-weapon-dedup';
