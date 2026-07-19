@@ -760,11 +760,30 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   if (!player) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { newlyEarnedTitles, TITLE_PASSIVE_PERK } = require('../engine/titles');
-  const fresh: string[] = newlyEarnedTitles(player);
+  // arb-fix — SPAM + persistence guard. Storm titles (Etherbound Survivor /
+  // Aetheric Attuned / Stormcaller) are awarded MID-action from the weather tick,
+  // and later stale-`player` writebacks in the same action revert earnedTitles /
+  // titleProgress — so the perk never stuck and the "You have earned a name to
+  // carry" banner re-fired on every fog tick. worldMemory.earnedTitleAnnounced is
+  // an announce-once ledger that player writebacks don't clobber. Because this
+  // runs at the pre-snapshot catch-all every action, step (a) folds any ledgered
+  // title back into earnedTitles so the perk PERSISTS, and step (b) announces a
+  // title only the first time it is earned.
+  const announced: string[] = getStore().worldMemory?.earnedTitleAnnounced ?? [];
+  // (a) reconcile — earnedTitles must contain everything already announced.
+  const clobbered = announced.filter((id) => !(player.earnedTitles ?? []).includes(id));
+  if (clobbered.length > 0) {
+    setStore((s) => (s.player
+      ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...clobbered] } }
+      : s));
+  }
+  const p2 = getStore().player;
+  if (!p2) return;
+  const fresh: string[] = newlyEarnedTitles(p2);
   if (fresh.length === 0) return;
   // OTA-848 — stamp each freshly-earned title with WHEN it landed (in-game hour
   // + real time) so the Character screen can show its earn-date on tap.
-  const atHours = player.hoursElapsed ?? 0;
+  const atHours = p2.hoursElapsed ?? 0;
   const atMs = Date.now();
   const freshLog = fresh.map((id) => ({ id, atHours, atMs }));
   setStore((s) => (s.player
@@ -774,7 +793,13 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
         titleLog: [...(s.player.titleLog ?? []), ...freshLog],
       } }
     : s));
-  for (const id of fresh) {
+  // (b) announce only titles never announced before, and record them in the
+  // clobber-immune ledger so a later revert can't make them re-fire.
+  const toAnnounce = fresh.filter((id) => !announced.includes(id));
+  if (toAnnounce.length > 0) {
+    setStore((s) => ({ worldMemory: { ...s.worldMemory, earnedTitleAnnounced: [...announced, ...toAnnounce] } }));
+  }
+  for (const id of toAnnounce) {
     const meta = ARBITER_TITLE_META[id];
     if (!meta) continue;
     // OTA-353 — announce the HONEST passive effect, not the canon
@@ -1942,6 +1967,12 @@ function worldTideCheck(
   const s = get();
   const player = s.player;
   if (!player) return;
+  // arb-fix — freeze world-sim faction drift during the tutorial. The tutorial
+  // runs on currentScreen 'exploration' with tutorialStep !== null, so the
+  // realtime guard's screen check doesn't cover it, and rests/actions in the
+  // intro were drifting four factions' standing before the player had done
+  // anything. Hold the world still until the character is out of the tutorial.
+  if (s.tutorialStep !== null && s.tutorialStep !== undefined) return;
   const hour = player.hoursElapsed ?? 0;
   if (s.worldMemory.lastWorldTickHour === undefined) {
     set((st) => ({ worldMemory: { ...st.worldMemory, lastWorldTickHour: hour } }));
@@ -4557,6 +4588,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
         dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
         factionRepIntroShown: saved.worldMemory.factionRepIntroShown ?? false,
+        earnedTitleAnnounced: saved.worldMemory.earnedTitleAnnounced ?? [],
         fusionCompensationGranted: saved.worldMemory.fusionCompensationGranted ?? false,
         pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
         // OTA-839 (HAL only) — one-time intel backfill: a returning character whose
@@ -7575,8 +7607,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           checkLowHpWarning(player.hp, newHp, player.hpMax ?? 1, get, set);
         }
       }
+      // arb-fix — dedupe the fade line by rendered text. Some abilities push two
+      // distinct effects that share a label (e.g. Legacy of Power's surge is a
+      // +STR and a +WIS buff, both "Legacy of Power (surge)"), so they'd log two
+      // identical "… fades." lines on the same tick. The buffs are separate; only
+      // the message is a duplicate.
+      const seenFade = new Set<string>();
       for (const ex of tick.expired) {
-        get().appendLog('system', `${ex.label ?? ex.kind} fades.`);
+        const line = `${ex.label ?? ex.kind} fades.`;
+        if (seenFade.has(line)) continue;
+        seenFade.add(line);
+        get().appendLog('system', line);
       }
       if (incapacitated) {
         get().appendLog('world', `You cannot move. Your action is lost.`);
@@ -8602,12 +8643,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // skips for non-weapons (a Layer 4 selectional restriction
           // already rejected those upstream).
           const instrumentArg = parsed.args?.find((a) => a.role === 'instrument');
-          if (instrumentArg?.resolvedItemId) {
+          // arb-fix — don't promote the named instrument into the MAIN hand when
+          // the player explicitly attacked with the OFF-hand ("attack with the
+          // off-hand cudgel"). The off-hand path below already routes reach/damage
+          // to the off slot; swapping it to main left the SAME single item bound to
+          // both hands (debug loadout read "main=Cudgel off=Cudgel" from one Cudgel).
+          const usedOffHand = /\boff[- ]?hand\b/.test(trimmed.toLowerCase());
+          if (instrumentArg?.resolvedItemId && !usedOffHand) {
             const swapTo = player.inventory.find((i) => i.id === instrumentArg.resolvedItemId);
             const currentMain = player.equipped?.main;
+            // Also skip if the named instrument IS the off-hand instance — attacking
+            // by an off-hand weapon's name shouldn't yank it into the main slot.
+            const isOffHandInstance =
+              !!instrumentArg.resolvedItemId && instrumentArg.resolvedItemId === player.equipped?.offId;
             if (
               swapTo &&
               swapTo.name !== currentMain &&
+              !isOffHandInstance &&
               (swapTo.kind === 'weapon' || swapTo.kind === 'runecaster')
             ) {
               get().appendLog('world', `You shift grip and bring up the ${swapTo.name}.`);
@@ -12834,18 +12886,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(enemyHit)));
           let hit = total >= ac;
           const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'a stone';
-          get().appendLog(
-            'combat',
-            `You — thrown ${projectile} → d20 ${roll} + DEX ${stats.dexterity} − 2 (improvised) = ${total} vs ${enemyHit.name} AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
-          );
-          // Agile / quick enemies get a dodge save against a thrown
-          // projectile just like a melee swing.
+          // arb-fix — resolve the agile/quick dodge BEFORE the outcome line so a
+          // connecting throw the enemy then slips reads as one verdict (✗ DODGED)
+          // instead of "✓ HIT" followed by "sidesteps". Same fix as the melee path.
+          let thrownDodged = false;
           if (hit) {
             const dodgeChance = traitDodgeChance(enemyHit.traits);
-            if (dodgeChance > 0 && Math.random() < dodgeChance) {
-              get().appendLog('combat', `${enemyHit.name} sidesteps the ${projectile}. (dodged)`);
-              hit = false;
-            }
+            if (dodgeChance > 0 && Math.random() < dodgeChance) thrownDodged = true;
+          }
+          get().appendLog(
+            'combat',
+            `You — thrown ${projectile} → d20 ${roll} + DEX ${stats.dexterity} − 2 (improvised) = ${total} vs ${enemyHit.name} AC ${ac} — ${thrownDodged ? '✗ DODGED' : hit ? '✓ HIT' : '✗ MISS'}`,
+          );
+          if (thrownDodged) {
+            get().appendLog('combat', `${enemyHit.name} sidesteps the ${projectile}. (dodged)`);
+            hit = false;
           }
           if (hit) {
             // Damage scales by the projectile's weight. A locket does 1.
@@ -15307,6 +15362,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (live) get().appendLog('debug', debugLoadout(live));
       }
       if (skill.success) {
+        // arb-fix — quest ARRIVAL/exploration stages (investigate/stealth/
+        // diplomacy/escape/cast) must not auto-advance mid-combat: a stealth
+        // check during a fight was advancing an unrelated mystery and dumping its
+        // "you make your way to the Cradle's edge…" arrival scene into the combat
+        // log. Only the hunt's genuine COMBAT stages (attack_provoke / boss) may
+        // advance while enemies are present.
+        const inCombat = (currentScene.enemies?.length ?? 0) > 0;
         // Hunt advancement: if the player has an active hunt whose next
         // stage expects this skill intent, advance one stage of the hunt.
         const huntMatch = (player.activeHunts ?? [])
@@ -15319,11 +15381,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Map intents to the hunt's expected check kinds. Any of these
             // intent matches advances the hunt one beat.
             return (
-              (next.checkKind === 'investigate' && intent === 'investigate') ||
-              (next.checkKind === 'stealth' && intent === 'stealth') ||
-              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
-              (next.checkKind === 'escape' && intent === 'escape') ||
-              (next.checkKind === 'cast' && intent === 'cast') ||
+              (!inCombat && next.checkKind === 'investigate' && intent === 'investigate') ||
+              (!inCombat && next.checkKind === 'stealth' && intent === 'stealth') ||
+              (!inCombat && next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+              (next.checkKind === 'escape' && intent === 'escape') || // combat flee can advance an escape stage
+              (!inCombat && next.checkKind === 'cast' && intent === 'cast') ||
               (next.checkKind === 'attack_provoke' && intent === 'attack') ||
               (next.checkKind === 'boss' && intent === 'attack')
             );
@@ -15348,7 +15410,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               (next.checkKind === 'boss' && intent === 'investigate')
             );
           });
-        if (mysteryMatch) {
+        if (mysteryMatch && !inCombat) {
           void Promise.resolve().then(() => get().advanceMystery(mysteryMatch.rec.id));
         }
         // Storyline auto-advance — same rule.
@@ -15369,7 +15431,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               (next.checkKind === 'boss' && intent === 'diplomacy')
             );
           });
-        if (storyMatch) {
+        if (storyMatch && !inCombat) {
           void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
         }
 
@@ -15432,7 +15494,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
               const enemy = activeEnemy(currentScene);
               const ste = livePlayer ? (effectiveStats(livePlayer).stealth ?? 5) : 5;
-              const steMod = Math.round((ste - 10) / 2);
+              // arb-fix — STEALTH is on this engine's ~0–10 stat scale (rollDie(10),
+              // and a Giant legitimately sits at 0), NOT D&D's 3–18. The gating skill
+              // check adds the RAW stat (log reads "STE 0"), so the init contest must
+              // too. The old Math.round((ste-10)/2) applied the D&D ability-modifier
+              // formula, which turns every realistic STEALTH into a PENALTY (0 → −5,
+              // 5 → −2), the exact opposite of the comment above ("STE scales every
+              // roll") — a passed check then still lost an unwinnable init race and
+              // surprised the player every time. Use the raw stat like the rest of
+              // the engine so STEALTH actually helps.
+              const steBonus = ste;
               // Awareness scales with the area's danger rating (alert country =
               // harder to slip). Kept small so STE stays the deciding factor.
               const enemyAware = 2 + Math.floor((currentScene.location?.danger ?? 2) / 2);
@@ -15456,7 +15527,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               let stealthSucceeded = false;
               if (openerAvailable) {
                 const roll = rollDie(20);
-                const total = roll + steMod + 3; // +3 for the drop (they're unaware)
+                const total = roll + steBonus + 3; // +3 for the drop (they're unaware)
                 const dc = 10 + enemyAware;
                 if (total >= dc) {
                   set((s) => (s.player
@@ -15465,14 +15536,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   get().appendLog('world', hasCover
                     ? `You melt into cover and ghost toward ${foe} from the angle they aren't watching. Your next strike lands before they know you're there. (+5 next attack)`
                     : `You drop low and move quiet, closing on ${foe} unseen across the open ground. (+5 next attack)`);
-                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steMod >= 0 ? '+' : ''}${steMod}+3 = ${total} vs DC ${dc} — UNSEEN`);
+                  get().appendLog('debug', `stealth: opener d20=${roll}+STE${steBonus >= 0 ? '+' : ''}${steBonus}+3 = ${total} vs DC ${dc} — UNSEEN`);
                   stealthSucceeded = true;
                 } else {
                   get().appendLog('world', `${foe} catches the movement — no sneaking up on this one. You'll have to take them head-on.`);
                   get().appendLog('debug', `stealth: opener d20=${roll} → ${total} vs DC ${dc} — SPOTTED`);
                 }
               } else {
-                const pInit = rollDie(20) + steMod + 2; // you chose the moment
+                const pInit = rollDie(20) + steBonus + 2; // you chose the moment
                 const eInit = rollDie(20) + enemyAware;
                 if (pInit >= eInit) {
                   const rounds = hasCover ? 2 : 1;
@@ -15929,10 +16000,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Always log the player's attack roll math so the combat log mirrors
     // the enemy's "d20 → X + ATK Y = Z vs AC W" line. Without this the
     // disk log only shows enemy attack rolls, which reads as one-sided.
+    // arb-fix — resolve an agile/quick enemy's dodge BEFORE printing the
+    // outcome line. The dodge (below) fully negates a connecting hit, so if we
+    // print "✓ HIT" first and then "the blow finds nothing", the player sees a
+    // guaranteed hit that missed. Roll the dodge once, up front, and fold it
+    // into the single outcome verdict (✗ DODGED). Damage math is unchanged.
+    let enemyDodged = false;
+    if (attack?.success) {
+      const dodgeChance = traitDodgeChance(enemy.traits);
+      if (dodgeChance > 0 && Math.random() < dodgeChance) enemyDodged = true;
+    }
+
     if (attack && typeof attack.total === 'number' && attack.target !== undefined) {
       const naturalRoll = attack.values?.[0] ?? attack.total - attack.bonus;
       const acTag = `vs ${enemy.name} AC ${attack.target}`;
-      const outcome = attack.critical
+      const outcome = enemyDodged
+        ? '✗ DODGED'
+        : attack.critical
         ? '✓ CRITICAL HIT'
         : naturalRoll === 1
           ? '✗ FUMBLE'
@@ -15944,12 +16028,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
-      // Agile / quick enemies get a save against the incoming hit. Roll
-      // against the trait's dodge chance — success completely negates
-      // damage AND the on-hit status that would have applied. Misses fall
-      // through to normal damage math.
-      const dodgeChance = traitDodgeChance(enemy.traits);
-      if (dodgeChance > 0 && Math.random() < dodgeChance) {
+      // Agile / quick enemies get a save against the incoming hit (rolled
+      // above). Success completely negates damage AND the on-hit status that
+      // would have applied. Misses fall through to normal damage math.
+      if (enemyDodged) {
         get().appendLog(
           'combat',
           `${enemy.name} reads the swing and twists clear — the blow finds nothing. (dodged, ${enemy.traits?.includes('agile') ? 'agile' : 'quick'})`,
@@ -17941,7 +18023,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // playtester: "instead of being all in red... just says in
     // green you have successfully stolen and then the item name".
     if (!success) {
-      get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC ${dc} — ✗ CAUGHT`);
+      get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + STE ${stats.stealth} = ${total} vs DC ${dc} — ✗ CAUGHT`);
     }
 
     if (success) {
@@ -19988,7 +20070,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = s.player;
     if (!player) return; // no game in progress yet — nothing to simulate
     // Don't churn the world during a boss/ending cutscene or on the title flow.
+    // arb-fix — also freeze during the tutorial: it runs on currentScreen
+    // 'exploration' with tutorialStep !== null, which this screen check missed,
+    // so the intro was drifting faction standing before the player acted.
     if (s.currentScreen === 'title' || s.currentScreen === 'character_creation' || s.currentScreen === 'ending') return;
+    if (s.tutorialStep !== null) return;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
     const hour = player.hoursElapsed ?? 0;
@@ -31054,17 +31140,21 @@ function weaponPhrase(weapon: string | null): string {
 function attackOpener(enemyName: string, weapon?: string | null): string {
   const w = weapon ?? null;
   if (w) {
+    // arb-fix — these openers are picked at attack time, BEFORE initiative is
+    // rolled, so none of them may assert who acts first (the resolved
+    // "You seize the initiative" / "X moves first" line prints later and would
+    // contradict them). Keep the flavor turn-order-neutral.
     return pick([
       `You raise the ${w.toLowerCase()} toward ${enemyName}. The room narrows around the both of you.`,
-      `Your ${w.toLowerCase()} comes around in an arc; ${enemyName} reads it but does not move yet.`,
+      `Your ${w.toLowerCase()} comes around in an arc; ${enemyName} squares up to meet it.`,
       `You commit forward with the ${w.toLowerCase()}. ${enemyName} watches your hands.`,
-      `The ${w.toLowerCase()} is already moving when ${enemyName} sees it coming.`,
+      `You bring the ${w.toLowerCase()} to bear on ${enemyName}.`,
     ]);
   }
   return pick([
     `You close on ${enemyName}. The room narrows around the both of you.`,
     `${enemyName} fixes on you. You commit to the strike.`,
-    `You drive toward ${enemyName} before it can choose first.`,
+    `You drive toward ${enemyName}, set to strike.`,
   ]);
 }
 

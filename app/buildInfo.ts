@@ -16956,4 +16956,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // grapplers, the "Climbing Gear" item). Its worn climb cost changed from 0 → 1 stamina/tier
 // (as cheap as a Reclaimer's Rope, and it still never wears out or snaps — just no longer a free
 // climb). Rest-at-altitude (dozing on a wall while the strap is worn) is unchanged.
-export const OTA_BUILD_ID = '2026-07-18-878-climbing-strap-gear';
+//
+// OTA-879 (playtest-log bugfix sweep) — nine fixes confirmed against a real APK log:
+//  1. STEALTH init contest used the D&D (ste-10)/2 modifier on this engine's 0–10 stat
+//     scale, turning STEALTH into a penalty — a PASSED sneak check still lost an unwinnable
+//     init race and surprised the player every time. Now uses the raw stat like the gating
+//     skill check, so STEALTH actually helps.
+//  2. Title re-award loop: the storm titles (Etherbound Survivor / Aetheric Attuned /
+//     Stormcaller) were awarded mid-action from the weather tick, then reverted by later
+//     stale-`player` writebacks — so the "You have earned a name to carry" banner re-fired on
+//     every fog tick and the perk never stuck. New worldMemory.earnedTitleAnnounced ledger
+//     (immune to player writebacks) announces once and re-folds the title so the perk persists.
+//  3. Stormcaller's passive DESCRIPTION was a copy of Aetheric Attuned's; reworded to its real
+//     effect (also halves electrical in combat). The flags always differed — no double-halving.
+//  4. "✓ HIT" then enemy "dodged" (the blow finds nothing): the dodge is now resolved BEFORE the
+//     outcome line, which reads ✗ DODGED. Melee + thrown paths. Damage math unchanged.
+//  5. Quest ARRIVAL/exploration stages no longer auto-advance mid-combat (a stealth check in a
+//     fight was dumping the Cradle-of-Dusk mystery's travel scene into the combat log).
+//  6. Killing a faction vendor now shifts standing — buildTraderEnemy carries the vendor's
+//     faction (the kill→standing path was gated on a factionId trader enemies never set).
+//  7. World-sim faction drift is frozen during the tutorial (it ran on currentScreen
+//     'exploration', which the realtime + tide guards missed, drifting standings in the intro).
+//  8. One off-hand weapon no longer shows in BOTH hand slots (an off-hand attack was promoting
+//     the weapon into the main slot; the single item then read as main=X off=X).
+//  9. Parser respects an explicit trailing ordinal ("raider 3" no longer resolves to raider 2);
+//     duplicate "Legacy of Power (surge) fades." line deduped; CAUGHT-theft roll label fixed
+//     (logged "+ DEX" but rolls Stealth).
+export const OTA_BUILD_ID = '2026-07-19-879-playtest-bugfix-sweep';
