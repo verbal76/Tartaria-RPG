@@ -171,6 +171,15 @@ function shortWeaponLabel(name: string): string {
 
 export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenPickpocket, pickpocketBlocked, onOpenMissions, onOpenSalvage, onOpenTake, onOpenClimb, onOpenTorch, hasTorch, torchReady, torchLabel, onFuse, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, equippedMainCoating, equippedOffCoating, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, climbBlockedReason }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
+  // arb-fix (OTA — adaptive quick row) — the out-of-combat quick row shows the
+  // world-interaction verbs (look / rest / investigate / take / salvage / climb /
+  // ability) always, and tucks the menus + rarer actions (pickpocket / craft /
+  // inventory / missions / torch / fuse) behind a MORE ▾ tray so the bottom of
+  // the screen isn't a wall of buttons. Nothing is hidden — MORE is always there
+  // — so discoverability holds and the layout doesn't jump as you move. During
+  // the tutorial the tray is forced open so every beat can still point at its
+  // control.
+  const [moreOpen, setMoreOpen] = useState(false);
   // arb110 — combat bandolier popup. Resolve the racked throwable ids to live
   // inventory rows (qty > 0); tapping one hurls it via throwFromBandolier.
   const [bandolierOpen, setBandolierOpen] = useState(false);
@@ -593,7 +602,6 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               tone={investigateTone}
               blocked={investigateBlocked}
             />
-            <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} />
             <QuickBtn
               label="take"
               onPress={takeOverride ?? onOpenTake}
@@ -621,17 +629,28 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="climb down" onPress={onClimbDown} defensive />
               </>
             )}
-            <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
-            <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
-            <QuickBtn label="all missions" tone="amber" onPress={onOpenMissions} blocked={tutLock} />
-            {hasTorch && (
-              <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
+            {/* MORE ▾ tray toggle — reveals the menus + rarer actions. Hidden
+                during the tutorial, where the tray is force-shown so the beats
+                can point at every control. */}
+            {!tutLock && (
+              <QuickBtn label={moreOpen ? 'less ▴' : 'more ▾'} onPress={() => setMoreOpen((v) => !v)} />
             )}
-            {/* OTA-788 — no TRADE button: stepping into a stall opens its wares
-                (and tapping the stall tab you're in re-opens them). FUSE stays —
-                the free Crucible has no other in-market affordance. */}
-            {activeBuildingId === 'market' && onFuse && (
-              <QuickBtn label="fuse" onPress={onFuse} blocked={tutLock} />
+            {(moreOpen || tutLock) && (
+              <>
+                <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} />
+                <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
+                <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
+                <QuickBtn label="all missions" tone="amber" onPress={onOpenMissions} blocked={tutLock} />
+                {hasTorch && (
+                  <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
+                )}
+                {/* OTA-788 — no TRADE button: stepping into a stall opens its wares
+                    (and tapping the stall tab you're in re-opens them). FUSE stays —
+                    the free Crucible has no other in-market affordance. */}
+                {activeBuildingId === 'market' && onFuse && (
+                  <QuickBtn label="fuse" onPress={onFuse} blocked={tutLock} />
+                )}
+              </>
             )}
           </>
         )}

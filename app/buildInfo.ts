@@ -17896,4 +17896,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // canonicalDistanceFromGrid(gridX/gridY, targetLocationId). The Primary Objective box is engine's
 // own lore-agnostic STORYLINE model (not HAL's 9-Capital tracker), so the capital-list distance
 // sort in the box doesn't apply here — that part of the HAL change was intentionally not ported.
-export const OTA_BUILD_ID = '2026-07-19-1160-mission-distance-sort';
+// 2026-07-19 OTA-1161 — adaptive quick-action row / MORE ▾ tray (port of HAL OTA-884). The
+// out-of-combat quick row keeps the world-interaction verbs (look / rest / ✦ ability / investigate /
+// take / salvage / climb) always visible and tucks the menus + rarer actions (pickpocket / craft /
+// inventory / all missions / torch / fuse) behind a single MORE ▾ / less ▴ toggle so the bottom of
+// the screen is no longer a wall of buttons. Nothing is removed; during the tutorial the tray is
+// force-open so each beat can still point at its control. Engine keeps its amber "all missions"
+// label inside the tray. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-1161-adaptive-quick-row';
