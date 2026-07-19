@@ -16297,4 +16297,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inventory / missions / torch / fuse) behind a single MORE ▾ / less ▴ toggle so the bottom of the
 // screen is no longer a wall of buttons. Nothing is removed; during the tutorial the tray is
 // force-open so each beat can still point at its control. UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-863-adaptive-quick-row';
+// 2026-07-19 OTA-864 — indoor 'room to room' leads no longer leak onto the open road (port of HAL
+// OTA-885). Mid-journey the departure scene (often a hub room) isn't rebuilt until arrival, so
+// player.hubRoomId / activeBuildingId linger and indoorsForOutdoorHooks read them as 'indoors'.
+// readsIndoorsForHooks now treats an active travel course (travelTarget pointing elsewhere, or any
+// whisperCourse) as ON THE ROAD and never indoors. Genuine interiors still plant interior leads.
+// JS-only; ships over-the-air. Covered by indoorHooksTravel.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-864-indoor-leads-on-road';

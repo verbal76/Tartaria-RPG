@@ -423,9 +423,41 @@ function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
  *  The wandering-lead hooks (HOOK_PLANTS) are all OUTDOOR sightings — smoke in
  *  the distance, a giant on the ridge, a submerged steeple — so none of them may
  *  be planted here. Investigating a candle in a house must not surface "a figure
- *  too tall to be human watches you from the far ridge" (the player's report). */
+ *  too tall to be human watches you from the far ridge" (the player's report).
+ *
+ *  Pure predicate (exported for tests). */
+export function readsIndoorsForHooks(p: {
+  hubRoomId?: string | null;
+  activeBuildingId?: string | null;
+  travelTarget?: { locationId: string } | null;
+  whisperCourse?: { label: string } | null;
+  currentLocationId?: string;
+} | null | undefined): boolean {
+  if (!p) return false;
+  // #1 fix (indoor prompts on the open road) — mid-journey the player is
+  // conceptually walking cross-country, but the departure scene (often a hub
+  // room) isn't rebuilt until arrival, so hubRoomId / activeBuildingId linger
+  // and the wandering / look-around narration kept emitting interior "you move
+  // from room to room" leads out in the open. If a travel course is active —
+  // an overland travelTarget pointing at a DIFFERENT location, or any whisper
+  // course — the player is ON THE ROAD: never read as indoors. (Mirrors the
+  // `onRoute` signal used elsewhere in the store.)
+  const onRoad =
+    (!!p.travelTarget && p.travelTarget.locationId !== p.currentLocationId) ||
+    !!p.whisperCourse;
+  if (onRoad) return false;
+  return !!p.hubRoomId || !!p.activeBuildingId;
+}
+
 function indoorsForOutdoorHooks(get: () => GameStore): boolean {
-  return !!get().player?.hubRoomId || !!get().activeBuildingId;
+  const s = get();
+  return readsIndoorsForHooks({
+    hubRoomId: s.player?.hubRoomId,
+    activeBuildingId: s.activeBuildingId,
+    travelTarget: s.player?.travelTarget ?? null,
+    whisperCourse: s.player?.whisperCourse ?? null,
+    currentLocationId: s.player?.currentLocationId,
+  });
 }
 
 /** arb36 — "you stumble on a structure" line for an enterable building
