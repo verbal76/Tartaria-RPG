@@ -1,0 +1,17 @@
+// CI SOURCE typecheck config. Extends the base tsconfig but scopes the check to
+// SHIPPED SOURCE (app/ + expo scaffolding) and EXCLUDES __tests__. The app source
+// is strict-clean (0 errors); the test fixtures carry pre-existing shape-drift that
+// is ratcheted separately (scripts/ci-typecheck-tests.mjs) so it can only shrink,
+// never grow. This is what the CI "typecheck (source)" job runs — a hard, green gate
+// that catches any regression in the code that actually ships to players.
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "App.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": ["node_modules", "__tests__", "**/*.test.ts", "**/*.test.tsx"]
+}
