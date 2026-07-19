@@ -629,6 +629,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="climb down" onPress={onClimbDown} defensive />
               </>
             )}
+            {/* USE TORCH stays a PRIMARY action — it's a situational world verb (it
+                only appears when you're carrying a torch), so it doesn't belong behind
+                MORE. Player ask: "use aetheric torch should not be under the more button." */}
+            {hasTorch && (
+              <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
+            )}
             {/* MORE ▾ tray toggle — reveals the menus + rarer actions. Hidden
                 during the tutorial, where the tray is force-shown so the beats
                 can point at every control. */}
@@ -641,9 +647,6 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
                 <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
                 <QuickBtn label="all missions" tone="amber" onPress={onOpenMissions} blocked={tutLock} />
-                {hasTorch && (
-                  <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
-                )}
                 {/* OTA-788 — no TRADE button: stepping into a stall opens its wares
                     (and tapping the stall tab you're in re-opens them). FUSE stays —
                     the free Crucible has no other in-market affordance. */}
