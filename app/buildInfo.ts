@@ -17088,4 +17088,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // one-line acknowledgement ("You leave the Hollow Edge where it fell — the same locked grip as
 // before…") so the player still knows it stays behind without re-reading the lore. Tracked per scene
 // (cleared on a fresh scene). JS-only; ships over-the-air. Covered by signatureWeaponDedup.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-891-signature-weapon-dedup';
+//
+// OTA-892 (USE TORCH back in the primary quick row) — follow-up to OTA-884's MORE ▾ tray. Player
+// ask: "use aetheric torch should not be under the more button." USE TORCH is a situational world
+// verb — it only appears while you're carrying a torch — so it now sits in the always-visible primary
+// row (just before the MORE toggle) instead of inside the tray. The menus + rarer actions
+// (pickpocket / craft / inventory / missions / fuse) stay behind MORE. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-892-torch-primary-button';
