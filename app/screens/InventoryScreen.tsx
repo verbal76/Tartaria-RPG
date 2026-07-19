@@ -624,14 +624,43 @@ export function InventoryScreen() {
       return fx?.kind === 'consumable' ? (fx.healHP ?? 0) : 0;
     })() : 0;
     const stackQty = pending.item.quantity;
-    // Self "Use Max": the most that fit under your max HP without overhealing.
+    // Self batch-heal. Two offers:
+    //   • "Heal to full" (OTA — player ask: "the first aid kit doesn't have a heal
+    //     max option"). Uses ceil(gap / perItem) kits — the fewest that reach max HP,
+    //     accepting a little overheal-waste on the LAST kit. A single "Use" already
+    //     tops you off when the gap is smaller than one kit, so this only surfaces
+    //     when it takes 2+ kits to reach full (i.e. a real one-tap saver), and only
+    //     when the pack actually holds enough to get there.
+    //   • "Use Max (no waste)" — the most that fit UNDER max with zero waste
+    //     (floor). Kept as a secondary, de-emphasised option, and only shown when
+    //     it's a genuinely different, smaller count than the top-off (the gap isn't
+    //     an exact multiple of the per-kit heal).
     if (isConsumable && perItemHP > 0 && player && player.hp < player.hpMax) {
-      const n = healBatchCount(perItemHP, player.hpMax - player.hp, stackQty);
-      if (n >= 2) {
-        const to = Math.min(player.hpMax, player.hp + perItemHP * n);
+      const hpGap = player.hpMax - player.hp;
+      const toFull = Math.min(stackQty, Math.ceil(hpGap / perItemHP));
+      const noWaste = healBatchCount(perItemHP, hpGap, stackQty);
+      const reachesFull = perItemHP * toFull >= hpGap;
+      if (toFull >= 2 && reachesFull) {
         buttons.push({
-          label: `Use Max ×${n} → ${to}/${player.hpMax} (no waste)`,
-          onPress: () => { useHealBatch(pending.item.name, 'self', n); closeModal(); },
+          label: `Heal to full ×${toFull} → ${player.hpMax}/${player.hpMax}`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', toFull); closeModal(); },
+          tone: 'primary',
+        });
+        if (noWaste >= 2 && noWaste < toFull) {
+          const to = player.hp + perItemHP * noWaste;
+          buttons.push({
+            label: `Use Max ×${noWaste} → ${to}/${player.hpMax} (no waste)`,
+            onPress: () => { useHealBatch(pending.item.name, 'self', noWaste); closeModal(); },
+            tone: 'neutral',
+          });
+        }
+      } else if (noWaste >= 2) {
+        // Can't reach full (not enough kits, or one kit already tops you off) —
+        // fall back to the original no-waste bulk-use offer.
+        const to = Math.min(player.hpMax, player.hp + perItemHP * noWaste);
+        buttons.push({
+          label: `Use Max ×${noWaste} → ${to}/${player.hpMax} (no waste)`,
+          onPress: () => { useHealBatch(pending.item.name, 'self', noWaste); closeModal(); },
           tone: 'primary',
         });
       }

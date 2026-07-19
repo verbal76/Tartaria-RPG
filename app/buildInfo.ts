@@ -17053,4 +17053,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 9px, wide-tracked font — playtest: too long and too small to read mid-fight. Shortened to "swipe
 // to aim · tap for info" and bumped to a larger, tighter, slightly brighter font (fontSize 9 → 12,
 // letterSpacing 1 → 0.3). UI-only; ships over-the-air.
-export const OTA_BUILD_ID = '2026-07-19-887-enemy-hint-legible';
+//
+// OTA-888 (First Aid Kit "Heal to full" option) — playtest: "the first aid kit doesn't have a heal
+// max option." The inventory batch-heal only offered "Use Max (no waste)" = floor(gap / perKit),
+// which stops SHORT of full whenever the missing HP isn't an exact multiple of the per-kit heal
+// (First Aid Kit = 25), so there was no single tap to the top. Added a primary "Heal to full ×N →
+// max/max" button using ceil(gap / perKit) kits (capped at the stack) — the fewest that reach max,
+// the last kit's surplus clamped at hpMax by useHealBatch. It shows only when it takes 2+ kits and
+// the pack holds enough; "Use Max (no waste)" stays as a de-emphasised secondary when it's a
+// smaller count. JS-only; ships over-the-air. Covered by healBatch.test.ts.
+export const OTA_BUILD_ID = '2026-07-19-888-heal-to-full';
