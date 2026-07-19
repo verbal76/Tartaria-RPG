@@ -16346,4 +16346,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ("the The …") via theLower() across 6 quest sites + broker + echo, "burn flares"/"poison sets in"
 // capitalization, plural singular-branches ("1 turns"/"1 stacks"/boosts), and "+0 rep" suppression.
 // JS/data-only; ships over-the-air. Covered by attackOpenerWeapon + grammar tests.
-export const OTA_BUILD_ID = '2026-07-19-872-narration-audit-sweep';
+// 2026-07-19 OTA-873 (SA-2) — reconcile 'Aether' vs 'Etheric' in player-facing prose (port of HAL
+// OTA-894). The central magic term shipped in two spellings, mixed even inside one faction entry;
+// canonicalised to AETHER across all prose (faction/race flavor, lore/glossary/concepts, hazard +
+// weather names, quest narration, location flavor, arbiter titles, engine prose literals incl. the
+// 'Aetherbound Survivor' title). Field-aware: ids/keys/tags untouched (etheric_storm_burst,
+// etherbound_survivor), 'ethereal' untouched, catalog item names deliberately deferred to a
+// save-migration pass. Data/string-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-873-aether-prose-reconcile';

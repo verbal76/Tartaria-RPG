@@ -3,7 +3,7 @@
     {
       "id": "mystery_red_tower",
       "title": "Fragment of the Red Tower",
-      "posterText": "A Forgotten Order scholar will pay handsomely for a confirmed Fragment of the Red Tower — the cursed Etheric core's outer casing, never recovered intact. 400 TC.",
+      "posterText": "A Forgotten Order scholar will pay handsomely for a confirmed Fragment of the Red Tower — the cursed Aetheric core's outer casing, never recovered intact. 400 TC.",
       "trophyName": "Fragment of the Red Tower",
       "minRep": 0,
       "factionId": "forgotten_order",
@@ -17,7 +17,7 @@
           "checkKind": null
         },
         {
-          "narration": "You think back through old salvage notes. Nimari, Red Tower, Etheric core. Reclaimers say the fragments roll downhill — anywhere mud collects, eventually one ends up. Mudstone-rich ground is the place to look.",
+          "narration": "You think back through old salvage notes. Nimari, Red Tower, Aetheric core. Reclaimers say the fragments roll downhill — anywhere mud collects, eventually one ends up. Mudstone-rich ground is the place to look.",
           "arbiter": "\"You know the where,\" the Arbiter says. \"Now do the work.\"",
           "checkKind": "investigate"
         },
@@ -64,7 +64,7 @@
     {
       "id": "mystery_leviathan_eye",
       "title": "The Leviathan's Eye",
-      "posterText": "True Tartarian agents will pay 500 TC and faith-favor for the preserved eye of a Mud Seas Leviathan — said to see through Etheric storms.",
+      "posterText": "True Tartarian agents will pay 500 TC and faith-favor for the preserved eye of a Mud Seas Leviathan — said to see through Aetheric storms.",
       "trophyName": "Preserved Leviathan Eye",
       "minRep": 5,
       "factionId": "true_tartarians",
@@ -106,7 +106,7 @@
       "rewardRep": 10,
       "stages": [
         {
-          "narration": "The Speaker spreads the contract. \"Watch — Tartarian make, hexagonal face, three dials. Counts the way the local Etheric time bends. Reclaimers used to wear them. Find a working one.\"",
+          "narration": "The Speaker spreads the contract. \"Watch — Tartarian make, hexagonal face, three dials. Counts the way the local Aetheric time bends. Reclaimers used to wear them. Find a working one.\"",
           "arbiter": null,
           "checkKind": null
         },
@@ -201,7 +201,7 @@
     {
       "id": "mystery_weeping_core",
       "title": "The Weeping Core",
-      "posterText": "A Forgotten Order savant seeks a \"Weeping Core\" — an Etheric core that leaks a slow tear of live Aether, thought lost in the Buried Cities. 500 TC.",
+      "posterText": "A Forgotten Order savant seeks a \"Weeping Core\" — an Aetheric core that leaks a slow tear of live Aether, thought lost in the Buried Cities. 500 TC.",
       "trophyName": "Weeping Core",
       "minRep": 0,
       "factionId": "forgotten_order",
@@ -375,7 +375,7 @@
       "rewardRep": 11,
       "stages": [
         {
-          "narration": "The Revivalist cell-leader is hungry-eyed. \"The Tartarians wrote down how the Flood began — a cipher-plate, buried at the Etheric Chamber's threshold. Sasha wants it read. It is a warning. A warning is only a set of instructions read backward.\"",
+          "narration": "The Revivalist cell-leader is hungry-eyed. \"The Tartarians wrote down how the Flood began — a cipher-plate, buried at the Aetheric Chamber's threshold. Sasha wants it read. It is a warning. A warning is only a set of instructions read backward.\"",
           "arbiter": "\"They want the recipe for the end of the world,\" the Arbiter says. \"To prevent it, they will tell you. To repeat it, they will not. Watch which.\"",
           "checkKind": null
         },

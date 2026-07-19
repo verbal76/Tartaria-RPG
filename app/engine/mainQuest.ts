@@ -332,7 +332,7 @@ const CAPITAL_ARRIVAL_SIGNATURES: Record<string, string> = {
   asgardar:
     'Asgardar announces itself before you crest the rise: the Grand Spire of Etheria, snapped a third of the way up, still hums a single sub-audible note that you feel in your teeth more than hear. Aether-light crawls the old channel-grooves like slow lightning that forgot how to strike.',
   samarran:
-    'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Etheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
+    'Samarran is all broken glass and cold arithmetic. Thametan\'s Tower leans over a plaza of shattered lenses, and the dead Aetheric Engine at its heart still ticks — one wrong, patient click every few seconds, like a clock counting down to something that already happened.',
   nimari:
     'Half of Nimari is under the silt; the half that isn\'t is red. The Red Tower throws a long rust-coloured shadow across drowned streets, and somewhere inside it a working Aetheric core pulses warm enough that the mud around your boots steams faintly.',
   drakova:

@@ -426,7 +426,7 @@
     {
       "id": "story_revivalist_sashas_gambit",
       "title": "Sasha's Gambit",
-      "posterText": "Sasha Ironheart of the Revivalists wants a core-line at the Etheric Chamber brought back to life — and she needs a blade willing to risk a Second Flood to do it. 2000 TC and standing.",
+      "posterText": "Sasha Ironheart of the Revivalists wants a core-line at the Aetheric Chamber brought back to life — and she needs a blade willing to risk a Second Flood to do it. 2000 TC and standing.",
       "factionId": "tartarian_revivalists",
       "minRep": 6,
       "rewardTc": 2000,
@@ -435,12 +435,12 @@
       "stages": [
         {
           "checkKind": null,
-          "narration": "Sasha Ironheart does not soften it. \"Every other faction tinkers at the edges. I mean to switch Tartaria back on. One core-line at the Etheric Chamber, reactivated. Yes, it could flood the world again. Doing nothing floods it slower. Are you a blade or a bystander?\"",
+          "narration": "Sasha Ironheart does not soften it. \"Every other faction tinkers at the edges. I mean to switch Tartaria back on. One core-line at the Aetheric Chamber, reactivated. Yes, it could flood the world again. Doing nothing floods it slower. Are you a blade or a bystander?\"",
           "arbiter": "\"She is the only one honest enough to name the risk,\" the Arbiter says. \"That does not make her right. It makes her dangerous with the lights on. Decide how far you will follow.\""
         },
         {
           "checkKind": "investigate",
-          "narration": "You survey the Etheric Chamber's dead core-line. Three of Sasha's cells got here first and left notes in the dust — one warns the line will overload, one says it will hold, one is simply a name and a date. The cells share a goal and not a method, and it shows.",
+          "narration": "You survey the Aetheric Chamber's dead core-line. Three of Sasha's cells got here first and left notes in the dust — one warns the line will overload, one says it will hold, one is simply a name and a date. The cells share a goal and not a method, and it shows.",
           "arbiter": null
         },
         {
