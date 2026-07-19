@@ -17871,4 +17871,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the title re-award-loop ledger — the engine already fixes that via recordTitleProgress
 // skipAward (storm award deferred to the pre-snapshot catch-all); and the off-hand dual-wield
 // display already had the engine's currentOff guard (kept, plus the id-based check).
-export const OTA_BUILD_ID = '2026-07-19-1156-playtest-bugfix-sweep';
+// 2026-07-19 OTA-1157 — anchor vendor faction follows the host outpost (port of HAL OTA-880,
+// follow-up to the sweep's vendor-kill fix). The armory anchor is re-skinned into every faction's
+// outpost but its vendor template hard-codes a fixed faction; when it spawns as the home-hub
+// anchor the scene now re-points it to the HOST faction (player.factionId), so pricing, buy-rep,
+// theft, and kill-standing attribute to the faction whose outpost it actually is.
+export const OTA_BUILD_ID = '2026-07-19-1157-anchor-vendor-host-faction';
