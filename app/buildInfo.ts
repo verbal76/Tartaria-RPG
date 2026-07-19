@@ -16333,4 +16333,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // paragraph on every enforcer left in a scene. Now the full reason shows the first time in a scene;
 // later leaves of the same weapon get a one-line acknowledgement. JS-only; ships over-the-air.
 // Covered by signatureWeaponDedup.test.ts.
-export const OTA_BUILD_ID = '2026-07-19-870-signature-weapon-dedup';
+// 2026-07-19 OTA-871 — USE TORCH back in the primary quick row (port of HAL OTA-892). Player ask:
+// "use aetheric torch should not be under the more button." USE TORCH only appears while carrying a
+// torch, so it moved out of the MORE ▾ tray into the always-visible primary row (before the MORE
+// toggle); the menus + rarer actions stay behind MORE. UI-only; ships over-the-air.
+export const OTA_BUILD_ID = '2026-07-19-871-torch-primary-button';
